@@ -11,8 +11,14 @@ class PostStorage implements EntityStorage {
     function save($data, $restriction) {
         $filename = $this->getFilename($data, $restriction);
         $oldSerializedPost = "";
-        if (file_exists($filename))
+        $isExistingPost = file_exists($filename);
+
+        if(!$this->shouldBeSaved($isExistingPost, $data, $restriction))
+            return;
+
+        if ($isExistingPost) {
             $oldSerializedPost = file_get_contents($filename);
+        }
 
         $post = $this->deserializePost($oldSerializedPost);
         $post = array_merge($post, $data);
@@ -21,6 +27,22 @@ class PostStorage implements EntityStorage {
 
     function delete($restriction) {
         // TODO: Implement delete() method.
+    }
+
+    /**
+     * @param $isExistingPost bool
+     * @param $data array
+     * @param $restriction array
+     * @return bool
+     */
+    private function shouldBeSaved($isExistingPost, $data, $restriction) {
+        if(isset($data['post_type']) && $data['post_type'] === 'revision')
+            return false;
+
+        if (!$isExistingPost && count($restriction) > 0) // update of non-existing post (probably revision)
+            return false;
+
+        return true;
     }
 
     private function getFilename($data, $restriction) {
