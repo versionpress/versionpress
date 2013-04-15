@@ -7,10 +7,16 @@ class EntityStorageFactory {
      */
     private $storageDir;
 
-    private $storageClasses;
+    /**
+     * @var string
+     */
+    private $tablePrefix;
 
-    function __construct($storageDir) {
+    private $storageClasses = array();
+
+    function __construct($storageDir, $tablePrefix) {
         $this->storageDir = $storageDir;
+        $this->tablePrefix = $tablePrefix;
         $this->initStorageClasses();
     }
 
@@ -28,11 +34,13 @@ class EntityStorageFactory {
     }
 
     private function initStorageClasses() {
-        $this->storageClasses = array(
-            'wp_posts' => array(
-                'class' => 'PostStorage',
-                'directory' => $this->storageDir . '/posts'
-            )
+        $this->addStorageClassInfo('posts', 'PostStorage', '/posts');
+    }
+
+    private function addStorageClassInfo($entityName, $className, $storageDirectory){
+        $this->storageClasses[$this->tablePrefix . $entityName] = array(
+            'class' => $className,
+            'directory' => $this->storageDir . $storageDirectory
         );
     }
 
