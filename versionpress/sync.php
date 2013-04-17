@@ -4,6 +4,18 @@ require_once(dirname(__FILE__) . '/../../wp-load.php');
 
 global $table_prefix;
 
+function prepareTableForVersionPressIdentifier($tableName) {
+    global $wpdb;
+    $sql = "ALTER TABLE $tableName ADD vp_id bigint(20) unsigned NOT NULL, ADD vp_parent_id bigint(20) unsigned NOT NULL;";
+    $wpdb->query($sql);
+}
+
+function createIndexOnVersionPressIndentifier($tableName) {
+    global $wpdb;
+    $sql = "ALTER TABLE $tableName ADD UNIQUE vp_id (vp_id);";
+    $wpdb->query($sql);
+}
+
 function createVersionPressIdentifiers($tableName) {
     global $wpdb;
     $rows = $wpdb->get_results("SELECT * FROM $tableName");
@@ -34,5 +46,8 @@ function createVersionPressIdentifiers($tableName) {
     }
 }
 
+$postsTableName = $table_prefix . 'posts';
 
-createVersionPressIdentifiers($table_prefix . 'posts');
+prepareTableForVersionPressIdentifier($postsTableName);
+createVersionPressIdentifiers($postsTableName);
+createIndexOnVersionPressIndentifier($postsTableName);
