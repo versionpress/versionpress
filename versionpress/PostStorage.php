@@ -29,12 +29,12 @@ class PostStorage implements EntityStorage {
         // TODO: Implement delete() method.
     }
 
-    /**
-     * @param $isExistingPost bool
-     * @param $data array
-     * @param $restriction array
-     * @return bool
-     */
+    function loadAll() {
+        $postFiles = $this->getPostFiles();
+        $posts = $this->loadAllFromFiles($postFiles);
+        return $posts;
+    }
+
     private function shouldBeSaved($isExistingPost, $data, $restriction) {
         if(isset($data['post_type']) && $data['post_type'] === 'revision')
             return false;
@@ -56,5 +56,21 @@ class PostStorage implements EntityStorage {
 
     private function serializePost($post) {
         return IniSerializer::serialize($post);
+    }
+
+    private function getPostFiles() {
+        if(!is_dir($this->directory))
+            return array();
+        $excludeList = array('.', '..');
+        $files = scandir($this->directory);
+
+        return array_diff($files, $excludeList);
+    }
+
+    private function loadAllFromFiles($postFiles) {
+        $that = $this;
+        return array_map(function($postFile) use ($that){
+            return $that->deserializePost(file_get_contents($that->directory . '/' . $postFile));
+        }, $postFiles);
     }
 }
