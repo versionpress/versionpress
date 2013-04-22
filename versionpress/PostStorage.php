@@ -8,7 +8,7 @@ class PostStorage implements EntityStorage {
         $this->directory = $directory;
     }
 
-    function save($data, $restriction) {
+    function save($data, $restriction = array()) {
         $filename = $this->getFilename($data, $restriction);
         $oldSerializedPost = "";
         $isExistingPost = file_exists($filename);
@@ -26,7 +26,8 @@ class PostStorage implements EntityStorage {
     }
 
     function delete($restriction) {
-        // TODO: Implement delete() method.
+        $fileName = $this->getFilename(array(), $restriction);
+        unlink($fileName);
     }
 
     function loadAll() {
@@ -35,8 +36,17 @@ class PostStorage implements EntityStorage {
         return $posts;
     }
 
+    function saveAll($posts) {
+        foreach($posts as $post) {
+            $this->save($post);
+        }
+    }
+
     private function shouldBeSaved($isExistingPost, $data, $restriction) {
         if(isset($data['post_type']) && $data['post_type'] === 'revision')
+            return false;
+
+        if(isset($data['post_status']) && $data['post_status'] === 'auto-draft')
             return false;
 
         if (!$isExistingPost && count($restriction) > 0) // update of non-existing post (probably revision)
@@ -55,6 +65,7 @@ class PostStorage implements EntityStorage {
     }
 
     private function serializePost($post) {
+        $post = $this->removeUnwantedColumns($post);
         return IniSerializer::serialize($post);
     }
 
@@ -72,5 +83,14 @@ class PostStorage implements EntityStorage {
         return array_map(function($postFile) use ($that){
             return $that->deserializePost(file_get_contents($that->directory . '/' . $postFile));
         }, $postFiles);
+    }
+
+    private function removeUnwantedColumns($post) {
+        static $excludeList = array('comment_count');
+        foreach($excludeList as $excludeKey) {
+            unset($post[$excludeKey]);
+        }
+
+        return $post;
     }
 }
