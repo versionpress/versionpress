@@ -7,16 +7,10 @@ class EntityStorageFactory {
      */
     private $storageDir;
 
-    /**
-     * @var string
-     */
-    private $tablePrefix;
-
     private $storageClasses = array();
 
-    function __construct($storageDir, $tablePrefix) {
+    function __construct($storageDir) {
         $this->storageDir = $storageDir;
-        $this->tablePrefix = $tablePrefix;
         $this->initStorageClasses();
     }
 
@@ -38,7 +32,7 @@ class EntityStorageFactory {
     }
 
     private function addStorageClassInfo($entityName, $className, $storageDirectory){
-        $this->storageClasses[$this->tablePrefix . $entityName] = array(
+        $this->storageClasses[$entityName] = array(
             'class' => $className,
             'directory' => $this->storageDir . $storageDirectory
         );

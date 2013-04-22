@@ -16,7 +16,7 @@ class MirroringDatabase extends wpdb {
         $result = parent::insert($table, $data, $format);
         if(!isset($data['ID']))
             $data['ID'] = mysql_insert_id($this->dbh);
-        $this->mirror->save($table, $data);
+        $this->mirror->save($this->stripTablePrefix($table), $data);
         return $result;
     }
 
@@ -24,13 +24,18 @@ class MirroringDatabase extends wpdb {
         $result = parent::update($table, $data, $where, $format, $where_format);
         if(!isset($data['ID']))
             $data['ID'] = $where['ID'];
-        $this->mirror->save($table, $data, $where);
+        $this->mirror->save($this->stripTablePrefix($table), $data, $where);
         return $result;
     }
 
     function delete($table, $where, $where_format = null) {
         $result = parent::delete($table, $where, $where_format);
-        $this->mirror->delete($table, $where);
+        $this->mirror->delete($this->stripTablePrefix($table), $where);
         return $result;
+    }
+
+    private function stripTablePrefix($tableName) {
+        global $table_prefix;
+        return substr($tableName, strlen($table_prefix));
     }
 }
