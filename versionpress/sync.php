@@ -36,9 +36,12 @@ class PostSynchronizer {
         $postWithoutIDs = array_map(function($post){ unset($post['ID']); return $post; }, $posts);
 
         foreach ($postWithoutIDs as $post) {
-            $sql = $this->buildInsertWithUpdateFallbackQuery($this->tableName, $post);
+            $sql = $this->buildInsertWithUpdateFallbackQuery($post);
             $this->database->query($sql);
         }
+
+        $fixGuidsSql = "UPDATE {$this->tableName} SET guid = IF(LOCATE('=', guid)=0, guid, CONCAT(LEFT(guid, LOCATE('=', guid)), id))";
+        $this->database->query($fixGuidsSql);
 
         $postVpIds = array_map(function($post){ return $post['vp_id'];  }, $posts);
         $sql = "DELETE FROM {$this->tableName} WHERE vp_id NOT IN (" . implode(', ', $postVpIds) . ")";
@@ -50,7 +53,7 @@ class PostSynchronizer {
         return $posts;
     }
 
-    private function buildInsertWithUpdateFallbackQuery($table, $data) {
+    private function buildInsertWithUpdateFallbackQuery($data) {
         $columns = array_keys($data);
         $stringColumns = implode(', ', $columns);
         $safeValues = array_map(function($value){ return "\"$value\""; }, $data);
