@@ -13,7 +13,7 @@ class PostStorage implements EntityStorage {
         $oldSerializedPost = "";
         $isExistingPost = file_exists($filename);
 
-        if(!$this->shouldBeSaved($isExistingPost, $data, $restriction))
+        if(!$this->shouldBeSaved($isExistingPost, $data))
             return;
 
         if ($isExistingPost) {
@@ -42,14 +42,14 @@ class PostStorage implements EntityStorage {
         }
     }
 
-    private function shouldBeSaved($isExistingPost, $data, $restriction) {
+    private function shouldBeSaved($isExistingPost, $data) {
         if(isset($data['post_type']) && $data['post_type'] === 'revision')
             return false;
 
         if(isset($data['post_status']) && $data['post_status'] === 'auto-draft')
             return false;
 
-        if (!$isExistingPost && count($restriction) > 0) // update of non-existing post (probably revision)
+        if (!$isExistingPost && !isset($data['post_type']))
             return false;
 
         return true;
