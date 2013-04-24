@@ -4,7 +4,7 @@ require_once(dirname(__FILE__) . '/../../wp-load.php');
 
 
 function syncPosts() {
-    $posts = loadAllPosts();
+    $posts = loadAllPostsFromFiles();
     updatePostsInDatabase($posts);
     fixParentIds();
     mirrorDatabaseToFiles();
@@ -18,9 +18,13 @@ function updatePostsInDatabase($posts) {
         $sql = buildInsertWithUpdateFallbackQuery($table_prefix . 'posts', $post);
         $wpdb->query($sql);
     }
+
+    $postVpIds = array_map(function($post){ return $post['vp_id'];  }, $posts);
+    $sql = "DELETE FROM wp_posts WHERE vp_id NOT IN (" . implode(', ', $postVpIds) . ")";
+    $wpdb->query($sql);
 }
 
-function loadAllPosts() {
+function loadAllPostsFromFiles() {
     $postStorage = getPostStorage();
     $posts = $postStorage->loadAll();
     return $posts;
@@ -63,15 +67,27 @@ function fixParentIds() {
         if($post->post_parent != $newParent) {
             $updateSql = "UPDATE wp_posts SET post_parent = $newParent WHERE ID = $post->ID";
             $wpdb->query($updateSql);
-            dump($updateSql);
         }
     }
 }
 
 function mirrorDatabaseToFiles() {
-    $posts = loadAllPostsFromDatabase();
+    $postsInDatabase = loadAllPostsFromDatabase();
+    $postsInFiles = loadAllPostsFromFiles();
+
+    $getPostId = function($post){ return $post['ID']; };
+
+    $dbPostIds = array_map($getPostId, $postsInDatabase);
+    $filePostIds = array_map($getPostId, $postsInFiles);
+
+    $deletedPostIds =  array_diff($filePostIds, $dbPostIds);
     $postStorage = getPostStorage();
-    $postStorage->saveAll($posts);
+
+    foreach($deletedPostIds as $deletedPostId) {
+        $postStorage->delete(array('ID' => $deletedPostId));
+    }
+
+    $postStorage->saveAll($postsInDatabase);
 }
 
 function loadAllPostsFromDatabase() {
