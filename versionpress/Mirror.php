@@ -12,6 +12,11 @@ class Mirror {
      */
     private $storages = array();
 
+    /**
+     * @var bool
+     */
+    private $wasAffected;
+
     function __construct(EntityStorageFactory $storageFactory) {
         $this->storageFactory = $storageFactory;
     }
@@ -30,6 +35,10 @@ class Mirror {
         $storage->delete($restriction);
     }
 
+    public function wasAffected() {
+        return $this->wasAffected;
+    }
+
     /**
      * @param string $entityType
      * @return EntityStorage
@@ -43,6 +52,11 @@ class Mirror {
 
         if($storage != null) {
             $this->storages[$entityType] = $storage;
+
+            $that = $this;
+            $storage->addChangeListener(function() use ($that) {
+                $that->wasAffected = true;
+            });
         }
 
         return $storage;

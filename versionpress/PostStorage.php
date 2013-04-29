@@ -2,7 +2,15 @@
 
 class PostStorage implements EntityStorage {
 
+    /**
+     * @var string
+     */
     private $directory;
+
+    /**
+     * @var callable[]
+     */
+    private $onChangeListeners;
 
     function __construct($directory) {
         $this->directory = $directory;
@@ -13,7 +21,7 @@ class PostStorage implements EntityStorage {
         $oldSerializedPost = "";
         $isExistingPost = file_exists($filename);
 
-        if(!$this->shouldBeSaved($isExistingPost, $data))
+        if (!$this->shouldBeSaved($isExistingPost, $data))
             return;
 
         if ($isExistingPost) {
@@ -21,8 +29,11 @@ class PostStorage implements EntityStorage {
         }
 
         $post = $this->deserializePost($oldSerializedPost);
-        $post = array_merge($post, $data);
-        file_put_contents($filename, $this->serializePost($post));
+        if($post != $data) {
+            $post = array_merge($post, $data);
+            file_put_contents($filename, $this->serializePost($post));
+            $this->callOnChangeListeners();
+        }
     }
 
     function delete($restriction) {
@@ -37,16 +48,20 @@ class PostStorage implements EntityStorage {
     }
 
     function saveAll($posts) {
-        foreach($posts as $post) {
+        foreach ($posts as $post) {
             $this->save($post);
         }
     }
 
+    function addChangeListener($callback) {
+        $this->onChangeListeners[] = $callback;
+    }
+
     private function shouldBeSaved($isExistingPost, $data) {
-        if(isset($data['post_type']) && $data['post_type'] === 'revision')
+        if (isset($data['post_type']) && $data['post_type'] === 'revision')
             return false;
 
-        if(isset($data['post_status']) && $data['post_status'] === 'auto-draft')
+        if (isset($data['post_status']) && $data['post_status'] === 'auto-draft')
             return false;
 
         if (!$isExistingPost && !isset($data['post_type']))
@@ -70,7 +85,7 @@ class PostStorage implements EntityStorage {
     }
 
     private function getPostFiles() {
-        if(!is_dir($this->directory))
+        if (!is_dir($this->directory))
             return array();
         $excludeList = array('.', '..');
         $files = scandir($this->directory);
@@ -80,17 +95,23 @@ class PostStorage implements EntityStorage {
 
     private function loadAllFromFiles($postFiles) {
         $that = $this;
-        return array_map(function($postFile) use ($that){
+        return array_map(function ($postFile) use ($that) {
             return $that->deserializePost(file_get_contents($that->directory . '/' . $postFile));
         }, $postFiles);
     }
 
     private function removeUnwantedColumns($post) {
         static $excludeList = array('comment_count');
-        foreach($excludeList as $excludeKey) {
+        foreach ($excludeList as $excludeKey) {
             unset($post[$excludeKey]);
         }
 
         return $post;
+    }
+
+    private function callOnChangeListeners() {
+        foreach ($this->onChangeListeners as $onChangeListener) {
+            call_user_func($onChangeListener);
+        }
     }
 }

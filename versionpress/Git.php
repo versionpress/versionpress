@@ -9,17 +9,19 @@ abstract class Git {
     private static $RELPATH_TO_GIT_ROOT_COMMAND = "git rev-parse --show-cdup";
 
     static function commit($message, $directory = "") {
+        chdir(dirname(__FILE__));
         if ($directory === "" && self::$gitRoot === null) {
             self::detectGitRoot();
         }
         $directory = $directory === "" ? self::$gitRoot : $directory;
         $gitAddPath = $directory . "/" . "*";
 
-        self::runShellCommand(self::$ADD_AND_COMMIT_COMMAND, $gitAddPath, $message);
+        $result = self::runShellCommand(self::$ADD_AND_COMMIT_COMMAND, $gitAddPath, $message);
     }
 
     private static function detectGitRoot() {
         self::$gitRoot = trim(self::runShellCommand(self::$RELPATH_TO_GIT_ROOT_COMMAND), "/\n");
+        self::$gitRoot = self::$gitRoot === '' ? '.' : self::$gitRoot;
     }
 
     private static function runShellCommand($command, $args = '') {

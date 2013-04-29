@@ -5,4 +5,5 @@ interface EntityStorage {
     function delete($restriction);
     function loadAll();
     function saveAll($posts);
+    function addChangeListener($callback);
 }
