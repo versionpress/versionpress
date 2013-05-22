@@ -5,7 +5,7 @@ abstract class Git {
     private static $gitRoot = null;
 
     // Constants
-    private static $ADD_AND_COMMIT_COMMAND = "git add -u %s && git commit -m %s";
+    private static $ADD_AND_COMMIT_COMMAND = "git add -A %s && git commit -m %s";
     private static $RELPATH_TO_GIT_ROOT_COMMAND = "git rev-parse --show-cdup";
 
     static function commit($message, $directory = "") {
