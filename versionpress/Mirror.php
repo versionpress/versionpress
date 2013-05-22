@@ -1,7 +1,6 @@
 <?php
 
 class Mirror {
-
     /**
      * @var EntityStorageFactory
      */
@@ -17,20 +16,22 @@ class Mirror {
      */
     private $wasAffected;
 
+    private $changeList;
+
     function __construct(EntityStorageFactory $storageFactory) {
         $this->storageFactory = $storageFactory;
     }
 
     public function save($entityType, $data, $restriction = array()) {
         $storage = $this->getStorage($entityType);
-        if($storage == null)
+        if ($storage == null)
             return;
         $storage->save($data, $restriction);
     }
 
     public function delete($entityType, $restriction) {
         $storage = $this->getStorage($entityType);
-        if($storage == null)
+        if ($storage == null)
             return;
         $storage->delete($restriction);
     }
@@ -39,23 +40,28 @@ class Mirror {
         return $this->wasAffected;
     }
 
+    public function getChangeList() {
+        return $this->changeList;
+    }
+
     /**
      * @param string $entityType
      * @return EntityStorage
      */
     private function getStorage($entityType) {
-        if(isset($this->storages[$entityType])) {
+        if (isset($this->storages[$entityType])) {
             return $this->storages[$entityType];
         }
 
         $storage = $this->storageFactory->getStorage($entityType);
 
-        if($storage != null) {
+        if ($storage != null) {
             $this->storages[$entityType] = $storage;
 
             $that = $this;
-            $storage->addChangeListener(function() use ($that) {
+            $storage->addChangeListener(function (ChangeInfo $changeInfo) use ($that) {
                 $that->wasAffected = true;
+                $this->changeList[] = $changeInfo;
             });
         }
 

@@ -17,28 +17,13 @@ class PostStorage implements EntityStorage {
     }
 
     function save($data, $restriction = array()) {
-        $filename = $this->getFilename($data, $restriction);
-        $oldSerializedPost = "";
-        $isExistingPost = file_exists($filename);
-
-        if (!$this->shouldBeSaved($isExistingPost, $data))
-            return;
-
-        if ($isExistingPost) {
-            $oldSerializedPost = file_get_contents($filename);
-        }
-
-        $post = $this->deserializePost($oldSerializedPost);
-        if($post != $data) {
-            $post = array_merge($post, $data);
-            file_put_contents($filename, $this->serializePost($post));
-            $this->callOnChangeListeners();
-        }
+        $this->savePost($data, $restriction, array($this, 'notifyChangeListeners'));
     }
 
     function delete($restriction) {
         $fileName = $this->getFilename(array(), $restriction);
         unlink($fileName);
+        $this->notifyChangeListeners($restriction, 'delete');
     }
 
     function loadAll() {
@@ -49,7 +34,7 @@ class PostStorage implements EntityStorage {
 
     function saveAll($posts) {
         foreach ($posts as $post) {
-            $this->save($post);
+            $this->savePost($post);
         }
     }
 
@@ -109,9 +94,43 @@ class PostStorage implements EntityStorage {
         return $post;
     }
 
-    private function callOnChangeListeners() {
+    private function notifyChangeListeners($post, $changeType) {
+        $changeInfo = $this->createChangeInfo($post, $changeType);
+        $this->callOnChangeListeners($changeInfo);
+    }
+
+    private function createChangeInfo($post, $changeType) {
+        $changeInfo = new ChangeInfo();
+        $changeInfo->entityType = 'post';
+        $changeInfo->entityId = $post['ID'];
+        $changeInfo->type = $changeType;
+        return $changeInfo;
+    }
+
+    private function callOnChangeListeners(ChangeInfo $changeInfo) {
         foreach ($this->onChangeListeners as $onChangeListener) {
-            call_user_func($onChangeListener);
+            call_user_func($onChangeListener, $changeInfo);
+        }
+    }
+
+    private function savePost($data, $restriction = array(), $callback = null) {
+        $filename = $this->getFilename($data, $restriction);
+        $oldSerializedPost = "";
+        $isExistingPost = file_exists($filename);
+
+        if (!$this->shouldBeSaved($isExistingPost, $data))
+            return;
+
+        if ($isExistingPost) {
+            $oldSerializedPost = file_get_contents($filename);
+        }
+
+        $post = $this->deserializePost($oldSerializedPost);
+        if ($post != $data) {
+            $post = array_merge($post, $data);
+            file_put_contents($filename, $this->serializePost($post));
+            if(is_callable($callback))
+                $callback($post, $isExistingPost ? 'create' : 'edit');
         }
     }
 }
