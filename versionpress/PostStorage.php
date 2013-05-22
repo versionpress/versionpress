@@ -22,8 +22,10 @@ class PostStorage implements EntityStorage {
 
     function delete($restriction) {
         $fileName = $this->getFilename(array(), $restriction);
-        unlink($fileName);
-        $this->notifyChangeListeners($restriction, 'delete');
+        if(is_file($fileName)){
+            unlink($fileName);
+            $this->notifyChangeListeners($restriction, 'delete');
+        }
     }
 
     function loadAll() {
@@ -130,7 +132,7 @@ class PostStorage implements EntityStorage {
             $post = array_merge($post, $data);
             file_put_contents($filename, $this->serializePost($post));
             if(is_callable($callback))
-                $callback($post, $isExistingPost ? 'create' : 'edit');
+                $callback($post, $isExistingPost ? 'edit' : 'create');
         }
     }
 }
