@@ -29,6 +29,7 @@ class EntityStorageFactory {
 
     private function initStorageClasses() {
         $this->addStorageClassInfo('posts', 'PostStorage', '/posts');
+        $this->addStorageClassInfo('comments', 'CommentStorage', '/comments');
     }
 
     private function addStorageClassInfo($entityName, $className, $storageDirectory){

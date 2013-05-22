@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__) . '/EntityStorage.php');
+require_once(dirname(__FILE__) . '/DirectoryStorage.php');
 require_once(dirname(__FILE__) . '/EntityStorageFactory.php');
 require_once(dirname(__FILE__) . '/Mirror.php');
 require_once(dirname(__FILE__) . '/MirroringDatabase.php');
