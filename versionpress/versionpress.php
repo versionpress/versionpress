@@ -33,7 +33,7 @@ register_shutdown_function(function () use ($mirror, $buildCommitMessage) {
     if ($mirror->wasAffected()) {
         $changeList = $mirror->getChangeList();
 
-        $commitMessage = join("\n", array_map($buildCommitMessage, $changeList));
+        $commitMessage = join(". ", array_map($buildCommitMessage, $changeList));
 
         Git::commit($commitMessage, dirname(__FILE__) . '/db');
     }
