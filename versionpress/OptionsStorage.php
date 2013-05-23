@@ -91,6 +91,6 @@ class OptionsStorage extends ObservableStorage implements EntityStorage {
     }
 
     private function shouldBeSaved($optionName) {
-        return substr($optionName,0, 1) !== '_';
+        return substr($optionName,0, 1) !== '_' || $optionName === 'cron';
     }
 }
