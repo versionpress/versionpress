@@ -1,12 +1,14 @@
 <?php
 
 require_once(dirname(__FILE__) . '/EntityStorage.php');
+require_once(dirname(__FILE__) . '/ObservableStorage.php');
 require_once(dirname(__FILE__) . '/DirectoryStorage.php');
 require_once(dirname(__FILE__) . '/EntityStorageFactory.php');
 require_once(dirname(__FILE__) . '/Mirror.php');
 require_once(dirname(__FILE__) . '/MirroringDatabase.php');
 require_once(dirname(__FILE__) . '/PostStorage.php');
 require_once(dirname(__FILE__) . '/CommentStorage.php');
+require_once(dirname(__FILE__) . '/OptionsStorage.php');
 require_once(dirname(__FILE__) . '/IniSerializer.php');
 require_once(dirname(__FILE__) . '/Git.php');
 require_once(dirname(__FILE__) . '/ChangeInfo.php');
@@ -27,7 +29,7 @@ $buildCommitMessage = function (ChangeInfo $changeInfo) {
         'delete' => 'Deleted'
     );
 
-    return sprintf("%s %s with ID %d.", $verbs[$changeInfo->type], $changeInfo->entityType, $changeInfo->entityId);
+    return sprintf("%s %s with ID %s.", $verbs[$changeInfo->type], $changeInfo->entityType, $changeInfo->entityId);
 };
 
 

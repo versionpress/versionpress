@@ -1,15 +1,10 @@
 <?php
 
-abstract class DirectoryStorage implements EntityStorage {
+abstract class DirectoryStorage extends ObservableStorage implements EntityStorage {
     /**
      * @var string
      */
     private $directory;
-
-    /**
-     * @var callable[]
-     */
-    private $onChangeListeners;
 
     protected $entityTypeName;
 
@@ -52,10 +47,6 @@ abstract class DirectoryStorage implements EntityStorage {
         }
     }
 
-    function addChangeListener($callback) {
-        $this->onChangeListeners[] = $callback;
-    }
-
     protected function shouldBeSaved($isExistingEntity, $data) {
         return true;
     }
@@ -70,7 +61,7 @@ abstract class DirectoryStorage implements EntityStorage {
     }
 
     private function serializeEntity($entity) {
-        return IniSerializer::serialize($entity);
+        return IniSerializer::serializeFlatData($entity);
     }
 
     private function getEntityFiles() {
@@ -104,12 +95,6 @@ abstract class DirectoryStorage implements EntityStorage {
         $changeInfo->entityId = $entity[$this->idColumnName];
         $changeInfo->type = $changeType;
         return $changeInfo;
-    }
-
-    private function callOnChangeListeners(ChangeInfo $changeInfo) {
-        foreach ($this->onChangeListeners as $onChangeListener) {
-            call_user_func($onChangeListener, $changeInfo);
-        }
     }
 
     private function saveEntity($data, $restriction = array(), $callback = null) {
