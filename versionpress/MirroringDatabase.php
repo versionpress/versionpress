@@ -14,7 +14,7 @@ class MirroringDatabase extends wpdb {
 
     function insert($table, $data, $format = null) {
         $entityName = $this->stripTablePrefix($table);
-        if ($entityName == 'posts') {
+        if ($this->entityShouldHaveVersionPressId($entityName)) {
             $data = $this->extendDataWithVpIds($table, $data);
         }
         $result = parent::insert($table, $data, $format);
@@ -23,6 +23,10 @@ class MirroringDatabase extends wpdb {
     }
 
     function update($table, $data, $where, $format = null, $where_format = null) {
+        $entityName = $this->stripTablePrefix($table);
+        if ($this->entityShouldHaveVersionPressId($entityName)) {
+            $data = $this->extendDataWithVpIds($table, $data);
+        }
         $result = parent::update($table, $data, $where, $format, $where_format);
         $this->mirror->save($this->stripTablePrefix($table), $data, $where);
         return $result;
@@ -41,11 +45,15 @@ class MirroringDatabase extends wpdb {
 
     private function extendDataWithVpIds($tableName, $data) {
         $data['vp_id'] = hexdec(uniqid());
-        if (isset($data['post_parent'])) {
+        if (isset($data['post_parent']) && $data['post_parent'] != 0) {
             $post = $this->get_row('SELECT vp_id FROM $tableName WHERE ID = $data[post_parent]');
             $parentVpId = $post->vp_parent_id;
             $data['vp_parent_id'] = $parentVpId;
         }
         return $data;
+    }
+
+    private function entityShouldHaveVersionPressId($entityName) {
+        return $entityName == 'posts';
     }
 }

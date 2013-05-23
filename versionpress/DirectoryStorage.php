@@ -112,6 +112,8 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
         }
 
         $entity = $this->deserializeEntity($oldSerializedEntity);
+        if(isset($entity['vp_id']))
+            unset($data['vp_id']);
 
         $diffData = [];
         foreach($data as $key => $value) {
