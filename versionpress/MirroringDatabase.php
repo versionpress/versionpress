@@ -18,16 +18,12 @@ class MirroringDatabase extends wpdb {
             $data = $this->extendDataWithVpIds($table, $data);
         }
         $result = parent::insert($table, $data, $format);
-        if (!isset($data['ID']))
-            $data['ID'] = $this->insert_id;
-        $this->mirror->save($entityName, $data);
+        $this->mirror->save($entityName, $data, array(), $this->insert_id);
         return $result;
     }
 
     function update($table, $data, $where, $format = null, $where_format = null) {
         $result = parent::update($table, $data, $where, $format, $where_format);
-        if (!isset($data['ID']))
-            $data['ID'] = $where['ID'];
         $this->mirror->save($this->stripTablePrefix($table), $data, $where);
         return $result;
     }

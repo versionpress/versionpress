@@ -21,13 +21,20 @@ abstract class DirectoryStorage implements EntityStorage {
         $this->idColumnName = $idColumnName;
     }
 
-    function save($data, $restriction = array()) {
+    function save($data, $restriction = array(), $id = 0) {
+        if (!isset($data[$this->idColumnName])) {
+            if(isset($restriction[$this->idColumnName]))
+                $data[$this->idColumnName] = $restriction[$this->idColumnName];
+            else
+                $data[$this->idColumnName] = $id;
+        }
+
         $this->saveEntity($data, $restriction, array($this, 'notifyChangeListeners'));
     }
 
     function delete($restriction) {
         $fileName = $this->getFilename(array(), $restriction);
-        if(is_file($fileName)){
+        if (is_file($fileName)) {
             unlink($fileName);
             $this->notifyChangeListeners($restriction, 'delete');
         }
@@ -63,7 +70,6 @@ abstract class DirectoryStorage implements EntityStorage {
     }
 
     private function serializeEntity($entity) {
-        $entity = $this->removeUnwantedColumns($entity);
         return IniSerializer::serialize($entity);
     }
 
@@ -107,6 +113,8 @@ abstract class DirectoryStorage implements EntityStorage {
     }
 
     private function saveEntity($data, $restriction = array(), $callback = null) {
+        $data = $this->removeUnwantedColumns($data);
+
         $filename = $this->getFilename($data, $restriction);
         $oldSerializedEntity = "";
         $isExistingEntity = file_exists($filename);
@@ -119,10 +127,18 @@ abstract class DirectoryStorage implements EntityStorage {
         }
 
         $entity = $this->deserializeEntity($oldSerializedEntity);
-        if ($entity != $data) {
-            $entity = array_merge($entity, $data);
+
+        $diffData = [];
+        foreach($data as $key => $value) {
+            if(!isset($entity[$key]) || (isset($entity[$key]) && $entity[$key] != $value))
+                $diffData[$key] = $value;
+        }
+
+
+        if (count($diffData) > 0 && $entity != $diffData) {
+            $entity = array_merge($entity, $diffData);
             file_put_contents($filename, $this->serializeEntity($entity));
-            if(is_callable($callback))
+            if (is_callable($callback))
                 $callback($entity, $isExistingEntity ? 'edit' : 'create');
         }
     }

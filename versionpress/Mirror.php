@@ -22,11 +22,11 @@ class Mirror {
         $this->storageFactory = $storageFactory;
     }
 
-    public function save($entityType, $data, $restriction = array()) {
+    public function save($entityType, $data, $restriction = array(), $insertId) {
         $storage = $this->getStorage($entityType);
         if ($storage == null)
             return;
-        $storage->save($data, $restriction);
+        $storage->save($data, $restriction, $insertId);
     }
 
     public function delete($entityType, $restriction) {
