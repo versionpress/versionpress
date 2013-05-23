@@ -29,9 +29,13 @@ class IniSerializer {
             if (is_array($value))
                 $output = array_merge($output, self::serializeSection($key, $value, $level));
             else
-                $output[] = $indentation . $key . " = " . (is_numeric($value) ? $value : '"' . $value . '"');
+                $output[] = $indentation . $key . " = " . (is_numeric($value) ? $value : '"' . self::escapeDoubleQuotes($value) . '"');
         }
         return $output;
+    }
+
+    private static function escapeDoubleQuotes($str) {
+        return str_replace('"', '\"', $str);
     }
 
     static function deserialize($string) {

@@ -18,6 +18,11 @@ class OptionsStorage extends ObservableStorage implements EntityStorage {
 
     function delete($restriction) {
         $optionName = $restriction['option_name'];
+
+        if(!$this->shouldBeSaved($optionName))
+            return;
+
+        $this->loadOptions();
         unset($this->options[$optionName]);
         $this->saveOptions();
     }
@@ -34,9 +39,12 @@ class OptionsStorage extends ObservableStorage implements EntityStorage {
     }
 
     private function saveOption($data, $callback = null) {
-        $this->loadOptions();
         $optionName = $data['option_name'];
-        $isNewOption = isset($this->options[$optionName]);
+        if(!$this->shouldBeSaved($optionName))
+            return;
+
+        $this->loadOptions();
+        $isNewOption = !isset($this->options[$optionName]);
 
         if($isNewOption) {
             $this->options[$optionName] = array();
@@ -46,12 +54,11 @@ class OptionsStorage extends ObservableStorage implements EntityStorage {
         $this->updateOption($optionName, $data);
 
         if($this->options != $originalOptions) {
+            $this->saveOptions();
 
             if (is_callable($callback))
-                $callback($optionName, $isNewOption ? 'create' : 'edit');
+            $callback($optionName, $isNewOption);
         }
-
-        $this->saveOptions();
     }
 
     private function updateOption($optionName, $data) {
@@ -59,18 +66,18 @@ class OptionsStorage extends ObservableStorage implements EntityStorage {
         static $fieldsToUpdate = array('option_value', 'autoload');
 
         foreach($fieldsToUpdate as $field)
-            $this->options[$optionName] = isset($data[$field]) ? $data[$field] : $originalValues[$field];
+            $this->options[$optionName][$field] = isset($data[$field]) ? $data[$field] : $originalValues[$field];
     }
 
     private function loadOptions() {
         if (is_file($this->file))
-            $this->options = parse_ini_file($this->file);
+            $this->options = parse_ini_file($this->file, true);
         else
             $this->options = array();
     }
 
     private function saveOptions() {
-        $options = IniSerializer::serialize($this->options, true);
+        $options = IniSerializer::serialize($this->options);
         file_put_contents($this->file, $options);
     }
 
@@ -81,5 +88,9 @@ class OptionsStorage extends ObservableStorage implements EntityStorage {
         $changeInfo->type = $isNewOption ? 'create' : 'edit';
 
         $this->callOnChangeListeners($changeInfo);
+    }
+
+    private function shouldBeSaved($optionName) {
+        return substr($optionName,0, 1) !== '_';
     }
 }
