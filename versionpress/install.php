@@ -16,7 +16,7 @@ function createIndexOnVersionPressIndentifier($tableName) {
     $wpdb->query($sql);
 }
 
-function createVersionPressIdentifiers($tableName) {
+function createVersionPressIdentifiers($tableName, $idColumnName, $parentIdColumnName) {
     global $wpdb;
     $rows = $wpdb->get_results("SELECT * FROM $tableName");
     $uniqueIds = array();
@@ -28,8 +28,8 @@ function createVersionPressIdentifiers($tableName) {
     }
 
     foreach ($rows as $row) {
-        if ($row->post_parent != 0) {
-            $parentId = $uniqueIds[$row->post_parent];
+        if ($row->{$parentIdColumnName} != 0) {
+            $parentId = $uniqueIds[$row->{$parentIdColumnName}];
             $row->vp_parent_id = $parentId;
         }
     }
@@ -37,7 +37,9 @@ function createVersionPressIdentifiers($tableName) {
     $wpdb->query("FLUSH TABLES $tableName WITH READ LOCK;SET AUTOCOMMIT=0;START TRANSACTION;");
     $result = true;
     foreach ($rows as $row) {
-        $result &= (bool)$wpdb->update($tableName, ["vp_id" => $row->vp_id, "vp_parent_id" => $row->vp_parent_id], ["ID" => $row->ID]);
+        // hand-written sql command because of storage handle on $wpdb->update method
+        $updateSqlQuery = "UPDATE $tableName SET vp_id = {$row->vp_id}, vp_parent_id = {$row->vp_parent_id} WHERE $idColumnName = {$row->{$idColumnName}}";
+        $result &= (bool)$wpdb->query($updateSqlQuery);
     }
     if ($result == true) {
         $wpdb->query("COMMIT;UNLOCK TABLES;");
@@ -46,8 +48,8 @@ function createVersionPressIdentifiers($tableName) {
     }
 }
 
-$postsTableName = $table_prefix . 'posts';
+$postsTableName = $table_prefix . 'comments';
 
 prepareTableForVersionPressIdentifier($postsTableName);
-createVersionPressIdentifiers($postsTableName);
+createVersionPressIdentifiers($postsTableName, 'comment_ID', 'comment_parent');
 createIndexOnVersionPressIndentifier($postsTableName);
