@@ -8,6 +8,7 @@ require_once(dirname(__FILE__) . '/Mirror.php');
 require_once(dirname(__FILE__) . '/MirroringDatabase.php');
 require_once(dirname(__FILE__) . '/PostStorage.php');
 require_once(dirname(__FILE__) . '/CommentStorage.php');
+require_once(dirname(__FILE__) . '/SingleFileStorage.php');
 require_once(dirname(__FILE__) . '/OptionsStorage.php');
 require_once(dirname(__FILE__) . '/IniSerializer.php');
 require_once(dirname(__FILE__) . '/Git.php');
