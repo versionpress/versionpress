@@ -2,8 +2,8 @@
 
 class PostSynchronizer extends PostsAndCommentsBaseSynchronizer {
 
-    function __construct(EntityStorage $postStorage, wpdb $database, $tableName) {
-        parent::__construct($postStorage, $database, $tableName, 'ID');
+    function __construct(EntityStorage $storage, wpdb $database, $tableName) {
+        parent::__construct($storage, $database, $tableName, 'ID', 'post_parent');
     }
 
     protected function doAfterDatabaseUpdate() {

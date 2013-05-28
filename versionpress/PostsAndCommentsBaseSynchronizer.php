@@ -5,7 +5,7 @@ abstract class PostsAndCommentsBaseSynchronizer {
     /**
      * @var EntityStorage
      */
-    protected $postStorage;
+    protected $storage;
 
     /**
      * @var string
@@ -22,25 +22,31 @@ abstract class PostsAndCommentsBaseSynchronizer {
      */
     protected $idColumnName;
 
-    function __construct(EntityStorage $postStorage, wpdb $database, $tableName, $idColumnName) {
-        $this->postStorage = $postStorage;
+    /**
+     * @var string
+     */
+    protected $parentIdColumnName;
+
+    function __construct(EntityStorage $storage, wpdb $database, $tableName, $idColumnName, $parentIdColumnName) {
+        $this->storage = $storage;
         $this->database = $database;
         $this->tableName = $tableName;
         $this->idColumnName = $idColumnName;
+        $this->parentIdColumnName = $parentIdColumnName;
     }
 
-    function syncPosts() {
-        $this->updatePostsInDatabase();
+    function synchronize() {
+        $this->updateDatabase();
         $this->fixParentIds();
-        $this->mirrorDatabaseToFiles();
+        $this->mirrorDatabaseToStorage();
     }
 
     protected function doAfterDatabaseUpdate() {
 
     }
 
-    private function updatePostsInDatabase() {
-        $posts = $this->loadAllPostsFromFiles();
+    private function updateDatabase() {
+        $posts = $this->loadAllEntitiesFromStorage();
         $postWithoutIDs = array_map(function($post){ unset($post[$this->idColumnName]); return $post; }, $posts);
 
         foreach ($postWithoutIDs as $post) {
@@ -55,8 +61,8 @@ abstract class PostsAndCommentsBaseSynchronizer {
         $this->doAfterDatabaseUpdate();
     }
 
-    private function loadAllPostsFromFiles() {
-        $posts = $this->postStorage->loadAll();
+    private function loadAllEntitiesFromStorage() {
+        $posts = $this->storage->loadAll();
         return $posts;
     }
 
@@ -76,43 +82,43 @@ abstract class PostsAndCommentsBaseSynchronizer {
 
     private function fixParentIds() {
         $sql = "SELECT {$this->idColumnName}, post_parent, vp_id, vp_parent_id FROM {$this->tableName}";
-        $posts = $this->database->get_results($sql);
+        $entities = $this->database->get_results($sql);
         $vpId_ID_map = array();
-        foreach($posts as $post) {
-            $vpId_ID_map[$post->vp_id] = $post->{$this->idColumnName};
+        foreach($entities as $entity) {
+            $vpId_ID_map[$entity->vp_id] = $entity->{$this->idColumnName};
         }
 
-        foreach($posts as $post) {
+        foreach($entities as $entity) {
             $newParent = 0;
-            if($post->vp_parent_id != 0){
-                $newParent = $vpId_ID_map[$post->vp_parent_id];
+            if($entity->vp_parent_id != 0){
+                $newParent = $vpId_ID_map[$entity->vp_parent_id];
             }
-            if($post->post_parent != $newParent) {
-                $updateSql = "UPDATE {$this->tableName} SET post_parent = $newParent WHERE {$this->idColumnName} = " . $post->{$this->idColumnName};
+            if($entity->{$this->parentIdColumnName} != $newParent) {
+                $updateSql = "UPDATE {$this->tableName} SET {$this->parentIdColumnName} = $newParent WHERE {$this->idColumnName} = " . $entity->{$this->idColumnName};
                 $this->database->query($updateSql);
             }
         }
     }
 
-    private function mirrorDatabaseToFiles() {
-        $postsInDatabase = $this->loadAllPostsFromDatabase();
-        $postsInFiles = $this->loadAllPostsFromFiles();
+    private function mirrorDatabaseToStorage() {
+        $entitiesInDatabase = $this->loadAllEntitiesFromDatabase();
+        $entitiesInStorage = $this->loadAllEntitiesFromStorage();
 
-        $getPostId = function($post){ return $post[$this->idColumnName]; };
+        $getEntityId = function($entity){ return $entity[$this->idColumnName]; };
 
-        $dbPostIds = array_map($getPostId, $postsInDatabase);
-        $filePostIds = array_map($getPostId, $postsInFiles);
+        $dbEntityIds = array_map($getEntityId, $entitiesInDatabase);
+        $storageEntityIds = array_map($getEntityId, $entitiesInStorage);
 
-        $deletedPostIds =  array_diff($filePostIds, $dbPostIds);
+        $entitiesToDelete =  array_diff($storageEntityIds, $dbEntityIds);
 
-        foreach($deletedPostIds as $deletedPostId) {
-            $this->postStorage->delete(array($this->idColumnName => $deletedPostId));
+        foreach($entitiesToDelete as $entityId) {
+            $this->storage->delete(array($this->idColumnName => $entityId));
         }
 
-        $this->postStorage->saveAll($postsInDatabase);
+        $this->storage->saveAll($entitiesInDatabase);
     }
 
-    private function loadAllPostsFromDatabase() {
+    private function loadAllEntitiesFromDatabase() {
         $sql = "SELECT * FROM {$this->tableName}";
         return $this->database->get_results($sql, ARRAY_A);
     }
