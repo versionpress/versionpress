@@ -31,6 +31,7 @@ class EntityStorageFactory {
         $this->addStorageClassInfo('posts', 'PostStorage', '/posts');
         $this->addStorageClassInfo('comments', 'CommentStorage', '/comments');
         $this->addStorageClassInfo('options', 'OptionsStorage', '/options.ini');
+        $this->addStorageClassInfo('terms', 'TermsStorage', '/terms.ini');
     }
 
     private function addStorageClassInfo($entityName, $className, $storageDirectory){

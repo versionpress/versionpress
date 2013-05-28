@@ -10,6 +10,7 @@ require_once(dirname(__FILE__) . '/PostStorage.php');
 require_once(dirname(__FILE__) . '/CommentStorage.php');
 require_once(dirname(__FILE__) . '/SingleFileStorage.php');
 require_once(dirname(__FILE__) . '/OptionsStorage.php');
+require_once(dirname(__FILE__) . '/TermsStorage.php');
 require_once(dirname(__FILE__) . '/IniSerializer.php');
 require_once(dirname(__FILE__) . '/Git.php');
 require_once(dirname(__FILE__) . '/ChangeInfo.php');
