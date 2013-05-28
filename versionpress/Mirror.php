@@ -7,9 +7,9 @@ class Mirror {
     private $storageFactory;
 
     /**
-     * @var EntityStorage[]
+     * @var array
      */
-    private $storages = array();
+    private $registeredStorages = array();
 
     /**
      * @var bool
@@ -22,7 +22,7 @@ class Mirror {
         $this->storageFactory = $storageFactory;
     }
 
-    public function save($entityType, $data, $restriction = array(), $insertId) {
+    public function save($entityType, $data, $restriction = array(), $insertId = 0) {
         $storage = $this->getStorage($entityType);
         if ($storage == null)
             return;
@@ -49,14 +49,15 @@ class Mirror {
      * @return EntityStorage
      */
     private function getStorage($entityType) {
-        if (isset($this->storages[$entityType])) {
-            return $this->storages[$entityType];
-        }
 
         $storage = $this->storageFactory->getStorage($entityType);
+        if($storage == null)
+            return null;
 
-        if ($storage != null) {
-            $this->storages[$entityType] = $storage;
+        $object_hash = spl_object_hash($storage);
+
+        if ($storage != null && !isset($this->registeredStorages[$object_hash])) {
+            $this->registeredStorages[$object_hash] = true;
 
             $that = $this;
             $storage->addChangeListener(function (ChangeInfo $changeInfo) use ($that) {
