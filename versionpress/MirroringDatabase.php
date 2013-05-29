@@ -7,16 +7,27 @@ class MirroringDatabase extends wpdb {
      */
     private $mirror;
 
-    function __construct($dbUser, $dbPassword, $dbName, $dbHost, Mirror $mirror) {
+    /**
+     * @var DbSchemaInfo
+     */
+    private $dbSchemaInfo;
+
+    function __construct($dbUser, $dbPassword, $dbName, $dbHost, Mirror $mirror, DbSchemaInfo $dbSchemaInfo) {
         parent::__construct($dbUser, $dbPassword, $dbName, $dbHost);
         $this->mirror = $mirror;
+        $this->dbSchemaInfo = $dbSchemaInfo;
     }
 
     function insert($table, $data, $format = null) {
         $entityName = $this->stripTablePrefix($table);
-        if ($this->entityShouldHaveVersionPressId($entityName)) {
-            $data = $this->extendDataWithVpIds($table, $data);
+        if ($this->dbSchemaInfo->entityShouldHaveVersionPressId($entityName)) {
+            $data = $this->extendDataWithVpId($data);
         }
+
+        if ($this->dbSchemaInfo->isHierarchical($entityName)) {
+            $data = $this->extendDataWithVpParentId($entityName, $data);
+        }
+
         $result = parent::insert($table, $data, $format);
         $this->mirror->save($entityName, $data, array(), $this->insert_id);
         return $result;
@@ -24,9 +35,11 @@ class MirroringDatabase extends wpdb {
 
     function update($table, $data, $where, $format = null, $where_format = null) {
         $entityName = $this->stripTablePrefix($table);
-        if ($this->entityShouldHaveVersionPressId($entityName)) {
-            $data = $this->extendDataWithVpIds($table, $data);
+
+        if ($this->dbSchemaInfo->isHierarchical($entityName)) {
+            $data = $this->extendDataWithVpParentId($entityName, $data);
         }
+
         $result = parent::update($table, $data, $where, $format, $where_format);
         $this->mirror->save($this->stripTablePrefix($table), $data, $where);
         return $result;
@@ -43,17 +56,27 @@ class MirroringDatabase extends wpdb {
         return substr($tableName, strlen($table_prefix));
     }
 
-    private function extendDataWithVpIds($tableName, $data) {
+    private function extendDataWithVpId($data) {
         $data['vp_id'] = hexdec(uniqid());
-        if (isset($data['post_parent']) && $data['post_parent'] != 0) {
-            $post = $this->get_row('SELECT vp_id FROM $tableName WHERE ID = $data[post_parent]');
-            $parentVpId = $post->vp_parent_id;
-            $data['vp_parent_id'] = $parentVpId;
-        }
         return $data;
     }
 
-    private function entityShouldHaveVersionPressId($entityName) {
-        return $entityName == 'posts';
+    private function extendDataWithVpParentId($tableName, $data) {
+        global $table_prefix;
+        $parentIdColumnName = $this->dbSchemaInfo->getParentIdColumnName($tableName);
+        if (isset($data[$parentIdColumnName]) && $data[$parentIdColumnName] != 0) {
+
+            $idColumnName = $this->dbSchemaInfo->getIdColumnName($tableName);
+            $parent = $this->get_row("SELECT vp_id FROM " . $table_prefix . $tableName ." WHERE $idColumnName = $data[$parentIdColumnName]");
+            $parentVpId = $parent->vp_id;
+            $data['vp_parent_id'] = $parentVpId;
+        }
+
+        if ($tableName === 'term_taxonomy' && isset($data['term_id'])) { // TODO: Find better solution
+            $parentTerm = $this->get_row('SELECT vp_id FROM ' . $table_prefix . 'terms WHERE term_id = ' . $data['term_id']);
+            $data['vp_term_id'] = $parentTerm->vp_id;
+        }
+
+        return $data;
     }
 }
