@@ -1,5 +1,6 @@
 <?php
 
+require_once(dirname(__FILE__) . '/DbSchemaInfo.php');
 require_once(dirname(__FILE__) . '/EntityStorage.php');
 require_once(dirname(__FILE__) . '/ObservableStorage.php');
 require_once(dirname(__FILE__) . '/DirectoryStorage.php');
@@ -15,9 +16,11 @@ require_once(dirname(__FILE__) . '/IniSerializer.php');
 require_once(dirname(__FILE__) . '/Git.php');
 require_once(dirname(__FILE__) . '/ChangeInfo.php');
 
-global $wpdb, $table_prefix;
-$mirror = new Mirror(new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR));
-$wpdb = new MirroringDatabase(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $mirror);
+global $wpdb, $table_prefix, $storageFactory;
+$storageFactory = new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR);
+$mirror = new Mirror($storageFactory);
+$schemaInfo = new DbSchemaInfo();
+$wpdb = new MirroringDatabase(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $mirror, $schemaInfo);
 
 
 $buildCommitMessage = function (ChangeInfo $changeInfo) {
@@ -33,6 +36,26 @@ $buildCommitMessage = function (ChangeInfo $changeInfo) {
 
     return sprintf("%s %s with ID %s.", $verbs[$changeInfo->type], $changeInfo->entityType, $changeInfo->entityId);
 };
+
+add_action('save_post', 'updatePostTerms');
+
+function updatePostTerms($postId) {
+    global $storageFactory;
+    $post = get_post($postId);
+    $postType = $post->post_type;
+    $taxonomies = get_object_taxonomies($postType);
+
+    $postUpdateData = array('ID' => $postId);
+
+    foreach ($taxonomies as $taxonomy) {
+        $terms = get_the_terms($postId, $taxonomy);
+        if($terms)
+            $postUpdateData[$taxonomy] = array_map(function ($term) { return $term->vp_id; }, $terms);
+    }
+
+    if (count($taxonomies) > 0)
+        $storageFactory->getStorage('posts')->save($postUpdateData);
+}
 
 
 register_shutdown_function(function () use ($mirror, $buildCommitMessage) {
