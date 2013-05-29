@@ -12,7 +12,7 @@ class IniSerializer {
     }
 
     static function serializeFlatData($data) {
-        return self::outputToString(self::serializeData($data, 0));
+        return self::outputToString(self::serializeData($data, 0, true));
     }
 
     private static function serializeSection($sectionName, $data, $level) {
@@ -22,14 +22,19 @@ class IniSerializer {
         return $output;
     }
 
-    private static function serializeData($data, $level) {
+    private static function serializeData($data, $level, $flat = false) {
         $output = array();
         $indentation = str_repeat(" ", $level * 2);
         foreach ($data as $key => $value) {
             if (is_array($value))
-                $output = array_merge($output, self::serializeSection($key, $value, $level));
+                if ($flat)
+                    foreach($value as $arrayValue)
+                        $output[] = self::formatEntry($indentation, $key . '[]', $arrayValue);
+                else
+                    $output = array_merge($output, self::serializeSection($key, $value, $level));
+
             else
-                $output[] = $indentation . $key . " = " . (is_numeric($value) ? $value : '"' . self::escapeDoubleQuotes($value) . '"');
+                $output[] = self::formatEntry($indentation, $key, $value);
         }
         return $output;
     }
@@ -44,5 +49,9 @@ class IniSerializer {
 
     private static function outputToString($output) {
         return implode("\r\n", $output);
+    }
+
+    private static function formatEntry($indentation, $key, $value) {
+        return $indentation . $key . " = " . (is_numeric($value) ? $value : '"' . self::escapeDoubleQuotes($value) . '"');
     }
 }
