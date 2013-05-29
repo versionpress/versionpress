@@ -10,6 +10,6 @@ class OptionsStorage extends SingleFileStorage implements EntityStorage {
 
     protected function shouldBeSaved(array $data) {
         $id = $data[$this->idColumnName];
-        return substr($id,0, 1) !== '_' || $id === 'cron';
+        return substr($id,0, 1) !== '_' && $id !== 'cron';
     }
 }
