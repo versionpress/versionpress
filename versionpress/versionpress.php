@@ -1,22 +1,22 @@
 <?php
 
-require_once(dirname(__FILE__) . '/DbSchemaInfo.php');
-require_once(dirname(__FILE__) . '/EntityStorage.php');
-require_once(dirname(__FILE__) . '/ObservableStorage.php');
-require_once(dirname(__FILE__) . '/DirectoryStorage.php');
-require_once(dirname(__FILE__) . '/EntityStorageFactory.php');
+require_once(dirname(__FILE__) . '/storages/EntityStorage.php');
+require_once(dirname(__FILE__) . '/storages/ObservableStorage.php');
+require_once(dirname(__FILE__) . '/storages/DirectoryStorage.php');
+require_once(dirname(__FILE__) . '/storages/EntityStorageFactory.php');
+require_once(dirname(__FILE__) . '/storages/CommentStorage.php');
+require_once(dirname(__FILE__) . '/storages/PostStorage.php');
+require_once(dirname(__FILE__) . '/storages/SingleFileStorage.php');
+require_once(dirname(__FILE__) . '/storages/OptionsStorage.php');
+require_once(dirname(__FILE__) . '/storages/TermsStorage.php');
+require_once(dirname(__FILE__) . '/database/DbSchemaInfo.php');
+require_once(dirname(__FILE__) . '/database/MirroringDatabase.php');
+require_once(dirname(__FILE__) . '/utils/IniSerializer.php');
+require_once(dirname(__FILE__) . '/utils/Git.php');
 require_once(dirname(__FILE__) . '/Mirror.php');
-require_once(dirname(__FILE__) . '/MirroringDatabase.php');
-require_once(dirname(__FILE__) . '/PostStorage.php');
-require_once(dirname(__FILE__) . '/CommentStorage.php');
-require_once(dirname(__FILE__) . '/SingleFileStorage.php');
-require_once(dirname(__FILE__) . '/OptionsStorage.php');
-require_once(dirname(__FILE__) . '/TermsStorage.php');
-require_once(dirname(__FILE__) . '/IniSerializer.php');
-require_once(dirname(__FILE__) . '/Git.php');
 require_once(dirname(__FILE__) . '/ChangeInfo.php');
 
-global $wpdb, $table_prefix, $storageFactory;
+global $wpdb, $table_prefix;
 $storageFactory = new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR);
 $mirror = new Mirror($storageFactory);
 $schemaInfo = new DbSchemaInfo();
@@ -37,24 +37,28 @@ $buildCommitMessage = function (ChangeInfo $changeInfo) {
     return sprintf("%s %s with ID %s.", $verbs[$changeInfo->type], $changeInfo->entityType, $changeInfo->entityId);
 };
 
-add_action('save_post', 'updatePostTerms');
+add_action('save_post', createUpdatePostTermsHook($storageFactory->getStorage('posts')));
 
-function updatePostTerms($postId) {
-    global $storageFactory;
-    $post = get_post($postId);
-    $postType = $post->post_type;
-    $taxonomies = get_object_taxonomies($postType);
+function createUpdatePostTermsHook(EntityStorage $storage) {
 
-    $postUpdateData = array('ID' => $postId);
+    return function ($postId) use ($storage) {
+        $post = get_post($postId);
+        $postType = $post->post_type;
+        $taxonomies = get_object_taxonomies($postType);
 
-    foreach ($taxonomies as $taxonomy) {
-        $terms = get_the_terms($postId, $taxonomy);
-        if($terms)
-            $postUpdateData[$taxonomy] = array_map(function ($term) { return $term->vp_id; }, $terms);
-    }
+        $postUpdateData = array('ID' => $postId);
 
-    if (count($taxonomies) > 0)
-        $storageFactory->getStorage('posts')->save($postUpdateData);
+        foreach ($taxonomies as $taxonomy) {
+            $terms = get_the_terms($postId, $taxonomy);
+            if ($terms)
+                $postUpdateData[$taxonomy] = array_map(function ($term) {
+                    return $term->vp_id;
+                }, $terms);
+        }
+
+        if (count($taxonomies) > 0)
+            $storage->save($postUpdateData);
+    };
 }
 
 
