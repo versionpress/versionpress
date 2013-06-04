@@ -34,14 +34,18 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
     }
 
     function delete($restriction) {
-        if(!$this->shouldBeSaved($restriction))
+        if (!$this->shouldBeSaved($restriction))
             return;
 
         $id = $restriction[$this->idColumnName];
 
         $this->loadEntities();
+        $originalEntities = $this->entities;
         unset($this->entities[$id]);
-        $this->saveEntities();
+        if ($this->entities != $originalEntities) {
+            $this->saveEntities();
+            $this->notifyOnChangeListeners($id, 'delete');
+        }
     }
 
     function loadAll() {
@@ -55,8 +59,8 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
         }
     }
 
-    private function saveEntity($data, $callback = null) {
-        if(!$this->shouldBeSaved($data))
+    protected function saveEntity($data, $callback = null) {
+        if (!$this->shouldBeSaved($data))
             return;
 
         $id = $data[$this->idColumnName];
@@ -64,45 +68,45 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
         $this->loadEntities();
         $isNew = !isset($this->entities[$id]);
 
-        if($isNew) {
+        if ($isNew) {
             $this->entities[$id] = array();
         }
         $originalEntities = $this->entities;
 
         $this->updateEntity($id, $data);
 
-        if($this->entities != $originalEntities) {
+        if ($this->entities != $originalEntities) {
             $this->saveEntities();
 
             if (is_callable($callback))
-            $callback($id, $isNew);
+                $callback($id, $isNew ? 'create' : 'edit');
         }
     }
 
     protected function updateEntity($id, $data) {
         $originalValues = $this->entities[$id];
 
-        foreach($this->savedFields as $field)
+        foreach ($this->savedFields as $field)
             $this->entities[$id][$field] = isset($data[$field]) ? $data[$field] : $originalValues[$field];
     }
 
-    private function loadEntities() {
+    protected function loadEntities() {
         if (is_file($this->file))
-            $this->entities = parse_ini_file($this->file, true);
+            $this->entities = IniSerializer::deserialize(file_get_contents($this->file));
         else
             $this->entities = array();
     }
 
-    private function saveEntities() {
-        $options = IniSerializer::serialize($this->entities);
-        file_put_contents($this->file, $options);
+    protected function saveEntities() {
+        $entities = IniSerializer::serialize($this->entities);
+        file_put_contents($this->file, $entities);
     }
 
-    private function notifyOnChangeListeners($optionName, $isNewOption) {
+    protected function notifyOnChangeListeners($entityId, $changeType) {
         $changeInfo = new ChangeInfo();
         $changeInfo->entityType = $this->entityName;
-        $changeInfo->entityId = $optionName;
-        $changeInfo->type = $isNewOption ? 'create' : 'edit';
+        $changeInfo->entityId = $entityId;
+        $changeInfo->type = $changeType;
 
         $this->callOnChangeListeners($changeInfo);
     }

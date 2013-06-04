@@ -42,7 +42,8 @@ class EntityStorageFactory {
         $this->addStorageClassInfo('posts', 'PostStorage', '/posts');
         $this->addStorageClassInfo('comments', 'CommentStorage', '/comments');
         $this->addStorageClassInfo('options', 'OptionsStorage', '/options.ini');
-        $this->addStorageClassInfo('terms', 'TermsStorage', '/terms.ini', array('term_taxonomy'));
+        $this->addStorageClassInfo('terms', 'TermsStorage', '/terms.ini');
+        $this->addStorageClassInfo('term_taxonomy', 'TermTaxonomyStorage', '/terms.ini');
     }
 
     private function addStorageClassInfo($entityName, $className, $storageDirectory, $aliases = array()) {
