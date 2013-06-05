@@ -33,8 +33,8 @@ class IniSerializer {
         foreach ($data as $key => $value) {
             if (is_array($value))
                 if ($flat)
-                    foreach ($value as $arrayValue)
-                        $output[] = self::formatEntry($indentation, $key . '[]', $arrayValue);
+                    foreach ($value as $arrayKey => $arrayValue)
+                        $output[] = self::formatEntry($indentation, $key . "[$arrayKey]", $arrayValue);
                 else
                     $output = array_merge($output, self::serializeSection($key, $value, $parentFullName));
 

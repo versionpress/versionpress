@@ -6,7 +6,9 @@ class DbSchemaInfo {
         static $idColumnNames = array(
             'posts' => 'ID',
             'comments' => 'comment_ID',
-            'term_taxonomy' => 'term_taxonomy_id'
+            'term_taxonomy' => 'term_taxonomy_id',
+            'options' => 'option_name',
+            'users' => 'ID'
         );
 
         return $idColumnNames[$tableName];
@@ -19,7 +21,7 @@ class DbSchemaInfo {
     }
 
     public function entityShouldHaveVersionPressId($entityName) {
-        return $this->isHierarchical($entityName) || $entityName === 'terms';
+        return $this->isHierarchical($entityName) || $entityName === 'terms' || $entityName === 'users';
     }
 
     public function getParentIdColumnName($tableName) {

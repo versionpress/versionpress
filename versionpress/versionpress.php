@@ -10,6 +10,8 @@ require_once(dirname(__FILE__) . '/storages/SingleFileStorage.php');
 require_once(dirname(__FILE__) . '/storages/OptionsStorage.php');
 require_once(dirname(__FILE__) . '/storages/TermsStorage.php');
 require_once(dirname(__FILE__) . '/storages/TermTaxonomyStorage.php');
+require_once(dirname(__FILE__) . '/storages/UserStorage.php');
+require_once(dirname(__FILE__) . '/storages/UserMetaStorage.php');
 require_once(dirname(__FILE__) . '/database/DbSchemaInfo.php');
 require_once(dirname(__FILE__) . '/database/MirroringDatabase.php');
 require_once(dirname(__FILE__) . '/utils/IniSerializer.php');
