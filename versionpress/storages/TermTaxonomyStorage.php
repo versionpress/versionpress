@@ -2,7 +2,7 @@
 
 class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
 
-    protected $savedFields = array('taxonomy', 'description', 'parent', 'vp_id', 'vp_parent_id', 'vp_term_id');
+    protected $notSavedFields = array('term_id', 'count');
 
     function __construct($file) {
         parent::__construct($file, 'term taxonomy', 'term_taxonomy_id');
@@ -70,7 +70,7 @@ class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
         $originalValues = $taxonomies[$taxonomyId];
 
 
-        foreach ($this->savedFields as $field)
+        foreach ($this->notSavedFields as $field)
             $taxonomies[$taxonomyId][$field] = isset($data[$field]) ? $data[$field] : $originalValues[$field];
     }
 }

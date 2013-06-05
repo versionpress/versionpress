@@ -19,12 +19,13 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
      */
     protected $entityName;
 
-    protected $savedFields = array();
+    protected $notSavedFields = array();
 
     function __construct($file, $entityName, $idColumnName) {
         $this->file = $file;
         $this->idColumnName = $idColumnName;
         $this->entityName = $entityName;
+        $this->notSavedFields[] = $idColumnName;
     }
 
     function save($data, $restriction = array(), $id = 0) {
@@ -84,10 +85,13 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
     }
 
     protected function updateEntity($id, $data) {
-        $originalValues = $this->entities[$id];
 
-        foreach ($this->savedFields as $field)
-            $this->entities[$id][$field] = isset($data[$field]) ? $data[$field] : $originalValues[$field];
+        foreach ($this->notSavedFields as $field)
+            unset($data[$field]);
+
+        foreach($data as $field => $value)
+            $this->entities[$id][$field] = $value;
+
     }
 
     protected function loadEntities() {

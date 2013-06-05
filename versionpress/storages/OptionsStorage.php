@@ -2,7 +2,7 @@
 
 class OptionsStorage extends SingleFileStorage implements EntityStorage {
 
-    protected $savedFields = array('option_value', 'autoload');
+    protected $notSavedFields = array('option_id');
 
     function __construct($file) {
         parent::__construct($file, 'option', 'option_name');
