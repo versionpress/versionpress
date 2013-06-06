@@ -6,4 +6,5 @@ interface EntityStorage {
     function loadAll();
     function saveAll($entities);
     function addChangeListener($callback);
+    function shouldBeSaved($data);
 }

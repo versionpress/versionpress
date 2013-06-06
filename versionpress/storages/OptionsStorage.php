@@ -8,8 +8,8 @@ class OptionsStorage extends SingleFileStorage implements EntityStorage {
         parent::__construct($file, 'option', 'option_name');
     }
 
-    protected function shouldBeSaved(array $data) {
+    public function shouldBeSaved($data) {
         $id = $data[$this->idColumnName];
-        return substr($id,0, 1) !== '_' && $id !== 'cron';
+        return !(substr($id, 0, 1) === '_' || $id === 'cron');
     }
 }

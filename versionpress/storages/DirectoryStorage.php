@@ -18,13 +18,13 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
 
     function save($data, $restriction = array(), $id = 0) {
         if (!isset($data[$this->idColumnName])) {
-            if(isset($restriction[$this->idColumnName]))
+            if (isset($restriction[$this->idColumnName]))
                 $data[$this->idColumnName] = $restriction[$this->idColumnName];
             else
                 $data[$this->idColumnName] = $id;
         }
 
-        $this->saveEntity($data, $restriction, array($this, 'notifyChangeListeners'));
+        $this->saveEntity($data, array($this, 'notifyChangeListeners'));
     }
 
     function delete($restriction) {
@@ -47,12 +47,11 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
         }
     }
 
-    protected function shouldBeSaved($isExistingEntity, $data) {
+    public function shouldBeSaved($data) {
         return true;
     }
 
-    private function getFilename($data, $restriction) {
-        $id = isset($data[$this->idColumnName]) ? $data[$this->idColumnName] : $restriction[$this->idColumnName];
+    private function getFilename($id) {
         return $this->directory . '/' . $id . '.txt';
     }
 
@@ -97,12 +96,12 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
         return $changeInfo;
     }
 
-    private function saveEntity($data, $restriction = array(), $callback = null) {
+    private function saveEntity($data, $callback = null) {
         $data = $this->removeUnwantedColumns($data);
 
-        $filename = $this->getFilename($data, $restriction);
+        $filename = $this->getFilename($data[$this->idColumnName]);
         $oldSerializedEntity = "";
-        $isExistingEntity = file_exists($filename);
+        $isExistingEntity = $this->isExistingEntity($filename);
 
         if (!$this->shouldBeSaved($isExistingEntity, $data))
             return;
@@ -112,12 +111,12 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
         }
 
         $entity = $this->deserializeEntity($oldSerializedEntity);
-        if(isset($entity['vp_id']))
+        if (isset($entity['vp_id']))
             unset($data['vp_id']);
 
         $diffData = [];
-        foreach($data as $key => $value) {
-            if(!isset($entity[$key]) || (isset($entity[$key]) && $entity[$key] != $value))
+        foreach ($data as $key => $value) {
+            if (!isset($entity[$key]) || (isset($entity[$key]) && $entity[$key] != $value))
                 $diffData[$key] = $value;
         }
 
@@ -128,5 +127,9 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
             if (is_callable($callback))
                 $callback($entity, $isExistingEntity ? 'edit' : 'create');
         }
+    }
+
+    protected function isExistingEntity($id) {
+        return file_exists($this->getFilename($id));
     }
 }

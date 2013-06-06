@@ -47,6 +47,10 @@ class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
 
     }
 
+    public function shouldBeSaved($data) {
+        return !(count($data) === 2 && isset($data['count'], $data[$this->idColumnName]));
+    }
+
     private function findTermId($data) {
         if (isset($data['term_id']))
             return $data['term_id'];

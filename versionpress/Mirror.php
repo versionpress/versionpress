@@ -68,4 +68,11 @@ class Mirror {
 
         return $storage;
     }
+
+    public function shouldBeSaved($entityName, $data) {
+        $storage = $this->getStorage($entityName);
+        if($storage === null)
+            return false;
+        return $storage->shouldBeSaved($data);
+    }
 }

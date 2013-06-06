@@ -2,35 +2,32 @@
 
 class DbSchemaInfo {
 
-    public function getIdColumnName($tableName) {
-        static $idColumnNames = array(
-            'posts' => 'ID',
-            'comments' => 'comment_ID',
-            'term_taxonomy' => 'term_taxonomy_id',
-            'options' => 'option_name',
-            'users' => 'ID'
-        );
+    private $schema;
 
-        return $idColumnNames[$tableName];
+    function __construct($schemaFile) {
+        $neonSchema = file_get_contents($schemaFile);
+        $this->schema = Neon::decode($neonSchema);
+
     }
 
-    public function isHierarchical($tableName) {
-        return $tableName === 'posts' ||
-        $tableName === 'comments' ||
-        $tableName === 'term_taxonomy';
+    public function hasId($entityName) {
+        return isset($this->schema[$entityName]['id']);
     }
 
-    public function entityShouldHaveVersionPressId($entityName) {
-        return $this->isHierarchical($entityName) || $entityName === 'terms' || $entityName === 'users';
+    public function hasReferences($entityName) {
+        return isset($this->schema[$entityName]['references'])
+        && count($this->schema[$entityName]['references']) > 0;
     }
 
-    public function getParentIdColumnName($tableName) {
-        static $parentIdColumnNames = array(
-            'posts' => 'post_parent',
-            'comments' => 'comment_parent',
-            'term_taxonomy' => 'parent'
-        );
+    public function getReferences($entityName) {
+        return $this->schema[$entityName]['references'];
+    }
 
-        return $parentIdColumnNames[$tableName];
+    public function getIdColumnName($entityName) {
+        return $this->schema[$entityName]['id'];
+    }
+
+    public function getReference($entityName, $referenceName) {
+        return $this->schema[$entityName]['references'][$referenceName];
     }
 }

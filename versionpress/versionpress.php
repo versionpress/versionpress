@@ -16,13 +16,15 @@ require_once(dirname(__FILE__) . '/database/DbSchemaInfo.php');
 require_once(dirname(__FILE__) . '/database/MirroringDatabase.php');
 require_once(dirname(__FILE__) . '/utils/IniSerializer.php');
 require_once(dirname(__FILE__) . '/utils/Git.php');
+require_once(dirname(__FILE__) . '/utils/Neon.php');
 require_once(dirname(__FILE__) . '/Mirror.php');
 require_once(dirname(__FILE__) . '/ChangeInfo.php');
 
 global $wpdb, $table_prefix;
 $storageFactory = new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR);
 $mirror = new Mirror($storageFactory);
-$schemaInfo = new DbSchemaInfo();
+$schemaFile = dirname(__FILE__) . '/database/schema.neon';
+$schemaInfo = new DbSchemaInfo($schemaFile);
 $wpdb = new MirroringDatabase(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $mirror, $schemaInfo);
 
 

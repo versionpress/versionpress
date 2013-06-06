@@ -115,7 +115,7 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
         $this->callOnChangeListeners($changeInfo);
     }
 
-    protected function shouldBeSaved(array $data) {
+    public function shouldBeSaved($data) {
         return true;
     }
 }
