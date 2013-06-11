@@ -2,7 +2,7 @@
 
 class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
 
-    protected $notSavedFields = array('term_id', 'count');
+    protected $notSavedFields = array('vp_term_id', 'count');
 
     function __construct($file) {
         parent::__construct($file, 'term taxonomy', 'term_taxonomy_id');
@@ -52,13 +52,11 @@ class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
     }
 
     private function findTermId($data) {
-        if (isset($data['term_id']))
-            return $data['term_id'];
-
         $taxonomyId = $data[$this->idColumnName];
 
         foreach ($this->entities as $termId => $term) {
-            if (isset($term['taxonomies'][$taxonomyId]))
+            if (isset($term['taxonomies'][$taxonomyId])
+                || (isset($data['vp_term_id']) && $term['vp_id'] == $data['vp_term_id']))
                 return $termId;
         }
 
@@ -71,10 +69,10 @@ class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
         if (!isset($taxonomies[$taxonomyId]))
             $taxonomies[$taxonomyId] = array();
 
-        $originalValues = $taxonomies[$taxonomyId];
-
-
         foreach ($this->notSavedFields as $field)
-            $taxonomies[$taxonomyId][$field] = isset($data[$field]) ? $data[$field] : $originalValues[$field];
+            unset($data[$field]);
+
+        foreach($data as $field => $value)
+            $taxonomies[$taxonomyId][$field] = $value;
     }
 }

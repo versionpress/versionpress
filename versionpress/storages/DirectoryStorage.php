@@ -28,7 +28,7 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
     }
 
     function delete($restriction) {
-        $fileName = $this->getFilename(array(), $restriction);
+        $fileName = $this->getFilename($restriction[$this->idColumnName]);
         if (is_file($fileName)) {
             unlink($fileName);
             $this->notifyChangeListeners($restriction, 'delete');

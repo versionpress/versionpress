@@ -22,14 +22,13 @@ comments:
   references:
     comment_post_ID:
       table: posts
-    user_ID:
+    user_id:
       table: users
+    comment_parent:
+      table: comments
 
 users:
   id: ID
-
-options:
-  id: option_name
 
 terms:
   id: term_id
