@@ -101,9 +101,9 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
 
         $filename = $this->getFilename($data[$this->idColumnName]);
         $oldSerializedEntity = "";
-        $isExistingEntity = $this->isExistingEntity($filename);
+        $isExistingEntity = $this->isExistingEntity($data[$this->idColumnName]);
 
-        if (!$this->shouldBeSaved($isExistingEntity, $data))
+        if (!$this->shouldBeSaved($data))
             return;
 
         if ($isExistingEntity) {

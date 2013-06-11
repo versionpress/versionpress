@@ -117,11 +117,7 @@ class MirroringDatabase extends wpdb {
         if ($referenceId === null)
             return;
 
-        $vpReferenceTableName = $this->getVpReferenceTableName();
-        $query = "INSERT INTO $vpReferenceTableName (`table`, `reference`, `vp_id`, `reference_vp_id`)
-                    VALUES (\"$entityName\", \"$referenceName\", $vpId, $referenceId)
-                    ON DUPLICATE KEY UPDATE `reference_vp_id` = $referenceId";
-        $this->query($query);
+        $this->creteReferenceRecord($entityName, $referenceName, $vpId, $referenceId);
     }
 
     private function hasId($entityName, $id) {
@@ -137,5 +133,14 @@ class MirroringDatabase extends wpdb {
 
     private function getVpReferenceTableName() {
         return $this->addTablePrefix('vp_references');
+    }
+
+    private function creteReferenceRecord($entityName, $referenceName, $vpId, $referenceId) {
+        $vpReferenceTableName = $this->getVpReferenceTableName();
+
+        $query = "INSERT INTO $vpReferenceTableName (`table`, `reference`, `vp_id`, `reference_vp_id`)
+                    VALUES (\"$entityName\", \"$referenceName\", $vpId, $referenceId)
+                    ON DUPLICATE KEY UPDATE `reference_vp_id` = $referenceId";
+        $this->query($query);
     }
 }

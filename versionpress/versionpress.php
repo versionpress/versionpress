@@ -42,11 +42,11 @@ $buildCommitMessage = function (ChangeInfo $changeInfo) {
     return sprintf("%s %s with ID %s.", $verbs[$changeInfo->type], $changeInfo->entityType, $changeInfo->entityId);
 };
 
-add_action('save_post', createUpdatePostTermsHook($storageFactory->getStorage('posts')));
+add_action('save_post', createUpdatePostTermsHook($storageFactory->getStorage('posts'), $wpdb));
 
-function createUpdatePostTermsHook(EntityStorage $storage) {
+function createUpdatePostTermsHook(EntityStorage $storage, wpdb $wpdb) {
 
-    return function ($postId) use ($storage) {
+    return function ($postId) use ($storage, $wpdb) {
         $post = get_post($postId);
         $postType = $post->post_type;
         $taxonomies = get_object_taxonomies($postType);
@@ -56,8 +56,10 @@ function createUpdatePostTermsHook(EntityStorage $storage) {
         foreach ($taxonomies as $taxonomy) {
             $terms = get_the_terms($postId, $taxonomy);
             if ($terms)
-                $postUpdateData[$taxonomy] = array_map(function ($term) {
-                    return $term->vp_id;
+                $postUpdateData[$taxonomy] = array_map(function ($term) use ($wpdb) {
+                    global $table_prefix;
+                    $vpIdTableName = $table_prefix . 'vp_id';
+                    return $wpdb->get_var("SELECT vp_id FROM $vpIdTableName WHERE id = {$term->term_id} AND `table` = 'terms'");
                 }, $terms);
         }
 
