@@ -15,4 +15,15 @@ class UserMetaStorage extends SingleFileStorage implements EntityStorage {
 
         $this->saveEntity($data, array($this, 'notifyOnChangeListeners'));
     }
+
+    function saveAll($entities) {
+        foreach($entities as $entity) {
+            $data = array(
+                'ID' => $entity['user_id'],
+                $entity['meta_key'] => $entity['meta_value']
+            );
+
+            $this->saveEntity($data);
+        }
+    }
 }

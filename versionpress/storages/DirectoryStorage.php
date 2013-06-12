@@ -97,11 +97,12 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
     }
 
     private function saveEntity($data, $callback = null) {
+        $id = $data[$this->idColumnName];
         $data = $this->removeUnwantedColumns($data);
 
-        $filename = $this->getFilename($data[$this->idColumnName]);
+        $filename = $this->getFilename($id);
         $oldSerializedEntity = "";
-        $isExistingEntity = $this->isExistingEntity($data[$this->idColumnName]);
+        $isExistingEntity = $this->isExistingEntity($id);
 
         if (!$this->shouldBeSaved($data))
             return;

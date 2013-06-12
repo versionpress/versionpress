@@ -56,7 +56,7 @@ class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
 
         foreach ($this->entities as $termId => $term) {
             if (isset($term['taxonomies'][$taxonomyId])
-                || (isset($data['vp_term_id']) && $term['vp_id'] == $data['vp_term_id']))
+                || (isset($data['vp_term_id']) && strval($term['vp_id']) == strval($data['vp_term_id'])))
                 return $termId;
         }
 

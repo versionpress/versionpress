@@ -30,4 +30,8 @@ class DbSchemaInfo {
     public function getReference($entityName, $referenceName) {
         return $this->schema[$entityName]['references'][$referenceName];
     }
+
+    public function getEntityNames() {
+        return array_keys($this->schema);
+    }
 }
