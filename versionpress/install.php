@@ -202,6 +202,9 @@ class VersionPressInstaller {
     private function saveAllEntitiesToStorage($entityName) {
         $storage = $this->storageFactory->getStorage($entityName);
         $entities = $this->database->get_results("SELECT * FROM {$this->getTableName($entityName)}", ARRAY_A);
+        $entities = array_filter($entities, function ($entity) use ($storage) {
+            return $storage->shouldBeSaved($entity);
+        });
         $entities = $this->extendEntitiesWithIdentifiers($entityName, $entities);
         $entities = $this->replaceForeignKeysWithReferencesInAllEntities($entityName, $entities);
         $entities = $this->doEntitySpecificActions($entityName, $entities);
@@ -219,7 +222,7 @@ class VersionPressInstaller {
         }, $entities);
     }
 
-    private function replaceForeignKeysWithReferences($entityName, $entity) {
+    public function replaceForeignKeysWithReferences($entityName, $entity) {
         $references = $this->dbSchema->getReferences($entityName);
         foreach ($references as $referenceName => $referenceInfo) {
             $targetEntity = $referenceInfo['table'];
@@ -243,7 +246,7 @@ class VersionPressInstaller {
         $idCache = $this->idCache;
 
         $entities = array_map(function ($entity) use ($entityName, $idColumnName, $idCache) {
-            $entity['vp_id'] = $this->idCache[$entityName][intval($entity[$idColumnName])];
+            $entity['vp_id'] = $idCache[$entityName][intval($entity[$idColumnName])];
             return $entity;
         }, $entities);
 
@@ -254,7 +257,7 @@ class VersionPressInstaller {
         if ($entityName === 'posts') {
             return array_map(array($this, 'extendPostWithTaxonomies'), $entities);
         }
-        if($entityName === 'usermeta') {
+        if ($entityName === 'usermeta') {
             return array_map(array($this, 'restoreUserIdInUsermeta'), $entities);
         }
         return $entities;
@@ -271,9 +274,9 @@ class VersionPressInstaller {
         foreach ($taxonomies as $taxonomy) {
             $terms = get_the_terms($id, $taxonomy);
             if ($terms) {
-                $_this = $this;
-                $post[$taxonomy] = array_map(function ($term) use ($_this) {
-                    return $this->idCache['terms'][$term->term_id];
+                $idCache = $this->idCache;
+                $post[$taxonomy] = array_map(function ($term) use ($idCache) {
+                    return $idCache['terms'][$term->term_id];
                 }, $terms);
             }
         }
@@ -283,8 +286,8 @@ class VersionPressInstaller {
 
     private function restoreUserIdInUsermeta($usermeta) {
         $userIds = $this->idCache['users'];
-        foreach($userIds as $userId => $vpId) {
-            if (strval($vpId) === strval($usermeta['vp_user_id'])){
+        foreach ($userIds as $userId => $vpId) {
+            if (strval($vpId) === strval($usermeta['vp_user_id'])) {
                 $usermeta['user_id'] = $userId;
                 return $usermeta;
             }

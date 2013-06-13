@@ -119,7 +119,7 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
         if (isset($entity['vp_id']))
             unset($data['vp_id']);
 
-        $diffData = [];
+        $diffData = array();
         foreach ($data as $key => $value) {
             if (!isset($entity[$key]) || (isset($entity[$key]) && $entity[$key] != $value))
                 $diffData[$key] = $value;

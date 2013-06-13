@@ -29,6 +29,6 @@ abstract class Git {
         array_shift($functionArgs); // Remove $command
         $escapedArgs = array_map("escapeshellarg", $functionArgs);
         $commandWithArguments = vsprintf($command, $escapedArgs);
-        return shell_exec($commandWithArguments);
+        return @shell_exec($commandWithArguments);
     }
 }
