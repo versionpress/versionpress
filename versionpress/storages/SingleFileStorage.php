@@ -88,7 +88,7 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
             $this->saveEntities();
 
             if (is_callable($callback))
-                $callback($id, $isNew ? 'create' : 'edit');
+                call_user_func($callback, $id, $isNew ? 'create' : 'edit');
         }
     }
 

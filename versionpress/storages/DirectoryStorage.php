@@ -130,7 +130,7 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
             $entity = array_merge($entity, $diffData);
             file_put_contents($filename, $this->serializeEntity($entity));
             if (is_callable($callback))
-                $callback($entity, $isExistingEntity ? 'edit' : 'create');
+                call_user_func($callback, $entity, $isExistingEntity ? 'edit' : 'create');
         }
     }
 

@@ -14,9 +14,9 @@ class Mirror {
     /**
      * @var bool
      */
-    private $wasAffected;
+    public $wasAffected;
 
-    private $changeList;
+    public $changeList;
 
     function __construct(EntityStorageFactory $storageFactory) {
         $this->storageFactory = $storageFactory;
@@ -62,7 +62,7 @@ class Mirror {
             $that = $this;
             $storage->addChangeListener(function (ChangeInfo $changeInfo) use ($that) {
                 $that->wasAffected = true;
-                $this->changeList[] = $changeInfo;
+                $that->changeList[] = $changeInfo;
             });
         }
 
