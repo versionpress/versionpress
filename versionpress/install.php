@@ -205,6 +205,7 @@ class VersionPressInstaller {
         $entities = $this->extendEntitiesWithIdentifiers($entityName, $entities);
         $entities = $this->replaceForeignKeysWithReferencesInAllEntities($entityName, $entities);
         $entities = $this->doEntitySpecificActions($entityName, $entities);
+        $storage->prepareStorage();
         $storage->saveAll($entities);
     }
 
@@ -296,10 +297,10 @@ class VersionPressInstaller {
 
 
 global $wpdb, $table_prefix;
-$wpdb->show_errors();
 
+mkdir(VERSIONPRESS_MIRRORING_DIR, 0777, true);
 $dbSchema = new DbSchemaInfo(dirname(__FILE__) . '/database/schema.neon');
 $storageFactory = new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR);
-
 $installer = new VersionPressInstaller($wpdb, $dbSchema, $storageFactory, $table_prefix);
 $installer->install();
+Git::commit('Installed VersionPress');

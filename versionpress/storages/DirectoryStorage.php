@@ -51,6 +51,10 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
         return true;
     }
 
+    function prepareStorage() {
+        @mkdir($this->directory, 0777, true);
+    }
+
     private function getFilename($id) {
         return $this->directory . '/' . $id . '.txt';
     }

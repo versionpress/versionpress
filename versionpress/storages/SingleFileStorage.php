@@ -65,6 +65,9 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
         }
     }
 
+    function prepareStorage() {
+    }
+
     protected function saveEntity($data, $callback = null) {
         if (!$this->shouldBeSaved($data))
             return;
@@ -94,7 +97,7 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
         foreach ($this->notSavedFields as $field)
             unset($data[$field]);
 
-        foreach($data as $field => $value)
+        foreach ($data as $field => $value)
             $this->entities[$id][$field] = $value;
 
     }
