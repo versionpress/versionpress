@@ -17,30 +17,17 @@ require_once(dirname(__FILE__) . '/database/MirroringDatabase.php');
 require_once(dirname(__FILE__) . '/utils/IniSerializer.php');
 require_once(dirname(__FILE__) . '/utils/Git.php');
 require_once(dirname(__FILE__) . '/utils/Neon.php');
+require_once(dirname(__FILE__) . '/utils/Arrays.php');
 require_once(dirname(__FILE__) . '/Mirror.php');
 require_once(dirname(__FILE__) . '/ChangeInfo.php');
 
-global $wpdb, $table_prefix;
+global $wpdb, $table_prefix, $storageFactory, $schemaInfo;
 $storageFactory = new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR);
 $mirror = new Mirror($storageFactory);
 $schemaFile = dirname(__FILE__) . '/database/schema.neon';
 $schemaInfo = new DbSchemaInfo($schemaFile);
 $wpdb = new MirroringDatabase(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $mirror, $schemaInfo);
 
-
-$buildCommitMessage = function (ChangeInfo $changeInfo) {
-    // Samples:
-    // Created post with ID 1
-    // Edited post with ID 2
-    // Deleted post with ID 3
-    static $verbs = array(
-        'create' => 'Created',
-        'edit' => 'Edited',
-        'delete' => 'Deleted'
-    );
-
-    return sprintf("%s %s with ID %s.", $verbs[$changeInfo->type], $changeInfo->entityType, $changeInfo->entityId);
-};
 
 add_action('save_post', createUpdatePostTermsHook($storageFactory->getStorage('posts'), $wpdb));
 
@@ -68,6 +55,19 @@ function createUpdatePostTermsHook(EntityStorage $storage, wpdb $wpdb) {
     };
 }
 
+$buildCommitMessage = function (ChangeInfo $changeInfo) {
+    // Samples:
+    // Created post with ID 1
+    // Edited post with ID 2
+    // Deleted post with ID 3
+    static $verbs = array(
+        'create' => 'Created',
+        'edit' => 'Edited',
+        'delete' => 'Deleted'
+    );
+
+    return sprintf("%s %s with ID %s.", $verbs[$changeInfo->type], $changeInfo->entityType, $changeInfo->entityId);
+};
 
 register_shutdown_function(function () use ($mirror, $buildCommitMessage) {
     if ($mirror->wasAffected()) {

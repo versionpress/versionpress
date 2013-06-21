@@ -60,6 +60,8 @@ class VersionPressInstaller {
     private function createVersionPressTables() {
         $table_prefix = $this->tablePrefix;
         $process = array();
+
+        $process[] = "DROP VIEW IF EXISTS `{$table_prefix}vp_reference_details`";
         $process[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_references`";
         $process[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_id`";
         $process[] = "CREATE TABLE `{$table_prefix}vp_id` (
@@ -82,6 +84,12 @@ class VersionPressInstaller {
           CONSTRAINT `ref_vp_id` FOREIGN KEY (`vp_id`) REFERENCES `{$table_prefix}vp_id` (`vp_id`) ON DELETE CASCADE ON UPDATE CASCADE,
           CONSTRAINT `ref_reference_vp_id` FOREIGN KEY (`reference_vp_id`) REFERENCES `{$table_prefix}vp_id` (`vp_id`) ON DELETE CASCADE ON UPDATE CASCADE
         ) ENGINE=InnoDB;";
+
+        $process[] = "CREATE VIEW `{$table_prefix}vp_reference_details` AS
+          SELECT `vp_id`.*, `vp_ref`.`reference`, `vp_ref`.`reference_vp_id`, `vp_id_ref`.`id` `reference_id`
+          FROM `{$table_prefix}vp_id` `vp_id`
+          JOIN `{$table_prefix}vp_references` `vp_ref` ON `vp_id`.`vp_id` = `vp_ref`.`vp_id`
+          JOIN `{$table_prefix}vp_id` `vp_id_ref` ON `vp_ref`.`reference_vp_id` = `vp_id_ref`.`vp_id`;";
 
         foreach ($process as $query) {
             $this->database->query($query);
