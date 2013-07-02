@@ -7,17 +7,17 @@ define('WP_DEBUG_LOG', true);
 require_once(dirname(__FILE__) . '/../../wp-load.php');
 require_once(dirname(__FILE__) . '/synchronizers/Synchronizer.php');
 require_once(dirname(__FILE__) . '/synchronizers/SynchronizerBase.php');
-require_once(dirname(__FILE__) . '/synchronizers/PostsSynchronizer.php');
+require_once(dirname(__FILE__) . '/synchronizers/OptionsSynchronizer.php');
 require_once(dirname(__FILE__) . '/utils/Git.php');
 require_once(dirname(__FILE__) . '/utils/Strings.php');
 
 
 global $wpdb, $table_prefix, $storageFactory, $schemaInfo;
 
-$postStorage = $storageFactory->getStorage('posts');
+$postStorage = $storageFactory->getStorage('options');
 $wpdb->show_errors();
 
-$postSynchronizer = new PostsSynchronizer($postStorage, $wpdb, $schemaInfo);
+$postSynchronizer = new OptionsSynchronizer($postStorage, $wpdb, $schemaInfo);
 $postSynchronizer->synchronize();
 
 //Git::commit('Test commit', dirname(__FILE__) . '/db');

@@ -1,6 +1,6 @@
 <?php
 
-class OptionsSynchronizer {
+class OptionsSynchronizer implements Synchronizer {
 
     /**
      * @var OptionsStorage
@@ -14,20 +14,23 @@ class OptionsSynchronizer {
 
     private $tableName;
 
-    function __construct(EntityStorage $optionsStorage, wpdb $database, $tableName) {
+    function __construct(EntityStorage $optionsStorage, wpdb $database, DbSchemaInfo $dbSchema) {
         $this->optionsStorage = $optionsStorage;
         $this->database = $database;
-        $this->tableName = $tableName;
+        $this->tableName = $dbSchema->getPrefixedTableName('options');
     }
 
     function synchronize() {
         $options = $this->optionsStorage->loadAll();
-
-        foreach($options as $optionName => $values) {
-            $sql = "INSERT INTO {$this->tableName} (option_name, option_value, autoload) VALUES (\"$optionName\", \"$values[option_value]\", \"$values[autoload]\")
-                    ON DUPLICATE KEY UPDATE option_value = \"$values[option_value]\", autoload = \"$values[autoload]\";";
-            $result = $this->database->query($sql);
+        $syncQuery = "INSERT INTO {$this->tableName} (option_name, option_value, autoload) VALUES ";
+        foreach ($options as $optionName => $values) {
+            $syncQuery .= "(\"$optionName\", \"" . mysql_real_escape_string($values['option_value']) . "\", \"$values[autoload]\"),";
         }
+
+        $syncQuery[mb_strlen($syncQuery) - 1] = " "; // strip last comma
+        $syncQuery .= " ON DUPLICATE KEY UPDATE option_value = VALUES(option_value), autoload = VALUES(autoload);";
+
+        $this->database->query($syncQuery);
     }
 
 }
