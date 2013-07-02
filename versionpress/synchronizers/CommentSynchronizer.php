@@ -85,7 +85,7 @@ class CommentSynchronizer implements Synchronizer {
 
         $references = $this->dbSchema->getReferences($this->entityName);
         foreach($references as $referenceName => $_){
-            $updateQuery = "UPDATE wp_comments SET `{$referenceName}` =
+            $updateQuery = "UPDATE {$this->getPrefixedTableName($this->entityName)} SET `{$referenceName}` =
             (SELECT reference_id FROM {$this->getPrefixedTableName('vp_reference_details')}
             WHERE id={$this->idColumnName} AND `table` = \"{$this->entityName}\" and reference = \"{$referenceName}\")";
             $this->executeQuery($updateQuery);
@@ -93,8 +93,8 @@ class CommentSynchronizer implements Synchronizer {
     }
 
     private function mirrorDatabaseToStorage() {
-        return;
-        $entitiesInDatabase = $this->getIdsInDatabase();
+
+        $entitiesInDatabase = $this->getEntitiesFromDatabase();
         $entitiesInStorage = $this->storage->loadAll();
 
         $getEntityId = function ($entity) {
@@ -112,7 +112,10 @@ class CommentSynchronizer implements Synchronizer {
         }
 
         foreach ($entitiesToSave as $key => $entityId) {
-            $this->storage->save($entitiesInDatabase[$key]); // TODO: replace foreign keys with vp references
+            $entity = $entitiesInDatabase[$key];
+            $entity = $this->extendEntityWithIdentifier($entity);           // TODO: remove duplicity with install script
+            $entity = $this->replaceForeignKeysWithIdentifiers($entity);    // ----
+            $this->storage->save($entity);
         }
     }
 
@@ -202,7 +205,7 @@ class CommentSynchronizer implements Synchronizer {
         $this->executeQuery("DELETE FROM {$this->getPrefixedTableName('vp_id')} WHERE `table` = \"{$this->entityName}\" AND id IN ({$idsString})"); // using cascade delete in mysql
     }
 
-    private function getIdsInDatabase() {
+    private function getEntitiesFromDatabase() {
         return $this->database->get_results("SELECT * FROM {$this->getPrefixedTableName($this->entityName)}", ARRAY_A);
     }
 
@@ -238,5 +241,32 @@ class CommentSynchronizer implements Synchronizer {
         }
 
         return $references;
+    }
+
+    private function extendEntityWithIdentifier($entity) {
+        $entityClone = $entity;
+        $entityClone['vp_id'] = $this->getIdForEntity($this->entityName, $entity[$this->idColumnName]);
+        return $entityClone;
+    }
+
+    private function getIdForEntity($entityName, $id) {
+        return $this->database->get_var("SELECT vp_id FROM {$this->getPrefixedTableName('vp_id')}
+        WHERE `table` = \"{$entityName}\" AND id = {$id}");
+    }
+
+    private function replaceForeignKeysWithIdentifiers($entity) {
+        if(!$this->dbSchema->hasReferences($this->entityName))
+            return $entity;
+
+        $references = $this->dbSchema->getReferences($this->entityName);
+        $entityClone = $entity;
+
+        foreach($references as $referenceName => $referenceInfo) {
+            if(!isset($entity[$referenceName]) || $entity[$referenceName] == 0)
+                continue;
+            $entityClone['vp_' . $referenceName] = $this->getIdForEntity($referenceInfo['table'], $entity[$referenceName]);
+        }
+
+        return $entityClone;
     }
 }
