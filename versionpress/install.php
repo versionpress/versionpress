@@ -310,7 +310,7 @@ class VersionPressInstaller {
 global $wpdb, $table_prefix;
 
 mkdir(VERSIONPRESS_MIRRORING_DIR, 0777, true);
-$dbSchema = new DbSchemaInfo(dirname(__FILE__) . '/database/schema.neon');
+$dbSchema = new DbSchemaInfo(dirname(__FILE__) . '/database/schema.neon', $table_prefix);
 $storageFactory = new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR);
 $installer = new VersionPressInstaller($wpdb, $dbSchema, $storageFactory, $table_prefix);
 $installer->install();

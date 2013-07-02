@@ -25,7 +25,7 @@ global $wpdb, $table_prefix, $storageFactory, $schemaInfo;
 $storageFactory = new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR);
 $mirror = new Mirror($storageFactory);
 $schemaFile = dirname(__FILE__) . '/database/schema.neon';
-$schemaInfo = new DbSchemaInfo($schemaFile);
+$schemaInfo = new DbSchemaInfo($schemaFile, $table_prefix);
 $wpdb = new MirroringDatabase(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $mirror, $schemaInfo);
 
 

@@ -102,6 +102,10 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
 
     private function saveEntity($data, $callback = null) {
         $id = $data[$this->idColumnName];
+
+        if (!$id)
+            return;
+
         $data = $this->removeUnwantedColumns($data);
 
         $filename = $this->getFilename($id);

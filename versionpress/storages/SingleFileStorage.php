@@ -17,14 +17,14 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
     /**
      * @var string
      */
-    protected $entityName;
+    protected $entityTypeName;
 
     protected $notSavedFields = array();
 
-    function __construct($file, $entityName, $idColumnName) {
+    function __construct($file, $entityTypeName, $idColumnName) {
         $this->file = $file;
         $this->idColumnName = $idColumnName;
-        $this->entityName = $entityName;
+        $this->entityTypeName = $entityTypeName;
         $this->notSavedFields[] = $idColumnName;
     }
 
@@ -74,6 +74,9 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
 
         $id = $data[$this->idColumnName];
 
+        if (!$id)
+            return;
+
         $this->loadEntities();
         $isNew = !isset($this->entities[$id]);
 
@@ -116,7 +119,7 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
 
     protected function notifyOnChangeListeners($entityId, $changeType) {
         $changeInfo = new ChangeInfo();
-        $changeInfo->entityType = $this->entityName;
+        $changeInfo->entityType = $this->entityTypeName;
         $changeInfo->entityId = $entityId;
         $changeInfo->type = $changeType;
 

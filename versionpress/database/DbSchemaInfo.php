@@ -3,11 +3,12 @@
 class DbSchemaInfo {
 
     private $schema;
+    private $prefix;
 
-    function __construct($schemaFile) {
+    function __construct($schemaFile, $prefix) {
         $neonSchema = file_get_contents($schemaFile);
         $this->schema = Neon::decode($neonSchema);
-
+        $this->prefix = $prefix;
     }
 
     public function hasId($entityName) {
@@ -33,5 +34,9 @@ class DbSchemaInfo {
 
     public function getEntityNames() {
         return array_keys($this->schema);
+    }
+
+    public function getPrefixedTableName($entityName) {
+        return $this->prefix . $entityName;
     }
 }
