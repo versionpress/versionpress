@@ -42,6 +42,8 @@ abstract class SynchronizerBase implements Synchronizer {
             return $entityClone;
         }, $entities);
 
+        $entitiesWithoutIds = $this->filterEntities($entitiesWithoutIds);
+
         foreach ($entitiesWithoutIds as $entity) {
             $vpId = $entity['vp_id'];
             $isExistingEntity = $this->isExistingEntity($vpId);
@@ -86,9 +88,9 @@ abstract class SynchronizerBase implements Synchronizer {
 
         $references = $this->dbSchema->getReferences($this->entityName);
         foreach($references as $referenceName => $_){
-            $updateQuery = "UPDATE {$this->getPrefixedTableName($this->entityName)} SET `{$referenceName}` =
-            (SELECT reference_id FROM {$this->getPrefixedTableName('vp_reference_details')}
-            WHERE id={$this->idColumnName} AND `table` = \"{$this->entityName}\" and reference = \"{$referenceName}\")";
+            $updateQuery = "UPDATE {$this->getPrefixedTableName($this->entityName)} entity SET `{$referenceName}` =
+            (SELECT reference_id FROM {$this->getPrefixedTableName('vp_reference_details')} ref
+            WHERE ref.id=entity.{$this->idColumnName} AND `table` = \"{$this->entityName}\" and reference = \"{$referenceName}\")";
             $this->executeQuery($updateQuery);
         }
     }
@@ -269,5 +271,9 @@ abstract class SynchronizerBase implements Synchronizer {
         }
 
         return $entityClone;
+    }
+
+    protected function filterEntities($entities) {
+        return $entities;
     }
 }
