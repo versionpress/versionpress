@@ -28,7 +28,8 @@ class SynchronizerFactory {
         static $synchronizerClasses = array(
             'posts' => 'PostsSynchronizer',
             'comments' => 'CommentsSynchronizer',
-            'options' => 'OptionsSynchronizer'
+            'options' => 'OptionsSynchronizer',
+            'users' => 'UsersSynchronizer'
         );
 
         $synchronizerClass = $synchronizerClasses[$synchronizerName];
