@@ -18,6 +18,7 @@ require_once(dirname(__FILE__) . '/utils/IniSerializer.php');
 require_once(dirname(__FILE__) . '/utils/Git.php');
 require_once(dirname(__FILE__) . '/utils/Neon.php');
 require_once(dirname(__FILE__) . '/utils/Arrays.php');
+require_once(dirname(__FILE__) . '/utils/Strings.php');
 require_once(dirname(__FILE__) . '/Mirror.php');
 require_once(dirname(__FILE__) . '/ChangeInfo.php');
 
