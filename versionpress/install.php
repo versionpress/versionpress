@@ -314,4 +314,6 @@ $dbSchema = new DbSchemaInfo(dirname(__FILE__) . '/database/schema.neon', $table
 $storageFactory = new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR);
 $installer = new VersionPressInstaller($wpdb, $dbSchema, $storageFactory, $table_prefix);
 $installer->install();
+if(!Git::isVersioned(dirname(__FILE__)))
+    Git::createGitRepository(ABSPATH);
 Git::commit('Installed VersionPress');

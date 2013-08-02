@@ -7,6 +7,7 @@ abstract class Git {
     // Constants
     private static $ADD_AND_COMMIT_COMMAND = "git add -A %s && git commit -m %s";
     private static $RELPATH_TO_GIT_ROOT_COMMAND = "git rev-parse --show-cdup";
+    private static $INIT_COMMAND = "git init -q";
 
     static function commit($message, $directory = "") {
         chdir(dirname(__FILE__));
@@ -17,6 +18,16 @@ abstract class Git {
         $gitAddPath = $directory . "/" . "*";
 
         $result = self::runShellCommand(self::$ADD_AND_COMMIT_COMMAND, $gitAddPath, $message);
+    }
+
+    static function isVersioned($directory) {
+        chdir($directory);
+        return self::runShellCommand('git status') !== NULL;
+    }
+
+    static function createGitRepository($directory) {
+        chdir($directory);
+        self::runShellCommand(self::$INIT_COMMAND);
     }
 
     private static function detectGitRoot() {
