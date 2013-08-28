@@ -29,7 +29,7 @@ abstract class SynchronizerBase implements Synchronizer {
     }
 
     function synchronize() {
-        $entities = $this->storage->loadAll();
+        $entities = $this->loadEntitiesFromStorage();
         $this->updateDatabase($entities);
         $this->fixReferences($entities);
         $this->mirrorDatabaseToStorage();
@@ -98,7 +98,7 @@ abstract class SynchronizerBase implements Synchronizer {
     private function mirrorDatabaseToStorage() {
 
         $entitiesInDatabase = $this->getEntitiesFromDatabase();
-        $entitiesInStorage = $this->storage->loadAll();
+        $entitiesInStorage = $this->loadEntitiesFromStorage();
 
         $getEntityId = function ($entity) {
             return $entity[$this->idColumnName];
@@ -143,7 +143,7 @@ abstract class SynchronizerBase implements Synchronizer {
         return $this->dbSchema->getPrefixedTableName($tableName);
     }
 
-    private function buildUpdateQuery($updateData) {
+    protected function buildUpdateQuery($updateData) {
         $id = $this->getId($updateData['vp_id']);
         $query = "UPDATE {$this->getPrefixedTableName($this->entityName)} SET";
         foreach ($updateData as $key => $value) {
@@ -159,7 +159,7 @@ abstract class SynchronizerBase implements Synchronizer {
         return (bool)$this->getId($vpId);
     }
 
-    private function buildCreateQuery($entity) {
+    protected function buildCreateQuery($entity) {
         $columns = array_keys($entity);
         $columns = array_filter($columns, function ($column) {
             return !Strings::startsWith($column, 'vp_');
@@ -274,6 +274,16 @@ abstract class SynchronizerBase implements Synchronizer {
     }
 
     protected function filterEntities($entities) {
+        return $entities;
+    }
+
+    protected  function transformEntities($entities) {
+        return $entities;
+    }
+
+    private function loadEntitiesFromStorage() {
+        $entities = $this->storage->loadAll();
+        $entities = $this->transformEntities($entities);
         return $entities;
     }
 }
