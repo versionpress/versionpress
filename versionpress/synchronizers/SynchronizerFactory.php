@@ -29,7 +29,8 @@ class SynchronizerFactory {
             'posts' => 'PostsSynchronizer',
             'comments' => 'CommentsSynchronizer',
             'options' => 'OptionsSynchronizer',
-            'users' => 'UsersSynchronizer'
+            'users' => 'UsersSynchronizer',
+            'usermeta' => 'UserMetaSynchronizer'
         );
 
         $synchronizerClass = $synchronizerClasses[$synchronizerName];
