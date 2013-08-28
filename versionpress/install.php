@@ -65,7 +65,7 @@ class VersionPressInstaller {
         $process[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_references`";
         $process[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_id`";
         $process[] = "CREATE TABLE `{$table_prefix}vp_id` (
-          `vp_id` BIGINT(20) NOT NULL,
+          `vp_id` BIGINT(20) NOT NULL AUTO_INCREMENT,
           `table` VARCHAR(64) NOT NULL,
           `id` BIGINT(20) NOT NULL,
           PRIMARY KEY (`vp_id`),
@@ -131,19 +131,11 @@ class VersionPressInstaller {
         $idColumnName = $this->dbSchema->getIdColumnName($entityName);
         $tableName = $this->getTableName($entityName);
         $entityIds = $this->database->get_col("SELECT $idColumnName FROM $tableName");
-        $idPairs = array();
-        $uniqid = round(hexdec(uniqid()) * rand(50, 100) / 100);
 
         foreach ($entityIds as $entityId) {
-            $idPairs[$entityId] = $uniqid;
-            $uniqid += 1000;
-        }
-
-        $this->idCache[$entityName] = $idPairs;
-
-        foreach ($idPairs as $entityId => $vpId) {
-            $query = "INSERT INTO {$this->getTableName('vp_id')} (`table`, vp_id, id) VALUES (\"$entityName\", $vpId, $entityId)";
+            $query = "INSERT INTO {$this->getTableName('vp_id')} (`table`, id) VALUES (\"$entityName\", $entityId)";
             $this->database->query($query);
+            $this->idCache[$entityName][$entityId] = $this->database->insert_id;
         }
     }
 

@@ -30,7 +30,7 @@ class MirroringDatabase extends wpdb {
         $shouldHaveId = $this->dbSchemaInfo->hasId($entityName);
 
         if ($shouldHaveId) {
-            $data['vp_id'] = $this->generateVpId();
+            $data['vp_id'] = $id;
             $this->saveId($entityName, $id, $data['vp_id']);
         }
 
@@ -61,7 +61,7 @@ class MirroringDatabase extends wpdb {
             $hasId = $this->hasId($entityName, $id);
 
             if (!$hasId) {
-                $data['vp_id'] = $this->generateVpId();
+                $data['vp_id'] = $this->insert_id;
                 $this->saveId($entityName, $id, $data['vp_id']);
             }
         }
@@ -106,10 +106,6 @@ class MirroringDatabase extends wpdb {
     private function addTablePrefix($entityName) {
         global $table_prefix;
         return $table_prefix . $entityName;
-    }
-
-    private function generateVpId() {
-        return hexdec(uniqid());
     }
 
     private function saveId($entityName, $id, $vpId) {
