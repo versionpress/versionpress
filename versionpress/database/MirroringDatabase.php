@@ -30,7 +30,7 @@ class MirroringDatabase extends wpdb {
         $shouldHaveId = $this->dbSchemaInfo->hasId($entityName);
 
         if ($shouldHaveId) {
-            $data['vp_id'] = $id;
+            $data['vp_id'] = $this->generateId();
             $this->saveId($entityName, $id, $data['vp_id']);
         }
 
@@ -61,7 +61,7 @@ class MirroringDatabase extends wpdb {
             $hasId = $this->hasId($entityName, $id);
 
             if (!$hasId) {
-                $data['vp_id'] = $this->insert_id;
+                $data['vp_id'] = $this->generateId();
                 $this->saveId($entityName, $id, $data['vp_id']);
             }
         }
@@ -110,7 +110,7 @@ class MirroringDatabase extends wpdb {
 
     private function saveId($entityName, $id, $vpId) {
         $vpIdTableName = $this->getVpIdTableName();
-        $query = "INSERT INTO $vpIdTableName (`vp_id`, `table`, `id`) VALUES ($vpId, \"$entityName\", $id)";
+        $query = "INSERT INTO $vpIdTableName (`vp_id`, `table`, `id`) VALUES (UNHEX('$vpId'), \"$entityName\", $id)";
         $this->query($query);
     }
 
@@ -127,8 +127,8 @@ class MirroringDatabase extends wpdb {
     private function deleteReferences($entityName, $id) {
         $vpIdTableName = $this->getVpIdTableName();
         $referencesTableName = $this->getVpReferenceTableName();
-        $vpId = $this->get_var("SELECT vp_id FROM $vpIdTableName WHERE `table` = \"$entityName\" AND id = $id");
-        $deleteQuery = "DELETE FROM $referencesTableName WHERE vp_id = $vpId";
+        $vpId = $this->get_var("SELECT HEX(vp_id) FROM $vpIdTableName WHERE `table` = \"$entityName\" AND id = $id");
+        $deleteQuery = "DELETE FROM $referencesTableName WHERE vp_id = UNHEX('$vpId')";
         $this->query($deleteQuery);
     }
 
@@ -157,15 +157,15 @@ class MirroringDatabase extends wpdb {
         $vpReferenceTableName = $this->getVpReferenceTableName();
 
         $query = "INSERT INTO $vpReferenceTableName (`table`, `reference`, `vp_id`, `reference_vp_id`)
-                    VALUES (\"$entityName\", \"$referenceName\", $vpId, $referenceId)
-                    ON DUPLICATE KEY UPDATE `reference_vp_id` = $referenceId";
+                    VALUES (\"$entityName\", \"$referenceName\", UNHEX('$vpId'), UNHEX('$referenceId'))
+                    ON DUPLICATE KEY UPDATE `reference_vp_id` = VALUES(reference_vp_id)";
         $this->query($query);
     }
 
     private function getReferenceId($entityName, $referenceName, $id) {
         $vpIdTableName = $this->getVpIdTableName();
         $reference = $this->dbSchemaInfo->getReference($entityName, $referenceName);
-        $getReferenceIdSql = "SELECT vp_id FROM $vpIdTableName WHERE `table` = \"$reference[table]\" AND id = $id";
+        $getReferenceIdSql = "SELECT HEX(vp_id) FROM $vpIdTableName WHERE `table` = \"$reference[table]\" AND id = $id";
         $referenceId = $this->get_var($getReferenceIdSql);
         return $referenceId;
     }
@@ -180,5 +180,9 @@ class MirroringDatabase extends wpdb {
             unset($data[$referenceName]);
         }
         return $data;
+    }
+
+    private function generateId() {
+        return Uuid::newUuidWithoutDelimiters();
     }
 }

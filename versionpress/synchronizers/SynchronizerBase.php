@@ -136,7 +136,7 @@ abstract class SynchronizerBase implements Synchronizer {
 
     private function getId($vpId) {
         $vpIdTableName = $this->getPrefixedTableName('vp_id');
-        return $this->database->get_var("SELECT id FROM $vpIdTableName WHERE `table` = \"$this->entityName\" AND vp_id = $vpId");
+        return $this->database->get_var("SELECT id FROM $vpIdTableName WHERE `table` = \"$this->entityName\" AND vp_id = UNHEX('$vpId')");
     }
 
     private function getPrefixedTableName($tableName) {
@@ -187,13 +187,13 @@ abstract class SynchronizerBase implements Synchronizer {
 
     private function createIdentifierRecord($vp_id, $id) {
         $query = "INSERT INTO {$this->getPrefixedTableName('vp_id')} (`table`, vp_id, id)
-            VALUES (\"{$this->entityName}\", $vp_id, $id)";
+            VALUES (\"{$this->entityName}\", UNHEX('$vp_id'), $id)";
         $this->executeQuery($query);
     }
 
     private function deleteEntitiesWhichAreNotInStorage($entities) {
         $vpIds = array_map(function ($entity) {
-            return $entity['vp_id'];
+            return 'UNHEX("' . $entity['vp_id'] . '")';
         }, $entities);
 
         $ids = $this->database->get_col("SELECT id FROM {$this->getPrefixedTableName('vp_id')} " .
@@ -223,8 +223,8 @@ abstract class SynchronizerBase implements Synchronizer {
             $referencesDetails[] = array(
                 '`table`' => "\"" . $this->entityName . "\"",
                 'reference' => "\"" . $referenceName . "\"",
-                'vp_id' => $entity['vp_id'],
-                'reference_vp_id' => $reference
+                'vp_id' => 'UNHEX("' . $entity['vp_id'] . '")',
+                'reference_vp_id' => 'UNHEX("' . $reference . '")'
             );
         }
 
@@ -253,7 +253,7 @@ abstract class SynchronizerBase implements Synchronizer {
     }
 
     private function getIdForEntity($entityName, $id) {
-        return $this->database->get_var("SELECT vp_id FROM {$this->getPrefixedTableName('vp_id')}
+        return $this->database->get_var("SELECT HEX(vp_id) FROM {$this->getPrefixedTableName('vp_id')}
         WHERE `table` = \"{$entityName}\" AND id = {$id}");
     }
 

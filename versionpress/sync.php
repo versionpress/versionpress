@@ -12,6 +12,7 @@ require_once(dirname(__FILE__) . '/synchronizers/PostsSynchronizer.php');
 require_once(dirname(__FILE__) . '/synchronizers/CommentsSynchronizer.php');
 require_once(dirname(__FILE__) . '/synchronizers/UsersSynchronizer.php');
 require_once(dirname(__FILE__) . '/synchronizers/UserMetaSynchronizer.php');
+require_once(dirname(__FILE__) . '/synchronizers/TermsSynchronizer.php');
 
 require_once(dirname(__FILE__) . '/synchronizers/SynchronizerFactory.php');
 require_once(dirname(__FILE__) . '/synchronizers/SynchronizationProcess.php');

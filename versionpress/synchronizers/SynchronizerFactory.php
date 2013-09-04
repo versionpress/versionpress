@@ -30,7 +30,8 @@ class SynchronizerFactory {
             'comments' => 'CommentsSynchronizer',
             'options' => 'OptionsSynchronizer',
             'users' => 'UsersSynchronizer',
-            'usermeta' => 'UserMetaSynchronizer'
+            'usermeta' => 'UserMetaSynchronizer',
+            'terms' => 'TermsSynchronizer',
         );
 
         $synchronizerClass = $synchronizerClasses[$synchronizerName];

@@ -19,6 +19,7 @@ require_once(dirname(__FILE__) . '/utils/Git.php');
 require_once(dirname(__FILE__) . '/utils/Neon.php');
 require_once(dirname(__FILE__) . '/utils/Arrays.php');
 require_once(dirname(__FILE__) . '/utils/Strings.php');
+require_once(dirname(__FILE__) . '/utils/Uuid.php');
 require_once(dirname(__FILE__) . '/Mirror.php');
 require_once(dirname(__FILE__) . '/ChangeInfo.php');
 
@@ -47,7 +48,7 @@ function createUpdatePostTermsHook(EntityStorage $storage, wpdb $wpdb) {
                 $postUpdateData[$taxonomy] = array_map(function ($term) use ($wpdb) {
                     global $table_prefix;
                     $vpIdTableName = $table_prefix . 'vp_id';
-                    return $wpdb->get_var("SELECT vp_id FROM $vpIdTableName WHERE id = {$term->term_id} AND `table` = 'terms'");
+                    return $wpdb->get_var("SELECT HEX(vp_id) FROM $vpIdTableName WHERE id = {$term->term_id} AND `table` = 'terms'");
                 }, $terms);
         }
 

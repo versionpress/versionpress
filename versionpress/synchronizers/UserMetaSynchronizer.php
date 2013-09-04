@@ -28,7 +28,7 @@ class UserMetaSynchronizer extends SynchronizerBase {
             'vp_id'
         );
 
-        $allMetaVpIdsQuery = sprintf('select reference_vp_id as user_vp_id, vp_id as meta_vp_id, meta_key, id as meta_id ' .
+        $allMetaVpIdsQuery = sprintf('select HEX(reference_vp_id) as user_vp_id, HEX(vp_id) as meta_vp_id, meta_key, id as meta_id ' .
             'from %s ' .
             'join %s on id = umeta_id ' .
             'where `table` = "usermeta"',
@@ -40,7 +40,6 @@ class UserMetaSynchronizer extends SynchronizerBase {
 
         $transformedEntities = array();
         foreach ($entities as $entity) {
-            $entity['vp_id'] = intval($entity['vp_id']);
             foreach($entity as $meta_key => $meta_value) {
                 if(in_array($meta_key, $propertiesBlacklist))
                     continue;
@@ -68,8 +67,8 @@ class UserMetaSynchronizer extends SynchronizerBase {
         $metaIdsMap = array();
 
         foreach ($metaIdsSource as $metaIdSource) {
-            $metaIdsMap[intval($metaIdSource->user_vp_id)][$metaIdSource->meta_key] =
-                array('meta_vp_id' => intval($metaIdSource->meta_vp_id), 'umeta_id' => intval($metaIdSource->meta_id));
+            $metaIdsMap[$metaIdSource->user_vp_id][$metaIdSource->meta_key] =
+                array('meta_vp_id' => $metaIdSource->meta_vp_id, 'umeta_id' => intval($metaIdSource->meta_id));
         }
         return $metaIdsMap;
     }

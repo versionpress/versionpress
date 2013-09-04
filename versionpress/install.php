@@ -18,6 +18,7 @@ require_once(dirname(__FILE__) . '/database/MirroringDatabase.php');
 require_once(dirname(__FILE__) . '/utils/IniSerializer.php');
 require_once(dirname(__FILE__) . '/utils/Git.php');
 require_once(dirname(__FILE__) . '/utils/Neon.php');
+require_once(dirname(__FILE__) . '/utils/Uuid.php');
 require_once(dirname(__FILE__) . '/Mirror.php');
 require_once(dirname(__FILE__) . '/ChangeInfo.php');
 
@@ -65,7 +66,7 @@ class VersionPressInstaller {
         $process[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_references`";
         $process[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_id`";
         $process[] = "CREATE TABLE `{$table_prefix}vp_id` (
-          `vp_id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+          `vp_id` BINARY(16) NOT NULL,
           `table` VARCHAR(64) NOT NULL,
           `id` BIGINT(20) NOT NULL,
           PRIMARY KEY (`vp_id`),
@@ -76,8 +77,8 @@ class VersionPressInstaller {
         $process[] = "CREATE TABLE `{$table_prefix}vp_references` (
           `table` VARCHAR(64) NOT NULL,
           `reference` VARCHAR(64) NOT NULL,
-          `vp_id` BIGINT(20) NOT NULL,
-          `reference_vp_id` BIGINT(20) NOT NULL,
+          `vp_id` BINARY(16) NOT NULL,
+          `reference_vp_id` BINARY(16) NOT NULL,
           PRIMARY KEY (`table`,`reference`,`vp_id`),
           KEY `reference_vp_id` (`reference_vp_id`),
           KEY `vp_id` (`vp_id`),
@@ -133,9 +134,11 @@ class VersionPressInstaller {
         $entityIds = $this->database->get_col("SELECT $idColumnName FROM $tableName");
 
         foreach ($entityIds as $entityId) {
-            $query = "INSERT INTO {$this->getTableName('vp_id')} (`table`, id) VALUES (\"$entityName\", $entityId)";
+            $vpId = Uuid::newUuidWithoutDelimiters();
+            $query = "INSERT INTO {$this->getTableName('vp_id')} (`table`, id, vp_id) VALUES (\"$entityName\", $entityId, UNHEX('$vpId'))";
+            echo $query . '<br>';
             $this->database->query($query);
-            $this->idCache[$entityName][$entityId] = $this->database->insert_id;
+            $this->idCache[$entityName][$entityId] = $vpId;
         }
     }
 
@@ -166,7 +169,7 @@ class VersionPressInstaller {
                 $referenceVpId = $this->idCache[$targetEntity][$entity[$referenceName]];
 
                 $query = "INSERT INTO {$this->getTableName('vp_references')} (`table`, reference, vp_id, reference_vp_id) " .
-                    "VALUES (\"$entityName\", \"$referenceName\", $vpId, $referenceVpId)";
+                    "VALUES (\"$entityName\", \"$referenceName\", UNHEX('$vpId'), UNHEX('$referenceVpId'))";
                 $this->database->query($query);
             }
         }
@@ -301,7 +304,7 @@ class VersionPressInstaller {
 
 global $wpdb, $table_prefix;
 
-mkdir(VERSIONPRESS_MIRRORING_DIR, 0777, true);
+@mkdir(VERSIONPRESS_MIRRORING_DIR, 0777, true);
 $dbSchema = new DbSchemaInfo(dirname(__FILE__) . '/database/schema.neon', $table_prefix);
 $storageFactory = new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR);
 $installer = new VersionPressInstaller($wpdb, $dbSchema, $storageFactory, $table_prefix);
