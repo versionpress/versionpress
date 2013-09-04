@@ -21,4 +21,4 @@ global $wpdb, $table_prefix, $storageFactory, $schemaInfo;
 $wpdb->show_errors();
 
 $synchronizationProcess = new SynchronizationProcess(new SynchronizerFactory($storageFactory, $wpdb, $schemaInfo));
-$synchronizationProcess->synchronize('options', 'posts', 'comments', 'users', 'usermeta');
+$synchronizationProcess->synchronize('options', 'posts', 'comments', 'users', 'usermeta', 'terms');
