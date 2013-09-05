@@ -32,6 +32,7 @@ class SynchronizerFactory {
             'users' => 'UsersSynchronizer',
             'usermeta' => 'UserMetaSynchronizer',
             'terms' => 'TermsSynchronizer',
+            'term_taxonomy' => 'TermTaxonomySynchronizer',
         );
 
         $synchronizerClass = $synchronizerClasses[$synchronizerName];

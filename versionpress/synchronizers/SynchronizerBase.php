@@ -217,7 +217,7 @@ abstract class SynchronizerBase implements Synchronizer {
 
         $referencesDetails = array();
         foreach ($references as $referenceName => $reference) {
-            if ($reference == 0)
+            if ($reference == "")
                 continue;
 
             $referencesDetails[] = array(

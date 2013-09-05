@@ -12,7 +12,7 @@ final class Uuid {
 
     // From: http://stackoverflow.com/questions/4049455/how-to-create-a-uuid-in-php-without-a-external-library
     private static function generate($formatString) {
-        return sprintf($formatString,
+        return strtoupper(sprintf($formatString,
             // 32 bits for "time_low"
             mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
 
@@ -30,7 +30,7 @@ final class Uuid {
 
             // 48 bits for "node"
             mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff )
-        );
+        ));
     }
 
     private function __construct() {

@@ -136,7 +136,6 @@ class VersionPressInstaller {
         foreach ($entityIds as $entityId) {
             $vpId = Uuid::newUuidWithoutDelimiters();
             $query = "INSERT INTO {$this->getTableName('vp_id')} (`table`, id, vp_id) VALUES (\"$entityName\", $entityId, UNHEX('$vpId'))";
-            echo $query . '<br>';
             $this->database->query($query);
             $this->idCache[$entityName][$entityId] = $vpId;
         }
@@ -230,11 +229,11 @@ class VersionPressInstaller {
         foreach ($references as $referenceName => $referenceInfo) {
             $targetEntity = $referenceInfo['table'];
 
-            if ($entity[$referenceName] == 0)
-                continue;
+            if ($entity[$referenceName] > 0) {
+                $referenceId = $this->idCache[$targetEntity][$entity[$referenceName]];
+                $entity['vp_' . $referenceName] = $referenceId;
+            }
 
-            $referenceId = $this->idCache[$targetEntity][$entity[$referenceName]];
-            $entity['vp_' . $referenceName] = $referenceId;
             unset($entity[$referenceName]);
         }
 
