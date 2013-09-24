@@ -2,7 +2,7 @@
 
 class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
 
-    protected $notSavedFields = array('vp_term_id', 'count');
+    protected $notSavedFields = array('vp_term_id', 'count', 'term_id');
 
     function __construct($file) {
         parent::__construct($file, 'term taxonomy', 'term_taxonomy_id');
@@ -49,6 +49,18 @@ class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
 
     public function shouldBeSaved($data) {
         return !(count($data) === 2 && isset($data['count'], $data[$this->idColumnName]));
+    }
+
+    function updateId($oldId, $newId) {
+        foreach($this->entities as &$term) {
+            if(!isset($term['taxonomies'])) continue;
+
+            if(isset($term['taxonomies'][$oldId])){
+                $term['taxonomies'][$newId] = $term['taxonomies'][$oldId];
+                unset($term['taxonomies'][$oldId]);
+            }
+        }
+        $this->saveEntities();
     }
 
     private function findTermId($data) {

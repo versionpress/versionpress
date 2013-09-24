@@ -68,6 +68,12 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
     function prepareStorage() {
     }
 
+    function updateId($oldId, $newId) {
+        $this->entities[$newId] = $this->entities[$oldId];
+        unset($this->entities[$oldId]);
+        $this->saveEntities();
+    }
+
     protected function saveEntity($data, $callback = null) {
         if (!$this->shouldBeSaved($data))
             return;

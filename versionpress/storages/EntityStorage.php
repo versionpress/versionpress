@@ -8,4 +8,5 @@ interface EntityStorage {
     function addChangeListener($callback);
     function shouldBeSaved($data);
     function prepareStorage();
+    function updateId($oldId, $newId);
 }

@@ -36,22 +36,17 @@ abstract class SynchronizerBase implements Synchronizer {
     }
 
     private function updateDatabase($entities) {
-        $entitiesWithoutIds = array_map(function ($entity) {
-            $entityClone = $entity;
-            unset($entityClone[$this->idColumnName]);
-            return $entityClone;
-        }, $entities);
+        $entities = $this->filterEntities($entities);
 
-        $entitiesWithoutIds = $this->filterEntities($entitiesWithoutIds);
-
-        foreach ($entitiesWithoutIds as $entity) {
+        foreach ($entities as $entity) {
             $vpId = $entity['vp_id'];
             $isExistingEntity = $this->isExistingEntity($vpId);
 
             if ($isExistingEntity) {
                 $this->updateEntityInDatabase($entity);
             } else {
-                $this->createEntityInDatabase($entity);
+                $databaseId = $this->createEntityInDatabase($entity);
+                $this->storage->updateId($entity[$this->idColumnName], $databaseId);
             }
         }
 
@@ -132,6 +127,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $this->executeQuery($createQuery);
         $id = $this->database->insert_id;
         $this->createIdentifierRecord($entity['vp_id'], $id);
+        return $id;
     }
 
     private function getId($vpId) {
@@ -147,8 +143,9 @@ abstract class SynchronizerBase implements Synchronizer {
         $id = $this->getId($updateData['vp_id']);
         $query = "UPDATE {$this->getPrefixedTableName($this->entityName)} SET";
         foreach ($updateData as $key => $value) {
-            if (!Strings::startsWith($key, 'vp_'))
-                $query .= " `$key` = " . (is_numeric($value) ? $value : '"' . mysql_real_escape_string($value) . '"') . ',';
+            if ($key == $this->idColumnName) continue;
+            if (Strings::startsWith($key, 'vp_')) continue;
+            $query .= " `$key` = " . (is_numeric($value) ? $value : '"' . mysql_real_escape_string($value) . '"') . ',';
         }
         $query[strlen($query) - 1] = ' '; // strip the last comma
         $query .= " WHERE $this->idColumnName = $id";
@@ -160,6 +157,7 @@ abstract class SynchronizerBase implements Synchronizer {
     }
 
     protected function buildCreateQuery($entity) {
+        unset($entity[$this->idColumnName]);
         $columns = array_keys($entity);
         $columns = array_filter($columns, function ($column) {
             return !Strings::startsWith($column, 'vp_');

@@ -55,6 +55,12 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
         @mkdir($this->directory, 0777, true);
     }
 
+    function updateId($oldId, $newId) {
+        $entity = $this->loadEntity($oldId);
+        $entity[$this->idColumnName] = $newId;
+        $this->save($entity);
+    }
+
     private function getFilename($id) {
         return $this->directory . '/' . $id . '.txt';
     }
@@ -140,5 +146,10 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
 
     protected function isExistingEntity($id) {
         return file_exists($this->getFilename($id));
+    }
+
+    private function loadEntity($id) {
+        $entities = $this->loadAllFromFiles(array($this->getFilename($id)));
+        return $entities[$id];
     }
 }
