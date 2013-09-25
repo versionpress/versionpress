@@ -33,9 +33,18 @@ class SynchronizerFactory {
             'usermeta' => 'UserMetaSynchronizer',
             'terms' => 'TermsSynchronizer',
             'term_taxonomy' => 'TermTaxonomySynchronizer',
+            'term_relationships' => 'TermRelationshipsSynchronizer',
         );
 
         $synchronizerClass = $synchronizerClasses[$synchronizerName];
-        return new $synchronizerClass($this->storageFactory->getStorage($synchronizerName), $this->database, $this->dbSchema);
+        return new $synchronizerClass($this->getStorage($synchronizerName), $this->database, $this->dbSchema);
+    }
+
+    private function getStorage($synchronizerName) {
+        static $synchronizerStorages = array(
+            'term_relationships' => 'posts'
+        );
+
+        return $this->storageFactory->getStorage(isset($synchronizerStorages[$synchronizerName]) ? $synchronizerStorages[$synchronizerName] : $synchronizerName);
     }
 }

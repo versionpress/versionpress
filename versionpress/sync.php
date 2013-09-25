@@ -14,6 +14,7 @@ require_once(dirname(__FILE__) . '/synchronizers/UsersSynchronizer.php');
 require_once(dirname(__FILE__) . '/synchronizers/UserMetaSynchronizer.php');
 require_once(dirname(__FILE__) . '/synchronizers/TermsSynchronizer.php');
 require_once(dirname(__FILE__) . '/synchronizers/TermTaxonomySynchronizer.php');
+require_once(dirname(__FILE__) . '/synchronizers/TermRelationShipsSynchronizer.php');
 
 require_once(dirname(__FILE__) . '/synchronizers/SynchronizerFactory.php');
 require_once(dirname(__FILE__) . '/synchronizers/SynchronizationProcess.php');
@@ -22,4 +23,4 @@ global $wpdb, $table_prefix, $storageFactory, $schemaInfo;
 $wpdb->show_errors();
 
 $synchronizationProcess = new SynchronizationProcess(new SynchronizerFactory($storageFactory, $wpdb, $schemaInfo));
-$synchronizationProcess->synchronize('terms', 'term_taxonomy');
+$synchronizationProcess->synchronize('term_relationships');

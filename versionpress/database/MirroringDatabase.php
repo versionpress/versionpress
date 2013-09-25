@@ -1,6 +1,6 @@
 <?php
 
-class MirroringDatabase extends wpdb {
+class MirroringDatabase extends ExtendedWpdb {
 
     /**
      * @var Mirror
