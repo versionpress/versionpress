@@ -23,4 +23,8 @@ global $wpdb, $table_prefix, $storageFactory, $schemaInfo;
 $wpdb->show_errors();
 
 $synchronizationProcess = new SynchronizationProcess(new SynchronizerFactory($storageFactory, $wpdb, $schemaInfo));
-$synchronizationProcess->synchronize('term_relationships');
+
+$synchronizationQueue = ['options', 'users', 'usermeta', 'posts', 'comments', 'terms', 'term_taxonomy', 'term_relationships'];
+
+$synchronizationProcess->synchronize($synchronizationQueue);
+Git::commit('Synchronized');
