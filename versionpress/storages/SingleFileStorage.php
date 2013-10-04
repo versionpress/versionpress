@@ -28,14 +28,7 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
         $this->notSavedFields[] = $idColumnName;
     }
 
-    function save($data, $restriction = array(), $id = 0) {
-        if (!isset($data[$this->idColumnName])) {
-            if (isset($restriction[$this->idColumnName]))
-                $data[$this->idColumnName] = $restriction[$this->idColumnName];
-            else
-                $data[$this->idColumnName] = $id;
-        }
-
+    function save($data) {
         $this->saveEntity($data, array($this, 'notifyOnChangeListeners'));
     }
 

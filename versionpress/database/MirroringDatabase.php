@@ -40,7 +40,10 @@ class MirroringDatabase extends ExtendedWpdb {
             $data = $this->saveReferences($entityName, $data);
         }
 
-        $this->mirror->save($entityName, $data, array(), $id);
+        $data[$this->dbSchemaInfo->getIdColumnName($entityName)] = $id;
+
+        $data = $this->fillId($entityName, $data, $id);
+        $this->mirror->save($entityName, $data);
 
         $this->insert_id = $id; // it was reset by saving id and references
         return $result;
@@ -72,7 +75,8 @@ class MirroringDatabase extends ExtendedWpdb {
             $data = $this->saveReferences($entityName, $data);
         }
 
-        $this->mirror->save($entityName, $data, $where);
+        $data = $this->fillId($entityName, $data, $where[$this->dbSchemaInfo->getIdColumnName($entityName)]);
+        $this->mirror->save($entityName, $data);
         return $result;
     }
 
@@ -118,7 +122,7 @@ class MirroringDatabase extends ExtendedWpdb {
         $referenceId = $this->getReferenceId($entityName, $referenceName, $id);
 
         if ($referenceId === null)
-            return;
+            return null;
 
         $this->creteReferenceRecord($entityName, $referenceName, $vpId, $referenceId);
         return $referenceId;
@@ -184,5 +188,13 @@ class MirroringDatabase extends ExtendedWpdb {
 
     private function generateId() {
         return Uuid::newUuidWithoutDelimiters();
+    }
+
+    private function fillId($entityName, $data, $id) {
+        $idColumnName = $this->dbSchemaInfo->getIdColumnName($entityName);
+        if (!isset($data[$idColumnName])) {
+            $data[$idColumnName] = $id;
+            return $data;
+        }
     }
 }
