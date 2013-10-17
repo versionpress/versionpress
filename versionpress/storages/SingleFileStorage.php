@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * Saves all entities of one type into single file
+ */
 abstract class SingleFileStorage extends ObservableStorage implements EntityStorage {
 
     protected $entities;

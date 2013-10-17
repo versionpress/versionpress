@@ -38,18 +38,7 @@ abstract class SynchronizerBase implements Synchronizer {
     private function updateDatabase($entities) {
         $entities = $this->filterEntities($entities);
 
-        foreach ($entities as $entity) {
-            $vpId = $entity['vp_id'];
-            $isExistingEntity = $this->isExistingEntity($vpId);
-
-            if ($isExistingEntity) {
-                $this->updateEntityInDatabase($entity);
-            } else {
-                $databaseId = $this->createEntityInDatabase($entity);
-                $this->storage->updateId($entity[$this->idColumnName], $databaseId);
-            }
-        }
-
+        $this->addOrUpdateEntities($entities);
         $this->deleteEntitiesWhichAreNotInStorage($entities);
     }
 
@@ -64,7 +53,7 @@ abstract class SynchronizerBase implements Synchronizer {
             $usedReferences = array_merge($usedReferences, $referenceDetails);
         }
 
-        if (count($usedReferences) > 0) {
+        if (count($usedReferences) > 0) { // update reference table
             $referenceTableName = $this->getPrefixedTableName('vp_references');
 
             $insertQuery = "INSERT INTO {$referenceTableName} (" . join(array_keys($usedReferences[0]), ', ') . ")
@@ -82,7 +71,7 @@ abstract class SynchronizerBase implements Synchronizer {
         }
 
         $references = $this->dbSchema->getReferences($this->entityName);
-        foreach($references as $referenceName => $_){
+        foreach($references as $referenceName => $_){ // update foreign keys by VersionPress references
             $updateQuery = "UPDATE {$this->getPrefixedTableName($this->entityName)} entity SET `{$referenceName}` =
             (SELECT reference_id FROM {$this->getPrefixedTableName('vp_reference_details')} ref
             WHERE ref.id=entity.{$this->idColumnName} AND `table` = \"{$this->entityName}\" and reference = \"{$referenceName}\")";
@@ -245,9 +234,8 @@ abstract class SynchronizerBase implements Synchronizer {
     }
 
     private function extendEntityWithIdentifier($entity) {
-        $entityClone = $entity;
-        $entityClone['vp_id'] = $this->getIdForEntity($this->entityName, $entity[$this->idColumnName]);
-        return $entityClone;
+        $entity['vp_id'] = $this->getIdForEntity($this->entityName, $entity[$this->idColumnName]);
+        return $entity;
     }
 
     private function getIdForEntity($entityName, $id) {
@@ -260,15 +248,14 @@ abstract class SynchronizerBase implements Synchronizer {
             return $entity;
 
         $references = $this->dbSchema->getReferences($this->entityName);
-        $entityClone = $entity;
 
         foreach($references as $referenceName => $referenceInfo) {
             if(!isset($entity[$referenceName]) || $entity[$referenceName] == 0)
                 continue;
-            $entityClone['vp_' . $referenceName] = $this->getIdForEntity($referenceInfo['table'], $entity[$referenceName]);
+            $entity['vp_' . $referenceName] = $this->getIdForEntity($referenceInfo['table'], $entity[$referenceName]);
         }
 
-        return $entityClone;
+        return $entity;
     }
 
     protected function filterEntities($entities) {
@@ -283,5 +270,19 @@ abstract class SynchronizerBase implements Synchronizer {
         $entities = $this->storage->loadAll();
         $entities = $this->transformEntities($entities);
         return $entities;
+    }
+
+    private function addOrUpdateEntities($entities) {
+        foreach ($entities as $entity) {
+            $vpId = $entity['vp_id'];
+            $isExistingEntity = $this->isExistingEntity($vpId);
+
+            if ($isExistingEntity) {
+                $this->updateEntityInDatabase($entity);
+            } else {
+                $databaseId = $this->createEntityInDatabase($entity);
+                $this->storage->updateId($entity[$this->idColumnName], $databaseId);
+            }
+        }
     }
 }

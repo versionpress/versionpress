@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Saves entities into separate files in given directory
+ */
 abstract class DirectoryStorage extends ObservableStorage implements EntityStorage {
     /**
      * @var string
@@ -124,12 +127,12 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
 
         $diffData = array();
         foreach ($data as $key => $value) {
-            if (!isset($entity[$key]) || (isset($entity[$key]) && $entity[$key] != $value))
+            if (!isset($entity[$key]) || (isset($entity[$key]) && $entity[$key] != $value)) // not present or different value
                 $diffData[$key] = $value;
         }
 
 
-        if (count($diffData) > 0 && $entity != $diffData) {
+        if (count($diffData) > 0) {
             $entity = array_merge($entity, $diffData);
             file_put_contents($filename, $this->serializeEntity($entity));
             if (is_callable($callback))

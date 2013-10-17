@@ -1,6 +1,10 @@
 <?php
+
 define('ARRAY_MAP', 'ARRAY_MAP');
 
+/**
+ * Adds new output format - a map, where first DB row is used as key and second one as value
+ */
 class ExtendedWpdb extends wpdb {
 
     function get_row($query = null, $output = OBJECT, $y = 0) {

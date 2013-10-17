@@ -10,7 +10,7 @@ class PostsSynchronizer extends SynchronizerBase {
 
         foreach ($entities as $entity) {
             $entityClone = $entity;
-            unset($entityClone['category'], $entityClone['post_tag']);
+            unset($entityClone['category'], $entityClone['post_tag']); // categories and tags are synchronized by TermRelationshipsSynchronizer
             $filteredEntities[] = $entityClone;
         }
 

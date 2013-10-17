@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Mirror reflects all DB changes to storages
+ */
 class Mirror {
     /**
      * @var EntityStorageFactory
@@ -44,10 +47,6 @@ class Mirror {
         return $this->changeList;
     }
 
-    /**
-     * @param string $entityType
-     * @return EntityStorage
-     */
     private function getStorage($entityType) {
 
         $storage = $this->storageFactory->getStorage($entityType);

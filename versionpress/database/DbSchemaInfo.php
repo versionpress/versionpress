@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Represents basic information about WordPress(+plugins) DB schema
+ * Information is loaded from given .neon file
+ */
 class DbSchemaInfo {
 
     private $schema;

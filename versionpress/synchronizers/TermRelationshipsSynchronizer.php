@@ -29,6 +29,13 @@ class TermRelationshipsSynchronizer implements Synchronizer {
         $this->fillTable($entities);
     }
 
+    /**
+     * Transforms $post from
+     *   $post[vp_id => x, category => y, post_tag => z] (object saved in file)
+     * to
+     *   $relationship[vp_object_id => x, vp_term_taxonomy_id => y]
+     *   $relationship[vp_object_id => x, vp_term_taxonomy_id => z] (entries in DB)
+     */
     private function transformEntities($entities) {
         $relationships = array();
 

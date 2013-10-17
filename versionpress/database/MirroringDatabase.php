@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * Mirroring database sends every change in DB (insert, update, delete) to file mirror
+ */
 class MirroringDatabase extends ExtendedWpdb {
 
     /**

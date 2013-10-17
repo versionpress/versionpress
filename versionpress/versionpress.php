@@ -31,7 +31,9 @@ $schemaFile = dirname(__FILE__) . '/database/schema.neon';
 $schemaInfo = new DbSchemaInfo($schemaFile, $table_prefix);
 $wpdb = new MirroringDatabase(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $mirror, $schemaInfo);
 
-
+// Hook for saving taxonomies into files
+// WordPress creates plain INSERT query and executes it using wpdb::query method instead of wpdb::insert.
+// It's too difficult to parse every INSERT query, that's why the WordPress hook is used.
 add_action('save_post', createUpdatePostTermsHook($storageFactory->getStorage('posts'), $wpdb));
 
 function createUpdatePostTermsHook(EntityStorage $storage, wpdb $wpdb) {
@@ -72,6 +74,7 @@ $buildCommitMessage = function (ChangeInfo $changeInfo) {
     return sprintf("%s %s with ID %s.", $verbs[$changeInfo->type], $changeInfo->entityType, $changeInfo->entityId);
 };
 
+// Checks if some entity has been changed. If so, it tries to commit.
 register_shutdown_function(function () use ($mirror, $buildCommitMessage) {
     if ($mirror->wasAffected()) {
         $changeList = $mirror->getChangeList();
