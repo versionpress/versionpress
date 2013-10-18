@@ -24,3 +24,9 @@ function versionpress_deactivate() {
 
 register_activation_hook(__FILE__, 'versionpress_activate');
 register_deactivation_hook(__FILE__, 'versionpress_deactivate');
+
+add_action( 'admin_menu', 'register_versionpress_menu' );
+
+function register_versionpress_menu(){
+    add_menu_page( 'VersionPress', 'VersionPress :)', 'manage_options', 'versionpress/test.php', '', plugins_url('akismet/akismet.gif' ), 0.001234987 );
+}
