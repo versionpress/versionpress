@@ -31,6 +31,7 @@ class IniSerializer {
         $output = array();
         $indentation = "  ";
         foreach ($data as $key => $value) {
+            if($key == '') continue;
             if (is_array($value))
                 if ($flat)
                     foreach ($value as $arrayKey => $arrayValue)

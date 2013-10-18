@@ -6,6 +6,7 @@ class OptionsStorage extends SingleFileStorage implements EntityStorage {
 
     function __construct($file) {
         parent::__construct($file, 'option', 'option_name');
+        $this->idColumnName = 'option_name';
     }
 
     public function shouldBeSaved($data) {

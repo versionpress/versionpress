@@ -39,18 +39,22 @@ add_action('save_post', createUpdatePostTermsHook($storageFactory->getStorage('p
 function createUpdatePostTermsHook(EntityStorage $storage, wpdb $wpdb) {
 
     return function ($postId) use ($storage, $wpdb) {
+        global $table_prefix;
+
         $post = get_post($postId);
         $postType = $post->post_type;
         $taxonomies = get_object_taxonomies($postType);
 
-        $postUpdateData = array('ID' => $postId);
+        $vpIdTableName = $table_prefix . 'vp_id';
+
+        $postVpId = $wpdb->get_var("SELECT HEX(vp_id) FROM $vpIdTableName WHERE id = $postId AND `table` = 'posts'");
+
+        $postUpdateData = array('vp_id' => $postVpId);
 
         foreach ($taxonomies as $taxonomy) {
             $terms = get_the_terms($postId, $taxonomy);
             if ($terms)
-                $postUpdateData[$taxonomy] = array_map(function ($term) use ($wpdb) {
-                    global $table_prefix;
-                    $vpIdTableName = $table_prefix . 'vp_id';
+                $postUpdateData[$taxonomy] = array_map(function ($term) use ($wpdb, $vpIdTableName) {
                     return $wpdb->get_var("SELECT HEX(vp_id) FROM $vpIdTableName WHERE id = {$term->term_id} AND `table` = 'terms'");
                 }, $terms);
         }
@@ -81,6 +85,6 @@ register_shutdown_function(function () use ($mirror, $buildCommitMessage) {
 
         $commitMessage = join(" ", array_map($buildCommitMessage, $changeList));
 
-        Git::commit($commitMessage, dirname(__FILE__) . '/db');
+        Git::commit($commitMessage);
     }
 });

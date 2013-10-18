@@ -24,7 +24,7 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
     }
 
     function delete($restriction) {
-        $fileName = $this->getFilename($restriction[$this->idColumnName]);
+        $fileName = $this->getFilename($restriction['vp_id']);
         if (is_file($fileName)) {
             unlink($fileName);
             $this->notifyChangeListeners($restriction, 'delete');
@@ -51,12 +51,6 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
         @mkdir($this->directory, 0777, true);
     }
 
-    function updateId($oldId, $newId) {
-        $entity = $this->loadEntity($oldId);
-        $entity[$this->idColumnName] = $newId;
-        $this->save($entity);
-    }
-
     private function getFilename($id) {
         return $this->directory . '/' . $id . '.txt';
     }
@@ -75,13 +69,14 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
         $excludeList = array('.', '..');
         $files = scandir($this->directory);
 
-        return array_diff($files, $excludeList);
+        $directory = $this->directory;
+        return array_map(function($filename) use ($directory) { return $directory . '/' . $filename; }, array_diff($files, $excludeList));
     }
 
     private function loadAllFromFiles($entityFiles) {
         $that = $this;
         return array_map(function ($entityFile) use ($that) {
-            return $that->deserializeEntity(file_get_contents($that->directory . '/' . $entityFile));
+            return $that->deserializeEntity(file_get_contents($entityFile));
         }, $entityFiles);
     }
 
@@ -97,13 +92,13 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
     private function createChangeInfo($entity, $changeType) {
         $changeInfo = new ChangeInfo();
         $changeInfo->entityType = $this->entityTypeName;
-        $changeInfo->entityId = $entity[$this->idColumnName];
+        $changeInfo->entityId = $entity['vp_id'];
         $changeInfo->type = $changeType;
         return $changeInfo;
     }
 
     private function saveEntity($data, $callback = null) {
-        $id = $data[$this->idColumnName];
+        $id = $data['vp_id'];
 
         if (!$id)
             return;

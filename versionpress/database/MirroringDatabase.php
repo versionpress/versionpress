@@ -54,6 +54,9 @@ class MirroringDatabase extends ExtendedWpdb {
     function update($table, $data, $where, $format = null, $where_format = null) {
         $result = parent::update($table, $data, $where, $format, $where_format);
         $entityName = $this->stripTablePrefix($table);
+        $idColumnName = $this->dbSchemaInfo->getIdColumnName($entityName);
+
+        $data = array_merge($data, $where);
 
         $shouldBeSaved = $this->mirror->shouldBeSaved($entityName, $data);
         if (!$shouldBeSaved)
@@ -62,12 +65,14 @@ class MirroringDatabase extends ExtendedWpdb {
         $shouldHaveId = $this->dbSchemaInfo->hasId($entityName);
 
         if ($shouldHaveId) {
-            $id = $where[$this->dbSchemaInfo->getIdColumnName($entityName)];
-            $hasId = $this->hasId($entityName, $id);
+            $id = $where[$idColumnName];
+            $vpId = $this->getVpId($entityName, $id);
 
-            if (!$hasId) {
+            if (!$vpId) {
                 $data['vp_id'] = $this->generateId();
                 $this->saveId($entityName, $id, $data['vp_id']);
+            } else {
+                $data['vp_id'] = $vpId;
             }
         }
 
@@ -77,7 +82,7 @@ class MirroringDatabase extends ExtendedWpdb {
             $data = $this->saveReferences($entityName, $data);
         }
 
-        $data = $this->fillId($entityName, $data, $where[$this->dbSchemaInfo->getIdColumnName($entityName)]);
+        $data = $this->fillId($entityName, $data, $where[$idColumnName]);
         $this->mirror->save($entityName, $data);
         return $result;
     }
@@ -97,10 +102,12 @@ class MirroringDatabase extends ExtendedWpdb {
         $hasId = $this->dbSchemaInfo->hasId($entityName);
 
         if ($hasId) {
+            $entityName = $this->stripTablePrefix($table);
+            $where['vp_id'] = $this->getVpId($entityName, $id);
             $this->deleteId($entityName, $id);
+            $this->mirror->delete($entityName, $where);
         }
 
-        $this->mirror->delete($this->stripTablePrefix($table), $where);
         return $result;
     }
 
@@ -131,9 +138,8 @@ class MirroringDatabase extends ExtendedWpdb {
     }
 
     private function deleteReferences($entityName, $id) {
-        $vpIdTableName = $this->getVpIdTableName();
         $referencesTableName = $this->getVpReferenceTableName();
-        $vpId = $this->get_var("SELECT HEX(vp_id) FROM $vpIdTableName WHERE `table` = \"$entityName\" AND id = $id");
+        $vpId = $this->getVpId($entityName, $id);
         $deleteQuery = "DELETE FROM $referencesTableName WHERE vp_id = UNHEX('$vpId')";
         $this->query($deleteQuery);
     }
@@ -145,10 +151,7 @@ class MirroringDatabase extends ExtendedWpdb {
     }
 
     private function hasId($entityName, $id) {
-        $vpIdTableName = $this->getVpIdTableName();
-        $query = "SELECT * FROM $vpIdTableName WHERE `table` = \"$entityName\" AND id = $id";
-        $result = $this->get_row($query);
-        return (bool)$result;
+        return (bool)$this->getVpId($entityName, $id);
     }
 
     private function getVpIdTableName() {
@@ -171,8 +174,7 @@ class MirroringDatabase extends ExtendedWpdb {
     private function getReferenceId($entityName, $referenceName, $id) {
         $vpIdTableName = $this->getVpIdTableName();
         $reference = $this->dbSchemaInfo->getReference($entityName, $referenceName);
-        $getReferenceIdSql = "SELECT HEX(vp_id) FROM $vpIdTableName WHERE `table` = \"$reference[table]\" AND id = $id";
-        $referenceId = $this->get_var($getReferenceIdSql);
+        $referenceId = $this->getVpId($reference['table'], $id);
         return $referenceId;
     }
 
@@ -196,7 +198,13 @@ class MirroringDatabase extends ExtendedWpdb {
         $idColumnName = $this->dbSchemaInfo->getIdColumnName($entityName);
         if (!isset($data[$idColumnName])) {
             $data[$idColumnName] = $id;
-            return $data;
         }
+        return $data;
+    }
+
+    private function getVpId($entityName, $id) {
+        $vpIdTableName = $this->getVpIdTableName();
+        $getVpIdSql = "SELECT HEX(vp_id) FROM $vpIdTableName WHERE `table` = \"$entityName\" AND id = $id";
+        return $this->get_var($getVpIdSql);
     }
 }

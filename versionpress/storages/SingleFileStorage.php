@@ -14,7 +14,7 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
     /**
      * @var string
      */
-    protected $idColumnName;
+    protected $idColumnName = 'vp_id';
 
     /**
      * @var string
@@ -25,9 +25,7 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
 
     function __construct($file, $entityTypeName, $idColumnName) {
         $this->file = $file;
-        $this->idColumnName = $idColumnName;
         $this->entityTypeName = $entityTypeName;
-        $this->notSavedFields[] = $idColumnName;
     }
 
     function save($data) {
@@ -61,12 +59,6 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
     }
 
     function prepareStorage() {
-    }
-
-    function updateId($oldId, $newId) {
-        $this->entities[$newId] = $this->entities[$oldId];
-        unset($this->entities[$oldId]);
-        $this->saveEntities();
     }
 
     protected function saveEntity($data, $callback = null) {
@@ -109,9 +101,6 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
     protected function loadEntities() {
         if (is_file($this->file)){
             $entities = IniSerializer::deserialize(file_get_contents($this->file));
-            foreach($entities as $id => &$entity)
-                if(!isset($entity[$this->idColumnName]))
-                    $entity[$this->idColumnName] = $id;
             $this->entities = $entities;
         }
         else

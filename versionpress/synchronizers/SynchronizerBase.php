@@ -179,6 +179,8 @@ abstract class SynchronizerBase implements Synchronizer {
     }
 
     private function deleteEntitiesWhichAreNotInStorage($entities) {
+        if(count($entities) == 0)
+            return;
         $vpIds = array_map(function ($entity) {
             return 'UNHEX("' . $entity['vp_id'] . '")';
         }, $entities);
@@ -280,8 +282,7 @@ abstract class SynchronizerBase implements Synchronizer {
             if ($isExistingEntity) {
                 $this->updateEntityInDatabase($entity);
             } else {
-                $databaseId = $this->createEntityInDatabase($entity);
-                $this->storage->updateId($entity[$this->idColumnName], $databaseId);
+                $this->createEntityInDatabase($entity);
             }
         }
     }

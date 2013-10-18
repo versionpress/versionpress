@@ -15,7 +15,7 @@ class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
         if ($termId === null)
             return;
 
-        $taxonomyId = $data[$this->idColumnName];
+        $taxonomyId = $data['vp_id'];
         $originalTaxonomies = $this->entities[$termId]['taxonomies'];
 
         $isNew = !isset($originalTaxonomies[$taxonomyId]);
@@ -31,7 +31,7 @@ class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
     }
 
     function delete($restriction) {
-        $taxonomyId = $restriction[$this->idColumnName];
+        $taxonomyId = $restriction['vp_id'];
 
         $this->loadEntities();
         $termId = $this->findTermId($restriction);
@@ -51,20 +51,8 @@ class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
         return !(count($data) === 2 && isset($data['count'], $data[$this->idColumnName]));
     }
 
-    function updateId($oldId, $newId) {
-        foreach($this->entities as &$term) {
-            if(!isset($term['taxonomies'])) continue;
-
-            if(isset($term['taxonomies'][$oldId])){
-                $term['taxonomies'][$newId] = $term['taxonomies'][$oldId];
-                unset($term['taxonomies'][$oldId]);
-            }
-        }
-        $this->saveEntities();
-    }
-
     private function findTermId($data) {
-        $taxonomyId = $data[$this->idColumnName];
+        $taxonomyId = $data['vp_id'];
 
         foreach ($this->entities as $termId => $term) {
             if (isset($term['taxonomies'][$taxonomyId])
