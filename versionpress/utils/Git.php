@@ -43,4 +43,8 @@ abstract class Git {
         $commandWithArguments = vsprintf($command, $escapedArgs);
         return @shell_exec($commandWithArguments);
     }
+
+    public static function pull() {
+        self::runShellCommand("git pull -s recursive -X theirs origin master");
+    }
 }
