@@ -11,7 +11,10 @@ class OptionsStorage extends SingleFileStorage implements EntityStorage {
 
     public function shouldBeSaved($data) {
         $id = $data[$this->idColumnName];
-        return !(substr($id, 0, 1) === '_' || $id === 'cron'); // With underscore begins all transient settings - there's no need to save them
-                                                               // Cron is specific for environment, so it's not saved, too.
+        return !(substr($id, 0, 1) === '_' // With underscore begins all transient settings - there's no need to save them
+                || $id === 'cron'          // Cron, siteurl and home are specific for environment, so they're not saved, too.
+                || $id === 'siteurl'
+                || $id === 'home');
+
     }
 }
