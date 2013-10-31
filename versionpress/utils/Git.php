@@ -47,4 +47,8 @@ abstract class Git {
     public static function pull() {
         self::runShellCommand("git pull -s recursive -X theirs origin master");
     }
+
+    public static function push() {
+        self::runShellCommand("git push origin master");
+    }
 }

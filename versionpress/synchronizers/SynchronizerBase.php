@@ -85,7 +85,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $entitiesInStorage = $this->loadEntitiesFromStorage();
 
         $getEntityId = function ($entity) {
-            return $entity[$this->idColumnName];
+            return $entity['vp_id'];
         };
 
         $dbEntityIds = array_map($getEntityId, $entitiesInDatabase);
@@ -95,7 +95,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $entitiesToSave = array_diff($dbEntityIds, $storageEntityIds);
 
         foreach ($entitiesToDelete as $entityId) {
-            $this->storage->delete(array($this->idColumnName => $entityId));
+            $this->storage->delete(array('vp_id' => $entityId));
         }
 
         foreach ($entitiesToSave as $key => $entityId) {
@@ -129,15 +129,16 @@ abstract class SynchronizerBase implements Synchronizer {
     }
 
     protected function buildUpdateQuery($updateData) {
-        $id = $this->getId($updateData['vp_id']);
-        $query = "UPDATE {$this->getPrefixedTableName($this->entityName)} SET";
+        $id = $updateData['vp_id'];
+        $tableName = $this->getPrefixedTableName($this->entityName);
+        $query = "UPDATE {$tableName} JOIN (SELECT * FROM wp_vp_id WHERE `table` = '{$this->entityName}') filtered_vp_id ON {$tableName}.{$this->idColumnName} = filtered_vp_id.id SET";
         foreach ($updateData as $key => $value) {
             if ($key == $this->idColumnName) continue;
             if (Strings::startsWith($key, 'vp_')) continue;
             $query .= " `$key` = " . (is_numeric($value) ? $value : '"' . mysql_real_escape_string($value) . '"') . ',';
         }
         $query[strlen($query) - 1] = ' '; // strip the last comma
-        $query .= " WHERE $this->idColumnName = $id";
+        $query .= " WHERE filtered_vp_id.vp_id = UNHEX('$id')";
         return $query;
     }
 
@@ -198,7 +199,10 @@ abstract class SynchronizerBase implements Synchronizer {
     }
 
     private function getEntitiesFromDatabase() {
-        return $this->database->get_results("SELECT * FROM {$this->getPrefixedTableName($this->entityName)}", ARRAY_A);
+        $tableName = $this->getPrefixedTableName($this->entityName);
+        $vpIdTable = $this->getPrefixedTableName('vp_id');
+        return $this->database->get_results("SELECT {$tableName}.*, HEX(vp_id) vp_id FROM {$tableName}
+        JOIN (SELECT * FROM {$vpIdTable} WHERE `table` = '{$this->entityName}') filtered_vp_id ON {$tableName}.{$this->idColumnName} = filtered_vp_id.id", ARRAY_A);
     }
 
     private function fixReferencesOfOneEntity($entity) {
