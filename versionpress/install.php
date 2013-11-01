@@ -310,4 +310,6 @@ $installer = new VersionPressInstaller($wpdb, $dbSchema, $storageFactory, $table
 $installer->install();
 if(!Git::isVersioned(dirname(__FILE__)))
     Git::createGitRepository(ABSPATH);
+
+Git::assumeUnchanged('wp-config.php');
 Git::commit('Installed VersionPress');

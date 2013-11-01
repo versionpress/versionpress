@@ -8,6 +8,7 @@ abstract class Git {
     private static $ADD_AND_COMMIT_COMMAND = "git add -A %s && git commit -m %s";
     private static $RELPATH_TO_GIT_ROOT_COMMAND = "git rev-parse --show-cdup";
     private static $INIT_COMMAND = "git init -q";
+    private static $ASSUME_UNCHANGED_COMMAND = "git update-index --assume-unchanged %s";
     private static $COMMIT_MESSAGE_PREFIX = '[VP] ';
 
     static function commit($message, $directory = "") {
@@ -50,5 +51,9 @@ abstract class Git {
 
     public static function push() {
         self::runShellCommand("git push origin master");
+    }
+
+    public static function assumeUnchanged($filename) {
+        self::runShellCommand(self::$ASSUME_UNCHANGED_COMMAND, $filename);
     }
 }
