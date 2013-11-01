@@ -19,7 +19,7 @@ class UserMetaStorage extends SingleFileStorage implements EntityStorage {
     function saveAll($entities) {
         foreach($entities as $entity) {
             $data = array(
-                'ID' => $entity['user_id'],
+                'vp_id' => $entity['vp_user_id'],
                 $entity['meta_key'] => $entity['meta_value']
             );
 

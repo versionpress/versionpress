@@ -99,7 +99,7 @@ class VersionPressInstaller {
     }
 
     private function lockDatabase() {
-        return;
+        return; // disabled for testing
         $entityNames = $this->dbSchema->getEntityNames();
         $tablePrefix = $this->tablePrefix;
         $tableNames = array_map(function ($entityName) use ($tablePrefix) {
