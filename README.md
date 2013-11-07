@@ -1,12 +1,12 @@
 # VersionPress #
 
 ## Prerequisites ##
-Apache webserver
-Git
 
-## Requirements ##
-PHP version 5.3 or greater
-MySQL version 5.0 or greater
+* Apache webserver
+* Git
+* PHP version 5.3 or greater
+* MySQL version 5.0 or greater
+
 
 ## Installation ##
 
@@ -17,6 +17,9 @@ MySQL version 5.0 or greater
 
 
 ## Apache Configuration Example ##
+
+Git push needs to be enabled on the server. This is an example config taken from [here](http://stackoverflow.com/questions/3817478/setting-up-git-server-on-windows-with-git-http-backend-exe#3982493):
+
 httpd.conf
 ```
 # ============================================================================
