@@ -1,6 +1,6 @@
 <?php
 
-require_once(VERSIONPRESS_PLUGIN_DIR . '/../../../wp-load.php');
+require_once(dirname(__FILE__) . '/../../../wp-load.php');
 require_once(VERSIONPRESS_PLUGIN_DIR . '/src/storages/EntityStorage.php');
 require_once(VERSIONPRESS_PLUGIN_DIR . '/src/storages/ObservableStorage.php');
 require_once(VERSIONPRESS_PLUGIN_DIR . '/src/storages/DirectoryStorage.php');

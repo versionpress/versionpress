@@ -4,7 +4,7 @@ define('WP_DEBUG', true);
 // Enable Debug logging to the /wp-content/debug.log file
 define('WP_DEBUG_LOG', true);
 
-require_once(VERSIONPRESS_PLUGIN_DIR . '/../../../wp-load.php');
+require_once(dirname(__FILE__) . '/../../../wp-load.php');
 require_once(VERSIONPRESS_PLUGIN_DIR . '/src/synchronizers/Synchronizer.php');
 require_once(VERSIONPRESS_PLUGIN_DIR . '/src/synchronizers/SynchronizerBase.php');
 require_once(VERSIONPRESS_PLUGIN_DIR . '/src/synchronizers/OptionsSynchronizer.php');
