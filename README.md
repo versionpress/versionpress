@@ -12,7 +12,7 @@
 
 1. Copy files into `wp-content` directory.
 2. Configure Apache
-3. Run wp-content/versionpress/install.php
+3. Activate plugin in WordPress administration
 4. Enjoy!
 
 
