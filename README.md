@@ -1,12 +1,12 @@
 # VersionPress #
 
 ## Prerequisites ##
-Apache webserver
-Git
+- Apache webserver
+- Git
 
 ## Requirements ##
-PHP version 5.3 or greater
-MySQL version 5.0 or greater
+- PHP version 5.3 or greater
+- MySQL version 5.0 or greater
 
 ## Installation ##
 
