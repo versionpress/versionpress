@@ -5,14 +5,14 @@ Author: Agilio
 Version: 0.0.1-alfa
 */
 function versionpress_activate() {
-    touch(VERSIONPRESS_DIR . '/.active');
+    touch(VERSIONPRESS_PLUGIN_DIR . '/.active');
     set_time_limit(0);
-    require_once(VERSIONPRESS_DIR . '/install.php');
+    require_once(VERSIONPRESS_PLUGIN_DIR . '/install.php');
 }
 
 function versionpress_deactivate() {
     global $wpdb, $table_prefix;
-    unlink(VERSIONPRESS_DIR . '/.active');
+    unlink(VERSIONPRESS_PLUGIN_DIR . '/.active');
 
     $queries[] = 'DROP VIEW `' . $table_prefix . 'vp_reference_details`;';
     $queries[] = 'DROP TABLE `' . $table_prefix . 'vp_references`, `' . $table_prefix . 'vp_id`;';
@@ -28,5 +28,5 @@ register_deactivation_hook(__FILE__, 'versionpress_deactivate');
 add_action( 'admin_menu', 'register_versionpress_menu' );
 
 function register_versionpress_menu(){
-    add_menu_page( 'VersionPress', 'VersionPress :)', 'manage_options', 'versionpress/test.php', '', plugins_url('akismet/akismet.gif' ), 0.001234987 );
+    add_menu_page( 'VersionPress', 'VersionPress', 'manage_options', 'versionpress/administration/sync.php', '', null, 0.001234987 );
 }
