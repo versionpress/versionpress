@@ -30,6 +30,7 @@ function replaceDatabaseSettings() {
     file_put_contents(ABSPATH . '/wp-config.php', implode(PHP_EOL, $configFileLines));
 }
 
+
 if (isset($_GET['pull'])) {
     Git::pull();
     replaceDatabaseSettings();
@@ -48,3 +49,21 @@ if (isset($_GET['push'])) {
 <form method="POST" action="<?php echo admin_url('admin.php?page=versionpress/administration/sync.php&push'); ?>">
     <input type="submit" value="Synchronize - push">
 </form>
+<table>
+    <tr>
+        <th></th>
+        <th>ID</th>
+        <th>Message</th>
+    </tr>
+    <?php
+    $commits = Git::log();
+    foreach($commits as $commit) {
+        echo "
+        <tr>
+            <td><a href='" . admin_url('admin.php?page=versionpress/administration/sync.php&revert=' . $commit['id']) . "' style='font-size: 18px;text-decoration:none;'>&#8630;</a></td>
+            <td>$commit[id]</td>
+            <td>$commit[message]</td>
+        </tr>";
+    }
+    ?>
+</table>

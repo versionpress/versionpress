@@ -56,4 +56,13 @@ abstract class Git {
     public static function assumeUnchanged($filename) {
         self::runShellCommand(self::$ASSUME_UNCHANGED_COMMAND, $filename);
     }
+
+    public static function log() {
+        $log = self::runShellCommand("git log --pretty=oneline");
+        $commits = explode("\n", $log);
+        return array_map(function ($commit){
+            list($id, $message) = explode(" ", $commit, 2);
+            return array("id" => $id, "message" => $message);
+        }, $commits);
+    }
 }
