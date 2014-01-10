@@ -5,14 +5,13 @@ Author: Agilio
 Version: 0.0.1-alfa
 */
 function versionpress_activate() {
-    touch(VERSIONPRESS_PLUGIN_DIR . '/.active');
-    set_time_limit(0);
-    require_once(VERSIONPRESS_PLUGIN_DIR . '/install.php');
+    copy(dirname(__FILE__) . '/_db.php', WP_CONTENT_DIR . '/db.php');
 }
 
 function versionpress_deactivate() {
     global $wpdb, $table_prefix;
     unlink(VERSIONPRESS_PLUGIN_DIR . '/.active');
+    unlink(WP_CONTENT_DIR . '/db.php');
 
     $queries[] = 'DROP VIEW `' . $table_prefix . 'vp_reference_details`;';
     $queries[] = 'DROP TABLE `' . $table_prefix . 'vp_references`, `' . $table_prefix . 'vp_id`;';
@@ -25,8 +24,29 @@ function versionpress_deactivate() {
 register_activation_hook(__FILE__, 'versionpress_activate');
 register_deactivation_hook(__FILE__, 'versionpress_deactivate');
 
+function isActive() {
+    return defined('VERSIONPRESS_PLUGIN_DIR') && file_exists(VERSIONPRESS_PLUGIN_DIR . '/.active');
+}
+
 add_action( 'admin_menu', 'register_versionpress_menu' );
 
 function register_versionpress_menu(){
-    add_menu_page( 'VersionPress', 'VersionPress', 'manage_options', 'versionpress/administration/sync.php', '', null, 0.001234987 );
+    add_menu_page(
+        'VersionPress',
+        'VersionPress',
+        'manage_options',
+        'versionpress/administration/index.php',
+        '',
+        null,
+        0.001234987
+    );
+
+    if(isActive())
+        add_submenu_page(
+            'versionpress/administration/index.php',
+            'Synchronization',
+            'Synchronization',
+            'manage_options',
+            'versionpress/administration/sync.php'
+        );
 }

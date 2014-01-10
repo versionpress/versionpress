@@ -33,8 +33,6 @@ class VersionPressInstaller {
      * @var DbSchemaInfo
      */
     private $dbSchema;
-
-
     /**
      * @var EntityStorageFactory
      */
@@ -57,6 +55,7 @@ class VersionPressInstaller {
         $this->saveReferences();
         $this->saveDatabaseToStorages();
         $this->commitDatabase();
+        $this->createGitRepository();
     }
 
     private function createVersionPressTables() {
@@ -298,18 +297,14 @@ class VersionPressInstaller {
 
         return $usermeta;
     }
+
+    private function createGitRepository() {
+        if(!Git::isVersioned(dirname(__FILE__))) {
+            Git::createGitRepository(ABSPATH);
+        }
+
+        Git::assumeUnchanged('wp-config.php');
+        Git::commit('Installed VersionPress');
+    }
+
 }
-
-
-global $wpdb, $table_prefix;
-
-@mkdir(VERSIONPRESS_MIRRORING_DIR, 0777, true);
-$dbSchema = new DbSchemaInfo(VERSIONPRESS_PLUGIN_DIR . '/src/database/schema.neon', $table_prefix);
-$storageFactory = new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR);
-$installer = new VersionPressInstaller($wpdb, $dbSchema, $storageFactory, $table_prefix);
-$installer->install();
-if(!Git::isVersioned(dirname(__FILE__)))
-    Git::createGitRepository(ABSPATH);
-
-Git::assumeUnchanged('wp-config.php');
-Git::commit('Installed VersionPress');
