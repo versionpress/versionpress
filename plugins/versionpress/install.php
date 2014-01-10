@@ -26,6 +26,10 @@ require_once(VERSIONPRESS_PLUGIN_DIR . '/src/ChangeInfo.php');
 
 class VersionPressInstaller {
     /**
+     * @var callable[]
+     */
+    public $onProgressChanged = array();
+    /**
      * @var wpdb
      */
     private $database;
@@ -49,6 +53,7 @@ class VersionPressInstaller {
     }
 
     public function install() {
+        $this->reportProgressChange("Installation starts");
         $this->createVersionPressTables();
         $this->lockDatabase();
         $this->createIdentifiers();
@@ -56,6 +61,7 @@ class VersionPressInstaller {
         $this->saveDatabaseToStorages();
         $this->commitDatabase();
         $this->createGitRepository();
+        $this->reportProgressChange("Installation finished");
     }
 
     private function createVersionPressTables() {
@@ -95,6 +101,8 @@ class VersionPressInstaller {
         foreach ($process as $query) {
             $this->database->query($query);
         }
+
+        $this->reportProgressChange("Created DB tables");
     }
 
     private function lockDatabase() {
@@ -122,6 +130,7 @@ class VersionPressInstaller {
         $entityNames = $this->dbSchema->getEntityNames();
         foreach ($entityNames as $entityName) {
             $this->createIdentifiersForEntityType($entityName);
+            $this->reportProgressChange("Created identifiers for " . $entityName);
         }
     }
 
@@ -145,6 +154,7 @@ class VersionPressInstaller {
         $entityNames = $this->dbSchema->getEntityNames();
         foreach ($entityNames as $entityName) {
             $this->saveReferencesForEntityType($entityName);
+            $this->reportProgressChange("Saved references to " . $entityName);
         }
     }
 
@@ -188,6 +198,7 @@ class VersionPressInstaller {
             $this->database->query("UNLOCK TABLES");
             $this->isDatabaseLocked = false;
         }
+        $this->reportProgressChange("Finishing changes");
     }
 
     private function getTableName($entityName) {
@@ -198,6 +209,7 @@ class VersionPressInstaller {
         $storageNames = $this->storageFactory->getAllSupportedStorages();
         foreach ($storageNames as $entityName) {
             $this->saveAllEntitiesToStorage($entityName);
+            $this->reportProgressChange("All " . $entityName . "saved into files");
         }
     }
 
@@ -300,11 +312,18 @@ class VersionPressInstaller {
 
     private function createGitRepository() {
         if(!Git::isVersioned(dirname(__FILE__))) {
+            $this->reportProgressChange("Creating Git repository...");
             Git::createGitRepository(ABSPATH);
+            $this->reportProgressChange("Repository created");
         }
 
         Git::assumeUnchanged('wp-config.php');
         Git::commit('Installed VersionPress');
     }
 
+    private function reportProgressChange($message) {
+        foreach($this->onProgressChanged as $listener) {
+            call_user_func($listener, $message);
+        }
+    }
 }
