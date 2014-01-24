@@ -64,27 +64,87 @@ function createUpdatePostTermsHook(EntityStorage $storage, wpdb $wpdb) {
     };
 }
 
-$buildCommitMessage = function (ChangeInfo $changeInfo) {
-    // Samples:
-    // Created post with ID 1
-    // Edited post with ID 2
-    // Deleted post with ID 3
-    static $verbs = array(
-        'create' => 'Created',
-        'edit' => 'Edited',
-        'delete' => 'Deleted'
-    );
+class Committer {
 
-    return sprintf("%s %s with ID %s.", $verbs[$changeInfo->type], $changeInfo->entityType, $changeInfo->entityId);
-};
+    /**
+     * @var Mirror
+     */
+    private $mirror;
+    private $forcedCommitMessage;
 
-// Checks if some entity has been changed. If so, it tries to commit.
-register_shutdown_function(function () use ($mirror, $buildCommitMessage) {
-    if ($mirror->wasAffected()) {
-        $changeList = $mirror->getChangeList();
+    public function __construct(Mirror $mirror) {
 
-        $commitMessage = join(" ", array_map($buildCommitMessage, $changeList));
-
-        Git::commit($commitMessage);
+        $this->mirror = $mirror;
     }
+
+    /**
+     * Checks if some entity has been changed. If so, it tries to commit.
+     */
+    public function commit () {
+        if($this->forcedCommitMessage) {
+            @unlink(get_home_path() . 'versionpress.maintenance');
+            Git::commit($this->forcedCommitMessage);
+            $this->forcedCommitMessage = null;
+        } elseif ($this->mirror->wasAffected() && $this->shouldCommit()) {
+            $changeList = $this->mirror->getChangeList();
+            $commitMessage = join(" ", array_map(array($this, 'formatCommitMessagePart'), $changeList));
+
+            Git::commit($commitMessage);
+        }
+    }
+
+    public function forceUpdateCommitMessage() {
+        require( get_home_path() . '/wp-includes/version.php' );
+        $this->forcedCommitMessage = 'WordPress updated to version ' . $wp_version;
+    }
+
+    /**
+     * Converts ChangeInfo to human readable string.
+     *
+     * Samples:
+     * Created post with ID 1
+     * Edited post with ID 2
+     * Deleted post with ID 3
+     *
+     * @param ChangeInfo $changeInfo
+     * @return string
+     */
+    private function formatCommitMessagePart(ChangeInfo $changeInfo) {
+        static $verbs = array(
+            'create' => 'Created',
+            'edit' => 'Edited',
+            'delete' => 'Deleted'
+        );
+
+        return sprintf("%s %s with ID %s.", $verbs[$changeInfo->type], $changeInfo->entityType, $changeInfo->entityId);
+    }
+
+    private function shouldCommit() {
+        // proof of concept
+        if($this->dbWasUpdated() && $this->existsMaintenanceFile())
+            return false;
+        return true;
+    }
+
+    private function dbWasUpdated() {
+        $changes = $this->mirror->getChangeList();
+        /** @var $change ChangeInfo */
+        foreach ($changes as $change) {
+            if ($change->entityType == 'option' && $change->entityId == 'db_version')
+                return true;
+        }
+        return false;
+    }
+
+    private function existsMaintenanceFile() {
+        $maintenanceFilePattern = get_home_path() . '*.maintenance';
+        return count(glob($maintenanceFilePattern)) > 0;
+    }
+}
+
+$committer = new Committer($mirror);
+add_filter('update_feedback', function () {
+    touch(get_home_path() . 'versionpress.maintenance');
 });
+add_action('_core_updated_successfully', array($committer, 'forceUpdateCommitMessage'));
+register_shutdown_function(array($committer, 'commit'));
