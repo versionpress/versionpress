@@ -209,7 +209,7 @@ class VersionPressInstaller {
         $storageNames = $this->storageFactory->getAllSupportedStorages();
         foreach ($storageNames as $entityName) {
             $this->saveAllEntitiesToStorage($entityName);
-            $this->reportProgressChange("All " . $entityName . "saved into files");
+            $this->reportProgressChange("All " . $entityName . " saved into files");
         }
     }
 
