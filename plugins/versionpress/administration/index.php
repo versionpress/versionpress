@@ -11,11 +11,7 @@ function initialize() {
     $dbSchema = new DbSchemaInfo(VERSIONPRESS_PLUGIN_DIR . '/src/database/schema.neon', $table_prefix);
     $storageFactory = new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR);
     $installer = new VersionPressInstaller($wpdb, $dbSchema, $storageFactory, $table_prefix);
-    $installer->onProgressChanged[] = function ($message) {
-        echo $message . "<br>";
-        ob_flush();
-        flush();
-    };
+    $installer->onProgressChanged[] = 'show_message';
     $installer->install();
 }
 
