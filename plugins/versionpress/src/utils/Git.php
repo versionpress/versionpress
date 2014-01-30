@@ -65,4 +65,11 @@ abstract class Git {
             return array("id" => $id, "message" => $message);
         }, $commits);
     }
+
+    public static function revert($commit) {
+        self::detectGitRoot();
+        chdir(self::$gitRoot);
+        self::runShellCommand("git checkout %s .", $commit);
+        self::commit(sprintf("Revert to %s", $commit));
+    }
 }

@@ -41,6 +41,12 @@ if (isset($_GET['push'])) {
     Git::push();
     file_get_contents("http://localhost/wordpress/wp-content/versionpress/sync.php");
 }
+
+if (isset($_GET['revert'])) {
+    Git::revert($_GET['revert']);
+    require_once __DIR__ . '/../../versionpress/sync.php';
+}
+
 ?>
 <h1>VersionPress</h1>
 <form method="POST" action="<?php echo admin_url('admin.php?page=versionpress/administration/sync.php&pull'); ?>">
