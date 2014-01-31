@@ -314,11 +314,11 @@ class VersionPressInstaller {
         if(!Git::isVersioned(dirname(__FILE__))) {
             $this->reportProgressChange("Creating Git repository...");
             Git::createGitRepository(ABSPATH);
-            $this->reportProgressChange("Repository created");
         }
 
         Git::assumeUnchanged('wp-config.php');
         Git::commit('Installed VersionPress');
+        $this->reportProgressChange("Created initial commit");
     }
 
     private function reportProgressChange($message) {

@@ -42,11 +42,6 @@ if (isset($_GET['push'])) {
     file_get_contents("http://localhost/wordpress/wp-content/versionpress/sync.php");
 }
 
-if (isset($_GET['revert'])) {
-    Git::revert($_GET['revert']);
-    require_once __DIR__ . '/../../versionpress/sync.php';
-}
-
 ?>
 <h1>VersionPress</h1>
 <form method="POST" action="<?php echo admin_url('admin.php?page=versionpress/administration/sync.php&pull'); ?>">
@@ -55,21 +50,3 @@ if (isset($_GET['revert'])) {
 <form method="POST" action="<?php echo admin_url('admin.php?page=versionpress/administration/sync.php&push'); ?>">
     <input type="submit" value="Synchronize - push">
 </form>
-<table>
-    <tr>
-        <th></th>
-        <th>ID</th>
-        <th>Message</th>
-    </tr>
-    <?php
-    $commits = Git::log();
-    foreach($commits as $commit) {
-        echo "
-        <tr>
-            <td><a href='" . admin_url('admin.php?page=versionpress/administration/sync.php&revert=' . $commit['id']) . "' style='font-size: 18px;text-decoration:none;'>&#8630;</a></td>
-            <td>$commit[id]</td>
-            <td>$commit[message]</td>
-        </tr>";
-    }
-    ?>
-</table>

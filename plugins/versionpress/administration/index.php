@@ -1,6 +1,5 @@
 <?php
-    if(isset($_GET['init']))
-        initialize();
+$isInitialized = is_file(VERSIONPRESS_PLUGIN_DIR . '/.active');
 
 function initialize() {
     require_once(VERSIONPRESS_PLUGIN_DIR . '/install.php');
@@ -17,7 +16,45 @@ function initialize() {
     touch(VERSIONPRESS_PLUGIN_DIR . '/.active');
 }
 
+
+if(isset($_GET['init']) && !$isInitialized) {
+    initialize();
 ?>
-<form method="POST" action="<?php echo admin_url('admin.php?page=versionpress/administration/index.php&init'); ?>">
-    <input type="submit" value="Initialize">
-</form>
+    <script type="text/javascript">
+        window.location = '<?php echo admin_url('admin.php?page=versionpress/administration/index.php'); ?>';
+    </script>
+<?php
+} elseif(!$isInitialized) {
+?>
+    <form method="POST" action="<?php echo admin_url('admin.php?page=versionpress/administration/index.php&init'); ?>">
+        <input type="submit" value="Initialize">
+    </form>
+<?php
+} else {
+    if (isset($_GET['revert'])) {
+        Git::revert($_GET['revert']);
+        require_once __DIR__ . '/../../versionpress/sync.php';
+    }
+?>
+    <h1>VersionPress</h1>
+    <table>
+        <tr>
+            <th></th>
+            <th>ID</th>
+            <th>Message</th>
+        </tr>
+        <?php
+        $commits = Git::log();
+        foreach($commits as $commit) {
+            echo "
+        <tr>
+            <td><a href='" . admin_url('admin.php?page=versionpress/administration/index.php&revert=' . $commit['id']) . "' style='font-size: 18px;text-decoration:none;'>&#8630;</a></td>
+            <td>$commit[id]</td>
+            <td>$commit[message]</td>
+        </tr>";
+        }
+        ?>
+    </table>
+<?php
+}
+?>
