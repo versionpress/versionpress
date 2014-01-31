@@ -19,8 +19,12 @@ abstract class Git {
         $directory = $directory === "" ? self::$gitRoot : $directory;
         $gitAddPath = $directory . "/" . "*";
 
-        $currentUser = wp_get_current_user();
-        $author = "{$currentUser->display_name} <{$currentUser->user_email}>";
+        if(is_user_logged_in() && is_admin()) {
+            $currentUser = wp_get_current_user();
+            $author = "{$currentUser->display_name} <{$currentUser->user_email}>";
+        } else {
+            $author = "Public Action <public.action@example.com>";
+        }
 
         self::runShellCommand(self::$ADD_AND_COMMIT_COMMAND, $gitAddPath, self::$COMMIT_MESSAGE_PREFIX . $message, $author);
     }
