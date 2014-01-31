@@ -93,9 +93,8 @@ class Committer {
         }
     }
 
-    public function forceUpdateCommitMessage() {
-        require( get_home_path() . '/wp-includes/version.php' );
-        $this->forcedCommitMessage = 'WordPress updated to version ' . $wp_version;
+    public function forceCommitMessage($commitMessage) {
+        $this->forcedCommitMessage = $commitMessage;
     }
 
     /**
@@ -146,5 +145,23 @@ $committer = new Committer($mirror);
 add_filter('update_feedback', function () {
     touch(get_home_path() . 'versionpress.maintenance');
 });
-add_action('_core_updated_successfully', array($committer, 'forceUpdateCommitMessage'));
+add_action('_core_updated_successfully', function() use ($committer) {
+    require( get_home_path() . '/wp-includes/version.php' ); // load constants (like $wp_version)
+    /** @var $wp_version */
+    $committer->forceCommitMessage('WordPress updated to version ' . $wp_version);
+});
+
+add_action('activated_plugin', function($pluginName) use ($committer) {
+    $committer->forceCommitMessage('Plugin "' . $pluginName .'" was activated');
+});
+
+add_action('deactivated_plugin', function($pluginName) use ($committer) {
+    $committer->forceCommitMessage('Plugin "' . $pluginName .'" was deactivated');
+});
+
+add_action('upgrader_process_complete', function($upgrader, $hook_extra) use ($committer) {
+    $pluginName = $hook_extra['plugin'];
+    $committer->forceCommitMessage('Plugin "' . $pluginName .'" was updated');
+}, 10, 2);
+
 register_shutdown_function(array($committer, 'commit'));
