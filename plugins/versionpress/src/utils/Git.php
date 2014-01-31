@@ -5,7 +5,7 @@ abstract class Git {
     private static $gitRoot = null;
 
     // Constants
-    private static $ADD_AND_COMMIT_COMMAND = "git add -A %s && git commit -m %s";
+    private static $ADD_AND_COMMIT_COMMAND = "git add -A %s && git commit -m %s --author %s";
     private static $RELPATH_TO_GIT_ROOT_COMMAND = "git rev-parse --show-cdup";
     private static $INIT_COMMAND = "git init -q";
     private static $ASSUME_UNCHANGED_COMMAND = "git update-index --assume-unchanged %s";
@@ -19,7 +19,10 @@ abstract class Git {
         $directory = $directory === "" ? self::$gitRoot : $directory;
         $gitAddPath = $directory . "/" . "*";
 
-        self::runShellCommand(self::$ADD_AND_COMMIT_COMMAND, $gitAddPath, self::$COMMIT_MESSAGE_PREFIX . $message);
+        $currentUser = wp_get_current_user();
+        $author = "{$currentUser->display_name} <{$currentUser->user_email}>";
+
+        self::runShellCommand(self::$ADD_AND_COMMIT_COMMAND, $gitAddPath, self::$COMMIT_MESSAGE_PREFIX . $message, $author);
     }
 
     static function isVersioned($directory) {
@@ -42,6 +45,7 @@ abstract class Git {
         array_shift($functionArgs); // Remove $command
         $escapedArgs = @array_map("escapeshellarg", $functionArgs);
         $commandWithArguments = vsprintf($command, $escapedArgs);
+        NDebugger::barDump($commandWithArguments);
         return @shell_exec($commandWithArguments);
     }
 
