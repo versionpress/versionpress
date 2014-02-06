@@ -49,8 +49,9 @@ abstract class Git {
     }
 
     private static function runShellCommand($command, $args = '') {
-        $commandWithArguments = self::prepareCommand($command, $args);
+        $commandWithArguments = call_user_func_array('Git::prepareCommand', func_get_args());
         NDebugger::log('Running command: ' . $commandWithArguments);
+        NDebugger::log('CWD: ' . getcwd());
         $result = self::runProcess($commandWithArguments);
         NDebugger::log('STDOUT: ' . $result['stdout']);
         NDebugger::log('STDERR: ' . $result['stderr']);
@@ -81,7 +82,8 @@ abstract class Git {
     public static function revert($commit) {
         self::detectGitRoot();
         chdir(self::$gitRoot);
-        self::runShellCommand("git checkout %s .", $commit);
+        $commitRange = sprintf("%s..HEAD", $commit);
+        self::runShellCommand("git revert -n %s", $commitRange);
         self::commit(sprintf("Revert to %s", $commit));
     }
 
@@ -91,7 +93,7 @@ abstract class Git {
             2 => array('pipe', 'w')
         );
 
-        $process = proc_open($cmd, $descriptor, $pipes);
+        $process = proc_open($cmd, $descriptor, $pipes, getcwd());
 
         $result = array(
             'stdout' => '',
