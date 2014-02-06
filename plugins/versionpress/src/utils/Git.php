@@ -49,11 +49,12 @@ abstract class Git {
     }
 
     private static function runShellCommand($command, $args = '') {
-        $functionArgs = func_get_args();
-        array_shift($functionArgs); // Remove $command
-        $escapedArgs = @array_map("escapeshellarg", $functionArgs);
-        $commandWithArguments = vsprintf($command, $escapedArgs);
-        return @shell_exec($commandWithArguments);
+        $commandWithArguments = self::prepareCommand($command, $args);
+        NDebugger::log('Running command: ' . $commandWithArguments);
+        $result = self::runProcess($commandWithArguments);
+        NDebugger::log('STDOUT: ' . $result['stdout']);
+        NDebugger::log('STDERR: ' . $result['stderr']);
+        return $result['stdout'];
     }
 
     public static function pull() {
@@ -69,7 +70,7 @@ abstract class Git {
     }
 
     public static function log() {
-        $log = self::runShellCommand("git log --pretty=oneline");
+        $log = trim(self::runShellCommand("git log --pretty=oneline"), "\n");
         $commits = explode("\n", $log);
         return array_map(function ($commit){
             list($id, $message) = explode(" ", $commit, 2);
@@ -82,5 +83,36 @@ abstract class Git {
         chdir(self::$gitRoot);
         self::runShellCommand("git checkout %s .", $commit);
         self::commit(sprintf("Revert to %s", $commit));
+    }
+
+    private static function runProcess($cmd) {
+        $descriptor = array(
+            1 => array('pipe', 'w'),
+            2 => array('pipe', 'w')
+        );
+
+        $process = proc_open($cmd, $descriptor, $pipes);
+
+        $result = array(
+            'stdout' => '',
+            'stderr' => ''
+        );
+
+        if(is_resource($process)) {
+            $result['stdout'] = stream_get_contents($pipes[1]);
+            $result['stderr'] = stream_get_contents($pipes[2]);
+        }
+
+        proc_close($process);
+
+        return $result;
+    }
+
+    private static function prepareCommand($command, $args = '') {
+        $functionArgs = func_get_args();
+        array_shift($functionArgs); // Remove $command
+        $escapedArgs = @array_map("escapeshellarg", $functionArgs);
+        $commandWithArguments = vsprintf($command, $escapedArgs);
+        return $commandWithArguments;
     }
 }
