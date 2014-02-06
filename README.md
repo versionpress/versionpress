@@ -9,10 +9,11 @@
 
 ## Installation ##
 
-1. Copy files into `wp-content` directory.
-2. Configure Apache
+1. Copy `plugins/versionpress` into `wp-content/plugins` directory.
+2. Configure Apache (if you want synchronize between two environments)
 3. Activate plugin in WordPress administration
-4. Enjoy!
+4. Go to VersionPress section in administration and click on "Initialize"
+5. Enjoy!
 
 
 ## Apache Configuration Example ##
