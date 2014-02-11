@@ -35,7 +35,7 @@ abstract class Git {
 
     static function isVersioned($directory) {
         chdir($directory);
-        return self::runShellCommand('git status') !== NULL;
+        return self::runShellCommand('git status') !== '';
     }
 
     static function createGitRepository($directory) {
