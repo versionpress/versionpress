@@ -13,9 +13,11 @@ abstract class Git {
     private static $CONFIG_COMMAND = "git config user.name %s && git config user.email %s";
 
     static function commit($message, $directory = "") {
-        chdir(dirname(__FILE__));
         if ($directory === "" && self::$gitRoot === null) {
+            $cwd = getcwd();
+            chdir(dirname(__FILE__));
             self::detectGitRoot();
+            chdir($cwd);
         }
         $directory = $directory === "" ? self::$gitRoot : $directory;
         $gitAddPath = $directory . "/" . "*";
@@ -72,6 +74,9 @@ abstract class Git {
 
     public static function log() {
         $log = trim(self::runShellCommand("git log --pretty=oneline"), "\n");
+        if($log === "")
+            return array();
+
         $commits = explode("\n", $log);
         return array_map(function ($commit){
             list($id, $message) = explode(" ", $commit, 2);
