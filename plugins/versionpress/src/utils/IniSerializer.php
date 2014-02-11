@@ -24,23 +24,23 @@ class IniSerializer {
             $output[] = "[" . $parentFullName . $sectionName . "]";
 
         $output = array_merge($output, self::serializeData($data, $parentFullName . $sectionName . "."));
+        $output[] = ""; // empty line after section
         return $output;
     }
 
     private static function serializeData($data, $parentFullName, $flat = false) {
         $output = array();
-        $indentation = "  ";
         foreach ($data as $key => $value) {
             if($key == '') continue;
             if (is_array($value))
-                if ($flat)
+                if ($flat) {
                     foreach ($value as $arrayKey => $arrayValue)
-                        $output[] = self::formatEntry($indentation, $key . "[$arrayKey]", $arrayValue);
-                else
+                        $output[] = self::formatEntry($key . "[$arrayKey]", $arrayValue);
+                } else {
                     $output = array_merge($output, self::serializeSection($key, $value, $parentFullName));
-
+                }
             else
-                $output[] = self::formatEntry($indentation, $key, $value);
+                $output[] = self::formatEntry($key, $value);
         }
         return $output;
     }
@@ -57,8 +57,8 @@ class IniSerializer {
         return implode("\r\n", $output);
     }
 
-    private static function formatEntry($indentation, $key, $value) {
-        return $indentation . $key . " = " . (is_numeric($value) ? $value : '"' . self::escapeDoubleQuotes($value) . '"');
+    private static function formatEntry($key, $value) {
+        return $key . " = " . (is_numeric($value) ? $value : '"' . self::escapeDoubleQuotes($value) . '"');
     }
 
     /**

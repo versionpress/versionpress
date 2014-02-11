@@ -52,7 +52,7 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
     }
 
     private function getFilename($id) {
-        return $this->directory . '/' . $id . '.txt';
+        return $this->directory . '/' . $id . '.ini';
     }
 
     private function deserializeEntity($serializedEntity) {
