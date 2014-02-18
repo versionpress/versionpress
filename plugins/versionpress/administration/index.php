@@ -2,7 +2,7 @@
 $isInitialized = is_file(VERSIONPRESS_PLUGIN_DIR . '/.active');
 
 function initialize() {
-    require_once(VERSIONPRESS_PLUGIN_DIR . '/install.php');
+    require_once(VERSIONPRESS_PLUGIN_DIR . '/VersionPressInstaller.php');
 
     global $wpdb, $table_prefix;
 

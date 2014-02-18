@@ -72,6 +72,7 @@ class MirroringDatabase extends ExtendedWpdb {
             }
             $vpId = $this->getVpId($entityName, $id);
 
+
             if (!$vpId) {
                 $data['vp_id'] = $this->generateId();
                 $this->saveId($entityName, $id, $data['vp_id']);
