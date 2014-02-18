@@ -99,6 +99,8 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
     }
 
     protected function loadEntities() {
+        if($this->entities) return;
+
         if (is_file($this->file)){
             $entities = IniSerializer::deserialize(file_get_contents($this->file));
             $this->entities = $entities;

@@ -1,12 +1,12 @@
 # Full format:
 #
-# table_name:
-#   id: primary_key_column_name
+# <table_name>:
+#   id: <primary_key_column_name>
 #   references:
-#     foreign_key_column_name:
-#       table: target_table_name
-#     another_foreign_key_column_name:
-#       table: another_target_table_name
+#     <foreign_key_column_name>:
+#       table: <target_table_name>
+#     <another_foreign_key_column_name>:
+#       table: <another_target_table_name>
 
 
 posts:

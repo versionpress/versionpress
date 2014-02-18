@@ -14,39 +14,21 @@ class UserMetaSynchronizer extends SynchronizerBase {
     }
 
     protected function transformEntities($entities) {
-        $propertiesBlacklist = array(
-            'ID',
-            'user_login',
-            'user_pass',
-            'user_nicename',
-            'user_email',
-            'user_url',
-            'user_registered',
-            'user_activation_key',
-            'user_status',
-            'display_name',
-            'vp_id'
-        );
-
-        $allMetaVpIdsQuery = sprintf('select HEX(reference_vp_id) as user_vp_id, HEX(vp_id) as meta_vp_id, meta_key, id as meta_id ' .
-            'from %s ' .
-            'join %s on id = umeta_id ' .
-            'where `table` = "usermeta"',
-            $this->dbSchema->getPrefixedTableName('vp_reference_details'),
-            $this->dbSchema->getPrefixedTableName('usermeta'));
-
-        $metaIdsSource = $this->database->get_results($allMetaVpIdsQuery);
-        $metaIdsMap = $this->createMetaIdsMap($metaIdsSource);
-
         $transformedEntities = array();
         foreach ($entities as $entity) {
             foreach($entity as $meta_key => $meta_value) {
-                if(in_array($meta_key, $propertiesBlacklist))
+                $dividerPosition = strrpos($meta_key, '#');
+
+                if($dividerPosition === false)
                     continue;
+
+                $key = substr($meta_key, 0, $dividerPosition);
+                $id = substr($meta_key, $dividerPosition + 1);
+
+
                 $transformedEntity = array();
-                $transformedEntity['vp_id'] = $metaIdsMap[$entity['vp_id']][$meta_key]['meta_vp_id'];
-                $transformedEntity['umeta_id'] = $metaIdsMap[$entity['vp_id']][$meta_key]['umeta_id'];
-                $transformedEntity['meta_key'] = $meta_key;
+                $transformedEntity['vp_id'] = $id;
+                $transformedEntity['meta_key'] = $key;
                 $transformedEntity['meta_value'] = $meta_value;
                 $transformedEntities[] = $transformedEntity;
             }
