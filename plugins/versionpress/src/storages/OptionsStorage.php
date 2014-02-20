@@ -15,6 +15,7 @@ class OptionsStorage extends SingleFileStorage implements EntityStorage {
                 || $id === 'cron'          // Cron, siteurl and home are specific for environment, so they're not saved, too.
                 || $id === 'siteurl'
                 || $id === 'home'
-                || $id === 'db_upgraded');
+                || $id === 'db_upgraded'
+                || $id === 'auto_updater.lock');
     }
 }
