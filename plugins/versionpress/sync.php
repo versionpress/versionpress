@@ -25,7 +25,7 @@ $wpdb->show_errors();
 
 function fixCommentCount(wpdb $wpdb) {
     $sql = "update {$wpdb->prefix}posts set comment_count =
-     (select count(*) from {$wpdb->prefix}comments where comment_post_ID = {$wpdb->prefix}posts.ID where comment_approved = 1);";
+     (select count(*) from {$wpdb->prefix}comments where comment_post_ID = {$wpdb->prefix}posts.ID and comment_approved = 1);";
     $wpdb->query($sql);
 }
 
