@@ -13,11 +13,9 @@ abstract class Git {
     private static $CONFIG_COMMAND = "git config user.name %s && git config user.email %s";
 
     static function commit($message, $directory = "") {
+        chdir(dirname(__FILE__));
         if ($directory === "" && self::$gitRoot === null) {
-            $cwd = getcwd();
-            chdir(dirname(__FILE__));
             self::detectGitRoot();
-            chdir($cwd);
         }
         $directory = $directory === "" ? self::$gitRoot : $directory;
         $gitAddPath = $directory . "/" . "*";
@@ -37,7 +35,7 @@ abstract class Git {
 
     static function isVersioned($directory) {
         chdir($directory);
-        return self::runShellCommand('git status') !== '';
+        return self::runShellCommandWithStandardOutput('git status') !== '';
     }
 
     static function createGitRepository($directory) {
@@ -46,8 +44,18 @@ abstract class Git {
     }
 
     private static function detectGitRoot() {
-        self::$gitRoot = trim(self::runShellCommand(self::$RELPATH_TO_GIT_ROOT_COMMAND), "/\n");
+        self::$gitRoot = trim(self::runShellCommandWithStandardOutput(self::$RELPATH_TO_GIT_ROOT_COMMAND), "/\n");
         self::$gitRoot = self::$gitRoot === '' ? '.' : self::$gitRoot;
+    }
+
+    private static function runShellCommandWithStandardOutput($command, $args = '') {
+        $result = call_user_func_array(array('Git', 'runShellCommand'), func_get_args());
+        return $result['stdout'];
+    }
+
+    private static function runShellCommandWithErrorOutput($command, $args = '') {
+        $result = call_user_func_array(array('Git', 'runShellCommand'), func_get_args());
+        return $result['stderr'];
     }
 
     private static function runShellCommand($command, $args = '') {
@@ -57,7 +65,7 @@ abstract class Git {
         $result = self::runProcess($commandWithArguments);
         NDebugger::log('STDOUT: ' . $result['stdout']);
         NDebugger::log('STDERR: ' . $result['stderr']);
-        return $result['stdout'];
+        return $result;
     }
 
     public static function pull() {
@@ -73,23 +81,33 @@ abstract class Git {
     }
 
     public static function log() {
-        $log = trim(self::runShellCommand("git log --pretty=oneline"), "\n");
-        if($log === "")
-            return array();
-
+        $log = trim(self::runShellCommandWithStandardOutput("git log --pretty=format:\"%%h;%%ad;%%s\" --date=relative"), "\n");
         $commits = explode("\n", $log);
         return array_map(function ($commit){
-            list($id, $message) = explode(" ", $commit, 2);
-            return array("id" => $id, "message" => $message);
+            list($id, $date, $message) = explode(";", $commit, 3);
+            return array("id" => $id, "date" => $date, "message" => $message);
         }, $commits);
     }
 
-    public static function revert($commit) {
+    public static function revertAll($commit) {
         self::detectGitRoot();
         chdir(self::$gitRoot);
         $commitRange = sprintf("%s..HEAD", $commit);
         self::runShellCommand("git revert -n %s", $commitRange);
         self::commit(sprintf("Revert to %s", $commit));
+    }
+
+    public static function revert($commit) {
+        self::detectGitRoot();
+        chdir(self::$gitRoot);
+        $output = self::runShellCommandWithErrorOutput("git revert -n %s", $commit);
+
+        if($output !== "") { // revert conflict
+            self::runShellCommand("git revert --abort");
+            return false;
+        }
+        self::commit(sprintf("Reverted commit %s", $commit));
+        return true;
     }
 
     private static function runProcess($cmd) {

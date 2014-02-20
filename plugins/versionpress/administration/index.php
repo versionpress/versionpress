@@ -1,3 +1,7 @@
+<style>
+    table th, table td {border-bottom: 1px solid #ccc;}
+</style>
+<h1>VersionPress</h1>
 <?php
 $isInitialized = is_file(VERSIONPRESS_PLUGIN_DIR . '/.active');
 
@@ -32,11 +36,17 @@ if(isset($_GET['init']) && !$isInitialized) {
 <?php
 } else {
     if (isset($_GET['revert'])) {
-        Git::revert($_GET['revert']);
+        if(Git::revert($_GET['revert'])) {
+            require_once __DIR__ . '/../../versionpress/sync.php';
+        } else {
+            echo "<div class='error'>Error: Overwritten changes can not be reverted.</div>";
+        }
+    }
+    if (isset($_GET['revert-all'])) {
+        Git::revertAll($_GET['revert']);
         require_once __DIR__ . '/../../versionpress/sync.php';
     }
 ?>
-    <h1>VersionPress</h1>
     <table class="wp-list-table widefat fixed posts">
         <tr>
             <th class="manage-column column-date">Date</th>
