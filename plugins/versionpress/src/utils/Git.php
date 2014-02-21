@@ -25,8 +25,8 @@ abstract class Git {
             $authorName = $currentUser->display_name;
             $authorEmail = $currentUser->user_email;
         } else {
-            $authorName = "Public Action";
-            $authorEmail = "public.action@example.com";
+            $authorName = "Non-admin action";
+            $authorEmail = "nonadmin@example.com";
         }
 
         self::runShellCommand(self::$CONFIG_COMMAND, $authorName, $authorEmail);
@@ -94,7 +94,7 @@ abstract class Git {
         chdir(self::$gitRoot);
         $commitRange = sprintf("%s..HEAD", $commit);
         self::runShellCommand("git revert -n %s", $commitRange);
-        self::commit(sprintf("Revert to %s", $commit));
+        self::commit(sprintf("Reverted to version %s", $commit));
     }
 
     public static function revert($commit) {
@@ -106,7 +106,7 @@ abstract class Git {
             self::runShellCommand("git revert --abort");
             return false;
         }
-        self::commit(sprintf("Reverted commit %s", $commit));
+        self::commit(sprintf("Reverted changes by version %s", $commit));
         return true;
     }
 

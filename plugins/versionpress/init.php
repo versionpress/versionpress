@@ -115,7 +115,7 @@ class Committer {
             'delete' => 'Deleted'
         );
 
-        return sprintf("%s %s with ID %s.", $verbs[$changeInfo->type], $changeInfo->entityType, $changeInfo->entityId);
+        return sprintf("%s %s with ID %s", $verbs[$changeInfo->type], $changeInfo->entityType, $changeInfo->entityId);
     }
 
     private function shouldCommit() {
