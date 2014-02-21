@@ -54,23 +54,32 @@ if(isset($_GET['init']) && !$isInitialized) {
         </tr>
         <tbody id="the-list">
         <?php
+
         $commits = Git::log();
+        $isFirstCommit = true;
+
         foreach($commits as $commit) {
+
+            $revertAllSnippet = $isFirstCommit ? "" : "|
+                <a href='" . admin_url('admin.php?page=versionpress/administration/index.php&revert-all=' . $commit['id']) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts site back to this state; effectively undos all the change up to this commit'>
+                Revert to this
+            </a>";
+
+
             echo "
         <tr class=\"post-1 type-post status-publish format-standard hentry category-uncategorized alternate level-0\">
             <td>$commit[date]</td>
             <td>$commit[id]</td>
             <td>$commit[message]</td>
             <td style=\"text-align: right\">
-                <a href='" . admin_url('admin.php?page=versionpress/administration/index.php&revert=' . $commit['id']) . "' style='text-decoration:none;'>
-                Revert&nbsp;only&nbsp;this
+                <a href='" . admin_url('admin.php?page=versionpress/administration/index.php&revert=' . $commit['id']) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts changes done by this commit'>
+                Undo this
                 </a>
-                |
-                <a href='" . admin_url('admin.php?page=versionpress/administration/index.php&revert-all=' . $commit['id']) . "' style='text-decoration:none;'>
-                Revert&nbsp;all
-                </a>
+                $revertAllSnippet
             </td>
         </tr>";
+
+            $isFirstCommit = false;
         }
         ?>
         </tbody>
