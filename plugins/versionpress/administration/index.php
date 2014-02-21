@@ -16,8 +16,6 @@ function initialize() {
     $installer = new VersionPressInstaller($wpdb, $dbSchema, $storageFactory, $table_prefix);
     $installer->onProgressChanged[] = 'show_message';
     $installer->install();
-
-    touch(VERSIONPRESS_PLUGIN_DIR . '/.active');
 }
 
 

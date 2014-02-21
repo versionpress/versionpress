@@ -61,6 +61,8 @@ class VersionPressInstaller {
         $this->saveDatabaseToStorages();
         $this->commitDatabase();
         $this->createGitRepository();
+        $this->activateVersionPress();
+        $this->doInstallationCommit();
         $this->reportProgressChange("Installation finished");
     }
 
@@ -317,13 +319,20 @@ class VersionPressInstaller {
         }
 
         Git::assumeUnchanged('wp-config.php');
-        Git::commit('Installed VersionPress');
-        $this->reportProgressChange("Created initial commit");
     }
 
     private function reportProgressChange($message) {
         foreach($this->onProgressChanged as $listener) {
             call_user_func($listener, $message);
         }
+    }
+
+    private function doInstallationCommit() {
+        Git::commit('Installed VersionPress');
+        $this->reportProgressChange("Created initial commit");
+    }
+
+    private function activateVersionPress() {
+        touch(VERSIONPRESS_PLUGIN_DIR . '/.active');
     }
 }
