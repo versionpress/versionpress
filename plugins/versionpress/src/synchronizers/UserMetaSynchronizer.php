@@ -15,7 +15,7 @@ class UserMetaSynchronizer extends SynchronizerBase {
 
     protected function transformEntities($entities) {
         $transformedEntities = array();
-        foreach ($entities as $entity) {
+        foreach ($entities as $userId => $entity) {
             foreach($entity as $meta_key => $meta_value) {
                 $dividerPosition = strrpos($meta_key, '#');
 
@@ -28,6 +28,7 @@ class UserMetaSynchronizer extends SynchronizerBase {
 
                 $transformedEntity = array();
                 $transformedEntity['vp_id'] = $id;
+                $transformedEntity['vp_user_id'] = $userId;
                 $transformedEntity['meta_key'] = $key;
                 $transformedEntity['meta_value'] = $meta_value;
                 $transformedEntities[] = $transformedEntity;
