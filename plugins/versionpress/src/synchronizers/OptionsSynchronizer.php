@@ -32,6 +32,21 @@ class OptionsSynchronizer implements Synchronizer {
         $syncQuery .= " ON DUPLICATE KEY UPDATE option_value = VALUES(option_value), autoload = VALUES(autoload);";
 
         $this->database->query($syncQuery);
+
+        if(count($options) == 0) return;
+
+        $optionNames = array_map(function($option) {
+            return "\"" . $option['option_name'] . "\"";
+        }, $options);
+
+        $optionNames[] = '"cron"';
+        $optionNames[] = '"siteurl"';
+        $optionNames[] = '"home"';
+        $optionNames[] = '"db_upgraded"';
+        $optionNames[] = '"auto_updater.lock"';
+
+        $deleteSql = "DELETE FROM {$this->tableName} WHERE option_name NOT IN(" . join(", ", $optionNames) . ") OR option_name NOT LIKE '_%'";
+        $this->database->query($deleteSql);
     }
 
 }
