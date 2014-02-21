@@ -41,7 +41,7 @@ if(isset($_GET['init']) && !$isInitialized) {
         }
     }
     if (isset($_GET['revert-all'])) {
-        Git::revertAll($_GET['revert']);
+        Git::revertAll($_GET['revert-all']);
         require_once __DIR__ . '/../../versionpress/sync.php';
     }
 ?>
