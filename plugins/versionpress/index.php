@@ -1,8 +1,10 @@
 <?php
 /*
 Plugin Name: VersionPress
+Plugin URI: http://versionpress.net/
+Description: Git-versioning plugin for WordPress
 Author: Agilio
-Version: 0.0.1-alfa
+Version: 1.0
 */
 function versionpress_activate() {
     copy(dirname(__FILE__) . '/_db.php', WP_CONTENT_DIR . '/db.php');
