@@ -65,12 +65,12 @@ if(isset($_GET['init']) && !$isInitialized) {
                 Revert to this
             </a>";
 
-
+            $message = substr($commit[message], 0, 100);
             echo "
         <tr class=\"post-1 type-post status-publish format-standard hentry category-uncategorized alternate level-0\">
             <td>$commit[date]</td>
             <td>$commit[id]</td>
-            <td>$commit[message]</td>
+            <td>$message</td>
             <td style=\"text-align: right\">
                 <a href='" . admin_url('admin.php?page=versionpress/administration/index.php&revert=' . $commit['id']) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts changes done by this commit'>
                 Undo this
