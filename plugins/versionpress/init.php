@@ -87,7 +87,7 @@ class Committer {
             $this->forcedCommitMessage = null;
         } elseif ($this->mirror->wasAffected() && $this->shouldCommit()) {
             $changeList = $this->mirror->getChangeList();
-            $commitMessage = join(" ", array_map(array($this, 'formatCommitMessagePart'), $changeList));
+            $commitMessage = array_map(array($this, 'formatCommitMessagePart'), $changeList)[0];
 
             Git::commit($commitMessage);
         }
@@ -115,7 +115,8 @@ class Committer {
             'delete' => 'Deleted'
         );
 
-        return sprintf("%s %s with ID %s", $verbs[$changeInfo->type], $changeInfo->entityType, $changeInfo->entityId);
+        $formattedEntityId = preg_match("/\d/", $changeInfo->entityId) ? substr($changeInfo->entityId, 0, 4) : $changeInfo->entityId;
+        return sprintf("%s %s '%s'", $verbs[$changeInfo->type], $changeInfo->entityType, $formattedEntityId);
     }
 
     private function shouldCommit() {
