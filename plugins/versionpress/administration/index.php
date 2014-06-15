@@ -5,6 +5,8 @@
 <?php
 $isInitialized = is_file(VERSIONPRESS_PLUGIN_DIR . '/.active');
 
+wp_enqueue_style('versionpress_admin_style', plugins_url( 'style.css' , __FILE__ ));
+
 function initialize() {
     require_once(VERSIONPRESS_PLUGIN_DIR . '/VersionPressInstaller.php');
 
@@ -45,12 +47,12 @@ if(isset($_GET['init']) && !$isInitialized) {
         require_once __DIR__ . '/../../versionpress/sync.php';
     }
 ?>
-    <table class="wp-list-table widefat fixed posts">
+    <table id="versionpress-commits-table" class="wp-list-table widefat fixed posts">
         <tr>
             <th class="manage-column column-date">Date</th>
-            <th class="manage-column column-date">ID</th>
-            <th class="manage-column">Message</th>
-            <th class="manage-column column-categories"></th>
+            <th class="manage-column column-commit-id">ID</th>
+            <th class="manage-column column-message">Message</th>
+            <th class="manage-column column-actions"></th>
         </tr>
         <tbody id="the-list">
         <?php
