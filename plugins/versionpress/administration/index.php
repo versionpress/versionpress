@@ -67,7 +67,7 @@ if(isset($_GET['init']) && !$isInitialized) {
                 Revert to this
             </a>";
 
-            $message = substr($commit[message], 0, 100);
+            $message = substr($commit["message"], 0, 100);
             echo "
         <tr class=\"post-1 type-post status-publish format-standard hentry category-uncategorized alternate level-0\">
             <td>$commit[date]</td>

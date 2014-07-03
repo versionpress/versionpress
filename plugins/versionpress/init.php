@@ -70,11 +70,15 @@ class Committer {
      * @var Mirror
      */
     private $mirror;
+    /**
+     * @var CommitMessageProvider
+     */
+    private $commitMessageProvider;
     private $forcedCommitMessage;
 
-    public function __construct(Mirror $mirror) {
-
+    public function __construct(Mirror $mirror, CommitMessageProvider $commitMessageProvider) {
         $this->mirror = $mirror;
+        $this->commitMessageProvider = $commitMessageProvider;
     }
 
     /**
@@ -109,14 +113,7 @@ class Committer {
      * @return string
      */
     private function formatCommitMessagePart(ChangeInfo $changeInfo) {
-        static $verbs = array(
-            'create' => 'Created',
-            'edit' => 'Edited',
-            'delete' => 'Deleted'
-        );
-
-        $formattedEntityId = preg_match("/\d/", $changeInfo->entityId) ? substr($changeInfo->entityId, 0, 4) : $changeInfo->entityId;
-        return sprintf("%s %s '%s'", $verbs[$changeInfo->type], $changeInfo->entityType, $formattedEntityId);
+        return $this->commitMessageProvider->getCommitMessage($changeInfo);
     }
 
     private function shouldCommit() {
@@ -142,7 +139,7 @@ class Committer {
     }
 }
 
-$committer = new Committer($mirror);
+$committer = new Committer($mirror, new CommitMessageProvider());
 add_filter('update_feedback', function () {
     touch(get_home_path() . 'versionpress.maintenance');
 });
