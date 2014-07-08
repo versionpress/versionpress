@@ -5,8 +5,7 @@ abstract class Git {
     private static $gitRoot = null;
 
     // Constants
-    private static $ADD_AND_COMMIT_COMMAND = "git add -A %s && git commit -m %s";
-    private static $ADD_AND_COMMIT_WITH_BODY_COMMAND = "git add -A %s && git commit -m %s -m %s";
+    private static $ADD_AND_COMMIT_COMMAND = "git add -A %s && git commit -F %s";
     private static $RELATIVE_PATH_TO_GIT_ROOT_COMMAND = "git rev-parse --show-cdup";
     private static $INIT_COMMAND = "git init -q";
     private static $ASSUME_UNCHANGED_COMMAND = "git update-index --assume-unchanged %s";
@@ -33,12 +32,14 @@ abstract class Git {
             $authorEmail = "nonadmin@example.com";
         }
 
+        $commitMessage = self::$COMMIT_MESSAGE_PREFIX . $message->getHead();
+        if($message->getBody() != null) $commitMessage .= "\n\n" . $message->getBody();
+        $tempCommitMessageFilename = md5(rand());
+        file_put_contents($tempCommitMessageFilename, $commitMessage);
+
         self::runShellCommand(self::$CONFIG_COMMAND, $authorName, $authorEmail);
-        if($message->getBody() != null) {
-            self::runShellCommand(self::$ADD_AND_COMMIT_WITH_BODY_COMMAND, $gitAddPath, self::$COMMIT_MESSAGE_PREFIX . $message->getHead(), $message->getBody());
-        } else {
-            self::runShellCommand(self::$ADD_AND_COMMIT_COMMAND, $gitAddPath, self::$COMMIT_MESSAGE_PREFIX . $message->getHead());
-        }
+        self::runShellCommand(self::$ADD_AND_COMMIT_COMMAND, $gitAddPath, $tempCommitMessageFilename);
+        unlink($tempCommitMessageFilename);
     }
 
     static function isVersioned($directory) {

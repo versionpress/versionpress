@@ -22,9 +22,18 @@ class CommitMessageProvider {
     }
 
     private function createParsableMessage(ChangeInfo $changeInfo) {
+        $entityType = $changeInfo->entityType;
         $action = $changeInfo->type;
         $id = $changeInfo->entityId;
 
-        return "[$action][$id]";
+        $messageParts = array(
+            'VP-Action' => "$entityType/$action",
+            'VP-ID' => $id
+        );
+
+        $message = join("\n", array_map(function ($k, $v) {
+                    return "$k: $v";
+                }, array_keys($messageParts), array_values($messageParts)));
+        return $message;
     }
 }
