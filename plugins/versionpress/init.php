@@ -23,6 +23,8 @@ require_once(VERSIONPRESS_PLUGIN_DIR . '/src/utils/Strings.php');
 require_once(VERSIONPRESS_PLUGIN_DIR . '/src/utils/Uuid.php');
 require_once(VERSIONPRESS_PLUGIN_DIR . '/src/Mirror.php');
 require_once(VERSIONPRESS_PLUGIN_DIR . '/src/ChangeInfo.php');
+require_once(VERSIONPRESS_PLUGIN_DIR . '/src/CommitMessage.php');
+require_once(VERSIONPRESS_PLUGIN_DIR . '/src/CommitMessageProvider.php');
 
 global $wpdb, $table_prefix, $storageFactory, $schemaInfo;
 $storageFactory = new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR);
@@ -86,12 +88,12 @@ class Committer {
      */
     public function commit () {
         if($this->forcedCommitMessage) {
-            @unlink(get_home_path() . 'versionpress.maintenance');
+            @unlink(get_home_path() . 'versionpress.maintenance'); // todo: this shouldn't be here...
             Git::commit($this->forcedCommitMessage);
             $this->forcedCommitMessage = null;
         } elseif ($this->mirror->wasAffected() && $this->shouldCommit()) {
             $changeList = $this->mirror->getChangeList();
-            $commitMessage = array_map(array($this, 'formatCommitMessagePart'), $changeList)[0];
+            $commitMessage = $this->createCommitMessage($changeList[0]);
 
             Git::commit($commitMessage);
         }
@@ -112,7 +114,7 @@ class Committer {
      * @param ChangeInfo $changeInfo
      * @return string
      */
-    private function formatCommitMessagePart(ChangeInfo $changeInfo) {
+    private function createCommitMessage(ChangeInfo $changeInfo) {
         return $this->commitMessageProvider->getCommitMessage($changeInfo);
     }
 

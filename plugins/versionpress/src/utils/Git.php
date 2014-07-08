@@ -6,13 +6,17 @@ abstract class Git {
 
     // Constants
     private static $ADD_AND_COMMIT_COMMAND = "git add -A %s && git commit -m %s";
-    private static $RELPATH_TO_GIT_ROOT_COMMAND = "git rev-parse --show-cdup";
+    private static $ADD_AND_COMMIT_WITH_BODY_COMMAND = "git add -A %s && git commit -m %s -m %s";
+    private static $RELATIVE_PATH_TO_GIT_ROOT_COMMAND = "git rev-parse --show-cdup";
     private static $INIT_COMMAND = "git init -q";
     private static $ASSUME_UNCHANGED_COMMAND = "git update-index --assume-unchanged %s";
     private static $COMMIT_MESSAGE_PREFIX = "[VP] ";
     private static $CONFIG_COMMAND = "git config user.name %s && git config user.email %s";
 
     static function commit($message, $directory = "") {
+        if(is_string($message))
+            $message = new CommitMessage($message);
+
         chdir(dirname(__FILE__));
         if ($directory === "" && self::$gitRoot === null) {
             self::detectGitRoot();
@@ -30,7 +34,11 @@ abstract class Git {
         }
 
         self::runShellCommand(self::$CONFIG_COMMAND, $authorName, $authorEmail);
-        self::runShellCommand(self::$ADD_AND_COMMIT_COMMAND, $gitAddPath, self::$COMMIT_MESSAGE_PREFIX . $message);
+        if($message->getBody() != null) {
+            self::runShellCommand(self::$ADD_AND_COMMIT_WITH_BODY_COMMAND, $gitAddPath, self::$COMMIT_MESSAGE_PREFIX . $message->getHead(), $message->getBody());
+        } else {
+            self::runShellCommand(self::$ADD_AND_COMMIT_COMMAND, $gitAddPath, self::$COMMIT_MESSAGE_PREFIX . $message->getHead());
+        }
     }
 
     static function isVersioned($directory) {
@@ -44,7 +52,7 @@ abstract class Git {
     }
 
     private static function detectGitRoot() {
-        self::$gitRoot = trim(self::runShellCommandWithStandardOutput(self::$RELPATH_TO_GIT_ROOT_COMMAND), "/\n");
+        self::$gitRoot = trim(self::runShellCommandWithStandardOutput(self::$RELATIVE_PATH_TO_GIT_ROOT_COMMAND), "/\n");
         self::$gitRoot = self::$gitRoot === '' ? '.' : self::$gitRoot;
     }
 

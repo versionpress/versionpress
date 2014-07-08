@@ -7,7 +7,7 @@ class CommitMessageProvider {
         $developerReadableMessage = $this->createDeveloperReadableMessage($changeInfo);
         $parsableMessage = $this->createParsableMessage($changeInfo);
 
-        return $developerReadableMessage . "\n\n" . $parsableMessage;
+        return new CommitMessage($developerReadableMessage, $parsableMessage);
     }
 
     private function createDeveloperReadableMessage(ChangeInfo $changeInfo) {
