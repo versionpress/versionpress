@@ -90,11 +90,7 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
     }
 
     private function createChangeInfo($entity, $changeType) {
-        $changeInfo = new ChangeInfo();
-        $changeInfo->entityType = $this->entityTypeName;
-        $changeInfo->entityId = $entity['vp_id'];
-        $changeInfo->type = $changeType;
-        return $changeInfo;
+        return new EntityChangeInfo($this->entityTypeName, $changeType, $entity['vp_id']);
     }
 
     private function saveEntity($data, $callback = null) {
@@ -131,12 +127,19 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
             $entity = array_merge($entity, $diffData);
             file_put_contents($filename, $this->serializeEntity($entity));
             if (is_callable($callback))
-                call_user_func($callback, $entity, $isExistingEntity ? 'edit' : 'create');
+                call_user_func($callback, $entity, $isExistingEntity ? $this->getEditAction($diffData) : 'create');
         }
     }
 
     protected function isExistingEntity($id) {
         return file_exists($this->getFilename($id));
+    }
+
+    /**
+     * @return string
+     */
+    protected function getEditAction($diffData) {
+        return 'edit';
     }
 
     private function loadEntity($id) {

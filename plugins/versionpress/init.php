@@ -24,7 +24,6 @@ require_once(VERSIONPRESS_PLUGIN_DIR . '/src/utils/Uuid.php');
 require_once(VERSIONPRESS_PLUGIN_DIR . '/src/Mirror.php');
 require_once(VERSIONPRESS_PLUGIN_DIR . '/src/ChangeInfo.php');
 require_once(VERSIONPRESS_PLUGIN_DIR . '/src/CommitMessage.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/CommitMessageProvider.php');
 
 global $wpdb, $table_prefix, $storageFactory, $schemaInfo;
 $storageFactory = new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR);
@@ -68,68 +67,49 @@ function createUpdatePostTermsHook(EntityStorage $storage, wpdb $wpdb) {
 
 class Committer {
 
-    /**
-     * @var Mirror
-     */
+    /** @var Mirror */
     private $mirror;
-    /**
-     * @var CommitMessageProvider
-     */
-    private $commitMessageProvider;
-    private $forcedCommitMessage;
+    /** @var  ChangeInfo */
+    private $forcedChangeInfo;
 
-    public function __construct(Mirror $mirror, CommitMessageProvider $commitMessageProvider) {
+    public function __construct(Mirror $mirror) {
         $this->mirror = $mirror;
-        $this->commitMessageProvider = $commitMessageProvider;
     }
 
     /**
-     * Checks if some entity has been changed. If so, it tries to commit.
+     * Checks if there is any change. If so, it tries to commit.
      */
-    public function commit () {
-        if($this->forcedCommitMessage) {
+    public function commit() {
+        if ($this->forcedChangeInfo) {
             @unlink(get_home_path() . 'versionpress.maintenance'); // todo: this shouldn't be here...
-            Git::commit($this->forcedCommitMessage);
-            $this->forcedCommitMessage = null;
+            Git::commit($this->forcedChangeInfo->getCommitMessage());
+            $this->forcedChangeInfo = null;
         } elseif ($this->mirror->wasAffected() && $this->shouldCommit()) {
             $changeList = $this->mirror->getChangeList();
-            $commitMessage = $this->createCommitMessage($changeList[0]);
+            $commitMessage = $changeList[0]->getCommitMessage();
 
             Git::commit($commitMessage);
         }
     }
 
-    public function forceCommitMessage($commitMessage) {
-        $this->forcedCommitMessage = $commitMessage;
-    }
-
-    /**
-     * Converts ChangeInfo to human readable string.
-     *
-     * Samples:
-     * Created post with ID 1
-     * Edited post with ID 2
-     * Deleted post with ID 3
-     *
-     * @param ChangeInfo $changeInfo
-     * @return string
-     */
-    private function createCommitMessage(ChangeInfo $changeInfo) {
-        return $this->commitMessageProvider->getCommitMessage($changeInfo);
+    public function forceChangeInfo(ChangeInfo $changeInfo) {
+        $this->forcedChangeInfo = $changeInfo;
     }
 
     private function shouldCommit() {
         // proof of concept
-        if($this->dbWasUpdated() && $this->existsMaintenanceFile())
+        if ($this->dbWasUpdated() && $this->existsMaintenanceFile())
             return false;
         return true;
     }
 
     private function dbWasUpdated() {
         $changes = $this->mirror->getChangeList();
-        /** @var $change ChangeInfo */
         foreach ($changes as $change) {
-            if ($change->entityType == 'option' && $change->entityId == 'db_version')
+            if ($change instanceof EntityChangeInfo &&
+                $change->getObjectType() == 'option' &&
+                $change->getEntityId() == 'db_version'
+            )
                 return true;
         }
         return false;
@@ -141,27 +121,29 @@ class Committer {
     }
 }
 
-$committer = new Committer($mirror, new CommitMessageProvider());
+$committer = new Committer($mirror);
 add_filter('update_feedback', function () {
     touch(get_home_path() . 'versionpress.maintenance');
 });
-add_action('_core_updated_successfully', function() use ($committer) {
-    require( get_home_path() . '/wp-includes/version.php' ); // load constants (like $wp_version)
-    /** @var $wp_version */
-    $committer->forceCommitMessage('WordPress updated to version ' . $wp_version);
+add_action('_core_updated_successfully', function () use ($committer) {
+    require(get_home_path() . '/wp-includes/version.php'); // load constants (like $wp_version)
+    /** @var string $wp_version */
+    $changeInfo = new WordPressUpdateChangeInfo($wp_version);
+    $committer->forceChangeInfo($changeInfo);
 });
 
-add_action('activated_plugin', function($pluginName) use ($committer) {
-    $committer->forceCommitMessage('Plugin "' . $pluginName .'" was activated');
+add_action('activated_plugin', function ($pluginName) use ($committer) {
+    $committer->forceChangeInfo(new PluginActivationChangeInfo($pluginName));
 });
 
-add_action('deactivated_plugin', function($pluginName) use ($committer) {
-    $committer->forceCommitMessage('Plugin "' . $pluginName .'" was deactivated');
+add_action('deactivated_plugin', function ($pluginName) use ($committer) {
+    $committer->forceChangeInfo(new PluginDeactivationChangeInfo($pluginName));
 });
 
-add_action('upgrader_process_complete', function($upgrader, $hook_extra) use ($committer) {
+add_action('upgrader_process_complete', function ($upgrader, $hook_extra) use ($committer) {
+    if($hook_extra['type'] == 'core' && $hook_extra['action'] == 'update') return; // handled by different hook
     $pluginName = $hook_extra['plugin'];
-    $committer->forceCommitMessage('Plugin "' . $pluginName .'" was updated');
+    $committer->forceChangeInfo(new PluginUpdateChangeInfo($pluginName));
 }, 10, 2);
 
 register_shutdown_function(array($committer, 'commit'));

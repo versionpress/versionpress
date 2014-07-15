@@ -10,7 +10,7 @@ abstract class ObservableStorage implements EntityStorage {
         $this->onChangeListeners[] = $callback;
     }
 
-    protected function callOnChangeListeners(ChangeInfo $changeInfo) {
+    protected function callOnChangeListeners(EntityChangeInfo $changeInfo) {
         foreach ($this->onChangeListeners as $onChangeListener) {
             call_user_func($onChangeListener, $changeInfo);
         }

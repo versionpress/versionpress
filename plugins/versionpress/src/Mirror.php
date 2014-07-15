@@ -19,6 +19,9 @@ class Mirror {
      */
     public $wasAffected;
 
+    /**
+     * @var ChangeInfo[]
+     */
     public $changeList;
 
     function __construct(EntityStorageFactory $storageFactory) {
@@ -43,6 +46,9 @@ class Mirror {
         return $this->wasAffected;
     }
 
+    /**
+     * @return ChangeInfo[]
+     */
     public function getChangeList() {
         return $this->changeList;
     }
@@ -59,7 +65,7 @@ class Mirror {
             $this->registeredStorages[$object_hash] = true;
 
             $that = $this;
-            $storage->addChangeListener(function (ChangeInfo $changeInfo) use ($that) {
+            $storage->addChangeListener(function (EntityChangeInfo $changeInfo) use ($that) {
                 $that->wasAffected = true;
                 $that->changeList[] = $changeInfo;
             });
