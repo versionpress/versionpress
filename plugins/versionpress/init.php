@@ -1,29 +1,10 @@
 <?php
 
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/storages/EntityStorage.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/storages/ObservableStorage.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/storages/DirectoryStorage.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/storages/EntityStorageFactory.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/storages/CommentStorage.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/storages/PostStorage.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/storages/SingleFileStorage.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/storages/OptionsStorage.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/storages/TermsStorage.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/storages/TermTaxonomyStorage.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/storages/UserStorage.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/storages/UserMetaStorage.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/database/DbSchemaInfo.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/database/ExtendedWpdb.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/database/MirroringDatabase.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/utils/IniSerializer.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/utils/Git.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/utils/Neon.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/utils/Arrays.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/utils/Strings.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/utils/Uuid.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/Mirror.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/ChangeInfo.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/src/CommitMessage.php');
+$robotLoader = new NRobotLoader();
+$robotLoader->addDirectory(dirname(__FILE__) . '/src');
+$robotLoader->setCacheStorage(new NFileStorage(dirname(__FILE__) . '/temp'));
+$robotLoader->register();
+
 
 global $wpdb, $table_prefix, $storageFactory, $schemaInfo;
 $storageFactory = new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR);
