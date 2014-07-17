@@ -37,7 +37,7 @@ function register_versionpress_menu(){
         'VersionPress',
         'VersionPress',
         'manage_options',
-        'versionpress/administration/index.php',
+        'versionpress/administration/versionpress.php',
         '',
         null,
         0.001234987
@@ -45,7 +45,7 @@ function register_versionpress_menu(){
 
     if(isActive())
         add_submenu_page(
-            'versionpress/administration/index.php',
+            'versionpress/administration/versionpress.php',
             'Synchronization',
             'Synchronization',
             'manage_options',
