@@ -8,7 +8,7 @@ $isInitialized = is_file(VERSIONPRESS_PLUGIN_DIR . '/.active');
 wp_enqueue_style('versionpress_admin_style', plugins_url( 'style.css' , __FILE__ ));
 
 function initialize() {
-    require_once(VERSIONPRESS_PLUGIN_DIR . '/VersionPressInstaller.php');
+    require_once(VERSIONPRESS_PLUGIN_DIR . '/src/VersionPressInstaller.php');
 
     global $wpdb, $table_prefix;
 
