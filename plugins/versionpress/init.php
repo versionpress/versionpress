@@ -133,17 +133,17 @@ add_action('_core_updated_successfully', function () use ($committer) {
 });
 
 add_action('activated_plugin', function ($pluginName) use ($committer) {
-    $committer->forceChangeInfo(new PluginActivationChangeInfo($pluginName));
+    $committer->forceChangeInfo(new PluginChangeInfo($pluginName, 'activate'));
 });
 
 add_action('deactivated_plugin', function ($pluginName) use ($committer) {
-    $committer->forceChangeInfo(new PluginDeactivationChangeInfo($pluginName));
+    $committer->forceChangeInfo(new PluginChangeInfo($pluginName, 'deactivate'));
 });
 
 add_action('upgrader_process_complete', function ($upgrader, $hook_extra) use ($committer) {
     if($hook_extra['type'] == 'core' && $hook_extra['action'] == 'update') return; // handled by different hook
     $pluginName = $hook_extra['plugin'];
-    $committer->forceChangeInfo(new PluginUpdateChangeInfo($pluginName));
+    $committer->forceChangeInfo(new PluginChangeInfo($pluginName, 'update'));
 }, 10, 2);
 
 register_shutdown_function(array($committer, 'commit'));
