@@ -5,7 +5,7 @@
       <paths name="VersionPress">
         <serverdata>
           <mappings>
-            <mapping deploy="wp-content/plugins/versionpress" local="$PROJECT_DIR$/plugins/versionpress" web="/" />
+            <mapping deploy="wp-content\plugins\versionpress" local="$PROJECT_DIR$/plugins/versionpress" web="/" />
           </mappings>
         </serverdata>
       </paths>
