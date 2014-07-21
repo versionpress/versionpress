@@ -7,6 +7,8 @@ Author: Agilio
 Version: 1.0
 */
 
+defined('ABSPATH') or die("Direct access not allowed");
+
 
 register_activation_hook(__FILE__, 'versionpress_activate');
 register_deactivation_hook(__FILE__, 'versionpress_deactivate');
