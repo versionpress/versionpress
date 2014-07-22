@@ -1,10 +1,5 @@
 <?php
 
-$robotLoader = new NRobotLoader();
-$robotLoader->addDirectory(dirname(__FILE__) . '/src');
-$robotLoader->setCacheStorage(new NFileStorage(dirname(__FILE__) . '/temp'));
-$robotLoader->register();
-
 
 global $wpdb, $table_prefix, $storageFactory, $schemaInfo;
 $storageFactory = new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR);

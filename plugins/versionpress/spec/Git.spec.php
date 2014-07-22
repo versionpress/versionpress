@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/../src/utils/Git.php';
 
 \PhpJasmine\Expectation::addMatcher('toBeGitRepository', 'GitRepositoryMatcher', null);
 
