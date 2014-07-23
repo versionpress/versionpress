@@ -13,14 +13,26 @@ class CommitMessage {
     /**
      * @return string
      */
-    public function getBody() {
-        return $this->body;
+    public function getHead() {
+        return $this->head;
     }
 
     /**
      * @return string
      */
-    public function getHead() {
-        return $this->head;
+    public function getBody() {
+        return $this->body;
+    }
+
+    public function getVersionPressTags() {
+        $tagLines = array_filter(array_map("trim", explode("\n", $this->getBody())), function ($line) {
+                return Strings::startsWith($line, "VP-");
+            });
+        $tags = array();
+        foreach ($tagLines as $line) {
+            list($key, $value) = array_map("trim", explode(":", $line, 2));
+            $tags[$key] = $value;
+        }
+        return $tags;
     }
 }

@@ -31,7 +31,6 @@ class EntityChangeInfo implements ChangeInfo {
         $this->entityId = $entityId;
     }
 
-
     /**
      * @return string
      */
@@ -58,6 +57,29 @@ class EntityChangeInfo implements ChangeInfo {
      */
     public function getCommitMessage() {
         return new CommitMessage($this->getCommitMessageHead(), $this->getCommitMessageBody());
+    }
+
+    /**
+     * @param CommitMessage $commitMessage
+     * @return boolean
+     */
+    public static function matchesCommitMessage(CommitMessage $commitMessage) {
+        $tags = $commitMessage->getVersionPressTags();
+        if(!isset($tags["VP-Action"])) return false;
+
+        $actionTag = $tags["VP-Action"];
+        return count(explode("/", $actionTag)) === 3; // there are three parts - $entityType, $action and $entityId
+    }
+
+    /**
+     * @param CommitMessage $commitMessage
+     * @return ChangeInfo
+     */
+    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
+        $tags = $commitMessage->getVersionPressTags();
+        $actionTag = $tags["VP-Action"];
+        list($entityType, $action, $entityId) = explode("/", $actionTag, 3);
+        return new self($entityType, $action, $entityId);
     }
 
     private function getCommitMessageHead() {

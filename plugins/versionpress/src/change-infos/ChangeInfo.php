@@ -15,4 +15,16 @@ interface ChangeInfo {
      * @return CommitMessage
      */
     function getCommitMessage();
+
+    /**
+     * @param CommitMessage $commitMessage
+     * @return bool
+     */
+    static function matchesCommitMessage(CommitMessage $commitMessage);
+
+    /**
+     * @param CommitMessage $commitMessage
+     * @return ChangeInfo
+     */
+    static function buildFromCommitMessage(CommitMessage $commitMessage);
 }

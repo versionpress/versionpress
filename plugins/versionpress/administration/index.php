@@ -56,6 +56,24 @@ if(isset($_GET['init']) && !$isInitialized) {
         <tbody id="the-list">
         <?php
 
+        /**
+         * @param Commit $commit
+         * @return ChangeInfo
+         */
+        function createChangeInfo(Commit $commit) {
+            /** @var ChangeInfo[] $changeInfoClasses */
+            $changeInfoClasses = array('PluginChangeInfo', 'WordPressUpdateChangeInfo', 'EntityChangeInfo');
+            $matchingChangeInfoClass = 'CustomChangeInfo'; // some fallback
+            foreach ($changeInfoClasses as $changeInfoClass) {
+                if($changeInfoClass::matchesCommitMessage($commit->getMessage())){
+                    $matchingChangeInfoClass = $changeInfoClass;
+                    break;
+                }
+            }
+            $changeInfo = $matchingChangeInfoClass::buildFromCommitMessage($commit->getMessage());
+            return $changeInfo;
+        }
+
         $commits = Git::log();
         $isFirstCommit = true;
 
