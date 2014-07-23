@@ -1,11 +1,22 @@
 <?php
 
+/**
+ * Creates commits using the `Git` class. By default, it detects the change from the `$mirror` object
+ * but it can also be forced by calling the `forceChangeInfo()` method.
+ */
 class Committer
 {
 
-    /** @var Mirror */
+    /**
+     * @var Mirror
+     */
     private $mirror;
-    /** @var  ChangeInfo */
+
+    /**
+     * If this is set, takes precedence over changes detected in the `$mirror`.
+     *
+     * @var  ChangeInfo
+     */
     private $forcedChangeInfo;
 
     public function __construct(Mirror $mirror)
@@ -14,7 +25,8 @@ class Committer
     }
 
     /**
-     * Checks if there is any change. If so, it tries to commit.
+     * Checks if there is any change in the `$mirror` and commits it. If there was a forced
+     * change set, it takes precedence.
      */
     public function commit()
     {
@@ -30,6 +42,11 @@ class Committer
         }
     }
 
+    /**
+     * Forces change info to be committed in the next call to `commit()`
+     *
+     * @param ChangeInfo $changeInfo
+     */
     public function forceChangeInfo(ChangeInfo $changeInfo)
     {
         $this->forcedChangeInfo = $changeInfo;
