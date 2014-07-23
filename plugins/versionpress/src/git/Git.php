@@ -11,6 +11,7 @@ abstract class Git {
     private static $ASSUME_UNCHANGED_COMMAND = "git update-index --assume-unchanged %s";
     private static $COMMIT_MESSAGE_PREFIX = "[VP] ";
     private static $CONFIG_COMMAND = "git config user.name %s && git config user.email %s";
+    private static $LOG_COMMAND = "git log --pretty=format:\"%%H|delimiter|%%aD|delimiter|%%ar|delimiter|%%an|delimiter|%%ae|delimiter|%%s|delimiter|%%b|end|\"";
 
     static function commit($message, $directory = "") {
         if(is_string($message))
@@ -89,12 +90,18 @@ abstract class Git {
         self::runShellCommand(self::$ASSUME_UNCHANGED_COMMAND, $filename);
     }
 
+    /**
+     * @return Commit[]
+     */
     public static function log() {
-        $log = trim(self::runShellCommandWithStandardOutput("git log --pretty=format:\"%%h;%%ad;%%s\" --date=relative"), "\n");
-        $commits = explode("\n", $log);
-        return array_map(function ($commit){
-            list($id, $date, $message) = explode(";", $commit, 3);
-            return array("id" => $id, "date" => $date, "message" => $message);
+        $commitDelimiter = chr(29);
+        $dataDelimiter = chr(30);
+        $logCommand = str_replace("|delimiter|", $dataDelimiter, self::$LOG_COMMAND);
+        $logCommand = str_replace("|end|", $commitDelimiter, $logCommand);
+        $log = trim(self::runShellCommandWithStandardOutput($logCommand), $commitDelimiter);
+        $commits = explode($commitDelimiter, $log);
+        return array_map(function ($rawCommit) {
+            return Commit::buildFromString($rawCommit);
         }, $commits);
     }
 

@@ -62,18 +62,18 @@ if(isset($_GET['init']) && !$isInitialized) {
         foreach($commits as $commit) {
 
             $revertAllSnippet = $isFirstCommit ? "" : "|
-                <a href='" . admin_url('admin.php?page=versionpress/administration/index.php&revert-all=' . $commit['id']) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts site back to this state; effectively undos all the change up to this commit'>
+                <a href='" . admin_url('admin.php?page=versionpress/administration/index.php&revert-all=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts site back to this state; effectively undos all the change up to this commit'>
                 Revert to this
             </a>";
 
-            $message = substr($commit["message"], 0, 100);
+            $message = substr($commit->getMessage()->getHead(), 0, 100);
             echo "
         <tr class=\"post-1 type-post status-publish format-standard hentry category-uncategorized alternate level-0\">
-            <td>$commit[date]</td>
-            <td>$commit[id]</td>
+            <td>{$commit->getRelativeDate()}</td>
+            <td>{$commit->getHash()}</td>
             <td>$message</td>
             <td style=\"text-align: right\">
-                <a href='" . admin_url('admin.php?page=versionpress/administration/index.php&revert=' . $commit['id']) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts changes done by this commit'>
+                <a href='" . admin_url('admin.php?page=versionpress/administration/index.php&revert=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts changes done by this commit'>
                 Undo this
                 </a>
                 $revertAllSnippet
