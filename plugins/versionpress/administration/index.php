@@ -62,7 +62,7 @@ if(isset($_GET['init']) && !$isInitialized) {
          */
         function createChangeInfo(Commit $commit) {
             /** @var ChangeInfo[] $changeInfoClasses */
-            $changeInfoClasses = array('PluginChangeInfo', 'WordPressUpdateChangeInfo', 'EntityChangeInfo');
+            $changeInfoClasses = array('PluginChangeInfo', 'WordPressUpdateChangeInfo', 'VersionPressChangeInfo', 'EntityChangeInfo');
             $matchingChangeInfoClass = 'CustomChangeInfo'; // some fallback
             foreach ($changeInfoClasses as $changeInfoClass) {
                 if($changeInfoClass::matchesCommitMessage($commit->getMessage())){
