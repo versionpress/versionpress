@@ -75,4 +75,13 @@ class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
         foreach($data as $field => $value)
             $taxonomies[$taxonomyId][$field] = $value;
     }
+
+    /**
+     * @param $entityId
+     * @param $changeType
+     * @return EntityChangeInfo
+     */
+    protected function createChangeInfo($entityId, $changeType) {
+        // TODO: Implement createChangeInfo() method.
+    }
 }

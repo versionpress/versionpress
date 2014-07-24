@@ -40,4 +40,9 @@ class PostStorage extends DirectoryStorage implements EntityStorage {
         return 'edit';
     }
 
+    protected function createChangeInfo($entity, $changeType) {
+        global $wpdb, $table_prefix;
+        $title = $wpdb->get_var('SELECT post_title FROM ' . $table_prefix . 'posts WHERE ' . $this->idColumnName . ' = ' . $entity[$this->idColumnName]);
+        return new PostChangeInfo($changeType, $entity['vp_id'], $title);
+    }
 }

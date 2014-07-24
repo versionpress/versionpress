@@ -57,4 +57,11 @@ class PluginChangeInfo implements ChangeInfo {
         list($_, $action, $pluginName) = explode("/", $actionTag, 3);
         return new self($pluginName, $action);
     }
+
+    /**
+     * @return string
+     */
+    public function getChangeDescription() {
+        return Strings::capitalize($this->action) . "d plugin " . $this->pluginName;
+    }
 }

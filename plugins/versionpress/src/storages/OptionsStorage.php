@@ -18,4 +18,13 @@ class OptionsStorage extends SingleFileStorage implements EntityStorage {
                 || $id === 'db_upgraded'
                 || $id === 'auto_updater.lock');
     }
+
+    /**
+     * @param $entityId
+     * @param $changeType
+     * @return EntityChangeInfo
+     */
+    protected function createChangeInfo($entityId, $changeType) {
+        return new OptionChangeInfo($changeType, $entityId);
+    }
 }

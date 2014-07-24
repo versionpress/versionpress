@@ -61,4 +61,11 @@ class WordPressUpdateChangeInfo implements ChangeInfo {
         list($_, $__, $version) = explode("/", $actionTag, 3);
         return new self($version);
     }
+
+    /**
+     * @return string
+     */
+    function getChangeDescription() {
+        return "Wordpress updated to version " . $this->getVersion();
+    }
 }

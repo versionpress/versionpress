@@ -28,4 +28,13 @@ class UserMetaStorage extends SingleFileStorage implements EntityStorage {
             $this->saveEntity($data);
         }
     }
+
+    /**
+     * @param $entityId
+     * @param $changeType
+     * @return EntityChangeInfo
+     */
+    protected function createChangeInfo($entityId, $changeType) {
+        // TODO: Implement createChangeInfo() method.
+    }
 }

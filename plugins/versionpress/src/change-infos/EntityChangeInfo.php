@@ -1,6 +1,6 @@
 <?php
 
-class EntityChangeInfo implements ChangeInfo {
+abstract class EntityChangeInfo implements ChangeInfo {
 
     /**
      * Post, comment etc.
@@ -71,17 +71,6 @@ class EntityChangeInfo implements ChangeInfo {
         return count(explode("/", $actionTag)) === 3; // there are three parts - $entityType, $action and $entityId
     }
 
-    /**
-     * @param CommitMessage $commitMessage
-     * @return ChangeInfo
-     */
-    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
-        $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags["VP-Action"];
-        list($entityType, $action, $entityId) = explode("/", $actionTag, 3);
-        return new self($entityType, $action, $entityId);
-    }
-
     private function getCommitMessageHead() {
         static $verbs = array(
             'create' => 'Created',
@@ -98,6 +87,20 @@ class EntityChangeInfo implements ChangeInfo {
         $action = $this->getAction();
         $id = $this->getEntityId();
 
-        return "VP-Action: $entityType/$action/$id";
+        $tags = array();
+        $tags["VP-Action"] = "$entityType/$action/$id";
+
+        $customTags = $this->getCustomTags();
+        $tags = array_merge($tags, $customTags);
+
+        $body = "";
+        foreach ($tags as $tagName => $tagValue) {
+            $body .= "$tagName: $tagValue\n";
+        }
+        return $body;
+    }
+
+    protected function getCustomTags() {
+        return array();
     }
 }

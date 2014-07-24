@@ -17,6 +17,11 @@ interface ChangeInfo {
     function getCommitMessage();
 
     /**
+     * @return string
+     */
+    function getChangeDescription();
+
+    /**
      * @param CommitMessage $commitMessage
      * @return bool
      */

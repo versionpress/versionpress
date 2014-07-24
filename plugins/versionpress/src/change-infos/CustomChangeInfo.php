@@ -50,4 +50,11 @@ class CustomChangeInfo implements ChangeInfo {
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         return new self($commitMessage);
     }
+
+    /**
+     * @return string
+     */
+    function getChangeDescription() {
+        return $this->commitMessage->getHead();
+    }
 }

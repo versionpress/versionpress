@@ -49,7 +49,6 @@ if(isset($_GET['init']) && !$isInitialized) {
     <table id="versionpress-commits-table" class="wp-list-table widefat fixed posts">
         <tr>
             <th class="manage-column column-date">Date</th>
-            <th class="manage-column column-commit-id">ID</th>
             <th class="manage-column column-message">Message</th>
             <th class="manage-column column-actions"></th>
         </tr>
@@ -62,10 +61,18 @@ if(isset($_GET['init']) && !$isInitialized) {
          */
         function createChangeInfo(Commit $commit) {
             /** @var ChangeInfo[] $changeInfoClasses */
-            $changeInfoClasses = array('PluginChangeInfo', 'WordPressUpdateChangeInfo', 'VersionPressChangeInfo', 'EntityChangeInfo');
+            $changeInfoClasses = array(
+                'PluginChangeInfo',
+                'WordPressUpdateChangeInfo',
+                'VersionPressChangeInfo',
+                'PostChangeInfo',
+                'CommentChangeInfo',
+                'OptionChangeInfo',
+                'CustomChangeInfo',
+            );
             $matchingChangeInfoClass = 'CustomChangeInfo'; // some fallback
             foreach ($changeInfoClasses as $changeInfoClass) {
-                if($changeInfoClass::matchesCommitMessage($commit->getMessage())){
+                if ($changeInfoClass::matchesCommitMessage($commit->getMessage())) {
                     $matchingChangeInfoClass = $changeInfoClass;
                     break;
                 }
@@ -77,18 +84,17 @@ if(isset($_GET['init']) && !$isInitialized) {
         $commits = Git::log();
         $isFirstCommit = true;
 
-        foreach($commits as $commit) {
-
+        foreach ($commits as $commit) {
+            $changeInfo = createChangeInfo($commit);
             $revertAllSnippet = $isFirstCommit ? "" : "|
                 <a href='" . admin_url('admin.php?page=versionpress/administration/index.php&revert-all=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts site back to this state; effectively undos all the change up to this commit'>
                 Revert to this
             </a>";
 
-            $message = substr($commit->getMessage()->getHead(), 0, 100);
+            $message = $changeInfo->getChangeDescription();
             echo "
         <tr class=\"post-1 type-post status-publish format-standard hentry category-uncategorized alternate level-0\">
             <td>{$commit->getRelativeDate()}</td>
-            <td>{$commit->getHash()}</td>
             <td>$message</td>
             <td style=\"text-align: right\">
                 <a href='" . admin_url('admin.php?page=versionpress/administration/index.php&revert=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts changes done by this commit'>

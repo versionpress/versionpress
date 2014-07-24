@@ -42,4 +42,11 @@ class VersionPressChangeInfo implements ChangeInfo {
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         return new self();
     }
+
+    /**
+     * @return string
+     */
+    function getChangeDescription() {
+        return "Installed VersionPress";
+    }
 }
