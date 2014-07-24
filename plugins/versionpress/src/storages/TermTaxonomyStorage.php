@@ -77,11 +77,11 @@ class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
     }
 
     /**
-     * @param $entityId
+     * @param $entity
      * @param $changeType
      * @return EntityChangeInfo
      */
-    protected function createChangeInfo($entityId, $changeType) {
+    protected function createChangeInfo($entity, $changeType) {
         // TODO: Implement createChangeInfo() method.
     }
 }

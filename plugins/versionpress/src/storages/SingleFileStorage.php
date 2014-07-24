@@ -84,7 +84,7 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
             $this->saveEntities();
 
             if (is_callable($callback))
-                call_user_func($callback, $id, $isNew ? 'create' : 'edit');
+                call_user_func($callback, $this->entities[$id], $isNew ? 'create' : 'edit');
         }
     }
 
@@ -114,8 +114,8 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
         file_put_contents($this->file, $entities);
     }
 
-    protected function notifyOnChangeListeners($entityId, $changeType) {
-        $changeInfo = $this->createChangeInfo($entityId, $changeType);
+    protected function notifyOnChangeListeners($entity, $changeType) {
+        $changeInfo = $this->createChangeInfo($entity, $changeType);
         $this->callOnChangeListeners($changeInfo);
     }
 
@@ -124,9 +124,9 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
     }
 
     /**
-     * @param $entityId
+     * @param $entity
      * @param $changeType
      * @return EntityChangeInfo
      */
-    protected abstract function createChangeInfo($entityId, $changeType);
+    protected abstract function createChangeInfo($entity, $changeType);
 }

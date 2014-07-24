@@ -20,11 +20,11 @@ class OptionsStorage extends SingleFileStorage implements EntityStorage {
     }
 
     /**
-     * @param $entityId
+     * @param $entity
      * @param $changeType
      * @return EntityChangeInfo
      */
-    protected function createChangeInfo($entityId, $changeType) {
-        return new OptionChangeInfo($changeType, $entityId);
+    protected function createChangeInfo($entity, $changeType) {
+        return new OptionChangeInfo($changeType, $entity[$this->idColumnName]);
     }
 }
