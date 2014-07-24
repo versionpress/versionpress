@@ -12,7 +12,6 @@ class UserStorage extends SingleFileStorage implements EntityStorage {
      * @return EntityChangeInfo
      */
     protected function createChangeInfo($entity, $changeType) {
-        global $wpdb, $table_prefix;
         $login = $entity["user_login"];
         return new UserChangeInfo($changeType, $entity, $login);
     }

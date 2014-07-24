@@ -40,10 +40,11 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
 
         $this->loadEntities();
         $originalEntities = $this->entities;
+        $entity = $this->entities[$id];
         unset($this->entities[$id]);
         if ($this->entities != $originalEntities) {
             $this->saveEntities();
-            $this->notifyOnChangeListeners($id, 'delete');
+            $this->notifyOnChangeListeners($entity, 'delete');
         }
     }
 
