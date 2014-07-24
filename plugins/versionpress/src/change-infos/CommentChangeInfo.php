@@ -26,7 +26,10 @@ class CommentChangeInfo extends EntityChangeInfo {
      * @return string
      */
     function getChangeDescription() {
-        return "New comment for post \"{$this->commentedPost}\"";
+        if($this->getAction() == "create")
+            return "New comment for post \"{$this->commentedPost}\"";
+        else
+            return "Edited comment of \"{$this->commentedPost}\" post";
     }
 
     /**

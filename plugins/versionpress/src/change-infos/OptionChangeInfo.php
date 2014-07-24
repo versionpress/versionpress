@@ -16,7 +16,10 @@ class OptionChangeInfo extends EntityChangeInfo {
      * @return string
      */
     function getChangeDescription() {
-        return "Changed option " . $this->getEntityId();
+        if($this->getAction() == "create")
+            return "New option \"{$this->getEntityId()}\"";
+        else
+            return "Changed option \"{$this->getEntityId()}\"";
     }
 
     /**
