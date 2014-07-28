@@ -10,6 +10,8 @@ $robotLoader->addDirectory(VERSIONPRESS_PLUGIN_DIR . '/src');
 $robotLoader->setCacheStorage(new NFileStorage(VERSIONPRESS_PLUGIN_DIR . '/temp'));
 $robotLoader->register();
 
+global $wpdb, $versionPressContainer;
+$versionPressContainer = DIContainer::getConfiguredInstance();
 
 if(file_exists(VERSIONPRESS_PLUGIN_DIR . '/.active'))
-    require_once(VERSIONPRESS_PLUGIN_DIR . '/init.php');
+    $wpdb = $versionPressContainer->resolve(VersionPressServices::DATABASE);
