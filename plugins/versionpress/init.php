@@ -16,13 +16,11 @@ add_action('save_post', createUpdatePostTermsHook($storageFactory->getStorage('p
 function createUpdatePostTermsHook(EntityStorage $storage, wpdb $wpdb) {
 
     return function ($postId) use ($storage, $wpdb) {
-        global $table_prefix;
-
         $post = get_post($postId);
         $postType = $post->post_type;
         $taxonomies = get_object_taxonomies($postType);
 
-        $vpIdTableName = $table_prefix . 'vp_id';
+        $vpIdTableName = $wpdb->prefix . 'vp_id';
 
         $postVpId = $wpdb->get_var("SELECT HEX(vp_id) FROM $vpIdTableName WHERE id = $postId AND `table` = 'posts'");
 

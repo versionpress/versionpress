@@ -6,7 +6,7 @@ define('WP_DEBUG_LOG', true);
 
 require_once(dirname(__FILE__) . '/../../../wp-load.php');
 
-global $wpdb, $table_prefix, $storageFactory, $schemaInfo;
+global $wpdb, $storageFactory, $schemaInfo;
 $wpdb->show_errors();
 
 function fixCommentCount(wpdb $wpdb) {

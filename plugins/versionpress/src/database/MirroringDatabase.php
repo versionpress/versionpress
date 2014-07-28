@@ -117,13 +117,11 @@ class MirroringDatabase extends ExtendedWpdb {
     }
 
     private function stripTablePrefix($tableName) {
-        global $table_prefix;
-        return substr($tableName, strlen($table_prefix));
+        return substr($tableName, strlen($this->prefix));
     }
 
     private function addTablePrefix($entityName) {
-        global $table_prefix;
-        return $table_prefix . $entityName;
+        return $this->prefix . $entityName;
     }
 
     private function saveId($entityName, $id, $vpId) {
@@ -177,7 +175,6 @@ class MirroringDatabase extends ExtendedWpdb {
     }
 
     private function getReferenceId($entityName, $referenceName, $id) {
-        $vpIdTableName = $this->getVpIdTableName();
         $reference = $this->dbSchemaInfo->getReference($entityName, $referenceName);
         $referenceId = $this->getVpId($reference['table'], $id);
         return $referenceId;

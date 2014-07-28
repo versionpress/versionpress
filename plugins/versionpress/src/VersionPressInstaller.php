@@ -20,15 +20,13 @@ class VersionPressInstaller {
      * @var EntityStorageFactory
      */
     private $storageFactory;
-    private $tablePrefix;
     private $isDatabaseLocked;
     private $idCache;
 
-    function __construct(wpdb $wpdb, DbSchemaInfo $dbSchema, EntityStorageFactory $storageFactory, $tablePrefix) {
+    function __construct(wpdb $wpdb, DbSchemaInfo $dbSchema, EntityStorageFactory $storageFactory) {
         $this->database = $wpdb;
         $this->dbSchema = $dbSchema;
         $this->storageFactory = $storageFactory;
-        $this->tablePrefix = $tablePrefix;
     }
 
     public function install() {
@@ -46,7 +44,7 @@ class VersionPressInstaller {
     }
 
     private function createVersionPressTables() {
-        $table_prefix = $this->tablePrefix;
+        $table_prefix = $this->database->prefix;
         $process = array();
 
         $process[] = "DROP VIEW IF EXISTS `{$table_prefix}vp_reference_details`";
@@ -183,7 +181,7 @@ class VersionPressInstaller {
     }
 
     private function getTableName($entityName) {
-        return $this->tablePrefix . $entityName;
+        return $this->database->prefix . $entityName;
     }
 
     private function saveDatabaseToStorages() {

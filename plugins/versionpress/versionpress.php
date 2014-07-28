@@ -27,10 +27,10 @@ function versionpress_deactivate() {
 
 function versionpress_uninstall() {
 
-    global $wpdb, $table_prefix;
+    global $wpdb;
 
-    $queries[] = 'DROP VIEW `' . $table_prefix . 'vp_reference_details`;';
-    $queries[] = 'DROP TABLE `' . $table_prefix . 'vp_references`, `' . $table_prefix . 'vp_id`;';
+    $queries[] = 'DROP VIEW `' . $wpdb->prefix . 'vp_reference_details`;';
+    $queries[] = 'DROP TABLE `' . $wpdb->prefix . 'vp_references`, `' . $wpdb->prefix . 'vp_id`;';
 
     foreach ($queries as $query) {
         $wpdb->query($query);

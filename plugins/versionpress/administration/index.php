@@ -9,12 +9,12 @@ wp_enqueue_style('versionpress_admin_style', plugins_url( 'style.css' , __FILE__
 
 function initialize() {
 
-    global $wpdb, $table_prefix;
+    global $wpdb;
 
     @mkdir(VERSIONPRESS_MIRRORING_DIR, 0777, true);
-    $dbSchema = new DbSchemaInfo(VERSIONPRESS_PLUGIN_DIR . '/src/database/schema.neon', $table_prefix);
+    $dbSchema = new DbSchemaInfo(VERSIONPRESS_PLUGIN_DIR . '/src/database/schema.neon', $wpdb->prefix);
     $storageFactory = new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR);
-    $installer = new VersionPressInstaller($wpdb, $dbSchema, $storageFactory, $table_prefix);
+    $installer = new VersionPressInstaller($wpdb, $dbSchema, $storageFactory);
     $installer->onProgressChanged[] = 'show_message';
     $installer->install();
 }
