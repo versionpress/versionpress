@@ -1,6 +1,9 @@
 <?php
 
 interface ChangeInfo {
+
+    const ACTION_TAG = "VP-Action";
+
     /**
      * @return string
      */

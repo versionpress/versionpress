@@ -35,7 +35,7 @@ class PluginChangeInfo implements ChangeInfo {
      * @return CommitMessage
      */
     public function getCommitMessage() {
-        return new CommitMessage("Plugin \"{$this->pluginName}\" was {$this->action}d", "VP-Action: {$this->getObjectType()}/{$this->getAction()}/" . $this->pluginName);
+        return new CommitMessage("Plugin \"{$this->pluginName}\" was {$this->action}d", ChangeInfo::ACTION_TAG .": {$this->getObjectType()}/{$this->getAction()}/" . $this->pluginName);
     }
 
     /**
@@ -44,7 +44,7 @@ class PluginChangeInfo implements ChangeInfo {
      */
     public static function matchesCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        return isset($tags["VP-Action"]) && Strings::startsWith($tags["VP-Action"], self::$OBJECT_TYPE);
+        return isset($tags[ChangeInfo::ACTION_TAG]) && Strings::startsWith($tags[ChangeInfo::ACTION_TAG], self::$OBJECT_TYPE);
     }
 
     /**
@@ -53,7 +53,7 @@ class PluginChangeInfo implements ChangeInfo {
      */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags["VP-Action"];
+        $actionTag = $tags[ChangeInfo::ACTION_TAG];
         list($_, $action, $pluginName) = explode("/", $actionTag, 3);
         return new self($pluginName, $action);
     }

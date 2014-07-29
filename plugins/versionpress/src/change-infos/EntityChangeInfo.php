@@ -65,9 +65,9 @@ abstract class EntityChangeInfo implements ChangeInfo {
      */
     public static function matchesCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        if(!isset($tags["VP-Action"])) return false;
+        if(!isset($tags[ChangeInfo::ACTION_TAG])) return false;
 
-        $actionTag = $tags["VP-Action"];
+        $actionTag = $tags[ChangeInfo::ACTION_TAG];
         return count(explode("/", $actionTag)) === 3; // there are three parts - $entityType, $action and $entityId
     }
 
@@ -88,7 +88,7 @@ abstract class EntityChangeInfo implements ChangeInfo {
         $id = $this->getEntityId();
 
         $tags = array();
-        $tags["VP-Action"] = "$entityType/$action/$id";
+        $tags[ChangeInfo::ACTION_TAG] = "$entityType/$action/$id";
 
         $customTags = $this->getCustomTags();
         $tags = array_merge($tags, $customTags);

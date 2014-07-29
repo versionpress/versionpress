@@ -23,7 +23,7 @@ class VersionPressChangeInfo implements ChangeInfo {
      * @return CommitMessage
      */
     public function getCommitMessage() {
-        return new CommitMessage("VersionPress was installed", "VP-Action: versionpress/install");
+        return new CommitMessage("VersionPress was installed", ChangeInfo::ACTION_TAG . ": versionpress/install");
     }
 
     /**
@@ -32,7 +32,7 @@ class VersionPressChangeInfo implements ChangeInfo {
      */
     public static function matchesCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        return isset($tags["VP-Action"]) && Strings::startsWith($tags["VP-Action"], "versionpress");
+        return isset($tags[ChangeInfo::ACTION_TAG]) && Strings::startsWith($tags[ChangeInfo::ACTION_TAG], "versionpress");
     }
 
     /**

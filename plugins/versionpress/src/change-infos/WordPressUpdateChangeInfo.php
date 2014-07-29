@@ -2,8 +2,8 @@
 
 class WordPressUpdateChangeInfo implements ChangeInfo {
 
-    private static $OBJECT_TYPE = "wordpress";
-    private static $ACTION = "update";
+    const OBJECT_TYPE = "wordpress";
+    const ACTION = "update";
 
     /** @var string */
     private $version;
@@ -16,14 +16,14 @@ class WordPressUpdateChangeInfo implements ChangeInfo {
      * @return string
      */
     public function getObjectType() {
-        return self::$OBJECT_TYPE;
+        return self::OBJECT_TYPE;
     }
 
     /**
      * @return string
      */
     public function getAction() {
-        return self::$ACTION;
+        return self::ACTION;
     }
 
     /**
@@ -38,7 +38,7 @@ class WordPressUpdateChangeInfo implements ChangeInfo {
      */
     public function getCommitMessage() {
         $messageHead = "WordPress updated to version " . $this->version;
-        $messageBody = "VP-Action: {$this->getObjectType()}/{$this->getAction()}/" . $this->version;
+        $messageBody = ChangeInfo::ACTION_TAG . ": {$this->getObjectType()}/{$this->getAction()}/" . $this->version;
         return new CommitMessage($messageHead, $messageBody);
     }
 
@@ -48,7 +48,7 @@ class WordPressUpdateChangeInfo implements ChangeInfo {
      */
     public static function matchesCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        return isset($tags["VP-Action"]) && Strings::startsWith($tags["VP-Action"], self::$OBJECT_TYPE);
+        return isset($tags[ChangeInfo::ACTION_TAG]) && Strings::startsWith($tags[ChangeInfo::ACTION_TAG], self::OBJECT_TYPE);
     }
 
     /**
@@ -57,7 +57,7 @@ class WordPressUpdateChangeInfo implements ChangeInfo {
      */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags["VP-Action"];
+        $actionTag = $tags[ChangeInfo::ACTION_TAG];
         list($_, $__, $version) = explode("/", $actionTag, 3);
         return new self($version);
     }

@@ -2,6 +2,8 @@
 
 class PostChangeInfo extends EntityChangeInfo {
 
+    const POST_TITLE_TAG = "VP-Post-Title";
+
     /**
      * @var string
      */
@@ -18,7 +20,7 @@ class PostChangeInfo extends EntityChangeInfo {
      */
     public static function matchesCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        return parent::matchesCommitMessage($commitMessage) && Strings::startsWith($tags["VP-Action"], "post");
+        return parent::matchesCommitMessage($commitMessage) && Strings::startsWith($tags[ChangeInfo::ACTION_TAG], "post");
     }
 
     /**
@@ -27,9 +29,9 @@ class PostChangeInfo extends EntityChangeInfo {
      */
     public static function buildFromCommitMessage(CommitMessage $commitMessage)  {
         $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags["VP-Action"];
+        $actionTag = $tags[ChangeInfo::ACTION_TAG];
         list($_, $action, $entityId) = explode("/", $actionTag, 3);
-        $titleTag = isset($tags["VP-Post-Title"]) ? $tags["VP-Post-Title"] : $entityId;
+        $titleTag = isset($tags[self::POST_TITLE_TAG]) ? $tags[self::POST_TITLE_TAG] : $entityId;
         return new self($action, $entityId, $titleTag);
     }
 
@@ -41,6 +43,6 @@ class PostChangeInfo extends EntityChangeInfo {
     }
 
     protected function getCustomTags() {
-        return array("VP-Post-Title" => $this->postTitle);
+        return array(self::POST_TITLE_TAG => $this->postTitle);
     }
 }

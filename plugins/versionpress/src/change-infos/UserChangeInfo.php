@@ -22,7 +22,7 @@ class UserChangeInfo extends EntityChangeInfo {
 
     public static function matchesCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        return parent::matchesCommitMessage($commitMessage) && Strings::startsWith($tags["VP-Action"], "user");
+        return parent::matchesCommitMessage($commitMessage) && Strings::startsWith($tags[ChangeInfo::ACTION_TAG], "user");
     }
 
     /**
@@ -31,7 +31,7 @@ class UserChangeInfo extends EntityChangeInfo {
      */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags["VP-Action"];
+        $actionTag = $tags[ChangeInfo::ACTION_TAG];
         $userLogin = $tags["VP-User-Login"];
         list($_, $action, $entityId) = explode("/", $actionTag);
         return new self($action, $entityId, $userLogin);

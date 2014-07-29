@@ -8,7 +8,7 @@ class OptionChangeInfo extends EntityChangeInfo {
 
     public static function matchesCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        return parent::matchesCommitMessage($commitMessage) && Strings::startsWith($tags["VP-Action"], "option");
+        return parent::matchesCommitMessage($commitMessage) && Strings::startsWith($tags[ChangeInfo::ACTION_TAG], "option");
     }
 
 
@@ -28,7 +28,7 @@ class OptionChangeInfo extends EntityChangeInfo {
      */
     static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags["VP-Action"];
+        $actionTag = $tags[ChangeInfo::ACTION_TAG];
         list($_, $action, $entityId) = explode("/", $actionTag, 3);
         return new self($action, $entityId);
     }
