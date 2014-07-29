@@ -122,7 +122,7 @@ class VersionPressInstaller {
         $entityIds = $this->database->get_col("SELECT $idColumnName FROM $tableName");
 
         foreach ($entityIds as $entityId) {
-            $vpId = Uuid::newUuidWithoutDelimiters();
+            $vpId = IdUtil::newId();
             $query = "INSERT INTO {$this->getTableName('vp_id')} (`table`, id, vp_id) VALUES (\"$entityName\", $entityId, UNHEX('$vpId'))";
             $this->database->query($query);
             $this->idCache[$entityName][$entityId] = $vpId;

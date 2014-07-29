@@ -193,7 +193,7 @@ class MirroringDatabase extends ExtendedWpdb {
     }
 
     private function generateId() {
-        return Uuid::newUuidWithoutDelimiters();
+        return IdUtil::newId();
     }
 
     private function fillId($entityName, $data, $id) {
