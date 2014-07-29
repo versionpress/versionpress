@@ -2,6 +2,9 @@
 
 class CommentChangeInfo extends EntityChangeInfo {
 
+    const POST_TITLE_TAG = "VP-Comment-PostTitle";
+    const AUTHOR_TAG = "VP-Comment-Author";
+
     /**
      * @var string
      */
@@ -39,16 +42,16 @@ class CommentChangeInfo extends EntityChangeInfo {
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[ChangeInfo::ACTION_TAG];
-        $commentAuthor = $tags["VP-Comment-Author"];
-        $commentedPost = $tags["VP-Comment-Post"];
+        $commentAuthor = $tags[self::AUTHOR_TAG];
+        $commentedPost = $tags[self::POST_TITLE_TAG];
         list($_, $action, $entityId) = explode("/", $actionTag, 3);
         return new self($action, $entityId, $commentAuthor, $commentedPost);
     }
 
     protected function getCustomTags() {
         return array(
-            "VP-Comment-Author" => $this->commentAuthor,
-            "VP-Comment-Post" => $this->commentedPost
+            self::AUTHOR_TAG => $this->commentAuthor,
+            self::POST_TITLE_TAG => $this->commentedPost
         );
     }
 }
