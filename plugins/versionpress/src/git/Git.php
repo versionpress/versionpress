@@ -110,7 +110,6 @@ abstract class Git {
         chdir(self::$gitRoot);
         $commitRange = sprintf("%s..HEAD", $commit);
         self::runShellCommand("git revert -n %s", $commitRange);
-        self::commit(sprintf("Reverted to version %s", $commit));
     }
 
     public static function revert($commit) {
@@ -122,7 +121,7 @@ abstract class Git {
             self::runShellCommand("git revert --abort");
             return false;
         }
-        self::commit(sprintf("Reverted changes by version %s", $commit));
+
         return true;
     }
 

@@ -26,7 +26,7 @@ class Reverter {
 
         $this->synchronize();
 
-        $changeInfo = new RevertChangeInfo();
+        $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_UNDO, $commitHash);
         $this->committer->forceChangeInfo($changeInfo);
         $this->committer->commit();
 
@@ -37,7 +37,7 @@ class Reverter {
         Git::revertAll($commitHash);
         $this->synchronize();
 
-        $changeInfo = new RevertChangeInfo();
+        $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_ROLLBACK, $commitHash);
         $this->committer->forceChangeInfo($changeInfo);
         $this->committer->commit();
     }
