@@ -35,6 +35,6 @@ class UserMetaStorage extends SingleFileStorage implements EntityStorage {
      * @return EntityChangeInfo
      */
     protected function createChangeInfo($entity, $changeType) {
-        // TODO: Implement createChangeInfo() method.
+        return new UserChangeInfo('edit', $entity['vp_id'], $entity['user_login']);
     }
 }

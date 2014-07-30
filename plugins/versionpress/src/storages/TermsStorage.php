@@ -12,6 +12,6 @@ class TermsStorage extends SingleFileStorage implements EntityStorage {
      * @return EntityChangeInfo
      */
     protected function createChangeInfo($entity, $changeType) {
-        // TODO: Implement createChangeInfo() method.
+        return new TermChangeInfo($changeType, $entity['vp_id'], $entity['name']);
     }
 }

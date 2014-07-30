@@ -65,12 +65,15 @@ if(isset($_GET['init']) && !$isInitialized) {
                 'PluginChangeInfo',
                 'WordPressUpdateChangeInfo',
                 'VersionPressChangeInfo',
+                'RevertChangeInfo',
                 'PostChangeInfo',
                 'CommentChangeInfo',
                 'OptionChangeInfo',
+                'TermChangeInfo',
+                'UserChangeInfo',
                 'CustomChangeInfo',
             );
-            $matchingChangeInfoClass = 'CustomChangeInfo'; // some fallback
+            $matchingChangeInfoClass = 'CustomChangeInfo'; // fallback
             foreach ($changeInfoClasses as $changeInfoClass) {
                 if ($changeInfoClass::matchesCommitMessage($commit->getMessage())) {
                     $matchingChangeInfoClass = $changeInfoClass;

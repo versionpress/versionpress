@@ -82,6 +82,7 @@ class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
      * @return EntityChangeInfo
      */
     protected function createChangeInfo($entity, $changeType) {
-        // TODO: Implement createChangeInfo() method.
+        $termId = $this->findTermId($entity);
+        return new TermChangeInfo('edit', $termId, $this->entities[$termId]['name']);
     }
 }
