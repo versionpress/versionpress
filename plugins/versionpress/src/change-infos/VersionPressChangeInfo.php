@@ -5,25 +5,28 @@
  */
 class VersionPressChangeInfo implements ChangeInfo {
 
+    const OBJECT_TYPE = "versionpress";
+    const ACTION = "install"; // there are no other actions handled by this change info yet
+
     /**
      * @return string
      */
     public function getObjectType() {
-        return "";
+        return self::OBJECT_TYPE;
     }
 
     /**
      * @return string
      */
     public function getAction() {
-        return "";
+        return self::ACTION;
     }
 
     /**
      * @return CommitMessage
      */
     public function getCommitMessage() {
-        return new CommitMessage("VersionPress was installed", ChangeInfo::ACTION_TAG . ": versionpress/install");
+        return new CommitMessage("VersionPress was installed",  sprintf("%s: %s/%s", ChangeInfo::ACTION_TAG, self::OBJECT_TYPE, self::ACTION));
     }
 
     /**
@@ -31,8 +34,7 @@ class VersionPressChangeInfo implements ChangeInfo {
      * @return boolean
      */
     public static function matchesCommitMessage(CommitMessage $commitMessage) {
-        $tags = $commitMessage->getVersionPressTags();
-        return isset($tags[ChangeInfo::ACTION_TAG]) && Strings::startsWith($tags[ChangeInfo::ACTION_TAG], "versionpress");
+        return ChangeInfoHelpers::actionTagStartsWith($commitMessage, self::OBJECT_TYPE . "/" . self::ACTION);
     }
 
     /**

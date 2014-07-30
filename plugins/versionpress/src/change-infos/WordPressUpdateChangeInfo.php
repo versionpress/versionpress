@@ -47,8 +47,7 @@ class WordPressUpdateChangeInfo implements ChangeInfo {
      * @return boolean
      */
     public static function matchesCommitMessage(CommitMessage $commitMessage) {
-        $tags = $commitMessage->getVersionPressTags();
-        return isset($tags[ChangeInfo::ACTION_TAG]) && Strings::startsWith($tags[ChangeInfo::ACTION_TAG], self::OBJECT_TYPE);
+        return ChangeInfoHelpers::actionTagStartsWith($commitMessage, self::OBJECT_TYPE);
     }
 
     /**

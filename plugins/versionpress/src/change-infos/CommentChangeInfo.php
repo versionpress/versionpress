@@ -21,8 +21,7 @@ class CommentChangeInfo extends EntityChangeInfo {
     }
 
     public static function matchesCommitMessage(CommitMessage $commitMessage) {
-        $tags = $commitMessage->getVersionPressTags();
-        return parent::matchesCommitMessage($commitMessage) && Strings::startsWith($tags[ChangeInfo::ACTION_TAG], "comment");
+        return parent::matchesCommitMessage($commitMessage) && ChangeInfoHelpers::actionTagStartsWith($commitMessage, "comment");
     }
 
     /**
