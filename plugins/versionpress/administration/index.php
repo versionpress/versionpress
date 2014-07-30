@@ -3,22 +3,19 @@
 </style>
 <h1>VersionPress</h1>
 <?php
-$isInitialized = is_file(VERSIONPRESS_PLUGIN_DIR . '/.active');
+global $versionPressContainer;
 
+$isInitialized = is_file(VERSIONPRESS_PLUGIN_DIR . '/.active');
 wp_enqueue_style('versionpress_admin_style', plugins_url( 'style.css' , __FILE__ ));
 
 function initialize() {
-
-    global $wpdb;
+    global $versionPressContainer;
 
     @mkdir(VERSIONPRESS_MIRRORING_DIR, 0777, true);
-    $dbSchema = new DbSchemaInfo(VERSIONPRESS_PLUGIN_DIR . '/src/database/schema.neon', $wpdb->prefix);
-    $storageFactory = new EntityStorageFactory(VERSIONPRESS_MIRRORING_DIR);
-    $installer = new VersionPressInstaller($wpdb, $dbSchema, $storageFactory);
+    $installer = $versionPressContainer->resolve(VersionPressServices::INSTALLER);
     $installer->onProgressChanged[] = 'show_message';
     $installer->install();
 }
-
 
 if(isset($_GET['init']) && !$isInitialized) {
     initialize();
@@ -35,15 +32,18 @@ if(isset($_GET['init']) && !$isInitialized) {
 <?php
 } else {
     if (isset($_GET['revert'])) {
-        if(Git::revert($_GET['revert'])) {
-            require_once __DIR__ . '/../../versionpress/sync.php';
-        } else {
+        /** @var Reverter $reverter */
+        $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
+        $revertSuccessful = $reverter->revert($_GET['revert']);
+
+        if(!$revertSuccessful) {
             echo "<div class='error'>Error: Overwritten changes can not be reverted.</div>";
         }
     }
     if (isset($_GET['revert-all'])) {
-        Git::revertAll($_GET['revert-all']);
-        require_once __DIR__ . '/../../versionpress/sync.php';
+        /** @var Reverter $reverter */
+        $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
+        $reverter->revertAll($_GET['revert-all']);
     }
 ?>
     <table id="versionpress-commits-table" class="wp-list-table widefat fixed posts">

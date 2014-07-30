@@ -7,6 +7,9 @@ final class VersionPressServices {
     const DATABASE = 'database';
     const COMMITTER = 'committer';
     const INSTALLER = 'installer';
+    const SYNCHRONIZATION_PROCESS = 'synchronization-process';
+    const SYNCHRONIZER_FACTORY = 'synchronizer-factory';
+    const REVERTER = 'reverter';
 
     private function __construct() {}
 }
