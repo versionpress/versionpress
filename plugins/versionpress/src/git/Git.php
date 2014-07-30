@@ -36,11 +36,12 @@ abstract class Git {
         $commitMessage = self::$COMMIT_MESSAGE_PREFIX . $message->getHead();
         if($message->getBody() != null) $commitMessage .= "\n\n" . $message->getBody();
         $tempCommitMessageFilename = md5(rand());
-        file_put_contents($tempCommitMessageFilename, $commitMessage);
+        $tempCommitMessagePath = VERSIONPRESS_PLUGIN_DIR . "/temp/" . $tempCommitMessageFilename;
+        file_put_contents($tempCommitMessagePath , $commitMessage);
 
         self::runShellCommand(self::$CONFIG_COMMAND, $authorName, $authorEmail);
-        self::runShellCommand(self::$ADD_AND_COMMIT_COMMAND, $gitAddPath, $tempCommitMessageFilename);
-        unlink($tempCommitMessageFilename);
+        self::runShellCommand(self::$ADD_AND_COMMIT_COMMAND, $gitAddPath, $tempCommitMessagePath);
+        unlink($tempCommitMessagePath);
     }
 
     static function isVersioned($directory) {
