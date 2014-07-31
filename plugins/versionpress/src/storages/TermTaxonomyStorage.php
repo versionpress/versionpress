@@ -16,6 +16,11 @@ class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
             return;
 
         $taxonomyId = $data['vp_id'];
+
+        if(!isset($this->entities[$termId]['taxonomies'])) {
+            $this->entities[$termId]['taxonomies'] = array();
+        }
+
         $originalTaxonomies = $this->entities[$termId]['taxonomies'];
 
         $isNew = !isset($originalTaxonomies[$taxonomyId]);
@@ -26,7 +31,7 @@ class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
             $this->saveEntities();
 
             if (is_callable($callback))
-                $callback($taxonomyId, $isNew ? 'create' : 'edit');
+                $callback($this->entities[$termId], $isNew ? 'create' : 'edit');
         }
     }
 
@@ -38,11 +43,12 @@ class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
 
         if($termId === null)
             return;
-        $originalTaxonomies = $this->entities[$termId]['taxonomies'];
+        $originalTerm = $this->entities[$termId];
+        $originalTaxonomies = $originalTerm['taxonomies'];
         unset($this->entities[$termId]['taxonomies'][$taxonomyId]);
         if($this->entities[$termId]['taxonomies'] != $originalTaxonomies) {
             $this->saveEntities();
-            $this->notifyOnChangeListeners($taxonomyId, 'delete');
+            $this->notifyOnChangeListeners($originalTerm, 'delete');
         }
 
     }
@@ -82,7 +88,6 @@ class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
      * @return EntityChangeInfo
      */
     protected function createChangeInfo($entity, $changeType) {
-        $termId = $this->findTermId($entity);
-        return new TermChangeInfo('edit', $termId, $this->entities[$termId]['name']);
+        return new TermChangeInfo('edit', $entity['vp_id'], $entity['name']);
     }
 }
