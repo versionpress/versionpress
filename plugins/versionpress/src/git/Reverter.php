@@ -49,7 +49,7 @@ class Reverter {
     }
 
     private function synchronize() {
-        $synchronizationQueue = ['options', 'users', 'usermeta', 'posts', 'comments', 'terms', 'term_taxonomy', 'term_relationships'];
+        $synchronizationQueue = array('options', 'users', 'usermeta', 'posts', 'comments', 'terms', 'term_taxonomy', 'term_relationships');
         $this->synchronizationProcess->synchronize($synchronizationQueue);
         $this->fixCommentCount();
     }
