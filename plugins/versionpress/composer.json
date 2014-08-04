@@ -15,9 +15,6 @@
             "email": "info@versionpress.net"
         }
     ],
-    "config": {
-        "vendor-dir": "plugins/versionpress/vendor"
-    },
     "repositories": [
         {
             "type": "vcs",
