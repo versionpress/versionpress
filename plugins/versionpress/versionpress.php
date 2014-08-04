@@ -13,7 +13,7 @@ register_activation_hook(__FILE__, 'versionpress_activate');
 register_deactivation_hook(__FILE__, 'versionpress_deactivate');
 register_uninstall_hook(__FILE__, 'versionpress_uninstall');
 
-add_action( 'admin_menu', 'register_versionpress_menu' );
+add_action( 'admin_menu', 'versionpress_admin_menu');
 
 if(isActive()) {
     registerHooks();
@@ -109,7 +109,7 @@ function isActive() {
     return defined('VERSIONPRESS_PLUGIN_DIR') && file_exists(VERSIONPRESS_PLUGIN_DIR . '/.active');
 }
 
-function register_versionpress_menu(){
+function versionpress_admin_menu() {
     add_menu_page(
         'VersionPress',
         'VersionPress',
