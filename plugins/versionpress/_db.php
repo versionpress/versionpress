@@ -19,7 +19,7 @@ define('VERSIONPRESS_MIRRORING_DIR', VERSIONPRESS_PLUGIN_DIR . '/db');
  * (Note: Nette 2.2 already uses the modular structure, however, it supports PHP 5.3 only. This might be
  * a problem for us, or not, see http://jira.agilio.cz/browse/WP-10 and http://jira.agilio.cz/browse/WP-40.
  */
-require_once(VERSIONPRESS_PLUGIN_DIR . '/libs/nette.min.php');
+require_once(VERSIONPRESS_PLUGIN_DIR . '/vendor/autoload.php');
 NDebugger::enable(NDebugger::DETECT, VERSIONPRESS_PLUGIN_DIR . '/log');
 
 $robotLoader = new NRobotLoader();
