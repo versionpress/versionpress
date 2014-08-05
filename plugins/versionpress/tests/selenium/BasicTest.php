@@ -12,9 +12,9 @@ class BasicTests extends WordpressSeleniumTestCase {
 
     public function testLogin() {
         $this->url('wp-admin');
-        $this->byId('user_login')->value('admin');
-        $this->byId('user_pass')->value('agilio');
+        $this->byId('user_login')->value(self::$config->getAdminName());
+        $this->byId('user_pass')->value(self::$config->getAdminPassword());
         $this->byId('wp-submit')->click();
-        $this->stringStartsWith('Dashboard', $this->title());
+        $this->assertStringStartsWith('Dashboard', $this->title());
     }
 }
