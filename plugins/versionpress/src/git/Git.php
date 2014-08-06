@@ -7,7 +7,7 @@ abstract class Git {
     // Constants
     private static $ADD_AND_COMMIT_COMMAND = "git add -A %s && git commit -F %s";
     private static $RELATIVE_PATH_TO_GIT_ROOT_COMMAND = "git rev-parse --show-cdup";
-    private static $INIT_COMMAND = "git init -q";
+    private static $INIT_COMMAND = "git init";
     private static $ASSUME_UNCHANGED_COMMAND = "git update-index --assume-unchanged %s";
     private static $COMMIT_MESSAGE_PREFIX = "[VP] ";
     private static $CONFIG_COMMAND = "git config user.name %s && git config user.email %s";
@@ -40,6 +40,8 @@ abstract class Git {
         file_put_contents($tempCommitMessagePath , $commitMessage);
 
         self::runShellCommand(self::$CONFIG_COMMAND, $authorName, $authorEmail);
+        self::runShellCommand('git add -A %s', $gitAddPath);
+        self::runShellCommand('git commit -F %s', $tempCommitMessageFilename);
         self::runShellCommand(self::$ADD_AND_COMMIT_COMMAND, $gitAddPath, $tempCommitMessagePath);
         unlink($tempCommitMessagePath);
     }
@@ -127,24 +129,13 @@ abstract class Git {
     }
 
     private static function runProcess($cmd) {
-        $descriptor = array(
-            1 => array('pipe', 'w'),
-            2 => array('pipe', 'w')
-        );
-
-        $process = proc_open($cmd, $descriptor, $pipes, getcwd());
+        $process = new \Symfony\Component\Process\Process($cmd, getcwd());
+        $process->run();
 
         $result = array(
-            'stdout' => '',
-            'stderr' => ''
+            'stdout' => $process->getOutput(),
+            'stderr' => $process->getErrorOutput()
         );
-
-        if(is_resource($process)) {
-            $result['stdout'] = stream_get_contents($pipes[1]);
-            $result['stderr'] = stream_get_contents($pipes[2]);
-        }
-
-        proc_close($process);
 
         return $result;
     }
