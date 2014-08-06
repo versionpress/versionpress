@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../../../wp-load.php');
+require_once(dirname(__FILE__) . '/../../../../wp-load.php');
 
 
 class VersionPressInstaller {
@@ -310,6 +310,7 @@ class VersionPressInstaller {
     }
 
     private function activateVersionPress() {
+        $this->reportProgressChange("Activating VersionPress...");
         touch(VERSIONPRESS_PLUGIN_DIR . '/.active');
     }
 }
