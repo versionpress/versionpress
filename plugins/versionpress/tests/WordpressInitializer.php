@@ -33,7 +33,7 @@ class WordpressInitializer {
     }
 
     private static function exec($command, $executionPath) {
-        echo "Executing command: " . $command;
+        echo "Executing command: " . $command . "\n";
         $cwd = getcwd();
         chdir($executionPath);
         $result = exec($command);
