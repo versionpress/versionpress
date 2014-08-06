@@ -10,7 +10,7 @@ class DbSchemaInfo {
 
     function __construct($schemaFile, $prefix) {
         $neonSchema = file_get_contents($schemaFile);
-        $this->schema = Neon::decode($neonSchema);
+        $this->schema = NNeon::decode($neonSchema);
         $this->prefix = $prefix;
     }
 

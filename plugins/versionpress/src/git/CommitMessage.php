@@ -26,7 +26,7 @@ class CommitMessage {
 
     public function getVersionPressTags() {
         $tagLines = array_filter(array_map("trim", explode("\n", $this->getBody())), function ($line) {
-                return Strings::startsWith($line, "VP-");
+                return NStrings::startsWith($line, "VP-");
             });
         $tags = array();
         foreach ($tagLines as $line) {

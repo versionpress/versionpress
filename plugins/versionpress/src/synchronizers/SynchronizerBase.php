@@ -134,7 +134,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $query = "UPDATE {$tableName} JOIN (SELECT * FROM wp_vp_id WHERE `table` = '{$this->entityName}') filtered_vp_id ON {$tableName}.{$this->idColumnName} = filtered_vp_id.id SET";
         foreach ($updateData as $key => $value) {
             if ($key == $this->idColumnName) continue;
-            if (Strings::startsWith($key, 'vp_')) continue;
+            if (NStrings::startsWith($key, 'vp_')) continue;
             $query .= " `$key` = " . (is_numeric($value) ? $value : '"' . mysql_real_escape_string($value) . '"') . ',';
         }
         $query[strlen($query) - 1] = ' '; // strip the last comma
@@ -150,7 +150,7 @@ abstract class SynchronizerBase implements Synchronizer {
         unset($entity[$this->idColumnName]);
         $columns = array_keys($entity);
         $columns = array_filter($columns, function ($column) {
-            return !Strings::startsWith($column, 'vp_');
+            return !NStrings::startsWith($column, 'vp_');
         });
         $columnsString = join(', ', array_map(function ($column) {
             return "`$column`";
@@ -229,8 +229,8 @@ abstract class SynchronizerBase implements Synchronizer {
         $referencesInfo = $this->dbSchema->getReferences($this->entityName);
 
         foreach ($entity as $key => $value) {
-            if (Strings::startsWith($key, 'vp_')) {
-                $key = Strings::substring($key, 3);
+            if (NStrings::startsWith($key, 'vp_')) {
+                $key = NStrings::substring($key, 3);
                 if (isset($referencesInfo[$key]))
                     $references[$key] = $value;
             }

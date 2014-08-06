@@ -61,6 +61,6 @@ class PluginChangeInfo implements ChangeInfo {
      * @return string
      */
     public function getChangeDescription() {
-        return Strings::capitalize($this->action) . "d plugin " . $this->pluginName;
+        return NStrings::capitalize($this->action) . "d plugin " . $this->pluginName;
     }
 }
