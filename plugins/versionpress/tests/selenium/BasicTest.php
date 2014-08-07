@@ -31,6 +31,13 @@ class BasicTests extends WordpressSeleniumTestCase {
         $this->assertEquals('Plugin activated.', $this->byId('message')->text());
     }
 
+    public function testInitializeVersionPress() {
+        $this->url('wp-admin/admin.php?page=versionpress/administration/index.php');
+        $this->byCssSelector('input[type=submit]')->click();
+        $lastCommitMessage = $this->byCssSelector('#the-list td:nth-child(2)')->text();
+        $this->assertEquals('[VP] Installed VersionPress', $lastCommitMessage);
+    }
+
     private function copyVersionPress() {
         $versionPressDir = __DIR__ . '/../../';
         $pluginDir = self::$config->getWordpressPath() . '/wp-content/plugins/versionpress/';
