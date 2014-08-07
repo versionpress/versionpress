@@ -2,7 +2,7 @@
 
 class BasicTests extends WordpressSeleniumTestCase {
     public function setUp() {
-        $this->setBrowser('firefox');
+
     }
 
     public function testWordpressWorks() {

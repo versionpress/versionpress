@@ -2,6 +2,8 @@
 
 class TestConfig {
 
+    private $webDriver;
+    private $firefoxExecutable;
     private $wordpressUrl;
     private $wordpressClearInstallationsPath;
     private $wordpressPath;
@@ -28,6 +30,23 @@ class TestConfig {
         $this->adminName = $rawConfig['admin-name'];
         $this->adminEmail = $rawConfig['admin-email'];
         $this->adminPassword = $rawConfig['admin-pass'];
+
+        $this->webDriver = $rawConfig['web-driver'] ?: "firefox";
+        $this->firefoxExecutable = $rawConfig['firefox-executable'];
+    }
+
+    /**
+     * @return string (default "firefox")
+     */
+    public function getWebDriver() {
+        return $this->webDriver;
+    }
+
+    /**
+     * @return string (default "" in which case the installed Firefox should be used)
+     */
+    public function getFirefoxExecutable() {
+        return $this->firefoxExecutable;
     }
 
     /**
