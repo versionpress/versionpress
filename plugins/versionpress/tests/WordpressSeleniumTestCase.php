@@ -10,7 +10,7 @@ abstract class WordpressSeleniumTestCase extends PHPUnit_Extensions_Selenium2Tes
         $this->setBrowser(self::$config->getWebDriver());
 
         $capabilities = $this->getDesiredCapabilities();
-        if (strlen(self::$config->getFirefoxExecutable()) > 0) {
+        if (self::$config->getFirefoxExecutable()) {
             $capabilities["firefox_binary"] = self::$config->getFirefoxExecutable();
         }
         $this->setDesiredCapabilities($capabilities);
