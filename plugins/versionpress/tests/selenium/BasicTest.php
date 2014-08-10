@@ -1,8 +1,8 @@
 <?php
 
-class BasicTests extends WordpressSeleniumTestCase {
-    public function setUp() {
-
+class BasicTests extends SeleniumTestCase {
+    public static function setUpBeforeClass() {
+        WpAutomation::setUpSite();
     }
 
     public function testWordpressWorks() {
@@ -33,7 +33,7 @@ class BasicTests extends WordpressSeleniumTestCase {
 
     private function copyVersionPress() {
         $versionPressDir = __DIR__ . '/../../';
-        $pluginDir = self::$config->getWordpressPath() . '/wp-content/plugins/versionpress/';
+        $pluginDir = self::$config->getSitePath() . '/wp-content/plugins/versionpress/';
         \Nette\Utils\FileSystem::copy($versionPressDir, $pluginDir);
     }
 }
