@@ -29,9 +29,17 @@ class WpAutomation {
         self::prepareFiles();
         self::createConfigFile();
         self::clearDatabase();
-        self::installWordpress();
+        self::installWp();
     }
 
+    /**
+     * Copies the plugin to the WP site.
+     */
+    public static function installVersionpress() {
+        $versionPressDir = __DIR__ . '/../'; // todo: Find better way to get this path
+        $pluginDir = self::$config->getSitePath() . '/wp-content/plugins/versionpress/';
+        \Nette\Utils\FileSystem::copy($versionPressDir, $pluginDir);
+    }
 
     /**
      * Puts WP directory to a default state, as if one manually downloaded the
@@ -58,7 +66,6 @@ class WpAutomation {
         }
     }
 
-
     /**
      * Returns a path where a clean installation of the configured WP version is stored and cached.
      *
@@ -67,7 +74,6 @@ class WpAutomation {
     private static function getCleanInstallationPath() {
         return self::$config->getCleanInstallationsPath() . '/' . self::$config->getWpVersion();
     }
-
 
     /**
      * Creates wp-config.php based on values in test-config.ini
@@ -103,7 +109,7 @@ class WpAutomation {
      * Installs WordPress. Assumes that files have been prepared on the file system, database is clean
      * and wp-config.php has been created.
      */
-    private static function installWordpress() {
+    private static function installWp() {
         $installCommand = sprintf('wp core install --url="%s" --title="%s" --admin_name="%s" --admin_email="%s" --admin_password="%s"',
             self::$config->getSiteUrl(),
             self::$config->getSiteTitle(),

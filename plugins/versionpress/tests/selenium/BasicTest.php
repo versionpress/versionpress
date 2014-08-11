@@ -1,9 +1,6 @@
 <?php
 
-class BasicTest extends SeleniumTestCase {
-    public static function setUpBeforeClass() {
-        WpAutomation::setUpSite();
-    }
+class BasicTest extends FullWipeSeleniumTestCase {
 
     public function testWordpressWorks() {
         $this->url('wp-admin');
@@ -20,7 +17,7 @@ class BasicTest extends SeleniumTestCase {
     }
 
     public function testInstallVersionPress() {
-        $this->copyVersionPress();
+        WpAutomation::installVersionpress();
         $this->url('wp-admin/plugins.php');
         try {
             $this->byId('versionpress');
@@ -36,11 +33,5 @@ class BasicTest extends SeleniumTestCase {
         $this->byCssSelector('input[type=submit]')->click();
         $lastCommitMessage = $this->byCssSelector('#the-list td:nth-child(2)')->text();
         $this->assertEquals('[VP] Installed VersionPress', $lastCommitMessage);
-    }
-
-    private function copyVersionPress() {
-        $versionPressDir = __DIR__ . '/../../';
-        $pluginDir = self::$config->getSitePath() . '/wp-content/plugins/versionpress/';
-        \Nette\Utils\FileSystem::copy($versionPressDir, $pluginDir);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 require_once(__DIR__ . '/../vendor/autoload.php');
-require_once(__DIR__ . '/SeleniumTestCase.php');
+require_once(__DIR__ . '/selenium/SeleniumTestCase.php');
+require_once(__DIR__ . '/selenium/FullWipeSeleniumTestCase.php');
 require_once(__DIR__ . '/TestConfig.php');
 require_once(__DIR__ . '/WpAutomation.php');
 
