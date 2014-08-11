@@ -1,6 +1,6 @@
 <?php
 
-class BasicTests extends WordpressSeleniumTestCase {
+class BasicTest extends WordpressSeleniumTestCase {
     public function setUp() {
 
     }

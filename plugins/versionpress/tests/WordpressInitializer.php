@@ -42,6 +42,7 @@ class WordpressInitializer {
     }
 
     private static function clearLivePath() {
+        self::setPermisionsForGitDirectory(); // Windows hack
         \Nette\Utils\FileSystem::delete(self::$config->getWordpressPath() . '/*');
     }
 
@@ -84,5 +85,18 @@ class WordpressInitializer {
         $installCommand = sprintf('wp core install --url="%s" --title="%s" --admin_name="%s" --admin_email="%s" --admin_password="%s"',
                             $url, $title, $adminName, $adminEmail, $adminPassword);
         self::exec($installCommand, self::$config->getWordpressPath());
+    }
+
+    private static function setPermisionsForGitDirectory()
+    {
+        $gitDirectoryPath = self::$config->getWordpressPath() . '/.git/';
+
+        if(!is_dir($gitDirectoryPath)) return;
+
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($gitDirectoryPath));
+
+        foreach($iterator as $item) {
+            chmod($item, 0777);
+        }
     }
 }
