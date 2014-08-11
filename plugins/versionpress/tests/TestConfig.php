@@ -1,45 +1,44 @@
 <?php
 
+/**
+ * Wrapper around test-config.ini
+ */
 class TestConfig {
 
-    private $webDriver;
     private $firefoxExecutable;
-    private $wordpressUrl;
-    private $wordpressClearInstallationsPath;
-    private $wordpressPath;
+    private $siteUrl;
+    private $cleanInstallationsPath;
+    private $sitePath;
     private $dbHost;
     private $dbUser;
     private $dbPassword;
     private $dbName;
-    private $testWpVersion;
+    private $wpVersion;
     private $siteTitle;
     private $adminName;
     private $adminEmail;
     private $adminPassword;
 
     function __construct(array $rawConfig) {
-        $this->wordpressUrl = $rawConfig['wordpress-url'];
-        $this->wordpressClearInstallationsPath = $rawConfig['wordpress-clear-installations'];
-        $this->wordpressPath = $rawConfig['wordpress-path'];
+
+        // DB
         $this->dbHost = $rawConfig['db-host'];
         $this->dbUser = $rawConfig['db-user'];
         $this->dbPassword = $rawConfig['db-pass'];
         $this->dbName = $rawConfig['db-name'];
-        $this->testWpVersion = $rawConfig['test-wp-version'];
+
+        // Site settings
+        $this->siteUrl = $rawConfig['site-url'];
+        $this->sitePath = $rawConfig['site-path'];
         $this->siteTitle = $rawConfig['site-title'];
         $this->adminName = $rawConfig['admin-name'];
         $this->adminEmail = $rawConfig['admin-email'];
         $this->adminPassword = $rawConfig['admin-pass'];
 
-        $this->webDriver = $rawConfig['web-driver'] ?: "firefox";
-        $this->firefoxExecutable = $rawConfig['firefox-executable'];
-    }
-
-    /**
-     * @return string (default "firefox")
-     */
-    public function getWebDriver() {
-        return $this->webDriver;
+        // Automation
+        $this->cleanInstallationsPath = $rawConfig['wp-clean-installations'];
+        $this->firefoxExecutable = $rawConfig['selenium-firefox-executable'];
+        $this->wpVersion = $rawConfig['wp-version'];
     }
 
     /**
@@ -80,29 +79,29 @@ class TestConfig {
     /**
      * @return string
      */
-    public function getTestWpVersion() {
-        return $this->testWpVersion;
+    public function getWpVersion() {
+        return $this->wpVersion;
     }
 
     /**
      * @return string
      */
-    public function getWordpressClearInstallationsPath() {
-        return $this->wordpressClearInstallationsPath;
+    public function getCleanInstallationsPath() {
+        return $this->cleanInstallationsPath;
     }
 
     /**
      * @return string
      */
-    public function getWordpressPath() {
-        return $this->wordpressPath;
+    public function getSitePath() {
+        return $this->sitePath;
     }
 
     /**
      * @return string
      */
-    public function getWordpressUrl() {
-        return $this->wordpressUrl;
+    public function getSiteUrl() {
+        return $this->siteUrl;
     }
 
     /**
