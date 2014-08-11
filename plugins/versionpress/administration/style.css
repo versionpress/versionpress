@@ -18,3 +18,24 @@
 #versionpress-commits-table .column-actions {
 	width: 160px;
 }
+
+ul {
+    list-style: inherit;
+    padding-left: 40px;
+}
+
+.vp-pre-uninstall-buttons {
+    margin: 40px 0px 20px;
+}
+
+.vp-pre-uninstall-buttons form {
+    display: inline-block;
+}
+
+.vp-pre-uninstall-buttons .button {
+    margin-right: 10px;
+}
+
+.vp-pre-uninstall-buttons .cancel-deactivation {
+    margin-right: 20px;
+}
