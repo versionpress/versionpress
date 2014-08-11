@@ -11,6 +11,9 @@ defined('ABSPATH') or die("Direct access not allowed");
 
 register_activation_hook(__FILE__, 'versionpress_activate');
 register_deactivation_hook(__FILE__, 'versionpress_deactivate');
+add_action('admin_post_deactivation_canceled', 'versionpress_admin_post_deactivation_canceled');
+add_action('admin_post_deactivation_keep_repo', 'versionpress_admin_post_deactivation_keep_repo');
+add_action('admin_post_deactivation_remove_repo', 'versionpress_admin_post_deactivation_remove_repo');
 register_uninstall_hook(__FILE__, 'versionpress_uninstall');
 
 add_action( 'admin_menu', 'versionpress_admin_menu');
@@ -89,8 +92,13 @@ function versionpress_activate() {
 }
 
 function versionpress_deactivate() {
-    unlink(VERSIONPRESS_PLUGIN_DIR . '/.active');
-    unlink(WP_CONTENT_DIR . '/db.php');
+
+
+    $deactivatePath = 'admin.php?page=versionpress/administration/deactivate.php';
+    $deactivateUrl = admin_url($deactivatePath);
+
+    wp_redirect($deactivateUrl);
+    die();
 }
 
 function versionpress_uninstall() {
@@ -128,4 +136,25 @@ function versionpress_admin_menu() {
             'manage_options',
             'versionpress/administration/sync.php'
         );
+
+    // Support for deactivate.php - add it to the internal $_registered_pages array
+    // See e.g. http://blog.wpessence.com/wordpress-admin-page-without-menu-item/
+    global $_registered_pages;
+    $menu_slug = plugin_basename("versionpress/administration/deactivate.php");
+    $hookname = get_plugin_page_hookname( $menu_slug, '' );
+    $_registered_pages[$hookname] = true;
+
 }
+
+function versionpress_admin_post_deactivation_canceled() {
+    wp_redirect(admin_url('plugins.php'));
+}
+
+function versionpress_admin_post_deactivation_remove_repo() {
+    // TODO - remove repo, db.php and uninstall
+}
+
+function versionpress_admin_post_deactivation_keep_repo() {
+    // TODO - remove db.php and uninstall
+}
+
