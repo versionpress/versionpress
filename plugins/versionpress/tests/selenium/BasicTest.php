@@ -8,11 +8,7 @@ class BasicTest extends FullWipeSeleniumTestCase {
     }
 
     public function testLogin() {
-        $this->url('wp-admin');
-        $this->byId('user_login')->value(self::$config->getAdminName());
-        usleep(100000); // wait for change focus
-        $this->byId('user_pass')->value(self::$config->getAdminPassword());
-        $this->byId('wp-submit')->click();
+        $this->loginIfNecessary();
         $this->assertStringStartsWith('Dashboard', $this->title());
     }
 

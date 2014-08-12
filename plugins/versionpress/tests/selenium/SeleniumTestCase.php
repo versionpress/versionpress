@@ -25,4 +25,21 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
 
         $this->setBrowserUrl(self::$config->getSiteUrl());
     }
+
+    /**
+     *
+     */
+    protected function loginIfNecessary() {
+        $this->url('wp-admin');
+        try {
+            $this->byId('user_login');
+        } catch (PHPUnit_Extensions_Selenium2TestCase_WebDriverException $e) {
+            // already logged in, do nothing
+            return;
+        }
+        $this->byId('user_login')->value(self::$config->getAdminName());
+        usleep(100000); // wait for change focus
+        $this->byId('user_pass')->value(self::$config->getAdminPassword());
+        $this->byId('wp-submit')->click();
+    }
 } 
