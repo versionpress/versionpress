@@ -67,7 +67,7 @@ class WpAutomation {
         self::ensureCleanInstallationIsAvailable();
         self::setPermisionsForGitDirectory(); // Windows hack (enables to delete files under .git/objects directory)
         \Nette\Utils\FileSystem::delete(self::$config->getSitePath() . '/*');
-        Nette\Utils\FileSystem::copy(self::getCleanInstallationPath(), self::$config->getSitePath());
+        \Nette\Utils\FileSystem::copy(self::getCleanInstallationPath(), self::$config->getSitePath());
     }
 
     /**
