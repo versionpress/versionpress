@@ -56,7 +56,7 @@ class WpAutomation {
     public static function enableVersionPress() {
         self::runWpCliCommand('plugin', 'activate', array('versionpress'));
         $code = 'global $versionPressContainer;@mkdir(VERSIONPRESS_MIRRORING_DIR, 0777, true);$installer = $versionPressContainer->resolve(VersionPressServices::INSTALLER);$installer->install();';
-        var_dump(self::runWpCliCommand('eval', array($code)));
+        self::runWpCliCommand('eval', array($code));
     }
 
     /**
