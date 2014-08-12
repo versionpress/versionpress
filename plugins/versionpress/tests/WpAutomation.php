@@ -42,6 +42,24 @@ class WpAutomation {
     }
 
     /**
+     * Creates new post using WP-CLI
+     *
+     * @param array $post (as wp_insert_post)
+     */
+    public static function createPost(array $post) {
+        self::runWpCliCommand('post', 'create', $post);
+    }
+
+    /**
+     * Activates VP in the administration and runs VersionPressInstaller
+     */
+    public static function enableVersionPress() {
+        self::runWpCliCommand('plugin', 'activate', array('versionpress'));
+        $code = 'global $versionPressContainer;@mkdir(VERSIONPRESS_MIRRORING_DIR, 0777, true);$installer = $versionPressContainer->resolve(VersionPressServices::INSTALLER);$installer->install();';
+        var_dump(self::runWpCliCommand('eval', array($code)));
+    }
+
+    /**
      * Puts WP directory to a default state, as if one manually downloaded the
      * WordPress ZIP and extracted it there.
      */
@@ -97,9 +115,14 @@ class WpAutomation {
      * Deletes all tables from the database.
      */
     private static function clearDatabase() {
-        $mysqli = new mysqli(self::$config->getDbHost(), self::$config->getDbUser(), self::$config->getDbPassword(), self::$config->getDbName());
+        $mysqli = new mysqli(
+            self::$config->getDbHost(),
+            self::$config->getDbUser(),
+            self::$config->getDbPassword(),
+            self::$config->getDbName()
+        );
         $res = $mysqli->query('show tables');
-        while($row = $res->fetch_row()) {
+        while ($row = $res->fetch_row()) {
             $dropTableSql = "DROP TABLE $row[0]";
             $mysqli->query($dropTableSql);
         }
@@ -110,7 +133,8 @@ class WpAutomation {
      * and wp-config.php has been created.
      */
     private static function installWp() {
-        $installCommand = sprintf('wp core install --url="%s" --title="%s" --admin_name="%s" --admin_email="%s" --admin_password="%s"',
+        $installCommand = sprintf(
+            'wp core install --url="%s" --title="%s" --admin_name="%s" --admin_email="%s" --admin_password="%s"',
             self::$config->getSiteUrl(),
             self::$config->getSiteTitle(),
             self::$config->getAdminName(),
@@ -127,16 +151,16 @@ class WpAutomation {
     private static function setPermisionsForGitDirectory() {
         $gitDirectoryPath = self::$config->getSitePath() . '/.git/';
 
-        if(!is_dir($gitDirectoryPath)) return;
+        if (!is_dir($gitDirectoryPath)) {
+            return;
+        }
 
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($gitDirectoryPath));
 
-        foreach($iterator as $item) {
+        foreach ($iterator as $item) {
             chmod($item, 0777);
         }
     }
-
-
 
     /**
      * Executes a $command from $executionPath
@@ -146,11 +170,38 @@ class WpAutomation {
      * @return string
      */
     private static function exec($command, $executionPath) {
-        echo "Executing command: " . $command . "\n";
         $cwd = getcwd();
         chdir($executionPath);
         $result = exec($command);
         chdir($cwd);
         return $result;
+    }
+
+    /**
+     * Executes a WP-CLI command
+     * http://wp-cli.org/commands/
+     *
+     * @param string $command
+     * @param string $subcommand
+     * @param array $args
+     * @return string
+     */
+    private static function runWpCliCommand($command, $subcommand, $args = array()) {
+        $cliCommand = "wp $command";
+
+        if (is_array($subcommand)) {
+            $args = $subcommand;
+        } else {
+            $cliCommand .= " $subcommand";
+        }
+
+        foreach ($args as $name => $value) {
+            if (is_int($name)) { // position based argument without name
+                $cliCommand .= " \"$value\"";
+            } else {
+                $cliCommand .= " --$name=\"$value\"";
+            }
+        }
+        return self::exec($cliCommand, self::$config->getSitePath());
     }
 }

@@ -10,8 +10,8 @@ class PostStorage extends DirectoryStorage implements EntityStorage {
      * Don't save revisions and drafts
      */
     public function shouldBeSaved($data) {
-        $id = $data['vp_id'];
-        $isExistingEntity = $this->isExistingEntity($id);
+        $id = @$data['vp_id'];
+        $isExistingEntity = !empty($id) && $this->isExistingEntity($id);
 
         if (isset($data['post_type']) && $data['post_type'] === 'revision')
             return false;

@@ -5,4 +5,4 @@ class FullWipeSeleniumTestCase extends SeleniumTestCase {
         parent::setUpBeforeClass();
         WpAutomation::setUpSite();
     }
-} 
+}
