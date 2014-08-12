@@ -5,7 +5,9 @@ is_file(CONFIG_FILE) or die('Create test-config.ini for automation to work');
 WpAutomation::$config = new TestConfig(parse_ini_file(CONFIG_FILE));
 
 /**
- * Automates some common tasks like setting up a WP site etc.
+ * Automates some common tasks like setting up a WP site, installing VersionPress etc.
+ *
+ * Currently, WpAutomation is a set of static functions as of v1; other options will be considered for v2, see WP-56.
  *
  * Note: Currently, the intention is to add supported tasks as public methods to this class. If this gets
  * unwieldy it will probably be split into multiple files / classes.
@@ -39,6 +41,15 @@ class WpAutomation {
         $versionPressDir = __DIR__ . '/../'; // todo: Find better way to get this path
         $pluginDir = self::$config->getSitePath() . '/wp-content/plugins/versionpress/';
         \Nette\Utils\FileSystem::copy($versionPressDir, $pluginDir);
+    }
+
+    public static function activateVersionpress() {
+        $activateCommand = "wp plugin activate versionpress";
+        self::exec($activateCommand, self::$config->getSitePath());
+    }
+
+    public static function uninstallVersionPress($keepRepository = false) {
+        self::runWpCliCommand('plugin', 'uninstall', array('versionpress'));
     }
 
     /**
