@@ -14,7 +14,6 @@ register_deactivation_hook(__FILE__, 'versionpress_deactivate');
 add_action('admin_post_deactivation_canceled', 'versionpress_admin_post_deactivation_canceled');
 add_action('admin_post_deactivation_keep_repo', 'versionpress_admin_post_deactivation_keep_repo');
 add_action('admin_post_deactivation_remove_repo', 'versionpress_admin_post_deactivation_remove_repo');
-register_uninstall_hook(__FILE__, 'versionpress_uninstall');
 
 add_action( 'admin_menu', 'versionpress_admin_menu');
 
@@ -101,18 +100,6 @@ function versionpress_deactivate() {
     die();
 }
 
-function versionpress_uninstall() {
-    global $wpdb;
-
-    $queries[] = 'DROP VIEW `' . $wpdb->prefix . 'vp_reference_details`;';
-    $queries[] = 'DROP TABLE `' . $wpdb->prefix . 'vp_references`, `' . $wpdb->prefix . 'vp_id`;';
-
-    foreach ($queries as $query) {
-        $wpdb->query($query);
-    }
-
-}
-
 function isActive() {
     return defined('VERSIONPRESS_PLUGIN_DIR') && file_exists(VERSIONPRESS_PLUGIN_DIR . '/.active');
 }
@@ -151,10 +138,19 @@ function versionpress_admin_post_deactivation_canceled() {
 }
 
 function versionpress_admin_post_deactivation_remove_repo() {
-    // TODO - remove repo, db.php and uninstall
+    _vp_uninstall($keepRepo = false);
 }
 
 function versionpress_admin_post_deactivation_keep_repo() {
-    // TODO - remove db.php and uninstall
+    _vp_uninstall($keepRepo = true);
+}
+
+function _vp_uninstall($keepRepo) {
+
+    define('VP_KEEP_REPO', $keepRepo);
+
+    deactivate_plugins("versionpress", true);
+    delete_plugins(array("versionpress/versionpress.php")); // will run uninstall.php as a side-effect
+    wp_redirect(admin_url("plugins.php"));
 }
 
