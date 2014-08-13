@@ -6,7 +6,7 @@ require_once(__DIR__ . '/wp-cli/WpCliTestCase.php');
 require_once(__DIR__ . '/TestConfig.php');
 require_once(__DIR__ . '/WpAutomation.php');
 
-NDebugger::enable(NDebugger::DETECT, __DIR__ . '/../log');
+NDebugger::enable(NDebugger::DEVELOPMENT, __DIR__ . '/../log');
 $robotLoader = new NRobotLoader();
 $robotLoader->addDirectory(__DIR__ . '/../src');
 $robotLoader->setCacheStorage(new NDevNullStorage());
@@ -19,4 +19,3 @@ SeleniumTestCase::$config = $config;
 WpCliTestCase::$config = $config;
 
 PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
-

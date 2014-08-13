@@ -38,7 +38,7 @@ class WpAutomation {
      * Copies the plugin to the WP site.
      */
     public static function installVersionpress() {
-        $versionPressDir = __DIR__ . '/../'; // todo: Find better way to get this path
+        $versionPressDir = __DIR__ . '/../';
         $pluginDir = self::$config->getSitePath() . '/wp-content/plugins/versionpress/';
         \Nette\Utils\FileSystem::copy($versionPressDir, $pluginDir);
     }
