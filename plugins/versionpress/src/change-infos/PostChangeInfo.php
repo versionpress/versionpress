@@ -44,4 +44,16 @@ class PostChangeInfo extends EntityChangeInfo {
     protected function getCustomTags() {
         return array(self::POST_TITLE_TAG => $this->postTitle);
     }
+
+    protected function getCommitMessageHead() {
+        if ($this->getAction() === 'trash' || $this->getAction() === 'untrash') {
+            $preposition = $this->getAction() === 'trash' ? 'to' : 'from';
+            $shortEntityId = substr($this->getEntityId(), 0, 4);
+            return sprintf("Post '%s' moved %s the trash", $shortEntityId, $preposition);
+        }
+
+        return parent::getCommitMessageHead();
+    }
+
+
 }

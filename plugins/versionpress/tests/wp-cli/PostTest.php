@@ -87,6 +87,22 @@ class PostTest extends WpCliTestCase {
         $this->assertEquals($createdPostVpId, $editedPostVpId);
     }
 
+    public function testDeletePost() {
+        $newPost = $this->somePost;
+
+
+        $id = WpAutomation::createPost($newPost);
+        $creationCommit = $this->getLastCommit();
+        $createdPostVpId = $this->getPostVpId($creationCommit);
+
+        WpAutomation::deletePost($id);
+        $deleteCommit = $this->getLastCommit();
+        $this->assertStringStartsWith("post/delete", $deleteCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG));
+
+        $deletedPostVpId = $this->getPostVpId($deleteCommit);
+        $this->assertEquals($createdPostVpId, $deletedPostVpId);
+    }
+
     /**
      * Returns last commit within tested WP site
      *

@@ -75,6 +75,16 @@ class WpAutomation {
     }
 
     /**
+     * Deletes the post using WP-CLI.
+     *
+     * @param $id
+     */
+    public static function deletePost($id) {
+        $args = array($id, '--force');
+        self::runWpCliCommand('post', 'delete', $args);
+    }
+
+    /**
      * Activates VP in the administration and runs VersionPressInstaller
      */
     public static function enableVersionPress() {

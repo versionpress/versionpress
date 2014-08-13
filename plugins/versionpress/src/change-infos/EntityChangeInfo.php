@@ -71,15 +71,15 @@ abstract class EntityChangeInfo implements ChangeInfo {
         return count(explode("/", $actionTag)) === 3; // there are three parts - $entityType, $action and $entityId
     }
 
-    private function getCommitMessageHead() {
+    protected  function getCommitMessageHead() {
         static $verbs = array(
             'create' => 'Created',
             'edit' => 'Edited',
             'delete' => 'Deleted'
         );
 
-        $formattedEntityId = preg_match("/\d/", $this->getEntityId()) ? substr($this->getEntityId(), 0, 4) : $this->getEntityId();
-        return sprintf("%s %s '%s'", $verbs[$this->getAction()], $this->getObjectType(), $formattedEntityId);
+        $shortEntityId = substr($this->getEntityId(), 0, 4);
+        return sprintf("%s %s '%s'", $verbs[$this->getAction()], $this->getObjectType(), $shortEntityId);
     }
 
     private function getCommitMessageBody() {

@@ -144,6 +144,6 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
 
     private function loadEntity($id) {
         $entities = $this->loadAllFromFiles(array($this->getFilename($id)));
-        return $entities[$id];
+        return $entities[0];
     }
 }

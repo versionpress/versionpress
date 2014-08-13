@@ -13,7 +13,7 @@ class PostStorage extends DirectoryStorage implements EntityStorage {
         $id = @$data['vp_id'];
         $isExistingEntity = !empty($id) && $this->isExistingEntity($id);
 
-        if (isset($data['post_type']) && $data['post_type'] === 'revision')
+        if (isset($data['post_type']) && ($data['post_type'] === 'revision' || $data['post_type'] === 'attachment'))
             return false;
 
         if (isset($data['post_status']) && ($data['post_status'] === 'auto-draft' || $data['post_status'] === 'draft'))
