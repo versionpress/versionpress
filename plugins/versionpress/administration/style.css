@@ -28,23 +28,40 @@ h2.vp-deactivation-header {
     margin-bottom: 20px;
 }
 
-ul {
-    list-style: inherit;
+.vp-deactivation ul {
+    list-style: none;
     padding-left: 40px;
 }
 
-.vp-pre-uninstall-buttons {
+.vp-deactivation ul li {
+    position: relative;
+}
+
+.vp-deactivation ul .icon {
+    position: absolute;
+    left: -25px;
+    top: 3px;
+}
+
+.vp-deactivation ul .ok-color {
+    color: inherit;
+}
+
+.vp-deactivation ul .warning-color {
+    color: inherit;
+}
+
+.deactivation-buttons {
     margin: 40px 0px 20px;
 }
 
-.vp-pre-uninstall-buttons form {
+.deactivation-buttons form {
     display: inline-block;
 }
 
-.vp-pre-uninstall-buttons .button {
+.deactivation-buttons .button {
     margin-right: 10px;
 }
 
-.vp-pre-uninstall-buttons .cancel-deactivation {
-    margin-right: 20px;
+.deactivation-buttons .cancel-deactivation {
 }

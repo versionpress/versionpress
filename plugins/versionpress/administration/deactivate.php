@@ -2,6 +2,7 @@
 defined('ABSPATH') or die("Direct access not allowed");
 
 wp_enqueue_style('versionpress_admin_style', plugins_url( 'style.css' , __FILE__ ));
+wp_enqueue_style('versionpress_admin_deactivation_icons', plugins_url( 'icons/style.css' , __FILE__ ));
 
 /**
  * Small helper function that outputs every button in its own form. We do this
@@ -24,26 +25,42 @@ function _vp_button($label, $action, $type = "delete", $cssClass = "") {
 
 ?>
 
-<div class="wrap">
+<div class="wrap vp-deactivation">
     <h2 class="vp-deactivation-header">VersionPress deactivation</h2>
 
 
 
     <div class="error below-h2">
-        <p>You are about to deactivate VersionPress. Note that in the current version:</p>
+        <p>You are about to deactivate VersionPress. Be aware that:</p>
 
         <ul>
-            <li><strong>There is no way to re-activate the plugin using the same repository</strong></li>
-            <li>Because of that, <strong>we will uninstall the plugin automatically in the next step</strong></li>
+
+            <li>
+                <span class="icon icon-notification warning-color"></span>
+                <span style="background-color: rgba(255, 255, 0, 0.7);">Later installations of VersionPress <strong>will not be able to undo or rollback changes</strong> done by this installation.</span> The changes are still technically in the repository if you want to inspect them using e.g. the Git command line tools but our web interface cannot yet work with the "old" changes.
+            </li>
+
+
+            <li>
+                <span class="icon icon-checkmark ok-color"></span>
+                Deactivation <strong>keeps the Git repository on the server</strong>. You can e.g. download the repository for local inspection.
+            </li>
+
+            <li>
+                <span class="icon icon-checkmark ok-color"></span>
+                You <strong>can reactivate VersionPress again</strong> and the current Git repository will not cause any trouble. The "new VersionPress" will just not be able to undo the "old" changes as stated above.
+            </li>
+
+            <li>
+                <span class="icon icon-notification warning-color"></span>
+                If you uninstall this plugin later (needs to be executed manually from the admin screens), the repository will be removed. We put this warning here because the final uninstallation is a step that we cannot influence and there will be just a generic warning that the process will remove everything it ever created. Which it will.
+            </li>
         </ul>
 
-        <p>You can choose to either keep or delete the Git repository. If you keep it, the <code>.git</code> folder will be left on your server and you can then e.g. download it and work with it using the command-line tools, etc.</p>
-
-        <div class="vp-pre-uninstall-buttons">
+        <div class="deactivation-buttons">
 
             <?php _vp_button("Cancel", "deactivation_canceled", "delete", "cancel-deactivation"); ?>
-            <?php _vp_button("Deactivate, uninstall and REMOVE repository", "deactivation_remove_repo"); ?>
-            <?php _vp_button("Deactivate, uninstall and KEEP repository", "deactivation_keep_repo", "primary"); ?>
+            <?php _vp_button("Confirm deactivation", "deactivation_keep_repo", "primary"); ?>
 
         </div>
 

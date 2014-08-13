@@ -13,7 +13,7 @@ register_activation_hook(__FILE__, 'versionpress_activate');
 register_deactivation_hook(__FILE__, 'versionpress_deactivate');
 add_action('admin_post_deactivation_canceled', 'versionpress_admin_post_deactivation_canceled');
 add_action('admin_post_deactivation_keep_repo', 'versionpress_admin_post_deactivation_keep_repo');
-add_action('admin_post_deactivation_remove_repo', 'versionpress_admin_post_deactivation_remove_repo');
+// uninstallation is handler in uninstall.php
 
 add_action( 'admin_menu', 'versionpress_admin_menu');
 
@@ -86,10 +86,18 @@ function createUpdatePostTermsHook(EntityStorage $storage, wpdb $wpdb) {
     };
 }
 
+//----------------------------------
+// Activation and deactivation
+//----------------------------------
+
 function versionpress_activate() {
     copy(dirname(__FILE__) . '/_db.php', WP_CONTENT_DIR . '/db.php');
 }
 
+/**
+ * Deactivation is a two-step process with a warning screen. See
+ * `versionpress_admin_post_deactivation_canceled()` and `versionpress_admin_post_deactivation_keep_repo()`
+ */
 function versionpress_deactivate() {
 
 
@@ -98,6 +106,42 @@ function versionpress_deactivate() {
 
     wp_redirect($deactivateUrl);
     die();
+}
+
+/**
+ * Handler of situation where user canceled the deactivation
+ */
+function versionpress_admin_post_deactivation_canceled() {
+    wp_redirect(admin_url('plugins.php'));
+}
+
+/**
+ * Handler of situation where user confirmed the deactivation. Most
+ * of the actual work is done here.
+ */
+function versionpress_admin_post_deactivation_keep_repo() {
+
+    unlink(WP_CONTENT_DIR . '/db.php');
+    unlink(__DIR__ . '/.active');
+
+    FileSystem::getWpFilesystem()->rmdir(__DIR__ . '/db');
+
+    global $wpdb;
+
+    $table_prefix = $wpdb->prefix;
+
+    $queries[] = "DROP VIEW IF EXISTS `{$table_prefix}vp_reference_details`";
+    $queries[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_references`";
+    $queries[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_id`";
+
+    foreach ($queries as $query) {
+        $wpdb->query($query);
+    }
+
+
+    deactivate_plugins("versionpress/versionpress.php", true);
+    wp_redirect(admin_url("plugins.php"));
+
 }
 
 function isActive() {
@@ -133,24 +177,4 @@ function versionpress_admin_menu() {
 
 }
 
-function versionpress_admin_post_deactivation_canceled() {
-    wp_redirect(admin_url('plugins.php'));
-}
-
-function versionpress_admin_post_deactivation_remove_repo() {
-    _vp_uninstall($keepRepo = false);
-}
-
-function versionpress_admin_post_deactivation_keep_repo() {
-    _vp_uninstall($keepRepo = true);
-}
-
-function _vp_uninstall($keepRepo) {
-
-    define('VP_KEEP_REPO', $keepRepo);
-
-    deactivate_plugins("versionpress", true);
-    delete_plugins(array("versionpress/versionpress.php")); // will run uninstall.php as a side-effect
-    wp_redirect(admin_url("plugins.php"));
-}
 

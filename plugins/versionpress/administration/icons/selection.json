@@ -1,0 +1,136 @@
+{
+	"IcoMoonType": "selection",
+	"icons": [
+		{
+			"icon": {
+				"paths": [
+					"M192 384l-192 192 384 384 640-640-192-192-448 448z"
+				],
+				"tags": [
+					"checkmark",
+					"tick"
+				],
+				"grid": 16
+			},
+			"properties": {
+				"id": 9,
+				"order": 5,
+				"prevSize": 32,
+				"code": 58883,
+				"name": "checkmark",
+				"ligatures": ""
+			},
+			"setIdx": 0,
+			"iconIdx": 9
+		},
+		{
+			"icon": {
+				"paths": [
+					"M512 0c-282.752 0-512 229.248-512 512s229.248 512 512 512 512-229.248 512-512-229.248-512-512-512zM432.64 748.256l-235.584-235.616 90.496-90.496 145.056 145.12 307.744-307.744 90.496 90.496-398.208 398.24z"
+				],
+				"tags": [
+					"check-alt",
+					"checkmark",
+					"tick"
+				],
+				"grid": 16
+			},
+			"properties": {
+				"id": 10,
+				"order": 2,
+				"prevSize": 32,
+				"code": 58880,
+				"name": "check-alt",
+				"ligatures": ""
+			},
+			"setIdx": 0,
+			"iconIdx": 10
+		},
+		{
+			"icon": {
+				"paths": [
+					"M512 158.724l-344.834 737.276h689.668l-344.834-737.276zM512 0v0c22.070 0 44.14 14.882 60.884 44.648l437.072 871.112c33.49 59.532 5 108.24-63.302 108.24h-869.308c-68.304 0-96.79-48.708-63.304-108.24l437.074-871.112c16.744-29.766 38.814-44.648 60.884-44.648zM448 768c0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64-35.346 0-64-28.654-64-64zM512 384c35.346 0 64 28.654 64 64l-20 192h-88l-20-192c0-35.346 28.654-64 64-64z"
+				],
+				"tags": [
+					"warning",
+					"sign"
+				],
+				"grid": 16
+			},
+			"properties": {
+				"id": 244,
+				"order": 4,
+				"prevSize": 32,
+				"code": 58881,
+				"name": "warning",
+				"ligatures": ""
+			},
+			"setIdx": 1,
+			"iconIdx": 244
+		},
+		{
+			"icon": {
+				"paths": [
+					"M512 96c-111.118 0-215.584 43.272-294.156 121.844s-121.844 183.038-121.844 294.156c0 111.118 43.272 215.584 121.844 294.156 78.572 78.572 183.038 121.844 294.156 121.844 111.118 0 215.584-43.272 294.156-121.844 78.572-78.572 121.844-183.038 121.844-294.156 0-111.118-43.272-215.584-121.844-294.156-78.572-78.572-183.038-121.844-294.156-121.844zM512 0v0c282.77 0 512 229.23 512 512s-229.23 512-512 512c-282.77 0-512-229.23-512-512 0-282.77 229.23-512 512-512zM448 704h128v128h-128zM448 192h128v384h-128z"
+				],
+				"tags": [
+					"notification",
+					"warning",
+					"notice",
+					"note",
+					"exclamation"
+				],
+				"grid": 16
+			},
+			"properties": {
+				"id": 245,
+				"order": 3,
+				"prevSize": 32,
+				"code": 58882,
+				"name": "notification",
+				"ligatures": ""
+			},
+			"setIdx": 1,
+			"iconIdx": 245
+		}
+	],
+	"height": 1024,
+	"metadata": {
+		"name": "icomoon"
+	},
+	"preferences": {
+		"fontPref": {
+			"prefix": "icon-",
+			"metadata": {
+				"fontFamily": "icomoon"
+			},
+			"showGlyphs": true,
+			"metrics": {
+				"emSize": 512,
+				"baseline": 6.25,
+				"whitespace": 50
+			},
+			"resetPoint": 58880,
+			"showQuickUse": true,
+			"quickUsageToken": false,
+			"showMetrics": true,
+			"showMetadata": false
+		},
+		"imagePref": {
+			"color": 0,
+			"height": 32,
+			"columns": 16,
+			"margin": 16,
+			"png": false,
+			"sprites": true
+		},
+		"historySize": 100,
+		"showCodes": true,
+		"gridSize": 16,
+		"showLiga": false,
+		"showGrid": true,
+		"showGlyphs": true,
+		"showQuickUse": true,
+		"search": ""
+	}
+}
