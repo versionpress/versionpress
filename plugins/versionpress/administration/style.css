@@ -19,6 +19,15 @@
 	width: 160px;
 }
 
+
+/*
+ * Styles for deactivate.php
+ */
+
+h2.vp-deactivation-header {
+    margin-bottom: 20px;
+}
+
 ul {
     list-style: inherit;
     padding-left: 40px;

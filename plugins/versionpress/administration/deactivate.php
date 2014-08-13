@@ -25,25 +25,25 @@ function _vp_button($label, $action, $type = "delete", $cssClass = "") {
 ?>
 
 <div class="wrap">
-    <h2>VersionPress deactivation</h2>
+    <h2 class="vp-deactivation-header">VersionPress deactivation</h2>
 
 
 
     <div class="error below-h2">
-        <p>You are about to deactivate VersionPress. Note that:</p>
+        <p>You are about to deactivate VersionPress. Note that in the current version:</p>
 
         <ul>
-            <li>There will be <strong>no way to re-activate the plugin with the current repository</strong>. We will probably support this in the future but currently, once VersionPress stops tracking a site it cannot return to tracking it again using the same repository.</li>
-            <li>Since the plugin cannot be sensibly re-activated, you will be taken to the uninstall screen in the next step. Choose now whether to <strong>keep or delete the repository</strong> - the WordPress uninstall screen will look the same in both cases but the <code>.git</code> folder of your website will either be kept or removed.</li>
+            <li><strong>There is no way to re-activate the plugin using the same repository</strong></li>
+            <li>Because of that, <strong>we will uninstall the plugin automatically in the next step</strong></li>
         </ul>
 
-        <p>If you choose to keep the repository, you can e.g. manually download the <code>.git</code> folder and work with it using the command-line tools etc.</p>
+        <p>You can choose to either keep or delete the Git repository. If you keep it, the <code>.git</code> folder will be left on your server and you can then e.g. download it and work with it using the command-line tools, etc.</p>
 
         <div class="vp-pre-uninstall-buttons">
 
             <?php _vp_button("Cancel", "deactivation_canceled", "delete", "cancel-deactivation"); ?>
-            <?php _vp_button("Deactivate and REMOVE repository", "deactivation_remove_repo"); ?>
-            <?php _vp_button("Deactivate and KEEP repository", "deactivation_keep_repo", "primary"); ?>
+            <?php _vp_button("Deactivate, uninstall and REMOVE repository", "deactivation_remove_repo"); ?>
+            <?php _vp_button("Deactivate, uninstall and KEEP repository", "deactivation_keep_repo", "primary"); ?>
 
         </div>
 
