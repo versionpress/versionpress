@@ -48,7 +48,7 @@ class WpAutomation {
         self::exec($activateCommand, self::$config->getSitePath());
     }
 
-    public static function uninstallVersionPress($keepRepository = false) {
+    public static function uninstallVersionPress() {
         self::runWpCliCommand('plugin', 'uninstall', array('versionpress'));
     }
 
