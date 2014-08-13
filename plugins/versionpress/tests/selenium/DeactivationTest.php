@@ -1,11 +1,16 @@
 <?php
 
 /**
- * Tests VersionPress deactivation / uninstallation.
+ * Tests VersionPress deactivation / reactivation / uninstallation flow.
+ *
  * Expects a site to be created but empty.
  */
 class DeactivationTest extends SeleniumTestCase {
 
+    /**
+     * VP is installed here in "before class" to prevent empty open browser seemingly
+     * doing nothing.
+     */
     public static function setUpBeforeClass() {
         WpAutomation::installVersionPress();
     }
@@ -21,11 +26,11 @@ class DeactivationTest extends SeleniumTestCase {
 
 
     /**
-     * Tests the "Cancel" button
+     * Scenario: cancel deactivation
      *
      * @test
      */
-    public function clickDisableButThenCancel() {
+    public function clickDeactivateButThenCancel() {
         $this->url('wp-admin/plugins.php');
         $this->byCssSelector('#versionpress .deactivate a')->click();
 
@@ -34,59 +39,53 @@ class DeactivationTest extends SeleniumTestCase {
         $this->byCssSelector('#deactivation_canceled')->click();
 
         $this->assertContains('wp-admin/plugins.php', $this->url());
+        $this->assertFileExists(self::$config->getSitePath() . '/wp-content/db.php');
     }
 
+
     /**
-     * Tests the "Uninstall and REMOVE repository" button
+     * Scenario: confirm deactivation
      *
      * @test
      */
-    public function clickDisableAndConfirmUninstall_RemoveRepository() {
-        $this->byCssSelector('#versionpress .deactivate a')->click();
-        $this->byCssSelector('#deactivation_remove_repo')->click();
+    public function clickDeactivateAndConfirmThat() {
 
-        try {
-            $this->byCssSelector('#versionpress');
-            $this->fail('The #versionpress element shouldn\'t exist.');
-        } catch (PHPUnit_Extensions_Selenium2TestCase_WebDriverException $e) {
-            $this->assertEquals(PHPUnit_Extensions_Selenium2TestCase_WebDriverException::NoSuchElement, $e->getCode());
-            return;
-        }
+        $this->byCssSelector('#versionpress .deactivate a')->click();  // takes us to the deactivation screen
+        $this->byCssSelector('#deactivation_keep_repo')->click(); // takes us to plugins.php
 
-        $this->assertFileNotExists(self::$config->getSitePath() . '/.git');
-        $this->assertFileNotExists(self::$config->getSitePath() . '/wp-content/db.php');
-
-    }
-
-    /**
-     * Tests the "Uninstall and KEEP repository" button.
-     *
-     * @test
-     */
-    public function clickDisableAndConfirmUninstall_KeepRepository() {
-
-        // We must set up VP again
-        WpAutomation::installVersionPress();
-        $this->_activateVersionPress();
-        $this->_initializeVersionPress();
-
-        $this->url('wp-admin/plugins.php');
-        $this->byCssSelector('#versionpress .deactivate a')->click();
-        $this->byCssSelector('#deactivation_keep_repo')->click();
-
-        try {
-            $this->byCssSelector('#versionpress');
-            $this->fail('The #versionpress element shouldn\'t exist.');
-        } catch (PHPUnit_Extensions_Selenium2TestCase_WebDriverException $e) {
-            $this->assertEquals(PHPUnit_Extensions_Selenium2TestCase_WebDriverException::NoSuchElement, $e->getCode());
-            return;
-        }
 
         $this->assertFileNotExists(self::$config->getSitePath() . '/wp-content/db.php');
+        $this->assertFileNotExists(self::$config->getSitePath() . '/wp-content/plugins/versionpress/.active');
         $this->assertFileExists(self::$config->getSitePath() . '/.git');
 
     }
 
+    /**
+     * Scenario: reactivate plugin
+     *
+     * @test
+     */
+    public function reactivatePlugin() {
+        $this->_activateVersionPress();
+        $this->assertFileExists(self::$config->getSitePath() . '/wp-content/db.php');
+    }
+
+    /**
+     * @test
+     */
+    public function deactivateAndUninstall() {
+        $this->byCssSelector('#versionpress .deactivate a')->click();  // takes us to the deactivation screen
+        $this->byCssSelector('#deactivation_keep_repo')->click(); // takes us to plugins.php
+
+        $this->byCssSelector('#versionpress .delete a')->click();
+
+        $this->byCssSelector('.wrap form:nth-of-type(1) input#submit')->click();
+
+        $this->assertFileNotExists(self::$config->getSitePath() . '/wp-content/db.php');
+        $this->assertFileNotExists(self::$config->getSitePath() . '/wp-content/plugins/versionpress');
+        $this->assertFileNotExists(self::$config->getSitePath() . '/.git');
+
+    }
 
 
     //---------------------
