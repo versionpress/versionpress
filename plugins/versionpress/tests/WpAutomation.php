@@ -99,7 +99,7 @@ class WpAutomation {
      */
     private static function prepareFiles() {
         self::ensureCleanInstallationIsAvailable();
-        self::setPermisionsForGitDirectory(); // Windows hack (enables to delete files under .git/objects directory)
+        FileSystem::setPermisionsForGitDirectory(); // Windows hack (enables to delete files under .git/objects directory)
         \Nette\Utils\FileSystem::delete(self::$config->getSitePath() . '/*');
         \Nette\Utils\FileSystem::copy(self::getCleanInstallationPath(), self::$config->getSitePath());
     }
@@ -173,22 +173,6 @@ class WpAutomation {
         self::runWpCliCommand("core", "install", $cmdArgs);
     }
 
-    /**
-     * Sets full privileges on the .git directory and everything under it
-     */
-    private static function setPermisionsForGitDirectory() {
-        $gitDirectoryPath = self::$config->getSitePath() . '/.git/';
-
-        if (!is_dir($gitDirectoryPath)) {
-            return;
-        }
-
-        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($gitDirectoryPath));
-
-        foreach ($iterator as $item) {
-            chmod($item, 0777);
-        }
-    }
 
     /**
      * Executes a $command from $executionPath

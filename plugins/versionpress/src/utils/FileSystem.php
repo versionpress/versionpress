@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Helper class to work with WP Filesystem. See the only method, `getWpFilesystem()`.
+ * Helper class to work with WP Filesystem. The main method is `getWpFilesystem()`.
  */
 class FileSystem {
 
@@ -33,4 +33,23 @@ class FileSystem {
 
         return $wp_filesystem;
     }
+
+    /**
+     * Sets full privileges on the .git directory and everything under it. Strangely, on Windows,
+     * the .git/objects folder cannot be removed before this method runs.
+     */
+    public static function setPermisionsForGitDirectory() {
+        $gitDirectoryPath = ABSPATH . '/.git';
+
+        if (!is_dir($gitDirectoryPath)) {
+            return;
+        }
+
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($gitDirectoryPath));
+
+        foreach ($iterator as $item) {
+            chmod($item, 0777);
+        }
+    }
+
 } 
