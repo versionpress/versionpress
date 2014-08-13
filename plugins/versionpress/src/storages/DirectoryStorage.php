@@ -115,18 +115,19 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
         if (isset($entity['vp_id']))
             unset($data['vp_id']);
 
-        $diffData = array();
+        $diff = array();
         foreach ($data as $key => $value) {
             if (!isset($entity[$key]) || (isset($entity[$key]) && $entity[$key] != $value)) // not present or different value
-                $diffData[$key] = $value;
+                $diff[$key] = $value;
         }
 
 
-        if (count($diffData) > 0) {
-            $entity = array_merge($entity, $diffData);
-            file_put_contents($filename, $this->serializeEntity($entity));
+        if (count($diff) > 0) {
+            $oldEntity = $entity;
+            $newEntity = array_merge($entity, $diff);
+            file_put_contents($filename, $this->serializeEntity($newEntity));
             if (is_callable($callback))
-                call_user_func($callback, $entity, $isExistingEntity ? $this->getEditAction($diffData) : 'create');
+                call_user_func($callback, $newEntity, $isExistingEntity ? $this->getEditAction($diff, $oldEntity, $newEntity) : 'create');
         }
     }
 
@@ -137,7 +138,7 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
     /**
      * @return string
      */
-    protected function getEditAction($diffData) {
+    protected function getEditAction($diff, $oldEntity, $newEntity) {
         return 'edit';
     }
 

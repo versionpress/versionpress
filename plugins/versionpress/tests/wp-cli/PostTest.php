@@ -68,6 +68,25 @@ class PostTest extends WpCliTestCase {
         $this->assertEquals($createdPostVpId, $editedPostVpId);
     }
 
+    public function testMovePostFromTrash() {
+        $newPost = $this->somePost;
+        $newPost["post_status"] = "trash";
+        $changes = array(
+            "post_status" => "publish"
+        );
+
+        $id = WpAutomation::createPost($newPost);
+        $creationCommit = $this->getLastCommit();
+        $createdPostVpId = $this->getPostVpId($creationCommit);
+
+        WpAutomation::editPost($id, $changes);
+        $editationCommit = $this->getLastCommit();
+        $this->assertStringStartsWith("post/untrash", $editationCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG));
+
+        $editedPostVpId = $this->getPostVpId($editationCommit);
+        $this->assertEquals($createdPostVpId, $editedPostVpId);
+    }
+
     /**
      * Returns last commit within tested WP site
      *

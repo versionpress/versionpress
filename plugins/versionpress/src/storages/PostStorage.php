@@ -34,9 +34,11 @@ class PostStorage extends DirectoryStorage implements EntityStorage {
         return $entity;
     }
 
-    protected function getEditAction($diffData) {
-        if(isset($diffData['post_status']) && $diffData['post_status'] === 'trash')
+    protected function getEditAction($diff, $oldEntity, $newEntity) {
+        if(isset($diff['post_status']) && $diff['post_status'] === 'trash')
             return 'trash';
+        if(isset($diff['post_status']) && $oldEntity['post_status'] === 'trash')
+            return 'untrash';
         return 'edit';
     }
 
