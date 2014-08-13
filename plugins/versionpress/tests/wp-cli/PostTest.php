@@ -2,6 +2,15 @@
 
 class PostTest extends WpCliTestCase {
 
+    private $somePost = array(
+        "post_type" => "post",
+        "post_status" => "publish",
+        "post_title" => "Hello VersionPress!",
+        "post_date" => "2011-11-11 11:11:11",
+        "post_content" => "Welcome to versioned WordPress!",
+        "post_author" => 1
+    );
+
     public static function setUpBeforeClass() {
         WpAutomation::setUpSite();
         WpAutomation::installVersionpress();
@@ -9,38 +18,22 @@ class PostTest extends WpCliTestCase {
     }
 
     public function testNewPost() {
-        $post = array(
-            "post_type" => "post",
-            "post_status" => "publish",
-            "post_title" => "Hello VersionPress!",
-            "post_date" => "2011-11-11 11:11:11",
-            "post_content" => "Welcome to versioned WordPress!",
-            "post_author" => 1
-        );
-
-        WpAutomation::createPost($post);
+        WpAutomation::createPost($this->somePost);
 
         $lastCommit = $this->getLastCommit();
         $comitAction = $lastCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG);
         $postTitleInCommit = $lastCommit->getMessage()->getVersionPressTag(PostChangeInfo::POST_TITLE_TAG);
         $this->assertStringStartsWith("post/create", $comitAction);
-        $this->assertEquals($post["post_title"], $postTitleInCommit);
+        $this->assertEquals($this->somePost["post_title"], $postTitleInCommit);
 
         list($_, $__, $postVpId) = explode("/", $comitAction, 3);
         $commitedPost = $this->getCommitedPost($postVpId);
-        $this->assertPostEquals($post, $commitedPost);
+        $this->assertPostEquals($this->somePost, $commitedPost);
         $this->assertIdExistsInDatabase($postVpId);
     }
 
     public function testEditPost() {
-        $newPost = array(
-            "post_type" => "post",
-            "post_status" => "publish",
-            "post_title" => "Hello VersionPress!",
-            "post_date" => "2011-11-11 11:11:11",
-            "post_content" => "Welcome to versioned WordPress!",
-            "post_author" => 1
-        );
+        $newPost = $this->somePost;
         $changes = array(
             "post_title" => "Announcing VersionPress!"
         );
@@ -52,6 +45,24 @@ class PostTest extends WpCliTestCase {
         WpAutomation::editPost($id, $changes);
         $editationCommit = $this->getLastCommit();
         $this->assertStringStartsWith("post/edit", $editationCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG));
+
+        $editedPostVpId = $this->getPostVpId($editationCommit);
+        $this->assertEquals($createdPostVpId, $editedPostVpId);
+    }
+
+    public function testMovePostToTrash() {
+        $newPost = $this->somePost;
+        $changes = array(
+            "post_status" => "trash"
+        );
+
+        $id = WpAutomation::createPost($newPost);
+        $creationCommit = $this->getLastCommit();
+        $createdPostVpId = $this->getPostVpId($creationCommit);
+
+        WpAutomation::editPost($id, $changes);
+        $editationCommit = $this->getLastCommit();
+        $this->assertStringStartsWith("post/trash", $editationCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG));
 
         $editedPostVpId = $this->getPostVpId($editationCommit);
         $this->assertEquals($createdPostVpId, $editedPostVpId);
