@@ -7,7 +7,7 @@
 class DeactivationTest extends SeleniumTestCase {
 
     public static function setUpBeforeClass() {
-        WpAutomation::installVersionpress();
+        WpAutomation::installVersionPress();
     }
 
     /**
@@ -66,7 +66,7 @@ class DeactivationTest extends SeleniumTestCase {
     public function clickDisableAndConfirmUninstall_KeepRepository() {
 
         // We must set up VP again
-        WpAutomation::installVersionpress();
+        WpAutomation::installVersionPress();
         $this->_activateVersionPress();
         $this->_initializeVersionPress();
 

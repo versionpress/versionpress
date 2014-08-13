@@ -37,13 +37,13 @@ class WpAutomation {
     /**
      * Copies the plugin to the WP site.
      */
-    public static function installVersionpress() {
+    public static function installVersionPress() {
         $versionPressDir = __DIR__ . '/../';
         $pluginDir = self::$config->getSitePath() . '/wp-content/plugins/versionpress/';
         \Nette\Utils\FileSystem::copy($versionPressDir, $pluginDir);
     }
 
-    public static function activateVersionpress() {
+    public static function activateVersionPress() {
         $activateCommand = "wp plugin activate versionpress";
         self::exec($activateCommand, self::$config->getSitePath());
     }

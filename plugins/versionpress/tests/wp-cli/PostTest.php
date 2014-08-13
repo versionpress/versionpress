@@ -13,7 +13,7 @@ class PostTest extends WpCliTestCase {
 
     public static function setUpBeforeClass() {
         WpAutomation::setUpSite();
-        WpAutomation::installVersionpress();
+        WpAutomation::installVersionPress();
         WpAutomation::enableVersionPress();
     }
 

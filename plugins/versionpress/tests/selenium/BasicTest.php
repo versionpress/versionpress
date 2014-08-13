@@ -13,7 +13,7 @@ class BasicTest extends FullWipeSeleniumTestCase {
     }
 
     public function testInstallVersionPress() {
-        WpAutomation::installVersionpress();
+        WpAutomation::installVersionPress();
         $this->url('wp-admin/plugins.php');
         try {
             $this->byId('versionpress');
