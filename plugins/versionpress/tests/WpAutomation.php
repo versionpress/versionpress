@@ -53,12 +53,25 @@ class WpAutomation {
     }
 
     /**
-     * Creates new post using WP-CLI
+     * Creates new post using WP-CLI. Returns ID of created post.
      *
      * @param array $post (as wp_insert_post)
+     * @return int
      */
     public static function createPost(array $post) {
-        self::runWpCliCommand('post', 'create', $post);
+        $post["porcelain"] = "";
+        return intval(self::runWpCliCommand('post', 'create', $post));
+    }
+
+    /**
+     * Changes the post using WP-CLI.
+     *
+     * @param $id
+     * @param $changes
+     */
+    public static function editPost($id, $changes) {
+        array_unshift($changes, $id);
+        self::runWpCliCommand('post', 'update', $changes);
     }
 
     /**
@@ -109,17 +122,12 @@ class WpAutomation {
      */
     private static function createConfigFile() {
         $args = array();
-        $args["--dbname"] = self::$config->getDbName();
-        $args["--dbuser"] = self::$config->getDbUser();
-        if (self::$config->getDbPassword()) $args["--dbpass"] = self::$config->getDbPassword();
-        if (self::$config->getDbPassword()) $args["--dbhost"] = self::$config->getDbHost();
+        $args["dbname"] = self::$config->getDbName();
+        $args["dbuser"] = self::$config->getDbUser();
+        if (self::$config->getDbPassword()) $args["dbpass"] = self::$config->getDbPassword();
+        if (self::$config->getDbHost()) $args["dbhost"] = self::$config->getDbHost();
 
-        $configCommand = "wp core config";
-        foreach ($args as $argName => $argValue) {
-            $configCommand .= " $argName=\"$argValue\"";
-        }
-
-        self::exec($configCommand, self::$config->getSitePath());
+        self::runWpCliCommand("core", "config", $args);
     }
 
     /**
@@ -144,16 +152,15 @@ class WpAutomation {
      * and wp-config.php has been created.
      */
     private static function installWp() {
-        $installCommand = sprintf(
-            'wp core install --url="%s" --title="%s" --admin_name="%s" --admin_email="%s" --admin_password="%s"',
-            self::$config->getSiteUrl(),
-            self::$config->getSiteTitle(),
-            self::$config->getAdminName(),
-            self::$config->getAdminEmail(),
-            self::$config->getAdminPassword()
+        $cmdArgs = array(
+            "url" => self::$config->getSiteUrl(),
+            "title" => self::$config->getSiteTitle(),
+            "admin_name" => self::$config->getAdminName(),
+            "admin_email" => self::$config->getAdminEmail(),
+            "admin_password" =>self::$config->getAdminPassword()
         );
 
-        self::exec($installCommand, self::$config->getSitePath());
+        self::runWpCliCommand("core", "install", $cmdArgs);
     }
 
     /**
@@ -209,8 +216,10 @@ class WpAutomation {
         foreach ($args as $name => $value) {
             if (is_int($name)) { // position based argument without name
                 $cliCommand .= " \"$value\"";
-            } else {
+            } elseif($value) {
                 $cliCommand .= " --$name=\"$value\"";
+            } else {
+                $cliCommand .= " --$name";
             }
         }
         return self::exec($cliCommand, self::$config->getSitePath());

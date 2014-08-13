@@ -26,11 +26,35 @@ class PostTest extends WpCliTestCase {
         $this->assertStringStartsWith("post/create", $comitAction);
         $this->assertEquals($post["post_title"], $postTitleInCommit);
 
-        list($_, $__, $postId) = explode("/", $comitAction, 3);
-
-        $commitedPost = $this->getCommitedPost($postId);
+        list($_, $__, $postVpId) = explode("/", $comitAction, 3);
+        $commitedPost = $this->getCommitedPost($postVpId);
         $this->assertPostEquals($post, $commitedPost);
-        $this->assertIdExistsInDatabase($postId);
+        $this->assertIdExistsInDatabase($postVpId);
+    }
+
+    public function testEditPost() {
+        $newPost = array(
+            "post_type" => "post",
+            "post_status" => "publish",
+            "post_title" => "Hello VersionPress!",
+            "post_date" => "2011-11-11 11:11:11",
+            "post_content" => "Welcome to versioned WordPress!",
+            "post_author" => 1
+        );
+        $changes = array(
+            "post_title" => "Announcing VersionPress!"
+        );
+
+        $id = WpAutomation::createPost($newPost);
+        $creationCommit = $this->getLastCommit();
+        $createdPostVpId = $this->getPostVpId($creationCommit);
+
+        WpAutomation::editPost($id, $changes);
+        $editationCommit = $this->getLastCommit();
+        $this->assertStringStartsWith("post/edit", $editationCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG));
+
+        $editedPostVpId = $this->getPostVpId($editationCommit);
+        $this->assertEquals($createdPostVpId, $editedPostVpId);
     }
 
     /**
@@ -85,5 +109,13 @@ class PostTest extends WpCliTestCase {
         $db = new NConnection("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
         $result = boolval($db->query("SELECT * FROM wp_vp_id WHERE vp_id=UNHEX('$postId')"));
         $this->assertTrue($result, "vp_id '$postId' not found in database");
+    }
+
+    private function getPostVpId($commit) {
+        list($_, $__, $postVpId) = explode(
+            "/",
+            $commit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG)
+        );
+        return $postVpId;
     }
 }
