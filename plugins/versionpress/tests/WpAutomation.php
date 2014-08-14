@@ -59,7 +59,7 @@ class WpAutomation {
      * @return int
      */
     public static function createPost(array $post) {
-        $post["porcelain"] = "";
+        $post["porcelain"] = ""; // wp-cli returns only id
         return intval(self::runWpCliCommand('post', 'create', $post));
     }
 
@@ -82,6 +82,38 @@ class WpAutomation {
     public static function deletePost($id) {
         $args = array($id, '--force');
         self::runWpCliCommand('post', 'delete', $args);
+    }
+
+    /**
+     * Creates new post using WP-CLI. Returns ID of created post.
+     *
+     * @param array $comment (as wp_insert_comment)
+     * @return int
+     */
+    public static function createComment(array $comment) {
+        $comment["porcelain"] = "";  // wp-cli returns only id
+        return intval(self::runWpCliCommand("comment", "create", $comment));
+    }
+
+    /**
+     * Changes the comment using WP-CLI.
+     *
+     * @param $id
+     * @param $changes
+     */
+    public static function editComment($id, $changes) {
+        array_unshift($changes, $id);
+        self::runWpCliCommand('comment', 'update', $changes);
+    }
+
+    /**
+     * Deletes the comment using WP-CLI.
+     *
+     * @param $id
+     */
+    public static function deleteComment($id) {
+        $args = array($id, '--force');
+        self::runWpCliCommand('comment', 'delete', $args);
     }
 
     /**
@@ -172,7 +204,6 @@ class WpAutomation {
 
         self::runWpCliCommand("core", "install", $cmdArgs);
     }
-
 
     /**
      * Executes a $command from $executionPath

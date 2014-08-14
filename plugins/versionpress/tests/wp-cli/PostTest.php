@@ -11,12 +11,6 @@ class PostTest extends WpCliTestCase {
         "post_author" => 1
     );
 
-    public static function setUpBeforeClass() {
-        WpAutomation::setUpSite();
-        WpAutomation::installVersionPress();
-        WpAutomation::enableVersionPress();
-    }
-
     public function testNewPost() {
         WpAutomation::createPost($this->somePost);
 
@@ -27,8 +21,8 @@ class PostTest extends WpCliTestCase {
         $this->assertEquals($this->somePost["post_title"], $postTitleInCommit);
 
         list($_, $__, $postVpId) = explode("/", $comitAction, 3);
-        $commitedPost = $this->getCommitedPost($postVpId);
-        $this->assertPostEquals($this->somePost, $commitedPost);
+        $commitedPost = $this->getCommitedEntity($postVpId);
+        $this->assertEntityEquals($this->somePost, $commitedPost);
         $this->assertIdExistsInDatabase($postVpId);
     }
 
@@ -37,7 +31,7 @@ class PostTest extends WpCliTestCase {
         $changes = array(
             "post_title" => "Announcing VersionPress!"
         );
-        $this->assertEditation($newPost, $changes, "post/edit");
+        $this->assertPostEditation($newPost, $changes, "post/edit");
     }
 
     public function testMovePostToTrash() {
@@ -45,7 +39,7 @@ class PostTest extends WpCliTestCase {
         $changes = array(
             "post_status" => "trash"
         );
-        $this->assertEditation($newPost, $changes, "post/trash");
+        $this->assertPostEditation($newPost, $changes, "post/trash");
     }
 
     public function testMovePostFromTrash() {
@@ -54,7 +48,7 @@ class PostTest extends WpCliTestCase {
         $changes = array(
             "post_status" => "publish"
         );
-        $this->assertEditation($newPost, $changes, "post/untrash");
+        $this->assertPostEditation($newPost, $changes, "post/untrash");
     }
 
     public function testDeletePost() {
@@ -62,76 +56,20 @@ class PostTest extends WpCliTestCase {
 
         $id = WpAutomation::createPost($newPost);
         $creationCommit = $this->getLastCommit();
-        $createdPostVpId = $this->getPostVpId($creationCommit);
+        $createdPostVpId = $this->getEntityVpId($creationCommit);
 
         WpAutomation::deletePost($id);
         $deleteCommit = $this->getLastCommit();
         $this->assertStringStartsWith("post/delete", $deleteCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG));
 
-        $deletedPostVpId = $this->getPostVpId($deleteCommit);
+        $deletedPostVpId = $this->getEntityVpId($deleteCommit);
         $this->assertEquals($createdPostVpId, $deletedPostVpId);
     }
 
-    /**
-     * Returns last commit within tested WP site
-     *
-     * @return Commit
-     */
-    private function getLastCommit() {
-        chdir(self::$config->getSitePath());
-        $gitLog = Git::log();
-        $lastCommit = $gitLog[0];
-        return $lastCommit;
-    }
 
-    private function getCommitedPost($postId) {
+    protected function getCommitedEntity($postId) {
         $path = self::$config->getSitePath() . '/wp-content/plugins/versionpress/db/posts/' . $postId . '.ini';
         return IniSerializer::deserialize(file_get_contents($path));
-    }
-
-    private function assertPostEquals($expectedPost, $actualPost) {
-        $postIsOk = true;
-        $errorMessages = array();
-
-        foreach ($expectedPost as $field => $value) {
-            if (isset($actualPost[$field])) {
-                $fieldIsOk = $value == $actualPost[$field];
-                $postIsOk &= $fieldIsOk;
-                if (!$fieldIsOk) {
-                    $errorMessages[] = "Field '$field' has wrong value";
-                }
-            } elseif (isset($actualPost["vp_$field"])) {
-                // OK ... there is some VP id
-            } else {
-                $postIsOk = false;
-                $errorMessages[] = "Field '$field' not found in post";
-            }
-        }
-
-        if ($postIsOk) {
-            $this->assertTrue(true); // OK
-        }
-        else {
-            $this->fail(join("\n", $errorMessages));
-        }
-    }
-
-    private function assertIdExistsInDatabase($postId) {
-        $dbHost = self::$config->getDbHost();
-        $dbName = self::$config->getDbName();
-        $dbUser = self::$config->getDbUser();
-        $dbPassword = self::$config->getDbPassword();
-        $db = new NConnection("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
-        $result = boolval($db->query("SELECT * FROM wp_vp_id WHERE vp_id=UNHEX('$postId')"));
-        $this->assertTrue($result, "vp_id '$postId' not found in database");
-    }
-
-    private function getPostVpId(Commit $commit) {
-        list($_, $__, $postVpId) = explode(
-            "/",
-            $commit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG)
-        );
-        return $postVpId;
     }
 
     /**
@@ -140,21 +78,10 @@ class PostTest extends WpCliTestCase {
      *
      * @param $newPost
      * @param $changes
+     * @param $expectedAction
      */
-    protected function assertEditation($newPost, $changes, $expectedAction) {
-        $id = WpAutomation::createPost($newPost);
-        $creationCommit = $this->getLastCommit();
-        $createdPostVpId = $this->getPostVpId($creationCommit);
-
-        WpAutomation::editPost($id, $changes);
-        $editationCommit = $this->getLastCommit();
-        $this->assertStringStartsWith(
-            $expectedAction,
-            $editationCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG),
-            "Expected another action"
-        );
-
-        $editedPostVpId = $this->getPostVpId($editationCommit);
-        $this->assertEquals($createdPostVpId, $editedPostVpId, "Edited different post");
+    protected function assertPostEditation($newPost, $changes, $expectedAction) {
+        $this->assertEditation($newPost, $changes, $expectedAction, "WpAutomation::createPost", "WpAutomation::editPost");
     }
+
 }
