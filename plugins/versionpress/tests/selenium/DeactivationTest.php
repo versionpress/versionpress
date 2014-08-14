@@ -34,7 +34,7 @@ class DeactivationTest extends SeleniumTestCase {
         $this->url('wp-admin/plugins.php');
         $this->byCssSelector('#versionpress .deactivate a')->click();
 
-        $this->assertContains('versionpress/administration/deactivate.php', $this->url());
+        $this->assertContains('versionpress/admin/deactivate.php', $this->url());
 
         $this->byCssSelector('#deactivation_canceled')->click();
 
@@ -100,7 +100,7 @@ class DeactivationTest extends SeleniumTestCase {
 
     private function _initializeVersionPress()
     {
-        $this->url('wp-admin/admin.php?page=versionpress/administration/index.php');
+        $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
         $this->byCssSelector('input[type=submit]')->click();
     }
 

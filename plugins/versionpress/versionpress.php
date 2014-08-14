@@ -101,7 +101,7 @@ function versionpress_activate() {
 function versionpress_deactivate() {
 
 
-    $deactivatePath = 'admin.php?page=versionpress/administration/deactivate.php';
+    $deactivatePath = 'admin.php?page=versionpress/admin/deactivate.php';
     $deactivateUrl = admin_url($deactivatePath);
 
     wp_redirect($deactivateUrl);
@@ -153,7 +153,7 @@ function versionpress_admin_menu() {
         'VersionPress',
         'VersionPress',
         'manage_options',
-        'versionpress/administration/index.php',
+        'versionpress/admin/index.php',
         '',
         null,
         0.001234987
@@ -161,17 +161,17 @@ function versionpress_admin_menu() {
 
     if(isActive())
         add_submenu_page(
-            'versionpress/administration/index.php',
+            'versionpress/admin/index.php',
             'Synchronization',
             'Synchronization',
             'manage_options',
-            'versionpress/administration/sync.php'
+            'versionpress/admin/sync.php'
         );
 
     // Support for deactivate.php - add it to the internal $_registered_pages array
     // See e.g. http://blog.wpessence.com/wordpress-admin-page-without-menu-item/
     global $_registered_pages;
-    $menu_slug = plugin_basename("versionpress/administration/deactivate.php");
+    $menu_slug = plugin_basename("versionpress/admin/deactivate.php");
     $hookname = get_plugin_page_hookname( $menu_slug, '' );
     $_registered_pages[$hookname] = true;
 

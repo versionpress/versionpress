@@ -44,9 +44,9 @@ if (isset($_GET['push'])) {
 
 ?>
 <h1>VersionPress</h1>
-<form method="POST" action="<?php echo admin_url('admin.php?page=versionpress/administration/sync.php&pull'); ?>">
+<form method="POST" action="<?php echo admin_url('admin.php?page=versionpress/admin/sync.php&pull'); ?>">
     <input type="submit" value="Synchronize - pull">
 </form>
-<form method="POST" action="<?php echo admin_url('admin.php?page=versionpress/administration/sync.php&push'); ?>">
+<form method="POST" action="<?php echo admin_url('admin.php?page=versionpress/admin/sync.php&push'); ?>">
     <input type="submit" value="Synchronize - push">
 </form>

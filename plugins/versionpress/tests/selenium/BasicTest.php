@@ -25,7 +25,7 @@ class BasicTest extends FullWipeSeleniumTestCase {
     }
 
     public function testInitializeVersionPress() {
-        $this->url('wp-admin/admin.php?page=versionpress/administration/index.php');
+        $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
         $this->byCssSelector('input[type=submit]')->click();
         $lastCommitMessage = $this->byCssSelector('#the-list td:nth-child(2)')->text();
         $this->assertEquals('[VP] Installed VersionPress', $lastCommitMessage);

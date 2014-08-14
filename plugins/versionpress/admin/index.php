@@ -12,6 +12,10 @@ function initialize() {
     global $versionPressContainer;
 
     @mkdir(VERSIONPRESS_MIRRORING_DIR, 0777, true);
+
+    /**
+     * @var Initializer $initializer
+     */
     $initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);
     $initializer->onProgressChanged[] = 'show_message';
     $initializer->initializeVersionPress();
@@ -21,12 +25,12 @@ if(isset($_GET['init']) && !$isInitialized) {
     initialize();
 ?>
     <script type="text/javascript">
-        window.location = '<?php echo admin_url('admin.php?page=versionpress/administration/index.php'); ?>';
+        window.location = '<?php echo admin_url('admin.php?page=versionpress/admin/index.php'); ?>';
     </script>
 <?php
 } elseif(!$isInitialized) {
 ?>
-    <form method="POST" action="<?php echo admin_url('admin.php?page=versionpress/administration/index.php&init'); ?>">
+    <form method="POST" action="<?php echo admin_url('admin.php?page=versionpress/admin/index.php&init'); ?>">
         <input type="submit" value="Initialize">
     </form>
 <?php
@@ -90,7 +94,7 @@ if(isset($_GET['init']) && !$isInitialized) {
         foreach ($commits as $commit) {
             $changeInfo = createChangeInfo($commit);
             $revertAllSnippet = $isFirstCommit ? "" : "|
-                <a href='" . admin_url('admin.php?page=versionpress/administration/index.php&revert-all=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts site back to this state; effectively undos all the change up to this commit'>
+                <a href='" . admin_url('admin.php?page=versionpress/admin/index.php&revert-all=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts site back to this state; effectively undos all the change up to this commit'>
                 Revert to this
             </a>";
 
@@ -100,7 +104,7 @@ if(isset($_GET['init']) && !$isInitialized) {
             <td>{$commit->getRelativeDate()}</td>
             <td>$message</td>
             <td style=\"text-align: right\">
-                <a href='" . admin_url('admin.php?page=versionpress/administration/index.php&revert=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts changes done by this commit'>
+                <a href='" . admin_url('admin.php?page=versionpress/admin/index.php&revert=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts changes done by this commit'>
                 Undo this
                 </a>
                 $revertAllSnippet
