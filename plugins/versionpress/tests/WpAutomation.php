@@ -117,11 +117,11 @@ class WpAutomation {
     }
 
     /**
-     * Activates VP in the administration and runs VersionPressInstaller
+     * Activates VP in the administration and runs the Initializer
      */
     public static function enableVersionPress() {
         self::runWpCliCommand('plugin', 'activate', array('versionpress'));
-        $code = 'global $versionPressContainer;@mkdir(VERSIONPRESS_MIRRORING_DIR, 0777, true);$installer = $versionPressContainer->resolve(VersionPressServices::INSTALLER);$installer->install();';
+        $code = 'global $versionPressContainer;@mkdir(VERSIONPRESS_MIRRORING_DIR, 0777, true);$initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);$initializer->initializeVersionPress();';
         self::runWpCliCommand('eval', array($code));
     }
 

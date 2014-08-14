@@ -1,6 +1,9 @@
 <?php
 
-class VersionPressInstaller {
+/**
+ * Initializes VersionPress - builds its internal repository and starts tracking the changes.
+ */
+class Initializer {
     /**
      * @var callable[]
      */
@@ -26,7 +29,7 @@ class VersionPressInstaller {
         $this->storageFactory = $storageFactory;
     }
 
-    public function install() {
+    public function initializeVersionPress() {
         $this->reportProgressChange("Installation starts");
         $this->createVersionPressTables();
         $this->lockDatabase();

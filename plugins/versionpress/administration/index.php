@@ -12,9 +12,9 @@ function initialize() {
     global $versionPressContainer;
 
     @mkdir(VERSIONPRESS_MIRRORING_DIR, 0777, true);
-    $installer = $versionPressContainer->resolve(VersionPressServices::INSTALLER);
-    $installer->onProgressChanged[] = 'show_message';
-    $installer->install();
+    $initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);
+    $initializer->onProgressChanged[] = 'show_message';
+    $initializer->initializeVersionPress();
 }
 
 if(isset($_GET['init']) && !$isInitialized) {
