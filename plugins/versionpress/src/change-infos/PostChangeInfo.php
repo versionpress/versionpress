@@ -38,6 +38,16 @@ class PostChangeInfo extends EntityChangeInfo {
      * @return string
      */
     public function getChangeDescription() {
+        switch($this->getAction()) {
+            case "create":
+                return "Created post \"{$this->postTitle}\"";
+            case "trash":
+                return "Post \"{$this->postTitle}\" moved to trash";
+            case "untrash":
+                return "Post \"{$this->postTitle}\" moved from trash";
+            case "delete":
+                return "Deleted post \"{$this->postTitle}\"";
+        }
         return "Edited post \"{$this->postTitle}\"";
     }
 

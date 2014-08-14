@@ -8,7 +8,7 @@ class CommentStorage extends DirectoryStorage implements EntityStorage {
 
     protected function createChangeInfo($entity, $changeType) {
         global $wpdb;
-        $result = $wpdb->get_row("SELECT post_title FROM {$wpdb->prefix}comments JOIN {$wpdb->prefix}posts ON comment_post_ID = ID WHERE comment_ID = " . $entity[$this->idColumnName]);
+        $result = $wpdb->get_row("SELECT post_title FROM {$wpdb->prefix}posts JOIN {$wpdb->prefix}vp_id ON {$wpdb->prefix}posts.ID = {$wpdb->prefix}vp_id.id WHERE vp_id = UNHEX('$entity[vp_comment_post_ID]')");
         $author = $entity["comment_author"];
         $postTitle = $result->post_title;
         return new CommentChangeInfo($changeType, $entity["vp_id"], $author, $postTitle);
