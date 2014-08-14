@@ -9,6 +9,6 @@ defined('WP_UNINSTALL_PLUGIN') or die('Direct access not allowed');
 
 require_once('src/utils/FileSystem.php');
 
-FileSystem::setPermisionsForGitDirectory();
+FileSystem::setPermisionsForGitDirectory(ABSPATH);
 FileSystem::getWpFilesystem()->rmdir(ABSPATH . '.git', true);
 
