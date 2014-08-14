@@ -52,6 +52,13 @@ class Committer
         $this->forcedChangeInfo = $changeInfo;
     }
 
+    /**
+     * Returns false in the mid-step of WP update.
+     * The update runs an async HTTP request, so there is created a maintenance file that indicates
+     * that the update is still running. Without this, there will be two commits for WP update.
+     *
+     * @return bool
+     */
     private function shouldCommit()
     {
         // proof of concept
