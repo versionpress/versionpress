@@ -2,8 +2,6 @@
 
 /**
  * Tests VersionPress deactivation / reactivation / uninstallation flow.
- *
- * Expects a site to be created but empty.
  */
 class DeactivationTest extends SeleniumTestCase {
 
@@ -12,6 +10,7 @@ class DeactivationTest extends SeleniumTestCase {
      * doing nothing.
      */
     public static function setUpBeforeClass() {
+        WpAutomation::setUpSite();
         WpAutomation::installVersionPress();
     }
 
