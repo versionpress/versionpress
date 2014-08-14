@@ -95,8 +95,27 @@ register_activation_hook(__FILE__, 'vp_activate');
 register_deactivation_hook(__FILE__, 'vp_deactivate');
 add_action('admin_post_cancel_deactivation', 'vp_admin_post_cancel_deactivation');
 add_action('admin_post_confirm_deactivation', 'vp_admin_post_confirm_deactivation');
+if (get_option('vp_just_activated')) {
+    add_filter('gettext', 'vp_gettext_filter_plugin_activated', 10, 3);
+}
 // uninstallation is handled in uninstall.php
 
+/**
+ * We hook to `gettext` filter to update the "plugin activated" message with a link
+ * to VP initializer. See [WP-66].
+ *
+ * @param string $translation Translated text.
+ * @param string $text        Text to translate.
+ * @param string $domain      Text domain. Unique identifier for retrieving translated strings.
+ */
+function vp_gettext_filter_plugin_activated($translation, $text, $domain) {
+    if ($text == 'Plugin <strong>activated</strong>.' && get_option('vp_just_activated')) {
+        delete_option('vp_just_activated');
+        return 'VersionPress activated. <strong><a href="' . admin_url('admin.php?page=versionpress/admin/index.php') . '" style="text-decoration: underline; font-size: 1.03em;">Continue here</a></strong> to start tracking the site.';
+    } else {
+        return $translation;
+    }
+}
 
 /**
  * Activates the plugin from a WordPress point of view. Note that for VersionPress
@@ -106,6 +125,7 @@ add_action('admin_post_confirm_deactivation', 'vp_admin_post_confirm_deactivatio
  */
 function vp_activate() {
     copy(dirname(__FILE__) . '/_db.php', WP_CONTENT_DIR . '/db.php');
+    add_option('vp_just_activated', '1');
 }
 
 /**
@@ -161,7 +181,14 @@ add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are
  */
 function vp_activation_nag() {
 
-    if (vp_is_active() || get_current_screen()->id == "versionpress/admin/index") {
+    if (vp_is_active() ||
+        get_current_screen()->id == "versionpress/admin/index" ||
+        get_current_screen()->id == "versionpress/admin/deactivate")
+    {
+        return;
+    }
+
+    if (get_option('vp_just_activated')) {
         return;
     }
 
