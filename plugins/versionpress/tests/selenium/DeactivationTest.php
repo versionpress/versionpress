@@ -36,7 +36,7 @@ class DeactivationTest extends SeleniumTestCase {
 
         $this->assertContains('versionpress/admin/deactivate.php', $this->url());
 
-        $this->byCssSelector('#deactivation_canceled')->click();
+        $this->byCssSelector('#cancel_deactivation')->click();
 
         $this->assertContains('wp-admin/plugins.php', $this->url());
         $this->assertFileExists(self::$config->getSitePath() . '/wp-content/db.php');
@@ -51,7 +51,7 @@ class DeactivationTest extends SeleniumTestCase {
     public function clickDeactivateAndConfirmThat() {
 
         $this->byCssSelector('#versionpress .deactivate a')->click();  // takes us to the deactivation screen
-        $this->byCssSelector('#deactivation_keep_repo')->click(); // takes us to plugins.php
+        $this->byCssSelector('#confirm_deactivation')->click(); // takes us to plugins.php
 
 
         $this->assertFileNotExists(self::$config->getSitePath() . '/wp-content/db.php');
@@ -75,7 +75,7 @@ class DeactivationTest extends SeleniumTestCase {
      */
     public function deactivateAndUninstall() {
         $this->byCssSelector('#versionpress .deactivate a')->click();  // takes us to the deactivation screen
-        $this->byCssSelector('#deactivation_keep_repo')->click(); // takes us to plugins.php
+        $this->byCssSelector('#confirm_deactivation')->click(); // takes us to plugins.php
 
         $this->byCssSelector('#versionpress .delete a')->click();
 

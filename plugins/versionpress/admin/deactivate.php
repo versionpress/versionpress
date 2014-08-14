@@ -11,7 +11,7 @@ wp_enqueue_style('versionpress_admin_deactivation_icons', plugins_url( 'icons/st
  *
  * @param string $label Label to display
  * @param string $action Action string that must match the admin_post_* hook in versionpress.php. For example,
- *                       the `deactivation_canceled` action will be mapped to `admin_post_deactivation_canceled` hook
+ *                       the `cancel_deactivation` action will be mapped to `admin_post_cancel_deactivation` hook
  *                       in the main plugin file.
  * @param string $type See `submit_button()`'s $type parameter
  * @param string $cssClass Optional CSS class to be used for the button
@@ -59,8 +59,8 @@ function _vp_button($label, $action, $type = "delete", $cssClass = "") {
 
         <div class="deactivation-buttons">
 
-            <?php _vp_button("Cancel", "deactivation_canceled", "delete", "cancel-deactivation"); ?>
-            <?php _vp_button("Confirm deactivation", "deactivation_keep_repo", "primary"); ?>
+            <?php _vp_button("Cancel", "cancel_deactivation", "delete", "cancel-deactivation"); ?>
+            <?php _vp_button("Confirm deactivation", "confirm_deactivation", "primary"); ?>
 
         </div>
 

@@ -9,19 +9,18 @@ Version: 1.0
 
 defined('ABSPATH') or die("Direct access not allowed");
 
-register_activation_hook(__FILE__, 'versionpress_activate');
-register_deactivation_hook(__FILE__, 'versionpress_deactivate');
-add_action('admin_post_deactivation_canceled', 'versionpress_admin_post_deactivation_canceled');
-add_action('admin_post_deactivation_keep_repo', 'versionpress_admin_post_deactivation_keep_repo');
-// uninstallation is handler in uninstall.php
 
-add_action( 'admin_menu', 'versionpress_admin_menu');
 
-if(isActive()) {
-    registerHooks();
+//----------------------------------------
+// Hooks for VersionPress functionality
+//----------------------------------------
+
+
+if (vp_is_active()) {
+    vp_register_hooks();
 }
 
-function registerHooks() {
+function vp_register_hooks() {
     global $wpdb, $versionPressContainer;
     $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
     $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
@@ -86,40 +85,50 @@ function createUpdatePostTermsHook(EntityStorage $storage, wpdb $wpdb) {
     };
 }
 
+
+
 //----------------------------------
 // Activation and deactivation
 //----------------------------------
 
-function versionpress_activate() {
+register_activation_hook(__FILE__, 'vp_activate');
+register_deactivation_hook(__FILE__, 'vp_deactivate');
+add_action('admin_post_cancel_deactivation', 'vp_admin_post_cancel_deactivation');
+add_action('admin_post_confirm_deactivation', 'vp_admin_post_confirm_deactivation');
+// uninstallation is handled in uninstall.php
+
+
+/**
+ * Activates the plugin from a WordPress point of view. Note that for VersionPress
+ * to become fully active, the Initializer needs to be run.
+ *
+ * @see Initializer
+ */
+function vp_activate() {
     copy(dirname(__FILE__) . '/_db.php', WP_CONTENT_DIR . '/db.php');
 }
 
 /**
  * Deactivation is a two-step process with a warning screen. See
- * `versionpress_admin_post_deactivation_canceled()` and `versionpress_admin_post_deactivation_keep_repo()`
+ * `versionpress_admin_post_cancel_deactivation()` and `versionpress_admin_post_confirm_deactivation()`
  */
-function versionpress_deactivate() {
-
-
-    $deactivatePath = 'admin.php?page=versionpress/admin/deactivate.php';
-    $deactivateUrl = admin_url($deactivatePath);
-
-    wp_redirect($deactivateUrl);
+function vp_deactivate() {
+    wp_redirect(admin_url('admin.php?page=versionpress/admin/deactivate.php'));
     die();
 }
 
 /**
- * Handler of situation where user canceled the deactivation
+ * Handles a situation where user canceled the deactivation
  */
-function versionpress_admin_post_deactivation_canceled() {
+function vp_admin_post_cancel_deactivation() {
     wp_redirect(admin_url('plugins.php'));
 }
 
 /**
- * Handler of situation where user confirmed the deactivation. Most
+ * Handles a situation where user confirmed the deactivation. Most
  * of the actual work is done here.
  */
-function versionpress_admin_post_deactivation_keep_repo() {
+function vp_admin_post_confirm_deactivation() {
 
     unlink(WP_CONTENT_DIR . '/db.php');
     unlink(__DIR__ . '/.active');
@@ -144,11 +153,34 @@ function versionpress_admin_post_deactivation_keep_repo() {
 
 }
 
-function isActive() {
-    return defined('VERSIONPRESS_PLUGIN_DIR') && file_exists(VERSIONPRESS_PLUGIN_DIR . '/.active');
+
+add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are just one step less important :) */);
+
+/**
+ * Displays the activation nag
+ */
+function vp_activation_nag() {
+
+    if (vp_is_active() || get_current_screen()->id == "versionpress/admin/index") {
+        return;
+    }
+
+
+    echo "<div class='update-nag'>VersionPress is installed but not yet tracking this site. <a href='" . admin_url('admin.php?page=versionpress/admin/index.php') . "'>Please finish the activation.</a></div>";
+
 }
 
-function versionpress_admin_menu() {
+
+
+
+//----------------------------------
+// Menu
+//----------------------------------
+
+
+add_action('admin_menu', 'vp_admin_menu');
+
+function vp_admin_menu() {
     add_menu_page(
         'VersionPress',
         'VersionPress',
@@ -159,7 +191,7 @@ function versionpress_admin_menu() {
         0.001234987
     );
 
-    if(isActive())
+    if(vp_is_active())
         add_submenu_page(
             'versionpress/admin/index.php',
             'Synchronization',
@@ -177,18 +209,22 @@ function versionpress_admin_menu() {
 
 }
 
-function vp_initialization_nag() {
 
-    if (isActive()) {
-        return;
-    }
 
-    $screen = get_current_screen();
-    if ($screen->id == "versionpress/admin/index") {
-        return;
-    }
+//----------------------------------
+// Public functions
+//----------------------------------
 
-    echo "<div class='update-nag'>VersionPress is installed but not yet tracking this site. <a href='" . admin_url('admin.php?page=versionpress/admin/index.php') . "'>Please finish the activation.</a></div>";
+/**
+ * Returns true if VersionPress is active. Note that active != activated and being
+ * active means that VersionPress is tracking changes.
+ *
+ * @return bool
+ */
+function vp_is_active() {
+    return defined('VERSIONPRESS_PLUGIN_DIR') && file_exists(VERSIONPRESS_PLUGIN_DIR . '/.active');
 }
-add_action( 'admin_notices', 'vp_initialization_nag', 4 /* WP update nag is 3, we are just one step less important :) */ );
+
+
+
 
