@@ -177,4 +177,18 @@ function versionpress_admin_menu() {
 
 }
 
+function vp_initialization_nag() {
+
+    if (isActive()) {
+        return;
+    }
+
+    $screen = get_current_screen();
+    if ($screen->id == "versionpress/admin/index") {
+        return;
+    }
+
+    echo "<div class='update-nag'>VersionPress is installed but not yet tracking this site. <a href='" . admin_url('admin.php?page=versionpress/admin/index.php') . "'>Please finish the activation.</a></div>";
+}
+add_action( 'admin_notices', 'vp_initialization_nag', 4 /* WP update nag is 3, we are just one step less important :) */ );
 
