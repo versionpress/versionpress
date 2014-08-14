@@ -37,17 +37,7 @@ class PostTest extends WpCliTestCase {
         $changes = array(
             "post_title" => "Announcing VersionPress!"
         );
-
-        $id = WpAutomation::createPost($newPost);
-        $creationCommit = $this->getLastCommit();
-        $createdPostVpId = $this->getPostVpId($creationCommit);
-
-        WpAutomation::editPost($id, $changes);
-        $editationCommit = $this->getLastCommit();
-        $this->assertStringStartsWith("post/edit", $editationCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG));
-
-        $editedPostVpId = $this->getPostVpId($editationCommit);
-        $this->assertEquals($createdPostVpId, $editedPostVpId);
+        $this->assertEditation($newPost, $changes, "post/edit");
     }
 
     public function testMovePostToTrash() {
@@ -55,17 +45,7 @@ class PostTest extends WpCliTestCase {
         $changes = array(
             "post_status" => "trash"
         );
-
-        $id = WpAutomation::createPost($newPost);
-        $creationCommit = $this->getLastCommit();
-        $createdPostVpId = $this->getPostVpId($creationCommit);
-
-        WpAutomation::editPost($id, $changes);
-        $editationCommit = $this->getLastCommit();
-        $this->assertStringStartsWith("post/trash", $editationCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG));
-
-        $editedPostVpId = $this->getPostVpId($editationCommit);
-        $this->assertEquals($createdPostVpId, $editedPostVpId);
+        $this->assertEditation($newPost, $changes, "post/trash");
     }
 
     public function testMovePostFromTrash() {
@@ -74,22 +54,11 @@ class PostTest extends WpCliTestCase {
         $changes = array(
             "post_status" => "publish"
         );
-
-        $id = WpAutomation::createPost($newPost);
-        $creationCommit = $this->getLastCommit();
-        $createdPostVpId = $this->getPostVpId($creationCommit);
-
-        WpAutomation::editPost($id, $changes);
-        $editationCommit = $this->getLastCommit();
-        $this->assertStringStartsWith("post/untrash", $editationCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG));
-
-        $editedPostVpId = $this->getPostVpId($editationCommit);
-        $this->assertEquals($createdPostVpId, $editedPostVpId);
+        $this->assertEditation($newPost, $changes, "post/untrash");
     }
 
     public function testDeletePost() {
         $newPost = $this->somePost;
-
 
         $id = WpAutomation::createPost($newPost);
         $creationCommit = $this->getLastCommit();
@@ -157,11 +126,35 @@ class PostTest extends WpCliTestCase {
         $this->assertTrue($result, "vp_id '$postId' not found in database");
     }
 
-    private function getPostVpId($commit) {
+    private function getPostVpId(Commit $commit) {
         list($_, $__, $postVpId) = explode(
             "/",
             $commit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG)
         );
         return $postVpId;
+    }
+
+    /**
+     * Creates new post, applies changes and checks that actual action corresponds with the expected one.
+     * Also checks there was edited the right post.
+     *
+     * @param $newPost
+     * @param $changes
+     */
+    protected function assertEditation($newPost, $changes, $expectedAction) {
+        $id = WpAutomation::createPost($newPost);
+        $creationCommit = $this->getLastCommit();
+        $createdPostVpId = $this->getPostVpId($creationCommit);
+
+        WpAutomation::editPost($id, $changes);
+        $editationCommit = $this->getLastCommit();
+        $this->assertStringStartsWith(
+            $expectedAction,
+            $editationCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG),
+            "Expected another action"
+        );
+
+        $editedPostVpId = $this->getPostVpId($editationCommit);
+        $this->assertEquals($createdPostVpId, $editedPostVpId, "Edited different post");
     }
 }
