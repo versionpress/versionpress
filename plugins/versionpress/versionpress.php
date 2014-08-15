@@ -3,8 +3,8 @@
 Plugin Name: VersionPress
 Plugin URI: http://versionpress.net/
 Description: Git-versioning plugin for WordPress
-Author: Agilio
-Version: 1.0
+Author: VersionPress
+Version: 1.0-alpha1
 */
 
 defined('ABSPATH') or die("Direct access not allowed");
