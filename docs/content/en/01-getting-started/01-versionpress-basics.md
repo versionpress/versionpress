@@ -3,6 +3,40 @@
 This page is an overview of how VersionPress works and what it provides.
 
 
+## Used terms
+
+VersionPress uses some common terms, hopefully consistently. If you are ever confused about their exact meaning, consult the list below:
+
+
+### 'the repository'
+
+Internal repository of VersionPress where it keeps all the historic versions of a site. Technically, it is the `.git` folder in the root of the site and it is the most important piece of data that VersionPress creates and maintains.
+
+
+### 'undo'
+
+The undo command reverts a single change on the site (or a set of changes when we have that implemented). Note that unlike the Undo functionality found it most text editors, VersionPress doesn't erase the history but rather creates a new change that does exactly the opposite of the original change.
+
+### 'rollback'
+
+Returns the site to some previous state, or, more precisely, creates a new version of the site that looks exactly like it used to at some point in the past. Rollback is essentially a set of Undo-s from the current state to the chosen past state.
+
+### 'a change'
+
+Basically one line in the VersionPress table. Some change that happened to the site at some point in the past.
+
+### 'a commit'
+
+Another, more technical word for a change in the Git terminology.
+
+### Git
+
+Git is a version control system that powers VersionPress behind the scenes. Find out more about it at http://git-scm.com/.
+
+
+
+
+
 ## Quick intro to version control
 
 TODO
