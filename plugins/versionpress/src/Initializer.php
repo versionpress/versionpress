@@ -1,26 +1,38 @@
 <?php
 
 /**
- * Initializes VersionPress - builds its internal repository and starts tracking the changes.
+ * Initializes ("activates" in UI terms) VersionPress - builds its internal repository and starts tracking the changes.
  */
 class Initializer {
+
     /**
+     * Array of functions to call when the progress changes. Implements part of the Observer pattern.
+     *
      * @var callable[]
      */
     public $onProgressChanged = array();
+
     /**
      * @var wpdb
      */
     private $database;
+
     /**
      * @var DbSchemaInfo
      */
     private $dbSchema;
+
     /**
      * @var EntityStorageFactory
      */
     private $storageFactory;
+
+    /**
+     * @var bool
+     */
     private $isDatabaseLocked;
+
+
     private $idCache;
 
     function __construct(wpdb $wpdb, DbSchemaInfo $dbSchema, EntityStorageFactory $storageFactory) {
@@ -29,18 +41,21 @@ class Initializer {
         $this->storageFactory = $storageFactory;
     }
 
+    /**
+     * Main entry point
+     */
     public function initializeVersionPress() {
-        $this->reportProgressChange("Installation starts");
+        $this->reportProgressChange(InitializerStates::START);
         $this->createVersionPressTables();
         $this->lockDatabase();
-        $this->createIdentifiers();
-        $this->saveReferences();
+        $this->createVPIDs();
+        $this->createVPIDReferences();
         $this->saveDatabaseToStorages();
         $this->commitDatabase();
         $this->createGitRepository();
         $this->activateVersionPress();
-        $this->doInstallationCommit();
-        $this->reportProgressChange("Installation finished");
+        $this->doInitializationCommit();
+        $this->reportProgressChange(InitializerStates::FINISHED);
     }
 
     private function createVersionPressTables() {
@@ -81,12 +96,12 @@ class Initializer {
             $this->database->query($query);
         }
 
-        $this->reportProgressChange("Created DB tables");
+        $this->reportProgressChange(InitializerStates::DB_TABLES_CREATED);
     }
 
     private function lockDatabase() {
         return; // disabled for testing
-        $entityNames = $this->dbSchema->getEntityNames();
+        $entityNames = $this->dbSchema->getAllEntityNames();
         $tablePrefix = $this->tablePrefix;
         $tableNames = array_map(function ($entityName) use ($tablePrefix) {
             return "`" . $tablePrefix . $entityName . "`";
@@ -105,17 +120,32 @@ class Initializer {
         $this->isDatabaseLocked = true;
     }
 
-    private function createIdentifiers() {
-        $entityNames = $this->dbSchema->getEntityNames();
+    /**
+     * Creates VPIDs for all entities that have a WordPress ID and stores them into `vp_id` table.
+     */
+    private function createVPIDs() {
+
+        $entityNames = $this->dbSchema->getAllEntityNames();
+
         foreach ($entityNames as $entityName) {
-            $this->createIdentifiersForEntityType($entityName);
+            $this->createVPIDsForEntitiesOfType($entityName);
             $this->reportProgressChange("Created identifiers for " . $entityName);
         }
+
+        $this->reportProgressChange(InitializerStates::VPIDS_CREATED);
     }
 
-    private function createIdentifiersForEntityType($entityName) {
-        if (!$this->dbSchema->hasId($entityName))
+    /**
+     * If entity type identified by $entityName defines an ID column, creates a mapping between WordPress ID and VPID
+     * for all entities (db rows) of such type.
+     *
+     * @param string $entityName E.g., "posts"
+     */
+    private function createVPIDsForEntitiesOfType($entityName) {
+
+        if (!$this->dbSchema->hasId($entityName)) {
             return;
+        }
 
         $idColumnName = $this->dbSchema->getIdColumnName($entityName);
         $tableName = $this->getTableName($entityName);
@@ -129,17 +159,33 @@ class Initializer {
         }
     }
 
-    private function saveReferences() {
-        $entityNames = $this->dbSchema->getEntityNames();
+    /**
+     * Creates mappings between VPIDs for all applicable entities (those that have VPIDs and reference
+     * other entitites with VPIDs). Stores those mappings into the `vp_references` table.
+     */
+    private function createVPIDReferences() {
+
+        $entityNames = $this->dbSchema->getAllEntityNames();
+
         foreach ($entityNames as $entityName) {
-            $this->saveReferencesForEntityType($entityName);
-            $this->reportProgressChange("Saved references to " . $entityName);
+            $this->createVPIDReferencesForEntitiesOfType($entityName);
+            $this->reportProgressChange("Saved references for " . $entityName);
         }
+
+        $this->reportProgressChange(InitializerStates::REFERENCES_CREATED);
+
     }
 
-    private function saveReferencesForEntityType($entityName) {
-        if (!$this->dbSchema->hasReferences($entityName))
+    /**
+     * If entity type identified by $entityName has references to other entity types, it creates a mapping
+     * between VPIDs for all the entities of the current type.
+     *
+     * @param string $entityName E.g., "posts"
+     */
+    private function createVPIDReferencesForEntitiesOfType($entityName) {
+        if (!$this->dbSchema->hasReferences($entityName)) {
             return;
+        }
 
         $references = $this->dbSchema->getReferences($entityName);
 
@@ -163,36 +209,27 @@ class Initializer {
         }
     }
 
-    private function rollbackDatabase() {
-        if ($this->isDatabaseLocked) {
-            $this->database->query("ROLLBACK");
-            $this->database->query("UNLOCK TABLES");
-            $this->isDatabaseLocked = false;
-        }
-    }
-
-    private function commitDatabase() {
-        if ($this->isDatabaseLocked) {
-            $this->database->query("COMMIT");
-            $this->database->query("UNLOCK TABLES");
-            $this->isDatabaseLocked = false;
-        }
-        $this->reportProgressChange("Finishing changes");
-    }
-
-    private function getTableName($entityName) {
-        return $this->database->prefix . $entityName;
-    }
-
+    /**
+     * Saves all eligible entities into the file system storage (the 'db' folder)
+     */
     private function saveDatabaseToStorages() {
+
+        FileSystem::getWpFilesystem()->mkdir(VERSIONPRESS_MIRRORING_DIR, 0777, true);
+
         $storageNames = $this->storageFactory->getAllSupportedStorages();
         foreach ($storageNames as $entityName) {
-            $this->saveAllEntitiesToStorage($entityName);
+            $this->saveEntitiesOfTypeToStorage($entityName);
             $this->reportProgressChange("All " . $entityName . " saved into files");
         }
     }
 
-    private function saveAllEntitiesToStorage($entityName) {
+    /**
+     * Saves entities of type identified by $entityName to their appropriate storage
+     * (chosen by factory).
+     *
+     * @param string $entityName
+     */
+    private function saveEntitiesOfTypeToStorage($entityName) {
         $storage = $this->storageFactory->getStorage($entityName);
         $entities = $this->database->get_results("SELECT * FROM {$this->getTableName($entityName)}", ARRAY_A);
         $entities = array_filter($entities, function ($entity) use ($storage) {
@@ -289,28 +326,81 @@ class Initializer {
         return $usermeta;
     }
 
+
+    /**
+     * Rolls back database if it was locked by `lockDatase()` and an unexpected shutdown occurred.
+     */
+    private function rollbackDatabase() {
+        if ($this->isDatabaseLocked) {
+            $this->database->query("ROLLBACK");
+            $this->database->query("UNLOCK TABLES");
+            $this->isDatabaseLocked = false;
+        }
+    }
+
+    /**
+     * Commits db changes if database has been locked
+     */
+    private function commitDatabase() {
+        if ($this->isDatabaseLocked) {
+            $this->database->query("COMMIT");
+            $this->database->query("UNLOCK TABLES");
+            $this->isDatabaseLocked = false;
+        }
+
+        $this->reportProgressChange(InitializerStates::DB_WORK_DONE);
+    }
+
+
     private function createGitRepository() {
         if(!Git::isVersioned(dirname(__FILE__))) {
-            $this->reportProgressChange("Creating Git repository...");
+            $this->reportProgressChange(InitializerStates::CREATING_GIT_REPOSITORY);
             Git::createGitRepository(ABSPATH);
         }
 
         Git::assumeUnchanged('wp-config.php');
     }
 
+
+    private function activateVersionPress() {
+        touch(VERSIONPRESS_PLUGIN_DIR . '/.active');
+        $this->reportProgressChange(InitializerStates::VERSIONPRESS_ACTIVATED);
+    }
+
+
+    private function doInitializationCommit() {
+        $this->reportProgressChange(InitializerStates::CREATING_INITIAL_COMMIT);
+        Git::commit('Installed VersionPress');
+    }
+
+
+
+
+    //----------------------------------------
+    // Helper functions
+    //----------------------------------------
+
+    /**
+     * Calls the registered `onProgressChanged` functions with the progress $message
+     *
+     * @param string $message
+     */
     private function reportProgressChange($message) {
-        foreach($this->onProgressChanged as $listener) {
+        foreach ($this->onProgressChanged as $listener) {
             call_user_func($listener, $message);
         }
     }
 
-    private function doInstallationCommit() {
-        Git::commit('Installed VersionPress');
-        $this->reportProgressChange("Created initial commit");
+    /**
+     * Could as well be a call to $dbSchema->getPrefixedTableName(). However, constructing
+     * prefixed table name is found in multiple locations in the project currently so
+     * hopefully this will be refactored at once some time in the future.
+     *
+     * @param $entityName
+     * @return string
+     */
+    private function getTableName($entityName) {
+        return $this->database->prefix . $entityName;
     }
 
-    private function activateVersionPress() {
-        $this->reportProgressChange("Activating VersionPress...");
-        touch(VERSIONPRESS_PLUGIN_DIR . '/.active');
-    }
 }

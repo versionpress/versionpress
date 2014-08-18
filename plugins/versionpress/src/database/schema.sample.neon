@@ -1,0 +1,23 @@
+# DB schema is described using this format:
+#
+# <entity_name>
+#     id: <simple_primary_col_name_if_table_has_one>
+#     references:
+#         <foreign_key_col_name_1>: <target_table_name>
+#         <foreign_key_col_name_2>: <target_table_name>
+#
+#
+# Some examples follow.
+
+# A typical entity:
+posts:
+    id: ID
+    references:
+        post_author: users
+        post_parent: posts
+
+# An entity that doesn't have a simple key:
+term_relationship:
+    references:
+        object_id: posts
+        term_taxonomy_id: term_taxonomy

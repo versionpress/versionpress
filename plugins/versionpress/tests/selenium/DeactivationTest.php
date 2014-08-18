@@ -100,7 +100,7 @@ class DeactivationTest extends SeleniumTestCase {
     private function _initializeVersionPress()
     {
         $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
-        $this->byCssSelector('input[type=submit]')->click();
+        $this->byCssSelector('#activate-versionpress-btn')->click();
     }
 
 }

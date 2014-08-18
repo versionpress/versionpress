@@ -2,6 +2,40 @@
 	padding-right: 10px;
 }
 
+.vp-index .welcome-panel {
+    padding-bottom: 23px;
+    margin-top: 40px;
+}
+.vp-index .welcome-panel p {
+    color: inherit;
+}
+
+.vp-index .welcome-panel .about-description {
+    margin: 23px 0 10px;
+}
+
+.vp-index .welcome-panel ul {
+    list-style: none;
+    padding-left: 40px;
+}
+
+.vp-index .welcome-panel ul li {
+    position: relative;
+}
+
+.vp-index .welcome-panel ul .icon {
+    position: absolute;
+    left: -25px;
+    top: 6px;
+}
+
+
+
+#versionpress-commits-table th,
+#versionpress-commits-table td {
+    border-bottom: 1px solid #ccc;
+}
+
 #versionpress-commits-table .column-date {
 	width: 100px;
 }

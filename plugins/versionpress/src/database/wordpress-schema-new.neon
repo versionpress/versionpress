@@ -1,0 +1,34 @@
+posts:
+    id: ID
+    references:
+        post_author: users
+        post_parent: posts
+
+comments:
+    id: comment_ID
+    references:
+        comment_post_ID: posts
+        user_id: users
+        comment_parent: comments
+
+users:
+    id: ID
+
+terms:
+    id: term_id
+
+term_taxonomy:
+    id: term_taxonomy_id
+    references:
+        parent: term_taxonomy
+        term_id: terms
+
+usermeta:
+    id: umeta_id
+    references:
+        user_id: users
+
+term_relationship:
+    references:
+        object_id: posts
+        term_taxonomy_id: term_taxonomy
