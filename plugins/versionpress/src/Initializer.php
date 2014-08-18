@@ -194,12 +194,11 @@ class Initializer {
         $entities = $this->database->get_results("SELECT $idColumnName, " . join(", ", $referenceNames) . " FROM {$this->getTableName($entityName)}", ARRAY_A);
 
         foreach ($entities as $entity) {
-            foreach ($references as $referenceName => $referenceInfo) {
+            foreach ($references as $referenceName => $targetEntity) {
                 if ($entity[$referenceName] == 0)
                     continue;
 
                 $vpId = $this->idCache[$entityName][$entity[$idColumnName]];
-                $targetEntity = $referenceInfo['table'];
                 $referenceVpId = $this->idCache[$targetEntity][$entity[$referenceName]];
 
                 $query = "INSERT INTO {$this->getTableName('vp_references')} (`table`, reference, vp_id, reference_vp_id) " .
@@ -254,8 +253,7 @@ class Initializer {
 
     public function replaceForeignKeysWithReferences($entityName, $entity) {
         $references = $this->dbSchema->getReferences($entityName);
-        foreach ($references as $referenceName => $referenceInfo) {
-            $targetEntity = $referenceInfo['table'];
+        foreach ($references as $referenceName => $targetEntity) {
 
             if ($entity[$referenceName] > 0) {
                 $referenceId = $this->idCache[$targetEntity][$entity[$referenceName]];

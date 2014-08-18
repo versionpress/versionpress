@@ -1,13 +1,14 @@
 <?php
 /**
- * Represents DB schema info, mostly the part about primary IDs and references to other entities.
- * The information is loaded from a *.neon file whose structure is shown in `schema.sample.neon`.
+ * Describes parts of the DB schema, currently mostly the relationships between entities. We need this
+ * because WordPress doesn't properly describe foreign key relationships.
+ *
+ * The information is loaded from a *.neon file whose structure is described in `schema.sample.neon`.
  */
 class DbSchemaInfo {
 
     /**
-     * Stores schema info in the form of nested arrays (e.g. paste
-     * the NEON into {@link http://ne-on.org/ ne-on.org}).
+     * Parsed NEON schema - to see what it looks like, paste the NEON into {@link http://ne-on.org/ ne-on.org}).
      *
      * @var array|int|mixed|NDateTime53|NNeonEntity|null|string
      */
@@ -33,6 +34,8 @@ class DbSchemaInfo {
     /**
      * Returns true if $entityName has a single unique ID column, i.e. a simple primary key.
      * For example, posts have a simple ID while term_relationships don't.
+     *
+     * Currently, all entities described in the neon files are expected to have IDs defined.
      *
      * @param string $entityName Like "posts" or "comments"
      * @return bool

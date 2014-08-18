@@ -258,7 +258,7 @@ abstract class SynchronizerBase implements Synchronizer {
         foreach($references as $referenceName => $referenceInfo) {
             if(!isset($entity[$referenceName]) || $entity[$referenceName] == 0)
                 continue;
-            $entity['vp_' . $referenceName] = $this->getIdForEntity($referenceInfo['table'], $entity[$referenceName]);
+            $entity['vp_' . $referenceName] = $this->getIdForEntity($referenceInfo, $entity[$referenceName]);
         }
 
         return $entity;

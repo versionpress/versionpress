@@ -1,48 +1,29 @@
-# Full format:
-#
-# <table_name>:
-#   id: <primary_key_column_name>
-#   references:
-#     <foreign_key_column_name>:
-#       table: <target_table_name>
-#     <another_foreign_key_column_name>:
-#       table: <another_target_table_name>
-
-
 posts:
-  id: ID
-  references:
-    post_author:
-      table: users
-    post_parent:
-      table: posts
+    id: ID
+    references:
+        post_author: users
+        post_parent: posts
 
 comments:
-  id: comment_ID
-  references:
-    comment_post_ID:
-      table: posts
-    user_id:
-      table: users
-    comment_parent:
-      table: comments
+    id: comment_ID
+    references:
+        comment_post_ID: posts
+        user_id: users
+        comment_parent: comments
 
 users:
-  id: ID
+    id: ID
 
 terms:
-  id: term_id
+    id: term_id
 
 term_taxonomy:
-  id: term_taxonomy_id
-  references:
-    parent:
-      table: term_taxonomy
-    term_id:
-      table: terms
+    id: term_taxonomy_id
+    references:
+        parent: term_taxonomy
+        term_id: terms
 
 usermeta:
-  id: umeta_id
-  references:
-    user_id:
-      table: users
+    id: umeta_id
+    references:
+        user_id: users

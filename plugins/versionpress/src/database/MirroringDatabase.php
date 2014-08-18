@@ -176,7 +176,7 @@ class MirroringDatabase extends ExtendedWpdb {
 
     private function getReferenceId($entityName, $referenceName, $id) {
         $reference = $this->dbSchemaInfo->getReference($entityName, $referenceName);
-        $referenceId = $this->getVpId($reference['table'], $id);
+        $referenceId = $this->getVpId($reference, $id);
         return $referenceId;
     }
 
