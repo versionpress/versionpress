@@ -13,6 +13,6 @@ class UserStorage extends SingleFileStorage implements EntityStorage {
      */
     protected function createChangeInfo($entity, $changeType) {
         $login = $entity["user_login"];
-        return new UserChangeInfo($changeType, $entity, $login);
+        return new UserChangeInfo($changeType, $entity["vp_id"], $login);
     }
 }

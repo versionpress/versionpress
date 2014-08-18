@@ -11,7 +11,7 @@ class CommentTest extends WpCliTestCase {
         "comment_post_ID" => 1,
     );
 
-    public function testNewPost() {
+    public function testNewComment() {
         WpAutomation::createComment($this->someComment);
 
         $lastCommit = $this->getLastCommit();
@@ -26,7 +26,7 @@ class CommentTest extends WpCliTestCase {
         $this->assertIdExistsInDatabase($commentVpId);
     }
 
-    public function testEditPost() {
+    public function testEditComment() {
         $newComment = $this->someComment;
         $changes = array(
             "comment_content" => "Announcing VersionPress!"
@@ -34,19 +34,9 @@ class CommentTest extends WpCliTestCase {
         $this->assertCommentEditation($newComment, $changes);
     }
 
-    public function testDeletePost() {
+    public function testDeleteComment() {
         $newComment = $this->someComment;
-
-        $id = WpAutomation::createComment($newComment);
-        $creationCommit = $this->getLastCommit();
-        $createdCommentVpId = $this->getEntityVpId($creationCommit);
-
-        WpAutomation::deleteComment($id);
-        $deleteCommit = $this->getLastCommit();
-        $this->assertEquals("comment/delete/$createdCommentVpId", $deleteCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG));
-
-        $deletedCommentVpId = $this->getEntityVpId($deleteCommit);
-        $this->assertEquals($createdCommentVpId, $deletedCommentVpId);
+        $this->assertCommentDeletion($newComment);
     }
 
     protected function getCommitedEntity($commentVpId) {
@@ -56,5 +46,9 @@ class CommentTest extends WpCliTestCase {
 
     private function assertCommentEditation($comment, $changes) {
         $this->assertEditation($comment, $changes, "comment/edit", "WpAutomation::createComment", "WpAutomation::editComment");
+    }
+
+    private function assertCommentDeletion($newComment) {
+        $this->assertDeletion($newComment, "comment", "WpAutomation::createComment", "WpAutomation::deleteComment");
     }
 } 

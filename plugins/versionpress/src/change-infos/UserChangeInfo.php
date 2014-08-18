@@ -2,6 +2,7 @@
 
 class UserChangeInfo extends EntityChangeInfo {
 
+    const USER_LOGIN = "VP-User-Login";
     /**
      * @var string
      */
@@ -31,13 +32,13 @@ class UserChangeInfo extends EntityChangeInfo {
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[ChangeInfo::ACTION_TAG];
-        $userLogin = $tags["VP-User-Login"];
+        $userLogin = $tags[self::USER_LOGIN];
         list($_, $action, $entityId) = explode("/", $actionTag);
         return new self($action, $entityId, $userLogin);
     }
 
     protected function getCustomTags() {
-        return array("VP-User-Login" => $this->userLogin);
+        return array(self::USER_LOGIN => $this->userLogin);
     }
 
 

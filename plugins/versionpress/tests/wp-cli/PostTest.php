@@ -53,35 +53,20 @@ class PostTest extends WpCliTestCase {
 
     public function testDeletePost() {
         $newPost = $this->somePost;
-
-        $id = WpAutomation::createPost($newPost);
-        $creationCommit = $this->getLastCommit();
-        $createdPostVpId = $this->getEntityVpId($creationCommit);
-
-        WpAutomation::deletePost($id);
-        $deleteCommit = $this->getLastCommit();
-        $this->assertStringStartsWith("post/delete", $deleteCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG));
-
-        $deletedPostVpId = $this->getEntityVpId($deleteCommit);
-        $this->assertEquals($createdPostVpId, $deletedPostVpId);
+        $this->assertPostDeletion($newPost);
     }
-
 
     protected function getCommitedEntity($postId) {
         $path = self::$config->getSitePath() . '/wp-content/plugins/versionpress/db/posts/' . $postId . '.ini';
         return IniSerializer::deserialize(file_get_contents($path));
     }
 
-    /**
-     * Creates new post, applies changes and checks that actual action corresponds with the expected one.
-     * Also checks there was edited the right post.
-     *
-     * @param $newPost
-     * @param $changes
-     * @param $expectedAction
-     */
     protected function assertPostEditation($newPost, $changes, $expectedAction) {
         $this->assertEditation($newPost, $changes, $expectedAction, "WpAutomation::createPost", "WpAutomation::editPost");
+    }
+
+    private function assertPostDeletion($newPost) {
+        $this->assertDeletion($newPost, "post", "WpAutomation::createPost", "WpAutomation::deletePost");
     }
 
 }

@@ -85,7 +85,7 @@ class WpAutomation {
     }
 
     /**
-     * Creates new post using WP-CLI. Returns ID of created post.
+     * Creates new comment using WP-CLI. Returns ID of created comment.
      *
      * @param array $comment (as wp_insert_comment)
      * @return int
@@ -117,11 +117,46 @@ class WpAutomation {
     }
 
     /**
+     * Creates new user using WP-CLI. Returns ID of created user.
+     *
+     * @param array $user (as wp_insert_comment)
+     * @return int
+     */
+    public static function createUser(array $user) {
+        $args = array($user["user_login"], $user["user_email"]);
+        unset($user["user_login"], $user["user_email"]);
+        $args = array_merge($args, $user);
+        $args["porcelain"] = "";  // wp-cli returns only id
+        return intval(self::runWpCliCommand("user", "create", $args));
+    }
+
+    /**
+     * Changes the user using WP-CLI.
+     *
+     * @param $id
+     * @param $changes
+     */
+    public static function editUser($id, $changes) {
+        array_unshift($changes, $id);
+        self::runWpCliCommand('user', 'update', $changes);
+    }
+
+    /**
+     * Deletes the user using WP-CLI.
+     *
+     * @param $id
+     */
+    public static function deleteUser($id) {
+        $args = array($id);
+        self::runWpCliCommand('user', 'delete', $args);
+    }
+
+    /**
      * Activates VP in the administration and runs the Initializer
      */
     public static function enableVersionPress() {
         self::runWpCliCommand('plugin', 'activate', array('versionpress'));
-        $code = 'global $versionPressContainer;@mkdir(VERSIONPRESS_MIRRORING_DIR, 0777, true);$initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);$initializer->initializeVersionPress();';
+        $code = 'global $versionPressContainer;$initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);$initializer->initializeVersionPress();';
         self::runWpCliCommand('eval', array($code));
     }
 

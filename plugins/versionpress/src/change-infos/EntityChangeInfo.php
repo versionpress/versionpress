@@ -78,7 +78,7 @@ abstract class EntityChangeInfo implements ChangeInfo {
             'delete' => 'Deleted'
         );
 
-        $shortEntityId = substr($this->getEntityId(), 0, 4);
+        $shortEntityId = preg_match("/\d/", $this->getEntityId()) ? substr($this->getEntityId(), 0, 4) : $this->getEntityId();
         return sprintf("%s %s '%s'", $verbs[$this->getAction()], $this->getObjectType(), $shortEntityId);
     }
 

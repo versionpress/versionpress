@@ -89,7 +89,7 @@ abstract class WpCliTestCase extends PHPUnit_Framework_TestCase {
         }
     }
 
-    protected function getEntityVpId(Commit $commit) {
+    protected function getVpIdFromCommit(Commit $commit) {
         list($_, $__, $entityVpId) = explode(
             "/",
             $commit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG)
@@ -97,10 +97,20 @@ abstract class WpCliTestCase extends PHPUnit_Framework_TestCase {
         return $entityVpId;
     }
 
+    /**
+     * Creates new post, applies changes and checks that actual action corresponds with the expected one.
+     * Also checks there was edited the right post.
+     *
+     * @param array $entity Entity to create
+     * @param array $changes Applied changes
+     * @param string $expectedAction
+     * @param callable $createFunction
+     * @param callable $editFunction
+     */
     protected function assertEditation($entity, $changes, $expectedAction, $createFunction, $editFunction) {
         $id = call_user_func($createFunction, $entity);
         $creationCommit = $this->getLastCommit();
-        $createdPostVpId = $this->getEntityVpId($creationCommit);
+        $createdPostVpId = $this->getVpIdFromCommit($creationCommit);
 
         call_user_func($editFunction, $id, $changes);
         $editationCommit = $this->getLastCommit();
@@ -110,7 +120,7 @@ abstract class WpCliTestCase extends PHPUnit_Framework_TestCase {
             "Expected another action"
         );
 
-        $editedPostVpId = $this->getEntityVpId($editationCommit);
+        $editedPostVpId = $this->getVpIdFromCommit($editationCommit);
         $this->assertEquals($createdPostVpId, $editedPostVpId, "Edited different entity");
 
         $commitedEntity = $this->getCommitedEntity($createdPostVpId);
@@ -118,5 +128,36 @@ abstract class WpCliTestCase extends PHPUnit_Framework_TestCase {
         $this->assertEntityEquals($newEntity, $commitedEntity);
     }
 
+    /**
+     * Creates new post, deletes it and checks that actual action corresponds with the expected one.
+     * Also checks there was deleted the right post.
+     *
+     * @param array $entity Entity to create
+     * @param string $entityName Name of entity (e.g. post, comment etc.)
+     * @param callable $createFunction Function that creates new entity (perhaps from WpAutomation)
+     * @param callable $deleteFunction Function that deletes new entity (perhaps from WpAutomation)
+     */
+    protected function assertDeletion($entity, $entityName, $createFunction, $deleteFunction) {
+        $id = call_user_func($createFunction, $entity);
+        $creationCommit = $this->getLastCommit();
+        $createdEntityVpId = $this->getVpIdFromCommit($creationCommit);
+
+        call_user_func($deleteFunction, $id);
+        $deleteCommit = $this->getLastCommit();
+        $this->assertEquals(
+            "$entityName/delete/$createdEntityVpId",
+            $deleteCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG)
+        );
+
+        $deletedEntityVpId = $this->getVpIdFromCommit($deleteCommit);
+        $this->assertEquals($createdEntityVpId, $deletedEntityVpId);
+    }
+
+    /**
+     * Returns entity by its VP ID.
+     *
+     * @param string $vpId
+     * @return array
+     */
     abstract protected function getCommitedEntity($vpId);
-} 
+}
