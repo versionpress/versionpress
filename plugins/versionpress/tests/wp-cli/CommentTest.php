@@ -31,7 +31,24 @@ class CommentTest extends WpCliTestCase {
         $changes = array(
             "comment_content" => "Announcing VersionPress!"
         );
-        $this->assertCommentEditation($newComment, $changes);
+        $this->assertCommentEditation($newComment, $changes, "edit");
+    }
+
+    public function testMoveCommentToTrash() {
+        $newComment = $this->someComment;
+        $changes = array(
+            "comment_approved" => "trash"
+        );
+        $this->assertCommentEditation($newComment, $changes, "trash");
+    }
+
+    public function testMoveCommentFromTrash() {
+        $newComment = $this->someComment;
+        $newComment["comment_approved"] = "trash";
+        $changes = array(
+            "comment_approved" => "1"
+        );
+        $this->assertCommentEditation($newComment, $changes, "untrash");
     }
 
     public function testDeleteComment() {
@@ -44,8 +61,8 @@ class CommentTest extends WpCliTestCase {
         return IniSerializer::deserialize(file_get_contents($path));
     }
 
-    private function assertCommentEditation($comment, $changes) {
-        $this->assertEditation($comment, $changes, "comment/edit", "WpAutomation::createComment", "WpAutomation::editComment");
+    private function assertCommentEditation($comment, $changes, $expectedAction) {
+        $this->assertEditation($comment, $changes, "comment/$expectedAction", "WpAutomation::createComment", "WpAutomation::editComment");
     }
 
     private function assertCommentDeletion($newComment) {

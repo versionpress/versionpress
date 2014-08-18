@@ -13,4 +13,12 @@ class CommentStorage extends DirectoryStorage implements EntityStorage {
         $postTitle = $result->post_title;
         return new CommentChangeInfo($changeType, $entity["vp_id"], $author, $postTitle);
     }
+
+    protected function getEditAction($diff, $oldEntity, $newEntity) {
+        if(isset($diff['comment_approved']) && $diff['comment_approved'] === 'trash')
+            return 'trash';
+        if(isset($diff['comment_approved']) && $oldEntity['comment_approved'] === 'trash')
+            return 'untrash';
+        return parent::getEditAction($diff, $oldEntity, $newEntity);
+    }
 }
