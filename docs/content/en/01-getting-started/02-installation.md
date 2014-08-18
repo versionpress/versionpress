@@ -1,9 +1,9 @@
-# Installing VersionPress
+# Installation and Uninstallation
 
 VersionPress ships as a standard plugin but there are two important things to be aware of:
 
-* VersionPress has **stricter system requirements** than is usual
-* Its **activation is a two-step process**
+1. VersionPress has **stricter system requirements** than is usual
+2. Its **activation is a two-step process**
 
 Both things are important, please read on.
 
@@ -32,9 +32,30 @@ The basic installation is the same as with any other plugin, however, note the l
 5. Activate the plugin
 6. **Finish the activation process** by going into the new VersionPress section in the administration and clicking the *Activate* button
 
-VersionPress activation is a two-step process. The first step is same as with any other plugin but at that point, VersionPress hasn't yet scanned the website or built its internal repository. **It won't do anything useful until you finish the activation.**
+The last step is important, otherwise VersionPress wouldn't be able to track changes. The on-screen instructions will guide you. 
 
-## Uninstalling VersionPress
+## Uninstallation
 
-TODO
+Uninstallation is a two-step process as with any other plugin:
+
+1. You first **deactivate** the plugin on the Plugins admin screen. The repository still exists after this step.
+2. You then **delete** the plugin to get rid of all its files *and the repository*. Be careful before you do this.
+
+Note that once VersionPress is deactivated, **it cannot be properly reactivated again with the same repository**. It will work partly – the reactivation process can create new commits in the old repository but commands like Undo or Rollback will not be available for the old commits.
+
+
+## VersionPress states at a glance
+
+| State | Git repo exists? | VersionPress tracking changes? |
+| :------------- | :-----: | :-----: |
+| WP site without VersionPress | No | No |
+| Installed  | No | No |
+| Activated on plugin screen | **Still not** | **Still not** |
+| Activation finished on VersionPress screen - the plugin is *active* | **Yes** | **Yes** |
+| Deactivated (on plugin admin screen) | Yes | **No** |
+| Reactivated (similar to state 3) | Yes (but obsolete) | **Still not** |
+| Fully active again (similar to step 4) | Yes (new repo or continued old one) | **Yes** |
+| Uninstalled | **No** | No |
+ 
+Especially note that the uninstallation also removes the repository so be careful before you do that.
 
