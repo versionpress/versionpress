@@ -46,10 +46,3 @@ usermeta:
   references:
     user_id:
       table: users
-
-term_relationship:
-  references:
-    object_id:
-      table: posts
-    term_taxonomy_id:
-      table: term_taxonomy
