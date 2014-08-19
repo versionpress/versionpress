@@ -2,28 +2,21 @@
 
 class InitializerStates {
 
-    /**
-     * Initial state, right at the beginning of the process
-     */
-    const START = "Starting activation";
+    const START = "Starting up";
 
-    const DB_TABLES_CREATED = "Database tables created";
+    const DB_TABLES_CREATED = "Helper database tables created";
 
-    const VPIDS_CREATED = "All identifiers created";
+    const VPIDS_CREATED = "Entities uniquely identified";
 
-    const REFERENCES_CREATED = "All references created";
+    const REFERENCES_CREATED = "Cross-references created";
 
-    const DB_WORK_DONE = "Work with database done";
+    const DB_WORK_DONE = "All database work done";
 
     const CREATING_GIT_REPOSITORY = "Creating Git repository";
 
-    const VERSIONPRESS_ACTIVATED = "VersionPress activated";
+    const VERSIONPRESS_ACTIVATED = "VersionPress put into active state";
 
-    const CREATING_INITIAL_COMMIT = "Creating initial commit";
+    const CREATING_INITIAL_COMMIT = "Creating initialization commit in the repository";
 
-
-    /**
-     * Last state
-     */
-    const FINISHED = "All finished, VersionPress fully activated";
+    const FINISHED = "All finished, VersionPress is ready";
 }

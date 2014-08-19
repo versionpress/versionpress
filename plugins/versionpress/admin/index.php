@@ -2,29 +2,115 @@
 
 wp_enqueue_style('versionpress_admin_style', plugins_url( 'style.css' , __FILE__ ));
 
+/**
+ * Function executed from Initializer that is given the progress message, decides
+ * whether it is suitable for output and if so, calls `show_message()` (WP function).
+ *
+ * @param string $progressMessage
+ */
+function _vp_show_progress_message($progressMessage) {
+
+    // We currently only output messages that are defined in InitializerStates
+    // which captures the main progress points without too many details
+
+    $initializerStatesReflection = new ReflectionClass('InitializerStates');
+    $progressConstantValues = array_values($initializerStatesReflection->getConstants());
+    if (in_array($progressMessage, $progressConstantValues)) {
+        show_message($progressMessage);
+    }
+}
+
 ?>
+
+<style>
+    /* Activation-specific styles need to be defined this way because wp_enqueue_style() puts the style in the footer
+       and in some cases, e.g. during the long-running initialization, the footer is not reached until
+       all the messages are drawn to the page. This might be improved in the future. */
+
+    .vp-index .welcome-panel {
+        padding-bottom: 23px;
+        margin-top: 40px;
+    }
+    .vp-index .welcome-panel p {
+        color: inherit;
+    }
+
+    .vp-index .welcome-panel .about-description {
+        margin: 23px 0 10px;
+    }
+
+    .vp-index .welcome-panel ul {
+        list-style: none;
+        padding-left: 40px;
+    }
+
+    .vp-index .welcome-panel ul li {
+        position: relative;
+    }
+
+    .vp-index .welcome-panel ul .icon {
+        position: absolute;
+        left: -25px;
+        top: 6px;
+    }
+
+    .initialization-progress p {
+        margin: 1px 0;
+    }
+
+    .initialization-done {
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+
+</style>
 
 
 <div class="wrap vp-index">
-
-    <h2>VersionPress</h2>
 
     <?php
 
     if (isset($_GET['init']) && !vp_is_active()) {
 
-        global $versionPressContainer;
+    ?>
 
-        /**
-         * @var Initializer $initializer
-         */
-        $initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);
-        $initializer->onProgressChanged[] = 'show_message'; // http://wpseek.com/show_message
-        $initializer->initializeVersionPress();
+        <div class="welcome-panel">
 
-        // Previous call is a long-running operation. The following redirect happens after quite a bit of time.
-        echo '<p>All done, please <a href="'. admin_url('admin.php?page=versionpress/admin/index.php') . '">continue here</a></p>';
-        //JsRedirect::redirect(admin_url('admin.php?page=versionpress/admin/index.php'));
+            <div class="welcome-panel-content">
+
+                <h3>VersionPress Activation</h3>
+
+
+                <p class="about-description">Setting things up for you. It may take a while, please be patient.</p>
+
+                <div class="initialization-progress">
+                    <?php
+                    global $versionPressContainer;
+
+                    /**
+                     * @var Initializer $initializer
+                     */
+                    $initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);
+                    $initializer->onProgressChanged[] = '_vp_show_progress_message';
+                    $initializer->initializeVersionPress(); // This is a long-running operation
+
+
+                    ?>
+
+                </div>
+
+                <p class="initialization-done">All done, we're now redirecting you (or <a href="<?php admin_url('admin.php?page=versionpress/admin/index.php') ?>">click here</a>).</p>
+                <?php
+                JsRedirect::redirect(admin_url('admin.php?page=versionpress/admin/index.php'), 1000);
+                ?>
+
+            </div>
+
+
+        </div>
+
+        <?php
+
 
     } elseif (!vp_is_active()) {
 
@@ -90,6 +176,8 @@ wp_enqueue_style('versionpress_admin_style', plugins_url( 'style.css' , __FILE__
             $reverter->revertAll($_GET['revert-all']);
         }
     ?>
+
+        <h2>VersionPress</h2>
 
         <table id="versionpress-commits-table" class="wp-list-table widefat fixed posts">
             <tr>
