@@ -110,8 +110,9 @@ class MirroringDatabase extends ExtendedWpdb {
             $entityName = $this->stripTablePrefix($table);
             $where['vp_id'] = $this->getVpId($entityName, $id);
             $this->deleteId($entityName, $id);
-            $this->mirror->delete($entityName, $where);
         }
+
+        $this->mirror->delete($entityName, $where);
 
         return $result;
     }

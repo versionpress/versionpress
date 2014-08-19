@@ -218,7 +218,6 @@ function vp_activation_nag() {
 add_action('admin_menu', 'vp_admin_menu');
 
 function vp_admin_menu() {
-    add_option("vp_foo", "bar");
     add_menu_page(
         'VersionPress',
         'VersionPress',
@@ -262,7 +261,4 @@ function vp_admin_menu() {
 function vp_is_active() {
     return defined('VERSIONPRESS_PLUGIN_DIR') && file_exists(VERSIONPRESS_PLUGIN_DIR . '/.active');
 }
-
-
-
 

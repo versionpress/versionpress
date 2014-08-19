@@ -162,6 +162,26 @@ class WpAutomation {
     }
 
     /**
+     * Changes option with given name using WP-CLI.
+     *
+     * @param string $name
+     * @param mixed $value
+     */
+    public static function editOption($name, $value) {
+        self::runWpCliCommand('option', 'update', array($name, $value));
+    }
+
+    /**
+     * Deletes option with given name using WP-CLI.
+     *
+     * @param string $name
+     */
+    public static function deleteOption($name) {
+        self::runWpCliCommand('option', 'delete', array($name));
+    }
+
+
+    /**
      * Activates VP in the administration and runs the Initializer
      */
     public static function enableVersionPress() {
