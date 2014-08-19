@@ -2,6 +2,8 @@
 
 wp_enqueue_style('versionpress_admin_style', plugins_url( 'style.css' , __FILE__ ));
 
+wp_enqueue_script('versionpress_admin_script', plugins_url( 'js/vp-admin.js' , __FILE__ ));
+
 /**
  * Function executed from Initializer that is given the progress message, decides
  * whether it is suitable for output and if so, calls `show_message()` (WP function).
@@ -31,6 +33,12 @@ function _vp_show_progress_message($progressMessage) {
         padding-bottom: 23px;
         margin-top: 40px;
     }
+
+    .vp-index #welcome-panel.welcome-panel {
+        margin-top: 20px;
+    }
+
+
     .vp-index .welcome-panel p {
         color: inherit;
     }
@@ -61,6 +69,10 @@ function _vp_show_progress_message($progressMessage) {
     .initialization-done {
         font-size: 1.2em;
         font-weight: bold;
+    }
+
+    .vp-index #vp-page-header {
+        margin-bottom: 15px;
     }
 
     tr.disabled {
@@ -211,7 +223,34 @@ function _vp_show_progress_message($progressMessage) {
         }
     ?>
 
-        <h2>VersionPress</h2>
+        <h2 id="vp-page-header">VersionPress</h2>
+
+        <?php
+        $showWelcomePanel = get_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, true);
+        NDebugger::barDump($showWelcomePanel);
+        if ($showWelcomePanel === "") {
+            $showWelcomePanel = "1";
+            add_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, $showWelcomePanel);
+        }
+
+        if ($showWelcomePanel === "1") {
+        ?>
+
+            <div id="welcome-panel" class="welcome-panel">
+
+                <a id="vp-welcome-panel-close-button" class="welcome-panel-close" href="">Dismiss</a>
+
+                <div class="welcome-panel-content">
+
+                    <h3>Welcome!</h3>
+
+                    <p class="about-description">Below is the main VersionPress table which will grow as changes are made to this site. You can <strong>Undo</strong> specific changes from the history or <strong>Roll back</strong> the site entirely to a previous state.</p>
+                </div>
+
+            </div>
+
+        <?php } ?>
+
 
         <table id="versionpress-commits-table" class="wp-list-table widefat fixed posts">
             <tr>

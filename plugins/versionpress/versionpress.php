@@ -311,6 +311,19 @@ function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
 }
 
 //----------------------------------
+// AJAX handling
+//----------------------------------
+
+add_action( 'wp_ajax_hide_vp_welcome_panel', 'vp_ajax_hide_vp_welcome_panel' );
+
+function vp_ajax_hide_vp_welcome_panel() {
+    update_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, "0");
+    die(); // this is required to return a proper result
+}
+
+
+
+//----------------------------------
 // Public functions
 //----------------------------------
 
