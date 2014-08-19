@@ -8,13 +8,15 @@ abstract class WpCliTestCase extends PHPUnit_Framework_TestCase {
      */
     public static $config;
     /** @var bool */
+    public static $skipSetup = false;
+    /** @var bool */
     private static $setUp = false;
 
     /** @var NConnection */
     private static $db;
 
     public static function setUpBeforeClass() {
-        if (!self::$setUp) {
+        if (!self::$skipSetup && !self::$setUp) {
             WpAutomation::setUpSite();
             WpAutomation::installVersionPress();
             WpAutomation::enableVersionPress();
