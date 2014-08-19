@@ -40,8 +40,6 @@ abstract class Git {
         file_put_contents($tempCommitMessagePath , $commitMessage);
 
         self::runShellCommand(self::$CONFIG_COMMAND, $authorName, $authorEmail);
-        self::runShellCommand('git add -A %s', $gitAddPath);
-        self::runShellCommand('git commit -F %s', $tempCommitMessageFilename);
         self::runShellCommand(self::$ADD_AND_COMMIT_COMMAND, $gitAddPath, $tempCommitMessagePath);
         unlink($tempCommitMessagePath);
     }
