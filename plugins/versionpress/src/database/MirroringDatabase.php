@@ -54,7 +54,6 @@ class MirroringDatabase extends ExtendedWpdb {
     function update($table, $data, $where, $format = null, $where_format = null) {
         $result = parent::update($table, $data, $where, $format, $where_format);
         $entityName = $this->stripTablePrefix($table);
-        $idColumnName = $this->dbSchemaInfo->getIdColumnName($entityName);
 
         $data = array_merge($data, $where);
 
@@ -68,6 +67,7 @@ class MirroringDatabase extends ExtendedWpdb {
             if($entityName === 'usermeta') {
                 $id = $this->getUsermetaId($data['user_id'], $data['meta_key']);
             } else {
+                $idColumnName = $this->dbSchemaInfo->getIdColumnName($entityName);
                 $id = $where[$idColumnName];
             }
             $vpId = $this->getVpId($entityName, $id);
@@ -87,7 +87,6 @@ class MirroringDatabase extends ExtendedWpdb {
             $data = $this->saveReferences($entityName, $data);
         }
 
-        $data = $this->fillId($entityName, $data, $where[$idColumnName]);
         $this->mirror->save($entityName, $data);
         return $result;
     }
