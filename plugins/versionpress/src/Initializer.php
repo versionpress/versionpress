@@ -368,7 +368,8 @@ class Initializer {
 
     private function doInitializationCommit() {
         $this->reportProgressChange(InitializerStates::CREATING_INITIAL_COMMIT);
-        Git::commit('Installed VersionPress');
+        $message = new CommitMessage('Installed VersionPress', 'VP-Action: versionpress/install');
+        Git::commit($message);
     }
 
 

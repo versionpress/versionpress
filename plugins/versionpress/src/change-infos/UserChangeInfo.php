@@ -18,7 +18,8 @@ class UserChangeInfo extends EntityChangeInfo {
      */
     public function getChangeDescription() {
         if($this->getAction() === "create")
-            return "New user \"{$this->userLogin}\"";
+            return "New user '{$this->userLogin}'";
+        return "Edited user '{$this->userLogin}'";
     }
 
     public static function matchesCommitMessage(CommitMessage $commitMessage) {

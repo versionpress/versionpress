@@ -161,6 +161,8 @@ function _vp_show_progress_message($progressMessage) {
 
     <?php
     } else {
+        global $versionPressContainer;
+
         if (isset($_GET['revert'])) {
             /** @var Reverter $reverter */
             $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);

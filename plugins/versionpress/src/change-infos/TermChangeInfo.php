@@ -18,7 +18,9 @@ class TermChangeInfo extends EntityChangeInfo {
      * @return string
      */
     public function getChangeDescription() {
-        return ""; // TODO: Implement getChangeDescription() method.
+        if($this->getAction() === "create")
+            return "New term '{$this->termName}'";
+        return "Edited term '{$this->termName}'";
     }
 
     public static function matchesCommitMessage(CommitMessage $commitMessage) {

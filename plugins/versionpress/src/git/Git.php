@@ -120,7 +120,7 @@ abstract class Git {
         chdir(self::$gitRoot);
         $output = self::runShellCommandWithErrorOutput("git revert -n %s", $commit);
 
-        if($output !== "") { // revert conflict
+        if($output !== null) { // revert conflict
             self::runShellCommand("git revert --abort");
             return false;
         }
