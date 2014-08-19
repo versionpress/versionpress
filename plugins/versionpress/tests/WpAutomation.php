@@ -152,6 +152,16 @@ class WpAutomation {
     }
 
     /**
+     * Creates new option using WP-CLI.
+     *
+     * @param string $name
+     * @param mixed $value
+     */
+    public static function createOption($name, $value) {
+        self::runWpCliCommand('option', 'add', array($name, $value));
+    }
+
+    /**
      * Activates VP in the administration and runs the Initializer
      */
     public static function enableVersionPress() {
@@ -282,6 +292,7 @@ class WpAutomation {
                 $cliCommand .= " --$name";
             }
         }
+
         return self::exec($cliCommand, self::$config->getSitePath());
     }
 }

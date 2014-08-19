@@ -7,6 +7,7 @@ abstract class WpCliTestCase extends PHPUnit_Framework_TestCase {
      * @var TestConfig
      */
     public static $config;
+    /** @var bool */
     private static $setUp = false;
 
     /** @var NConnection */
@@ -78,7 +79,7 @@ abstract class WpCliTestCase extends PHPUnit_Framework_TestCase {
                 // OK ... there is some VP id
             } else {
                 $entityIsOk = false;
-                $errorMessages[] = "Field '$field' not found in post";
+                $errorMessages[] = "Field '$field' not found in the entity";
             }
         }
 

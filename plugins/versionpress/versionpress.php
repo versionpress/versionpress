@@ -21,9 +21,14 @@ if (vp_is_active()) {
 }
 
 function vp_register_hooks() {
+    /** @var wpdb $wpdb */
     global $wpdb, $versionPressContainer;
+    /** @var EntityStorageFactory $storageFactory */
     $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
+    /** @var Committer $committer */
     $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
+    /** @var Mirror $mirror */
+    $mirror = $versionPressContainer->resolve(VersionPressServices::MIRROR);
 
     /**
      *  Hook for saving taxonomies into files
@@ -55,6 +60,11 @@ function vp_register_hooks() {
         $pluginName = $hook_extra['plugin'];
         $committer->forceChangeInfo(new PluginChangeInfo($pluginName, 'update'));
     }, 10, 2);
+
+    add_action('added_option', function ($name) use ($wpdb, $mirror) {
+        $option = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}options WHERE option_name='$name'", ARRAY_A);
+        $mirror->save("options", $option);
+    });
 
     register_shutdown_function(array($committer, 'commit'));
 }
@@ -208,6 +218,7 @@ function vp_activation_nag() {
 add_action('admin_menu', 'vp_admin_menu');
 
 function vp_admin_menu() {
+    add_option("vp_foo", "bar");
     add_menu_page(
         'VersionPress',
         'VersionPress',
