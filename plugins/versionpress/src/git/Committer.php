@@ -61,7 +61,6 @@ class Committer
      */
     private function shouldCommit()
     {
-        // proof of concept
         if ($this->dbWasUpdated() && $this->existsMaintenanceFile())
             return false;
         return true;
