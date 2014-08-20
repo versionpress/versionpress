@@ -370,6 +370,8 @@ class Initializer {
         $this->reportProgressChange(InitializerStates::CREATING_INITIAL_COMMIT);
         $message = new CommitMessage('Installed VersionPress', 'VP-Action: versionpress/install');
         Git::commit($message);
+        $lastCommitHash = Git::getLastCommitHash();
+        file_put_contents(VERSIONPRESS_PLUGIN_DIR . '/.active', $lastCommitHash);
     }
 
 

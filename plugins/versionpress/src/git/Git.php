@@ -12,15 +12,18 @@ abstract class Git {
     private static $COMMIT_MESSAGE_PREFIX = "[VP] ";
     private static $CONFIG_COMMAND = "git config user.name %s && git config user.email %s";
     private static $LOG_COMMAND = "git log --pretty=format:\"%%H|delimiter|%%aD|delimiter|%%ar|delimiter|%%an|delimiter|%%ae|delimiter|%%s|delimiter|%%b|end|\"";
+    private static $REV_PARSE_COMMAND = "git rev-parse %s";
 
-    static function commit($message, $directory = "") {
+    public static function commit($message, $directory = "") {
         if(is_string($message))
             $message = new CommitMessage($message);
 
         chdir(dirname(__FILE__));
+
         if ($directory === "" && self::$gitRoot === null) {
             self::detectGitRoot();
         }
+
         $directory = $directory === "" ? self::$gitRoot : $directory;
         $gitAddPath = $directory . "/" . "*";
 
@@ -34,7 +37,9 @@ abstract class Git {
         }
 
         $commitMessage = self::$COMMIT_MESSAGE_PREFIX . $message->getHead();
+
         if($message->getBody() != null) $commitMessage .= "\n\n" . $message->getBody();
+
         $tempCommitMessageFilename = md5(rand());
         $tempCommitMessagePath = VERSIONPRESS_PLUGIN_DIR . "/temp/" . $tempCommitMessageFilename;
         file_put_contents($tempCommitMessagePath , $commitMessage);
@@ -44,14 +49,70 @@ abstract class Git {
         unlink($tempCommitMessagePath);
     }
 
-    static function isVersioned($directory) {
+    public static function isVersioned($directory) {
         chdir($directory);
         return self::runShellCommandWithStandardOutput('git status') !== null;
     }
 
-    static function createGitRepository($directory) {
+    public static function createGitRepository($directory) {
         chdir($directory);
         self::runShellCommand(self::$INIT_COMMAND);
+    }
+
+    public static function pull() {
+        self::runShellCommand("git pull -s recursive -X theirs origin master");
+    }
+
+    public static function push() {
+        self::runShellCommand("git push origin master");
+    }
+
+    public static function assumeUnchanged($filename) {
+        self::runShellCommand(self::$ASSUME_UNCHANGED_COMMAND, $filename);
+    }
+
+    public static function getLastCommitHash() {
+        return self::runShellCommandWithStandardOutput(self::$REV_PARSE_COMMAND, "HEAD");
+    }
+
+    /**
+     * @return Commit[]
+     */
+    public static function log() {
+        $commitDelimiter = chr(29);
+        $dataDelimiter = chr(30);
+        $logCommand = str_replace("|delimiter|", $dataDelimiter, self::$LOG_COMMAND);
+        $logCommand = str_replace("|end|", $commitDelimiter, $logCommand);
+        $log = trim(self::runShellCommandWithStandardOutput($logCommand), $commitDelimiter);
+        $commits = explode($commitDelimiter, $log);
+        return array_map(function ($rawCommit) {
+            return Commit::buildFromString(trim($rawCommit));
+        }, $commits);
+    }
+
+    public static function revertAll($commit) {
+        self::detectGitRoot();
+        chdir(self::$gitRoot);
+        $commitRange = sprintf("%s..HEAD", $commit);
+        self::runShellCommand("git revert -n %s", $commitRange);
+    }
+
+    public static function revert($commit) {
+        self::detectGitRoot();
+        chdir(self::$gitRoot);
+        $output = self::runShellCommandWithErrorOutput("git revert -n %s", $commit);
+
+        if($output !== null) { // revert conflict
+            self::runShellCommand("git revert --abort");
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function wasCreatedAfter($commitHash, $afterWhat) {
+        $cmd = "git log $afterWhat..$commitHash --oneline";
+        return self::runShellCommandWithStandardOutput($cmd) != null;
     }
 
     private static function detectGitRoot() {
@@ -77,53 +138,6 @@ abstract class Git {
         NDebugger::log('STDOUT: ' . $result['stdout']);
         NDebugger::log('STDERR: ' . $result['stderr']);
         return $result;
-    }
-
-    public static function pull() {
-        self::runShellCommand("git pull -s recursive -X theirs origin master");
-    }
-
-    public static function push() {
-        self::runShellCommand("git push origin master");
-    }
-
-    public static function assumeUnchanged($filename) {
-        self::runShellCommand(self::$ASSUME_UNCHANGED_COMMAND, $filename);
-    }
-
-    /**
-     * @return Commit[]
-     */
-    public static function log() {
-        $commitDelimiter = chr(29);
-        $dataDelimiter = chr(30);
-        $logCommand = str_replace("|delimiter|", $dataDelimiter, self::$LOG_COMMAND);
-        $logCommand = str_replace("|end|", $commitDelimiter, $logCommand);
-        $log = trim(self::runShellCommandWithStandardOutput($logCommand), $commitDelimiter);
-        $commits = explode($commitDelimiter, $log);
-        return array_map(function ($rawCommit) {
-            return Commit::buildFromString($rawCommit);
-        }, $commits);
-    }
-
-    public static function revertAll($commit) {
-        self::detectGitRoot();
-        chdir(self::$gitRoot);
-        $commitRange = sprintf("%s..HEAD", $commit);
-        self::runShellCommand("git revert -n %s", $commitRange);
-    }
-
-    public static function revert($commit) {
-        self::detectGitRoot();
-        chdir(self::$gitRoot);
-        $output = self::runShellCommandWithErrorOutput("git revert -n %s", $commit);
-
-        if($output !== null) { // revert conflict
-            self::runShellCommand("git revert --abort");
-            return false;
-        }
-
-        return true;
     }
 
     private static function runProcess($cmd) {
