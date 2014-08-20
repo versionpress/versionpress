@@ -22,7 +22,7 @@ class Reverter {
     }
 
     public function revert($commitHash) {
-        if(!Git::revert($commitHash)) return false;
+        if(!Git::revert($commitHash)) return RevertStatus::FAILED;
 
         $this->synchronize();
 
@@ -30,16 +30,22 @@ class Reverter {
         $this->committer->forceChangeInfo($changeInfo);
         $this->committer->commit();
 
-        return true;
+        return RevertStatus::OK;
     }
 
     public function revertAll($commitHash) {
         Git::revertAll($commitHash);
+
+        if(!Git::willCommit()) {
+            return RevertStatus::NOTHING_TO_COMMIT;
+        }
+
         $this->synchronize();
 
         $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_ROLLBACK, $commitHash);
         $this->committer->forceChangeInfo($changeInfo);
         $this->committer->commit();
+        return RevertStatus::OK;
     }
 
     private function fixCommentCount() {

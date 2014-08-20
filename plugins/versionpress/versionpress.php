@@ -183,7 +183,6 @@ function vp_admin_post_confirm_deactivation() {
 
 }
 
-
 add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are just one step less important :) */);
 
 /**
@@ -246,7 +245,33 @@ function vp_admin_menu() {
 
 }
 
+add_action('admin_action_vp_undo', 'vp_undo');
 
+function vp_undo () {
+    _vp_revert('revert');
+}
+
+add_action('admin_action_vp_rollback', 'vp_rollback');
+
+function vp_rollback () {
+    _vp_revert('revertAll');
+}
+
+function _vp_revert($reverterMethod) {
+    global $versionPressContainer;
+    /** @var Reverter $reverter */
+    $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
+
+    $commitHash = $_GET['commit'];
+    $revertStatus = call_user_func(array($reverter, $reverterMethod), $commitHash);
+    $adminPage = 'admin.php?page=versionpress/admin/index.php';
+
+    if($revertStatus !== RevertStatus::OK) {
+        wp_redirect(admin_url($adminPage . '&error=' . $revertStatus));
+    } else {
+        wp_redirect($adminPage);
+    }
+}
 
 //----------------------------------
 // Public functions

@@ -152,6 +152,10 @@ abstract class Git {
         return $result;
     }
 
+    public static function willCommit() {
+        return self::runShellCommandWithStandardOutput("git status -s") != null;
+    }
+
     private static function prepareCommand($command, $args = '') {
         $functionArgs = func_get_args();
         array_shift($functionArgs); // Remove $command

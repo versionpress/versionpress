@@ -164,21 +164,21 @@ function _vp_show_progress_message($progressMessage) {
 
     <?php
     } else {
-        global $versionPressContainer;
+        if (isset($_GET['error'])) {
+            $errors = array(
+                RevertStatus::FAILED => array(
+                    'class' => 'error',
+                    'message' => 'Error: Overwritten changes can not be reverted.'
+                ),
+                RevertStatus::NOTHING_TO_COMMIT => array(
+                    'class' => 'updated',
+                    'message' => 'There was nothing to commit. Current state is the same as the one you want rollback to.'
+                ),
 
-        if (isset($_GET['revert'])) {
-            /** @var Reverter $reverter */
-            $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
-            $revertSuccessful = $reverter->revert($_GET['revert']);
+            );
 
-            if(!$revertSuccessful) {
-                echo "<div class='error'>Error: Overwritten changes can not be reverted.</div>";
-            }
-        }
-        if (isset($_GET['revert-all'])) {
-            /** @var Reverter $reverter */
-            $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
-            $reverter->revertAll($_GET['revert-all']);
+            $error = $errors[$_GET['error']];
+            echo "<div class='$error[class]'><p>$error[message]</p></div>";
         }
     ?>
 
@@ -233,17 +233,13 @@ function _vp_show_progress_message($progressMessage) {
 
                 $changeInfo = createChangeInfo($commit);
 
-                $undoSnippet = "<a href='" . admin_url('admin.php?page=versionpress/admin/index.php&revert=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts changes done by this commit'>
-                    Undo this
-                    </a>";
+                $undoSnippet = "<a href='" . admin_url('admin.php?action=vp_undo&commit=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts changes done by this commit'>Undo this</a>";
 
-                $rollbackSnippet = "<a href='" . admin_url('admin.php?page=versionpress/admin/index.php&revert-all=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts site back to this state; effectively undos all the change up to this commit'>
-                    Rollback to this
-                </a>";
+                $rollbackSnippet = "<a href='" . admin_url('admin.php?action=vp_rollback&commit=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts site back to this state; effectively undos all the change up to this commit'>Rollback to this</a>";
 
                 $versioningSnippet = "";
                 if($canUndoCommit) $versioningSnippet .= $undoSnippet;
-                if($canUndoCommit && $canRollbackToThisCommit) $versioningSnippet .= " | ";
+                if($canUndoCommit && $canRollbackToThisCommit) $versioningSnippet .= "&nbsp;|&nbsp;";
                 if($canRollbackToThisCommit) $versioningSnippet .= $rollbackSnippet;
                 $isEnabled = $canUndoCommit || $canRollbackToThisCommit;
 
