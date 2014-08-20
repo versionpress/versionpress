@@ -95,17 +95,17 @@ class MirroringDatabase extends ExtendedWpdb {
         $result = parent::delete($table, $where, $where_format);
 
         $entityName = $this->stripTablePrefix($table);
-        $id = $where[$this->dbSchemaInfo->getIdColumnName($entityName)];
-
-        $hasReferences = $this->dbSchemaInfo->hasReferences($entityName);
-
-        if ($hasReferences) {
-            $this->deleteReferences($entityName, $id);
-        }
 
         $hasId = $this->dbSchemaInfo->hasId($entityName);
 
         if ($hasId) {
+            $hasReferences = $this->dbSchemaInfo->hasReferences($entityName);
+            $id = $where[$this->dbSchemaInfo->getIdColumnName($entityName)];
+
+            if ($hasReferences) {
+                $this->deleteReferences($entityName, $id);
+            }
+
             $entityName = $this->stripTablePrefix($table);
             $where['vp_id'] = $this->getVpId($entityName, $id);
             $this->deleteId($entityName, $id);
