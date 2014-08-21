@@ -241,7 +241,7 @@ function _vp_show_progress_message($progressMessage) {
                 if($canUndoCommit) $versioningSnippet .= $undoSnippet;
                 if($canUndoCommit && $canRollbackToThisCommit) $versioningSnippet .= "&nbsp;|&nbsp;";
                 if($canRollbackToThisCommit) $versioningSnippet .= $rollbackSnippet;
-                $isEnabled = $canUndoCommit || $canRollbackToThisCommit;
+                $isEnabled = $canUndoCommit || $canRollbackToThisCommit || $commit->getHash() === $initialCommitHash;
 
                 $message = $changeInfo->getChangeDescription();
                 echo "
