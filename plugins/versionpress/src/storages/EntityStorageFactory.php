@@ -7,9 +7,7 @@ class EntityStorageFactory {
      */
     private $storageDir;
 
-    private $storageClasses = array();
-
-    private $aliases = array();
+    private $storageClassInfo = array();
 
     private $storages = array();
 
@@ -20,26 +18,25 @@ class EntityStorageFactory {
 
     /**
      * Returns storage by given entity type
-     * @param $entityType string
+     * @param string $entityName
      * @return EntityStorage
      */
-    public function getStorage($entityType) {
-        $alias = $this->aliases[$entityType];
-        if(isset($this->storages[$alias]))
-            return $this->storages[$alias];
+    public function getStorage($entityName) {
+        if(isset($this->storages[$entityName]))
+            return $this->storages[$entityName];
 
-        $entityStorageClass = $this->getStorageClass($alias);
-        $entityStorageDirectory = $this->getStorageDirectory($alias);
+        $entityStorageClass = $this->getStorageClass($entityName);
+        $entityStorageDirectory = $this->getStorageDirectory($entityName);
         if (class_exists($entityStorageClass)){
             $storage = new $entityStorageClass($entityStorageDirectory);
-            $this->storages[$alias] = $storage;
+            $this->storages[$entityName] = $storage;
             return $storage;
         }
         return null;
     }
 
     public function getAllSupportedStorages() {
-        return array_keys($this->aliases);
+        return array_keys($this->storages);
     }
 
     private function initStorageClasses() {
@@ -52,24 +49,20 @@ class EntityStorageFactory {
         $this->addStorageClassInfo('usermeta', 'UserMetaStorage', '/users.ini');
     }
 
-    private function addStorageClassInfo($entityName, $className, $storageDirectory, $aliases = array()) {
-
-        $this->aliases[$entityName] = $entityName;
-        foreach($aliases as $alias) {
-            $this->aliases[$alias] = $entityName;
-        }
-
-        $this->storageClasses[$entityName] = array(
+    private function addStorageClassInfo($entityName, $className, $storageDirectory) {
+        $this->storageClassInfo[$entityName] = array(
             'class' => $className,
             'directory' => $this->storageDir . $storageDirectory
         );
     }
 
-    private function getStorageClass($alias) {
-        return $this->storageClasses[$alias]['class'];
+    private function getStorageClass($entityName) {
+        if(!isset($this->storageClassInfo[$entityName])) return null;
+        return $this->storageClassInfo[$entityName]['class'];
     }
 
-    private function getStorageDirectory($alias) {
-        return $this->storageClasses[$alias]['directory'];
+    private function getStorageDirectory($entityName) {
+        if(!isset($this->storageClassInfo[$entityName])) return null;
+        return $this->storageClassInfo[$entityName]['directory'];
     }
 }

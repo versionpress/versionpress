@@ -13,13 +13,16 @@ class PostStorage extends DirectoryStorage implements EntityStorage {
         $id = @$data['vp_id'];
         $isExistingEntity = !empty($id) && $this->isExistingEntity($id);
 
-        if (isset($data['post_type']) && ($data['post_type'] === 'revision' || $data['post_type'] === 'attachment'))
+        if (isset($data['post_type']) && ($data['post_type'] === 'revision'))
             return false;
 
         if (isset($data['post_status']) && ($data['post_status'] === 'auto-draft' || $data['post_status'] === 'draft'))
             return false;
 
         if (!$isExistingEntity && !isset($data['post_type']))
+            return false;
+
+        if(!$isExistingEntity && $data['post_type'] === 'attachment' && !isset($data['post_title']))
             return false;
 
         return true;
@@ -44,6 +47,7 @@ class PostStorage extends DirectoryStorage implements EntityStorage {
 
     protected function createChangeInfo($entity, $changeType) {
         $title = $entity['post_title'];
-        return new PostChangeInfo($changeType, $entity['vp_id'], $title);
+        $type = $entity['post_type'];
+        return new PostChangeInfo($changeType, $entity['vp_id'], $type, $title);
     }
 }
