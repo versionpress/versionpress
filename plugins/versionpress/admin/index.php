@@ -153,10 +153,39 @@ function _vp_show_progress_message($progressMessage) {
 
                 </ul>
 
-                <div style="text-align: center;">
-                    <a href="<?php echo admin_url('admin.php?page=versionpress/admin/index.php&init'); ?>" class="button button-primary button-hero" id="activate-versionpress-btn">Activate VersionPress</a>
-                </div>
+                <h4>System requirements check</h4>
 
+                <ul>
+                    <?php
+                    $requirementsChecker = new RequirementsChecker();
+                    $report = $requirementsChecker->getReport();
+
+                    foreach ($report as $requirement) {
+                        $iconClass = $requirement["fulfilled"] ? "icon-checkmark" : "icon-warning";
+                    ?>
+                    <li>
+                        <span class="icon <?php echo $iconClass; ?>"></span>
+                        <?php echo $requirement["name"]; ?>
+                    </li>
+                    <?php
+                    }
+                    ?>
+                </ul>
+
+                <div style="text-align: center;">
+                <?php
+                    if($requirementsChecker->isEverythingFulfilled()) {
+                        $activationUrl = admin_url('admin.php?page=versionpress/admin/index.php&init');
+                        $buttonClass = "button-primary";
+                    } else {
+                        $activationUrl = "#";
+                        $buttonClass = "button-primary-disabled";
+                    }
+                ?>
+                        <a href="<?php echo $activationUrl; ?>"
+                           class="button <?php echo $buttonClass; ?> button-hero" id="activate-versionpress-btn">Activate
+                            VersionPress</a>
+                </div>
             </div>
 
 
