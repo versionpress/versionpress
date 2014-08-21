@@ -287,6 +287,16 @@ function _vp_revert($reverterMethod) {
     }
 }
 
+add_action( 'admin_bar_menu', 'vp_admin_bar_warning' );
+
+function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
+    $adminBar->add_node(array(
+            'id' => 'vp-running',
+            'title' => 'VersionPress is running in <span style="color:red;font-weight:bold">alpha version</span>',
+            'parent' => 'top-secondary'
+        ));
+}
+
 //----------------------------------
 // Public functions
 //----------------------------------
