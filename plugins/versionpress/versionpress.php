@@ -287,12 +287,25 @@ function _vp_revert($reverterMethod) {
     }
 }
 
-add_action( 'admin_bar_menu', 'vp_admin_bar_warning' );
+if(vp_is_active()) {
+    add_action('admin_bar_menu', 'vp_admin_bar_warning');
+}
 
 function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
+    $adminBarText = "VersionPress is running in <span style=\"color:red;font-weight:bold\">alpha version</span>";
+    $thickboxWidth = 600;
+    $thickboxHeight = 200;
+    $thickboxUrl = "#TB_inline?width=$thickboxWidth&height=$thickboxHeight&inlineId=modal-window-id";
+    $thickboxTitle = "VersionPress is DANGEROUS";
+    $thickboxText = "It can destroy the world!";
+
+    add_thickbox();
     $adminBar->add_node(array(
             'id' => 'vp-running',
-            'title' => 'VersionPress is running in <span style="color:red;font-weight:bold">alpha version</span>',
+            'title' => "<a href=\"$thickboxUrl\" title=\"$thickboxTitle\" class=\"ab-item thickbox\">$adminBarText</a>
+            <div id=\"modal-window-id\" style=\"display:none;\">
+                <p>$thickboxText</p>
+            </div>",
             'parent' => 'top-secondary'
         ));
 }
