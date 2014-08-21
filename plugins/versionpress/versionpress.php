@@ -56,7 +56,7 @@ function vp_register_hooks() {
     });
 
     add_action('upgrader_process_complete', function ($upgrader, $hook_extra) use ($committer) {
-        if ($hook_extra['type'] == 'core' && $hook_extra['action'] == 'update') return; // handled by different hook
+        if(!($hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'update')) return; // handled by different hook
         $pluginName = $hook_extra['plugin'];
         $committer->forceChangeInfo(new PluginChangeInfo($pluginName, 'update'));
     }, 10, 2);
@@ -65,6 +65,20 @@ function vp_register_hooks() {
         $option = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}options WHERE option_name='$name'", ARRAY_A);
         $mirror->save("options", $option);
     });
+
+    add_filter('upgrader_pre_install', function($_, $hook_extra) use ($committer) {
+        if(!($hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'install')) return;
+        $pluginsBeforeInstallation = get_plugins();
+        add_filter('upgrader_post_install', function ($_, $hook_extra) use ($pluginsBeforeInstallation, $committer) {
+            if(!($hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'install')) return;
+            wp_cache_delete('plugins', 'plugins');
+            $pluginsAfterInstallation = get_plugins();
+            $installedPlugin = array_diff_key($pluginsAfterInstallation, $pluginsBeforeInstallation);
+            reset($installedPlugin);
+            $pluginName = key($installedPlugin);
+            $committer->forceChangeInfo(new PluginChangeInfo($pluginName, 'install'));
+        }, 10, 2);
+    },10, 2);
 
     register_shutdown_function(array($committer, 'commit'));
 }

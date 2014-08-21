@@ -36,7 +36,7 @@ class PluginChangeInfo implements ChangeInfo {
      * @return CommitMessage
      */
     public function getCommitMessage() {
-        return new CommitMessage("Plugin \"{$this->pluginFile}\" was {$this->action}d", ChangeInfo::ACTION_TAG .": {$this->getObjectType()}/{$this->getAction()}/" . $this->pluginFile);
+        return new CommitMessage("Plugin \"{$this->pluginFile}\" was {$this->action}" . (NStrings::endsWith($this->action, "e") ? "d" : "ed"), ChangeInfo::ACTION_TAG .": {$this->getObjectType()}/{$this->getAction()}/" . $this->pluginFile);
     }
 
     /**
@@ -62,7 +62,7 @@ class PluginChangeInfo implements ChangeInfo {
      * @return string
      */
     public function getChangeDescription() {
-        return NStrings::capitalize($this->action) . "d plugin '{$this->getPluginName()}'";
+        return NStrings::capitalize($this->action) . (NStrings::endsWith($this->action, "e") ? "d" : "ed") . " plugin '{$this->getPluginName()}'";
     }
 
     /**
