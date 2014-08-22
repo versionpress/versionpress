@@ -31,13 +31,8 @@ function _vp_show_progress_message($progressMessage) {
 
     .vp-index .welcome-panel {
         padding-bottom: 23px;
-        margin-top: 40px;
-    }
-
-    .vp-index #welcome-panel.welcome-panel {
         margin-top: 20px;
     }
-
 
     .vp-index .welcome-panel p {
         color: inherit;
@@ -138,28 +133,28 @@ function _vp_show_progress_message($progressMessage) {
 
                 <h3>Welcome to VersionPress!</h3>
 
-                <p class="about-description">We're ready to make your admin experience better. Click the button below so that VersionPress can initialize its internal repository and start tracking your site. A few things to know:</p>
+                <p class="about-description">We're ready to make your admin experience better. Click the button below so that VersionPress can initialize itself and start tracking your site. A few things to know:</p>
 
                 <ul>
 
                     <li>
                         <span class="icon icon-checkmark"></span>
-                        VersionPress doesn't require any interaction or further setup. Just activate it and it will start doing its thing.
+                        VersionPress doesn't require any further setup or interaction. Just activate it and it will start doing its thing.
                     </li>
 
                     <li>
                         <span class="icon icon-checkmark"></span>
-                        To undo a change or roll back to some previous state of the site, use the VersionPress menu item on the left.
+                        To undo a change or roll back to some previous state use the VersionPress item in the left menu.
                     </li>
 
                     <li>
                         <span class="icon icon-checkmark"></span>
-                        VersionPress never sends your data anywhere – it is not a service, it is an installed thing on your server.
+                        VersionPress never sends your data anywhere – it is not a service but an installed thing on your server.
                     </li>
 
                     <li>
                         <span class="icon icon-notification"></span>
-                        You are using a preview version of VersionPress which is only suitable for testing purposes. If you encounter any issues you can always contact us at info@versionpress.net.
+                        You are using a preview version of VersionPress which is suitable for testing purposes only. If you encounter any issues please contact us at <a href="mailto:info@versionpress.net">info@versionpress.net</a>.
                     </li>
 
 
