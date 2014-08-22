@@ -3,7 +3,7 @@
 This page is an overview of how VersionPress works and what it provides.
 
 
-## Used terms
+## Terms used
 
 VersionPress uses some common terms, hopefully consistently. If you are ever confused about their exact meaning, consult the list below:
 
@@ -28,6 +28,10 @@ Basically one line in the VersionPress table. Some change that happened to the s
 ### 'a commit'
 
 Another, more technical word for a change in the Git terminology.
+
+### 'an entity'
+
+For example a post or a comment. These are things that VersionPress tracks. We use this rather abstract term instead of e.g. a "database row" because not all tracked entities do necessarily need to be database rows etc.
 
 ### Git
 
