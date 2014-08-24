@@ -2,7 +2,7 @@
 
 VersionPress ships as a standard plugin but there are two important things to be aware of:
 
-1. VersionPress has **stricter system requirements** than is usual
+1. VersionPress has **stricter system requirements** than usual
 2. Its **activation is a two-step process**
 
 Both things are important, please read on.

@@ -1,11 +1,16 @@
-# VersionPress Basics
+# Basic Concepts
 
 This page is an overview of how VersionPress works and what it provides.
 
 
+## Version control
+
+Basically, what VersionPress brings to the world of WordPress sites is a true version control. This means that VersionPress tracks all the changes that happen to a site and offers the chance to undo them or roll back to some previous state of the site.  
+
+
 ## Terms used
 
-VersionPress uses some common terms, hopefully consistently. If you are ever confused about their exact meaning, consult the list below:
+VersionPress uses some terms that might need explanation. If you are ever confused about their exact meaning please consult the list below:
 
 
 ### 'the repository'
@@ -41,6 +46,3 @@ Git is a version control system that powers VersionPress behind the scenes. Find
 
 
 
-## Quick intro to version control
-
-TODO

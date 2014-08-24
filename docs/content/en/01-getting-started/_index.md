@@ -1,6 +1,7 @@
-# Getting started with VersionPress
+# Getting Started
 
-VersionPress is a version control plugin for your site. It acts like an Undo button and allows you to revert any and every action that ever happens on the site.
+VersionPress is a version control plugin for WordPress sites. This section will  help you get started quickly:
 
-This documentation covers all the essential information about it - from the concepts to 
-the daily usage guide.
+* [Understand the basic concepts](./getting-started/concepts)
+* [Install VersionPress](./getting-started/installation-uninstallation)
+* [Use it](./getting-started/usage-guide)

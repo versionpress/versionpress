@@ -1,5 +1,9 @@
 # VersionPress Documentation #
 
-This is documentation for [VersionPress](http://versionpress.net/), a version control plugin for WordPress.
+Welcome to [VersionPress](http://versionpress.net/) documentation. VersionPress itself is intuitive to use but some things like core concepts or installation details require more attention and are described here.
 
-NOTE: VersionPress is currently an alpha version and this docs are preliminary.
+<div class="note">
+  <strong>Note</strong>
+  <p>VersionPress is currently in its alpha stage and these docs, like everything else, are preliminary and will improve over time.</p>
+</div>
+
