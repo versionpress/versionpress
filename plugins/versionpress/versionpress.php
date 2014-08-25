@@ -240,16 +240,7 @@ function vp_admin_menu() {
         null,
         0.001234987
     );
-
-    if(vp_is_active())
-        add_submenu_page(
-            'versionpress/admin/index.php',
-            'Synchronization',
-            'Synchronization',
-            'manage_options',
-            'versionpress/admin/sync.php'
-        );
-
+    
     // Support for deactivate.php - add it to the internal $_registered_pages array
     // See e.g. http://blog.wpessence.com/wordpress-admin-page-without-menu-item/
     global $_registered_pages;
