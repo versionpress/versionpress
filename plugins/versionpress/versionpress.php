@@ -292,12 +292,13 @@ if(vp_is_active()) {
 }
 
 function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
-    $adminBarText = "VersionPress is running in <span style=\"color:red;font-weight:bold\">alpha version</span>";
+    $adminBarText = "You are running an <span style=\"color:red;font-weight:bold\">alpha version</span> of VersionPress";
     $thickboxWidth = 600;
     $thickboxHeight = 200;
     $thickboxUrl = "#TB_inline?width=$thickboxWidth&height=$thickboxHeight&inlineId=modal-window-id";
-    $thickboxTitle = "VersionPress is DANGEROUS";
-    $thickboxText = "It can destroy the world!";
+    $thickboxTitle = "Use for TESTING ONLY";
+    $thickboxText = "<p>You are running an alpha version of VersionPress which means that there <em>are</em> bugs, this site's data may become corrupt etc. <strong style='color: red;'>NEVER USE THIS VERSION IN PRODUCTION OR WITH A PRODUCTION DATABASE.</strong></p>";
+    $thickboxText .= "<p><a href='http://versionpress.net/docs/en/release-notes' target='_blank'>Learn more about VersionPress releases</a></p>";
 
     add_thickbox();
     $adminBar->add_node(array(
