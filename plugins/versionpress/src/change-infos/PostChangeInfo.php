@@ -34,7 +34,7 @@ class PostChangeInfo extends EntityChangeInfo {
      */
     public static function buildFromCommitMessage(CommitMessage $commitMessage)  {
         $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags[ChangeInfo::ACTION_TAG];
+        $actionTag = $tags[BaseChangeInfo::ACTION_TAG];
         list($_, $action, $entityId) = explode("/", $actionTag, 3);
         $titleTag = isset($tags[self::POST_TITLE_TAG]) ? $tags[self::POST_TITLE_TAG] : $entityId;
         $type = isset($tags[self::POST_TYPE_TAG]) ? $tags[self::POST_TYPE_TAG] : "post";

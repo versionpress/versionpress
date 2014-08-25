@@ -32,7 +32,7 @@ class UserChangeInfo extends EntityChangeInfo {
      */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags[ChangeInfo::ACTION_TAG];
+        $actionTag = $tags[BaseChangeInfo::ACTION_TAG];
         $userLogin = $tags[self::USER_LOGIN];
         list($_, $action, $entityId) = explode("/", $actionTag);
         return new self($action, $entityId, $userLogin);

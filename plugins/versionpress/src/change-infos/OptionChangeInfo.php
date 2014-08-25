@@ -34,7 +34,7 @@ class OptionChangeInfo extends EntityChangeInfo {
      */
     static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags[ChangeInfo::ACTION_TAG];
+        $actionTag = $tags[BaseChangeInfo::ACTION_TAG];
         $value = isset($tags[self::VALUE_TAG]) ? $tags[self::VALUE_TAG] : "";
         list($_, $action, $entityId) = explode("/", $actionTag, 3);
         return new self($action, $entityId, $value);

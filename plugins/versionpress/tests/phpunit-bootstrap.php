@@ -22,3 +22,7 @@ PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
 
 global $argv;
 WpCliTestCase::$skipSetup = in_array("--skip-setup", $argv);
+
+WpAutomation::setUpSite();
+WpAutomation::installVersionPress();
+die();

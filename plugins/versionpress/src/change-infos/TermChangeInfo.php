@@ -33,7 +33,7 @@ class TermChangeInfo extends EntityChangeInfo {
      */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags[ChangeInfo::ACTION_TAG];
+        $actionTag = $tags[BaseChangeInfo::ACTION_TAG];
         list($_, $action, $entityId) = explode("/", $actionTag, 3);
         $nameTag = $tags[self::TERM_NAME_TAG];
         return new self($action, $entityId, $nameTag);

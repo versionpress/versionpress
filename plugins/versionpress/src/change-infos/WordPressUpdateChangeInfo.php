@@ -1,6 +1,6 @@
 <?php
 
-class WordPressUpdateChangeInfo implements ChangeInfo {
+class WordPressUpdateChangeInfo extends BaseChangeInfo {
 
     const OBJECT_TYPE = "wordpress";
     const ACTION = "update";
@@ -34,15 +34,6 @@ class WordPressUpdateChangeInfo implements ChangeInfo {
     }
 
     /**
-     * @return CommitMessage
-     */
-    public function getCommitMessage() {
-        $messageHead = "WordPress updated to version " . $this->version;
-        $messageBody = ChangeInfo::ACTION_TAG . ": {$this->getObjectType()}/{$this->getAction()}/" . $this->version;
-        return new CommitMessage($messageHead, $messageBody);
-    }
-
-    /**
      * @param CommitMessage $commitMessage
      * @return boolean
      */
@@ -56,7 +47,7 @@ class WordPressUpdateChangeInfo implements ChangeInfo {
      */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags[ChangeInfo::ACTION_TAG];
+        $actionTag = $tags[BaseChangeInfo::ACTION_TAG];
         list($_, $__, $version) = explode("/", $actionTag, 3);
         return new self($version);
     }
@@ -66,5 +57,23 @@ class WordPressUpdateChangeInfo implements ChangeInfo {
      */
     function getChangeDescription() {
         return "Wordpress updated to version " . $this->getVersion();
+    }
+
+    /**
+     * Returns the first line of commit message
+     *
+     * @return string
+     */
+    protected function getCommitMessageHead() {
+        return "WordPress updated to version " . $this->getVersion();
+    }
+
+    /**
+     * Returns the content of VP-Action tag
+     *
+     * @return string
+     */
+    protected function getActionTag() {
+        return "{$this->getObjectType()}/{$this->getAction()}/{$this->getVersion()}";
     }
 }

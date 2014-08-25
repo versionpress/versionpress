@@ -1,6 +1,6 @@
 <?php
 
-abstract class EntityChangeInfo implements ChangeInfo {
+abstract class EntityChangeInfo extends BaseChangeInfo {
 
     /**
      * Post, comment etc.
@@ -53,25 +53,18 @@ abstract class EntityChangeInfo implements ChangeInfo {
     }
 
     /**
-     * @return CommitMessage
-     */
-    public function getCommitMessage() {
-        return new CommitMessage($this->getCommitMessageHead(), $this->getCommitMessageBody());
-    }
-
-    /**
      * @param CommitMessage $commitMessage
      * @return boolean
      */
     public static function matchesCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        if(!isset($tags[ChangeInfo::ACTION_TAG])) return false;
+        if(!isset($tags[BaseChangeInfo::ACTION_TAG])) return false;
 
-        $actionTag = $tags[ChangeInfo::ACTION_TAG];
+        $actionTag = $tags[BaseChangeInfo::ACTION_TAG];
         return count(explode("/", $actionTag)) === 3; // there are three parts - $entityType, $action and $entityId
     }
 
-    protected  function getCommitMessageHead() {
+    protected function getCommitMessageHead() {
         static $verbs = array(
             'create' => 'Created',
             'edit' => 'Edited',
@@ -82,25 +75,10 @@ abstract class EntityChangeInfo implements ChangeInfo {
         return sprintf("%s %s '%s'", $verbs[$this->getAction()], $this->getObjectType(), $shortEntityId);
     }
 
-    private function getCommitMessageBody() {
-        $entityType = $this->getObjectType();
-        $action = $this->getAction();
-        $id = $this->getEntityId();
-
-        $tags = array();
-        $tags[ChangeInfo::ACTION_TAG] = "$entityType/$action/$id";
-
-        $customTags = $this->getCustomTags();
-        $tags = array_merge($tags, $customTags);
-
-        $body = "";
-        foreach ($tags as $tagName => $tagValue) {
-            $body .= "$tagName: $tagValue\n";
-        }
-        return $body;
-    }
-
-    protected function getCustomTags() {
-        return array();
+    /**
+     * @return string
+     */
+    protected function getActionTag() {
+        return "{$this->getObjectType()}/{$this->getAction()}/{$this->getEntityId()}";
     }
 }

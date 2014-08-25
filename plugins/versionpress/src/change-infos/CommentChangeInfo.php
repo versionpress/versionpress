@@ -41,7 +41,7 @@ class CommentChangeInfo extends EntityChangeInfo {
      */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags[ChangeInfo::ACTION_TAG];
+        $actionTag = $tags[BaseChangeInfo::ACTION_TAG];
         $commentAuthor = $tags[self::AUTHOR_TAG];
         $commentedPost = $tags[self::POST_TITLE_TAG];
         list($_, $action, $entityId) = explode("/", $actionTag, 3);

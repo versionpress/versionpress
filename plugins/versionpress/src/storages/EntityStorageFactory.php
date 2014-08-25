@@ -36,7 +36,7 @@ class EntityStorageFactory {
     }
 
     public function getAllSupportedStorages() {
-        return array_keys($this->storages);
+        return array_keys($this->storageClassInfo);
     }
 
     private function initStorageClasses() {

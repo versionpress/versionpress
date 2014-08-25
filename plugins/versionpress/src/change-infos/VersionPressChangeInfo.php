@@ -3,7 +3,7 @@
 /**
  * Class used for commit representing installation of VersionPress
  */
-class VersionPressChangeInfo implements ChangeInfo {
+class VersionPressChangeInfo extends BaseChangeInfo {
 
     const OBJECT_TYPE = "versionpress";
     const ACTION = "install"; // there are no other actions handled by this change info yet
@@ -20,13 +20,6 @@ class VersionPressChangeInfo implements ChangeInfo {
      */
     public function getAction() {
         return self::ACTION;
-    }
-
-    /**
-     * @return CommitMessage
-     */
-    public function getCommitMessage() {
-        return new CommitMessage("VersionPress was installed",  sprintf("%s: %s/%s", ChangeInfo::ACTION_TAG, self::OBJECT_TYPE, self::ACTION));
     }
 
     /**
@@ -50,5 +43,23 @@ class VersionPressChangeInfo implements ChangeInfo {
      */
     function getChangeDescription() {
         return "Installed VersionPress";
+    }
+
+    /**
+     * Returns the first line of commit message
+     *
+     * @return string
+     */
+    protected function getCommitMessageHead() {
+        return "VersionPress was installed";
+    }
+
+    /**
+     * Returns the content of VP-Action tag
+     *
+     * @return string
+     */
+    protected function getActionTag() {
+        return sprintf("%s/%s", self::OBJECT_TYPE, self::ACTION);
     }
 }

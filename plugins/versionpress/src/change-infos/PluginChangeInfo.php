@@ -1,21 +1,25 @@
 <?php
 
-class PluginChangeInfo implements ChangeInfo {
+class PluginChangeInfo extends BaseChangeInfo {
 
     private static $OBJECT_TYPE = "plugin";
-    private static $plugins;
+    const PLUGIN_NAME_TAG = "VP-Plugin-Name";
 
-    /** @var  string */
+    /** @var string */
     private $pluginFile;
+
+    /** @var string */
+    private $pluginName;
     /**
      * Values: activate / deactivate / update
      * @var string
      */
     private $action;
 
-    public function __construct($pluginFile, $action) {
+    public function __construct($pluginFile, $action, $pluginName = null) {
         $this->pluginFile = $pluginFile;
         $this->action = $action;
+        $this->pluginName = $pluginName ? $pluginName : $this->findPluginName();
     }
 
     /**
@@ -33,13 +37,6 @@ class PluginChangeInfo implements ChangeInfo {
     }
 
     /**
-     * @return CommitMessage
-     */
-    public function getCommitMessage() {
-        return new CommitMessage("Plugin \"{$this->pluginFile}\" was {$this->action}" . (NStrings::endsWith($this->action, "e") ? "d" : "ed"), ChangeInfo::ACTION_TAG .": {$this->getObjectType()}/{$this->getAction()}/" . $this->pluginFile);
-    }
-
-    /**
      * @param CommitMessage $commitMessage
      * @return boolean
      */
@@ -52,27 +49,43 @@ class PluginChangeInfo implements ChangeInfo {
      * @return ChangeInfo
      */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
-        $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags[ChangeInfo::ACTION_TAG];
-        list($_, $action, $pluginName) = explode("/", $actionTag, 3);
-        return new self($pluginName, $action);
+        $actionTag = $commitMessage->getVersionPressTag(BaseChangeInfo::ACTION_TAG);
+        $pluginName = $commitMessage->getVersionPressTag(self::PLUGIN_NAME_TAG);
+        list($_, $action, $pluginFile) = explode("/", $actionTag, 3);
+        return new self($pluginFile, $action, $pluginName);
     }
 
     /**
      * @return string
      */
     public function getChangeDescription() {
-        return NStrings::capitalize($this->action) . (NStrings::endsWith($this->action, "e") ? "d" : "ed") . " plugin '{$this->getPluginName()}'";
+        return NStrings::capitalize($this->action) . (NStrings::endsWith($this->action, "e") ? "d" : "ed") . " plugin '{$this->pluginName}'";
     }
 
     /**
      * @return string
      */
-    private function getPluginName() {
-        if(!self::$plugins) {
-            self::$plugins = get_plugins();
-        }
+    protected function getActionTag() {
+        return "{$this->getObjectType()}/{$this->getAction()}/" . $this->pluginFile;
+    }
 
-        return self::$plugins[$this->pluginFile]["Name"];
+    /**
+     * Returns the first line of commit message
+     *
+     * @return string
+     */
+    protected function getCommitMessageHead() {
+        return "Plugin \"{$this->pluginFile}\" was {$this->action}" . (NStrings::endsWith($this->action, "e") ? "d" : "ed");
+    }
+
+    protected function getCustomTags() {
+        return array(
+            self::PLUGIN_NAME_TAG => $this->pluginName
+        );
+    }
+
+    private function findPluginName() {
+        $plugins = get_plugins();
+        return $plugins[$this->pluginFile]["Name"];
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-class RevertChangeInfo implements ChangeInfo {
+class RevertChangeInfo extends BaseChangeInfo {
 
     const OBJECT_TYPE = "versionpress";
     const ACTION_UNDO = "undo";
@@ -35,14 +35,6 @@ class RevertChangeInfo implements ChangeInfo {
     }
 
     /**
-     * @return CommitMessage
-     */
-    public function getCommitMessage() {
-        $messageHeader = ($this->action == self::ACTION_UNDO ? "Reverted change " : "Rollback to ") . $this->commitHash;
-        return new CommitMessage($messageHeader,  sprintf("%s: %s/%s/%s", ChangeInfo::ACTION_TAG, self::OBJECT_TYPE, $this->getAction(), $this->commitHash));
-    }
-
-    /**
      * @param CommitMessage $commitMessage
      * @return boolean
      */
@@ -57,7 +49,7 @@ class RevertChangeInfo implements ChangeInfo {
      */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        list($_, $action, $commitHash) = explode("/", $tags[ChangeInfo::ACTION_TAG], 3);
+        list($_, $action, $commitHash) = explode("/", $tags[BaseChangeInfo::ACTION_TAG], 3);
         return new self($action, $commitHash);
     }
 
@@ -66,5 +58,23 @@ class RevertChangeInfo implements ChangeInfo {
      */
     public function getChangeDescription() {
         return ($this->action == self::ACTION_UNDO ? "Reverted change " : "Rollback to ") . $this->commitHash;
+    }
+
+    /**
+     * Returns the first line of commit message
+     *
+     * @return string
+     */
+    protected function getCommitMessageHead() {
+        return ($this->action == self::ACTION_UNDO ? "Reverted change " : "Rollback to ") . $this->commitHash;
+    }
+
+    /**
+     * Returns the content of VP-Action tag
+     *
+     * @return string
+     */
+    protected function getActionTag() {
+        return sprintf("%s/%s/%s", self::OBJECT_TYPE, $this->getAction(), $this->commitHash);
     }
 }

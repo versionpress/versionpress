@@ -13,7 +13,7 @@ class UserTest extends WpCliTestCase {
         WpAutomation::createUser($this->someUser);
 
         $lastCommit = $this->getLastCommit();
-        $comitAction = $lastCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG);
+        $comitAction = $lastCommit->getMessage()->getVersionPressTag(BaseChangeInfo::ACTION_TAG);
         $loginInTag = $lastCommit->getMessage()->getVersionPressTag(UserChangeInfo::USER_LOGIN);
         $this->assertStringStartsWith("user/create", $comitAction);
         $this->assertEquals($this->someUser["user_login"], $loginInTag);

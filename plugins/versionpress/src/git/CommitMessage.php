@@ -58,6 +58,6 @@ class CommitMessage {
      */
     public function getVersionPressTag($tagName) {
         $tags = $this->getVersionPressTags();
-        return $tags[$tagName];
+        return isset($tags[$tagName]) ? $tags[$tagName] : "";
     }
 }

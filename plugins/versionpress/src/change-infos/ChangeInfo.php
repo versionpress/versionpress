@@ -1,19 +1,6 @@
 <?php
 
 interface ChangeInfo {
-
-    const ACTION_TAG = "VP-Action";
-
-    /**
-     * @return string
-     */
-    function getObjectType();
-
-    /**
-     * @return string
-     */
-    function getAction();
-
     /**
      * @return CommitMessage
      */

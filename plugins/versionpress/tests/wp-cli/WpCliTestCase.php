@@ -95,7 +95,7 @@ abstract class WpCliTestCase extends PHPUnit_Framework_TestCase {
     protected function getVpIdFromCommit(Commit $commit) {
         list($_, $__, $entityVpId) = explode(
             "/",
-            $commit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG)
+            $commit->getMessage()->getVersionPressTag(BaseChangeInfo::ACTION_TAG)
         );
         return $entityVpId;
     }
@@ -119,7 +119,7 @@ abstract class WpCliTestCase extends PHPUnit_Framework_TestCase {
         $editationCommit = $this->getLastCommit();
         $this->assertStringStartsWith(
             $expectedAction,
-            $editationCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG),
+            $editationCommit->getMessage()->getVersionPressTag(BaseChangeInfo::ACTION_TAG),
             "Expected another action"
         );
 
@@ -149,7 +149,7 @@ abstract class WpCliTestCase extends PHPUnit_Framework_TestCase {
         $deleteCommit = $this->getLastCommit();
         $this->assertEquals(
             "$entityName/delete/$createdEntityVpId",
-            $deleteCommit->getMessage()->getVersionPressTag(ChangeInfo::ACTION_TAG)
+            $deleteCommit->getMessage()->getVersionPressTag(BaseChangeInfo::ACTION_TAG)
         );
 
         $deletedEntityVpId = $this->getVpIdFromCommit($deleteCommit);
