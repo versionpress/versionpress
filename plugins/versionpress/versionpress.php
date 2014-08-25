@@ -177,7 +177,7 @@ function vp_admin_post_confirm_deactivation() {
     unlink(WP_CONTENT_DIR . '/db.php');
     unlink(__DIR__ . '/.active');
 
-    FileSystem::getWpFilesystem()->rmdir(__DIR__ . '/db');
+    FileSystem::getWpFilesystem()->rmdir(__DIR__ . '/db', true);
 
     global $wpdb;
 

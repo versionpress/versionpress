@@ -13,7 +13,7 @@ class FileSystem {
      * @see http://codex.wordpress.org/Filesystem_API
      * @see http://wordpress.stackexchange.com/questions/157629/convenient-way-to-use-wp-filesystem
      *
-     * @return WP_Filesystem_Base
+     * @return WP_Filesystem_Direct
      */
     public static function getWpFilesystem() {
         global $wp_filesystem;
