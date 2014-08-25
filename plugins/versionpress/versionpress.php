@@ -186,6 +186,7 @@ function vp_admin_post_confirm_deactivation() {
     $queries[] = "DROP VIEW IF EXISTS `{$table_prefix}vp_reference_details`";
     $queries[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_references`";
     $queries[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_id`";
+    $queries[] = "DELETE FROM `{$table_prefix}usermeta` WHERE meta_key LIKE \"vp_%\"";
 
     foreach ($queries as $query) {
         $wpdb->query($query);
@@ -240,7 +241,7 @@ function vp_admin_menu() {
         null,
         0.001234987
     );
-    
+
     // Support for deactivate.php - add it to the internal $_registered_pages array
     // See e.g. http://blog.wpessence.com/wordpress-admin-page-without-menu-item/
     global $_registered_pages;
