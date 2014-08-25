@@ -1,14 +1,21 @@
-# Basic Concepts
+# Basic Concepts #
 
 This page is an overview of how VersionPress works and what it provides.
 
 
-## Version control
+## Version control ##
 
-Basically, what VersionPress brings to the world of WordPress sites is a true version control. This means that VersionPress tracks all the changes that happen to a site and offers the chance to undo them or roll back to some previous state of the site.  
+Basically, what VersionPress brings to the world of WordPress sites is a true version control. This means that VersionPress tracks all the changes that happen to a site and offers the chance to undo them or roll back to some previous state of the site.
+
+Once you have all the changes tracked, many nice and useful things are suddenly possible. For instance, VersionPress can sync two versions of a site, for example local development version and the production version, while automatically taking care of what would normally become sync conflict. Team work is possible. Selective undos are possible. Having proper version control in place is simply tremendously useful.
 
 
-## Terms used
+## Performance considerations ##
+
+VersionPress generally consumes server resources only after some change has occurred on the web site while for read-only requests, it adds no overhead at all (WordPress fetches the data like if there was no VersionPress). If you have a site that is very write-heavy then VersionPress might not be a good fit but for most websites out there where 99% of web requests are read-only, VersionPress will work just fine.
+
+
+## Terms used ##
 
 VersionPress uses some terms that might need explanation. If you are ever confused about their exact meaning please consult the list below:
 
