@@ -20,6 +20,8 @@ gulp.task('copy', ['clean'], function(cb) {
     '!versionpress.iml',
     '!gulpfile.js',
     '!package.json',
+    '!composer.json',
+    '!composer.lock'
     ], {dot: true}).pipe(gulp.dest('./build'));
 });
 
