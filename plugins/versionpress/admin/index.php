@@ -222,7 +222,7 @@ function _vp_show_progress_message($progressMessage) {
 
         <?php
         $showWelcomePanel = get_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, true);
-        NDebugger::barDump($showWelcomePanel);
+
         if ($showWelcomePanel === "") {
             $showWelcomePanel = "1";
             add_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, $showWelcomePanel);
