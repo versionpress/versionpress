@@ -5,6 +5,8 @@ var rename = require('gulp-rename');
 var zip = require('gulp-zip');
 var fs = require('fs');
 var replace = require('gulp-replace');
+var packageVersion = "";
+
 
 gulp.task('clean', function(cb) {
   del(['build', 'dist'], cb);
@@ -19,9 +21,7 @@ gulp.task('copy', ['clean'], function(cb) {
     '!./{tests,tests/**}',
     '!versionpress.iml',
     '!gulpfile.js',
-    '!package.json',
-    '!composer.json',
-    '!composer.lock'
+    '!package.json'
     ], {dot: true}).pipe(gulp.dest('./build'));
 });
 
@@ -41,12 +41,18 @@ gulp.task('remove-temp-files', ['rename-back'], function(cb) {
 
 gulp.task('composer-install', ['remove-temp-files'], shell.task(['composer install -d build --no-dev --prefer-dist']));
 
+gulp.task('remove-composer-files', ['composer-install'], function (cb) {
+    del(['./build/composer.json', './build/composer.lock'], cb);
+});
+
 gulp.task('persist-plugin-comment', ['rename-back'], function(cb) {
   var fileOptions = {encoding: 'UTF-8'};
   fs.readFile('./versionpress.php', fileOptions, function (err, content) {
     var definePosition = content.indexOf("define");
     var originalHead = content.substr(0, definePosition);
-    
+    var versionMatch = content.match(/^Version: (.*)$/m);
+    packageVersion = versionMatch[1];
+
     fs.readFile('./build/versionpress.php', fileOptions, function (err, content) {
       var definePosition = content.indexOf("define");
       var newContent = originalHead + content.substr(definePosition);
@@ -64,12 +70,12 @@ gulp.task('set-production-mode', ['rename-back'], function (cb) {
     )).pipe(gulp.dest('./build'));
 });
 
-gulp.task('zip', ['remove-temp-files', 'persist-plugin-comment', 'set-production-mode'], function(cb) {
+gulp.task('zip', ['persist-plugin-comment', 'set-production-mode', 'remove-composer-files'], function(cb) {
   return gulp.src('./build/**', {dot: true}).
     pipe(rename(function (path) {
         path.dirname = 'versionpress/' + path.dirname;
     })).
-    pipe(zip('versionpress-1.0-alpha1.zip')).
+    pipe(zip('versionpress-' + packageVersion + '.zip')).
     pipe(gulp.dest('./dist'));
 });
 
