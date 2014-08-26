@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "bfd7fd24edb7e4a5fd05f20c5d77c46e",
+    "hash": "689379146c645b830adee36198e8eba8",
     "packages": [
         {
             "name": "nette/nette-minified",
@@ -114,6 +114,45 @@
         }
     ],
     "packages-dev": [
+        {
+            "name": "janvoracek/comment-stripper",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/JanVoracek/comment-stripper.git",
+                "reference": "832d5cb1f8150da5124eb2dd0c19639a7e2d98ed"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/JanVoracek/comment-stripper/zipball/832d5cb1f8150da5124eb2dd0c19639a7e2d98ed",
+                "reference": "832d5cb1f8150da5124eb2dd0c19639a7e2d98ed",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "bin": [
+                "strip"
+            ],
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "JanVoracek",
+                    "email": "jan@voracek.net"
+                }
+            ],
+            "description": "Strips the comments from PHP file",
+            "homepage": "https://github.com/JanVoracek/comment-stripper/",
+            "keywords": [
+                "comment",
+                "strip"
+            ],
+            "time": "2014-08-26 08:19:08"
+        },
         {
             "name": "nette/utils",
             "version": "v2.2.1",
@@ -641,7 +680,8 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "nette/nette-minified": 20
+        "nette/nette-minified": 20,
+        "janvoracek/comment-stripper": 20
     },
     "prefer-stable": false,
     "platform": [

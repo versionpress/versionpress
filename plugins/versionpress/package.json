@@ -1,0 +1,25 @@
+{
+  "name": "versionpress",
+  "version": "1.0.0",
+  "description": "",
+  "main": "gulpfile.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "gulp-rename": "~1.2.0",
+    "del": "~0.1.2",
+    "gulp": "~3.8.7",
+    "gulp-shell": "~0.2.9"
+  },
+  "devDependencies": {
+    "gulp-zip": "~2.0.1",
+    "gulp-replace": "~0.4.0",
+    "coffee-script": "~1.7.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "GPL"
+}
