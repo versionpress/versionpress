@@ -147,7 +147,7 @@ class WpAutomation {
      * @param $id
      */
     public static function deleteUser($id) {
-        $args = array($id);
+        $args = array($id, 'yes' => '');
         self::runWpCliCommand('user', 'delete', $args);
     }
 
@@ -278,11 +278,9 @@ class WpAutomation {
      * @return string
      */
     private static function exec($command, $executionPath) {
-        $cwd = getcwd();
-        chdir($executionPath);
-        $result = exec($command);
-        chdir($cwd);
-        return $result;
+        $process = new \Symfony\Component\Process\Process($command, $executionPath);
+        $process->run();
+        return $process->getOutput();
     }
 
     /**
