@@ -1,5 +1,2 @@
 .active
 vendor
-node_modules
-build
-dist

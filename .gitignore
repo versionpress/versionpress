@@ -1,3 +1,6 @@
 # IDEA project files
 .idea/workspace.xml
 .idea/tasks.xml
+build
+dist
+node_modules
