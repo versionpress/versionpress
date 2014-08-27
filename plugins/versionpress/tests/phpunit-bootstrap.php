@@ -1,4 +1,5 @@
 <?php
+
 require_once(__DIR__ . '/../vendor/autoload.php');
 require_once(__DIR__ . '/selenium/SeleniumTestCase.php');
 require_once(__DIR__ . '/selenium/FullWipeSeleniumTestCase.php');
@@ -22,7 +23,3 @@ PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
 
 global $argv;
 WpCliTestCase::$skipSetup = in_array("--skip-setup", $argv);
-
-WpAutomation::setUpSite();
-WpAutomation::installVersionPress();
-die();
