@@ -141,7 +141,7 @@ abstract class Git {
     }
 
     private static function runProcess($cmd) {
-        /**
+        /*
          * MAMP / XAMPP issue on Mac OS X,
          * see http://jira.agilio.cz/browse/WP-106.
          * 
