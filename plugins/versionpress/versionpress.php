@@ -283,22 +283,29 @@ if(vp_is_active()) {
     add_action('admin_bar_menu', 'vp_admin_bar_warning');
 }
 
+wp_enqueue_style('versionpress_admin_style', plugins_url( 'admin/css/jquery.webui-popover.min.css' , __FILE__ ));
+wp_enqueue_script('jquery');
+wp_enqueue_script('versionpress_admin_script', plugins_url( 'admin/js/jquery.webui-popover.min.js' , __FILE__ ), 'jquery');
 function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
     $adminBarText = "You are running an <span style=\"color:red;font-weight:bold\">alpha version</span> of VersionPress";
     $thickboxWidth = 600;
     $thickboxHeight = 200;
     $thickboxUrl = "#TB_inline?width=$thickboxWidth&height=$thickboxHeight&inlineId=modal-window-id";
-    $thickboxTitle = "Use for TESTING ONLY";
-    $thickboxText = "<p>You are running an alpha version of VersionPress which means that there <em>are</em> bugs, this site's data may become corrupt etc. <strong style='color: red;'>NEVER USE THIS VERSION IN PRODUCTION OR WITH A PRODUCTION DATABASE.</strong></p>";
-    $thickboxText .= "<p><a href='http://versionpress.net/docs/en/release-notes' target='_blank'>Learn more about VersionPress releases</a></p>";
+    $popoverTitle = "Use for TESTING ONLY";
+    $popoverText = "<p>You are running an alpha version of VersionPress which means that there <em>are</em> bugs, this site's data may become corrupt etc. <strong style='color: red;'>NEVER USE THIS VERSION IN PRODUCTION OR WITH A PRODUCTION DATABASE.</strong></p>";
+    $popoverText .= "<p><a href='http://versionpress.net/docs/en/release-notes' target='_blank'>Learn more about VersionPress releases</a></p>";
 
-    add_thickbox();
     $adminBar->add_node(array(
             'id' => 'vp-running',
-            'title' => "<a href=\"$thickboxUrl\" title=\"$thickboxTitle\" class=\"ab-item thickbox\">$adminBarText</a>
-            <div id=\"modal-window-id\" style=\"display:none;\">
-                <p>$thickboxText</p>
-            </div>",
+            'title' => "<a href='#' class='ab-item' id='vp-warning'>$adminBarText</a>
+            <script>
+            var warning = jQuery('#vp-warning');
+            warning.webuiPopover({title:\"$popoverTitle\", content: \"$popoverText\"});
+            jQuery('body').on('click', function(e) {
+                if(e.target != warning[0])
+                    jQuery('#vp-warning').webuiPopover('hide');
+            });
+            </script>",
             'parent' => 'top-secondary'
         ));
 }
