@@ -131,7 +131,7 @@ abstract class SynchronizerBase implements Synchronizer {
     protected function buildUpdateQuery($updateData) {
         $id = $updateData['vp_id'];
         $tableName = $this->getPrefixedTableName($this->entityName);
-        $query = "UPDATE {$tableName} JOIN (SELECT * FROM wp_vp_id WHERE `table` = '{$this->entityName}') filtered_vp_id ON {$tableName}.{$this->idColumnName} = filtered_vp_id.id SET";
+        $query = "UPDATE {$tableName} JOIN (SELECT * FROM {$this->database->prefix}vp_id WHERE `table` = '{$this->entityName}') filtered_vp_id ON {$tableName}.{$this->idColumnName} = filtered_vp_id.id SET";
         foreach ($updateData as $key => $value) {
             if ($key == $this->idColumnName) continue;
             if (NStrings::startsWith($key, 'vp_')) continue;
