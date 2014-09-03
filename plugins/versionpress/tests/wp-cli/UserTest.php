@@ -42,6 +42,34 @@ class UserTest extends WpCliTestCase {
         $this->assertUserDeletion($newUser);
     }
 
+    public function testEditUserMeta() {
+        $newUser = $this->someUser;
+        $newUser["user_login"] = "test-versionpress-editmeta";
+        $newUser["user_email"] = "test.versionpress.editmeta@example.com";
+
+        $changedUserMeta = "first_name";
+        $userMetaValue = "Edited name";
+
+        $id = WpAutomation::createUser($newUser);
+        $creationCommit = $this->getLastCommit();
+        $createdUserVpId = $this->getVpIdFromCommit($creationCommit);
+
+        WpAutomation::editUserMeta($id, $changedUserMeta, $userMetaValue);
+        $editationCommit = $this->getLastCommit();
+        $this->assertStringStartsWith(
+            "user/edit",
+            $editationCommit->getMessage()->getVersionPressTag(BaseChangeInfo::ACTION_TAG),
+            "Expected another action"
+        );
+
+        $editedUserVpId = $this->getVpIdFromCommit($editationCommit);
+        $this->assertEquals($createdUserVpId, $editedUserVpId, "Edited different entity");
+
+        $commitedEntity = $this->getCommitedEntity($createdUserVpId);
+        $newEntity = array_merge($newUser, array($changedUserMeta => $userMetaValue));
+        $this->assertEntityEquals($newEntity, $commitedEntity);
+    }
+
     protected function getCommitedEntity($vpId) {
         $path = self::$config->getSitePath() . '/wp-content/plugins/versionpress/db/users.ini';
         $users = IniSerializer::deserialize(file_get_contents($path), true);

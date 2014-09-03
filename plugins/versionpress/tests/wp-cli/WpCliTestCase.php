@@ -70,6 +70,15 @@ abstract class WpCliTestCase extends PHPUnit_Framework_TestCase {
         $entityIsOk = true;
         $errorMessages = array();
 
+        $actualEntityCopy = $actualEntity;
+        foreach ($actualEntityCopy as $field => $value) {
+            if(strpos($field, "#") !== false) {
+                list($realField) = explode("#", $field);
+                unset($actualEntity[$field]);
+                $actualEntity[$realField] = $value;
+            }
+        }
+
         foreach ($expectedEntity as $field => $value) {
             if (isset($actualEntity[$field])) {
                 $fieldIsOk = $value == $actualEntity[$field];

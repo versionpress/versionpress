@@ -152,6 +152,17 @@ class WpAutomation {
     }
 
     /**
+     * Changes the user using WP-CLI.
+     *
+     * @param $id
+     * @param $name
+     * @param $value
+     */
+    public static function editUserMeta($id, $name, $value) {
+        self::runWpCliCommand('user', 'meta update', func_get_args());
+    }
+
+    /**
      * Creates new option using WP-CLI.
      *
      * @param string $name
