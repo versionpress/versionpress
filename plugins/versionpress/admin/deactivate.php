@@ -1,7 +1,7 @@
 <?php
 defined('ABSPATH') or die("Direct access not allowed");
 
-wp_enqueue_style('versionpress_admin_style', plugins_url( 'style.css' , __FILE__ ));
+wp_enqueue_style('versionpress_admin_style', plugins_url( 'css/style.css' , __FILE__ ));
 wp_enqueue_style('versionpress_admin_deactivation_icons', plugins_url( 'icons/style.css' , __FILE__ ));
 
 /**

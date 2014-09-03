@@ -1,6 +1,6 @@
 <?php
 
-wp_enqueue_style('versionpress_admin_style', plugins_url( 'style.css' , __FILE__ ));
+wp_enqueue_style('versionpress_admin_style', plugins_url( 'css/style.css' , __FILE__ ));
 
 wp_enqueue_script('versionpress_admin_script', plugins_url( 'js/vp-admin.js' , __FILE__ ));
 

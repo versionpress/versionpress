@@ -1,0 +1,73 @@
+#wpbody {
+	padding-right: 10px;
+}
+
+
+#versionpress-commits-table th,
+#versionpress-commits-table td {
+    border-bottom: 1px solid #ccc;
+}
+
+#versionpress-commits-table .column-date {
+	width: 100px;
+}
+
+#versionpress-commits-table .column-commit-id {
+	width: 60px;
+}
+
+#versionpress-commits-table .column-commit-id {
+	/*width: 100%;*/
+}
+
+
+#versionpress-commits-table .column-actions {
+	width: 160px;
+}
+
+
+/*
+ * Styles for deactivate.php
+ */
+
+h2.vp-deactivation-header {
+    margin-bottom: 20px;
+}
+
+.vp-deactivation ul {
+    list-style: none;
+    padding-left: 40px;
+}
+
+.vp-deactivation ul li {
+    position: relative;
+}
+
+.vp-deactivation ul .icon {
+    position: absolute;
+    left: -25px;
+    top: 3px;
+}
+
+.vp-deactivation ul .ok-color {
+    color: inherit;
+}
+
+.vp-deactivation ul .warning-color {
+    color: inherit;
+}
+
+.deactivation-buttons {
+    margin: 40px 0px 20px;
+}
+
+.deactivation-buttons form {
+    display: inline-block;
+}
+
+.deactivation-buttons .button {
+    margin-right: 10px;
+}
+
+.deactivation-buttons .cancel-deactivation {
+}
