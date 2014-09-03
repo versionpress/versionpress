@@ -141,6 +141,18 @@ abstract class Git {
     }
 
     private static function runProcess($cmd) {
+        /**
+         * MAMP / XAMPP issue on Mac OS X,
+         * see http://jira.agilio.cz/browse/WP-106.
+         * 
+         * http://stackoverflow.com/a/16903162/1243495
+         */
+        $dyldLibraryPath = getenv("DYLD_LIBRARY_PATH");
+        if($dyldLibraryPath != "") {
+            putenv("DYLD_LIBRARY_PATH=");
+
+        }
+
         $process = new \Symfony\Component\Process\Process($cmd, getcwd());
         $process->run();
 
@@ -148,6 +160,8 @@ abstract class Git {
             'stdout' => $process->getOutput(),
             'stderr' => $process->getErrorOutput()
         );
+
+        putenv("DYLD_LIBRARY_PATH=$dyldLibraryPath");
 
         return $result;
     }
