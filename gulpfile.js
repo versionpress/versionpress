@@ -86,4 +86,8 @@ gulp.task('zip', ['persist-plugin-comment', 'set-production-mode', 'remove-compo
         pipe(gulp.dest(distDir));
 });
 
-gulp.task('default', ['zip']);
+gulp.task('clean-build', ['zip'], function (cb) {
+	del(['build'], cb);
+});
+
+gulp.task('default', ['clean-build']);
