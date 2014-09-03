@@ -242,6 +242,7 @@ class WpAutomation {
         $args = array();
         $args["dbname"] = self::$config->getDbName();
         $args["dbuser"] = self::$config->getDbUser();
+        $args["dbprefix"] = self::$config->getDbPrefix();
         if (self::$config->getDbPassword()) $args["dbpass"] = self::$config->getDbPassword();
         if (self::$config->getDbHost()) $args["dbhost"] = self::$config->getDbHost();
 

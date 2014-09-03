@@ -13,6 +13,7 @@ class TestConfig {
     private $dbUser;
     private $dbPassword;
     private $dbName;
+    private $dbPrefix;
     private $wpVersion;
     private $siteTitle;
     private $adminName;
@@ -26,6 +27,7 @@ class TestConfig {
         $this->dbUser = $rawConfig['db-user'];
         $this->dbPassword = $rawConfig['db-pass'];
         $this->dbName = $rawConfig['db-name'];
+        $this->dbPrefix = $rawConfig['db-prefix'];
 
         // Site settings
         $this->siteUrl = $rawConfig['site-url'];
@@ -74,6 +76,13 @@ class TestConfig {
      */
     public function getDbUser() {
         return $this->dbUser;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDbPrefix() {
+        return $this->dbPrefix;
     }
 
     /**

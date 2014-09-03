@@ -54,7 +54,8 @@ abstract class WpCliTestCase extends PHPUnit_Framework_TestCase {
      * @param $vpId
      */
     protected function assertIdExistsInDatabase($vpId) {
-        $result = boolval(self::$db->query("SELECT * FROM wp_vp_id WHERE vp_id=UNHEX('$vpId')"));
+        $prefix = self::$config->getDbPrefix();
+        $result = boolval(self::$db->query("SELECT * FROM {$prefix}vp_id WHERE vp_id=UNHEX('$vpId')"));
         $this->assertTrue($result, "vp_id '$vpId' not found in database");
     }
 
