@@ -284,13 +284,11 @@ if(vp_is_active()) {
 }
 
 wp_enqueue_style('versionpress_admin_style', plugins_url( 'admin/css/jquery.webui-popover.min.css' , __FILE__ ));
+wp_enqueue_style('versionpress_popover_style', plugins_url( 'admin/css/popover-custom.css' , __FILE__ ));
 wp_enqueue_script('jquery');
 wp_enqueue_script('versionpress_admin_script', plugins_url( 'admin/js/jquery.webui-popover.min.js' , __FILE__ ), 'jquery');
 function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
     $adminBarText = "You are running an <span style=\"color:red;font-weight:bold\">alpha version</span> of VersionPress";
-    $thickboxWidth = 600;
-    $thickboxHeight = 200;
-    $thickboxUrl = "#TB_inline?width=$thickboxWidth&height=$thickboxHeight&inlineId=modal-window-id";
     $popoverTitle = "Use for TESTING ONLY";
     $popoverText = "<p>You are running an alpha version of VersionPress which means that there <em>are</em> bugs, this site's data may become corrupt etc. <strong style='color: red;'>NEVER USE THIS VERSION IN PRODUCTION OR WITH A PRODUCTION DATABASE.</strong></p>";
     $popoverText .= "<p><a href='http://versionpress.net/docs/en/release-notes' target='_blank'>Learn more about VersionPress releases</a></p>";

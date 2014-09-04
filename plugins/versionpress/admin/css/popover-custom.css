@@ -1,0 +1,11 @@
+.webui-popover p {
+    font-size: 13px;
+    font-family: "Open Sans", sans-serif;
+    margin: 1em 0;
+    line-height: 1.5;
+}
+
+.webui-popover a {
+    color: #0074a2;
+    text-decoration: underline;
+}
