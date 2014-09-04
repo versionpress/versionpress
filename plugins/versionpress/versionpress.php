@@ -289,8 +289,8 @@ wp_enqueue_script('jquery');
 wp_enqueue_script('versionpress_popover_script', plugins_url( 'admin/js/jquery.webui-popover.min.js' , __FILE__ ), 'jquery');
 function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
     $adminBarText = "You are running an <span style=\"color:red;font-weight:bold\">alpha version</span> of VersionPress";
-    $popoverTitle = "Use for TESTING ONLY";
-    $popoverText = "<p>You are running an alpha version of VersionPress which means that there <em>are</em> bugs, this site's data may become corrupt etc. <strong style='color: red;'>NEVER USE THIS VERSION IN PRODUCTION OR WITH A PRODUCTION DATABASE.</strong></p>";
+    $popoverTitle = "Use for <strong>testing only</strong>";
+    $popoverText = "<p>You are running an alpha version of VersionPress which means that there <em>are</em> bugs, this site's data may become corrupt etc.<br /><br /><strong style='color: red;'>NEVER USE THIS VERSION IN PRODUCTION OR WITH A PRODUCTION DATABASE.</strong></p>";
     $popoverText .= "<p><a href='http://versionpress.net/docs/en/release-notes' target='_blank'>Learn more about VersionPress releases</a></p>";
 
     $adminBar->add_node(array(
@@ -298,10 +298,17 @@ function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
             'title' => "<a href='#' class='ab-item' id='vp-warning'>$adminBarText</a>
             <script>
             var warning = jQuery('#vp-warning');
-            warning.webuiPopover({title:\"$popoverTitle\", content: \"$popoverText\"});
+            var customPopoverClass = \"versionpress-alpha\"; // used to identify the popover later
+
+            warning.webuiPopover({title:\"$popoverTitle\", content: \"$popoverText\", closeable: true, style: customPopoverClass, width:450});
             jQuery('body').on('click', function(e) {
-                if(e.target != warning[0])
+                var popopOverSelector = '.webui-popover-' + customPopoverClass;
+                if (jQuery(popopOverSelector).length > 0 && jQuery(popopOverSelector).is(':visible') && jQuery(e.target).parents(popopOverSelector).length == 0 &&
+                    !jQuery(e.target).is(warning) && jQuery(e.target).parents('#vp-warning').length == 0)
+                {
+                    // Hide popover if the click was anywhere but in the link or the popover itself.
                     jQuery('#vp-warning').webuiPopover('hide');
+                }
             });
             </script>",
             'parent' => 'top-secondary'
