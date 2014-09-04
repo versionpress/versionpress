@@ -1,9 +1,10 @@
 # Release Notes #
 
-The current release is **1.0-alpha1**, released on 2014-x-y. Our versioning scheme is described below in the *Release versioning* section.
+The current release is **1.0-alpha2**, released on 4-Sep-2014. Our versioning scheme is described below in the *Release versioning* section.
 
 Release notes of all the versions shipped so far:
 
+* [1.0-alpha2](./release-notes/1.0-alpha2)
 * [1.0-alpha1](./release-notes/1.0-alpha1)
 
 You can also view our [roadmap](./release-notes/roadmap).
