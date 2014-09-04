@@ -56,7 +56,7 @@ class WordPressUpdateChangeInfo extends BaseChangeInfo {
      * @return string
      */
     function getChangeDescription() {
-        return "Wordpress updated to version " . $this->getVersion();
+        return "WordPress updated to version " . $this->getVersion();
     }
 
     /**
