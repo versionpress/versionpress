@@ -283,10 +283,10 @@ if(vp_is_active()) {
     add_action('admin_bar_menu', 'vp_admin_bar_warning');
 }
 
-wp_enqueue_style('versionpress_admin_style', plugins_url( 'admin/css/jquery.webui-popover.min.css' , __FILE__ ));
-wp_enqueue_style('versionpress_popover_style', plugins_url( 'admin/css/popover-custom.css' , __FILE__ ));
+wp_enqueue_style('versionpress_popover_style', plugins_url( 'admin/css/jquery.webui-popover.min.css' , __FILE__ ));
+wp_enqueue_style('versionpress_popover_custom_style', plugins_url( 'admin/css/popover-custom.css' , __FILE__ ));
 wp_enqueue_script('jquery');
-wp_enqueue_script('versionpress_admin_script', plugins_url( 'admin/js/jquery.webui-popover.min.js' , __FILE__ ), 'jquery');
+wp_enqueue_script('versionpress_popover_script', plugins_url( 'admin/js/jquery.webui-popover.min.js' , __FILE__ ), 'jquery');
 function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
     $adminBarText = "You are running an <span style=\"color:red;font-weight:bold\">alpha version</span> of VersionPress";
     $popoverTitle = "Use for TESTING ONLY";
