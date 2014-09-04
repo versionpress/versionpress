@@ -217,6 +217,11 @@ class WpAutomation {
      * it downloads it from wp.org and stores it as `<clean-installations-dir>/<version>`.
      */
     private static function ensureCleanInstallationIsAvailable() {
+
+        if (!is_dir(self::$config->getCleanInstallationsPath())) {
+            mkdir(self::$config->getCleanInstallationsPath(), 0777, true);
+        }
+
         if (!is_dir(self::getCleanInstallationPath())) {
             $downloadPath = self::getCleanInstallationPath();
             $wpVersion = self::$config->getWpVersion();
