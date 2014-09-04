@@ -2,6 +2,11 @@
 
 This page is an overview of how VersionPress works and what it provides.
 
+<div class="note">
+  <strong>Note: This will be reworked</strong>
+  <p>Feel free to carry on to <a href="./installation-uninstallation">Installation and Uninstallation</a>.</p>
+</div>
+
 
 ## Version control ##
 
