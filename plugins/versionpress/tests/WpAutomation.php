@@ -26,6 +26,8 @@ class WpAutomation {
      * Does a full setup of a WP site including removing the old site,
      * downloading files from wp.org, setting up a fresh database, executing
      * the install script etc.
+     *
+     * Database as specified in the config file must exist and be accessible.
      */
     public static function setUpSite() {
         self::prepareFiles();
@@ -297,6 +299,11 @@ class WpAutomation {
     private static function exec($command, $executionPath) {
         $process = new \Symfony\Component\Process\Process($command, $executionPath);
         $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new Exception($process->getErrorOutput());
+        }
+
         return $process->getOutput();
     }
 
