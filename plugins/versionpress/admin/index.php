@@ -264,6 +264,7 @@ function _vp_show_progress_message($progressMessage) {
                 /** @var ChangeInfo[] $changeInfoClasses */
                 $changeInfoClasses = array(
                     'PluginChangeInfo',
+                    'ThemeChangeInfo',
                     'WordPressUpdateChangeInfo',
                     'VersionPressChangeInfo',
                     'RevertChangeInfo',

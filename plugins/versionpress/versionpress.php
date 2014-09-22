@@ -80,6 +80,10 @@ function vp_register_hooks() {
         }, 10, 2);
     },10, 2);
 
+    add_action('switch_theme', function($themeName) use ($committer) {
+         $committer->forceChangeInfo(new ThemeChangeInfo($themeName, 'switch'));
+    });
+
     register_shutdown_function(array($committer, 'commit'));
 }
 
