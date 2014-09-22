@@ -56,6 +56,12 @@ function vp_register_hooks() {
     });
 
     add_action('upgrader_process_complete', function ($upgrader, $hook_extra) use ($committer) {
+        if($hook_extra['type'] === 'theme') { // proof of concept
+            $themeName = $upgrader->skin->api->name;
+            $themeSlug = $upgrader->skin->api->slug; // maybe use this? but how can I get the slug in the switch_theme hook?
+            $committer->forceChangeInfo(new ThemeChangeInfo($themeName, $hook_extra['action']));
+        }
+
         if(!($hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'update')) return; // handled by different hook
         $pluginName = $hook_extra['plugin'];
         $committer->forceChangeInfo(new PluginChangeInfo($pluginName, 'update'));
