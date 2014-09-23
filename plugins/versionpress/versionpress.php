@@ -91,6 +91,15 @@ function vp_register_hooks() {
         $committer->forceChangeInfo(new ThemeChangeInfo($themeId, 'switch', $themeName));
     }, 10, 2);
 
+    //----------------------------------------
+    // URL "hooks"
+    //----------------------------------------
+
+    if(basename($_SERVER['PHP_SELF']) === 'themes.php' && isset($_GET['action']) && $_GET['action'] === 'delete') {
+        $themeId = $_GET['stylesheet'];
+        $committer->forceChangeInfo(new ThemeChangeInfo($themeId, 'delete'));
+    }
+
     register_shutdown_function(array($committer, 'commit'));
 }
 
