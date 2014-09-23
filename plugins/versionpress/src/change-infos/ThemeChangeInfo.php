@@ -6,17 +6,26 @@ class ThemeChangeInfo extends BaseChangeInfo {
     const THEME_NAME_TAG = "VP-Theme-Name";
 
     /** @var string */
-    private $themeName;
+    private $themeId;
 
+    /** @var string */
+    private $themeName;
     /**
      * Values: switch / install
      * @var string
      */
     private $action;
 
-    public function __construct($themeName, $action, $pluginName = null) {
-        $this->themeName = $themeName;
+    public function __construct($themeId, $action, $themeName = null) {
+        $this->themeId = $themeId;
         $this->action = $action;
+
+        if($themeName == null) {
+            $themes = wp_get_themes();
+            $themeName = $themes[$themeId]->name;
+        }
+
+        $this->themeName = $themeName;
     }
 
     /**
@@ -48,8 +57,8 @@ class ThemeChangeInfo extends BaseChangeInfo {
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $actionTag = $commitMessage->getVersionPressTag(BaseChangeInfo::ACTION_TAG);
         $themeName = $commitMessage->getVersionPressTag(self::THEME_NAME_TAG);
-        list($_, $action, $themeName) = explode("/", $actionTag, 3); // maybe slug
-        return new self($themeName, $action);
+        list($_, $action, $themeId) = explode("/", $actionTag, 3); // maybe slug
+        return new self($themeId, $action, $themeName);
     }
 
     /**
@@ -64,7 +73,7 @@ class ThemeChangeInfo extends BaseChangeInfo {
      * @return string
      */
     protected function getActionTag() {
-        return "{$this->getObjectType()}/{$this->getAction()}/" . $this->themeName;
+        return "{$this->getObjectType()}/{$this->getAction()}/" . $this->themeId;
     }
 
     /**
