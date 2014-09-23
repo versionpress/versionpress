@@ -1,0 +1,14 @@
+{
+  "name": "VersionPress-docs",
+  "version": "1.0.0",
+  "description": "VersionPress docs content",
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket.org:agilio/versionpress-docs.git"
+  },
+  "author": "VersionPress",
+  "devDependencies": {
+    "del": "^0.1.3",
+    "gulp": "^3.8.8"
+  }
+}
