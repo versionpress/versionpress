@@ -105,6 +105,20 @@ function vp_register_hooks() {
         $committer->forceChangeInfo(new ThemeChangeInfo($themeId, 'delete'));
     }
 
+    if(basename($_SERVER['PHP_SELF']) === 'plugins.php'
+        && isset($_GET['action']) && $_GET['action'] === 'delete-selected'
+        && isset($_REQUEST['verify-delete'])) {
+
+        if ( ! function_exists( 'get_plugins' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+
+        $plugins = $_REQUEST['checked'];
+        $plugin = $plugins[0];
+
+        $committer->forceChangeInfo(new PluginChangeInfo($plugin, 'delete'));
+    }
+
     register_shutdown_function(array($committer, 'commit'));
 }
 
