@@ -176,6 +176,15 @@ function _vp_show_progress_message($progressMessage) {
                     </li>
                     <?php
                     }
+
+                    if($requirementsChecker->isEverythingFulfilled() && Git::isVersioned(dirname(__FILE__))) {
+                    ?>
+                        <li>
+                            <span class="icon icon-warning"></span>
+                            Note: This website is already versioned in Git (the repository is either your custom or has been created by a previous installation of VersionPress). It is not a problem for VersionPress, but be sure you know what you are doing.
+                        </li>
+                    <?php
+                    }
                     ?>
                 </ul>
 
