@@ -87,9 +87,14 @@ function vp_register_hooks() {
     },10, 2);
 
     add_action('switch_theme', function($themeName, $theme) use ($committer) {
-        $themeId = $theme->template;
+        $themeId = $theme->stylesheet;
         $committer->forceChangeInfo(new ThemeChangeInfo($themeId, 'switch', $themeName));
     }, 10, 2);
+
+    add_action('customize_save_after', function($customizeManager) use ($committer) {
+        $stylesheet = $customizeManager->theme()->stylesheet;
+        $committer->forceChangeInfo(new ThemeChangeInfo($stylesheet, 'customize'));
+    });
 
     //----------------------------------------
     // URL "hooks"
