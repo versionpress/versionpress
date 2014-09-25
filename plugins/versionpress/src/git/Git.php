@@ -79,7 +79,7 @@ abstract class Git {
      * @return Commit
      */
     public static function getInitialCommit() {
-        $initialCommitHash = self::runShellCommandWithStandardOutput("git rev-list --max-parents=0 HEAD");
+        $initialCommitHash = trim(self::runShellCommandWithStandardOutput("git rev-list --max-parents=0 HEAD"));
         $logWithInitialCommit = self::log($initialCommitHash);
         return $logWithInitialCommit[0];
     }
