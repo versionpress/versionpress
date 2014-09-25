@@ -233,11 +233,6 @@ function _vp_show_progress_message($progressMessage) {
         $showWelcomePanel = get_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, true);
 
         if ($showWelcomePanel === "") {
-            $showWelcomePanel = "1";
-            add_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, $showWelcomePanel);
-        }
-
-        if ($showWelcomePanel === "1") {
         ?>
 
             <div id="welcome-panel" class="welcome-panel">
