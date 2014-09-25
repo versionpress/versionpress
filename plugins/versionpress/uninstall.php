@@ -7,8 +7,16 @@
 
 defined('WP_UNINSTALL_PLUGIN') or die('Direct access not allowed');
 
-require_once('src/utils/FileSystem.php');
+require_once(dirname(__FILE__) . '/_db.php');
 
-FileSystem::setPermisionsForGitDirectory(ABSPATH);
-FileSystem::getWpFilesystem()->rmdir(ABSPATH . '.git', true);
+$commit = Git::getInitialCommit();
+
+if(VersionPressChangeInfo::matchesCommitMessage($commit->getMessage())) {
+
+    $backupPath = WP_CONTENT_DIR . '/backup/.git-backup-' . date("YmdHis");
+    mkdir(basename($backupPath), 0777, true);
+
+    FileSystem::setPermisionsForGitDirectory(ABSPATH);
+    FileSystem::getWpFilesystem()->move(ABSPATH . '.git', $backupPath, true);
+}
 

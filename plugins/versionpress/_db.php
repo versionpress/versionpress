@@ -9,7 +9,7 @@
  */
 
 /**  */
-define('VERSIONPRESS_PLUGIN_DIR', dirname(__FILE__) . '/plugins/versionpress');
+define('VERSIONPRESS_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins/versionpress');
 define('VERSIONPRESS_MIRRORING_DIR', VERSIONPRESS_PLUGIN_DIR . '/db');
 
 /**

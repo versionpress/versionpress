@@ -76,12 +76,23 @@ abstract class Git {
     }
 
     /**
+     * @return Commit
+     */
+    public static function getInitialCommit() {
+        $initialCommitHash = self::runShellCommandWithStandardOutput("git rev-list --max-parents=0 HEAD");
+        $logWithInitialCommit = self::log($initialCommitHash);
+        return $logWithInitialCommit[0];
+    }
+
+    /**
+     * @param string $rev see gitrevisions
      * @return Commit[]
      */
-    public static function log() {
+    public static function log($rev = "") {
         $commitDelimiter = chr(29);
         $dataDelimiter = chr(30);
-        $logCommand = str_replace("|delimiter|", $dataDelimiter, self::$LOG_COMMAND);
+        $logCommand = self::$LOG_COMMAND . " " . $rev;
+        $logCommand = str_replace("|delimiter|", $dataDelimiter, $logCommand);
         $logCommand = str_replace("|end|", $commitDelimiter, $logCommand);
         $log = trim(self::runShellCommandWithStandardOutput($logCommand), $commitDelimiter);
         $commits = explode($commitDelimiter, $log);
