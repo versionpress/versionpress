@@ -2,18 +2,31 @@
 
 Content of user documentation.
 
-## How to author
 
-See [wiki](http://wiki.agilio.cz/versionpress:dokumentace#uzivatelska-dokumentace) on how to author the documentation.
+## Note about Git branches
+
+These docs use Git branches to reflect product branches – for example, the `1.0-beta1` VersionPress release has its contents living in the `1.0-beta1` branch of this repository.
+
+The `master` branch should follow the latest version. For example, if the latest version is `2.0`, do this:
+
+     git symbolic-ref refs/heads/master refs/heads/2.0
+
+Note that you need to execute this command manually on every clone of the repo.
+
+
+## How to author the docs
+
+See the [wiki](http://wiki.agilio.cz/versionpress:dokumentace#uzivatelska-dokumentace).
+
 
 ## How to test and deploy
 
 Authoring and visually testing the documentation is simple:
 
 1. Make sure that in the local folder structure, the `VersionPress-docs` and `VersionPress-docssite` folders sit side by side (and that they are named exactly this).
-2. Install Node.js + NPM + Gulp + run `npm install`
+2. Install Node.js + NPM + Gulp + run `npm install` inside `VersionPress-docs`
 3. Run `gulp watch`
-4. Open the VersionPress-docssite project in Visual Studio and run it (Ctrl+F5)
+4. Open the *VersionPress-docssite* project in Visual Studio and run it (Ctrl+F5)
 5. Change the Markdown files as you wish, the content will be automatically copied to the test site (as long as `gulp watch` is running).
 
 When the site is ready for deployment:
