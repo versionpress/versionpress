@@ -123,6 +123,36 @@ function vp_register_hooks() {
         $committer->forceChangeInfo(new ThemeChangeInfo($_GET['theme'], 'edit'));
     }
 
+    if(basename($_SERVER['PHP_SELF']) === 'plugin-editor.php' && isset($_POST['action']) && $_POST['action'] === 'update') {
+        if ( ! function_exists( 'get_plugins' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+
+        $editedFile = $_POST['file'];
+        $editedFilePathParts = preg_split("~[/\\\]~", $editedFile);
+        $plugins = array_keys(get_plugins());
+        $bestRank = 0;
+        $bestMatch = "";
+
+        foreach($plugins as $plugin) {
+            $rank = 0;
+            $pluginPathParts = preg_split("~[/\\\]~", $plugin);
+            $maxEqualParts = min(count($editedFilePathParts), count($pluginPathParts));
+
+            for($part = 0 ; $part < $maxEqualParts; $part++) {
+                if($editedFilePathParts[$part] !== $pluginPathParts[$part]) break;
+                $rank += 1;
+            }
+
+            if($rank > $bestRank) {
+                $bestRank = $rank;
+                $bestMatch = $plugin;
+            }
+        }
+
+        $committer->forceChangeInfo(new PluginChangeInfo($bestMatch, 'edit'));
+    }
+
     register_shutdown_function(array($committer, 'commit'));
 }
 

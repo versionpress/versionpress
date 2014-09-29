@@ -11,7 +11,7 @@ class PluginChangeInfo extends BaseChangeInfo {
     /** @var string */
     private $pluginName;
     /**
-     * Values: activate / deactivate / update
+     * Values: activate / deactivate / update / edit
      * @var string
      */
     private $action;
