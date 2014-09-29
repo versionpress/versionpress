@@ -24,6 +24,11 @@ class RequirementsChecker {
             'fulfilled' => $this->tryWrite()
         );
 
+        $this->requirements[] = array(
+            'name' => 'The db.php file is available',
+            'fulfilled' => !is_file(WP_CONTENT_DIR . '/db.php')
+        );
+
         $this->everythingFulfilled = array_reduce($this->requirements, function ($carry, $requirement) {
             return $carry && $requirement['fulfilled'];
         }, true);
