@@ -123,12 +123,18 @@ function vp_register_hooks() {
         $committer->forceChangeInfo(new ThemeChangeInfo($_GET['theme'], 'edit'));
     }
 
-    if(basename($_SERVER['PHP_SELF']) === 'plugin-editor.php' && isset($_POST['action']) && $_POST['action'] === 'update') {
+    if(basename($_SERVER['PHP_SELF']) === 'plugin-editor.php' &&
+        ((isset($_POST['action']) && $_POST['action'] === 'update') || isset($_GET['liveupdate'])
+        )) {
+        $committer->disableCommit();
+    }
+
+    if(basename($_SERVER['PHP_SELF']) === 'plugin-editor.php' && isset($_GET['a']) && $_GET['a'] === 'te') {
         if ( ! function_exists( 'get_plugins' ) ) {
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
         }
 
-        $editedFile = $_POST['file'];
+        $editedFile = $_GET['file'];
         $editedFilePathParts = preg_split("~[/\\\]~", $editedFile);
         $plugins = array_keys(get_plugins());
         $bestRank = 0;

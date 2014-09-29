@@ -19,6 +19,9 @@ class Committer
      */
     private $forcedChangeInfo;
 
+    /** @var  bool */
+    private $commitDisabled;
+
     public function __construct(Mirror $mirror)
     {
         $this->mirror = $mirror;
@@ -30,6 +33,8 @@ class Committer
      */
     public function commit()
     {
+        if($this->commitDisabled) return;
+
         if ($this->forcedChangeInfo) {
             @unlink(get_home_path() . 'versionpress.maintenance'); // todo: this shouldn't be here...
             Git::commit($this->forcedChangeInfo->getCommitMessage());
@@ -50,6 +55,14 @@ class Committer
     public function forceChangeInfo(ChangeInfo $changeInfo)
     {
         $this->forcedChangeInfo = $changeInfo;
+    }
+
+    /**
+     * All `commit()` calls are ignored after calling this method.
+     */
+    public function disableCommit()
+    {
+        $this->commitDisabled = true;
     }
 
     /**
