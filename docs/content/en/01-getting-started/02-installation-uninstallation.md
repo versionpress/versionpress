@@ -10,15 +10,21 @@ Both things are important, please read on.
 
 ## System requirements
 
-The server environment must currently match these requirements:
+The server environment must currently match these requirements, some of which are checked automatically before VersionPress activation:
 
   * WordPress 3.8 or higher
   * PHP 5.3 or higher
-  * Git 1.7 or higher installed on the server 
-  * Safe mode turned off
-  * The `proc_open()` function enabled
+  * Git 1.7 or higher installed on the server *(checked automatically before activation)*
+  * Safe mode turned off *(checked automatically before activation)*
+  * The `proc_open()` function enabled *(checked automatically before activation)*
+  * There must be no `wp-content/db.php` file on the disk *(checked automatically before activation)*
 
-In practice, this means that you need to have control over your server as these will typically not be available in a common hosting scenario. We are aware that this is an issue and will be lowering these requirements in some future release. 
+In practice, this means that you need to have control over your server as these will typically not be available in a common hosting scenario. We are aware that this is an issue and will be lowering these requirements in some future release.
+
+<div class="note">
+  <strong>Note about db.php</strong>
+  <p>VersionPress currently uses the <code>db.php</code> file to hook into some of the WordPress' actions that don't have other good extensibility points. We know that having a dependency on <code>db.php</code> is a problem in some server environments (e.g., there might be a collision with some other plugin also requiring <code>db.php</code>) and will have a solution to this at some point in the future.</p>
+</div>
 
 
 ## Installation
