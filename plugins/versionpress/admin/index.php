@@ -1,4 +1,5 @@
 <?php
+require_once(WP_CONTENT_DIR . '/plugins/versionpress/bootstrap.php');
 
 wp_enqueue_style('versionpress_admin_style', plugins_url( 'css/style.css' , __FILE__ ));
 
@@ -81,7 +82,6 @@ function _vp_show_progress_message($progressMessage) {
     <?php
 
     if (isset($_GET['init']) && !vp_is_active()) {
-
     ?>
 
         <div class="welcome-panel">

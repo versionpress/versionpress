@@ -7,7 +7,7 @@
 
 defined('WP_UNINSTALL_PLUGIN') or die('Direct access not allowed');
 
-require_once(dirname(__FILE__) . '/_db.php');
+require_once(dirname(__FILE__) . '/bootstrap.php');
 
 $commit = Git::getInitialCommit();
 

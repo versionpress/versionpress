@@ -361,6 +361,7 @@ class Initializer {
 
 
     private function activateVersionPress() {
+        copy(VERSIONPRESS_PLUGIN_DIR . '/_db.php', WP_CONTENT_DIR . '/db.php');
         touch(VERSIONPRESS_PLUGIN_DIR . '/.active');
         $this->reportProgressChange(InitializerStates::VERSIONPRESS_ACTIVATED);
     }

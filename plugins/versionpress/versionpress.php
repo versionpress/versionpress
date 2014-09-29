@@ -227,7 +227,6 @@ function vp_gettext_filter_plugin_activated($translation, $text, $domain) {
  * @see Initializer
  */
 function vp_activate() {
-    copy(dirname(__FILE__) . '/_db.php', WP_CONTENT_DIR . '/db.php');
     add_option('vp_just_activated', '1');
 }
 
