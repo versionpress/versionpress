@@ -119,6 +119,10 @@ function vp_register_hooks() {
         $committer->forceChangeInfo(new PluginChangeInfo($plugin, 'delete'));
     }
 
+    if(basename($_SERVER['PHP_SELF']) === 'theme-editor.php' && isset($_GET['updated']) && $_GET['updated'] === 'true') {
+        $committer->forceChangeInfo(new ThemeChangeInfo($_GET['theme'], 'edit'));
+    }
+
     register_shutdown_function(array($committer, 'commit'));
 }
 

@@ -16,7 +16,8 @@ class OptionsStorage extends SingleFileStorage implements EntityStorage {
                 || $id === 'siteurl'
                 || $id === 'home'
                 || $id === 'db_upgraded'
-                || $id === 'auto_updater.lock');
+                || $id === 'auto_updater.lock'
+                || $id === 'recently_edited');
     }
 
     /**
