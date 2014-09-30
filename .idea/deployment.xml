@@ -7,6 +7,10 @@
           <mappings>
             <mapping deploy="wp-content\plugins\versionpress" local="$PROJECT_DIR$/plugins/versionpress" web="/" />
           </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/plugins/versionpress/tests" />
+            <excludedPath local="true" path="$PROJECT_DIR$/plugins/versionpress/spec" />
+          </excludedPaths>
         </serverdata>
       </paths>
     </serverData>
