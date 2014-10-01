@@ -126,6 +126,11 @@ abstract class Git {
         return self::runShellCommandWithStandardOutput($cmd) != null;
     }
 
+    public static function getNumberOfCommits() {
+        $cmd = "git rev-list HEAD --count";
+        return trim(self::runShellCommandWithStandardOutput($cmd));
+    }
+
     private static function detectGitRoot() {
         self::$gitRoot = trim(self::runShellCommandWithStandardOutput(self::$RELATIVE_PATH_TO_GIT_ROOT_COMMAND), "/\n");
         self::$gitRoot = self::$gitRoot === '' ? '.' : self::$gitRoot;

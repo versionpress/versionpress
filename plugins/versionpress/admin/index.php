@@ -291,7 +291,10 @@ function _vp_show_progress_message($progressMessage) {
             }
 
             $initialCommitHash = trim(file_get_contents(VERSIONPRESS_PLUGIN_DIR . '/.active'));
-            $commits = Git::log();
+            $gitLogPaginator = new GitLogPaginator();
+            $gitLogPaginator->setDefaultNumberOfCommits(5);
+            $commits = $gitLogPaginator->getPage(0); // for now it displays only first page
+
             $canUndoCommit = Git::wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
             $isFirstCommit = true;
 
