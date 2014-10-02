@@ -297,7 +297,7 @@ function _vp_show_progress_message($progressMessage) {
             $commits = $gitLogPaginator->getPage($page);
 
             $canUndoCommit = Git::wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
-            $isFirstCommit = true;
+            $isFirstCommit = $page === 0;
 
             foreach ($commits as $commit) {
                 $canUndoCommit = $canUndoCommit && ($commit->getHash() !== $initialCommitHash);
