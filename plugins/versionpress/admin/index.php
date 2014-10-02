@@ -292,8 +292,9 @@ function _vp_show_progress_message($progressMessage) {
 
             $initialCommitHash = trim(file_get_contents(VERSIONPRESS_PLUGIN_DIR . '/.active'));
             $gitLogPaginator = new GitLogPaginator();
-            $gitLogPaginator->setDefaultNumberOfCommits(5);
-            $commits = $gitLogPaginator->getPage(0); // for now it displays only first page
+            $gitLogPaginator->setCommitsPerPage(5);
+            $page = isset($_GET['vp-page']) ? intval($_GET['vp-page']) : 0;
+            $commits = $gitLogPaginator->getPage($page);
 
             $canUndoCommit = Git::wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
             $isFirstCommit = true;
@@ -328,6 +329,27 @@ function _vp_show_progress_message($progressMessage) {
             }
             ?>
             </tbody>
+            <tfoot>
+                <tr>
+                    <td>
+                        <?php
+                            $pageNumbers = $gitLogPaginator->getPrettySteps($page);
+                            $pageLinks = array();
+
+                            foreach($pageNumbers as $pageNumber) {
+                                $pageUrl = admin_url('admin.php?page=versionpress/admin/index.php&vp-page=' . $pageNumber);
+                                if($pageNumber == $page) {
+                                    $pageLinks[] = $pageNumber + 1;
+                                } else {
+                                    $pageLinks[] = "<a href=\"$pageUrl\">" . ($pageNumber + 1) . "</a>";
+                                }
+                            }
+
+                            echo implode(" | ", $pageLinks);
+                        ?>
+                    </td>
+                </tr>
+            </tfoot>
         </table>
     <?php
     }
