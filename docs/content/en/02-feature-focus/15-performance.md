@@ -1,0 +1,3 @@
+# Performance Considerations #
+
+VersionPress generally consumes server resources only after some change has occurred on the web site while for read-only requests, it adds no overhead at all (WordPress fetches the data like if there was no VersionPress). If you have a site that is very write-heavy then VersionPress might not be a good fit but for most websites out there where 99% of web requests are read-only, VersionPress will work just fine.
