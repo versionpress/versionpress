@@ -80,8 +80,7 @@ abstract class Git {
      */
     public static function getInitialCommit() {
         $initialCommitHash = trim(self::runShellCommandWithStandardOutput("git rev-list --max-parents=0 HEAD"));
-        $logWithInitialCommit = self::log($initialCommitHash);
-        return $logWithInitialCommit[0];
+        return self::getCommit($initialCommitHash);
     }
 
     /**
@@ -99,6 +98,18 @@ abstract class Git {
         return array_map(function ($rawCommit) {
             return Commit::buildFromString(trim($rawCommit));
         }, $commits);
+    }
+
+    /**
+     * Returns list of files that were modified in given revision.
+     * @param string $rev see gitrevisions
+     * @return string[]
+     */
+    public static function getModifiedFiles($rev) {
+        $cmd = sprintf("git diff --name-only %s", $rev);
+        $result = trim(self::runShellCommandWithStandardOutput($cmd));
+        $files = explode("\n", $result);
+        return $files;
     }
 
     public static function revertAll($commit) {
@@ -160,7 +171,7 @@ abstract class Git {
         /*
          * MAMP / XAMPP issue on Mac OS X,
          * see http://jira.agilio.cz/browse/WP-106.
-         * 
+         *
          * http://stackoverflow.com/a/16903162/1243495
          */
         $dyldLibraryPath = getenv("DYLD_LIBRARY_PATH");
@@ -184,6 +195,15 @@ abstract class Git {
 
     public static function willCommit() {
         return self::runShellCommandWithStandardOutput("git status -s") != null;
+    }
+
+    /**
+     * @param $commitHash
+     * @return Commit
+     */
+    public static function getCommit($commitHash) {
+        $logWithInitialCommit = self::log($commitHash);
+        return $logWithInitialCommit[0];
     }
 
     private static function prepareCommand($command, $args = '') {
