@@ -29,7 +29,7 @@ class PostStorage extends DirectoryStorage implements EntityStorage {
     }
 
     protected function removeUnwantedColumns($entity) {
-        static $excludeList = array('comment_count');
+        static $excludeList = array('comment_count', 'post_modified', 'post_modified_gmt');
         foreach ($excludeList as $excludeKey) {
             unset($entity[$excludeKey]);
         }
