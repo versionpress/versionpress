@@ -331,7 +331,7 @@ function _vp_show_progress_message($progressMessage) {
             </tbody>
             <tfoot>
                 <tr>
-                    <td>
+                    <td colspan="3">
                         <?php
                             $pageNumbers = $gitLogPaginator->getPrettySteps($page);
                             $pageLinks = array();
