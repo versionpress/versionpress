@@ -1,55 +1,42 @@
 # Basic Concepts #
 
-This page is an overview of how VersionPress works and what it provides.
-
-<div class="note">
-  <strong>Note: This will be reworked</strong>
-  <p>Feel free to carry on to <a href="./installation-uninstallation">Installation and Uninstallation</a>.</p>
-</div>
+VersionPress brings true *version control* to the world of WordPress. It is a fairly simple concept but if you never worked with a version control system before, this page will walk you through things like basic ideas, commonly used terms etc. 
 
 
 ## Version control ##
 
-Basically, what VersionPress brings to the world of WordPress sites is a true version control. This means that VersionPress tracks all the changes that happen to a site and offers the chance to undo them or roll back to some previous state of the site.
+Version control simply means that **historic revisions of some content are stored**, not just the current version. It has many forms, from simple Undo buttons in text editors to advanced systems for managing documents but the basic principle is really this simple.
 
-Once you have all the changes tracked, many nice and useful things are suddenly possible. For instance, VersionPress can sync two versions of a site, for example local development version and the production version, while automatically taking care of what would normally become sync conflict. Team work is possible. Selective undos are possible. Having proper version control in place is simply tremendously useful.
+[Image of version control]
 
+The amazing thing about version control is that its consequences are usually much more interesting than it would appear from the mere description. Take Wikipedia, for example; its content versioning is not just some boring programmers' thing. It enabled a whole new approach to content authoring. Another example is WordPress itself – it would be nowhere near where it is today if its developers couldn't collaborate using a version control system called Subversion.     
 
-## Terms used ##
-
-VersionPress uses some terms that might need explanation. If you are ever confused about their exact meaning please consult the list below:
-
-
-### 'the repository'
-
-Internal repository of VersionPress where it keeps all the historic versions of a site. Technically, it is the `.git` folder in the root of the site and it is the most important piece of data that VersionPress creates and maintains.
+VersionPress applies true version control to WordPress *sites*. While previously, actions like updating a plugin, removing a user or something similar would change the site irreversibly, VersionPress adds an "undo" button for that.
 
 
-### 'undo'
+## Commonly used terms ##
 
-The undo command reverts a single change on the site (or a set of changes when we have that implemented). Note that unlike the Undo functionality found it most text editors, VersionPress doesn't erase the history but rather creates a new change that does exactly the opposite of the original change.
+There are some terms that you will see often both in this documentation and in the product itself. Refer to the list below whenever in doubt.
 
-### 'rollback'
+<dl>
 
-Returns the site to some previous state, or, more precisely, creates a new version of the site that looks exactly like it used to at some point in the past. Rollback is essentially a set of Undo-s from the current state to the chosen past state.
+<dt>repository</dt>
+<dd>Internal repository of VersionPress where it keeps all the historic versions of a site. Technically, it is the `.git` folder in the root of the site and it is the most important piece of data that VersionPress creates and maintains.</dd>
 
-### 'a change'
+<dt>undo</dt>
+<dd>The undo command reverts a single change on the site (or a set of changes when we have that implemented). Note that unlike the Undo functionality found it most text editors, VersionPress doesn't erase the history but rather creates a new change that does exactly the opposite of the original change.</dd>
 
-Basically one line in the VersionPress table. Some change that happened to the site at some point in the past.
+<dt>rollback</dt>
+<dd>Returns the site to some previous state, or, more precisely, creates a new version of the site that looks exactly like it used to at some point in the past. Rollback is essentially a set of Undo-s from the current state to the chosen past state.</dd>
 
-### 'a commit'
+<dt>a change</dt>
+<dd>Basically one line in the VersionPress table. Some change that happened to the site at some point in the past.</dd>
 
-Another, more technical word for a change in the Git terminology.
+<dt>commit</dt>
+<dd>Another, more technical word for a change in the Git terminology.</dd>
 
-### 'an entity'
+<dt>entity</dt>
+<dd>For example a post or a comment. These are things that VersionPress tracks. We use this rather abstract term instead of e.g. a "database row" because not all tracked entities do necessarily need to be database rows etc.</dd>
 
-For example a post or a comment. These are things that VersionPress tracks. We use this rather abstract term instead of e.g. a "database row" because not all tracked entities do necessarily need to be database rows etc.
-
-### Git
-
-Git is a version control system that powers VersionPress behind the scenes. Find out more about it at http://git-scm.com/.
-
-
-
-
+</dl>
 
