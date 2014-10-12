@@ -4,7 +4,11 @@ Welcome to [VersionPress](http://versionpress.net/) documentation. VersionPress 
 
 <div class="note">
   <strong>Note</strong>
-  <p>VersionPress is currently in its alpha stage and these docs, like everything else, are preliminary and will improve over time.</p>
+  <p>VersionPress is currently in its pre-release stage and these docs, like everything else, are preliminary and will improve over time.</p>
 </div>
 
-Continue to the [Getting Started](./en/getting-started) section.
+These docs are divided into a couple of sections:
+
+* [Getting Started](./en/getting-started) – will give you a brief introduction to VersionPress
+* [Feature Focus](./en/feature-focus) – discusses most important feature areas in more detail
+* [Release Notes](./en/release-note) – contains details all releases 
