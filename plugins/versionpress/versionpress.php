@@ -298,7 +298,7 @@ function vp_send_bug_report() {
 
     $target_url = 'http://versionpress.net/report-problem';
 
-    $postData = array('email' => $email, 'description' => $description, 'zip' => '@' . $zipFile);
+    $postData = array('email' => $email, 'description' => $description, 'zip' => new CURLFile($zipFile));
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $target_url);
