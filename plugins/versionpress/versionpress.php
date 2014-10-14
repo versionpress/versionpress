@@ -295,6 +295,21 @@ function vp_send_bug_report() {
 
     Zip::zipDirectory($bugReportDir, $zipFile);
     FileSystem::deleteRecursive($bugReportDir);
+
+    $target_url = 'http://versionpress.net/report-problem';
+
+    $postData = array('email' => $email, 'description' => $description, 'zip' => '@' . $zipFile);
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $target_url);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $result = curl_exec ($ch);
+    curl_close ($ch);
+    echo $result;
+
+    unlink($zipFile);
 }
 
 add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are just one step less important :) */);
