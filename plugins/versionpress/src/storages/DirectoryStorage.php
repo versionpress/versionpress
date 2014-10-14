@@ -75,10 +75,13 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
     }
 
     private function loadAllFromFiles($entityFiles) {
-        $that = $this;
-        return array_map(function ($entityFile) use ($that) {
-            return $that->deserializeEntity(file_get_contents($entityFile));
-        }, $entityFiles);
+        $entities = array();
+
+        foreach ($entityFiles as $file) {
+            $entities[] = $this->deserializeEntity(file_get_contents($file));
+        }
+
+        return $entities;
     }
 
     protected function removeUnwantedColumns($entity) {
