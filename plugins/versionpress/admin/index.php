@@ -80,6 +80,10 @@ function _vp_show_progress_message($progressMessage) {
         display: none;
     }
 
+    #vp-service-panel.displayed {
+        display: block;
+    }
+
     #vp-service-panel-button {
         font-size: 16px;
         float: right;
@@ -234,12 +238,15 @@ function _vp_show_progress_message($progressMessage) {
             $error = $errors[$_GET['error']];
             echo "<div class='$error[class]'><p>$error[message]</p></div>";
         }
+
+        $displayServicePanel = false;
+        $displayServicePanel |= isset($_GET['bug-report']);
     ?>
 
         <button id="vp-service-panel-button"><span class="icon icon-cog"></span></button>
         <h2 id="vp-page-header">VersionPress</h2>
 
-        <div id="vp-service-panel" class="welcome-panel">
+        <div id="vp-service-panel" class="welcome-panel <?php if($displayServicePanel) echo "displayed"; ?>">
             <h3>VersionPress Service Panel</h3>
             <h4>Bug report</h4>
             <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
