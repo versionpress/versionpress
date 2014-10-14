@@ -236,6 +236,23 @@ function _vp_show_progress_message($progressMessage) {
             );
 
             $error = $errors[$_GET['error']];
+        }
+
+        if(isset($_GET['bug-report'])) {
+            if($_GET['bug-report'] === 'ok') {
+                $error = array(
+                    'class' => 'updated',
+                    'message' => 'Bug report was sent. Thank you.'
+                );
+            } elseif($_GET['bug-report'] === 'err') {
+                $error = array(
+                    'class' => 'error',
+                    'message' => 'There was a problem with sending bug report. Please try it again. Thank you.'
+                );
+            }
+        }
+
+        if(isset($error)) {
             echo "<div class='$error[class]'><p>$error[message]</p></div>";
         }
 
