@@ -294,6 +294,7 @@ function vp_send_bug_report() {
     file_put_contents($bugReportDir . '/phpinfo.html', $info);
 
     Zip::zipDirectory($bugReportDir, $zipFile);
+    FileSystem::deleteRecursive($bugReportDir);
 }
 
 add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are just one step less important :) */);

@@ -67,4 +67,11 @@ class FileSystem {
         }
         closedir($dir);
     }
+
+    public static function deleteRecursive($dirPath) {
+        foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dirPath, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST) as $path) {
+            $path->isDir() ? rmdir($path->getPathname()) : unlink($path->getPathname());
+        }
+        rmdir($dirPath);
+    }
 } 
