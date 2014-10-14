@@ -30,7 +30,7 @@ class PostChangeInfo extends EntityChangeInfo {
 
     /**
      * @param CommitMessage $commitMessage
-     * @return ChangeInfo
+     * @return PostChangeInfo
      */
     public static function buildFromCommitMessage(CommitMessage $commitMessage)  {
         $tags = $commitMessage->getVersionPressTags();
