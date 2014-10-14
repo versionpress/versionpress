@@ -19,12 +19,12 @@ class FileSystem {
         global $wp_filesystem;
 
         $url = wp_nonce_url('plugins.php');
-        if (false === ($creds = request_filesystem_credentials($url, '', false, false, null) ) ) {
+        if (false === ($creds = request_filesystem_credentials($url, '', false, false, null))) {
             echo "Could not create filesystem credentials";
             return null;
         }
 
-        if ( ! WP_Filesystem($creds) ) {
+        if (!WP_Filesystem($creds)) {
             request_filesystem_credentials($url, '', true, false, null);
             echo "Filesystem credentials were not available";
             return null;
@@ -53,4 +53,18 @@ class FileSystem {
         }
     }
 
+    public static function copyRecursive($src, $dst) {
+        $dir = opendir($src);
+        @mkdir($dst);
+        while (false !== ($file = readdir($dir))) {
+            if (($file != '.') && ($file != '..')) {
+                if (is_dir($src . '/' . $file)) {
+                    self::copyRecursive($src . '/' . $file, $dst . '/' . $file);
+                } else {
+                    copy($src . '/' . $file, $dst . '/' . $file);
+                }
+            }
+        }
+        closedir($dir);
+    }
 } 

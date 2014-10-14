@@ -276,6 +276,26 @@ function vp_admin_post_confirm_deactivation() {
 
 }
 
+add_action('admin_post_vp_send_bug_report', 'vp_send_bug_report');
+
+function vp_send_bug_report() {
+    $email = $_POST['email'];
+    $description = $_POST['description'];
+    $time = date('YmdHis');
+    $bugReportDir = VERSIONPRESS_PLUGIN_DIR . '/bug-report-' . $time;
+    $zipFile = $bugReportDir . '.zip';
+
+    mkdir($bugReportDir);
+    FileSystem::copyRecursive(VERSIONPRESS_PLUGIN_DIR . '/log', $bugReportDir . '/log');
+    ob_start();
+    phpinfo();
+    $info = ob_get_contents();
+    ob_end_clean();
+    file_put_contents($bugReportDir . '/phpinfo.html', $info);
+
+    Zip::zipDirectory($bugReportDir, $zipFile);
+}
+
 add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are just one step less important :) */);
 
 /**

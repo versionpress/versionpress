@@ -242,7 +242,8 @@ function _vp_show_progress_message($progressMessage) {
         <div id="vp-service-panel" class="welcome-panel">
             <h3>VersionPress Service Panel</h3>
             <h4>Bug report</h4>
-            <form action="some-page.php" method="post">
+            <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
+                <input type="hidden" name="action" value="vp_send_bug_report">
                 <table class="form-table">
                     <tbody>
                         <tr>
@@ -262,14 +263,16 @@ function _vp_show_progress_message($progressMessage) {
                             </th>
 
                             <td>
-                                <textarea rows="4" cols="22" id="vp-bug-description"></textarea>
+                                <textarea rows="4" cols="22" id="vp-bug-description" name="description"></textarea>
                                 <br>
                                 <span class="description">Please tell us what you were doing when the bug occured.</span>
                             </td>
                         </tr>
                     </tbody>
                 </table>
-                <p class="submit"><input type="submit" value="Send bug report" class="button-primary" name="send-bug-report"></p>
+                <p class="submit">
+                    <?php submit_button("Send bug report", "submit", "vp_send_bug_report", false); ?>
+                </p>
             </form>
         </div>
 
