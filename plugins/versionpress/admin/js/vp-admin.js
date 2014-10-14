@@ -1,20 +1,24 @@
 jQuery(document).ready(function($) {
 
-    if ($('#welcome-panel').length) {
-        $('#vp-page-header').hide();
-    }
+    var $welcomePanelCloseButton = $('#vp-welcome-panel-close-button');
+    var $welcomePanel = $('#welcome-panel');
+    var $servicePanelButton = $('#vp-service-panel-button');
+    var $servicePanel = $('#vp-service-panel');
 
-    $('#vp-welcome-panel-close-button').click(function() {
+    $welcomePanelCloseButton.click(function() {
 
         $.post( ajaxurl, {
             action: 'hide_vp_welcome_panel'
         });
 
-        $('#welcome-panel').addClass('hidden');
-        $('#vp-page-header').show();
-
+        $welcomePanel.addClass('hidden');
         return false;
 
     });
 
+    $servicePanelButton.toggle(function() {
+        $servicePanel.stop().slideDown();
+    }, function() {
+        $servicePanel.stop().slideUp();
+    });
 });

@@ -2,6 +2,7 @@
 require_once(WP_CONTENT_DIR . '/plugins/versionpress/bootstrap.php');
 
 wp_enqueue_style('versionpress_admin_style', plugins_url( 'css/style.css' , __FILE__ ));
+wp_enqueue_style('versionpress_admin_icons', plugins_url( 'icons/style.css' , __FILE__ ));
 
 wp_enqueue_script('versionpress_admin_script', plugins_url( 'js/vp-admin.js' , __FILE__ ));
 
@@ -74,6 +75,16 @@ function _vp_show_progress_message($progressMessage) {
     tr.disabled {
         opacity: 0.5;
     }
+
+    #vp-service-panel {
+        display: none;
+    }
+
+    #vp-service-panel-button {
+        font-size: 16px;
+        float: right;
+        padding: 2px 12px;
+    }
 </style>
 
 
@@ -123,8 +134,6 @@ function _vp_show_progress_message($progressMessage) {
 
 
     } elseif (!vp_is_active()) {
-
-        wp_enqueue_style('versionpress_admin_deactivation_icons', plugins_url( 'icons/style.css' , __FILE__ ));
     ?>
 
         <div class="welcome-panel">
@@ -227,7 +236,42 @@ function _vp_show_progress_message($progressMessage) {
         }
     ?>
 
+        <button id="vp-service-panel-button"><span class="icon icon-cog"></span></button>
         <h2 id="vp-page-header">VersionPress</h2>
+
+        <div id="vp-service-panel" class="welcome-panel">
+            <h3>VersionPress Service Panel</h3>
+            <h4>Bug report</h4>
+            <form action="some-page.php" method="post">
+                <table class="form-table">
+                    <tbody>
+                        <tr>
+                            <th scope="row">
+                                <label for="vp-bug-email">Email</label>
+                            </th>
+
+                            <td>
+                                <input type="email" value="" id="vp-bug-email" name="email">
+                                <br>
+                                <span class="description">We will respond you to this email.</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                <label for="vp-bug-description">Bug description</label>
+                            </th>
+
+                            <td>
+                                <textarea rows="4" cols="22" id="vp-bug-description"></textarea>
+                                <br>
+                                <span class="description">Please tell us what you were doing when the bug occured.</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="submit"><input type="submit" value="Send bug report" class="button-primary" name="send-bug-report"></p>
+            </form>
+        </div>
 
         <?php
         $showWelcomePanel = get_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, true);
@@ -249,7 +293,6 @@ function _vp_show_progress_message($progressMessage) {
             </div>
 
         <?php } ?>
-
 
         <table id="versionpress-commits-table" class="wp-list-table widefat fixed posts">
             <tr>
