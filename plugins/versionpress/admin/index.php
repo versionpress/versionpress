@@ -31,29 +31,29 @@ function _vp_show_progress_message($progressMessage) {
        and in some cases, e.g. during the long-running initialization, the footer is not reached until
        all the messages are drawn to the page. This might be improved in the future. */
 
-    .vp-index .welcome-panel {
+    .vp-index .vp-panel {
         padding-bottom: 23px;
         margin-top: 20px;
     }
 
-    .vp-index .welcome-panel p {
+    .vp-index .vp-panel p {
         color: inherit;
     }
 
-    .vp-index .welcome-panel .about-description {
+    .vp-index .vp-panel .about-description {
         margin: 23px 0 10px;
     }
 
-    .vp-index .welcome-panel ul {
+    .vp-index .vp-panel ul {
         list-style: none;
         padding-left: 40px;
     }
 
-    .vp-index .welcome-panel ul li {
+    .vp-index .vp-panel ul li {
         position: relative;
     }
 
-    .vp-index .welcome-panel ul .icon {
+    .vp-index .vp-panel ul .icon {
         position: absolute;
         left: -25px;
         top: 6px;
@@ -95,7 +95,7 @@ function _vp_show_progress_message($progressMessage) {
     if (isset($_GET['init']) && !vp_is_active()) {
     ?>
 
-        <div class="welcome-panel">
+        <div class="vp-panel">
 
             <div class="welcome-panel-content">
 
@@ -136,7 +136,7 @@ function _vp_show_progress_message($progressMessage) {
     } elseif (!vp_is_active()) {
     ?>
 
-        <div class="welcome-panel">
+        <div class="vp-panel">
 
             <div class="welcome-panel-content">
 
@@ -239,7 +239,7 @@ function _vp_show_progress_message($progressMessage) {
         <button id="vp-service-panel-button"><span class="icon icon-cog"></span></button>
         <h2 id="vp-page-header">VersionPress</h2>
 
-        <div id="vp-service-panel" class="welcome-panel">
+        <div id="vp-service-panel" class="vp-panel">
             <h3>VersionPress Service Panel</h3>
             <h4>Bug report</h4>
             <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
@@ -282,7 +282,7 @@ function _vp_show_progress_message($progressMessage) {
         if ($showWelcomePanel === "") {
         ?>
 
-            <div id="welcome-panel" class="welcome-panel">
+            <div id="welcome-panel" class="vp-panel">
 
                 <a id="vp-welcome-panel-close-button" class="welcome-panel-close" href="">Dismiss</a>
 
