@@ -305,11 +305,13 @@ function vp_send_bug_report() {
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    $result = curl_exec ($ch);
+    curl_exec ($ch);
+    $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close ($ch);
-    echo $result;
-
     unlink($zipFile);
+    $result = $statusCode == 200 ? "ok" : "err";
+
+    wp_redirect(admin_url("admin.php?page=versionpress/admin/index.php&bug-report=$result"));
 }
 
 add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are just one step less important :) */);
