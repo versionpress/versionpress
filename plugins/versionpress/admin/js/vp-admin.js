@@ -16,9 +16,13 @@ jQuery(document).ready(function($) {
 
     });
 
-    $servicePanelButton.toggle(function() {
-        $servicePanel.stop().slideDown();
-    }, function() {
-        $servicePanel.stop().slideUp();
-    });
+    $servicePanelButton.click(toggleServicePanel);
+
+    function toggleServicePanel() {
+        if($servicePanel.is(':visible')) {
+            $servicePanel.stop().slideUp();
+        } else {
+            $servicePanel.stop().slideDown();
+        }
+    }
 });
