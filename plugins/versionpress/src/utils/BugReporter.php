@@ -63,6 +63,21 @@ class BugReporter {
         mkdir($bugReportDir);
         FileSystem::copyRecursive(VERSIONPRESS_PLUGIN_DIR . '/log', $bugReportDir . '/log');
         $this->savePhpinfo($bugReportDir);
+        $this->saveWordPressSpecificInfo($bugReportDir);
         Zip::zipDirectory($bugReportDir, $zipFile);
+    }
+
+    private function saveWordPressSpecificInfo($bugReportDir) {
+        require(get_home_path() . '/wp-includes/version.php'); // load constants (like $wp_version)
+        $info = array();
+        /** @var $wp_version */
+        $info['wp-version'] = $wp_version;
+        $info['installed-plugins'] = get_plugins();
+        $info['installed-themes'] = wp_get_themes();
+        $info['active-plugins'] = get_option('active_plugins');
+        $info['current-theme'] = wp_get_theme()->get_stylesheet();
+
+        $serializedInfo = var_export($info, true);
+        file_put_contents($bugReportDir . '/info.ini', $serializedInfo);
     }
 }
