@@ -404,18 +404,29 @@ function _vp_show_progress_message($progressMessage) {
                     <td colspan="3">
                         <?php
                             $pageNumbers = $gitLogPaginator->getPrettySteps($page);
-                            $pageLinks = array();
+
+                            $i = 0;
+                            $links = "";
+                            $lastNumber = 0;
 
                             foreach($pageNumbers as $pageNumber) {
+                                $divider = "";
+                                if($i > 0 && $lastNumber != $pageNumber-1) $divider = "&hellip;";
+                                elseif($i > 0) $divider = "|";
+
+                                $links .= " " . $divider . " ";
                                 $pageUrl = admin_url('admin.php?page=versionpress/admin/index.php&vp-page=' . $pageNumber);
                                 if($pageNumber == $page) {
-                                    $pageLinks[] = $pageNumber + 1;
+                                    $links .= $pageNumber + 1;
                                 } else {
-                                    $pageLinks[] = "<a href=\"$pageUrl\">" . ($pageNumber + 1) . "</a>";
+                                    $links .= "<a href=\"$pageUrl\">" . ($pageNumber + 1) . "</a>";
                                 }
+
+                                $lastNumber = $pageNumber;
+                                $i += 1;
                             }
 
-                            echo implode(" | ", $pageLinks);
+                            echo $links;
                         ?>
                     </td>
                 </tr>
