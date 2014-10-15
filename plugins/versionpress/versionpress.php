@@ -281,36 +281,11 @@ add_action('admin_post_vp_send_bug_report', 'vp_send_bug_report');
 function vp_send_bug_report() {
     $email = $_POST['email'];
     $description = $_POST['description'];
-    $time = date('YmdHis');
-    $bugReportDir = VERSIONPRESS_PLUGIN_DIR . '/bug-report-' . $time;
-    $zipFile = $bugReportDir . '.zip';
 
-    mkdir($bugReportDir);
-    FileSystem::copyRecursive(VERSIONPRESS_PLUGIN_DIR . '/log', $bugReportDir . '/log');
-    ob_start();
-    phpinfo();
-    $info = ob_get_contents();
-    ob_end_clean();
-    file_put_contents($bugReportDir . '/phpinfo.html', $info);
+    $bugReporter = new BugReporter('http://versionpress.net/report-problem');
+    $reportedSuccessfully = $bugReporter->reportBug($email, $description);
 
-    Zip::zipDirectory($bugReportDir, $zipFile);
-    FileSystem::deleteRecursive($bugReportDir);
-
-    $target_url = 'http://versionpress.net/report-problem';
-
-    $postData = array('email' => $email, 'description' => $description, 'zip' => new CURLFile($zipFile));
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $target_url);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_exec ($ch);
-    $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close ($ch);
-    unlink($zipFile);
-    $result = $statusCode == 200 ? "ok" : "err";
-
+    $result = $reportedSuccessfully ? "ok" : "err";
     wp_redirect(admin_url("admin.php?page=versionpress/admin/index.php&bug-report=$result"));
 }
 
