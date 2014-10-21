@@ -78,7 +78,7 @@ gulp.task('persist-plugin-comment', ['rename-back'], function (cb) {
 });
 
 gulp.task('set-production-mode', ['rename-back'], function (cb) {
-    return gulp.src(buildDir + '/_db.php').pipe(replace(
+    return gulp.src(buildDir + '/bootstrap.php').pipe(replace(
         "NDebugger::DETECT",
         "NDebugger::PRODUCTION"
     )).pipe(gulp.dest(buildDir));
