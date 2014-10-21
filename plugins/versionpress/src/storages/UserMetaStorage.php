@@ -2,6 +2,9 @@
 
 class UserMetaStorage extends SingleFileStorage implements EntityStorage {
 
+    private $userMetaKey;
+    private $userMetaVpId;
+
     function __construct($file) {
         parent::__construct($file, 'user', 'ID');
     }
@@ -13,6 +16,9 @@ class UserMetaStorage extends SingleFileStorage implements EntityStorage {
             'vp_id' => $values['vp_user_id'],
             $key => $values['meta_value']
         );
+
+        $this->userMetaKey = $values['meta_key'];
+        $this->userMetaVpId = $values['vp_id'];
 
         $this->saveEntity($data, array($this, 'notifyOnChangeListeners'));
     }
@@ -35,6 +41,6 @@ class UserMetaStorage extends SingleFileStorage implements EntityStorage {
      * @return EntityChangeInfo
      */
     protected function createChangeInfo($entity, $changeType) {
-        return new UserChangeInfo('edit', $entity['vp_id'], $entity['user_login']);
+        return new UserMetaChangeInfo($changeType, $this->userMetaVpId, $entity['user_login'], $this->userMetaKey);
     }
 }

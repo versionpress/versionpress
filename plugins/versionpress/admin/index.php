@@ -346,6 +346,7 @@ function _vp_show_progress_message($progressMessage) {
                     'CommentChangeInfo',
                     'OptionChangeInfo',
                     'TermChangeInfo',
+                    'UserMetaChangeInfo',
                     'UserChangeInfo',
                     'CustomChangeInfo',
                 );
