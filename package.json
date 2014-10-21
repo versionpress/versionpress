@@ -6,16 +6,16 @@
   "directories": {
     "test": "tests"
   },
-  "dependencies": {
-    "gulp-rename": "~1.2.0",
+  "dependencies": {},
+  "devDependencies": {
+    "coffee-script": "~1.7.1",
     "del": "~0.1.2",
     "gulp": "~3.8.7",
-    "gulp-shell": "~0.2.9"
-  },
-  "devDependencies": {
-    "gulp-zip": "~2.0.1",
+    "gulp-add-src": "^0.1.1",
+    "gulp-rename": "~1.2.0",
     "gulp-replace": "~0.4.0",
-    "coffee-script": "~1.7.1"
+    "gulp-shell": "~0.2.9",
+    "gulp-zip": "~2.0.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
