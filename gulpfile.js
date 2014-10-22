@@ -6,7 +6,6 @@ var zip = require('gulp-zip');
 var replace = require('gulp-replace');
 var fs = require('fs');
 var path = require('path');
-var addsrc = require('gulp-add-src');
 
 var packageVersion = "";
 
@@ -27,14 +26,9 @@ gulp.task('copy', ['clean'], function (cb) {
         '!' + vpDir + '/{spec,spec/**}',
         '!' + vpDir + '/{tests,tests/**}',
         '!' + vpDir + '/versionpress.iml',
-        '!' + vpDir + '/log/**',
+        '!' + vpDir + '/log/**/!(.gitignore)',
         '!' + vpDir + '/package.json'
-    ], srcOptions).pipe(addsrc([
-        // could not find glob that would work in a single `src()` above,
-        // something like `'!' + vpDir + '/log/{**,!.gitignore}'`
-        // so the .gitignore file is appended to src() in this separate step
-        vpDir + '/log/.gitignore'
-    ], srcOptions)).pipe(gulp.dest(buildDir));
+    ], srcOptions).pipe(gulp.dest(buildDir));
 });
 
 gulp.task('strip-comments', ['copy'], function (cb) {
