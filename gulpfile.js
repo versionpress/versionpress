@@ -21,10 +21,10 @@ gulp.task('copy', ['clean'], function (cb) {
     var srcOptions = {dot: true, base: vpDir};
     return gulp.src([
         vpDir + '/**',
-        '!' + vpDir + '/{node_modules,node_modules/**}',
-        '!' + vpDir + '/{vendor,vendor/**}',
-        '!' + vpDir + '/{spec,spec/**}',
-        '!' + vpDir + '/{tests,tests/**}',
+        '!' + vpDir + '/node_modules{,/**}',
+        '!' + vpDir + '/vendor{,/**}',
+        '!' + vpDir + '/spec{,/**}',
+        '!' + vpDir + '/tests{,/**}',
         '!' + vpDir + '/versionpress.iml',
         '!' + vpDir + '/log/**/!(.gitignore)',
         '!' + vpDir + '/package.json'
