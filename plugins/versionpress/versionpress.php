@@ -232,11 +232,18 @@ function vp_activate() {
 
 /**
  * Deactivation is a two-step process with a warning screen. See
- * `versionpress_admin_post_cancel_deactivation()` and `versionpress_admin_post_confirm_deactivation()`
+ * `vp_admin_post_cancel_deactivation()` and `vp_admin_post_confirm_deactivation()`
+ *
+ * @see vp_admin_post_confirm_deactivation()
+ * @see vp_admin_post_cancel_deactivation()
  */
 function vp_deactivate() {
-    wp_redirect(admin_url('admin.php?page=versionpress/admin/deactivate.php'));
-    die();
+    if (vp_is_active()) {
+        wp_redirect(admin_url('admin.php?page=versionpress/admin/deactivate.php'));
+        die();
+    } else {
+        vp_admin_post_confirm_deactivation();
+    }
 }
 
 /**
@@ -247,8 +254,9 @@ function vp_admin_post_cancel_deactivation() {
 }
 
 /**
- * Handles a situation where user confirmed the deactivation. Most
- * of the actual work is done here.
+ * Most of the actual deactivation work is done here. Called either as a response
+ * to the user confirming the deactivation on `?page=versionpress/admin/deactivate.php`
+ * or is called directly from vp_deactivate() if the confirmation screen was not necessary.
  */
 function vp_admin_post_confirm_deactivation() {
 
