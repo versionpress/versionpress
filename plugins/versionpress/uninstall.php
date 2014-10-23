@@ -2,7 +2,12 @@
 
 /**
  * Uninstallation script for VersionPress. Most things already happened in the
- * `versionpress_admin_post_confirm_deactivation` hook; here, we just delete the .git repo.
+ * `vp_admin_post_confirm_deactivation` hook; here, we just move the .git repo.
+ *
+ * Testing tip: place exit() at the end of the script and then in the browser
+ * just go back and try again.
+ *
+ * @see vp_admin_post_confirm_deactivation()
  */
 
 defined('WP_UNINSTALL_PLUGIN') or die('Direct access not allowed');
@@ -11,9 +16,13 @@ require_once(dirname(__FILE__) . '/bootstrap.php');
 
 if (UninstallationUtil::uninstallation_should_remove_git_repo()) {
 
+    $backupsDir = WP_CONTENT_DIR . '/vpbackups';
+    if (!file_exists($backupsDir)) {
+        wp_mkdir_p($backupsDir);
+        FileSystem::getWpFilesystem()->put_contents($backupsDir . '/.gitignore', 'git-backup-*');
+    }
 
-    $backupPath = WP_CONTENT_DIR . '/backup/.git-backup-' . date("YmdHis");
-    mkdir(basename($backupPath), 0777, true);
+    $backupPath = $backupsDir . '/git-backup-' . date("YmdHis");
 
     FileSystem::setPermisionsForGitDirectory(ABSPATH);
     FileSystem::getWpFilesystem()->move(ABSPATH . '.git', $backupPath, true);

@@ -58,7 +58,7 @@ function _vp_button($label, $action, $type = "delete", $cssClass = "") {
 
                 <li>
                     <span class="icon icon-notification warning-color"></span>
-                    If you <strong>uninstall</strong> VersionPress later (by clicking the Delete button on the Plugins page) the Git repository will be moved to the <code>wp-content/backup</code> folder. The site will appear unversioned but you can always restore the repository from there should you need to.
+                    If you <strong>uninstall</strong> VersionPress later (by clicking the Delete button on the Plugins page) the Git repository will be moved to the <code>wp-content/vpbackups</code> folder. The site will appear unversioned but you can always restore the repository from there should you need to.
                 </li>
 
             <?php
