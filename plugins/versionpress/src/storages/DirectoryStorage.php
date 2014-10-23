@@ -13,6 +13,9 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
 
     protected $idColumnName;
 
+    /** @var EntityFilter[] */
+    private $filters = array();
+
     function __construct($directory, $entityTypeName, $idColumnName = 'ID') {
         $this->directory = $directory;
         $this->entityTypeName = $entityTypeName;
@@ -102,6 +105,7 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
             return;
 
         $data = $this->removeUnwantedColumns($data);
+        $data = $this->applyFilters($data);
 
         $filename = $this->getFilename($id);
         $oldSerializedEntity = "";
@@ -148,5 +152,17 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
     private function loadEntity($id) {
         $entities = $this->loadAllFromFiles(array($this->getFilename($id)));
         return $entities[0];
+    }
+
+    protected function applyFilters($data) {
+        foreach ($this->filters as $filter) {
+            $data = $filter->apply($data);
+        }
+
+        return $data;
+    }
+
+    protected function addFilter(EntityFilter $filter) {
+        $this->filters[] = $filter;
     }
 }
