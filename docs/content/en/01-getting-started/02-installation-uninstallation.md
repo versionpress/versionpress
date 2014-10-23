@@ -51,8 +51,9 @@ Uninstallation is a two-step process as with any other plugin:
 
 There are two important things to note:
 
-* Once VersionPress is deactivated, **it cannot be fully reactivated again on the same repository**. This means that while you can initialize VersionPress again and the presence of the old repository will not be a problem, features like Undo or Rollback will only be available for the *new* commits, created by the current activation of VersionPress.
-* **On uninstallation, the Git repository itself is moved to a backup folder** under `wp-content`. This means that after VersionPress uninstallation the site will no longer be considered Git-version-controlled but at the same time, if you need to restore or download the repository you still can.
+* Once VersionPress is deactivated, **it cannot be fully reactivated again on the same repository**. This means that while you can initialize VersionPress again and the presence of the old repository will not be a problem, features like Undo or Rollback will only be available for *new* commits, created by the current activation of VersionPress.
+* **On uninstallation, the Git repository itself is moved to a backup folder** under `wp-content/vpbackups`. This means that after VersionPress uninstallation the site will no longer be considered Git-version-controlled but at the same time, if you need to restore or download the repository you still can.
+    * Note: VersionPress will only remove / backup the repository if it detects that it was VersionPress-initiated repository. If you created the Git repository manually before you even installed VersionPress the repository will stay there untouched.  
 
 
 ## VersionPress states at a glance
@@ -70,6 +71,6 @@ To sum up the previous text, here are the states that the site can be in:
 | Fully active again (similar to step 4) | Yes | **Yes** |
 | Uninstalled | **No** (backed up) | No |
  
-<sup>1)</sup> The repo might exist if you created it manually or if VersionPress was previously installed. It is not a problem – VersionPress will happily add commits to the existing repo. But a common scenario is that there is no default Git repo in which case VersionPress will create one.
+<sup>1)</sup> The repo might exist if you created it manually or if VersionPress was previously installed. It is not a problem – VersionPress will happily add commits to the existing repository but a common scenario is that there is no default Git repository and VersionPress creates one.
 
 
