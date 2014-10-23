@@ -17,6 +17,7 @@ class AbsoluteUrlFilter implements EntityFilter {
      */
     function apply($entity) {
         foreach ($entity as $field => $value) {
+            if($field === "guid") continue; // guids cannot be changed even they are in form of URL
             if(isset($entity[$field])) {
                 $entity[$field] = $this->replaceLocalUrls($value);
             }
