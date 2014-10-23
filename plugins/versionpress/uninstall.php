@@ -9,9 +9,8 @@ defined('WP_UNINSTALL_PLUGIN') or die('Direct access not allowed');
 
 require_once(dirname(__FILE__) . '/bootstrap.php');
 
-$commit = Git::getInitialCommit();
+if (UninstallationUtil::uninstallation_should_remove_git_repo()) {
 
-if(VersionPressChangeInfo::matchesCommitMessage($commit->getMessage())) {
 
     $backupPath = WP_CONTENT_DIR . '/backup/.git-backup-' . date("YmdHis");
     mkdir(basename($backupPath), 0777, true);
