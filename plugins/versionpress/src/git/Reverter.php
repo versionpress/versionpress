@@ -58,12 +58,6 @@ class Reverter {
         return RevertStatus::OK;
     }
 
-    private function fixCommentCount() {
-        $sql = "update {$this->database->prefix}posts set comment_count =
-     (select count(*) from {$this->database->prefix}comments where comment_post_ID = {$this->database->prefix}posts.ID and comment_approved = 1);";
-        $this->database->query($sql);
-    }
-
     private function updateChangeDateForPosts($vpIds) {
         $date = current_time('mysql');
         $dateGmt = current_time('mysql', true);
@@ -76,7 +70,6 @@ class Reverter {
     private function synchronize() {
         $synchronizationQueue = array('options', 'users', 'usermeta', 'posts', 'comments', 'terms', 'term_taxonomy', 'term_relationships');
         $this->synchronizationProcess->synchronize($synchronizationQueue);
-        $this->fixCommentCount();
     }
 
     private function getAffectedPosts($modifiedFiles) {

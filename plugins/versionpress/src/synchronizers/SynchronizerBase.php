@@ -32,6 +32,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $entities = $this->loadEntitiesFromStorage();
         $this->updateDatabase($entities);
         $this->fixReferences($entities);
+        $this->doEntitySpecificActions();
         $this->mirrorDatabaseToStorage();
     }
 
@@ -289,5 +290,8 @@ abstract class SynchronizerBase implements Synchronizer {
                 $this->createEntityInDatabase($entity);
             }
         }
+    }
+
+    protected function doEntitySpecificActions() {
     }
 }
