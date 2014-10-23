@@ -4,7 +4,6 @@ class PostStorage extends DirectoryStorage implements EntityStorage {
 
     function __construct($directory) {
         parent::__construct($directory, 'post');
-        $this->addFilter(new PostGuidFilter());
         $this->addFilter(new AbsoluteUrlFilter());
     }
 
