@@ -252,8 +252,17 @@ function vp_admin_post_cancel_deactivation() {
  */
 function vp_admin_post_confirm_deactivation() {
 
-    unlink(WP_CONTENT_DIR . '/db.php');
-    unlink(__DIR__ . '/.active');
+    if (!file_exists(WP_CONTENT_DIR . '/db.php')) {
+        require_once(WP_CONTENT_DIR . '/plugins/versionpress/bootstrap.php');
+    }
+
+    if (file_exists(WP_CONTENT_DIR . '/db.php')) {
+        unlink(WP_CONTENT_DIR . '/db.php');
+    }
+
+    if (file_exists(__DIR__ . '/.active')) {
+        unlink(__DIR__ . '/.active');
+    }
 
     FileSystem::getWpFilesystem()->rmdir(__DIR__ . '/db', true);
 
