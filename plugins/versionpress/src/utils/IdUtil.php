@@ -24,7 +24,7 @@ final class IdUtil {
      * @param $formatString
      * @return string
      */
-    private static function newUuid($formatString) {
+    public static function newUuid($formatString = '%04x%04x-%04x-%04x-%04x-%04x%04x%04x') {
         return strtoupper(sprintf($formatString,
             // 32 bits for "time_low"
             mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),

@@ -312,7 +312,21 @@ function vp_activation_nag() {
 
 }
 
-
+add_filter('wp_insert_post_data', 'vp_generate_post_guid', '99', 2);
+/**
+ * Creates random GUID that is not based on URL
+ *
+ * @param array $data Sanitized post data
+ * @param array $postarr Raw post data
+ * @return array
+ */
+function vp_generate_post_guid($data, $postarr) {
+    if(empty($postarr['ID'])) // it's insert not update
+        $data['guid'] = IdUtil::newUuid();
+    else
+        $data['guid'] = preg_replace("~^https?://(.*)$~i", "$1", $data['guid']); // strip the protocol (it's created by sanitize_post function)
+    return $data;
+}
 
 
 //----------------------------------
