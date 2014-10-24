@@ -91,19 +91,20 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
         return $entity;
     }
 
-    private function notifyChangeListeners($entity, $changeType) {
+    protected function notifyChangeListeners($entity, $changeType) {
         $changeInfo = $this->createChangeInfo($entity, $changeType);
         $this->callOnChangeListeners($changeInfo);
     }
 
     protected abstract function createChangeInfo($entity, $changeType);
 
-    private function saveEntity($data, $callback = null) {
+    protected function saveEntity($data, $callback = null) {
         $id = $data['vp_id'];
 
         if (!$id)
             return;
 
+        unset($data[$this->idColumnName]);
         $data = $this->removeUnwantedColumns($data);
         $data = $this->applyFilters($data);
 

@@ -47,6 +47,7 @@ class EntityStorageFactory {
         $this->addStorageClassInfo('term_taxonomy', 'TermTaxonomyStorage', '/terms.ini');
         $this->addStorageClassInfo('users', 'UserStorage', '/users.ini');
         $this->addStorageClassInfo('usermeta', 'UserMetaStorage', '/users.ini');
+        $this->addStorageClassInfo('postmeta', 'PostMetaStorage', '/posts');
     }
 
     private function addStorageClassInfo($entityName, $className, $storageDirectory) {

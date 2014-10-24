@@ -4,6 +4,11 @@ posts:
         post_author: users
         post_parent: posts
 
+postmeta:
+    id: meta_id
+    references:
+        post_id: posts
+
 comments:
     id: comment_ID
     references:
