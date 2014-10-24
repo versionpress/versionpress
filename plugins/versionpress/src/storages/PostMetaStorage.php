@@ -15,7 +15,7 @@ class PostMetaStorage extends DirectoryStorage {
         $this->postMetaKey = $values['meta_key'];
         $this->postMetaVpId = $values['vp_id'];
 
-        $this->saveEntity($data, array($this, 'notifyOnChangeListeners'));
+        $this->saveEntity($data, array($this, 'notifyChangeListeners'));
     }
 
     function delete($restriction) {

@@ -66,7 +66,9 @@ class MirroringDatabase extends ExtendedWpdb {
         if ($shouldHaveId) {
             if($entityName === 'usermeta') {
                 $id = $this->getUsermetaId($data['user_id'], $data['meta_key']);
-            } else {
+            } elseif($entityName === 'postmeta') {
+                $id = $this->getPostMetaId($data['post_id'], $data['meta_key']);
+            }  else {
                 $idColumnName = $this->dbSchemaInfo->getIdColumnName($entityName);
                 $id = $where[$idColumnName];
             }
@@ -212,6 +214,11 @@ class MirroringDatabase extends ExtendedWpdb {
 
     private function getUsermetaId($user_id, $meta_key) {
         $getMetaIdSql = "SELECT umeta_id FROM {$this->prefix}usermeta WHERE meta_key = \"$meta_key\" AND user_id = $user_id";
+        return $this->get_var($getMetaIdSql);
+    }
+
+    private function getPostMetaId($post_id, $meta_key) {
+        $getMetaIdSql = "SELECT meta_id FROM {$this->prefix}postmeta WHERE meta_key = \"$meta_key\" AND post_id = $post_id";
         return $this->get_var($getMetaIdSql);
     }
 }
