@@ -68,7 +68,7 @@ class Reverter {
     }
 
     private function synchronize() {
-        $synchronizationQueue = array('options', 'users', 'usermeta', 'posts', 'comments', 'terms', 'term_taxonomy', 'term_relationships');
+        $synchronizationQueue = array('options', 'users', 'usermeta', 'posts', 'postmeta', 'comments', 'terms', 'term_taxonomy', 'term_relationships');
         $this->synchronizationProcess->synchronize($synchronizationQueue);
     }
 

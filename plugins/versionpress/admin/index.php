@@ -342,6 +342,7 @@ function _vp_show_progress_message($progressMessage) {
                     'WordPressUpdateChangeInfo',
                     'VersionPressChangeInfo',
                     'RevertChangeInfo',
+                    'PostMetaChangeInfo',
                     'PostChangeInfo',
                     'CommentChangeInfo',
                     'OptionChangeInfo',

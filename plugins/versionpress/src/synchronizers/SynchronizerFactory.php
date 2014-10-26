@@ -27,6 +27,7 @@ class SynchronizerFactory {
     public function createSynchronizer($synchronizerName) {
         static $synchronizerClasses = array(
             'posts' => 'PostsSynchronizer',
+            'postmeta' => 'PostMetaSynchronizer',
             'comments' => 'CommentsSynchronizer',
             'options' => 'OptionsSynchronizer',
             'users' => 'UsersSynchronizer',
