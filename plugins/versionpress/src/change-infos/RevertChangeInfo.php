@@ -1,6 +1,18 @@
 <?php
 
-class RevertChangeInfo extends BaseChangeInfo {
+/**
+ * Change info about undos and rollbacks. Other VersionPress action
+ * that are not undos or rollbacks are represented using {@link VersionPressChangeInfo}.
+ *
+ * VP tags:
+ *
+ *     VP-Action: versionpress/(undo|rollback)/HASH123
+ *
+ * (No additional tags are required, even the ranges, when we support them, will be part
+ * of the hash part of the main VP-Action tag.)
+ *
+ */
+class RevertChangeInfo extends TrackedChangeInfo {
 
     const OBJECT_TYPE = "versionpress";
     const ACTION_UNDO = "undo";
@@ -20,27 +32,12 @@ class RevertChangeInfo extends BaseChangeInfo {
         $this->commitHash = $commitHash;
     }
 
-    /**
-     * @return string
-     */
     public function getObjectType() {
         return self::OBJECT_TYPE;
     }
 
-    /**
-     * @return string
-     */
     public function getAction() {
         return $this->action;
-    }
-
-    /**
-     * @param CommitMessage $commitMessage
-     * @return boolean
-     */
-    public static function matchesCommitMessage(CommitMessage $commitMessage) {
-        return ChangeInfoHelpers::actionTagStartsWith($commitMessage, self::OBJECT_TYPE . "/" . self::ACTION_UNDO)
-            || ChangeInfoHelpers::actionTagStartsWith($commitMessage, self::OBJECT_TYPE . "/" . self::ACTION_ROLLBACK);
     }
 
     /**
@@ -49,7 +46,7 @@ class RevertChangeInfo extends BaseChangeInfo {
      */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        list($_, $action, $commitHash) = explode("/", $tags[BaseChangeInfo::ACTION_TAG], 3);
+        list($_, $action, $commitHash) = explode("/", $tags[TrackedChangeInfo::ACTION_TAG], 3);
         return new self($action, $commitHash);
     }
 
@@ -65,7 +62,7 @@ class RevertChangeInfo extends BaseChangeInfo {
      *
      * @return string
      */
-    protected function getCommitMessageHead() {
+    protected function constructCommitMessageHead() {
         return ($this->action == self::ACTION_UNDO ? "Reverted change " : "Rollback to ") . $this->commitHash;
     }
 
@@ -74,7 +71,7 @@ class RevertChangeInfo extends BaseChangeInfo {
      *
      * @return string
      */
-    protected function getActionTag() {
+    protected function constructActionTagValue() {
         return sprintf("%s/%s/%s", self::OBJECT_TYPE, $this->getAction(), $this->commitHash);
     }
 }

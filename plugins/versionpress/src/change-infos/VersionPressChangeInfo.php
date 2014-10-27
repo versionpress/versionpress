@@ -1,36 +1,35 @@
 <?php
 
 /**
- * Class used for commit representing installation of VersionPress
+ * Represents VersionPress actions other than reverts (see {@link RevertChangeInfo}  for that).
+ * It currently records only the `install` action and is probably the simplest of ChangeInfo types
+ * as it doesn't capture any additional information.
+ *
+ * VP tags:
+ *
+ *     VP-Action: versionpress/install
+ *
  */
-class VersionPressChangeInfo extends BaseChangeInfo {
-
-    const OBJECT_TYPE = "versionpress";
-    const ACTION = "install"; // there are no other actions handled by this change info yet
+class VersionPressChangeInfo extends TrackedChangeInfo {
 
     /**
+     * @inheritdoc
      * @return string
      */
     public function getObjectType() {
-        return self::OBJECT_TYPE;
+        return "versionpress";
     }
 
     /**
+     * @inheritdoc
      * @return string
      */
     public function getAction() {
-        return self::ACTION;
+        return "install";
     }
 
     /**
-     * @param CommitMessage $commitMessage
-     * @return boolean
-     */
-    public static function matchesCommitMessage(CommitMessage $commitMessage) {
-        return ChangeInfoHelpers::actionTagStartsWith($commitMessage, self::OBJECT_TYPE . "/" . self::ACTION);
-    }
-
-    /**
+     * @inheritdoc
      * @param CommitMessage $commitMessage
      * @return ChangeInfo
      */
@@ -39,27 +38,26 @@ class VersionPressChangeInfo extends BaseChangeInfo {
     }
 
     /**
+     * @inheritdoc
      * @return string
      */
-    function getChangeDescription() {
+    public function getChangeDescription() {
         return "Installed VersionPress";
     }
 
     /**
-     * Returns the first line of commit message
-     *
+     * @inheritdoc
      * @return string
      */
-    protected function getCommitMessageHead() {
-        return "VersionPress was installed";
+    protected function constructCommitMessageHead() {
+        return $this->getChangeDescription();
     }
 
     /**
-     * Returns the content of VP-Action tag
-     *
+     * @inheritdoc
      * @return string
      */
-    protected function getActionTag() {
-        return sprintf("%s/%s", self::OBJECT_TYPE, self::ACTION);
+    protected function constructActionTagValue() {
+        return "versionpress/install";
     }
 }

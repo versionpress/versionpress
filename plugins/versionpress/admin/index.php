@@ -330,36 +330,6 @@ function _vp_show_progress_message($progressMessage) {
             <tbody id="the-list">
             <?php
 
-            /**
-             * @param Commit $commit
-             * @return ChangeInfo
-             */
-            function createChangeInfo(Commit $commit) {
-                /** @var ChangeInfo[] $changeInfoClasses */
-                $changeInfoClasses = array(
-                    'PluginChangeInfo',
-                    'ThemeChangeInfo',
-                    'WordPressUpdateChangeInfo',
-                    'VersionPressChangeInfo',
-                    'RevertChangeInfo',
-                    'PostChangeInfo',
-                    'CommentChangeInfo',
-                    'OptionChangeInfo',
-                    'TermChangeInfo',
-                    'UserMetaChangeInfo',
-                    'UserChangeInfo',
-                    'CustomChangeInfo',
-                );
-                $matchingChangeInfoClass = 'CustomChangeInfo'; // fallback
-                foreach ($changeInfoClasses as $changeInfoClass) {
-                    if ($changeInfoClass::matchesCommitMessage($commit->getMessage())) {
-                        $matchingChangeInfoClass = $changeInfoClass;
-                        break;
-                    }
-                }
-                $changeInfo = $matchingChangeInfoClass::buildFromCommitMessage($commit->getMessage());
-                return $changeInfo;
-            }
 
             $initialCommitHash = trim(file_get_contents(VERSIONPRESS_PLUGIN_DIR . '/.active'));
             $gitLogPaginator = new GitLogPaginator();
@@ -374,7 +344,7 @@ function _vp_show_progress_message($progressMessage) {
                 $canUndoCommit = $canUndoCommit && ($commit->getHash() !== $initialCommitHash);
                 $canRollbackToThisCommit = !$isFirstCommit && ($canUndoCommit || $commit->getHash() === $initialCommitHash);
 
-                $changeInfo = createChangeInfo($commit);
+                $changeInfo = ChangeInfoMatcher::createMatchingChangeInfo($commit->getMessage());
 
                 $undoSnippet = "<a href='" . admin_url('admin.php?action=vp_undo&commit=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts changes done by this commit'>Undo this</a>";
 

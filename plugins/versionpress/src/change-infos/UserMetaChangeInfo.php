@@ -1,9 +1,19 @@
 <?php
 
+/**
+ * Changes of certain user properties.
+ *
+ * VP tags:
+ *
+ *     VP-Action: usermeta/(create|edit|delete)/VPID
+ *
+ * TODO this is work in progress at the time of writing this documentation, see WP-130
+ */
 class UserMetaChangeInfo extends EntityChangeInfo {
 
     const USER_LOGIN = "VP-User-Login";
     const USER_META_KEY = "VP-UserMeta-Key";
+
     /**
      * @var string
      */
@@ -20,26 +30,15 @@ class UserMetaChangeInfo extends EntityChangeInfo {
         $this->userMetaKey = $userMetaKey;
     }
 
-    /**
-     * @return string
-     */
     public function getChangeDescription() {
         if($this->getAction() === "create")
             return "New option '{$this->userMetaKey}' for user '{$this->userLogin}'";
         return "Edited option '{$this->userMetaKey}' for user '{$this->userLogin}'";
     }
 
-    public static function matchesCommitMessage(CommitMessage $commitMessage) {
-        return parent::matchesCommitMessage($commitMessage) && ChangeInfoHelpers::actionTagStartsWith($commitMessage, "usermeta");
-    }
-
-    /**
-     * @param CommitMessage $commitMessage
-     * @return ChangeInfo
-     */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags[BaseChangeInfo::ACTION_TAG];
+        $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
         $userMetaKey = $tags[self::USER_META_KEY];
         $userLogin = $tags[self::USER_LOGIN];
         list($_, $action, $entityId) = explode("/", $actionTag);

@@ -15,7 +15,7 @@ class PostTest extends WpCliTestCase {
         WpAutomation::createPost($this->somePost);
 
         $lastCommit = $this->getLastCommit();
-        $comitAction = $lastCommit->getMessage()->getVersionPressTag(BaseChangeInfo::ACTION_TAG);
+        $comitAction = $lastCommit->getMessage()->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         $postTitleInCommit = $lastCommit->getMessage()->getVersionPressTag(PostChangeInfo::POST_TITLE_TAG);
         $this->assertStringStartsWith("post/create", $comitAction);
         $this->assertEquals($this->somePost["post_title"], $postTitleInCommit);

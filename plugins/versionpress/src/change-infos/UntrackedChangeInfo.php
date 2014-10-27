@@ -1,9 +1,13 @@
 <?php
 
 /**
- * Used as fallback for commits that were not created by VersionPress
+ * Represents commits that were not created by VersionPress and we don't know
+ * much about them. This ChangeInfo type is a fallback type when no better
+ * match is found by ChangeInfoMatcher.
+ *
+ * @see TrackedChangeInfo
  */
-class CustomChangeInfo implements ChangeInfo {
+class UntrackedChangeInfo implements ChangeInfo {
 
     /**
      * @var CommitMessage
@@ -15,20 +19,8 @@ class CustomChangeInfo implements ChangeInfo {
     }
 
     /**
-     * @return string
-     */
-    public function getObjectType() {
-        return "";
-    }
-
-    /**
-     * @return string
-     */
-    public function getAction() {
-        return "";
-    }
-
-    /**
+     * @inheritdoc
+     *
      * @return CommitMessage
      */
     public function getCommitMessage() {
@@ -36,14 +28,8 @@ class CustomChangeInfo implements ChangeInfo {
     }
 
     /**
-     * @param CommitMessage $commitMessage
-     * @return bool
-     */
-    public static function matchesCommitMessage(CommitMessage $commitMessage) {
-        return true;
-    }
-
-    /**
+     * @inheritdoc
+     *
      * @param CommitMessage $commitMessage
      * @return ChangeInfo
      */
@@ -52,9 +38,11 @@ class CustomChangeInfo implements ChangeInfo {
     }
 
     /**
+     * @inheritdoc
+     *
      * @return string
      */
     function getChangeDescription() {
-        return $this->commitMessage->getHead();
+        return $this->commitMessage->getSubject();
     }
 }

@@ -1,6 +1,17 @@
 <?php
 
-class WordPressUpdateChangeInfo extends BaseChangeInfo {
+/**
+ * Change info about updating WordPress itself.
+ *
+ * Nitpicker's corner: the word "update" in the class name is OK, probably better upgrade,
+ * see the frequency (and the title) of the {@link http://codex.wordpress.org/Updating_WordPress Updating WordPress}
+ * topic in Codex.
+ *
+ * VP tags:
+ *
+ *     VP-Action: wordpress/update/4.0
+ */
+class WordPressUpdateChangeInfo extends TrackedChangeInfo {
 
     const OBJECT_TYPE = "wordpress";
     const ACTION = "update";
@@ -47,7 +58,7 @@ class WordPressUpdateChangeInfo extends BaseChangeInfo {
      */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags[BaseChangeInfo::ACTION_TAG];
+        $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
         list($_, $__, $version) = explode("/", $actionTag, 3);
         return new self($version);
     }
@@ -59,21 +70,13 @@ class WordPressUpdateChangeInfo extends BaseChangeInfo {
         return "WordPress updated to version " . $this->getVersion();
     }
 
-    /**
-     * Returns the first line of commit message
-     *
-     * @return string
-     */
-    protected function getCommitMessageHead() {
-        return "WordPress updated to version " . $this->getVersion();
-    }
-
-    /**
-     * Returns the content of VP-Action tag
-     *
-     * @return string
-     */
-    protected function getActionTag() {
+    protected function constructActionTagValue() {
         return "{$this->getObjectType()}/{$this->getAction()}/{$this->getVersion()}";
     }
+
+    protected function getCustomTags() {
+        return array();
+    }
+
+
 }

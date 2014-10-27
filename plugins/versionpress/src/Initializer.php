@@ -369,8 +369,8 @@ class Initializer {
 
     private function doInitializationCommit() {
         $this->reportProgressChange(InitializerStates::CREATING_INITIAL_COMMIT);
-        $message = new CommitMessage('Installed VersionPress', 'VP-Action: versionpress/install');
-        Git::commit($message);
+        $installationChangeInfo = new VersionPressChangeInfo();
+        Git::commit($installationChangeInfo->getCommitMessage());
         $lastCommitHash = Git::getLastCommitHash();
         file_put_contents(VERSIONPRESS_PLUGIN_DIR . '/.active', $lastCommitHash);
     }

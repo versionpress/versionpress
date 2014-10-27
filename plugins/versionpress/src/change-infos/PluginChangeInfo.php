@@ -1,6 +1,19 @@
 <?php
 
-class PluginChangeInfo extends BaseChangeInfo {
+/**
+ * Plugin changes like installation, activation, deactivation etc.
+ *
+ * VP tags:
+ *
+ *     VP-Action: plugin/(install|activate|deactivate|update|edit|delete)/hello.php
+ *     VP-Plugin-Name: Hello Dolly
+ *
+ * Note that the plugin identifier could be, and typically will be, something containing path separator,
+ * e.g. `akismet/akismet.php`. So the full VP-Action tag will look like this:
+ *
+ *     VP-Action: plugin/install/akismet/akismet.php
+ */
+class PluginChangeInfo extends TrackedChangeInfo {
 
     private static $OBJECT_TYPE = "plugin";
     const PLUGIN_NAME_TAG = "VP-Plugin-Name";
@@ -10,72 +23,42 @@ class PluginChangeInfo extends BaseChangeInfo {
 
     /** @var string */
     private $pluginName;
-    /**
-     * Values: activate / deactivate / update / edit
-     * @var string
-     */
+
+    /** @var string */
     private $action;
 
+    /**
+     * @param string $pluginFile Something like "hello.php", or for plugins with their own folders, "akismet/akismet.php"
+     * @param string $action See VP-Action tag documentation in the class docs
+     * @param string $pluginName If not provided, finds the plugin name automatically based on $pluginFile
+     */
     public function __construct($pluginFile, $action, $pluginName = null) {
         $this->pluginFile = $pluginFile;
         $this->action = $action;
         $this->pluginName = $pluginName ? $pluginName : $this->findPluginName();
     }
 
-    /**
-     * @return string
-     */
     public function getObjectType() {
         return self::$OBJECT_TYPE;
     }
 
-    /**
-     * @return string
-     */
     public function getAction() {
         return $this->action;
     }
 
-    /**
-     * @param CommitMessage $commitMessage
-     * @return boolean
-     */
-    public static function matchesCommitMessage(CommitMessage $commitMessage) {
-        return ChangeInfoHelpers::actionTagStartsWith($commitMessage, "plugin");
-    }
-
-    /**
-     * @param CommitMessage $commitMessage
-     * @return ChangeInfo
-     */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
-        $actionTag = $commitMessage->getVersionPressTag(BaseChangeInfo::ACTION_TAG);
+        $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         $pluginName = $commitMessage->getVersionPressTag(self::PLUGIN_NAME_TAG);
         list($_, $action, $pluginFile) = explode("/", $actionTag, 3);
         return new self($pluginFile, $action, $pluginName);
     }
 
-    /**
-     * @return string
-     */
     public function getChangeDescription() {
         return NStrings::capitalize($this->action) . (NStrings::endsWith($this->action, "e") ? "d" : "ed") . " plugin '{$this->pluginName}'";
     }
 
-    /**
-     * @return string
-     */
-    protected function getActionTag() {
+    protected function constructActionTagValue() {
         return "{$this->getObjectType()}/{$this->getAction()}/" . $this->pluginFile;
-    }
-
-    /**
-     * Returns the first line of commit message
-     *
-     * @return string
-     */
-    protected function getCommitMessageHead() {
-        return "Plugin \"{$this->pluginFile}\" was {$this->action}" . (NStrings::endsWith($this->action, "e") ? "d" : "ed");
     }
 
     protected function getCustomTags() {
