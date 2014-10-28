@@ -14,6 +14,6 @@ class UninstallationUtil {
      */
     public static function uninstallation_should_remove_git_repo() {
         $initialCommit = Git::getInitialCommit();
-        return VersionPressChangeInfo::matchesCommitMessage($initialCommit->getMessage());
+        return ChangeInfoMatcher::matchesChangeInfo($initialCommit->getMessage(), 'VersionPressChangeInfo');
     }
 }
