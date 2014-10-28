@@ -294,6 +294,7 @@ class WpAutomation {
      *
      * @param string $command
      * @param string $executionPath Working directory for the command
+     * @throws Exception When process execution is not successful
      * @return string
      */
     private static function exec($command, $executionPath) {
