@@ -5,9 +5,9 @@ class PostTest extends WpCliTestCase {
     private $somePost = array(
         "post_type" => "post",
         "post_status" => "publish",
-        "post_title" => "Hello VersionPress!",
+        "post_title" => "Hello VersionPress",
         "post_date" => "2011-11-11 11:11:11",
-        "post_content" => "Welcome to versioned WordPress!",
+        "post_content" => "Welcome to versioned WordPress",
         "post_author" => 1
     );
 
