@@ -46,14 +46,6 @@ class WordPressUpdateChangeInfo extends TrackedChangeInfo {
 
     /**
      * @param CommitMessage $commitMessage
-     * @return boolean
-     */
-    public static function matchesCommitMessage(CommitMessage $commitMessage) {
-        return ChangeInfoHelpers::actionTagStartsWith($commitMessage, self::OBJECT_TYPE);
-    }
-
-    /**
-     * @param CommitMessage $commitMessage
      * @return ChangeInfo
      */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
