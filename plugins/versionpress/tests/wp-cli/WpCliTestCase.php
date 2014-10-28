@@ -85,7 +85,7 @@ abstract class WpCliTestCase extends PHPUnit_Framework_TestCase {
                 $fieldIsOk = $value == $actualEntity[$field];
                 $entityIsOk &= $fieldIsOk;
                 if (!$fieldIsOk) {
-                    $errorMessages[] = "Field '$field' has wrong value";
+                    $errorMessages[] = "Field '$field' has wrong value (expected '$value', actual '$actualEntity[$field]')";
                 }
             } elseif (isset($actualEntity["vp_$field"])) {
                 // OK ... there is some VP id
