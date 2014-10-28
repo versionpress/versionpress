@@ -29,7 +29,7 @@ class PostTest extends WpCliTestCase {
     public function testEditPost() {
         $newPost = $this->somePost;
         $changes = array(
-            "post_title" => "Announcing VersionPress!"
+            "post_title" => "Announcing VersionPress"
         );
         $this->assertPostEditation($newPost, $changes, "post/edit");
     }
