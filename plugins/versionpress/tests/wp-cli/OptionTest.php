@@ -10,7 +10,7 @@ class OptionTest extends WpCliTestCase {
         WpAutomation::createOption($this->someOption["option_name"], $this->someOption["option_value"]);
 
         $lastCommit = $this->getLastCommit();
-        $commitAction = $lastCommit->getMessage()->getVersionPressTag(BaseChangeInfo::ACTION_TAG);
+        $commitAction = $lastCommit->getMessage()->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         $this->assertEquals("option/create/{$this->someOption["option_name"]}", $commitAction);
 
         list($_, $__, $optionId) = explode("/", $commitAction, 3);
@@ -24,7 +24,7 @@ class OptionTest extends WpCliTestCase {
         WpAutomation::editOption($changedOption["option_name"], $changedOption["option_value"]);
 
         $lastCommit = $this->getLastCommit();
-        $commitAction = $lastCommit->getMessage()->getVersionPressTag(BaseChangeInfo::ACTION_TAG);
+        $commitAction = $lastCommit->getMessage()->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         $this->assertEquals("option/edit/$changedOption[option_name]", $commitAction);
 
         list($_, $__, $optionId) = explode("/", $commitAction, 3);
@@ -36,7 +36,7 @@ class OptionTest extends WpCliTestCase {
         WpAutomation::deleteOption($this->someOption["option_name"]);
 
         $lastCommit = $this->getLastCommit();
-        $commitAction = $lastCommit->getMessage()->getVersionPressTag(BaseChangeInfo::ACTION_TAG);
+        $commitAction = $lastCommit->getMessage()->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         $this->assertEquals("option/delete/{$this->someOption["option_name"]}", $commitAction);
         $this->assertNull(@$this->getCommitedEntity($this->someOption["option_name"]));
     }

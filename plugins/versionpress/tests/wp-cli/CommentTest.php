@@ -15,7 +15,7 @@ class CommentTest extends WpCliTestCase {
         WpAutomation::createComment($this->someComment);
 
         $lastCommit = $this->getLastCommit();
-        $comitAction = $lastCommit->getMessage()->getVersionPressTag(BaseChangeInfo::ACTION_TAG);
+        $comitAction = $lastCommit->getMessage()->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         $commentAuthorInTag = $lastCommit->getMessage()->getVersionPressTag(CommentChangeInfo::AUTHOR_TAG);
         $this->assertStringStartsWith("comment/create", $comitAction);
         $this->assertEquals($this->someComment["comment_author"], $commentAuthorInTag);

@@ -1,6 +1,17 @@
 <?php
 
-class ThemeChangeInfo extends BaseChangeInfo {
+/**
+ * Theme changes like installation, switching, editing etc.
+ *
+ * VP tags:
+ *
+ *     VP-Action: theme/(install|update|customize|edit|switch|delete)/twentyfourteen
+ *     VP-Theme-Name: Twenty Fourteen
+ *
+ * Note: theme is `customize`d via the WP customizer, `edit`ed via the built in text editor.
+ *
+ */
+class ThemeChangeInfo extends TrackedChangeInfo {
 
     private static $OBJECT_TYPE = "theme";
     const THEME_NAME_TAG = "VP-Theme-Name";
@@ -10,17 +21,20 @@ class ThemeChangeInfo extends BaseChangeInfo {
 
     /** @var string */
     private $themeName;
-    /**
-     * Values: switch / install
-     * @var string
-     */
+
+    /** @var string */
     private $action;
 
+    /**
+     * @param string $themeId E.g. "twentyfourteen"
+     * @param string $action One of the supported actions, see this class's docs
+     * @param string $themeName If not provided, found automatically based on $themeId
+     */
     public function __construct($themeId, $action, $themeName = null) {
         $this->themeId = $themeId;
         $this->action = $action;
 
-        if($themeName == null) {
+        if ($themeName == null) {
             $themes = wp_get_themes();
             $themeName = $themes[$themeId]->name;
         }
@@ -28,61 +42,32 @@ class ThemeChangeInfo extends BaseChangeInfo {
         $this->themeName = $themeName;
     }
 
-    /**
-     * @return string
-     */
     public function getObjectType() {
         return self::$OBJECT_TYPE;
     }
 
-    /**
-     * @return string
-     */
     public function getAction() {
         return $this->action;
     }
 
-    /**
-     * @param CommitMessage $commitMessage
-     * @return boolean
-     */
-    public static function matchesCommitMessage(CommitMessage $commitMessage) {
-        return ChangeInfoHelpers::actionTagStartsWith($commitMessage, "theme");
-    }
-
-    /**
-     * @param CommitMessage $commitMessage
-     * @return ChangeInfo
-     */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
-        $actionTag = $commitMessage->getVersionPressTag(BaseChangeInfo::ACTION_TAG);
+        $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         $themeName = $commitMessage->getVersionPressTag(self::THEME_NAME_TAG);
-        list($_, $action, $themeId) = explode("/", $actionTag, 3); // maybe slug
+        list( , $action, $themeId) = explode("/", $actionTag, 3);
         return new self($themeId, $action, $themeName);
     }
 
-    /**
-     * @return string
-     */
     public function getChangeDescription() {
-        if($this->action === 'switch') return "Theme switched to '{$this->themeName}'";
+
+        if ($this->action === 'switch') {
+            return "Theme switched to '{$this->themeName}'";
+        }
+
         return NStrings::capitalize($this->action) . (NStrings::endsWith($this->action, "e") ? "d" : "ed") . " theme '{$this->themeName}'";
     }
 
-    /**
-     * @return string
-     */
-    protected function getActionTag() {
+    protected function getActionTagValue() {
         return "{$this->getObjectType()}/{$this->getAction()}/" . $this->themeId;
-    }
-
-    /**
-     * Returns the first line of commit message
-     *
-     * @return string
-     */
-    protected function getCommitMessageHead() {
-        return $this->getChangeDescription();
     }
 
     protected function getCustomTags() {

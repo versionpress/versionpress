@@ -1,65 +1,38 @@
 <?php
 
 /**
- * Class used for commit representing installation of VersionPress
+ * Represents VersionPress actions other than reverts (see {@link RevertChangeInfo}  for that).
+ * It currently records only the "install" action and is probably the simplest of ChangeInfo types
+ * as it doesn't capture any additional info.
+ *
+ * VP tags:
+ *
+ *     VP-Action: versionpress/install
+ *
  */
-class VersionPressChangeInfo extends BaseChangeInfo {
+class VersionPressChangeInfo extends TrackedChangeInfo {
 
-    const OBJECT_TYPE = "versionpress";
-    const ACTION = "install"; // there are no other actions handled by this change info yet
-
-    /**
-     * @return string
-     */
     public function getObjectType() {
-        return self::OBJECT_TYPE;
+        return "versionpress";
     }
 
-    /**
-     * @return string
-     */
     public function getAction() {
-        return self::ACTION;
+        return "install";
     }
 
-    /**
-     * @param CommitMessage $commitMessage
-     * @return boolean
-     */
-    public static function matchesCommitMessage(CommitMessage $commitMessage) {
-        return ChangeInfoHelpers::actionTagStartsWith($commitMessage, self::OBJECT_TYPE . "/" . self::ACTION);
-    }
-
-    /**
-     * @param CommitMessage $commitMessage
-     * @return ChangeInfo
-     */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         return new self();
     }
 
-    /**
-     * @return string
-     */
-    function getChangeDescription() {
+    public function getChangeDescription() {
         return "Installed VersionPress";
     }
 
-    /**
-     * Returns the first line of commit message
-     *
-     * @return string
-     */
-    protected function getCommitMessageHead() {
-        return "VersionPress was installed";
+    protected function getActionTagValue() {
+        return "versionpress/install";
     }
 
-    /**
-     * Returns the content of VP-Action tag
-     *
-     * @return string
-     */
-    protected function getActionTag() {
-        return sprintf("%s/%s", self::OBJECT_TYPE, self::ACTION);
+    protected function getCustomTags() {
+        return array();
     }
 }

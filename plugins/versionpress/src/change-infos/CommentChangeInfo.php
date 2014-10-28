@@ -1,17 +1,24 @@
 <?php
 
+/**
+ * Comment changes.
+ *
+ * VP tags:
+ *
+ *     VP-Action: comment/(create|edit|delete|trash|untrash)/VPID
+ *     VP-Comment-Author: John Smith
+ *     VP-Comment-PostTitle: Hello world
+ *
+ */
 class CommentChangeInfo extends EntityChangeInfo {
 
     const POST_TITLE_TAG = "VP-Comment-PostTitle";
     const AUTHOR_TAG = "VP-Comment-Author";
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $commentAuthor;
-    /**
-     * @var string
-     */
+
+    /** @var string */
     private $commentedPost;
 
     public function __construct($action, $entityId, $commentAuthor, $commentedPost) {
@@ -20,31 +27,20 @@ class CommentChangeInfo extends EntityChangeInfo {
         $this->commentedPost = $commentedPost;
     }
 
-    public static function matchesCommitMessage(CommitMessage $commitMessage) {
-        return parent::matchesCommitMessage($commitMessage) && ChangeInfoHelpers::actionTagStartsWith($commitMessage, "comment");
-    }
-
-    /**
-     * @return string
-     */
     function getChangeDescription() {
         if($this->getAction() === "create")
             return "New comment for post '{$this->commentedPost}'";
         if($this->getAction() === "delete")
             return "Deleted comment for post '{$this->commentedPost}'";
-        return "Edited comment of '{$this->commentedPost}' post";
+        return "Edited comment for post '{$this->commentedPost}'";
     }
 
-    /**
-     * @param CommitMessage $commitMessage
-     * @return ChangeInfo
-     */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags[BaseChangeInfo::ACTION_TAG];
+        $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
         $commentAuthor = $tags[self::AUTHOR_TAG];
         $commentedPost = $tags[self::POST_TITLE_TAG];
-        list($_, $action, $entityId) = explode("/", $actionTag, 3);
+        list(, $action, $entityId) = explode("/", $actionTag, 3);
         return new self($action, $entityId, $commentAuthor, $commentedPost);
     }
 

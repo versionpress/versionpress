@@ -1,17 +1,27 @@
 <?php
 
+/**
+ * Post changes.
+ *
+ * VP tags:
+ *
+ *     VP-Action: post/(create|edit|delete|trash|untrash)/VPID
+ *     VP-Post-Title: Hello world
+ *     VP-Post-Type: (post|page)
+ */
 class PostChangeInfo extends EntityChangeInfo {
 
     const POST_TITLE_TAG = "VP-Post-Title";
     const POST_TYPE_TAG = "VP-Post-Type";
 
     /**
+     * Type of the post - "post" or "page"
+     *
      * @var string
      */
     private $postType;
-    /**
-     * @var string
-     */
+
+    /** @var string */
     private $postTitle;
 
     public function __construct($action, $entityId, $postType, $postTitle) {
@@ -20,30 +30,18 @@ class PostChangeInfo extends EntityChangeInfo {
         $this->postTitle = $postTitle;
     }
 
-    /**
-     * @param CommitMessage $commitMessage
-     * @return bool
-     */
-    public static function matchesCommitMessage(CommitMessage $commitMessage) {
-        return parent::matchesCommitMessage($commitMessage) && ChangeInfoHelpers::actionTagStartsWith($commitMessage, "post");
-    }
-
-    /**
-     * @param CommitMessage $commitMessage
-     * @return PostChangeInfo
-     */
     public static function buildFromCommitMessage(CommitMessage $commitMessage)  {
         $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags[BaseChangeInfo::ACTION_TAG];
-        list($_, $action, $entityId) = explode("/", $actionTag, 3);
+
+        $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
+        list( , $action, $entityId) = explode("/", $actionTag, 3);
+
         $titleTag = isset($tags[self::POST_TITLE_TAG]) ? $tags[self::POST_TITLE_TAG] : $entityId;
         $type = isset($tags[self::POST_TYPE_TAG]) ? $tags[self::POST_TYPE_TAG] : "post";
+
         return new self($action, $entityId, $type, $titleTag);
     }
 
-    /**
-     * @return string
-     */
     public function getChangeDescription() {
         switch($this->getAction()) {
             case "create":
@@ -64,16 +62,5 @@ class PostChangeInfo extends EntityChangeInfo {
             self::POST_TYPE_TAG => $this->postType
         );
     }
-
-    protected function getCommitMessageHead() {
-        if ($this->getAction() === 'trash' || $this->getAction() === 'untrash') {
-            $preposition = $this->getAction() === 'trash' ? 'to' : 'from';
-            $shortEntityId = substr($this->getEntityId(), 0, 4);
-            return sprintf(NStrings::capitalize($this->postType) . " '%s' moved %s the trash", $shortEntityId, $preposition);
-        }
-
-        return parent::getCommitMessageHead();
-    }
-
 
 }

@@ -1,79 +1,60 @@
 <?php
 
-class WordPressUpdateChangeInfo extends BaseChangeInfo {
+/**
+ * Change info about updating WordPress itself.
+ *
+ * Nitpicker's corner: the word "update" in the class name is better than upgrade,
+ * see the frequency (and the title) of the {@link http://codex.wordpress.org/Updating_WordPress Updating WordPress}
+ * topic in Codex.
+ *
+ * VP tags:
+ *
+ *     VP-Action: wordpress/update/4.0
+ *
+ * No custom tags needed.
+ */
+class WordPressUpdateChangeInfo extends TrackedChangeInfo {
 
     const OBJECT_TYPE = "wordpress";
     const ACTION = "update";
 
     /** @var string */
-    private $version;
+    private $newVersion;
 
     public function __construct($version) {
-        $this->version = $version;
+        $this->newVersion = $version;
     }
 
-    /**
-     * @return string
-     */
     public function getObjectType() {
         return self::OBJECT_TYPE;
     }
 
-    /**
-     * @return string
-     */
     public function getAction() {
         return self::ACTION;
     }
 
-    /**
-     * @return string
-     */
-    public function getVersion() {
-        return $this->version;
+    public function getNewVersion() {
+        return $this->newVersion;
     }
 
-    /**
-     * @param CommitMessage $commitMessage
-     * @return boolean
-     */
-    public static function matchesCommitMessage(CommitMessage $commitMessage) {
-        return ChangeInfoHelpers::actionTagStartsWith($commitMessage, self::OBJECT_TYPE);
-    }
-
-    /**
-     * @param CommitMessage $commitMessage
-     * @return ChangeInfo
-     */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags[BaseChangeInfo::ACTION_TAG];
-        list($_, $__, $version) = explode("/", $actionTag, 3);
+        $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
+        list( , , $version) = explode("/", $actionTag, 3);
         return new self($version);
     }
 
-    /**
-     * @return string
-     */
     function getChangeDescription() {
-        return "WordPress updated to version " . $this->getVersion();
+        return "WordPress updated to version " . $this->getNewVersion();
     }
 
-    /**
-     * Returns the first line of commit message
-     *
-     * @return string
-     */
-    protected function getCommitMessageHead() {
-        return "WordPress updated to version " . $this->getVersion();
+    protected function getActionTagValue() {
+        return "{$this->getObjectType()}/{$this->getAction()}/{$this->getNewVersion()}";
     }
 
-    /**
-     * Returns the content of VP-Action tag
-     *
-     * @return string
-     */
-    protected function getActionTag() {
-        return "{$this->getObjectType()}/{$this->getAction()}/{$this->getVersion()}";
+    protected function getCustomTags() {
+        return array();
     }
+
+
 }

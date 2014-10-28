@@ -13,7 +13,7 @@ class UserTest extends WpCliTestCase {
         WpAutomation::createUser($this->someUser);
 
         $lastCommit = $this->getLastCommit();
-        $comitAction = $lastCommit->getMessage()->getVersionPressTag(BaseChangeInfo::ACTION_TAG);
+        $comitAction = $lastCommit->getMessage()->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         $loginInTag = $lastCommit->getMessage()->getVersionPressTag(UserChangeInfo::USER_LOGIN);
         $this->assertStringStartsWith("user/create", $comitAction);
         $this->assertEquals($this->someUser["user_login"], $loginInTag);
@@ -58,7 +58,7 @@ class UserTest extends WpCliTestCase {
         $editationCommit = $this->getLastCommit();
         $this->assertStringStartsWith(
             "user/edit",
-            $editationCommit->getMessage()->getVersionPressTag(BaseChangeInfo::ACTION_TAG),
+            $editationCommit->getMessage()->getVersionPressTag(TrackedChangeInfo::ACTION_TAG),
             "Expected another action"
         );
 

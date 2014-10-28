@@ -15,8 +15,9 @@ abstract class Git {
     private static $REV_PARSE_COMMAND = "git rev-parse %s";
 
     public static function commit($message, $directory = "") {
-        if(is_string($message))
+        if (is_string($message)) {
             $message = new CommitMessage($message);
+        }
 
         chdir(dirname(__FILE__));
 
@@ -27,7 +28,7 @@ abstract class Git {
         $directory = $directory === "" ? self::$gitRoot : $directory;
         $gitAddPath = $directory . "/" . "*";
 
-        if(is_user_logged_in() && is_admin()) {
+        if (is_user_logged_in() && is_admin()) {
             $currentUser = wp_get_current_user();
             $authorName = $currentUser->display_name;
             $authorEmail = $currentUser->user_email;
@@ -36,9 +37,9 @@ abstract class Git {
             $authorEmail = "nonadmin@example.com";
         }
 
-        $commitMessage = self::$COMMIT_MESSAGE_PREFIX . $message->getHead();
+        $commitMessage = self::$COMMIT_MESSAGE_PREFIX . $message->getSubject();
 
-        if($message->getBody() != null) $commitMessage .= "\n\n" . $message->getBody();
+        if ($message->getBody() != null) $commitMessage .= "\n\n" . $message->getBody();
 
         $tempCommitMessageFilename = md5(rand());
         $tempCommitMessagePath = VERSIONPRESS_PLUGIN_DIR . "/temp/" . $tempCommitMessageFilename;
