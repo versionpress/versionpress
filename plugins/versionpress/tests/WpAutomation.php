@@ -199,7 +199,7 @@ class WpAutomation {
      */
     public static function enableVersionPress() {
         self::runWpCliCommand('plugin', 'activate', array('versionpress'));
-        $code = 'global $versionPressContainer;$initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);$initializer->initializeVersionPress();';
+        $code = 'require_once(WP_CONTENT_DIR . \'/plugins/versionpress/bootstrap.php\'); $initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER); $initializer->initializeVersionPress();';
         self::runWpCliCommand('eval', array($code));
     }
 
