@@ -23,7 +23,6 @@ gulp.task('copy', ['clean'], function (cb) {
         vpDir + '/**',
         '!' + vpDir + '/node_modules{,/**}',
         '!' + vpDir + '/vendor{,/**}',
-        '!' + vpDir + '/spec{,/**}',
         '!' + vpDir + '/tests{,/**}',
         '!' + vpDir + '/versionpress.iml',
         '!' + vpDir + '/log/**/!(.gitignore)',
