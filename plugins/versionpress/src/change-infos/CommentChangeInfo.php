@@ -15,14 +15,10 @@ class CommentChangeInfo extends EntityChangeInfo {
     const POST_TITLE_TAG = "VP-Comment-PostTitle";
     const AUTHOR_TAG = "VP-Comment-Author";
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $commentAuthor;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $commentedPost;
 
     public function __construct($action, $entityId, $commentAuthor, $commentedPost) {
@@ -30,7 +26,6 @@ class CommentChangeInfo extends EntityChangeInfo {
         $this->commentAuthor = $commentAuthor;
         $this->commentedPost = $commentedPost;
     }
-
 
     function getChangeDescription() {
         if($this->getAction() === "create")
@@ -45,7 +40,7 @@ class CommentChangeInfo extends EntityChangeInfo {
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
         $commentAuthor = $tags[self::AUTHOR_TAG];
         $commentedPost = $tags[self::POST_TITLE_TAG];
-        list($_, $action, $entityId) = explode("/", $actionTag, 3);
+        list(, $action, $entityId) = explode("/", $actionTag, 3);
         return new self($action, $entityId, $commentAuthor, $commentedPost);
     }
 

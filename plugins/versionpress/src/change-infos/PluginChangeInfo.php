@@ -9,9 +9,10 @@
  *     VP-Plugin-Name: Hello Dolly
  *
  * Note that the plugin identifier could be, and typically will be, something containing path separator,
- * e.g. `akismet/akismet.php`. So the full VP-Action tag will look like this:
+ * e.g. `akismet/akismet.php`. So the full VP-Action tag will often look like:
  *
  *     VP-Action: plugin/install/akismet/akismet.php
+ *
  */
 class PluginChangeInfo extends TrackedChangeInfo {
 
@@ -49,7 +50,7 @@ class PluginChangeInfo extends TrackedChangeInfo {
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         $pluginName = $commitMessage->getVersionPressTag(self::PLUGIN_NAME_TAG);
-        list($_, $action, $pluginFile) = explode("/", $actionTag, 3);
+        list( , $action, $pluginFile) = explode("/", $actionTag, 3);
         return new self($pluginFile, $action, $pluginName);
     }
 
@@ -57,7 +58,7 @@ class PluginChangeInfo extends TrackedChangeInfo {
         return NStrings::capitalize($this->action) . (NStrings::endsWith($this->action, "e") ? "d" : "ed") . " plugin '{$this->pluginName}'";
     }
 
-    protected function constructActionTagValue() {
+    protected function getActionTagValue() {
         return "{$this->getObjectType()}/{$this->getAction()}/" . $this->pluginFile;
     }
 

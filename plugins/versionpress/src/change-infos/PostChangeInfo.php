@@ -34,7 +34,7 @@ class PostChangeInfo extends EntityChangeInfo {
         $tags = $commitMessage->getVersionPressTags();
 
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
-        list($_, $action, $entityId) = explode("/", $actionTag, 3);
+        list( , $action, $entityId) = explode("/", $actionTag, 3);
 
         $titleTag = isset($tags[self::POST_TITLE_TAG]) ? $tags[self::POST_TITLE_TAG] : $entityId;
         $type = isset($tags[self::POST_TYPE_TAG]) ? $tags[self::POST_TYPE_TAG] : "post";

@@ -1,65 +1,60 @@
 <?php
 
 /**
- * Base class for all ChangeInfo objects representing commits tracked
- * by VersionPress. One common thing about them is that they build
- * on top of metadata stored in VP tags inside of commit messages
- * (all of them have at least the `VP-Action` tag).
+ * Base class for ChangeInfos that are properly tracked by VersionPress. They use
+ * commit metadata in form of VP tags to which some useful information is persisted
+ * and later read when the main VersionPress table is being rendered. At least
+ * the VP-Action tag is always present, something like:
  *
- * See also UntrackedChangeInfo which represents a commit that was created
- * outside of VersionPress.
+ *     VP-Action: post/edit/VPID123
+ *
+ * Specific subclasses optionally add their own tags.
  *
  * @see CommitMessage::getVersionPressTags()
- * @see UntrackedChangeInfo
+ * @see UntrackedChangeInfo Changes created outside of VersionPress.
  */
 abstract class TrackedChangeInfo implements ChangeInfo {
 
+    /**
+     * VP tag common to all tracked change infos. It is the only required tag for them.
+     */
     const ACTION_TAG = "VP-Action";
 
     /**
-     * Object type part of the VP-Action tag value. The `matchesCommitMessage()` method
-     * usually uses this to match ChangeInfo type to a raw commit message.
+     * Object type, the first part of the VP-Action tag value.
      *
-     * For example, if the VP-Action tag has the value of "post/edit/VPID123", the
-     * objectType is "post".
+     * For example, when objectType is "post", the VP-Action tag will be something like "post/edit/VPID123".
      *
      * @return string
      */
     abstract function getObjectType();
 
     /**
-     * The action part of the VP-Action tag value. Identifies what happened with
-     * the object type, for instance, a plugin (object type) may have been
-     * updated, installed, deactivated etc.
+     * The action done on the object type, for instance "install" or "activate" if the object was a plugin.
+     * Action is always part of VP-Action tag as the second segment.
      *
      * @return string
      */
     abstract function getAction();
 
-    /**
-     * @inheritdoc
-     *
-     * @return CommitMessage
-     */
+
     public function getCommitMessage() {
-        return new CommitMessage($this->getChangeDescription(), $this->constructCommitMessageBody());
+        return new CommitMessage($this->getChangeDescription(), $this->getCommitMessageBody());
     }
 
-
     /**
-     * Constructs commit message body, which is typically a couple of lines
-     * with VP tags.
+     * Constructs commit message body, which is typically a couple of lines of VP tags.
      *
-     * General algorithm is defined in this base class implementation and the subclasses
+     * General algorithm is defined in this base class and the subclasses
      * only need to provide content for VP-Action tag and an array of custom VP tags.
      *
-     * @see constructActionTagValue()
+     * @see getActionTagValue()
      * @see getCustomTags()
      *
      * @return string
      */
-    private function constructCommitMessageBody() {
-        $actionTag = $this->constructActionTagValue();
+    private function getCommitMessageBody() {
+        $actionTag = $this->getActionTagValue();
 
         $tags = array();
         if($actionTag) {
@@ -77,23 +72,21 @@ abstract class TrackedChangeInfo implements ChangeInfo {
     }
 
     /**
-     * Constructs string for the VP-Action tag value based on the ChangeInfo properties.
-     * Used to construct the commit message body from this ChangeInfo object.
+     * Used to construct a commit message body, subclasses provide a string for the VP-Action tag value
+     * using this method.
      *
-     * @see constructCommitMessageBody()
-     *
+     * @see getCommitMessageBody()
      * @return string
      */
-    abstract protected function constructActionTagValue();
+    abstract protected function getActionTagValue();
 
     /**
-     * Subclasses return an associative array of addition VP tags they wish
-     * to store to a commit message body. By default, there are no additional
-     * VP tags (an empty array).
+     * Used to construct a commit message body, subclasses provide an array of VP tags
+     * using this method. If they don't need custom tags, they return an empty array.
      *
+     * @see getCommitMessageBody()
      * @return array
      */
-    protected function getCustomTags() {
-        return array();
-    }
+    abstract protected function getCustomTags();
+
 }

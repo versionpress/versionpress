@@ -1,12 +1,14 @@
 <?php
 
 /**
- * Theme changes like their installation, switching, editing etc.
+ * Theme changes like installation, switching, editing etc.
  *
  * VP tags:
  *
  *     VP-Action: theme/(install|update|customize|edit|switch|delete)/twentyfourteen
  *     VP-Theme-Name: Twenty Fourteen
+ *
+ * Note: theme is `customize`d via the WP customizer, `edit`ed via the built in text editor.
  *
  */
 class ThemeChangeInfo extends TrackedChangeInfo {
@@ -51,7 +53,7 @@ class ThemeChangeInfo extends TrackedChangeInfo {
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         $themeName = $commitMessage->getVersionPressTag(self::THEME_NAME_TAG);
-        list($_, $action, $themeId) = explode("/", $actionTag, 3);
+        list( , $action, $themeId) = explode("/", $actionTag, 3);
         return new self($themeId, $action, $themeName);
     }
 
@@ -64,7 +66,7 @@ class ThemeChangeInfo extends TrackedChangeInfo {
         return NStrings::capitalize($this->action) . (NStrings::endsWith($this->action, "e") ? "d" : "ed") . " theme '{$this->themeName}'";
     }
 
-    protected function constructActionTagValue() {
+    protected function getActionTagValue() {
         return "{$this->getObjectType()}/{$this->getAction()}/" . $this->themeId;
     }
 

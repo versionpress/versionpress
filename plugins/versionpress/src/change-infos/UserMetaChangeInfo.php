@@ -1,27 +1,25 @@
 <?php
 
 /**
- * Changes of certain user properties.
+ * Changes of certain user properties like nickname etc.
  *
  * VP tags:
  *
  *     VP-Action: usermeta/(create|edit|delete)/VPID
  *
  * TODO this is work in progress at the time of writing this documentation, see WP-130
+ *
+ * @see UserChangeInfo
  */
 class UserMetaChangeInfo extends EntityChangeInfo {
 
     const USER_LOGIN = "VP-User-Login";
     const USER_META_KEY = "VP-UserMeta-Key";
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $userLogin;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $userMetaKey;
 
     public function __construct($action, $entityId, $userLogin, $userMetaKey) {
@@ -41,7 +39,7 @@ class UserMetaChangeInfo extends EntityChangeInfo {
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
         $userMetaKey = $tags[self::USER_META_KEY];
         $userLogin = $tags[self::USER_LOGIN];
-        list($_, $action, $entityId) = explode("/", $actionTag);
+        list( , $action, $entityId) = explode("/", $actionTag);
         return new self($action, $entityId, $userLogin, $userMetaKey);
     }
 

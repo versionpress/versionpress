@@ -7,14 +7,14 @@
  *
  *     VP-Action: user/(create|edit|delete)/VPID
  *     VP-User-Login: testuser
+ *
+ * @see UserMetaChangeInfo
  */
 class UserChangeInfo extends EntityChangeInfo {
 
     const USER_LOGIN = "VP-User-Login";
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $userLogin;
 
     public function __construct($action, $entityId, $userLogin) {
@@ -32,7 +32,7 @@ class UserChangeInfo extends EntityChangeInfo {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
         $userLogin = $tags[self::USER_LOGIN];
-        list($_, $action, $entityId) = explode("/", $actionTag);
+        list( , $action, $entityId) = explode("/", $actionTag);
         return new self($action, $entityId, $userLogin);
     }
 

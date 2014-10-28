@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Option changes like creating or updating entities from the `options` table.
+ * Option changes like creating or updating them.
  *
  * VP tags:
  *
  *     VP-Action: option/(create|edit|delete)/blogname
  *
- * Note: there used to be a VP-Option-Value tag before but we don't use it any more as it doesn't make
- * much sense - the data change is captured in the commit body and we don't need to store it in a tag.
+ * Note: there was an intention to use VP-Option-Value tag before but it was never implemented and
+ * it is not clear how to approach this. See WP-147.
  */
 class OptionChangeInfo extends EntityChangeInfo {
 
@@ -27,7 +27,7 @@ class OptionChangeInfo extends EntityChangeInfo {
     static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
-        list($_, $action, $entityId) = explode("/", $actionTag, 3);
+        list( , $action, $entityId) = explode("/", $actionTag, 3);
         return new self($action, $entityId);
     }
 

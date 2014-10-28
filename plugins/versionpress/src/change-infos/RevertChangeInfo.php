@@ -6,7 +6,7 @@
  *
  * VP tags:
  *
- *     VP-Action: versionpress/(undo|rollback)/HASH123
+ *     VP-Action: versionpress/(undo|rollback)/hash123
  *
  * (No additional tags are required, even the ranges, when we support them, will be part
  * of the hash part of the main VP-Action tag.)
@@ -18,13 +18,10 @@ class RevertChangeInfo extends TrackedChangeInfo {
     const ACTION_UNDO = "undo";
     const ACTION_ROLLBACK = "rollback";
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $action;
-    /**
-     * @var string
-     */
+
+    /** @var string */
     private $commitHash;
 
     function __construct($action, $commitHash) {
@@ -40,38 +37,22 @@ class RevertChangeInfo extends TrackedChangeInfo {
         return $this->action;
     }
 
-    /**
-     * @param CommitMessage $commitMessage
-     * @return ChangeInfo
-     */
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        list($_, $action, $commitHash) = explode("/", $tags[TrackedChangeInfo::ACTION_TAG], 3);
+        list( , $action, $commitHash) = explode("/", $tags[TrackedChangeInfo::ACTION_TAG], 3);
         return new self($action, $commitHash);
     }
 
-    /**
-     * @return string
-     */
     public function getChangeDescription() {
         return ($this->action == self::ACTION_UNDO ? "Reverted change " : "Rollback to ") . $this->commitHash;
     }
 
-    /**
-     * Returns the first line of commit message
-     *
-     * @return string
-     */
-    protected function constructCommitMessageHead() {
-        return ($this->action == self::ACTION_UNDO ? "Reverted change " : "Rollback to ") . $this->commitHash;
-    }
-
-    /**
-     * Returns the content of VP-Action tag
-     *
-     * @return string
-     */
-    protected function constructActionTagValue() {
+    protected function getActionTagValue() {
         return sprintf("%s/%s/%s", self::OBJECT_TYPE, $this->getAction(), $this->commitHash);
     }
+
+    protected function getCustomTags() {
+        return array();
+    }
+
 }
