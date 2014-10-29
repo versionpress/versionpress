@@ -269,8 +269,8 @@ function vp_admin_post_confirm_deactivation() {
         unlink(WP_CONTENT_DIR . '/db.php');
     }
 
-    if (file_exists(__DIR__ . '/.active')) {
-        unlink(__DIR__ . '/.active');
+    if (file_exists(VERSIONPRESS_ACTIVATION_FILE)) {
+        unlink(VERSIONPRESS_ACTIVATION_FILE);
     }
 
     FileSystem::getWpFilesystem()->rmdir(VERSIONPRESS_MIRRORING_DIR, true);
@@ -471,6 +471,6 @@ function vp_ajax_hide_vp_welcome_panel() {
  * @return bool
  */
 function vp_is_active() {
-    return defined('VERSIONPRESS_PLUGIN_DIR') && file_exists(VERSIONPRESS_PLUGIN_DIR . '/.active');
+    return defined('VERSIONPRESS_ACTIVATION_FILE') && file_exists(VERSIONPRESS_ACTIVATION_FILE);
 }
 

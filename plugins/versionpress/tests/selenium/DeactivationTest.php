@@ -54,7 +54,7 @@ class DeactivationTest extends SeleniumTestCase {
 
 
         $this->assertFileNotExists(self::$config->getSitePath() . '/wp-content/db.php');
-        $this->assertFileNotExists(self::$config->getSitePath() . '/wp-content/plugins/versionpress/.active');
+        $this->assertFileNotExists(self::$config->getSitePath() . '/wp-content/vpdb/.active');
         $this->assertFileExists(self::$config->getSitePath() . '/.git');
 
     }
@@ -104,4 +104,3 @@ class DeactivationTest extends SeleniumTestCase {
     }
 
 }
- 

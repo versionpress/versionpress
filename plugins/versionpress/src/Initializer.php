@@ -362,7 +362,7 @@ class Initializer {
 
     private function activateVersionPress() {
         copy(VERSIONPRESS_PLUGIN_DIR . '/_db.php', WP_CONTENT_DIR . '/db.php');
-        touch(VERSIONPRESS_PLUGIN_DIR . '/.active');
+        touch(VERSIONPRESS_ACTIVATION_FILE);
         $this->reportProgressChange(InitializerStates::VERSIONPRESS_ACTIVATED);
     }
 
@@ -372,7 +372,7 @@ class Initializer {
         $installationChangeInfo = new VersionPressChangeInfo();
         Git::commit($installationChangeInfo->getCommitMessage());
         $lastCommitHash = Git::getLastCommitHash();
-        file_put_contents(VERSIONPRESS_PLUGIN_DIR . '/.active', $lastCommitHash);
+        file_put_contents(VERSIONPRESS_ACTIVATION_FILE, $lastCommitHash);
     }
 
 

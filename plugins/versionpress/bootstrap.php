@@ -1,6 +1,7 @@
 <?php
 define('VERSIONPRESS_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins/versionpress');
 define('VERSIONPRESS_MIRRORING_DIR', WP_CONTENT_DIR . '/vpdb');
+define('VERSIONPRESS_ACTIVATION_FILE', VERSIONPRESS_MIRRORING_DIR . '/.active');
 
 /**
  * Nette is currently referenced as a minified library. We only need pieces from it so we should
@@ -25,6 +26,6 @@ $robotLoader->register();
 global $wpdb, $versionPressContainer;
 $versionPressContainer = DIContainer::getConfiguredInstance();
 
-if (file_exists(VERSIONPRESS_PLUGIN_DIR . '/.active')) {
+if (file_exists(VERSIONPRESS_ACTIVATION_FILE)) {
     $wpdb = $versionPressContainer->resolve(VersionPressServices::DATABASE);
 }
