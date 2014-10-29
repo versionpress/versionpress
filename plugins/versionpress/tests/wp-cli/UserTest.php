@@ -68,7 +68,7 @@ class UserTest extends WpCliTestCase {
     }
 
     protected function getCommitedEntity($vpId) {
-        $path = self::$config->getSitePath() . '/wp-content/plugins/versionpress/db/users.ini';
+        $path = self::$config->getSitePath() . '/wp-content/vpdb/users.ini';
         $users = IniSerializer::deserialize(file_get_contents($path), true);
         return $users[$vpId];
     }

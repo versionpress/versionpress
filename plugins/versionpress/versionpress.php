@@ -273,7 +273,7 @@ function vp_admin_post_confirm_deactivation() {
         unlink(__DIR__ . '/.active');
     }
 
-    FileSystem::getWpFilesystem()->rmdir(__DIR__ . '/db', true);
+    FileSystem::getWpFilesystem()->rmdir(VERSIONPRESS_MIRRORING_DIR, true);
 
     global $wpdb;
 
@@ -282,7 +282,12 @@ function vp_admin_post_confirm_deactivation() {
     $queries[] = "DROP VIEW IF EXISTS `{$table_prefix}vp_reference_details`";
     $queries[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_references`";
     $queries[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_id`";
-    $queries[] = "DELETE FROM `{$table_prefix}usermeta` WHERE meta_key LIKE \"vp_%\"";
+
+    $vpOptionsReflection = new ReflectionClass('VersionPressOptions');
+    $usermetaToDelete = array_values($vpOptionsReflection->getConstants());
+    $queryRestriction = '"' . join('", "', $usermetaToDelete) . '"';
+
+    $queries[] = "DELETE FROM `{$table_prefix}usermeta` WHERE meta_key IN ({$queryRestriction})";
 
     foreach ($queries as $query) {
         $wpdb->query($query);
@@ -339,6 +344,8 @@ add_filter('wp_insert_post_data', 'vp_generate_post_guid', '99', 2);
  * @return array
  */
 function vp_generate_post_guid($data, $postarr) {
+    if(!vp_is_active()) return $data;
+
     if(empty($postarr['ID'])) { // it's insert not update
         $data['guid'] = IdUtil::newUuid();
     } elseif(preg_match("~^https?://[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$~i", $data['guid'])) { // it's guid

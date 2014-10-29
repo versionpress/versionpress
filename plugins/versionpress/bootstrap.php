@@ -1,6 +1,6 @@
 <?php
 define('VERSIONPRESS_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins/versionpress');
-define('VERSIONPRESS_MIRRORING_DIR', VERSIONPRESS_PLUGIN_DIR . '/db');
+define('VERSIONPRESS_MIRRORING_DIR', WP_CONTENT_DIR . '/vpdb');
 
 /**
  * Nette is currently referenced as a minified library. We only need pieces from it so we should

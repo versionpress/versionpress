@@ -42,7 +42,7 @@ class OptionTest extends WpCliTestCase {
     }
 
     protected function getCommitedEntity($vpId) {
-        $path = self::$config->getSitePath() . '/wp-content/plugins/versionpress/db/options.ini';
+        $path = self::$config->getSitePath() . '/wp-content/vpdb/options.ini';
         $options = IniSerializer::deserialize(file_get_contents($path), true);
         return $options[$vpId];
     }

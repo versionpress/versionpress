@@ -57,7 +57,7 @@ class CommentTest extends WpCliTestCase {
     }
 
     protected function getCommitedEntity($commentVpId) {
-        $path = self::$config->getSitePath() . '/wp-content/plugins/versionpress/db/comments/' . $commentVpId . '.ini';
+        $path = self::$config->getSitePath() . '/wp-content/vpdb/comments/' . $commentVpId . '.ini';
         return IniSerializer::deserialize(file_get_contents($path));
     }
 

@@ -57,7 +57,7 @@ class PostTest extends WpCliTestCase {
     }
 
     protected function getCommitedEntity($postId) {
-        $path = self::$config->getSitePath() . '/wp-content/plugins/versionpress/db/posts/' . $postId . '.ini';
+        $path = self::$config->getSitePath() . '/wp-content/vpdb/posts/' . $postId . '.ini';
         return IniSerializer::deserialize(file_get_contents($path));
     }
 
