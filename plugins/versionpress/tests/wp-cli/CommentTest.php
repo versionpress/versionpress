@@ -29,7 +29,7 @@ class CommentTest extends WpCliTestCase {
     public function testEditComment() {
         $newComment = $this->someComment;
         $changes = array(
-            "comment_content" => "Announcing VersionPress!"
+            "comment_content" => "Test comment"
         );
         $this->assertCommentEditation($newComment, $changes, "edit");
     }
