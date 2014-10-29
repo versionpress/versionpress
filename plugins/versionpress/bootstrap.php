@@ -10,6 +10,11 @@ define('VERSIONPRESS_MIRRORING_DIR', VERSIONPRESS_PLUGIN_DIR . '/db');
  * a problem for us, or not, see http://jira.agilio.cz/browse/WP-10 and http://jira.agilio.cz/browse/WP-40.
  */
 require_once(VERSIONPRESS_PLUGIN_DIR . '/vendor/autoload.php');
+
+if(defined('DOING_AJAX')) {
+    NDebugger::$bar = false;
+}
+
 NDebugger::enable(NDebugger::DETECT, VERSIONPRESS_PLUGIN_DIR . '/log');
 
 $robotLoader = new NRobotLoader();
