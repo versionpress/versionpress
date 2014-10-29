@@ -142,8 +142,8 @@ abstract class WpCliTestCase extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Creates new post, deletes it and checks that actual action corresponds with the expected one.
-     * Also checks there was deleted the right post.
+     * Creates new entity, deletes it and checks that actual action corresponds with the expected one.
+     * Also checks there the right entity was deleted.
      *
      * @param array $entity Entity to create
      * @param string $entityName Name of entity (e.g. post, comment etc.)
