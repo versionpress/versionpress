@@ -5,7 +5,7 @@ class PostMetaStorage extends DirectoryStorage {
     private $postMetaKey;
     private $postMetaVpId;
 
-    private $ignoredMeta = array('_edit_lock', '_edit_last');
+    private $ignoredMeta = array('_edit_lock', '_edit_last', '_pingme', '_encloseme');
 
     function __construct($directory) {
         parent::__construct($directory, 'post');
