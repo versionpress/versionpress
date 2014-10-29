@@ -57,13 +57,10 @@ class UserTest extends WpCliTestCase {
         WpAutomation::editUserMeta($id, $changedUserMeta, $userMetaValue);
         $editationCommit = $this->getLastCommit();
         $this->assertStringStartsWith(
-            "user/edit",
+            "usermeta/edit",
             $editationCommit->getMessage()->getVersionPressTag(TrackedChangeInfo::ACTION_TAG),
             "Expected another action"
         );
-
-        $editedUserVpId = $this->getVpIdFromCommit($editationCommit);
-        $this->assertEquals($createdUserVpId, $editedUserVpId, "Edited different entity");
 
         $commitedEntity = $this->getCommitedEntity($createdUserVpId);
         $newEntity = array_merge($newUser, array($changedUserMeta => $userMetaValue));
