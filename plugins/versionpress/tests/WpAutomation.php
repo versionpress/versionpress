@@ -330,7 +330,8 @@ class WpAutomation {
             if (is_int($name)) { // position based argument without name
                 $cliCommand .= " \"$value\"";
             } elseif($value) {
-                $cliCommand .= " --$name=\"$value\"";
+                $escapedValue = \Symfony\Component\Process\ProcessUtils::escapeArgument($value);
+                $cliCommand .= " --$name=$escapedValue";
             } else {
                 $cliCommand .= " --$name";
             }
