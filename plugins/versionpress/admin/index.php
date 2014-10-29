@@ -333,7 +333,7 @@ function _vp_show_progress_message($progressMessage) {
 
             $initialCommitHash = trim(file_get_contents(VERSIONPRESS_PLUGIN_DIR . '/.active'));
             $gitLogPaginator = new GitLogPaginator();
-            $gitLogPaginator->setCommitsPerPage(5);
+            $gitLogPaginator->setCommitsPerPage(25);
             $page = isset($_GET['vp-page']) ? intval($_GET['vp-page']) : 0;
             $commits = $gitLogPaginator->getPage($page);
 
