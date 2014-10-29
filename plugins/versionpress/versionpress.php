@@ -420,9 +420,9 @@ wp_enqueue_style('versionpress_popover_custom_style', plugins_url( 'admin/css/po
 wp_enqueue_script('jquery');
 wp_enqueue_script('versionpress_popover_script', plugins_url( 'admin/js/jquery.webui-popover.min.js' , __FILE__ ), 'jquery');
 function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
-    $adminBarText = "You are running an <span style=\"color:red;font-weight:bold\">alpha version</span> of VersionPress";
+    $adminBarText = "You are running a <span style=\"color:red;font-weight:bold\">preview version</span> of VersionPress";
     $popoverTitle = "Use for <strong>testing only</strong>";
-    $popoverText = "<p>You are running an alpha version of VersionPress which means that there <em>are</em> bugs, this site's data may become corrupt etc.<br /><br /><strong style='color: red;'>NEVER USE THIS VERSION IN PRODUCTION OR WITH A PRODUCTION DATABASE.</strong></p>";
+    $popoverText = "<p>You are running a preview version of VersionPress which means that there <em>are</em> bugs, this site's data may become corrupt etc.<br /><br /><strong style='color: red;'>DON'T USE THIS VERSION IN PRODUCTION OR WITH A PRODUCTION DATABASE.</strong></p>";
     $popoverText .= "<p><a href='http://versionpress.net/docs/en/release-notes' target='_blank'>Learn more about VersionPress releases</a></p>";
 
     $adminBar->add_node(array(
