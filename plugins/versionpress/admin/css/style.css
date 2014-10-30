@@ -1,3 +1,16 @@
+/*------------------------------
+ * General styles
+ *------------------------------*/
+
+.vp-highlight-text {
+    background-color: rgba(255, 255, 0, 0.7);
+}
+
+
+/*------------------------------
+ * Admin pages
+ *------------------------------*/
+
 #wpbody {
 	padding-right: 10px;
 }
@@ -33,9 +46,11 @@
     margin-top: 2px;
 }
 
-/*
- * Styles for deactivate.php
- */
+
+/*------------------------------
+ * Styles for admin/deactivate.php
+ *------------------------------*/
+
 
 h2.vp-deactivation-header {
     margin-bottom: 20px;
@@ -65,7 +80,7 @@ h2.vp-deactivation-header {
 }
 
 .deactivation-buttons {
-    margin: 40px 0px 20px;
+    margin: 40px 0 20px;
 }
 
 .deactivation-buttons form {

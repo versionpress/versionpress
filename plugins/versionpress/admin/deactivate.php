@@ -38,7 +38,7 @@ function _vp_button($label, $action, $type = "delete", $cssClass = "") {
 
             <li>
                 <span class="icon icon-notification warning-color"></span>
-                <span style="background-color: rgba(255, 255, 0, 0.7);">Later installations of VersionPress <strong>will not be able to undo or rollback changes</strong> done by this installation.</span> The changes are still technically in the repository if you want to inspect them using e.g. the command line tools etc.
+                <span class="vp-highlight-text">Later installations of VersionPress <strong>will not be able to undo or rollback changes</strong> done by this installation.</span> The changes are still technically in the repository if you want to inspect them using e.g. the command line tools etc.
             </li>
 
 
