@@ -3,7 +3,8 @@
     "description": "VersionPress is a version control plugin for WordPress. It versions both files and the database enabling things like site-wide reverts, safe updates, easy staging etc. All on your server.",
     "require": {
         "nette/nette-minified": "dev-v2.0-prefix",
-        "symfony/process": "2.5.*"
+        "symfony/process": "2.5.*",
+        "michelf/php-markdown": "1.4.*"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",

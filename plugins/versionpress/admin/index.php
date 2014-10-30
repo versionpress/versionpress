@@ -175,10 +175,10 @@ function _vp_show_progress_message($progressMessage) {
 
                 <h4>System requirements check</h4>
 
-                <ul>
+                <ul class="vp-requirements-check">
                     <?php
                     $requirementsChecker = new RequirementsChecker();
-                    $report = $requirementsChecker->getReport();
+                    $report = $requirementsChecker->getRequirements();
 
                     foreach ($report as $requirement) {
                         $iconClass = $requirement["fulfilled"] ? "icon-checkmark" : "icon-warning";
@@ -186,15 +186,16 @@ function _vp_show_progress_message($progressMessage) {
                     <li>
                         <span class="icon <?php echo $iconClass; ?>"></span>
                         <?php echo $requirement["name"]; ?>
+                        <p class="<?php echo $requirement["fulfilled"] ? 'closed' : 'open'; ?>"><?php echo Markdown::transform($requirement["help"]); ?></p>
                     </li>
                     <?php
                     }
 
-                    if($requirementsChecker->isEverythingFulfilled() && Git::isVersioned(dirname(__FILE__))) {
+                    if ($requirementsChecker->isEverythingFulfilled() && Git::isVersioned(dirname(__FILE__))) {
                     ?>
                         <li>
                             <span class="icon icon-warning"></span>
-                            Note: This website is already versioned in Git (the repository is either your custom or has been created by a previous installation of VersionPress). It is not a problem for VersionPress, but be sure you know what you are doing.
+                            Note: This website is already versioned in Git (the repository is either your custom or has been created by a previous installation of VersionPress). It is not a problem for VersionPress, just be sure that you know what you are doing.
                         </li>
                     <?php
                     }

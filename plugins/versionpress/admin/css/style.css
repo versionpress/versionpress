@@ -25,6 +25,13 @@
 	width: 160px;
 }
 
+.vp-requirements-check li p.closed {
+    display: none;
+}
+
+.vp-requirements-check li p {
+    margin-top: 2px;
+}
 
 /*
  * Styles for deactivate.php
