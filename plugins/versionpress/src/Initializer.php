@@ -363,6 +363,7 @@ class Initializer {
     private function activateVersionPress() {
         copy(VERSIONPRESS_PLUGIN_DIR . '/_db.php', WP_CONTENT_DIR . '/db.php');
         touch(VERSIONPRESS_ACTIVATION_FILE);
+        file_put_contents(dirname(VERSIONPRESS_ACTIVATION_FILE) . '/.gitignore', basename(VERSIONPRESS_ACTIVATION_FILE));
         $this->reportProgressChange(InitializerStates::VERSIONPRESS_ACTIVATED);
     }
 
