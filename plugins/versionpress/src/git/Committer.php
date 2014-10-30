@@ -41,7 +41,8 @@ class Committer
             $this->forcedChangeInfo = null;
         } elseif ($this->mirror->wasAffected() && $this->shouldCommit()) {
             $changeList = $this->mirror->getChangeList();
-            $commitMessage = $changeList[0]->getCommitMessage();
+            $changeInfo = count($changeList) > 1 ? new CompositeChangeInfo($changeList) : $changeList[0];
+            $commitMessage = $changeInfo->getCommitMessage();
 
             Git::commit($commitMessage);
         }

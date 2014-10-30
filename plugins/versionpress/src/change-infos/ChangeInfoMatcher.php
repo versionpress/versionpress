@@ -55,6 +55,10 @@ class ChangeInfoMatcher {
      */
     public static function findMatchingChangeInfo(CommitMessage $commitMessage) {
 
+        if(substr_count($commitMessage->getBody(), TrackedChangeInfo::ACTION_TAG) > 1) {
+            return "CompositeChangeInfo";
+        }
+
         $actionTagValue = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG); // can be empty string which is not a problem
 
         foreach (self::$changeInfoMap as $actionTagExpression => $changeInfoType) {
