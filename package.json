@@ -14,7 +14,8 @@
     "gulp-rename": "~1.2.0",
     "gulp-replace": "~0.4.0",
     "gulp-shell": "~0.2.9",
-    "gulp-zip": "~2.0.1"
+    "gulp-zip": "~2.0.1",
+    "shelljs": "^0.3.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

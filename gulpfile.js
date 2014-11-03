@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var del = require('del');
 var shell = require('gulp-shell');
+var shelljs = require('shelljs/global');
 var rename = require('gulp-rename');
 var zip = require('gulp-zip');
 var replace = require('gulp-replace');
@@ -8,10 +9,16 @@ var fs = require('fs');
 var path = require('path');
 
 var packageVersion = "";
+var buildType = '';
 
 var buildDir = './build';
 var distDir = './dist';
 var vpDir = './plugins/versionpress';
+
+
+gulp.task('set-nightly-build', function() {
+    buildType = 'nightly';
+});
 
 gulp.task('clean', function (cb) {
     del([buildDir, distDir], cb);
@@ -57,10 +64,15 @@ gulp.task('persist-plugin-comment', ['rename-back'], function (cb) {
         var originalHead = content.substr(0, definePosition);
         var versionMatch = content.match(/^Version: (.*)$/m);
         packageVersion = versionMatch[1];
+        if (buildType == 'nightly') {
+            var gitCommit = exec('git rev-parse --short HEAD', {silent: true}).output.trim(); // trims the "\n" from the end
+            packageVersion += '+' + gitCommit;
+        }
 
         fs.readFile(buildDir + '/versionpress.php', fileOptions, function (err, content) {
             var definePosition = content.indexOf("define");
             var newContent = originalHead + content.substr(definePosition);
+            newContent = newContent.replace(/^Version: .*$/m, 'Version: ' + packageVersion);
             fs.writeFile(buildDir + '/versionpress.php', newContent, fileOptions, function (err) {
                 cb();
             });
@@ -88,4 +100,7 @@ gulp.task('clean-build', ['zip'], function (cb) {
 	del(['build'], cb);
 });
 
+gulp.task('nightly', ['set-nightly-build', 'clean-build']);
+
 gulp.task('default', ['clean-build']);
+
