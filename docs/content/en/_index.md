@@ -9,6 +9,6 @@ Welcome to [VersionPress](http://versionpress.net/) documentation. VersionPress 
 
 These docs are divided into a couple of sections:
 
-* [Getting Started](./en/getting-started) – will give you a brief introduction to VersionPress
+* [Getting Started](./en/getting-started) – brief introduction to VersionPress
 * [Feature Focus](./en/feature-focus) – discusses most important feature areas in more detail
-* [Release Notes](./en/release-note) – contains details all releases 
+* [Release Notes](./en/release-note) – details of all releases

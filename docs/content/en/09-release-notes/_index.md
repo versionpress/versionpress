@@ -4,6 +4,7 @@ The current release is **1.0-alpha3**, released on 30-Sep-2014. Our versioning s
 
 Release notes of all the versions shipped so far:
 
+* [1.0-beta1](./release-notes/1.0-beta1)
 * [1.0-alpha3](./release-notes/1.0-alpha3)
 * [1.0-alpha2](./release-notes/1.0-alpha2)
 * [1.0-alpha1](./release-notes/1.0-alpha1)

@@ -1,20 +1,19 @@
-# How VersionPress works #
+# How VersionPress Works #
 
-This is a high-level overview of how VersionPress works. If you are a common user you generally don't need to worry but if you're wondering what exactly VersionPress does, this page is for you. 
+Sometimes, the best way to understand a product is to have a brief idea of how it works, internally. That way, you know what actions are safe, what is possibly problematic and so on. This page should provide that brief overview.
 
 
 ## High level overview ##
 
-Site with VersionPress installed and activated has three main parts:
+WordPress site with VersionPress installed and activated contains three main parts:
 
-* **WordPress itself**, i.e. PHP + MySQL
-* **Git repository** that manages all the historic versions
-* **Glue code** that translates raw WordPress data into a format that can be managed by Git
+* **WordPress itself**, i.e. the PHP code and MySQL database
+* **[Git](./git) repository** that manages the historic revisions
+* **Our plugin** that translates WordPress data into the Git format and does all the other things like providing the admin pages etc.
 
-Most of the VersionPress code falls under the third point but it's important to note that we have generally very little code to implement the version control itself. We depend on [Git](http://git-scm.com/) to do the heavy lifting for us which has [many advantages](./git). 
+One important point here is that our code actually implements very little versioning logic itself. Instead, we depend heavily on Git which was an important strategic decision. This has many advantages but also poses some new challenges as described [here](./git).
 
-There are two more important things with regards to how VersionPress works:
+With regards to how VersionPress works, **it generally observes write operations** (e.g., updating a post, adding a comment etc.) and prepares the data in a format that will be suitable for version control in Git. The files in this format are stored in the `wp-content/vpdb` folder and later committed to the Git repository. In the opposite direction, they can be used to update the MySQL database on operations like Undo, Rollback or Clone.
 
-1. **VersionPress only observes write operations**. This is kind of obvious because read operations don't change state and there would be nothing to commit but it is important for performance. Read-heavy sites (most blogs, public websites etc.) are therefore fine. (See also [Performance considerations](./performance).)
-2. **MySQL database is only updated by VersionPress on Undo or Rollback**. Storing new versions does not manipulate disk or MySQL data in any way.
+On read operations (displaying a post etc.), VersionPress generally does nothing. It might happen that even something that appears as a read operation changes some data behind the scenes, in which case there will be a new commit.
 
