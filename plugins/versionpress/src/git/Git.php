@@ -68,6 +68,10 @@ abstract class Git {
         self::runShellCommand("git push origin master");
     }
 
+    public static function cloneRepository($repository, $path) {
+        self::runShellCommand("git clone %s %s", $repository, $path);
+    }
+
     public static function assumeUnchanged($filename) {
         self::runShellCommand(self::$ASSUME_UNCHANGED_COMMAND, $filename);
     }
