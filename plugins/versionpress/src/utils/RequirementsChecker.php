@@ -14,13 +14,13 @@ class RequirementsChecker {
         );
 
         $this->requirements[] = array(
-            'name' => 'proc_open()',
+            'name' => 'Execute external commands',
             'fulfilled' => $this->tryRunProcess(),
             'help' => 'PHP function `proc_open()` must be enabled as VersionPress uses it to execute Git commands. Please update your php.ini.'
         );
 
         $this->requirements[] = array(
-            'name' => 'Git availability',
+            'name' => 'Git installed',
             'fulfilled' => $this->tryGit(),
             'help' => 'Git must be installed on the server. Please [download](http://git-scm.com/) and install it.'
         );

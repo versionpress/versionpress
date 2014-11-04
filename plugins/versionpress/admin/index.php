@@ -140,40 +140,15 @@ function _vp_show_progress_message($progressMessage) {
     } elseif (!vp_is_active()) {
     ?>
 
-        <div class="welcome-panel">
+        <div class="welcome-panel vp-activation-panel">
 
             <div class="welcome-panel-content">
 
                 <h3>Welcome to VersionPress!</h3>
 
-                <p class="about-description">We're ready to make your admin experience better. Click the button below so that VersionPress can initialize itself and start tracking your site. A few things to know:</p>
+                <p class="about-description">Please click the <i>Activate VersionPress</i> button below to start tracking the site – note that it will take a few moments, depending on the size of this site. You can then use the VersionPress menu item on the left to access all its features.</p>
 
-                <ul>
-
-                    <li>
-                        <span class="icon icon-checkmark"></span>
-                        VersionPress doesn't require any further setup or interaction. Just activate it and it will start doing its thing.
-                    </li>
-
-                    <li>
-                        <span class="icon icon-checkmark"></span>
-                        To undo a change or roll back to some previous state use the VersionPress item in the left menu.
-                    </li>
-
-                    <li>
-                        <span class="icon icon-checkmark"></span>
-                        VersionPress never sends your data anywhere – it is not a service but an installed thing on your server.
-                    </li>
-
-                    <li>
-                        <span class="icon icon-notification"></span>
-                        You are using a preview version of VersionPress which is suitable for testing purposes only. If you encounter any issues please contact us at <a href="mailto:info@versionpress.net">info@versionpress.net</a>.
-                    </li>
-
-
-                </ul>
-
-                <h4>System requirements check</h4>
+                <h4>System requirements check:</h4>
 
                 <ul class="vp-requirements-check">
                     <?php
@@ -216,6 +191,15 @@ function _vp_show_progress_message($progressMessage) {
                            class="button <?php echo $buttonClass; ?> button-hero" id="activate-versionpress-btn">Activate
                             VersionPress</a>
                 </div>
+
+                <ul>
+                    <li>
+
+                        <span class="icon icon-notification"></span>
+                        You are activating a preview version which is suitable for testing purposes only. If you encounter any issues please contact us at <a href="mailto:info@versionpress.net">info@versionpress.net</a>.
+                    </li>
+                </ul>
+
             </div>
 
 
