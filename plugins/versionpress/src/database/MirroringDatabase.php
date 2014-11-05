@@ -75,9 +75,7 @@ class MirroringDatabase extends ExtendedWpdb {
             } elseif (isset($where[$idColumnName])) {
                 $ids[] = $where[$idColumnName];
             } else {
-                $sql = "SELECT {$idColumnName} FROM {$table} WHERE ";
-                $sql .= join(" AND ", array_map(function($column) { return "`$column` = %s";}, array_keys($where)));
-                $ids = $this->get_col($this->prepare($sql, $where));
+                $ids = $this->getIdsForRestriction($entityName, $where);
             }
 
             foreach ($ids as $id) {
@@ -110,24 +108,32 @@ class MirroringDatabase extends ExtendedWpdb {
         $result = parent::delete($table, $where, $where_format);
 
         $entityName = $this->stripTablePrefix($table);
-
         $hasId = $this->dbSchemaInfo->hasId($entityName);
+        $ids = array();
 
         if ($hasId) {
             $hasReferences = $this->dbSchemaInfo->hasReferences($entityName);
-            $id = $where[$this->dbSchemaInfo->getIdColumnName($entityName)];
-
-            if ($hasReferences) {
-                $this->deleteReferences($entityName, $id);
+            $idColumnName = $this->dbSchemaInfo->getIdColumnName($entityName);
+            if(isset($where[$idColumnName])) {
+                $ids[] = $where[$idColumnName];
+            } else {
+                $ids = $this->getIdsForRestriction($entityName, $where);
             }
 
-            $entityName = $this->stripTablePrefix($table);
-            $where['vp_id'] = $this->getVpId($entityName, $id);
-            $this->deleteId($entityName, $id);
+            foreach ($ids as $id) {
+                if ($hasReferences) {
+                    $this->deleteReferences($entityName, $id);
+                }
+
+                $where['vp_id'] = $this->getVpId($entityName, $id);
+                $this->deleteId($entityName, $id);
+                $this->mirror->delete($entityName, $where);
+            }
+
+            return $result;
         }
 
         $this->mirror->delete($entityName, $where);
-
         return $result;
     }
 
@@ -233,5 +239,30 @@ class MirroringDatabase extends ExtendedWpdb {
     private function getPostMetaId($post_id, $meta_key) {
         $getMetaIdSql = "SELECT meta_id FROM {$this->prefix}postmeta WHERE meta_key = \"$meta_key\" AND post_id = $post_id";
         return $this->get_var($getMetaIdSql);
+    }
+
+    /**
+     * Returns all ids from DB suitable for given restriction.
+     * E.g. all comment_id values where comment_post_id = 1
+     * @param string $entityName
+     * @param array $where
+     * @return array
+     */
+    private function getIdsForRestriction($entityName, $where) {
+        $idColumnName = $this->dbSchemaInfo->getIdColumnName($entityName);
+        $table = $this->dbSchemaInfo->getPrefixedTableName($entityName);
+
+        $sql = "SELECT {$idColumnName} FROM {$table} WHERE ";
+        $sql .= join(
+            " AND ",
+            array_map(
+                function ($column) {
+                    return "`$column` = %s";
+                },
+                array_keys($where)
+            )
+        );
+        $ids = $this->get_col($this->prepare($sql, $where));
+        return $ids;
     }
 }
