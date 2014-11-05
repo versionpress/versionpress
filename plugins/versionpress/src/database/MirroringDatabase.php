@@ -102,12 +102,6 @@ class MirroringDatabase extends ExtendedWpdb {
             return $result;
         }
 
-        $hasReferences = $this->dbSchemaInfo->hasReferences($entityName);
-
-        if ($hasReferences) {
-            $data = $this->saveReferences($entityName, $data);
-        }
-
         $this->mirror->save($entityName, $data);
         return $result;
     }
