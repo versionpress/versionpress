@@ -58,29 +58,48 @@ class MirroringDatabase extends ExtendedWpdb {
         $data = array_merge($data, $where);
 
         $shouldBeSaved = $this->mirror->shouldBeSaved($entityName, $data);
-        if (!$shouldBeSaved)
+        if (!$shouldBeSaved) {
             return $result;
+        }
 
         $shouldHaveId = $this->dbSchemaInfo->hasId($entityName);
 
         if ($shouldHaveId) {
-            if($entityName === 'usermeta') {
-                $id = $this->getUsermetaId($data['user_id'], $data['meta_key']);
-            } elseif($entityName === 'postmeta') {
-                $id = $this->getPostMetaId($data['post_id'], $data['meta_key']);
-            }  else {
-                $idColumnName = $this->dbSchemaInfo->getIdColumnName($entityName);
-                $id = $where[$idColumnName];
-            }
-            $vpId = $this->getVpId($entityName, $id);
+            $idColumnName = $this->dbSchemaInfo->getIdColumnName($entityName);
+            $ids = array();
 
-
-            if (!$vpId) {
-                $data['vp_id'] = $this->generateId();
-                $this->saveId($entityName, $id, $data['vp_id']);
+            if ($entityName === 'usermeta') {
+                $ids[] = $this->getUsermetaId($data['user_id'], $data['meta_key']);
+            } elseif ($entityName === 'postmeta') {
+                $ids[] = $this->getPostMetaId($data['post_id'], $data['meta_key']);
+            } elseif (isset($where[$idColumnName])) {
+                $ids[] = $where[$idColumnName];
             } else {
-                $data['vp_id'] = $vpId;
+                $sql = "SELECT {$idColumnName} FROM {$table} WHERE ";
+                $sql .= join(" AND ", array_map(function($column) { return "`$column` = %s";}, array_keys($where)));
+                $ids = $this->get_col($this->prepare($sql, $where));
             }
+
+            foreach ($ids as $id) {
+                $vpId = $this->getVpId($entityName, $id);
+
+
+                if (!$vpId) {
+                    $data['vp_id'] = $this->generateId();
+                    $this->saveId($entityName, $id, $data['vp_id']);
+                } else {
+                    $data['vp_id'] = $vpId;
+                }
+
+                $hasReferences = $this->dbSchemaInfo->hasReferences($entityName);
+
+                if ($hasReferences) {
+                    $data = $this->saveReferences($entityName, $data);
+                }
+
+                $this->mirror->save($entityName, $data);
+            }
+            return $result;
         }
 
         $hasReferences = $this->dbSchemaInfo->hasReferences($entityName);
