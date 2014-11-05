@@ -57,14 +57,14 @@ function vp_register_hooks() {
     });
 
     add_action('upgrader_process_complete', function ($upgrader, $hook_extra) use ($committer) {
-        if($hook_extra['type'] === 'theme') {
+        if ($hook_extra['type'] === 'theme') {
             $themeName = isset($upgrader->skin->api) ? $upgrader->skin->api->name : null;
             $themeId = $upgrader->result['destination_name'];
             $action = $hook_extra['action']; // can be "install" or "update", see WP_Upgrader and search for `'hook_extra' =>`
             $committer->forceChangeInfo(new ThemeChangeInfo($themeId, $action, $themeName));
         }
 
-        if(!($hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'update')) return; // handled by different hook
+        if (!($hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'update')) return; // handled by different hook
         $pluginName = $hook_extra['plugin'];
         $committer->forceChangeInfo(new PluginChangeInfo($pluginName, 'update'));
     }, 10, 2);
@@ -74,11 +74,11 @@ function vp_register_hooks() {
         $mirror->save("options", $option);
     });
 
-    add_filter('upgrader_pre_install', function($_, $hook_extra) use ($committer) {
-        if(!($hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'install')) return;
+    add_filter('upgrader_pre_install', function ($_, $hook_extra) use ($committer) {
+        if (!($hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'install')) return;
         $pluginsBeforeInstallation = get_plugins();
         add_filter('upgrader_post_install', function ($_, $hook_extra) use ($pluginsBeforeInstallation, $committer) {
-            if(!($hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'install')) return;
+            if (!($hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'install')) return;
             wp_cache_delete('plugins', 'plugins');
             $pluginsAfterInstallation = get_plugins();
             $installedPlugin = array_diff_key($pluginsAfterInstallation, $pluginsBeforeInstallation);
@@ -86,14 +86,14 @@ function vp_register_hooks() {
             $pluginName = key($installedPlugin);
             $committer->forceChangeInfo(new PluginChangeInfo($pluginName, 'install'));
         }, 10, 2);
-    },10, 2);
+    }, 10, 2);
 
-    add_action('switch_theme', function($themeName, $theme) use ($committer) {
+    add_action('switch_theme', function ($themeName, $theme) use ($committer) {
         $themeId = $theme->stylesheet;
         $committer->forceChangeInfo(new ThemeChangeInfo($themeId, 'switch', $themeName));
     }, 10, 2);
 
-    add_action('customize_save_after', function($customizeManager) use ($committer) {
+    add_action('customize_save_after', function ($customizeManager) use ($committer) {
         $stylesheet = $customizeManager->theme()->stylesheet;
         $committer->forceChangeInfo(new ThemeChangeInfo($stylesheet, 'customize'));
         register_shutdown_function(function () {
@@ -113,16 +113,17 @@ function vp_register_hooks() {
     // URL "hooks"
     //----------------------------------------
 
-    if(basename($_SERVER['PHP_SELF']) === 'themes.php' && isset($_GET['action']) && $_GET['action'] === 'delete') {
+    if (basename($_SERVER['PHP_SELF']) === 'themes.php' && isset($_GET['action']) && $_GET['action'] === 'delete') {
         $themeId = $_GET['stylesheet'];
         $committer->forceChangeInfo(new ThemeChangeInfo($themeId, 'delete'));
     }
 
-    if(basename($_SERVER['PHP_SELF']) === 'plugins.php'
+    if (basename($_SERVER['PHP_SELF']) === 'plugins.php'
         && isset($_GET['action']) && $_GET['action'] === 'delete-selected'
-        && isset($_REQUEST['verify-delete'])) {
+        && isset($_REQUEST['verify-delete'])
+    ) {
 
-        if ( ! function_exists( 'get_plugins' ) ) {
+        if (!function_exists('get_plugins')) {
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
         }
 
@@ -132,18 +133,19 @@ function vp_register_hooks() {
         $committer->forceChangeInfo(new PluginChangeInfo($plugin, 'delete'));
     }
 
-    if(basename($_SERVER['PHP_SELF']) === 'theme-editor.php' && isset($_GET['updated']) && $_GET['updated'] === 'true') {
+    if (basename($_SERVER['PHP_SELF']) === 'theme-editor.php' && isset($_GET['updated']) && $_GET['updated'] === 'true') {
         $committer->forceChangeInfo(new ThemeChangeInfo($_GET['theme'], 'edit'));
     }
 
-    if(basename($_SERVER['PHP_SELF']) === 'plugin-editor.php' &&
+    if (basename($_SERVER['PHP_SELF']) === 'plugin-editor.php' &&
         ((isset($_POST['action']) && $_POST['action'] === 'update') || isset($_GET['liveupdate'])
-        )) {
+        )
+    ) {
         $committer->disableCommit();
     }
 
-    if(basename($_SERVER['PHP_SELF']) === 'plugin-editor.php' && isset($_GET['a']) && $_GET['a'] === 'te') {
-        if ( ! function_exists( 'get_plugins' ) ) {
+    if (basename($_SERVER['PHP_SELF']) === 'plugin-editor.php' && isset($_GET['a']) && $_GET['a'] === 'te') {
+        if (!function_exists('get_plugins')) {
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
         }
 
@@ -153,17 +155,17 @@ function vp_register_hooks() {
         $bestRank = 0;
         $bestMatch = "";
 
-        foreach($plugins as $plugin) {
+        foreach ($plugins as $plugin) {
             $rank = 0;
             $pluginPathParts = preg_split("~[/\\\]~", $plugin);
             $maxEqualParts = min(count($editedFilePathParts), count($pluginPathParts));
 
-            for($part = 0 ; $part < $maxEqualParts; $part++) {
-                if($editedFilePathParts[$part] !== $pluginPathParts[$part]) break;
+            for ($part = 0; $part < $maxEqualParts; $part++) {
+                if ($editedFilePathParts[$part] !== $pluginPathParts[$part]) break;
                 $rank += 1;
             }
 
-            if($rank > $bestRank) {
+            if ($rank > $bestRank) {
                 $bestRank = $rank;
                 $bestMatch = $plugin;
             }
@@ -200,7 +202,6 @@ function createUpdatePostTermsHook(EntityStorage $storage, wpdb $wpdb) {
             $storage->save($postUpdateData);
     };
 }
-
 
 
 //----------------------------------
@@ -333,8 +334,8 @@ function vp_activation_nag() {
 
     if (vp_is_active() ||
         get_current_screen()->id == "versionpress/admin/index" ||
-        get_current_screen()->id == "versionpress/admin/deactivate")
-    {
+        get_current_screen()->id == "versionpress/admin/deactivate"
+    ) {
         return;
     }
 
@@ -356,11 +357,11 @@ add_filter('wp_insert_post_data', 'vp_generate_post_guid', '99', 2);
  * @return array
  */
 function vp_generate_post_guid($data, $postarr) {
-    if(!vp_is_active()) return $data;
+    if (!vp_is_active()) return $data;
 
-    if(empty($postarr['ID'])) { // it's insert not update
+    if (empty($postarr['ID'])) { // it's insert not update
         $data['guid'] = IdUtil::newUuid();
-    } elseif(preg_match("~^https?://[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$~i", $data['guid'])) { // it's guid
+    } elseif (preg_match("~^https?://[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$~i", $data['guid'])) { // it's guid
         // strip the protocol (it's created by sanitize_post function)
         $data['guid'] = preg_replace("~^https?://(.*)$~i", "$1", $data['guid']);
     }
@@ -390,20 +391,20 @@ function vp_admin_menu() {
     // See e.g. http://blog.wpessence.com/wordpress-admin-page-without-menu-item/
     global $_registered_pages;
     $menu_slug = plugin_basename("versionpress/admin/deactivate.php");
-    $hookname = get_plugin_page_hookname( $menu_slug, '' );
+    $hookname = get_plugin_page_hookname($menu_slug, '');
     $_registered_pages[$hookname] = true;
 
 }
 
 add_action('admin_action_vp_undo', 'vp_undo');
 
-function vp_undo () {
+function vp_undo() {
     _vp_revert('revert');
 }
 
 add_action('admin_action_vp_rollback', 'vp_rollback');
 
-function vp_rollback () {
+function vp_rollback() {
     _vp_revert('revertAll');
 }
 
@@ -416,21 +417,21 @@ function _vp_revert($reverterMethod) {
     $revertStatus = call_user_func(array($reverter, $reverterMethod), $commitHash);
     $adminPage = 'admin.php?page=versionpress/admin/index.php';
 
-    if($revertStatus !== RevertStatus::OK) {
+    if ($revertStatus !== RevertStatus::OK) {
         wp_redirect(admin_url($adminPage . '&error=' . $revertStatus));
     } else {
         wp_redirect($adminPage);
     }
 }
 
-if(vp_is_active()) {
+if (vp_is_active()) {
     add_action('admin_bar_menu', 'vp_admin_bar_warning');
 }
 
-wp_enqueue_style('versionpress_popover_style', plugins_url( 'admin/css/jquery.webui-popover.min.css' , __FILE__ ));
-wp_enqueue_style('versionpress_popover_custom_style', plugins_url( 'admin/css/popover-custom.css' , __FILE__ ));
+wp_enqueue_style('versionpress_popover_style', plugins_url('admin/css/jquery.webui-popover.min.css', __FILE__));
+wp_enqueue_style('versionpress_popover_custom_style', plugins_url('admin/css/popover-custom.css', __FILE__));
 wp_enqueue_script('jquery');
-wp_enqueue_script('versionpress_popover_script', plugins_url( 'admin/js/jquery.webui-popover.min.js' , __FILE__ ), 'jquery');
+wp_enqueue_script('versionpress_popover_script', plugins_url('admin/js/jquery.webui-popover.min.js', __FILE__), 'jquery');
 function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
     $adminBarText = "You are running a <span style=\"color:red;font-weight:bold\">preview version</span> of VersionPress";
     $popoverTitle = "Use for <strong>testing only</strong>";
@@ -438,8 +439,8 @@ function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
     $popoverText .= "<p><a href='http://versionpress.net/docs/en/release-notes' target='_blank'>Learn more about VersionPress releases</a></p>";
 
     $adminBar->add_node(array(
-            'id' => 'vp-running',
-            'title' => "<a href='#' class='ab-item' id='vp-warning'>$adminBarText</a>
+        'id' => 'vp-running',
+        'title' => "<a href='#' class='ab-item' id='vp-warning'>$adminBarText</a>
             <script>
             var warning = jQuery('#vp-warning');
             var customPopoverClass = \"versionpress-alpha\"; // used to identify the popover later
@@ -455,21 +456,20 @@ function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
                 }
             });
             </script>",
-            'parent' => 'top-secondary'
-        ));
+        'parent' => 'top-secondary'
+    ));
 }
 
 //----------------------------------
 // AJAX handling
 //----------------------------------
 
-add_action( 'wp_ajax_hide_vp_welcome_panel', 'vp_ajax_hide_vp_welcome_panel' );
+add_action('wp_ajax_hide_vp_welcome_panel', 'vp_ajax_hide_vp_welcome_panel');
 
 function vp_ajax_hide_vp_welcome_panel() {
     update_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, "0");
     die(); // this is required to return a proper result
 }
-
 
 
 //----------------------------------
