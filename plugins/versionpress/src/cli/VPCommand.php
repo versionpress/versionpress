@@ -5,7 +5,7 @@
  */
 class VPCommand extends WP_CLI_Command
 {
-    const BRANCH_FLAG = "branch";
+    const NAME_FLAG = "name";
 
     /**
      * Clone the site to a separate folder, db and Git branch.
@@ -24,13 +24,13 @@ class VPCommand extends WP_CLI_Command
      * @subcommand clone
      */
     public function clone_($args = array(), $flags = array()) {
-        $branch = $flags[self::BRANCH_FLAG];
-        $this->doClone($branch);
+        $name = $flags[self::NAME_FLAG];
+        $this->doClone($name);
     }
 
-    private function doClone($branch) {
+    private function doClone($name) {
         $currentWpPath = get_home_path();
-        $branchPath = sprintf("%s/%s_%s", dirname($currentWpPath), basename($currentWpPath), $branch);
+        $branchPath = sprintf("%s/%s_%s", dirname($currentWpPath), basename($currentWpPath), $name);
         Git::cloneRepository($currentWpPath, $branchPath);
     }
 }
