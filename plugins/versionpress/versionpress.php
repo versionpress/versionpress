@@ -101,6 +101,14 @@ function vp_register_hooks() {
         });
     });
 
+    add_action('trashed_post', function ($postId) use ($committer, $wpdb) {
+        $post = get_post($postId, ARRAY_A);
+
+        $vpId = $wpdb->get_var("SELECT HEX(vp_id) FROM {$wpdb->prefix}vp_id WHERE `table` = 'posts' AND id = {$postId}");
+        $postType = $post['post_type'];
+        $postTitle = $post['post_title'];
+        $committer->forceChangeInfo(new PostChangeInfo('trash', $vpId, $postType, $postTitle));
+    });
     //----------------------------------------
     // URL "hooks"
     //----------------------------------------
