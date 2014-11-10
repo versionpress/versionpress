@@ -2,17 +2,13 @@
 
 class Reverter {
 
-    /**
-     * @var SynchronizationProcess
-     */
+    /** @var SynchronizationProcess */
     private $synchronizationProcess;
-    /**
-     * @var wpdb
-     */
+
+    /** @var wpdb */
     private $database;
-    /**
-     * @var Committer
-     */
+
+    /** @var Committer */
     private $committer;
 
     public function __construct(SynchronizationProcess $synchronizationProcess, wpdb $database, Committer $committer) {
@@ -27,7 +23,9 @@ class Reverter {
 
         $this->updateChangeDateForPosts($affectedPosts);
 
-        if(!Git::revert($commitHash)) return RevertStatus::FAILED;
+        if (!Git::revert($commitHash)) {
+            return RevertStatus::FAILED;
+        }
 
         $this->synchronize();
 
@@ -68,8 +66,7 @@ class Reverter {
     }
 
     private function synchronize() {
-        $synchronizationQueue = array('options', 'users', 'usermeta', 'posts', 'postmeta', 'comments', 'terms', 'term_taxonomy', 'term_relationships');
-        $this->synchronizationProcess->synchronize($synchronizationQueue);
+        $this->synchronizationProcess->synchronize();
     }
 
     private function getAffectedPosts($modifiedFiles) {
