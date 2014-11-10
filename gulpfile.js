@@ -28,6 +28,7 @@ gulp.task('copy', ['clean'], function (cb) {
     var srcOptions = {dot: true, base: vpDir};
     return gulp.src([
         vpDir + '/**',
+        '!' + vpDir + '/.gitignore',
         '!' + vpDir + '/vendor{,/**}',
         '!' + vpDir + '/tests{,/**}',
         '!' + vpDir + '/versionpress.iml',
