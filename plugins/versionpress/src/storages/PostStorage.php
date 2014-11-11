@@ -17,7 +17,10 @@ class PostStorage extends DirectoryStorage implements EntityStorage {
         if (isset($data['post_type']) && ($data['post_type'] === 'revision'))
             return false;
 
-        if (isset($data['post_status']) && ($data['post_status'] === 'auto-draft' || $data['post_status'] === 'draft'))
+        if (isset($data['post_status']) && ($data['post_status'] === 'auto-draft'))
+            return false;
+
+        if (isset($data['post_status']) && ($data['post_status'] === 'draft' && DOING_AJAX === true)) // ignoring ajax autosaves
             return false;
 
         if (!$isExistingEntity && !isset($data['post_type']))
@@ -43,12 +46,19 @@ class PostStorage extends DirectoryStorage implements EntityStorage {
             return 'trash';
         if(isset($diff['post_status']) && $oldEntity['post_status'] === 'trash')
             return 'untrash';
+        if(isset($diff['post_status']) && $oldEntity['post_status'] === 'draft' && $newEntity['post_status'] === 'publish')
+            return 'publish';
         return parent::getEditAction($diff, $oldEntity, $newEntity);
     }
 
-    protected function createChangeInfo($entity, $changeType) {
-        $title = $entity['post_title'];
-        $type = $entity['post_type'];
-        return new PostChangeInfo($changeType, $entity['vp_id'], $type, $title);
+    protected function createChangeInfo($oldEntity, $newEntity, $changeType) {
+        $title = $newEntity['post_title'];
+        $type = $newEntity['post_type'];
+
+        if(!isset($oldEntity['post_status']) && isset($newEntity['post_status']) && $newEntity['post_status'] === 'draft') {
+            $changeType = 'draft';
+        }
+
+        return new PostChangeInfo($changeType, $newEntity['vp_id'], $type, $title);
     }
 }

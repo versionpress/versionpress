@@ -5,7 +5,7 @@
  *
  * VP tags:
  *
- *     VP-Action: post/(create|edit|delete|trash|untrash)/VPID
+ *     VP-Action: post/(create|edit|delete|trash|untrash|draft|publish)/VPID
  *     VP-Post-Title: Hello world
  *     VP-Post-Type: (post|page)
  */
@@ -52,6 +52,10 @@ class PostChangeInfo extends EntityChangeInfo {
                 return NStrings::capitalize($this->postType) . " '{$this->postTitle}' moved from trash";
             case "delete":
                 return "Deleted {$this->postType} '{$this->postTitle}'";
+            case "draft":
+                return "Created draft for {$this->postType} '{$this->postTitle}'";
+            case "publish":
+                return "Published {$this->postType} '{$this->postTitle}'";
         }
         return "Edited {$this->postType} '{$this->postTitle}'";
     }
