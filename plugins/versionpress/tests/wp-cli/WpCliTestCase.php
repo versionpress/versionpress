@@ -42,8 +42,8 @@ abstract class WpCliTestCase extends PHPUnit_Framework_TestCase {
      * @return Commit
      */
     protected function getLastCommit() {
-        chdir(WpCliTestCase::$config->getSitePath());
-        $gitLog = Git::log();
+        $repository = new GitRepository(WpCliTestCase::$config->getSitePath());
+        $gitLog = $repository->log();
         $lastCommit = $gitLog[0];
         return $lastCommit;
     }

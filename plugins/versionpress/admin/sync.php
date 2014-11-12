@@ -32,13 +32,13 @@ function replaceDatabaseSettings() {
 
 
 if (isset($_GET['pull'])) {
-    Git::pull();
+    //GitStatic::pull();
     replaceDatabaseSettings();
     require_once __DIR__ . '/../../versionpress/sync.php';
 }
 if (isset($_GET['push'])) {
-    Git::pull();
-    Git::push();
+    //GitStatic::pull();
+    //GitStatic::push();
     file_get_contents("http://localhost/wordpress/wp-content/versionpress/sync.php");
 }
 

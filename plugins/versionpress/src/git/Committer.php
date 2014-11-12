@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Creates commits using the `Git` class. By default, it detects the change from the `$mirror` object
+ * Creates commits using the `GitStatic` class. By default, it detects the change from the `$mirror` object
  * but it can also be forced by calling the `forceChangeInfo()` method.
  */
 class Committer
@@ -18,13 +18,17 @@ class Committer
      * @var  ChangeInfo
      */
     private $forcedChangeInfo;
-
+    /**
+     * @var GitRepository
+     */
+    private $repository;
     /** @var  bool */
     private $commitDisabled;
 
-    public function __construct(Mirror $mirror)
+    public function __construct(Mirror $mirror, GitRepository $repository)
     {
         $this->mirror = $mirror;
+        $this->repository = $repository;
     }
 
     /**
@@ -37,15 +41,26 @@ class Committer
 
         if ($this->forcedChangeInfo) {
             @unlink(get_home_path() . 'versionpress.maintenance'); // todo: this shouldn't be here...
-            Git::commit($this->forcedChangeInfo->getCommitMessage());
+            $commitMessage = $this->forcedChangeInfo->getCommitMessage();
             $this->forcedChangeInfo = null;
         } elseif ($this->mirror->wasAffected() && $this->shouldCommit()) {
             $changeList = $this->mirror->getChangeList();
             $changeInfo = count($changeList) > 1 ? new CompositeChangeInfo($changeList) : $changeList[0];
             $commitMessage = $changeInfo->getCommitMessage();
-
-            Git::commit($commitMessage);
+        } else {
+            return;
         }
+
+        if (is_user_logged_in() && is_admin()) {
+            $currentUser = wp_get_current_user();
+            $authorName = $currentUser->display_name;
+            $authorEmail = $currentUser->user_email;
+        } else {
+            $authorName = "Non-admin action";
+            $authorEmail = "nonadmin@example.com";
+        }
+        $this->repository->add("*");
+        $this->repository->commit($commitMessage, $authorName, $authorEmail);
     }
 
     /**

@@ -49,11 +49,11 @@ class DIContainer {
         });
 
         $dic->register(VersionPressServices::COMMITTER, function () use ($dic) {
-            return new Committer($dic->resolve(VersionPressServices::MIRROR));
+            return new Committer($dic->resolve(VersionPressServices::MIRROR), $dic->resolve(VersionPressServices::REPOSITORY));
         });
 
         $dic->register(VersionPressServices::INITIALIZER, function () use ($dic) {
-            return new Initializer($dic->resolve(VersionPressServices::DATABASE), $dic->resolve(VersionPressServices::DB_SCHEMA), $dic->resolve(VersionPressServices::STORAGE_FACTORY));
+            return new Initializer($dic->resolve(VersionPressServices::DATABASE), $dic->resolve(VersionPressServices::DB_SCHEMA), $dic->resolve(VersionPressServices::STORAGE_FACTORY), $dic->resolve(VersionPressServices::REPOSITORY));
         });
 
         $dic->register(VersionPressServices::SYNCHRONIZER_FACTORY, function () use ($dic) {
@@ -65,7 +65,11 @@ class DIContainer {
         });
 
         $dic->register(VersionPressServices::REVERTER, function () use ($dic) {
-            return new Reverter($dic->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS), $dic->resolve(VersionPressServices::DATABASE), $dic->resolve(VersionPressServices::COMMITTER));
+            return new Reverter($dic->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS), $dic->resolve(VersionPressServices::DATABASE), $dic->resolve(VersionPressServices::COMMITTER), $dic->resolve(VersionPressServices::REPOSITORY));
+        });
+
+        $dic->register(VersionPressServices::REPOSITORY, function () {
+            return new GitRepository(ABSPATH, VERSIONPRESS_PLUGIN_DIR . '/temp');
         });
 
         return self::$instance;

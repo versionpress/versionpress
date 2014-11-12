@@ -14,7 +14,7 @@ defined('WP_UNINSTALL_PLUGIN') or die('Direct access not allowed');
 
 require_once(dirname(__FILE__) . '/bootstrap.php');
 
-if (UninstallationUtil::uninstallation_should_remove_git_repo()) {
+if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
 
     $backupsDir = WP_CONTENT_DIR . '/vpbackups';
     if (!file_exists($backupsDir)) {

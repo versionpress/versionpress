@@ -53,7 +53,7 @@ function _vp_button($label, $action, $type = "delete", $cssClass = "") {
             </li>
 
             <?php
-            if (UninstallationUtil::uninstallation_should_remove_git_repo()) {
+            if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
                 ?>
 
                 <li>

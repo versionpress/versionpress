@@ -1,13 +1,22 @@
 <?php
 
 /**
- * Useful for pagination of git log. Uses the `Git` class.
+ * Useful for pagination of git log. Uses the `GitStatic` class.
  */
 class GitLogPaginator {
 
+    /**
+     * @var GitRepository
+     */
+    private $repository;
     private $commitsPerPage = 25;
     private $isLastPage = false;
     private $numberOfCommits;
+
+    function __construct(GitRepository $repository) {
+        $this->repository = $repository;
+    }
+
 
     /**
      * Returns a subset of commits ordered from newest to oldest.
@@ -16,7 +25,7 @@ class GitLogPaginator {
      * @return Commit[]
      */
     public function getPage($pageNumber) {
-        $this->numberOfCommits = Git::getNumberOfCommits();
+        $this->numberOfCommits = $this->repository->getNumberOfCommits();
 
         $firstCommitIndex = $pageNumber * $this->commitsPerPage;
         $lastCommitIndex = ($pageNumber + 1) * $this->commitsPerPage;
@@ -29,7 +38,7 @@ class GitLogPaginator {
             $this->isLastPage = false;
         }
 
-        return Git::log($range);
+        return $this->repository->log($range);
     }
 
     /**

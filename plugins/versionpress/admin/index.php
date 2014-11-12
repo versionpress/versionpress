@@ -152,6 +152,10 @@ function _vp_show_progress_message($progressMessage) {
 
                 <ul class="vp-requirements-check">
                     <?php
+                    global $versionPressContainer;
+                    /** @var GitRepository $repository */
+                    $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+
                     $requirementsChecker = new RequirementsChecker();
                     $report = $requirementsChecker->getRequirements();
 
@@ -166,7 +170,7 @@ function _vp_show_progress_message($progressMessage) {
                     <?php
                     }
 
-                    if ($requirementsChecker->isEverythingFulfilled() && Git::isVersioned(dirname(__FILE__))) {
+                    if ($requirementsChecker->isEverythingFulfilled() && $repository->isVersioned()) {
                     ?>
                         <li>
                             <span class="icon icon-warning"></span>
@@ -314,15 +318,17 @@ function _vp_show_progress_message($progressMessage) {
             </tr>
             <tbody id="the-list">
             <?php
-
+            global $versionPressContainer;
+            /** @var GitRepository $repository */
+            $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
 
             $initialCommitHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
-            $gitLogPaginator = new GitLogPaginator();
+            $gitLogPaginator = new GitLogPaginator($repository);
             $gitLogPaginator->setCommitsPerPage(25);
             $page = isset($_GET['vp-page']) ? intval($_GET['vp-page']) : 0;
             $commits = $gitLogPaginator->getPage($page);
 
-            $canUndoCommit = Git::wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
+            $canUndoCommit = $repository->wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
             $isFirstCommit = $page === 0;
 
             foreach ($commits as $commit) {

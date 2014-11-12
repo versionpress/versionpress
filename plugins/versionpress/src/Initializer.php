@@ -32,13 +32,18 @@ class Initializer {
      */
     private $isDatabaseLocked;
 
+    /**
+     * @var GitRepository
+     */
+    private $repository;
 
     private $idCache;
 
-    function __construct(wpdb $wpdb, DbSchemaInfo $dbSchema, EntityStorageFactory $storageFactory) {
+    function __construct(wpdb $wpdb, DbSchemaInfo $dbSchema, EntityStorageFactory $storageFactory, GitRepository $repository) {
         $this->database = $wpdb;
         $this->dbSchema = $dbSchema;
         $this->storageFactory = $storageFactory;
+        $this->repository = $repository;
     }
 
     /**
@@ -351,12 +356,12 @@ class Initializer {
 
 
     private function createGitRepository() {
-        if(!Git::isVersioned(dirname(__FILE__))) {
+        if (!$this->repository->isVersioned()) {
             $this->reportProgressChange(InitializerStates::CREATING_GIT_REPOSITORY);
-            Git::createGitRepository(ABSPATH);
+            $this->repository->init();
         }
 
-        Git::assumeUnchanged('wp-config.php');
+        $this->repository->assumeUnchanged('wp-config.php');
     }
 
 
@@ -371,8 +376,14 @@ class Initializer {
     private function doInitializationCommit() {
         $this->reportProgressChange(InitializerStates::CREATING_INITIAL_COMMIT);
         $installationChangeInfo = new VersionPressChangeInfo();
-        Git::commit($installationChangeInfo->getCommitMessage());
-        $lastCommitHash = Git::getLastCommitHash();
+
+        $currentUser = wp_get_current_user();
+        $authorName = $currentUser->display_name;
+        $authorEmail = $currentUser->user_email;
+
+        $this->repository->add("*");
+        $this->repository->commit($installationChangeInfo->getCommitMessage(), $authorName, $authorEmail);
+        $lastCommitHash = $this->repository->getLastCommitHash();
         file_put_contents(VERSIONPRESS_ACTIVATION_FILE, $lastCommitHash);
     }
 
