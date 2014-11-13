@@ -16,6 +16,7 @@ class PostMetaChangeInfo extends EntityChangeInfo {
     const POST_TITLE_TAG = "VP-Post-Title";
     const POST_TYPE_TAG = "VP-Post-Type";
     const POST_META_KEY = "VP-PostMeta-Key";
+    const POST_VPID_TAG = "VP-Post-Id";
 
     /** @var string */
     private $postType;
@@ -24,12 +25,16 @@ class PostMetaChangeInfo extends EntityChangeInfo {
     private $postTitle;
 
     /** @var string */
+    private $postVpId;
+
+    /** @var string */
     private $metaKey;
 
-    public function __construct($action, $entityId, $postType, $postTitle, $metaKey) {
+    public function __construct($action, $entityId, $postType, $postTitle, $postVpId, $metaKey) {
         parent::__construct("postmeta", $action, $entityId);
         $this->postType = $postType;
         $this->postTitle = $postTitle;
+        $this->postVpId = $postVpId;
         $this->metaKey = $metaKey;
     }
 
@@ -40,7 +45,8 @@ class PostMetaChangeInfo extends EntityChangeInfo {
         $titleTag = isset($tags[self::POST_TITLE_TAG]) ? $tags[self::POST_TITLE_TAG] : $entityId;
         $type = $tags[self::POST_TYPE_TAG];
         $metaKey = $tags[self::POST_META_KEY];
-        return new self($action, $entityId, $type, $titleTag, $metaKey);
+        $postVpId = $tags[self::POST_VPID_TAG];
+        return new self($action, $entityId, $type, $titleTag, $postVpId, $metaKey);
     }
 
     public function getChangeDescription() {
@@ -57,11 +63,12 @@ class PostMetaChangeInfo extends EntityChangeInfo {
         return array(
             "add" => array(
                 array(
-                    "type" => "path",
-                    "path" => VERSIONPRESS_MIRRORING_DIR . "/*"
+                    "type" => "storage-file",
+                    "entity" => "post",
+                    "id" => $this->postVpId
                 )
             )
-        ); // todo: save only related file
+        );
     }
 
     protected function getCustomTags() {

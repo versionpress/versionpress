@@ -32,8 +32,9 @@ class PostMetaStorage extends DirectoryStorage {
     protected function createChangeInfo($oldEntity, $newEntity, $changeType) {
         $postTitle = $newEntity['post_title'];
         $postType = $newEntity['post_type'];
+        $postVpId = $newEntity['vp_id'];
 
-        return new PostMetaChangeInfo($changeType, $this->postMetaVpId, $postType, $postTitle, $this->postMetaKey);
+        return new PostMetaChangeInfo($changeType, $this->postMetaVpId, $postType, $postTitle, $postVpId, $this->postMetaKey);
     }
 
     private function transformToPostField($values) {
