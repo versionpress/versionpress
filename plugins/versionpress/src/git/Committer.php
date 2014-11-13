@@ -128,6 +128,7 @@ class Committer
             foreach ($changeInfo->getChangeInfoList() as $subChangeInfo) {
                 $this->addRelatedFiles($subChangeInfo);
             }
+            return;
         }
 
         $changes = $changeInfo->getChangedFiles();

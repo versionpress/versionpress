@@ -97,7 +97,7 @@ class PluginChangeInfo extends TrackedChangeInfo {
     public function getChangedFiles() {
         $changeType = $this->getAction() === "delete" ? "delete" : "add";
         $pluginChange = array("type" => "path", "path" => $path = plugin_basename($this->pluginFile));
-        $optionChange = array("type" => "storage-file", "entity" => "option", "id" => "");
+        $optionChange = array("type" => "storage-file", "entity" => "options", "id" => "");
         return array($changeType => array($pluginChange, $optionChange));
     }
 }

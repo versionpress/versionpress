@@ -64,7 +64,7 @@ class PostMetaChangeInfo extends EntityChangeInfo {
             "add" => array(
                 array(
                     "type" => "storage-file",
-                    "entity" => "post",
+                    "entity" => "posts",
                     "id" => $this->postVpId
                 )
             )
@@ -75,7 +75,8 @@ class PostMetaChangeInfo extends EntityChangeInfo {
         return array(
             self::POST_TITLE_TAG => $this->postTitle,
             self::POST_TYPE_TAG => $this->postType,
-            self::POST_META_KEY => $this->metaKey
+            self::POST_META_KEY => $this->metaKey,
+            self::POST_VPID_TAG => $this->postVpId,
         );
     }
 }

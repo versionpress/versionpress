@@ -97,10 +97,23 @@ abstract class EntityChangeInfo extends TrackedChangeInfo {
         $changeType = $this->getAction() === "delete" ? "delete" : "add";
         $change = array(
             "type" => "storage-file",
-            "entity" => $this->getObjectType(),
+            "entity" => $this->getEntityName(),
             "id" => $this->getEntityId()
         );
 
         return array($changeType => array($change));
+    }
+
+    /**
+     * Translates ChangeInfo objectType to entityName (used by storages)
+     * user => users
+     * post => posts
+     * etc.
+     *
+     * @return string
+     */
+    private function getEntityName() {
+        if (NStrings::endsWith($this->getObjectType(), "meta")) return $this->getObjectType();
+        return $this->getObjectType() . "s";
     }
 }
