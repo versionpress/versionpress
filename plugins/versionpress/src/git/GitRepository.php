@@ -1,7 +1,6 @@
 <?php
 
 class GitRepository {
-
     /** @var string */
     private $repositoryRoot;
     /** @var string */
@@ -13,13 +12,21 @@ class GitRepository {
     /** @var string */
     private $commitMessagePrefix;
     // Constants
+
     private static $ADD_COMMAND = "git add %s";
+    private static $UPDATE_COMMAND = "git add -u %s"; // removes deleted files
     private static $COMMIT_COMMAND = "git commit -F %s";
     private static $INIT_COMMAND = "git init";
+    private static $STATUS_COMMAND = "git status -s";
+    private static $INITAL_COMMIT_HASH_COMMAND = "git rev-list --max-parents=0 HEAD";
     private static $ASSUME_UNCHANGED_COMMAND = "git update-index --assume-unchanged %s";
+    private static $MODIFIED_FILES_COMMAND = "git diff --name-only %s";
     private static $CONFIG_COMMAND = "git config user.name %s && git config user.email %s";
     private static $LOG_COMMAND = "git log --pretty=format:\"%%H|delimiter|%%aD|delimiter|%%ar|delimiter|%%an|delimiter|%%ae|delimiter|%%s|delimiter|%%b|end|\"";
     private static $REV_PARSE_COMMAND = "git rev-parse %s";
+    private static $REVERT_COMMAND = "git revert -n %s";
+    private static $REVERT_ABORT_COMMAND = "git revert --abort";
+    private static $COUNT_COMMITS_COMMAND = "git rev-list HEAD --count";
 
 
     function __construct($repositoryRoot, $tempDirectory = "./", $commitMessagePrefix = "[VP] ") {
@@ -32,8 +39,14 @@ class GitRepository {
         $this->runShellCommand(self::$ADD_COMMAND, $path);
     }
 
+    public function rm($path) {
+        $this->runShellCommand(self::$UPDATE_COMMAND, $path);
+    }
+
     /**
      * @param CommitMessage $message
+     * @param string $authorName
+     * @param string $authorEmail
      */
     public function commit($message, $authorName = "", $authorEmail= "") {
         $this->authorName = $authorName;
@@ -55,7 +68,7 @@ class GitRepository {
     }
 
     public function isVersioned() {
-        return $this->runShellCommandWithStandardOutput('git status') !== null;
+        return $this->runShellCommandWithStandardOutput(self::$STATUS_COMMAND) !== null;
     }
 
     public function init() {
@@ -82,7 +95,7 @@ class GitRepository {
      * @return Commit
      */
     public function getInitialCommit() {
-        $initialCommitHash = $this->runShellCommandWithStandardOutput("git rev-list --max-parents=0 HEAD");
+        $initialCommitHash = $this->runShellCommandWithStandardOutput(self::$INITAL_COMMIT_HASH_COMMAND);
         return $this->getCommit($initialCommitHash);
     }
 
@@ -109,7 +122,7 @@ class GitRepository {
      * @return string[]
      */
     public function getModifiedFiles($rev) {
-        $cmd = sprintf("git diff --name-only %s", $rev);
+        $cmd = sprintf(self::$MODIFIED_FILES_COMMAND, $rev);
         $result = $this->runShellCommandWithStandardOutput($cmd);
         $files = explode("\n", $result);
         return $files;
@@ -117,14 +130,14 @@ class GitRepository {
 
     public function revertAll($commit) {
         $commitRange = sprintf("%s..HEAD", $commit);
-        $this->runShellCommand("git revert -n %s", $commitRange);
+        $this->runShellCommand(self::$REVERT_COMMAND, $commitRange);
     }
 
     public function revert($commit) {
-        $output = $this->runShellCommandWithErrorOutput("git revert -n %s", $commit);
+        $output = $this->runShellCommandWithErrorOutput(self::$REVERT_COMMAND, $commit);
 
         if($output !== null) { // revert conflict
-            $this->runShellCommand("git revert --abort");
+            $this->runShellCommand(self::$REVERT_ABORT_COMMAND);
             return false;
         }
 
@@ -137,8 +150,7 @@ class GitRepository {
     }
 
     public function getNumberOfCommits() {
-        $cmd = "git rev-list HEAD --count";
-        return intval($this->runShellCommandWithStandardOutput($cmd));
+        return intval($this->runShellCommandWithStandardOutput(self::$COUNT_COMMITS_COMMAND));
     }
 
     private function runShellCommandWithStandardOutput($command, $args = '') {
@@ -197,7 +209,7 @@ class GitRepository {
     }
 
     public function willCommit() {
-        $status = $this->runShellCommandWithStandardOutput("git status -s");
+        $status = $this->runShellCommandWithStandardOutput(self::$STATUS_COMMAND);
         return NStrings::match($status, "~^[AMD].*~") !== null;
     }
 
