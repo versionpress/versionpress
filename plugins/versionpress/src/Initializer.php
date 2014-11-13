@@ -381,6 +381,11 @@ class Initializer {
         $authorName = $currentUser->display_name;
         $authorEmail = $currentUser->user_email;
 
+        if (defined('WP_CLI') && WP_CLI) {
+            $authorName = "wp-cli";
+            $authorEmail = "wp-cli@example.com";
+        }
+
         $this->repository->add("*");
         $this->repository->commit($installationChangeInfo->getCommitMessage(), $authorName, $authorEmail);
         $lastCommitHash = $this->repository->getLastCommitHash();
