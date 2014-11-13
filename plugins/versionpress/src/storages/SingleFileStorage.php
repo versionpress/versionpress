@@ -124,6 +124,10 @@ abstract class SingleFileStorage extends ObservableStorage implements EntityStor
         return true;
     }
 
+    function getEntityFilename($id) {
+        return $this->file;
+    }
+
     /**
      * @param $entity
      * @param $changeType

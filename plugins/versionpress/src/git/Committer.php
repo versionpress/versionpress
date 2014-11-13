@@ -24,11 +24,16 @@ class Committer
     private $repository;
     /** @var  bool */
     private $commitDisabled;
+    /**
+     * @var EntityStorageFactory
+     */
+    private $storageFactory;
 
-    public function __construct(Mirror $mirror, GitRepository $repository)
+    public function __construct(Mirror $mirror, GitRepository $repository, EntityStorageFactory $storageFactory)
     {
         $this->mirror = $mirror;
         $this->repository = $repository;
+        $this->storageFactory = $storageFactory;
     }
 
     /**
@@ -132,7 +137,7 @@ class Committer
                 if ($change["type"] === "storage-file") {
                     $entityType = $change["entity"];
                     $entityId = $change["id"];
-                    $path = $this->getEntityFile($entityType, $entityId);
+                    $path = $this->storageFactory->getStorage($entityType)->getEntityFilename($entityId);
                 } elseif ($change["type"] === "path") {
                     $path = $change["path"];
                 } else {
@@ -145,37 +150,6 @@ class Committer
                     $this->repository->rm($path);
                 }
             }
-        }
-    }
-
-    /**
-     * @param $entityType
-     * @param $entityId
-     * @return string
-     */
-    private function getEntityFile($entityType, $entityId) {
-        if ($entityType === "comment") {
-            return VERSIONPRESS_MIRRORING_DIR . '/comments/' . $entityId . '.ini';
-        }
-
-        if ($entityType === "post") {
-            return VERSIONPRESS_MIRRORING_DIR . '/posts/' . $entityId . '.ini';
-        }
-
-        if ($entityType === "user") {
-            return VERSIONPRESS_MIRRORING_DIR . '/users.ini';
-        }
-
-        if ($entityType === "usermeta") {
-            return VERSIONPRESS_MIRRORING_DIR . '/users.ini';
-        }
-
-        if ($entityType === "option") {
-            return VERSIONPRESS_MIRRORING_DIR . '/options.ini';
-        }
-
-        if ($entityType === "term") {
-            return VERSIONPRESS_MIRRORING_DIR . '/terms.ini';
         }
     }
 }

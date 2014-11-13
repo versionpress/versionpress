@@ -27,11 +27,11 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
     }
 
     function delete($restriction) {
-        $fileName = $this->getFilename($restriction['vp_id']);
+        $fileName = $this->getEntityFilename($restriction['vp_id']);
         if (is_file($fileName)) {
             $entity = $this->loadEntity($restriction['vp_id']);
             unlink($fileName);
-            $this->notifyChangeListeners($entity, 'delete');
+            $this->notifyChangeListeners($entity, $entity, 'delete');
         }
     }
 
@@ -51,11 +51,11 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
         return true;
     }
 
-    function prepareStorage() {
+    public function prepareStorage() {
         @mkdir($this->directory, 0777, true);
     }
 
-    private function getFilename($id) {
+    public function getEntityFilename($id) {
         return $this->directory . '/' . $id . '.ini';
     }
 
@@ -113,7 +113,7 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
         $data = $this->removeUnwantedColumns($data);
         $data = $this->applyFilters($data);
 
-        $filename = $this->getFilename($id);
+        $filename = $this->getEntityFilename($id);
         $oldSerializedEntity = "";
         $isExistingEntity = $this->isExistingEntity($id);
 
@@ -145,7 +145,7 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
     }
 
     protected function isExistingEntity($id) {
-        return file_exists($this->getFilename($id));
+        return file_exists($this->getEntityFilename($id));
     }
 
     /**
@@ -156,7 +156,7 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
     }
 
     private function loadEntity($vpid) {
-        $entities = $this->loadAllFromFiles(array($this->getFilename($vpid)));
+        $entities = $this->loadAllFromFiles(array($this->getEntityFilename($vpid)));
         return $entities[$vpid];
     }
 

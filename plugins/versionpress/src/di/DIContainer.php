@@ -49,7 +49,7 @@ class DIContainer {
         });
 
         $dic->register(VersionPressServices::COMMITTER, function () use ($dic) {
-            return new Committer($dic->resolve(VersionPressServices::MIRROR), $dic->resolve(VersionPressServices::REPOSITORY));
+            return new Committer($dic->resolve(VersionPressServices::MIRROR), $dic->resolve(VersionPressServices::REPOSITORY), $dic->resolve(VersionPressServices::STORAGE_FACTORY));
         });
 
         $dic->register(VersionPressServices::INITIALIZER, function () use ($dic) {
