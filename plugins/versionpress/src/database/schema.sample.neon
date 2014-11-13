@@ -16,3 +16,11 @@
 #   3. The `references` field is optional
 #
 
+posts:
+    id: ID
+    references:
+        post_author: users
+        post_parent: posts
+
+users:
+    id: ID
