@@ -90,6 +90,15 @@ class CompositeChangeInfo implements ChangeInfo {
     }
 
     /**
+     * Returns all ChangeInfo objects encapsulated in CompositeChangeInfo.
+     *
+     * @return ChangeInfo[]
+     */
+    public function getChangeInfoList() {
+        return $this->changeInfoList;
+    }
+
+    /**
      * @return ChangeInfo[]
      */
     private function getSortedChangeInfoList() {

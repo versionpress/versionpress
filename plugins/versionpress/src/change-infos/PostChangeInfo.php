@@ -60,6 +60,15 @@ class PostChangeInfo extends EntityChangeInfo {
         return "Edited {$this->postType} '{$this->postTitle}'";
     }
 
+    public function getChangedFiles() {
+        $changes = parent::getChangedFiles();
+        if ($this->postType !== "attachment") return $changes;
+
+        $changeType = $this->getAction() === "delete" ? "delete" : "add";
+        $changes[$changeType][] = array("type" => "path", "path" => WP_CONTENT_DIR . "/uploads/*");
+        return $changes;
+    }
+
     protected function getCustomTags() {
         return array(
             self::POST_TITLE_TAG => $this->postTitle,

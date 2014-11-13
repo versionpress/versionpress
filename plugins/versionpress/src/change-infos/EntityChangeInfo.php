@@ -71,4 +71,36 @@ abstract class EntityChangeInfo extends TrackedChangeInfo {
     protected function getActionTagValue() {
         return "{$this->getObjectType()}/{$this->getAction()}/{$this->getEntityId()}";
     }
+
+    /**
+     * Reports changes in files that relate to given ChangeInfo. Used in Committer
+     * to commit only related files.
+     * Returns data in this format:
+     *
+     * add  =>   [
+     *             [ type => "storage-file",
+     *               entity => "post",
+     *               id => <VPID> ],
+     *             [ type => "path",
+     *               path => C:/www/wp/wp-content/upload/* ],
+     *           ],
+     * delete => [
+     *             [ type => "storage-file",
+     *               entity => "user",
+     *               id => <VPID> ],
+     *             ...
+     *           ]
+     *
+     * @return array
+     */
+    public function getChangedFiles() {
+        $changeType = $this->getAction() === "delete" ? "delete" : "add";
+        $change = array(
+            "type" => "storage-file",
+            "entity" => $this->getObjectType(),
+            "id" => $this->getEntityId()
+        );
+
+        return array($changeType => array($change));
+    }
 }

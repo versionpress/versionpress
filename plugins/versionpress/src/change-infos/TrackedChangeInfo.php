@@ -89,4 +89,27 @@ abstract class TrackedChangeInfo implements ChangeInfo {
      */
     abstract protected function getCustomTags();
 
+    /**
+     * Reports changes in files that relate to given ChangeInfo. Used in Committer
+     * to commit only related files.
+     * Returns data in this format:
+     *
+     * add  =>   [
+     *             [ type => "storage-file",
+     *               entity => "post",
+     *               id => <VPID> ],
+     *             [ type => "path",
+     *               path => C:/www/wp/wp-content/upload/* ],
+     *           ],
+     * delete => [
+     *             [ type => "storage-file",
+     *               entity => "user",
+     *               id => <VPID> ],
+     *             ...
+     *           ]
+     *
+     * @return array
+     */
+    abstract public function getChangedFiles();
+
 }

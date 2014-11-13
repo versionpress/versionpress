@@ -41,12 +41,11 @@ class Committer
 
         if ($this->forcedChangeInfo) {
             @unlink(get_home_path() . 'versionpress.maintenance'); // todo: this shouldn't be here...
-            $commitMessage = $this->forcedChangeInfo->getCommitMessage();
+            $changeInfo = $this->forcedChangeInfo;
             $this->forcedChangeInfo = null;
         } elseif ($this->mirror->wasAffected() && $this->shouldCommit()) {
             $changeList = $this->mirror->getChangeList();
             $changeInfo = count($changeList) > 1 ? new CompositeChangeInfo($changeList) : $changeList[0];
-            $commitMessage = $changeInfo->getCommitMessage();
         } else {
             return;
         }
@@ -59,8 +58,9 @@ class Committer
             $authorName = "Non-admin action";
             $authorEmail = "nonadmin@example.com";
         }
-        $this->repository->add("*");
-        $this->repository->commit($commitMessage, $authorName, $authorEmail);
+
+        $this->addRelatedFiles($changeInfo);
+        $this->repository->commit($changeInfo->getCommitMessage(), $authorName, $authorEmail);
     }
 
     /**
@@ -112,5 +112,70 @@ class Committer
     {
         $maintenanceFilePattern = get_home_path() . '*.maintenance';
         return count(glob($maintenanceFilePattern)) > 0;
+    }
+
+    /**
+     * @param TrackedChangeInfo $changeInfo
+     */
+    private function addRelatedFiles($changeInfo) {
+        if ($changeInfo instanceof CompositeChangeInfo) {
+            /** @var TrackedChangeInfo $subChangeInfo */
+            foreach ($changeInfo->getChangeInfoList() as $subChangeInfo) {
+                $this->addRelatedFiles($subChangeInfo);
+            }
+        }
+
+        $changes = $changeInfo->getChangedFiles();
+
+        foreach ($changes as $actionType => $changesForGivenAction) {
+            foreach ($changesForGivenAction as $change) {
+                if ($change["type"] === "storage-file") {
+                    $entityType = $change["entity"];
+                    $entityId = $change["id"];
+                    $path = $this->getEntityFile($entityType, $entityId);
+                } elseif ($change["type"] === "path") {
+                    $path = $change["path"];
+                } else {
+                    continue;
+                }
+
+                if ($actionType === "add") {
+                    $this->repository->add($path);
+                } elseif ($actionType === "delete") {
+                    $this->repository->rm($path);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $entityType
+     * @param $entityId
+     * @return string
+     */
+    private function getEntityFile($entityType, $entityId) {
+        if ($entityType === "comment") {
+            return VERSIONPRESS_MIRRORING_DIR . '/comments/' . $entityId . '.ini';
+        }
+
+        if ($entityType === "post") {
+            return VERSIONPRESS_MIRRORING_DIR . '/posts/' . $entityId . '.ini';
+        }
+
+        if ($entityType === "user") {
+            return VERSIONPRESS_MIRRORING_DIR . '/users.ini';
+        }
+
+        if ($entityType === "usermeta") {
+            return VERSIONPRESS_MIRRORING_DIR . '/users.ini';
+        }
+
+        if ($entityType === "option") {
+            return VERSIONPRESS_MIRRORING_DIR . '/options.ini';
+        }
+
+        if ($entityType === "term") {
+            return VERSIONPRESS_MIRRORING_DIR . '/terms.ini';
+        }
     }
 }

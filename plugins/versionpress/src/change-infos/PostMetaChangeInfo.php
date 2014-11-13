@@ -53,6 +53,17 @@ class PostMetaChangeInfo extends EntityChangeInfo {
         return "Edited option '{$this->metaKey}' for {$this->postType} '{$this->postTitle}'";
     }
 
+    public function getChangedFiles() {
+        return array(
+            "add" => array(
+                array(
+                    "type" => "path",
+                    "path" => VERSIONPRESS_MIRRORING_DIR . "/*"
+                )
+            )
+        ); // todo: save only related file
+    }
+
     protected function getCustomTags() {
         return array(
             self::POST_TITLE_TAG => $this->postTitle,
