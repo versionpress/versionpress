@@ -5,7 +5,13 @@
  *
  * VP tags:
  *
- *     VP-Action: option/(create|edit|delete)/blogname
+ *     VP-Action: option/(create|edit|delete)/<name>
+ *
+ * Examples:
+ *
+ *     VP-Action: option/create/test_option
+ *     VP-Action: option/edit/blogname
+ *     VP-Action: option/delete/test_option
  *
  * Note: there was an intention to use VP-Option-Value tag before but it was never implemented and
  * it is not clear how to approach this. See WP-147.
@@ -17,11 +23,15 @@ class OptionChangeInfo extends EntityChangeInfo {
     }
 
     function getChangeDescription() {
-        if($this->getAction() == "create") {
-            return "New option '{$this->getEntityId()}'";
-        } else {
-            return "Changed option '{$this->getEntityId()}'";
-        }
+
+        $messages = array(
+            "create" => "New option '{$this->getEntityId()}'",
+            "edit" => "Changed option '{$this->getEntityId()}'",
+            "delete" => "Deleted option '{$this->getEntityId()}'"
+        );
+
+        return $messages[$this->getAction()];
+
     }
 
     static function buildFromCommitMessage(CommitMessage $commitMessage) {
