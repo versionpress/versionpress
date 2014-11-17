@@ -1,6 +1,15 @@
 <?php
 
-abstract class ObservableStorage implements EntityStorage {
+abstract class Storage {
+
+    abstract function save($data);
+    abstract function delete($restriction);
+    abstract function loadAll();
+    abstract function saveAll($entities);
+    abstract function shouldBeSaved($data);
+    abstract function prepareStorage();
+    abstract function getEntityFilename($id);
+
     /**
      * @var callable[]
      */

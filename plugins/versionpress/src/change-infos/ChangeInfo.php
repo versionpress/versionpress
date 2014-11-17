@@ -4,7 +4,7 @@
  * Represents one logical change in the WP site - one row in the main VersionPress table.
  *
  * ChangeInfo is first created from a hook that observes some action (see versionpress.php, or for
- * {@link EntityChangeInfo}s the initiator is usually some {@link EntityStorage}). The ChangeInfo is then
+ * {@link EntityChangeInfo}s the initiator is usually some {@link Storage}). The ChangeInfo is then
  * persisted to a commit message by {@link Committer} and later reconstructed from it again when the main
  * VersionPress table is being displayed (see admin/index.php and {@link ChangeInfoMatcher}).
  *

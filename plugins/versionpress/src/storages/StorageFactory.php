@@ -1,6 +1,6 @@
 <?php
 
-class EntityStorageFactory {
+class StorageFactory {
 
     /**
      * @var string
@@ -19,16 +19,16 @@ class EntityStorageFactory {
     /**
      * Returns storage by given entity type
      * @param string $entityName
-     * @return EntityStorage
+     * @return Storage
      */
     public function getStorage($entityName) {
-        if(isset($this->storages[$entityName]))
+        if (isset($this->storages[$entityName]))
             return $this->storages[$entityName];
 
-        $entityStorageClass = $this->getStorageClass($entityName);
-        $entityStorageDirectory = $this->getStorageDirectory($entityName);
-        if (class_exists($entityStorageClass)){
-            $storage = new $entityStorageClass($entityStorageDirectory);
+        $storageClass = $this->getStorageClass($entityName);
+        $storageDirectory = $this->getStorageDirectory($entityName);
+        if (class_exists($storageClass)){
+            $storage = new $storageClass($storageDirectory);
             $this->storages[$entityName] = $storage;
             return $storage;
         }

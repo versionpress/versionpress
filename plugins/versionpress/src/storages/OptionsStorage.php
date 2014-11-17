@@ -1,6 +1,6 @@
 <?php
 
-class OptionsStorage extends SingleFileStorage implements EntityStorage {
+class OptionsStorage extends SingleFileStorage {
 
     protected $notSavedFields = array('option_id');
 

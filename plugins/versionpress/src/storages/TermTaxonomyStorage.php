@@ -1,6 +1,6 @@
 <?php
 
-class TermTaxonomyStorage extends SingleFileStorage implements EntityStorage {
+class TermTaxonomyStorage extends SingleFileStorage {
 
     protected $notSavedFields = array('vp_term_id', 'count', 'term_id');
 

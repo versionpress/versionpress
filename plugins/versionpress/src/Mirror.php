@@ -5,7 +5,7 @@
  */
 class Mirror {
     /**
-     * @var EntityStorageFactory
+     * @var StorageFactory
      */
     private $storageFactory;
 
@@ -24,7 +24,7 @@ class Mirror {
      */
     public $changeList;
 
-    function __construct(EntityStorageFactory $storageFactory) {
+    function __construct(StorageFactory $storageFactory) {
         $this->storageFactory = $storageFactory;
     }
 

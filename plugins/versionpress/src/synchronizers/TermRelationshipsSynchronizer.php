@@ -16,7 +16,7 @@ class TermRelationshipsSynchronizer implements Synchronizer {
      */
     private $dbSchema;
 
-    function __construct(EntityStorage $postStorage, ExtendedWpdb $database, DbSchemaInfo $dbSchema) {
+    function __construct(Storage $postStorage, ExtendedWpdb $database, DbSchemaInfo $dbSchema) {
         $this->postStorage = $postStorage;
         $this->postIdColumnName = $dbSchema->getIdColumnName('posts');
         $this->database = $database;

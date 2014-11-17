@@ -3,7 +3,7 @@
 /**
  * Saves entities into separate files in given directory
  */
-abstract class DirectoryStorage extends ObservableStorage implements EntityStorage {
+abstract class DirectoryStorage extends Storage {
     /**
      * @var string
      */

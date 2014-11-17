@@ -1,6 +1,6 @@
 <?php
 
-class TermsStorage extends SingleFileStorage implements EntityStorage {
+class TermsStorage extends SingleFileStorage {
 
     function __construct($file) {
         parent::__construct($file, 'term', 'term_id');

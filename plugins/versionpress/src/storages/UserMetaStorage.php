@@ -1,6 +1,6 @@
 <?php
 
-class UserMetaStorage extends SingleFileStorage implements EntityStorage {
+class UserMetaStorage extends SingleFileStorage {
 
     private $userMetaKey;
     private $userMetaVpId;

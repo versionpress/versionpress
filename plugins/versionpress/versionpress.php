@@ -23,7 +23,7 @@ if (vp_is_active()) {
 function vp_register_hooks() {
     /** @var wpdb $wpdb */
     global $wpdb, $versionPressContainer;
-    /** @var EntityStorageFactory $storageFactory */
+    /** @var StorageFactory $storageFactory */
     $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
     /** @var Committer $committer */
     $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
@@ -176,7 +176,7 @@ function vp_register_hooks() {
     register_shutdown_function(array($committer, 'commit'));
 }
 
-function createUpdatePostTermsHook(EntityStorage $storage, wpdb $wpdb) {
+function createUpdatePostTermsHook(Storage $storage, wpdb $wpdb) {
 
     return function ($postId) use ($storage, $wpdb) {
         $post = get_post($postId);

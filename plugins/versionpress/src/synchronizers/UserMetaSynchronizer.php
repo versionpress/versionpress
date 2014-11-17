@@ -7,7 +7,7 @@ class UserMetaSynchronizer extends SynchronizerBase {
     /** @var  DbSchemaInfo */
     private $dbSchema;
 
-    function __construct(EntityStorage $storage, wpdb $database, DbSchemaInfo $dbSchema) {
+    function __construct(Storage $storage, wpdb $database, DbSchemaInfo $dbSchema) {
         parent::__construct($storage, $database, $dbSchema, 'usermeta');
         $this->database = $database;
         $this->dbSchema = $dbSchema;

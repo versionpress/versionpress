@@ -6,7 +6,7 @@ abstract class SynchronizerBase implements Synchronizer {
     private $idColumnName;
 
     /**
-     * @var EntityStorage
+     * @var Storage
      */
     private $storage;
 
@@ -20,7 +20,7 @@ abstract class SynchronizerBase implements Synchronizer {
      */
     private $dbSchema;
 
-    function __construct(EntityStorage $storage, wpdb $database, DbSchemaInfo $dbSchema, $entityName) {
+    function __construct(Storage $storage, wpdb $database, DbSchemaInfo $dbSchema, $entityName) {
         $this->storage = $storage;
         $this->database = $database;
         $this->dbSchema = $dbSchema;

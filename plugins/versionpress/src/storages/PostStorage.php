@@ -1,6 +1,6 @@
 <?php
 
-class PostStorage extends DirectoryStorage implements EntityStorage {
+class PostStorage extends DirectoryStorage {
 
     function __construct($directory) {
         parent::__construct($directory, 'post');

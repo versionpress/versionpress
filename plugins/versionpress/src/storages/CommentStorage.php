@@ -1,6 +1,6 @@
 <?php
 
-class CommentStorage extends DirectoryStorage implements EntityStorage {
+class CommentStorage extends DirectoryStorage {
 
     function __construct($directory) {
         parent::__construct($directory, 'comment', 'comment_ID');

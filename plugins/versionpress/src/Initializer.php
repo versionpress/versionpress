@@ -23,7 +23,7 @@ class Initializer {
     private $dbSchema;
 
     /**
-     * @var EntityStorageFactory
+     * @var StorageFactory
      */
     private $storageFactory;
 
@@ -39,7 +39,7 @@ class Initializer {
 
     private $idCache;
 
-    function __construct(wpdb $wpdb, DbSchemaInfo $dbSchema, EntityStorageFactory $storageFactory, GitRepository $repository) {
+    function __construct(wpdb $wpdb, DbSchemaInfo $dbSchema, StorageFactory $storageFactory, GitRepository $repository) {
         $this->database = $wpdb;
         $this->dbSchema = $dbSchema;
         $this->storageFactory = $storageFactory;

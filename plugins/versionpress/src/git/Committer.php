@@ -25,11 +25,11 @@ class Committer
     /** @var  bool */
     private $commitDisabled;
     /**
-     * @var EntityStorageFactory
+     * @var StorageFactory
      */
     private $storageFactory;
 
-    public function __construct(Mirror $mirror, GitRepository $repository, EntityStorageFactory $storageFactory)
+    public function __construct(Mirror $mirror, GitRepository $repository, StorageFactory $storageFactory)
     {
         $this->mirror = $mirror;
         $this->repository = $repository;

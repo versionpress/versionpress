@@ -2,7 +2,7 @@
 /**
  * Saves all entities of one type into single file
  */
-abstract class SingleFileStorage extends ObservableStorage implements EntityStorage {
+abstract class SingleFileStorage extends Storage {
 
     protected $entities;
 

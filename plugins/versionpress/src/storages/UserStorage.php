@@ -1,6 +1,6 @@
 <?php
 
-class UserStorage extends SingleFileStorage implements EntityStorage {
+class UserStorage extends SingleFileStorage {
 
     function __construct($file) {
         parent::__construct($file, 'user', 'ID');
