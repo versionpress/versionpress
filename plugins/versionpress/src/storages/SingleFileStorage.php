@@ -1,6 +1,9 @@
 <?php
+
 /**
- * Saves all entities of one type into single file
+ * Saves entities of same type to a single file. Useful for entities for which
+ * there aren't expected to exist many instances, or where the length
+ * of each entity is relatively fixed. For example, users or options use this storage.
  */
 abstract class SingleFileStorage extends Storage {
 

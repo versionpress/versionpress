@@ -1,12 +1,18 @@
 <?php
 
 /**
- * Saves entities into separate files in given directory
+ * Saves entities to files in a common directory. Useful for entities that either
+ * expect a lot of instance of them (posts, comments etc.) or have variable length
+ * and some may be rather large (again, e.g. posts).
+ *
+ * For example, posts are stored as <vpid>.ini in the `vpdb/posts` folder.
+ *
+ * Note that the same file can be used by multiple entities. For example, both
+ * the main post data and postmeta for it are stored in the same INI file.
  */
 abstract class DirectoryStorage extends Storage {
-    /**
-     * @var string
-     */
+
+    /** @var string */
     private $directory;
 
     protected $entityTypeName;
