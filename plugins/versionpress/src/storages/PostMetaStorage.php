@@ -5,21 +5,22 @@ class PostMetaStorage extends DirectoryStorage {
     private $postMetaKey;
     private $postMetaVpId;
 
-    private $ignoredMeta = array('_edit_lock', '_edit_last', '_pingme', '_encloseme');
-
     function __construct($directory) {
         parent::__construct($directory, 'post');
     }
 
-    function save($values) {
-        if(in_array($values['meta_key'], $this->ignoredMeta)) return;
+    function save($data) {
 
-        $data = $this->transformToPostField($values);
+        if (!$this->shouldBeSaved($data)) {
+            return null;
+        }
 
-        $this->postMetaKey = $values['meta_key'];
-        $this->postMetaVpId = $values['vp_id'];
+        $transformedData = $this->transformToPostField($data);
 
-        parent::save($data);
+        $this->postMetaKey = $data['meta_key'];
+        $this->postMetaVpId = $data['vp_id'];
+
+        parent::save($transformedData);
     }
 
     function saveAll($entities) {
@@ -28,6 +29,17 @@ class PostMetaStorage extends DirectoryStorage {
             parent::save($data);
         }
     }
+
+    public function shouldBeSaved($data) {
+        $ignoredMeta = array(
+            '_edit_lock',
+            '_edit_last',
+            '_pingme',
+            '_encloseme'
+        );
+        return !in_array($data['meta_key'], $ignoredMeta);
+    }
+
 
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
         $postTitle = $newEntity['post_title'];
