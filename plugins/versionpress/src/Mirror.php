@@ -9,9 +9,6 @@ class Mirror {
     /** @var StorageFactory */
     private $storageFactory;
 
-    /** @var array */
-    private $registeredStorages = array();
-
     /** @var bool */
     private $wasAffected;
 
@@ -31,10 +28,15 @@ class Mirror {
      * @param array $data Data passed to the `Storage::save()` method
      */
     public function save($entityType, $data) {
-        $storage = $this->getStorage($entityType);
-        if ($storage == null)
+        $storage = $this->storageFactory->getStorage($entityType);
+        if ($storage == null) {
             return;
-        $storage->save($data);
+        }
+
+        $changeInfo = $storage->save($data);
+        if ($changeInfo) {
+            $this->changeList[] = $changeInfo;
+        }
     }
 
     /**
@@ -46,10 +48,15 @@ class Mirror {
      * @param array $restriction Restriction passed to the `Storage::delete()` method
      */
     public function delete($entityType, $restriction) {
-        $storage = $this->getStorage($entityType);
-        if ($storage == null)
+        $storage = $this->storageFactory->getStorage($entityType);
+        if ($storage == null) {
             return;
-        $storage->delete($restriction);
+        }
+
+        $changeInfo = $storage->delete($restriction);
+        if ($changeInfo) {
+            $this->changeList[] = $changeInfo;
+        }
     }
 
     /**
@@ -75,37 +82,15 @@ class Mirror {
      *
      * @see Storage::shouldBeSaved()
      *
-     * @param string $entityName Determines the storage
+     * @param string $entityType Determines the storage
      * @param array $data Data passed to Storage::shouldBeSaved()
      * @return bool
      */
-    public function shouldBeSaved($entityName, $data) {
-        $storage = $this->getStorage($entityName);
+    public function shouldBeSaved($entityType, $data) {
+        $storage = $this->storageFactory->getStorage($entityType);
         if($storage === null)
             return false;
         return $storage->shouldBeSaved($data);
-    }
-
-
-    private function getStorage($entityType) {
-
-        $storage = $this->storageFactory->getStorage($entityType);
-        if($storage == null)
-            return null;
-
-        $object_hash = spl_object_hash($storage);
-
-        if ($storage != null && !isset($this->registeredStorages[$object_hash])) {
-            $this->registeredStorages[$object_hash] = true;
-
-            $that = $this;
-            $storage->addChangeListener(function (EntityChangeInfo $changeInfo) use ($that) {
-                $that->wasAffected = true;
-                $that->changeList[] = $changeInfo;
-            });
-        }
-
-        return $storage;
     }
 
 }

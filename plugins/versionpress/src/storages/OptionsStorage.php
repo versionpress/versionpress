@@ -20,12 +20,7 @@ class OptionsStorage extends SingleFileStorage {
                 || $id === 'recently_edited');
     }
 
-    /**
-     * @param $entity
-     * @param $changeType
-     * @return EntityChangeInfo
-     */
-    protected function createChangeInfo($entity, $changeType) {
-        return new OptionChangeInfo($changeType, $entity[$this->idColumnName]);
+    protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
+        return new OptionChangeInfo($action, $newEntity[$this->idColumnName]);
     }
 }

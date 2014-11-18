@@ -7,10 +7,10 @@ class PostStorage extends DirectoryStorage {
         $this->addFilter(new AbsoluteUrlFilter());
     }
 
-    /**
-     * Don't save revisions and drafts
-     */
     public function shouldBeSaved($data) {
+
+        // Don't save revisions and drafts
+
         $id = @$data['vp_id'];
         $isExistingEntity = !empty($id) && $this->isExistingEntity($id);
 
@@ -41,24 +41,29 @@ class PostStorage extends DirectoryStorage {
         return $entity;
     }
 
-    protected function getEditAction($diff, $oldEntity, $newEntity) {
-        if(isset($diff['post_status']) && $diff['post_status'] === 'trash')
-            return 'trash';
-        if(isset($diff['post_status']) && $oldEntity['post_status'] === 'trash')
-            return 'untrash';
-        if(isset($diff['post_status']) && $oldEntity['post_status'] === 'draft' && $newEntity['post_status'] === 'publish')
-            return 'publish';
-        return parent::getEditAction($diff, $oldEntity, $newEntity);
-    }
+    protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
 
-    protected function createChangeInfo($oldEntity, $newEntity, $changeType) {
+        if (!$action) {
+
+            $diff = EntityUtils::getDiff($oldEntity, $newEntity);
+
+            if (isset($diff['post_status']) && $diff['post_status'] === 'trash') {
+                $action = 'trash';
+            } elseif (isset($diff['post_status']) && $oldEntity['post_status'] === 'trash') {
+                $action = 'untrash';
+            } elseif (isset($diff['post_status']) && $oldEntity['post_status'] === 'draft' && $newEntity['post_status'] === 'publish') {
+                $action = 'publish';
+            } elseif (!isset($oldEntity['post_status']) && isset($newEntity['post_status']) && $newEntity['post_status'] === 'draft') {
+                $action = 'draft';
+            } else {
+                $action = 'edit';
+            }
+
+        }
+
         $title = $newEntity['post_title'];
         $type = $newEntity['post_type'];
 
-        if(!isset($oldEntity['post_status']) && isset($newEntity['post_status']) && $newEntity['post_status'] === 'draft') {
-            $changeType = 'draft';
-        }
-
-        return new PostChangeInfo($changeType, $newEntity['vp_id'], $type, $title);
+        return new PostChangeInfo($action, $newEntity['vp_id'], $type, $title);
     }
 }

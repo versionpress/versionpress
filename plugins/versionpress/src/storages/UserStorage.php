@@ -6,13 +6,7 @@ class UserStorage extends SingleFileStorage {
         parent::__construct($file, 'user', 'ID');
     }
 
-    /**
-     * @param $entity
-     * @param $changeType
-     * @return EntityChangeInfo
-     */
-    protected function createChangeInfo($entity, $changeType) {
-        $login = $entity["user_login"];
-        return new UserChangeInfo($changeType, $entity["vp_id"], $login);
+    protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
+        return new UserChangeInfo($action, $newEntity["vp_id"], $newEntity["user_login"]);
     }
 }

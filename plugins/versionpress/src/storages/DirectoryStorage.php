@@ -29,7 +29,40 @@ abstract class DirectoryStorage extends Storage {
     }
 
     function save($data) {
-        $this->saveEntity($data, array($this, 'notifyChangeListeners'));
+        $id = $data['vp_id'];
+
+        if (!$id)
+            return null;
+
+        unset($data[$this->idColumnName]);
+        $data = $this->removeUnwantedColumns($data);
+        $data = $this->applyFilters($data);
+
+        $filename = $this->getEntityFilename($id);
+        $oldSerializedEntity = "";
+        $isExistingEntity = $this->isExistingEntity($id);
+
+        if (!$this->shouldBeSaved($data))
+            return null;
+
+        if ($isExistingEntity) {
+            $oldSerializedEntity = file_get_contents($filename);
+        }
+
+        $oldEntity = $this->deserializeEntity($oldSerializedEntity);
+        $diff = EntityUtils::getDiff($oldEntity, $data);
+
+        if (count($diff) > 0) {
+
+            $newEntity = array_merge($oldEntity, $diff);
+            file_put_contents($filename, $this->serializeEntity($newEntity));
+
+            return $this->createChangeInfo($oldEntity, $newEntity, !$isExistingEntity ? 'create' : null);
+
+        } else {
+            return null;
+        }
+
     }
 
     function delete($restriction) {
@@ -37,7 +70,9 @@ abstract class DirectoryStorage extends Storage {
         if (is_file($fileName)) {
             $entity = $this->loadEntity($restriction['vp_id']);
             unlink($fileName);
-            $this->notifyChangeListeners($entity, $entity, 'delete');
+            return $this->createChangeInfo($entity, $entity, 'delete');
+        } else {
+            return null;
         }
     }
 
@@ -49,7 +84,7 @@ abstract class DirectoryStorage extends Storage {
 
     function saveAll($entities) {
         foreach ($entities as $entity) {
-            $this->saveEntity($entity);
+            $this->save($entity);
         }
     }
 
@@ -102,63 +137,8 @@ abstract class DirectoryStorage extends Storage {
         return $entity;
     }
 
-    protected function notifyChangeListeners($oldEntity, $newEntity, $changeType) {
-        $changeInfo = $this->createChangeInfo($oldEntity, $newEntity, $changeType);
-        $this->callOnChangeListeners($changeInfo);
-    }
-
-    protected abstract function createChangeInfo($oldEntity, $newEntity, $changeType);
-
-    protected function saveEntity($data, $callback = null) {
-        $id = $data['vp_id'];
-
-        if (!$id)
-            return;
-
-        unset($data[$this->idColumnName]);
-        $data = $this->removeUnwantedColumns($data);
-        $data = $this->applyFilters($data);
-
-        $filename = $this->getEntityFilename($id);
-        $oldSerializedEntity = "";
-        $isExistingEntity = $this->isExistingEntity($id);
-
-        if (!$this->shouldBeSaved($data))
-            return;
-
-        if ($isExistingEntity) {
-            $oldSerializedEntity = file_get_contents($filename);
-        }
-
-        $entity = $this->deserializeEntity($oldSerializedEntity);
-        if (isset($entity['vp_id']))
-            unset($data['vp_id']);
-
-        $diff = array();
-        foreach ($data as $key => $value) {
-            if (!isset($entity[$key]) || (isset($entity[$key]) && $entity[$key] != $value)) // not present or different value
-                $diff[$key] = $value;
-        }
-
-
-        if (count($diff) > 0) {
-            $oldEntity = $entity;
-            $newEntity = array_merge($entity, $diff);
-            file_put_contents($filename, $this->serializeEntity($newEntity));
-            if (is_callable($callback))
-                call_user_func($callback, $oldEntity, $newEntity, $isExistingEntity ? $this->getEditAction($diff, $oldEntity, $newEntity) : 'create');
-        }
-    }
-
     protected function isExistingEntity($id) {
         return file_exists($this->getEntityFilename($id));
-    }
-
-    /**
-     * @return string
-     */
-    protected function getEditAction($diff, $oldEntity, $newEntity) {
-        return 'edit';
     }
 
     private function loadEntity($vpid) {

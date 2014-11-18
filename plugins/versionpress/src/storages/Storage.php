@@ -10,10 +10,12 @@ abstract class Storage {
     /**
      * Saves data to a storage
      *
-     * @param array $data Associative array with values to save. On `insert`, the $data will contain a full entity,
-     *                    on further updates, the data will typically contain just the updated values
+     * @param array $data Associative array with values to save. On `insert`, the $data will contain full entity data
+     *                    plus things like VPID. On further updates, the data will typically contain just the updated values
      *                    and a VPID (assigned in {@link MirroringDatabase} so that the appropriate file could
      *                    be located).
+     * @return ChangeInfo|null Null indicates that the save operation didn't really change anything (may happen). Otherwise,
+     *                         the ChangeInfo object is returned.
      */
     abstract function save($data);
 
@@ -22,6 +24,8 @@ abstract class Storage {
      * Deletes entity from a storage
      *
      * @param array $restriction An array that typically contains a 'vp_id' key that specifies which entity to delete
+     * @return ChangeInfo|null Null indicates that no actual delete happened (for example, the INI file for a given VPID
+     *                         didn't exist). Otherwise, the ChangeInfo object is returned (its action is usually 'delete').
      */
     abstract function delete($restriction);
 
@@ -35,7 +39,7 @@ abstract class Storage {
     /**
      * True / false if the entity should be saved / ignored. Works as a filtering method.
      *
-     * @param $data
+     * @param array $data
      * @return bool
      */
     abstract function shouldBeSaved($data);
@@ -64,27 +68,22 @@ abstract class Storage {
      */
     abstract function getEntityFilename($id);
 
-
     /**
-     * @var callable[]
-     */
-    private $onChangeListeners = array();
-
-    /**
-     * This storage notifies "change listeners" of changes done to a storage
-     * when the save() action is done. Currently only used by the Mirror and
-     * there is only one listener at any time so it could probably be replaced
-     * by a return value of the save() method.
+     * Internal method to create a ChangeInfo. Though it is mostly an implementation
+     * detail of the `save()` and `delete()` methods, most storages create ChangeInfos
+     * in similar ways so the method has been extracted here, at least for the sake
+     * of consistency and documentation.
      *
-     * @param callable $callback
+     * @param array $oldEntity The entity as it was stored last time. Note that the previous state
+     *   is not always known or some storages might not want to provide this to the function so it sometimes
+     *   is null.
+     * @param array $newEntity The updated entity. Always contains the full data, never null.
+     * @param string $action Code that calls this method (save() and delete() methods)
+     *   can provide an action or just leave this as null which means that the specific
+     *   implementation should determine the action from the $oldEntity / $newEntity.
+     *
+     * @return ChangeInfo Eventually used as the return value of the `save()` or the `delete()` method
      */
-    function addChangeListener($callback) {
-        $this->onChangeListeners[] = $callback;
-    }
+    protected abstract function createChangeInfo($oldEntity, $newEntity, $action = null);
 
-    protected function callOnChangeListeners(EntityChangeInfo $changeInfo) {
-        foreach ($this->onChangeListeners as $onChangeListener) {
-            call_user_func($onChangeListener, $changeInfo);
-        }
-    }
 }

@@ -8,16 +8,16 @@ class TermTaxonomyStorage extends SingleFileStorage {
         parent::__construct($file, 'term taxonomy', 'term_taxonomy_id');
     }
 
-    protected function saveEntity($data, $callback = null) {
+    public function save($data) {
         $this->loadEntities();
         $termId = $this->findTermId($data);
 
         if ($termId === null)
-            return;
+            return null;
 
         $taxonomyId = $data['vp_id'];
 
-        if(!isset($this->entities[$termId]['taxonomies'])) {
+        if (!isset($this->entities[$termId]['taxonomies'])) {
             $this->entities[$termId]['taxonomies'] = array();
         }
 
@@ -29,26 +29,28 @@ class TermTaxonomyStorage extends SingleFileStorage {
 
         if ($this->entities[$termId]['taxonomies'] != $originalTaxonomies) {
             $this->saveEntities();
-
-            if (is_callable($callback))
-                $callback($this->entities[$termId], $isNew ? 'create' : 'edit');
+            return $this->createChangeInfo(null, $this->entities[$termId], $isNew ? 'create' : 'edit');
+        } else {
+            return null;
         }
     }
 
-    function delete($restriction) {
+    public function delete($restriction) {
         $taxonomyId = $restriction['vp_id'];
 
         $this->loadEntities();
         $termId = $this->findTermId($restriction);
 
         if($termId === null)
-            return;
+            return null;
         $originalTerm = $this->entities[$termId];
         $originalTaxonomies = $originalTerm['taxonomies'];
         unset($this->entities[$termId]['taxonomies'][$taxonomyId]);
-        if($this->entities[$termId]['taxonomies'] != $originalTaxonomies) {
+        if ($this->entities[$termId]['taxonomies'] != $originalTaxonomies) {
             $this->saveEntities();
-            $this->notifyOnChangeListeners($originalTerm, 'delete');
+            return $this->createChangeInfo(null, $originalTerm, 'delete');
+        } else {
+            return null;
         }
 
     }
@@ -82,12 +84,7 @@ class TermTaxonomyStorage extends SingleFileStorage {
             $taxonomies[$taxonomyId][$field] = $value;
     }
 
-    /**
-     * @param $entity
-     * @param $changeType
-     * @return EntityChangeInfo
-     */
-    protected function createChangeInfo($entity, $changeType) {
-        return new TermChangeInfo('edit', $entity['vp_id'], $entity['name']);
+    protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
+        return new TermChangeInfo('edit', $newEntity['vp_id'], $newEntity['name']);
     }
 }

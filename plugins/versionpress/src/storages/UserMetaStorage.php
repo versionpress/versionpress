@@ -15,23 +15,18 @@ class UserMetaStorage extends SingleFileStorage {
         $this->userMetaKey = $values['meta_key'];
         $this->userMetaVpId = $values['vp_id'];
 
-        $this->saveEntity($data, array($this, 'notifyOnChangeListeners'));
+        parent::save($data);
     }
 
     function saveAll($entities) {
         foreach($entities as $entity) {
             $data = $this->transformToUserField($entity);
-            $this->saveEntity($data);
+            parent::save($data);
         }
     }
 
-    /**
-     * @param $entity
-     * @param $changeType
-     * @return EntityChangeInfo
-     */
-    protected function createChangeInfo($entity, $changeType) {
-        return new UserMetaChangeInfo($changeType, $this->userMetaVpId, $entity['user_login'], $this->userMetaKey);
+    protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
+        return new UserMetaChangeInfo($action, $this->userMetaVpId, $newEntity['user_login'], $this->userMetaKey);
     }
 
     public function shouldBeSaved($data) {

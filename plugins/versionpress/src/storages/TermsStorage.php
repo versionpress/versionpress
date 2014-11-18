@@ -6,12 +6,7 @@ class TermsStorage extends SingleFileStorage {
         parent::__construct($file, 'term', 'term_id');
     }
 
-    /**
-     * @param $entity
-     * @param $changeType
-     * @return EntityChangeInfo
-     */
-    protected function createChangeInfo($entity, $changeType) {
-        return new TermChangeInfo($changeType, $entity['vp_id'], $entity['name']);
+    protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
+        return new TermChangeInfo($action, $newEntity['vp_id'], $newEntity['name']);
     }
 }

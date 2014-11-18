@@ -32,47 +32,13 @@ abstract class SingleFileStorage extends Storage {
     }
 
     function save($data) {
-        $this->saveEntity($data, array($this, 'notifyOnChangeListeners'));
-    }
-
-    function delete($restriction) {
-        if (!$this->shouldBeSaved($restriction))
-            return;
-
-        $id = $restriction[$this->idColumnName];
-
-        $this->loadEntities();
-        $originalEntities = $this->entities;
-        $entity = $this->entities[$id];
-        unset($this->entities[$id]);
-        if ($this->entities != $originalEntities) {
-            $this->saveEntities();
-            $this->notifyOnChangeListeners($entity, 'delete');
-        }
-    }
-
-    function loadAll() {
-        $this->loadEntities();
-        return $this->entities;
-    }
-
-    function saveAll($entities) {
-        foreach ($entities as $entity) {
-            $this->saveEntity($entity);
-        }
-    }
-
-    function prepareStorage() {
-    }
-
-    protected function saveEntity($data, $callback = null) {
         if (!$this->shouldBeSaved($data))
-            return;
+            return null;
 
         $id = $data[$this->idColumnName];
 
         if (!$id)
-            return;
+            return null;
 
         $this->loadEntities();
         $isNew = !isset($this->entities[$id]);
@@ -86,10 +52,43 @@ abstract class SingleFileStorage extends Storage {
 
         if ($this->entities != $originalEntities) {
             $this->saveEntities();
-
-            if (is_callable($callback))
-                call_user_func($callback, $this->entities[$id], $isNew ? 'create' : 'edit');
+            return $this->createChangeInfo(null, $this->entities[$id], $isNew ? 'create' : 'edit');
+        } else {
+            return null;
         }
+
+    }
+
+    function delete($restriction) {
+        if (!$this->shouldBeSaved($restriction))
+            return null;
+
+        $id = $restriction[$this->idColumnName];
+
+        $this->loadEntities();
+        $originalEntities = $this->entities;
+        $entity = $this->entities[$id];
+        unset($this->entities[$id]);
+        if ($this->entities != $originalEntities) {
+            $this->saveEntities();
+            return $this->createChangeInfo(null, $entity, 'delete');
+        } else {
+            return null;
+        }
+    }
+
+    function loadAll() {
+        $this->loadEntities();
+        return $this->entities;
+    }
+
+    function saveAll($entities) {
+        foreach ($entities as $entity) {
+            $this->save($entity);
+        }
+    }
+
+    function prepareStorage() {
     }
 
     protected function updateEntity($id, $data) {
@@ -118,11 +117,6 @@ abstract class SingleFileStorage extends Storage {
         file_put_contents($this->file, $entities);
     }
 
-    protected function notifyOnChangeListeners($entity, $changeType) {
-        $changeInfo = $this->createChangeInfo($entity, $changeType);
-        $this->callOnChangeListeners($changeInfo);
-    }
-
     public function shouldBeSaved($data) {
         return true;
     }
@@ -131,10 +125,4 @@ abstract class SingleFileStorage extends Storage {
         return $this->file;
     }
 
-    /**
-     * @param $entity
-     * @param $changeType
-     * @return EntityChangeInfo
-     */
-    protected abstract function createChangeInfo($entity, $changeType);
 }

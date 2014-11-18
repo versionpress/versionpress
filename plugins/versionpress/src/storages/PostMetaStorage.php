@@ -19,22 +19,22 @@ class PostMetaStorage extends DirectoryStorage {
         $this->postMetaKey = $values['meta_key'];
         $this->postMetaVpId = $values['vp_id'];
 
-        $this->saveEntity($data, array($this, 'notifyChangeListeners'));
+        parent::save($data);
     }
 
     function saveAll($entities) {
         foreach ($entities as $entity) {
             $data = $this->transformToPostField($entity);
-            $this->saveEntity($data);
+            parent::save($data);
         }
     }
 
-    protected function createChangeInfo($oldEntity, $newEntity, $changeType) {
+    protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
         $postTitle = $newEntity['post_title'];
         $postType = $newEntity['post_type'];
         $postVpId = $newEntity['vp_id'];
 
-        return new PostMetaChangeInfo($changeType, $this->postMetaVpId, $postType, $postTitle, $postVpId, $this->postMetaKey);
+        return new PostMetaChangeInfo($action, $this->postMetaVpId, $postType, $postTitle, $postVpId, $this->postMetaKey);
     }
 
     private function transformToPostField($values) {
