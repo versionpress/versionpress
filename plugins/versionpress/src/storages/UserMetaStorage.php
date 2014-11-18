@@ -9,13 +9,13 @@ class UserMetaStorage extends SingleFileStorage {
         parent::__construct($file, 'user', 'ID');
     }
 
-    function save($values) {
-        $data = $this->transformToUserField($values);
+    function save($data) {
+        $transformedData = $this->transformToUserField($data);
 
-        $this->userMetaKey = $values['meta_key'];
-        $this->userMetaVpId = $values['vp_id'];
+        $this->userMetaKey = $data['meta_key'];
+        $this->userMetaVpId = $data['vp_id'];
 
-        parent::save($data);
+        parent::save($transformedData);
     }
 
     function saveAll($entities) {
