@@ -15,16 +15,26 @@ abstract class DirectoryStorage extends Storage {
     /** @var string */
     private $directory;
 
-    protected $entityTypeName;
+    /** @var string */
+    private $entityType;
 
-    protected $idColumnName;
+    /** @var string */
+    private $idColumnName;
 
     /** @var EntityFilter[] */
     private $filters = array();
 
-    function __construct($directory, $entityTypeName, $idColumnName = 'ID') {
+    /**
+     * Concrete implementation have a contructor with just parameter, the $directory,
+     * and provide $entityType and $idColumnName to this parent constructor.
+     *
+     * @param $directory
+     * @param $entityType
+     * @param string $idColumnName
+     */
+    function __construct($directory, $entityType, $idColumnName = 'ID') {
         $this->directory = $directory;
-        $this->entityTypeName = $entityTypeName;
+        $this->entityType = $entityType;
         $this->idColumnName = $idColumnName;
     }
 
@@ -115,7 +125,9 @@ abstract class DirectoryStorage extends Storage {
         $files = scandir($this->directory);
 
         $directory = $this->directory;
-        return array_map(function($filename) use ($directory) { return $directory . '/' . $filename; }, array_diff($files, $excludeList));
+        return array_map(function ($filename) use ($directory) {
+            return $directory . '/' . $filename;
+        }, array_diff($files, $excludeList));
     }
 
     private function loadAllFromFiles($entityFiles) {
@@ -126,7 +138,7 @@ abstract class DirectoryStorage extends Storage {
             $entities[] = $this->deserializeEntity(file_get_contents($file));
         }
 
-        foreach($entities as $entity) {
+        foreach ($entities as $entity) {
             $indexedEntities[$entity['vp_id']] = $entity;
         }
 

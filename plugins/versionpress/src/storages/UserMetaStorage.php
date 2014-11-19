@@ -19,7 +19,7 @@ class UserMetaStorage extends SingleFileStorage {
     }
 
     function saveAll($entities) {
-        foreach($entities as $entity) {
+        foreach ($entities as $entity) {
             $data = $this->transformToUserField($entity);
             parent::save($data);
         }
@@ -30,8 +30,13 @@ class UserMetaStorage extends SingleFileStorage {
     }
 
     public function shouldBeSaved($data) {
-        if(isset($data['meta_key']) && $data['meta_key'] === 'session_tokens') return false;
-        if(NStrings::startsWith(key($data), 'session_tokens')) return false;
+        if (isset($data['meta_key']) && $data['meta_key'] === 'session_tokens') {
+            return false;
+        }
+
+        if (NStrings::startsWith(key($data), 'session_tokens')) {
+            return false;
+        }
 
         return parent::shouldBeSaved($data);
     }

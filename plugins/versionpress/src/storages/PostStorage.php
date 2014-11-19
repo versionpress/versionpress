@@ -26,7 +26,7 @@ class PostStorage extends DirectoryStorage {
         if (!$isExistingEntity && !isset($data['post_type']))
             return false;
 
-        if(!$isExistingEntity && $data['post_type'] === 'attachment' && !isset($data['post_title']))
+        if (!$isExistingEntity && $data['post_type'] === 'attachment' && !isset($data['post_title']))
             return false;
 
         return true;

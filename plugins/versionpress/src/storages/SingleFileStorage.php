@@ -9,26 +9,28 @@ abstract class SingleFileStorage extends Storage {
 
     protected $entities;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $file;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $idColumnName = 'vp_id';
 
-    /**
-     * @var string
-     */
-    protected $entityTypeName;
+    /** @var string */
+    private $entityType;
 
     protected $notSavedFields = array();
 
-    function __construct($file, $entityTypeName, $idColumnName) {
+    /**
+     * Concrete implementation have a contructor with just parameter, the $file,
+     * and provide $entityType and $idColumnName to this parent constructor.
+     *
+     * @param $file
+     * @param $entityType
+     * @param $idColumnName
+     */
+    function __construct($file, $entityType, $idColumnName) {
         $this->file = $file;
-        $this->entityTypeName = $entityTypeName;
+        $this->entityType = $entityType;
         $this->idColumnName = $idColumnName;
     }
 
@@ -92,25 +94,29 @@ abstract class SingleFileStorage extends Storage {
     function prepareStorage() {
     }
 
-    protected function updateEntity($id, $data) {
+    private function updateEntity($id, $data) {
 
-        foreach ($this->notSavedFields as $field)
+        foreach ($this->notSavedFields as $field) {
             unset($data[$field]);
+        }
 
-        foreach ($data as $field => $value)
+        foreach ($data as $field => $value) {
             $this->entities[$id][$field] = $value;
+        }
 
     }
 
     protected function loadEntities() {
-        if($this->entities) return;
+        if ($this->entities) {
+            return;
+        }
 
-        if (is_file($this->file)){
+        if (is_file($this->file)) {
             $entities = IniSerializer::deserialize(file_get_contents($this->file));
             $this->entities = $entities;
-        }
-        else
+        } else {
             $this->entities = array();
+        }
     }
 
     protected function saveEntities() {

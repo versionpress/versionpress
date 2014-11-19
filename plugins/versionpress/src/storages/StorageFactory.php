@@ -5,30 +5,34 @@ class StorageFactory {
     /**
      * @var string
      */
-    private $storageDir;
+    private $vpdbDir;
 
     private $storageClassInfo = array();
 
     private $storages = array();
 
-    function __construct($storageDir) {
-        $this->storageDir = $storageDir;
+    /**
+     * @param string $vpdbDir Path to the `wp-content/vpdb` directory
+     */
+    function __construct($vpdbDir) {
+        $this->vpdbDir = $vpdbDir;
         $this->initStorageClasses();
     }
 
     /**
      * Returns storage by given entity type
+     *
      * @param string $entityName
-     * @return Storage
+     * @return Storage|null
      */
     public function getStorage($entityName) {
         if (isset($this->storages[$entityName]))
             return $this->storages[$entityName];
 
         $storageClass = $this->getStorageClass($entityName);
-        $storageDirectory = $this->getStorageDirectory($entityName);
-        if (class_exists($storageClass)){
-            $storage = new $storageClass($storageDirectory);
+        $storagePath = $this->getStoragePath($entityName);
+        if (class_exists($storageClass)) {
+            $storage = new $storageClass($storagePath);
             $this->storages[$entityName] = $storage;
             return $storage;
         }
@@ -50,20 +54,24 @@ class StorageFactory {
         $this->addStorageClassInfo('postmeta', 'PostMetaStorage', '/posts');
     }
 
-    private function addStorageClassInfo($entityName, $className, $storageDirectory) {
+    private function addStorageClassInfo($entityName, $className, $storagePath) {
         $this->storageClassInfo[$entityName] = array(
             'class' => $className,
-            'directory' => $this->storageDir . $storageDirectory
+            'path' => $this->vpdbDir . $storagePath
         );
     }
 
     private function getStorageClass($entityName) {
-        if(!isset($this->storageClassInfo[$entityName])) return null;
+        if (!isset($this->storageClassInfo[$entityName])) {
+            return null;
+        }
         return $this->storageClassInfo[$entityName]['class'];
     }
 
-    private function getStorageDirectory($entityName) {
-        if(!isset($this->storageClassInfo[$entityName])) return null;
-        return $this->storageClassInfo[$entityName]['directory'];
+    private function getStoragePath($entityName) {
+        if (!isset($this->storageClassInfo[$entityName])) {
+            return null;
+        }
+        return $this->storageClassInfo[$entityName]['path'];
     }
 }
