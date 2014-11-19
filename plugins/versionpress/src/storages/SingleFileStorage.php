@@ -29,6 +29,7 @@ abstract class SingleFileStorage extends Storage {
     function __construct($file, $entityTypeName, $idColumnName) {
         $this->file = $file;
         $this->entityTypeName = $entityTypeName;
+        $this->idColumnName = $idColumnName;
     }
 
     function save($data) {
