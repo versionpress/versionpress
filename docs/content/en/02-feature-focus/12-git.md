@@ -1,6 +1,6 @@
-# Git #
+# Versioning Engine - Git #
 
-Under the hood, VersionPress relies on [Git](http://git-scm.com/) which is one of the most wide-spread version control systems in the world. It was an important decision up-front that brings many benefits but also one trade-off in form of higher system requirements (Git is currently required on the server). This page discusses why we chose Git and why it's such an important decision for the project. 
+Under the hood, VersionPress relies on [Git](http://git-scm.com/) which is one of the most wide-spread version control systems in the world. It was an important decision up-front that brings many benefits but also one trade-off in form of higher system requirements (Git is currently required on the server). This page discusses why we chose Git and why it's such an important decision for the project.
 
 
 ## Why Git ##
