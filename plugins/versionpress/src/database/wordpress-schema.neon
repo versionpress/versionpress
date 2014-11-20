@@ -33,6 +33,5 @@ usermeta:
     references:
         user_id: users
 
-# options:
-# they have the id column too, technically, but we don't to generate VPIDs
-# for them as option names are basically a "primary key" for all our intents and purposes
+options:
+    vpid: option_name

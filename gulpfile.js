@@ -29,10 +29,11 @@ gulp.task('copy', ['clean'], function (cb) {
     return gulp.src([
         vpDir + '/**',
         '!' + vpDir + '/.gitignore',
-        '!' + vpDir + '/vendor{,/**}',
+        '!' + vpDir + '/vendor{,/**}', // `vendor` is fresh-generated later in the `composer-install` task
         '!' + vpDir + '/tests{,/**}',
         '!' + vpDir + '/versionpress.iml',
-        '!' + vpDir + '/log/**/!(.gitignore)'
+        '!' + vpDir + '/log/**/!(.gitignore)', // keep just the .gitignore inside `log` folder
+        '!' + vpDir + '/src/**/*.md' // all Markdown files are considered documentation
     ], srcOptions).pipe(gulp.dest(buildDir));
 });
 
