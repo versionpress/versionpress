@@ -31,13 +31,20 @@ class PostMetaStorage extends DirectoryStorage {
     }
 
     public function shouldBeSaved($data) {
+
+        // This method is called either with the original data where 'meta_key' exists,
+        // or from the parent::save() in which case the data is already transformed. We need
+        // to support both cases.
+
+        $postMetaKey = isset($data['meta_key']) ? $data['meta_key'] : $this->postMetaKey;
+
         $ignoredMeta = array(
             '_edit_lock',
             '_edit_last',
             '_pingme',
             '_encloseme'
         );
-        return !in_array($data['meta_key'], $ignoredMeta);
+        return !in_array($postMetaKey, $ignoredMeta);
     }
 
 
