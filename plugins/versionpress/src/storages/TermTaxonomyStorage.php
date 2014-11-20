@@ -87,6 +87,7 @@ class TermTaxonomyStorage extends SingleFileStorage {
     }
 
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
-        return new TermChangeInfo($action, $newEntity['vp_id'], $newEntity['name']);
+        // Whatever operation on term-taxonomy, it is always an 'edit' action on the related term
+        return new TermChangeInfo('edit', $newEntity['vp_id'], $newEntity['name']);
     }
 }
