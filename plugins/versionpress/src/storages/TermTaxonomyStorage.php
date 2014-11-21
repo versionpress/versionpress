@@ -1,5 +1,26 @@
 <?php
 
+/**
+ * Quite an untypical storage. Stores taxonomy together with terms, as INI sections
+ * called <term_vpid>.taxonomies.<term_taxonomy_vpid>.
+ *
+ * An example of how term-taxonomy is stored:
+ *
+ *     ; this is a term, just for demo purpose
+ *     [8ABB7E35241445A096E60C67977EEA52]
+ *     term_id = 1
+ *     name = "Uncategorized"
+ *     slug = "uncategorized"
+ *     term_group = 0
+ *     vp_id = "8ABB7E35241445A096E60C67977EEA52"
+ *
+ *     ; taxonomy of that term:
+ *     [8ABB7E35241445A096E60C67977EEA52.taxonomies.B915DEDDA9634BE38367AD6A65D8CA8B]
+ *     term_taxonomy_id = 1
+ *     taxonomy = "category"
+ *     description = ""
+ *     vp_id = "B915DEDDA9634BE38367AD6A65D8CA8B"
+ */
 class TermTaxonomyStorage extends SingleFileStorage {
 
     protected $notSavedFields = array('vp_term_id', 'count', 'term_id');
@@ -8,10 +29,11 @@ class TermTaxonomyStorage extends SingleFileStorage {
         $this->loadEntities();
         $termId = $this->findTermId($data);
 
-        if ($termId === null)
+        if (!$termId) {
             return null;
+        }
 
-        $taxonomyId = $data['vp_id'];
+        $taxonomyVpid = $data['vp_id'];
 
         if (!isset($this->entities[$termId]['taxonomies'])) {
             $this->entities[$termId]['taxonomies'] = array();
@@ -19,9 +41,9 @@ class TermTaxonomyStorage extends SingleFileStorage {
 
         $originalTaxonomies = $this->entities[$termId]['taxonomies'];
 
-        $isNew = !isset($originalTaxonomies[$taxonomyId]);
+        $isNew = !isset($originalTaxonomies[$taxonomyVpid]);
 
-        $this->updateTaxonomy($termId, $taxonomyId, $data);
+        $this->updateTaxonomy($termId, $taxonomyVpid, $data);
 
         if ($this->entities[$termId]['taxonomies'] != $originalTaxonomies) {
             $this->saveEntities();
@@ -52,14 +74,20 @@ class TermTaxonomyStorage extends SingleFileStorage {
     }
 
     public function shouldBeSaved($data) {
-        return !(count($data) === 2 && isset($data['count'], $data[$this->idColumnName]));
+        return !(count($data) === 2 && isset($data['count'], $data[$this->entityInfo->idColumnName]));
     }
 
+    /**
+     * Finds term ID related to the taxonomy, or null if no such term exists
+     *
+     * @param $data
+     * @return string|null
+     */
     private function findTermId($data) {
-        $taxonomyId = $data['vp_id'];
+        $taxonomyVpid = $data['vp_id'];
 
         foreach ($this->entities as $termId => $term) {
-            if (isset($term['taxonomies'][$taxonomyId])
+            if (isset($term['taxonomies'][$taxonomyVpid])
                 || (isset($data['vp_term_id']) && strval($term['vp_id']) == strval($data['vp_term_id']))
             ) {
                 return $termId;
