@@ -19,7 +19,7 @@ class TermTaxonomySynchronizer extends SynchronizerBase {
 
             foreach($term['taxonomies'] as $taxonomyId => $taxonomy) {
                 $copy = $taxonomy;
-                $copy[$this->schema->getIdColumnName('term_taxonomy')] = $taxonomyId;
+                $copy[$this->schema->getEntityInfo('term_taxonomy')->idColumnName] = $taxonomyId;
                 $copy['vp_term_id'] = $term['vp_id'];
                 $taxonomies[] = $copy;
             }

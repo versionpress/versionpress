@@ -2,10 +2,8 @@
 
 class StorageFactory {
 
-    /**
-     * @var string
-     */
     private $vpdbDir;
+    private $dbSchemaInfo;
 
     private $storageClassInfo = array();
 
@@ -13,10 +11,12 @@ class StorageFactory {
 
     /**
      * @param string $vpdbDir Path to the `wp-content/vpdb` directory
+     * @param DbSchemaInfo $dbSchemaInfo Passed to storages
      */
-    function __construct($vpdbDir) {
+    function __construct($vpdbDir, $dbSchemaInfo) {
         $this->vpdbDir = $vpdbDir;
         $this->initStorageClasses();
+        $this->dbSchemaInfo = $dbSchemaInfo;
     }
 
     /**
@@ -32,7 +32,7 @@ class StorageFactory {
         $storageClass = $this->getStorageClass($entityName);
         $storagePath = $this->getStoragePath($entityName);
         if (class_exists($storageClass)) {
-            $storage = new $storageClass($storagePath);
+            $storage = new $storageClass($storagePath, $this->dbSchemaInfo->getEntityInfo($entityName));
             $this->storages[$entityName] = $storage;
             return $storage;
         }

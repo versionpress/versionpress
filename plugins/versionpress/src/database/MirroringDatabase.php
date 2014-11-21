@@ -29,20 +29,16 @@ class MirroringDatabase extends ExtendedWpdb {
         if (!$shouldBeSaved)
             return $result;
 
-        $shouldHaveId = $this->dbSchemaInfo->hasId($entityName);
-
-        if ($shouldHaveId) {
+        if ($this->dbSchemaInfo->getEntityInfo($entityName)->usesGeneratedVpids) {
             $data['vp_id'] = $this->generateId();
             $this->saveId($entityName, $id, $data['vp_id']);
         }
 
-        $hasReferences = $this->dbSchemaInfo->hasReferences($entityName);
-
-        if ($hasReferences) {
+        if ($this->dbSchemaInfo->getEntityInfo($entityName)->hasReferences) {
             $data = $this->saveReferences($entityName, $data);
         }
 
-        $data[$this->dbSchemaInfo->getIdColumnName($entityName)] = $id;
+        $data[$this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName] = $id;
 
         $data = $this->fillId($entityName, $data, $id);
         $this->mirror->save($entityName, $data);
@@ -62,10 +58,9 @@ class MirroringDatabase extends ExtendedWpdb {
             return $result;
         }
 
-        $shouldHaveId = $this->dbSchemaInfo->hasId($entityName);
+        if ($this->dbSchemaInfo->getEntityInfo($entityName)->usesGeneratedVpids) {
 
-        if ($shouldHaveId) {
-            $idColumnName = $this->dbSchemaInfo->getIdColumnName($entityName);
+            $idColumnName = $this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName;
             $ids = array();
 
             if ($entityName === 'usermeta') {
@@ -89,9 +84,7 @@ class MirroringDatabase extends ExtendedWpdb {
                     $data['vp_id'] = $vpId;
                 }
 
-                $hasReferences = $this->dbSchemaInfo->hasReferences($entityName);
-
-                if ($hasReferences) {
+                if ($this->dbSchemaInfo->getEntityInfo($entityName)->hasReferences) {
                     $data = $this->saveReferences($entityName, $data);
                 }
 
@@ -108,12 +101,11 @@ class MirroringDatabase extends ExtendedWpdb {
         $result = parent::delete($table, $where, $where_format);
 
         $entityName = $this->stripTablePrefix($table);
-        $hasId = $this->dbSchemaInfo->hasId($entityName);
-        $ids = array();
 
-        if ($hasId) {
-            $hasReferences = $this->dbSchemaInfo->hasReferences($entityName);
-            $idColumnName = $this->dbSchemaInfo->getIdColumnName($entityName);
+        if ($this->dbSchemaInfo->getEntityInfo($entityName)->usesGeneratedVpids) {
+            $ids = array();
+            $hasReferences = $this->dbSchemaInfo->getEntityInfo($entityName)->hasReferences;
+            $idColumnName = $this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName;
             if(isset($where[$idColumnName])) {
                 $ids[] = $where[$idColumnName];
             } else {
@@ -196,13 +188,13 @@ class MirroringDatabase extends ExtendedWpdb {
     }
 
     private function getReferenceId($entityName, $referenceName, $id) {
-        $reference = $this->dbSchemaInfo->getReference($entityName, $referenceName);
+        $reference = $this->dbSchemaInfo->getEntityInfo($entityName)->references[$referenceName];
         $referenceId = $this->getVpId($reference, $id);
         return $referenceId;
     }
 
     private function saveReferences($entityName, $data) {
-        $references = $this->dbSchemaInfo->getReferences($entityName);
+        $references = $this->dbSchemaInfo->getEntityInfo($entityName)->references;
         foreach ($references as $referenceName => $referenceInfo) {
             if (isset($data[$referenceName]) && $data[$referenceName] > 0) {
                 $referenceId = $this->saveReference($entityName, $referenceName, $data['vp_id'], $data[$referenceName]);
@@ -218,7 +210,7 @@ class MirroringDatabase extends ExtendedWpdb {
     }
 
     private function fillId($entityName, $data, $id) {
-        $idColumnName = $this->dbSchemaInfo->getIdColumnName($entityName);
+        $idColumnName = $this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName;
         if (!isset($data[$idColumnName])) {
             $data[$idColumnName] = $id;
         }
@@ -249,7 +241,7 @@ class MirroringDatabase extends ExtendedWpdb {
      * @return array
      */
     private function getIdsForRestriction($entityName, $where) {
-        $idColumnName = $this->dbSchemaInfo->getIdColumnName($entityName);
+        $idColumnName = $this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName;
         $table = $this->dbSchemaInfo->getPrefixedTableName($entityName);
 
         $sql = "SELECT {$idColumnName} FROM {$table} WHERE ";

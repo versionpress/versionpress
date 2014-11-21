@@ -86,4 +86,10 @@ abstract class Storage {
      */
     protected abstract function createChangeInfo($oldEntity, $newEntity, $action = null);
 
+    /**
+     * @param string $path Full path to the storage
+     * @param EntityInfo $entityInfo Entity info
+     */
+    abstract function __construct($path, $entityInfo);
+
 }

@@ -5,10 +5,6 @@ class UserMetaStorage extends SingleFileStorage {
     private $userMetaKey;
     private $userMetaVpId;
 
-    function __construct($file) {
-        parent::__construct($file, 'user', 'ID');
-    }
-
     function save($data) {
         $transformedData = $this->transformToUserField($data);
 

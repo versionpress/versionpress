@@ -2,17 +2,17 @@
 
 class PostStorage extends DirectoryStorage {
 
-    function __construct($directory) {
-        parent::__construct($directory, 'post');
+    function __construct($directory, $entityInfo) {
+        parent::__construct($directory, $entityInfo);
         $this->addFilter(new AbsoluteUrlFilter());
     }
+
 
     public function shouldBeSaved($data) {
 
         // Don't save revisions and drafts
 
-        $id = @$data['vp_id'];
-        $isExistingEntity = !empty($id) && $this->isExistingEntity($id);
+        $isExistingEntity = isset($data['vp_id']) && $this->isExistingEntity($data['vp_id']);
 
         if (isset($data['post_type']) && ($data['post_type'] === 'revision'))
             return false;

@@ -25,7 +25,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $this->database = $database;
         $this->dbSchema = $dbSchema;
         $this->entityName = $entityName;
-        $this->idColumnName = $dbSchema->getIdColumnName($this->entityName);
+        $this->idColumnName = $dbSchema->getEntityInfo($this->$entityName)->idColumnName;
     }
 
     function synchronize() {
@@ -44,9 +44,10 @@ abstract class SynchronizerBase implements Synchronizer {
     }
 
     private function fixReferences($entities) {
-        $hasReferences = $this->dbSchema->hasReferences($this->entityName);
-        if (!$hasReferences)
+
+        if (!($this->dbSchema->getEntityInfo($this->entityName)->hasReferences)) {
             return;
+        }
 
         $usedReferences = array();
         foreach ($entities as $entity) {
@@ -71,7 +72,7 @@ abstract class SynchronizerBase implements Synchronizer {
             $this->executeQuery($deleteQuery);
         }
 
-        $references = $this->dbSchema->getReferences($this->entityName);
+        $references = $this->dbSchema->getEntityInfo($this->entityName)->references;
         foreach($references as $referenceName => $_){ // update foreign keys by VersionPress references
             $updateQuery = "UPDATE {$this->getPrefixedTableName($this->entityName)} entity SET `{$referenceName}` =
             (SELECT reference_id FROM {$this->getPrefixedTableName('vp_reference_details')} ref
@@ -227,7 +228,7 @@ abstract class SynchronizerBase implements Synchronizer {
 
     private function getAllReferences($entity) {
         $references = array();
-        $referencesInfo = $this->dbSchema->getReferences($this->entityName);
+        $referencesInfo = $this->dbSchema->getEntityInfo($this->entityName)->references;
 
         foreach ($entity as $key => $value) {
             if (NStrings::startsWith($key, 'vp_')) {
@@ -251,10 +252,12 @@ abstract class SynchronizerBase implements Synchronizer {
     }
 
     private function replaceForeignKeysWithIdentifiers($entity) {
-        if(!$this->dbSchema->hasReferences($this->entityName))
-            return $entity;
 
-        $references = $this->dbSchema->getReferences($this->entityName);
+        if (!$this->dbSchema->getEntityInfo($this->entityName)->hasReferences) {
+            return $entity;
+        }
+
+        $references = $this->dbSchema->getEntityInfo($this->entityName)->references;
 
         foreach($references as $referenceName => $referenceInfo) {
             if(!isset($entity[$referenceName]) || $entity[$referenceName] == 0)

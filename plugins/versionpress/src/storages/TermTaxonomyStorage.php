@@ -4,10 +4,6 @@ class TermTaxonomyStorage extends SingleFileStorage {
 
     protected $notSavedFields = array('vp_term_id', 'count', 'term_id');
 
-    function __construct($file) {
-        parent::__construct($file, 'term taxonomy', 'term_taxonomy_id');
-    }
-
     public function save($data) {
         $this->loadEntities();
         $termId = $this->findTermId($data);

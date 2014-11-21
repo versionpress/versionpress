@@ -7,49 +7,47 @@
  */
 abstract class SingleFileStorage extends Storage {
 
-    protected $entities;
 
-    /** @var string */
     protected $file;
-
-    /** @var string */
-    protected $idColumnName = 'vp_id';
-
-    /** @var string */
-    private $entityType;
-
-    protected $notSavedFields = array();
+    protected $entityInfo;
 
     /**
-     * Concrete implementation have a contructor with just parameter, the $file,
-     * and provide $entityType and $idColumnName to this parent constructor.
+     * All entities from this storage. Available after loadEntities() has been called.
      *
-     * @param $file
-     * @param $entityType
-     * @param $idColumnName
+     * @var array
      */
-    function __construct($file, $entityType, $idColumnName) {
+    protected $entities;
+
+    /**
+     * Array of fields that should be ignored / not saved in storage
+     *
+     * @var array
+     */
+    protected $notSavedFields = array();
+
+    function __construct($file, $entityInfo) {
         $this->file = $file;
-        $this->entityType = $entityType;
-        $this->idColumnName = $idColumnName;
+        $this->entityInfo = $entityInfo;
     }
 
     function save($data) {
         if (!$this->shouldBeSaved($data))
             return null;
 
-        $id = $data[$this->idColumnName];
+        $id = $data[$this->entityInfo->vpidColumnName];
 
-        if (!$id)
+        if (!$id) {
             return null;
+        }
 
         $this->loadEntities();
+        $originalEntities = $this->entities;
+
         $isNew = !isset($this->entities[$id]);
 
         if ($isNew) {
             $this->entities[$id] = array();
         }
-        $originalEntities = $this->entities;
 
         $this->updateEntity($id, $data);
 
@@ -63,15 +61,18 @@ abstract class SingleFileStorage extends Storage {
     }
 
     function delete($restriction) {
-        if (!$this->shouldBeSaved($restriction))
+        if (!$this->shouldBeSaved($restriction)) {
             return null;
+        }
 
-        $id = $restriction[$this->idColumnName];
+        $id = $restriction[$this->entityInfo->idColumnName];
 
         $this->loadEntities();
         $originalEntities = $this->entities;
         $entity = $this->entities[$id];
+
         unset($this->entities[$id]);
+
         if ($this->entities != $originalEntities) {
             $this->saveEntities();
             return $this->createChangeInfo(null, $entity, 'delete');
@@ -94,6 +95,13 @@ abstract class SingleFileStorage extends Storage {
     function prepareStorage() {
     }
 
+    /**
+     * Updates entity on index $id with values in $data. Fields listed in $this->notSavedFields
+     * are ignored.
+     *
+     * @param string $id
+     * @param array $data key => value
+     */
     private function updateEntity($id, $data) {
 
         foreach ($this->notSavedFields as $field) {
@@ -106,6 +114,9 @@ abstract class SingleFileStorage extends Storage {
 
     }
 
+    /**
+     * Loads all entities from a file to the $this->entities if they were not already loaded
+     */
     protected function loadEntities() {
         if ($this->entities) {
             return;
@@ -119,6 +130,9 @@ abstract class SingleFileStorage extends Storage {
         }
     }
 
+    /**
+     * Saves all entities to a file
+     */
     protected function saveEntities() {
         $entities = IniSerializer::serialize($this->entities);
         file_put_contents($this->file, $entities);

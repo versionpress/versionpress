@@ -31,8 +31,8 @@ class DIContainer {
 
         self::$instance = $dic = new DIContainer();
 
-        $dic->register(VersionPressServices::STORAGE_FACTORY, function () {
-            return new StorageFactory(VERSIONPRESS_MIRRORING_DIR);
+        $dic->register(VersionPressServices::STORAGE_FACTORY, function () use ($dic) {
+            return new StorageFactory(VERSIONPRESS_MIRRORING_DIR, $dic->resolve(VersionPressServices::DB_SCHEMA));
         });
 
         $dic->register(VersionPressServices::MIRROR, function () use ($dic) {

@@ -53,8 +53,8 @@ class Initializer {
         $this->reportProgressChange(InitializerStates::START);
         $this->createVersionPressTables();
         $this->lockDatabase();
-        $this->createVPIDs();
-        $this->createVPIDReferences();
+        $this->createVpids();
+        $this->createVpidReferences();
         $this->saveDatabaseToStorages();
         $this->commitDatabase();
         $this->createGitRepository();
@@ -128,12 +128,12 @@ class Initializer {
     /**
      * Creates VPIDs for all entities that have a WordPress ID and stores them into `vp_id` table.
      */
-    private function createVPIDs() {
+    private function createVpids() {
 
         $entityNames = $this->dbSchema->getAllEntityNames();
 
         foreach ($entityNames as $entityName) {
-            $this->createVPIDsForEntitiesOfType($entityName);
+            $this->createVpidsForEntitiesOfType($entityName);
             $this->reportProgressChange("Created identifiers for " . $entityName);
         }
 
@@ -146,13 +146,13 @@ class Initializer {
      *
      * @param string $entityName E.g., "posts"
      */
-    private function createVPIDsForEntitiesOfType($entityName) {
+    private function createVpidsForEntitiesOfType($entityName) {
 
-        if (!$this->dbSchema->hasId($entityName)) {
+        if (!$this->dbSchema->getEntityInfo($entityName)->usesGeneratedVpids) {
             return;
         }
 
-        $idColumnName = $this->dbSchema->getIdColumnName($entityName);
+        $idColumnName = $this->dbSchema->getEntityInfo($entityName)->idColumnName;
         $tableName = $this->getTableName($entityName);
         $entityIds = $this->database->get_col("SELECT $idColumnName FROM $tableName");
 
@@ -168,12 +168,12 @@ class Initializer {
      * Creates mappings between VPIDs for all applicable entities (those that have VPIDs and reference
      * other entitites with VPIDs). Stores those mappings into the `vp_references` table.
      */
-    private function createVPIDReferences() {
+    private function createVpidReferences() {
 
         $entityNames = $this->dbSchema->getAllEntityNames();
 
         foreach ($entityNames as $entityName) {
-            $this->createVPIDReferencesForEntitiesOfType($entityName);
+            $this->createVpidReferencesForEntitiesOfType($entityName);
             $this->reportProgressChange("Saved references for " . $entityName);
         }
 
@@ -187,14 +187,15 @@ class Initializer {
      *
      * @param string $entityName E.g., "posts"
      */
-    private function createVPIDReferencesForEntitiesOfType($entityName) {
-        if (!$this->dbSchema->hasReferences($entityName)) {
+    private function createVpidReferencesForEntitiesOfType($entityName) {
+
+        if (!$this->dbSchema->getEntityInfo($entityName)->hasReferences) {
             return;
         }
 
-        $references = $this->dbSchema->getReferences($entityName);
+        $references = $this->dbSchema->getEntityInfo($entityName)->references;
 
-        $idColumnName = $this->dbSchema->getIdColumnName($entityName);
+        $idColumnName = $this->dbSchema->getEntityInfo($entityName)->idColumnName;
         $referenceNames = array_keys($references);
         $entities = $this->database->get_results("SELECT $idColumnName, " . join(", ", $referenceNames) . " FROM {$this->getTableName($entityName)}", ARRAY_A);
 
@@ -239,7 +240,7 @@ class Initializer {
         $entities = array_filter($entities, function ($entity) use ($storage) {
             return $storage->shouldBeSaved($entity);
         });
-        $entities = $this->extendEntitiesWithIdentifiers($entityName, $entities);
+        $entities = $this->extendEntitiesWithVpids($entityName, $entities);
         $entities = $this->replaceForeignKeysWithReferencesInAllEntities($entityName, $entities);
         $entities = $this->doEntitySpecificActions($entityName, $entities);
         $storage->prepareStorage();
@@ -247,8 +248,9 @@ class Initializer {
     }
 
     private function replaceForeignKeysWithReferencesInAllEntities($entityName, $entities) {
-        if (!$this->dbSchema->hasReferences($entityName))
+        if (!$this->dbSchema->getEntityInfo($entityName)->hasReferences) {
             return $entities;
+        }
 
         $_this = $this;
         return array_map(function ($entity) use ($entityName, $_this) {
@@ -257,7 +259,7 @@ class Initializer {
     }
 
     public function replaceForeignKeysWithReferences($entityName, $entity) {
-        $references = $this->dbSchema->getReferences($entityName);
+        $references = $this->dbSchema->getEntityInfo($entityName)->references;
         foreach ($references as $referenceName => $targetEntity) {
 
             if ($entity[$referenceName] > 0) {
@@ -271,11 +273,12 @@ class Initializer {
         return $entity;
     }
 
-    private function extendEntitiesWithIdentifiers($entityName, $entities) {
-        if (!$this->dbSchema->hasId($entityName))
+    private function extendEntitiesWithVpids($entityName, $entities) {
+        if (!$this->dbSchema->getEntityInfo($entityName)->usesGeneratedVpids) {
             return $entities;
+        }
 
-        $idColumnName = $this->dbSchema->getIdColumnName($entityName);
+        $idColumnName = $this->dbSchema->getEntityInfo($entityName)->idColumnName;
         $idCache = $this->idCache;
 
         $entities = array_map(function ($entity) use ($entityName, $idColumnName, $idCache) {
@@ -297,7 +300,7 @@ class Initializer {
     }
 
     private function extendPostWithTaxonomies($post) {
-        $idColumnName = $this->dbSchema->getIdColumnName('posts');
+        $idColumnName = $this->dbSchema->getEntityInfo('posts')->idColumnName;
         $id = $post[$idColumnName];
 
         $postType = $post['post_type'];

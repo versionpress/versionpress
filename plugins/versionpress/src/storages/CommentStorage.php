@@ -2,10 +2,6 @@
 
 class CommentStorage extends DirectoryStorage {
 
-    function __construct($directory) {
-        parent::__construct($directory, 'comment', 'comment_ID');
-    }
-
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
 
         if (!$action) {

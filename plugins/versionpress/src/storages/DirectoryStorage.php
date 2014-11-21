@@ -15,45 +15,37 @@ abstract class DirectoryStorage extends Storage {
     /** @var string */
     private $directory;
 
-    /** @var string */
-    private $entityType;
-
-    /** @var string */
-    private $idColumnName;
-
     /** @var EntityFilter[] */
     private $filters = array();
 
-    /**
-     * Concrete implementation have a contructor with just parameter, the $directory,
-     * and provide $entityType and $idColumnName to this parent constructor.
-     *
-     * @param $directory
-     * @param $entityType
-     * @param string $idColumnName
-     */
-    function __construct($directory, $entityType, $idColumnName = 'ID') {
+    private $entityInfo;
+
+    function __construct($directory, $entityInfo) {
         $this->directory = $directory;
-        $this->entityType = $entityType;
-        $this->idColumnName = $idColumnName;
+        $this->entityInfo = $entityInfo;
     }
 
     function save($data) {
-        $id = $data['vp_id'];
+        $id = $data[$this->entityInfo->vpidColumnName];
 
-        if (!$id)
+        if (!$id) {
             return null;
+        }
 
-        unset($data[$this->idColumnName]);
+        if ($this->entityInfo->usesGeneratedVpids) {
+            // to avoid merge conflicts
+            unset($data[$this->entityInfo->idColumnName]);
+        }
         $data = $this->removeUnwantedColumns($data);
         $data = $this->applyFilters($data);
+
+        if (!$this->shouldBeSaved($data)) {
+            return null;
+        }
 
         $filename = $this->getEntityFilename($id);
         $oldSerializedEntity = "";
         $isExistingEntity = $this->isExistingEntity($id);
-
-        if (!$this->shouldBeSaved($data))
-            return null;
 
         if ($isExistingEntity) {
             $oldSerializedEntity = file_get_contents($filename);
