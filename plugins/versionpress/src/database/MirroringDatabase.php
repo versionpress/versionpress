@@ -21,7 +21,13 @@ class MirroringDatabase extends ExtendedWpdb {
     }
 
     function insert($table, $data, $format = null) {
+
         $result = parent::insert($table, $data, $format);
+
+        if (defined('VP_DEACTIVATING')) {
+            return $result;
+        }
+
         $id = $this->insert_id;
         $entityName = $this->stripTablePrefix($table);
         $shouldBeSaved = $this->mirror->shouldBeSaved($entityName, $data);
@@ -49,6 +55,11 @@ class MirroringDatabase extends ExtendedWpdb {
 
     function update($table, $data, $where, $format = null, $where_format = null) {
         $result = parent::update($table, $data, $where, $format, $where_format);
+
+        if (defined('VP_DEACTIVATING')) {
+            return $result;
+        }
+
         $entityName = $this->stripTablePrefix($table);
 
         $data = array_merge($data, $where);
@@ -99,6 +110,10 @@ class MirroringDatabase extends ExtendedWpdb {
 
     function delete($table, $where, $where_format = null) {
         $result = parent::delete($table, $where, $where_format);
+
+        if (defined('VP_DEACTIVATING')) {
+            return $result;
+        }
 
         $entityName = $this->stripTablePrefix($table);
 

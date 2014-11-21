@@ -273,6 +273,8 @@ function vp_admin_post_cancel_deactivation() {
  */
 function vp_admin_post_confirm_deactivation() {
 
+    define('VP_DEACTIVATING', true);
+
     if (!file_exists(WP_CONTENT_DIR . '/db.php')) {
         require_once(WP_CONTENT_DIR . '/plugins/versionpress/bootstrap.php');
     }
@@ -307,7 +309,10 @@ function vp_admin_post_confirm_deactivation() {
 
 
     deactivate_plugins("versionpress/versionpress.php", true);
-    wp_redirect(admin_url("plugins.php"));
+
+    if (defined('WP_ADMIN')) {
+        wp_redirect(admin_url("plugins.php"));
+    }
 
 }
 
