@@ -2,6 +2,11 @@
 
 /**
  * Initializes ("activates" in UI terms) VersionPress - builds its internal repository and starts tracking the changes.
+ *
+ * Tip: to quickly test "undo" initialization for rapid testing, use `wp vp-automate start-over` command,
+ * see VpAutomateCommand.
+ *
+ * @see VpAutomateCommand::startOver
  */
 class Initializer {
 
