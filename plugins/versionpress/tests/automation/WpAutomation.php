@@ -1,6 +1,6 @@
 <?php
 
-define('CONFIG_FILE', __DIR__ . '/test-config.ini');
+define('CONFIG_FILE', __DIR__ . '/../test-config.ini');
 is_file(CONFIG_FILE) or die('Create test-config.ini for automation to work');
 WpAutomation::$config = new TestConfig(parse_ini_file(CONFIG_FILE));
 
