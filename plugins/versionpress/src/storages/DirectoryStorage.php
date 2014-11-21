@@ -95,7 +95,7 @@ abstract class DirectoryStorage extends Storage {
     }
 
     public function prepareStorage() {
-        @mkdir($this->directory, 0777, true);
+        wp_mkdir_p($this->directory);
     }
 
     public function getEntityFilename($id) {
