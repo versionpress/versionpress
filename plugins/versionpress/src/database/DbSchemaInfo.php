@@ -44,7 +44,7 @@ class DbSchemaInfo {
      */
     public function getEntityInfo($entityName) {
         if (!isset($this->entityInfoRegistry[$entityName])) {
-            $this->entityInfoRegistry[$entityName] = new EntityInfo($this->schema[$entityName]);
+            $this->entityInfoRegistry[$entityName] = new EntityInfo(array($entityName => $this->schema[$entityName]));
         }
 
         return $this->entityInfoRegistry[$entityName];
