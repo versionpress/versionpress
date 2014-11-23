@@ -1,36 +1,35 @@
 <?php
 
 /**
- * Helper class to work with WP Filesystem. The main method is `getWpFilesystem()`.
+ * Helper functions to work with filesystem. Currently, the functions use either bare implementation
+ * or {@link http://symfony.com/doc/master/components/filesystem/introduction.html Symfony Filesystem}.
  */
 class FileSystem {
 
     /**
-     * Prepares $wp_filesystem and returns it. I don't really understand why it's so complicated
-     * to invoke a single filesystem command using WP Filesystem API but until
-     * that is cleared up, this helper method was created.
+     * Renames (moves) origin to target.
      *
-     * @see http://codex.wordpress.org/Filesystem_API
-     * @see http://wordpress.stackexchange.com/questions/157629/convenient-way-to-use-wp-filesystem
+     * @see \Symfony\Component\Filesystem\Filesystem::rename()
      *
-     * @return WP_Filesystem_Direct
+     * @param string $origin
+     * @param string $target
+     * @param bool $overwrite
      */
-    public static function getWpFilesystem() {
-        global $wp_filesystem;
+    public static function rename($origin, $target, $overwrite = false) {
+        $fs = new \Symfony\Component\Filesystem\Filesystem();
+        $fs->rename($origin, $target, $overwrite);
+    }
 
-        $url = wp_nonce_url('plugins.php');
-        if (false === ($creds = request_filesystem_credentials($url, '', false, false, null))) {
-            echo "Could not create filesystem credentials";
-            return null;
-        }
-
-        if (!WP_Filesystem($creds)) {
-            request_filesystem_credentials($url, '', true, false, null);
-            echo "Filesystem credentials were not available";
-            return null;
-        }
-
-        return $wp_filesystem;
+    /**
+     * Removes a file / directory. Works recursively.
+     *
+     * @see \Symfony\Component\Filesystem\Filesystem::remove()
+     *
+     * @param string $path Path to a file or directory.
+     */
+    public static function remove($path) {
+        $fs = new \Symfony\Component\Filesystem\Filesystem();
+        $fs->remove($path);
     }
 
     /**

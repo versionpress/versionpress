@@ -19,12 +19,12 @@ if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
     $backupsDir = WP_CONTENT_DIR . '/vpbackups';
     if (!file_exists($backupsDir)) {
         wp_mkdir_p($backupsDir);
-        FileSystem::getWpFilesystem()->put_contents($backupsDir . '/.gitignore', 'git-backup-*');
+        file_put_contents($backupsDir . '/.gitignore', 'git-backup-*');
     }
 
     $backupPath = $backupsDir . '/git-backup-' . date("YmdHis");
 
     FileSystem::setPermisionsForGitDirectory(ABSPATH);
-    FileSystem::getWpFilesystem()->move(ABSPATH . '.git', $backupPath, true);
+    FileSystem::rename(ABSPATH . '.git', $backupPath, true);
 }
 

@@ -287,7 +287,7 @@ function vp_admin_post_confirm_deactivation() {
         unlink(VERSIONPRESS_ACTIVATION_FILE);
     }
 
-    FileSystem::getWpFilesystem()->rmdir(VERSIONPRESS_MIRRORING_DIR, true);
+    FileSystem::remove(VERSIONPRESS_MIRRORING_DIR);
 
     global $wpdb;
 

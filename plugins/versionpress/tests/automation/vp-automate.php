@@ -27,7 +27,7 @@ class VpAutomateCommand extends WP_CLI_Command {
      */
     public function startOver($args, $assoc_args) {
         vp_admin_post_confirm_deactivation();
-        FileSystem::getWpFilesystem()->rmdir(ABSPATH . '.git', true);
+        FileSystem::remove(ABSPATH . '.git');
     }
 
 }
