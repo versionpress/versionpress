@@ -38,6 +38,14 @@ class FileSystem {
         $fs->remove($path);
     }
 
+    /**
+     * Copy directory. Uses Symfony's mirror() under the cover.
+     *
+     * @see \Symfony\Component\Filesystem\Filesystem::mirror()
+     *
+     * @param string $origin
+     * @param string $target
+     */
     public static function copyDir($origin, $target) {
         $fs = new \Symfony\Component\Filesystem\Filesystem();
         $fs->mirror($origin, $target);
