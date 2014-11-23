@@ -63,16 +63,26 @@ class FileSystem {
     }
 
     /**
-     * If the path is a `.git` repository, it attempts to set 0777 permissions
-     * on everything under it because the remove / move operation on it would otherwise fail,
+     * If the path is either a `.git` repository itself or a directory that contains it,
+     * this method attempts to set 0777 permissions on the `.git` folder to avoid issues
      * on Windows.
      *
      * @param $path
      */
     private static function possiblyFixGitPermissions($path) {
-        if (is_dir($path) && basename($path) == '.git') {
 
-            $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
+        $gitDir = null;
+        if (is_dir($path)) {
+            if (basename($path) == '.git') {
+                $gitDir = $path;
+            } else if (is_dir($path . '/.git')) {
+                $gitDir = $path . '/.git';
+            }
+        }
+
+        if ($gitDir) {
+
+            $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($gitDir));
 
             foreach ($iterator as $item) {
                 chmod($item, 0777);
