@@ -16,6 +16,9 @@ class FileSystem {
      * @param bool $overwrite
      */
     public static function rename($origin, $target, $overwrite = false) {
+
+        self::possiblyFixGitPermissions($origin);
+
         $fs = new \Symfony\Component\Filesystem\Filesystem();
         $fs->rename($origin, $target, $overwrite);
     }
@@ -28,29 +31,18 @@ class FileSystem {
      * @param string $path Path to a file or directory.
      */
     public static function remove($path) {
+
+        self::possiblyFixGitPermissions($path);
+
         $fs = new \Symfony\Component\Filesystem\Filesystem();
         $fs->remove($path);
     }
 
-    /**
-     * Sets full privileges on the .git directory and everything under it. Strangely, on Windows,
-     * the .git/objects folder cannot be removed before this method runs.
-     *
-     * @param string $basePath Path where the .git directory is located
-     */
-    public static function setPermisionsForGitDirectory($basePath) {
-        $gitDirectoryPath = $basePath . '/.git';
-
-        if (!is_dir($gitDirectoryPath)) {
-            return;
-        }
-
-        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($gitDirectoryPath));
-
-        foreach ($iterator as $item) {
-            chmod($item, 0777);
-        }
+    public static function copyDir($origin, $target) {
+        $fs = new \Symfony\Component\Filesystem\Filesystem();
+        $fs->mirror($origin, $target);
     }
+
 
     public static function copyRecursive($src, $dst) {
         $dir = opendir($src);
@@ -72,5 +64,25 @@ class FileSystem {
             $path->isDir() ? rmdir($path->getPathname()) : unlink($path->getPathname());
         }
         rmdir($dirPath);
+    }
+
+    /**
+     * If the path is a `.git` repository, it attempts to set 0777 permissions
+     * on everything under it because the remove / move operation on it would otherwise fail,
+     * on Windows.
+     *
+     * @param $path
+     */
+    private static function possiblyFixGitPermissions($path) {
+        if (is_dir($path) && basename($path) == '.git') {
+
+            $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
+
+            foreach ($iterator as $item) {
+                chmod($item, 0777);
+            }
+
+        }
+
     }
 } 

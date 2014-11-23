@@ -24,7 +24,6 @@ if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
 
     $backupPath = $backupsDir . '/git-backup-' . date("YmdHis");
 
-    FileSystem::setPermisionsForGitDirectory(ABSPATH);
     FileSystem::rename(ABSPATH . '.git', $backupPath, true);
 }
 

@@ -209,7 +209,6 @@ class WpAutomation {
      */
     private static function prepareFiles() {
         self::ensureCleanInstallationIsAvailable();
-        FileSystem::setPermisionsForGitDirectory(self::$config->getSitePath()); // Windows hack (enables to delete files under .git/objects directory)
         \Nette\Utils\FileSystem::delete(self::$config->getSitePath() . '/*');
         \Nette\Utils\FileSystem::copy(self::getCleanInstallationPath(), self::$config->getSitePath());
     }
