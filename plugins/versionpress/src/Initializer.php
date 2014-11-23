@@ -224,7 +224,7 @@ class Initializer {
      */
     private function saveDatabaseToStorages() {
 
-        wp_mkdir_p(VERSIONPRESS_MIRRORING_DIR);
+        FileSystem::mkdir(VERSIONPRESS_MIRRORING_DIR);
 
         $storageNames = $this->storageFactory->getAllSupportedStorages();
         foreach ($storageNames as $entityName) {

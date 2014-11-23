@@ -41,8 +41,8 @@ class BugReporter {
     }
 
     private function clean($bugReportDir, $zipFile) {
-        FileSystem::deleteRecursive($bugReportDir);
-        unlink($zipFile);
+        FileSystem::remove($bugReportDir);
+        FileSystem::remove($zipFile);
     }
 
     private function sendBugReport($email, $description, $zipFile) {
@@ -60,8 +60,8 @@ class BugReporter {
     }
 
     private function prepareBugReport($bugReportDir, $zipFile) {
-        mkdir($bugReportDir);
-        FileSystem::copyRecursive(VERSIONPRESS_PLUGIN_DIR . '/log', $bugReportDir . '/log');
+        FileSystem::mkdir($bugReportDir);
+        FileSystem::copyDir(VERSIONPRESS_PLUGIN_DIR . '/log', $bugReportDir . '/log');
         $this->savePhpinfo($bugReportDir);
         $this->saveWordPressSpecificInfo($bugReportDir);
         Zip::zipDirectory($bugReportDir, $zipFile);

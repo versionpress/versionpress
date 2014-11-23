@@ -220,7 +220,7 @@ class WpAutomation {
     private static function ensureCleanInstallationIsAvailable() {
 
         if (!is_dir(self::$config->getCleanInstallationsPath())) {
-            mkdir(self::$config->getCleanInstallationsPath(), 0777, true);
+            FileSystem::mkdir(self::$config->getCleanInstallationsPath());
         }
 
         if (!is_dir(self::getCleanInstallationPath())) {

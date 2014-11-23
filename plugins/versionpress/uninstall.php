@@ -18,7 +18,7 @@ if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
 
     $backupsDir = WP_CONTENT_DIR . '/vpbackups';
     if (!file_exists($backupsDir)) {
-        wp_mkdir_p($backupsDir);
+        FileSystem::mkdir($backupsDir);
         file_put_contents($backupsDir . '/.gitignore', 'git-backup-*');
     }
 

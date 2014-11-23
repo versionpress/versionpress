@@ -83,7 +83,7 @@ class RequirementsChecker {
         $filePath = WP_CONTENT_DIR . '/' . $filename;
         @file_put_contents($filePath, "");
         $fileExists = is_file($filePath);
-        @unlink($filePath);
+        FileSystem::remove($filePath);
         return $fileExists;
     }
 }

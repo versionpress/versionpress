@@ -280,11 +280,11 @@ function vp_admin_post_confirm_deactivation() {
     }
 
     if (file_exists(WP_CONTENT_DIR . '/db.php')) {
-        unlink(WP_CONTENT_DIR . '/db.php');
+        FileSystem::remove(WP_CONTENT_DIR . '/db.php');
     }
 
     if (file_exists(VERSIONPRESS_ACTIVATION_FILE)) {
-        unlink(VERSIONPRESS_ACTIVATION_FILE);
+        FileSystem::remove(VERSIONPRESS_ACTIVATION_FILE);
     }
 
     FileSystem::remove(VERSIONPRESS_MIRRORING_DIR);

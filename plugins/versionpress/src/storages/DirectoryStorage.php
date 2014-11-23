@@ -71,7 +71,7 @@ abstract class DirectoryStorage extends Storage {
         $fileName = $this->getEntityFilename($restriction['vp_id']);
         if (is_file($fileName)) {
             $entity = $this->loadEntity($restriction['vp_id']);
-            unlink($fileName);
+            FileSystem::remove($fileName);
             return $this->createChangeInfo($entity, $entity, 'delete');
         } else {
             return null;
@@ -95,7 +95,7 @@ abstract class DirectoryStorage extends Storage {
     }
 
     public function prepareStorage() {
-        wp_mkdir_p($this->directory);
+        FileSystem::mkdir($this->directory);
     }
 
     public function getEntityFilename($id) {

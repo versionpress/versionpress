@@ -64,7 +64,7 @@ class GitRepository {
 
         $this->runShellCommand(self::$CONFIG_COMMAND, $this->authorName, $this->authorEmail);
         $this->runShellCommand(self::$COMMIT_COMMAND, $tempCommitMessagePath);
-        unlink($tempCommitMessagePath);
+        FileSystem::remove($tempCommitMessagePath);
     }
 
     public function isVersioned() {

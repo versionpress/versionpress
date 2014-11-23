@@ -45,7 +45,7 @@ class Committer
         if($this->commitDisabled) return;
 
         if ($this->forcedChangeInfo) {
-            @unlink(get_home_path() . 'versionpress.maintenance'); // todo: this shouldn't be here...
+            FileSystem::remove(get_home_path() . 'versionpress.maintenance'); // todo: this shouldn't be here...
             $changeInfo = $this->forcedChangeInfo;
             $this->forcedChangeInfo = null;
         } elseif ($this->mirror->wasAffected() && $this->shouldCommit()) {

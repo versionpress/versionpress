@@ -39,7 +39,7 @@ class FileSystem {
     }
 
     /**
-     * Copy directory. Uses Symfony's mirror() under the cover.
+     * Copies a directory. Uses Symfony's mirror() under the cover.
      *
      * @see \Symfony\Component\Filesystem\Filesystem::mirror()
      *
@@ -51,27 +51,15 @@ class FileSystem {
         $fs->mirror($origin, $target);
     }
 
-
-    public static function copyRecursive($src, $dst) {
-        $dir = opendir($src);
-        @mkdir($dst);
-        while (false !== ($file = readdir($dir))) {
-            if (($file != '.') && ($file != '..')) {
-                if (is_dir($src . '/' . $file)) {
-                    self::copyRecursive($src . '/' . $file, $dst . '/' . $file);
-                } else {
-                    copy($src . '/' . $file, $dst . '/' . $file);
-                }
-            }
-        }
-        closedir($dir);
-    }
-
-    public static function deleteRecursive($dirPath) {
-        foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dirPath, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST) as $path) {
-            $path->isDir() ? rmdir($path->getPathname()) : unlink($path->getPathname());
-        }
-        rmdir($dirPath);
+    /**
+     * Creates a directory
+     *
+     * @param string $dir
+     * @param int $mode
+     */
+    public static function mkdir($dir, $mode = 0777) {
+        $fs = new \Symfony\Component\Filesystem\Filesystem();
+        $fs->mkdir($dir, $mode);
     }
 
     /**
