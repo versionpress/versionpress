@@ -40,7 +40,7 @@ class WpAutomation {
      * Copies the plugin to the WP site.
      */
     public static function installVersionPress() {
-        $versionPressDir = __DIR__ . '/../';
+        $versionPressDir = __DIR__ . '/../..';
         $pluginDir = self::$config->getSitePath() . '/wp-content/plugins/versionpress/';
         FileSystem::copyDir($versionPressDir, $pluginDir);
     }
@@ -209,7 +209,7 @@ class WpAutomation {
      */
     private static function prepareFiles() {
         self::ensureCleanInstallationIsAvailable();
-        FileSystem::remove(self::$config->getSitePath() . '/*');
+        FileSystem::remove(self::$config->getSitePath());
         FileSystem::copyDir(self::getCleanInstallationPath(), self::$config->getSitePath());
     }
 
@@ -301,7 +301,12 @@ class WpAutomation {
         $process->run();
 
         if (!$process->isSuccessful()) {
-            throw new Exception($process->getErrorOutput());
+            $msg = $process->getErrorOutput();
+            if (!$msg) {
+                // e.g. WP-CLI outputs to STDOUT instead of STDERR
+                $msg = $process->getOutput();
+            }
+            throw new Exception('Error executing cmd \'' . $command . '\': ' . $msg);
         }
 
         return $process->getOutput();

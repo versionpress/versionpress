@@ -5,7 +5,7 @@ require_once(__DIR__ . '/selenium/SeleniumTestCase.php');
 require_once(__DIR__ . '/selenium/FullWipeSeleniumTestCase.php');
 require_once(__DIR__ . '/wp-cli/WpCliTestCase.php');
 require_once(__DIR__ . '/TestConfig.php');
-require_once(__DIR__ . '/WpAutomation.php');
+require_once(__DIR__ . '/automation/WpAutomation.php');
 
 NDebugger::enable(NDebugger::DEVELOPMENT, __DIR__ . '/../log');
 $robotLoader = new NRobotLoader();
