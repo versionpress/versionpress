@@ -42,7 +42,7 @@ class WpAutomation {
     public static function installVersionPress() {
         $versionPressDir = __DIR__ . '/../';
         $pluginDir = self::$config->getSitePath() . '/wp-content/plugins/versionpress/';
-        \Nette\Utils\FileSystem::copy($versionPressDir, $pluginDir);
+        FileSystem::copyDir($versionPressDir, $pluginDir);
     }
 
     public static function activateVersionPress() {
@@ -209,8 +209,8 @@ class WpAutomation {
      */
     private static function prepareFiles() {
         self::ensureCleanInstallationIsAvailable();
-        \Nette\Utils\FileSystem::delete(self::$config->getSitePath() . '/*');
-        \Nette\Utils\FileSystem::copy(self::getCleanInstallationPath(), self::$config->getSitePath());
+        FileSystem::remove(self::$config->getSitePath() . '/*');
+        FileSystem::copyDir(self::getCleanInstallationPath(), self::$config->getSitePath());
     }
 
     /**
