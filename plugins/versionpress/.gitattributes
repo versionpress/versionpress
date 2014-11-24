@@ -1,0 +1,3 @@
+# Auto detect text files and perform EOL normalization
+# (`text=auto` means that repo will use LF, `eol=lf` means that Git will ensure LF in the working copy)
+* text=auto eol=lf
