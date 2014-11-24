@@ -26,9 +26,9 @@ abstract class DirectoryStorage extends Storage {
     }
 
     function save($data) {
-        $id = $data[$this->entityInfo->vpidColumnName];
+        $vpid = $data[$this->entityInfo->vpidColumnName];
 
-        if (!$id) {
+        if (!$vpid) {
             return null;
         }
 
@@ -43,9 +43,9 @@ abstract class DirectoryStorage extends Storage {
             return null;
         }
 
-        $filename = $this->getEntityFilename($id);
+        $filename = $this->getEntityFilename($vpid);
         $oldSerializedEntity = "";
-        $isExistingEntity = $this->isExistingEntity($id);
+        $isExistingEntity = $this->isExistingEntity($vpid);
 
         if ($isExistingEntity) {
             $oldSerializedEntity = file_get_contents($filename);

@@ -34,26 +34,26 @@ abstract class SingleFileStorage extends Storage {
         if (!$this->shouldBeSaved($data))
             return null;
 
-        $id = $data[$this->entityInfo->vpidColumnName];
+        $vpid = $data[$this->entityInfo->vpidColumnName];
 
-        if (!$id) {
+        if (!$vpid) {
             return null;
         }
 
         $this->loadEntities();
         $originalEntities = $this->entities;
 
-        $isNew = !isset($this->entities[$id]);
+        $isNew = !isset($this->entities[$vpid]);
 
         if ($isNew) {
-            $this->entities[$id] = array();
+            $this->entities[$vpid] = array();
         }
 
-        $this->updateEntity($id, $data);
+        $this->updateEntity($vpid, $data);
 
         if ($this->entities != $originalEntities) {
             $this->saveEntities();
-            return $this->createChangeInfo(null, $this->entities[$id], $isNew ? 'create' : 'edit');
+            return $this->createChangeInfo(null, $this->entities[$vpid], $isNew ? 'create' : 'edit');
         } else {
             return null;
         }
