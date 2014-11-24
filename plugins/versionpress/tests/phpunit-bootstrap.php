@@ -3,7 +3,7 @@
 require_once(__DIR__ . '/../vendor/autoload.php');
 require_once(__DIR__ . '/selenium/SeleniumTestCase.php');
 require_once(__DIR__ . '/selenium/FullWipeSeleniumTestCase.php');
-require_once(__DIR__ . '/wp-cli/WpCliTestCase.php');
+require_once(__DIR__ . '/end2end/WpCliTestCase.php');
 require_once(__DIR__ . '/TestConfig.php');
 require_once(__DIR__ . '/automation/WpAutomation.php');
 
