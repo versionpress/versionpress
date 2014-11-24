@@ -65,13 +65,13 @@ abstract class SingleFileStorage extends Storage {
             return null;
         }
 
-        $id = $restriction[$this->entityInfo->idColumnName];
+        $vpid = $restriction[$this->entityInfo->vpidColumnName];
 
         $this->loadEntities();
         $originalEntities = $this->entities;
-        $entity = $this->entities[$id];
+        $entity = $this->entities[$vpid];
 
-        unset($this->entities[$id]);
+        unset($this->entities[$vpid]);
 
         if ($this->entities != $originalEntities) {
             $this->saveEntities();
