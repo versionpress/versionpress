@@ -3,7 +3,11 @@
   <component name="ProjectCodeStyleSettingsManager">
     <option name="PER_PROJECT_SETTINGS">
       <value>
+        <XML>
+          <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
+        </XML>
         <codeStyleSettings language="PHP">
+          <option name="CLASS_BRACE_STYLE" value="1" />
           <option name="METHOD_BRACE_STYLE" value="1" />
         </codeStyleSettings>
       </value>
