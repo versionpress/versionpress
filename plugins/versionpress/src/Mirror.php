@@ -9,11 +9,8 @@ class Mirror {
     /** @var StorageFactory */
     private $storageFactory;
 
-    /** @var bool */
-    private $wasAffected;
-
     /** @var ChangeInfo[] */
-    private $changeList;
+    private $changeList = array();
 
     function __construct(StorageFactory $storageFactory) {
         $this->storageFactory = $storageFactory;
@@ -60,16 +57,8 @@ class Mirror {
     }
 
     /**
-     * True if at least one of the calls to `save()` actually influenced the storage somehow.
-     *
-     * @return bool
-     */
-    public function wasAffected() {
-        return $this->wasAffected;
-    }
-
-    /**
-     * If wasAffected(), this array contains a list of {@see ChangeInfo} objects
+     * Contains a list of {@see ChangeInfo} objects captured by this mirror.
+     * Can be an empty array if there was no real change in any of the storages.
      *
      * @return ChangeInfo[]
      */
