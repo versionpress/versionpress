@@ -390,8 +390,8 @@ class Initializer {
         $authorEmail = $currentUser->user_email;
 
         if (defined('WP_CLI') && WP_CLI) {
-            $authorName = "wp-cli";
-            $authorEmail = "wp-cli@example.com";
+            $authorName = GitConfig::$wpcliUserName;
+            $authorEmail = GitConfig::$wpcliUserEmail;
         }
 
         $this->repository->add("*");

@@ -62,6 +62,9 @@ class Committer
             $currentUser = wp_get_current_user();
             $authorName = $currentUser->display_name;
             $authorEmail = $currentUser->user_email;
+        } else if (defined('WP_CLI') && WP_CLI) {
+            $authorName = GitConfig::$wpcliUserName;
+            $authorEmail = GitConfig::$wpcliUserEmail;
         } else {
             $authorName = "Non-admin action";
             $authorEmail = "nonadmin@example.com";
