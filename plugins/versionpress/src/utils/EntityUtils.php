@@ -22,21 +22,16 @@ class EntityUtils {
      *
      * @param array $oldEntityData Usually a full entity data in its original state
      * @param array $newEntityData Full or partial data of the new entity
-     * @param bool $ignoreVpid If true (default), `vp_id` key is ignored (not added to the diff)
      *
      * @return array Key=>value pairs of things that are new or changed in $newEntity (they can
      *               never be "removed", that will never happen when capturing SQL UPDATE actions)
      */
-    public static function getDiff($oldEntityData, $newEntityData, $ignoreVpid = true) {
+    public static function getDiff($oldEntityData, $newEntityData) {
         $diff = array();
         foreach ($newEntityData as $key => $value) {
             if (!isset($oldEntityData[$key]) || $oldEntityData[$key] != $value) {
                 $diff[$key] = $value;
             }
-        }
-
-        if ($ignoreVpid && isset($diff['vp_id'])) {
-            unset($diff['vp_id']);
         }
 
         return $diff;
