@@ -77,6 +77,8 @@ class EntityInfo {
     public $hasReferences;
 
     /**
+     * Does the parsing and sets all properties
+     *
      * @param array $entitySchema Example:
      *   array('posts' => array(
      *     'id' => 'ID',
@@ -95,9 +97,13 @@ class EntityInfo {
         if (isset($schemaInfo['id'])) {
             $this->idColumnName = $schemaInfo['id'];
             $this->vpidColumnName = 'vp_id'; // convention
+            $this->usesGeneratedVpids = true;
+            $this->hasNaturalVpid = false;
         } else {
             $this->idColumnName = $schemaInfo['vpid'];
             $this->vpidColumnName = $schemaInfo['vpid'];
+            $this->usesGeneratedVpids = false;
+            $this->hasNaturalVpid = true;
         }
 
         if (isset($schemaInfo['references'])) {
