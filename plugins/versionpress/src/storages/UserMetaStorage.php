@@ -11,7 +11,7 @@ class UserMetaStorage extends SingleFileStorage {
         $this->userMetaKey = $data['meta_key'];
         $this->userMetaVpId = $data['vp_id'];
 
-        parent::save($transformedData);
+        return parent::save($transformedData);
     }
 
     function saveAll($entities) {
@@ -26,11 +26,7 @@ class UserMetaStorage extends SingleFileStorage {
     }
 
     public function shouldBeSaved($data) {
-        if (isset($data['meta_key']) && $data['meta_key'] === 'session_tokens') {
-            return false;
-        }
-
-        if (NStrings::startsWith(key($data), 'session_tokens')) {
+        if ($this->userMetaKey === 'session_tokens') {
             return false;
         }
 

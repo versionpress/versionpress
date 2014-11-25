@@ -17,7 +17,7 @@ class PostMetaStorage extends DirectoryStorage {
         $this->postMetaKey = $data['meta_key'];
         $this->postMetaVpId = $data['vp_id'];
 
-        parent::save($transformedData);
+        return parent::save($transformedData);
     }
 
     function saveAll($entities) {
