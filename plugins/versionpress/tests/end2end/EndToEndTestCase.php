@@ -1,38 +1,63 @@
 <?php
 
-abstract class WpCliTestCase extends PHPUnit_Framework_TestCase {
+/**
+ * Base class for end-to-end tests that usually set up the whole site from scratch,
+ * execute actions on it via WpAutomation / WP-CLI and then assert that commits look right,
+ * correct database entities have been created etc.
+ */
+abstract class EndToEndTestCase extends PHPUnit_Framework_TestCase {
+
     /**
      * Configuration read from `test-config.ini` and set to this variable from phpunit-bootstrap.php.
      *
      * @var TestConfig
      */
     public static $config;
-    /** @var bool */
-    public static $skipSetup = false;
-    /** @var bool */
-    private static $setUp = false;
 
-    /** @var NConnection */
+    /**
+     * Can be set to true by external code to suppress setting up a test site. By default,
+     * the `setUpBeforeClass()` method will set up a test site from scratch.
+     *
+     * @var bool
+     */
+    public static $skipSetup = false;
+
+    /**
+     * Internal flag so that `setUpBeforeClass()` is run only once.
+     *
+     * @var bool
+     */
+    private static $isAlreadySetUp = false;
+
+    /**
+     * Connection to the database, created in `setUpBeforeClass()`
+     *
+     * @var NConnection
+     */
     private static $db;
 
     public static function setUpBeforeClass() {
-        if (!self::$skipSetup && !self::$setUp) {
+
+        if (!self::$skipSetup && !self::$isAlreadySetUp) {
+
             WpAutomation::setUpSite();
             WpAutomation::installVersionPress();
             WpAutomation::enableVersionPress();
-            self::setUpDatabase();
-            self::$setUp = true;
+            self::prepareDbConnection();
+
+            self::$isAlreadySetUp = true;
         }
+
     }
 
     /**
-     * Creates connection to the database.
+     * Sets up `self::$db` instance.
      */
-    private static function setUpDatabase() {
-        $dbHost = WpCliTestCase::$config->getDbHost();
-        $dbName = WpCliTestCase::$config->getDbName();
-        $dbUser = WpCliTestCase::$config->getDbUser();
-        $dbPassword = WpCliTestCase::$config->getDbPassword();
+    private static function prepareDbConnection() {
+        $dbHost = self::$config->getDbHost();
+        $dbName = self::$config->getDbName();
+        $dbUser = self::$config->getDbUser();
+        $dbPassword = self::$config->getDbPassword();
         self::$db = new NConnection("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
     }
 
@@ -42,7 +67,7 @@ abstract class WpCliTestCase extends PHPUnit_Framework_TestCase {
      * @return Commit
      */
     protected function getLastCommit() {
-        $repository = new GitRepository(WpCliTestCase::$config->getSitePath());
+        $repository = new GitRepository(EndToEndTestCase::$config->getSitePath());
         $gitLog = $repository->log();
         $lastCommit = $gitLog[0];
         return $lastCommit;

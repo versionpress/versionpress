@@ -1,6 +1,6 @@
 <?php
 
-class CommentTest extends WpCliTestCase {
+class CommentTest extends EndToEndTestCase {
     private $someComment = array(
         "comment_author" => "Mr VersionPress",
         "comment_author_email" => "versionpress@example.com",
