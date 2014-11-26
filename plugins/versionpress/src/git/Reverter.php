@@ -32,7 +32,7 @@ class Reverter {
 
         $this->updateChangeDateForPosts($affectedPosts);
 
-        if(!$this->repository->revert($commitHash)) return RevertStatus::FAILED;
+        if (!$this->repository->revert($commitHash)) return RevertStatus::FAILED;
 
         $this->synchronize();
 
@@ -51,7 +51,7 @@ class Reverter {
 
         $this->repository->revertAll($commitHash);
 
-        if(!$this->repository->willCommit()) {
+        if (!$this->repository->willCommit()) {
             return RevertStatus::NOTHING_TO_COMMIT;
         }
 
@@ -80,9 +80,9 @@ class Reverter {
     private function getAffectedPosts($modifiedFiles) {
         $posts = array();
 
-        foreach($modifiedFiles as $filename) {
+        foreach ($modifiedFiles as $filename) {
             $match = NStrings::match($filename, "~/posts/(.*)\.ini~");
-            if($match) {
+            if ($match) {
                 $posts[] = $match[1];
             }
         }

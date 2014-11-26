@@ -73,7 +73,7 @@ abstract class SynchronizerBase implements Synchronizer {
         }
 
         $references = $this->dbSchema->getEntityInfo($this->entityName)->references;
-        foreach($references as $referenceName => $_){ // update foreign keys by VersionPress references
+        foreach ($references as $referenceName => $_){ // update foreign keys by VersionPress references
             $updateQuery = "UPDATE {$this->getPrefixedTableName($this->entityName)} entity SET `{$referenceName}` =
             (SELECT reference_id FROM {$this->getPrefixedTableName('vp_reference_details')} ref
             WHERE ref.id=entity.{$this->idColumnName} AND `table` = \"{$this->entityName}\" and reference = \"{$referenceName}\")";
@@ -182,7 +182,7 @@ abstract class SynchronizerBase implements Synchronizer {
     }
 
     private function deleteEntitiesWhichAreNotInStorage($entities) {
-        if(count($entities) == 0)
+        if (count($entities) == 0)
             return;
         $vpIds = array_map(function ($entity) {
             return 'UNHEX("' . $entity['vp_id'] . '")';
@@ -259,8 +259,8 @@ abstract class SynchronizerBase implements Synchronizer {
 
         $references = $this->dbSchema->getEntityInfo($this->entityName)->references;
 
-        foreach($references as $referenceName => $referenceInfo) {
-            if(!isset($entity[$referenceName]) || $entity[$referenceName] == 0)
+        foreach ($references as $referenceName => $referenceInfo) {
+            if (!isset($entity[$referenceName]) || $entity[$referenceName] == 0)
                 continue;
             $entity['vp_' . $referenceName] = $this->getIdForEntity($referenceInfo, $entity[$referenceName]);
         }

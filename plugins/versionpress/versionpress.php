@@ -450,7 +450,7 @@ function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
             var customPopoverClass = \"versionpress-alpha\"; // used to identify the popover later
 
             warning.webuiPopover({title:\"$popoverTitle\", content: \"$popoverText\", closeable: true, style: customPopoverClass, width:450});
-            jQuery('body').on('click', function(e) {
+            jQuery('body').on('click', function (e) {
                 var popopOverSelector = '.webui-popover-' + customPopoverClass;
                 if (jQuery(popopOverSelector).length > 0 && jQuery(popopOverSelector).is(':visible') && jQuery(e.target).parents(popopOverSelector).length == 0 &&
                     !jQuery(e.target).is(warning) && jQuery(e.target).parents('#vp-warning').length == 0)

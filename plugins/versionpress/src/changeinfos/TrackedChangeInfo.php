@@ -57,7 +57,7 @@ abstract class TrackedChangeInfo implements ChangeInfo {
         $actionTag = $this->getActionTagValue();
 
         $tags = array();
-        if($actionTag) {
+        if ($actionTag) {
             $tags[self::ACTION_TAG] = $actionTag;
         }
 

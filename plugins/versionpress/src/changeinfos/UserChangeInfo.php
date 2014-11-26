@@ -23,7 +23,7 @@ class UserChangeInfo extends EntityChangeInfo {
     }
 
     public function getChangeDescription() {
-        if($this->getAction() === "create")
+        if ($this->getAction() === "create")
             return "New user '{$this->userLogin}'";
         return "Edited user '{$this->userLogin}'";
     }

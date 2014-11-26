@@ -16,10 +16,10 @@ class UserMetaSynchronizer extends SynchronizerBase {
     protected function transformEntities($entities) {
         $transformedEntities = array();
         foreach ($entities as $userId => $entity) {
-            foreach($entity as $meta_key => $meta_value) {
+            foreach ($entity as $meta_key => $meta_value) {
                 $dividerPosition = strrpos($meta_key, '#');
 
-                if($dividerPosition === false)
+                if ($dividerPosition === false)
                     continue;
 
                 $key = substr($meta_key, 0, $dividerPosition);

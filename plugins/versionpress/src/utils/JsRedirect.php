@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: Borek
- * Date: 14. 8. 2014
- * Time: 16:00
- */
 
 class JsRedirect {
 
@@ -17,7 +11,7 @@ class JsRedirect {
     public static function redirect($url, $timeout = 0) {
         $redirectionJs = <<<JS
 <script type="text/javascript">
-    window.setTimeout(function() {
+    window.setTimeout(function () {
         window.location = '$url';
     }, $timeout);
 </script>

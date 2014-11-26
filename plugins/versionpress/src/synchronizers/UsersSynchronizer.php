@@ -21,10 +21,10 @@ class UsersSynchronizer extends SynchronizerBase {
         );
 
         $filteredEntities = array();
-        foreach($entities as $entity){
+        foreach ($entities as $entity){
             $safeEntity = array();
-            foreach($allowedProperties as $allowedProperty){
-                if(isset($entity[$allowedProperty])){
+            foreach ($allowedProperties as $allowedProperty){
+                if (isset($entity[$allowedProperty])){
                     $safeEntity[$allowedProperty] = $entity[$allowedProperty];
                 }
             }

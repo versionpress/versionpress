@@ -19,9 +19,9 @@ function replaceDatabaseSettings() {
     );
 
     $configFileLines = file(ABSPATH . '/wp-config.php');
-    foreach($configFileLines as $lineNumber => $line) {
-        foreach($replacementDefinitions as $i => $replacementDefinition) {
-            if(preg_match($replacementDefinition['regexp'],$line)) {
+    foreach ($configFileLines as $lineNumber => $line) {
+        foreach ($replacementDefinitions as $i => $replacementDefinition) {
+            if (preg_match($replacementDefinition['regexp'],$line)) {
                 $configFileLines[$lineNumber] = sprintf($replacementDefinition['replaceWith'], $replacementDefinition['value']);
                 unset($replacementDefinitions[$i]);
             }

@@ -19,7 +19,7 @@ class SynchronizationProcess {
      * @param array|string $synchronizationSequence
      */
     function synchronize($synchronizationSequence) {
-        if(!is_array($synchronizationSequence)){
+        if (!is_array($synchronizationSequence)){
             $synchronizationSequence = func_get_args();
         }
 

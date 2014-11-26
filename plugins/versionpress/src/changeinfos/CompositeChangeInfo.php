@@ -81,7 +81,7 @@ class CompositeChangeInfo implements ChangeInfo {
         $splittedBodies = explode("\n\n", $fullBody);
         $changeInfoList = array();
 
-        foreach($splittedBodies as $body) {
+        foreach ($splittedBodies as $body) {
             $partialCommitMessage = new CommitMessage("", $body);
             $changeInfoList[] = ChangeInfoMatcher::createMatchingChangeInfo($partialCommitMessage);
         }

@@ -183,7 +183,7 @@ function _vp_show_progress_message($progressMessage) {
 
                 <div style="text-align: center;">
                 <?php
-                    if($requirementsChecker->isEverythingFulfilled()) {
+                    if ($requirementsChecker->isEverythingFulfilled()) {
                         $activationUrl = admin_url('admin.php?page=versionpress/admin/index.php&init');
                         $buttonClass = "button-primary";
                     } else {
@@ -227,13 +227,13 @@ function _vp_show_progress_message($progressMessage) {
             $error = $errors[$_GET['error']];
         }
 
-        if(isset($_GET['bug-report'])) {
-            if($_GET['bug-report'] === 'ok') {
+        if (isset($_GET['bug-report'])) {
+            if ($_GET['bug-report'] === 'ok') {
                 $error = array(
                     'class' => 'updated',
                     'message' => 'Bug report was sent. Thank you.'
                 );
-            } elseif($_GET['bug-report'] === 'err') {
+            } elseif ($_GET['bug-report'] === 'err') {
                 $error = array(
                     'class' => 'error',
                     'message' => 'There was a problem with sending bug report. Please try it again. Thank you.'
@@ -241,7 +241,7 @@ function _vp_show_progress_message($progressMessage) {
             }
         }
 
-        if(isset($error)) {
+        if (isset($error)) {
             echo "<div class='$error[class]'><p>$error[message]</p></div>";
         }
 
@@ -252,7 +252,7 @@ function _vp_show_progress_message($progressMessage) {
         <button id="vp-service-panel-button"><span class="icon icon-cog"></span></button>
         <h2 id="vp-page-header">VersionPress</h2>
 
-        <div id="vp-service-panel" class="welcome-panel <?php if($displayServicePanel) echo "displayed"; ?>">
+        <div id="vp-service-panel" class="welcome-panel <?php if ($displayServicePanel) echo "displayed"; ?>">
             <h3>VersionPress Service Panel</h3>
             <h4>Bug report</h4>
             <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
@@ -342,9 +342,9 @@ function _vp_show_progress_message($progressMessage) {
                 $rollbackSnippet = "<a href='" . admin_url('admin.php?action=vp_rollback&commit=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts site back to this state; effectively undos all the change up to this commit'>Roll back to this</a>";
 
                 $versioningSnippet = "";
-                if($canUndoCommit) $versioningSnippet .= $undoSnippet;
-                if($canUndoCommit && $canRollbackToThisCommit) $versioningSnippet .= "&nbsp;|&nbsp;";
-                if($canRollbackToThisCommit) $versioningSnippet .= $rollbackSnippet;
+                if ($canUndoCommit) $versioningSnippet .= $undoSnippet;
+                if ($canUndoCommit && $canRollbackToThisCommit) $versioningSnippet .= "&nbsp;|&nbsp;";
+                if ($canRollbackToThisCommit) $versioningSnippet .= $rollbackSnippet;
                 $isEnabled = $canUndoCommit || $canRollbackToThisCommit || $commit->getHash() === $initialCommitHash;
 
                 $message = $changeInfo->getChangeDescription();
@@ -371,14 +371,14 @@ function _vp_show_progress_message($progressMessage) {
                             $links = "";
                             $lastNumber = 0;
 
-                            foreach($pageNumbers as $pageNumber) {
+                            foreach ($pageNumbers as $pageNumber) {
                                 $divider = "";
-                                if($i > 0 && $lastNumber != $pageNumber-1) $divider = "&hellip;";
-                                elseif($i > 0) $divider = "|";
+                                if ($i > 0 && $lastNumber != $pageNumber-1) $divider = "&hellip;";
+                                elseif ($i > 0) $divider = "|";
 
                                 $links .= " " . $divider . " ";
                                 $pageUrl = admin_url('admin.php?page=versionpress/admin/index.php&vp-page=' . $pageNumber);
-                                if($pageNumber == $page) {
+                                if ($pageNumber == $page) {
                                     $links .= $pageNumber + 1;
                                 } else {
                                     $links .= "<a href=\"$pageUrl\">" . ($pageNumber + 1) . "</a>";

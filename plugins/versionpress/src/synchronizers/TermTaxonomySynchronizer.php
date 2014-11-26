@@ -14,10 +14,10 @@ class TermTaxonomySynchronizer extends SynchronizerBase {
     private function extractTaxonomiesFromTerms($terms) {
         $taxonomies = array();
 
-        foreach($terms as $term) {
-            if(!isset($term['taxonomies'])) continue;
+        foreach ($terms as $term) {
+            if (!isset($term['taxonomies'])) continue;
 
-            foreach($term['taxonomies'] as $taxonomyId => $taxonomy) {
+            foreach ($term['taxonomies'] as $taxonomyId => $taxonomy) {
                 $copy = $taxonomy;
                 $copy[$this->schema->getEntityInfo('term_taxonomy')->idColumnName] = $taxonomyId;
                 $copy['vp_term_id'] = $term['vp_id'];

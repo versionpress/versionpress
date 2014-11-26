@@ -55,7 +55,7 @@ class ChangeInfoMatcher {
      */
     public static function findMatchingChangeInfo(CommitMessage $commitMessage) {
 
-        if(substr_count($commitMessage->getBody(), TrackedChangeInfo::ACTION_TAG) > 1) {
+        if (substr_count($commitMessage->getBody(), TrackedChangeInfo::ACTION_TAG) > 1) {
             return "CompositeChangeInfo";
         }
 

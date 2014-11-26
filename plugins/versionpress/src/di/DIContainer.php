@@ -26,7 +26,7 @@ class DIContainer {
      * @return DIContainer
      */
     public static function getConfiguredInstance() {
-        if(self::$instance != null)
+        if (self::$instance != null)
             return self::$instance;
 
         self::$instance = $dic = new DIContainer();

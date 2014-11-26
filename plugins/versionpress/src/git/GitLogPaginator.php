@@ -30,7 +30,7 @@ class GitLogPaginator {
         $firstCommitIndex = $pageNumber * $this->commitsPerPage;
         $lastCommitIndex = ($pageNumber + 1) * $this->commitsPerPage;
 
-        if($lastCommitIndex >= $this->numberOfCommits) {
+        if ($lastCommitIndex >= $this->numberOfCommits) {
             $range = sprintf("HEAD~%s", $firstCommitIndex);
             $this->isLastPage = true;
         } else {

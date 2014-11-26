@@ -24,7 +24,7 @@ class OptionsSynchronizer implements Synchronizer {
         $options = $this->optionsStorage->loadAll();
         $syncQuery = "INSERT INTO {$this->tableName} (option_name, option_value, autoload) VALUES ";
         foreach ($options as $optionName => $values) {
-            if(!isset($values['autoload'])) $values['autoload'] = 'yes'; // default value
+            if (!isset($values['autoload'])) $values['autoload'] = 'yes'; // default value
             $syncQuery .= "(\"$optionName\", \"" . mysql_real_escape_string($values['option_value']) . "\", \"$values[autoload]\"),";
         }
 
@@ -33,9 +33,9 @@ class OptionsSynchronizer implements Synchronizer {
 
         $this->database->query($syncQuery);
 
-        if(count($options) == 0) return;
+        if (count($options) == 0) return;
 
-        $optionNames = array_map(function($option) {
+        $optionNames = array_map(function ($option) {
             return "\"" . $option['option_name'] . "\"";
         }, $options);
 

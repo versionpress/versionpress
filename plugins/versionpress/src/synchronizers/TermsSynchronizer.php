@@ -10,7 +10,7 @@ class TermsSynchronizer extends SynchronizerBase {
 
     protected function transformEntities($entities) {
         $transformedEntities = array();
-        foreach($entities as $id => $entity) {
+        foreach ($entities as $id => $entity) {
             $entityCopy = $entity;
             unset($entityCopy['taxonomies']); // taxonomies are synchronized by TermTaxonomySynchronizer
             $entityCopy[$this->schema->getEntityInfo('terms')->idColumnName] = $id;

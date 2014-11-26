@@ -22,7 +22,7 @@ class TermChangeInfo extends EntityChangeInfo {
     }
 
     public function getChangeDescription() {
-        if($this->getAction() === "create")
+        if ($this->getAction() === "create")
             return "New term '{$this->termName}'";
         return "Edited term '{$this->termName}'";
     }

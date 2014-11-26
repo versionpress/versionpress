@@ -66,7 +66,7 @@ class CommitMessage {
      * @return array Array of tagName => value (trimmed)
      */
     public function getVersionPressTags() {
-        if(!$this->tags) {
+        if (!$this->tags) {
             $tagLines = array_filter(
                 array_map("trim", explode("\n", $this->getBody())),
                 function ($line) {

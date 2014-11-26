@@ -136,7 +136,7 @@ class GitRepository {
     public function revert($commit) {
         $output = $this->runShellCommandWithErrorOutput(self::$REVERT_COMMAND, $commit);
 
-        if($output !== null) { // revert conflict
+        if ($output !== null) { // revert conflict
             $this->runShellCommand(self::$REVERT_ABORT_COMMAND);
             return false;
         }
@@ -187,7 +187,7 @@ class GitRepository {
          * http://stackoverflow.com/a/16903162/1243495
          */
         $dyldLibraryPath = getenv("DYLD_LIBRARY_PATH");
-        if($dyldLibraryPath != "") {
+        if ($dyldLibraryPath != "") {
             putenv("DYLD_LIBRARY_PATH=");
 
         }
@@ -202,8 +202,8 @@ class GitRepository {
 
         putenv("DYLD_LIBRARY_PATH=$dyldLibraryPath");
 
-        if($result['stdout'] !== null) $result['stdout'] = trim($result['stdout']);
-        if($result['stderr'] !== null) $result['stderr'] = trim($result['stderr']);
+        if ($result['stdout'] !== null) $result['stdout'] = trim($result['stdout']);
+        if ($result['stderr'] !== null) $result['stderr'] = trim($result['stderr']);
 
         return $result;
     }

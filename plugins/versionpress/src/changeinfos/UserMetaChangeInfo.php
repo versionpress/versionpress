@@ -29,7 +29,7 @@ class UserMetaChangeInfo extends EntityChangeInfo {
     }
 
     public function getChangeDescription() {
-        if($this->getAction() === "create")
+        if ($this->getAction() === "create")
             return "New option '{$this->userMetaKey}' for user '{$this->userLogin}'";
         return "Edited option '{$this->userMetaKey}' for user '{$this->userLogin}'";
     }

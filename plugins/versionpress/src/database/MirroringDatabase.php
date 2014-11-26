@@ -121,7 +121,7 @@ class MirroringDatabase extends ExtendedWpdb {
             $ids = array();
             $hasReferences = $this->dbSchemaInfo->getEntityInfo($entityName)->hasReferences;
             $idColumnName = $this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName;
-            if(isset($where[$idColumnName])) {
+            if (isset($where[$idColumnName])) {
                 $ids[] = $where[$idColumnName];
             } else {
                 $ids = $this->getIdsForRestriction($entityName, $where);
