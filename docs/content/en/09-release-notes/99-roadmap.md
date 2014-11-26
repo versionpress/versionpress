@@ -15,6 +15,6 @@ This page should give you an idea of where we are and what is planned for the fu
 * Synchronization functionality incl. support for staging / testing environment. *(Planned for v2.0.)*
 * Explicit support for selected 3rd party plugins (some 3rd party plugins work out of the box, some won't and for the most popular ones, we'll be adding explicit support). *(Planned to be implemented continually over time.)*
 * UI improvements (side-by-side diffs, better display of change details etc.)
+* Lowering system requirements, e.g., not requiring Git on the server
 * Multisite support
 * Localization
-* Lowering system requirements, e.g., not requiring Git on the server or supporting PHP 5.2
