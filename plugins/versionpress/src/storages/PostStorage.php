@@ -41,9 +41,9 @@ class PostStorage extends DirectoryStorage {
         return $entity;
     }
 
-    protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
+    protected function createChangeInfo($oldEntity, $newEntity, $action) {
 
-        if (!$action) {
+        if ($action === 'edit') { // determine more specific edit action
 
             $diff = EntityUtils::getDiff($oldEntity, $newEntity);
 

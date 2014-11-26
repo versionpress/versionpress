@@ -4,7 +4,7 @@ class CommentStorage extends DirectoryStorage {
 
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
 
-        if (!$action) {
+        if ($action === 'edit') { // determine more specific edit action
 
             $diff = EntityUtils::getDiff($oldEntity, $newEntity);
 

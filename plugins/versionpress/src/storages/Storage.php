@@ -79,12 +79,12 @@ abstract class Storage {
      *   is null.
      * @param array $newEntity The updated entity. Always contains the full data, never null.
      * @param string $action Code that calls this method (save() and delete() methods)
-     *   can provide an action or just leave this as null which means that the specific
-     *   implementation should determine the action from the $oldEntity / $newEntity.
+     *   provides typically a basic action (create / edit / delete). More specific action can be
+     *   determined from the $oldEntity / $newEntity in implementation of this method.
      *
      * @return ChangeInfo Eventually used as the return value of the `save()` or the `delete()` method
      */
-    protected abstract function createChangeInfo($oldEntity, $newEntity, $action = null);
+    protected abstract function createChangeInfo($oldEntity, $newEntity, $action);
 
     /**
      * @param string $path Full path to the storage

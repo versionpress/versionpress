@@ -59,7 +59,7 @@ abstract class DirectoryStorage extends Storage {
             $newEntity = array_merge($oldEntity, $diff);
             file_put_contents($filename, $this->serializeEntity($newEntity));
 
-            return $this->createChangeInfo($oldEntity, $newEntity, !$isExistingEntity ? 'create' : null);
+            return $this->createChangeInfo($oldEntity, $newEntity, !$isExistingEntity ? 'create' : 'edit');
 
         } else {
             return null;
@@ -102,11 +102,11 @@ abstract class DirectoryStorage extends Storage {
         return $this->directory . '/' . $id . '.ini';
     }
 
-    private function deserializeEntity($serializedEntity) {
+    protected function deserializeEntity($serializedEntity) {
         return IniSerializer::deserialize($serializedEntity);
     }
 
-    private function serializeEntity($entity) {
+    protected function serializeEntity($entity) {
         return IniSerializer::serializeFlatData($entity);
     }
 
