@@ -27,6 +27,28 @@ class PostMetaStorage extends DirectoryStorage {
         }
     }
 
+    function delete($restriction) {
+        $filename = $this->getEntityFilename($restriction['vp_post_id']);
+        $post = $this->deserializeEntity(file_get_contents($filename));
+        $fieldToDelete = "";
+
+        foreach ($post as $fieldname => $value) {
+            if (NStrings::endsWith($fieldname, "#$restriction[vp_id]")) {
+                $fieldToDelete = $fieldname;
+                break;
+            }
+        }
+
+        if (!$fieldToDelete)
+            return null;
+
+        unset($post[$fieldToDelete]);
+        file_put_contents($filename, $this->serializeEntity($post));
+
+        list($metaKey) = explode('#', $fieldToDelete, 2);
+        return new PostMetaChangeInfo("delete", $restriction['vp_id'], $post['post_type'], $post['post_title'], $post['vp_id'], $metaKey);
+    }
+
     public function shouldBeSaved($data) {
 
         // This method is called either with the original data where 'meta_key' exists,
@@ -44,21 +66,37 @@ class PostMetaStorage extends DirectoryStorage {
         return !in_array($postMetaKey, $ignoredMeta);
     }
 
-
-    protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
+    protected function createChangeInfo($oldEntity, $newEntity, $action) {
         $postTitle = $newEntity['post_title'];
         $postType = $newEntity['post_type'];
         $postVpId = $newEntity['vp_id'];
+
+        if ($action === 'edit') {
+            // New postmeta is editation of the post, therefore we need to determine the creation.
+            $action = isset($oldEntity[$this->getJoinedKey($this->postMetaKey, $this->postMetaVpId)]) ? 'edit' : 'create';
+        }
 
         return new PostMetaChangeInfo($action, $this->postMetaVpId, $postType, $postTitle, $postVpId, $this->postMetaKey);
     }
 
     private function transformToPostField($values) {
-        $key = sprintf('%s#%s', $values['meta_key'], $values['vp_id']);
+        $key = $this->getJoinedKey($values['meta_key'], $values['vp_id']);
         $data = array(
             'vp_id' => $values['vp_post_id'],
             $key => $values['meta_value']
         );
         return $data;
+    }
+
+    /**
+     * Returns $metaKey#$vpId from $metaKey and $vpId inputs.
+     * It's used in a post file as key representing postmeta.
+     *
+     * @param $metaKey
+     * @param $vpId
+     * @return string
+     */
+    private function getJoinedKey($metaKey, $vpId) {
+        return sprintf('%s#%s', $metaKey, $vpId);
     }
 }

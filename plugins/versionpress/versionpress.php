@@ -21,14 +21,14 @@ if (vp_is_active()) {
 }
 
 function vp_register_hooks() {
-    /** @var wpdb $wpdb */
+    /** @var MirroringDatabase $wpdb */
     global $wpdb, $versionPressContainer;
-    /** @var StorageFactory $storageFactory */
-    $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
     /** @var Committer $committer */
     $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
     /** @var Mirror $mirror */
     $mirror = $versionPressContainer->resolve(VersionPressServices::MIRROR);
+    /** @var DbSchemaInfo $dbSchemaInfo */
+    $dbSchemaInfo = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
 
     /**
      *  Hook for saving taxonomies into files
@@ -107,6 +107,13 @@ function vp_register_hooks() {
         $postType = $post['post_type'];
         $postTitle = $post['post_title'];
         $committer->forceChangeInfo(new PostChangeInfo('trash', $vpId, $postType, $postTitle));
+    });
+
+    add_action('delete_postmeta', function ($metaIds) use ($wpdb, $dbSchemaInfo) {
+        $idColumnName = $dbSchemaInfo->getEntityInfo("postmeta")->idColumnName;
+        foreach ($metaIds as $metaId) {
+            $wpdb->delete($dbSchemaInfo->getPrefixedTableName("postmeta"), array($idColumnName => $metaId), null, false);
+        }
     });
     //----------------------------------------
     // URL "hooks"
