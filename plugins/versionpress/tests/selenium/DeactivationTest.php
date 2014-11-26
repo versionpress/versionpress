@@ -11,7 +11,7 @@ class DeactivationTest extends SeleniumTestCase {
      */
     public static function setUpBeforeClass() {
         WpAutomation::setUpSite();
-        WpAutomation::installVersionPress();
+        WpAutomation::copyVersionPressFiles();
     }
 
     /**

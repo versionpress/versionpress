@@ -41,7 +41,7 @@ abstract class EndToEndTestCase extends PHPUnit_Framework_TestCase {
         if (!self::$skipSetup && !self::$isAlreadySetUp) {
 
             WpAutomation::setUpSite();
-            WpAutomation::installVersionPress();
+            WpAutomation::copyVersionPressFiles();
             WpAutomation::enableVersionPress();
             self::prepareDbConnection();
 
