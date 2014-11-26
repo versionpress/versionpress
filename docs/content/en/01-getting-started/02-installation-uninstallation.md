@@ -22,7 +22,12 @@ The server environment must currently match these requirements, some of which ar
 In practice, this means that you need to have control over your server as these will typically not be available in a common hosting scenario. We are aware that this is an issue and will be lowering these requirements in some future release.
 
 <div class="note">
-  <strong>Note about db.php</strong>
+  <strong>Note about PHP 5.3</strong>
+  <p>WordPress itself can run even on the old and now <a href="http://php.net/eol.php">long unsupported</a> PHP version 5.2. We also started with this version in mind but eventually dropped it so that we could use the newer language features and some 3rd party libraries that are 5.3+ only. Back-porting VersionPress to PHP 5.2 is currently not planned.</p>
+</div>
+
+<div class="note">
+  <strong>Note about <code>db.php</code></strong>
   <p>VersionPress currently uses the <code>db.php</code> file to hook into some of the WordPress' actions that don't have other good extensibility points. We know that having a dependency on <code>db.php</code> is a problem in some server environments (e.g., there might be a collision with some other plugin also requiring <code>db.php</code>) and will have a solution to this at some point in the future.</p>
 </div>
 
