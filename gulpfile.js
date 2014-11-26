@@ -7,34 +7,66 @@ var zip = require('gulp-zip');
 var replace = require('gulp-replace');
 var fs = require('fs');
 var path = require('path');
+var iniParser = require('ini');
 
 var packageVersion = "";
-var buildType = '';
+var buildType = ''; // empty (default, means production), 'nightly' or 'test-deploy'
 
 var buildDir = './build';
 var distDir = './dist';
 var vpDir = './plugins/versionpress';
+var srcDef = []; // prepared in `prepare-src-definition`
 
 
 gulp.task('set-nightly-build', function() {
     buildType = 'nightly';
 });
 
-gulp.task('clean', function (cb) {
-    del([buildDir, distDir], cb);
+gulp.task('prepare-test-deploy', function() {
+    var testConfigStr = fs.readFileSync(vpDir + '/tests/test-config.ini', 'utf-8');
+    var testConfig = iniParser.parse(testConfigStr);
+    buildDir = testConfig["Site-Settings"]["site-path"];
+
+    buildType = 'test-deploy'; // later influences the `prepare-src-definition` task
 });
 
-gulp.task('copy', ['clean'], function (cb) {
+/**
+ * Prepares `srcDef` that is later used in the `copy` task. The src definition
+ * is slightly different for various `buildType`s.
+ */
+gulp.task('prepare-src-definition', function () {
+
+    srcDef = [];
+
+    srcDef.push(vpDir + '/**'); // add all, except:
+
+    srcDef.push('!' + vpDir + '/versionpress.iml');
+    srcDef.push('!' + vpDir + '/.gitignore'); // this .gitignore is valid for a project, not for deployed VP
+    srcDef.push('!' + vpDir + '/.editorconfig');
+    srcDef.push('!' + vpDir + '/.gitattributes');
+    srcDef.push('!' + vpDir + '/tests{,/**}'); // tests might be useful for `test-deploy` but we don't currently need them
+    srcDef.push('!' + vpDir + '/log/**/!(.gitignore)'); // keep just the .gitignore inside `log` folder
+    srcDef.push('!' + vpDir + '/**.md'); // all Markdown files are considered documentation
+
+    // and now some build-specific patterns:
+    if (buildType == 'test-deploy') {
+        srcDef.push('!' + vpDir + '/composer.json');
+        srcDef.push('!' + vpDir + '/composer.lock');
+        // keep `vendor`
+    } else {
+        srcDef.push('!' + vpDir + '/vendor{,/**}'); // `vendor` is fresh-generated later in the `composer-install` task
+        // keep composer.json|lock
+    }
+
+});
+
+gulp.task('clean', function (cb) {
+    del([buildDir, distDir], {force: true} , cb);
+});
+
+gulp.task('copy', ['clean', 'prepare-src-definition'], function (cb) {
     var srcOptions = {dot: true, base: vpDir};
-    return gulp.src([
-        vpDir + '/**',
-        '!' + vpDir + '/.gitignore',
-        '!' + vpDir + '/vendor{,/**}', // `vendor` is fresh-generated later in the `composer-install` task
-        '!' + vpDir + '/tests{,/**}',
-        '!' + vpDir + '/versionpress.iml',
-        '!' + vpDir + '/log/**/!(.gitignore)', // keep just the .gitignore inside `log` folder
-        '!' + vpDir + '/src/**/*.md' // all Markdown files are considered documentation
-    ], srcOptions).pipe(gulp.dest(buildDir));
+    return gulp.src(srcDef, srcOptions).pipe(gulp.dest(buildDir));
 });
 
 gulp.task('strip-comments', ['copy'], function (cb) {
@@ -103,6 +135,11 @@ gulp.task('clean-build', ['zip'], function (cb) {
 });
 
 gulp.task('nightly', ['set-nightly-build', 'clean-build']);
+
+/**
+ * Copies plugin files to the test directory specified in `test-config.ini`.
+ */
+gulp.task('test-deploy', ['prepare-test-deploy', 'copy']);
 
 gulp.task('default', ['clean-build']);
 

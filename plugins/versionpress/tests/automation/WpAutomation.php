@@ -41,8 +41,8 @@ class WpAutomation {
      */
     public static function installVersionPress() {
         $versionPressDir = __DIR__ . '/../..';
-        $pluginDir = self::$config->getSitePath() . '/wp-content/plugins/versionpress/';
-        FileSystem::copyDir($versionPressDir, $pluginDir);
+        $gulpBaseDir = $versionPressDir . '/../..';
+        self::exec('gulp test-deploy', $gulpBaseDir);
     }
 
     public static function activateVersionPress() {
