@@ -1,3 +1,7 @@
+/**
+ * VersionPress build script. See the end of the file for main callable tasks.
+ */
+
 var gulp = require('gulp');
 var del = require('del');
 var shell = require('gulp-shell');
@@ -9,19 +13,65 @@ var fs = require('fs');
 var path = require('path');
 var iniParser = require('ini');
 
+/**
+ * Version to be displayed both in WordPress administration and used as a suffix of the generated ZIP file
+ * @type {string}
+ */
 var packageVersion = "";
-var buildType = ''; // empty (default, means production), 'nightly' or 'test-deploy'
 
+/**
+ * Type of build. Possible values:
+ *
+ *  - '' (default - means production)
+ *  - 'nightly' - set by the `nightly` task
+ *  - 'test-deploy' - set by the `test-deploy` task
+ *
+ * @type {string}
+ */
+var buildType = ''; // empty (default, means production),
+
+/**
+ * Directory where the VP files are copied to and some actions
+ * like `composer install`, comment stripping etc. are run on them.
+ *
+ * One exception is the `test-deploy` task that basically just runs the `copy`
+ * and sets buildDir directly to some WP test site, see `prepare-test-deploy`.
+ *
+ * @type {string}
+ */
 var buildDir = './build';
+
+/**
+ * Where to put the final ZIP file
+ *
+ * @type {string}
+ */
+
 var distDir = './dist';
+
+/**
+ * VersionPress source directory
+ *
+ * @type {string}
+ */
 var vpDir = './plugins/versionpress';
-var srcDef = []; // prepared in `prepare-src-definition`
+
+/**
+ * Array of globs that will be used in gulp.src() to copy files from source to destination.
+ * Prepared in `prepare-src-definition`.
+ *
+ * @type {Array}
+ */
+var srcDef = [];
 
 
 gulp.task('set-nightly-build', function() {
     buildType = 'nightly';
 });
 
+/**
+ * Sets `buildDir` and `buildType` so that the copy methods copies to the WP test site.
+ */
 gulp.task('prepare-test-deploy', function() {
     var testConfigStr = fs.readFileSync(vpDir + '/tests/test-config.ini', 'utf-8');
     var testConfig = iniParser.parse(testConfigStr);
@@ -32,7 +82,7 @@ gulp.task('prepare-test-deploy', function() {
 
 /**
  * Prepares `srcDef` that is later used in the `copy` task. The src definition
- * is slightly different for various `buildType`s.
+ * is slightly different for various buildTypes.
  */
 gulp.task('prepare-src-definition', function () {
 
@@ -60,15 +110,28 @@ gulp.task('prepare-src-definition', function () {
 
 });
 
+/**
+ * Cleans buildDir and distDir
+ */
 gulp.task('clean', function (cb) {
     del([buildDir, distDir], {force: true} , cb);
 });
 
+
+/**
+ * Copies files defined by `srcDef` to `buildDir`
+ */
 gulp.task('copy', ['clean', 'prepare-src-definition'], function (cb) {
     var srcOptions = {dot: true, base: vpDir};
     return gulp.src(srcDef, srcOptions).pipe(gulp.dest(buildDir));
 });
 
+/**
+ * Removes all comments from the source code and stores the new files to .php-strip files.
+ * Next tasks are `rename-phpstrip-back` and `remove-phpstrip-files` and also `persist-plugin-comment`
+ * needs to be run in order to restore plugin metadata which are also technically comments but need
+ * to be there.
+ */
 gulp.task('strip-comments', ['copy'], function (cb) {
 	var stripCmd = (vpDir + '/vendor/bin/strip').replace(/\//g, path.sep);
 
@@ -76,22 +139,37 @@ gulp.task('strip-comments', ['copy'], function (cb) {
         pipe(shell([stripCmd + ' <%= file.path %> > <%= file.path %>-strip']));
 });
 
-gulp.task('rename-back', ['strip-comments'], function (cb) {
+/**
+ * Copies content of *.php-strip files back to the original files
+ */
+gulp.task('rename-phpstrip-back', ['strip-comments'], function (cb) {
     return gulp.src(buildDir + '/**/*.php-strip').pipe(rename({extname: '.php'})).
         pipe(gulp.dest(buildDir));
 });
 
-gulp.task('remove-temp-files', ['rename-back'], function (cb) {
+/**
+ * Removes *.php-strip files
+ */
+gulp.task('remove-phpstrip-files', ['rename-phpstrip-back'], function (cb) {
     del(buildDir + '/**/*.php-strip', cb);
 });
 
-gulp.task('composer-install', ['remove-temp-files'], shell.task(['composer install -d ' + buildDir + ' --no-dev --prefer-dist']));
+/**
+ * Installs Composer packages, ignores dev packages prefers dist ones
+ */
+gulp.task('composer-install', ['remove-phpstrip-files'], shell.task(['composer install -d ' + buildDir + ' --no-dev --prefer-dist']));
 
+/**
+ * Removes composer.json|lock after the `composer-install` task is done
+ */
 gulp.task('remove-composer-files', ['composer-install'], function (cb) {
     del([buildDir + '/composer.json', buildDir + '/composer.lock'], cb);
 });
 
-gulp.task('persist-plugin-comment', ['rename-back'], function (cb) {
+/**
+ * Copies plugin metadata from source versionpress.php to the `buildDir` version.
+ */
+gulp.task('persist-plugin-comment', ['rename-phpstrip-back'], function (cb) {
     var fileOptions = {encoding: 'UTF-8'};
     fs.readFile(vpDir + '/versionpress.php', fileOptions, function (err, content) {
         var definePosition = content.indexOf("define");
@@ -114,13 +192,19 @@ gulp.task('persist-plugin-comment', ['rename-back'], function (cb) {
     });
 });
 
-gulp.task('set-production-mode', ['rename-back'], function (cb) {
+/**
+ * Does some code changes to build a production version. Currently sets NDebugger::PRODUCTION mode.
+ */
+gulp.task('set-production-mode', ['rename-phpstrip-back'], function (cb) {
     return gulp.src(buildDir + '/bootstrap.php').pipe(replace(
         "NDebugger::DETECT",
         "NDebugger::PRODUCTION"
     )).pipe(gulp.dest(buildDir));
 });
 
+/**
+ * Builds the final ZIP in the `distDir` folder.
+ */
 gulp.task('zip', ['persist-plugin-comment', 'set-production-mode', 'remove-composer-files'], function (cb) {
     return gulp.src(buildDir + '/**', {dot: true}).
         pipe(rename(function (path) {
@@ -130,16 +214,35 @@ gulp.task('zip', ['persist-plugin-comment', 'set-production-mode', 'remove-compo
         pipe(gulp.dest(distDir));
 });
 
+/**
+ * After the ZIP has been built, cleans the build directory
+ */
 gulp.task('clean-build', ['zip'], function (cb) {
 	del(['build'], cb);
 });
 
+
+
+//--------------------------------------
+// Main callable tasks
+//--------------------------------------
+
+/**
+ * Default task that exports production build
+ */
+gulp.task('default', ['clean-build']);
+
+/**
+ * Exports "nightly" build which contains the same files as production (`default`) build
+ * but the version number in both plugin metadata and file name contains short Git hash,
+ * e.g., "versionpress-1.0+58a96f2.zip" or "Version: 1.0+58a96f2".
+ */
 gulp.task('nightly', ['set-nightly-build', 'clean-build']);
 
 /**
- * Copies plugin files to the test directory specified in `test-config.ini`.
+ * Task called from WpAutomation to copy the plugin files to the test directory
+ * specified in `test-config.ini`. Basically does only the `copy` task.
  */
 gulp.task('test-deploy', ['prepare-test-deploy', 'copy']);
 
-gulp.task('default', ['clean-build']);
 
