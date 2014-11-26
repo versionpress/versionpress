@@ -35,7 +35,7 @@ function vp_register_hooks() {
      *  WordPress creates plain INSERT query and executes it using wpdb::query method instead of wpdb::insert.
      *  It's too difficult to parse every INSERT query, that's why the WordPress hook is used.
      */
-    add_action('save_post', createUpdatePostTermsHook($storageFactory->getStorage('posts'), $wpdb));
+    add_action('save_post', createUpdatePostTermsHook($mirror, $wpdb));
 
     add_filter('update_feedback', function () {
         touch(get_home_path() . 'versionpress.maintenance');
@@ -176,9 +176,9 @@ function vp_register_hooks() {
     register_shutdown_function(array($committer, 'commit'));
 }
 
-function createUpdatePostTermsHook(Storage $storage, wpdb $wpdb) {
+function createUpdatePostTermsHook(Mirror $mirror, wpdb $wpdb) {
 
-    return function ($postId) use ($storage, $wpdb) {
+    return function ($postId) use ($mirror, $wpdb) {
         $post = get_post($postId);
         $postType = $post->post_type;
         $taxonomies = get_object_taxonomies($postType);
@@ -198,7 +198,7 @@ function createUpdatePostTermsHook(Storage $storage, wpdb $wpdb) {
         }
 
         if (count($taxonomies) > 0)
-            $storage->save($postUpdateData);
+            $mirror->save("posts", $postUpdateData);
     };
 }
 
