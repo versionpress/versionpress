@@ -12,8 +12,6 @@ class CommentStorage extends DirectoryStorage {
                 $action = 'trash';
             } elseif (isset($diff['comment_approved']) && $oldEntity['comment_approved'] === 'trash') {
                 $action = 'untrash';
-            } else {
-                $action = 'edit';
             }
         }
 

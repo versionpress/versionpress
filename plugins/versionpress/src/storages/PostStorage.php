@@ -55,10 +55,7 @@ class PostStorage extends DirectoryStorage {
                 $action = 'publish';
             } elseif (!isset($oldEntity['post_status']) && isset($newEntity['post_status']) && $newEntity['post_status'] === 'draft') {
                 $action = 'draft';
-            } else {
-                $action = 'edit';
             }
-
         }
 
         $title = $newEntity['post_title'];
