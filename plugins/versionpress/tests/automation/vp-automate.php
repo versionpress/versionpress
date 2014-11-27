@@ -6,7 +6,7 @@
  *
  * Example of usage:
  *
- *     wp --require="c:\wpsite\wp-content\plugins\versionpress\tests\automation\vp-automate.php" vp-automate start-over
+ *     wp --require="wp-content/plugins/versionpress/tests/automation/vp-automate.php" vp-automate start-over
  *
  */
 
@@ -20,14 +20,15 @@ class VpAutomateCommand extends WP_CLI_Command {
      *
      * ## DETAILS
      *
-     * Basically does plugin deactivation plus removing the Git repo. Deactivation
-     * does things like removing `vpdb`, `db.php`, VersionPress db tables etc.
+     * Basically does plugin deactivation, removing the Git repo and plugin activation.
+     * Deactivation does things like removing `vpdb`, `db.php`, VersionPress db tables etc.
      *
      * @subcommand start-over
      */
     public function startOver($args, $assoc_args) {
         vp_admin_post_confirm_deactivation();
         FileSystem::remove(ABSPATH . '.git');
+        activate_plugin('versionpress/versionpress.php');
     }
 
 }
