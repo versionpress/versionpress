@@ -7,8 +7,12 @@ class CommentStorage extends DirectoryStorage {
         if ($action === 'edit') { // determine more specific edit action
 
             $diff = EntityUtils::getDiff($oldEntity, $newEntity);
-
-            if (isset($diff['comment_approved']) && $diff['comment_approved'] === 'trash') {
+            if (isset($diff['comment_approved']) && (
+                ($oldEntity['comment_approved'] === 'trash' && $newEntity['comment_approved'] === 'post-trashed') ||
+                ($oldEntity['comment_approved'] === 'post-trashed' && $newEntity['comment_approved'] === 'trash')
+                )) {
+                $action = 'edit'; // trash -> post-trashed and post-trashed -> trash are not interesting action for us
+            } elseif (isset($diff['comment_approved']) && $diff['comment_approved'] === 'trash') {
                 $action = 'trash';
             } elseif (isset($diff['comment_approved']) && $oldEntity['comment_approved'] === 'trash') {
                 $action = 'untrash';

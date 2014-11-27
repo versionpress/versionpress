@@ -100,13 +100,17 @@ function vp_register_hooks() {
         });
     });
 
-    add_action('trashed_post', function ($postId) use ($committer, $wpdb) {
-        $post = get_post($postId, ARRAY_A);
+    add_action('untrashed_post_comments', function ($postId) use ($wpdb, $dbSchemaInfo) {
+        $commentsTable = $dbSchemaInfo->getPrefixedTableName("comments");
+        $referenceDetailsView = $dbSchemaInfo->getPrefixedTableName("vp_reference_details");
+        $commentStatusSql = "select c.comment_ID, c.comment_approved from {$referenceDetailsView} r join {$commentsTable} c on c.comment_ID = r.id where `table` = 'comments' and r.reference_id = {$postId}";
+        $comments = $wpdb->get_results($commentStatusSql, ARRAY_A);
 
-        $vpId = $wpdb->get_var("SELECT HEX(vp_id) FROM {$wpdb->prefix}vp_id WHERE `table` = 'posts' AND id = {$postId}");
-        $postType = $post['post_type'];
-        $postTitle = $post['post_title'];
-        $committer->forceChangeInfo(new PostChangeInfo('trash', $vpId, $postType, $postTitle));
+        foreach ($comments as $comment) {
+            $wpdb->update($commentsTable,
+                array("comment_approved" => $comment["comment_approved"]),
+                array("comment_ID" => $comment["comment_ID"]), null, null, false);
+        }
     });
 
     add_action('delete_postmeta', function ($metaIds) use ($wpdb, $dbSchemaInfo) {

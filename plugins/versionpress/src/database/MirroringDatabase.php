@@ -53,8 +53,8 @@ class MirroringDatabase extends ExtendedWpdb {
         return $result;
     }
 
-    function update($table, $data, $where, $format = null, $where_format = null) {
-        $result = parent::update($table, $data, $where, $format, $where_format);
+    function update($table, $data, $where, $format = null, $where_format = null, $updateDatabase = true) {
+        $result = $updateDatabase ? parent::update($table, $data, $where, $format, $where_format) : false;
 
         if (defined('VP_DEACTIVATING')) {
             return $result;
@@ -129,7 +129,7 @@ class MirroringDatabase extends ExtendedWpdb {
 
             foreach ($ids as $id) {
                 if ($entityName === 'postmeta' && !isset($where['vp_post_id'])) {
-                    $where['vp_post_id'] = $this->get_var("select HEX(reference_vp_id) from wp_vp_reference_details where `table` = 'postmeta' and id = " . $where[$idColumnName]);
+                    $where['vp_post_id'] = $this->get_var("select HEX(reference_vp_id) from {$this->dbSchemaInfo->getPrefixedTableName('vp_reference_details')} where `table` = 'postmeta' and id = " . $where[$idColumnName]);
                 }
 
                 if ($hasReferences) {
