@@ -65,8 +65,7 @@ class CompositeChangeInfo implements ChangeInfo {
     public function getChangeDescription() {
         $changeList = $this->getSortedChangeInfoList();
         $firstChangeDescription = $changeList[0]->getChangeDescription();
-        $numberOfAnotherChanges = count($changeList) - 1; // minus the one which change description is displayed
-        return $firstChangeDescription . " and $numberOfAnotherChanges more change" . ($numberOfAnotherChanges > 1 ? "s" : "");
+        return $firstChangeDescription;
     }
 
     /**
