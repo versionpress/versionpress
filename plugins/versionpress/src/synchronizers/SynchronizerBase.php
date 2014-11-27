@@ -25,7 +25,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $this->database = $database;
         $this->dbSchema = $dbSchema;
         $this->entityName = $entityName;
-        $this->idColumnName = $dbSchema->getEntityInfo($this->$entityName)->idColumnName;
+        $this->idColumnName = $dbSchema->getEntityInfo($this->entityName)->idColumnName;
     }
 
     function synchronize() {
@@ -33,7 +33,6 @@ abstract class SynchronizerBase implements Synchronizer {
         $this->updateDatabase($entities);
         $this->fixReferences($entities);
         $this->doEntitySpecificActions();
-        $this->mirrorDatabaseToStorage();
     }
 
     private function updateDatabase($entities) {
@@ -78,33 +77,6 @@ abstract class SynchronizerBase implements Synchronizer {
             (SELECT reference_id FROM {$this->getPrefixedTableName('vp_reference_details')} ref
             WHERE ref.id=entity.{$this->idColumnName} AND `table` = \"{$this->entityName}\" and reference = \"{$referenceName}\")";
             $this->executeQuery($updateQuery);
-        }
-    }
-
-    private function mirrorDatabaseToStorage() {
-
-        $entitiesInDatabase = $this->getEntitiesFromDatabase();
-        $entitiesInStorage = $this->loadEntitiesFromStorage();
-
-        $getEntityId = function ($entity) {
-            return $entity['vp_id'];
-        };
-
-        $dbEntityIds = array_map($getEntityId, $entitiesInDatabase);
-        $storageEntityIds = array_map($getEntityId, $entitiesInStorage);
-
-        $entitiesToDelete = array_diff($storageEntityIds, $dbEntityIds);
-        $entitiesToSave = array_diff($dbEntityIds, $storageEntityIds);
-
-        foreach ($entitiesToDelete as $entityId) {
-            $this->storage->delete(array('vp_id' => $entityId));
-        }
-
-        foreach ($entitiesToSave as $key => $entityId) {
-            $entity = $entitiesInDatabase[$key];
-            $entity = $this->extendEntityWithIdentifier($entity);           // TODO: remove duplicity with install script
-            $entity = $this->replaceForeignKeysWithIdentifiers($entity);    // ----
-            $this->storage->save($entity);
         }
     }
 

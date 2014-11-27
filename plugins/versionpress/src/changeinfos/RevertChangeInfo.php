@@ -77,6 +77,6 @@ class RevertChangeInfo extends TrackedChangeInfo {
      * @return array
      */
     public function getChangedFiles() {
-        return array();
+        return array("add" => array(array("type" => "path", "path" => "*")));
     }
 }
