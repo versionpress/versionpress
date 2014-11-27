@@ -159,9 +159,11 @@ class Initializer {
 
         $idColumnName = $this->dbSchema->getEntityInfo($entityName)->idColumnName;
         $tableName = $this->getTableName($entityName);
-        $entityIds = $this->database->get_col("SELECT $idColumnName FROM $tableName");
+        $entities = $this->database->get_results("SELECT * FROM $tableName", ARRAY_A);
 
-        foreach ($entityIds as $entityId) {
+        foreach ($entities as $entity) {
+            if (!$this->storageFactory->getStorage($entityName)->shouldBeSaved($entity)) continue;
+            $entityId = $entity[$idColumnName];
             $vpId = IdUtil::newId();
             $query = "INSERT INTO {$this->getTableName('vp_id')} (`table`, id, vp_id) VALUES (\"$entityName\", $entityId, UNHEX('$vpId'))";
             $this->database->query($query);
