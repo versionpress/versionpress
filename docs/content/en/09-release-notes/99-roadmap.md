@@ -3,11 +3,14 @@
 This page should give you an idea of where we are and what is planned for the future. Please be sure to understand our [rapid release cycle and versioning scheme](../release-notes).
 
 <div class="note">
-  <strong>Note: This list is tentative</strong>
-  <p>The list below is tentative and subject to change any time but the **sort order roughly represents our priorities** – the higher up the list an item is, the higher chance it will be implemented sooner.</p>
+
+  **This list is tentative**
+
+  The list below is tentative and subject to change any time but the **sort order roughly represents our priorities** – the higher up the list an item is, the higher chance it will be implemented sooner.
+
 </div>
 
-* <del>Core versioning functionality.</del> *(Shipped as part of [1.0-alpha1](./1.0-alpha1).)*
+* <del>Core versioning functionality.</del> *(Shipped as part of [1.0-alpha1](./1.0-alpha1), continually improved in the 1.0 timeframe.)*
 * <del>Tracking of all the changes in a clean WordPress installation.</del> *(Partially shipped as part of [1.0-alpha1](./1.0-alpha1), notable updates in [1.0-alpha3](./1.0-alpha3).)*
 * <del>Selective Undo.</del> *(Shipped as part of [1.0-alpha1](./1.0-alpha1).)*
 * <del>Complete rollback to a previous state of a site.</del> *(Shipped as part of [1.0-alpha1](./1.0-alpha1).)*
