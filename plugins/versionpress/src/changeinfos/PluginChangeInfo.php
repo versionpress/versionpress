@@ -96,8 +96,19 @@ class PluginChangeInfo extends TrackedChangeInfo {
      */
     public function getChangedFiles() {
         $changeType = $this->getAction() === "delete" ? "delete" : "add";
-        $pluginChange = array("type" => "path", "path" => $path = plugin_basename($this->pluginFile));
+
+        $path = WP_CONTENT_DIR . "/plugins/";
+        if (dirname($this->pluginFile) == ".") {
+            // single-file plugin like hello.php
+            $path .= $this->pluginFile;
+        } else {
+            // multifile plugin like akismet/...
+            $path .= dirname($this->pluginFile) . "/*";
+        }
+        $pluginChange = array("type" => "path", "path" => $path);
+
         $optionChange = array("type" => "storage-file", "entity" => "options", "id" => "");
+
         return array($changeType => array($pluginChange, $optionChange));
     }
 }
