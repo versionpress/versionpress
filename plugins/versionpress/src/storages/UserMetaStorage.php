@@ -16,8 +16,7 @@ class UserMetaStorage extends SingleFileStorage {
 
     function saveAll($entities) {
         foreach ($entities as $entity) {
-            $data = $this->transformToUserField($entity);
-            parent::save($data);
+            $this->save($entity);
         }
     }
 
