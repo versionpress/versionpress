@@ -5,19 +5,13 @@ abstract class SynchronizerBase implements Synchronizer {
     private $entityName;
     private $idColumnName;
 
-    /**
-     * @var Storage
-     */
+    /** @var Storage */
     private $storage;
 
-    /**
-     * @var wpdb
-     */
+    /** @var wpdb */
     private $database;
 
-    /**
-     * @var DbSchemaInfo
-     */
+    /** @var DbSchemaInfo */
     private $dbSchema;
 
     function __construct(Storage $storage, wpdb $database, DbSchemaInfo $dbSchema, $entityName) {
@@ -172,13 +166,6 @@ abstract class SynchronizerBase implements Synchronizer {
         $this->executeQuery("DELETE FROM {$this->getPrefixedTableName('vp_id')} WHERE `table` = \"{$this->entityName}\" AND id IN ({$idsString})"); // using cascade delete in mysql
     }
 
-    private function getEntitiesFromDatabase() {
-        $tableName = $this->getPrefixedTableName($this->entityName);
-        $vpIdTable = $this->getPrefixedTableName('vp_id');
-        return $this->database->get_results("SELECT {$tableName}.*, HEX(vp_id) vp_id FROM {$tableName}
-        JOIN (SELECT * FROM {$vpIdTable} WHERE `table` = '{$this->entityName}') filtered_vp_id ON {$tableName}.{$this->idColumnName} = filtered_vp_id.id", ARRAY_A);
-    }
-
     private function fixReferencesOfOneEntity($entity) {
         $references = $this->getAllReferences($entity);
 
@@ -211,33 +198,6 @@ abstract class SynchronizerBase implements Synchronizer {
         }
 
         return $references;
-    }
-
-    private function extendEntityWithIdentifier($entity) {
-        $entity['vp_id'] = $this->getIdForEntity($this->entityName, $entity[$this->idColumnName]);
-        return $entity;
-    }
-
-    private function getIdForEntity($entityName, $id) {
-        return $this->database->get_var("SELECT HEX(vp_id) FROM {$this->getPrefixedTableName('vp_id')}
-        WHERE `table` = \"{$entityName}\" AND id = {$id}");
-    }
-
-    private function replaceForeignKeysWithIdentifiers($entity) {
-
-        if (!$this->dbSchema->getEntityInfo($this->entityName)->hasReferences) {
-            return $entity;
-        }
-
-        $references = $this->dbSchema->getEntityInfo($this->entityName)->references;
-
-        foreach ($references as $referenceName => $referenceInfo) {
-            if (!isset($entity[$referenceName]) || $entity[$referenceName] == 0)
-                continue;
-            $entity['vp_' . $referenceName] = $this->getIdForEntity($referenceInfo, $entity[$referenceName]);
-        }
-
-        return $entity;
     }
 
     protected function filterEntities($entities) {
