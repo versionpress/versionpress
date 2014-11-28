@@ -1,6 +1,6 @@
 # Release Notes #
 
-The current release is **1.0-beta1**, released on 26-Nov-2014. Our versioning scheme is described below in the *Release versioning* section.
+The current release is **1.0-beta1**, released on 28-Nov-2014. Our versioning scheme is described below in the *Release versioning* section.
 
 Release notes of all the versions shipped so far:
 
