@@ -25,6 +25,10 @@ class UserMetaStorage extends SingleFileStorage {
     }
 
     public function shouldBeSaved($data) {
+        if (isset($data['meta_key']) && $data['meta_key'] === 'session_tokens') {
+            return false;
+        }
+
         if ($this->userMetaKey === 'session_tokens') {
             return false;
         }

@@ -68,8 +68,8 @@ abstract class SynchronizerBase implements Synchronizer {
         $references = $this->dbSchema->getEntityInfo($this->entityName)->references;
         foreach ($references as $referenceName => $_){ // update foreign keys by VersionPress references
             $updateQuery = "UPDATE {$this->getPrefixedTableName($this->entityName)} entity SET `{$referenceName}` =
-            (SELECT reference_id FROM {$this->getPrefixedTableName('vp_reference_details')} ref
-            WHERE ref.id=entity.{$this->idColumnName} AND `table` = \"{$this->entityName}\" and reference = \"{$referenceName}\")";
+            IFNULL((SELECT reference_id FROM {$this->getPrefixedTableName('vp_reference_details')} ref
+            WHERE ref.id=entity.{$this->idColumnName} AND `table` = \"{$this->entityName}\" and reference = \"{$referenceName}\"), entity.{$referenceName})";
             $this->executeQuery($updateQuery);
         }
     }
