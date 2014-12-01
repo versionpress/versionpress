@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * TODO this needs a better name
+ */
 abstract class SynchronizerBase implements Synchronizer {
 
     private $entityName;
