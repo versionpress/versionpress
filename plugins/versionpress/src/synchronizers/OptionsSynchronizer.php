@@ -1,15 +1,15 @@
 <?php
 
+/**
+ * Options synchronizer. Skips transient options and a couple of hardcoded values like
+ * `cron` or `siteurl`, see the `synchronize()` method.
+ */
 class OptionsSynchronizer implements Synchronizer {
 
-    /**
-     * @var OptionsStorage
-     */
+    /** @var OptionsStorage */
     private $optionsStorage;
 
-    /**
-     * @var wpdb
-     */
+    /** @var wpdb */
     private $database;
 
     private $tableName;
@@ -35,17 +35,17 @@ class OptionsSynchronizer implements Synchronizer {
 
         if (count($options) == 0) return;
 
-        $optionNames = array_map(function ($option) {
+        $ignoredOptionNames = array_map(function ($option) {
             return "\"" . $option['option_name'] . "\"";
         }, $options);
 
-        $optionNames[] = '"cron"';
-        $optionNames[] = '"siteurl"';
-        $optionNames[] = '"home"';
-        $optionNames[] = '"db_upgraded"';
-        $optionNames[] = '"auto_updater.lock"';
+        $ignoredOptionNames[] = '"cron"';
+        $ignoredOptionNames[] = '"siteurl"';
+        $ignoredOptionNames[] = '"home"';
+        $ignoredOptionNames[] = '"db_upgraded"';
+        $ignoredOptionNames[] = '"auto_updater.lock"';
 
-        $deleteSql = "DELETE FROM {$this->tableName} WHERE option_name NOT IN(" . join(", ", $optionNames) . ") OR option_name NOT LIKE '_%'";
+        $deleteSql = "DELETE FROM {$this->tableName} WHERE option_name NOT IN(" . join(", ", $ignoredOptionNames) . ") OR option_name NOT LIKE '_%'";
         $this->database->query($deleteSql);
     }
 

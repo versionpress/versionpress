@@ -1,7 +1,8 @@
 <?php
 
 class PostMetaSynchronizer extends SynchronizerBase {
-    /** @var  wpdb */
+
+    /** @var wpdb */
     private $database;
 
     /** @var  DbSchemaInfo */

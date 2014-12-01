@@ -1,7 +1,12 @@
 <?php
 
+/**
+ * Posts synchronizer. Uses AbsoluteUrlFilter to restore local URLs and fixes
+ * comment counts for restored posts.
+ */
 class PostsSynchronizer extends SynchronizerBase {
-    /** @var EntityFilter */
+
+    /** @var AbsoluteUrlFilter */
     private $filter;
 
     /** @var wpdb */

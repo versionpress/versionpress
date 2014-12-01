@@ -1,10 +1,11 @@
 <?php
 
 class UserMetaSynchronizer extends SynchronizerBase {
-    /** @var  wpdb */
+
+    /** @var wpdb */
     private $database;
 
-    /** @var  DbSchemaInfo */
+    /** @var DbSchemaInfo */
     private $dbSchema;
 
     function __construct(Storage $storage, wpdb $database, DbSchemaInfo $dbSchema) {

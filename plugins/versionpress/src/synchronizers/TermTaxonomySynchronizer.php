@@ -1,10 +1,12 @@
 <?php
+
 class TermTaxonomySynchronizer extends SynchronizerBase {
-    private $schema;
+
+    private $dbSchema;
 
     function __construct(Storage $storage, wpdb $database, DbSchemaInfo $dbSchema) {
         parent::__construct($storage, $database, $dbSchema, 'term_taxonomy');
-        $this->schema = $dbSchema;
+        $this->dbSchema = $dbSchema;
     }
 
     protected function transformEntities($entities) {
@@ -19,7 +21,7 @@ class TermTaxonomySynchronizer extends SynchronizerBase {
 
             foreach ($term['taxonomies'] as $taxonomyId => $taxonomy) {
                 $copy = $taxonomy;
-                $copy[$this->schema->getEntityInfo('term_taxonomy')->idColumnName] = $taxonomyId;
+                $copy[$this->dbSchema->getEntityInfo('term_taxonomy')->idColumnName] = $taxonomyId;
                 $copy['vp_term_id'] = $term['vp_id'];
                 $taxonomies[] = $copy;
             }

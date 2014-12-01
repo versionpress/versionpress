@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Replaces absolute site URL with placeholder
+ *
+ * @uses get_site_url()
+ */
 class AbsoluteUrlFilter implements EntityFilter {
 
     const PLACEHOLDER = "<<[site-url]>>";

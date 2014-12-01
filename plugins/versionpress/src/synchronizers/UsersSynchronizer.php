@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Users synchronizer, does quite strict filtering of entity content (only allows
+ * a couple of properties to be set).
+ */
 class UsersSynchronizer extends SynchronizerBase {
     function __construct(Storage $storage, wpdb $database, DbSchemaInfo $dbSchema) {
         parent::__construct($storage, $database, $dbSchema, 'users');
