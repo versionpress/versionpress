@@ -3,7 +3,7 @@
 require_once(__DIR__ . '/../vendor/autoload.php');
 require_once(__DIR__ . '/selenium/SeleniumTestCase.php');
 require_once(__DIR__ . '/selenium/FullWipeSeleniumTestCase.php');
-require_once(__DIR__ . '/end2end/WpCliTestCase.php');
+require_once(__DIR__ . '/end2end/EndToEndTestCase.php');
 require_once(__DIR__ . '/TestConfig.php');
 require_once(__DIR__ . '/automation/WpAutomation.php');
 
@@ -17,9 +17,9 @@ if(!is_file(__DIR__ . '/test-config.ini')) die('You have to create test-config.i
 
 $config = new TestConfig(parse_ini_file(__DIR__ . '/test-config.ini'));
 SeleniumTestCase::$config = $config;
-WpCliTestCase::$config = $config;
+EndToEndTestCase::$config = $config;
 
 PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
 
 global $argv;
-WpCliTestCase::$skipSetup = in_array("--skip-setup", $argv);
+EndToEndTestCase::$skipSetup = in_array("--skip-setup", $argv);

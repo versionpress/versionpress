@@ -5,7 +5,14 @@ is_file(CONFIG_FILE) or die('Create test-config.ini for automation to work');
 WpAutomation::$config = new TestConfig(parse_ini_file(CONFIG_FILE));
 
 /**
- * Automates some common tasks like setting up a WP site, installing VersionPress etc.
+ * Automates some common tasks like setting up a WP site, installing VersionPress, working with posts, comments etc.
+ *
+ * You should have the whole development environment set up as described on our wiki. Specifically, these are required:
+ *
+ *  - WP-CLI (`wp --info` works in console)
+ *  - NPM packages installed in <project_root>
+ *  - Gulp (`gulp -v` works in console)
+ *  - `test-config.ini` file created in `versionpress/tests`
  *
  * Currently, WpAutomation is a set of static functions as of v1; other options will be considered for v2, see WP-56.
  *
@@ -37,12 +44,13 @@ class WpAutomation {
     }
 
     /**
-     * Copies the plugin to the WP site.
+     * Copies VP files to the test site. It does so using a Gulp script which specifies
+     * which paths to include and which ones to ignore. See <project_root>\gulpfile.js.
      */
-    public static function installVersionPress() {
+    public static function copyVersionPressFiles() {
         $versionPressDir = __DIR__ . '/../..';
-        $pluginDir = self::$config->getSitePath() . '/wp-content/plugins/versionpress/';
-        FileSystem::copyDir($versionPressDir, $pluginDir);
+        $gulpBaseDir = $versionPressDir . '/../..'; // project root as checked out from our repository
+        self::exec('gulp test-deploy', $gulpBaseDir);
     }
 
     public static function activateVersionPress() {
