@@ -75,7 +75,7 @@ gulp.task('set-nightly-build', function() {
 gulp.task('prepare-test-deploy', function() {
     var testConfigStr = fs.readFileSync(vpDir + '/tests/test-config.ini', 'utf-8');
     var testConfig = iniParser.parse(testConfigStr);
-    buildDir = testConfig["Site-Settings"]["site-path"];
+    buildDir = testConfig["Site-Settings"]["site-path"] + "/wp-content/plugins/versionpress";
 
     buildType = 'test-deploy'; // later influences the `prepare-src-definition` task
 });
