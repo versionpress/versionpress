@@ -4,19 +4,29 @@ class CommentStorage extends DirectoryStorage {
 
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
 
-        if ($action === 'edit') { // determine more specific edit action
-
+        if ($action === 'edit') {
             $diff = EntityUtils::getDiff($oldEntity, $newEntity);
-            if (isset($diff['comment_approved']) && (
+        }
+
+        if (isset($diff['comment_approved'])) { // determine more specific edit action
+            if (
                 ($oldEntity['comment_approved'] === 'trash' && $newEntity['comment_approved'] === 'post-trashed') ||
                 ($oldEntity['comment_approved'] === 'post-trashed' && $newEntity['comment_approved'] === 'trash')
-                )) {
+                ) {
                 $action = 'edit'; // trash -> post-trashed and post-trashed -> trash are not interesting action for us
-            } elseif (isset($diff['comment_approved']) && $diff['comment_approved'] === 'trash') {
+            } elseif ($diff['comment_approved'] === 'trash') {
                 $action = 'trash';
-            } elseif (isset($diff['comment_approved']) && $oldEntity['comment_approved'] === 'trash') {
+            } elseif ($oldEntity['comment_approved'] === 'trash') {
                 $action = 'untrash';
+            } elseif ($oldEntity['comment_approved'] == 0 && $newEntity['comment_approved'] == 1) {
+                $action = 'approve';
+            } elseif ($oldEntity['comment_approved'] == 1 && $newEntity['comment_approved'] == 0) {
+                $action = 'unapprove';
             }
+        }
+
+        if ($action === 'create' && $newEntity['comment_approved'] == 0) {
+            $action = 'create-pending';
         }
 
         $author = $newEntity["comment_author"];

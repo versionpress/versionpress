@@ -5,7 +5,7 @@
  *
  * VP tags:
  *
- *     VP-Action: comment/(create|edit|delete|trash|untrash)/VPID
+ *     VP-Action: comment/(create|edit|delete|trash|untrash|create-pending|approve|unapprove)/VPID
  *     VP-Comment-Author: John Smith
  *     VP-Comment-PostTitle: Hello world
  *
@@ -28,10 +28,23 @@ class CommentChangeInfo extends EntityChangeInfo {
     }
 
     function getChangeDescription() {
-        if ($this->getAction() === "create")
-            return "New comment for post '{$this->commentedPost}'";
-        if ($this->getAction() === "delete")
-            return "Deleted comment for post '{$this->commentedPost}'";
+        switch ($this->getAction()) {
+            case "create":
+                return "New comment for post '{$this->commentedPost}'";
+            case "delete":
+                return "Deleted comment for post '{$this->commentedPost}'";
+            case "trash":
+                return "Comment for post '{$this->commentedPost}' moved to trash";
+            case "untrash":
+                return "Comment for post '{$this->commentedPost}' moved from trash";
+            case "create-pending":
+                return "New comment for post '{$this->commentedPost}' (pending approval)";
+            case "approve":
+                return "Approved comment for post '{$this->commentedPost}'";
+            case "unapprove":
+                return "Unapproved comment for post '{$this->commentedPost}'";
+        }
+
         return "Edited comment for post '{$this->commentedPost}'";
     }
 
