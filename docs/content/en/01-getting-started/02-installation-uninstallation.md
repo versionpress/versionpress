@@ -21,6 +21,8 @@ The server environment must currently match these requirements, some of which ar
 
 In practice, this means that you need to have control over your server as these will typically not be available in a common hosting scenario. We are aware that this is an issue and will be lowering these requirements in some future release.
 
+For some advanced features, you might also need WP-CLI installed, see a separate section below.
+
 <div class="note">
   <strong>Note about PHP 5.3</strong>
   <p>WordPress itself can run even on the old and now <a href="http://php.net/eol.php">long unsupported</a> PHP version 5.2. We also started with this version in mind but eventually dropped it so that we could use the newer language features and some 3rd party libraries that are 5.3+ only. Back-porting VersionPress to PHP 5.2 is currently not planned.</p>
@@ -59,6 +61,14 @@ There are two important things to note:
 * Once VersionPress is deactivated, **it cannot be fully reactivated again on the same repository**. This means that while you can initialize VersionPress again and the presence of the old repository will not be a problem, features like Undo or Rollback will only be available for *new* commits, created by the current activation of VersionPress.
 * **On uninstallation, the Git repository itself is moved to a backup folder** under `wp-content/vpbackups`. This means that after VersionPress uninstallation the site will no longer be considered Git-version-controlled but at the same time, if you need to restore or download the repository you still can.
     * Note: VersionPress will only remove / backup the repository if it detects that it was VersionPress-initiated repository. If you created the Git repository manually before you even installed VersionPress the repository will stay there untouched.  
+
+
+## WP-CLI
+
+VersionPress comes with several WP-CLI commands that allow you to automate some of the work or execute certain features from command line.
+
+Please follow [WP-CLI installation instructions](https://github.com/wp-cli/wp-cli/wiki/Alternative-Install-Methods) and then refer to [this section](../feature-focus/wp-cli) for instructions on how to use the `wp vp` commands.
+
 
 
 ## VersionPress states at a glance
