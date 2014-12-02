@@ -102,7 +102,7 @@ gulp.task('prepare-src-definition', function () {
     if (buildType == 'test-deploy') {
         srcDef.push('!' + vpDir + '/composer.json');
         srcDef.push('!' + vpDir + '/composer.lock');
-        // keep `vendor`
+        srcDef.push('!' + vpDir + '/vendor/**/.git{,/**}'); // keep vendor but ignore all nested Git repositories in it (e.g., nette minified)
     } else {
         srcDef.push('!' + vpDir + '/vendor{,/**}'); // `vendor` is fresh-generated later in the `composer-install` task
         // keep composer.json|lock
