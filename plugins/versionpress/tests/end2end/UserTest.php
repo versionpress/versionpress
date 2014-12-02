@@ -1,6 +1,6 @@
 <?php
 
-class UserTest extends WpCliTestCase {
+class UserTest extends EndToEndTestCase {
 
     private $someUser = array(
         "user_login" => "test-versionpress",

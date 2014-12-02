@@ -1,6 +1,6 @@
 <?php
 
-class OptionTest extends WpCliTestCase {
+class OptionTest extends EndToEndTestCase {
     private $someOption = array(
         "option_name" => "vp_test_option",
         "option_value" => "some value"

@@ -1,6 +1,6 @@
 <?php
 
-class PostTest extends WpCliTestCase {
+class PostTest extends EndToEndTestCase {
 
     private $somePost = array(
         "post_type" => "post",
