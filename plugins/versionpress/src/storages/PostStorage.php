@@ -11,8 +11,8 @@ class PostStorage extends DirectoryStorage {
     public function shouldBeSaved($data) {
 
         // Don't save revisions and drafts
-
-        $isExistingEntity = isset($data['vp_id']) && $this->isExistingEntity($data['vp_id']);
+        if (isset($_POST['wp-preview'])) // ignore saving draft on preview
+            return false;
 
         if (isset($data['post_type']) && ($data['post_type'] === 'revision'))
             return false;
@@ -22,6 +22,8 @@ class PostStorage extends DirectoryStorage {
 
         if (isset($data['post_status']) && ($data['post_status'] === 'draft' && DOING_AJAX === true)) // ignoring ajax autosaves
             return false;
+
+        $isExistingEntity = isset($data['vp_id']) && $this->isExistingEntity($data['vp_id']);
 
         if (!$isExistingEntity && !isset($data['post_type']))
             return false;
