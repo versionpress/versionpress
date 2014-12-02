@@ -24,6 +24,7 @@ class PostsSynchronizer extends SynchronizerBase {
         foreach ($entities as $entity) {
             $entityClone = $entity;
             unset($entityClone['category'], $entityClone['post_tag']); // categories and tags are synchronized by TermRelationshipsSynchronizer
+            $entityClone = $this->removePostMeta($entityClone);
             $entityClone = $this->filter->restore($entityClone);
             $filteredEntities[] = $entityClone;
         }
@@ -39,5 +40,16 @@ class PostsSynchronizer extends SynchronizerBase {
         $sql = "update {$this->database->prefix}posts set comment_count =
      (select count(*) from {$this->database->prefix}comments where comment_post_ID = {$this->database->prefix}posts.ID and comment_approved = 1);";
         $this->database->query($sql);
+    }
+
+    private function removePostMeta($entity) {
+        $postWithoutMeta = array();
+
+        foreach ($entity as $key => $value) {
+            if (NStrings::contains($key, '#')) continue;
+            $postWithoutMeta[$key] = $value;
+        }
+
+        return $postWithoutMeta;
     }
 }

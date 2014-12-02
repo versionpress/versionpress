@@ -28,7 +28,7 @@ class FileSystem {
      *
      * @see \Symfony\Component\Filesystem\Filesystem::remove()
      *
-     * @param string $path Path to a file or directory.
+     * @param string|Traversable $path Path to a file or directory.
      */
     public static function remove($path) {
 
@@ -36,6 +36,24 @@ class FileSystem {
 
         $fs = new \Symfony\Component\Filesystem\Filesystem();
         $fs->remove($path);
+    }
+
+    /**
+     * Removes the content of a directory (not the directory itself). Works recursively.
+     *
+     * @param string $path Path to a directory.
+     */
+    public static function removeContent($path) {
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+
+        foreach ($iterator as $item) {
+            if ($item->isDir() && \Nette\Utils\Strings::endsWith($iterator->key(), ".git")) {
+                self::possiblyFixGitPermissions($iterator->key());
+            }
+        }
+
+        $fs = new \Symfony\Component\Filesystem\Filesystem();
+        $fs->remove($iterator);
     }
 
     /**

@@ -217,7 +217,7 @@ class WpAutomation {
      */
     private static function prepareFiles() {
         self::ensureCleanInstallationIsAvailable();
-        FileSystem::remove(self::$config->getSitePath());
+        FileSystem::removeContent(self::$config->getSitePath());
         FileSystem::copyDir(self::getCleanInstallationPath(), self::$config->getSitePath());
     }
 
