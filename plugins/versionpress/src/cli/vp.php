@@ -54,7 +54,7 @@ class VPCommand extends WP_CLI_Command
         WP_CLI::success("Site files cloned");
 
 
-        $configureCloneCmd = 'wp --require=' . escapeshellarg($clonePath . '/wp-content/plugins/versionpress/src/cli/VPInternalCommand.php');
+        $configureCloneCmd = 'wp --require=' . escapeshellarg($clonePath . '/wp-content/plugins/versionpress/src/cli/vp-internal.php');
         $configureCloneCmd .= ' vp-internal init-clone --name=' . escapeshellarg($name);
         if (array_key_exists('force', $assoc_args)) {
             $configureCloneCmd .= ' --force-db';

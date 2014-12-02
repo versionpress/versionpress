@@ -8,7 +8,7 @@
  * These internal commands are not registered with WP-CLI automatically like the "public"
  * `wp vp` commands in versionpress.php. You have to manually require the file, e.g.:
  *
- *     wp --require=path/to/this/VPInternalCommand.php vp-internal ...
+ *     wp --require=path/to/this/vp-internal.php vp-internal ...
  *
  * These internal commands are mostly used by public `wp vp` commands.
  *
