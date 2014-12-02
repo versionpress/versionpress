@@ -1,4 +1,5 @@
 <?php
+// NOTE: VersionPress must be fully activated for these commands to be available
 
 /**
  * VersionPress CLI commands.
@@ -42,14 +43,24 @@ class VPCommand extends WP_CLI_Command
         }
 
         if (is_dir($clonePath)) {
-            $rmDirResult = FileSystem::getWpFilesystem()->rmdir($clonePath, true);
-            if (!$rmDirResult) {
-                // rmdir most often fails, maybe because of Git repo in it? try some other removal strategy
+            try {
+                FileSystem::remove($clonePath);
+            } catch (\Symfony\Component\Filesystem\Exception\IOException $e) {
                 WP_CLI::error("Could not delete directory '" . basename($clonePath) . "'. Please do it manually.");
             }
         }
 
-        Git::cloneRepository($currentWpPath, $clonePath);
+        $cloneCommand = sprintf("git clone %s %s", escapeshellarg($currentWpPath), escapeshellarg($clonePath));
+
+        $process = new \Symfony\Component\Process\Process($cloneCommand, $currentWpPath);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            WP_CLI::log($process->getErrorOutput());
+            WP_CLI::error("Cloning Git repo failed");
+        } else {
+            WP_CLI::log($process->getOutput());
+        }
 
         WP_CLI::success("Site files cloned");
 
