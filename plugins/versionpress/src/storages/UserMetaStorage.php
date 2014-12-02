@@ -1,37 +1,39 @@
 <?php
 
-class UserMetaStorage extends SingleFileStorage implements EntityStorage {
+class UserMetaStorage extends SingleFileStorage {
 
     private $userMetaKey;
     private $userMetaVpId;
 
-    function __construct($file) {
-        parent::__construct($file, 'user', 'ID');
-    }
+    function save($data) {
+        $transformedData = $this->transformToUserField($data);
 
-    function save($values) {
-        $data = $this->transformToUserField($values);
+        $this->userMetaKey = $data['meta_key'];
+        $this->userMetaVpId = $data['vp_id'];
 
-        $this->userMetaKey = $values['meta_key'];
-        $this->userMetaVpId = $values['vp_id'];
-
-        $this->saveEntity($data, array($this, 'notifyOnChangeListeners'));
+        return parent::save($transformedData);
     }
 
     function saveAll($entities) {
-        foreach($entities as $entity) {
-            $data = $this->transformToUserField($entity);
-            $this->saveEntity($data);
+        foreach ($entities as $entity) {
+            $this->save($entity);
         }
     }
 
-    /**
-     * @param $entity
-     * @param $changeType
-     * @return EntityChangeInfo
-     */
-    protected function createChangeInfo($entity, $changeType) {
-        return new UserMetaChangeInfo($changeType, $this->userMetaVpId, $entity['user_login'], $this->userMetaKey);
+    protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
+        return new UserMetaChangeInfo($action, $this->userMetaVpId, $newEntity['user_login'], $this->userMetaKey);
+    }
+
+    public function shouldBeSaved($data) {
+        if (isset($data['meta_key']) && $data['meta_key'] === 'session_tokens') {
+            return false;
+        }
+
+        if ($this->userMetaKey === 'session_tokens') {
+            return false;
+        }
+
+        return parent::shouldBeSaved($data);
     }
 
     private function transformToUserField($values) {

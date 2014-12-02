@@ -6,7 +6,7 @@
  *
  * Note about the "[VP]" prefix: this class just doesn't care. When the commit is first created,
  * external code will typically put prefix-less subject into this object. Only when
- * {@link Git::commit()} executes the commit itself will get the [VP] prefix. On the other hand,
+ * {@link GitRepository::commit()} executes the commit itself will get the [VP] prefix. On the other hand,
  * when the commit is read from the repository and parsed back into this object,
  * it will typically have the [VP] prefix. It doesn't matter as VersionPress typically only
  * works with the commit body and its VP tags.
@@ -66,7 +66,7 @@ class CommitMessage {
      * @return array Array of tagName => value (trimmed)
      */
     public function getVersionPressTags() {
-        if(!$this->tags) {
+        if (!$this->tags) {
             $tagLines = array_filter(
                 array_map("trim", explode("\n", $this->getBody())),
                 function ($line) {

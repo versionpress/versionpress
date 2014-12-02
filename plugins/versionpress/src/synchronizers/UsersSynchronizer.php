@@ -1,7 +1,11 @@
 <?php
 
+/**
+ * Users synchronizer, does quite strict filtering of entity content (only allows
+ * a couple of properties to be set).
+ */
 class UsersSynchronizer extends SynchronizerBase {
-    function __construct(EntityStorage $storage, wpdb $database, DbSchemaInfo $dbSchema) {
+    function __construct(Storage $storage, wpdb $database, DbSchemaInfo $dbSchema) {
         parent::__construct($storage, $database, $dbSchema, 'users');
     }
 
@@ -21,10 +25,10 @@ class UsersSynchronizer extends SynchronizerBase {
         );
 
         $filteredEntities = array();
-        foreach($entities as $entity){
+        foreach ($entities as $entity){
             $safeEntity = array();
-            foreach($allowedProperties as $allowedProperty){
-                if(isset($entity[$allowedProperty])){
+            foreach ($allowedProperties as $allowedProperty){
+                if (isset($entity[$allowedProperty])){
                     $safeEntity[$allowedProperty] = $entity[$allowedProperty];
                 }
             }

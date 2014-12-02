@@ -10,6 +10,7 @@ final class VersionPressServices {
     const SYNCHRONIZATION_PROCESS = 'synchronization-process';
     const SYNCHRONIZER_FACTORY = 'synchronizer-factory';
     const REVERTER = 'reverter';
+    const REPOSITORY = 'repository';
 
     private function __construct() {}
 }

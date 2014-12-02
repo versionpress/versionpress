@@ -5,43 +5,98 @@ class PostMetaStorage extends DirectoryStorage {
     private $postMetaKey;
     private $postMetaVpId;
 
-    private $ignoredMeta = array('_edit_lock', '_edit_last', '_pingme', '_encloseme');
 
-    function __construct($directory) {
-        parent::__construct($directory, 'post');
-    }
+    function save($data) {
 
-    function save($values) {
-        if(in_array($values['meta_key'], $this->ignoredMeta)) return;
+        if (!$this->shouldBeSaved($data)) {
+            return null;
+        }
 
-        $data = $this->transformToPostField($values);
+        $transformedData = $this->transformToPostField($data);
 
-        $this->postMetaKey = $values['meta_key'];
-        $this->postMetaVpId = $values['vp_id'];
+        $this->postMetaKey = $data['meta_key'];
+        $this->postMetaVpId = $data['vp_id'];
 
-        $this->saveEntity($data, array($this, 'notifyChangeListeners'));
+        return parent::save($transformedData);
     }
 
     function saveAll($entities) {
         foreach ($entities as $entity) {
             $data = $this->transformToPostField($entity);
-            $this->saveEntity($data);
+            parent::save($data);
         }
     }
 
-    protected function createChangeInfo($entity, $changeType) {
-        $postTitle = $entity['post_title'];
-        $postType = $entity['post_type'];
+    function delete($restriction) {
+        $filename = $this->getEntityFilename($restriction['vp_post_id']);
+        $post = $this->deserializeEntity(file_get_contents($filename));
+        $fieldToDelete = "";
 
-        return new PostMetaChangeInfo($changeType, $this->postMetaVpId, $postType, $postTitle, $this->postMetaKey);
+        foreach ($post as $fieldname => $value) {
+            if (NStrings::endsWith($fieldname, "#$restriction[vp_id]")) {
+                $fieldToDelete = $fieldname;
+                break;
+            }
+        }
+
+        if (!$fieldToDelete)
+            return null;
+
+        unset($post[$fieldToDelete]);
+        file_put_contents($filename, $this->serializeEntity($post));
+
+        list($metaKey) = explode('#', $fieldToDelete, 2);
+        return new PostMetaChangeInfo("delete", $restriction['vp_id'], $post['post_type'], $post['post_title'], $post['vp_id'], $metaKey);
+    }
+
+    public function shouldBeSaved($data) {
+
+        // This method is called either with the original data where 'meta_key' exists,
+        // or from the parent::save() in which case the data is already transformed. We need
+        // to support both cases.
+
+        $postMetaKey = isset($data['meta_key']) ? $data['meta_key'] : $this->postMetaKey;
+
+        $ignoredMeta = array(
+            '_edit_lock',
+            '_edit_last',
+            '_pingme',
+            '_encloseme'
+        );
+        return !in_array($postMetaKey, $ignoredMeta);
+    }
+
+    protected function createChangeInfo($oldEntity, $newEntity, $action) {
+        $postTitle = $newEntity['post_title'];
+        $postType = $newEntity['post_type'];
+        $postVpId = $newEntity['vp_id'];
+
+        if ($action === 'edit') {
+            // New postmeta is editation of the post, therefore we need to determine the creation.
+            $action = isset($oldEntity[$this->getJoinedKey($this->postMetaKey, $this->postMetaVpId)]) ? 'edit' : 'create';
+        }
+
+        return new PostMetaChangeInfo($action, $this->postMetaVpId, $postType, $postTitle, $postVpId, $this->postMetaKey);
     }
 
     private function transformToPostField($values) {
-        $key = sprintf('%s#%s', $values['meta_key'], $values['vp_id']);
+        $key = $this->getJoinedKey($values['meta_key'], $values['vp_id']);
         $data = array(
             'vp_id' => $values['vp_post_id'],
             $key => $values['meta_value']
         );
         return $data;
+    }
+
+    /**
+     * Returns $metaKey#$vpId from $metaKey and $vpId inputs.
+     * It's used in a post file as key representing postmeta.
+     *
+     * @param $metaKey
+     * @param $vpId
+     * @return string
+     */
+    private function getJoinedKey($metaKey, $vpId) {
+        return sprintf('%s#%s', $metaKey, $vpId);
     }
 }

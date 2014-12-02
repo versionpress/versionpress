@@ -4,7 +4,8 @@
     "require": {
         "nette/nette-minified": "dev-v2.0-prefix",
         "symfony/process": "2.5.*",
-        "michelf/php-markdown": "1.4.*"
+        "michelf/php-markdown": "1.4.*",
+        "symfony/filesystem": "~2.5"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",

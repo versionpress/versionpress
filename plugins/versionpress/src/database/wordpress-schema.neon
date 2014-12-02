@@ -32,3 +32,6 @@ usermeta:
     id: umeta_id
     references:
         user_id: users
+
+options:
+    vpid: option_name

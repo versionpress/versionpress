@@ -1,29 +1,32 @@
 <?php
 
-class PostStorage extends DirectoryStorage implements EntityStorage {
+class PostStorage extends DirectoryStorage {
 
-    function __construct($directory) {
-        parent::__construct($directory, 'post');
+    function __construct($directory, $entityInfo) {
+        parent::__construct($directory, $entityInfo);
         $this->addFilter(new AbsoluteUrlFilter());
     }
 
-    /**
-     * Don't save revisions and drafts
-     */
+
     public function shouldBeSaved($data) {
-        $id = @$data['vp_id'];
-        $isExistingEntity = !empty($id) && $this->isExistingEntity($id);
+
+        // Don't save revisions and drafts
+
+        $isExistingEntity = isset($data['vp_id']) && $this->isExistingEntity($data['vp_id']);
 
         if (isset($data['post_type']) && ($data['post_type'] === 'revision'))
             return false;
 
-        if (isset($data['post_status']) && ($data['post_status'] === 'auto-draft' || $data['post_status'] === 'draft'))
+        if (isset($data['post_status']) && ($data['post_status'] === 'auto-draft'))
+            return false;
+
+        if (isset($data['post_status']) && ($data['post_status'] === 'draft' && DOING_AJAX === true)) // ignoring ajax autosaves
             return false;
 
         if (!$isExistingEntity && !isset($data['post_type']))
             return false;
 
-        if(!$isExistingEntity && $data['post_type'] === 'attachment' && !isset($data['post_title']))
+        if (!$isExistingEntity && $data['post_type'] === 'attachment' && !isset($data['post_title']))
             return false;
 
         return true;
@@ -38,17 +41,28 @@ class PostStorage extends DirectoryStorage implements EntityStorage {
         return $entity;
     }
 
-    protected function getEditAction($diff, $oldEntity, $newEntity) {
-        if(isset($diff['post_status']) && $diff['post_status'] === 'trash')
-            return 'trash';
-        if(isset($diff['post_status']) && $oldEntity['post_status'] === 'trash')
-            return 'untrash';
-        return parent::getEditAction($diff, $oldEntity, $newEntity);
-    }
+    protected function createChangeInfo($oldEntity, $newEntity, $action) {
 
-    protected function createChangeInfo($entity, $changeType) {
-        $title = $entity['post_title'];
-        $type = $entity['post_type'];
-        return new PostChangeInfo($changeType, $entity['vp_id'], $type, $title);
+        if ($action === 'edit') { // determine more specific edit action
+
+            $diff = EntityUtils::getDiff($oldEntity, $newEntity);
+
+            if (isset($diff['post_status']) && $diff['post_status'] === 'trash') {
+                $action = 'trash';
+            } elseif (isset($diff['post_status']) && $oldEntity['post_status'] === 'trash') {
+                $action = 'untrash';
+            } elseif (isset($diff['post_status']) && $oldEntity['post_status'] === 'draft' && $newEntity['post_status'] === 'publish') {
+                $action = 'publish';
+            }
+        }
+
+        if ($action == 'create' && $newEntity['post_status'] === 'draft') {
+            $action = 'draft';
+        }
+
+        $title = $newEntity['post_title'];
+        $type = $newEntity['post_type'];
+
+        return new PostChangeInfo($action, $newEntity['vp_id'], $type, $title);
     }
 }

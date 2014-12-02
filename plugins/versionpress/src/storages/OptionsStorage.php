@@ -1,32 +1,21 @@
 <?php
 
-class OptionsStorage extends SingleFileStorage implements EntityStorage {
+class OptionsStorage extends SingleFileStorage {
 
     protected $notSavedFields = array('option_id');
 
-    function __construct($file) {
-        parent::__construct($file, 'option', 'option_name');
-        $this->idColumnName = 'option_name';
-    }
-
     public function shouldBeSaved($data) {
-        $id = $data[$this->idColumnName];
+        $id = $data[$this->entityInfo->idColumnName];
         return !(substr($id, 0, 1) === '_' // With underscore begins all transient settings - there's no need to save them
                 || $id === 'cron'          // Cron, siteurl and home are specific for environment, so they're not saved, too.
                 || $id === 'siteurl'
                 || $id === 'home'
                 || $id === 'db_upgraded'
                 || $id === 'auto_updater.lock'
-                || $id === 'recently_edited'
-                || $id === 'session_tokens');
+                || $id === 'recently_edited');
     }
 
-    /**
-     * @param $entity
-     * @param $changeType
-     * @return EntityChangeInfo
-     */
-    protected function createChangeInfo($entity, $changeType) {
-        return new OptionChangeInfo($changeType, $entity[$this->idColumnName]);
+    protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
+        return new OptionChangeInfo($action, $newEntity[$this->entityInfo->idColumnName]);
     }
 }

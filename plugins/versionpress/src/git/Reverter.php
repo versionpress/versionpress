@@ -10,20 +10,24 @@ class Reverter {
 
     /** @var Committer */
     private $committer;
+    
+    /** @var GitRepository */
+    private $repository;
 
-    public function __construct(SynchronizationProcess $synchronizationProcess, wpdb $database, Committer $committer) {
+    public function __construct(SynchronizationProcess $synchronizationProcess, wpdb $database, Committer $committer, GitRepository $repository) {
         $this->synchronizationProcess = $synchronizationProcess;
         $this->database = $database;
         $this->committer = $committer;
+        $this->repository = $repository;
     }
 
     public function revert($commitHash) {
-        $modifiedFiles = Git::getModifiedFiles(sprintf("%s~1..%s", $commitHash, $commitHash));
+        $modifiedFiles = $this->repository->getModifiedFiles(sprintf("%s~1..%s", $commitHash, $commitHash));
         $affectedPosts = $this->getAffectedPosts($modifiedFiles);
 
         $this->updateChangeDateForPosts($affectedPosts);
 
-        if (!Git::revert($commitHash)) {
+        if (!$this->repository->revert($commitHash)) {
             return RevertStatus::FAILED;
         }
 
@@ -37,14 +41,14 @@ class Reverter {
     }
 
     public function revertAll($commitHash) {
-        $modifiedFiles = Git::getModifiedFiles($commitHash);
+        $modifiedFiles = $this->repository->getModifiedFiles($commitHash);
         $affectedPosts = $this->getAffectedPosts($modifiedFiles);
 
         $this->updateChangeDateForPosts($affectedPosts);
 
-        Git::revertAll($commitHash);
+        $this->repository->revertAll($commitHash);
 
-        if(!Git::willCommit()) {
+        if (!$this->repository->willCommit()) {
             return RevertStatus::NOTHING_TO_COMMIT;
         }
 
@@ -72,9 +76,9 @@ class Reverter {
     private function getAffectedPosts($modifiedFiles) {
         $posts = array();
 
-        foreach($modifiedFiles as $filename) {
+        foreach ($modifiedFiles as $filename) {
             $match = NStrings::match($filename, "~/posts/(.*)\.ini~");
-            if($match) {
+            if ($match) {
                 $posts[] = $match[1];
             }
         }

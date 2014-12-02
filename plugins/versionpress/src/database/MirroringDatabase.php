@@ -21,7 +21,13 @@ class MirroringDatabase extends ExtendedWpdb {
     }
 
     function insert($table, $data, $format = null) {
+
         $result = parent::insert($table, $data, $format);
+
+        if (defined('VP_DEACTIVATING')) {
+            return $result;
+        }
+
         $id = $this->insert_id;
         $entityName = $this->stripTablePrefix($table);
         $shouldBeSaved = $this->mirror->shouldBeSaved($entityName, $data);
@@ -29,20 +35,16 @@ class MirroringDatabase extends ExtendedWpdb {
         if (!$shouldBeSaved)
             return $result;
 
-        $shouldHaveId = $this->dbSchemaInfo->hasId($entityName);
-
-        if ($shouldHaveId) {
+        if ($this->dbSchemaInfo->getEntityInfo($entityName)->usesGeneratedVpids) {
             $data['vp_id'] = $this->generateId();
             $this->saveId($entityName, $id, $data['vp_id']);
         }
 
-        $hasReferences = $this->dbSchemaInfo->hasReferences($entityName);
-
-        if ($hasReferences) {
+        if ($this->dbSchemaInfo->getEntityInfo($entityName)->hasReferences) {
             $data = $this->saveReferences($entityName, $data);
         }
 
-        $data[$this->dbSchemaInfo->getIdColumnName($entityName)] = $id;
+        $data[$this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName] = $id;
 
         $data = $this->fillId($entityName, $data, $id);
         $this->mirror->save($entityName, $data);
@@ -51,70 +53,98 @@ class MirroringDatabase extends ExtendedWpdb {
         return $result;
     }
 
-    function update($table, $data, $where, $format = null, $where_format = null) {
-        $result = parent::update($table, $data, $where, $format, $where_format);
+    function update($table, $data, $where, $format = null, $where_format = null, $updateDatabase = true) {
+        $result = $updateDatabase ? parent::update($table, $data, $where, $format, $where_format) : false;
+
+        if (defined('VP_DEACTIVATING')) {
+            return $result;
+        }
+
         $entityName = $this->stripTablePrefix($table);
 
         $data = array_merge($data, $where);
 
         $shouldBeSaved = $this->mirror->shouldBeSaved($entityName, $data);
-        if (!$shouldBeSaved)
+        if (!$shouldBeSaved) {
             return $result;
-
-        $shouldHaveId = $this->dbSchemaInfo->hasId($entityName);
-
-        if ($shouldHaveId) {
-            if($entityName === 'usermeta') {
-                $id = $this->getUsermetaId($data['user_id'], $data['meta_key']);
-            } elseif($entityName === 'postmeta') {
-                $id = $this->getPostMetaId($data['post_id'], $data['meta_key']);
-            }  else {
-                $idColumnName = $this->dbSchemaInfo->getIdColumnName($entityName);
-                $id = $where[$idColumnName];
-            }
-            $vpId = $this->getVpId($entityName, $id);
-
-
-            if (!$vpId) {
-                $data['vp_id'] = $this->generateId();
-                $this->saveId($entityName, $id, $data['vp_id']);
-            } else {
-                $data['vp_id'] = $vpId;
-            }
         }
 
-        $hasReferences = $this->dbSchemaInfo->hasReferences($entityName);
+        if ($this->dbSchemaInfo->getEntityInfo($entityName)->usesGeneratedVpids) {
 
-        if ($hasReferences) {
-            $data = $this->saveReferences($entityName, $data);
+            $idColumnName = $this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName;
+            $ids = array();
+
+            if ($entityName === 'usermeta') {
+                $ids[] = $this->getUsermetaId($data['user_id'], $data['meta_key']);
+            } elseif ($entityName === 'postmeta') {
+                $ids[] = $this->getPostMetaId($data['post_id'], $data['meta_key']);
+            } elseif (isset($where[$idColumnName])) {
+                $ids[] = $where[$idColumnName];
+            } else {
+                $ids = $this->getIdsForRestriction($entityName, $where);
+            }
+
+            foreach ($ids as $id) {
+                $vpId = $this->getVpId($entityName, $id);
+
+
+                if (!$vpId) {
+                    $data['vp_id'] = $this->generateId();
+                    $this->saveId($entityName, $id, $data['vp_id']);
+                } else {
+                    $data['vp_id'] = $vpId;
+                }
+
+                if ($this->dbSchemaInfo->getEntityInfo($entityName)->hasReferences) {
+                    $data = $this->saveReferences($entityName, $data);
+                }
+
+                $this->mirror->save($entityName, $data);
+            }
+            return $result;
         }
 
         $this->mirror->save($entityName, $data);
         return $result;
     }
 
-    function delete($table, $where, $where_format = null) {
-        $result = parent::delete($table, $where, $where_format);
+    function delete($table, $where, $where_format = null, $updateDatabase = true) {
+        $result = $updateDatabase ? parent::delete($table, $where, $where_format) : false;
+
+        if (defined('VP_DEACTIVATING')) {
+            return $result;
+        }
 
         $entityName = $this->stripTablePrefix($table);
 
-        $hasId = $this->dbSchemaInfo->hasId($entityName);
-
-        if ($hasId) {
-            $hasReferences = $this->dbSchemaInfo->hasReferences($entityName);
-            $id = $where[$this->dbSchemaInfo->getIdColumnName($entityName)];
-
-            if ($hasReferences) {
-                $this->deleteReferences($entityName, $id);
+        if ($this->dbSchemaInfo->getEntityInfo($entityName)->usesGeneratedVpids) {
+            $ids = array();
+            $hasReferences = $this->dbSchemaInfo->getEntityInfo($entityName)->hasReferences;
+            $idColumnName = $this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName;
+            if (isset($where[$idColumnName])) {
+                $ids[] = $where[$idColumnName];
+            } else {
+                $ids = $this->getIdsForRestriction($entityName, $where);
             }
 
-            $entityName = $this->stripTablePrefix($table);
-            $where['vp_id'] = $this->getVpId($entityName, $id);
-            $this->deleteId($entityName, $id);
+            foreach ($ids as $id) {
+                if ($entityName === 'postmeta' && !isset($where['vp_post_id'])) {
+                    $where['vp_post_id'] = $this->get_var("select HEX(reference_vp_id) from {$this->dbSchemaInfo->getPrefixedTableName('vp_reference_details')} where `table` = 'postmeta' and id = " . $where[$idColumnName]);
+                }
+
+                if ($hasReferences) {
+                    $this->deleteReferences($entityName, $id);
+                }
+
+                $where['vp_id'] = $this->getVpId($entityName, $id);
+                $this->deleteId($entityName, $id);
+                $this->mirror->delete($entityName, $where);
+            }
+
+            return $result;
         }
 
         $this->mirror->delete($entityName, $where);
-
         return $result;
     }
 
@@ -177,13 +207,13 @@ class MirroringDatabase extends ExtendedWpdb {
     }
 
     private function getReferenceId($entityName, $referenceName, $id) {
-        $reference = $this->dbSchemaInfo->getReference($entityName, $referenceName);
+        $reference = $this->dbSchemaInfo->getEntityInfo($entityName)->references[$referenceName];
         $referenceId = $this->getVpId($reference, $id);
         return $referenceId;
     }
 
     private function saveReferences($entityName, $data) {
-        $references = $this->dbSchemaInfo->getReferences($entityName);
+        $references = $this->dbSchemaInfo->getEntityInfo($entityName)->references;
         foreach ($references as $referenceName => $referenceInfo) {
             if (isset($data[$referenceName]) && $data[$referenceName] > 0) {
                 $referenceId = $this->saveReference($entityName, $referenceName, $data['vp_id'], $data[$referenceName]);
@@ -199,7 +229,7 @@ class MirroringDatabase extends ExtendedWpdb {
     }
 
     private function fillId($entityName, $data, $id) {
-        $idColumnName = $this->dbSchemaInfo->getIdColumnName($entityName);
+        $idColumnName = $this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName;
         if (!isset($data[$idColumnName])) {
             $data[$idColumnName] = $id;
         }
@@ -220,5 +250,30 @@ class MirroringDatabase extends ExtendedWpdb {
     private function getPostMetaId($post_id, $meta_key) {
         $getMetaIdSql = "SELECT meta_id FROM {$this->prefix}postmeta WHERE meta_key = \"$meta_key\" AND post_id = $post_id";
         return $this->get_var($getMetaIdSql);
+    }
+
+    /**
+     * Returns all ids from DB suitable for given restriction.
+     * E.g. all comment_id values where comment_post_id = 1
+     * @param string $entityName
+     * @param array $where
+     * @return array
+     */
+    private function getIdsForRestriction($entityName, $where) {
+        $idColumnName = $this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName;
+        $table = $this->dbSchemaInfo->getPrefixedTableName($entityName);
+
+        $sql = "SELECT {$idColumnName} FROM {$table} WHERE ";
+        $sql .= join(
+            " AND ",
+            array_map(
+                function ($column) {
+                    return "`$column` = %s";
+                },
+                array_keys($where)
+            )
+        );
+        $ids = $this->get_col($this->prepare($sql, $where));
+        return $ids;
     }
 }

@@ -1,37 +1,80 @@
 <?php
 
 /**
- * Saves entities into separate files in given directory
+ * Saves entities to files in a common directory. Useful for entities that either
+ * expect a lot of instance of them (posts, comments etc.) or have variable length
+ * and some may be rather large (again, e.g. posts).
+ *
+ * For example, posts are stored as <vpid>.ini in the `vpdb/posts` folder.
+ *
+ * Note that the same file can be used by multiple entities. For example, both
+ * the main post data and postmeta for it are stored in the same INI file.
  */
-abstract class DirectoryStorage extends ObservableStorage implements EntityStorage {
-    /**
-     * @var string
-     */
+abstract class DirectoryStorage extends Storage {
+
+    /** @var string */
     private $directory;
-
-    protected $entityTypeName;
-
-    protected $idColumnName;
 
     /** @var EntityFilter[] */
     private $filters = array();
 
-    function __construct($directory, $entityTypeName, $idColumnName = 'ID') {
+    private $entityInfo;
+
+    function __construct($directory, $entityInfo) {
         $this->directory = $directory;
-        $this->entityTypeName = $entityTypeName;
-        $this->idColumnName = $idColumnName;
+        $this->entityInfo = $entityInfo;
     }
 
     function save($data) {
-        $this->saveEntity($data, array($this, 'notifyChangeListeners'));
+        $vpid = $data[$this->entityInfo->vpidColumnName];
+
+        if (!$vpid) {
+            return null;
+        }
+
+        if ($this->entityInfo->usesGeneratedVpids) {
+            // to avoid merge conflicts
+            unset($data[$this->entityInfo->idColumnName]);
+        }
+        $data = $this->removeUnwantedColumns($data);
+        $data = $this->applyFilters($data);
+
+        if (!$this->shouldBeSaved($data)) {
+            return null;
+        }
+
+        $filename = $this->getEntityFilename($vpid);
+        $oldSerializedEntity = "";
+        $isExistingEntity = $this->isExistingEntity($vpid);
+
+        if ($isExistingEntity) {
+            $oldSerializedEntity = file_get_contents($filename);
+        }
+
+        $oldEntity = $this->deserializeEntity($oldSerializedEntity);
+        $diff = EntityUtils::getDiff($oldEntity, $data);
+
+        if (count($diff) > 0) {
+
+            $newEntity = array_merge($oldEntity, $diff);
+            file_put_contents($filename, $this->serializeEntity($newEntity));
+
+            return $this->createChangeInfo($oldEntity, $newEntity, !$isExistingEntity ? 'create' : 'edit');
+
+        } else {
+            return null;
+        }
+
     }
 
     function delete($restriction) {
-        $fileName = $this->getFilename($restriction['vp_id']);
+        $fileName = $this->getEntityFilename($restriction['vp_id']);
         if (is_file($fileName)) {
             $entity = $this->loadEntity($restriction['vp_id']);
-            unlink($fileName);
-            $this->notifyChangeListeners($entity, 'delete');
+            FileSystem::remove($fileName);
+            return $this->createChangeInfo($entity, $entity, 'delete');
+        } else {
+            return null;
         }
     }
 
@@ -43,7 +86,7 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
 
     function saveAll($entities) {
         foreach ($entities as $entity) {
-            $this->saveEntity($entity);
+            $this->save($entity);
         }
     }
 
@@ -51,19 +94,19 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
         return true;
     }
 
-    function prepareStorage() {
-        @mkdir($this->directory, 0777, true);
+    public function prepareStorage() {
+        FileSystem::mkdir($this->directory);
     }
 
-    private function getFilename($id) {
+    public function getEntityFilename($id) {
         return $this->directory . '/' . $id . '.ini';
     }
 
-    private function deserializeEntity($serializedEntity) {
+    protected function deserializeEntity($serializedEntity) {
         return IniSerializer::deserialize($serializedEntity);
     }
 
-    private function serializeEntity($entity) {
+    protected function serializeEntity($entity) {
         return IniSerializer::serializeFlatData($entity);
     }
 
@@ -74,7 +117,9 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
         $files = scandir($this->directory);
 
         $directory = $this->directory;
-        return array_map(function($filename) use ($directory) { return $directory . '/' . $filename; }, array_diff($files, $excludeList));
+        return array_map(function ($filename) use ($directory) {
+            return $directory . '/' . $filename;
+        }, array_diff($files, $excludeList));
     }
 
     private function loadAllFromFiles($entityFiles) {
@@ -85,7 +130,7 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
             $entities[] = $this->deserializeEntity(file_get_contents($file));
         }
 
-        foreach($entities as $entity) {
+        foreach ($entities as $entity) {
             $indexedEntities[$entity['vp_id']] = $entity;
         }
 
@@ -96,67 +141,12 @@ abstract class DirectoryStorage extends ObservableStorage implements EntityStora
         return $entity;
     }
 
-    protected function notifyChangeListeners($entity, $changeType) {
-        $changeInfo = $this->createChangeInfo($entity, $changeType);
-        $this->callOnChangeListeners($changeInfo);
-    }
-
-    protected abstract function createChangeInfo($entity, $changeType);
-
-    protected function saveEntity($data, $callback = null) {
-        $id = $data['vp_id'];
-
-        if (!$id)
-            return;
-
-        unset($data[$this->idColumnName]);
-        $data = $this->removeUnwantedColumns($data);
-        $data = $this->applyFilters($data);
-
-        $filename = $this->getFilename($id);
-        $oldSerializedEntity = "";
-        $isExistingEntity = $this->isExistingEntity($id);
-
-        if (!$this->shouldBeSaved($data))
-            return;
-
-        if ($isExistingEntity) {
-            $oldSerializedEntity = file_get_contents($filename);
-        }
-
-        $entity = $this->deserializeEntity($oldSerializedEntity);
-        if (isset($entity['vp_id']))
-            unset($data['vp_id']);
-
-        $diff = array();
-        foreach ($data as $key => $value) {
-            if (!isset($entity[$key]) || (isset($entity[$key]) && $entity[$key] != $value)) // not present or different value
-                $diff[$key] = $value;
-        }
-
-
-        if (count($diff) > 0) {
-            $oldEntity = $entity;
-            $newEntity = array_merge($entity, $diff);
-            file_put_contents($filename, $this->serializeEntity($newEntity));
-            if (is_callable($callback))
-                call_user_func($callback, $newEntity, $isExistingEntity ? $this->getEditAction($diff, $oldEntity, $newEntity) : 'create');
-        }
-    }
-
     protected function isExistingEntity($id) {
-        return file_exists($this->getFilename($id));
-    }
-
-    /**
-     * @return string
-     */
-    protected function getEditAction($diff, $oldEntity, $newEntity) {
-        return 'edit';
+        return file_exists($this->getEntityFilename($id));
     }
 
     private function loadEntity($vpid) {
-        $entities = $this->loadAllFromFiles(array($this->getFilename($vpid)));
+        $entities = $this->loadAllFromFiles(array($this->getEntityFilename($vpid)));
         return $entities[$vpid];
     }
 

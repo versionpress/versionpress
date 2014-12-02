@@ -1,13 +1,14 @@
 <?php
 
 class UserMetaSynchronizer extends SynchronizerBase {
-    /** @var  wpdb */
+
+    /** @var wpdb */
     private $database;
 
-    /** @var  DbSchemaInfo */
+    /** @var DbSchemaInfo */
     private $dbSchema;
 
-    function __construct(EntityStorage $storage, wpdb $database, DbSchemaInfo $dbSchema) {
+    function __construct(Storage $storage, wpdb $database, DbSchemaInfo $dbSchema) {
         parent::__construct($storage, $database, $dbSchema, 'usermeta');
         $this->database = $database;
         $this->dbSchema = $dbSchema;
@@ -16,10 +17,10 @@ class UserMetaSynchronizer extends SynchronizerBase {
     protected function transformEntities($entities) {
         $transformedEntities = array();
         foreach ($entities as $userId => $entity) {
-            foreach($entity as $meta_key => $meta_value) {
+            foreach ($entity as $meta_key => $meta_value) {
                 $dividerPosition = strrpos($meta_key, '#');
 
-                if($dividerPosition === false)
+                if ($dividerPosition === false)
                     continue;
 
                 $key = substr($meta_key, 0, $dividerPosition);

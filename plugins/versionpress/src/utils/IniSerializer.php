@@ -20,7 +20,7 @@ class IniSerializer {
             return $prevState && is_array($value);
         }, true);
 
-        if(!$containsOnlyArrays)
+        if (!$containsOnlyArrays)
             $output[] = "[" . $parentFullName . $sectionName . "]";
 
         $output = array_merge($output, self::serializeData($data, $parentFullName . $sectionName . "."));
@@ -31,7 +31,7 @@ class IniSerializer {
     private static function serializeData($data, $parentFullName, $flat = false) {
         $output = array();
         foreach ($data as $key => $value) {
-            if($key == '') continue;
+            if ($key == '') continue;
             if (is_array($value))
                 if ($flat) {
                     foreach ($value as $arrayKey => $arrayValue)

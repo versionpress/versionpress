@@ -140,43 +140,22 @@ function _vp_show_progress_message($progressMessage) {
     } elseif (!vp_is_active()) {
     ?>
 
-        <div class="welcome-panel">
+        <div class="welcome-panel vp-activation-panel">
 
             <div class="welcome-panel-content">
 
                 <h3>Welcome to VersionPress!</h3>
 
-                <p class="about-description">We're ready to make your admin experience better. Click the button below so that VersionPress can initialize itself and start tracking your site. A few things to know:</p>
+                <p class="about-description">Please click the <i>Activate VersionPress</i> button below to start tracking the site – note that it will take a few moments, depending on the size of this site. You can then use the VersionPress menu item on the left to access all its features.</p>
 
-                <ul>
-
-                    <li>
-                        <span class="icon icon-checkmark"></span>
-                        VersionPress doesn't require any further setup or interaction. Just activate it and it will start doing its thing.
-                    </li>
-
-                    <li>
-                        <span class="icon icon-checkmark"></span>
-                        To undo a change or roll back to some previous state use the VersionPress item in the left menu.
-                    </li>
-
-                    <li>
-                        <span class="icon icon-checkmark"></span>
-                        VersionPress never sends your data anywhere – it is not a service but an installed thing on your server.
-                    </li>
-
-                    <li>
-                        <span class="icon icon-notification"></span>
-                        You are using a preview version of VersionPress which is suitable for testing purposes only. If you encounter any issues please contact us at <a href="mailto:info@versionpress.net">info@versionpress.net</a>.
-                    </li>
-
-
-                </ul>
-
-                <h4>System requirements check</h4>
+                <h4>System requirements check:</h4>
 
                 <ul class="vp-requirements-check">
                     <?php
+                    global $versionPressContainer;
+                    /** @var GitRepository $repository */
+                    $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+
                     $requirementsChecker = new RequirementsChecker();
                     $report = $requirementsChecker->getRequirements();
 
@@ -191,7 +170,7 @@ function _vp_show_progress_message($progressMessage) {
                     <?php
                     }
 
-                    if ($requirementsChecker->isEverythingFulfilled() && Git::isVersioned(dirname(__FILE__))) {
+                    if ($requirementsChecker->isEverythingFulfilled() && $repository->isVersioned()) {
                     ?>
                         <li>
                             <span class="icon icon-warning"></span>
@@ -204,7 +183,7 @@ function _vp_show_progress_message($progressMessage) {
 
                 <div style="text-align: center;">
                 <?php
-                    if($requirementsChecker->isEverythingFulfilled()) {
+                    if ($requirementsChecker->isEverythingFulfilled()) {
                         $activationUrl = admin_url('admin.php?page=versionpress/admin/index.php&init');
                         $buttonClass = "button-primary";
                     } else {
@@ -216,6 +195,15 @@ function _vp_show_progress_message($progressMessage) {
                            class="button <?php echo $buttonClass; ?> button-hero" id="activate-versionpress-btn">Activate
                             VersionPress</a>
                 </div>
+
+                <ul>
+                    <li>
+
+                        <span class="icon icon-notification"></span>
+                        You are activating a preview version which is suitable for testing purposes only. If you encounter any issues please contact us at <a href="mailto:info@versionpress.net">info@versionpress.net</a>.
+                    </li>
+                </ul>
+
             </div>
 
 
@@ -239,13 +227,13 @@ function _vp_show_progress_message($progressMessage) {
             $error = $errors[$_GET['error']];
         }
 
-        if(isset($_GET['bug-report'])) {
-            if($_GET['bug-report'] === 'ok') {
+        if (isset($_GET['bug-report'])) {
+            if ($_GET['bug-report'] === 'ok') {
                 $error = array(
                     'class' => 'updated',
                     'message' => 'Bug report was sent. Thank you.'
                 );
-            } elseif($_GET['bug-report'] === 'err') {
+            } elseif ($_GET['bug-report'] === 'err') {
                 $error = array(
                     'class' => 'error',
                     'message' => 'There was a problem with sending bug report. Please try it again. Thank you.'
@@ -253,7 +241,7 @@ function _vp_show_progress_message($progressMessage) {
             }
         }
 
-        if(isset($error)) {
+        if (isset($error)) {
             echo "<div class='$error[class]'><p>$error[message]</p></div>";
         }
 
@@ -264,7 +252,7 @@ function _vp_show_progress_message($progressMessage) {
         <button id="vp-service-panel-button"><span class="icon icon-cog"></span></button>
         <h2 id="vp-page-header">VersionPress</h2>
 
-        <div id="vp-service-panel" class="welcome-panel <?php if($displayServicePanel) echo "displayed"; ?>">
+        <div id="vp-service-panel" class="welcome-panel <?php if ($displayServicePanel) echo "displayed"; ?>">
             <h3>VersionPress Service Panel</h3>
             <h4>Bug report</h4>
             <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
@@ -330,15 +318,17 @@ function _vp_show_progress_message($progressMessage) {
             </tr>
             <tbody id="the-list">
             <?php
-
+            global $versionPressContainer;
+            /** @var GitRepository $repository */
+            $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
 
             $initialCommitHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
-            $gitLogPaginator = new GitLogPaginator();
+            $gitLogPaginator = new GitLogPaginator($repository);
             $gitLogPaginator->setCommitsPerPage(25);
             $page = isset($_GET['vp-page']) ? intval($_GET['vp-page']) : 0;
             $commits = $gitLogPaginator->getPage($page);
 
-            $canUndoCommit = Git::wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
+            $canUndoCommit = $repository->wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
             $isFirstCommit = $page === 0;
 
             foreach ($commits as $commit) {
@@ -352,9 +342,9 @@ function _vp_show_progress_message($progressMessage) {
                 $rollbackSnippet = "<a href='" . admin_url('admin.php?action=vp_rollback&commit=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts site back to this state; effectively undos all the change up to this commit'>Roll back to this</a>";
 
                 $versioningSnippet = "";
-                if($canUndoCommit) $versioningSnippet .= $undoSnippet;
-                if($canUndoCommit && $canRollbackToThisCommit) $versioningSnippet .= "&nbsp;|&nbsp;";
-                if($canRollbackToThisCommit) $versioningSnippet .= $rollbackSnippet;
+                if ($canUndoCommit) $versioningSnippet .= $undoSnippet;
+                if ($canUndoCommit && $canRollbackToThisCommit) $versioningSnippet .= "&nbsp;|&nbsp;";
+                if ($canRollbackToThisCommit) $versioningSnippet .= $rollbackSnippet;
                 $isEnabled = $canUndoCommit || $canRollbackToThisCommit || $commit->getHash() === $initialCommitHash;
 
                 $message = $changeInfo->getChangeDescription();
@@ -381,14 +371,14 @@ function _vp_show_progress_message($progressMessage) {
                             $links = "";
                             $lastNumber = 0;
 
-                            foreach($pageNumbers as $pageNumber) {
+                            foreach ($pageNumbers as $pageNumber) {
                                 $divider = "";
-                                if($i > 0 && $lastNumber != $pageNumber-1) $divider = "&hellip;";
-                                elseif($i > 0) $divider = "|";
+                                if ($i > 0 && $lastNumber != $pageNumber-1) $divider = "&hellip;";
+                                elseif ($i > 0) $divider = "|";
 
                                 $links .= " " . $divider . " ";
                                 $pageUrl = admin_url('admin.php?page=versionpress/admin/index.php&vp-page=' . $pageNumber);
-                                if($pageNumber == $page) {
+                                if ($pageNumber == $page) {
                                     $links .= $pageNumber + 1;
                                 } else {
                                     $links .= "<a href=\"$pageUrl\">" . ($pageNumber + 1) . "</a>";

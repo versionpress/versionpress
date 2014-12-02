@@ -1,19 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="VersionPress" autoUploadExternalChanges="true">
-    <serverData>
-      <paths name="VersionPress">
-        <serverdata>
-          <mappings>
-            <mapping deploy="wp-content\plugins\versionpress" local="$PROJECT_DIR$/plugins/versionpress" web="/" />
-          </mappings>
-          <excludedPaths>
-            <excludedPath local="true" path="$PROJECT_DIR$/plugins/versionpress/tests" />
-          </excludedPaths>
-        </serverdata>
-      </paths>
-    </serverData>
+  <component name="PublishConfigData" autoUpload="Always" serverName="vp01" autoUploadExternalChanges="true">
     <option name="myAutoUpload" value="ALWAYS" />
   </component>
 </project>
-

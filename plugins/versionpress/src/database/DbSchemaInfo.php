@@ -1,14 +1,14 @@
 <?php
 /**
- * Describes parts of the DB schema, currently mostly the relationships between entities. We need this
- * because WordPress doesn't properly describe foreign key relationships.
- *
- * The information is loaded from a *.neon file whose structure is described in `schema.sample.neon`.
+ * Describes parts of the DB schema, specifically telling how to identify entities
+ * and what are the relationships between them. The information is loaded from a *.neon file
+ * which is described in `schema-readme.md`.
  */
 class DbSchemaInfo {
 
     /**
      * Parsed NEON schema - to see what it looks like, paste the NEON into {@link http://ne-on.org/ ne-on.org}).
+     * Parsed in constructor.
      *
      * @var array|int|mixed|NDateTime53|NNeonEntity|null|string
      */
@@ -22,6 +22,11 @@ class DbSchemaInfo {
     private $prefix;
 
     /**
+     * @var array entityName => EntityInfo object. Lazily constructed, see getEntityInfo().
+     */
+    private $entityInfoRegistry;
+
+    /**
      * @param string $schemaFile Path to a *.neon file to read from disk
      * @param string $prefix
      */
@@ -32,67 +37,19 @@ class DbSchemaInfo {
     }
 
     /**
-     * Returns true if $entityName has a single unique ID column, i.e. a simple primary key.
-     * For example, posts have a simple ID while term_relationships don't.
+     * Returns EntityInfo for a given entity name (e.g., "posts" or "comments")
      *
-     * Currently, all entities described in the neon files are expected to have IDs defined.
-     *
-     * @param string $entityName Like "posts" or "comments"
-     * @return bool
+     * @param $entityName
+     * @return EntityInfo
      */
-    public function hasId($entityName) {
-        return isset($this->schema[$entityName]['id']);
+    public function getEntityInfo($entityName) {
+        if (!isset($this->entityInfoRegistry[$entityName])) {
+            $this->entityInfoRegistry[$entityName] = new EntityInfo(array($entityName => $this->schema[$entityName]));
+        }
+
+        return $this->entityInfoRegistry[$entityName];
     }
 
-    /**
-     * Returns true if $entityName has references (foreign keys) to other entities, i.e. if the table
-     * has foreign keys.
-     *
-     * @param string $entityName Like "posts" or "comments"
-     * @return bool
-     */
-    public function hasReferences($entityName) {
-        return isset($this->schema[$entityName]['references']) &&
-               count($this->schema[$entityName]['references']) > 0;
-    }
-
-    /**
-     * Returns references (foreign keys) of the entity.
-     *
-     * TODO: It currently produces "undefined index" error if the entity has no references.
-     * Maybe it should return an empty array instead?
-     *
-     * @param string $entityName Like "posts" or "comments"
-     * @return array
-     */
-    public function getReferences($entityName) {
-        return $this->schema[$entityName]['references'];
-    }
-
-    /**
-     * If hasId(), return the name of the ID (simple primary key) column. Otherwise, produces "undefined index" error.
-     *
-     * @param string $entityName
-     * @return mixed
-     */
-    public function getIdColumnName($entityName) {
-        return $this->schema[$entityName]['id'];
-    }
-
-    /**
-     * Gets a named reference of the entity. For example, posts have the
-     * `post_author` reference. A call to `getReference('posts', 'post_author')`
-     * returns which table it points to, for example `array('table' => 'users')`.
-     *
-     * TODO: maybe there's not need to return an array but straight the table name?
-     *
-     * @param string $entityName
-     * @param string $referenceName
-     * @return array
-     */
-    public function getReference($entityName, $referenceName) {
-        return $this->schema[$entityName]['references'][$referenceName];
-    }
 
     /**
      * Gets all entities defined by the schema

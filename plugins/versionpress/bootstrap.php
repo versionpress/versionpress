@@ -12,7 +12,7 @@ define('VERSIONPRESS_ACTIVATION_FILE', VERSIONPRESS_MIRRORING_DIR . '/.active');
  */
 require_once(VERSIONPRESS_PLUGIN_DIR . '/vendor/autoload.php');
 
-if(defined('DOING_AJAX')) {
+if (defined('DOING_AJAX')) {
     NDebugger::$bar = false;
 }
 

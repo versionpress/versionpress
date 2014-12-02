@@ -2,7 +2,7 @@
 
 class SynchronizerFactory {
     /**
-     * @var EntityStorageFactory
+     * @var StorageFactory
      */
     private $storageFactory;
     /**
@@ -14,7 +14,7 @@ class SynchronizerFactory {
      */
     private $dbSchema;
 
-    function __construct(EntityStorageFactory $storageFactory, wpdb $database, DbSchemaInfo $dbSchema) {
+    function __construct(StorageFactory $storageFactory, wpdb $database, DbSchemaInfo $dbSchema) {
         $this->storageFactory = $storageFactory;
         $this->database = $database;
         $this->dbSchema = $dbSchema;

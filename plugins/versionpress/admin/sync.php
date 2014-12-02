@@ -19,9 +19,9 @@ function replaceDatabaseSettings() {
     );
 
     $configFileLines = file(ABSPATH . '/wp-config.php');
-    foreach($configFileLines as $lineNumber => $line) {
-        foreach($replacementDefinitions as $i => $replacementDefinition) {
-            if(preg_match($replacementDefinition['regexp'],$line)) {
+    foreach ($configFileLines as $lineNumber => $line) {
+        foreach ($replacementDefinitions as $i => $replacementDefinition) {
+            if (preg_match($replacementDefinition['regexp'],$line)) {
                 $configFileLines[$lineNumber] = sprintf($replacementDefinition['replaceWith'], $replacementDefinition['value']);
                 unset($replacementDefinitions[$i]);
             }
@@ -32,13 +32,13 @@ function replaceDatabaseSettings() {
 
 
 if (isset($_GET['pull'])) {
-    Git::pull();
+    //GitStatic::pull();
     replaceDatabaseSettings();
     require_once __DIR__ . '/../../versionpress/sync.php';
 }
 if (isset($_GET['push'])) {
-    Git::pull();
-    Git::push();
+    //GitStatic::pull();
+    //GitStatic::push();
     file_get_contents("http://localhost/wordpress/wp-content/versionpress/sync.php");
 }
 

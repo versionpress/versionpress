@@ -1,77 +1,94 @@
 <?php
 
 /**
- * Helper class to work with WP Filesystem. The main method is `getWpFilesystem()`.
+ * Helper functions to work with filesystem. Currently, the functions use either bare implementation
+ * or {@link http://symfony.com/doc/master/components/filesystem/introduction.html Symfony Filesystem}.
  */
 class FileSystem {
 
     /**
-     * Prepares $wp_filesystem and returns it. I don't really understand why it's so complicated
-     * to invoke a single filesystem command using WP Filesystem API but until
-     * that is cleared up, this helper method was created.
+     * Renames (moves) origin to target.
      *
-     * @see http://codex.wordpress.org/Filesystem_API
-     * @see http://wordpress.stackexchange.com/questions/157629/convenient-way-to-use-wp-filesystem
+     * @see \Symfony\Component\Filesystem\Filesystem::rename()
      *
-     * @return WP_Filesystem_Direct
+     * @param string $origin
+     * @param string $target
+     * @param bool $overwrite
      */
-    public static function getWpFilesystem() {
-        global $wp_filesystem;
+    public static function rename($origin, $target, $overwrite = false) {
 
-        $url = wp_nonce_url('plugins.php');
-        if (false === ($creds = request_filesystem_credentials($url, '', false, false, null))) {
-            echo "Could not create filesystem credentials";
-            return null;
-        }
+        self::possiblyFixGitPermissions($origin);
 
-        if (!WP_Filesystem($creds)) {
-            request_filesystem_credentials($url, '', true, false, null);
-            echo "Filesystem credentials were not available";
-            return null;
-        }
-
-        return $wp_filesystem;
+        $fs = new \Symfony\Component\Filesystem\Filesystem();
+        $fs->rename($origin, $target, $overwrite);
     }
 
     /**
-     * Sets full privileges on the .git directory and everything under it. Strangely, on Windows,
-     * the .git/objects folder cannot be removed before this method runs.
+     * Removes a file / directory. Works recursively.
      *
-     * @param string $basePath Path where the .git directory is located
+     * @see \Symfony\Component\Filesystem\Filesystem::remove()
+     *
+     * @param string $path Path to a file or directory.
      */
-    public static function setPermisionsForGitDirectory($basePath) {
-        $gitDirectoryPath = $basePath . '/.git';
+    public static function remove($path) {
 
-        if (!is_dir($gitDirectoryPath)) {
-            return;
-        }
+        self::possiblyFixGitPermissions($path);
 
-        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($gitDirectoryPath));
-
-        foreach ($iterator as $item) {
-            chmod($item, 0777);
-        }
+        $fs = new \Symfony\Component\Filesystem\Filesystem();
+        $fs->remove($path);
     }
 
-    public static function copyRecursive($src, $dst) {
-        $dir = opendir($src);
-        @mkdir($dst);
-        while (false !== ($file = readdir($dir))) {
-            if (($file != '.') && ($file != '..')) {
-                if (is_dir($src . '/' . $file)) {
-                    self::copyRecursive($src . '/' . $file, $dst . '/' . $file);
-                } else {
-                    copy($src . '/' . $file, $dst . '/' . $file);
-                }
+    /**
+     * Copies a directory. Uses Symfony's mirror() under the cover.
+     *
+     * @see \Symfony\Component\Filesystem\Filesystem::mirror()
+     *
+     * @param string $origin
+     * @param string $target
+     */
+    public static function copyDir($origin, $target) {
+        $fs = new \Symfony\Component\Filesystem\Filesystem();
+        $fs->mirror($origin, $target);
+    }
+
+    /**
+     * Creates a directory
+     *
+     * @param string $dir
+     * @param int $mode
+     */
+    public static function mkdir($dir, $mode = 0777) {
+        $fs = new \Symfony\Component\Filesystem\Filesystem();
+        $fs->mkdir($dir, $mode);
+    }
+
+    /**
+     * If the path is either a `.git` repository itself or a directory that contains it,
+     * this method attempts to set 0777 permissions on the `.git` folder to avoid issues
+     * on Windows.
+     *
+     * @param $path
+     */
+    private static function possiblyFixGitPermissions($path) {
+
+        $gitDir = null;
+        if (is_dir($path)) {
+            if (basename($path) == '.git') {
+                $gitDir = $path;
+            } else if (is_dir($path . '/.git')) {
+                $gitDir = $path . '/.git';
             }
         }
-        closedir($dir);
-    }
 
-    public static function deleteRecursive($dirPath) {
-        foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dirPath, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST) as $path) {
-            $path->isDir() ? rmdir($path->getPathname()) : unlink($path->getPathname());
+        if ($gitDir) {
+
+            $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($gitDir));
+
+            foreach ($iterator as $item) {
+                chmod($item, 0777);
+            }
+
         }
-        rmdir($dirPath);
+
     }
 } 
