@@ -31,8 +31,13 @@ class VPInternalCommand extends WP_CLI_Command
      * @synopsis --name=<name> [--force-db]
      *
      * @subcommand init-clone
+     *
+     * @when before_wp_load
      */
     public function initClone($args = array(), $assoc_args = array()) {
+
+        require_once(__DIR__ . '/../../../../../wp-config.php');
+
         $name = $assoc_args['name'];
         $dbName = DB_NAME . '_' . $name;
 
@@ -51,7 +56,10 @@ class VPInternalCommand extends WP_CLI_Command
         // 2) Update wp-config
         $wpConfigFile = ABSPATH . 'wp-config.php';
         $config = file_get_contents($wpConfigFile);
-        $config = preg_replace("/^(define.*\\(.*['\"]DB_NAME['\"]\\,.*['\"])(.*)(['\"].*)$/m", "$1$dbName$3", $config, 1);
+
+        // http://regex101.com/r/fS0zG2/1 - just remove the "g" modifier which is there for testing only
+        $config = preg_replace("/^(define\\s*\\(\\s*['\"]DB_NAME['\"]\\s*\\,\\s*['\"])(.*)(['\"].*)$/m", "$1$dbName$3", $config, 1);
+
         file_put_contents($wpConfigFile, $config);
         WP_CLI::success("wp-config.php updated");
 
