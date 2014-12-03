@@ -44,6 +44,11 @@ class FileSystem {
      * @param string $path Path to a directory.
      */
     public static function removeContent($path) {
+
+        if (!is_dir($path)) {
+            return;
+        }
+
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
 
         foreach ($iterator as $item) {
