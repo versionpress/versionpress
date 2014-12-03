@@ -36,7 +36,9 @@ class VPCommand extends WP_CLI_Command
         $name = $assoc_args['name'];
 
         $currentWpPath = get_home_path();
-        $clonePath = sprintf("%s/%s_%s", dirname($currentWpPath), basename($currentWpPath), $name);
+        $cloneDirName = sprintf("%s_%s", basename($currentWpPath), $name);
+        $clonePath = dirname($currentWpPath) . '/' . $cloneDirName;
+        $cloneUrl = $this->getCloneUrl(get_site_url(), basename($currentWpPath), $cloneDirName);
 
         if (is_dir($clonePath) && !array_key_exists('force', $assoc_args)) {
             WP_CLI::error("Directory '" . basename($clonePath) . "' already exists. Use --force to overwrite it or use another clone name.");
@@ -67,6 +69,7 @@ class VPCommand extends WP_CLI_Command
 
         $configureCloneCmd = 'wp --require=' . escapeshellarg($clonePath . '/wp-content/plugins/versionpress/src/cli/vp-internal.php');
         $configureCloneCmd .= ' vp-internal init-clone --name=' . escapeshellarg($name);
+        $configureCloneCmd .= ' --site-url=' . escapeshellarg($cloneUrl);
         if (array_key_exists('force', $assoc_args)) {
             $configureCloneCmd .= ' --force-db';
         }
@@ -84,6 +87,22 @@ class VPCommand extends WP_CLI_Command
 
         WP_CLI::success("Cloning done. Find your clone in '" . basename($clonePath) . "'.");
 
+    }
+
+    /**
+     * Examples (clone name "test"):
+     *
+     *   http://localhost/vp01  ->  http://localhost/vp01_test
+     *   http://vp01            ->  http://vp01_test
+     *   http://www.vp01.dev    ->  http://www.vp01_test.dev
+     *
+     * @param string $originUrl
+     * @param string $originDirName
+     * @param string $cloneDirName
+     * @return string
+     */
+    private function getCloneUrl($originUrl, $originDirName, $cloneDirName) {
+        return str_replace($originDirName, $cloneDirName, $originUrl);
     }
 
 }

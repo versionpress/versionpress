@@ -68,7 +68,7 @@ class Initializer {
         $this->reportProgressChange(InitializerStates::FINISHED);
     }
 
-    private function createVersionPressTables() {
+    public function createVersionPressTables() {
         $table_prefix = $this->database->prefix;
         $process = array();
 
