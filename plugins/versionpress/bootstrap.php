@@ -16,7 +16,8 @@ if (defined('DOING_AJAX')) {
     NDebugger::$bar = false;
 }
 
-NDebugger::enable(NDebugger::DETECT, VERSIONPRESS_PLUGIN_DIR . '/log');
+$ndebuggerMode = defined('WP_CLI') && WP_CLI ? NDebugger::DEVELOPMENT : NDebugger::DETECT;
+NDebugger::enable($ndebuggerMode, VERSIONPRESS_PLUGIN_DIR . '/log');
 
 $robotLoader = new NRobotLoader();
 $robotLoader->addDirectory(VERSIONPRESS_PLUGIN_DIR . '/src');

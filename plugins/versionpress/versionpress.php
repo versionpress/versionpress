@@ -9,6 +9,9 @@ Version: 1.0-beta2
 
 defined('ABSPATH') or die("Direct access not allowed");
 
+if (defined('WP_CLI') && WP_CLI && vp_is_active()) {
+    WP_CLI::add_command('vp', 'VPCommand');
+}
 
 
 //----------------------------------------
