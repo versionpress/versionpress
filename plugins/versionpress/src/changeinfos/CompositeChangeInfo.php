@@ -122,6 +122,15 @@ class CompositeChangeInfo implements ChangeInfo {
             return -1;
         if ($priority1 > $priority2)
             return 1;
+        if ($changeInfo1 instanceof EntityChangeInfo && $changeInfo2 instanceof EntityChangeInfo) {
+            // priority by order is the same only for same class
+            // so if they are both the same EntityChangeInfo we can compare actions
+            if ($changeInfo1->getAction() === "create")
+                return 1;
+            if ($changeInfo2->getAction() === "create")
+                return -1;
+        }
+
         return 0;
     }
 }
