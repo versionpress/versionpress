@@ -13,6 +13,7 @@ class TermChangeInfo extends EntityChangeInfo {
 
     const TERM_NAME_TAG = "VP-Term-Name";
     const TERM_OLD_NAME_TAG = "VP-Term-OldName";
+    const TERM_TAXONOMY_TAG = "VP-Term-Taxonomy";
 
     /** @var string */
     private $termName;
@@ -20,18 +21,27 @@ class TermChangeInfo extends EntityChangeInfo {
     /** @var string */
     private $oldTermName;
 
-    public function __construct($action, $entityId, $termName, $oldTermName = null) {
+    /** @var string */
+    private $taxonomy;
+
+    public function __construct($action, $entityId, $termName, $taxonomy, $oldTermName = null) {
         parent::__construct("term", $action, $entityId);
         $this->termName = $termName;
+        $this->taxonomy = $taxonomy;
         $this->oldTermName = $oldTermName;
     }
 
     public function getChangeDescription() {
-        if ($this->getAction() === "create")
-            return "New term '{$this->termName}'";
-        if ($this->getAction() === "rename")
-            return "Term '{$this->oldTermName}' renamed to '{$this->termName}'";
-        return "Edited term '{$this->termName}'";
+        $taxonomy = $this->formatTaxonomyName();
+
+        switch ($this->getAction()) {
+            case "create":
+                return "New {$taxonomy} '{$this->termName}'";
+            case "rename":
+                return NStrings::firstUpper($taxonomy) . " '{$this->oldTermName}' renamed to '{$this->termName}'";
+        }
+
+        return "Edited {$taxonomy} '{$this->termName}'";
     }
 
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
@@ -40,12 +50,14 @@ class TermChangeInfo extends EntityChangeInfo {
         list( , $action, $entityId) = explode("/", $actionTag, 3);
         $name = $tags[self::TERM_NAME_TAG];
         $oldName = isset($tags[self::TERM_OLD_NAME_TAG]) ? $tags[self::TERM_OLD_NAME_TAG] : null;
-        return new self($action, $entityId, $name, $oldName);
+        $taxonomy = $tags[self::TERM_TAXONOMY_TAG];
+        return new self($action, $entityId, $name, $taxonomy, $oldName);
     }
 
     protected function getCustomTags() {
         $tags = array(
-            self::TERM_NAME_TAG => $this->termName
+            self::TERM_NAME_TAG => $this->termName,
+            self::TERM_TAXONOMY_TAG => $this->taxonomy,
         );
 
         if ($this->getAction() === "rename") {
@@ -53,6 +65,10 @@ class TermChangeInfo extends EntityChangeInfo {
         }
 
         return $tags;
+    }
+
+    private function formatTaxonomyName() {
+        return str_replace("_", " ", $this->taxonomy);
     }
 
 }

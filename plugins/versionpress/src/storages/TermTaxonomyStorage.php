@@ -25,7 +25,11 @@ class TermTaxonomyStorage extends SingleFileStorage {
 
     protected $notSavedFields = array('vp_term_id', 'count', 'term_id');
 
+    private $currentlySavedTaxonomy;
+
     public function save($data) {
+        $this->currentlySavedTaxonomy = $data['taxonomy'];
+
         $this->loadEntities();
         $termId = $this->findTermId($data);
 
@@ -112,6 +116,6 @@ class TermTaxonomyStorage extends SingleFileStorage {
 
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
         // Whatever operation on term-taxonomy, it is always an 'edit' action on the related term
-        return new TermChangeInfo('edit', $newEntity['vp_id'], $newEntity['name']);
+        return new TermChangeInfo('edit', $newEntity['vp_id'], $newEntity['name'], $this->currentlySavedTaxonomy);
     }
 }

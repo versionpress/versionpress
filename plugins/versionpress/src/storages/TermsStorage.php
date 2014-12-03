@@ -5,10 +5,17 @@ class TermsStorage extends SingleFileStorage {
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
         $diff = EntityUtils::getDiff($oldEntity, $newEntity);
 
-        if (isset($diff['name'])) {
-            return new TermChangeInfo('rename', $newEntity['vp_id'], $newEntity['name'], $oldEntity['name']);
+        $taxonomy = 'term'; // general type (if there is more then one taxonomy)
+
+        if (count($newEntity['taxonomies']) === 1) {
+            $termTaxonomy = current($newEntity['taxonomies']);
+            $taxonomy = $termTaxonomy['taxonomy'];
         }
 
-        return new TermChangeInfo($action, $newEntity['vp_id'], $newEntity['name']);
+        if ($oldEntity && isset($diff['name'])) {
+            return new TermChangeInfo('rename', $newEntity['vp_id'], $newEntity['name'], $taxonomy, $oldEntity['name']);
+        }
+
+        return new TermChangeInfo($action, $newEntity['vp_id'], $newEntity['name'], $taxonomy);
     }
 }
