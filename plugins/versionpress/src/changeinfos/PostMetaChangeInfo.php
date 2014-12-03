@@ -50,13 +50,23 @@ class PostMetaChangeInfo extends EntityChangeInfo {
     }
 
     public function getChangeDescription() {
-        switch($this->getAction()) {
-            case "create":
-                return "Created option '{$this->metaKey}' for {$this->postType} '{$this->postTitle}'";
-            case "delete":
-                return "Deleted option '{$this->metaKey}' for {$this->postType} '{$this->postTitle}'";
+        $verb = "Edited";
+        $subject = "option '{$this->metaKey}'";
+        $rest = "for {$this->postType} '{$this->postTitle}'";
+
+        if ($this->metaKey === "_thumbnail_id") { // featured image
+            $verb = "Changed";
+            $subject = "featured image";
+
+            if ($this->getAction() === "create")
+                $verb = "Set";
+            if ($this->getAction() === "delete")
+                $verb = "Removed";
+        } elseif ($this->getAction() === "create" || $this->getAction() === "delete") {
+            $verb = NStrings::firstUpper($this->getAction()) . "d";
         }
-        return "Edited option '{$this->metaKey}' for {$this->postType} '{$this->postTitle}'";
+
+        return sprintf("%s %s %s", $verb, $subject, $rest);
     }
 
     public function getChangedFiles() {
