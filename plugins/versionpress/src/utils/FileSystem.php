@@ -62,7 +62,7 @@ class FileSystem {
     }
 
     /**
-     * Copies a file. Uses Symfony's copy.
+     * Copies a file. Uses Symfony's copy but actually honors the third parameter.
      *
      * @param string $origin
      * @param string $target

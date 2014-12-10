@@ -373,6 +373,7 @@ class Initializer {
         if (!$this->repository->isVersioned()) {
             $this->reportProgressChange(InitializerStates::CREATING_GIT_REPOSITORY);
             $this->repository->init();
+            $this->installGitignore();
         }
 
         $this->repository->assumeUnchanged('wp-config.php');
@@ -443,4 +444,12 @@ class Initializer {
         FileSystem::copy(__DIR__ . "/.htaccess.tpl", VERSIONPRESS_MIRRORING_DIR . "/.htaccess");
         FileSystem::copy(__DIR__ . "/web.tpl.config", VERSIONPRESS_MIRRORING_DIR . "/web.config");
     }
+    
+    /**
+     * Installs Gitignore to the repository root, or does nothing if the file already exists.
+     */
+    private function installGitignore() {
+        FileSystem::copy(__DIR__ . '/gitignore.tpl', ABSPATH . '.gitignore', false);
+    }
+
 }
