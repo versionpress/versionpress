@@ -29,7 +29,7 @@ class RevertChangeInfo extends TrackedChangeInfo {
         $this->commitHash = $commitHash;
     }
 
-    public function getObjectType() {
+    public function getEntityName() {
         return self::OBJECT_TYPE;
     }
 

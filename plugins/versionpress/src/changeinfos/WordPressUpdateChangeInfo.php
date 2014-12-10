@@ -25,7 +25,7 @@ class WordPressUpdateChangeInfo extends TrackedChangeInfo {
         $this->newVersion = $version;
     }
 
-    public function getObjectType() {
+    public function getEntityName() {
         return self::OBJECT_TYPE;
     }
 
@@ -49,7 +49,7 @@ class WordPressUpdateChangeInfo extends TrackedChangeInfo {
     }
 
     protected function getActionTagValue() {
-        return "{$this->getObjectType()}/{$this->getAction()}/{$this->getNewVersion()}";
+        return "{$this->getEntityName()}/{$this->getAction()}/{$this->getNewVersion()}";
     }
 
     protected function getCustomTags() {

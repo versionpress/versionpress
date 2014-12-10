@@ -27,7 +27,7 @@ abstract class TrackedChangeInfo implements ChangeInfo {
      *
      * @return string
      */
-    abstract function getObjectType();
+    abstract function getEntityName();
 
     /**
      * The action done on the object type, for instance "install" or "activate" if the object was a plugin.

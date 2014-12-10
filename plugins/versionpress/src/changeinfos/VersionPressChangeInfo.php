@@ -12,7 +12,7 @@
  */
 class VersionPressChangeInfo extends TrackedChangeInfo {
 
-    public function getObjectType() {
+    public function getEntityName() {
         return "versionpress";
     }
 

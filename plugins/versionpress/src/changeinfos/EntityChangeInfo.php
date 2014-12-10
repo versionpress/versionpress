@@ -6,7 +6,7 @@
  *
  * Derived ChangeInfos have these things in common:
  *
- * - The VP-Action tag value has the form of "entityType/action/entityId",
+ * - The VP-Action tag value has the form of "entityName/action/entityId",
  *   e.g. "post/create/8F805A77ABC9485BA3F114E3E251E5FD" or "option/edit/blogname".
  *   Most commonly, the entityId is VPID.
  *
@@ -18,7 +18,7 @@
 abstract class EntityChangeInfo extends TrackedChangeInfo {
 
     /** @var string */
-    private $entityType;
+    private $entityName;
 
     /** @var string */
     private $action;
@@ -27,18 +27,18 @@ abstract class EntityChangeInfo extends TrackedChangeInfo {
     private $entityId;
 
     /**
-     * @param string $entityType Entity type, used for the first segment of VP-Action tag
+     * @param string $entityName Entity name, used for the first segment of VP-Action tag
      * @param string $action Action, the middle segment of the VP-Action tag
      * @param string $entityId VPID, the last segment od the VP-Action tag
      */
-    public function __construct($entityType, $action, $entityId) {
-        $this->entityType = $entityType;
+    public function __construct($entityName, $action, $entityId) {
+        $this->entityName = $entityName;
         $this->action = $action;
         $this->entityId = $entityId;
     }
 
-    public function getObjectType() {
-        return $this->entityType;
+    public function getEntityName() {
+        return $this->entityName;
     }
 
     /**
@@ -69,7 +69,7 @@ abstract class EntityChangeInfo extends TrackedChangeInfo {
      * @return string
      */
     protected function getActionTagValue() {
-        return "{$this->getObjectType()}/{$this->getAction()}/{$this->getEntityId()}";
+        return "{$this->getEntityName()}/{$this->getAction()}/{$this->getEntityId()}";
     }
 
     /**
@@ -97,7 +97,7 @@ abstract class EntityChangeInfo extends TrackedChangeInfo {
         $changeType = $this->getAction() === "delete" ? "delete" : "add";
         $change = array(
             "type" => "storage-file",
-            "entity" => $this->getObjectType(),
+            "entity" => $this->getEntityName(),
             "id" => $this->getEntityId()
         );
 

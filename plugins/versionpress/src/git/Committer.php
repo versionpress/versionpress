@@ -111,7 +111,7 @@ class Committer
         $changes = $this->mirror->getChangeList();
         foreach ($changes as $change) {
             if ($change instanceof EntityChangeInfo &&
-                $change->getObjectType() == 'option' &&
+                $change->getEntityName() == 'option' &&
                 $change->getEntityId() == 'db_version'
             )
                 return true;
