@@ -14,22 +14,39 @@ class Reverter {
     /** @var GitRepository */
     private $repository;
 
-    public function __construct(SynchronizationProcess $synchronizationProcess, wpdb $database, Committer $committer, GitRepository $repository) {
+    /** @var DbSchemaInfo */
+    private $dbSchemaInfo;
+
+    /** @var StorageFactory */
+    private $storageFactory;
+
+    public function __construct(SynchronizationProcess $synchronizationProcess, wpdb $database, Committer $committer, GitRepository $repository, DbSchemaInfo $dbSchemaInfo, StorageFactory $storageFactory) {
         $this->synchronizationProcess = $synchronizationProcess;
         $this->database = $database;
         $this->committer = $committer;
         $this->repository = $repository;
+        $this->dbSchemaInfo = $dbSchemaInfo;
+        $this->storageFactory = $storageFactory;
     }
 
     public function revert($commitHash) {
         $modifiedFiles = $this->repository->getModifiedFiles(sprintf("%s~1..%s", $commitHash, $commitHash));
-        $affectedPosts = $this->getAffectedPosts($modifiedFiles);
+        $revertedCommit = $this->repository->getCommit($commitHash);
 
-        $this->updateChangeDateForPosts($affectedPosts);
 
         if (!$this->repository->revert($commitHash)) {
             return RevertStatus::FAILED;
         }
+
+        $referencesOk = $this->checkReferencesForRevertedCommit($revertedCommit);
+
+        if (!$referencesOk) {
+            $this->repository->abortRevert();
+            return RevertStatus::FAILED;
+        }
+
+        $affectedPosts = $this->getAffectedPosts($modifiedFiles);
+        $this->updateChangeDateForPosts($affectedPosts);
 
         $this->synchronize();
 
@@ -84,5 +101,43 @@ class Reverter {
         }
 
         return $posts;
+    }
+
+    private function checkReferencesForRevertedCommit(Commit $revertedCommit) {
+        $changeInfo = ChangeInfoMatcher::createMatchingChangeInfo($revertedCommit->getMessage());
+        if ($changeInfo instanceof EntityChangeInfo) {
+            return $this->checkEntityReferences($changeInfo);
+        }
+
+        if ($changeInfo instanceof CompositeChangeInfo) {
+            foreach ($changeInfo->getChangeInfoList() as $subChangeInfo) {
+                if ($subChangeInfo instanceof EntityChangeInfo && !$this->checkEntityReferences($subChangeInfo)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private function checkEntityReferences(EntityChangeInfo $changeInfo) {
+        $entityName = $changeInfo->getEntityName();
+        $entityId = $changeInfo->getEntityId();
+
+        $entityInfo = $this->dbSchemaInfo->getEntityInfo($entityName);
+        $storage = $this->storageFactory->getStorage($entityName);
+        $entity = $storage->loadEntity($entityId);
+
+        $vpIdTable = $this->dbSchemaInfo->getPrefixedTableName("vp_id");
+
+        foreach ($entityInfo->references as $reference => $referencedEntityName) {
+            $vpReference = "vp_$reference";
+            if (isset($entity[$vpReference])) {
+                $entityExists = (bool)$this->database->get_var("SELECT vp_id FROM {$vpIdTable} WHERE vp_id = UNHEX(\"{$entity[$vpReference]}\")");
+                if (!$entityExists) return false;
+            }
+        }
+
+        return true;
     }
 }

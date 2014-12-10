@@ -137,11 +137,15 @@ class GitRepository {
         $output = $this->runShellCommandWithErrorOutput(self::$REVERT_COMMAND, $commit);
 
         if ($output !== null) { // revert conflict
-            $this->runShellCommand(self::$REVERT_ABORT_COMMAND);
+            $this->abortRevert();
             return false;
         }
 
         return true;
+    }
+
+    public function abortRevert() {
+        $this->runShellCommand(self::$REVERT_ABORT_COMMAND);
     }
 
     public function wasCreatedAfter($commitHash, $afterWhat) {

@@ -65,7 +65,14 @@ class DIContainer {
         });
 
         $dic->register(VersionPressServices::REVERTER, function () use ($dic) {
-            return new Reverter($dic->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS), $dic->resolve(VersionPressServices::DATABASE), $dic->resolve(VersionPressServices::COMMITTER), $dic->resolve(VersionPressServices::REPOSITORY));
+            return new Reverter(
+                $dic->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS),
+                $dic->resolve(VersionPressServices::DATABASE),
+                $dic->resolve(VersionPressServices::COMMITTER),
+                $dic->resolve(VersionPressServices::REPOSITORY),
+                $dic->resolve(VersionPressServices::DB_SCHEMA),
+                $dic->resolve(VersionPressServices::STORAGE_FACTORY)
+            );
         });
 
         $dic->register(VersionPressServices::REPOSITORY, function () {

@@ -145,7 +145,7 @@ abstract class DirectoryStorage extends Storage {
         return file_exists($this->getEntityFilename($id));
     }
 
-    private function loadEntity($vpid) {
+    public function loadEntity($vpid) {
         $entities = $this->loadAllFromFiles(array($this->getEntityFilename($vpid)));
         return $entities[$vpid];
     }

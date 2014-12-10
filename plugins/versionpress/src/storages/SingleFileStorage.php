@@ -81,6 +81,11 @@ abstract class SingleFileStorage extends Storage {
         }
     }
 
+    function loadEntity($id) {
+        $this->loadEntities();
+        return $this->entities[$id];
+    }
+
     function loadAll() {
         $this->loadEntities();
         return $this->entities;

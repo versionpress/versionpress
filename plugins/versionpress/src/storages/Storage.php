@@ -30,6 +30,14 @@ abstract class Storage {
     abstract function delete($restriction);
 
     /**
+     * Load an entity by given VPID
+     *
+     * @param $id string VPID
+     * @return array Array representing an entity
+     */
+    abstract function loadEntity($id);
+
+    /**
      * Loads all entities managed by this storage
      *
      * @return array[] Array of arrays where keys are VPIDs and values are arrays with entity data
