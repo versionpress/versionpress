@@ -20,6 +20,8 @@ if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
     if (!file_exists($backupsDir)) {
         FileSystem::mkdir($backupsDir);
         file_put_contents($backupsDir . '/.gitignore', 'git-backup-*');
+        FileSystem::copy(__DIR__ . '/src/initialization/.htaccess.tpl', $backupsDir . '/.htaccess');
+        FileSystem::copy(__DIR__ . '/src/initialization/web.tpl.config', $backupsDir . '/web.config');
     }
 
     $backupPath = $backupsDir . '/git-backup-' . date("YmdHis");
