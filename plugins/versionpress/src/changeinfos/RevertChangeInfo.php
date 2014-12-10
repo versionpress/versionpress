@@ -44,7 +44,17 @@ class RevertChangeInfo extends TrackedChangeInfo {
     }
 
     public function getChangeDescription() {
-        return ($this->action == self::ACTION_UNDO ? "Reverted change " : "Rollback to ") . $this->commitHash;
+        global $versionPressContainer; // temporary solution todo: find better way to pass the dependency
+        /** @var GitRepository $repository */
+        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+        $revertedCommit = $repository->getCommit($this->commitHash);
+
+        if ($this->action === self::ACTION_UNDO) {
+            $revertedChangeInfo = ChangeInfoMatcher::createMatchingChangeInfo($revertedCommit->getMessage());
+            return sprintf("Reverted change \"%s\"", $revertedChangeInfo->getChangeDescription());
+        }
+
+        return sprintf("Rollback to the same state as of %s", $revertedCommit->getDate()->format('d-M-y H:i:s'));
     }
 
     protected function getActionTagValue() {
