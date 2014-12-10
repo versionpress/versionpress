@@ -171,11 +171,7 @@ class GitRepository {
 
         chdir($this->repositoryRoot);
 
-        NDebugger::log('Running command: ' . $commandWithArguments);
-        NDebugger::log('CWD: ' . getcwd());
         $result = $this->runProcess($commandWithArguments);
-        NDebugger::log('STDOUT: ' . $result['stdout']);
-        NDebugger::log('STDERR: ' . $result['stderr']);
         return $result;
     }
 
