@@ -62,6 +62,22 @@ class FileSystem {
     }
 
     /**
+     * Copies a file. Uses Symfony's copy.
+     *
+     * @param string $origin
+     * @param string $target
+     * @param bool $override
+     */
+    public static function copy($origin, $target, $override = false) {
+        $fs = new \Symfony\Component\Filesystem\Filesystem();
+
+        if (!$override && $fs->exists($target))
+            return;
+
+        $fs->copy($origin, $target, $override);
+    }
+
+    /**
      * Copies a directory. Uses Symfony's mirror() under the cover.
      *
      * @see \Symfony\Component\Filesystem\Filesystem::mirror()

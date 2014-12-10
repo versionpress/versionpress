@@ -64,6 +64,7 @@ class Initializer {
         $this->commitDatabase();
         $this->createGitRepository();
         $this->activateVersionPress();
+        $this->copyAccessRulesFiles();
         $this->doInitializationCommit();
         $this->reportProgressChange(InitializerStates::FINISHED);
     }
@@ -435,4 +436,11 @@ class Initializer {
         return $this->dbSchema->getPrefixedTableName($entityName);
     }
 
+    /**
+     * Copies the .htaccess and web.config files into the vpdb directory.
+     */
+    private function copyAccessRulesFiles() {
+        FileSystem::copy(__DIR__ . "/.htaccess.tpl", VERSIONPRESS_MIRRORING_DIR . "/.htaccess");
+        FileSystem::copy(__DIR__ . "/web.tpl.config", VERSIONPRESS_MIRRORING_DIR . "/web.config");
+    }
 }

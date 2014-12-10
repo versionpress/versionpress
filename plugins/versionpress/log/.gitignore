@@ -1,2 +1,7 @@
+# Ignore everything
 *
+
+# But not these...
 !.gitignore
+!.htaccess
+!web.config
