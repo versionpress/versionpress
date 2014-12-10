@@ -35,14 +35,14 @@ class Reverter {
 
 
         if (!$this->repository->revert($commitHash)) {
-            return RevertStatus::FAILED;
+            return RevertStatus::MERGE_CONFLICT;
         }
 
         $referencesOk = $this->checkReferencesForRevertedCommit($revertedCommit);
 
         if (!$referencesOk) {
             $this->repository->abortRevert();
-            return RevertStatus::FAILED;
+            return RevertStatus::VIOLATED_REFERENTIAL_INTEGRITY;
         }
 
         $affectedPosts = $this->getAffectedPosts($modifiedFiles);

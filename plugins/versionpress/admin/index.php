@@ -213,7 +213,7 @@ function _vp_show_progress_message($progressMessage) {
     } else {
         if (isset($_GET['error'])) {
             $errors = array(
-                RevertStatus::FAILED => array(
+                RevertStatus::MERGE_CONFLICT => array(
                     'class' => 'error',
                     'message' => 'Error: Overwritten changes can not be reverted.'
                 ),
@@ -221,7 +221,10 @@ function _vp_show_progress_message($progressMessage) {
                     'class' => 'updated',
                     'message' => 'There was nothing to commit. Current state is the same as the one you want rollback to.'
                 ),
-
+                RevertStatus::VIOLATED_REFERENTIAL_INTEGRITY => array(
+                    'class' => 'error',
+                    'message' => 'Error: Objects with missing references cannot be restored. For example we cannot restore comment where the related post was deleted.'
+                ),
             );
 
             $error = $errors[$_GET['error']];
