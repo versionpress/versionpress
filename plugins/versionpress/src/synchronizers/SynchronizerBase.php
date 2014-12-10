@@ -142,13 +142,13 @@ abstract class SynchronizerBase implements Synchronizer {
      */
     private function getId($vpid) {
         $vpIdTableName = $this->getPrefixedTableName('vp_id');
-        return $this->database->get_var("SELECT id FROM $vpIdTableName WHERE `table` = \"$this->entityName\" AND vp_id = UNHEX('$vpid')");
+        return $this->database->get_var("SELECT id FROM $vpIdTableName WHERE `table` = \"{$this->dbSchema->getTableName($this->entityName)}\" AND vp_id = UNHEX('$vpid')");
     }
 
     private function buildUpdateQuery($updateData) {
         $id = $updateData['vp_id'];
         $tableName = $this->getPrefixedTableName($this->entityName);
-        $query = "UPDATE {$tableName} JOIN (SELECT * FROM {$this->database->prefix}vp_id WHERE `table` = '{$this->entityName}') filtered_vp_id ON {$tableName}.{$this->idColumnName} = filtered_vp_id.id SET";
+        $query = "UPDATE {$tableName} JOIN (SELECT * FROM {$this->database->prefix}vp_id WHERE `table` = '{$this->dbSchema->getTableName($this->entityName)}') filtered_vp_id ON {$tableName}.{$this->idColumnName} = filtered_vp_id.id SET";
         foreach ($updateData as $key => $value) {
             if ($key == $this->idColumnName) continue;
             if (NStrings::startsWith($key, 'vp_')) continue;
@@ -182,7 +182,7 @@ abstract class SynchronizerBase implements Synchronizer {
 
     private function createIdentifierRecord($vp_id, $id) {
         $query = "INSERT INTO {$this->getPrefixedTableName('vp_id')} (`table`, vp_id, id)
-            VALUES (\"{$this->entityName}\", UNHEX('$vp_id'), $id)";
+            VALUES (\"{$this->dbSchema->getTableName($this->entityName)}\", UNHEX('$vp_id'), $id)";
         $this->executeQuery($query);
     }
 
@@ -194,7 +194,7 @@ abstract class SynchronizerBase implements Synchronizer {
         }, $entities);
 
         $ids = $this->database->get_col("SELECT id FROM {$this->getPrefixedTableName('vp_id')} " .
-            "WHERE `table` = \"{$this->entityName}\" AND vp_id NOT IN (" . join(",", $vpIds) . ")");
+            "WHERE `table` = \"{$this->dbSchema->getTableName($this->entityName)}\" AND vp_id NOT IN (" . join(",", $vpIds) . ")");
 
         if (count($ids) == 0)
             return;
@@ -202,7 +202,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $idsString = join(',', $ids);
 
         $this->executeQuery("DELETE FROM {$this->getPrefixedTableName($this->entityName)} WHERE {$this->idColumnName} IN ({$idsString})");
-        $this->executeQuery("DELETE FROM {$this->getPrefixedTableName('vp_id')} WHERE `table` = \"{$this->entityName}\" AND id IN ({$idsString})"); // using cascade delete in mysql
+        $this->executeQuery("DELETE FROM {$this->getPrefixedTableName('vp_id')} WHERE `table` = \"{$this->dbSchema->getTableName($this->entityName)}\" AND id IN ({$idsString})"); // using cascade delete in mysql
     }
 
 
@@ -236,29 +236,29 @@ abstract class SynchronizerBase implements Synchronizer {
             $constraintOfAllExistingReferences = 'NOT((' . join(array_map(function ($a) {
                     return join(Arrays::parametrize($a), ' AND ');
                 }, $usedReferences), ') OR (') . '))';
-            $deleteQuery = "DELETE FROM {$referenceTableName} WHERE {$constraintOfAllExistingReferences} AND `table` = \"{$this->entityName}\"";
+            $deleteQuery = "DELETE FROM {$referenceTableName} WHERE {$constraintOfAllExistingReferences} AND `table` = \"{$this->dbSchema->getTableName($this->entityName)}\"";
             $this->executeQuery($deleteQuery);
         }
 
         $references = $this->dbSchema->getEntityInfo($this->entityName)->references;
-        foreach ($references as $referenceName => $_){ // update foreign keys by VersionPress references
-            $updateQuery = "UPDATE {$this->getPrefixedTableName($this->entityName)} entity SET `{$referenceName}` =
+        foreach ($references as $reference => $_){ // update foreign keys by VersionPress references
+            $updateQuery = "UPDATE {$this->getPrefixedTableName($this->entityName)} entity SET `{$reference}` =
             IFNULL((SELECT reference_id FROM {$this->getPrefixedTableName('vp_reference_details')} ref
-            WHERE ref.id=entity.{$this->idColumnName} AND `table` = \"{$this->entityName}\" and reference = \"{$referenceName}\"), entity.{$referenceName})";
+            WHERE ref.id=entity.{$this->idColumnName} AND `table` = \"{$this->dbSchema->getTableName($this->entityName)}\" and reference = \"{$reference}\"), entity.{$reference})";
             $this->executeQuery($updateQuery);
         }
     }
 
     private function fixReferencesOfOneEntity($entity) {
         $references = $this->getAllReferences($entity);
+        $tableName = $this->dbSchema->getTableName($this->entityName);
 
         $referencesDetails = array();
         foreach ($references as $referenceName => $reference) {
             if ($reference == "")
                 continue;
-
             $referencesDetails[] = array(
-                '`table`' => "\"" . $this->entityName . "\"",
+                '`table`' => "\"" . $tableName . "\"",
                 'reference' => "\"" . $referenceName . "\"",
                 'vp_id' => 'UNHEX("' . $entity['vp_id'] . '")',
                 'reference_vp_id' => 'UNHEX("' . $reference . '")'

@@ -26,15 +26,15 @@ class SynchronizerFactory {
      */
     public function createSynchronizer($synchronizerName) {
         static $synchronizerClasses = array(
-            'posts' => 'PostsSynchronizer',
+            'post' => 'PostsSynchronizer',
             'postmeta' => 'PostMetaSynchronizer',
-            'comments' => 'CommentsSynchronizer',
-            'options' => 'OptionsSynchronizer',
-            'users' => 'UsersSynchronizer',
+            'comment' => 'CommentsSynchronizer',
+            'option' => 'OptionsSynchronizer',
+            'user' => 'UsersSynchronizer',
             'usermeta' => 'UserMetaSynchronizer',
-            'terms' => 'TermsSynchronizer',
+            'term' => 'TermsSynchronizer',
             'term_taxonomy' => 'TermTaxonomySynchronizer',
-            'term_relationships' => 'TermRelationshipsSynchronizer',
+            'term_relationship' => 'TermRelationshipsSynchronizer',
         );
 
         $synchronizerClass = $synchronizerClasses[$synchronizerName];
@@ -43,7 +43,7 @@ class SynchronizerFactory {
 
     private function getStorage($synchronizerName) {
         static $synchronizerStorages = array(
-            'term_relationships' => 'posts'
+            'term_relationship' => 'post'
         );
 
         return $this->storageFactory->getStorage(isset($synchronizerStorages[$synchronizerName]) ? $synchronizerStorages[$synchronizerName] : $synchronizerName);

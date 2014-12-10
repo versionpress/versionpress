@@ -7,11 +7,18 @@
 class EntityInfo {
 
     /**
-     * Name of the entity, e.g. 'posts' or 'comments'. Matches db table name without prefix.
+     * Name of the entity, e.g. 'post' or 'comment'.
      *
      * @var string
      */
     public $entityName;
+
+    /**
+     * Name of DB table where the entity is stored. By default it's {@see entityName}.
+     *
+     * @var string
+     */
+    public $tableName;
 
     /**
      * Name of a column that uniquely identifies the entity within a db table. This is most
@@ -59,8 +66,8 @@ class EntityInfo {
      * Keys are column names in this entity, values are names of referenced entities. E.g.:
      *
      *     array(
-     *       'post_author' => 'users',
-     *       'post_parent' => 'posts'
+     *       'post_author' => 'user',
+     *       'post_parent' => 'post'
      *     )
      *
      * If the entity doesn't have references, returns empty array.
@@ -80,10 +87,11 @@ class EntityInfo {
      * Does the parsing and sets all properties
      *
      * @param array $entitySchema Example:
-     *   array('posts' => array(
+     *   array('post' => array(
+     *     'table' => 'posts',
      *     'id' => 'ID',
      *     'references' => array (
-     *        'post_author' => 'users'
+     *        'post_author' => 'user'
      *      )
      *   ))
      */
@@ -92,6 +100,12 @@ class EntityInfo {
         $this->entityName = $key;
 
         $schemaInfo = $entitySchema[$key];
+
+        if (isset($schemaInfo['table'])) {
+            $this->tableName = $schemaInfo['table'];
+        } else {
+            $this->tableName = $this->entityName;
+        }
 
         // The schema defines either 'id' or 'vpid', see schema-readme.md. This has this meaning:
         if (isset($schemaInfo['id'])) {
@@ -114,5 +128,4 @@ class EntityInfo {
             $this->hasReferences = false;
         }
     }
-
 }

@@ -21,11 +21,11 @@ class Mirror {
      *
      * @see Storage::save()
      *
-     * @param string $entityType Entity type determines the storage used
+     * @param string $entityName Entity type determines the storage used
      * @param array $data Data passed to the `Storage::save()` method
      */
-    public function save($entityType, $data) {
-        $storage = $this->storageFactory->getStorage($entityType);
+    public function save($entityName, $data) {
+        $storage = $this->storageFactory->getStorage($entityName);
         if ($storage == null) {
             return;
         }
@@ -41,11 +41,11 @@ class Mirror {
      *
      * @see Storage::delete()
      *
-     * @param string $entityType Entity type determines the storage used
+     * @param string $entityName Entity type determines the storage used
      * @param array $restriction Restriction passed to the `Storage::delete()` method
      */
-    public function delete($entityType, $restriction) {
-        $storage = $this->storageFactory->getStorage($entityType);
+    public function delete($entityName, $restriction) {
+        $storage = $this->storageFactory->getStorage($entityName);
         if ($storage == null) {
             return;
         }
@@ -71,12 +71,12 @@ class Mirror {
      *
      * @see Storage::shouldBeSaved()
      *
-     * @param string $entityType Determines the storage
+     * @param string $entityName Determines the storage
      * @param array $data Data passed to Storage::shouldBeSaved()
      * @return bool
      */
-    public function shouldBeSaved($entityType, $data) {
-        $storage = $this->storageFactory->getStorage($entityType);
+    public function shouldBeSaved($entityName, $data) {
+        $storage = $this->storageFactory->getStorage($entityName);
         if ($storage === null)
             return false;
         return $storage->shouldBeSaved($data);

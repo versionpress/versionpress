@@ -19,7 +19,7 @@ class SynchronizationProcess {
      */
     function synchronize() {
 
-        $synchronizationSequence = array('options', 'users', 'usermeta', 'posts', 'postmeta', 'comments', 'terms', 'term_taxonomy', 'term_relationships');
+        $synchronizationSequence = array('option', 'user', 'usermeta', 'post', 'postmeta', 'comment', 'term', 'term_taxonomy', 'term_relationship');
 
         foreach ($synchronizationSequence as $synchronizerName) {
             $this->synchronizerFactory

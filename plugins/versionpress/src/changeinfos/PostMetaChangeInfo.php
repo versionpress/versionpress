@@ -74,7 +74,7 @@ class PostMetaChangeInfo extends EntityChangeInfo {
             "add" => array(
                 array(
                     "type" => "storage-file",
-                    "entity" => "posts",
+                    "entity" => "post",
                     "id" => $this->postVpId
                 )
             )

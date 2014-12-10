@@ -73,7 +73,7 @@ function vp_register_hooks() {
 
     add_action('added_option', function ($name) use ($wpdb, $mirror) {
         $option = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}options WHERE option_name='$name'", ARRAY_A);
-        $mirror->save("options", $option);
+        $mirror->save("option", $option);
     });
 
     add_filter('upgrader_pre_install', function ($_, $hook_extra) use ($committer) {
@@ -104,7 +104,7 @@ function vp_register_hooks() {
     });
 
     add_action('untrashed_post_comments', function ($postId) use ($wpdb, $dbSchemaInfo) {
-        $commentsTable = $dbSchemaInfo->getPrefixedTableName("comments");
+        $commentsTable = $dbSchemaInfo->getPrefixedTableName("comment");
         $referenceDetailsView = $dbSchemaInfo->getPrefixedTableName("vp_reference_details");
         $commentStatusSql = "select c.comment_ID, c.comment_approved from {$referenceDetailsView} r join {$commentsTable} c on c.comment_ID = r.id where `table` = 'comments' and r.reference_id = {$postId}";
         $comments = $wpdb->get_results($commentStatusSql, ARRAY_A);
@@ -212,7 +212,7 @@ function createUpdatePostTermsHook(Mirror $mirror, wpdb $wpdb) {
         }
 
         if (count($taxonomies) > 0)
-            $mirror->save("posts", $postUpdateData);
+            $mirror->save("post", $postUpdateData);
     };
 }
 

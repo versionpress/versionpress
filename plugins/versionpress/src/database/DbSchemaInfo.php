@@ -37,7 +37,7 @@ class DbSchemaInfo {
     }
 
     /**
-     * Returns EntityInfo for a given entity name (e.g., "posts" or "comments")
+     * Returns EntityInfo for a given entity name (e.g., "post" or "comment")
      *
      * @param $entityName
      * @return EntityInfo
@@ -61,12 +61,50 @@ class DbSchemaInfo {
     }
 
     /**
-     * For something like "posts", returns "wp_posts"
+     * For something like "post", returns "posts"
+     *
+     * @param $entityName
+     * @return string
+     */
+    public function getTableName($entityName) {
+        $tableName = $this->isEntity($entityName) ? $this->getEntityInfo($entityName)->tableName : $entityName;
+        return $tableName;
+    }
+
+    /**
+     * For something like "post", returns "wp_posts"
      *
      * @param $entityName
      * @return string
      */
     public function getPrefixedTableName($entityName) {
-        return $this->prefix . $entityName;
+        return $this->prefix . $this->getTableName($entityName);
+    }
+
+    /**
+     * Returns EntityInfo for a given table name (e.g., "posts" or "commentmeta")
+     *
+     * @param $tableName
+     * @return EntityInfo
+     */
+    public function getEntityInfoByTableName($tableName) {
+        $entityNames = $this->getAllEntityNames();
+        foreach ($entityNames as $entityName) {
+            $entityInfo = $this->getEntityInfo($entityName);
+            if ($entityInfo->tableName === $tableName)
+                return $entityInfo;
+        }
+        return null;
+    }
+
+    /**
+     * Returns true if given name is an entity (is defined in schema).
+     * Useful for prefixing VP tables.
+     *
+     * @param $entityOrTableName
+     * @return bool
+     */
+    private function isEntity($entityOrTableName) {
+        return in_array($entityOrTableName, $this->getAllEntityNames());
     }
 }

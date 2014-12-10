@@ -2,22 +2,30 @@
 
 Some essential information about database entities and their relationships is described in a [NEON](http://ne-on.org/) format which is then parsed and made accessible via the `DbSchemaInfo` class. This excerpt from `wordpress-schema.neon` is basically a complete example of all the possible options: 
 
-    posts:
+    post:
+        table: posts
         id: ID
         references:
-            post_author: users
-            post_parent: posts
+            post_author: user
+            post_parent: post
 
-    users:
+    user:
+        table: posts
         id: ID
 
-    options:
+    usermeta:
+        id: umeta_id
+        references:
+            user_id: user
+
+    option:
+        table: options
         vpid: option_name
 
 
 ## Defining entities
 
-The top-level keys are **entity names** (`posts`, `users` and `options` in this example). Entity names **match database table names** without a prefix and there is a record in the schema file for every database table that is being tracked. (There may be database tables that VersionPress doesn't care about and those are not in the schema; that's fine.)
+The top-level keys are **entity names** (`post`, `user`, `usermeta` and `option` in this example). By default, the entity names **match database table names** without a prefix, however it is possible to specify different table name (e.g. post > posts). Also there is a record in the schema file for every database table that is being tracked. (There may be database tables that VersionPress doesn't care about and those are not in the schema; that's fine.)
 
 
 ## Identifying entities

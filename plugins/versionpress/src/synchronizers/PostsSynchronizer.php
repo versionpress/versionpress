@@ -13,7 +13,7 @@ class PostsSynchronizer extends SynchronizerBase {
     private $database;
 
     function __construct(Storage $storage, wpdb $database, DbSchemaInfo $dbSchema) {
-        parent::__construct($storage, $database, $dbSchema, 'posts');
+        parent::__construct($storage, $database, $dbSchema, 'post');
         $this->filter = new AbsoluteUrlFilter();
         $this->database = $database;
     }

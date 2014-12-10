@@ -44,12 +44,12 @@ class StorageFactory {
     }
 
     private function initStorageClasses() {
-        $this->addStorageClassInfo('posts', 'PostStorage', '/posts');
-        $this->addStorageClassInfo('comments', 'CommentStorage', '/comments');
-        $this->addStorageClassInfo('options', 'OptionsStorage', '/options.ini');
-        $this->addStorageClassInfo('terms', 'TermsStorage', '/terms.ini');
+        $this->addStorageClassInfo('post', 'PostStorage', '/posts');
+        $this->addStorageClassInfo('comment', 'CommentStorage', '/comments');
+        $this->addStorageClassInfo('option', 'OptionsStorage', '/options.ini');
+        $this->addStorageClassInfo('term', 'TermsStorage', '/terms.ini');
         $this->addStorageClassInfo('term_taxonomy', 'TermTaxonomyStorage', '/terms.ini');
-        $this->addStorageClassInfo('users', 'UserStorage', '/users.ini');
+        $this->addStorageClassInfo('user', 'UserStorage', '/users.ini');
         $this->addStorageClassInfo('usermeta', 'UserMetaStorage', '/users.ini');
         $this->addStorageClassInfo('postmeta', 'PostMetaStorage', '/posts');
     }

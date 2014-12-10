@@ -5,7 +5,7 @@ class TermsSynchronizer extends SynchronizerBase {
     private $dbSchema;
 
     function __construct(Storage $storage, wpdb $database, DbSchemaInfo $dbSchema) {
-        parent::__construct($storage, $database, $dbSchema, 'terms');
+        parent::__construct($storage, $database, $dbSchema, 'term');
         $this->dbSchema = $dbSchema;
     }
 
@@ -14,7 +14,7 @@ class TermsSynchronizer extends SynchronizerBase {
         foreach ($entities as $id => $entity) {
             $entityCopy = $entity;
             unset($entityCopy['taxonomies']); // taxonomies are synchronized by TermTaxonomySynchronizer
-            $entityCopy[$this->dbSchema->getEntityInfo('terms')->idColumnName] = $id;
+            $entityCopy[$this->dbSchema->getEntityInfo('term')->idColumnName] = $id;
 
             $transformedEntities[] = $entityCopy;
         }

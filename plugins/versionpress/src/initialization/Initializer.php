@@ -112,9 +112,9 @@ class Initializer {
     private function lockDatabase() {
         return; // disabled for testing
         $entityNames = $this->dbSchema->getAllEntityNames();
-        $tablePrefix = $this->tablePrefix;
-        $tableNames = array_map(function ($entityName) use ($tablePrefix) {
-            return "`" . $tablePrefix . $entityName . "`";
+        $dbSchema = $this->dbSchema;
+        $tableNames = array_map(function ($entityName) use ($dbSchema) {
+            return "`{$dbSchema->getPrefixedTableName($entityName)}`";
         }, $entityNames);
 
         $lockQueries = array();
@@ -149,7 +149,7 @@ class Initializer {
      * If entity type identified by $entityName defines an ID column, creates a mapping between WordPress ID and VPID
      * for all entities (db rows) of such type.
      *
-     * @param string $entityName E.g., "posts"
+     * @param string $entityName E.g., "post"
      */
     private function createVpidsForEntitiesOfType($entityName) {
 
@@ -158,14 +158,15 @@ class Initializer {
         }
 
         $idColumnName = $this->dbSchema->getEntityInfo($entityName)->idColumnName;
-        $tableName = $this->getTableName($entityName);
-        $entities = $this->database->get_results("SELECT * FROM $tableName", ARRAY_A);
+        $tableName = $this->dbSchema->getTableName($entityName);
+        $prefixedTableName = $this->dbSchema->getPrefixedTableName($entityName);
+        $entities = $this->database->get_results("SELECT * FROM $prefixedTableName", ARRAY_A);
 
         foreach ($entities as $entity) {
             if (!$this->storageFactory->getStorage($entityName)->shouldBeSaved($entity)) continue;
             $entityId = $entity[$idColumnName];
             $vpId = IdUtil::newId();
-            $query = "INSERT INTO {$this->getTableName('vp_id')} (`table`, id, vp_id) VALUES (\"$entityName\", $entityId, UNHEX('$vpId'))";
+            $query = "INSERT INTO {$this->getTableName('vp_id')} (`table`, id, vp_id) VALUES (\"$tableName\", $entityId, UNHEX('$vpId'))";
             $this->database->query($query);
             $this->idCache[$entityName][$entityId] = $vpId;
         }
@@ -192,7 +193,7 @@ class Initializer {
      * If entity type identified by $entityName has references to other entity types, it creates a mapping
      * between VPIDs for all the entities of the current type.
      *
-     * @param string $entityName E.g., "posts"
+     * @param string $entityName E.g., "post"
      */
     private function createVpidReferencesForEntitiesOfType($entityName) {
 
@@ -207,15 +208,17 @@ class Initializer {
         $entities = $this->database->get_results("SELECT $idColumnName, " . join(", ", $referenceNames) . " FROM {$this->getTableName($entityName)}", ARRAY_A);
 
         foreach ($entities as $entity) {
-            foreach ($references as $referenceName => $targetEntity) {
-                if ($entity[$referenceName] == 0)
+            foreach ($references as $reference => $targetEntity) {
+                if ($entity[$reference] == 0)
                     continue;
 
                 $vpId = $this->idCache[$entityName][$entity[$idColumnName]];
-                $referenceVpId = $this->idCache[$targetEntity][$entity[$referenceName]];
+                $referenceVpId = $this->idCache[$targetEntity][$entity[$reference]];
+
+                $tableName = $this->dbSchema->getTableName($entityName);
 
                 $query = "INSERT INTO {$this->getTableName('vp_references')} (`table`, reference, vp_id, reference_vp_id) " .
-                    "VALUES (\"$entityName\", \"$referenceName\", UNHEX('$vpId'), UNHEX('$referenceVpId'))";
+                    "VALUES (\"$tableName\", \"$reference\", UNHEX('$vpId'), UNHEX('$referenceVpId'))";
                 $this->database->query($query);
             }
         }
@@ -297,7 +300,7 @@ class Initializer {
     }
 
     private function doEntitySpecificActions($entityName, $entities) {
-        if ($entityName === 'posts') {
+        if ($entityName === 'post') {
             return array_map(array($this, 'extendPostWithTaxonomies'), $entities);
         }
         if ($entityName === 'usermeta') {
@@ -307,7 +310,7 @@ class Initializer {
     }
 
     private function extendPostWithTaxonomies($post) {
-        $idColumnName = $this->dbSchema->getEntityInfo('posts')->idColumnName;
+        $idColumnName = $this->dbSchema->getEntityInfo('post')->idColumnName;
         $id = $post[$idColumnName];
 
         $postType = $post['post_type'];
@@ -319,7 +322,7 @@ class Initializer {
             if ($terms) {
                 $idCache = $this->idCache;
                 $post[$taxonomy] = array_map(function ($term) use ($idCache) {
-                    return $idCache['terms'][$term->term_id];
+                    return $idCache['term'][$term->term_id];
                 }, $terms);
             }
         }
@@ -328,7 +331,7 @@ class Initializer {
     }
 
     private function restoreUserIdInUsermeta($usermeta) {
-        $userIds = $this->idCache['users'];
+        $userIds = $this->idCache['user'];
         foreach ($userIds as $userId => $vpId) {
             if (strval($vpId) === strval($usermeta['vp_user_id'])) {
                 $usermeta['user_id'] = $userId;
@@ -429,7 +432,7 @@ class Initializer {
      * @return string
      */
     private function getTableName($entityName) {
-        return $this->database->prefix . $entityName;
+        return $this->dbSchema->getPrefixedTableName($entityName);
     }
 
 }

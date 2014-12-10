@@ -90,7 +90,7 @@ class ThemeChangeInfo extends TrackedChangeInfo {
     public function getChangedFiles() {
         $changeType = $this->getAction() === "delete" ? "delete" : "add";
         $themeChange = array("type" => "path", "path" => $path = WP_CONTENT_DIR . "/themes/" . $this->themeId . "/*");
-        $optionChange = array("type" => "storage-file", "entity" => "options", "id" => "");
+        $optionChange = array("type" => "storage-file", "entity" => "option", "id" => "");
         return array($changeType => array($themeChange, $optionChange));
     }
 

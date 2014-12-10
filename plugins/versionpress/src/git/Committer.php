@@ -142,9 +142,9 @@ class Committer
         foreach ($changes as $actionType => $changesForGivenAction) {
             foreach ($changesForGivenAction as $change) {
                 if ($change["type"] === "storage-file") {
-                    $entityType = $change["entity"];
+                    $entityName = $change["entity"];
                     $entityId = $change["id"];
-                    $path = $this->storageFactory->getStorage($entityType)->getEntityFilename($entityId);
+                    $path = $this->storageFactory->getStorage($entityName)->getEntityFilename($entityId);
                 } elseif ($change["type"] === "path") {
                     $path = $change["path"];
                 } else {

@@ -1,37 +1,42 @@
-posts:
+post:
+    table: posts
     id: ID
     references:
-        post_author: users
-        post_parent: posts
+        post_author: user
+        post_parent: post
 
 postmeta:
     id: meta_id
     references:
-        post_id: posts
+        post_id: post
 
-comments:
+comment:
+    table: comments
     id: comment_ID
     references:
-        comment_post_ID: posts
-        user_id: users
-        comment_parent: comments
+        comment_post_ID: post
+        user_id: user
+        comment_parent: comment
 
-users:
+user:
+    table: users
     id: ID
 
-terms:
+term:
+    table: terms
     id: term_id
 
 term_taxonomy:
     id: term_taxonomy_id
     references:
         parent: term_taxonomy
-        term_id: terms
+        term_id: term
 
 usermeta:
     id: umeta_id
     references:
-        user_id: users
+        user_id: user
 
-options:
+option:
+    table: options
     vpid: option_name

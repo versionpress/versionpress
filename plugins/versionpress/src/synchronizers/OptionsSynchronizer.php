@@ -17,7 +17,7 @@ class OptionsSynchronizer implements Synchronizer {
     function __construct(Storage $optionsStorage, wpdb $database, DbSchemaInfo $dbSchema) {
         $this->optionsStorage = $optionsStorage;
         $this->database = $database;
-        $this->tableName = $dbSchema->getPrefixedTableName('options');
+        $this->tableName = $dbSchema->getPrefixedTableName('option');
     }
 
     function synchronize() {
