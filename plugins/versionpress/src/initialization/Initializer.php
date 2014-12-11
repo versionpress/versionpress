@@ -449,7 +449,7 @@ class Initializer {
      * Installs Gitignore to the repository root, or does nothing if the file already exists.
      */
     private function installGitignore() {
-        FileSystem::copy(__DIR__ . '/gitignore.tpl', ABSPATH . '.gitignore', false);
+        FileSystem::copy(__DIR__ . '/.gitignore.tpl', ABSPATH . '.gitignore', false);
     }
 
 }

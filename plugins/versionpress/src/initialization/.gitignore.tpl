@@ -5,11 +5,14 @@
 /wp-config.php
 
 /wp-content/*
+!/wp-content/db.php
+!/wp-content/index.php
 !/wp-content/plugins/
 /wp-content/plugins/versionpress/
 !/wp-content/mu-plugins/
 !/wp-content/themes/
 !/wp-content/uploads/
+!/wp-content/vpdb/
 
 
 #------------------------
