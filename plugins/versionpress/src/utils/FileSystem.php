@@ -130,4 +130,15 @@ class FileSystem {
         }
 
     }
+
+    /**
+     * Compares two files and returns true if their contents is equal
+     *
+     * @param $file1
+     * @param $file2
+     * @return bool
+     */
+    public static function filesHaveSameContents($file1, $file2) {
+        return sha1_file($file1) == sha1_file($file2);
+    }
 } 
