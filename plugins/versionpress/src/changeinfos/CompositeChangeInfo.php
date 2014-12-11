@@ -5,7 +5,7 @@
  */
 class CompositeChangeInfo implements ChangeInfo {
 
-    /** @var ChangeInfo[] */
+    /** @var TrackedChangeInfo[] */
     private $changeInfoList;
 
     /**
@@ -30,7 +30,7 @@ class CompositeChangeInfo implements ChangeInfo {
     );
 
     /**
-     * @param ChangeInfo[] $changeInfoList
+     * @param TrackedChangeInfo[] $changeInfoList
      */
     public function __construct($changeInfoList) {
         $this->changeInfoList = $changeInfoList;
@@ -91,14 +91,14 @@ class CompositeChangeInfo implements ChangeInfo {
     /**
      * Returns all ChangeInfo objects encapsulated in CompositeChangeInfo.
      *
-     * @return ChangeInfo[]
+     * @return TrackedChangeInfo[]
      */
     public function getChangeInfoList() {
         return $this->changeInfoList;
     }
 
     /**
-     * @return ChangeInfo[]
+     * @return TrackedChangeInfo[]
      */
     private function getSortedChangeInfoList() {
         $changeList = $this->changeInfoList;
@@ -107,9 +107,12 @@ class CompositeChangeInfo implements ChangeInfo {
     }
 
     /**
-     * @param ChangeInfo $changeInfo1
-     * @param ChangeInfo $changeInfo2
-     * @return int
+     * Compare function for usort()
+     *
+     * @param TrackedChangeInfo $changeInfo1
+     * @param TrackedChangeInfo $changeInfo2
+     * @return int If $changeInfo1 is more important, returns -1, and the opposite for $changeInfo2. ChangeInfos
+     *   of same priorities return zero.
      */
     private function compareChangeInfoByPriority($changeInfo1, $changeInfo2) {
         $class1 = get_class($changeInfo1);
@@ -118,17 +121,42 @@ class CompositeChangeInfo implements ChangeInfo {
         $priority1 = array_search($class1, $this->priorityOrder);
         $priority2 = array_search($class2, $this->priorityOrder);
 
-        if ($priority1 < $priority2)
+        if ($priority1 < $priority2) {
             return -1;
-        if ($priority1 > $priority2)
+        }
+
+        if ($priority1 > $priority2) {
             return 1;
-        if ($changeInfo1 instanceof EntityChangeInfo && $changeInfo2 instanceof EntityChangeInfo) {
-            // priority by order is the same only for same class
-            // so if they are both the same EntityChangeInfo we can compare actions
-            if ($changeInfo1->getAction() === "create")
-                return 1;
-            if ($changeInfo2->getAction() === "create")
+        }
+
+        // For two ThemeChangeInfo objects, the "switch" one wins
+        // (Note: the type comparisons can be done for one object only as they are of the same type at this point)
+        if ($changeInfo1 instanceof ThemeChangeInfo) {
+
+            if ($changeInfo1->getAction() == "switch") {
                 return -1;
+            } else if ($changeInfo2->getAction() == "switch") {
+                return 1;
+            } else {
+                return 0;
+            }
+
+        }
+
+
+        if ($changeInfo1 instanceof EntityChangeInfo) {
+
+            // Generally, the "create" action takes precedence
+            if ($changeInfo1->getAction() === "create") {
+                return 1;
+            }
+
+            if ($changeInfo2->getAction() === "create") {
+                return -1;
+            }
+
+            return 0;
+
         }
 
         return 0;

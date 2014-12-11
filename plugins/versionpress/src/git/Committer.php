@@ -15,9 +15,9 @@ class Committer
     /**
      * If this is set, takes precedence over changes detected in the `$mirror`.
      *
-     * @var  ChangeInfo
+     * @var ChangeInfo[]
      */
-    private $forcedChangeInfo;
+    private $forcedChangeInfo = array();
     /**
      * @var GitRepository
      */
@@ -44,10 +44,10 @@ class Committer
     {
         if ($this->commitDisabled) return;
 
-        if ($this->forcedChangeInfo) {
+        if (count($this->forcedChangeInfo) > 0) {
             FileSystem::remove(get_home_path() . 'versionpress.maintenance'); // todo: this shouldn't be here...
-            $changeInfo = $this->forcedChangeInfo;
-            $this->forcedChangeInfo = null;
+            $changeInfo = count($this->forcedChangeInfo) > 1 ? new CompositeChangeInfo($this->forcedChangeInfo) : $this->forcedChangeInfo[0];
+            $this->forcedChangeInfo = array();
         } elseif ($this->shouldCommit()) {
             $changeList = $this->mirror->getChangeList();
             if (empty($changeList)) {
@@ -81,7 +81,7 @@ class Committer
      */
     public function forceChangeInfo(ChangeInfo $changeInfo)
     {
-        $this->forcedChangeInfo = $changeInfo;
+        $this->forcedChangeInfo[] = $changeInfo;
     }
 
     /**
