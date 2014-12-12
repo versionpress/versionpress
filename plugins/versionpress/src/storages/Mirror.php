@@ -9,7 +9,7 @@ class Mirror {
     /** @var StorageFactory */
     private $storageFactory;
 
-    /** @var ChangeInfo[] */
+    /** @var TrackedChangeInfo[] */
     private $changeList = array();
 
     function __construct(StorageFactory $storageFactory) {
@@ -60,7 +60,7 @@ class Mirror {
      * Contains a list of {@see ChangeInfo} objects captured by this mirror.
      * Can be an empty array if there was no real change in any of the storages.
      *
-     * @return ChangeInfo[]
+     * @return TrackedChangeInfo[]
      */
     public function getChangeList() {
         return $this->changeList;

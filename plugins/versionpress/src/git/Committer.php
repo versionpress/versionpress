@@ -13,11 +13,11 @@ class Committer
     private $mirror;
 
     /**
-     * If this is set, takes precedence over changes detected in the `$mirror`.
+     * If there are forced ChangedInfos, they take precedence over changes detected in the `$mirror`.
      *
-     * @var ChangeInfo[]
+     * @var TrackedChangeInfo[]
      */
-    private $forcedChangeInfo = array();
+    private $forcedChangeInfos = array();
     /**
      * @var GitRepository
      */
@@ -44,10 +44,10 @@ class Committer
     {
         if ($this->commitDisabled) return;
 
-        if (count($this->forcedChangeInfo) > 0) {
+        if (count($this->forcedChangeInfos) > 0) {
             FileSystem::remove(get_home_path() . 'versionpress.maintenance'); // todo: this shouldn't be here...
-            $changeInfo = count($this->forcedChangeInfo) > 1 ? new CompositeChangeInfo($this->forcedChangeInfo) : $this->forcedChangeInfo[0];
-            $this->forcedChangeInfo = array();
+            $changeInfo = count($this->forcedChangeInfos) > 1 ? new CompositeChangeInfo($this->forcedChangeInfos) : $this->forcedChangeInfos[0];
+            $this->forcedChangeInfos = array();
         } elseif ($this->shouldCommit()) {
             $changeList = $this->mirror->getChangeList();
             if (empty($changeList)) {
@@ -75,13 +75,17 @@ class Committer
     }
 
     /**
-     * Forces change info to be committed in the next call to `commit()`
+     * Forces change info to be committed in the next call to `commit()`, overwriting whatever
+     * might have been captured by the Mirror.
      *
-     * @param ChangeInfo $changeInfo
+     * There can be more forced changed infos and they behave the same as more ChangeInfos returned
+     * by the Mirror, i.e. are wrapped in a CompositeChangeInfo and sorted by priorities.
+     *
+     * @param TrackedChangeInfo $changeInfo
      */
-    public function forceChangeInfo(ChangeInfo $changeInfo)
+    public function forceChangeInfo(TrackedChangeInfo $changeInfo)
     {
-        $this->forcedChangeInfo[] = $changeInfo;
+        $this->forcedChangeInfos[] = $changeInfo;
     }
 
     /**
