@@ -148,11 +148,11 @@ class CompositeChangeInfo implements ChangeInfo {
 
             // Generally, the "create" action takes precedence
             if ($changeInfo1->getAction() === "create") {
-                return 1;
+                return -1;
             }
 
             if ($changeInfo2->getAction() === "create") {
-                return -1;
+                return 1;
             }
 
             return 0;
