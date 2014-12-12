@@ -234,7 +234,7 @@ abstract class SynchronizerBase implements Synchronizer {
             $this->executeQuery($insertQuery);
 
             $constraintOfAllExistingReferences = 'NOT((' . join(array_map(function ($a) {
-                    return join(Arrays::parametrize($a), ' AND ');
+                    return join(ArrayUtils::parametrize($a), ' AND ');
                 }, $usedReferences), ') OR (') . '))';
             $deleteQuery = "DELETE FROM {$referenceTableName} WHERE {$constraintOfAllExistingReferences} AND `table` = \"{$this->dbSchema->getTableName($this->entityName)}\"";
             $this->executeQuery($deleteQuery);

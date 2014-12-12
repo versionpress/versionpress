@@ -100,9 +100,9 @@ class CompositeChangeInfo implements ChangeInfo {
     /**
      * @return TrackedChangeInfo[]
      */
-    private function getSortedChangeInfoList() {
+    public function getSortedChangeInfoList() {
         $changeList = $this->changeInfoList;
-        usort($changeList, array($this, 'compareChangeInfoByPriority'));
+        ArrayUtils::stablesort($changeList, array($this, 'compareChangeInfoByPriority'));
         return $changeList;
     }
 
@@ -114,7 +114,7 @@ class CompositeChangeInfo implements ChangeInfo {
      * @return int If $changeInfo1 is more important, returns -1, and the opposite for $changeInfo2. ChangeInfos
      *   of same priorities return zero.
      */
-    private function compareChangeInfoByPriority($changeInfo1, $changeInfo2) {
+    public function compareChangeInfoByPriority($changeInfo1, $changeInfo2) {
         $class1 = get_class($changeInfo1);
         $class2 = get_class($changeInfo2);
 
