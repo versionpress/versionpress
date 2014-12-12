@@ -21,6 +21,9 @@ class WordPressUpdateChangeInfo extends TrackedChangeInfo {
     /** @var string */
     private $newVersion;
 
+    /**
+     * @param string $version WordPress version that was udated to
+     */
     public function __construct($version) {
         $this->newVersion = $version;
     }
