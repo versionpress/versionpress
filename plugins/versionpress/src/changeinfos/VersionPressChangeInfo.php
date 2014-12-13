@@ -54,7 +54,7 @@ class VersionPressChangeInfo extends TrackedChangeInfo {
 
             default:
                 // just in case, this path shouldn't really be reached
-                return StringUtils::capitalize(StringUtils::verbToPastSense($this->action)) . " VersionPress";
+                return NStrings::capitalize(StringUtils::verbToPastTense($this->action)) . " VersionPress";
 
         }
 

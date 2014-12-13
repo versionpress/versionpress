@@ -63,7 +63,7 @@ class ThemeChangeInfo extends TrackedChangeInfo {
             return "Theme switched to '{$this->themeName}'";
         }
 
-        return NStrings::capitalize($this->action) . (NStrings::endsWith($this->action, "e") ? "d" : "ed") . " theme '{$this->themeName}'";
+        return NStrings::capitalize(StringUtils::verbToPastTense($this->action)) . " theme '{$this->themeName}'";
     }
 
     /**

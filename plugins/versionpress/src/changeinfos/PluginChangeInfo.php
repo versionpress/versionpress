@@ -55,7 +55,7 @@ class PluginChangeInfo extends TrackedChangeInfo {
     }
 
     public function getChangeDescription() {
-        return NStrings::capitalize($this->action) . (NStrings::endsWith($this->action, "e") ? "d" : "ed") . " plugin '{$this->pluginName}'";
+        return NStrings::capitalize(StringUtils::verbToPastTense($this->action)) . " plugin '{$this->pluginName}'";
     }
 
     protected function getActionTagValue() {

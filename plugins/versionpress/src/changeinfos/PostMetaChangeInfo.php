@@ -63,7 +63,7 @@ class PostMetaChangeInfo extends EntityChangeInfo {
             if ($this->getAction() === "delete")
                 $verb = "Removed";
         } elseif ($this->getAction() === "create" || $this->getAction() === "delete") {
-            $verb = NStrings::firstUpper($this->getAction()) . "d";
+            $verb = NStrings::firstUpper(StringUtils::verbToPastTense($this->getAction()));
         }
 
         return sprintf("%s %s %s", $verb, $subject, $rest);
