@@ -7,56 +7,71 @@
  *
  * VP tags:
  *
- *     VP-Action: versionpress/install
+ *     VP-Action: versionpress/install   <-- DEPRECATED, replaced by versionpress/activate
+ *                versionpress/activate/1.0
  *
  */
 class VersionPressChangeInfo extends TrackedChangeInfo {
+
+
+    private $action;
+    private $versionPressVersion;
+
+
+    /**
+     * @param string $action
+     * @param string $versionPressVersion
+     */
+    function __construct($action, $versionPressVersion = null) {
+        $this->action = $action;
+        $this->versionPressVersion = $versionPressVersion;
+    }
 
     public function getEntityName() {
         return "versionpress";
     }
 
     public function getAction() {
-        return "install";
+        return $this->action;
     }
 
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
-        return new self();
+        $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
+        list( , $action, $versionPressVersion) = explode("/", $actionTag, 3);
+        return new self($action, $versionPressVersion);
     }
 
     public function getChangeDescription() {
-        return "Installed VersionPress";
+
+        switch ($this->action) {
+
+            case "install":
+                // Pre-1.0-beta2 message, see also WP-219
+                return "Installed VersionPress";
+
+            case "activate":
+                return "Activated VersionPress " . $this->versionPressVersion;
+
+            default:
+                // just in case, this path shouldn't really be reached
+                return StringUtils::capitalize(StringUtils::verbToPastSense($this->action)) . " VersionPress";
+
+        }
+
     }
 
     protected function getActionTagValue() {
-        return "versionpress/install";
+        $actionTag = "versionpress/$this->action";
+        if ($this->versionPressVersion) {
+            $actionTag .= "/" . $this->versionPressVersion;
+        }
+        return $actionTag;
     }
 
     protected function getCustomTags() {
         return array();
     }
 
-    /**
-     * Reports changes in files that relate to given ChangeInfo. Used in Committer
-     * to commit only related files.
-     * Returns data in this format:
-     *
-     * add  =>   [
-     *             [ type => "storage-file",
-     *               entity => "post",
-     *               id => <VPID> ],
-     *             [ type => "path",
-     *               path => C:/www/wp/wp-content/upload/* ],
-     *           ],
-     * delete => [
-     *             [ type => "storage-file",
-     *               entity => "user",
-     *               id => <VPID> ],
-     *             ...
-     *           ]
-     *
-     * @return array
-     */
     public function getChangedFiles() {
         return array("add" => array(array("type" => "path", "path" => "*")));
     }

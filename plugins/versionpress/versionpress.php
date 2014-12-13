@@ -506,3 +506,13 @@ function vp_is_active() {
     return defined('VERSIONPRESS_ACTIVATION_FILE') && file_exists(VERSIONPRESS_ACTIVATION_FILE);
 }
 
+/**
+ * Returns VersionPress version as specified in plugin metadata
+ *
+ * @return string
+ */
+function vp_get_version() {
+    $pluginData = get_plugin_data(VERSIONPRESS_PLUGIN_DIR . "/versionpress.php", false, false);
+    return $pluginData['Version'];
+}
+

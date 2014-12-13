@@ -397,7 +397,7 @@ class Initializer {
 
 
         $this->reportProgressChange(InitializerStates::CREATING_INITIAL_COMMIT);
-        $installationChangeInfo = new VersionPressChangeInfo();
+        $installationChangeInfo = new VersionPressChangeInfo("activate", vp_get_version());
 
         $currentUser = wp_get_current_user();
         $authorName = $currentUser->display_name;
