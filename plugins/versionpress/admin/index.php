@@ -325,7 +325,13 @@ function _vp_show_progress_message($progressMessage) {
             /** @var GitRepository $repository */
             $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
 
-            $initialCommitHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
+            $preActivationHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
+            if (empty($preActivationHash)) {
+                $initialCommitHash = $repository->getInitialCommit()->getHash();
+            } else {
+                $initialCommitHash = $repository->getChildCommit($preActivationHash);
+            }
+
             $gitLogPaginator = new GitLogPaginator($repository);
             $gitLogPaginator->setCommitsPerPage(25);
             $page = isset($_GET['vp-page']) ? intval($_GET['vp-page']) : 0;

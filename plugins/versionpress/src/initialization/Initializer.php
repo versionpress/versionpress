@@ -383,12 +383,19 @@ class Initializer {
     private function activateVersionPress() {
         copy(VERSIONPRESS_PLUGIN_DIR . '/_db.php', WP_CONTENT_DIR . '/db.php');
         touch(VERSIONPRESS_ACTIVATION_FILE);
-        file_put_contents(dirname(VERSIONPRESS_ACTIVATION_FILE) . '/.gitignore', basename(VERSIONPRESS_ACTIVATION_FILE));
         $this->reportProgressChange(InitializerStates::VERSIONPRESS_ACTIVATED);
     }
 
 
     private function doInitializationCommit() {
+
+        // Since WP-217 the `.active` file contains not the SHA1 of the first commit that VersionPress
+        // created but the one before that (which may be an empty string if VersionPress's commit
+        // was the first one in the repository).
+        $lastCommitHash = $this->repository->getLastCommitHash();
+        file_put_contents(VERSIONPRESS_ACTIVATION_FILE, $lastCommitHash);
+
+
         $this->reportProgressChange(InitializerStates::CREATING_INITIAL_COMMIT);
         $installationChangeInfo = new VersionPressChangeInfo();
 
@@ -403,8 +410,6 @@ class Initializer {
 
         $this->repository->add("*");
         $this->repository->commit($installationChangeInfo->getCommitMessage(), $authorName, $authorEmail);
-        $lastCommitHash = $this->repository->getLastCommitHash();
-        file_put_contents(VERSIONPRESS_ACTIVATION_FILE, $lastCommitHash);
     }
 
 

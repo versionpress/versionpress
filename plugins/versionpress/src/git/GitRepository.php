@@ -87,8 +87,19 @@ class GitRepository {
         $this->runShellCommand(self::$ASSUME_UNCHANGED_COMMAND, $filename);
     }
 
+    /**
+     * Gets last commit hash in the repository, or an empty string is there are no commits
+     * in the repo.
+     *
+     * @return string Empty string or SHA1
+     */
     public function getLastCommitHash() {
-        return $this->runShellCommandWithStandardOutput(self::$REV_PARSE_COMMAND, "HEAD");
+        $result = $this->runShellCommand(self::$REV_PARSE_COMMAND, "HEAD");
+        if ($result["stderr"]) {
+            return "";
+        } else {
+            return $result["stdout"];
+        }
     }
 
     /**
@@ -148,9 +159,30 @@ class GitRepository {
         $this->runShellCommand(self::$REVERT_ABORT_COMMAND);
     }
 
+    /**
+     * Returns true if $commitHash was created after the $afterWhat commit ("after" meaning
+     * that $commitHash is more recent commit, a child of $afterWhat). Same two commits return false.
+     *
+     * @param $commitHash
+     * @param $afterWhat
+     * @return bool
+     */
     public function wasCreatedAfter($commitHash, $afterWhat) {
         $cmd = "git log $afterWhat..$commitHash --oneline";
         return $this->runShellCommandWithStandardOutput($cmd) != null;
+    }
+
+    /**
+     * Returns child ("next") commit. Assumes there is only a single child commit.
+     *
+     * @param $commitHash
+     * @return mixed
+     */
+    public function getChildCommit($commitHash) {
+        $cmd = "git log --reverse --ancestry-path --format=%%H $commitHash^..";
+        $result = $this->runShellCommandWithStandardOutput($cmd);
+        list($childHash) = explode("\n", $result);
+        return $childHash;
     }
 
     public function getNumberOfCommits() {
