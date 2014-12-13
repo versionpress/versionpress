@@ -96,7 +96,8 @@ function vp_register_hooks() {
     }, 10, 2);
 
     add_action('customize_save_after', function ($customizeManager) use ($committer) {
-        $stylesheet = $customizeManager->theme()->stylesheet;
+        /** @var WP_Customize_Manager $customizeManager */
+        $stylesheet = $customizeManager->theme()->get_stylesheet();
         $committer->forceChangeInfo(new ThemeChangeInfo($stylesheet, 'customize'));
         register_shutdown_function(function () {
             wp_remote_get(admin_url("admin.php"));

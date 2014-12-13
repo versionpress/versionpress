@@ -42,8 +42,11 @@ class ChangeInfoMatcher {
      * @return ChangeInfo
      */
     public static function createMatchingChangeInfo(CommitMessage $commitMessage) {
+
+        /** @var ChangeInfo $matchingChangeInfoType */
         $matchingChangeInfoType = self::findMatchingChangeInfo($commitMessage);
         return $matchingChangeInfoType::buildFromCommitMessage($commitMessage);
+
     }
 
     /**

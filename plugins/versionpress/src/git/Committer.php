@@ -60,7 +60,9 @@ class Committer
 
         if (is_user_logged_in() && is_admin()) {
             $currentUser = wp_get_current_user();
+            /** @noinspection PhpUndefinedFieldInspection */
             $authorName = $currentUser->display_name;
+            /** @noinspection PhpUndefinedFieldInspection */
             $authorEmail = $currentUser->user_email;
         } else if (defined('WP_CLI') && WP_CLI) {
             $authorName = GitConfig::$wpcliUserName;

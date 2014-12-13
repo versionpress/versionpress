@@ -123,7 +123,7 @@ class Initializer {
         $lockQueries[] = "SET AUTOCOMMIT=0;";
         $lockQueries[] = "START TRANSACTION;";
 
-        register_shutdown_function(array($this, 'rollbackDatabase'));
+        register_shutdown_function(array('self', 'rollbackDatabase'));
 
         foreach ($lockQueries as $lockQuery)
             $this->database->query($lockQuery);
@@ -400,7 +400,9 @@ class Initializer {
         $installationChangeInfo = new VersionPressChangeInfo("activate", vp_get_version());
 
         $currentUser = wp_get_current_user();
+        /** @noinspection PhpUndefinedFieldInspection */
         $authorName = $currentUser->display_name;
+        /** @noinspection PhpUndefinedFieldInspection */
         $authorEmail = $currentUser->user_email;
 
         if (defined('WP_CLI') && WP_CLI) {

@@ -102,6 +102,7 @@ class IniSerializer {
                         $returnArray[$x[0]] = array();
                     }
                     $first = true;
+                    $b = null;
                     foreach ($x as $k => $v) {
                         if ($first === true) {
                             $b = $array[$key];
