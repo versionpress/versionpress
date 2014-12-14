@@ -72,7 +72,7 @@ class Committer
             $authorEmail = "nonadmin@example.com";
         }
 
-        $this->addRelatedFiles($changeInfo);
+        $this->stageRelatedFiles($changeInfo);
         $this->repository->commit($changeInfo->getCommitMessage(), $authorName, $authorEmail);
     }
 
@@ -132,13 +132,16 @@ class Committer
     }
 
     /**
+     * Calls Git `add` or `rm` on files that are related to the given $changeInfo.
+     * The "exchange format" is an array documented in {@see TrackedChangedInfo::getChangedFiles()}.
+     *
      * @param TrackedChangeInfo $changeInfo
      */
-    private function addRelatedFiles($changeInfo) {
+    private function stageRelatedFiles($changeInfo) {
         if ($changeInfo instanceof CompositeChangeInfo) {
             /** @var TrackedChangeInfo $subChangeInfo */
             foreach ($changeInfo->getChangeInfoList() as $subChangeInfo) {
-                $this->addRelatedFiles($subChangeInfo);
+                $this->stageRelatedFiles($subChangeInfo);
             }
             return;
         }
