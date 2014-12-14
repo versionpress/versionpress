@@ -304,6 +304,15 @@ function vp_admin_post_confirm_deactivation() {
 
     FileSystem::remove(VERSIONPRESS_MIRRORING_DIR);
 
+
+    global $versionPressContainer;
+    /** @var Committer $committer */
+    $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
+
+    $committer->forceChangeInfo(new VersionPressChangeInfo("deactivate"));
+
+
+
     global $wpdb;
 
     $table_prefix = $wpdb->prefix;

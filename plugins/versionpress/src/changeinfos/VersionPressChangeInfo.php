@@ -9,6 +9,7 @@
  *
  *     VP-Action: versionpress/install   <-- DEPRECATED, replaced by versionpress/activate
  *                versionpress/activate/1.0
+ *                versionpress/deactivate
  *
  */
 class VersionPressChangeInfo extends TrackedChangeInfo {
@@ -52,6 +53,9 @@ class VersionPressChangeInfo extends TrackedChangeInfo {
             case "activate":
                 return "Activated VersionPress " . $this->versionPressVersion;
 
+            case "deactivate":
+                return "Deactivated VersionPress";
+
             default:
                 // just in case, this path shouldn't really be reached
                 return NStrings::capitalize(StringUtils::verbToPastTense($this->action)) . " VersionPress";
@@ -73,6 +77,25 @@ class VersionPressChangeInfo extends TrackedChangeInfo {
     }
 
     public function getChangedFiles() {
-        return array("add" => array(array("type" => "path", "path" => "*")));
+
+        switch ($this->action) {
+
+            case "deactivate":
+                $result = array(
+                    "delete" => array(
+                        array("type" => "path", "path" => VERSIONPRESS_MIRRORING_DIR . "/*"),
+                        array("type" => "path", "path" => WP_CONTENT_DIR . "/db.php"),
+                    )
+                );
+                break;
+
+            default:
+
+                $result = array("add" => array(array("type" => "path", "path" => "*")));
+
+        }
+
+
+        return $result;
     }
 }
