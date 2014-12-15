@@ -26,15 +26,15 @@ Most of the time, VersionPress works silently, simply tracking all the important
 
 Most tracked changes involve database entities which are described below but some actions involve files as well. These are the common situations:
 
- - Theme installations, uninstallations and updates
- - Plugin installations, uninstallations and updates
- - WordPress core updates
- - Media uploads
+ - **Theme** installations, uninstallations and updates
+ - **Plugin** installations, uninstallations and updates
+ - **WordPress core** updates
+ - **Media** uploads
 
-When any such action happens, VersionPress commits both the database change (e.g., an updated list of installed plugins) and the corresponding files (e.g., plugin files in `wp-content/plugins/someplugin`).
+When any such action happens, VersionPress commits both the database change and a related file(s) change. For example, when installing a plugin, VersionPress will take not that the list of installed plugins has been changed in the database and commit the corresponding plugin files as well.
 
-VersionPress tries to be clever about what files it commits so if there is also some unrelated change on the disk, e.g. you've been manually editing a theme file, it will try to avoid committing this unrelated change.
-
+Note that not all files are versioned because you e.g. don't want to commit cache files, large backup ZIPs etc. Please refer to the [What's not tracked](#whats-not-tracked) section for more.  
+ 
 
 
 ### Database entities
