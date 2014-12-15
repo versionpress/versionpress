@@ -3,15 +3,48 @@
 Content of user documentation.
 
 
-## Note about Git branches
+## Note about docs versions
 
-These docs use Git branches to reflect product branches – for example, the `1.0-beta1` VersionPress release has its contents living in the `1.0-beta1` branch of this repository.
+We no longer use Git branches to manage multiple versions of this documentation, "version toggles" are used instead – all versions available via the website are built from the single master branch.
 
-The `master` branch should follow the latest version. For example, if the latest version is `2.0`, do this:
+There are a couple of simple conventions that make this work:
 
-     git symbolic-ref refs/heads/master refs/heads/2.0
+ - The main configuration (`content/config.yaml`) specifies **displayVersion**, e.g., `1.0`
+ - Doc topics specify since which version they apply, e.g., `since: 2.0`.
+     - This can be done on file level or whole section (folder) level, see below
+     - Missing `since` is the same as `since: 0.0`
+ - The docs site only renders topics that are valid for the displayVersion 
 
-Note that you need to execute this command manually on every clone of the repo.
+Versions are compared using **semver**, the first 2 digits are usually enough for our purposes.
+
+
+### Example
+
+The default configuration specifies which version should be displayed to the user:
+
+    # content/config.yaml
+    displayVersion: 1.0
+
+And every doc topic specifies whether it should be visible for this version using the **`since`** metadata., e.g. in :
+
+    ---
+    since: 2.0
+    ---
+    
+    # WP-CLI Commands
+    
+    Rest of the Markdown here...
+
+The `since` tag can appear in two places:
+
+ 1. In file's "front matter" (see [Jekyll](http://jekyllrb.com/docs/frontmatter/))
+ 2. In section's `config.yaml` file. For instance, the whole `sync` section (folder) is only available since the 2.0 release.
+
+This concept will probably expand to the file-heading / paragraph level as well, for instance, using something like:
+
+    ## Subheading         [since: 2.0]
+
+but this hasn't been needed / implemented yet.
 
 
 ## How to author the docs
