@@ -1,3 +1,7 @@
+---
+since: 2.0
+---
+
 # WP-CLI Commands #
 
 For advanced usage, VersionPress comes bundled with several [WP-CLI](http://wp-cli.org/) commands. BTW, we absolutely love the WP-CLI project, what a great effort by the WordPress community!
