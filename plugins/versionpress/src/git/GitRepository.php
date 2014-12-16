@@ -14,7 +14,7 @@ class GitRepository {
     // Constants
 
     private static $ADD_COMMAND = "git add %s";
-    private static $UPDATE_COMMAND = "git add -u %s"; // removes deleted files
+    private static $UPDATE_COMMAND = "git add -A %s"; // adds new files and removes deleted files
     private static $COMMIT_COMMAND = "git commit -F %s";
     private static $INIT_COMMAND = "git init";
     private static $STATUS_COMMAND = "git status -s";
@@ -39,7 +39,7 @@ class GitRepository {
         $this->runShellCommand(self::$ADD_COMMAND, $path);
     }
 
-    public function rm($path) {
+    public function update($path) {
         $this->runShellCommand(self::$UPDATE_COMMAND, $path);
     }
 

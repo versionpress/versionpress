@@ -71,12 +71,10 @@ class PostMetaChangeInfo extends EntityChangeInfo {
 
     public function getChangedFiles() {
         return array(
-            "add" => array(
-                array(
-                    "type" => "storage-file",
-                    "entity" => "post",
-                    "id" => $this->postVpId
-                )
+            array(
+                "type" => "storage-file",
+                "entity" => "post",
+                "id" => $this->postVpId
             )
         );
     }

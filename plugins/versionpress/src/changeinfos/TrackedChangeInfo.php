@@ -92,24 +92,16 @@ abstract class TrackedChangeInfo implements ChangeInfo {
     /**
      * Reports changes in files that relate to this ChangeInfo. Used by {@see Committer::stageRelatedFiles()}.
      *
-     * The data is an array where keys are "add" or "delete" and the keys are arrays of path specifications.
      * Path specifications are either pointers to storage files based on entity name and VPID
      * or a concrete path (optionally with wildcards).
      *
      * An example:
      *
      *     array(
-     *         "add" => array(
-     *             array("type" => "storage-file", "entity" => "post", "id" => VPID),
-     *             array("type" => "storage-file", "entity" => "comment", "id" => VPID),
-     *             array("type" => "path", "path" => "c:/wp/example.txt"),
-     *             array("type" => "path", "path" => "c:/wp/folder/*")
-     *         ),
-     *
-     *         "delete" => array(
-     *             array("type" => "storage-file", "entity" => "user", "id" => VPID),
-     *             array("type" => "path", "path" => "c:/wp/example2.txt"),
-     *         )
+     *         array("type" => "storage-file", "entity" => "post", "id" => VPID),
+     *         array("type" => "storage-file", "entity" => "comment", "id" => VPID),
+     *         array("type" => "path", "path" => "c:/wp/example.txt"),
+     *         array("type" => "path", "path" => "c:/wp/folder/*")
      *     );
      *
      * @return array

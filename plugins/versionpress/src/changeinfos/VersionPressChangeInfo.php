@@ -77,25 +77,14 @@ class VersionPressChangeInfo extends TrackedChangeInfo {
     }
 
     public function getChangedFiles() {
-
         switch ($this->action) {
-
             case "deactivate":
-                $result = array(
-                    "delete" => array(
-                        array("type" => "path", "path" => VERSIONPRESS_MIRRORING_DIR . "/*"),
-                        array("type" => "path", "path" => WP_CONTENT_DIR . "/db.php"),
-                    )
+                return array(
+                    array("type" => "path", "path" => VERSIONPRESS_MIRRORING_DIR . "/*"),
+                    array("type" => "path", "path" => WP_CONTENT_DIR . "/db.php"),
                 );
-                break;
-
             default:
-
-                $result = array("add" => array(array("type" => "path", "path" => "*")));
-
+                return array(array("type" => "path", "path" => "*"));
         }
-
-
-        return $result;
     }
 }

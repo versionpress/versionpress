@@ -148,24 +148,18 @@ class Committer
 
         $changes = $changeInfo->getChangedFiles();
 
-        foreach ($changes as $actionType => $changesForGivenAction) {
-            foreach ($changesForGivenAction as $change) {
-                if ($change["type"] === "storage-file") {
-                    $entityName = $change["entity"];
-                    $entityId = $change["id"];
-                    $path = $this->storageFactory->getStorage($entityName)->getEntityFilename($entityId);
-                } elseif ($change["type"] === "path") {
-                    $path = $change["path"];
-                } else {
-                    continue;
-                }
-
-                if ($actionType === "add") {
-                    $this->repository->add($path);
-                } elseif ($actionType === "delete") {
-                    $this->repository->rm($path);
-                }
+        foreach ($changes as $change) {
+            if ($change["type"] === "storage-file") {
+                $entityName = $change["entity"];
+                $entityId = $change["id"];
+                $path = $this->storageFactory->getStorage($entityName)->getEntityFilename($entityId);
+            } elseif ($change["type"] === "path") {
+                $path = $change["path"];
+            } else {
+                continue;
             }
+
+            $this->repository->update($path);
         }
     }
 }
