@@ -11,7 +11,7 @@ class PostStorage extends DirectoryStorage {
     public function shouldBeSaved($data) {
 
         // Don't save revisions and drafts
-        if (isset($_POST['wp-preview'])) // ignore saving draft on preview
+        if (isset($_POST['wp-preview']) && $_POST['wp-preview'] === 'dopreview') // ignore saving draft on preview
             return false;
 
         if (isset($data['post_type']) && ($data['post_type'] === 'revision'))
