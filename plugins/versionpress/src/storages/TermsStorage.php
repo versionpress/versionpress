@@ -7,7 +7,7 @@ class TermsStorage extends SingleFileStorage {
 
         $taxonomy = 'term'; // general type (if there is more then one taxonomy)
 
-        if (count($newEntity['taxonomies']) === 1) {
+        if (isset($newEntity['taxonomies']) && count($newEntity['taxonomies']) === 1) {
             $termTaxonomy = current($newEntity['taxonomies']);
             $taxonomy = $termTaxonomy['taxonomy'];
         }
