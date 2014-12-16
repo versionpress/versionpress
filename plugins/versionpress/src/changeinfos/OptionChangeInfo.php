@@ -44,4 +44,14 @@ class OptionChangeInfo extends EntityChangeInfo {
     protected function getCustomTags() {
         return array();
     }
+
+    public function getChangedFiles() {
+
+        $result = parent::getChangedFiles();
+        if ($this->getEntityId() == "rewrite_rules") {
+            $result[] = array("type" => "path", "path" => ABSPATH . ".htaccess");
+        }
+        
+        return $result;
+    }
 }
