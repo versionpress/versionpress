@@ -14,7 +14,7 @@ The server environment must currently match these requirements, some of which ar
 
   * WordPress 3.8 or higher
   * PHP 5.3 or higher
-  * Git 1.7 or higher installed on the server *(checked automatically before activation)*
+  * Git 1.9 or higher installed on the server *(checked automatically before activation)*
   * Safe mode turned off *(checked automatically before activation)*
   * The `proc_open()` function enabled *(checked automatically before activation)*
   * There must be no `wp-content/db.php` file on the disk *(checked automatically before activation)*
