@@ -20,9 +20,9 @@ class RequirementsChecker {
         );
 
         $this->requirements[] = array(
-            'name' => 'Git installed',
+            'name' => 'Git 1.9+ installed',
             'fulfilled' => $this->tryGit(),
-            'help' => 'Git must be installed on the server. Please [download](http://git-scm.com/) and install it.'
+            'help' => 'Git must be installed on the server. The minimal required version is 1.9. Please [download](http://git-scm.com/) and install it.'
         );
 
         $this->requirements[] = array(
@@ -72,7 +72,11 @@ class RequirementsChecker {
         try {
             $process = new \Symfony\Component\Process\Process("git --version");
             $process->run();
-            return $process->getErrorOutput() === null;
+            if ($process->getErrorOutput() !== null) return false; // there is no git
+            $output = trim($process->getOutput());
+            $match = NStrings::match($output, "~git version (\\d[\\d\\.]+\\d).*~");
+            $version = $match[1];
+            return version_compare("1.9", $version, "<=");
         } catch (Exception $e) {
             return false;
         }
