@@ -210,11 +210,19 @@ class Initializer {
 
         foreach ($entities as $entity) {
             foreach ($references as $reference => $targetEntity) {
-                if ($entity[$reference] == 0)
+                if ($entity[$reference] == 0) {
                     continue;
+                }
 
-                $vpId = $this->idCache[$entityName][$entity[$idColumnName]];
-                $referenceVpId = $this->idCache[$targetEntity][$entity[$reference]];
+                $entityId = $entity[$idColumnName];
+                $referenceId = $entity[$reference];
+
+                if (!isset($this->idCache[$entityName][$entityId]) || !isset($this->idCache[$targetEntity][$referenceId])) {
+                    continue; // VersionPress is not tracking this entity
+                }
+
+                $vpId = $this->idCache[$entityName][$entityId];
+                $referenceVpId = $this->idCache[$targetEntity][$referenceId];
 
                 $tableName = $this->dbSchema->getTableName($entityName);
 
