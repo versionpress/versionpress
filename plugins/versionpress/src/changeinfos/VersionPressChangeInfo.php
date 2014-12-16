@@ -38,7 +38,7 @@ class VersionPressChangeInfo extends TrackedChangeInfo {
 
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
-        list( , $action, $versionPressVersion) = explode("/", $actionTag, 3);
+        list( , $action, $versionPressVersion) = array_pad(explode("/", $actionTag, 3), 3, "");
         return new self($action, $versionPressVersion);
     }
 
