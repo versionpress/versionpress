@@ -4,7 +4,7 @@ Plugin Name: VersionPress
 Plugin URI: http://versionpress.net/
 Description: Git-versioning plugin for WordPress
 Author: VersionPress
-Version: 1.0-beta2
+Version: 1.0-rc1
 */
 
 defined('ABSPATH') or die("Direct access not allowed");
