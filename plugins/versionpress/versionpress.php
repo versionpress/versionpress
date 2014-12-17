@@ -44,7 +44,7 @@ function vp_register_hooks() {
         touch(get_home_path() . 'versionpress.maintenance');
     });
     add_action('_core_updated_successfully', function () use ($committer) {
-        require(get_home_path() . '/wp-includes/version.php'); // load constants (like $wp_version)
+        require(ABSPATH . 'wp-includes/version.php'); // load constants (like $wp_version)
         /** @var string $wp_version */
         $changeInfo = new WordPressUpdateChangeInfo($wp_version);
         $committer->forceChangeInfo($changeInfo);
@@ -236,8 +236,9 @@ if (get_option('vp_just_activated')) {
  * to VP initializer. See [WP-66].
  *
  * @param string $translation Translated text.
- * @param string $text        Text to translate.
- * @param string $domain      Text domain. Unique identifier for retrieving translated strings.
+ * @param string $text Text to translate.
+ * @param string $domain Text domain. Unique identifier for retrieving translated strings.
+ * @return string
  */
 function vp_gettext_filter_plugin_activated($translation, $text, $domain) {
     if ($text == 'Plugin <strong>activated</strong>.' && get_option('vp_just_activated')) {

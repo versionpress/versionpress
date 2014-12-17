@@ -85,6 +85,7 @@ class RequirementsChecker {
     private function tryWrite() {
         $filename = ".vp-try-write";
         $filePath = WP_CONTENT_DIR . '/' . $filename;
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
         @file_put_contents($filePath, "");
         $fileExists = is_file($filePath);
         FileSystem::remove($filePath);

@@ -112,6 +112,7 @@ class Initializer {
 
     private function lockDatabase() {
         return; // disabled for testing
+        /** @noinspection PhpUnreachableStatementInspection */
         $entityNames = $this->dbSchema->getAllEntityNames();
         $dbSchema = $this->dbSchema;
         $tableNames = array_map(function ($entityName) use ($dbSchema) {

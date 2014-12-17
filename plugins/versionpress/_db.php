@@ -5,6 +5,7 @@
  *
  * VersionPress uses this primarily to overwrite the `$wpdb` instance with its mirroring implementation
  * but we also use this to auto-load all the classes etc. This might be a little wasteful
- * and should be looked at, see http://jira.agilio.cz/browse/WP-41.
+ * and should be looked at, see WP-41.
  */
+/** @noinspection PhpIncludeInspection */
 require_once(WP_CONTENT_DIR . '/plugins/versionpress/bootstrap.php');

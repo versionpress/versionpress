@@ -1,5 +1,5 @@
 <?php
-define('VERSIONPRESS_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins/versionpress');
+define('VERSIONPRESS_PLUGIN_DIR', __DIR__);
 define('VERSIONPRESS_MIRRORING_DIR', WP_CONTENT_DIR . '/vpdb');
 define('VERSIONPRESS_ACTIVATION_FILE', VERSIONPRESS_MIRRORING_DIR . '/.active');
 

@@ -1,5 +1,5 @@
 <?php
-require_once(WP_CONTENT_DIR . '/plugins/versionpress/bootstrap.php');
+require_once(__DIR__ . '/../bootstrap.php');
 
 wp_enqueue_style('versionpress_admin_style', plugins_url( 'css/style.css' , __FILE__ ));
 wp_enqueue_style('versionpress_admin_icons', plugins_url( 'icons/style.css' , __FILE__ ));
@@ -20,6 +20,8 @@ function _vp_show_progress_message($progressMessage) {
     $initializerStatesReflection = new ReflectionClass('InitializerStates');
     $progressConstantValues = array_values($initializerStatesReflection->getConstants());
     if (in_array($progressMessage, $progressConstantValues)) {
+        /** @noinspection PhpParamsInspection */
+        /** @noinspection PhpInternalEntityUsedInspection */
         show_message($progressMessage);
     }
 }

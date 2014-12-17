@@ -200,10 +200,6 @@ class MirroringDatabase extends ExtendedWpdb {
         $this->query($deleteQuery);
     }
 
-    private function hasId($entityName, $id) {
-        return (bool)$this->getVpId($entityName, $id);
-    }
-
     private function getVpIdTableName() {
         return $this->addTablePrefix('vp_id');
     }

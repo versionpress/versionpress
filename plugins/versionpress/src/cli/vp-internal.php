@@ -39,6 +39,7 @@ class VPInternalCommand extends WP_CLI_Command
      */
     public function initClone($args, $assoc_args) {
 
+        /** @noinspection PhpIncludeInspection */
         require_once(__DIR__ . '/../../../../../wp-config.php');
 
         $name = $assoc_args['name'];

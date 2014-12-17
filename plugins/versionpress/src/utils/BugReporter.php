@@ -68,7 +68,7 @@ class BugReporter {
     }
 
     private function saveWordPressSpecificInfo($bugReportDir) {
-        require(get_home_path() . '/wp-includes/version.php'); // load constants (like $wp_version)
+        require(ABSPATH . 'wp-includes/version.php'); // load constants (like $wp_version)
         $info = array();
         /** @var $wp_version */
         $info['wp-version'] = $wp_version;
