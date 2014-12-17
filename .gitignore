@@ -1,6 +1,9 @@
 # IDEA project files
-.idea/workspace.xml
-.idea/tasks.xml
-build
-dist
+/.idea/workspace.xml
+/.idea/tasks.xml
+
+# Build dirs
+/build
+/dist
 node_modules
+
