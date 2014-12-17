@@ -1,0 +1,17 @@
+{
+    "name": "versionpress/versionpress-libs",
+    "description": "Libraries referenced by PhpStorm but not actually dependencies",
+    "require-dev": {
+        "johnpbloch/wordpress": "4.0.1",
+        "wp-cli/wp-cli": "~0.17"
+    },
+    "extra": {
+        "wordpress-install-dir": "wordpress"
+    },
+    "authors": [
+        {
+            "name": "VersionPress",
+            "email": "info@versionpress.net"
+        }
+    ]
+}
