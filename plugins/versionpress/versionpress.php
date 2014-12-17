@@ -13,6 +13,10 @@ if (defined('WP_CLI') && WP_CLI && vp_is_active()) {
     WP_CLI::add_command('vp', 'VPCommand');
 }
 
+if (defined('VP_MAINTENANCE')) {
+    NDebugger::log("Ooops. Something went wrong :( The .maintenance file was not deleted.");
+    vp_disable_maintenance();
+}
 
 //----------------------------------------
 // Hooks for VersionPress functionality
@@ -443,7 +447,9 @@ function _vp_revert($reverterMethod) {
     $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
 
     $commitHash = $_GET['commit'];
+    vp_enable_maintenance();
     $revertStatus = call_user_func(array($reverter, $reverterMethod), $commitHash);
+    vp_disable_maintenance();
     $adminPage = 'admin.php?page=versionpress/admin/index.php';
 
     if ($revertStatus !== RevertStatus::OK) {
@@ -502,6 +508,18 @@ function vp_ajax_hide_vp_welcome_panel() {
     die(); // this is required to return a proper result
 }
 
+//----------------------------------
+// Private functions
+//----------------------------------
+
+function vp_enable_maintenance() {
+    $maintenance_string = '<?php define("VP_MAINTENANCE", true); $upgrading = ' . time() . '; ?>';
+    file_put_contents(ABSPATH . '/.maintenance', $maintenance_string);
+}
+
+function vp_disable_maintenance() {
+    FileSystem::remove(ABSPATH . '/.maintenance');
+}
 
 //----------------------------------
 // Public functions

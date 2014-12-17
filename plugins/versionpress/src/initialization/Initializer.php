@@ -56,6 +56,7 @@ class Initializer {
      */
     public function initializeVersionPress() {
         $this->reportProgressChange(InitializerStates::START);
+        vp_enable_maintenance();
         $this->createVersionPressTables();
         $this->lockDatabase();
         $this->createVpids();
@@ -66,6 +67,7 @@ class Initializer {
         $this->activateVersionPress();
         $this->copyAccessRulesFiles();
         $this->doInitializationCommit();
+        vp_disable_maintenance();
         $this->reportProgressChange(InitializerStates::FINISHED);
     }
 
