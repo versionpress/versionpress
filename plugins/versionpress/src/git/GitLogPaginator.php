@@ -1,4 +1,5 @@
 <?php
+namespace VersionPress\Git;
 
 /**
  * Useful for pagination of git log. Uses the `GitStatic` class.

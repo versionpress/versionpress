@@ -1,4 +1,7 @@
 <?php
+namespace VersionPress\Storages;
+
+use VersionPress\ChangeInfos\TermChangeInfo;
 
 /**
  * Quite an untypical storage. Stores taxonomy together with terms, as INI sections

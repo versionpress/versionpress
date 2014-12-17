@@ -1,5 +1,10 @@
 <?php
 
+namespace VersionPress\ChangeInfos;
+
+use Exception;
+use VersionPress\Git\CommitMessage;
+
 class ChangeInfoMatcher {
 
     /**
@@ -12,25 +17,25 @@ class ChangeInfoMatcher {
     private static $changeInfoMap = array(
 
         // VersionPress actions:
-        "versionpress/(?!(undo|rollback)).*" => 'VersionPressChangeInfo',
-        "versionpress/(undo|rollback)/.*" => 'RevertChangeInfo',
+        "versionpress/(?!(undo|rollback)).*" => 'VersionPress\ChangeInfos\VersionPressChangeInfo',
+        "versionpress/(undo|rollback)/.*" => 'VersionPress\ChangeInfos\RevertChangeInfo',
 
         // WordPress core actions:
-        "plugin/.*" => 'PluginChangeInfo',
-        "theme/.*" => 'ThemeChangeInfo',
-        "wordpress/update/.*" => 'WordPressUpdateChangeInfo',
+        "plugin/.*" => 'VersionPress\ChangeInfos\PluginChangeInfo',
+        "theme/.*" => 'VersionPress\ChangeInfos\ThemeChangeInfo',
+        "wordpress/update/.*" => 'VersionPress\ChangeInfos\WordPressUpdateChangeInfo',
 
         // Actions on entities:
-        "post/.*" => 'PostChangeInfo',
-        "postmeta/.*" => 'PostMetaChangeInfo',
-        "comment/.*" => 'CommentChangeInfo',
-        "option/.*" => 'OptionChangeInfo',
-        "term/.*" => 'TermChangeInfo',
-        "usermeta/.*" => 'UserMetaChangeInfo',
-        "user/.*" => 'UserChangeInfo',
+        "post/.*" => 'VersionPress\ChangeInfos\PostChangeInfo',
+        "postmeta/.*" => 'VersionPress\ChangeInfos\PostMetaChangeInfo',
+        "comment/.*" => 'VersionPress\ChangeInfos\CommentChangeInfo',
+        "option/.*" => 'VersionPress\ChangeInfos\OptionChangeInfo',
+        "term/.*" => 'VersionPress\ChangeInfos\TermChangeInfo',
+        "usermeta/.*" => 'VersionPress\ChangeInfos\UserMetaChangeInfo',
+        "user/.*" => 'VersionPress\ChangeInfos\UserChangeInfo',
 
         // Unknown action:
-        "" => 'UntrackedChangeInfo',
+        "" => 'VersionPress\ChangeInfos\UntrackedChangeInfo',
 
     );
 
@@ -59,7 +64,7 @@ class ChangeInfoMatcher {
     public static function findMatchingChangeInfo(CommitMessage $commitMessage) {
 
         if (substr_count($commitMessage->getBody(), TrackedChangeInfo::ACTION_TAG) > 1) {
-            return "CompositeChangeInfo";
+            return "VersionPress\ChangeInfos\CompositeChangeInfo";
         }
 
         $actionTagValue = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG); // can be empty string which is not a problem

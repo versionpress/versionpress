@@ -1,5 +1,18 @@
 <?php
 
+namespace VersionPress\Git;
+
+use Committer;
+use NStrings;
+use VersionPress\ChangeInfos\ChangeInfoMatcher;
+use VersionPress\ChangeInfos\CompositeChangeInfo;
+use VersionPress\ChangeInfos\EntityChangeInfo;
+use VersionPress\ChangeInfos\RevertChangeInfo;
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Storages\StorageFactory;
+use VersionPress\Synchronizers\SynchronizationProcess;
+use wpdb;
+
 class Reverter {
 
     /** @var SynchronizationProcess */
@@ -10,7 +23,7 @@ class Reverter {
 
     /** @var Committer */
     private $committer;
-    
+
     /** @var GitRepository */
     private $repository;
 

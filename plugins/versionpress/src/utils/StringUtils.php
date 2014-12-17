@@ -1,6 +1,9 @@
 <?php
 
 
+namespace VersionPress\Utils;
+use NStrings;
+
 class StringUtils {
 
     /**
@@ -10,7 +13,7 @@ class StringUtils {
      * @param string $verb
      * @return string
      */
-    public static function verbToPastTense($verb){
+    public static function verbToPastTense($verb) {
         return $verb . (NStrings::endsWith($verb, "e") ? "d" : "ed");
     }
 

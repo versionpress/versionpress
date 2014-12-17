@@ -1,5 +1,7 @@
 <?php
 
+namespace VersionPress\Git;
+
 class RevertStatus {
 
     const OK = 'ok';

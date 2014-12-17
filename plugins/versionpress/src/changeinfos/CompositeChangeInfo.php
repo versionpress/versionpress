@@ -1,4 +1,8 @@
 <?php
+namespace VersionPress\ChangeInfos;
+
+use VersionPress\Git\CommitMessage;
+use VersionPress\Utils\ArrayUtils;
 
 /**
  * Class representing more changes in one commit
@@ -15,18 +19,18 @@ class CompositeChangeInfo implements ChangeInfo {
      * @var string[]
      */
     private $priorityOrder = array(
-        "WordPressUpdateChangeInfo",
-        "VersionPressChangeInfo",
-        "PostChangeInfo",
-        "CommentChangeInfo",
-        "UserChangeInfo",
-        "RevertChangeInfo",
-        "PluginChangeInfo",
-        "ThemeChangeInfo",
-        "TermChangeInfo",
-        "OptionChangeInfo",
-        "PostMetaChangeInfo",
-        "UserMetaChangeInfo",
+        "VersionPress\ChangeInfos\WordPressUpdateChangeInfo",
+        "VersionPress\ChangeInfos\VersionPressChangeInfo",
+        "VersionPress\ChangeInfos\PostChangeInfo",
+        "VersionPress\ChangeInfos\CommentChangeInfo",
+        "VersionPress\ChangeInfos\UserChangeInfo",
+        "VersionPress\ChangeInfos\RevertChangeInfo",
+        "VersionPress\ChangeInfos\PluginChangeInfo",
+        "VersionPress\ChangeInfos\ThemeChangeInfo",
+        "VersionPress\ChangeInfos\TermChangeInfo",
+        "VersionPress\ChangeInfos\OptionChangeInfo",
+        "VersionPress\ChangeInfos\PostMetaChangeInfo",
+        "VersionPress\ChangeInfos\UserMetaChangeInfo",
     );
 
     /**
@@ -129,7 +133,7 @@ class CompositeChangeInfo implements ChangeInfo {
             return 1;
         }
 
-        // For two ThemeChangeInfo objects, the "switch" one wins
+        // For two VersionPress\ChangeInfos\ThemeChangeInfo objects, the "switch" one wins
         // (Note: the type comparisons can be done for one object only as they are of the same type at this point)
         if ($changeInfo1 instanceof ThemeChangeInfo) {
 

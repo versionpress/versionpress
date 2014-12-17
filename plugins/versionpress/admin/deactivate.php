@@ -1,5 +1,7 @@
 <?php
 
+use VersionPress\Utils\UninstallationUtil;
+
 defined('ABSPATH') or die("Direct access not allowed");
 
 wp_enqueue_style('versionpress_admin_style', plugins_url( 'css/style.css' , __FILE__ ));

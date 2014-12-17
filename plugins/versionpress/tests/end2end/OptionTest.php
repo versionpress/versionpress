@@ -1,5 +1,8 @@
 <?php
 
+use VersionPress\ChangeInfos\TrackedChangeInfo;
+use VersionPress\Utils\IniSerializer;
+
 class OptionTest extends EndToEndTestCase {
     private $someOption = array(
         "option_name" => "vp_test_option",

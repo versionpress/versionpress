@@ -1,4 +1,12 @@
 <?php
+use VersionPress\ChangeInfos\CompositeChangeInfo;
+use VersionPress\ChangeInfos\EntityChangeInfo;
+use VersionPress\ChangeInfos\TrackedChangeInfo;
+use VersionPress\Git\GitConfig;
+use VersionPress\Git\GitRepository;
+use VersionPress\Storages\Mirror;
+use VersionPress\Storages\StorageFactory;
+use VersionPress\Utils\FileSystem;
 
 /**
  * Creates commits using the `GitStatic` class. By default, it detects the change from the `$mirror` object
@@ -78,10 +86,10 @@ class Committer
 
     /**
      * Forces change info to be committed in the next call to `commit()`, overwriting whatever
-     * might have been captured by the Mirror.
+     * might have been captured by the VersionPress\Storages\Mirror.
      *
      * There can be more forced changed infos and they behave the same as more ChangeInfos returned
-     * by the Mirror, i.e. are wrapped in a CompositeChangeInfo and sorted by priorities.
+     * by the VersionPress\Storages\Mirror, i.e. are wrapped in a VersionPress\ChangeInfos\CompositeChangeInfo and sorted by priorities.
      *
      * @param TrackedChangeInfo $changeInfo
      */

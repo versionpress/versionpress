@@ -1,4 +1,7 @@
 <?php
+namespace VersionPress\ChangeInfos;
+
+use VersionPress\Git\CommitMessage;
 
 /**
  * Change info about updating WordPress itself.
@@ -43,7 +46,7 @@ class WordPressUpdateChangeInfo extends TrackedChangeInfo {
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
-        list( , , $version) = explode("/", $actionTag, 3);
+        list(, , $version) = explode("/", $actionTag, 3);
         return new self($version);
     }
 

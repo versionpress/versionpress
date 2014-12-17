@@ -1,4 +1,7 @@
 <?php
+namespace VersionPress\ChangeInfos;
+
+use VersionPress\Git\CommitMessage;
 
 /**
  * User changes.
@@ -32,7 +35,7 @@ class UserChangeInfo extends EntityChangeInfo {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
         $userLogin = $tags[self::USER_LOGIN];
-        list( , $action, $entityId) = explode("/", $actionTag);
+        list(, $action, $entityId) = explode("/", $actionTag);
         return new self($action, $entityId, $userLogin);
     }
 

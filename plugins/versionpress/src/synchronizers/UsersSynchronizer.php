@@ -1,4 +1,9 @@
 <?php
+namespace VersionPress\Synchronizers;
+
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Storages\Storage;
+use wpdb;
 
 /**
  * Users synchronizer, does quite strict filtering of entity content (only allows
@@ -25,10 +30,10 @@ class UsersSynchronizer extends SynchronizerBase {
         );
 
         $filteredEntities = array();
-        foreach ($entities as $entity){
+        foreach ($entities as $entity) {
             $safeEntity = array();
-            foreach ($allowedProperties as $allowedProperty){
-                if (isset($entity[$allowedProperty])){
+            foreach ($allowedProperties as $allowedProperty) {
+                if (isset($entity[$allowedProperty])) {
                     $safeEntity[$allowedProperty] = $entity[$allowedProperty];
                 }
             }

@@ -1,5 +1,10 @@
 <?php
 
+namespace VersionPress\Storages;
+
+use NStrings;
+use VersionPress\ChangeInfos\PostMetaChangeInfo;
+
 class PostMetaStorage extends DirectoryStorage {
 
     private $postMetaKey;

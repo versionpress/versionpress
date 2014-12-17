@@ -1,5 +1,7 @@
 <?php
 
+namespace VersionPress\Filters;
+
 /**
  * Replaces absolute site URL with placeholder
  *

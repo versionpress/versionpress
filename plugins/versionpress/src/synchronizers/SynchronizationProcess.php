@@ -1,5 +1,7 @@
 <?php
 
+namespace VersionPress\Synchronizers;
+
 class SynchronizationProcess {
 
     /**

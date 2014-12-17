@@ -1,4 +1,14 @@
 <?php
+namespace VersionPress\Initialization;
+
+use VersionPress\ChangeInfos\VersionPressChangeInfo;
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Git\GitConfig;
+use VersionPress\Git\GitRepository;
+use VersionPress\Storages\StorageFactory;
+use VersionPress\Utils\FileSystem;
+use VersionPress\Utils\IdUtil;
+use wpdb;
 
 /**
  * Initializes ("activates" in UI terms) VersionPress - builds its internal repository and starts tracking the changes.
@@ -28,7 +38,7 @@ class Initializer {
     private $dbSchema;
 
     /**
-     * @var StorageFactory
+     * @var \VersionPress\Storages\StorageFactory
      */
     private $storageFactory;
 
@@ -462,7 +472,7 @@ class Initializer {
         FileSystem::copy(__DIR__ . "/.htaccess.tpl", VERSIONPRESS_MIRRORING_DIR . "/.htaccess");
         FileSystem::copy(__DIR__ . "/web.tpl.config", VERSIONPRESS_MIRRORING_DIR . "/web.config");
     }
-    
+
     /**
      * Installs Gitignore to the repository root, or does nothing if the file already exists.
      */

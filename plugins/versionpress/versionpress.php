@@ -7,10 +7,25 @@ Author: VersionPress
 Version: 1.0-rc1
 */
 
+use VersionPress\ChangeInfos\PluginChangeInfo;
+use VersionPress\ChangeInfos\ThemeChangeInfo;
+use VersionPress\ChangeInfos\VersionPressChangeInfo;
+use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Database\MirroringDatabase;
+use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\Reverter;
+use VersionPress\Git\RevertStatus;
+use VersionPress\Initialization\VersionPressOptions;
+use VersionPress\Storages\Mirror;
+use VersionPress\Utils\BugReporter;
+use VersionPress\Utils\FileSystem;
+use VersionPress\Utils\IdUtil;
+
 defined('ABSPATH') or die("Direct access not allowed");
 
 if (defined('WP_CLI') && WP_CLI && vp_is_active()) {
-    WP_CLI::add_command('vp', 'VPCommand');
+    WP_CLI::add_command('vp', 'VersionPress\Cli\VPCommand');
 }
 
 if (defined('VP_MAINTENANCE')) {
@@ -326,7 +341,7 @@ function vp_admin_post_confirm_deactivation() {
     $queries[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_references`";
     $queries[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_id`";
 
-    $vpOptionsReflection = new ReflectionClass('VersionPressOptions');
+    $vpOptionsReflection = new ReflectionClass('VersionPress\Initialization\VersionPressOptions');
     $usermetaToDelete = array_values($vpOptionsReflection->getConstants());
     $queryRestriction = '"' . join('", "', $usermetaToDelete) . '"';
 

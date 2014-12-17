@@ -1,5 +1,10 @@
 <?php
 
+namespace VersionPress\Storages;
+
+use VersionPress\ChangeInfos\TermChangeInfo;
+use VersionPress\Utils\EntityUtils;
+
 class TermsStorage extends SingleFileStorage {
 
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {

@@ -1,4 +1,15 @@
 <?php
+use VersionPress\ChangeInfos\ChangeInfoMatcher;
+use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\GitLogPaginator;
+use VersionPress\Git\GitRepository;
+use VersionPress\Git\RevertStatus;
+use VersionPress\Initialization\Initializer;
+use VersionPress\Initialization\VersionPressOptions;
+use VersionPress\Utils\JsRedirect;
+use VersionPress\Utils\Markdown;
+use VersionPress\Utils\RequirementsChecker;
+
 require_once(__DIR__ . '/../bootstrap.php');
 
 wp_enqueue_style('versionpress_admin_style', plugins_url( 'css/style.css' , __FILE__ ));
@@ -7,17 +18,17 @@ wp_enqueue_style('versionpress_admin_icons', plugins_url( 'icons/style.css' , __
 wp_enqueue_script('versionpress_admin_script', plugins_url( 'js/vp-admin.js' , __FILE__ ));
 
 /**
- * Function executed from Initializer that is given the progress message, decides
+ * Function executed from VersionPress\Initialization\Initializer that is given the progress message, decides
  * whether it is suitable for output and if so, calls `show_message()` (WP function).
  *
  * @param string $progressMessage
  */
 function _vp_show_progress_message($progressMessage) {
 
-    // We currently only output messages that are defined in InitializerStates
+    // We currently only output messages that are defined in VersionPress\Initialization\InitializerStates
     // which captures the main progress points without too many details
 
-    $initializerStatesReflection = new ReflectionClass('InitializerStates');
+    $initializerStatesReflection = new ReflectionClass('VersionPress\Initialization\InitializerStates');
     $progressConstantValues = array_values($initializerStatesReflection->getConstants());
     if (in_array($progressMessage, $progressConstantValues)) {
         /** @noinspection PhpParamsInspection */

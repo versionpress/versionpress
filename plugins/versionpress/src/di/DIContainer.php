@@ -1,5 +1,18 @@
 <?php
 
+namespace VersionPress\DI;
+
+use Committer;
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Database\MirroringDatabase;
+use VersionPress\Git\GitRepository;
+use VersionPress\Git\Reverter;
+use VersionPress\Initialization\Initializer;
+use VersionPress\Storages\Mirror;
+use VersionPress\Storages\StorageFactory;
+use VersionPress\Synchronizers\SynchronizationProcess;
+use VersionPress\Synchronizers\SynchronizerFactory;
+
 class DIContainer {
     /** @var DIContainer */
     private static $instance;
@@ -41,7 +54,7 @@ class DIContainer {
 
         $dic->register(VersionPressServices::DB_SCHEMA, function () {
             global $table_prefix;
-            return new DbSchemaInfo(VERSIONPRESS_PLUGIN_DIR . '/src/database/wordpress-schema.neon', $table_prefix);
+            return new DbSchemaInfo(VERSIONPRESS_PLUGIN_DIR . '/src/Database/wordpress-schema.neon', $table_prefix);
         });
 
         $dic->register(VersionPressServices::DATABASE, function () use ($dic) {

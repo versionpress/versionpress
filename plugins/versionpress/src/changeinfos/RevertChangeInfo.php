@@ -1,8 +1,13 @@
 <?php
+namespace VersionPress\ChangeInfos;
+
+use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\CommitMessage;
+use VersionPress\Git\GitRepository;
 
 /**
  * Change info about undos and rollbacks. Other VersionPress action
- * that are not undos or rollbacks are represented using {@link VersionPressChangeInfo}.
+ * that are not undos or rollbacks are represented using {@link VersionPress\ChangeInfos\VersionPressChangeInfo}.
  *
  * VP tags:
  *
@@ -39,7 +44,7 @@ class RevertChangeInfo extends TrackedChangeInfo {
 
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
-        list( , $action, $commitHash) = explode("/", $tags[TrackedChangeInfo::ACTION_TAG], 3);
+        list(, $action, $commitHash) = explode("/", $tags[TrackedChangeInfo::ACTION_TAG], 3);
         return new self($action, $commitHash);
     }
 

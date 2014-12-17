@@ -1,5 +1,6 @@
 <?php
 
+namespace VersionPress\Utils;
 /**
  * VersionPress "entities" are often just associative arrays, often not even complete
  * (for instance if the SQL update method is captured and only part of the entity data

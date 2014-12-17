@@ -1,5 +1,7 @@
 <?php
 
+namespace VersionPress\DI;
+
 final class VersionPressServices {
     const STORAGE_FACTORY = 'storage-factory';
     const MIRROR = 'mirror';
@@ -12,5 +14,6 @@ final class VersionPressServices {
     const REVERTER = 'reverter';
     const REPOSITORY = 'repository';
 
-    private function __construct() {}
+    private function __construct() {
+    }
 }

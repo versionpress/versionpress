@@ -1,4 +1,11 @@
 <?php
+namespace VersionPress\Synchronizers;
+
+use NStrings;
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Storages\Storage;
+use VersionPress\Utils\ArrayUtils;
+use wpdb;
 
 /**
  * Base class for synchronizers that work with generated VPIDs.
@@ -20,7 +27,7 @@ abstract class SynchronizerBase implements Synchronizer {
     private $dbSchema;
 
     /**
-     * @param Storage $storage Specific synchronizers will use specific storage types, see SynchronizerFactory
+     * @param Storage $storage Specific Synchronizers will use specific storage types, see VersionPress\Synchronizers\SynchronizerFactory
      * @param wpdb $database
      * @param DbSchemaInfo $dbSchema
      * @param string $entityName Constructors in subclasses provide this
@@ -64,7 +71,7 @@ abstract class SynchronizerBase implements Synchronizer {
      * @param array $entities Entities as loaded from the storage
      * @return array Entities as transformed (if at all) by this synchronizer
      */
-    protected  function transformEntities($entities) {
+    protected function transformEntities($entities) {
         return $entities;
     }
 
@@ -241,7 +248,7 @@ abstract class SynchronizerBase implements Synchronizer {
         }
 
         $references = $this->dbSchema->getEntityInfo($this->entityName)->references;
-        foreach ($references as $reference => $_){ // update foreign keys by VersionPress references
+        foreach ($references as $reference => $_) { // update foreign keys by VersionPress references
             $updateQuery = "UPDATE {$this->getPrefixedTableName($this->entityName)} entity SET `{$reference}` =
             IFNULL((SELECT reference_id FROM {$this->getPrefixedTableName('vp_reference_details')} ref
             WHERE ref.id=entity.{$this->idColumnName} AND `table` = \"{$this->dbSchema->getTableName($this->entityName)}\" and reference = \"{$reference}\"), entity.{$reference})";
@@ -289,7 +296,7 @@ abstract class SynchronizerBase implements Synchronizer {
     //--------------------------------------
 
     /**
-     * Specific synchronizers might do entity-specific actions, for example, PostsSynchronizer
+     * Specific Synchronizers might do entity-specific actions, for example, VersionPress\Synchronizers\PostsSynchronizer
      * updates comment count in the database (something we don't track in the storage).
      */
     protected function doEntitySpecificActions() {

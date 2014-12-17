@@ -13,7 +13,7 @@ $robotLoader->addDirectory(__DIR__ . '/../src');
 $robotLoader->setCacheStorage(new NDevNullStorage());
 $robotLoader->register();
 
-if(!is_file(__DIR__ . '/test-config.ini')) die('You have to create test-config.ini with base url for running the tests.');
+if (!is_file(__DIR__ . '/test-config.ini')) die('You have to create test-config.ini with base url for running the tests.');
 
 $config = new TestConfig(parse_ini_file(__DIR__ . '/test-config.ini'));
 SeleniumTestCase::$config = $config;

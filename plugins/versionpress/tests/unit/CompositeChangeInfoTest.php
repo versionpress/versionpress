@@ -1,5 +1,10 @@
 <?php
 
+use VersionPress\ChangeInfos\CompositeChangeInfo;
+use VersionPress\ChangeInfos\PostChangeInfo;
+use VersionPress\ChangeInfos\ThemeChangeInfo;
+use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
+
 class CompositeChangeInfoTest extends PHPUnit_Framework_TestCase {
 
 

@@ -1,5 +1,6 @@
 <?php
 
+namespace VersionPress\Database;
 /**
  * Info about an entity. Basically represents a section of the NEON schema file -  find
  * the parsing logic in the constructor.

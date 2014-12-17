@@ -9,6 +9,7 @@
  *     wp --require="wp-content/plugins/versionpress/tests/automation/vp-automate.php" vp-automate start-over
  *
  */
+use VersionPress\Utils\FileSystem;
 
 /**
  * Internal VersionPress automation commands. Some of them depend on tests-config.ini.

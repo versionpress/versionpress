@@ -1,5 +1,10 @@
 <?php
 
+namespace VersionPress\ChangeInfos;
+use NStrings;
+use VersionPress\Git\CommitMessage;
+use VersionPress\Utils\StringUtils;
+
 /**
  * Theme changes like installation, switching, editing etc.
  *
@@ -53,7 +58,7 @@ class ThemeChangeInfo extends TrackedChangeInfo {
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         $themeName = $commitMessage->getVersionPressTag(self::THEME_NAME_TAG);
-        list( , $action, $themeId) = explode("/", $actionTag, 3);
+        list(, $action, $themeId) = explode("/", $actionTag, 3);
         return new self($themeId, $action, $themeName);
     }
 

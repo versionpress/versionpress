@@ -1,5 +1,10 @@
 <?php
 
+namespace VersionPress\Storages;
+
+use VersionPress\ChangeInfos\CommentChangeInfo;
+use VersionPress\Utils\EntityUtils;
+
 class CommentStorage extends DirectoryStorage {
 
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
@@ -12,7 +17,7 @@ class CommentStorage extends DirectoryStorage {
             if (
                 ($oldEntity['comment_approved'] === 'trash' && $newEntity['comment_approved'] === 'post-trashed') ||
                 ($oldEntity['comment_approved'] === 'post-trashed' && $newEntity['comment_approved'] === 'trash')
-                ) {
+            ) {
                 $action = 'edit'; // trash -> post-trashed and post-trashed -> trash are not interesting action for us
             } elseif ($diff['comment_approved'] === 'trash') {
                 $action = 'trash';

@@ -10,6 +10,9 @@
  * @see vp_admin_post_confirm_deactivation()
  */
 
+use VersionPress\Utils\FileSystem;
+use VersionPress\Utils\UninstallationUtil;
+
 defined('WP_UNINSTALL_PLUGIN') or die('Direct access not allowed');
 
 require_once(dirname(__FILE__) . '/bootstrap.php');
@@ -20,8 +23,8 @@ if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
     if (!file_exists($backupsDir)) {
         FileSystem::mkdir($backupsDir);
         file_put_contents($backupsDir . '/.gitignore', 'git-backup-*');
-        FileSystem::copy(__DIR__ . '/src/initialization/.htaccess.tpl', $backupsDir . '/.htaccess');
-        FileSystem::copy(__DIR__ . '/src/initialization/web.tpl.config', $backupsDir . '/web.config');
+        FileSystem::copy(__DIR__ . '/src/Initialization/.htaccess.tpl', $backupsDir . '/.htaccess');
+        FileSystem::copy(__DIR__ . '/src/Initialization/web.tpl.config', $backupsDir . '/web.config');
     }
 
     $backupPath = $backupsDir . '/git-backup-' . date("YmdHis");
@@ -29,7 +32,7 @@ if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
     FileSystem::rename(ABSPATH . '.git', $backupPath, true);
 
     $productionGitignore = ABSPATH . '.gitignore';
-    $templateGitignore = __DIR__ . '/src/initialization/.gitignore.tpl';
+    $templateGitignore = __DIR__ . '/src/Initialization/.gitignore.tpl';
 
     if (FileSystem::filesHaveSameContents($productionGitignore, $templateGitignore)) {
         FileSystem::remove($productionGitignore);

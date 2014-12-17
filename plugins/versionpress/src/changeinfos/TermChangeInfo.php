@@ -1,4 +1,8 @@
 <?php
+namespace VersionPress\ChangeInfos;
+
+use NStrings;
+use VersionPress\Git\CommitMessage;
 
 /**
  * Term (categories, tags) changes.
@@ -47,7 +51,7 @@ class TermChangeInfo extends EntityChangeInfo {
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
-        list( , $action, $entityId) = explode("/", $actionTag, 3);
+        list(, $action, $entityId) = explode("/", $actionTag, 3);
         $name = $tags[self::TERM_NAME_TAG];
         $oldName = isset($tags[self::TERM_OLD_NAME_TAG]) ? $tags[self::TERM_OLD_NAME_TAG] : null;
         $taxonomy = $tags[self::TERM_TAXONOMY_TAG];

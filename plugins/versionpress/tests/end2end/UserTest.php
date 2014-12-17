@@ -1,5 +1,9 @@
 <?php
 
+use VersionPress\ChangeInfos\TrackedChangeInfo;
+use VersionPress\ChangeInfos\UserChangeInfo;
+use VersionPress\Utils\IniSerializer;
+
 class UserTest extends EndToEndTestCase {
 
     private $someUser = array(

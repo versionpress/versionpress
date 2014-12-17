@@ -1,4 +1,7 @@
 <?php
+namespace VersionPress\ChangeInfos;
+
+use VersionPress\Git\CommitMessage;
 
 /**
  * Option changes like creating or updating them.
@@ -37,7 +40,7 @@ class OptionChangeInfo extends EntityChangeInfo {
     static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
-        list( , $action, $entityId) = explode("/", $actionTag, 3);
+        list(, $action, $entityId) = explode("/", $actionTag, 3);
         return new self($action, $entityId);
     }
 
@@ -51,7 +54,7 @@ class OptionChangeInfo extends EntityChangeInfo {
         if ($this->getEntityId() == "rewrite_rules") {
             $result[] = array("type" => "path", "path" => ABSPATH . ".htaccess");
         }
-        
+
         return $result;
     }
 }

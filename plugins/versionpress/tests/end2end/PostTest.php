@@ -1,5 +1,9 @@
 <?php
 
+use VersionPress\ChangeInfos\PostChangeInfo;
+use VersionPress\ChangeInfos\TrackedChangeInfo;
+use VersionPress\Utils\IniSerializer;
+
 class PostTest extends EndToEndTestCase {
 
     private $somePost = array(

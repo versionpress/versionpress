@@ -1,5 +1,11 @@
 <?php
 
+namespace VersionPress\Storages;
+
+use VersionPress\ChangeInfos\PostChangeInfo;
+use VersionPress\Filters\AbsoluteUrlFilter;
+use VersionPress\Utils\EntityUtils;
+
 class PostStorage extends DirectoryStorage {
 
     function __construct($directory, $entityInfo) {

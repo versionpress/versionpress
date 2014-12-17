@@ -1,4 +1,9 @@
 <?php
+namespace VersionPress\Synchronizers;
+
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Storages\Storage;
+use wpdb;
 
 /**
  * Comments synchronizer, the simplest VPID one (simply uses base class implementation)

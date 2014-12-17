@@ -1,7 +1,12 @@
 <?php
+namespace VersionPress\ChangeInfos;
+
+use NStrings;
+use VersionPress\Git\CommitMessage;
+use VersionPress\Utils\StringUtils;
 
 /**
- * Represents VersionPress actions other than reverts (see {@link RevertChangeInfo}  for that).
+ * Represents VersionPress actions other than reverts (see {@link VersionPress\ChangeInfos\RevertChangeInfo}  for that).
  * It currently records only the "install" action and is probably the simplest of ChangeInfo types
  * as it doesn't capture any additional info.
  *
@@ -38,7 +43,7 @@ class VersionPressChangeInfo extends TrackedChangeInfo {
 
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
-        list( , $action, $versionPressVersion) = array_pad(explode("/", $actionTag, 3), 3, "");
+        list(, $action, $versionPressVersion) = array_pad(explode("/", $actionTag, 3), 3, "");
         return new self($action, $versionPressVersion);
     }
 

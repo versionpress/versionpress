@@ -1,5 +1,11 @@
 <?php
 
+namespace VersionPress\Utils;
+
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use ZipArchive;
+
 /**
  * Helper class for zipping bug report.
  * Inspired by http://stackoverflow.com/a/1334949/1243495
@@ -11,7 +17,7 @@ class Zip {
         }
 
         $zip = new ZipArchive();
-        if (!$zip->open($zipFile, ZIPARCHIVE::CREATE)) {
+        if (!$zip->open($zipFile, ZipArchive::CREATE)) {
             return false;
         }
 

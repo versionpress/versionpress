@@ -1,4 +1,10 @@
 <?php
+namespace VersionPress\Synchronizers;
+
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Storages\OptionsStorage;
+use VersionPress\Storages\Storage;
+use wpdb;
 
 /**
  * Options synchronizer. Skips transient options and a couple of hardcoded values like

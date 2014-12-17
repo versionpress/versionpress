@@ -1,5 +1,7 @@
 <?php
 
+namespace VersionPress\Initialization;
+
 class InitializerStates {
 
     const START = "Starting up";

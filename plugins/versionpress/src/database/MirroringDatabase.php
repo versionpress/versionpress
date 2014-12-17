@@ -1,4 +1,9 @@
 <?php
+namespace VersionPress\Database;
+
+use VersionPress\Storages\Mirror;
+use VersionPress\Utils\IdUtil;
+
 /**
  * Mirroring database sends every change in DB (insert, update, delete) to file mirror
  */

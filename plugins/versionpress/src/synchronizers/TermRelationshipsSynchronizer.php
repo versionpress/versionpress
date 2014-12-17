@@ -1,4 +1,10 @@
 <?php
+namespace VersionPress\Synchronizers;
+
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Database\ExtendedWpdb;
+use VersionPress\Storages\PostStorage;
+use VersionPress\Storages\Storage;
 
 /**
  * Terms relationships synchronizer. Completely truncates the table and fills
@@ -34,7 +40,7 @@ class TermRelationshipsSynchronizer implements Synchronizer {
      *   $relationship[vp_object_id => x, vp_term_taxonomy_id => y]
      *   $relationship[vp_object_id => x, vp_term_taxonomy_id => z] (entries in DB)
      *
-     * @param array $entities Entities as returned by PostStorage
+     * @param array $entities Entities as returned by VersionPress\Storages\PostStorage
      * @return array Entities suitable for the term_relationships table
      */
     private function transformEntities($entities) {
@@ -88,7 +94,9 @@ class TermRelationshipsSynchronizer implements Synchronizer {
             $vpIds[] = $entity['vp_term_taxonomy_id'];
         }
 
-        $hexVpIds = array_map(function ($vpId) { return "UNHEX('" . $vpId  . "')"; }, $vpIds);
+        $hexVpIds = array_map(function ($vpId) {
+            return "UNHEX('" . $vpId . "')";
+        }, $vpIds);
 
         return $this->database->get_results('SELECT HEX(vp_id), id FROM ' . $this->dbSchema->getPrefixedTableName('vp_id') . ' WHERE vp_id IN (' . join(', ', $hexVpIds) . ')', ARRAY_MAP);
     }

@@ -1,5 +1,8 @@
 <?php
 
+namespace VersionPress\Git;
+use DateTime;
+
 class Commit {
 
     /** @var string */

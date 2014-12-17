@@ -1,5 +1,9 @@
 <?php
 
+namespace VersionPress\Storages;
+
+use VersionPress\Database\DbSchemaInfo;
+
 class StorageFactory {
 
     private $vpdbDir;
@@ -44,14 +48,14 @@ class StorageFactory {
     }
 
     private function initStorageClasses() {
-        $this->addStorageClassInfo('post', 'PostStorage', '/posts');
-        $this->addStorageClassInfo('comment', 'CommentStorage', '/comments');
-        $this->addStorageClassInfo('option', 'OptionsStorage', '/options.ini');
-        $this->addStorageClassInfo('term', 'TermsStorage', '/terms.ini');
-        $this->addStorageClassInfo('term_taxonomy', 'TermTaxonomyStorage', '/terms.ini');
-        $this->addStorageClassInfo('user', 'UserStorage', '/users.ini');
-        $this->addStorageClassInfo('usermeta', 'UserMetaStorage', '/users.ini');
-        $this->addStorageClassInfo('postmeta', 'PostMetaStorage', '/posts');
+        $this->addStorageClassInfo('post', 'VersionPress\Storages\PostStorage', '/posts');
+        $this->addStorageClassInfo('comment', 'VersionPress\Storages\CommentStorage', '/comments');
+        $this->addStorageClassInfo('option', 'VersionPress\Storages\OptionsStorage', '/options.ini');
+        $this->addStorageClassInfo('term', 'VersionPress\Storages\TermsStorage', '/terms.ini');
+        $this->addStorageClassInfo('term_taxonomy', 'VersionPress\Storages\TermTaxonomyStorage', '/terms.ini');
+        $this->addStorageClassInfo('user', 'VersionPress\Storages\UserStorage', '/users.ini');
+        $this->addStorageClassInfo('usermeta', 'VersionPress\Storages\UserMetaStorage', '/users.ini');
+        $this->addStorageClassInfo('postmeta', 'VersionPress\Storages\PostMetaStorage', '/posts');
     }
 
     private function addStorageClassInfo($entityName, $className, $storagePath) {

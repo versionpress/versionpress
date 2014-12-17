@@ -1,5 +1,11 @@
 <?php
 
+namespace VersionPress\Synchronizers;
+
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Storages\Storage;
+use wpdb;
+
 class PostMetaSynchronizer extends SynchronizerBase {
 
     /** @var wpdb */

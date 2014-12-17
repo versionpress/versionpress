@@ -1,12 +1,13 @@
 <?php
 
+namespace VersionPress\Utils;
 /**
- * Markdown helper class
+ * VersionPress\Utils\Markdown helper class
  */
 class Markdown {
 
     /**
-     * Transforms Markdown to HTML using {@link https://michelf.ca/projects/php-markdown/ PHP Markdown}.
+     * Transforms VersionPress\Utils\Markdown to HTML using {@link https://michelf.ca/projects/php-markdown/ PHP VersionPress\Utils\Markdown}.
      * One special feature is single line detection - if the passed $text is single line, this function
      * removes the wrapping `<p>` element which PHPMarkdown automatically adds.
      *

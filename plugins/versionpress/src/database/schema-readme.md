@@ -1,6 +1,6 @@
 # NEON Schema Format #
 
-Some essential information about database entities and their relationships is described in a [NEON](http://ne-on.org/) format which is then parsed and made accessible via the `DbSchemaInfo` class. This excerpt from `wordpress-schema.neon` is basically a complete example of all the possible options: 
+Some essential information about database entities and their relationships is described in a [NEON](http://ne-on.org/) format which is then parsed and made accessible via the `VersionPress\Database\DbSchemaInfo` class. This excerpt from `wordpress-schema.neon` is basically a complete example of all the possible options: 
 
     post:
         table: posts

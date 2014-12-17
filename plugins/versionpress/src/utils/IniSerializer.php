@@ -1,5 +1,7 @@
 <?php
 
+namespace VersionPress\Utils;
+
 class IniSerializer {
 
     static function serialize($data) {

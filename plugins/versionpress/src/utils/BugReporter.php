@@ -1,5 +1,8 @@
 <?php
 
+namespace VersionPress\Utils;
+use CURLFile;
+
 /**
  * Helper class for sending bug reports
  */

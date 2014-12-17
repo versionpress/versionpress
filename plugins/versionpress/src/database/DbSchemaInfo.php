@@ -1,4 +1,9 @@
 <?php
+namespace VersionPress\Database;
+use NDateTime53;
+use NNeon;
+use NNeonEntity;
+
 /**
  * Describes parts of the DB schema, specifically telling how to identify entities
  * and what are the relationships between them. The information is loaded from a *.neon file

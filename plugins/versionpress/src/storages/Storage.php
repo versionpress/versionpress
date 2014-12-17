@@ -1,7 +1,11 @@
 <?php
+namespace VersionPress\Storages;
+
+use VersionPress\ChangeInfos\ChangeInfo;
+use VersionPress\Database\EntityInfo;
 
 /**
- * Stores an entity to a file that can be versioned by Git. Storages are chosen by {@link Mirror},
+ * Stores an entity to a file that can be versioned by Git. Storages are chosen by {@link VersionPress\Storages\Mirror},
  * in a way "implement" its API of saving and deleting entities and in the end
  * manage INI files in the `wp-content/vpdb` folder.
  */
@@ -12,7 +16,7 @@ abstract class Storage {
      *
      * @param array $data Associative array with values to save. On `insert`, the $data will contain full entity data
      *                    plus things like VPID. On further updates, the data will typically contain just the updated values
-     *                    and a VPID (assigned in {@link MirroringDatabase} so that the appropriate file could
+     *                    and a VPID (assigned in {@link VersionPress\Database\MirroringDatabase} so that the appropriate file could
      *                    be located).
      * @return ChangeInfo|null Null indicates that the save operation didn't really change anything (may happen). Otherwise,
      *                         the ChangeInfo object is returned.
@@ -53,7 +57,7 @@ abstract class Storage {
     abstract function shouldBeSaved($data);
 
     /**
-     * Called from {@link Initializer} to give storage a chance to prepare itself.
+     * Called from {@link VersionPress\Initialization\Initializer} to give storage a chance to prepare itself.
      * For example, directory storage uses this to create its folder.
      *
      * Note: consider if this method needs to be here
@@ -61,7 +65,7 @@ abstract class Storage {
     abstract function prepareStorage();
 
     /**
-     * Only used by Initializer, possibly remove?
+     * Only used by VersionPress\Initialization\Initializer, possibly remove?
      *
      * @param $entities
      */

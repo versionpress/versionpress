@@ -1,11 +1,16 @@
 <?php
 
+namespace VersionPress\Utils;
+
+use Exception;
+use NStrings;
+
 class RequirementsChecker {
     private $requirements = array();
 
     function __construct() {
 
-        // Markdown can be used in the 'help' field
+        // VersionPress\Utils\Markdown can be used in the 'help' field
 
         $this->requirements[] = array(
             'name' => 'PHP 5.3',
@@ -35,9 +40,9 @@ class RequirementsChecker {
             'name' => 'db.php hook',
             'fulfilled' => !is_file(WP_CONTENT_DIR . '/db.php'),
             'help' => 'For VersionPress to do its magic, it needs to create a `wp-content/db.php` file and put some code there. ' .
-                      'However, this file is already occupied, possibly by some other plugin. Debugger plugins often do this so if you can, please disable them ' .
-                      'and remove the `db.php` file physically. If you can\'t, we have plans on how to deal with this and will ' .
-                      'ship a solution as part of some future VersionPress udpate (it is high on our priority list and should be fixed before the final 1.0 release).'
+                'However, this file is already occupied, possibly by some other plugin. Debugger plugins often do this so if you can, please disable them ' .
+                'and remove the `db.php` file physically. If you can\'t, we have plans on how to deal with this and will ' .
+                'ship a solution as part of some future VersionPress udpate (it is high on our priority list and should be fixed before the final 1.0 release).'
         );
 
         $this->everythingFulfilled = array_reduce($this->requirements, function ($carry, $requirement) {

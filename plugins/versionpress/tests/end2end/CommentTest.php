@@ -1,5 +1,9 @@
 <?php
 
+use VersionPress\ChangeInfos\CommentChangeInfo;
+use VersionPress\ChangeInfos\TrackedChangeInfo;
+use VersionPress\Utils\IniSerializer;
+
 class CommentTest extends EndToEndTestCase {
     private $someComment = array(
         "comment_author" => "Mr VersionPress",

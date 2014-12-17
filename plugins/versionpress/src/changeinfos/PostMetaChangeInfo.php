@@ -1,4 +1,9 @@
 <?php
+namespace VersionPress\ChangeInfos;
+
+use NStrings;
+use VersionPress\Git\CommitMessage;
+use VersionPress\Utils\StringUtils;
 
 /**
  * Changes of post meta.
@@ -38,10 +43,10 @@ class PostMetaChangeInfo extends EntityChangeInfo {
         $this->metaKey = $metaKey;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage)  {
+    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
-        list( , $action, $entityId) = explode("/", $actionTag, 3);
+        list(, $action, $entityId) = explode("/", $actionTag, 3);
         $titleTag = isset($tags[self::POST_TITLE_TAG]) ? $tags[self::POST_TITLE_TAG] : $entityId;
         $type = $tags[self::POST_TYPE_TAG];
         $metaKey = $tags[self::POST_META_KEY];

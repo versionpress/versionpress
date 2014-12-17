@@ -1,5 +1,7 @@
 <?php
 
+namespace VersionPress\Utils;
+
 class ArrayUtils {
 
     public static function parametrize($array) {
@@ -39,8 +41,7 @@ class ArrayUtils {
         while ($ptr1 < count($array1) && $ptr2 < count($array2)) {
             if (call_user_func($cmp_function, $array1[$ptr1], $array2[$ptr2]) < 1) {
                 $array[] = $array1[$ptr1++];
-            }
-            else {
+            } else {
                 $array[] = $array2[$ptr2++];
             }
         }

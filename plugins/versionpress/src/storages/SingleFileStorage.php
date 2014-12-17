@@ -1,5 +1,8 @@
 <?php
 
+namespace VersionPress\Storages;
+use VersionPress\Utils\IniSerializer;
+
 /**
  * Saves entities of same type to a single file. Useful for entities for which
  * there aren't expected to exist many instances, or where the length

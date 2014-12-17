@@ -1,11 +1,15 @@
 <?php
 // NOTE: VersionPress must be fully activated for these commands to be available
 
+namespace VersionPress\Cli;
+use VersionPress\Utils\FileSystem;
+use WP_CLI;
+use WP_CLI_Command;
+
 /**
  * VersionPress CLI commands.
  */
-class VPCommand extends WP_CLI_Command
-{
+class VPCommand extends WP_CLI_Command {
 
     /**
      * Clones site to a new folder, database and Git branch.
@@ -67,7 +71,7 @@ class VPCommand extends WP_CLI_Command
         WP_CLI::success("Site files cloned");
 
 
-        $configureCloneCmd = 'wp --require=' . escapeshellarg($clonePath . '/wp-content/plugins/versionpress/src/cli/vp-internal.php');
+        $configureCloneCmd = 'wp --require=' . escapeshellarg($clonePath . '/wp-content/plugins/versionpress/src/Cli/vp-internal.php');
         $configureCloneCmd .= ' vp-internal init-clone --name=' . escapeshellarg($name);
         $configureCloneCmd .= ' --site-url=' . escapeshellarg($cloneUrl);
         if (array_key_exists('force', $assoc_args)) {
@@ -108,5 +112,5 @@ class VPCommand extends WP_CLI_Command
 }
 
 if (defined('WP_CLI') && WP_CLI) {
-    WP_CLI::add_command('vp', 'VPCommand');
+    WP_CLI::add_command('vp', 'VersionPress\Cli\VPCommand');
 }

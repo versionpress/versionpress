@@ -1,4 +1,8 @@
 <?php
+namespace VersionPress\ChangeInfos;
+
+use NStrings;
+use VersionPress\Git\CommitMessage;
 
 /**
  * Post changes.
@@ -30,11 +34,11 @@ class PostChangeInfo extends EntityChangeInfo {
         $this->postTitle = $postTitle;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage)  {
+    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
 
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
-        list( , $action, $entityId) = explode("/", $actionTag, 3);
+        list(, $action, $entityId) = explode("/", $actionTag, 3);
 
         $titleTag = isset($tags[self::POST_TITLE_TAG]) ? $tags[self::POST_TITLE_TAG] : $entityId;
         $type = isset($tags[self::POST_TYPE_TAG]) ? $tags[self::POST_TYPE_TAG] : "post";
@@ -43,7 +47,7 @@ class PostChangeInfo extends EntityChangeInfo {
     }
 
     public function getChangeDescription() {
-        switch($this->getAction()) {
+        switch ($this->getAction()) {
             case "create":
                 return "Created {$this->postType} '{$this->postTitle}'";
             case "trash":

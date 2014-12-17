@@ -1,5 +1,9 @@
 <?php
 
+namespace VersionPress\Storages;
+
+use VersionPress\ChangeInfos\UserMetaChangeInfo;
+
 class UserMetaStorage extends SingleFileStorage {
 
     private $userMetaKey;

@@ -1,4 +1,10 @@
 <?php
+namespace VersionPress\Storages;
+
+use VersionPress\Filters\EntityFilter;
+use VersionPress\Utils\EntityUtils;
+use VersionPress\Utils\FileSystem;
+use VersionPress\Utils\IniSerializer;
 
 /**
  * Saves entities to files in a common directory. Useful for entities that either

@@ -1,5 +1,10 @@
 <?php
 
+namespace VersionPress\ChangeInfos;
+use NStrings;
+use VersionPress\Git\CommitMessage;
+use VersionPress\Utils\StringUtils;
+
 /**
  * Plugin changes like installation, activation, deactivation etc.
  *
@@ -50,7 +55,7 @@ class PluginChangeInfo extends TrackedChangeInfo {
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         $pluginName = $commitMessage->getVersionPressTag(self::PLUGIN_NAME_TAG);
-        list( , $action, $pluginFile) = explode("/", $actionTag, 3);
+        list(, $action, $pluginFile) = explode("/", $actionTag, 3);
         return new self($pluginFile, $action, $pluginName);
     }
 

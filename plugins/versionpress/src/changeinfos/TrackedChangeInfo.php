@@ -1,4 +1,7 @@
 <?php
+namespace VersionPress\ChangeInfos;
+
+use VersionPress\Git\CommitMessage;
 
 /**
  * Base class for ChangeInfos that are properly tracked by VersionPress. They use

@@ -1,5 +1,13 @@
 <?php
 
+namespace VersionPress\Cli;
+use VersionPress\DI\VersionPressServices;
+use VersionPress\Initialization\Initializer;
+use VersionPress\Synchronizers\SynchronizationProcess;
+use WP_CLI;
+use WP_CLI_Command;
+use wpdb;
+
 /**
  * Internal VersionPress commands.
  *
@@ -13,8 +21,7 @@
  * These internal commands are mostly used by public `wp vp` commands.
  *
  */
-class VPInternalCommand extends WP_CLI_Command
-{
+class VPInternalCommand extends WP_CLI_Command {
 
     /**
      * Initializes a clone
@@ -98,7 +105,7 @@ class VPInternalCommand extends WP_CLI_Command
 
         // 4) Create WP tables
 
-        $createWpTablesCmd = 'wp core install --url=' . escapeshellarg($cloneUrl) .  ' --title=x --admin_user=x --admin_password=x --admin_email=x@example.com';
+        $createWpTablesCmd = 'wp core install --url=' . escapeshellarg($cloneUrl) . ' --title=x --admin_user=x --admin_password=x --admin_email=x@example.com';
         $process = new \Symfony\Component\Process\Process($createWpTablesCmd);
         $process->run();
         if (!$process->isSuccessful()) {
@@ -109,8 +116,6 @@ class VPInternalCommand extends WP_CLI_Command
         }
 
         // ... we need to truncate sample data (everything except `options`)
-
-
 
 
         // Remaining steps are done in `vp-internal finish-init-clone` where WP + VP is fully loaded
@@ -125,8 +130,6 @@ class VPInternalCommand extends WP_CLI_Command
         } else {
             WP_CLI::log($process->getOutput());
         }
-
-
 
 
     }
@@ -156,12 +159,11 @@ class VPInternalCommand extends WP_CLI_Command
         // 6) Create VersionPress tables
 
         global $versionPressContainer;
-        /** @var Initializer $initializer */
+        /** @var \VersionPress\Initialization\Initializer $initializer */
         $initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);
         $initializer->createVersionPressTables();
 
         WP_CLI::success("VersionPress tables created");
-
 
 
         // 7) Run synchronization
@@ -176,5 +178,5 @@ class VPInternalCommand extends WP_CLI_Command
 }
 
 if (defined('WP_CLI') && WP_CLI) {
-    WP_CLI::add_command('vp-internal', 'VPInternalCommand');
+    WP_CLI::add_command('vp-internal', 'VersionPress\Cli\VPInternalCommand');
 }

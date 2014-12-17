@@ -1,5 +1,8 @@
 <?php
 
+namespace VersionPress\ChangeInfos;
+use VersionPress\Git\CommitMessage;
+
 /**
  * Comment changes.
  *

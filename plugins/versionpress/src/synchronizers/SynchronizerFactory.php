@@ -1,5 +1,11 @@
 <?php
 
+namespace VersionPress\Synchronizers;
+
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Storages\StorageFactory;
+use wpdb;
+
 class SynchronizerFactory {
     /**
      * @var StorageFactory
@@ -26,15 +32,15 @@ class SynchronizerFactory {
      */
     public function createSynchronizer($synchronizerName) {
         static $synchronizerClasses = array(
-            'post' => 'PostsSynchronizer',
-            'postmeta' => 'PostMetaSynchronizer',
-            'comment' => 'CommentsSynchronizer',
-            'option' => 'OptionsSynchronizer',
-            'user' => 'UsersSynchronizer',
-            'usermeta' => 'UserMetaSynchronizer',
-            'term' => 'TermsSynchronizer',
-            'term_taxonomy' => 'TermTaxonomySynchronizer',
-            'term_relationship' => 'TermRelationshipsSynchronizer',
+            'post' => 'VersionPress\Synchronizers\PostsSynchronizer',
+            'postmeta' => 'VersionPress\Synchronizers\PostMetaSynchronizer',
+            'comment' => 'VersionPress\Synchronizers\CommentsSynchronizer',
+            'option' => 'VersionPress\Synchronizers\OptionsSynchronizer',
+            'user' => 'VersionPress\Synchronizers\UsersSynchronizer',
+            'usermeta' => 'VersionPress\Synchronizers\UserMetaSynchronizer',
+            'term' => 'VersionPress\Synchronizers\TermsSynchronizer',
+            'term_taxonomy' => 'VersionPress\Synchronizers\TermTaxonomySynchronizer',
+            'term_relationship' => 'VersionPress\Synchronizers\TermRelationshipsSynchronizer',
         );
 
         $synchronizerClass = $synchronizerClasses[$synchronizerName];

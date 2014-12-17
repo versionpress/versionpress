@@ -1,8 +1,11 @@
 <?php
+namespace VersionPress\Storages;
+
+use VersionPress\ChangeInfos\TrackedChangeInfo;
 
 /**
  * Reflects database changes to storages. It is a facade / entry point to a set
- * of storages {@link Storage storages} that implement the actual functionality.
+ * of storages {@link VersionPress\Storages\Storage storages} that implement the actual functionality.
  */
 class Mirror {
 
@@ -17,12 +20,12 @@ class Mirror {
     }
 
     /**
-     * Chooses an appropriate storage and calls its {@see Storage::save() save()} method.
+     * Chooses an appropriate storage and calls its {@see VersionPress\Storages\Storage::save() save()} method.
      *
      * @see Storage::save()
      *
      * @param string $entityName Entity type determines the storage used
-     * @param array $data Data passed to the `Storage::save()` method
+     * @param array $data Data passed to the `VersionPress\Storages\Storage::save()` method
      */
     public function save($entityName, $data) {
         $storage = $this->storageFactory->getStorage($entityName);
@@ -37,12 +40,12 @@ class Mirror {
     }
 
     /**
-     * Chooses an appropriate storage and calls its {@see Storage::delete() delete()} method.
+     * Chooses an appropriate storage and calls its {@see VersionPress\Storages\Storage::delete() delete()} method.
      *
      * @see Storage::delete()
      *
      * @param string $entityName Entity type determines the storage used
-     * @param array $restriction Restriction passed to the `Storage::delete()` method
+     * @param array $restriction Restriction passed to the `VersionPress\Storages\Storage::delete()` method
      */
     public function delete($entityName, $restriction) {
         $storage = $this->storageFactory->getStorage($entityName);
@@ -57,7 +60,7 @@ class Mirror {
     }
 
     /**
-     * Contains a list of {@see ChangeInfo} objects captured by this mirror.
+     * Contains a list of {@see VersionPress\ChangeInfos\ChangeInfo} objects captured by this mirror.
      * Can be an empty array if there was no real change in any of the storages.
      *
      * @return TrackedChangeInfo[]
@@ -72,7 +75,7 @@ class Mirror {
      * @see Storage::shouldBeSaved()
      *
      * @param string $entityName Determines the storage
-     * @param array $data Data passed to Storage::shouldBeSaved()
+     * @param array $data Data passed to VersionPress\Storages\Storage::shouldBeSaved()
      * @return bool
      */
     public function shouldBeSaved($entityName, $data) {

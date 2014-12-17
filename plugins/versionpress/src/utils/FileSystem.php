@@ -1,5 +1,11 @@
 <?php
 
+namespace VersionPress\Utils;
+use FilesystemIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use Traversable;
+
 /**
  * Helper functions to work with filesystem. Currently, the functions use either bare implementation
  * or {@link http://symfony.com/doc/master/components/filesystem/introduction.html Symfony Filesystem}.
@@ -141,4 +147,4 @@ class FileSystem {
     public static function filesHaveSameContents($file1, $file2) {
         return sha1_file($file1) == sha1_file($file2);
     }
-} 
+}

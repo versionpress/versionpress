@@ -1,4 +1,7 @@
 <?php
+namespace VersionPress\ChangeInfos;
+
+use VersionPress\Git\CommitMessage;
 
 /**
  * Represents commits that were not created by VersionPress and we don't know

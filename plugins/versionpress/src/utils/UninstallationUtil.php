@@ -1,4 +1,9 @@
 <?php
+namespace VersionPress\Utils;
+
+use VersionPress\ChangeInfos\ChangeInfoMatcher;
+use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\GitRepository;
 
 /**
  * Small helper class
@@ -17,6 +22,6 @@ class UninstallationUtil {
         /** @var GitRepository $repository */
         $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
         $initialCommit = $repository->getInitialCommit();
-        return ChangeInfoMatcher::matchesChangeInfo($initialCommit->getMessage(), 'VersionPressChangeInfo');
+        return ChangeInfoMatcher::matchesChangeInfo($initialCommit->getMessage(), 'VersionPress\ChangeInfos\VersionPressChangeInfo');
     }
 }

@@ -1,4 +1,7 @@
 <?php
+use VersionPress\ChangeInfos\TrackedChangeInfo;
+use VersionPress\Git\Commit;
+use VersionPress\Git\GitRepository;
 
 /**
  * Base class for end-to-end tests that usually set up the whole site from scratch,

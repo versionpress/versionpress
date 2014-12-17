@@ -1,5 +1,7 @@
 <?php
 
+use VersionPress\Utils\FileSystem;
+
 define('CONFIG_FILE', __DIR__ . '/../test-config.ini');
 is_file(CONFIG_FILE) or die('Create test-config.ini for automation to work');
 WpAutomation::$config = new TestConfig(parse_ini_file(CONFIG_FILE));
@@ -69,7 +71,7 @@ class WpAutomation {
      * @return int
      */
     public static function createPost(array $post) {
-        $post["porcelain"] = ""; // wp-cli returns only id
+        $post["porcelain"] = ""; // wp-Cli returns only id
         return intval(self::runWpCliCommand('post', 'create', $post));
     }
 
@@ -101,7 +103,7 @@ class WpAutomation {
      * @return int
      */
     public static function createComment(array $comment) {
-        $comment["porcelain"] = "";  // wp-cli returns only id
+        $comment["porcelain"] = "";  // wp-Cli returns only id
         return intval(self::runWpCliCommand("comment", "create", $comment));
     }
 
@@ -136,7 +138,7 @@ class WpAutomation {
         $args = array($user["user_login"], $user["user_email"]);
         unset($user["user_login"], $user["user_email"]);
         $args = array_merge($args, $user);
-        $args["porcelain"] = "";  // wp-cli returns only id
+        $args["porcelain"] = "";  // wp-Cli returns only id
         return intval(self::runWpCliCommand("user", "create", $args));
     }
 
@@ -203,11 +205,11 @@ class WpAutomation {
 
 
     /**
-     * Activates VP in the administration and runs the Initializer
+     * Activates VP in the administration and runs the VersionPress\Initialization\Initializer
      */
     public static function enableVersionPress() {
         self::runWpCliCommand('plugin', 'activate', array('versionpress'));
-        $code = 'require_once(WP_CONTENT_DIR . \'/plugins/versionpress/bootstrap.php\'); $initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER); $initializer->initializeVersionPress();';
+        $code = 'require_once(WP_CONTENT_DIR . \'/plugins/versionpress/bootstrap.php\'); $initializer = $versionPressContainer->resolve(VersionPress\DI\VersionPressServices::INITIALIZER); $initializer->initializeVersionPress();';
         self::runWpCliCommand('eval', array($code));
     }
 
@@ -322,7 +324,7 @@ class WpAutomation {
 
     /**
      * Executes a WP-CLI command
-     * http://wp-cli.org/commands/
+     * http://wp-Cli.org/commands/
      *
      * @param string $command
      * @param string $subcommand

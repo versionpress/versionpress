@@ -1,5 +1,8 @@
 <?php
 
+namespace VersionPress\Database;
+use wpdb;
+
 define('ARRAY_MAP', 'ARRAY_MAP');
 
 /**

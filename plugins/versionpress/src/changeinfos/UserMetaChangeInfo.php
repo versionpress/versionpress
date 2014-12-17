@@ -1,4 +1,7 @@
 <?php
+namespace VersionPress\ChangeInfos;
+
+use VersionPress\Git\CommitMessage;
 
 /**
  * Changes of certain user properties like nickname etc.
@@ -39,7 +42,7 @@ class UserMetaChangeInfo extends EntityChangeInfo {
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
         $userMetaKey = $tags[self::USER_META_KEY];
         $userLogin = $tags[self::USER_LOGIN];
-        list( , $action, $entityId) = explode("/", $actionTag);
+        list(, $action, $entityId) = explode("/", $actionTag);
         return new self($action, $entityId, $userLogin, $userMetaKey);
     }
 

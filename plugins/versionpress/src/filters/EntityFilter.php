@@ -1,5 +1,7 @@
 <?php
 
+namespace VersionPress\Filters;
+
 interface EntityFilter {
     /**
      * Applies the filter on given entity

@@ -1,5 +1,7 @@
 <?php
 
+namespace VersionPress\ChangeInfos;
+
 /**
  * Base class for entity change infos like PostChangeInfo, CommentChangeInfo etc.
  * An entity is a database-tracked object that usually has a VPID (but not alwasy, see e.g. options).

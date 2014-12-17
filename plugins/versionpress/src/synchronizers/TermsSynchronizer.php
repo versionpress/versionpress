@@ -1,5 +1,11 @@
 <?php
 
+namespace VersionPress\Synchronizers;
+
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Storages\Storage;
+use wpdb;
+
 class TermsSynchronizer extends SynchronizerBase {
 
     private $dbSchema;
@@ -13,7 +19,7 @@ class TermsSynchronizer extends SynchronizerBase {
         $transformedEntities = array();
         foreach ($entities as $id => $entity) {
             $entityCopy = $entity;
-            unset($entityCopy['taxonomies']); // taxonomies are synchronized by TermTaxonomySynchronizer
+            unset($entityCopy['taxonomies']); // taxonomies are synchronized by VersionPress\Synchronizers\TermTaxonomySynchronizer
             $entityCopy[$this->dbSchema->getEntityInfo('term')->idColumnName] = $id;
 
             $transformedEntities[] = $entityCopy;

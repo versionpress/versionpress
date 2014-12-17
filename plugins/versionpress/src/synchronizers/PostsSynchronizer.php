@@ -1,7 +1,14 @@
 <?php
+namespace VersionPress\Synchronizers;
+
+use NStrings;
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Filters\AbsoluteUrlFilter;
+use VersionPress\Storages\Storage;
+use wpdb;
 
 /**
- * Posts synchronizer. Uses AbsoluteUrlFilter to restore local URLs and fixes
+ * Posts synchronizer. Uses VersionPress\Filters\AbsoluteUrlFilter to restore local URLs and fixes
  * comment counts for restored posts.
  */
 class PostsSynchronizer extends SynchronizerBase {

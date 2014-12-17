@@ -1,12 +1,15 @@
 <?php
 
+namespace VersionPress\Git;
+use NStrings;
+
 /**
  * Represents Git commit message (originally a string) as a structure with subject,
  * body and VP tags parsed from the body.
  *
  * Note about the "[VP]" prefix: this class just doesn't care. When the commit is first created,
  * external code will typically put prefix-less subject into this object. Only when
- * {@link GitRepository::commit()} executes the commit itself will get the [VP] prefix. On the other hand,
+ * {@link VersionPress\Git\GitRepository::commit()} executes the commit itself will get the [VP] prefix. On the other hand,
  * when the commit is read from the repository and parsed back into this object,
  * it will typically have the [VP] prefix. It doesn't matter as VersionPress typically only
  * works with the commit body and its VP tags.

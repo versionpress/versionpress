@@ -1,5 +1,10 @@
 <?php
 
+namespace VersionPress\Git;
+
+use NStrings;
+use VersionPress\Utils\FileSystem;
+
 class GitRepository {
     /** @var string */
     private $repositoryRoot;
@@ -48,7 +53,7 @@ class GitRepository {
      * @param string $authorName
      * @param string $authorEmail
      */
-    public function commit($message, $authorName = "", $authorEmail= "") {
+    public function commit($message, $authorName = "", $authorEmail = "") {
         $this->authorName = $authorName;
         $this->authorEmail = $authorEmail;
 
@@ -60,7 +65,7 @@ class GitRepository {
 
         $tempCommitMessageFilename = md5(rand());
         $tempCommitMessagePath = $this->tempDirectory . $tempCommitMessageFilename;
-        file_put_contents($tempCommitMessagePath , $commitMessage);
+        file_put_contents($tempCommitMessagePath, $commitMessage);
 
         $this->runShellCommand(self::$CONFIG_COMMAND, $this->authorName, $this->authorEmail);
         $this->runShellCommand(self::$COMMIT_COMMAND, $tempCommitMessagePath);
