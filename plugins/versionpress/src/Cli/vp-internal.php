@@ -2,7 +2,6 @@
 
 namespace VersionPress\Cli;
 use VersionPress\DI\VersionPressServices;
-use VersionPress\Initialization\Initializer;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use WP_CLI;
 use WP_CLI_Command;
