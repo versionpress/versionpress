@@ -46,13 +46,37 @@ class WpAutomation {
     }
 
     /**
-     * Copies VP files to the test site. It does so using a Gulp script which specifies
-     * which paths to include and which ones to ignore. See <project_root>\gulpfile.js.
+     * Returns true if the site is installed and working
+     *
+     * @return bool
+     */
+    public static function isSiteSetUp() {
+        try {
+            self::runWpCliCommand("core", "is-installed");
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Returns true if VerisonPress is active and tracking the site
+     *
+     * @return bool
+     */
+    public static function isVersionPressInitialized() {
+        return is_file(self::$config->getSitePath() . '/wp-content/vpdb/.active');
+    }
+
+    /**
+     * Copies VP files to the test site and possibly removes all old files from there. It does so using
+     * a Gulp script which specifies which paths to include and which ones to ignore.
+     * See <project_root>\gulpfile.js.
      */
     public static function copyVersionPressFiles() {
         $versionPressDir = __DIR__ . '/../..';
         $gulpBaseDir = $versionPressDir . '/../..'; // project root as checked out from our repository
-        self::exec('gulp test-deploy', $gulpBaseDir);
+        self::exec('gulp test-deploy', $gulpBaseDir); // this also cleans the destination directory, see gulpfile.js "clean" task
     }
 
     public static function activateVersionPress() {
@@ -61,6 +85,7 @@ class WpAutomation {
     }
 
     public static function uninstallVersionPress() {
+        self::runWpCliCommand('plugin', 'deactivate', array('versionpress'));
         self::runWpCliCommand('plugin', 'uninstall', array('versionpress'));
     }
 
@@ -205,17 +230,17 @@ class WpAutomation {
 
 
     /**
-     * Activates VP in the administration and runs the VersionPress\Initialization\Initializer
+     * Activates VersionPress plugin and runs the Initializer
      */
-    public static function enableVersionPress() {
+    public static function initializeVersionPress() {
         self::runWpCliCommand('plugin', 'activate', array('versionpress'));
         $code = 'require_once(WP_CONTENT_DIR . \'/plugins/versionpress/bootstrap.php\'); $initializer = $versionPressContainer->resolve(VersionPress\DI\VersionPressServices::INITIALIZER); $initializer->initializeVersionPress();';
         self::runWpCliCommand('eval', array($code));
     }
 
     /**
-     * Puts WP directory to a default state, as if one manually downloaded the
-     * WordPress ZIP and extracted it there.
+     * Puts WP directory to a default state, as if one manually downloaded the WordPress ZIP 
+     * and extracted it there. Removes all old files if necessary.
      */
     private static function prepareFiles() {
         self::ensureCleanInstallationIsAvailable();

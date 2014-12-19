@@ -2,7 +2,6 @@
 
 require_once(__DIR__ . '/../vendor/autoload.php');
 require_once(__DIR__ . '/selenium/SeleniumTestCase.php');
-require_once(__DIR__ . '/selenium/FullWipeSeleniumTestCase.php');
 require_once(__DIR__ . '/end2end/EndToEndTestCase.php');
 require_once(__DIR__ . '/TestConfig.php');
 require_once(__DIR__ . '/automation/WpAutomation.php');
@@ -23,3 +22,4 @@ PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
 
 global $argv;
 EndToEndTestCase::$skipSetup = in_array("--skip-setup", $argv);
+SeleniumTestCase::$forceSetup = in_array("--force-setup", $argv);

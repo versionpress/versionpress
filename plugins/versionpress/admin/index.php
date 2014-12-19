@@ -4,6 +4,7 @@ use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitLogPaginator;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\RevertStatus;
+use VersionPress\Initialization\InitializationConfig;
 use VersionPress\Initialization\Initializer;
 use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Utils\JsRedirect;
@@ -139,7 +140,7 @@ function _vp_show_progress_message($progressMessage) {
 
                 <p class="initialization-done">All done, we're now redirecting you (or <a href="<?php admin_url('admin.php?page=versionpress/admin/index.php') ?>">click here</a>).</p>
                 <?php
-                JsRedirect::redirect(admin_url('admin.php?page=versionpress/admin/index.php'), 1000);
+                JsRedirect::redirect(admin_url('admin.php?page=versionpress/admin/index.php'), InitializationConfig::REDIRECT_AFTER_MS);
                 ?>
 
             </div>

@@ -286,11 +286,11 @@ function vp_activate() {
  * @see vp_admin_post_cancel_deactivation()
  */
 function vp_deactivate() {
-    if (vp_is_active()) {
+    if (defined('WP_CLI') || !vp_is_active()) {
+        vp_admin_post_confirm_deactivation();
+    } else {
         wp_redirect(admin_url('admin.php?page=versionpress/admin/deactivate.php'));
         die();
-    } else {
-        vp_admin_post_confirm_deactivation();
     }
 }
 
@@ -392,7 +392,7 @@ function vp_activation_nag() {
     }
 
 
-    echo "<div class='update-nag'>VersionPress is installed but not yet tracking this site. <a href='" . admin_url('admin.php?page=versionpress/admin/index.php') . "'>Please finish the activation.</a></div>";
+    echo "<div class='update-nag vp-activation-nag'>VersionPress is installed but not yet tracking this site. <a href='" . admin_url('admin.php?page=versionpress/admin/index.php') . "'>Please finish the activation.</a></div>";
 
 }
 
