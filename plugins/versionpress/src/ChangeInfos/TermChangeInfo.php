@@ -58,7 +58,7 @@ class TermChangeInfo extends EntityChangeInfo {
         return new self($action, $entityId, $name, $taxonomy, $oldName);
     }
 
-    protected function getCustomTags() {
+    public function getCustomTags() {
         $tags = array(
             self::TERM_NAME_TAG => $this->termName,
             self::TERM_TAXONOMY_TAG => $this->taxonomy,

@@ -44,7 +44,7 @@ class OptionChangeInfo extends EntityChangeInfo {
         return new self($action, $entityId);
     }
 
-    protected function getCustomTags() {
+    public function getCustomTags() {
         return array();
     }
 

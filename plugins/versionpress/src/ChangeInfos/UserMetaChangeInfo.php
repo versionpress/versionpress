@@ -46,7 +46,7 @@ class UserMetaChangeInfo extends EntityChangeInfo {
         return new self($action, $entityId, $userLogin, $userMetaKey);
     }
 
-    protected function getCustomTags() {
+    public function getCustomTags() {
         return array(
             self::USER_LOGIN => $this->userLogin,
             self::USER_META_KEY => $this->userMetaKey

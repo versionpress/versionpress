@@ -60,7 +60,7 @@ class CommentChangeInfo extends EntityChangeInfo {
         return new self($action, $entityId, $commentAuthor, $commentedPost);
     }
 
-    protected function getCustomTags() {
+    public function getCustomTags() {
         return array(
             self::AUTHOR_TAG => $this->commentAuthor,
             self::POST_TITLE_TAG => $this->commentedPost

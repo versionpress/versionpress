@@ -67,7 +67,7 @@ class PluginChangeInfo extends TrackedChangeInfo {
         return "{$this->getEntityName()}/{$this->getAction()}/" . $this->pluginFile;
     }
 
-    protected function getCustomTags() {
+    public function getCustomTags() {
         return array(
             self::PLUGIN_NAME_TAG => $this->pluginName
         );

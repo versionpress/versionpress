@@ -3,6 +3,7 @@
 namespace VersionPress\Git;
 
 use NStrings;
+use Symfony\Component\Process\Process;
 use VersionPress\Utils\FileSystem;
 
 class GitRepository {
@@ -31,7 +32,7 @@ class GitRepository {
     private static $REV_PARSE_COMMAND = "git rev-parse %s";
     private static $REVERT_COMMAND = "git revert -n %s";
     private static $REVERT_ABORT_COMMAND = "git revert --abort";
-    private static $COUNT_COMMITS_COMMAND = "git rev-list HEAD --count";
+    private static $COUNT_COMMITS_COMMAND = "git rev-list %s --count";
 
 
     function __construct($repositoryRoot, $tempDirectory = "./", $commitMessagePrefix = "[VP] ") {
@@ -93,7 +94,7 @@ class GitRepository {
     }
 
     /**
-     * Gets last commit hash in the repository, or an empty string is there are no commits
+     * Gets last (most recent) commit hash in the repository, or an empty string is there are no commits
      * in the repo.
      *
      * @return string Empty string or SHA1
@@ -116,13 +117,15 @@ class GitRepository {
     }
 
     /**
+     * Returns an array of Commits.
+     *
      * @param string $rev see gitrevisions
      * @return Commit[]
      */
     public function log($rev = "") {
         $commitDelimiter = chr(29);
         $dataDelimiter = chr(30);
-        $logCommand = self::$LOG_COMMAND . " " . $rev;
+        $logCommand = self::$LOG_COMMAND . " " . escapeshellarg($rev);
         $logCommand = str_replace("|delimiter|", $dataDelimiter, $logCommand);
         $logCommand = str_replace("|end|", $commitDelimiter, $logCommand);
         $log = trim($this->runShellCommandWithStandardOutput($logCommand), $commitDelimiter);
@@ -138,8 +141,7 @@ class GitRepository {
      * @return string[]
      */
     public function getModifiedFiles($rev) {
-        $cmd = sprintf(self::$MODIFIED_FILES_COMMAND, $rev);
-        $result = $this->runShellCommandWithStandardOutput($cmd);
+        $result = $this->runShellCommandWithStandardOutput(self::$MODIFIED_FILES_COMMAND, $rev);
         $files = explode("\n", $result);
         return $files;
     }
@@ -190,27 +192,78 @@ class GitRepository {
         return $childHash;
     }
 
-    public function getNumberOfCommits() {
-        return intval($this->runShellCommandWithStandardOutput(self::$COUNT_COMMITS_COMMAND));
+    /**
+     * Counts number of commits.
+     *
+     * @param string $startRevision Where to start. NULL means the initial commit (repo start)
+     * @param string $endRevision Where to end. This will typically be HEAD.
+     * @return int
+     */
+    public function getNumberOfCommits($startRevision = null, $endRevision = "HEAD") {
+
+        $revRange = empty($startRevision) ? $endRevision : "$startRevision..$endRevision";
+
+        return intval($this->runShellCommandWithStandardOutput(self::$COUNT_COMMITS_COMMAND, $revRange));
     }
 
+    /**
+     * Invokes {@see runShellCommand()} and returns its stdout output. The params are the same,
+     * only the return type is string instead of an array.
+     *
+     * @see runShellCommand()
+     * @see runShellCommandWithErrorOutput()
+     *
+     * @param string $command
+     * @param string $args
+     * @return string
+     */
     private function runShellCommandWithStandardOutput($command, $args = '') {
         $result = call_user_func_array(array($this, 'runShellCommand'), func_get_args());
         return $result['stdout'];
     }
 
+    /**
+     * Invokes {@see runShellCommand()} and returns its stderr output. The params are the same,
+     * only the return type is string instead of an array.
+     *
+     * @see runShellCommand()
+     * @see runShellCommandWithStandardOutput()
+     *
+     * @param string $command
+     * @param string $args
+     * @return string
+     */
     private function runShellCommandWithErrorOutput($command, $args = '') {
         $result = call_user_func_array(array($this, 'runShellCommand'), func_get_args());
         return $result['stderr'];
     }
 
-    private function runShellCommand($command, $args = '') {
+    /**
+     * Run a Git command, either fully specified (e.g., 'git log') or just by the name (e.g., 'log').
+     * The comamnd can contain `sprintf()` markers, e.g., '%s', which are then replaced by shell-escaped
+     * args provided as further parameters to this method.
+     *
+     * Note: shell-escaping is actually pretty important even for things that are not paths, like revisions.
+     * For example, `git log HEAD^` will not work on Windows, `git log "HEAD^"` will. So the right
+     * approach is to provide `git log %s` as the $command and rev range as $args.
+     *
+     * @param string $command E.g., 'git log' or 'git add %s' (path will be shell-escaped) or just 'log'
+     *   (the "git " part is optional).
+     * @param string $args Will be shell-escaped and replace sprintf markers in $command
+     * @return array array('stdout' => , 'stderr' => )
+     */
+    public function runShellCommand($command, $args = '') {
+
+        if (!NStrings::startsWith($command, "git ")) {
+            $command = "git " . $command;
+        }
+
         $functionArgs = func_get_args();
         array_shift($functionArgs); // Remove $command
         $escapedArgs = @array_map("escapeshellarg", $functionArgs);
         $commandWithArguments = vsprintf($command, $escapedArgs);
 
-        chdir($this->repositoryRoot);
+        chdir($this->repositoryRoot); // TODO maybe just pass repository root to Symfony\Process in runProcess()
 
         $result = $this->runProcess($commandWithArguments);
         return $result;
@@ -229,7 +282,7 @@ class GitRepository {
 
         }
 
-        $process = new \Symfony\Component\Process\Process($cmd, getcwd());
+        $process = new Process($cmd, getcwd());
         $process->run();
 
         $result = array(

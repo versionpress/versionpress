@@ -72,7 +72,7 @@ class PostChangeInfo extends EntityChangeInfo {
         return $changes;
     }
 
-    protected function getCustomTags() {
+    public function getCustomTags() {
         return array(
             self::POST_TITLE_TAG => $this->postTitle,
             self::POST_TYPE_TAG => $this->postType

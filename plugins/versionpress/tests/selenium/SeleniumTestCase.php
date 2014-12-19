@@ -9,6 +9,7 @@
  *     method in subclass.
  *  3. Admin is automatically logged in before the tests are run. If you don't want this override
  *     the `setUpPage()` method in subclass.
+ *  4.
  */
 abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
 
@@ -26,6 +27,11 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
      */
     public static $forceSetup;
 
+    /**
+     * @var \VersionPress\Git\GitRepository
+     */
+    protected $gitRepository;
+
     public function __construct($name = NULL, array $data = array(), $dataName = '') {
         parent::__construct($name, $data, $dataName);
 
@@ -38,6 +44,8 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
         $this->setDesiredCapabilities($capabilities);
 
         $this->setBrowserUrl(self::$config->getSiteUrl());
+
+        $this->gitRepository = new \VersionPress\Git\GitRepository(self::$config->getSitePath());
     }
 
     /**
@@ -68,36 +76,73 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
             return;
         }
 
-        $this->url('wp-admin');
+        $this->url("wp-admin");
         try {
-            $this->byId('user_login');
+            $this->byId("user_login");
         } catch (PHPUnit_Extensions_Selenium2TestCase_WebDriverException $e) {
             // already logged in, do nothing
             return;
         }
-        $this->byId('user_login')->value(self::$config->getAdminName());
-        usleep(100000); // wait for change focus
-        $this->byId('user_pass')->value(self::$config->getAdminPassword());
-        $this->byId('loginform')->submit();
+        $this->byId("user_login")->value(self::$config->getAdminName());
+        usleep(100 * 1000); // wait for change focus
+        $this->byId("user_pass")->value(self::$config->getAdminPassword());
+        $this->byId("loginform")->submit();
 
         self::$loggedIn = true;
     }
 
 
     //----------------------------
-    // Some helper asserts
+    // Helper asserts / methods
     //----------------------------
 
     /**
-     * Simple wrapper for a common scenario that is actually easy to do without this
-     * helper assert but unintuitive.
+     * Small wrapper aroung built-in execute() method
      *
-     * See also {@link https://github.com/giorgiosironi/phpunit-selenium/blob/a6fdffdd56f4884ef39e09a9c62e5e4eb273e42c/Tests/Selenium2TestCaseTest.php#L1065 this test case}.
+     * @param string $code JavaScript code
+     */
+    protected function executeScript($code) {
+        $this->execute(array(
+            'script' => $code,
+            'args' => array()
+        ));
+    }
+
+    /**
+     * Asserts that element exists.
+     *
+     * (This is actually easy to do without this helper but is a bit unintuitive. See also
+     * {@link https://github.com/giorgiosironi/phpunit-selenium/blob/a6fdffdd56f4884ef39e09a9c62e5e4eb273e42c/Tests/Selenium2TestCaseTest.php#L1065 this test case}.)
      *
      * @param string $cssSelector
      */
     protected function assertElementExists($cssSelector) {
         $this->byCssSelector($cssSelector);
+    }
+
+    /**
+     * Types text into TinyMCE. Can be plain text or contain HTML tags.
+     *
+     * @param string $text
+     */
+    protected function setTinyMCEContent($text) {
+        $this->executeScript("tinyMCE.activeEditor.setContent('$text')");
+    }
+
+    /**
+     * Explicitly wait for the element identified by $cssSelector to appear on the screen (throws
+     * assertion error if this element doesn't appear). Note that default Selenium methods
+     * have this behavior built-in so you typically only need to call this method at the end of the
+     * test method, before the assertions are run (it prevents them from running too soon).
+     *
+     * (This is just a friendly name / facade to the built-in waiting mechanism.
+     * Doing something like `$el = $this->byCssSelector(..)` has the same effect but would
+     * look a bit odd.)
+     *
+     * @param string $cssSelector
+     */
+    protected function waitForElement($cssSelector) {
+        $this->assertElementExists($cssSelector);
     }
 
 } 

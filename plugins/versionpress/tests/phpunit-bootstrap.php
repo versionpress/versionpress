@@ -3,6 +3,8 @@
 require_once(__DIR__ . '/../vendor/autoload.php');
 require_once(__DIR__ . '/selenium/SeleniumTestCase.php');
 require_once(__DIR__ . '/end2end/EndToEndTestCase.php');
+require_once(__DIR__ . '/utils/CommitAsserter.php');
+require_once(__DIR__ . '/utils/ChangeInfoUtils.php');
 require_once(__DIR__ . '/TestConfig.php');
 require_once(__DIR__ . '/automation/WpAutomation.php');
 

@@ -66,7 +66,7 @@ class RevertChangeInfo extends TrackedChangeInfo {
         return sprintf("%s/%s/%s", self::OBJECT_TYPE, $this->getAction(), $this->commitHash);
     }
 
-    protected function getCustomTags() {
+    public function getCustomTags() {
         return array();
     }
 

@@ -131,10 +131,9 @@ class ActivationDeactivationTest extends SeleniumTestCase {
     public function completeUninstallationRemovesGitRepo() {
 
         $this->byCssSelector('#versionpress .delete a')->click();
-
         $this->byCssSelector('.wrap form:nth-of-type(1) input#submit')->click();
 
-        $this->assertElementExists('.plugins-php #message.updated'); // basically waits for return to the main plugins.php page, only then we will assert files
+        $this->waitForElement('.plugins-php #message.updated');
 
         $this->assertFileNotExists(self::$config->getSitePath() . '/wp-content/db.php');
         $this->assertFileNotExists(self::$config->getSitePath() . '/wp-content/plugins/versionpress');

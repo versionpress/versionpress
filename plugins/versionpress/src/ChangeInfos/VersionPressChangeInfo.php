@@ -77,7 +77,7 @@ class VersionPressChangeInfo extends TrackedChangeInfo {
         return $actionTag;
     }
 
-    protected function getCustomTags() {
+    public function getCustomTags() {
         return array();
     }
 

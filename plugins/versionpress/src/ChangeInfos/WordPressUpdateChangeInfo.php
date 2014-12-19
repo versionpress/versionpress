@@ -58,7 +58,7 @@ class WordPressUpdateChangeInfo extends TrackedChangeInfo {
         return "{$this->getEntityName()}/{$this->getAction()}/{$this->getNewVersion()}";
     }
 
-    protected function getCustomTags() {
+    public function getCustomTags() {
         return array();
     }
 

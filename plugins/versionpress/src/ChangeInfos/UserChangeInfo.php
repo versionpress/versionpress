@@ -39,7 +39,7 @@ class UserChangeInfo extends EntityChangeInfo {
         return new self($action, $entityId, $userLogin);
     }
 
-    protected function getCustomTags() {
+    public function getCustomTags() {
         return array(
             self::USER_LOGIN => $this->userLogin
         );

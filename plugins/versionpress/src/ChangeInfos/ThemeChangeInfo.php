@@ -81,7 +81,7 @@ class ThemeChangeInfo extends TrackedChangeInfo {
         return "{$this->getEntityName()}/{$this->getAction()}/" . $this->themeId;
     }
 
-    protected function getCustomTags() {
+    public function getCustomTags() {
         return array(
             self::THEME_NAME_TAG => $this->themeName
         );

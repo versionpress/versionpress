@@ -90,7 +90,7 @@ abstract class TrackedChangeInfo implements ChangeInfo {
      * @see getCommitMessageBody()
      * @return array
      */
-    abstract protected function getCustomTags();
+    abstract public function getCustomTags();
 
     /**
      * Reports changes in files that relate to this ChangeInfo. Used by {@see Committer::stageRelatedFiles()}.
