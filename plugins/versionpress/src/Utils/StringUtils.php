@@ -4,6 +4,11 @@
 namespace VersionPress\Utils;
 use NStrings;
 
+/**
+ * Our string utils. Only adds what's not already provided by NStrings.
+ *
+ * @link http://doc.nette.org/en/2.2/strings
+ */
 class StringUtils {
 
     /**
