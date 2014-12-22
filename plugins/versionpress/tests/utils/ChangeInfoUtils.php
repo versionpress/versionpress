@@ -39,6 +39,33 @@ class ChangeInfoUtils {
     }
 
     /**
+     * @param ChangeInfo $changeInfo
+     * @param string $tagKey
+     * @return string|null Value or null if key not found
+     */
+    public static function getCustomTagValue($changeInfo, $tagKey) {
+        /** @var TrackedChangeInfo $actualChangeInfo */
+        $actualChangeInfo = null;
+
+        if ($changeInfo instanceof CompositeChangeInfo) {
+            /** @var CompositeChangeInfo $changeInfo */
+            $sortedChangeInfos = $changeInfo->getSortedChangeInfoList();
+            $actualChangeInfo = $sortedChangeInfos[0];
+        } else {
+            /** @var TrackedChangeInfo $changeInfo */
+            $actualChangeInfo = $changeInfo;
+        }
+
+        $customTags = $actualChangeInfo->getCustomTags();
+        if (isset($customTags[$tagKey])) {
+            return $customTags[$tagKey];
+        } else {
+            return null;
+        }
+
+    }
+
+    /**
      * Returns true if two changeinfos capture the same thing, i.e., if their commits are logically
      * equivalent. Currently compares that it was the same action on the same entity (incl. VPID)
      * and that the set of custom VP tags is the same (keys must be the same, values may differ).

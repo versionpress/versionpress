@@ -108,7 +108,7 @@ class CommitAsserter {
      * @param int $whichCommit See param description in assertCommitAction()
      * @return \VersionPress\Git\Commit
      */
-    private function getCommit($whichCommit) {
+    private function getCommit($whichCommit = 0) {
 
         // We use 'git log' to get the commit info and construct the rev range this way:
         //
@@ -135,6 +135,17 @@ class CommitAsserter {
      */
     public function getChangeInfo($commit) {
         return \VersionPress\ChangeInfos\ChangeInfoMatcher::createMatchingChangeInfo($commit->getMessage());
+    }
+
+    public function assertCommitTag($tagKey, $tagValue) {
+        $changeInfo = $this->getChangeInfo($this->getCommit());
+        $foundCustomTagValue = ChangeInfoUtils::getCustomTagValue($changeInfo, $tagKey);
+
+        if (!$foundCustomTagValue) {
+            PHPUnit_Framework_Assert::fail("VP tag " . $tagKey . " not found on created commit");
+        }
+
+        PHPUnit_Framework_Assert::assertEquals($tagValue, $foundCustomTagValue, "Expected: '" . $tagKey . ": " . $tagValue . "', Actual: '" . $tagKey . ": " . $foundCustomTagValue . "'");
     }
 
 }

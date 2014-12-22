@@ -1,51 +1,51 @@
 <?php
 
 /**
- * Post tests
+ * Pages tests
  *
- * @testdox Posts via web:
+ * @testdox Pagesvia web:
  */
-class PostsViaWebTest extends PostTypeTestCase {
+class PagesViaWebTest extends PostTypeTestCase {
 
     public function getPostType() {
-        return "post";
+        return "page";
     }
 
     /**
      * @test
-     * @testdox New post creates 'post/create' action
+     * @testdox New page creates 'post/create' action
      */
-    public function addingPostCreatesPostCreateAction() {
+    public function addingPageCreatesPostCreateAction() {
         $this->runAddPostTest();
     }
 
     /**
      * @test
-     * @testdox Updating post creates 'post/edit' action
+     * @testdox Updating page content creates 'post/edit' action
      *
-     * @depends addingPostCreatesPostCreateAction
+     * @depends addingPageCreatesPostCreateAction
      */
-    public function updatingPostCreatesPostEditAction() {
+    public function updatingPageCreatesPostEditAction() {
         $this->runUpdatePostTest();
     }
 
     /**
      * @test
-     * @testdox Updating post via quick edit creates equivalent 'post/edit' action
+     * @testdox Updating page via quick edit creates equivalent 'post/edit' action
      *
-     * @depends updatingPostCreatesPostEditAction
+     * @depends updatingPageCreatesPostEditAction
      */
-    public function updatingPostViaQuickEditWorksEquallyWell(){
+    public function updatingPageViaQuickEditWorksEquallyWell(){
         $this->runUpdatePostViaQuickEditTest();
     }
 
     /**
      * @test
-     * @testdox Trashing post creates 'post/trash' action
+     * @testdox Trashing page creates 'post/trash' action
      *
-     * @depends updatingPostViaQuickEditWorksEquallyWell
+     * @depends updatingPageViaQuickEditWorksEquallyWell
      */
-    public function trashingPostCreatesPostTrashAction() {
+    public function trashingPageCreatesPostTrashAction() {
         $this->runTrashPostTest();
     }
 
@@ -53,7 +53,7 @@ class PostsViaWebTest extends PostTypeTestCase {
      * @test
      * @testdox Undo creates 'post/untrash' action
      *
-     * @depends trashingPostCreatesPostTrashAction
+     * @depends trashingPageCreatesPostTrashAction
      */
     public function undoCreatesPostUntrashAction() {
         $this->runUndoTrashTest();
@@ -61,7 +61,7 @@ class PostsViaWebTest extends PostTypeTestCase {
 
     /**
      * @test
-     * @testdox Deleting post permanenly creates 'post/delete' action
+     * @testdox Deleting page permanenly creates 'post/delete' action
      * @depends undoCreatesPostUntrashAction
      */
     public function deletePermanentlyCreatesPostDeleteAction() {
@@ -94,5 +94,6 @@ class PostsViaWebTest extends PostTypeTestCase {
     public function publishingDraftCreatesPostPublishAction() {
         $this->runPublishDraftTest();
     }
+
 
 }
