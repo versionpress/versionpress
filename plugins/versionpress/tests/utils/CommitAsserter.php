@@ -50,11 +50,11 @@ class CommitAsserter {
     /**
      * Asserts that the number of commits made since the constructor matches the given number
      *
-     * @param $num
+     * @param int $numExpectedCommits
      */
-    public function assertNumCommits($num) {
+    public function assertNumCommits($numExpectedCommits) {
         $numActualCommits = $this->gitRepository->getNumberOfCommits($this->startCommit->getHash());
-        PHPUnit_Framework_Assert::assertEquals($num, $numActualCommits);
+        PHPUnit_Framework_Assert::assertEquals($numExpectedCommits, $numActualCommits, sprintf("Expected %d commit(s), got %d", $numExpectedCommits, $numActualCommits));
     }
 
     /**
@@ -62,16 +62,10 @@ class CommitAsserter {
      * the most recent commit; if this asserter captured more commits $whichCommit specifies
      * which commit to assert against.
      *
-     * @param string $expectedAction Expected action, e.g., "post/edit" or "wordpress/update".
-     * @param int $whichCommit Zero, -1, -2 etc. specifying which commit to assert against. You can
-     *   visualize it like this: if 4 commits were captured, the most recent one at the top:
+     * @see $whichCommitParameter
      *
-     *   <pre>
-     *       9b85e18     <=   0
-     *       436f828     <=  -1
-     *       6b9ca72     <=  -2
-     *       d16dffd     <=  -3
-     *   </pre>
+     * @param string $expectedAction Expected action, e.g., "post/edit" or "wordpress/update".
+     * @param int $whichCommit See $whichCommitParameter documentation. "HEAD" by default.
      */
     public function assertCommitAction($expectedAction, $whichCommit = 0) {
         $commit = $this->getCommit($whichCommit);
