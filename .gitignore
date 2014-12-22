@@ -7,3 +7,5 @@
 /dist
 node_modules
 
+# Other
+Thumbs.db
