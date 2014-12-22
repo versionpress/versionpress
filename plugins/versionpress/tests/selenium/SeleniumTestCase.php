@@ -111,13 +111,16 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
     /**
      * Asserts that element exists.
      *
-     * (This is actually easy to do without this helper but is a bit unintuitive. See also
-     * {@link https://github.com/giorgiosironi/phpunit-selenium/blob/a6fdffdd56f4884ef39e09a9c62e5e4eb273e42c/Tests/Selenium2TestCaseTest.php#L1065 this test case}.)
-     *
      * @param string $cssSelector
+     * @param int $timeout Timeout for the assert to succeed. By default, assertion is done immediately.
      */
-    protected function assertElementExists($cssSelector) {
-        $this->byCssSelector($cssSelector);
+    protected function assertElementExists($cssSelector, $timeout = 0) {
+        if ($timeout == 0) {
+            // See e.g. https://github.com/giorgiosironi/phpunit-selenium/blob/a6fdffdd56f4884ef39e09a9c62e5e4eb273e42c/Tests/Selenium2TestCaseTest.php#L1065
+            $this->byCssSelector($cssSelector);
+        } else {
+            $this->waitForElement($cssSelector, $timeout);
+        }
     }
 
     /**
@@ -140,9 +143,14 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
      * look a bit odd.)
      *
      * @param string $cssSelector
+     * @param int $timeout Timeout in milliseconds. Default: 3 seconds.
      */
-    protected function waitForElement($cssSelector) {
+    protected function waitForElement($cssSelector, $timeout = 3000) {
+
+        $previousImplicitWait = $this->timeouts()->getLastImplicitWaitValue();
+        $this->timeouts()->implicitWait($timeout);
         $this->assertElementExists($cssSelector);
+        $this->timeouts()->implicitWait($previousImplicitWait);
     }
 
 } 
