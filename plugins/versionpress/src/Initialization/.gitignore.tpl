@@ -3,6 +3,7 @@
 #------------------------
 
 /wp-config.php
+.maintenance
 
 /wp-content/*
 !/wp-content/db.php
