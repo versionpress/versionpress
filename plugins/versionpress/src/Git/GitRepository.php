@@ -146,6 +146,27 @@ class GitRepository {
         return $files;
     }
 
+    /**
+     * Like getModifiedFiles() but also returns the status of each file ("A" for added,
+     * "M" for modified, "D" for deleted and "R" for renamed).
+     *
+     * @param string $rev See gitrevisions
+     * @return array( array("status" => "M", "path" => "wp-content/vpdb/something.ini" )
+     */
+    public function getModifiedFilesWithStatus($rev) {
+        $command = 'git diff --name-status %s';
+        $output = $this->runShellCommandWithStandardOutput($command, $rev);
+        $result = array();
+
+        foreach (explode("\n", $output) as $line) {
+            list($status, $path) = explode("\t", $line);
+            $result[] = array("status" => $status, "path" => $path);
+        }
+
+        return $result;
+
+    }
+
     public function revertAll($commit) {
         $commitRange = sprintf("%s..HEAD", $commit);
         $this->runShellCommand(self::$REVERT_COMMAND, $commitRange);

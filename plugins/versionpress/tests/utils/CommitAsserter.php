@@ -105,25 +105,11 @@ class CommitAsserter {
     }
 
     /**
-     * @param int $whichCommit See param description in assertCommitAction()
+     * @param int $whichCommit See $whichCommitParameter documentation. "HEAD" by default.
      * @return \VersionPress\Git\Commit
      */
     private function getCommit($whichCommit = 0) {
-
-        // We use 'git log' to get the commit info and construct the rev range this way:
-        //
-        //   "HEAD^..HEAD"      -> get the most recent commit
-        //   "HEAD^^..HEAD^"    -> get second commit
-        //   "HEAD^^^..HEAD^^"  -> get third commit
-        //
-        // So we just need to emit the currect number of carets (works fine for small number of commits)
-
-        $numCarets = abs($whichCommit);
-        $startRevisionCarets = str_repeat("^", $numCarets + 1);
-        $endRevisionCarets = str_repeat("^", $numCarets);
-
-        $revRange = "HEAD$startRevisionCarets..HEAD$endRevisionCarets";
-
+        $revRange = $this->getRevRange($whichCommit);
         $commits = $this->gitRepository->log($revRange);
         return $commits[0];
 
@@ -146,6 +132,48 @@ class CommitAsserter {
         }
 
         PHPUnit_Framework_Assert::assertEquals($tagValue, $foundCustomTagValue, "Expected: '" . $tagKey . ": " . $tagValue . "', Actual: '" . $tagKey . ": " . $foundCustomTagValue . "'");
+    }
+
+    /**
+     * Asserts that commit modified a path. Wildcards may be used.
+     *
+     * @param string $type Standard git "M" (modified), "A" (added), "D" (deleted) etc.
+     * @param string $path Path relative to repo root. Supports wildcards, e.g. "wp-content/uploads/*"
+     * @param int $whichCommit See $whichCommitParameter documentation. "HEAD" by default.
+     */
+    public function assertCommitPath($type, $path, $whichCommit = 0) {
+        $revRange = $this->getRevRange($whichCommit);
+        $affectedFiles = $this->gitRepository->getModifiedFilesWithStatus($revRange);
+        $matchingPaths = array_filter($affectedFiles, function ($item) use ($type, $path) {
+            return $item["status"] == $type && fnmatch($path, $item["path"]);
+        });
+        if (count($matchingPaths) == 0) {
+            PHPUnit_Framework_Assert::fail("Commit didn't affect path '$path' with change of type '$type'");
+        }
+    }
+
+    /**
+     * Converts $whichCommit (int) to a Git rev range
+     *
+     * @param int $whichCommit
+     * @return string
+     */
+    private function getRevRange($whichCommit) {
+
+        // We use 'git log' to get the commit info and construct the rev range this way:
+        //
+        //   "HEAD^..HEAD"      -> get the most recent commit
+        //   "HEAD^^..HEAD^"    -> get second commit
+        //   "HEAD^^^..HEAD^^"  -> get third commit
+        //
+        // So we just need to emit the currect number of carets (works fine for small number of commits)
+
+        $numCarets = abs($whichCommit);
+        $startRevisionCarets = str_repeat("^", $numCarets + 1);
+        $endRevisionCarets = str_repeat("^", $numCarets);
+
+        $revRange = "HEAD$startRevisionCarets..HEAD$endRevisionCarets";
+        return $revRange;
     }
 
 }
