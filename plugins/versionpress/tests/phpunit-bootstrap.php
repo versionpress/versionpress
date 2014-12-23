@@ -25,4 +25,4 @@ PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
 
 global $argv;
 EndToEndTestCase::$skipSetup = in_array("--skip-setup", $argv);
-SeleniumTestCase::$forceSetup = in_array("--force-setup", $argv);
+SeleniumTestCase::$forceSetup = in_array("--force-setup", $argv) || getenv('VP_FORCE_SETUP');

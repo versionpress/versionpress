@@ -21,7 +21,8 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
     public static $config;
 
     /**
-     * Set from phpunit-bootstrap.php to true if `--force-setup` has been passed as a command line parameter.
+     * Set from phpunit-bootstrap.php to true if `--force-setup` has been passed as a command line parameter
+     * or if 'VP_FORCE_SETUP' environment variable is true (non-empty).
      *
      * @var bool
      */
