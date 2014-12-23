@@ -24,6 +24,7 @@ class UploadsTest extends SeleniumTestCase {
         $commitAsserter->assertCommitAction("post/create");
         $commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
         $commitAsserter->assertCommitPath("A", "wp-content/uploads/*");
+        $commitAsserter->assertCleanWorkingDirectory();
 
     }
 

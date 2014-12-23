@@ -176,4 +176,11 @@ class CommitAsserter {
         return $revRange;
     }
 
+    public function assertCleanWorkingDirectory() {
+        $gitStatus = $this->gitRepository->getStatus();
+        if (!empty($gitStatus)) {
+            PHPUnit_Framework_Assert::fail("Expected clean working directory but got:\n$gitStatus");
+        }
+    }
+
 }

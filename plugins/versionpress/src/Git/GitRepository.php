@@ -332,4 +332,20 @@ class GitRepository {
         $logWithInitialCommit = $this->log($commitHash);
         return $logWithInitialCommit[0];
     }
+
+    /**
+     * Returns git status in short format, something like:
+     *
+     *     A path1.txt
+     *     M path2.txt
+     *
+     * Clean working directory returns an empty string.
+     *
+     * @return string
+     */
+    public function getStatus() {
+        $gitCmd = "git status --porcelain";
+        $output = $this->runShellCommandWithStandardOutput($gitCmd);
+        return $output;
+    }
 }

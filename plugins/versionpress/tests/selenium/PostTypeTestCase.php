@@ -34,6 +34,7 @@ class PostTypeTestCase extends \SeleniumTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/create");
         $commitAsserter->assertCommitTag("VP-Post-Type",  $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
     }
 
     public function runUpdatePostTest() {
@@ -46,6 +47,7 @@ class PostTypeTestCase extends \SeleniumTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/edit");
         $commitAsserter->assertCommitTag("VP-Post-Type",  $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
 
     }
 
@@ -64,6 +66,7 @@ class PostTypeTestCase extends \SeleniumTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitsAreEquivalent();
         $commitAsserter->assertCommitTag("VP-Post-Type",  $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
     }
 
     public function runTrashPostTest() {
@@ -74,6 +77,7 @@ class PostTypeTestCase extends \SeleniumTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/trash");
         $commitAsserter->assertCommitTag("VP-Post-Type",  $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
     }
 
     public function runUndoTrashTest() {
@@ -87,6 +91,7 @@ class PostTypeTestCase extends \SeleniumTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/untrash");
         $commitAsserter->assertCommitTag("VP-Post-Type",  $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
 
     }
 
@@ -101,6 +106,7 @@ class PostTypeTestCase extends \SeleniumTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/delete");
         $commitAsserter->assertCommitTag("VP-Post-Type",  $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
 
     }
 
@@ -114,6 +120,7 @@ class PostTypeTestCase extends \SeleniumTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/draft");
         $commitAsserter->assertCommitTag("VP-Post-Type",  $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
 
     }
 
@@ -130,6 +137,7 @@ class PostTypeTestCase extends \SeleniumTestCase {
         $this->window('');
 
         $commitAsserter->assertNumCommits(0);
+        $commitAsserter->assertCleanWorkingDirectory();
 
     }
 
@@ -142,6 +150,7 @@ class PostTypeTestCase extends \SeleniumTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/publish");
         $commitAsserter->assertCommitTag("VP-Post-Type",  $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
 
     }
 
