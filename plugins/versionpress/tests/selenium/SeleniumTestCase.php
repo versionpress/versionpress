@@ -83,6 +83,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
             // already logged in, do nothing
             return;
         }
+        usleep(100 * 1000); // sometimes we need to wait for the page to fully load
         $this->byId("user_login")->value(self::$config->getAdminName());
         usleep(100 * 1000); // wait for change focus
         $this->byId("user_pass")->value(self::$config->getAdminPassword());
