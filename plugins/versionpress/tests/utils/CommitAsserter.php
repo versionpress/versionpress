@@ -1,5 +1,7 @@
 <?php
+use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
+use VersionPress\Git\Commit;
 use VersionPress\Tests\Utils\ChangeInfoUtils;
 
 
@@ -15,7 +17,7 @@ class CommitAsserter {
     /**
      * When this object is created, a reference to most recent commit at that time
      * is stored in this variable so that asserts can only work with the newly created commits.
-     * @var \VersionPress\Git\Commit
+     * @var Commit
      */
     private $startCommit;
     private $gitRepository;
@@ -54,7 +56,9 @@ class CommitAsserter {
      */
     public function assertNumCommits($numExpectedCommits) {
         $numActualCommits = $this->gitRepository->getNumberOfCommits($this->startCommit->getHash());
-        PHPUnit_Framework_Assert::assertEquals($numExpectedCommits, $numActualCommits, sprintf("Expected %d commit(s), got %d", $numExpectedCommits, $numActualCommits));
+        if ($numExpectedCommits !== $numActualCommits) {
+            PHPUnit_Framework_Assert::fail("There were $numActualCommits commit(s) while we expected $numExpectedCommits");
+        }
     }
 
     /**
@@ -71,7 +75,11 @@ class CommitAsserter {
         $commit = $this->getCommit($whichCommit);
         $changeInfo = $this->getChangeInfo($commit);
         $commitAction = ChangeInfoUtils::getFullAction($changeInfo);
-        PHPUnit_Framework_Assert::assertStringStartsWith($expectedAction, $commitAction);
+
+        if ($expectedAction != $commitAction) {
+            PHPUnit_Framework_Assert::fail("Expected '$expectedAction' but the commit action was '$commitAction'");
+        }
+
     }
 
     /**
@@ -106,7 +114,7 @@ class CommitAsserter {
 
     /**
      * @param int $whichCommit See $whichCommitParameter documentation. "HEAD" by default.
-     * @return \VersionPress\Git\Commit
+     * @return Commit
      */
     private function getCommit($whichCommit = 0) {
         $revRange = $this->getRevRange($whichCommit);
@@ -116,8 +124,8 @@ class CommitAsserter {
     }
 
     /**
-     * @param \VersionPress\Git\Commit $commit
-     * @return \VersionPress\ChangeInfos\ChangeInfo
+     * @param Commit $commit
+     * @return ChangeInfo
      */
     public function getChangeInfo($commit) {
         return \VersionPress\ChangeInfos\ChangeInfoMatcher::createMatchingChangeInfo($commit->getMessage());
@@ -131,18 +139,28 @@ class CommitAsserter {
             PHPUnit_Framework_Assert::fail("VP tag " . $tagKey . " not found on created commit");
         }
 
-        PHPUnit_Framework_Assert::assertEquals($tagValue, $foundCustomTagValue, "Expected: '" . $tagKey . ": " . $tagValue . "', Actual: '" . $tagKey . ": " . $foundCustomTagValue . "'");
+        if ($foundCustomTagValue !== $tagValue) {
+            PHPUnit_Framework_Assert::fail("Expected: '$tagKey: $tagValue', Actual: '$tagKey: $foundCustomTagValue'");
+        }
     }
 
     /**
-     * Asserts that commit modified a path. Wildcards may be used.
+     * Asserts that commit affected some path. Paths support wildcards and two placeholders:
+     *
+     *  - %vpdb% expands to "wp-content/vpdb"
+     *  - %VPID% expands to the VPID of the committed entity
+     *
+     * Placeholders are case insensitive.
      *
      * @param string $type Standard git "M" (modified), "A" (added), "D" (deleted) etc.
-     * @param string $path Path relative to repo root. Supports wildcards, e.g. "wp-content/uploads/*"
+     * @param string $path Path relative to repo root. Supports wildcards, e.g. "wp-content/uploads/*",
+     *   and placeholders, e.g., "%vpdb%/posts/%VPID%.ini"
      * @param int $whichCommit See $whichCommitParameter documentation. "HEAD" by default.
      */
     public function assertCommitPath($type, $path, $whichCommit = 0) {
         $revRange = $this->getRevRange($whichCommit);
+        $path = str_ireplace("%vpdb%", "wp-content/vpdb", $path);
+        $path = str_ireplace("%VPID%", ChangeInfoUtils::getVpid($this->getChangeInfo($this->getCommit($whichCommit))), $path);
         $affectedFiles = $this->gitRepository->getModifiedFilesWithStatus($revRange);
         $matchingPaths = array_filter($affectedFiles, function ($item) use ($type, $path) {
             return $item["status"] == $type && fnmatch($path, $item["path"]);
