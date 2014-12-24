@@ -92,6 +92,7 @@ class WpAutomation {
     /**
      * Creates new post using WP-CLI. Returns ID of created post.
      *
+     * @see wp_insert_post()
      * @param array $post (as wp_insert_post)
      * @return int
      */
