@@ -8,7 +8,7 @@ use VersionPress\Git\CommitMessage;
  *
  * VP tags:
  *
- *     VP-Action: comment/(create|edit|delete|trash|untrash|create-pending|approve|unapprove)/VPID
+ *     VP-Action: comment/(create|edit|delete|trash|untrash|spam|unspam|create-pending|approve|unapprove)/VPID
  *     VP-Comment-Author: John Smith
  *     VP-Comment-PostTitle: Hello world
  *
@@ -40,6 +40,10 @@ class CommentChangeInfo extends EntityChangeInfo {
                 return "Comment for post '{$this->commentedPost}' moved to trash";
             case "untrash":
                 return "Comment for post '{$this->commentedPost}' moved from trash";
+            case "spam":
+                return "Comment for post '{$this->commentedPost}' marked as spam";
+            case "unspam":
+                return "Comment for post '{$this->commentedPost}' marked as not spam";
             case "create-pending":
                 return "New comment for post '{$this->commentedPost}' (pending approval)";
             case "approve":

@@ -23,6 +23,10 @@ class CommentStorage extends DirectoryStorage {
                 $action = 'trash';
             } elseif ($oldEntity['comment_approved'] === 'trash') {
                 $action = 'untrash';
+            } elseif ($diff['comment_approved'] === 'spam') {
+                $action = 'spam';
+            } elseif ($oldEntity['comment_approved'] === 'spam') {
+                $action = 'unspam';
             } elseif ($oldEntity['comment_approved'] == 0 && $newEntity['comment_approved'] == 1) {
                 $action = 'approve';
             } elseif ($oldEntity['comment_approved'] == 1 && $newEntity['comment_approved'] == 0) {
