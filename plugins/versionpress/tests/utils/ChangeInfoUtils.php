@@ -21,21 +21,8 @@ class ChangeInfoUtils {
      * @return string
      */
     public static function getFullAction($changeInfo) {
-
-        /** @var TrackedChangeInfo $actualChangeInfo */
-        $actualChangeInfo = null;
-
-        if ($changeInfo instanceof CompositeChangeInfo) {
-            /** @var CompositeChangeInfo $changeInfo */
-            $sortedChangeInfos = $changeInfo->getSortedChangeInfoList();
-            $actualChangeInfo = $sortedChangeInfos[0];
-        } else {
-            /** @var TrackedChangeInfo $changeInfo */
-            $actualChangeInfo = $changeInfo;
-        }
-
+        $actualChangeInfo = self::getTrackedChangeInfo($changeInfo);
         return sprintf("%s/%s", $actualChangeInfo->getEntityName(), $actualChangeInfo->getAction());
-
     }
 
     /**
@@ -44,18 +31,7 @@ class ChangeInfoUtils {
      * @return string|null Value or null if key not found
      */
     public static function getCustomTagValue($changeInfo, $tagKey) {
-        /** @var TrackedChangeInfo $actualChangeInfo */
-        $actualChangeInfo = null;
-
-        if ($changeInfo instanceof CompositeChangeInfo) {
-            /** @var CompositeChangeInfo $changeInfo */
-            $sortedChangeInfos = $changeInfo->getSortedChangeInfoList();
-            $actualChangeInfo = $sortedChangeInfos[0];
-        } else {
-            /** @var TrackedChangeInfo $changeInfo */
-            $actualChangeInfo = $changeInfo;
-        }
-
+        $actualChangeInfo = self::getTrackedChangeInfo($changeInfo);
         $customTags = $actualChangeInfo->getCustomTags();
         if (isset($customTags[$tagKey])) {
             return $customTags[$tagKey];
@@ -63,6 +39,15 @@ class ChangeInfoUtils {
             return null;
         }
 
+    }
+
+    public static function getVpid($changeInfo) {
+        $actualChangeInfo = self::getTrackedChangeInfo($changeInfo);
+        if ($actualChangeInfo instanceof EntityChangeInfo) {
+            return $actualChangeInfo->getEntityId();
+        } else {
+            throw new \Exception("This method only work on EntityChangeInfo");
+        }
     }
 
     /**
@@ -101,6 +86,24 @@ class ChangeInfoUtils {
 
         return count($differentKeys) == 0;
 
+    }
+
+    /**
+     * Returns an actionable tracked change info (CompositeChangeInfo isn't so it returns its most
+     * important internal changeinfo).
+     *
+     * @param ChangeInfo $changeInfo
+     * @return TrackedChangeInfo
+     */
+    public static function getTrackedChangeInfo($changeInfo) {
+
+        if ($changeInfo instanceof CompositeChangeInfo) {
+            /** @var CompositeChangeInfo $changeInfo */
+            $sortedChangeInfos = $changeInfo->getSortedChangeInfoList();
+            return $sortedChangeInfos[0];
+        } else {
+            return $changeInfo;
+        }
     }
 
 }

@@ -93,6 +93,12 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
         self::$loggedIn = true;
     }
 
+    protected function logOut() {
+        $this->url('wp-login.php?action=logout');
+        $this->byCssSelector('body>p>a')->click();
+        $this->waitForPageLoad();
+    }
+
 
     //----------------------------
     // Helper asserts / methods
@@ -117,12 +123,23 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
      * Small wrapper aroung built-in execute() method
      *
      * @param string $code JavaScript code
+     * @return string JS result, if any
      */
     protected function executeScript($code) {
-        $this->execute(array(
+        return $this->execute(array(
             'script' => $code,
             'args' => array()
         ));
+    }
+
+    /**
+     * Selenium cannot click on hidden things, JavaScript can. Use this method instead
+     * of `$this->byCssSelector('...')->click()` if you need to.
+     *
+     * @param string $cssSelector
+     */
+    protected function jsClick($cssSelector) {
+        $this->executeScript("jQuery('$cssSelector')[0].click()");
     }
 
     /**
@@ -168,6 +185,12 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
         $this->timeouts()->implicitWait($timeout);
         $this->assertElementExists($cssSelector);
         $this->timeouts()->implicitWait($previousImplicitWait);
+    }
+
+    protected function waitForPageLoad() {
+        $this->waitUntil(function (SeleniumTestCase $testCase) {
+            return $testCase->executeScript("return document.readyState;") == "complete";
+        });
     }
 
 } 

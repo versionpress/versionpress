@@ -55,7 +55,7 @@ class PostTypeTestCase extends \SeleniumTestCase {
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         $this->url($this->getPostTypeScreenUrl());
-        $this->executeScript("jQuery('#the-list tr:first-child .row-actions .editinline').click()");
+        $this->jsClick('#the-list tr:first-child .row-actions .editinline');
         usleep(100*1000);
         $titleField = $this->byCssSelector('#the-list tr.inline-edit-row input.ptitle');
         $titleField->clear();
@@ -171,7 +171,7 @@ class PostTypeTestCase extends \SeleniumTestCase {
      * Trashes post. Waits for the operation to complete.
      */
     private function trashPost() {
-        $this->executeScript("jQuery('#the-list tr:first-child .row-actions .submitdelete')[0].click()");
+        $this->jsClick('#the-list tr:first-child .row-actions .submitdelete');
         $this->waitForElement('#message.updated');
     }
 
