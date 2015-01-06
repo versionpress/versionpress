@@ -123,16 +123,24 @@ class GitRepository {
      * @return Commit[]
      */
     public function log($rev = "") {
+
         $commitDelimiter = chr(29);
         $dataDelimiter = chr(30);
-        $logCommand = self::$LOG_COMMAND . " " . escapeshellarg($rev);
+
+        $logCommand = self::$LOG_COMMAND;
+        if (!empty($rev)) {
+            $logCommand .= " " . escapeshellarg($rev);
+        }
+
         $logCommand = str_replace("|delimiter|", $dataDelimiter, $logCommand);
         $logCommand = str_replace("|end|", $commitDelimiter, $logCommand);
         $log = trim($this->runShellCommandWithStandardOutput($logCommand), $commitDelimiter);
+
         $commits = explode($commitDelimiter, $log);
         return array_map(function ($rawCommit) {
             return Commit::buildFromString(trim($rawCommit));
         }, $commits);
+
     }
 
     /**
