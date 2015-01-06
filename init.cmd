@@ -41,6 +41,11 @@ cd "plugins\versionpress"
 cmd /C "composer install"
 endlocal
 
+echo.
+echo 4) Install npm dependencies
+
+cmd /C "npm install"
+
 
 echo.
 echo [OK] All done
