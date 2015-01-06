@@ -16,7 +16,7 @@ WHERE composer >nul 2>nul
 IF %ERRORLEVEL% NEQ 0 ECHO Please install Composer & exit /b %ERRORLEVEL%
 
 WHERE gulp >nul 2>nul
-IF %ERRORLEVEL% NEQ 0 ECHO Please install Gulp /b %ERRORLEVEL%
+IF %ERRORLEVEL% NEQ 0 ECHO Please install Gulp & exit /b %ERRORLEVEL%
 
 
 
@@ -49,6 +49,10 @@ cmd /C "npm install"
 
 echo.
 echo [OK] All done
+
+echo.
+echo In PhpStorm, run Composer -^> Init...
+echo.
 
 :: Pause when run via double-click, see http://stackoverflow.com/a/3552659/21728
 for %%x in (%cmdcmdline%) do if /i "%%~x"=="/c" set DOUBLECLICKED=1
