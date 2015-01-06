@@ -36,7 +36,7 @@ class CommentsTest extends SeleniumTestCase {
         $this->byCssSelector('#comment')->value("Public comment");
 
         $this->byCssSelector('#submit')->click();
-        $this->waitForPageLoad();
+        $this->waitAfterRedirect();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("comment/create-pending");
@@ -76,10 +76,10 @@ class CommentsTest extends SeleniumTestCase {
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         $this->clickEditLink();
-        $this->waitForPageLoad();
+        $this->waitAfterRedirect();
         $this->setValue('#content', 'Updated comment by admin');
         $this->byCssSelector('#save')->click();
-        $this->waitForPageLoad();
+        $this->waitAfterRedirect();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("comment/edit");
@@ -99,9 +99,9 @@ class CommentsTest extends SeleniumTestCase {
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         $this->clickEditLink();
-        $this->waitForPageLoad();
+        $this->waitAfterRedirect();
         $this->byCssSelector('#delete-action a')->click();
-        $this->waitForPageLoad();
+        $this->waitAfterRedirect();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("comment/trash");
@@ -120,8 +120,7 @@ class CommentsTest extends SeleniumTestCase {
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         $this->url('wp-admin/edit-comments.php?comment_status=trash');
-        $this->jsClick('#the-comment-list tr:first-child .untrash a');
-        $this->url('wp-admin/edit-comments.php');
+        $this->jsClickAndWait('#the-comment-list tr:first-child .untrash a');
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("comment/untrash");
@@ -137,12 +136,13 @@ class CommentsTest extends SeleniumTestCase {
      */
     public function deletingCommentCreatesCommentDeleteAction() {
 
-        $this->jsClick('#the-comment-list tr:first-child .trash a');
+        $this->url('wp-admin/edit-comments.php');
+        $this->jsClickAndWait('#the-comment-list tr:first-child .trash a');
         $this->url('wp-admin/edit-comments.php?comment_status=trash');
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        $this->jsClick('#the-comment-list tr:first-child .delete a');
+        $this->jsClickAndWait('#the-comment-list tr:first-child .delete a');
         $this->url('wp-admin/edit-comments.php');
 
         $commitAsserter->assertNumCommits(1);
@@ -155,8 +155,7 @@ class CommentsTest extends SeleniumTestCase {
     /**
      * @test
      * @testdox Unapproving comment creates 'comment/unapprove' action
-     *
-     * (depends intentionally missing, this test does not depend on anything)
+     * @depends addingCommentCreatesCommentCreateAction
      */
     public function unapproveComment() {
         $this->createNewComment();
@@ -164,8 +163,7 @@ class CommentsTest extends SeleniumTestCase {
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         $this->url('wp-admin/edit-comments.php');
-        $this->jsClick('#the-comment-list tr:first-child .unapprove a');
-        $this->refresh();
+        $this->jsClickAndWait('#the-comment-list tr:first-child .unapprove a');
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("comment/unapprove");
@@ -182,8 +180,7 @@ class CommentsTest extends SeleniumTestCase {
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         $this->url('wp-admin/edit-comments.php?comment_status=moderated');
-        $this->jsClick('#the-comment-list tr:first-child .approve a');
-        $this->url('wp-admin/edit-comments.php');
+        $this->jsClickAndWait('#the-comment-list tr:first-child .approve a');
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("comment/approve");
@@ -201,8 +198,7 @@ class CommentsTest extends SeleniumTestCase {
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         $this->url('wp-admin/edit-comments.php');
-        $this->jsClick('#the-comment-list tr:first-child .spam a');
-        $this->refresh();
+        $this->jsClickAndWait('#the-comment-list tr:first-child .spam a');
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("comment/spam");
@@ -220,8 +216,7 @@ class CommentsTest extends SeleniumTestCase {
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         $this->url('wp-admin/edit-comments.php?comment_status=spam');
-        $this->jsClick('#the-comment-list tr:first-child .unspam a');
-        $this->url('wp-admin/edit-comments.php');
+        $this->jsClickAndWait('#the-comment-list tr:first-child .unspam a');
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("comment/unspam");
@@ -268,7 +263,7 @@ class CommentsTest extends SeleniumTestCase {
         $this->url('?p=' . self::$testPostId);
         $this->byCssSelector('#comment')->value("Comment by admin");
         $this->byCssSelector('#submit')->click();
-        $this->waitForPageLoad();
+        $this->waitAfterRedirect();
     }
 
 }

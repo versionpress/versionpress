@@ -19,6 +19,7 @@ class TestConfig {
     private $adminName;
     private $adminEmail;
     private $adminPassword;
+    private $afterRedirectWaitingTime;
 
     function __construct(array $rawConfig) {
 
@@ -41,6 +42,7 @@ class TestConfig {
         $this->cleanInstallationsPath = $rawConfig['wp-clean-installations'];
         $this->firefoxExecutable = $rawConfig['selenium-firefox-executable'];
         $this->wpVersion = $rawConfig['wp-version'];
+        $this->afterRedirectWaitingTime = $rawConfig['after-redirect-waiting-time'];
     }
 
     /**
@@ -141,6 +143,10 @@ class TestConfig {
         return $this->siteTitle;
     }
 
-
+    /**
+     * @return int Time in ms
+     */
+    public function getAfterRedirectWaitingTime() {
+        return $this->afterRedirectWaitingTime;
+    }
 }
-

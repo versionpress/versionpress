@@ -96,7 +96,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
     protected function logOut() {
         $this->url('wp-login.php?action=logout');
         $this->byCssSelector('body>p>a')->click();
-        $this->waitForPageLoad();
+        $this->waitAfterRedirect();
     }
 
 
@@ -140,6 +140,19 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
      */
     protected function jsClick($cssSelector) {
         $this->executeScript("jQuery('$cssSelector')[0].click()");
+    }
+
+    /**
+     * Uses {@link jsClick} and waits for AJAX request.
+     *
+     * @param string $cssSelector
+     */
+    protected function jsClickAndWait($cssSelector) {
+        $this->jsClick($cssSelector);
+        usleep(100 * 1000);
+        $this->waitUntilTrue(function (SeleniumTestCase $testCase) {
+            return $testCase->executeScript("return jQuery.active;") === 0;
+        }, 5000);
     }
 
     /**
@@ -187,10 +200,28 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
         $this->timeouts()->implicitWait($previousImplicitWait);
     }
 
-    protected function waitForPageLoad() {
-        $this->waitUntil(function (SeleniumTestCase $testCase) {
+    /**
+     * If there is a redirect after POST (Post/Redirect/Get pattern) you have wait for the shutdown
+     * function that creates a commit - the commit may take longer time then rendering new page.
+     */
+    protected function waitAfterRedirect() {
+        $this->waitUntilTrue(function (SeleniumTestCase $testCase) {
             return $testCase->executeScript("return document.readyState;") == "complete";
         });
+
+        usleep(self::$config->getAfterRedirectWaitingTime() * 1000);
     }
 
+    /**
+     * Selenium API improvement. Wait until callback is true or timeout occurs.
+     *
+     * @param $callback
+     * @param $timeout
+     */
+    protected function waitUntilTrue($callback, $timeout = null) {
+        $this->waitUntil(function (SeleniumTestCase $testCase) use ($callback) {
+            $result = call_user_func($callback, $testCase);
+            return $result === true ? true : null;
+        }, $timeout);
+    }
 } 
