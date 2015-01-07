@@ -147,6 +147,16 @@ class CompositeChangeInfo implements ChangeInfo {
 
         }
 
+        // The WPLANG option has always lower priority then any other option (no matter the action)
+        if ($changeInfo1 instanceof OptionChangeInfo &&
+            $changeInfo2 instanceof OptionChangeInfo) {
+            if ($changeInfo1->getEntityId() == "WPLANG") {
+                return 1;
+            } else if ($changeInfo2->getEntityId() == "WPLANG") {
+                return -1;
+            }
+        }
+
 
         if ($changeInfo1 instanceof EntityChangeInfo) {
 

@@ -26,7 +26,7 @@ class PostStorage extends DirectoryStorage {
         if (isset($data['post_status']) && ($data['post_status'] === 'auto-draft'))
             return false;
 
-        if (isset($data['post_status']) && ($data['post_status'] === 'draft' && DOING_AJAX === true)) // ignoring ajax autosaves
+        if (isset($data['post_status']) && ($data['post_status'] === 'draft' && defined('DOING_AJAX') && DOING_AJAX === true)) // ignoring ajax autosaves
             return false;
 
         $isExistingEntity = isset($data['vp_id']) && $this->isExistingEntity($data['vp_id']);

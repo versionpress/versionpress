@@ -29,11 +29,11 @@ class UserMetaStorage extends SingleFileStorage {
     }
 
     public function shouldBeSaved($data) {
-        if (isset($data['meta_key']) && $data['meta_key'] === 'session_tokens') {
+        if ($this->keyEquals($data, 'session_tokens')) {
             return false;
         }
 
-        if ($this->userMetaKey === 'session_tokens') {
+        if ($this->keyEndsWith($data, 'dashboard_quick_press_last_post_id')) {
             return false;
         }
 
@@ -47,5 +47,13 @@ class UserMetaStorage extends SingleFileStorage {
             $key => $values['meta_value']
         );
         return $data;
+    }
+
+    private function keyEquals($data, $key) {
+        return (isset($data['meta_key']) && $data['meta_key'] === $key) || $this->userMetaKey === $key;
+    }
+
+    private function keyEndsWith($data, $suffix) {
+        return (isset($data['meta_key']) && \NStrings::endsWith($data['meta_key'], $suffix)) || \NStrings::endsWith($this->userMetaKey, $suffix);
     }
 }
