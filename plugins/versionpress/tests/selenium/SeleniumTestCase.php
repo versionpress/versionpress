@@ -70,27 +70,17 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
         $this->loginIfNecessary();
     }
 
-    private static $loggedIn = false;
     protected function loginIfNecessary() {
-
-        if (self::$loggedIn) {
-            return;
-        }
-
-        $this->url("wp-admin");
         try {
-            $this->byId("user_login");
+            $this->byId('wpadminbar');
         } catch (PHPUnit_Extensions_Selenium2TestCase_WebDriverException $e) {
-            // already logged in, do nothing
-            return;
+            $this->url('wp-admin');
+            usleep(100 * 1000); // sometimes we need to wait for the page to fully load
+            $this->byId('user_login')->value(self::$config->getAdminName());
+            usleep(100 * 1000); // wait for change focus
+            $this->byId('user_pass')->value(self::$config->getAdminPassword());
+            $this->byId("loginform")->submit();
         }
-        usleep(100 * 1000); // sometimes we need to wait for the page to fully load
-        $this->byId("user_login")->value(self::$config->getAdminName());
-        usleep(100 * 1000); // wait for change focus
-        $this->byId("user_pass")->value(self::$config->getAdminPassword());
-        $this->byId("loginform")->submit();
-
-        self::$loggedIn = true;
     }
 
     protected function logOut() {
@@ -139,7 +129,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
      * @param string $cssSelector
      */
     protected function jsClick($cssSelector) {
-        $this->executeScript("jQuery('$cssSelector')[0].click()");
+        $this->executeScript("jQuery(\"$cssSelector\")[0].click()");
     }
 
     /**
@@ -205,7 +195,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
     protected function waitAfterRedirect() {
         $this->waitUntilTrue(function (SeleniumTestCase $testCase) {
             return $testCase->executeScript("return document.readyState;") == "complete";
-        });
+        }, 5000);
 
         usleep(self::$config->getAfterRedirectWaitingTime() * 1000);
     }
