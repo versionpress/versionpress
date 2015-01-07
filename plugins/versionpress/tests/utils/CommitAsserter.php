@@ -1,4 +1,5 @@
 <?php
+use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\Git\Commit;
@@ -159,8 +160,12 @@ class CommitAsserter {
      */
     public function assertCommitPath($type, $path, $whichCommit = 0) {
         $revRange = $this->getRevRange($whichCommit);
-        $path = str_ireplace("%vpdb%", "wp-content/vpdb", $path);
-        $path = str_ireplace("%VPID%", ChangeInfoUtils::getVpid($this->getChangeInfo($this->getCommit($whichCommit))), $path);
+        if (Strings::contains($path, "%vpdb%")) {
+            $path = str_ireplace("%vpdb%", "wp-content/vpdb", $path);
+        }
+        if (Strings::contains($path, "%VPID%")) {
+            $path = str_ireplace("%VPID%", ChangeInfoUtils::getVpid($this->getChangeInfo($this->getCommit($whichCommit))), $path);
+        }
         $affectedFiles = $this->gitRepository->getModifiedFilesWithStatus($revRange);
         $matchingPaths = array_filter($affectedFiles, function ($item) use ($type, $path) {
             return $item["status"] == $type && fnmatch($path, $item["path"]);

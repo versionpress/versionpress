@@ -16,7 +16,7 @@ class UploadsTest extends SeleniumTestCase {
         if (!$this->byCssSelector('#html-upload')->displayed()) {
             $this->byCssSelector('.upload-flash-bypass a')->click();
         }
-        $this->byCssSelector('#async-upload')->value(__DIR__ . DIRECTORY_SEPARATOR . 'test.png'); // separator is actually OS-specific here
+        $this->byCssSelector('#async-upload')->value(__DIR__ . DIRECTORY_SEPARATOR . 'test-data' . DIRECTORY_SEPARATOR . 'test.png'); // separator is actually OS-specific here
         $this->byCssSelector('#html-upload')->click();
 
         $this->waitForElement('.thumbnail', 3000);
