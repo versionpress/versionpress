@@ -50,7 +50,6 @@ class PluginsTest extends SeleniumTestCase {
      * @depends deletingPluginCreatesPluginDeleteAction
      */
     public function uploadingPluginCreatesPluginInstallAction() {
-        $this->loginIfNecessary();
         $this->url('wp-admin/plugin-install.php?tab=upload');
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -63,6 +62,44 @@ class PluginsTest extends SeleniumTestCase {
         $commitAsserter->assertCommitAction("plugin/install");
         $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
         $commitAsserter->assertCommitPath("A", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
+        $commitAsserter->assertCleanWorkingDirectory();
+    }
+
+    /**
+     * @test
+     * @testdox Activating plugin creates 'plugin/activate' action
+     * @depends uploadingPluginCreatesPluginInstallAction
+     */
+    public function activatingPluginCreatesPluginActivateAction() {
+        $this->url("http://127.0.0.1/wordpress/wp-admin/plugins.php");
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        $this->byCssSelector("#". self::$pluginInfo['css-id'] ." .activate a")->click();
+        $this->waitAfterRedirect();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("plugin/activate");
+        $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
+        $commitAsserter->assertCommitPath("M", "%vpdb%/options.ini");
+        $commitAsserter->assertCleanWorkingDirectory();
+    }
+
+    /**
+     * @test
+     * @testdox Deactivating plugin creates 'plugin/deactivate' action
+     * @depends activatingPluginCreatesPluginActivateAction
+     */
+    public function deactivatingPluginCreatesPluginDeactivateAction() {
+        $this->url("http://127.0.0.1/wordpress/wp-admin/plugins.php");
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        $this->byCssSelector("#". self::$pluginInfo['css-id'] ." .deactivate a")->click();
+        $this->waitAfterRedirect();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("plugin/deactivate");
+        $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
+        $commitAsserter->assertCommitPath("M", "%vpdb%/options.ini");
         $commitAsserter->assertCleanWorkingDirectory();
     }
 }
