@@ -16,7 +16,8 @@ class OptionsStorage extends SingleFileStorage {
             || $id === 'home'
             || $id === 'db_upgraded'
             || $id === 'auto_updater.lock'
-            || $id === 'recently_edited');
+            || $id === 'recently_edited'
+            || $id === 'can_compress_scripts');
     }
 
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
