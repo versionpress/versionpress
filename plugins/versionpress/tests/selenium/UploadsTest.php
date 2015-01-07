@@ -41,7 +41,7 @@ class UploadsTest extends SeleniumTestCase {
         $this->waitForElement('.edit-attachment-frame', 300);
         $this->setValue('.setting[data-setting=title] input', 'updated image title');
         $this->keys(PHPUnit_Extensions_Selenium2TestCase_Keys::TAB); // focus out, AJAX saves the image
-        usleep(500*1000);
+        $this->waitForAjax();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/edit");
@@ -60,8 +60,7 @@ class UploadsTest extends SeleniumTestCase {
 
         $this->byCssSelector('.delete-attachment')->click();
         $this->acceptAlert();
-        usleep(1000*1000);
-        $this->waitForElement('#wp-media-grid');
+        $this->waitForAjax();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/delete");

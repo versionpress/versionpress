@@ -28,8 +28,7 @@ class PostTypeTestCase extends \SeleniumTestCase {
         $this->prepareTestPost();
 
         $this->byCssSelector('form#post #publish')->click();
-
-        $this->waitForElement('#message.updated');
+        $this->waitAfterRedirect();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/create");
@@ -42,7 +41,7 @@ class PostTypeTestCase extends \SeleniumTestCase {
 
         $this->setTinyMCEContent("Updated content");
         $this->byCssSelector('form#post #publish')->click();
-        $this->waitForElement('#message.updated');
+        $this->waitAfterRedirect();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/edit");
@@ -55,13 +54,12 @@ class PostTypeTestCase extends \SeleniumTestCase {
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         $this->url($this->getPostTypeScreenUrl());
-        $this->jsClick('#the-list tr:first-child .row-actions .editinline');
-        usleep(100*1000);
+        $this->jsClickAndWait('#the-list tr:first-child .row-actions .editinline');
+
         $titleField = $this->byCssSelector('#the-list tr.inline-edit-row input.ptitle');
         $titleField->clear();
         $titleField->value("Quick-edited post title");
-        $this->byCssSelector('#the-list tr.inline-edit-row a.save')->click();
-        usleep(1000*1000);
+        $this->jsClickAndWait('#the-list tr.inline-edit-row a.save');
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitsAreEquivalent();
@@ -83,8 +81,7 @@ class PostTypeTestCase extends \SeleniumTestCase {
     public function runUndoTrashTest() {
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        $undoLink = $this->byCssSelector('#message.updated a');
-        $undoLink->click();
+        $this->jsClickAndWait('#message.updated a');
 
         $this->assertElementExists('#message.updated'); // "1 post restored from the Trash"
 
@@ -171,8 +168,8 @@ class PostTypeTestCase extends \SeleniumTestCase {
      * Trashes post. Waits for the operation to complete.
      */
     private function trashPost() {
-        $this->jsClick('#the-list tr:first-child .row-actions .submitdelete');
-        $this->waitForElement('#message.updated');
+        $this->jsClickAndWait('#the-list tr:first-child .row-actions .submitdelete');
+        $this->waitAfterRedirect();
     }
 
     /**

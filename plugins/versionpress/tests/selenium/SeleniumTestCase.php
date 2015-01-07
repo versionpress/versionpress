@@ -150,9 +150,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
     protected function jsClickAndWait($cssSelector) {
         $this->jsClick($cssSelector);
         usleep(100 * 1000);
-        $this->waitUntilTrue(function (SeleniumTestCase $testCase) {
-            return $testCase->executeScript("return jQuery.active;") === 0;
-        }, 5000);
+        $this->waitForAjax();
     }
 
     /**
@@ -223,5 +221,14 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
             $result = call_user_func($callback, $testCase);
             return $result === true ? true : null;
         }, $timeout);
+    }
+
+    /**
+     * Wait for all AJAX requests caused by jQuery are done.
+     */
+    protected function waitForAjax() {
+        $this->waitUntilTrue(function (SeleniumTestCase $testCase) {
+            return $testCase->executeScript("return jQuery.active;") === 0;
+        }, 5000);
     }
 } 
