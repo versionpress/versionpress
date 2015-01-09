@@ -373,7 +373,7 @@ function _vp_show_progress_message($progressMessage) {
                 $message = $changeInfo->getChangeDescription();
                 echo "
             <tr class=\"post-1 type-post status-publish format-standard hentry category-uncategorized alternate level-0" . ($isEnabled ? "" : " disabled") . "\">
-                <td>{$commit->getRelativeDate()}</td>
+                <td title=\"{$commit->getDate()->format('d-M-y H:i:s')}\">{$commit->getRelativeDate()}</td>
                 <td>$message</td>
                 <td style=\"text-align: right\">
                     $versioningSnippet
