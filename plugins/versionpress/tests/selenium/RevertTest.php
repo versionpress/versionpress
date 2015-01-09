@@ -38,6 +38,25 @@ class RevertTest extends SeleniumTestCase {
         $commitAsserter->assertCleanWorkingDirectory();
     }
 
+    /**
+     * @test
+     * @testdox Comment deletion cannot be reverted if the commented post no longer exists
+     */
+    public function entityWithMissingReferenceCannotBeRestoredWithRevert() {
+        $this->loginIfNecessary();
+        $postId = $this->createTestPost();
+        $commentId = $this->createCommentForPost($postId);
+        WpAutomation::deleteComment($commentId);
+        WpAutomation::deletePost($postId);
+        $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        $this->undoNthCommit(2);
+        $commitAsserter->assertNumCommits(0);
+        $commitAsserter->assertCleanWorkingDirectory();
+
+    }
+
     //---------------------
     // Helper methods
     //---------------------
@@ -55,7 +74,26 @@ class RevertTest extends SeleniumTestCase {
         return WpAutomation::createPost($post);
     }
 
+    private function createCommentForPost($postId) {
+        $comment = array(
+            "comment_author" => "Mr VersionPress",
+            "comment_author_email" => "versionpress@example.com",
+            "comment_author_url" => "https://wordpress.org/",
+            "comment_date" => "2012-12-12 12:12:12",
+            "comment_content" => "Have you heard about VersionPress? It's new awesome version control plugin for WordPress.",
+            "comment_approved" => 1,
+            "comment_post_ID" => $postId,
+        );
+
+        return WpAutomation::createComment($comment);
+    }
+
     private function undoLastCommit() {
-        $this->jsClick("#versionpress-commits-table tr:first-child a[href*=vp_undo]");
+        $this->undoNthCommit(1);
+    }
+
+    private function undoNthCommit($n) {
+        $this->jsClick("#versionpress-commits-table tr:nth-child($n) a[href*=vp_undo]");
+        $this->waitAfterRedirect();
     }
 }
