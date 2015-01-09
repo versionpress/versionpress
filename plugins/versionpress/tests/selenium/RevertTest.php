@@ -57,6 +57,27 @@ class RevertTest extends SeleniumTestCase {
 
     }
 
+    /**
+     * @test
+     * @testdox Rollback reverts all changes made after chosen commit
+     */
+    public function rollbackRevertsAllChangesMadeAfterChosenCommit() {
+        $this->loginIfNecessary();
+        $postId = $this->createTestPost();
+        $this->createCommentForPost($postId);
+        WpAutomation::editOption('blogname', 'Blogname for revert test');
+        $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        $this->rollbackToNthCommit(4);
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('versionpress/rollback');
+        $commitAsserter->assertCommitPath('D', '%vpdb%/posts/*');
+        $commitAsserter->assertCommitPath('D', '%vpdb%/comments/*');
+        $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
+        $commitAsserter->assertCleanWorkingDirectory();
+    }
+
     //---------------------
     // Helper methods
     //---------------------
@@ -92,8 +113,13 @@ class RevertTest extends SeleniumTestCase {
         $this->undoNthCommit(1);
     }
 
-    private function undoNthCommit($n) {
-        $this->jsClick("#versionpress-commits-table tr:nth-child($n) a[href*=vp_undo]");
+    private function undoNthCommit($whichCommit) {
+        $this->jsClick("#versionpress-commits-table tr:nth-child($whichCommit) a[href*=vp_undo]");
+        $this->waitAfterRedirect();
+    }
+
+    private function rollbackToNthCommit($whichCommit) {
+        $this->jsClick("#versionpress-commits-table tr:nth-child($whichCommit) a[href*=vp_rollback]");
         $this->waitAfterRedirect();
     }
 }
