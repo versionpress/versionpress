@@ -229,6 +229,32 @@ class WpAutomation {
         self::runWpCliCommand('option', 'delete', array($name));
     }
 
+    /**
+     * Returns stylesheet of current theme.
+     *
+     * @return string
+     */
+    public static function getCurrentTheme() {
+        $status = self::runWpCliCommand('theme', 'status');
+        $status = preg_replace("/\033\[[^m]*m/", '', $status); // remove formatting
+
+        preg_match_all("/^[^A-Z]*([A-Z]+)[^a-z]+([a-z\-]+).*$/m", $status, $matches);
+
+        foreach ($matches[1] as $lineNumber => $status) {
+            if (\Nette\Utils\Strings::contains($status, 'A')) {
+                return $matches[2][$lineNumber];
+            }
+        }
+
+        return null; // this should never happen, there is always some activate theme
+    }
+
+    /**
+     * @param string $theme Theme stylesheet
+     */
+    public static function switchTheme($theme) {
+        self::runWpCliCommand('theme', 'activate', array($theme));
+    }
 
     /**
      * Activates VersionPress plugin and runs the Initializer
@@ -240,7 +266,7 @@ class WpAutomation {
     }
 
     /**
-     * Puts WP directory to a default state, as if one manually downloaded the WordPress ZIP 
+     * Puts WP directory to a default state, as if one manually downloaded the WordPress ZIP
      * and extracted it there. Removes all old files if necessary.
      */
     private static function prepareFiles() {

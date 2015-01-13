@@ -79,8 +79,8 @@ function vp_register_hooks() {
 
     add_action('upgrader_process_complete', function ($upgrader, $hook_extra) use ($committer) {
         if ($hook_extra['type'] === 'theme') {
-            $themeName = isset($upgrader->skin->api) ? $upgrader->skin->api->name : null;
             $themeId = $upgrader->result['destination_name'];
+            $themeName = isset($upgrader->skin->api, $upgrader->skin->api->name) ? $upgrader->skin->api->name : wp_get_theme($themeId)->get('Name');
             $action = $hook_extra['action']; // can be "install" or "update", see WP_Upgrader and search for `'hook_extra' =>`
             $committer->forceChangeInfo(new ThemeChangeInfo($themeId, $action, $themeName));
         }
