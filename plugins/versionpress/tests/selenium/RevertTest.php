@@ -3,9 +3,9 @@
 class RevertTest extends SeleniumTestCase {
     /**
      * @test
-     * @testdox Undo reverts only one commit
+     * @testdox Undo reverts changes in given commit
      */
-    public function undoRevertsOnlyOneCommit() {
+    public function undoRevertChangesInGivenCommit() {
         $this->loginIfNecessary();
         $this->createTestPost();
         $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
@@ -15,7 +15,28 @@ class RevertTest extends SeleniumTestCase {
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction('versionpress/undo');
+        $commitAsserter->assertCountOfAffectedFiles(1);
         $commitAsserter->assertCommitPath('D', '%vpdb%/posts/*');
+        $commitAsserter->assertCleanWorkingDirectory();
+    }
+
+    /**
+     * @test
+     * @testdox Undo reverts only one commit
+     */
+    public function undoRevertsOnlyOneCommit() {
+        $this->loginIfNecessary();
+        WpAutomation::editOption('blogname', 'Blogname for undo test');
+        $this->createTestPost();
+        $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        $this->undoNthCommit(2);
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('versionpress/undo');
+        $commitAsserter->assertCountOfAffectedFiles(1);
+        $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();
     }
 
@@ -32,8 +53,9 @@ class RevertTest extends SeleniumTestCase {
         $this->undoLastCommit();
         $this->undoLastCommit();
 
-        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertNumCommits(2);
         $commitAsserter->assertCommitAction('versionpress/undo');
+        $commitAsserter->assertCountOfAffectedFiles(1);
         $commitAsserter->assertCommitPath('A', '%vpdb%/posts/*');
         $commitAsserter->assertCleanWorkingDirectory();
     }
@@ -65,13 +87,14 @@ class RevertTest extends SeleniumTestCase {
         $this->loginIfNecessary();
         $postId = $this->createTestPost();
         $this->createCommentForPost($postId);
-        WpAutomation::editOption('blogname', 'Blogname for revert test');
+        WpAutomation::editOption('blogname', 'Blogname for rollback test');
         $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         $this->rollbackToNthCommit(4);
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction('versionpress/rollback');
+        $commitAsserter->assertCountOfAffectedFiles(3);
         $commitAsserter->assertCommitPath('D', '%vpdb%/posts/*');
         $commitAsserter->assertCommitPath('D', '%vpdb%/comments/*');
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');

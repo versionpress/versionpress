@@ -160,18 +160,29 @@ class CommitAsserter {
      */
     public function assertCommitPath($type, $path, $whichCommit = 0) {
         $revRange = $this->getRevRange($whichCommit);
-        if (Strings::contains($path, "%vpdb%")) {
-            $path = str_ireplace("%vpdb%", "wp-content/vpdb", $path);
-        }
-        if (Strings::contains($path, "%VPID%")) {
-            $path = str_ireplace("%VPID%", ChangeInfoUtils::getVpid($this->getChangeInfo($this->getCommit($whichCommit))), $path);
-        }
+        $path = $this->expandPath($path, $whichCommit);
         $affectedFiles = $this->gitRepository->getModifiedFilesWithStatus($revRange);
         $matchingPaths = array_filter($affectedFiles, function ($item) use ($type, $path) {
             return $item["status"] == $type && fnmatch($path, $item["path"]);
         });
         if (count($matchingPaths) == 0) {
             PHPUnit_Framework_Assert::fail("Commit didn't affect path '$path' with change of type '$type'");
+        }
+    }
+
+    /**
+     * Asserts that commit affected exact number of files (no matter the type).
+     *
+     * @param int $count Expected count of affected files.
+     * @param int $whichCommit See $whichCommitParameter documentation. "HEAD" by default.
+     */
+    public function assertCountOfAffectedFiles($count, $whichCommit = 0) {
+        $revRange = $this->getRevRange($whichCommit);
+        $affectedFiles = $this->gitRepository->getModifiedFilesWithStatus($revRange);
+        $countOfAffectedFiles = count($affectedFiles);
+        if ($countOfAffectedFiles != $count) {
+            $adverb = $countOfAffectedFiles < $count ? "less" : "more";
+            PHPUnit_Framework_Assert::fail("Commit affected $adverb files ($countOfAffectedFiles) then expected ($count)");
         }
     }
 
@@ -204,6 +215,23 @@ class CommitAsserter {
         if (!empty($gitStatus)) {
             PHPUnit_Framework_Assert::fail("Expected clean working directory but got:\n$gitStatus");
         }
+    }
+
+    /**
+     * @param $path
+     * @param $whichCommit
+     * @return mixed
+     * @throws Exception
+     */
+    private function expandPath($path, $whichCommit) {
+        if (Strings::contains($path, "%vpdb%")) {
+            $path = str_ireplace("%vpdb%", "wp-content/vpdb", $path);
+        }
+        if (Strings::contains($path, "%VPID%")) {
+            $path = str_ireplace("%VPID%", ChangeInfoUtils::getVpid($this->getChangeInfo($this->getCommit($whichCommit))), $path);
+            return $path;
+        }
+        return $path;
     }
 
 }
