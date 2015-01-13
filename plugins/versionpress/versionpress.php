@@ -109,10 +109,17 @@ function vp_register_hooks() {
         }, 10, 2);
     }, 10, 2);
 
-    add_action('switch_theme', function ($themeName, $theme) use ($committer) {
-        $themeId = $theme->stylesheet;
-        $committer->forceChangeInfo(new ThemeChangeInfo($themeId, 'switch', $themeName));
-    }, 10, 2);
+    add_action('switch_theme', function () use ($committer) {
+        $committer->disableCommit(); // the change will be committed on next load
+    });
+
+    add_action('after_switch_theme', function () use ($committer) {
+        $theme = wp_get_theme();
+        $stylesheet = $theme->get_stylesheet();
+        $themeName = $theme->get('Name');
+
+        $committer->forceChangeInfo(new ThemeChangeInfo($stylesheet, 'switch', $themeName));
+    });
 
     add_action('customize_save_after', function ($customizeManager) use ($committer) {
         /** @var WP_Customize_Manager $customizeManager */
