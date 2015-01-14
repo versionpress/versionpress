@@ -492,10 +492,10 @@ wp_enqueue_script('versionpress_popover_script', plugins_url('admin/js/jquery.we
 function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
     if (!current_user_can('activate_plugins')) return;
 
-    $adminBarText = "You are running a <span style=\"color:red;font-weight:bold\">preview version</span> of VersionPress";
-    $popoverTitle = "Use for <strong>testing only</strong>";
-    $popoverText = "<p>You are running a preview version of VersionPress which means that there <em>are</em> bugs, this site's data may become corrupt etc.<br /><br /><strong style='color: red;'>DON'T USE THIS VERSION IN PRODUCTION OR WITH A PRODUCTION DATABASE.</strong></p>";
-    $popoverText .= "<p><a href='http://versionpress.net/docs/en/release-notes' target='_blank'>Learn more about VersionPress releases</a></p>";
+    $adminBarText = "You are running <span style=\"color:#FF8800;font-weight:bold\">EAP version</span> of VersionPress";
+    $popoverTitle = "NOTE";
+    $popoverText = "<p style='margin-top: 5px;'>You are running <strong>VersionPress " . vp_get_version() . "</strong> which is an <strong style='font-size: 1.15em;'>EAP release</strong>. Please understand that EAP releases are early versions of the software and as such might not fully support certain workflows, 3<sup>rd</sup> party plugins, hosts etc.<br /><br /><strong>We recommend that you maintain a safe backup of the site</strong></p>";
+    $popoverText .= "<p><a href='http://docs.versionpress.net/en/release-notes' target='_blank'>Learn more about VersionPress releases</a></p>";
 
     $adminBar->add_node(array(
         'id' => 'vp-running',
