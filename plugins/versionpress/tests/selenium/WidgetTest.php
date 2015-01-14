@@ -5,7 +5,11 @@ class WidgetTest extends SeleniumTestCase {
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
         self::clearSidebars();
-        WpAutomation::deleteOption('widget_calendar');
+        try {
+            WpAutomation::deleteOption('widget_calendar');
+        } catch (Exception $e) {
+            // It's ok. This option does not exist in the clear WP.
+        }
     }
 
     /**
