@@ -29,6 +29,28 @@ class WidgetTest extends SeleniumTestCase {
         $commitAsserter->assertCleanWorkingDirectory();
     }
 
+    /**
+     * @test
+     * @testdox Creating second widget of given type updates the option
+     * @depends creatingFirstWidgetOfGivenTypeCreatesOption
+     */
+    public function creatingSecondWidgetOfGivenTypeUpdatesOption() {
+        $this->url('wp-admin/widgets.php');
+        $this->jsClick("#widget-list .widget:contains('Calendar') .widget-control-edit");
+        $this->waitAfterRedirect();
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        $this->byCssSelector("form[action='widgets.php'] input[name*=title]")->value('Other widget');
+        $this->byCssSelector("form[action='widgets.php'] input[type=submit]")->click();
+        $this->waitAfterRedirect();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('option/edit');
+        $commitAsserter->assertCountOfAffectedFiles(1);
+        $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
+        $commitAsserter->assertCleanWorkingDirectory();
+    }
+
     private static function clearSidebars() {
         $sidebars = WpAutomation::getSidebars();
         if (count($sidebars) == 0) {
