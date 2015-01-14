@@ -31,9 +31,9 @@ class RequirementsChecker {
         );
 
         $this->requirements[] = array(
-            'name' => 'Write access to wp-content directory',
+            'name' => 'Write access on the filesystem',
             'fulfilled' => $this->tryWrite(),
-            'help' => 'VersionPress needs write access to the `wp-content` dir as its stores its internal database there. Please change the permissions on your file system.'
+            'help' => 'VersionPress needs write access in the site root and all nested directories. Please update the permissions.'
         );
 
         $this->requirements[] = array(
