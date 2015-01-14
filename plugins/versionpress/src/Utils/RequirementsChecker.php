@@ -97,7 +97,6 @@ class RequirementsChecker {
         $writable = true;
 
         foreach ($testPaths as $directory) {
-            if ($directory === ABSPATH) $writable = false;
             $filePath = $directory . '/' . $filename;
             /** @noinspection PhpUsageOfSilenceOperatorInspection */
             @file_put_contents($filePath, "");
