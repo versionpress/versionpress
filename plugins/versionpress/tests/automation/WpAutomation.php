@@ -257,6 +257,44 @@ class WpAutomation {
     }
 
     /**
+     * Returns list of sidebar IDs defined by current template (without wp_inactive_widgets).
+     *
+     * @return array
+     */
+    public static function getSidebars() {
+        $sidebarsJson = self::runWpCliCommand('sidebar', 'list', array('format' => 'json', 'fields' => 'id'));
+        $sidebars = json_decode($sidebarsJson);
+        $sidebarIds = array_map(function ($sidebar) { return $sidebar->id; }, $sidebars);
+        $sidebarIds = array_filter($sidebarIds, function ($id) { return $id != 'wp_inactive_widgets'; });
+        return $sidebarIds;
+    }
+
+    /**
+     * Returns list of widgets in given sidebar.
+     *
+     * @param string $sidebar sidebar id
+     * @return array
+     */
+    public static function getWidgets($sidebar) {
+        $widgetsJson = self::runWpCliCommand('widget', 'list', array($sidebar, 'format' => 'json', 'fields' => 'id'));
+        $widgets = json_decode($widgetsJson);
+        $widgetIds = array_map(function ($widget) { return $widget->id; }, $widgets);
+        return $widgetIds;
+    }
+
+    /**
+     * Deletes widget(s)
+     *
+     * @param string[]|string $widgets Name of widget or list of widgets
+     */
+    public static function deleteWidgets($widgets) {
+        $widgets = trim(is_array($widgets) ? join(' ', $widgets) : $widgets);
+        if (strlen($widgets) > 0) {
+            self::exec('wp widget delete ' . $widgets, self::$config->getSitePath());
+        }
+    }
+
+    /**
      * Activates VersionPress plugin and runs the Initializer
      */
     public static function initializeVersionPress() {
