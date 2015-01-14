@@ -29,7 +29,8 @@ class UserMetaStorage extends SingleFileStorage {
     }
 
     public function shouldBeSaved($data) {
-        if ($this->keyEquals($data, 'session_tokens')) {
+        if ($this->keyEquals($data, 'session_tokens') ||
+            $this->keyEquals($data, 'nav_menu_recently_edited')) {
             return false;
         }
 
