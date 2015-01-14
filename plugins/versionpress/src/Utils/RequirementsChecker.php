@@ -89,11 +89,22 @@ class RequirementsChecker {
 
     private function tryWrite() {
         $filename = ".vp-try-write";
-        $filePath = WP_CONTENT_DIR . '/' . $filename;
-        /** @noinspection PhpUsageOfSilenceOperatorInspection */
-        @file_put_contents($filePath, "");
-        $fileExists = is_file($filePath);
-        FileSystem::remove($filePath);
-        return $fileExists;
+        $testPaths = array(
+            ABSPATH,
+            WP_CONTENT_DIR,
+        );
+
+        $writable = true;
+
+        foreach ($testPaths as $directory) {
+            if ($directory === ABSPATH) $writable = false;
+            $filePath = $directory . '/' . $filename;
+            /** @noinspection PhpUsageOfSilenceOperatorInspection */
+            @file_put_contents($filePath, "");
+            $writable &= is_file($filePath);
+            FileSystem::remove($filePath);
+        }
+
+        return $writable;
     }
 }
