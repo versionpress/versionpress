@@ -12,6 +12,7 @@ var replace = require('gulp-replace');
 var fs = require('fs');
 var path = require('path');
 var iniParser = require('ini');
+var chalk = require('chalk');
 
 /**
  * Version to be displayed both in WordPress administration and used as a suffix of the generated ZIP file
@@ -230,7 +231,11 @@ gulp.task('clean-build', ['zip'], function (cb) {
 /**
  * Default task that exports production build
  */
-gulp.task('default', ['clean-build']);
+gulp.task('default', ['clean-build'], function() {
+    console.log(" ");
+    console.log("Build ready: " + chalk.white.bold.bgGreen("versionpress-" + packageVersion + ".zip"));
+    console.log(" ");
+});
 
 /**
  * Exports "nightly" build which contains the same files as production (`default`) build

@@ -8,6 +8,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "chalk": "^0.5.1",
     "coffee-script": "~1.7.1",
     "del": "~0.1.2",
     "gulp": "~3.8.7",
