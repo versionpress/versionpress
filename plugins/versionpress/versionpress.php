@@ -565,6 +565,9 @@ function vp_is_active() {
  * @return string
  */
 function vp_get_version() {
+    if (!function_exists('get_plugin_data')) {
+        require_once(ABSPATH . 'wp-admin/includes/plugin.php');
+    }
     $pluginData = get_plugin_data(VERSIONPRESS_PLUGIN_DIR . "/versionpress.php", false, false);
     return $pluginData['Version'];
 }
