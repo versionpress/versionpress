@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var del = require('del');
 var fs = require('fs');
+var browserSync = require('browser-sync');
 
 var source = "./content/**";
 var destination = "../VersionPress-docssite/VersionPress.DocsSite/App_Data/content";
@@ -28,8 +29,16 @@ gulp.task('create-changed-file', ['copy-contents'], function(cb) {
 
 gulp.task('copy-docs', ['copy-contents'], function() {});
 
-gulp.task('watch', function() {
-  gulp.watch(source, ['copy-docs']);
+gulp.task('watch', ['browser-sync'], function() {
+  gulp.watch(source, ['copy-docs', browserSync.reload]);
+});
+
+gulp.task('browser-sync', function() {
+  browserSync({
+      proxy: 'http://localhost:1515',
+      port: 1516,
+      notify: false
+  });
 });
 
 gulp.task('default', ['copy-docs'], function() {});
