@@ -10,28 +10,66 @@ Both things are important, please read on.
 
 ## System requirements
 
-The server environment must currently match these requirements, some of which are checked automatically before VersionPress activation:
+The server environment must match certain requirements, some of which are checked automatically on VersionPress activation. We also recommend some other setup steps below.
 
-  * WordPress 3.8 or higher
-  * PHP 5.3 or higher
-  * Git 1.9 or higher installed on the server *(checked automatically before activation)*
-  * Safe mode turned off *(checked automatically before activation)*
-  * The `proc_open()` function enabled *(checked automatically before activation)*
-  * There must be no `wp-content/db.php` file on the disk *(checked automatically before activation)*
-
-In practice, this means that you need to have control over your server as these will typically not be available in a common hosting scenario. We are aware that this is an issue and will be lowering these requirements in some future release.
-
-For some advanced features, you might also need WP-CLI installed, see a separate section below.
-
-<div class="note">
-  <strong>Note about PHP 5.3</strong>
-  <p>WordPress itself can run even on the old and now <a href="http://php.net/eol.php">long unsupported</a> PHP version 5.2. We also started with this version in mind but eventually dropped it so that we could use the newer language features and some 3rd party libraries that are 5.3+ only. Back-porting VersionPress to PHP 5.2 is currently not planned.</p>
+<div class="important">
+  <strong>Important</strong>
+  <p>VersionPress is a lot more involved than most other WordPress plugins. Please pay attention to this section before proceeding with installation.</p> 
 </div>
 
-<div class="note">
-  <strong>Note about <code>db.php</code></strong>
-  <p>VersionPress currently uses the <code>db.php</code> file to hook into some of the WordPress' actions that don't have other good extensibility points. We know that having a dependency on <code>db.php</code> is a problem in some server environments (e.g., there might be a collision with some other plugin also requiring <code>db.php</code>) and will have a solution to this at some point in the future.</p>
-</div>
+Minimum system requirements are:
+
+ - WordPress 3.9 or higher
+ - PHP 5.3 or higher
+ - Git 1.9 or higher installed on the server *(checked automatically before activation)*
+ - Safe mode turned off *(checked automatically before activation)*
+ - `proc_open()` enabled *(checked automatically before activation)*
+ - Write permissions in the site root and everywhere under it *(checked automatically before activation)*
+ - No `wp-content/db.php` on the disk *(checked automatically before activation)*
+ - No path customizations (e.g., custom location for `wp-content`)
+
+As a general rule, we recommend using the latest versions of everything. Furthermore, we recommend some other things for the current version of VersionPress:
+
+ - Apache as a web server
+ - Review the dependencies of other plugins (see below)
+
+In practice, this means that you need to have a lot of control over your server environment. We are aware that this is an issue and will be lowering these requirements over time.
+
+Here are notes on some of the requirements:
+
+
+### PHP 5.3
+
+WordPress itself can run even on the old and [long unsupported](http://php.net/eol.php) PHP 5.2. We also started with this version but eventually dropped it so that we could use the newer language features and some 3<sup>rd</sup> party libraries that are 5.3+ only.
+
+Back-porting VersionPress to PHP 5.2 will probably never happen.
+
+
+### The db.php "hook"
+
+VersionPress currently uses the `wp-content/db.php` file to hook into some WordPress actions for the lack of better extensibility points (see [issue #29710](https://core.trac.wordpress.org/ticket/29710)). This means that VersionPress will be in a conflict with some other plugins like those for caching, debugging etc. We will have a solution to this in some future release.
+
+
+### Path customizations
+
+Some advanced users like having their plugins directory and other folders outside of the site root. This is not possible with VersionPress because it couldn't track changes in those files.
+
+
+### Apache web server
+
+Apache web server is recommended because VersionPress does e.g. some `.htaccess` modifications to make sure the site is secure and other web servers may (and typically will) ignore those.
+
+If you use a web server other than Apache, please make sure you protect some files like the `wp-content/vpdb` content or `<root>/.git` from direct access. 
+
+
+### External libraries
+
+VersionPress depends on several external libraries like for launching the Git process or for working with filesystem. The nature of PHP is such that if some other plugin happens to use the same library in an incompatible version, it might cause issues to VersionPress (or vice versa). The external libraries used by VersionPress are:
+
+ - `nette/nette-minified`
+ - `symfony/process`
+ - `symfony/filesystem`
+ - `michelf/php-markdown`
 
 
 ## Installation
