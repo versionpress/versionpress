@@ -29,6 +29,13 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
     public static $forceSetup;
 
     /**
+     * If true, {@link loginIfNecessary} is called on {@link setUpSite}.
+     *
+     * @var bool
+     */
+    protected static $autologin = true;
+
+    /**
      * @var \VersionPress\Git\GitRepository
      */
     protected $gitRepository;
@@ -67,7 +74,9 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
     }
 
     public function setUpPage() {
-        $this->loginIfNecessary();
+        if (self::$autologin) {
+            $this->loginIfNecessary();
+        }
     }
 
     protected function loginIfNecessary() {
