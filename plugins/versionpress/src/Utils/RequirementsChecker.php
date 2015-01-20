@@ -45,6 +45,12 @@ class RequirementsChecker {
                 'ship a solution as part of some future VersionPress udpate (it is high on our priority list and should be fixed before the final 1.0 release).'
         );
 
+        $this->requirements[] = array(
+            'name' => 'Not multisite',
+            'fulfilled' => !is_multisite(),
+            'help' => 'Currently VersionPress does not support multisites. Stay tuned!'
+        );
+
         $this->everythingFulfilled = array_reduce($this->requirements, function ($carry, $requirement) {
             return $carry && $requirement['fulfilled'];
         }, true);
