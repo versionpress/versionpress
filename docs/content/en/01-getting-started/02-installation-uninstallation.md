@@ -86,6 +86,18 @@ The basic installation is the same as with any other plugin, however, note the l
 The last step is important, otherwise VersionPress wouldn't be able to track changes. The on-screen instructions will guide you through it. 
 
 
+## Update / upgrade
+
+The update process is manual at the moment, and actually very simple:
+
+ 1. Get the latest version of VersionPress
+ 2. Replace the folder `wp-content/plugins/versionpress` with the new version
+
+If some version-specific rules apply, they will be described in the [release notes](../release-notes).
+
+
+
+
 ## Uninstallation
 
 Uninstallation is a two-step process as with any other plugin:
