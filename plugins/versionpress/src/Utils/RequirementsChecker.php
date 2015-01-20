@@ -14,30 +14,35 @@ class RequirementsChecker {
 
         $this->requirements[] = array(
             'name' => 'PHP 5.3',
+            'level' => 'critical',
             'fulfilled' => version_compare(PHP_VERSION, '5.3.0', '>='),
             'help' => 'PHP 5.3 is currently required. We might support PHP 5.2 (the minimum WordPress-required PHP version) in some future update.'
         );
 
         $this->requirements[] = array(
             'name' => 'Execute external commands',
+            'level' => 'critical',
             'fulfilled' => $this->tryRunProcess(),
             'help' => 'PHP function `proc_open()` must be enabled as VersionPress uses it to execute Git commands. Please update your php.ini.'
         );
 
         $this->requirements[] = array(
             'name' => 'Git 1.9+ installed',
+            'level' => 'critical',
             'fulfilled' => $this->tryGit(),
             'help' => 'Git must be installed on the server. The minimal required version is 1.9. Please [download](http://git-scm.com/) and install it.'
         );
 
         $this->requirements[] = array(
             'name' => 'Write access on the filesystem',
+            'level' => 'critical',
             'fulfilled' => $this->tryWrite(),
             'help' => 'VersionPress needs write access in the site root and all nested directories. Please update the permissions.'
         );
 
         $this->requirements[] = array(
             'name' => 'db.php hook',
+            'level' => 'critical',
             'fulfilled' => !is_file(WP_CONTENT_DIR . '/db.php'),
             'help' => 'For VersionPress to do its magic, it needs to create a `wp-content/db.php` file and put some code there. ' .
                 'However, this file is already occupied, possibly by some other plugin. Debugger plugins often do this so if you can, please disable them ' .
@@ -47,12 +52,20 @@ class RequirementsChecker {
 
         $this->requirements[] = array(
             'name' => 'Not multisite',
+            'level' => 'critical',
             'fulfilled' => !is_multisite(),
             'help' => 'Currently VersionPress does not support multisites. Stay tuned!'
         );
 
+        $this->requirements[] = array(
+            'name' => '.htaccess or web.config support',
+            'level' => 'warning',
+            'fulfilled' => $this->tryAccessControlFiles(),
+            'help' => 'It\'s highly recommended to secure `wp-content/plugins/log` and `wp-content/vpdb` directories from access via browser after activation!'
+        );
+
         $this->everythingFulfilled = array_reduce($this->requirements, function ($carry, $requirement) {
-            return $carry && $requirement['fulfilled'];
+            return $carry && ($requirement['fulfilled'] || $requirement['level'] === 'warning');
         }, true);
     }
 
@@ -111,5 +124,10 @@ class RequirementsChecker {
         }
 
         return $writable;
+    }
+
+    private function tryAccessControlFiles() {
+        $securedUrl = site_url() . '/wp-content/plugins/versionpress/temp/security-check.txt';
+        return file_get_contents($securedUrl) === false;
     }
 }
