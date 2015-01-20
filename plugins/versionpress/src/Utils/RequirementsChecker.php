@@ -59,6 +59,14 @@ class RequirementsChecker {
         );
 
         $this->requirements[] = array(
+            'name' => 'Standard directory layout',
+            'level' => 'critical',
+            'fulfilled' => $this->testDirectoryLayout(),
+            'help' => 'It\'s necessary to use standard WordPress directory layout with the current version of VersionPress.'
+        );
+
+
+        $this->requirements[] = array(
             'name' => '.gitignore',
             'level' => 'critical',
             'fulfilled' => $this->testGitignore(),
@@ -140,7 +148,7 @@ class RequirementsChecker {
     }
 
     private function testGitignore() {
-        $gitignorePath = ABSPATH . '/.gitignore';
+        $gitignorePath = ABSPATH . '.gitignore';
         $gitignoreExists = is_file($gitignorePath);
         if (!$gitignoreExists) {
             return true;
@@ -148,5 +156,17 @@ class RequirementsChecker {
 
         $gitignoreContainsVersionPressRules = NStrings::contains(file_get_contents($gitignorePath), 'plugins/versionpress');
         return $gitignoreContainsVersionPressRules;
+    }
+
+    private function testDirectoryLayout() {
+        $uploadDirInfo = wp_upload_dir();
+
+        $isStandardLayout = true;
+        $isStandardLayout &= ABSPATH . 'wp-content' === WP_CONTENT_DIR;
+        $isStandardLayout &= WP_CONTENT_DIR . '/plugins' === WP_PLUGIN_DIR;
+        $isStandardLayout &= WP_CONTENT_DIR . '/themes' === get_theme_root();
+        $isStandardLayout &= WP_CONTENT_DIR . '/uploads' === $uploadDirInfo['basedir'];
+
+        return $isStandardLayout;
     }
 }
