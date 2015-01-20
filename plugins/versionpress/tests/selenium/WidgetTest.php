@@ -55,6 +55,45 @@ class WidgetTest extends SeleniumTestCase {
         $commitAsserter->assertCleanWorkingDirectory();
     }
 
+    /**
+     * @test
+     * @testdox Editing widget creates 'option/edit' action.
+     */
+    public function editingWidgetCreatesOptionEditAction() {
+        $this->url('wp-admin/widgets.php');
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        $this->jsClick('#widgets-right .widget-control-edit');
+        $this->executeScript("jQuery('#widgets-right .widget .widget-inside input[name*=title]').first().val('Edited title')");
+        $this->executeScript("jQuery('#widgets-right .widget .widget-inside input[type=submit]').first().click()");
+        $this->waitForAjax();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('option/edit');
+        $commitAsserter->assertCountOfAffectedFiles(1);
+        $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
+        $commitAsserter->assertCleanWorkingDirectory();
+    }
+
+    /**
+     * @test
+     * @testdox Deleting widget creates 'option/edit' action
+     */
+    public function deletingWdigetCreatesOptionEditAction() {
+        $this->url('wp-admin/widgets.php');
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        $this->jsClick('#widgets-right .widget-control-edit');
+        $this->executeScript("jQuery('#widgets-right .widget .widget-control-remove').first().click()");
+        $this->waitForAjax();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('option/edit');
+        $commitAsserter->assertCountOfAffectedFiles(1);
+        $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
+        $commitAsserter->assertCleanWorkingDirectory();
+    }
+
     private static function clearSidebars() {
         $sidebars = WpAutomation::getSidebars();
         if (count($sidebars) == 0) {
