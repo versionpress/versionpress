@@ -31,6 +31,7 @@ if (defined('WP_CLI') && WP_CLI && vp_is_active()) {
 }
 
 if (defined('VP_MAINTENANCE')) {
+    require_once(__DIR__ . '/bootstrap.php');
     NDebugger::log("Ooops. Something went wrong :( The .maintenance file was not deleted.");
     vp_disable_maintenance();
 }
