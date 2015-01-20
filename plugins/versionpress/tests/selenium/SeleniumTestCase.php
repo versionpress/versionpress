@@ -105,7 +105,9 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
      * @param $value
      */
     protected function setValue($cssSelector, $value) {
-        $this->byCssSelector($cssSelector)->value($value);
+        $element = $this->byCssSelector($cssSelector);
+        $element->clear();
+        $element->value($value);
         $this->executeScript("jQuery('$cssSelector').val('$value')");
     }
 
