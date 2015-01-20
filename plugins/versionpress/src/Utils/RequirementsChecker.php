@@ -4,6 +4,7 @@ namespace VersionPress\Utils;
 
 use Exception;
 use NStrings;
+use Symfony\Component\Process\Process;
 
 class RequirementsChecker {
     private $requirements = array();
@@ -58,6 +59,13 @@ class RequirementsChecker {
         );
 
         $this->requirements[] = array(
+            'name' => '.gitignore',
+            'level' => 'critical',
+            'fulfilled' => $this->testGitignore(),
+            'help' => 'It seems you have already created .gitignore file in the site root. It\'s necessary to add some rules for VersionPress. Please add those from `wp-content/plugins/versionpress/src/Initialization/.gitignore.tpl`.'
+        );
+
+        $this->requirements[] = array(
             'name' => '.htaccess or web.config support',
             'level' => 'warning',
             'fulfilled' => $this->tryAccessControlFiles(),
@@ -84,7 +92,7 @@ class RequirementsChecker {
 
     private function tryRunProcess() {
         try {
-            $process = new \Symfony\Component\Process\Process("echo test");
+            $process = new Process("echo test");
             $process->run();
             return true;
         } catch (Exception $e) {
@@ -94,7 +102,7 @@ class RequirementsChecker {
 
     private function tryGit() {
         try {
-            $process = new \Symfony\Component\Process\Process("git --version");
+            $process = new Process("git --version");
             $process->run();
             if ($process->getErrorOutput() !== null) return false; // there is no git
             $output = trim($process->getOutput());
@@ -129,5 +137,16 @@ class RequirementsChecker {
     private function tryAccessControlFiles() {
         $securedUrl = site_url() . '/wp-content/plugins/versionpress/temp/security-check.txt';
         return file_get_contents($securedUrl) === false;
+    }
+
+    private function testGitignore() {
+        $gitignorePath = ABSPATH . '/.gitignore';
+        $gitignoreExists = is_file($gitignorePath);
+        if (!$gitignoreExists) {
+            return true;
+        }
+
+        $gitignoreContainsVersionPressRules = NStrings::contains(file_get_contents($gitignorePath), 'plugins/versionpress');
+        return $gitignoreContainsVersionPressRules;
     }
 }
