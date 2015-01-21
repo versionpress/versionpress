@@ -64,7 +64,7 @@ If you use a web server other than Apache, please make sure you protect some fil
 
 ### External libraries
 
-VersionPress depends on several external libraries like for launching the Git process or for working with filesystem. The nature of PHP is such that if some other plugin happens to use the same library in an incompatible version, it might cause issues to VersionPress (or vice versa). The external libraries used by VersionPress are:
+VersionPress depends on external libraries for launching Git processes, working with the file system, etc. The nature of PHP is such that if some other plugin happens to include the same library but in an incompatible version, it might cause issues to VersionPress (or vice versa). There is not much we can do about it so here's just the list of those dependencies so that you can troubleshoot yourself if needs be:
 
  - `nette/nette-minified`
  - `symfony/process`
