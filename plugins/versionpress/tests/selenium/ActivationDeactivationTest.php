@@ -1,4 +1,4 @@
-<?php
+    <?php
 use VersionPress\Initialization\InitializationConfig;
 
 /**
@@ -13,7 +13,9 @@ class ActivationDeactivationTest extends SeleniumTestCase {
         if (!WpAutomation::isSiteSetUp()) {
             WpAutomation::setUpSite();
         }
-        WpAutomation::uninstallVersionPress();
+        try {
+            WpAutomation::uninstallVersionPress();
+        } catch (Exception $e) {}
         WpAutomation::copyVersionPressFiles();
     }
 
