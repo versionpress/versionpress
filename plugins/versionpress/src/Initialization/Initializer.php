@@ -8,6 +8,7 @@ use VersionPress\Git\GitRepository;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\IdUtil;
+use VersionPress\VersionPress;
 use wpdb;
 
 /**
@@ -418,7 +419,7 @@ class Initializer {
 
 
         $this->reportProgressChange(InitializerStates::CREATING_INITIAL_COMMIT);
-        $installationChangeInfo = new VersionPressChangeInfo("activate", vp_get_version());
+        $installationChangeInfo = new VersionPressChangeInfo("activate", VersionPress::getVersion());
 
         $currentUser = wp_get_current_user();
         /** @noinspection PhpUndefinedFieldInspection */

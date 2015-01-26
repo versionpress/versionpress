@@ -5,9 +5,10 @@ namespace VersionPress\Git;
 use Committer;
 use NStrings;
 use VersionPress\ChangeInfos\ChangeInfoMatcher;
-use VersionPress\ChangeInfos\CompositeChangeInfo;
+use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\RevertChangeInfo;
+use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Synchronizers\SynchronizationProcess;
@@ -117,16 +118,15 @@ class Reverter {
     }
 
     private function checkReferencesForRevertedCommit(Commit $revertedCommit) {
-        $changeInfo = ChangeInfoMatcher::createMatchingChangeInfo($revertedCommit->getMessage());
-        if ($changeInfo instanceof EntityChangeInfo) {
-            return $this->checkEntityReferences($changeInfo);
+        $changeInfo = ChangeInfoMatcher::buildChangeInfo($revertedCommit->getMessage());
+
+        if ($changeInfo instanceof UntrackedChangeInfo) {
+            return true;
         }
 
-        if ($changeInfo instanceof CompositeChangeInfo) {
-            foreach ($changeInfo->getChangeInfoList() as $subChangeInfo) {
-                if ($subChangeInfo instanceof EntityChangeInfo && !$this->checkEntityReferences($subChangeInfo)) {
-                    return false;
-                }
+        foreach ($changeInfo->getChangeInfoList() as $subChangeInfo) {
+            if ($subChangeInfo instanceof EntityChangeInfo && !$this->checkEntityReferences($subChangeInfo)) {
+                return false;
             }
         }
 

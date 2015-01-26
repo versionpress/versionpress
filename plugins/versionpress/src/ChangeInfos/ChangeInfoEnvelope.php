@@ -3,11 +3,18 @@ namespace VersionPress\ChangeInfos;
 
 use VersionPress\Git\CommitMessage;
 use VersionPress\Utils\ArrayUtils;
+use VersionPress\VersionPress;
 
 /**
  * Class representing more changes in one commit
  */
-class CompositeChangeInfo implements ChangeInfo {
+class ChangeInfoEnvelope implements ChangeInfo {
+
+    /**
+     * VP meta tag that says the version of VersionPress in which was the commit made.
+     * It's parsed into {@link version} field by the {@link buildFromCommitMessage} method.
+     */
+    const VP_VERSION_TAG = "X-VP-Version";
 
     /** @var TrackedChangeInfo[] */
     private $changeInfoList;
@@ -33,11 +40,15 @@ class CompositeChangeInfo implements ChangeInfo {
         "VersionPress\ChangeInfos\UserMetaChangeInfo",
     );
 
+    private $version;
+
     /**
      * @param TrackedChangeInfo[] $changeInfoList
+     * @param string|null $version
      */
-    public function __construct($changeInfoList) {
+    public function __construct($changeInfoList, $version = null) {
         $this->changeInfoList = $changeInfoList;
+        $this->version = $version === null ? VersionPress::getVersion() : $version;
     }
 
     /**
@@ -55,6 +66,7 @@ class CompositeChangeInfo implements ChangeInfo {
         }
 
         $body = join("\n\n", $bodies);
+        $body .= sprintf("\n\n%s: %s", self::VP_VERSION_TAG, $this->version);
 
         return new CommitMessage($subject, $body);
     }
@@ -82,18 +94,27 @@ class CompositeChangeInfo implements ChangeInfo {
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $fullBody = $commitMessage->getBody();
         $splittedBodies = explode("\n\n", $fullBody);
+        $lastBody = $splittedBodies[count($splittedBodies) - 1];
         $changeInfoList = array();
+        $version = null;
+
+        if (self::containsVersion($lastBody)) {
+            $version = self::extractVersion($lastBody);
+            array_pop($splittedBodies);
+        }
 
         foreach ($splittedBodies as $body) {
             $partialCommitMessage = new CommitMessage("", $body);
-            $changeInfoList[] = ChangeInfoMatcher::createMatchingChangeInfo($partialCommitMessage);
+            /** @var ChangeInfo $matchingChangeInfoType */
+            $matchingChangeInfoType = ChangeInfoMatcher::findMatchingChangeInfo($partialCommitMessage);
+            $changeInfoList[] = $matchingChangeInfoType::buildFromCommitMessage($partialCommitMessage);
         }
 
-        return new self($changeInfoList);
+        return new self($changeInfoList, $version);
     }
 
     /**
-     * Returns all ChangeInfo objects encapsulated in CompositeChangeInfo.
+     * Returns all ChangeInfo objects encapsulated in ChangeInfoEnvelope.
      *
      * @return TrackedChangeInfo[]
      */
@@ -174,5 +195,15 @@ class CompositeChangeInfo implements ChangeInfo {
         }
 
         return 0;
+    }
+
+    private static function containsVersion($lastBody) {
+        return \NStrings::startsWith($lastBody, self::VP_VERSION_TAG);
+    }
+
+    private static function extractVersion($lastBody) {
+        $tmpMessage = new CommitMessage("", $lastBody);
+        $version = $tmpMessage->getVersionPressTag(self::VP_VERSION_TAG);
+        return $version;
     }
 }

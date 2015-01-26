@@ -55,7 +55,7 @@ class RevertChangeInfo extends TrackedChangeInfo {
         $revertedCommit = $repository->getCommit($this->commitHash);
 
         if ($this->action === self::ACTION_UNDO) {
-            $revertedChangeInfo = ChangeInfoMatcher::createMatchingChangeInfo($revertedCommit->getMessage());
+            $revertedChangeInfo = ChangeInfoMatcher::buildChangeInfo($revertedCommit->getMessage());
             return sprintf("Reverted change \"%s\"", $revertedChangeInfo->getChangeDescription());
         }
 

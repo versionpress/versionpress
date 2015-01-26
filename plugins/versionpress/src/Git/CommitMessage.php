@@ -73,7 +73,7 @@ class CommitMessage {
             $tagLines = array_filter(
                 array_map("trim", explode("\n", $this->getBody())),
                 function ($line) {
-                    return NStrings::startsWith($line, "VP-");
+                    return NStrings::startsWith($line, "VP-") || NStrings::startsWith($line, "X-VP-");
                 }
             );
             $tags = array();

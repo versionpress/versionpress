@@ -3,7 +3,7 @@
 namespace VersionPress\Tests\Utils;
 
 use VersionPress\ChangeInfos\ChangeInfo;
-use VersionPress\ChangeInfos\CompositeChangeInfo;
+use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\Database\EntityInfo;
@@ -55,13 +55,17 @@ class ChangeInfoUtils {
      * equivalent. Currently compares that it was the same action on the same entity (incl. VPID)
      * and that the set of custom VP tags is the same (keys must be the same, values may differ).
      *
-     * Note: currently doesn't work for CompositeChangeInfo.
-     *
-     * @param TrackedChangeInfo $changeInfo1
-     * @param TrackedChangeInfo $changeInfo2
+     * @param TrackedChangeInfo|ChangeInfoEnvelope $changeInfo1
+     * @param TrackedChangeInfo|ChangeInfoEnvelope $changeInfo2
      * @return bool
      */
     public static function captureSameAction($changeInfo1, $changeInfo2) {
+
+        if (self::firstIsEnvelopeContainingSecond($changeInfo1, $changeInfo2) ||
+            self::firstIsEnvelopeContainingSecond($changeInfo2, $changeInfo1) ||
+            self::bothAreEnvelopesContainingTheSame($changeInfo1, $changeInfo2)) {
+            return true;
+        }
 
         if (get_class($changeInfo1) !== get_class($changeInfo2)) {
             return false;
@@ -89,7 +93,7 @@ class ChangeInfoUtils {
     }
 
     /**
-     * Returns an actionable tracked change info (CompositeChangeInfo isn't so it returns its most
+     * Returns an actionable tracked change info (ChangeInfoEnvelope isn't so it returns its most
      * important internal changeinfo).
      *
      * @param ChangeInfo $changeInfo
@@ -97,8 +101,8 @@ class ChangeInfoUtils {
      */
     public static function getTrackedChangeInfo($changeInfo) {
 
-        if ($changeInfo instanceof CompositeChangeInfo) {
-            /** @var CompositeChangeInfo $changeInfo */
+        if ($changeInfo instanceof ChangeInfoEnvelope) {
+            /** @var ChangeInfoEnvelope $changeInfo */
             $sortedChangeInfos = $changeInfo->getSortedChangeInfoList();
             return $sortedChangeInfos[0];
         } else {
@@ -106,4 +110,55 @@ class ChangeInfoUtils {
         }
     }
 
+    private static function firstIsEnvelopeContainingSecond($firstChangeInfo, $secondChangeInfo) {
+        $initialConditionsSatisfied = $firstChangeInfo instanceof ChangeInfoEnvelope && $secondChangeInfo instanceof TrackedChangeInfo;
+
+        if (!$initialConditionsSatisfied) {
+            return false;
+        }
+
+        $changeInfoList = $firstChangeInfo->getChangeInfoList();
+        return count($changeInfoList) === 1 && self::captureSameAction($changeInfoList[0], $secondChangeInfo);
+    }
+
+    /**
+     * @param ChangeInfoEnvelope $firstChangeInfo
+     * @param ChangeInfoEnvelope $secondChangeInfo
+     * @return bool
+     */
+    private static function bothAreEnvelopesContainingTheSame($firstChangeInfo, $secondChangeInfo) {
+        $initialConditionsSatisfied = $firstChangeInfo instanceof ChangeInfoEnvelope && $secondChangeInfo instanceof ChangeInfoEnvelope;
+
+        if (!$initialConditionsSatisfied) {
+            return false;
+        }
+
+        $firstChangeInfoList = $firstChangeInfo->getChangeInfoList();
+        $secondChangeInfoList = $secondChangeInfo->getChangeInfoList();
+
+        if (count($firstChangeInfoList) !== count($secondChangeInfoList)) {
+            return false;
+        }
+
+        return self::listsContainSameChangeInfos($firstChangeInfoList, $secondChangeInfoList);
+    }
+
+    /**
+     * @param TrackedChangeInfo[] $firstChangeInfoList
+     * @param TrackedChangeInfo[] $secondChangeInfoList
+     * @return bool
+     */
+    private static function listsContainSameChangeInfos($firstChangeInfoList, $secondChangeInfoList) {
+        $length = count($firstChangeInfoList);
+        for ($i = 0; $i < $length; $i++) {
+            $changeInfoInFirstList = $firstChangeInfoList[$i];
+            $changeInfoInSecondList = $secondChangeInfoList[$i];
+
+            if (!self::captureSameAction($changeInfoInFirstList, $changeInfoInSecondList)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

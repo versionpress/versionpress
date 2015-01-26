@@ -1,11 +1,11 @@
 <?php
 
-use VersionPress\ChangeInfos\CompositeChangeInfo;
+use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\PostChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
 
-class CompositeChangeInfoTest extends PHPUnit_Framework_TestCase {
+class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase {
 
 
     /**
@@ -13,10 +13,10 @@ class CompositeChangeInfoTest extends PHPUnit_Framework_TestCase {
      * @dataProvider samePriorityExamples
      */
     public function changeInfosWithSamePriorityMaintainOrder($inputChangeInfosSample, $sortedChangeInfosSample) {
-        $compositeChangeInfo = new CompositeChangeInfo($inputChangeInfosSample);
-        $sortedByCompositeChangeInfo = $compositeChangeInfo->getSortedChangeInfoList();
+        $changeInfoEnvelope = new ChangeInfoEnvelope($inputChangeInfosSample);
+        $sortedByChangeInfoEnvelope = $changeInfoEnvelope->getSortedChangeInfoList();
 
-        $this->assertEquals($sortedChangeInfosSample, $sortedByCompositeChangeInfo);
+        $this->assertEquals($sortedChangeInfosSample, $sortedByChangeInfoEnvelope);
     }
 
     /** @test */
@@ -28,10 +28,10 @@ class CompositeChangeInfoTest extends PHPUnit_Framework_TestCase {
         $input = array($normalPriorityPostChangeInfo, $higherPriorityPostChangeInfo);
         $expectedSorted = array($higherPriorityPostChangeInfo, $normalPriorityPostChangeInfo);
 
-        $compositeChangeInfo = new CompositeChangeInfo($input);
-        $sortedByCompositeChangeInfo = $compositeChangeInfo->getSortedChangeInfoList();
+        $changeInfoEnvelope = new ChangeInfoEnvelope($input);
+        $sortedByChangeInfoEnvelope = $changeInfoEnvelope->getSortedChangeInfoList();
 
-        $this->assertEquals($sortedByCompositeChangeInfo, $expectedSorted);
+        $this->assertEquals($sortedByChangeInfoEnvelope, $expectedSorted);
     }
 
 
@@ -44,10 +44,10 @@ class CompositeChangeInfoTest extends PHPUnit_Framework_TestCase {
         $input = array($normalPriorityThemeChangeInfo, $higherPriorityThemeChangeInfo);
         $expectedSorted = array($higherPriorityThemeChangeInfo, $normalPriorityThemeChangeInfo);
 
-        $compositeChangeInfo = new CompositeChangeInfo($input);
-        $sortedByCompositeChangeInfo = $compositeChangeInfo->getSortedChangeInfoList();
+        $changeInfoEnvelope = new ChangeInfoEnvelope($input);
+        $sortedByChangeInfoEnvelope = $changeInfoEnvelope->getSortedChangeInfoList();
 
-        $this->assertEquals($sortedByCompositeChangeInfo, $expectedSorted);
+        $this->assertEquals($sortedByChangeInfoEnvelope, $expectedSorted);
     }
 
 

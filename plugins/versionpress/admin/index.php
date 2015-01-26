@@ -10,6 +10,7 @@ use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Utils\JsRedirect;
 use VersionPress\Utils\Markdown;
 use VersionPress\Utils\RequirementsChecker;
+use VersionPress\VersionPress;
 
 require_once(__DIR__ . '/../bootstrap.php');
 
@@ -110,7 +111,7 @@ function _vp_show_progress_message($progressMessage) {
 
     <?php
 
-    if (isset($_GET['init']) && !vp_is_active()) {
+    if (isset($_GET['init']) && !VersionPress::isActive()) {
     ?>
 
         <div class="welcome-panel">
@@ -151,7 +152,7 @@ function _vp_show_progress_message($progressMessage) {
         <?php
 
 
-    } elseif (!vp_is_active()) {
+    } elseif (!VersionPress::isActive()) {
     ?>
 
         <div class="welcome-panel vp-activation-panel">
@@ -358,8 +359,7 @@ function _vp_show_progress_message($progressMessage) {
                 $canUndoCommit = $canUndoCommit && ($commit->getHash() !== $initialCommitHash);
                 $canRollbackToThisCommit = !$isFirstCommit && ($canUndoCommit || $commit->getHash() === $initialCommitHash);
 
-                $changeInfo = ChangeInfoMatcher::createMatchingChangeInfo($commit->getMessage());
-
+                $changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
                 $undoSnippet = "<a href='" . admin_url('admin.php?action=vp_undo&commit=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts changes done by this commit'>Undo this</a>";
 
                 $rollbackSnippet = "<a href='" . admin_url('admin.php?action=vp_rollback&commit=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts site back to this state; effectively undos all the change up to this commit'>Roll back to this</a>";

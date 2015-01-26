@@ -23,10 +23,11 @@ use VersionPress\Storages\Mirror;
 use VersionPress\Utils\BugReporter;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\IdUtil;
+use VersionPress\VersionPress;
 
 defined('ABSPATH') or die("Direct access not allowed");
 
-if (defined('WP_CLI') && WP_CLI && vp_is_active()) {
+if (defined('WP_CLI') && WP_CLI && VersionPress::isActive()) {
     WP_CLI::add_command('vp', 'VersionPress\Cli\VPCommand');
 }
 
@@ -41,7 +42,7 @@ if (defined('VP_MAINTENANCE')) {
 //----------------------------------------
 
 
-if (vp_is_active()) {
+if (VersionPress::isActive()) {
     vp_register_hooks();
 }
 
@@ -296,7 +297,7 @@ function vp_activate() {
  * @see vp_admin_post_cancel_deactivation()
  */
 function vp_deactivate() {
-    if (defined('WP_CLI') || !vp_is_active()) {
+    if (defined('WP_CLI') || !VersionPress::isActive()) {
         vp_admin_post_confirm_deactivation();
     } else {
         wp_redirect(admin_url('admin.php?page=versionpress/admin/deactivate.php'));
@@ -390,7 +391,7 @@ add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are
  */
 function vp_activation_nag() {
 
-    if (vp_is_active() ||
+    if (VersionPress::isActive() ||
         get_current_screen()->id == "versionpress/admin/index" ||
         get_current_screen()->id == "versionpress/admin/deactivate"
     ) {
@@ -415,7 +416,7 @@ add_filter('wp_insert_post_data', 'vp_generate_post_guid', '99', 2);
  * @return array
  */
 function vp_generate_post_guid($data, $postarr) {
-    if (!vp_is_active()) return $data;
+    if (!VersionPress::isActive()) return $data;
 
     if (empty($postarr['ID'])) { // it's insert not update
         $data['guid'] = IdUtil::newUuid();
@@ -484,7 +485,7 @@ function _vp_revert($reverterMethod) {
     }
 }
 
-if (vp_is_active()) {
+if (VersionPress::isActive()) {
     add_action('admin_bar_menu', 'vp_admin_bar_warning');
 }
 
@@ -497,7 +498,7 @@ function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
 
     $adminBarText = "<span style=\"color:#FF8800;font-weight:bold\">VersionPress EAP running</span>";
     $popoverTitle = "Note";
-    $popoverText = "<p style='margin-top: 5px;'>You are running <strong>VersionPress " . vp_get_version() . "</strong> which is an <strong style='font-size: 1.15em;'>EAP release</strong>. Please understand that EAP releases are early versions of the software and as such might not fully support certain workflows, 3<sup>rd</sup> party plugins, hosts etc.<br /><br /><strong>We recommend that you keep a safe backup of the site at all times</strong></p>";
+    $popoverText = "<p style='margin-top: 5px;'>You are running <strong>VersionPress " . VersionPress::getVersion() . "</strong> which is an <strong style='font-size: 1.15em;'>EAP release</strong>. Please understand that EAP releases are early versions of the software and as such might not fully support certain workflows, 3<sup>rd</sup> party plugins, hosts etc.<br /><br /><strong>We recommend that you keep a safe backup of the site at all times</strong></p>";
     $popoverText .= "<p><a href='http://docs.versionpress.net/en/release-notes' target='_blank'>Learn more about VersionPress releases</a></p>";
 
     $adminBar->add_node(array(
@@ -545,31 +546,3 @@ function vp_enable_maintenance() {
 function vp_disable_maintenance() {
     FileSystem::remove(ABSPATH . '/.maintenance');
 }
-
-//----------------------------------
-// Public functions
-//----------------------------------
-
-/**
- * Returns true if VersionPress is active. Note that active != activated and being
- * active means that VersionPress is tracking changes.
- *
- * @return bool
- */
-function vp_is_active() {
-    return defined('VERSIONPRESS_ACTIVATION_FILE') && file_exists(VERSIONPRESS_ACTIVATION_FILE);
-}
-
-/**
- * Returns VersionPress version as specified in plugin metadata
- *
- * @return string
- */
-function vp_get_version() {
-    if (!function_exists('get_plugin_data')) {
-        require_once(ABSPATH . 'wp-admin/includes/plugin.php');
-    }
-    $pluginData = get_plugin_data(VERSIONPRESS_PLUGIN_DIR . "/versionpress.php", false, false);
-    return $pluginData['Version'];
-}
-

@@ -161,7 +161,7 @@ class PostTypeTestCase extends \SeleniumTestCase {
      * @return string
      */
     private function getPostTypeScreenUrl() {
-        return 'wp-admin/edit.php?post_type=' . $this->getPostType();
+        return 'wp-admin/edit.php?post_type=' . $this->getPostType() . '&orderby=date&order=desc';
     }
 
     /**

@@ -40,18 +40,17 @@ class ChangeInfoMatcher {
     );
 
     /**
-     * For a given commit message, finds the matching ChangeInfo class and creates
-     * an instance of it. Matching is done based on the value of the VP-Action tag.
+     * For a given commit message, creates ChangeInfoEnvelope containing all ChangeInfo.
      *
      * @param CommitMessage $commitMessage
-     * @return ChangeInfo
+     * @return ChangeInfoEnvelope|UntrackedChangeInfo
      */
-    public static function createMatchingChangeInfo(CommitMessage $commitMessage) {
+    public static function buildChangeInfo(CommitMessage $commitMessage) {
+        if (self::findMatchingChangeInfo($commitMessage) === 'VersionPress\ChangeInfos\UntrackedChangeInfo') {
+            return UntrackedChangeInfo::buildFromCommitMessage($commitMessage);
+        }
 
-        /** @var ChangeInfo $matchingChangeInfoType */
-        $matchingChangeInfoType = self::findMatchingChangeInfo($commitMessage);
-        return $matchingChangeInfoType::buildFromCommitMessage($commitMessage);
-
+        return ChangeInfoEnvelope::buildFromCommitMessage($commitMessage);
     }
 
     /**
@@ -64,7 +63,7 @@ class ChangeInfoMatcher {
     public static function findMatchingChangeInfo(CommitMessage $commitMessage) {
 
         if (substr_count($commitMessage->getBody(), TrackedChangeInfo::ACTION_TAG) > 1) {
-            return "VersionPress\ChangeInfos\CompositeChangeInfo";
+            return "VersionPress\ChangeInfos\ChangeInfoEnvelope";
         }
 
         $actionTagValue = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG); // can be empty string which is not a problem
@@ -78,8 +77,6 @@ class ChangeInfoMatcher {
 
         // Code execution should never reach this point, at least the 'UntrackedChangeInfo' should match
         throw new Exception("Matching ChangeInfo type not found");
-
-
     }
 
     /**
