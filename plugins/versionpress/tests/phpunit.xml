@@ -1,2 +1,18 @@
 <phpunit bootstrap="phpunit-bootstrap.php">
+    <testsuites>
+
+        <testsuite name="Unit Tests">
+            <directory>unit</directory>
+        </testsuite>
+
+        <testsuite name="Selenium Tests">
+            <directory>selenium</directory>
+        </testsuite>
+
+        <!-- These are outdated at the time of writing, update them and then enable; see WP-189 -->
+        <!--<testsuite name="End 2 End">-->
+            <!--<directory>end2end</directory>-->
+        <!--</testsuite>-->
+
+    </testsuites>
 </phpunit>
