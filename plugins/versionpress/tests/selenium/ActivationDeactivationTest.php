@@ -58,7 +58,8 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      */
     public function successfulActivationRedirectsToMainVersionPressTable() {
         $this->byCssSelector('#activate-versionpress-btn')->click();
-        $this->assertElementExists('#versionpress-commits-table', InitializationConfig::REDIRECT_AFTER_MS + 3000);
+        $this->waitAfterRedirect();
+        $this->waitForElement('#versionpress-commits-table', InitializationConfig::REDIRECT_AFTER_MS + 3000);
     }
 
 

@@ -80,16 +80,21 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
     }
 
     protected function loginIfNecessary() {
-        try {
-            $this->url('wp-admin');
-            usleep(100 * 1000); // sometimes we need to wait for the page to fully load
-            $this->byId('user_login')->value(self::$config->getAdminName());
-            usleep(100 * 1000); // wait for change focus
-            $this->byId('user_pass')->value(self::$config->getAdminPassword());
-            $this->byId("loginform")->submit();
-        } catch (PHPUnit_Extensions_Selenium2TestCase_WebDriverException $e) {
-            // already logged in
+        if ($this->elementExists('#wpadminbar')) {
+            return;
         }
+
+        $this->url('wp-admin');
+        usleep(100 * 1000); // sometimes we need to wait for the page to fully load
+
+        if (!$this->elementExists('#user_login')) {
+            return;
+        }
+
+        $this->byId('user_login')->value(self::$config->getAdminName());
+        usleep(100 * 1000); // wait for change focus
+        $this->byId('user_pass')->value(self::$config->getAdminPassword());
+        $this->byId("loginform")->submit();
     }
 
     protected function logOut() {
@@ -158,14 +163,20 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
      * Asserts that element exists.
      *
      * @param string $cssSelector
-     * @param int $timeout Timeout for the assert to succeed. By default, assertion is done immediately.
      */
-    protected function assertElementExists($cssSelector, $timeout = 0) {
-        if ($timeout == 0) {
+    protected function assertElementExists($cssSelector) {
+        if (!$this->elementExists($cssSelector)) {
+            $this->fail("Element \"$cssSelector\" does not exist");
+        }
+    }
+
+    protected function elementExists($cssSelector) {
+        try {
             // See e.g. https://github.com/giorgiosironi/phpunit-selenium/blob/a6fdffdd56f4884ef39e09a9c62e5e4eb273e42c/Tests/Selenium2TestCaseTest.php#L1065
             $this->byCssSelector($cssSelector);
-        } else {
-            $this->waitForElement($cssSelector, $timeout);
+            return true;
+        } catch (PHPUnit_Extensions_Selenium2TestCase_WebDriverException $e) {
+            return false;
         }
     }
 
@@ -192,7 +203,6 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
      * @param int $timeout Timeout in milliseconds. Default: 3 seconds.
      */
     protected function waitForElement($cssSelector, $timeout = 3000) {
-
         $previousImplicitWait = $this->timeouts()->getLastImplicitWaitValue();
         $this->timeouts()->implicitWait($timeout);
         $this->assertElementExists($cssSelector);

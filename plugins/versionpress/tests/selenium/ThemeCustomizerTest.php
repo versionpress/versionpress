@@ -8,9 +8,12 @@ class ThemeCustomizerTest extends SeleniumTestCase {
     public function everyChangeMadeInCustomizerCreatesThemeCustomizeAction() {
         $this->url('wp-admin/customize.php');
         $this->byCssSelector('#accordion-section-title_tagline .accordion-section-title')->click();
-        $this->setValue('#customize-control-blogname input', 'Blogname from customizer');
+        $this->setValue('#customize-control-blogname input', 'Some name');
+        $this->byId('save')->click();
+        $this->waitForAjax();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->setValue('#customize-control-blogname input', 'Blogname from customizer');
         $this->byId('save')->click();
         $this->waitForAjax();
 
