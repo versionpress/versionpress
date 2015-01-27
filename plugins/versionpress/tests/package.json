@@ -10,6 +10,7 @@
     "chalk": "^0.5.1",
     "gulp": "^3.8.10",
     "gulp-phpunit": "^0.7.0",
-    "selenium-please": "^0.2.2"
+    "selenium-please": "^0.2.2",
+    "tcp-port-used": "^0.1.2"
   }
 }

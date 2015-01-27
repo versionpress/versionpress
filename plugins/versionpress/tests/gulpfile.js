@@ -2,18 +2,33 @@ var gulp = require('gulp');
 var phpunit = require('gulp-phpunit');
 var seleniumPlease = require('selenium-please');
 var chalk = require('chalk');
+var tcpPortUsed = require('tcp-port-used');
 
 // Run this task to get the help
 gulp.task('default', function() {
-    console.log('');
-    console.log(chalk.cyan('Usage:') + ' ' + chalk.bold('gulp run-tests'));
-    console.log('');
-    console.log(' - Make sure that ' + chalk.yellow('test-config.ini') + ' is configured properly');
-    console.log(' - Tests defined in ' + chalk.yellow('phpunit.xml') + ' will be run');
-    console.log(' - ' + chalk.yellow('Java') + ' has to be installed and in the PATH');
-    console.log(' - Selenium Server will be downloaded and run automatically');
-    console.log(' - Firefox defined in test-config.ini will be used');
-    console.log('');
+
+    tcpPortUsed.check(4444).then(function(isInUse) {
+
+        var portStatus = '';
+        if (isInUse) {
+            portStatus = chalk.red(' (currently in use)');
+        } else {
+            portStatus = ' (currently is)';
+        }
+
+        console.log('');
+        console.log(chalk.cyan('Usage:') + ' ' + chalk.bold('gulp run-tests'));
+        console.log('');
+        console.log(' - Make sure that ' + chalk.yellow('test-config.ini') + ' is configured properly');
+        console.log(' - Tests defined in ' + chalk.yellow('phpunit.xml') + ' will be run');
+        console.log(' - Port ' + chalk.yellow('4444') + ' must be available' + portStatus);
+        console.log(' - ' + chalk.yellow('Java') + ' has to be installed and in the PATH');
+        console.log(' - Selenium Server will be downloaded and run automatically');
+        console.log(' - Firefox defined in test-config.ini will be used');
+        console.log('');
+
+    })
+
 });
 
 gulp.task('run-tests', function(cb) {
