@@ -153,9 +153,20 @@ function vp_register_hooks() {
             $wpdb->delete($dbSchemaInfo->getPrefixedTableName("postmeta"), array($idColumnName => $metaId), null, false);
         }
     });
+
+    add_action('wp_ajax_save-widget', function () use ($committer) {
+        if (defined('DOING_AJAX') && DOING_AJAX && isset($_POST['delete_widget']) && $_POST['delete_widget']) {
+            $committer->postponeCommit('widgets');
+        }
+    }, 0); // zero because the default WP action with priority 1 calls wp_die()
+
     //----------------------------------------
     // URL "hooks"
     //----------------------------------------
+
+    if (defined('DOING_AJAX') && DOING_AJAX && isset($_REQUEST['action']) && $_REQUEST['action'] === 'widgets-order') {
+        $committer->usePostponedChangeInfos('widgets');
+    }
 
     if (basename($_SERVER['PHP_SELF']) === 'themes.php' && isset($_GET['action']) && $_GET['action'] === 'delete') {
         $themeId = $_GET['stylesheet'];

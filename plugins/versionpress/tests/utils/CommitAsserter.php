@@ -1,6 +1,7 @@
 <?php
 use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\ChangeInfo;
+use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\Git\Commit;
 use VersionPress\Tests\Utils\ChangeInfoUtils;
@@ -101,8 +102,9 @@ class CommitAsserter {
         $commitChangeInfo = $this->getChangeInfo($commit);
         $referenceCommitChangeInfo = $this->getChangeInfo($referenceCommit);
 
-        if (!($commitChangeInfo instanceof TrackedChangeInfo) || !($referenceCommitChangeInfo instanceof TrackedChangeInfo)) {
-            PHPUnit_Framework_Assert::fail("Sorry, this assertion is only available for TrackedChangedInfo commits");
+        if (!($commitChangeInfo instanceof TrackedChangeInfo || $commitChangeInfo instanceof ChangeInfoEnvelope) ||
+            !($referenceCommitChangeInfo instanceof TrackedChangeInfo || $referenceCommitChangeInfo instanceof ChangeInfoEnvelope)) {
+            PHPUnit_Framework_Assert::fail("Sorry, this assertion is only available for TrackedChangedInfo or ChangeInfoEnvelope commits");
         }
 
         /** @var TrackedChangeInfo $commitChangeInfo */
@@ -126,10 +128,10 @@ class CommitAsserter {
 
     /**
      * @param Commit $commit
-     * @return ChangeInfo
+     * @return ChangeInfoEnvelope|UntrackedChangeInfo
      */
-    public function getChangeInfo($commit) {
-        return \VersionPress\ChangeInfos\ChangeInfoMatcher::createMatchingChangeInfo($commit->getMessage());
+    private function getChangeInfo($commit) {
+        return \VersionPress\ChangeInfos\ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
     }
 
     public function assertCommitTag($tagKey, $tagValue) {

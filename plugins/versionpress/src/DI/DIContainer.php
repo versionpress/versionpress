@@ -89,7 +89,7 @@ class DIContainer {
         });
 
         $dic->register(VersionPressServices::REPOSITORY, function () {
-            return new GitRepository(ABSPATH, VERSIONPRESS_PLUGIN_DIR . '/temp');
+            return new GitRepository(ABSPATH, VERSIONPRESS_TEMP_DIR);
         });
 
         return self::$instance;

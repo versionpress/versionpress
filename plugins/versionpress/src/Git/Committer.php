@@ -1,5 +1,5 @@
 <?php
-use VersionPress\ChangeInfos\CompositeChangeInfo;
+use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\Git\GitConfig;
@@ -32,10 +32,16 @@ class Committer
     private $repository;
     /** @var  bool */
     private $commitDisabled;
+    /** @var  bool */
+    private $commitPostponed;
+    /** @var  string */
+    private $postponeKey;
     /**
      * @var StorageFactory
      */
     private $storageFactory;
+    private $fileForPostpone = 'postponed-commits';
+    private $postponedChangeInfos = array();
 
     public function __construct(Mirror $mirror, GitRepository $repository, StorageFactory $storageFactory)
     {
@@ -54,14 +60,14 @@ class Committer
 
         if (count($this->forcedChangeInfos) > 0) {
             FileSystem::remove(get_home_path() . 'versionpress.maintenance'); // todo: this shouldn't be here...
-            $changeInfo = count($this->forcedChangeInfos) > 1 ? new CompositeChangeInfo($this->forcedChangeInfos) : $this->forcedChangeInfos[0];
+            $changeInfo = new ChangeInfoEnvelope($this->forcedChangeInfos);
             $this->forcedChangeInfos = array();
         } elseif ($this->shouldCommit()) {
-            $changeList = $this->mirror->getChangeList();
+            $changeList =  array_merge($this->postponedChangeInfos, $this->mirror->getChangeList());
             if (empty($changeList)) {
                 return;
             }
-            $changeInfo = count($changeList) > 1 ? new CompositeChangeInfo($changeList) : $changeList[0];
+            $changeInfo = new ChangeInfoEnvelope($changeList);
         } else {
             return;
         }
@@ -80,6 +86,11 @@ class Committer
             $authorEmail = "nonadmin@example.com";
         }
 
+        if ($this->commitPostponed) {
+            $this->postponeChangeInfo($changeInfo);
+            return;
+        }
+
         $this->stageRelatedFiles($changeInfo);
         $this->repository->commit($changeInfo->getCommitMessage(), $authorName, $authorEmail);
     }
@@ -89,7 +100,7 @@ class Committer
      * might have been captured by the VersionPress\Storages\Mirror.
      *
      * There can be more forced changed infos and they behave the same as more ChangeInfos returned
-     * by the VersionPress\Storages\Mirror, i.e. are wrapped in a VersionPress\ChangeInfos\CompositeChangeInfo and sorted by priorities.
+     * by the VersionPress\Storages\Mirror, i.e. are wrapped in a VersionPress\ChangeInfos\ChangeInfoEnvelope and sorted by priorities.
      *
      * @param TrackedChangeInfo $changeInfo
      */
@@ -104,6 +115,29 @@ class Committer
     public function disableCommit()
     {
         $this->commitDisabled = true;
+    }
+
+    /**
+     * The `commit()` method will not affect the repository after calling this method.
+     * Instead it will save ChangeInfo objects for commit on the next request.
+     *
+     * @param string $key Key for postponedChangeInfos commit
+     */
+    public function postponeCommit($key) {
+        $this->commitPostponed = true;
+        $this->postponeKey = $key;
+    }
+
+    /**
+     * Prepends previously postponedChangeInfos ChangeInfo objects to the current one.
+     *
+     * @param string $key
+     */
+    public function usePostponedChangeInfos($key) {
+        $postponed = $this->loadPostponedChangeInfos();
+        $this->postponedChangeInfos = $postponed[$key];
+        unset($postponed[$key]);
+        $this->savePostponedChangeInfos($postponed);
     }
 
     /**
@@ -140,13 +174,13 @@ class Committer
     }
 
     /**
-     * Calls Git `add` or `rm` on files that are related to the given $changeInfo.
+     * Calls Git `add -A` on files that are related to the given $changeInfo.
      * The "exchange format" is an array documented in {@see TrackedChangedInfo::getChangedFiles()}.
      *
-     * @param TrackedChangeInfo $changeInfo
+     * @param TrackedChangeInfo|ChangeInfoEnvelope $changeInfo
      */
     private function stageRelatedFiles($changeInfo) {
-        if ($changeInfo instanceof CompositeChangeInfo) {
+        if ($changeInfo instanceof ChangeInfoEnvelope) {
             /** @var TrackedChangeInfo $subChangeInfo */
             foreach ($changeInfo->getChangeInfoList() as $subChangeInfo) {
                 $this->stageRelatedFiles($subChangeInfo);
@@ -169,5 +203,37 @@ class Committer
 
             $this->repository->update($path);
         }
+    }
+
+    /**
+     * @param ChangeInfoEnvelope $changeInfoEnvelope
+     */
+    private function postponeChangeInfo($changeInfoEnvelope) {
+        $postponed = $this->loadPostponedChangeInfos();
+
+        if (!isset($postponed[$this->postponeKey])) {
+            $postponed[$this->postponeKey] = array();
+        }
+
+        $postponed[$this->postponeKey] = array_merge($postponed[$this->postponeKey], $changeInfoEnvelope->getChangeInfoList());
+        $this->savePostponedChangeInfos($postponed);
+    }
+
+    /**
+     * @return TrackedChangeInfo[key][]
+     */
+    private function loadPostponedChangeInfos() {
+        $file = VERSIONPRESS_TEMP_DIR . '/' . $this->fileForPostpone;
+        $serializedPostponedChangeInfos = file_get_contents($file);
+        return unserialize($serializedPostponedChangeInfos);
+    }
+
+    /**
+     * @param TrackedChangeInfo[key][] $postponedChangeInfos
+     */
+    private function savePostponedChangeInfos($postponedChangeInfos) {
+        $file = VERSIONPRESS_TEMP_DIR . '/'. $this->fileForPostpone;
+        $serializedPostponedChangeInfos = serialize($postponedChangeInfos);
+        file_put_contents($file, $serializedPostponedChangeInfos);
     }
 }

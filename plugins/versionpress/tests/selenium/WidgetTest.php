@@ -79,7 +79,7 @@ class WidgetTest extends SeleniumTestCase {
      * @test
      * @testdox Deleting widget creates 'option/edit' action
      */
-    public function deletingWdigetCreatesOptionEditAction() {
+    public function deletingWidgetCreatesOptionEditAction() {
         $this->url('wp-admin/widgets.php');
         $commitAsserter = new CommitAsserter($this->gitRepository);
 

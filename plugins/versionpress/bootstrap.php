@@ -4,6 +4,7 @@ use VersionPress\DI\VersionPressServices;
 
 define('VERSIONPRESS_PLUGIN_DIR', __DIR__);
 define('VERSIONPRESS_MIRRORING_DIR', WP_CONTENT_DIR . '/vpdb');
+define('VERSIONPRESS_TEMP_DIR', VERSIONPRESS_PLUGIN_DIR . '/temp');
 define('VERSIONPRESS_ACTIVATION_FILE', VERSIONPRESS_MIRRORING_DIR . '/.active');
 
 /**
