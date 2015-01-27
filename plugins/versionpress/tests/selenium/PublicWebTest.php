@@ -28,6 +28,9 @@ class PublicWebTest extends SeleniumTestCase {
      * @testdox Public web is accessible
      */
     public function publicWebIsAccessible() {
+
+        $this->logOut();
+
         $this->url("?p=" . self::$testPostId);
         $this->assertStringStartsWith(self::$testPost["post_title"], $this->title());
     }

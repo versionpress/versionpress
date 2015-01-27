@@ -27,6 +27,8 @@ class CommentsTest extends SeleniumTestCase {
      */
     public function publicCommentAwaitsModeration() {
 
+        $this->logOut();
+
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         $this->url('?p=' . self::$testPostId);

@@ -30,7 +30,7 @@ class PluginsTest extends SeleniumTestCase {
      * @testdox Deleting plugin creates 'plugin/delete' action
      */
     public function deletingPluginCreatesPluginDeleteAction() {
-        $this->url("http://127.0.0.1/wordpress/wp-admin/plugins.php");
+        $this->url("wp-admin/plugins.php");
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         $this->byCssSelector("#". self::$pluginInfo['css-id'] ." .delete a")->click();
@@ -71,7 +71,7 @@ class PluginsTest extends SeleniumTestCase {
      * @depends uploadingPluginCreatesPluginInstallAction
      */
     public function activatingPluginCreatesPluginActivateAction() {
-        $this->url("http://127.0.0.1/wordpress/wp-admin/plugins.php");
+        $this->url("wp-admin/plugins.php");
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         $this->byCssSelector("#". self::$pluginInfo['css-id'] ." .activate a")->click();
@@ -90,7 +90,7 @@ class PluginsTest extends SeleniumTestCase {
      * @depends activatingPluginCreatesPluginActivateAction
      */
     public function deactivatingPluginCreatesPluginDeactivateAction() {
-        $this->url("http://127.0.0.1/wordpress/wp-admin/plugins.php");
+        $this->url("wordpress/wp-admin/plugins.php");
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         $this->byCssSelector("#". self::$pluginInfo['css-id'] ." .deactivate a")->click();
