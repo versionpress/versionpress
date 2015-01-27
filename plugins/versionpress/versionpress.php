@@ -268,7 +268,7 @@ register_activation_hook(__FILE__, 'vp_activate');
 register_deactivation_hook(__FILE__, 'vp_deactivate');
 add_action('admin_post_cancel_deactivation', 'vp_admin_post_cancel_deactivation');
 add_action('admin_post_confirm_deactivation', 'vp_admin_post_confirm_deactivation');
-if (get_option('vp_just_activated')) {
+if (get_transient('vp_just_activated')) {
     add_filter('gettext', 'vp_gettext_filter_plugin_activated', 10, 3);
 }
 // uninstallation is handled in uninstall.php
@@ -283,8 +283,8 @@ if (get_option('vp_just_activated')) {
  * @return string
  */
 function vp_gettext_filter_plugin_activated($translation, $text, $domain) {
-    if ($text == 'Plugin <strong>activated</strong>.' && get_option('vp_just_activated')) {
-        delete_option('vp_just_activated');
+    if ($text == 'Plugin <strong>activated</strong>.' && get_transient('vp_just_activated')) {
+        delete_transient('vp_just_activated');
         return 'VersionPress activated. <strong><a href="' . admin_url('admin.php?page=versionpress/admin/index.php') . '" style="text-decoration: underline; font-size: 1.03em;">Continue here</a></strong> to start tracking the site.';
     } else {
         return $translation;
@@ -298,7 +298,7 @@ function vp_gettext_filter_plugin_activated($translation, $text, $domain) {
  * @see Initializer
  */
 function vp_activate() {
-    add_option('vp_just_activated', '1');
+    set_transient('vp_just_activated', '1', 10);
 }
 
 /**
@@ -410,7 +410,7 @@ function vp_activation_nag() {
         return;
     }
 
-    if (get_option('vp_just_activated')) {
+    if (get_transient('vp_just_activated')) {
         return;
     }
 
