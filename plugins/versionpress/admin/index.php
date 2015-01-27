@@ -12,8 +12,6 @@ use VersionPress\Utils\Markdown;
 use VersionPress\Utils\RequirementsChecker;
 use VersionPress\VersionPress;
 
-require_once(__DIR__ . '/../bootstrap.php');
-
 wp_enqueue_style('versionpress_admin_style', plugins_url( 'css/style.css' , __FILE__ ));
 wp_enqueue_style('versionpress_admin_icons', plugins_url( 'icons/style.css' , __FILE__ ));
 

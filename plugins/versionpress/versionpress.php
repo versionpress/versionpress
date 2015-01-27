@@ -27,12 +27,13 @@ use VersionPress\VersionPress;
 
 defined('ABSPATH') or die("Direct access not allowed");
 
+require_once(__DIR__ . '/bootstrap.php');
+
 if (defined('WP_CLI') && WP_CLI && VersionPress::isActive()) {
     WP_CLI::add_command('vp', 'VersionPress\Cli\VPCommand');
 }
 
 if (defined('VP_MAINTENANCE')) {
-    require_once(__DIR__ . '/bootstrap.php');
     NDebugger::log("Ooops. Something went wrong :( The .maintenance file was not deleted.");
     vp_disable_maintenance();
 }
