@@ -421,7 +421,7 @@ class WpAutomation {
      * @param array $args
      * @return string
      */
-    private static function runWpCliCommand($command, $subcommand, $args = array()) {
+    public static function runWpCliCommand($command, $subcommand, $args = array()) {
         $cliCommand = "wp $command";
 
         if (is_array($subcommand)) {

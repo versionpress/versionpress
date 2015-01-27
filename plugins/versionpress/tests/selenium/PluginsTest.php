@@ -16,6 +16,9 @@ class PluginsTest extends SeleniumTestCase {
 
 
     public static function setupBeforeClass() {
+
+        parent::setUpBeforeClass();
+
         $testDataPath = __DIR__ . DIRECTORY_SEPARATOR . 'test-data' . DIRECTORY_SEPARATOR;
         self::$pluginInfo = array(
             'zipfile' => $testDataPath . 'hello-dolly.1.6.zip',
@@ -23,6 +26,7 @@ class PluginsTest extends SeleniumTestCase {
             'name' => 'Hello Dolly',
             'affected-path' => 'hello-dolly/*',
         );
+
     }
 
     /**
@@ -30,6 +34,15 @@ class PluginsTest extends SeleniumTestCase {
      * @testdox Deleting plugin creates 'plugin/delete' action
      */
     public function deletingPluginCreatesPluginDeleteAction() {
+
+        try {
+            WpAutomation::runWpCliCommand('plugin', 'is-installed', array(self::$pluginInfo['css-id'])); // throws is plugin not installed
+        } catch (Exception $e) {
+            WpAutomation::runWpCliCommand('plugin', 'install', array(self::$pluginInfo['zipfile']));
+        }
+        WpAutomation::runWpCliCommand('plugin', 'deactivate', array(self::$pluginInfo['css-id']));
+
+
         $this->url("wp-admin/plugins.php");
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
@@ -90,7 +103,7 @@ class PluginsTest extends SeleniumTestCase {
      * @depends activatingPluginCreatesPluginActivateAction
      */
     public function deactivatingPluginCreatesPluginDeactivateAction() {
-        $this->url("wordpress/wp-admin/plugins.php");
+        $this->url("wp-admin/plugins.php");
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         $this->byCssSelector("#". self::$pluginInfo['css-id'] ." .deactivate a")->click();
