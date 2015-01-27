@@ -13,7 +13,7 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase {
      * @dataProvider samePriorityExamples
      */
     public function changeInfosWithSamePriorityMaintainOrder($inputChangeInfosSample, $sortedChangeInfosSample) {
-        $changeInfoEnvelope = new ChangeInfoEnvelope($inputChangeInfosSample);
+        $changeInfoEnvelope = new ChangeInfoEnvelope($inputChangeInfosSample, "1.0");
         $sortedByChangeInfoEnvelope = $changeInfoEnvelope->getSortedChangeInfoList();
 
         $this->assertEquals($sortedChangeInfosSample, $sortedByChangeInfoEnvelope);
@@ -28,7 +28,7 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase {
         $input = array($normalPriorityPostChangeInfo, $higherPriorityPostChangeInfo);
         $expectedSorted = array($higherPriorityPostChangeInfo, $normalPriorityPostChangeInfo);
 
-        $changeInfoEnvelope = new ChangeInfoEnvelope($input);
+        $changeInfoEnvelope = new ChangeInfoEnvelope($input, "1.0");
         $sortedByChangeInfoEnvelope = $changeInfoEnvelope->getSortedChangeInfoList();
 
         $this->assertEquals($sortedByChangeInfoEnvelope, $expectedSorted);
@@ -44,7 +44,7 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase {
         $input = array($normalPriorityThemeChangeInfo, $higherPriorityThemeChangeInfo);
         $expectedSorted = array($higherPriorityThemeChangeInfo, $normalPriorityThemeChangeInfo);
 
-        $changeInfoEnvelope = new ChangeInfoEnvelope($input);
+        $changeInfoEnvelope = new ChangeInfoEnvelope($input, "1.0");
         $sortedByChangeInfoEnvelope = $changeInfoEnvelope->getSortedChangeInfoList();
 
         $this->assertEquals($sortedByChangeInfoEnvelope, $expectedSorted);
