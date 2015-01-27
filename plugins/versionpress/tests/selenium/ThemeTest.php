@@ -15,6 +15,7 @@ class ThemeTest extends SeleniumTestCase {
 
 
     public static function setupBeforeClass() {
+        parent::setUpBeforeClass();
         $testDataPath = __DIR__ . DIRECTORY_SEPARATOR . 'test-data' . DIRECTORY_SEPARATOR;
         self::$themeInfo = array(
             'zipfile' => $testDataPath . 'test-theme.zip',
