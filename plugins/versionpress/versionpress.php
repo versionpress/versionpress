@@ -161,6 +161,15 @@ function vp_register_hooks() {
         }
     }, 0); // zero because the default WP action with priority 1 calls wp_die()
 
+    add_action('permalink_structure_changed', function () use ($committer) {
+        $committer->postponeCommit('permalinks');
+    });
+
+    add_action('update_option', function ($option) use ($committer) {
+       if ($option === 'rewrite_rules') {
+           $committer->usePostponedChangeInfos('permalinks');
+       }
+    });
     //----------------------------------------
     // URL "hooks"
     //----------------------------------------
