@@ -1,6 +1,7 @@
 <?php
 use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
+use VersionPress\ChangeInfos\ChangeInfoMatcher;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\Git\Commit;
@@ -15,6 +16,7 @@ use VersionPress\Tests\Utils\ChangeInfoUtils;
  * Can be used from any type of tests (Selenium, WP-CLI, ...).
  */
 class CommitAsserter {
+
 
     /**
      * When this object is created, a reference to most recent commit at that time
@@ -35,14 +37,16 @@ class CommitAsserter {
      *       6b9ca72         <=  -2
      *       d16dffd         <=  -3
      *
-     * (This member is here just to document various "whichCommit" parameters, is not used itself).
+     * (This member is here just to document various "whichCommit" parameters, is not actually used).
      *
      * @var int
      */
     private $whichCommitParameter;
 
     /**
-     * Create CommitAsserter to start tracking the git repo for future asserts
+     * Create CommitAsserter to start tracking the git repo for future asserts. Should generally
+     * be called after a test setup (if there is any) and before all the actual work. Asserts follow
+     * after it.
      *
      * @param \VersionPress\Git\GitRepository $gitRepository
      */
@@ -51,17 +55,52 @@ class CommitAsserter {
         $this->startCommit = $gitRepository->getCommit($gitRepository->getLastCommitHash());
     }
 
+
+
+    //---------------------------
+    // Pre-assertion setup
+    //---------------------------
+
+    private $ignoreCommitsWithActions = array();
+
     /**
-     * Asserts that the number of commits made since the constructor matches the given number
+     * Ignores commits of given action(s)
+     *
+     * This is useful in tests where different number of commits might be created in different circumstances.
+     * For example, file upload will create two commits on first attempted upload ('post/create'
+     * and 'usermeta/edit') while it will only generate a single commit ('post/create') for repeated
+     * runs. In such case, if we only care about the 'post/create' action, 'usermeta/edit' can be set as ignored
+     * using this method.
+     *
+     * @param string|string[] $action An action like "usermeta/edit", or an array of them
+     */
+    public function ignoreCommits($action) {
+        if (is_string($action)) {
+            $this->ignoreCommitsWithActions = array($action);
+        } else {
+            $this->ignoreCommitsWithActions = $action;
+        }
+    }
+
+
+
+    //---------------------------
+    // Assertions
+    //---------------------------
+
+    /**
+     * Asserts that the number of commits made since the constructor matches the given number.
      *
      * @param int $numExpectedCommits
      */
     public function assertNumCommits($numExpectedCommits) {
-        $numActualCommits = $this->gitRepository->getNumberOfCommits($this->startCommit->getHash());
+        $commits = $this->getNonIgnoredCommits();
+        $numActualCommits = count($commits);
         if ($numExpectedCommits !== $numActualCommits) {
             PHPUnit_Framework_Assert::fail("There were $numActualCommits commit(s) while we expected $numExpectedCommits");
         }
     }
+
 
     /**
      * Asserts that the recorded commit if of certain type, e.g. "post/edit". By default inspects
@@ -113,25 +152,6 @@ class CommitAsserter {
         if (!ChangeInfoUtils::captureSameAction($commitChangeInfo, $referenceCommitChangeInfo)) {
             PHPUnit_Framework_Assert::fail("Commit " . $commit->getHash() . " does not capture the same action as reference commit " . $referenceCommit->getHash());
         }
-    }
-
-    /**
-     * @param int $whichCommit See $whichCommitParameter documentation. "HEAD" by default.
-     * @return Commit
-     */
-    private function getCommit($whichCommit = 0) {
-        $revRange = $this->getRevRange($whichCommit);
-        $commits = $this->gitRepository->log($revRange);
-        return $commits[0];
-
-    }
-
-    /**
-     * @param Commit $commit
-     * @return ChangeInfoEnvelope|UntrackedChangeInfo
-     */
-    private function getChangeInfo($commit) {
-        return \VersionPress\ChangeInfos\ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
     }
 
     public function assertCommitTag($tagKey, $tagValue) {
@@ -188,6 +208,68 @@ class CommitAsserter {
         }
     }
 
+    public function assertCleanWorkingDirectory() {
+        $gitStatus = $this->gitRepository->getStatus();
+        if (!empty($gitStatus)) {
+            PHPUnit_Framework_Assert::fail("Expected clean working directory but got:\n$gitStatus");
+        }
+    }
+
+
+
+    //---------------------------
+    // Helper methods
+    //---------------------------
+
+    /**
+     * Cache for getNonIgnoredCommits(), don't use directly
+     */
+    private $commitCache;
+
+    /**
+     * Use this to fetch all the commits since $startCommit that are not ignored.
+     *
+     * @return Commit[]
+     */
+    private function getNonIgnoredCommits() {
+        if (!$this->commitCache) {
+            $unfilteredCommits = $this->gitRepository->log("{$this->startCommit->getHash()}..HEAD");
+            $that = $this;
+            $filteredCommits = array_filter($unfilteredCommits, function($commit) use ($that) {
+                return !in_array(ChangeInfoUtils::getFullAction($that->getChangeInfo($commit)), $that->ignoreCommitsWithActions);
+            });
+            $this->commitCache = array_values($filteredCommits); // array_values reindexes the array from zero
+        }
+        return $this->commitCache;
+    }
+
+
+    /**
+     * @param int $whichCommit See $whichCommitParameter documentation. The most recent commit by default.
+     * @return Commit
+     */
+    private function getCommit($whichCommit = 0) {
+        $nonIgnoredCommits = $this->getNonIgnoredCommits();
+        $index = abs($whichCommit);
+        if (isset($nonIgnoredCommits[$index])) {
+            return $nonIgnoredCommits[$index];
+        } else {
+            $fromRev = "HEAD~" . ($index + 1);
+            $toRev = "HEAD~" . $index;
+            $commits = $this->gitRepository->log("$fromRev..$toRev");
+            return $commits[0];
+        }
+    }
+
+    /**
+     * @param Commit $commit
+     * @return ChangeInfoEnvelope|UntrackedChangeInfo
+     */
+    protected function getChangeInfo($commit) {
+        return ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
+    }
+
+
     /**
      * Converts $whichCommit (int) to a Git rev range
      *
@@ -196,28 +278,13 @@ class CommitAsserter {
      */
     private function getRevRange($whichCommit) {
 
-        // We use 'git log' to get the commit info and construct the rev range this way:
-        //
-        //   "HEAD^..HEAD"      -> get the most recent commit
-        //   "HEAD^^..HEAD^"    -> get second commit
-        //   "HEAD^^^..HEAD^^"  -> get third commit
-        //
-        // So we just need to emit the currect number of carets (works fine for small number of commits)
+        $nonIgnoredCommits = $this->getNonIgnoredCommits();
+        $commit = $nonIgnoredCommits[abs($whichCommit)];
+        $revRange = "{$commit->getHash()}^..{$commit->getHash()}"; // will fail if commit is the first one but that should never happen
 
-        $numCarets = abs($whichCommit);
-        $startRevisionCarets = str_repeat("^", $numCarets + 1);
-        $endRevisionCarets = str_repeat("^", $numCarets);
-
-        $revRange = "HEAD$startRevisionCarets..HEAD$endRevisionCarets";
         return $revRange;
     }
 
-    public function assertCleanWorkingDirectory() {
-        $gitStatus = $this->gitRepository->getStatus();
-        if (!empty($gitStatus)) {
-            PHPUnit_Framework_Assert::fail("Expected clean working directory but got:\n$gitStatus");
-        }
-    }
 
     /**
      * @param $path

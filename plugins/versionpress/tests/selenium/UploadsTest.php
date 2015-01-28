@@ -21,6 +21,8 @@ class UploadsTest extends SeleniumTestCase {
 
         $this->waitForElement('.thumbnail', 3000);
 
+        $commitAsserter->ignoreCommits("usermeta/edit");
+
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/create");
         $commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
