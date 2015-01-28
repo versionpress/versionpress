@@ -3,6 +3,7 @@ var phpunit = require('gulp-phpunit');
 var seleniumPlease = require('selenium-please');
 var chalk = require('chalk');
 var tcpPortUsed = require('tcp-port-used');
+var argv = require('yargs').argv;
 
 // Run this task to get the help
 gulp.task('default', function() {
@@ -17,7 +18,13 @@ gulp.task('default', function() {
         }
 
         console.log('');
-        console.log(chalk.cyan('Usage:') + ' ' + chalk.bold('gulp run-tests'));
+        console.log(chalk.cyan('Usage:') + ' ' + chalk.bold('gulp run-tests [--force-setup[=before-suite|before-class]]'));
+        console.log('');
+        console.log(chalk.cyan('Options:'));
+        console.log('  ' + chalk.bold('--force-setup[=before-suite|before-class]'));
+        console.log('    Force WP site refresh before suite or every Selenium test class. No value = same as \'before-suite\'.');
+        console.log('');
+        console.log(chalk.cyan('Notes:'));
         console.log('');
         console.log(' - Make sure that ' + chalk.yellow('test-config.ini') + ' is configured properly');
         console.log(' - Tests defined in ' + chalk.yellow('phpunit.xml') + ' will be run');
@@ -51,6 +58,15 @@ gulp.task('run-tests', function(cb) {
         port: 4444
 
     }, function(err, selenium) {
+
+        if (argv['force-setup'] !== undefined) {
+
+            if (argv['force-setup'] === true) {
+                // just --force-setup without any value, default to before-suite
+                argv['force-setup'] = "before-suite";
+            }
+            process.env['VP_FORCE_SETUP'] = argv['force-setup'];
+        }
 
         gulp.src('phpunit.xml')
             .pipe(phpunit('..\\vendor\\bin\\phpunit.bat', {verbose: true}))

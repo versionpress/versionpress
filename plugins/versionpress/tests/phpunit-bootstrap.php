@@ -25,4 +25,45 @@ PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
 
 global $argv;
 EndToEndTestCase::$skipSetup = in_array("--skip-setup", $argv);
-SeleniumTestCase::$forceSetup = in_array("--force-setup", $argv) || getenv('VP_FORCE_SETUP');
+
+/**
+ * One accepted CLI option is --force-setup which can come in the following variants:
+ *
+ *  * Not specified at all => setup is not forced
+ *  * --force-setup=before-class  => site will be refreshed before every test class
+ *  * --force-setup=before-suite  => site will be refreshed once, before all tests are run
+ *  * --force-setup (without any value, or with an unknown value)  => warning is issues
+ *
+ * @var array
+ */
+
+$cliOptions = getopt("", array("force-setup::"));
+$setupBeforeClass = false;
+$setupBeforeSuite = false;
+if (!empty($cliOptions)) {
+
+    switch ($cliOptions["force-setup"]) {
+        case "before-class":
+            $setupBeforeClass = true;
+            break;
+
+        case "before-suite":
+            $setupBeforeSuite = true;
+            break;
+
+        default:
+            echo "Incorrect value of 'force-setup' parameter, should be 'before-class' or 'before-suite'";
+
+    }
+
+}
+
+$setupBeforeClass = $setupBeforeClass || getenv('VP_FORCE_SETUP') == "before-class";
+$setupBeforeSuite = $setupBeforeSuite || getenv('VP_FORCE_SETUP') == "before-suite";
+
+SeleniumTestCase::$forceSetup = $setupBeforeClass;
+
+if ($setupBeforeSuite) {
+    echo "Setting up site before suite";
+    SeleniumTestCase::setUpSite(true);
+}

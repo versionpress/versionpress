@@ -21,8 +21,8 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
     public static $config;
 
     /**
-     * Set from phpunit-bootstrap.php to true if `--force-setup` has been passed as a command line parameter
-     * or if 'VP_FORCE_SETUP' environment variable is true (non-empty).
+     * Set from phpunit-bootstrap.php to true if `--force-setup=before-class` has been passed as a command line parameter
+     * or if 'VP_FORCE_SETUP' environment variable contains the "before-class" value. See phpunit-bootstrap.php for more.
      *
      * @var bool
      */
@@ -56,17 +56,22 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
         $this->gitRepository = new \VersionPress\Git\GitRepository(self::$config->getSitePath());
     }
 
-    /**
-     * Check if site is set up and VersionPress fully activated, and if not, do so.
-     */
     public static function setUpBeforeClass() {
-        parent::setUpBeforeClass();
+        self::setUpSite(self::$forceSetup);
+    }
 
-        if (self::$forceSetup || !WpAutomation::isSiteSetUp()) {
+    /**
+     * Check if site is set up and VersionPress fully activated, and if not, do so. The $force
+     * parametr may force this.
+     *
+     * @param bool $force Force all the automation actions to be taken regardless of the site state
+     */
+    public static function setUpSite($force) {
+        if ($force || !WpAutomation::isSiteSetUp()) {
             WpAutomation::setUpSite();
         }
 
-        if (self::$forceSetup || !WpAutomation::isVersionPressInitialized()) {
+        if ($force || !WpAutomation::isVersionPressInitialized()) {
             WpAutomation::copyVersionPressFiles();
             WpAutomation::initializeVersionPress();
         }
