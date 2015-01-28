@@ -186,6 +186,7 @@ class PostTypeTestCase extends \SeleniumTestCase {
      */
     private function prepareTestPost() {
         $this->byCssSelector('.edit-php #wpbody-content .wrap a.add-new-h2')->click();
+        $this->waitAfterRedirect();
         $this->byCssSelector('form#post input#title')->value("Test " . $this->getPostType());
         $this->setTinyMCEContent("Test content");
     }
