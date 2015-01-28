@@ -27,40 +27,26 @@ class PluginsTest extends SeleniumTestCase {
             'affected-path' => 'hello-dolly/*',
         );
 
-    }
-
-    /**
-     * @test
-     * @testdox Deleting plugin creates 'plugin/delete' action
-     */
-    public function deletingPluginCreatesPluginDeleteAction() {
-
+        // possibly delete single-file Hello dolly
         try {
-            WpAutomation::runWpCliCommand('plugin', 'is-installed', array(self::$pluginInfo['css-id'])); // throws is plugin not installed
+            WpAutomation::runWpCliCommand('plugin', 'uninstall', array('hello'));
         } catch (Exception $e) {
-            WpAutomation::runWpCliCommand('plugin', 'install', array(self::$pluginInfo['zipfile']));
         }
-        WpAutomation::runWpCliCommand('plugin', 'deactivate', array(self::$pluginInfo['css-id']));
 
+        // possibly delete our testing plugin
+        try {
+            WpAutomation::runWpCliCommand('plugin', 'uninstall', array('hello-dolly'));
+        } catch (Exception $e) {
+        }
 
-        $this->url("wp-admin/plugins.php");
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $process = new \Symfony\Component\Process\Process("git add -A && git commit -m " . escapeshellarg("Plugin setup"), self::$config->getSitePath());
+        $process->run();
 
-        $this->byCssSelector("#". self::$pluginInfo['css-id'] ." .delete a")->click();
-        $this->byCssSelector("#submit")->click();
-        $this->waitAfterRedirect();
-
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("plugin/delete");
-        $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
-        $commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
-        $commitAsserter->assertCleanWorkingDirectory();
     }
 
     /**
      * @test
      * @testdox Uploading plugin creates 'plugin/install' action
-     * @depends deletingPluginCreatesPluginDeleteAction
      */
     public function uploadingPluginCreatesPluginInstallAction() {
         $this->url('wp-admin/plugin-install.php?tab=upload');
@@ -115,4 +101,26 @@ class PluginsTest extends SeleniumTestCase {
         $commitAsserter->assertCommitPath("M", "%vpdb%/options.ini");
         $commitAsserter->assertCleanWorkingDirectory();
     }
+
+    /**
+     * @test
+     * @testdox Deleting plugin creates 'plugin/delete' action
+     * @depends deactivatingPluginCreatesPluginDeactivateAction
+     */
+    public function deletingPluginCreatesPluginDeleteAction() {
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        $this->byCssSelector("#". self::$pluginInfo['css-id'] ." .delete a")->click();
+        $this->waitAfterRedirect();
+        $this->byCssSelector("#submit")->click();
+        $this->waitAfterRedirect();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("plugin/delete");
+        $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
+        $commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
+        $commitAsserter->assertCleanWorkingDirectory();
+    }
+
 }
