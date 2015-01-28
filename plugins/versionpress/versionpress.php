@@ -9,6 +9,7 @@ Author URI: http://versionpress.net/
 License: GPLv2 or later
 */
 
+use Tracy\Debugger;
 use VersionPress\ChangeInfos\PluginChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\VersionPressChangeInfo;
@@ -34,7 +35,7 @@ if (defined('WP_CLI') && WP_CLI && VersionPress::isActive()) {
 }
 
 if (defined('VP_MAINTENANCE')) {
-    NDebugger::log("Ooops. Something went wrong :( The .maintenance file was not deleted.");
+    Debugger::log("Ooops. Something went wrong :( The .maintenance file was not deleted.");
     vp_disable_maintenance();
 }
 

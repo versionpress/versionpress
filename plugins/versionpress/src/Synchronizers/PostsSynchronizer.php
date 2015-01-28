@@ -1,7 +1,7 @@
 <?php
 namespace VersionPress\Synchronizers;
 
-use NStrings;
+use Nette\Utils\Strings;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Filters\AbsoluteUrlFilter;
 use VersionPress\Storages\Storage;
@@ -53,7 +53,7 @@ class PostsSynchronizer extends SynchronizerBase {
         $postWithoutMeta = array();
 
         foreach ($entity as $key => $value) {
-            if (NStrings::contains($key, '#')) continue;
+            if (Strings::contains($key, '#')) continue;
             $postWithoutMeta[$key] = $value;
         }
 

@@ -1,5 +1,9 @@
 <?php
 
+use Nette\Caching\Storages\DevNullStorage;
+use Nette\Loaders\RobotLoader;
+use Tracy\Debugger;
+
 require_once(__DIR__ . '/../vendor/autoload.php');
 require_once(__DIR__ . '/selenium/SeleniumTestCase.php');
 require_once(__DIR__ . '/selenium/PostTypeTestCase.php');
@@ -9,10 +13,10 @@ require_once(__DIR__ . '/utils/ChangeInfoUtils.php');
 require_once(__DIR__ . '/TestConfig.php');
 require_once(__DIR__ . '/automation/WpAutomation.php');
 
-NDebugger::enable(NDebugger::DEVELOPMENT, __DIR__ . '/../log');
-$robotLoader = new NRobotLoader();
+Debugger::enable(Debugger::DEVELOPMENT, __DIR__ . '/../log');
+$robotLoader = new RobotLoader();
 $robotLoader->addDirectory(__DIR__ . '/../src');
-$robotLoader->setCacheStorage(new NDevNullStorage());
+$robotLoader->setCacheStorage(new DevNullStorage());
 $robotLoader->register();
 
 if (!is_file(__DIR__ . '/test-config.ini')) die('You have to create test-config.ini with base url for running the tests.');

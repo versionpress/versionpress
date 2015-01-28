@@ -3,9 +3,8 @@
 namespace VersionPress\Git;
 
 use Committer;
-use NStrings;
+use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\ChangeInfoMatcher;
-use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\RevertChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
@@ -108,7 +107,7 @@ class Reverter {
         $posts = array();
 
         foreach ($modifiedFiles as $filename) {
-            $match = NStrings::match($filename, "~/posts/(.*)\.ini~");
+            $match = Strings::match($filename, "~/posts/(.*)\.ini~");
             if ($match) {
                 $posts[] = $match[1];
             }

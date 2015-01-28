@@ -2,7 +2,7 @@
 
 namespace VersionPress\Git;
 
-use NStrings;
+use Nette\Utils\Strings;
 use Symfony\Component\Process\Process;
 use VersionPress\Utils\FileSystem;
 
@@ -283,7 +283,7 @@ class GitRepository {
      */
     public function runShellCommand($command, $args = '') {
 
-        if (!NStrings::startsWith($command, "git ")) {
+        if (!Strings::startsWith($command, "git ")) {
             $command = "git " . $command;
         }
 
@@ -329,7 +329,7 @@ class GitRepository {
 
     public function willCommit() {
         $status = $this->runShellCommandWithStandardOutput(self::$STATUS_COMMAND);
-        return NStrings::match($status, "~^[AMD].*~") !== null;
+        return Strings::match($status, "~^[AMD].*~") !== null;
     }
 
     /**

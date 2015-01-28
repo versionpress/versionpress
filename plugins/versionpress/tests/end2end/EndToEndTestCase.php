@@ -1,4 +1,5 @@
 <?php
+use Nette\Database\Connection;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\Git\Commit;
 use VersionPress\Git\GitRepository;
@@ -35,7 +36,7 @@ abstract class EndToEndTestCase extends PHPUnit_Framework_TestCase {
     /**
      * Connection to the database, created in `setUpBeforeClass()`
      *
-     * @var NConnection
+     * @var Connection
      */
     private static $db;
 
@@ -61,7 +62,7 @@ abstract class EndToEndTestCase extends PHPUnit_Framework_TestCase {
         $dbName = self::$config->getDbName();
         $dbUser = self::$config->getDbUser();
         $dbPassword = self::$config->getDbPassword();
-        self::$db = new NConnection("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
+        self::$db = new Connection("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
     }
 
     /**

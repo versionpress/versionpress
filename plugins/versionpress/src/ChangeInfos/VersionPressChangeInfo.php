@@ -1,7 +1,7 @@
 <?php
 namespace VersionPress\ChangeInfos;
 
-use NStrings;
+use Nette\Utils\Strings;
 use VersionPress\Git\CommitMessage;
 use VersionPress\Utils\StringUtils;
 
@@ -63,7 +63,7 @@ class VersionPressChangeInfo extends TrackedChangeInfo {
 
             default:
                 // just in case, this path shouldn't really be reached
-                return NStrings::capitalize(StringUtils::verbToPastTense($this->action)) . " VersionPress";
+                return Strings::capitalize(StringUtils::verbToPastTense($this->action)) . " VersionPress";
 
         }
 

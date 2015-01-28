@@ -1,8 +1,8 @@
 <?php
 namespace VersionPress\Database;
-use NDateTime53;
-use NNeon;
-use NNeonEntity;
+use DateTime;
+use Nette\Neon\Neon;
+use Nette\Neon\Entity;
 
 /**
  * Describes parts of the DB schema, specifically telling how to identify entities
@@ -12,10 +12,10 @@ use NNeonEntity;
 class DbSchemaInfo {
 
     /**
-     * Parsed NEON schema - to see what it looks like, paste the NEON into {@link http://ne-on.org/ ne-on.org}).
+     * Parsed NEON schema - to see what it looks like, paste the NEON into {@link http://ne-on.org/ne-on.org}).
      * Parsed in constructor.
      *
-     * @var array|int|mixed|NDateTime53|NNeonEntity|null|string
+     * @var array|int|mixed|DateTime|Entity|null|string
      */
     private $schema;
 
@@ -37,7 +37,7 @@ class DbSchemaInfo {
      */
     function __construct($schemaFile, $prefix) {
         $neonSchema = file_get_contents($schemaFile);
-        $this->schema = NNeon::decode($neonSchema);
+        $this->schema = Neon::decode($neonSchema);
         $this->prefix = $prefix;
     }
 

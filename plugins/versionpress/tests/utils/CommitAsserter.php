@@ -1,8 +1,8 @@
 <?php
 use Nette\Utils\Strings;
-use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
+use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\Git\Commit;
 use VersionPress\Tests\Utils\ChangeInfoUtils;
 

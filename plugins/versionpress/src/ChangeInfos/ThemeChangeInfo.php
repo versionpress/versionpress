@@ -1,7 +1,7 @@
 <?php
 
 namespace VersionPress\ChangeInfos;
-use NStrings;
+use Nette\Utils\Strings;
 use VersionPress\Git\CommitMessage;
 use VersionPress\Utils\StringUtils;
 
@@ -68,7 +68,7 @@ class ThemeChangeInfo extends TrackedChangeInfo {
             return "Theme switched to '{$this->themeName}'";
         }
 
-        return NStrings::capitalize(StringUtils::verbToPastTense($this->action)) . " theme '{$this->themeName}'";
+        return Strings::capitalize(StringUtils::verbToPastTense($this->action)) . " theme '{$this->themeName}'";
     }
 
     public function getChangedFiles() {

@@ -1,7 +1,7 @@
 <?php
 namespace VersionPress\Synchronizers;
 
-use NStrings;
+use Nette\Utils\Strings;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\ArrayUtils;
@@ -158,7 +158,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $query = "UPDATE {$tableName} JOIN (SELECT * FROM {$this->database->prefix}vp_id WHERE `table` = '{$this->dbSchema->getTableName($this->entityName)}') filtered_vp_id ON {$tableName}.{$this->idColumnName} = filtered_vp_id.id SET";
         foreach ($updateData as $key => $value) {
             if ($key == $this->idColumnName) continue;
-            if (NStrings::startsWith($key, 'vp_')) continue;
+            if (Strings::startsWith($key, 'vp_')) continue;
             $query .= " `$key` = " . (is_numeric($value) ? $value : '"' . mysql_real_escape_string($value) . '"') . ',';
         }
         $query[strlen($query) - 1] = ' '; // strip the last comma
@@ -170,7 +170,7 @@ abstract class SynchronizerBase implements Synchronizer {
         unset($entity[$this->idColumnName]);
         $columns = array_keys($entity);
         $columns = array_filter($columns, function ($column) {
-            return !NStrings::startsWith($column, 'vp_');
+            return !Strings::startsWith($column, 'vp_');
         });
         $columnsString = join(', ', array_map(function ($column) {
             return "`$column`";
@@ -280,8 +280,8 @@ abstract class SynchronizerBase implements Synchronizer {
         $referencesInfo = $this->dbSchema->getEntityInfo($this->entityName)->references;
 
         foreach ($entity as $key => $value) {
-            if (NStrings::startsWith($key, 'vp_')) {
-                $key = NStrings::substring($key, 3);
+            if (Strings::startsWith($key, 'vp_')) {
+                $key = Strings::substring($key, 3);
                 if (isset($referencesInfo[$key]))
                     $references[$key] = $value;
             }

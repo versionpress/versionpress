@@ -1,7 +1,7 @@
 <?php
 namespace VersionPress\ChangeInfos;
 
-use NStrings;
+use Nette\Utils\Strings;
 use VersionPress\Git\CommitMessage;
 
 /**
@@ -51,9 +51,9 @@ class PostChangeInfo extends EntityChangeInfo {
             case "create":
                 return "Created {$this->postType} '{$this->postTitle}'";
             case "trash":
-                return NStrings::capitalize($this->postType) . " '{$this->postTitle}' moved to trash";
+                return Strings::capitalize($this->postType) . " '{$this->postTitle}' moved to trash";
             case "untrash":
-                return NStrings::capitalize($this->postType) . " '{$this->postTitle}' moved from trash";
+                return Strings::capitalize($this->postType) . " '{$this->postTitle}' moved from trash";
             case "delete":
                 return "Deleted {$this->postType} '{$this->postTitle}'";
             case "draft":

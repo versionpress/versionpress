@@ -1,7 +1,7 @@
 <?php
 
 namespace VersionPress\Git;
-use NStrings;
+use Nette\Utils\Strings;
 
 /**
  * Represents Git commit message (originally a string) as a structure with subject,
@@ -73,7 +73,7 @@ class CommitMessage {
             $tagLines = array_filter(
                 array_map("trim", explode("\n", $this->getBody())),
                 function ($line) {
-                    return NStrings::startsWith($line, "VP-") || NStrings::startsWith($line, "X-VP-");
+                    return Strings::startsWith($line, "VP-") || Strings::startsWith($line, "X-VP-");
                 }
             );
             $tags = array();

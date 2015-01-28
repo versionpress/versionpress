@@ -2,6 +2,7 @@
 
 namespace VersionPress\Utils;
 use FilesystemIterator;
+use Nette\Utils\Strings;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Traversable;
@@ -58,7 +59,7 @@ class FileSystem {
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
 
         foreach ($iterator as $item) {
-            if ($item->isDir() && \Nette\Utils\Strings::endsWith($iterator->key(), ".git")) {
+            if ($item->isDir() && Strings::endsWith($iterator->key(), ".git")) {
                 self::possiblyFixGitPermissions($iterator->key());
             }
         }

@@ -1,7 +1,7 @@
 <?php
 namespace VersionPress\ChangeInfos;
 
-use NStrings;
+use Nette\Utils\Strings;
 use VersionPress\Git\CommitMessage;
 
 /**
@@ -42,7 +42,7 @@ class TermChangeInfo extends EntityChangeInfo {
             case "create":
                 return "New {$taxonomy} '{$this->termName}'";
             case "rename":
-                return NStrings::firstUpper($taxonomy) . " '{$this->oldTermName}' renamed to '{$this->termName}'";
+                return Strings::firstUpper($taxonomy) . " '{$this->oldTermName}' renamed to '{$this->termName}'";
         }
 
         return "Edited {$taxonomy} '{$this->termName}'";

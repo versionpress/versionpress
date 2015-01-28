@@ -103,7 +103,7 @@ gulp.task('prepare-src-definition', function () {
     if (buildType == 'test-deploy') {
         srcDef.push('!' + vpDir + '/composer.json');
         srcDef.push('!' + vpDir + '/composer.lock');
-        srcDef.push('!' + vpDir + '/vendor/**/.git{,/**}'); // keep vendor but ignore all nested Git repositories in it (e.g., nette minified)
+        srcDef.push('!' + vpDir + '/vendor/**/.git{,/**}'); // keep vendor but ignore all nested Git repositories in it
     } else {
         srcDef.push('!' + vpDir + '/vendor{,/**}'); // `vendor` is fresh-generated later in the `composer-install` task
         // keep composer.json|lock
@@ -194,12 +194,12 @@ gulp.task('persist-plugin-comment', ['rename-phpstrip-back'], function (cb) {
 });
 
 /**
- * Does some code changes to build a production version. Currently sets NDebugger::PRODUCTION mode.
+ * Does some code changes to build a production version. Currently sets Debugger::PRODUCTION mode.
  */
 gulp.task('set-production-mode', ['rename-phpstrip-back'], function (cb) {
     return gulp.src(buildDir + '/bootstrap.php').pipe(replace(
-        "NDebugger::DETECT",
-        "NDebugger::PRODUCTION"
+        "Debugger::DETECT",
+        "Debugger::PRODUCTION"
     )).pipe(gulp.dest(buildDir));
 });
 

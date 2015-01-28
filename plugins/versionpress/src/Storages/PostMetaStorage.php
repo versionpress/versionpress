@@ -2,7 +2,7 @@
 
 namespace VersionPress\Storages;
 
-use NStrings;
+use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\PostMetaChangeInfo;
 
 class PostMetaStorage extends DirectoryStorage {
@@ -38,7 +38,7 @@ class PostMetaStorage extends DirectoryStorage {
         $fieldToDelete = "";
 
         foreach ($post as $fieldname => $value) {
-            if (NStrings::endsWith($fieldname, "#$restriction[vp_id]")) {
+            if (Strings::endsWith($fieldname, "#$restriction[vp_id]")) {
                 $fieldToDelete = $fieldname;
                 break;
             }

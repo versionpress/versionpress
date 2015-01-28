@@ -1,7 +1,7 @@
 <?php
 
 namespace VersionPress\ChangeInfos;
-use NStrings;
+use Nette\Utils\Strings;
 use VersionPress\Git\CommitMessage;
 use VersionPress\Utils\StringUtils;
 
@@ -60,7 +60,7 @@ class PluginChangeInfo extends TrackedChangeInfo {
     }
 
     public function getChangeDescription() {
-        return NStrings::capitalize(StringUtils::verbToPastTense($this->action)) . " plugin '{$this->pluginName}'";
+        return Strings::capitalize(StringUtils::verbToPastTense($this->action)) . " plugin '{$this->pluginName}'";
     }
 
     protected function getActionTagValue() {

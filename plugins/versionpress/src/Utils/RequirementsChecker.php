@@ -3,7 +3,7 @@
 namespace VersionPress\Utils;
 
 use Exception;
-use NStrings;
+use Nette\Utils\Strings;
 use Symfony\Component\Process\Process;
 
 class RequirementsChecker {
@@ -114,7 +114,7 @@ class RequirementsChecker {
             $process->run();
             if ($process->getErrorOutput() !== null) return false; // there is no git
             $output = trim($process->getOutput());
-            $match = NStrings::match($output, "~git version (\\d[\\d\\.]+\\d).*~");
+            $match = Strings::match($output, "~git version (\\d[\\d\\.]+\\d).*~");
             $version = $match[1];
             return version_compare("1.9", $version, "<=");
         } catch (Exception $e) {
@@ -155,7 +155,7 @@ class RequirementsChecker {
             return true;
         }
 
-        $gitignoreContainsVersionPressRules = NStrings::contains(file_get_contents($gitignorePath), 'plugins/versionpress');
+        $gitignoreContainsVersionPressRules = Strings::contains(file_get_contents($gitignorePath), 'plugins/versionpress');
         return $gitignoreContainsVersionPressRules;
     }
 

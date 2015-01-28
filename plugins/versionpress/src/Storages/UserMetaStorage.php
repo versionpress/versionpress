@@ -2,6 +2,7 @@
 
 namespace VersionPress\Storages;
 
+use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\UserMetaChangeInfo;
 
 class UserMetaStorage extends SingleFileStorage {
@@ -55,6 +56,6 @@ class UserMetaStorage extends SingleFileStorage {
     }
 
     private function keyEndsWith($data, $suffix) {
-        return (isset($data['meta_key']) && \NStrings::endsWith($data['meta_key'], $suffix)) || \NStrings::endsWith($this->userMetaKey, $suffix);
+        return (isset($data['meta_key']) && Strings::endsWith($data['meta_key'], $suffix)) || Strings::endsWith($this->userMetaKey, $suffix);
     }
 }

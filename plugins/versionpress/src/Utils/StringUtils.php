@@ -2,7 +2,7 @@
 
 
 namespace VersionPress\Utils;
-use NStrings;
+use Nette\Utils\Strings;
 
 /**
  * Our string utils. Only adds what's not already provided by NStrings.
@@ -19,7 +19,7 @@ class StringUtils {
      * @return string
      */
     public static function verbToPastTense($verb) {
-        return $verb . (NStrings::endsWith($verb, "e") ? "d" : "ed");
+        return $verb . (Strings::endsWith($verb, "e") ? "d" : "ed");
     }
 
 }
