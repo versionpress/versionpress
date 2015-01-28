@@ -73,10 +73,12 @@ gulp.task('run-tests', function(cb) {
             .on('end', function() {
                 console.log("Tests done");
                 selenium.kill();
+                cb();
             })
             .on('error', function(err) {
                 console.log("Test failed");
                 selenium.kill();
+                cb();
             });
 
     });
