@@ -114,18 +114,20 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
     //----------------------------
 
     /**
-     * The built-in $seleniumElement->value('xyz') method only appends to an existing value,
-     * and calling $selElement->clear() before it might create additional commit if the form
-     * is watched by some WordPress JavaScript / AJAX. This method is a workaround that
-     * truly sets the value (overwrites the original one), hopefully without sideeffects
-     * (it is using jQuery for it).
+     * The built-in $element->value('xyz') method only appends to an existing value,
+     * this method overwrites the whole field.
      *
      * @param $cssSelector
      * @param $value
      */
     protected function setValue($cssSelector, $value) {
+
+        // Implementation note: calling $element->clear() causes image edit form in WP 4.1 to dispatch
+        // an unwanted AJAX request, which is why we need to clear the value using JavaScript.
+        // That works on both WP 4.1 and pre-4.1.
+
         $element = $this->byCssSelector($cssSelector);
-        $element->clear();
+        $this->executeScript("jQuery('$cssSelector').val('')");
         $element->value($value);
     }
 
