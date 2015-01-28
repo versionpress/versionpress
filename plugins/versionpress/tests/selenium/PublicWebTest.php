@@ -45,9 +45,9 @@ class PublicWebTest extends SeleniumTestCase {
 
         $this->url('?p=' . self::$testPostId);
 
-        $this->byCssSelector('#author')->value("John Tester");
-        $this->byCssSelector('#email')->value("john.tester@example.com");
-        $this->byCssSelector('#comment')->value("Public comment");
+        $this->setValue('#author', "John Tester");
+        $this->setValue('#email', "john.tester@example.com");
+        $this->setValue('#comment', "Public comment");
 
         $this->byCssSelector('#submit')->click();
         $this->waitAfterRedirect();
