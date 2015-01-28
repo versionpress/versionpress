@@ -136,7 +136,12 @@ class GitRepository {
         $logCommand = str_replace("|end|", $commitDelimiter, $logCommand);
         $log = trim($this->runShellCommandWithStandardOutput($logCommand), $commitDelimiter);
 
-        $commits = explode($commitDelimiter, $log);
+        if ($log == "") {
+            $commits = array();
+        } else {
+            $commits = explode($commitDelimiter, $log);
+        }
+        
         return array_map(function ($rawCommit) {
             return Commit::buildFromString(trim($rawCommit));
         }, $commits);
