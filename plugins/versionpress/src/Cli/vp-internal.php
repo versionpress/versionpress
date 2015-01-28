@@ -1,6 +1,7 @@
 <?php
 
 namespace VersionPress\Cli;
+use Symfony\Component\Process\Process;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use WP_CLI;
@@ -55,7 +56,7 @@ class VPInternalCommand extends WP_CLI_Command {
 
         // 1) Create a new Git branch here
         $createBranchCommand = 'git checkout -b ' . escapeshellarg($name);
-        $process = new \Symfony\Component\Process\Process($createBranchCommand);
+        $process = new Process($createBranchCommand);
         $process->run();
 
         if (!$process->isSuccessful()) {
@@ -80,7 +81,7 @@ class VPInternalCommand extends WP_CLI_Command {
 
         if (array_key_exists("force-db", $assoc_args)) {
             $dropDbCmd = 'wp db drop --yes';
-            $process = new \Symfony\Component\Process\Process($dropDbCmd);
+            $process = new Process($dropDbCmd);
             $process->run();
             if ($process->isSuccessful()) {
                 WP_CLI::success("Database dropped");
@@ -92,7 +93,7 @@ class VPInternalCommand extends WP_CLI_Command {
 
 
         $createDbCmd = 'wp db create';
-        $process = new \Symfony\Component\Process\Process($createDbCmd);
+        $process = new Process($createDbCmd);
         $process->run();
         if (!$process->isSuccessful()) {
             WP_CLI::log("Failed creating database. If the problem is existing db, try running this with --force-db flag.");
@@ -105,7 +106,7 @@ class VPInternalCommand extends WP_CLI_Command {
         // 4) Create WP tables
 
         $createWpTablesCmd = 'wp core install --url=' . escapeshellarg($cloneUrl) . ' --title=x --admin_user=x --admin_password=x --admin_email=x@example.com';
-        $process = new \Symfony\Component\Process\Process($createWpTablesCmd);
+        $process = new Process($createWpTablesCmd);
         $process->run();
         if (!$process->isSuccessful()) {
             WP_CLI::log("Failed creating WP tables.");
@@ -121,7 +122,7 @@ class VPInternalCommand extends WP_CLI_Command {
 
         $finishInitCloneCmd = 'wp --require=' . escapeshellarg(__FILE__) . ' vp-internal finish-init-clone';
 
-        $process = new \Symfony\Component\Process\Process($finishInitCloneCmd);
+        $process = new Process($finishInitCloneCmd);
         $process->run();
         if (!$process->isSuccessful()) {
             WP_CLI::log($process->getOutput());

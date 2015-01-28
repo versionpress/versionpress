@@ -2,6 +2,8 @@
 // NOTE: VersionPress must be fully activated for these commands to be available
 
 namespace VersionPress\Cli;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Process\Process;
 use VersionPress\Utils\FileSystem;
 use WP_CLI;
 use WP_CLI_Command;
@@ -51,14 +53,14 @@ class VPCommand extends WP_CLI_Command {
         if (is_dir($clonePath)) {
             try {
                 FileSystem::remove($clonePath);
-            } catch (\Symfony\Component\Filesystem\Exception\IOException $e) {
+            } catch (IOException $e) {
                 WP_CLI::error("Could not delete directory '" . basename($clonePath) . "'. Please do it manually.");
             }
         }
 
         $cloneCommand = sprintf("git clone %s %s", escapeshellarg($currentWpPath), escapeshellarg($clonePath));
 
-        $process = new \Symfony\Component\Process\Process($cloneCommand, $currentWpPath);
+        $process = new Process($cloneCommand, $currentWpPath);
         $process->run();
 
         if (!$process->isSuccessful()) {
@@ -79,7 +81,7 @@ class VPCommand extends WP_CLI_Command {
         }
         $configureCloneCmd .= " --debug";
 
-        $process = new \Symfony\Component\Process\Process($configureCloneCmd, $clonePath);
+        $process = new Process($configureCloneCmd, $clonePath);
         $process->run();
 
         if (!$process->isSuccessful()) {

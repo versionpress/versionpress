@@ -366,6 +366,8 @@ class WpAutomation {
             self::$config->getDbName()
         );
         $res = $mysqli->query('show tables');
+
+        /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $res->fetch_row()) {
             $dropTableSql = "DROP TABLE $row[0]";
             $mysqli->query($dropTableSql);
