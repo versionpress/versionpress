@@ -35,7 +35,6 @@ if (defined('WP_CLI') && WP_CLI && VersionPress::isActive()) {
 }
 
 if (defined('VP_MAINTENANCE')) {
-    Debugger::log("Ooops. Something went wrong :( The .maintenance file was not deleted.");
     vp_disable_maintenance();
 }
 

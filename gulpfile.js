@@ -13,6 +13,7 @@ var fs = require('fs');
 var path = require('path');
 var iniParser = require('ini');
 var chalk = require('chalk');
+var removeLines = require('gulp-remove-lines');
 
 /**
  * Version to be displayed both in WordPress administration and used as a suffix of the generated ZIP file
@@ -194,19 +195,18 @@ gulp.task('persist-plugin-comment', ['rename-phpstrip-back'], function (cb) {
 });
 
 /**
- * Does some code changes to build a production version. Currently sets Debugger::PRODUCTION mode.
+ * Disables the debugger because we don't want to handle all exceptions and errors caused by all plugins. See WP-268.
  */
-gulp.task('set-production-mode', ['rename-phpstrip-back'], function (cb) {
-    return gulp.src(buildDir + '/bootstrap.php').pipe(replace(
-        "Debugger::DETECT",
-        "Debugger::PRODUCTION"
+gulp.task('disable-debugger', ['rename-phpstrip-back'], function (cb) {
+    return gulp.src(buildDir + '/bootstrap.php').pipe(removeLines(
+        {filters: [/^Debugger::enable/]}
     )).pipe(gulp.dest(buildDir));
 });
 
 /**
  * Builds the final ZIP in the `distDir` folder.
  */
-gulp.task('zip', ['persist-plugin-comment', 'set-production-mode', 'remove-composer-files'], function (cb) {
+gulp.task('zip', ['persist-plugin-comment', 'disable-debugger', 'remove-composer-files'], function (cb) {
     return gulp.src(buildDir + '/**', {dot: true}).
         pipe(rename(function (path) {
             path.dirname = 'versionpress/' + path.dirname;

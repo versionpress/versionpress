@@ -23,8 +23,7 @@ if (defined('DOING_AJAX')) {
     header("Content-Type: application/json");
 }
 
-$ndebuggerMode = defined('WP_CLI') && WP_CLI ? Debugger::DEVELOPMENT : Debugger::DETECT;
-Debugger::enable($ndebuggerMode, VERSIONPRESS_PLUGIN_DIR . '/log');
+Debugger::enable(Debugger::DEVELOPMENT, VERSIONPRESS_PLUGIN_DIR . '/log');
 
 $robotLoader = new RobotLoader();
 $robotLoader->addDirectory(VERSIONPRESS_PLUGIN_DIR . '/src');

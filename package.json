@@ -12,6 +12,7 @@
     "coffee-script": "~1.7.1",
     "del": "~0.1.2",
     "gulp": "~3.8.7",
+    "gulp-remove-lines": "^0.1.0",
     "gulp-rename": "~1.2.0",
     "gulp-replace": "~0.4.0",
     "gulp-shell": "~0.2.9",
