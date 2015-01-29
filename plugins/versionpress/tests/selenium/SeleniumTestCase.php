@@ -218,11 +218,13 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
     /**
      * If there is a redirect after POST (Post/Redirect/Get pattern) you have wait for the shutdown
      * function that creates a commit - the commit may take longer time then rendering new page.
+     *
+     * @param int $timeout Milliseconds
      */
-    protected function waitAfterRedirect() {
+    protected function waitAfterRedirect($timeout = 5000) {
         $this->waitUntilTrue(function (SeleniumTestCase $testCase) {
             return $testCase->executeScript("return document.readyState;") == "complete";
-        }, 5000);
+        }, $timeout);
 
         usleep(self::$config->getAfterRedirectWaitingTime() * 1000);
     }

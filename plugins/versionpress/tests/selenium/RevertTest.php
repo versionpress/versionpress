@@ -138,11 +138,11 @@ class RevertTest extends SeleniumTestCase {
 
     private function undoNthCommit($whichCommit) {
         $this->jsClick("#versionpress-commits-table tr:nth-child($whichCommit) a[href*=vp_undo]");
-        $this->waitAfterRedirect();
+        $this->waitAfterRedirect(10000);
     }
 
     private function rollbackToNthCommit($whichCommit) {
         $this->jsClick("#versionpress-commits-table tr:nth-child($whichCommit) a[href*=vp_rollback]");
-        $this->waitAfterRedirect();
+        $this->waitAfterRedirect(10000);
     }
 }
