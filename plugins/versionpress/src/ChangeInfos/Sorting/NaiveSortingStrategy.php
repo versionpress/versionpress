@@ -18,18 +18,18 @@ class NaiveSortingStrategy implements SortingStrategy {
      * @var string[]
      */
     private $priorityOrder = array(
-        "VersionPress\ChangeInfos\WordPressUpdateChangeInfo",
-        "VersionPress\ChangeInfos\VersionPressChangeInfo",
-        "VersionPress\ChangeInfos\PostChangeInfo",
-        "VersionPress\ChangeInfos\CommentChangeInfo",
-        "VersionPress\ChangeInfos\UserChangeInfo",
-        "VersionPress\ChangeInfos\RevertChangeInfo",
-        "VersionPress\ChangeInfos\PluginChangeInfo",
-        "VersionPress\ChangeInfos\ThemeChangeInfo",
-        "VersionPress\ChangeInfos\TermChangeInfo",
-        "VersionPress\ChangeInfos\OptionChangeInfo",
-        "VersionPress\ChangeInfos\PostMetaChangeInfo",
-        "VersionPress\ChangeInfos\UserMetaChangeInfo",
+        'VersionPress\ChangeInfos\WordPressUpdateChangeInfo',
+        'VersionPress\ChangeInfos\VersionPressChangeInfo',
+        'VersionPress\ChangeInfos\PostChangeInfo',
+        'VersionPress\ChangeInfos\CommentChangeInfo',
+        'VersionPress\ChangeInfos\UserChangeInfo',
+        'VersionPress\ChangeInfos\RevertChangeInfo',
+        'VersionPress\ChangeInfos\PluginChangeInfo',
+        'VersionPress\ChangeInfos\ThemeChangeInfo',
+        'VersionPress\ChangeInfos\TermChangeInfo',
+        'VersionPress\ChangeInfos\OptionChangeInfo',
+        'VersionPress\ChangeInfos\PostMetaChangeInfo',
+        'VersionPress\ChangeInfos\UserMetaChangeInfo',
     );
 
     function sort($changeInfoList) {
