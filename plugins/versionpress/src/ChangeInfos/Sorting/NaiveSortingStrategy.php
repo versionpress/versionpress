@@ -110,7 +110,14 @@ class NaiveSortingStrategy implements SortingStrategy {
      */
     private function compareOptionChangeInfo($changeInfo1, $changeInfo2) {
 
-        // First, the "create" action takes precedence
+        // The WPLANG option always has the lowest priority (it is a "noise")
+        if ($changeInfo1->getEntityId() == "WPLANG") {
+            return 1;
+        } else if ($changeInfo2->getEntityId() == "WPLANG") {
+            return -1;
+        }
+
+        // The "create" action takes precedence
         if ($changeInfo1->getAction() === "create" && $changeInfo2->getAction() !== "create") {
             return -1;
         }
@@ -119,8 +126,8 @@ class NaiveSortingStrategy implements SortingStrategy {
             return 1;
         }
 
-        // Else, just sort by alphabet (which is their order in the databse and rougly OK
-        // until we work out something better
+        // Finally, sort by alphabet. It is the options order in the databse and rougly OK
+        // until we work out something better.
         return strcmp($changeInfo1->getEntityId(), $changeInfo2->getEntityId());
     }
 }
