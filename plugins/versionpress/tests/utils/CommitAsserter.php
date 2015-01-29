@@ -122,13 +122,13 @@ class CommitAsserter {
         if ($regardlessOfPriority) {
             $changeInfoContainsAction = ChangeInfoUtils::containsAction($changeInfo, $expectedAction);
             if (!$changeInfoContainsAction) {
-                PHPUnit_Framework_Assert::fail("Action '$expectedAction' not found in commit '{$commit->getShortHash()}'");
+                PHPUnit_Framework_Assert::fail("Action '$expectedAction' not found in commit {$commit->getShortHash()}");
             }
         } else {
             $commitAction = ChangeInfoUtils::getFullAction($changeInfo);
 
             if ($expectedAction != $commitAction) {
-                PHPUnit_Framework_Assert::fail("Expected '$expectedAction' but the commit action was '$commitAction'");
+                PHPUnit_Framework_Assert::fail("Expected action '$expectedAction' but was '$commitAction' in commit {$commit->getShortHash()}");
             }
         }
 
