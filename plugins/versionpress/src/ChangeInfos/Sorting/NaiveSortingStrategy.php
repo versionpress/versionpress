@@ -109,6 +109,18 @@ class NaiveSortingStrategy implements SortingStrategy {
      * @return int
      */
     private function compareOptionChangeInfo($changeInfo1, $changeInfo2) {
+
+        // First, the "create" action takes precedence
+        if ($changeInfo1->getAction() === "create" && $changeInfo2->getAction() !== "create") {
+            return -1;
+        }
+
+        if ($changeInfo2->getAction() === "create" && $changeInfo1->getAction() !== "create") {
+            return 1;
+        }
+
+        // Else, just sort by alphabet (which is their order in the databse and rougly OK
+        // until we work out something better
         return strcmp($changeInfo1->getEntityId(), $changeInfo2->getEntityId());
     }
 }
