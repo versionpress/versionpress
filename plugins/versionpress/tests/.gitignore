@@ -1,2 +1,3 @@
 test-config.ini
 *.local.php
+phpunit-log.*

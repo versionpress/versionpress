@@ -69,7 +69,11 @@ gulp.task('run-tests', function(cb) {
         }
 
         gulp.src('phpunit.xml')
-            .pipe(phpunit('..\\vendor\\bin\\phpunit.bat', {verbose: true}))
+            .pipe(phpunit('..\\vendor\\bin\\phpunit.bat', {
+                logTap: "./phpunit-log.tap.txt",
+                testdoxText: "./phpunit-log.textdox.txt",
+                verbose: true
+            }))
             .on('end', function() {
                 console.log("Tests done");
                 selenium.kill();
