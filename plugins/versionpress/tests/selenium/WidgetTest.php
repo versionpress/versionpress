@@ -27,7 +27,7 @@ class WidgetTest extends SeleniumTestCase {
         $this->waitAfterRedirect();
 
         $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction('option/create');
+        $commitAsserter->assertCommitAction('option/create', 0, true);
         $commitAsserter->assertCountOfAffectedFiles(1);
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();

@@ -111,14 +111,25 @@ class CommitAsserter {
      *
      * @param string $expectedAction Expected action, e.g., "post/edit" or "wordpress/update".
      * @param int $whichCommit See $whichCommitParameter documentation. "HEAD" by default.
+     * @param bool $regardlessOfPriority By default, commit action must be the "main" one in the envelope
+     *   (with the highest priority). If this param is set to true the whole envelope is searched for
+     *   the given action.
      */
-    public function assertCommitAction($expectedAction, $whichCommit = 0) {
+    public function assertCommitAction($expectedAction, $whichCommit = 0, $regardlessOfPriority = false) {
         $commit = $this->getCommit($whichCommit);
         $changeInfo = $this->getChangeInfo($commit);
-        $commitAction = ChangeInfoUtils::getFullAction($changeInfo);
 
-        if ($expectedAction != $commitAction) {
-            PHPUnit_Framework_Assert::fail("Expected '$expectedAction' but the commit action was '$commitAction'");
+        if ($regardlessOfPriority) {
+            $changeInfoContainsAction = ChangeInfoUtils::containsAction($changeInfo, $expectedAction);
+            if (!$changeInfoContainsAction) {
+                PHPUnit_Framework_Assert::fail("Action '$expectedAction' not found in commit '{$commit->getShortHash()}'");
+            }
+        } else {
+            $commitAction = ChangeInfoUtils::getFullAction($changeInfo);
+
+            if ($expectedAction != $commitAction) {
+                PHPUnit_Framework_Assert::fail("Expected '$expectedAction' but the commit action was '$commitAction'");
+            }
         }
 
     }

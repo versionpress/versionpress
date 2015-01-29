@@ -6,6 +6,7 @@ use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
+use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\Database\EntityInfo;
 
 class ChangeInfoUtils {
@@ -160,5 +161,27 @@ class ChangeInfoUtils {
         }
 
         return true;
+    }
+
+    /**
+     * @param ChangeInfoEnvelope|UntrackedChangeInfo $changeInfo
+     * @param string $fullAction
+     * @return bool
+     * @throws \Exception
+     */
+    public static function containsAction($changeInfo, $fullAction) {
+        if ($changeInfo instanceof ChangeInfoEnvelope) {
+
+            $changeInfos = $changeInfo->getChangeInfoList();
+            foreach ($changeInfos as $ci) {
+                if (self::getFullAction($ci) == $fullAction) {
+                    return true;
+                }
+            }
+            return false;
+
+        } else {
+            throw new \Exception("Only ChangeInfoEnvelopes are supported");
+        }
     }
 }

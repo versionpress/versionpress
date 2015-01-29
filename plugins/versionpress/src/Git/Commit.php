@@ -51,6 +51,15 @@ class Commit {
     }
 
     /**
+     * Short hash - first 7 characters.
+     *
+     * @return string
+     */
+    public function getShortHash() {
+        return substr($this->hash, 0, 7);
+    }
+
+    /**
      * @return DateTime
      */
     public function getDate() {
