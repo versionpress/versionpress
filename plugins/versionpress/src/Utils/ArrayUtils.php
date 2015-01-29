@@ -12,8 +12,7 @@ class ArrayUtils {
     }
 
     /**
-     * Similar to `usort()` but maintains order or equal items (the algorithm
-     * is "stable").
+     * Similar to `usort()` but maintains order of equal items (the algorithm is "stable").
      *
      * Adapted from http://stackoverflow.com/a/4353844/21728 / http://php.net/manual/en/function.usort.php#38827
      *
