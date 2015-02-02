@@ -16,12 +16,102 @@ use wpdb;
  * These internal commands are not registered with WP-CLI automatically like the "public"
  * `wp vp` commands in versionpress.php. You have to manually require the file, e.g.:
  *
- *     wp --require=path/to/this/vp-internal.php vp-internal ...
+ *     wp --require=wp-content/plugins/versionpress/src/Cli/vp-internal.php vp-internal ...
  *
  * These internal commands are mostly used by public `wp vp` commands.
  *
  */
 class VPInternalCommand extends WP_CLI_Command {
+
+
+    /**
+     * Restores a WP site from Git repo. Fails if the db exists.
+     *
+     * ## OPTIONS
+     *
+     * --db=<name>
+     * : Name of the db, a new user in it and his password
+     *
+     * @synopsis --db=<name>
+     *
+     * @subcommand restore-site
+     *
+     * @when before_wp_load
+     */
+    public function restoreSite($args, $assoc_args) {
+
+        if (!defined('WP_CONTENT_DIR')) {
+            define('WP_CONTENT_DIR', 'xyz'); //doesn't matter, it's just to prevent the NOTICE in the require`d bootstrap.php
+        }
+        require_once(__DIR__ . '/../../bootstrap.php');
+
+        // 1) Create wp-config.php
+        $configCmd = 'wp core config --dbname=' . escapeshellarg($assoc_args['db']) . ' --dbuser=root';
+
+        $process = new Process($configCmd);
+        $process->run();
+        if (!$process->isSuccessful()) {
+            WP_CLI::log("Failed creating wp-config.php");
+            WP_CLI::error($process->getErrorOutput());
+        } else {
+            WP_CLI::success("wp-config.php created");
+        }
+
+
+        // 2) Create db
+        $createDbCommand = 'wp db create';
+
+        $process = new Process($createDbCommand);
+        $process->run();
+        if (!$process->isSuccessful()) {
+            WP_CLI::log("Failed creating DB");
+            WP_CLI::error($process->getErrorOutput());
+        } else {
+            WP_CLI::success("DB created");
+        }
+
+        // 3) Create WP tables
+        $createWpTablesCmd = 'wp core install --url=' . escapeshellarg("http://localhost/" . dirname(getcwd())) . ' --title=x --admin_user=x --admin_password=x --admin_email=x@example.com';
+        $process = new Process($createWpTablesCmd);
+        $process->run();
+        if (!$process->isSuccessful()) {
+            WP_CLI::log("Failed creating WP tables.");
+            WP_CLI::error($process->getErrorOutput());
+        } else {
+            WP_CLI::success("WP tables created");
+        }
+
+
+        // The next couple of the steps need to be done after the WP is fully loaded; we can use finish-init-clone for that
+
+        $finishInitCloneCmd = 'wp --require=' . escapeshellarg(__FILE__) . ' vp-internal finish-init-clone --truncate-options';
+
+        $process = new Process($finishInitCloneCmd);
+        $process->run();
+        if (!$process->isSuccessful()) {
+            WP_CLI::log("Could not finish site restore");
+            WP_CLI::error($process->getErrorOutput());
+        } else {
+            WP_CLI::log($process->getOutput());
+        }
+
+
+        // Finally, clean the working copy
+
+        $cleanWDCmd = 'git reset --hard';
+
+        $process = new Process($cleanWDCmd);
+        $process->run();
+        if (!$process->isSuccessful()) {
+            WP_CLI::log("Could not clean working directory");
+            WP_CLI::error($process->getErrorOutput());
+        } else {
+            WP_CLI::log($process->getOutput());
+        }
+
+
+    }
+
 
     /**
      * Initializes a clone
@@ -137,6 +227,11 @@ class VPInternalCommand extends WP_CLI_Command {
     /**
      * Finishes init-clone operation
      *
+     * --truncate-options
+     * : By default, options table is not truncated. This flag changes the behavior.
+     *
+     * @synopsis [--truncate-options]
+     *
      * @subcommand finish-init-clone
      *
      */
@@ -147,7 +242,13 @@ class VPInternalCommand extends WP_CLI_Command {
 
         /** @var wpdb $wpdb */
         global $wpdb;
-        $sql = "SELECT concat('TRUNCATE TABLE `', TABLE_NAME, '`;') FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '" . DB_NAME . "' AND TABLE_NAME NOT LIKE '%options';";
+        $sql = "SELECT concat('TRUNCATE TABLE `', TABLE_NAME, '`;') FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '" . DB_NAME . "'";
+        if ($assoc_args["truncate-options"]) {
+            $sql .= ";";
+        } else {
+            $sql .= " AND TABLE_NAME NOT LIKE '%options';";
+        }
+
         $results = $wpdb->get_results($sql, ARRAY_N);
 
         foreach ($results as $subResult) {
