@@ -183,8 +183,9 @@ class CommitAsserter {
      *
      *  - %vpdb% expands to "wp-content/vpdb"
      *  - %VPID% expands to the VPID of the committed entity
+     *  - %vptag(TAG_NAME)% expands to the value of given TAG_NAME
      *
-     * Placeholders are case insensitive.
+     * Placeholders are case sensitive.
      *
      * @param string $type Standard git "M" (modified), "A" (added), "D" (deleted) etc.
      * @param string $path Path relative to repo root. Supports wildcards, e.g. "wp-content/uploads/*",
@@ -305,12 +306,27 @@ class CommitAsserter {
      */
     private function expandPath($path, $whichCommit) {
         if (Strings::contains($path, "%vpdb%")) {
-            $path = str_ireplace("%vpdb%", "wp-content/vpdb", $path);
+            $path = str_replace("%vpdb%", "wp-content/vpdb", $path);
         }
-        if (Strings::contains($path, "%VPID%")) {
-            $path = str_ireplace("%VPID%", ChangeInfoUtils::getVpid($this->getChangeInfo($this->getCommit($whichCommit))), $path);
-            return $path;
+
+        $containsVpId = Strings::contains($path, "%VPID%");
+        $containsVpTag = Strings::contains($path, "%vptag");
+
+        if ($containsVpId || $containsVpTag) {
+            $changeInfo = $this->getChangeInfo($this->getCommit($whichCommit));
+
+            if ($containsVpId) {
+                $path = str_replace("%VPID%", ChangeInfoUtils::getVpid($changeInfo), $path);
+            }
+
+            if ($containsVpTag) {
+                $commitMessage = $changeInfo->getCommitMessage();
+                $path = preg_replace_callback('/(.*)%vptag\((.*)\)%(.*)/', function ($parts) use ($commitMessage) {
+                    return $parts[1] . $commitMessage->getVersionPressTag($parts[2]) . $parts[3];
+                }, $path);
+            }
         }
+
         return $path;
     }
 

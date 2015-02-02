@@ -5,7 +5,7 @@ namespace VersionPress\Storages;
 use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\UserMetaChangeInfo;
 
-class UserMetaStorage extends SingleFileStorage {
+class UserMetaStorage extends DirectoryStorage {
 
     private $userMetaKey;
     private $userMetaVpId;
@@ -26,7 +26,7 @@ class UserMetaStorage extends SingleFileStorage {
     }
 
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
-        return new UserMetaChangeInfo($action, $this->userMetaVpId, $newEntity['user_login'], $this->userMetaKey);
+        return new UserMetaChangeInfo($action, $this->userMetaVpId, $newEntity['user_login'], $this->userMetaKey, $newEntity['vp_id']);
     }
 
     public function shouldBeSaved($data) {

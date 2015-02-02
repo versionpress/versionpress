@@ -53,8 +53,8 @@ class StorageFactory {
         $this->addStorageClassInfo('option', 'VersionPress\Storages\OptionsStorage', '/options.ini');
         $this->addStorageClassInfo('term', 'VersionPress\Storages\TermsStorage', '/terms.ini');
         $this->addStorageClassInfo('term_taxonomy', 'VersionPress\Storages\TermTaxonomyStorage', '/terms.ini');
-        $this->addStorageClassInfo('user', 'VersionPress\Storages\UserStorage', '/users.ini');
-        $this->addStorageClassInfo('usermeta', 'VersionPress\Storages\UserMetaStorage', '/users.ini');
+        $this->addStorageClassInfo('user', 'VersionPress\Storages\UserStorage', '/users');
+        $this->addStorageClassInfo('usermeta', 'VersionPress\Storages\UserMetaStorage', '/users');
         $this->addStorageClassInfo('postmeta', 'VersionPress\Storages\PostMetaStorage', '/posts');
     }
 

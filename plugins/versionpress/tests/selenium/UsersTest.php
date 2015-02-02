@@ -28,7 +28,7 @@ class UsersTest extends SeleniumTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("user/create");
         $commitAsserter->assertCommitTag("VP-User-Login", $this->testUser['login']);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/users.ini");
+        $commitAsserter->assertCommitPath("A", "%vpdb%/users/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
     }
 
@@ -55,7 +55,7 @@ class UsersTest extends SeleniumTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("user/edit");
         $commitAsserter->assertCommitTag("VP-User-Login", $this->testUser['login']);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/users.ini");
+        $commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
     }
 
@@ -81,7 +81,7 @@ class UsersTest extends SeleniumTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("usermeta/edit");
         $commitAsserter->assertCommitTag("VP-User-Login", $this->testUser['login']);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/users.ini");
+        $commitAsserter->assertCommitPath("M", "%vpdb%/users/%vptag(VP-User-Id)%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
     }
 
@@ -104,7 +104,7 @@ class UsersTest extends SeleniumTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("user/delete");
         $commitAsserter->assertCommitTag("VP-User-Login", $this->testUser['login']);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/users.ini");
+        $commitAsserter->assertCommitPath("D", "%vpdb%/users/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
     }
 }
