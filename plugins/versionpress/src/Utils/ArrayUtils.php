@@ -49,4 +49,21 @@ class ArrayUtils {
         while ($ptr2 < count($array2)) $array[] = $array2[$ptr2++];
         return;
     }
+
+    /**
+     * Determines whether any element of an array satisfies a condition.
+     *
+     * @param array $array
+     * @param callable $predicate
+     * @return bool
+     */
+    public static function any($array, $predicate) {
+        foreach ($array as $item) {
+            if ($predicate($item)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
