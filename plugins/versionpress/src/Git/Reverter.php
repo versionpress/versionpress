@@ -61,12 +61,11 @@ class Reverter {
         $affectedPosts = $this->getAffectedPosts($modifiedFiles);
         $this->updateChangeDateForPosts($affectedPosts);
 
-        $this->synchronize();
-
         $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_UNDO, $commitHash);
         $this->committer->forceChangeInfo($changeInfo);
         $this->committer->commit();
 
+        $this->synchronize();
         return RevertStatus::OK;
     }
 
@@ -82,11 +81,11 @@ class Reverter {
             return RevertStatus::NOTHING_TO_COMMIT;
         }
 
-        $this->synchronize();
-
         $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_ROLLBACK, $commitHash);
         $this->committer->forceChangeInfo($changeInfo);
         $this->committer->commit();
+
+        $this->synchronize();
         return RevertStatus::OK;
     }
 
