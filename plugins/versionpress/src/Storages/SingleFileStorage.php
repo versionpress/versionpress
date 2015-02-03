@@ -142,7 +142,7 @@ abstract class SingleFileStorage extends Storage {
      * Saves all entities to a file
      */
     protected function saveEntities() {
-        $entities = IniSerializer::serialize($this->entities);
+        $entities = IniSerializer::serializeSectionedData($this->entities);
         file_put_contents($this->file, $entities);
     }
 

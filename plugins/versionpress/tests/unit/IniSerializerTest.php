@@ -12,7 +12,7 @@ class IniSerializerTest extends PHPUnit_Framework_TestCase {
      */
     public function throwsOnNonSectionedData() {
         $this->setExpectedException('Exception');
-        IniSerializer::serialize(array("key" => "value"));
+        IniSerializer::serializeSectionedData(array("key" => "value"));
     }
 
     /**
@@ -20,11 +20,11 @@ class IniSerializerTest extends PHPUnit_Framework_TestCase {
      */
     public function throwsOnEmptySection() {
         $this->setExpectedException('Exception');
-        IniSerializer::serialize(array("Section" => array()));
+        IniSerializer::serializeSectionedData(array("Section" => array()));
     }
 
     /**
-     * Simplest possible INI - anything less that this throws. A couple of required elements can be seen here:
+     * Simplest possible sectioned INI - anything less that this throws. A couple of required elements can be seen here:
      *
      *   1. Section must be present
      *   2. ... and non-empty
@@ -43,7 +43,7 @@ key = ""
 INI
         );
 
-        $this->assertEquals($ini, IniSerializer::serialize($data));
+        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data));
         $this->assertEquals($data, IniSerializer::deserialize($ini));
 
     }
@@ -62,7 +62,7 @@ key2 = "value2"
 INI
         );
 
-        $this->assertEquals($ini, IniSerializer::serialize($data));
+        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data));
         $this->assertEquals($data, IniSerializer::deserialize($ini));
 
     }
@@ -82,7 +82,7 @@ key3 = 1.1
 INI
         );
 
-        $this->assertEquals($ini, IniSerializer::serialize($data));
+        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data));
         $this->assertEquals($data, IniSerializer::deserialize($ini));
 
     }
@@ -102,7 +102,7 @@ key3 = 11.1
 INI
         );
 
-        $this->assertEquals($ini, IniSerializer::serialize($data));
+        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data));
         $this->assertEquals($data, IniSerializer::deserialize($ini));
 
     }
@@ -120,7 +120,7 @@ key = "value"
 INI
         );
 
-        $this->assertEquals($ini, IniSerializer::serialize($data));
+        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data));
         $this->assertEquals($data, IniSerializer::deserialize($ini));
 
     }
@@ -141,7 +141,7 @@ key = "value"
 INI
         );
 
-        $this->assertEquals($ini, IniSerializer::serialize($data));
+        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data));
         $this->assertEquals($data, IniSerializer::deserialize($ini));
 
     }

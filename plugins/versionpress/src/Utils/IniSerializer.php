@@ -3,15 +3,19 @@
 namespace VersionPress\Utils;
 
 /**
- * Converts data arrays to and from INI strings
+ * Serializes and deserializes data arrays into INI strings.
  *
  * Our INI format is a bit stricter than the generic INI format. Specifically, the following rules apply:
  *
- *  - CRLF line endings (as per standard INI but some implementations allow also LF)
- *  - Data structure must be sectioned, e.g. must be sometlink like array("Section" => array("key" => "value"))
- *    instead of array("key" => "value")
- *  - Sections must not be empty
+ *  - Strings strictly use CRLF line endings (some implementations also allow LF)
+ *  - Section names and keys are case sensitive (as opposed to Windows built-in implementation)
  *  - At least empty string is always serialized, e.g., `key = ""`, never `key = `
+ *  - The key/value separator is always ` = ` (single space followed by equals sign followed by empty space)
+ *
+ * The serializer supports two kinds of data structures:
+ *
+ *  1. Flat - simple associative arrays
+ *  2. Sectioned - associative arrays where key-value sets are grouped into sections
  *
  * @package VersionPress\Utils
  */
@@ -25,7 +29,7 @@ class IniSerializer {
      * @return string Nested INI format
      * @throws \Exception
      */
-    public static function serialize($data) {
+    public static function serializeSectionedData($data) {
         $output = array();
         foreach ($data as $sectionName => $section) {
             if (!is_array($section)) {
