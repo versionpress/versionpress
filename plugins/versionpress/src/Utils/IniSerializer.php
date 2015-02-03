@@ -2,17 +2,49 @@
 
 namespace VersionPress\Utils;
 
+/**
+ * Converts data arrays to and from INI strings
+ *
+ * Our INI format is a bit stricter than the generic INI format. Specifically, the following rules apply:
+ *
+ *  - CRLF line endings (as per standard INI but some implementations allow also LF)
+ *  - Data structure must be sectioned, e.g. must be sometlink like array("Section" => array("key" => "value"))
+ *    instead of array("key" => "value")
+ *  - Sections must not be empty
+ *  - At least empty string is always serialized, e.g., `key = ""`, never `key = `
+ *
+ * @package VersionPress\Utils
+ */
 class IniSerializer {
 
-    static function serialize($data) {
+
+    /**
+     * Serializes sectioned data array into an INI string
+     *
+     * @param array $data
+     * @return string Nested INI format
+     * @throws \Exception
+     */
+    public static function serialize($data) {
         $output = array();
         foreach ($data as $sectionName => $section) {
+            if (!is_array($section)) {
+                throw new \Exception("INI serializer only supports sectioned data");
+            } else if (empty($section)) {
+                throw new \Exception("Empty sections are not supported");
+            }
             $output = array_merge($output, self::serializeSection($sectionName, $section, ""));
         }
         return self::outputToString($output);
     }
 
-    static function serializeFlatData($data) {
+    /**
+     * Serializes flat data (non-sectioned) into an INI string
+     *
+     * @param $data
+     * @return string
+     */
+    public static function serializeFlatData($data) {
         return self::outputToString(self::serializeData($data, "", true));
     }
 
@@ -26,7 +58,13 @@ class IniSerializer {
             $output[] = "[" . $parentFullName . $sectionName . "]";
 
         $output = array_merge($output, self::serializeData($data, $parentFullName . $sectionName . "."));
-        $output[] = ""; // empty line after section
+
+        // Add empty line after section. There could have been empty lines already generated from recursive
+        // calls so just add it if it's necessary.
+        if (end($output) !== "") {
+            $output[] = "";
+        }
+
         return $output;
     }
 
@@ -51,7 +89,14 @@ class IniSerializer {
         return str_replace('"', '\"', $str);
     }
 
-    static function deserialize($string) {
+
+    /**
+     * Deserializes nested INI format into an array structure
+     *
+     * @param string $string Nested INI string
+     * @return array Array structure corresponding to the nested INI format
+     */
+    public static function deserialize($string) {
         return self::recursive_parse(parse_ini_string($string, true));
     }
 
@@ -86,6 +131,9 @@ class IniSerializer {
      *     ]
      *   ]
      * ]
+     *
+     * @param $array
+     * @return array
      */
     private static function recursive_parse($array) {
         $returnArray = array();
