@@ -70,8 +70,18 @@ class VPInternalCommand extends WP_CLI_Command {
             WP_CLI::success("DB created");
         }
 
+
+        // 3) Disable VersionPress tracking
+        $dbphpFile = 'wp-content/db.php';
+        if (file_exists($dbphpFile)) {
+            unlink($dbphpFile);
+        }
+        // will be restored at the end of this method
+
+
+
         // 3) Create WP tables
-        $createWpTablesCmd = 'wp core install --url=' . escapeshellarg("http://localhost/" . dirname(getcwd())) . ' --title=x --admin_user=x --admin_password=x --admin_email=x@example.com';
+        $createWpTablesCmd = 'wp core install --url=' . escapeshellarg("http://localhost/" . basename(getcwd())) . ' --title=x --admin_user=x --admin_password=x --admin_email=x@example.com';
         $process = new Process($createWpTablesCmd);
         $process->run();
         if (!$process->isSuccessful()) {
@@ -82,23 +92,9 @@ class VPInternalCommand extends WP_CLI_Command {
         }
 
 
-        // The next couple of the steps need to be done after the WP is fully loaded; we can use finish-init-clone for that
-
-        $finishInitCloneCmd = 'wp --require=' . escapeshellarg(__FILE__) . ' vp-internal finish-init-clone --truncate-options';
-
-        $process = new Process($finishInitCloneCmd);
-        $process->run();
-        if (!$process->isSuccessful()) {
-            WP_CLI::log("Could not finish site restore");
-            WP_CLI::error($process->getErrorOutput());
-        } else {
-            WP_CLI::log($process->getOutput());
-        }
-
-
         // Finally, clean the working copy
 
-        $cleanWDCmd = 'git reset --hard';
+        $cleanWDCmd = 'git reset --hard && git clean -xf wp-content/vpdb';
 
         $process = new Process($cleanWDCmd);
         $process->run();
@@ -106,7 +102,20 @@ class VPInternalCommand extends WP_CLI_Command {
             WP_CLI::log("Could not clean working directory");
             WP_CLI::error($process->getErrorOutput());
         } else {
-            WP_CLI::log($process->getOutput());
+            WP_CLI::success("Working directory reset");
+        }
+
+
+
+        // The next couple of the steps need to be done after the WP is fully loaded; we can use finish-init-clone for that
+
+        $finishInitCloneCmd = 'wp --require=' . escapeshellarg(__FILE__) . ' vp-internal finish-init-clone --truncate-options';
+
+        $process = new Process($finishInitCloneCmd);
+        $process->run();
+        WP_CLI::log($process->getOutput());
+        if (!$process->isSuccessful()) {
+            WP_CLI::error("Could not finish site restore");
         }
 
 
@@ -242,6 +251,7 @@ class VPInternalCommand extends WP_CLI_Command {
 
         /** @var wpdb $wpdb */
         global $wpdb;
+
         $sql = "SELECT concat('TRUNCATE TABLE `', TABLE_NAME, '`;') FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '" . DB_NAME . "'";
         if ($assoc_args["truncate-options"]) {
             $sql .= ";";
@@ -255,6 +265,7 @@ class VPInternalCommand extends WP_CLI_Command {
             $truncateCmd = $subResult[0];
             $wpdb->query($truncateCmd);
         }
+        WP_CLI::success("Truncated DB tables");
 
 
         // 6) Create VersionPress tables
