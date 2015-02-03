@@ -48,10 +48,10 @@ class AbsoluteUrlFilter implements EntityFilter {
     }
 
     private function replaceLocalUrls($value) {
-        return str_replace($this->siteUrl, self::PLACEHOLDER, $value);
+        return is_string($value) ? str_replace($this->siteUrl, self::PLACEHOLDER, $value) : $value;
     }
 
     private function replacePlaceholders($value) {
-        return str_replace(self::PLACEHOLDER, $this->siteUrl, $value);
+        return is_string($value) ? str_replace(self::PLACEHOLDER, $this->siteUrl, $value) : $value;
     }
 }

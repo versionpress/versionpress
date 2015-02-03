@@ -179,7 +179,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $query = "INSERT INTO {$this->getPrefixedTableName($this->entityName)} ({$columnsString}) VALUES (";
 
         foreach ($columns as $column) {
-            $query .= (is_numeric($entity[$column]) ? $entity[$column] : '"' . mysql_real_escape_string($entity[$column]) . '"') . ", ";
+            $query .= (is_numeric($entity[$column]) ? $entity[$column] : '"' . esc_sql($entity[$column]) . '"') . ", ";
         }
 
         $query[strlen($query) - 2] = ' '; // strip the last comma

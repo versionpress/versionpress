@@ -61,8 +61,9 @@ abstract class DirectoryStorage extends Storage {
         $diff = EntityUtils::getDiff($oldEntity, $data);
 
         if (count($diff) > 0) {
-
             $newEntity = array_merge($oldEntity, $diff);
+            $newEntity = array_filter($newEntity, function ($value) { return $value !== false; });
+
             file_put_contents($filename, $this->serializeEntity($newEntity));
 
             return $this->createChangeInfo($oldEntity, $newEntity, !$isExistingEntity ? 'create' : 'edit');

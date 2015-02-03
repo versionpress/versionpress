@@ -97,11 +97,4 @@ abstract class Storage {
      * @return ChangeInfo Eventually used as the return value of the `save()` or the `delete()` method
      */
     protected abstract function createChangeInfo($oldEntity, $newEntity, $action);
-
-    /**
-     * @param string $path Full path to the storage
-     * @param EntityInfo $entityInfo Entity info
-     */
-    abstract function __construct($path, $entityInfo);
-
 }
