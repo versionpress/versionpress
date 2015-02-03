@@ -36,7 +36,7 @@ EndToEndTestCase::$skipSetup = in_array("--skip-setup", $argv);
  *  * Not specified at all => setup is not forced
  *  * --force-setup=before-class  => site will be refreshed before every test class
  *  * --force-setup=before-suite  => site will be refreshed once, before all tests are run
- *  * --force-setup (without any value, or with an unknown value)  => warning is issues
+ *  * --force-setup (without any value, or with an unknown value)  => warning is issued
  *
  * @var array
  */
@@ -62,10 +62,18 @@ if (!empty($cliOptions)) {
 
 }
 
+$copyVpFilesBeforeClass = false;
+$cliOptions = getopt("", array("copy-vp-files::"));
+if (isset($cliOptions['copy-vp-files'])) {
+    $copyVpFilesBeforeClass = true;
+}
+
 $setupBeforeClass = $setupBeforeClass || getenv('VP_FORCE_SETUP') == "before-class";
 $setupBeforeSuite = $setupBeforeSuite || getenv('VP_FORCE_SETUP') == "before-suite";
+$copyVpFilesBeforeClass = $copyVpFilesBeforeClass || getenv('VP_COPY_FILES');
 
 SeleniumTestCase::$forceSetup = $setupBeforeClass;
+SeleniumTestCase::$copyVpFilesBeforeClass = $copyVpFilesBeforeClass;
 
 if ($setupBeforeSuite) {
     echo "Setting up site before suite";

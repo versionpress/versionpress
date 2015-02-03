@@ -28,6 +28,15 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
      */
     public static $forceSetup;
 
+
+    /**
+     * Set from phpunit-bootstrap.php to true if `--copy-vp-files=true` has been passed as a command line parameter
+     * or if 'VP_COPY_FILES' environment variable is present.
+     *
+     * @var bool
+     */
+    public static $copyVpFilesBeforeClass;
+
     /**
      * If true, {@link loginIfNecessary} is called on {@link setUpSite}.
      *
@@ -74,6 +83,8 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
         if ($force || !WpAutomation::isVersionPressInitialized()) {
             WpAutomation::copyVersionPressFiles();
             WpAutomation::initializeVersionPress();
+        } else if (self::$copyVpFilesBeforeClass) {
+            WpAutomation::copyVersionPressFiles();
         }
 
     }
