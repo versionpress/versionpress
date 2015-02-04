@@ -42,15 +42,6 @@ class IniSerializer {
         return self::outputToString($output);
     }
 
-    /**
-     * Serializes flat data (non-sectioned) into an INI string
-     *
-     * @param $data
-     * @return string
-     */
-    public static function serializeFlatData($data) {
-        return self::outputToString(self::serializeData($data, "", true));
-    }
 
     private static function serializeSection($sectionName, $data, $parentFullName = "") {
         $output = array();
@@ -76,15 +67,24 @@ class IniSerializer {
         $output = array();
         foreach ($data as $key => $value) {
             if ($key == '') continue;
-            if (is_array($value))
-                if ($flat) {
+            if (is_array($value)) {
+
+                if (!ArrayUtils::isAssociative($value)) {
+
+                    // Plain arrays are serialized as key[0] = val1, key[1] = val2
+
                     foreach ($value as $arrayKey => $arrayValue)
                         $output[] = self::formatEntry($key . "[$arrayKey]", $arrayValue);
                 } else {
+
+                    // Associative arrays create subsections
+
                     $output = array_merge($output, self::serializeSection($key, $value, $parentFullName));
                 }
-            else
+
+            } else {
                 $output[] = self::formatEntry($key, $value);
+            }
         }
         return $output;
     }
@@ -172,4 +172,5 @@ class IniSerializer {
         }
         return $returnArray;
     }
+
 }

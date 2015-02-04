@@ -48,7 +48,7 @@ class PostMetaStorage extends DirectoryStorage {
             return null;
 
         unset($post[$fieldToDelete]);
-        file_put_contents($filename, $this->serializeEntity($post));
+        file_put_contents($filename, $this->serializeEntity($post['vp_id'], $post));
 
         list($metaKey) = explode('#', $fieldToDelete, 2);
         return new PostMetaChangeInfo("delete", $restriction['vp_id'], $post['post_type'], $post['post_title'], $post['vp_id'], $metaKey);

@@ -49,4 +49,18 @@ class ArrayUtils {
         while ($ptr2 < count($array2)) $array[] = $array2[$ptr2++];
         return;
     }
+
+    /**
+     * Returns true if the array is associative. Associative being defined
+     * as an array containing at least one string key.
+     *
+     * @param mixed $array Array is generally expected but any value may be provided (will return false)
+     * @return bool
+     */
+    public static function isAssociative($array) {
+        if (!is_array($array)) {
+            return false;
+        }
+        return (bool)count(array_filter(array_keys($array), 'is_string'));
+    }
 }

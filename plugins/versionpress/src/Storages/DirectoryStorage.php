@@ -63,7 +63,7 @@ abstract class DirectoryStorage extends Storage {
         if (count($diff) > 0) {
 
             $newEntity = array_merge($oldEntity, $diff);
-            file_put_contents($filename, $this->serializeEntity($newEntity));
+            file_put_contents($filename, $this->serializeEntity($vpid, $newEntity));
 
             return $this->createChangeInfo($oldEntity, $newEntity, !$isExistingEntity ? 'create' : 'edit');
 
@@ -109,11 +109,19 @@ abstract class DirectoryStorage extends Storage {
     }
 
     protected function deserializeEntity($serializedEntity) {
-        return IniSerializer::deserialize($serializedEntity);
+
+        $data = IniSerializer::deserialize($serializedEntity);
+        if (empty($data)) {
+            return $data;
+        } else {
+            $deserialized = IniSerializer::deserialize($serializedEntity);
+            return reset($deserialized);
+        }
+
     }
 
-    protected function serializeEntity($entity) {
-        return IniSerializer::serializeFlatData($entity);
+    protected function serializeEntity($vpid, $entity) {
+        return IniSerializer::serializeSectionedData(array($vpid => $entity));
     }
 
     private function getEntityFiles() {
