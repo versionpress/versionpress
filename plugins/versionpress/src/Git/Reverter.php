@@ -11,6 +11,7 @@ use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Synchronizers\SynchronizationProcess;
+use VersionPress\Utils\ArrayUtils;
 use wpdb;
 
 class Reverter {
@@ -65,7 +66,9 @@ class Reverter {
         $this->committer->forceChangeInfo($changeInfo);
         $this->committer->commit();
 
-        $this->synchronize();
+        $entitiesToSynchronize = $this->detectEntitiesToSynchronize($modifiedFiles);
+
+        $this->synchronize($entitiesToSynchronize);
         return RevertStatus::OK;
     }
 
@@ -85,7 +88,9 @@ class Reverter {
         $this->committer->forceChangeInfo($changeInfo);
         $this->committer->commit();
 
-        $this->synchronize();
+        $entitiesToSynchronize = $this->detectEntitiesToSynchronize($modifiedFiles);
+
+        $this->synchronize($entitiesToSynchronize);
         return RevertStatus::OK;
     }
 
@@ -98,8 +103,8 @@ class Reverter {
         }
     }
 
-    private function synchronize() {
-        $this->synchronizationProcess->synchronize();
+    private function synchronize($entitiesToSynchronize) {
+        $this->synchronizationProcess->synchronize($entitiesToSynchronize);
     }
 
     private function getAffectedPosts($modifiedFiles) {
@@ -148,5 +153,52 @@ class Reverter {
         }
 
         return true;
+    }
+
+    /**
+     * @param string[] $modifiedFiles List of modified files
+     * @return string[] List of entity types
+     */
+    private function detectEntitiesToSynchronize($modifiedFiles) {
+        $entitiesToSynchronize = array();
+
+        if ($this->wasModified($modifiedFiles, 'posts')) {
+            $entitiesToSynchronize[] = 'post';
+            $entitiesToSynchronize[] = 'postmeta';
+            $entitiesToSynchronize[] = 'term_relationship';
+        }
+
+        if ($this->wasModified($modifiedFiles, 'comments')) {
+            $entitiesToSynchronize[] = 'comment';
+        }
+
+        if ($this->wasModified($modifiedFiles, 'users.ini')) {
+            $entitiesToSynchronize[] = 'user';
+            $entitiesToSynchronize[] = 'usermeta';
+        }
+
+        if ($this->wasModified($modifiedFiles, 'terms.ini')) {
+            $entitiesToSynchronize[] = 'term';
+            $entitiesToSynchronize[] = 'term_taxonomy';
+        }
+
+        if ($this->wasModified($modifiedFiles, 'options.ini')) {
+            $entitiesToSynchronize[] = 'option';
+        }
+
+        return $entitiesToSynchronize;
+    }
+
+    /**
+     * Returns true if any item of array $modifiedFiles contains a substring $pathPart.
+     *
+     * @param string[] $modifiedFiles
+     * @param string $pathPart
+     * @return bool
+     */
+    private function wasModified($modifiedFiles, $pathPart) {
+        return ArrayUtils::any($modifiedFiles, function ($file) use ($pathPart) {
+            return Strings::contains($file, $pathPart);
+        });
     }
 }
