@@ -4,6 +4,7 @@ namespace VersionPress\Storages;
 
 use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\PostMetaChangeInfo;
+use VersionPress\Utils\ArrayUtils;
 
 class PostMetaStorage extends MetaEntityStorage {
     function __construct(PostStorage $storage) {
@@ -11,22 +12,14 @@ class PostMetaStorage extends MetaEntityStorage {
     }
 
     protected function createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action) {
-        $postTitle = $this->getFieldFromOneOrSecond('post_title', $newParentEntity, $oldParentEntity);
-        $postType = $this->getFieldFromOneOrSecond('post_type', $newParentEntity, $oldParentEntity);
-        $postVpId = $this->getFieldFromOneOrSecond('vp_id', $newParentEntity, $oldParentEntity);
+        $postTitle = ArrayUtils::getFieldFromFirstWhereExists('post_title', $newParentEntity, $oldParentEntity);
+        $postType = ArrayUtils::getFieldFromFirstWhereExists('post_type', $newParentEntity, $oldParentEntity);
+        $postVpId = ArrayUtils::getFieldFromFirstWhereExists('vp_id', $newParentEntity, $oldParentEntity);
 
-        $vpId = $this->getFieldFromOneOrSecond('vp_id', $newEntity, $oldEntity);
-        $metaKey = $this->getFieldFromOneOrSecond('meta_key', $newEntity, $oldEntity);
+        $vpId = ArrayUtils::getFieldFromFirstWhereExists('vp_id', $newEntity, $oldEntity);
+        $metaKey = ArrayUtils::getFieldFromFirstWhereExists('meta_key', $newEntity, $oldEntity);
 
         return new PostMetaChangeInfo($action, $vpId, $postType, $postTitle, $postVpId, $metaKey);
-    }
-
-    private function getFieldFromOneOrSecond($field, $entity1, $entity2) {
-        if (isset($entity1) && isset($entity1[$field])) {
-            return $entity1[$field];
-        }
-
-        return $entity2[$field];
     }
 
     public function shouldBeSaved($data) {

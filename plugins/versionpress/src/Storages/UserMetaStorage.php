@@ -4,29 +4,12 @@ namespace VersionPress\Storages;
 
 use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\UserMetaChangeInfo;
+use VersionPress\Utils\ArrayUtils;
 
-class UserMetaStorage extends DirectoryStorage {
+class UserMetaStorage extends MetaEntityStorage {
 
-    private $userMetaKey;
-    private $userMetaVpId;
-
-    function save($data) {
-        $transformedData = $this->transformToUserField($data);
-
-        $this->userMetaKey = $data['meta_key'];
-        $this->userMetaVpId = $data['vp_id'];
-
-        return parent::save($transformedData);
-    }
-
-    function saveAll($entities) {
-        foreach ($entities as $entity) {
-            $this->save($entity);
-        }
-    }
-
-    protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
-        return new UserMetaChangeInfo($action, $this->userMetaVpId, $newEntity['user_login'], $this->userMetaKey, $newEntity['vp_id']);
+    function __construct(UserStorage $userStorage) {
+        parent::__construct($userStorage, 'meta_key', 'meta_value', 'vp_user_id');
     }
 
     public function shouldBeSaved($data) {
@@ -42,20 +25,20 @@ class UserMetaStorage extends DirectoryStorage {
         return parent::shouldBeSaved($data);
     }
 
-    private function transformToUserField($values) {
-        $key = sprintf('%s#%s', $values['meta_key'], $values['vp_id']);
-        $data = array(
-            'vp_id' => $values['vp_user_id'],
-            $key => $values['meta_value']
-        );
-        return $data;
-    }
-
     private function keyEquals($data, $key) {
-        return (isset($data['meta_key']) && $data['meta_key'] === $key) || $this->userMetaKey === $key;
+        return (isset($data['meta_key']) && $data['meta_key'] === $key);
     }
 
     private function keyEndsWith($data, $suffix) {
-        return (isset($data['meta_key']) && Strings::endsWith($data['meta_key'], $suffix)) || Strings::endsWith($this->userMetaKey, $suffix);
+        return (isset($data['meta_key']) && Strings::endsWith($data['meta_key'], $suffix));
+    }
+
+    protected function createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action) {
+        $userMetaVpId = ArrayUtils::getFieldFromFirstWhereExists('vp_id', $oldEntity, $newEntity);
+        $userLogin = ArrayUtils::getFieldFromFirstWhereExists('user_login', $oldParentEntity, $newParentEntity);
+        $userMetaKey = ArrayUtils::getFieldFromFirstWhereExists('meta_key', $oldEntity, $newEntity);
+        $userVpId = ArrayUtils::getFieldFromFirstWhereExists('vp_id', $oldParentEntity, $newParentEntity);
+
+        return new UserMetaChangeInfo($action, $userMetaVpId, $userLogin, $userMetaKey, $userVpId);
     }
 }

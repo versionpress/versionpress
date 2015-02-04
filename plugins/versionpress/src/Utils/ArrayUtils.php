@@ -66,4 +66,25 @@ class ArrayUtils {
 
         return false;
     }
+
+    /**
+     * Takes a field name and two or more arrays. Returns value of given field from first array where is defined.
+     *
+     * @param $field
+     * @param $array
+     * @param $array,...
+     * @return mixed Value of field or null if is not found.
+     */
+    public static function getFieldFromFirstWhereExists($field, $array, $_ = null) {
+        $arrays = func_get_args();
+        array_shift($arrays); // field
+
+        foreach ($arrays as $array) {
+            if (is_array($array) && isset($array[$field])) {
+                return $array[$field];
+            }
+        }
+
+        return null;
+    }
 }

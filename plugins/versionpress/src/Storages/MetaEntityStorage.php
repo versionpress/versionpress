@@ -39,7 +39,7 @@ abstract class MetaEntityStorage extends Storage {
             return null;
         }
 
-        $oldParent = $this->parentStorage->loadEntity($this->getParentVpId($data['vp_id']));
+        $oldParent = $this->parentStorage->loadEntity($data[$this->parentReferenceName]);
         $oldEntity = $this->extractEntityFromParent($oldParent, $data['vp_id']);
 
         $transformedData = $this->transformToParentEntityField($data);
@@ -47,7 +47,7 @@ abstract class MetaEntityStorage extends Storage {
         $this->lastVpId = $data['vp_id'];
 
         $this->parentStorage->save($transformedData);
-        $newParent = $this->parentStorage->loadEntity($this->getParentVpId($data['vp_id']));
+        $newParent = $this->parentStorage->loadEntity($data[$this->parentReferenceName]);
         $newEntity = $this->extractEntityFromParent($newParent, $data['vp_id']);
 
         if (!$oldEntity) {

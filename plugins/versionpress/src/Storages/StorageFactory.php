@@ -57,7 +57,7 @@ class StorageFactory {
         $this->addStorageClassInfo('term', 'VersionPress\Storages\TermsStorage', '%vpdb%/terms.ini', self::ENTITY_INFO);
         $this->addStorageClassInfo('term_taxonomy', 'VersionPress\Storages\TermTaxonomyStorage', '%vpdb%/terms.ini', self::ENTITY_INFO);
         $this->addStorageClassInfo('user', 'VersionPress\Storages\UserStorage', '%vpdb%/users', self::ENTITY_INFO);
-        $this->addStorageClassInfo('usermeta', 'VersionPress\Storages\UserMetaStorage', '%vpdb%/users', self::ENTITY_INFO);
+        $this->addStorageClassInfo('usermeta', 'VersionPress\Storages\UserMetaStorage', '%storage(user)%');
         $this->addStorageClassInfo('postmeta', 'VersionPress\Storages\PostMetaStorage', '%storage(post)%');
     }
 

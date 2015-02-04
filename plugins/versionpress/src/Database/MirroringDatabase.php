@@ -150,6 +150,10 @@ class MirroringDatabase extends ExtendedWpdb {
                     $where['vp_post_id'] = $this->get_var("select HEX(reference_vp_id) from {$this->dbSchemaInfo->getPrefixedTableName('vp_reference_details')} where `table` = 'postmeta' and id = " . $where[$idColumnName]);
                 }
 
+                if ($entityName === 'usermeta' && !isset($where['vp_user_id'])) {
+                    $where['vp_user_id'] = $this->get_var("select HEX(reference_vp_id) from {$this->dbSchemaInfo->getPrefixedTableName('vp_reference_details')} where `table` = 'usermeta' and id = " . $where[$idColumnName]);
+                }
+
                 if ($hasReferences) {
                     $this->deleteReferences($entityName, $id);
                 }

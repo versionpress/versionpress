@@ -148,10 +148,17 @@ function vp_register_hooks() {
         }
     });
 
-    add_action('delete_postmeta', function ($metaIds) use ($wpdb, $dbSchemaInfo) {
+    add_action('deleted_post_meta', function ($metaIds) use ($wpdb, $dbSchemaInfo) {
         $idColumnName = $dbSchemaInfo->getEntityInfo("postmeta")->idColumnName;
         foreach ($metaIds as $metaId) {
             $wpdb->delete($dbSchemaInfo->getPrefixedTableName("postmeta"), array($idColumnName => $metaId), null, false);
+        }
+    });
+
+    add_action('deleted_user_meta', function ($metaIds) use ($wpdb, $dbSchemaInfo) {
+        $idColumnName = $dbSchemaInfo->getEntityInfo("usermeta")->idColumnName;
+        foreach ($metaIds as $metaId) {
+            $wpdb->delete($dbSchemaInfo->getPrefixedTableName("usermeta"), array($idColumnName => $metaId), null, false);
         }
     });
 
