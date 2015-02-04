@@ -4,8 +4,16 @@ namespace VersionPress\Storages;
 
 
 use Nette\Utils\Strings;
-use VersionPress\Database\EntityInfo;
 
+/**
+ * Stores meta entities like postmeta and usermeta. It means that the meta entities are stored together
+ * with their "parent" entities (e.g. postmeta is saved within the post). Meta entity is only key-value record
+ * with a reference to the parent entity. The format for saving meta entities is key#vpid = value. This key
+ * extended by VPID is called joined key.
+ *
+ * The MetaEntityStorage typically transforms the entity to the format metioned above and then saves it using
+ * parent storage as a field of the parent entity.
+ */
 abstract class MetaEntityStorage extends Storage {
 
     private $lastVpId;
@@ -74,7 +82,7 @@ abstract class MetaEntityStorage extends Storage {
     }
 
     public function loadAll() {
-        $parentEntities =  $this->parentStorage->loadAll();
+        $parentEntities = $this->parentStorage->loadAll();
         $entities = array();
 
         foreach ($parentEntities as $parent) {
@@ -153,6 +161,13 @@ abstract class MetaEntityStorage extends Storage {
         );
     }
 
+    /**
+     * Finds a joined key with given VPID within the parent entity.
+     *
+     * @param $parent
+     * @param $vpId
+     * @return string|null
+     */
     private function getJoinedKeyByVpId($parent, $vpId) {
         foreach ($parent as $field => $value) {
             if (Strings::contains($field, $vpId)) {
@@ -163,6 +178,14 @@ abstract class MetaEntityStorage extends Storage {
         return null;
     }
 
+    /**
+     * Returns VPID of parent entity of meta entity with given VPID.
+     * For now is the implementation totally non-optimized.
+     * @todo Proof of concept - optimize this method with some indexing mechanism.
+     *
+     * @param $vpid
+     * @return string|null
+     */
     private function getParentVpId($vpid) {
         $entities = $this->parentStorage->loadAll();
         foreach ($entities as $entity) {
