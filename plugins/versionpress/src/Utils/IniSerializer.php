@@ -17,6 +17,10 @@ namespace VersionPress\Utils;
  *  1. Flat - simple associative arrays
  *  2. Sectioned - associative arrays where key-value sets are grouped into sections
  *
+ * Problematic cases:
+ *
+ *  - "\" (should be invalid, see http://3v4l.org/1DJ49)
+ *
  * @package VersionPress\Utils
  */
 class IniSerializer {
@@ -42,15 +46,23 @@ class IniSerializer {
         return self::outputToString($output);
     }
 
-
+    /**
+     * Serializes section - works recursively for subsections
+     *
+     * @param string $sectionName Something like "Section"
+     * @param array $data
+     * @param string $parentFullName Empty string or something ending with a dot, e.g. "ParentSection."
+     * @return array Array of strings that will be lines in the output INI string
+     */
     private static function serializeSection($sectionName, $data, $parentFullName = "") {
-        $output = array();
-        $containsOnlyArrays = array_reduce($data, function ($prevState, $value) {
-            return $prevState && is_array($value);
-        }, true);
 
-        if (!$containsOnlyArrays)
-            $output[] = "[" . $parentFullName . $sectionName . "]";
+        $data = self::ensureCorrectOrder($data);
+
+        $output = array();
+
+        if (!self::containsOnlySubsections($data)) {
+            $output[] = "[$parentFullName$sectionName]";
+        }
 
         $output = array_merge($output, self::serializeData($data, $parentFullName . $sectionName . "."));
 
@@ -63,7 +75,30 @@ class IniSerializer {
         return $output;
     }
 
-    private static function serializeData($data, $parentFullName, $flat = false) {
+    /**
+     * Returns true of the section data contains only subsections.
+     *
+     * @param $data
+     * @return bool
+     */
+    private static function containsOnlySubsections($data) {
+
+        // Let's keep the full-fledged algo here but there could also be a simpler one:
+        // should there be a normal key-value pair in the data, it would be the first one
+        // because if it followed after some subsection, it would belong to the subsection in the INI
+        // format. So it must be first.
+
+        foreach ($data as $key => $value) {
+            if (!ArrayUtils::isAssociative($value)) {
+                return false;
+            }
+        }
+
+        return true;
+
+    }
+
+    private static function serializeData($data, $parentFullName) {
         $output = array();
         foreach ($data as $key => $value) {
             if ($key == '') continue;
@@ -74,7 +109,8 @@ class IniSerializer {
                     // Plain arrays are serialized as key[0] = val1, key[1] = val2
 
                     foreach ($value as $arrayKey => $arrayValue)
-                        $output[] = self::formatEntry($key . "[$arrayKey]", $arrayValue);
+                        $output[] = self::serializeKeyValuePair($key . "[$arrayKey]", $arrayValue);
+
                 } else {
 
                     // Associative arrays create subsections
@@ -83,7 +119,7 @@ class IniSerializer {
                 }
 
             } else {
-                $output[] = self::formatEntry($key, $value);
+                $output[] = self::serializeKeyValuePair($key, $value);
             }
         }
         return $output;
@@ -108,9 +144,39 @@ class IniSerializer {
         return implode("\r\n", $output);
     }
 
-    private static function formatEntry($key, $value) {
+
+    /**
+     * Serializes key-value pair
+     *
+     * @param string $key
+     * @param string|int|float $value String or a numeric value (number or string containing number)
+     * @return string
+     */
+    private static function serializeKeyValuePair($key, $value) {
         return $key . " = " . (is_numeric($value) ? $value : '"' . self::escapeDoubleQuotes($value) . '"');
     }
+
+    /**
+     * Simple key-values must appear before subsections for serialization to work correctly,
+     * which this method ensures.
+     *
+     * @param array $data
+     * @return array
+     */
+    private static function ensureCorrectOrder($data) {
+        $keyValues = array();
+        $subsections = array();
+        foreach ($data as $key => $value) {
+            if (ArrayUtils::isAssociative($value)) {
+                $subsections[$key] = $value;
+            } else {
+                $keyValues[$key] = $value;
+            }
+        }
+
+        return array_merge($keyValues, $subsections);
+    }
+
 
     /**
      * From http://stackoverflow.com/questions/3242175/parsing-an-advanced-ini-file-with-php
