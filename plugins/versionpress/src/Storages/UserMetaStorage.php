@@ -34,10 +34,10 @@ class UserMetaStorage extends MetaEntityStorage {
     }
 
     protected function createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action) {
-        $userMetaVpId = ArrayUtils::getFieldFromFirstWhereExists('vp_id', $oldEntity, $newEntity);
-        $userLogin = ArrayUtils::getFieldFromFirstWhereExists('user_login', $oldParentEntity, $newParentEntity);
-        $userMetaKey = ArrayUtils::getFieldFromFirstWhereExists('meta_key', $oldEntity, $newEntity);
-        $userVpId = ArrayUtils::getFieldFromFirstWhereExists('vp_id', $oldParentEntity, $newParentEntity);
+        $userMetaVpId = $newEntity['vp_id'];
+        $userLogin = $newParentEntity['user_login'];
+        $userMetaKey = $newEntity['meta_key'];
+        $userVpId = $newParentEntity['vp_id'];
 
         return new UserMetaChangeInfo($action, $userMetaVpId, $userLogin, $userMetaKey, $userVpId);
     }

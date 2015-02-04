@@ -78,7 +78,7 @@ abstract class MetaEntityStorage extends Storage {
         $newParentEntity = $parent;
 
         $this->parentStorage->save($parent);
-        return $this->createChangeInfoWithParentEntity($oldEntity, null, $oldParentEntity, $newParentEntity, 'delete');
+        return $this->createChangeInfoWithParentEntity($oldEntity, $oldEntity, $oldParentEntity, $newParentEntity, 'delete');
     }
 
     public function loadAll() {

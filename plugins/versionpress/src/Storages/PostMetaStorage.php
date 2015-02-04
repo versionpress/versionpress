@@ -12,12 +12,12 @@ class PostMetaStorage extends MetaEntityStorage {
     }
 
     protected function createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action) {
-        $postTitle = ArrayUtils::getFieldFromFirstWhereExists('post_title', $newParentEntity, $oldParentEntity);
-        $postType = ArrayUtils::getFieldFromFirstWhereExists('post_type', $newParentEntity, $oldParentEntity);
-        $postVpId = ArrayUtils::getFieldFromFirstWhereExists('vp_id', $newParentEntity, $oldParentEntity);
+        $postTitle = $newParentEntity['post_title'];
+        $postType = $newParentEntity['post_type'];
+        $postVpId = $newParentEntity['vp_id'];
 
-        $vpId = ArrayUtils::getFieldFromFirstWhereExists('vp_id', $newEntity, $oldEntity);
-        $metaKey = ArrayUtils::getFieldFromFirstWhereExists('meta_key', $newEntity, $oldEntity);
+        $vpId = $newEntity['vp_id'];
+        $metaKey = $newEntity['meta_key'];
 
         return new PostMetaChangeInfo($action, $vpId, $postType, $postTitle, $postVpId, $metaKey);
     }
