@@ -99,6 +99,15 @@ abstract class MetaEntityStorage extends Storage {
         return $entities;
     }
 
+    function exists($vpId) {
+        $parentvpId = $this->getParentVpId($vpId);
+        $parentExists = $this->parentStorage->exists($parentvpId);
+        if (!$parentExists) {
+            return false;
+        }
+        return (bool)$this->getJoinedKeyByVpId($this->parentStorage->loadEntity($parentvpId), $vpId);
+    }
+
     public function getEntityFilename($vpId) {
         $parentVpId = $this->getParentVpId($vpId);
         return $this->parentStorage->getEntityFilename($parentVpId);

@@ -106,7 +106,7 @@ class Reverter {
         $posts = array();
 
         foreach ($modifiedFiles as $filename) {
-            $match = Strings::match($filename, "~/posts/(.*)\.ini~");
+            $match = Strings::match($filename, '~/posts/(.*)\.ini~');
             if ($match) {
                 $posts[] = $match[1];
             }
@@ -139,12 +139,10 @@ class Reverter {
         $storage = $this->storageFactory->getStorage($entityName);
         $entity = $storage->loadEntity($entityId);
 
-        $vpIdTable = $this->dbSchemaInfo->getPrefixedTableName("vp_id");
-
         foreach ($entityInfo->references as $reference => $referencedEntityName) {
             $vpReference = "vp_$reference";
             if (isset($entity[$vpReference])) {
-                $entityExists = (bool)$this->database->get_var("SELECT vp_id FROM {$vpIdTable} WHERE vp_id = UNHEX(\"{$entity[$vpReference]}\")");
+                $entityExists = $this->storageFactory->getStorage($referencedEntityName)->exists($entity[$vpReference]);
                 if (!$entityExists) return false;
             }
         }

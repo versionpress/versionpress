@@ -97,4 +97,12 @@ abstract class Storage {
      * @return ChangeInfo Eventually used as the return value of the `save()` or the `delete()` method
      */
     protected abstract function createChangeInfo($oldEntity, $newEntity, $action);
+
+    /**
+     * Returns true if the entity exists.
+     *
+     * @param string $id VPID
+     * @return bool
+     */
+    abstract function exists($id);
 }

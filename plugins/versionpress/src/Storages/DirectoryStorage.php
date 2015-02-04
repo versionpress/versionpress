@@ -51,7 +51,7 @@ abstract class DirectoryStorage extends Storage {
 
         $filename = $this->getEntityFilename($vpid);
         $oldSerializedEntity = "";
-        $isExistingEntity = $this->isExistingEntity($vpid);
+        $isExistingEntity = $this->exists($vpid);
 
         if ($isExistingEntity) {
             $oldSerializedEntity = file_get_contents($filename);
@@ -148,7 +148,7 @@ abstract class DirectoryStorage extends Storage {
         return $entity;
     }
 
-    protected function isExistingEntity($id) {
+    public function exists($id) {
         return file_exists($this->getEntityFilename($id));
     }
 
