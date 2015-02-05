@@ -165,11 +165,13 @@ class IniSerializer {
         // https://regex101.com/r/cJ6eN0/3
         $stringValueRegEx = "/\"(.*)(?<!\\\\)\"/sU";
 
-        $iniString = preg_replace_callback($stringValueRegEx, function($matches) {
-            return IniSerializer::getReplacedEolString($matches[0], "charsToPlaceholders");
-        }, $iniString);
+        $iniString = preg_replace_callback($stringValueRegEx, array('self', 'replace_eol_callback'), $iniString);
 
         return $iniString;
+    }
+
+    private static function replace_eol_callback($matches) {
+        return self::getReplacedEolString($matches[0], "charsToPlaceholders");
     }
 
     /**
