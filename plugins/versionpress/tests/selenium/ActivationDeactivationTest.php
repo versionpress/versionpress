@@ -10,12 +10,14 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * We're overriding the default setUpBeforeClass()
      */
     public static function setUpBeforeClass() {
-        if (!WpAutomation::isSiteSetUp()) {
+        if (self::$forceSetup || !WpAutomation::isSiteSetUp()) {
             WpAutomation::setUpSite();
         }
+
         try {
             WpAutomation::uninstallVersionPress();
         } catch (Exception $e) {}
+        
         WpAutomation::copyVersionPressFiles();
     }
 
