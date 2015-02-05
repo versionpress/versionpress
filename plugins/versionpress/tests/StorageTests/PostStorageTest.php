@@ -41,6 +41,16 @@ class PostStorageTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->testingPost == $loadedPost);
     }
 
+    /**
+     * @test
+     */
+    public function loadAllReturnsOnlyOriginalEntities() {
+        $this->storage->save($this->testingPost);
+        $loadedPosts = $this->storage->loadAll();
+        $this->assertTrue(count($loadedPosts) === 1);
+        $this->assertTrue($this->testingPost == reset($loadedPosts));
+    }
+
     protected function setUp() {
         parent::setUp();
         $entityInfo = new EntityInfo(array(

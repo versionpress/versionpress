@@ -26,6 +26,16 @@ class TermsStorageTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->testingTerm == $loadedTerm);
     }
 
+    /**
+     * @test
+     */
+    public function loadAllReturnsOnlyOriginalEntities() {
+        $this->storage->save($this->testingTerm);
+        $loadedTerms = $this->storage->loadAll();
+        $this->assertTrue(count($loadedTerms) === 1);
+        $this->assertTrue($this->testingTerm == reset($loadedTerms));
+    }
+
     protected function setUp() {
         parent::setUp();
         $entityInfo = new EntityInfo(array(

@@ -32,6 +32,16 @@ class UserStorageTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->testingUser == $loadedUser);
     }
 
+    /**
+     * @test
+     */
+    public function loadAllReturnsOnlyOriginalEntities() {
+        $this->storage->save($this->testingUser);
+        $loadedUsers = $this->storage->loadAll();
+        $this->assertTrue(count($loadedUsers) === 1);
+        $this->assertTrue($this->testingUser == reset($loadedUsers));
+    }
+
     protected function setUp() {
         parent::setUp();
         $entityInfo = new EntityInfo(array(

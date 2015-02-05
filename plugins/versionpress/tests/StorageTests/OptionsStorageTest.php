@@ -25,6 +25,16 @@ class OptionsStorageTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->testingOption == $loadedOption);
     }
 
+    /**
+     * @test
+     */
+    public function loadAllReturnsOnlyOriginalEntities() {
+        $this->storage->save($this->testingOption);
+        $loadedOptions = $this->storage->loadAll();
+        $this->assertTrue(count($loadedOptions) === 1);
+        $this->assertTrue($this->testingOption == reset($loadedOptions));
+    }
+
     protected function setUp() {
         parent::setUp();
         $entityInfo = new EntityInfo(array(

@@ -52,6 +52,17 @@ class PostMetaStorageTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->testingPostMeta == $loadedPost);
     }
 
+    /**
+     * @test
+     */
+    public function loadAllReturnsOnlyOriginalEntities() {
+        $this->postStorage->save($this->testingPost);
+        $this->storage->save($this->testingPostMeta);
+        $loadedPostMeta = $this->storage->loadAll();
+        $this->assertTrue(count($loadedPostMeta) === 1);
+        $this->assertTrue($this->testingPostMeta == reset($loadedPostMeta));
+    }
+
     protected function setUp() {
         parent::setUp();
         $postInfo = new EntityInfo(array(

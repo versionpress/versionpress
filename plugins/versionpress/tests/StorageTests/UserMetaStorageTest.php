@@ -45,6 +45,17 @@ class UserMetaStorageTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->testingUserMeta == $loadedUserMeta);
     }
 
+    /**
+     * @test
+     */
+    public function loadAllReturnsOnlyOriginalEntities() {
+        $this->userStorage->save($this->testingUser);
+        $this->storage->save($this->testingUserMeta);
+        $loadedUserMeta = $this->storage->loadAll();
+        $this->assertTrue(count($loadedUserMeta) === 1);
+        $this->assertTrue($this->testingUserMeta == reset($loadedUserMeta));
+    }
+
     protected function setUp() {
         parent::setUp();
         $userInfo = new EntityInfo(array(

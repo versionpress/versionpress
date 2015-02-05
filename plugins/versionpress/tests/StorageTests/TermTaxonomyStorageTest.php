@@ -51,7 +51,7 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
         $this->storage->save($this->testingTermTaxonomy);
         $loadedTermTaxonomies = $this->storage->loadAll();
         $this->assertTrue(count($loadedTermTaxonomies) === 1);
-        $this->assertTrue($this->testingTermTaxonomy == $loadedTermTaxonomies[0]);
+        $this->assertTrue($this->testingTermTaxonomy == reset($loadedTermTaxonomies));
     }
 
     protected function setUp() {

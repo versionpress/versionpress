@@ -35,6 +35,16 @@ class CommentStorageTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->testingComment == $loadedComment);
     }
 
+    /**
+     * @test
+     */
+    public function loadAllReturnsOnlyOriginalEntities() {
+        $this->storage->save($this->testingComment);
+        $loadedComments = $this->storage->loadAll();
+        $this->assertTrue(count($loadedComments) === 1);
+        $this->assertTrue($this->testingComment == reset($loadedComments));
+    }
+
     protected function setUp() {
         parent::setUp();
         $entityInfo = new EntityInfo(array(
