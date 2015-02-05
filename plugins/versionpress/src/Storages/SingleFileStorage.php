@@ -1,6 +1,7 @@
 <?php
 
 namespace VersionPress\Storages;
+use VersionPress\Database\EntityInfo;
 use VersionPress\Utils\IniSerializer;
 
 /**
@@ -10,8 +11,9 @@ use VersionPress\Utils\IniSerializer;
  */
 abstract class SingleFileStorage extends Storage {
 
-
+    /** @var string */
     protected $file;
+    /** @var EntityInfo */
     protected $entityInfo;
 
     /**
@@ -116,6 +118,10 @@ abstract class SingleFileStorage extends Storage {
      * @param array $data key => value
      */
     private function updateEntity($id, $data) {
+
+        if (!$this->entityInfo->hasNaturalVpid) { // keeping natural id is ok, it does not vary across staging / produciton
+            unset($data[$this->entityInfo->idColumnName]);
+        }
 
         foreach ($this->notSavedFields as $field) {
             unset($data[$field]);

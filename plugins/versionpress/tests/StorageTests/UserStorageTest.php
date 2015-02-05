@@ -3,24 +3,12 @@
 namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\EntityInfo;
-use VersionPress\Storages\PostMetaStorage;
-use VersionPress\Storages\PostStorage;
-use VersionPress\Storages\UserMetaStorage;
 use VersionPress\Storages\UserStorage;
 use VersionPress\Utils\FileSystem;
 
-class UserMetaStorageTest extends \PHPUnit_Framework_TestCase {
-    /** @var UserMetaStorage */
-    private $storage;
+class UserStorageTest extends \PHPUnit_Framework_TestCase {
     /** @var UserStorage */
-    private $userStorage;
-
-    private $testingUserMeta = array(
-        'meta_key' => 'lastname',
-        'meta_value' => 'Doe',
-        'vp_id' => "F11A5FF2219A3430E099B3838C42EBCA",
-        'vp_user_id' => "3EC9EF54CAF94300BBA89111FA833222",
-    );
+    private $storage;
 
     private $testingUser = array(
         "user_login" => "admin",
@@ -38,16 +26,15 @@ class UserMetaStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function savedUserMetaEqualsLoadedPostMeta() {
-        $this->userStorage->save($this->testingUser);
-        $this->storage->save($this->testingUserMeta);
-        $loadedUserMeta = $this->storage->loadEntity($this->testingUserMeta['vp_id']);
-        $this->assertTrue($this->testingUserMeta == $loadedUserMeta);
+    public function savedUserEqualsLoadedUser() {
+        $this->storage->save($this->testingUser);
+        $loadedUser = $this->storage->loadEntity($this->testingUser['vp_id']);
+        $this->assertTrue($this->testingUser == $loadedUser);
     }
 
     protected function setUp() {
         parent::setUp();
-        $userInfo = new EntityInfo(array(
+        $entityInfo = new EntityInfo(array(
             'user' => array(
                 'table' => 'users',
                 'id' => 'ID',
@@ -55,8 +42,7 @@ class UserMetaStorageTest extends \PHPUnit_Framework_TestCase {
         ));
 
         mkdir(__DIR__ . '/users');
-        $this->userStorage = new UserStorage(__DIR__ . '/users', $userInfo);
-        $this->storage = new UserMetaStorage($this->userStorage);
+        $this->storage = new UserStorage(__DIR__ . '/users', $entityInfo);
     }
 
     protected function tearDown() {
