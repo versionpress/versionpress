@@ -152,6 +152,95 @@ INI
     // Escaping / special characters
     //--------------------------------
 
+
+    /**
+     * @test
+     */
+    public function backslash_single() {
+
+        $data = array(
+            "Section" => array(
+                "key1" => "My \\ site"
+            )
+        );
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+key1 = "My \\ site"
+
+INI
+        );
+
+        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data));
+        $this->assertEquals($data, IniSerializer::deserialize($ini));
+
+    }
+
+    /**
+     * @test
+     */
+    public function backslash_double() {
+
+        $data = array(
+            "Section" => array(
+                "key1" => "My \\\\ site"
+            )
+        );
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+key1 = "My \\\\ site"
+
+INI
+        );
+
+        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data));
+        $this->assertEquals($data, IniSerializer::deserialize($ini));
+
+    }
+
+    /**
+     * @test
+     */
+    public function backslash_tripple() {
+
+        $data = array(
+            "Section" => array(
+                "key1" => "My \\\\\\ site"
+            )
+        );
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+key1 = "My \\\\\\ site"
+
+INI
+        );
+
+        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data));
+        $this->assertEquals($data, IniSerializer::deserialize($ini));
+
+    }
+
+    /**
+     * @test
+     */
+    public function backslash_atTheEndOfString() {
+
+        $data = array(
+            "Section" => array(
+                "key1" => "Value \\"
+            )
+        );
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+key1 = "Value \\"
+
+INI
+        );
+
+        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data));
+        $this->assertEquals($data, IniSerializer::deserialize($ini));
+
+    }
+
     /**
      * @test
      */
@@ -171,6 +260,8 @@ INI
     }
 
     /**
+     * This tests one problematic aspect of parse_ini_string(), see WP-288.
+     *
      * @test
      */
     public function doubleQuoteEscapingAtTheEOL() {
@@ -313,6 +404,27 @@ INI
         $this->assertEquals($data, IniSerializer::deserialize($ini));
 
     }
+
+    /**
+     * @test
+     */
+    public function specialCharactersAreTakenLiterally() {
+
+        // e.g., "\n" should not have any special meaning
+
+        $data = array("Section" => array("key1" => '\n'));
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+key1 = "\\n"
+
+INI
+        ); // two backslashes because of how backslashes are serialized, see backslash_* tests
+
+        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data));
+        $this->assertEquals($data, IniSerializer::deserialize($ini));
+
+    }
+
 
 
 
