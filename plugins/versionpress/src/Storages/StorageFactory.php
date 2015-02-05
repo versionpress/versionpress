@@ -2,6 +2,7 @@
 
 namespace VersionPress\Storages;
 
+use Nette\Utils\Strings;
 use VersionPress\Database\DbSchemaInfo;
 
 class StorageFactory {
@@ -12,6 +13,7 @@ class StorageFactory {
     private $storageClassInfo = array();
 
     private $storages = array();
+    const ENTITY_INFO = '%entityInfo%';
 
     /**
      * @param string $vpdbDir Path to the `wp-content/vpdb` directory
@@ -34,9 +36,10 @@ class StorageFactory {
             return $this->storages[$entityName];
 
         $storageClass = $this->getStorageClass($entityName);
-        $storagePath = $this->getStoragePath($entityName);
         if (class_exists($storageClass)) {
-            $storage = new $storageClass($storagePath, $this->dbSchemaInfo->getEntityInfo($entityName));
+            $rc = new \ReflectionClass($storageClass);
+            $args = $this->getStorageArgs($entityName);
+            $storage = $rc->newInstanceArgs($args);
             $this->storages[$entityName] = $storage;
             return $storage;
         }
@@ -48,20 +51,24 @@ class StorageFactory {
     }
 
     private function initStorageClasses() {
-        $this->addStorageClassInfo('post', 'VersionPress\Storages\PostStorage', '/posts');
-        $this->addStorageClassInfo('comment', 'VersionPress\Storages\CommentStorage', '/comments');
-        $this->addStorageClassInfo('option', 'VersionPress\Storages\OptionsStorage', '/options.ini');
-        $this->addStorageClassInfo('term', 'VersionPress\Storages\TermsStorage', '/terms.ini');
-        $this->addStorageClassInfo('term_taxonomy', 'VersionPress\Storages\TermTaxonomyStorage', '/terms.ini');
-        $this->addStorageClassInfo('user', 'VersionPress\Storages\UserStorage', '/users.ini');
-        $this->addStorageClassInfo('usermeta', 'VersionPress\Storages\UserMetaStorage', '/users.ini');
-        $this->addStorageClassInfo('postmeta', 'VersionPress\Storages\PostMetaStorage', '/posts');
+        $this->addStorageClassInfo('post', 'VersionPress\Storages\PostStorage', '%vpdb%/posts', self::ENTITY_INFO);
+        $this->addStorageClassInfo('comment', 'VersionPress\Storages\CommentStorage', '%vpdb%/comments', self::ENTITY_INFO);
+        $this->addStorageClassInfo('option', 'VersionPress\Storages\OptionsStorage', '%vpdb%/options.ini', self::ENTITY_INFO);
+        $this->addStorageClassInfo('term', 'VersionPress\Storages\TermsStorage', '%vpdb%/terms.ini', self::ENTITY_INFO);
+        $this->addStorageClassInfo('term_taxonomy', 'VersionPress\Storages\TermTaxonomyStorage', '%vpdb%/terms.ini', self::ENTITY_INFO);
+        $this->addStorageClassInfo('user', 'VersionPress\Storages\UserStorage', '%vpdb%/users', self::ENTITY_INFO);
+        $this->addStorageClassInfo('usermeta', 'VersionPress\Storages\UserMetaStorage', '%storage(user)%');
+        $this->addStorageClassInfo('postmeta', 'VersionPress\Storages\PostMetaStorage', '%storage(post)%');
     }
 
-    private function addStorageClassInfo($entityName, $className, $storagePath) {
+    private function addStorageClassInfo($entityName, $className, $args) {
+        $args = func_get_args();
+        array_shift($args); // remove $entityName
+        array_shift($args); // remove $className
+
         $this->storageClassInfo[$entityName] = array(
             'class' => $className,
-            'path' => $this->vpdbDir . $storagePath
+            'args' => $args
         );
     }
 
@@ -72,10 +79,30 @@ class StorageFactory {
         return $this->storageClassInfo[$entityName]['class'];
     }
 
-    private function getStoragePath($entityName) {
-        if (!isset($this->storageClassInfo[$entityName])) {
-            return null;
+    private function getStorageArgs($entityName) {
+        $args = $this->storageClassInfo[$entityName]['args'];
+        return $this->expandArgs($entityName, $args);
+    }
+
+    private function expandArgs($entityName, $args) {
+        $expandedArgs = array();
+        foreach ($args as $arg) {
+            if (is_string($arg) && Strings::contains($arg, '%vpdb%')) {
+                $arg = str_replace('%vpdb%', $this->vpdbDir, $arg);
+            }
+
+            if (is_string($arg) && $arg === self::ENTITY_INFO) {
+                $arg = $this->dbSchemaInfo->getEntityInfo($entityName);
+            }
+
+            if (is_string($arg) && Strings::contains($arg, '%storage')) {
+                $matches = Strings::match($arg, '%storage\((.*)\)%');
+                $entity = $matches[1];
+                $arg = $this->getStorage($entity);
+            }
+
+            $expandedArgs[] = $arg;
         }
-        return $this->storageClassInfo[$entityName]['path'];
+        return $expandedArgs;
     }
 }

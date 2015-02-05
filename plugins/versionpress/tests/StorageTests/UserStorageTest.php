@@ -1,0 +1,62 @@
+<?php
+
+namespace VersionPress\Tests\StorageTests;
+
+use VersionPress\Database\EntityInfo;
+use VersionPress\Storages\UserStorage;
+use VersionPress\Utils\FileSystem;
+
+class UserStorageTest extends \PHPUnit_Framework_TestCase {
+    /** @var UserStorage */
+    private $storage;
+
+    private $testingUser = array(
+        "user_login" => "admin",
+        "user_pass" => '$P$B3hfEaUjEIkzHqzDHQ5kCALiUGv3rt1',
+        "user_nicename" => "admin",
+        "user_email" => "versionpress@example.com",
+        "user_url" => "",
+        "user_registered" => "2015-02-02 14:19:58",
+        "user_activation_key" => "",
+        "user_status" => 0,
+        "display_name" => "admin",
+        "vp_id" => "3EC9EF54CAF94300BBA89111FA833222",
+    );
+
+    /**
+     * @test
+     */
+    public function savedUserEqualsLoadedUser() {
+        $this->storage->save($this->testingUser);
+        $loadedUser = $this->storage->loadEntity($this->testingUser['vp_id']);
+        $this->assertTrue($this->testingUser == $loadedUser);
+    }
+
+    /**
+     * @test
+     */
+    public function loadAllReturnsOnlyOriginalEntities() {
+        $this->storage->save($this->testingUser);
+        $loadedUsers = $this->storage->loadAll();
+        $this->assertTrue(count($loadedUsers) === 1);
+        $this->assertTrue($this->testingUser == reset($loadedUsers));
+    }
+
+    protected function setUp() {
+        parent::setUp();
+        $entityInfo = new EntityInfo(array(
+            'user' => array(
+                'table' => 'users',
+                'id' => 'ID',
+            )
+        ));
+
+        mkdir(__DIR__ . '/users');
+        $this->storage = new UserStorage(__DIR__ . '/users', $entityInfo);
+    }
+
+    protected function tearDown() {
+        parent::tearDown();
+        FileSystem::remove(__DIR__ . '/users');
+    }
+}

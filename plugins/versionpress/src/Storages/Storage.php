@@ -99,9 +99,10 @@ abstract class Storage {
     protected abstract function createChangeInfo($oldEntity, $newEntity, $action);
 
     /**
-     * @param string $path Full path to the storage
-     * @param EntityInfo $entityInfo Entity info
+     * Returns true if the entity exists.
+     *
+     * @param string $id VPID
+     * @return bool
      */
-    abstract function __construct($path, $entityInfo);
-
+    abstract function exists($id);
 }

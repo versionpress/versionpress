@@ -80,6 +80,35 @@ class TermTaxonomyStorage extends SingleFileStorage {
 
     }
 
+    function loadEntity($id) {
+        $this->loadEntities();
+        foreach ($this->entities as $term) {
+            if (isset($term['taxonomies']) && isset($term['taxonomies'][$id])){
+                $taxonomy = $term['taxonomies'][$id];
+                $taxonomy['vp_term_id'] = $term['vp_id'];
+                return $taxonomy;
+            }
+        }
+        return null;
+    }
+
+    function loadAll() {
+        $this->loadEntities();
+        $taxonomies = array();
+
+        foreach ($this->entities as $term) {
+            if (isset($term['taxonomies'])) {
+                foreach ($term['taxonomies'] as $taxonomy) {
+                    $taxonomy['vp_term_id'] = $term['vp_id'];
+                    $taxonomies[] = $taxonomy;
+                }
+            }
+        }
+
+        return $taxonomies;
+    }
+
+
     public function shouldBeSaved($data) {
         return !(count($data) === 2 && isset($data['count'], $data[$this->entityInfo->idColumnName]));
     }

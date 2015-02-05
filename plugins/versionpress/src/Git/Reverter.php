@@ -11,6 +11,7 @@ use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Synchronizers\SynchronizationProcess;
+use VersionPress\Utils\ArrayUtils;
 use wpdb;
 
 class Reverter {
@@ -61,12 +62,13 @@ class Reverter {
         $affectedPosts = $this->getAffectedPosts($modifiedFiles);
         $this->updateChangeDateForPosts($affectedPosts);
 
-        $this->synchronize();
-
         $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_UNDO, $commitHash);
         $this->committer->forceChangeInfo($changeInfo);
         $this->committer->commit();
 
+        $entitiesToSynchronize = $this->detectEntitiesToSynchronize($modifiedFiles);
+
+        $this->synchronize($entitiesToSynchronize);
         return RevertStatus::OK;
     }
 
@@ -82,11 +84,13 @@ class Reverter {
             return RevertStatus::NOTHING_TO_COMMIT;
         }
 
-        $this->synchronize();
-
         $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_ROLLBACK, $commitHash);
         $this->committer->forceChangeInfo($changeInfo);
         $this->committer->commit();
+
+        $entitiesToSynchronize = $this->detectEntitiesToSynchronize($modifiedFiles);
+
+        $this->synchronize($entitiesToSynchronize);
         return RevertStatus::OK;
     }
 
@@ -99,15 +103,15 @@ class Reverter {
         }
     }
 
-    private function synchronize() {
-        $this->synchronizationProcess->synchronize();
+    private function synchronize($entitiesToSynchronize) {
+        $this->synchronizationProcess->synchronize($entitiesToSynchronize);
     }
 
     private function getAffectedPosts($modifiedFiles) {
         $posts = array();
 
         foreach ($modifiedFiles as $filename) {
-            $match = Strings::match($filename, "~/posts/(.*)\.ini~");
+            $match = Strings::match($filename, '~/posts/(.*)\.ini~');
             if ($match) {
                 $posts[] = $match[1];
             }
@@ -140,16 +144,61 @@ class Reverter {
         $storage = $this->storageFactory->getStorage($entityName);
         $entity = $storage->loadEntity($entityId);
 
-        $vpIdTable = $this->dbSchemaInfo->getPrefixedTableName("vp_id");
-
         foreach ($entityInfo->references as $reference => $referencedEntityName) {
             $vpReference = "vp_$reference";
             if (isset($entity[$vpReference])) {
-                $entityExists = (bool)$this->database->get_var("SELECT vp_id FROM {$vpIdTable} WHERE vp_id = UNHEX(\"{$entity[$vpReference]}\")");
+                $entityExists = $this->storageFactory->getStorage($referencedEntityName)->exists($entity[$vpReference]);
                 if (!$entityExists) return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * @param string[] $modifiedFiles List of modified files
+     * @return string[] List of entity types
+     */
+    private function detectEntitiesToSynchronize($modifiedFiles) {
+        $entitiesToSynchronize = array();
+
+        if ($this->wasModified($modifiedFiles, 'posts')) {
+            $entitiesToSynchronize[] = 'post';
+            $entitiesToSynchronize[] = 'postmeta';
+            $entitiesToSynchronize[] = 'term_relationship';
+        }
+
+        if ($this->wasModified($modifiedFiles, 'comments')) {
+            $entitiesToSynchronize[] = 'comment';
+        }
+
+        if ($this->wasModified($modifiedFiles, 'users.ini')) {
+            $entitiesToSynchronize[] = 'user';
+            $entitiesToSynchronize[] = 'usermeta';
+        }
+
+        if ($this->wasModified($modifiedFiles, 'terms.ini')) {
+            $entitiesToSynchronize[] = 'term';
+            $entitiesToSynchronize[] = 'term_taxonomy';
+        }
+
+        if ($this->wasModified($modifiedFiles, 'options.ini')) {
+            $entitiesToSynchronize[] = 'option';
+        }
+
+        return $entitiesToSynchronize;
+    }
+
+    /**
+     * Returns true if any item of array $modifiedFiles contains a substring $pathPart.
+     *
+     * @param string[] $modifiedFiles
+     * @param string $pathPart
+     * @return bool
+     */
+    private function wasModified($modifiedFiles, $pathPart) {
+        return ArrayUtils::any($modifiedFiles, function ($file) use ($pathPart) {
+            return Strings::contains($file, $pathPart);
+        });
     }
 }

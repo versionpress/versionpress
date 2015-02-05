@@ -37,6 +37,7 @@
           <root url="file://$MODULE_DIR$/vendor/symfony/process" />
           <root url="file://$MODULE_DIR$/../../ext-libs/vendor/wp-cli" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/php-code-coverage" />
+          <root url="file://$MODULE_DIR$/vendor/ifsnop/mysqldump-php" />
           <root url="file://$MODULE_DIR$/vendor/nette/neon" />
           <root url="file://$MODULE_DIR$/vendor/nette/finder" />
           <root url="file://$MODULE_DIR$/vendor/nette/utils" />
@@ -62,6 +63,7 @@
           <root url="file://$MODULE_DIR$/vendor/symfony/process" />
           <root url="file://$MODULE_DIR$/../../ext-libs/vendor/wp-cli" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/php-code-coverage" />
+          <root url="file://$MODULE_DIR$/vendor/ifsnop/mysqldump-php" />
           <root url="file://$MODULE_DIR$/vendor/nette/neon" />
           <root url="file://$MODULE_DIR$/vendor/nette/finder" />
           <root url="file://$MODULE_DIR$/vendor/nette/utils" />

@@ -63,4 +63,21 @@ class ArrayUtils {
         }
         return (bool)count(array_filter(array_keys($array), 'is_string'));
     }
+
+    /**
+     * Determines whether any element of an array satisfies a condition.
+     *
+     * @param array $array
+     * @param callable $predicate
+     * @return bool
+     */
+    public static function any($array, $predicate) {
+        foreach ($array as $item) {
+            if ($predicate($item)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
