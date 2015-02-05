@@ -146,6 +146,11 @@ class MirroringDatabase extends ExtendedWpdb {
             }
 
             foreach ($ids as $id) {
+                $where['vp_id'] = $this->getVpId($entityName, $id);
+                if (!$where['vp_id']) {
+                    continue; // already deleted - deleting postmeta is sometimes called twice
+                }
+
                 if ($entityName === 'postmeta' && !isset($where['vp_post_id'])) {
                     $where['vp_post_id'] = $this->get_var("select HEX(reference_vp_id) from {$this->dbSchemaInfo->getPrefixedTableName('vp_reference_details')} where `table` = 'postmeta' and id = " . $where[$idColumnName]);
                 }
@@ -158,7 +163,6 @@ class MirroringDatabase extends ExtendedWpdb {
                     $this->deleteReferences($entityName, $id);
                 }
 
-                $where['vp_id'] = $this->getVpId($entityName, $id);
                 $this->deleteId($entityName, $id);
                 $this->mirror->delete($entityName, $where);
             }
