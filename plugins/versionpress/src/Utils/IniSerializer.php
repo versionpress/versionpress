@@ -137,8 +137,72 @@ class IniSerializer {
      * @return array Array structure corresponding to the nested INI format
      */
     public static function deserialize($string) {
-        return self::recursive_parse(parse_ini_string($string, true));
+        $string = self::eolWorkaround_addPlaceholders($string);
+        $deserialized = parse_ini_string($string, true);
+        $deserialized = self::eolWorkaround_removePlaceholders($deserialized);
+        $deserialized = self::recursive_parse($deserialized);
+        return $deserialized;
     }
+
+    /**
+     * PHP (Zend, not HHVM) has a bug that causes parse_ini_string() to fail when the line
+     * ends with an escaped quote, like:
+     *
+     * ```
+     * key = "start of some multiline value \"
+     * continued here"
+     * ```
+     *
+     * The workaround is to replace CR and LF chars inside the values (and ONLY inside the values)
+     * with custom placeholders which will then be reverted back.
+     *
+     * @param string $iniString
+     * @return mixed
+     */
+    private static function eolWorkaround_addPlaceholders($iniString) {
+
+        // https://regex101.com/r/cJ6eN0/3
+        $stringValueRegEx = "/\"(.*)(?<!\\\\)\"/sU";
+
+        $iniString = preg_replace_callback($stringValueRegEx, function($matches) {
+            return IniSerializer::getReplacedEolString($matches[0], "charsToPlaceholders");
+        }, $iniString);
+
+        return $iniString;
+    }
+
+    /**
+     * @param $deserializedArray
+     * @return array
+     */
+    private static function eolWorkaround_removePlaceholders($deserializedArray) {
+
+        foreach ($deserializedArray as $key => $value) {
+            if (is_array($value)) {
+                $deserializedArray[$key] = self::eolWorkaround_removePlaceholders($value);
+            } else if (is_string($value)) {
+                $deserializedArray[$key] = self::getReplacedEolString($value, "placeholdersToChars");
+            }
+        }
+
+        return $deserializedArray;
+
+    }
+
+    private static function getReplacedEolString($str, $direction) {
+
+        $replacement = array(
+            "\n" => "{{{EOL-LF}}}",
+            "\r" => "{{{EOL-CR}}}",
+        );
+
+        $from = ($direction == "charsToPlaceholders") ? array_keys($replacement) : array_values($replacement);
+        $to = ($direction == "charsToPlaceholders") ? array_values($replacement) : array_keys($replacement);
+
+        return str_replace($from, $to, $str);
+
+    }
+
 
     private static function outputToString($output) {
         return implode("\r\n", $output);
