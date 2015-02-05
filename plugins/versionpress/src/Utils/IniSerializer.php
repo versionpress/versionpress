@@ -125,8 +125,10 @@ class IniSerializer {
         return $output;
     }
 
-    private static function escapeDoubleQuotes($str) {
-        return str_replace('"', '\"', $str);
+    private static function escapeString($str) {
+        $str = str_replace('\\', '\\\\', $str); // single backslash to two, as in single-quoted PHP strings, see WP-289
+        $str = str_replace('"', '\"', $str); // escape double quotes, must be done after backslashes
+        return $str;
     }
 
 
@@ -217,7 +219,7 @@ class IniSerializer {
      * @return string
      */
     private static function serializeKeyValuePair($key, $value) {
-        return $key . " = " . (is_numeric($value) ? $value : '"' . self::escapeDoubleQuotes($value) . '"');
+        return $key . " = " . (is_numeric($value) ? $value : '"' . self::escapeString($value) . '"');
     }
 
     /**
