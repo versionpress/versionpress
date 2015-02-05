@@ -25,7 +25,6 @@ namespace VersionPress\Utils;
  */
 class IniSerializer {
 
-
     /**
      * Serializes sectioned data array into an INI string
      *
@@ -33,7 +32,7 @@ class IniSerializer {
      * @return string Nested INI format
      * @throws \Exception
      */
-    public static function serializeSectionedData($data) {
+    public static function serialize($data) {
         $output = array();
         foreach ($data as $sectionName => $section) {
             if (!is_array($section)) {

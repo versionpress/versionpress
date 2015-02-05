@@ -121,7 +121,7 @@ abstract class DirectoryStorage extends Storage {
     }
 
     protected function serializeEntity($vpid, $entity) {
-        return IniSerializer::serializeSectionedData(array($vpid => $entity));
+        return IniSerializer::serialize(array($vpid => $entity));
     }
 
     private function getEntityFiles() {

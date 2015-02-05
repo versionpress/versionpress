@@ -37,7 +37,7 @@ autoload = "yes"
 INI
         );
 
-        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data), "Serialization failed - strings are different");
+        $this->assertEquals($ini, IniSerializer::serialize($data), "Serialization failed - strings are different");
         $this->assertEquals($data, IniSerializer::deserialize($ini), "Deserialization failed - arrays are different");
 
     }
@@ -242,7 +242,7 @@ autoload = "yes"
 INI
         );
 
-        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data), "Serialization failed - strings are different");
+        $this->assertEquals($ini, IniSerializer::serialize($data), "Serialization failed - strings are different");
         $this->assertEquals($data, IniSerializer::deserialize($ini), "Deserialization failed - arrays are different");
 
     }
@@ -469,7 +469,7 @@ autoload = "yes"
 INI
         );
 
-        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data), "Serialization failed - strings are different");
+        $this->assertEquals($ini, IniSerializer::serialize($data), "Serialization failed - strings are different");
         $this->assertEquals($data, IniSerializer::deserialize($ini), "Deserialization failed - arrays are different");
 
     }
@@ -673,7 +673,7 @@ autoload = "yes"
 INI
         );
 
-        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data), "Serialization failed - strings are different");
+        $this->assertEquals($ini, IniSerializer::serialize($data), "Serialization failed - strings are different");
         $this->assertEquals($data, IniSerializer::deserialize($ini), "Deserialization failed - arrays are different");
 
     }
@@ -705,7 +705,7 @@ autoload = "yes"
 INI
         );
 
-        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data), "Serialization failed - strings are different");
+        $this->assertEquals($ini, IniSerializer::serialize($data), "Serialization failed - strings are different");
         $this->assertEquals($data, IniSerializer::deserialize($ini), "Deserialization failed - arrays are different");
 
     }
@@ -741,7 +741,7 @@ autoload = "yes"
 INI
         );
 
-        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data), "Serialization failed - strings are different");
+        $this->assertEquals($ini, IniSerializer::serialize($data), "Serialization failed - strings are different");
         $this->assertEquals($data, IniSerializer::deserialize($ini), "Deserialization failed - arrays are different");
 
     }
@@ -1333,7 +1333,7 @@ autoload = "yes"
 INI
         );
 
-        $this->assertEquals($ini, IniSerializer::serializeSectionedData($data), "Serialization failed - strings are different");
+        $this->assertEquals($ini, IniSerializer::serialize($data), "Serialization failed - strings are different");
         $this->assertEquals($data, IniSerializer::deserialize($ini), "Deserialization failed - arrays are different");
 
     }
