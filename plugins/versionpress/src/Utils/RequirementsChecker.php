@@ -12,7 +12,7 @@ class RequirementsChecker {
 
     function __construct() {
 
-        // VersionPress\Utils\Markdown can be used in the 'help' field
+        // Markdown can be used in the 'help' field
 
         $this->requirements[] = array(
             'name' => 'PHP 5.3',
