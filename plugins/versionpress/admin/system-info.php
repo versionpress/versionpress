@@ -5,6 +5,36 @@ use VersionPress\Utils\RequirementsChecker;
 
 defined('ABSPATH') or die("Direct access not allowed");
 
+$outputFormat = $_GET['f'];
+$supportedOutputFormats = array(
+    've',
+    'tc'
+);
+if (!in_array($outputFormat, $supportedOutputFormats)) {
+    $outputFormat = $supportedOutputFormats[0];
+}
+
+function displaySystemInfoArray($array) {
+
+    global $outputFormat;
+
+    switch ($outputFormat) {
+        case 've': // var_export
+
+            echo '<pre><code style="language-php">';
+            echo htmlspecialchars(var_export($array, true));
+            echo '</code></pre>';
+
+            break;
+
+        case 'tc':
+            \Tracy\Debugger::dump($array);
+            break;
+
+    }
+
+}
+
 ?>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css"/>
@@ -14,26 +44,54 @@ defined('ABSPATH') or die("Direct access not allowed");
     hljs.initHighlightingOnLoad();
 </script>
 
+<style>
+    h1 {
+        margin-top: 30px;
+    }
+
+    h2 {
+        margin: 30px 0 0;
+    }
+
+    .system-info-toc li {
+        margin: 0;
+    }
+
+</style>
+
 <h1>System info</h1>
 
-<h2>Git</h2>
-
-<pre><code style="language-php">
-<?php var_export(SystemInfo::getGitInfo()); ?>
-</code></pre>
+<p>Quick overview of this WordPress installation for VersionPress purposes.</p>
 
 
-<h2>WordPress</h2>
+<div>
+    Format:
+    <a href="<?php echo admin_url('admin.php?page=versionpress/admin/system-info.php&f=ve') ?>">var_export</a> |
+    <a href="<?php echo admin_url('admin.php?page=versionpress/admin/system-info.php&f=tc') ?>">tracy</a>
 
-<pre><code style="language-php">
-<?php var_export(SystemInfo::getWordPressInfo()); ?>
-</code></pre>
+    <br />
+
+
+    Jump to:
+    <a href="#git-info">Git info</a> |
+    <a href="#wordpress-info">WordPress info</a> |
+    <a href="#php-info">System / PHP info</a>
+
+</div>
+
+
+<h2 id="git-info">Git</h2>
+
+<?php displaySystemInfoArray(SystemInfo::getGitInfo()); ?>
+
+
+<h2 id="wordpress-info">WordPress</h2>
+
+<?php displaySystemInfoArray(SystemInfo::getWordPressInfo()); ?>
 
 
 
-<h2>Server environment</h2>
+<h2 id="php-info">Server environment / PHP info</h2>
 
-<pre><code style="language-php">
-<?php var_export(SystemInfo::getPhpInfo()); ?>
-</code></pre>
+<?php displaySystemInfoArray(SystemInfo::getPhpInfo()); ?>
 
