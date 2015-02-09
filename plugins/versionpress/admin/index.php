@@ -16,7 +16,11 @@ defined('ABSPATH') or die("Direct access not allowed");
 
 wp_enqueue_style('versionpress_admin_style', plugins_url( 'css/style.css' , __FILE__ ));
 wp_enqueue_style('versionpress_admin_icons', plugins_url( 'icons/style.css' , __FILE__ ));
+wp_enqueue_style('versionpress_popover_style', plugins_url('admin/css/jquery.webui-popover.min.css', __FILE__));
+wp_enqueue_style('versionpress_popover_custom_style', plugins_url('admin/css/popover-custom.css', __FILE__));
 
+wp_enqueue_script('jquery');
+wp_enqueue_script('versionpress_popover_script', plugins_url('admin/js/jquery.webui-popover.min.js', __FILE__), 'jquery');
 wp_enqueue_script('versionpress_admin_script', plugins_url( 'js/vp-admin.js' , __FILE__ ));
 
 /**
@@ -374,11 +378,24 @@ function _vp_show_progress_message($progressMessage) {
             foreach ($commits as $commit) {
                 $canUndoCommit = $canUndoCommit && ($commit->getHash() !== $initialCommitHash);
                 $canRollbackToThisCommit = !$isFirstCommit && ($canUndoCommit || $commit->getHash() === $initialCommitHash);
+                $commitDate = $commit->getDate()->format('d-M-y H:i:s');
 
                 $changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
-                $undoSnippet = "<a href='" . admin_url('admin.php?action=vp_undo&commit=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts changes done by this commit'>Undo this</a>";
+                $undoSnippet = "<a " .
+                    "href='" . admin_url('admin.php?action=vp_undo&commit=' . $commit->getHash()) . "' " .
+                    "class='vp-undo' " .
+                    "data-commit='" . $commit->getHash() . "' " .
+                    "data-commit-message=\"" . htmlspecialchars($changeInfo->getChangeDescription()) . "\"" .
+                    "style='text-decoration:none; white-space:nowrap;' " .
+                    "title='Reverts changes done by this commit'>Undo this</a>";
 
-                $rollbackSnippet = "<a href='" . admin_url('admin.php?action=vp_rollback&commit=' . $commit->getHash()) . "' style='text-decoration:none; white-space:nowrap;' title='Reverts site back to this state; effectively undos all the change up to this commit'>Roll back to this</a>";
+                $rollbackSnippet = "<a " .
+                    "href='" . admin_url('admin.php?action=vp_rollback&commit=' . $commit->getHash()) . "' " .
+                    "class='vp-rollback' " .
+                    "data-commit='" . $commit->getHash() . "' " .
+                    "data-commit-date='" . $commitDate . "'" .
+                    "style='text-decoration:none; white-space:nowrap;' " .
+                    "title='Reverts site back to this state; effectively undos all the change up to this commit'>Roll back to this</a>";
 
                 $versioningSnippet = "";
                 if ($canUndoCommit) $versioningSnippet .= $undoSnippet;
@@ -389,7 +406,7 @@ function _vp_show_progress_message($progressMessage) {
                 $message = $changeInfo->getChangeDescription();
                 echo "
             <tr class=\"post-1 type-post status-publish format-standard hentry category-uncategorized alternate level-0" . ($isEnabled ? "" : " disabled") . "\">
-                <td title=\"{$commit->getDate()->format('d-M-y H:i:s')}\">{$commit->getRelativeDate()}</td>
+                <td title=\"{$commitDate}\">{$commit->getRelativeDate()}</td>
                 <td>$message</td>
                 <td style=\"text-align: right\">
                     $versioningSnippet
