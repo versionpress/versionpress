@@ -572,6 +572,21 @@ function vp_ajax_hide_vp_welcome_panel() {
     die(); // this is required to return a proper result
 }
 
+add_action('wp_ajax_vp_prepare_revert_popup', 'vp_prepare_revert_popup');
+
+function vp_prepare_revert_popup() {
+    global $versionPressContainer;
+    /** @var \VersionPress\Git\GitRepository $repository */
+    $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+    $clearWorkingDirectory = $repository->getStatus() == null;
+
+    $ajaxResult = new stdClass();
+    $ajaxResult->clearWorkingDirectory = $clearWorkingDirectory;
+
+    echo json_encode($ajaxResult);
+    wp_die();
+}
+
 //----------------------------------
 // Private functions
 //----------------------------------

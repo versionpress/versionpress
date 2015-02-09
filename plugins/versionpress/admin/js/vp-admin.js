@@ -27,43 +27,80 @@ jQuery(document).ready(function($) {
     }
 
 
+    var customRevertPopoverClass = "versionpress-revert-popover"; // used to identify the popover later
     var undoRollbackSelector = '.vp-undo, .vp-rollback';
-    $(undoRollbackSelector).click(showRevertPopup);
+    var staticWarningText = "Watch out! This operation can be a little bit risky."
+    var $staticWarning = $("<div>").html(staticWarningText);
 
-    function showRevertPopup (e) {
+    $('body').on('click', undoRollbackSelector, function (e) {
         var $link = $(this);
-        var customPopoverClass = "versionpress-revert-popover"; // used to identify the popover later
         var type = $link.hasClass('vp-undo') ? 'undo' : 'rollback';
-        var title = type == 'undo' ? "Undo \"" + $link.data('commit-message') + '"' : "Rollback to " + $link.data('commit-date');
+        var hash = $link.data('commit');
 
+        var data = {
+            action: 'vp_prepare_revert_popup',
+            type: type,
+            hash: hash
+        }
 
-        $link.webuiPopover({
-            type: "async",
-            url: "http://date.jsontest.com/",
-            title: title,
-            content: function (data) {
-                $link.webuiPopover('show');
-                return data.time;
-            },
-            closeable: true,
-            width: 450,
-            style: customPopoverClass
-        });
-        $('body').on('click', function (e) {
-            var popopOverSelector = '.webui-popover-' + customPopoverClass;
-            if ($(popopOverSelector).length > 0 && $(popopOverSelector).is(':visible') && jQuery(e.target).parents(popopOverSelector).length == 0 &&
-                !$(e.target).is($link) && $(e.target).parents(undoRollbackSelector).length == 0)
-            {
-                // Hide popover if the click was anywhere but in the link or the popover itself.
-                $link.webuiPopover('hide');
+        $.post(ajaxurl, data).then(function (data) {
+            if (typeof(data) === "string") {
+                data = JSON.parse(data);
             }
+
+            fillPopup(data);
         });
 
-        $link.webuiPopover('show');
-        $link.webuiPopover('hide');
+        showRevertPopup($link);
 
         e.preventDefault();
         e.stopPropagation();
         return false;
+    });
+
+    function showRevertPopup ($link, data) {
+        var type = $link.hasClass('vp-undo') ? 'undo' : 'rollback';
+        var title = type == 'undo' ? "Undo \"" + $link.data('commit-message') + '"' : "Rollback to " + $link.data('commit-date');
+        var $content = $('<div>');
+        $content.append($staticWarning);
+        $content.append('<div class="spinner">');
+
+        $link.webuiPopover({
+            title: title,
+            cache: false,
+            content: $content.html(),
+            closeable: true,
+            width: 450,
+            style: customRevertPopoverClass,
+            placement: 'top-left'
+        });
+
+        function maybeHidePopover (e) {
+            var popopOverSelector = '.webui-popover-' + customRevertPopoverClass;
+            if ($(popopOverSelector).length > 0 && $(popopOverSelector).is(':visible') && jQuery(e.target).parents(popopOverSelector).length == 0 &&
+                !$(e.target).is($link) && $(e.target).parents(undoRollbackSelector).length == 0)
+            {
+                // Hide popover if the click was anywhere but in the link or the popover itself.
+                $link.webuiPopover('destroy');
+                $('body').off('click', maybeHidePopover);
+            }
+        };
+
+        $('body').on('click', maybeHidePopover);
+
+        $link.webuiPopover('show');
+    }
+
+    function fillPopup(data) {
+        var $popupContent = $('.webui-popover-' + customRevertPopoverClass + ' .webui-popover-content');
+        $popupContent.html(renderPopupContent(data));
+    }
+
+    function renderPopupContent(data) {
+        var clearWorkingDirectory = data.clearWorkingDirectory;
+        var $content = $('<div>');
+        $content.append($staticWarning);
+        $content.append(clearWorkingDirectory ? "OK" : "Error: Working directory");
+        return $content;
     }
 });

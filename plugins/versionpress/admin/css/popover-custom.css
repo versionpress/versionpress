@@ -9,3 +9,9 @@
     color: #0074a2;
     text-decoration: underline;
 }
+
+.webui-popover .spinner {
+    display: block;
+    float: none;
+    margin: auto;
+}
