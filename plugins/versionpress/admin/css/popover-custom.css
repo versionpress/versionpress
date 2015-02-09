@@ -15,3 +15,11 @@
     float: none;
     margin: auto;
 }
+
+.webui-popover .webui-popover-title .title-content {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    width: 94%
+}

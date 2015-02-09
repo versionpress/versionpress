@@ -66,7 +66,7 @@ jQuery(document).ready(function($) {
         $content.append('<div class="spinner">');
 
         $link.webuiPopover({
-            title: title,
+            title: $('<div class="title-content">').html(title),
             cache: false,
             content: $content.html(),
             closeable: true,
