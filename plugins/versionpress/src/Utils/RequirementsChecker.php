@@ -114,9 +114,7 @@ class RequirementsChecker {
             $process->run();
             if ($process->getErrorOutput() !== null) return false; // there is no git
             $output = trim($process->getOutput());
-            $match = Strings::match($output, "~git version (\\d[\\d\\.]+\\d).*~");
-            $version = $match[1];
-            return version_compare("1.9", $version, "<=");
+            return self::gitMatchesMinimumRequiredVersion($output, "1.9");
         } catch (Exception $e) {
             return false;
         }
@@ -169,5 +167,12 @@ class RequirementsChecker {
         $isStandardLayout &= WP_CONTENT_DIR . '/uploads' === $uploadDirInfo['basedir'];
 
         return $isStandardLayout;
+    }
+
+    public static function gitMatchesMinimumRequiredVersion($gitVersionOutput, $minimumRequiredVersion) {
+        $match = Strings::match($gitVersionOutput, "~git version (\\d[\\d\\.]+\\d).*~");
+        $version = $match[1];
+        return version_compare($minimumRequiredVersion, $version, "<=");
+
     }
 }
