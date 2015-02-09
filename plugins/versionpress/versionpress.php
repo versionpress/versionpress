@@ -474,12 +474,22 @@ function vp_admin_menu() {
         0.001234987
     );
 
-    // Support for deactivate.php - add it to the internal $_registered_pages array
-    // See e.g. http://blog.wpessence.com/wordpress-admin-page-without-menu-item/
+    // Support for PHP files that should not appear in the menu but should still be accessible via URL
+    // like `/wp-admin/admin.php?page=versionpress/admin/xyz.php`
+    //
+    // We need to add it to  $_registered_pages, see e.g. http://blog.wpessence.com/wordpress-admin-page-without-menu-item/
+
+    $directAccessPages = array(
+        'deactivate.php',
+        'system-info.php'
+    );
+
     global $_registered_pages;
-    $menu_slug = plugin_basename("versionpress/admin/deactivate.php");
-    $hookname = get_plugin_page_hookname($menu_slug, '');
-    $_registered_pages[$hookname] = true;
+    foreach ($directAccessPages as $directAccessPage) {
+        $menu_slug = plugin_basename("versionpress/admin/$directAccessPage");
+        $hookname = get_plugin_page_hookname($menu_slug, '');
+        $_registered_pages[$hookname] = true;
+    }
 
 }
 

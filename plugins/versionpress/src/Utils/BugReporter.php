@@ -2,6 +2,7 @@
 
 namespace VersionPress\Utils;
 use CURLFile;
+use Utils\SystemInfo;
 
 /**
  * Helper class for sending bug reports
@@ -71,15 +72,7 @@ class BugReporter {
     }
 
     private function saveWordPressSpecificInfo($bugReportDir) {
-        require(ABSPATH . 'wp-includes/version.php'); // load constants (like $wp_version)
-        $info = array();
-        /** @var $wp_version */
-        $info['wp-version'] = $wp_version;
-        $info['installed-plugins'] = get_plugins();
-        $info['installed-themes'] = wp_get_themes();
-        $info['active-plugins'] = get_option('active_plugins');
-        $info['current-theme'] = wp_get_theme()->get_stylesheet();
-
+        $info = SystemInfo::getWordPressInfo();
         $serializedInfo = var_export($info, true);
         file_put_contents($bugReportDir . '/info.ini', $serializedInfo);
     }

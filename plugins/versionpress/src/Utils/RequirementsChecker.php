@@ -5,6 +5,7 @@ namespace VersionPress\Utils;
 use Exception;
 use Nette\Utils\Strings;
 use Symfony\Component\Process\Process;
+use Utils\SystemInfo;
 
 class RequirementsChecker {
     private $requirements = array();
@@ -110,11 +111,8 @@ class RequirementsChecker {
 
     private function tryGit() {
         try {
-            $process = new Process("git --version");
-            $process->run();
-            if ($process->getErrorOutput() !== null) return false; // there is no git
-            $output = trim($process->getOutput());
-            return self::gitMatchesMinimumRequiredVersion($output, "1.9");
+            $gitVersion = SystemInfo::getGitVersion();
+            return self::gitMatchesMinimumRequiredVersion($gitVersion, "1.9");
         } catch (Exception $e) {
             return false;
         }
@@ -169,10 +167,22 @@ class RequirementsChecker {
         return $isStandardLayout;
     }
 
-    public static function gitMatchesMinimumRequiredVersion($gitVersionOutput, $minimumRequiredVersion) {
-        $match = Strings::match($gitVersionOutput, "~git version (\\d[\\d\\.]+\\d).*~");
-        $version = $match[1];
-        return version_compare($minimumRequiredVersion, $version, "<=");
+    /**
+     * Minimum required Git version
+     */
+    const GIT_MINIMUM_REQUIRED_VERSION = "1.9";
+
+    /**
+     * Returns true if git version matches the minimum required version. If minimum required version
+     * is not given, RequirementsChecker::GIT_MINIMUM_REQUIRED_VERSION is used by default.
+     *
+     * @param string $gitVersion
+     * @param string $minimumRequiredVersion
+     * @return bool
+     */
+    public static function gitMatchesMinimumRequiredVersion($gitVersion, $minimumRequiredVersion = null) {
+        $minimumRequiredVersion = $minimumRequiredVersion ? $minimumRequiredVersion : self::GIT_MINIMUM_REQUIRED_VERSION;
+        return version_compare($gitVersion, $minimumRequiredVersion, ">=");
 
     }
 }
