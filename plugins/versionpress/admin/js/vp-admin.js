@@ -48,7 +48,7 @@ jQuery(document).ready(function($) {
                 data = JSON.parse(data);
             }
 
-            fillPopup(data);
+            fillPopup($link, data);
         });
 
         showRevertPopup($link);
@@ -91,16 +91,26 @@ jQuery(document).ready(function($) {
         $link.webuiPopover('show');
     }
 
-    function fillPopup(data) {
+    function fillPopup($link, data) {
         var $popupContent = $('.webui-popover-' + customRevertPopoverClass + ' .webui-popover-content');
-        $popupContent.html(renderPopupContent(data));
+        $popupContent.html(renderPopupContent($link, data));
     }
 
-    function renderPopupContent(data) {
+    function renderPopupContent($link, data) {
         var clearWorkingDirectory = data.clearWorkingDirectory;
         var $content = $('<div>');
         $content.append($staticWarning);
-        $content.append(clearWorkingDirectory ? "OK" : "Error: Working directory");
+
+        if (!clearWorkingDirectory) {
+            $content.append("Please commit your changes");
+            return $content;
+        }
+
+        var $buttonContainer = $('<div>').css('text-align', 'center');
+        var $okButton = $('<a class="button" href="#">OK</a>').attr('href', $link.attr('href'));
+        var $cancelButton = $('<a class="button cancel" href="#">Cancel</a>').click(function () { $link.webuiPopover('destroy'); });
+        $buttonContainer.append($okButton).append(' ').append($cancelButton);
+        $content.append($buttonContainer);
         return $content;
     }
 });
