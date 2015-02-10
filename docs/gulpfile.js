@@ -2,35 +2,37 @@ var gulp = require('gulp');
 var del = require('del');
 var fs = require('fs');
 var browserSync = require('browser-sync');
+var gutil = require('gulp-util');
+var watch = require('gulp-watch');
+var runSequence = require('run-sequence');
 
 var source = "./content/**";
 var destination = "../VersionPress-docssite/VersionPress.DocsSite/App_Data/content";
-//var destination = "./testcopy";
+
+/**
+ * Default task reports usage only
+ */
+gulp.task('default', function (cb) {
+    gutil.log('');
+    gutil.log('Usage:');
+    gutil.log(' ' + gutil.colors.green('gulp copy-docs') + ' Copies docs to docssite');
+    gutil.log(' ' + gutil.colors.green('gulp watch') + '     Copies docs on every change, plus BrowserSync');
+    gutil.log('');
+});
 
 
 gulp.task('clean', function(cb) {
   del(destination, {force: true}, cb);
 });
 
-gulp.task('copy-contents', ['clean'], function() {
+gulp.task('copy-docs', ['clean'], function() {
   return gulp.src(source, { dot: true }).pipe(gulp.dest(destination));
 });
 
-/*
-// .changed file created this way was a problem for `gulp watch` - there
-// were many cases where the clean task reported unlink errors just on this file
-// So right now we copy the .changed file straight from the sources where it has
-// been added.
-gulp.task('create-changed-file', ['copy-contents'], function(cb) {
-  fs.openSync(destination + "/.changed", 'w');
-  cb();
-});
-*/
-
-gulp.task('copy-docs', ['copy-contents'], function() {});
-
 gulp.task('watch', ['browser-sync'], function() {
-  gulp.watch(source, ['copy-docs', browserSync.reload]);
+  watch(source, function() {
+      runSequence('copy-docs', browserSync.reload);
+  });
 });
 
 gulp.task('browser-sync', function() {
@@ -40,5 +42,3 @@ gulp.task('browser-sync', function() {
       notify: false
   });
 });
-
-gulp.task('default', ['copy-docs'], function() {});
