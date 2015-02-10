@@ -108,7 +108,7 @@ jQuery(document).ready(function($) {
         }
 
         var $buttonContainer = $('<div>').addClass('button-container');
-        var $okButton = $('<a class="button" href="#">OK</a>').attr('href', $link.attr('href'));
+        var $okButton = $('<a class="button" href="#">Proceed</a>').attr('href', $link.attr('href'));
         var $cancelButton = $('<a class="button cancel" href="#">Cancel</a>').click(function () { $link.webuiPopover('destroy'); });
 
         if (disableOk) {
