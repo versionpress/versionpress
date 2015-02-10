@@ -163,38 +163,62 @@ function _vp_show_progress_message($progressMessage) {
 
                 <p class="about-description">Please click the <i>Activate VersionPress</i> button below to start tracking the site – note that it will take a few moments, depending on the size of this site. You can then use the VersionPress menu item on the left to access all its features.</p>
 
-                <h4>System requirements check:</h4>
+                <div class="checks-and-warnings">
 
-                <ul class="vp-requirements-check">
-                    <?php
-                    global $versionPressContainer;
-                    /** @var GitRepository $repository */
-                    $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+                    <div class="left">
+                        <h4>System requirements check</h4>
 
-                    $requirementsChecker = new RequirementsChecker();
-                    $report = $requirementsChecker->getRequirements();
+                        <ul class="vp-requirements-check">
+                            <?php
+                            global $versionPressContainer;
+                            /** @var GitRepository $repository */
+                            $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
 
-                    foreach ($report as $requirement) {
-                        $iconClass = $requirement["fulfilled"] ? "icon-checkmark" : "icon-warning";
-                    ?>
-                    <li>
-                        <span class="icon <?php echo $iconClass; ?>"></span>
-                        <?php echo $requirement["name"]; ?>
-                        <p class="<?php echo $requirement["fulfilled"] ? 'closed' : 'open'; ?>"><?php echo Markdown::transform($requirement["help"]); ?></p>
-                    </li>
-                    <?php
-                    }
+                            $requirementsChecker = new RequirementsChecker();
+                            $report = $requirementsChecker->getRequirements();
 
-                    if ($requirementsChecker->isEverythingFulfilled() && $repository->isVersioned()) {
-                    ?>
-                        <li>
-                            <span class="icon icon-warning"></span>
-                            Note: This website is already versioned in Git (the repository is either your custom or has been created by a previous installation of VersionPress). It is not a problem for VersionPress, just be sure that you know what you are doing.
-                        </li>
-                    <?php
-                    }
-                    ?>
-                </ul>
+                            foreach ($report as $requirement) {
+                                $iconClass = $requirement["fulfilled"] ? "icon-checkmark" : "icon-warning";
+                                ?>
+                                <li>
+                                    <span class="icon <?php echo $iconClass; ?>"></span>
+                                    <?php echo $requirement["name"]; ?>
+                                    <p class="<?php echo $requirement["fulfilled"] ? 'closed' : 'open'; ?>"><?php echo Markdown::transform($requirement["help"]); ?></p>
+                                </li>
+                            <?php
+                            }
+
+                            if ($requirementsChecker->isEverythingFulfilled() && $repository->isVersioned()) {
+                                ?>
+                                <li>
+                                    <span class="icon icon-warning"></span>
+                                    Note: This website is already versioned in Git (the repository is either your custom or has been created by a previous installation of VersionPress). It is not a problem for VersionPress, just be sure that you know what you are doing.
+                                </li>
+                            <?php
+                            }
+                            ?>
+                        </ul>
+
+                    </div>
+
+                    <div class="right">
+                        <h4>General notes</h4>
+
+                        <ul>
+                            <li>
+                                <span class="icon icon-notification"></span>
+                                You are activating a preview version which is suitable for testing purposes only. If you encounter any issues please contact us at <a href="mailto:info@versionpress.net">info@versionpress.net</a>.
+                            </li>
+                            <li>
+                                <span class="icon icon-notification"></span>
+                                3<sup>rd</sup> party plugins that manipulate the database are generally not supported until tested, please find out more about it <u>here</u>.
+                            </li>
+                        </ul>
+
+
+                    </div>
+
+                </div>
 
                 <div style="text-align: center;">
                 <?php
@@ -210,14 +234,6 @@ function _vp_show_progress_message($progressMessage) {
                            class="button <?php echo $buttonClass; ?> button-hero" id="activate-versionpress-btn">Activate
                             VersionPress</a>
                 </div>
-
-                <ul>
-                    <li>
-
-                        <span class="icon icon-notification"></span>
-                        You are activating a preview version which is suitable for testing purposes only. If you encounter any issues please contact us at <a href="mailto:info@versionpress.net">info@versionpress.net</a>.
-                    </li>
-                </ul>
 
             </div>
 

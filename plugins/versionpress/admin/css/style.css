@@ -8,6 +8,22 @@
 
 
 /*------------------------------
+ * Activation
+ *------------------------------*/
+
+.vp-activation-panel .left {
+    display: inline-block;
+    vertical-align: top;
+    width: 48%;
+}
+
+.vp-activation-panel .right {
+    display: inline-block;
+    vertical-align: top;
+    width: 48%;
+}
+
+/*------------------------------
  * Admin pages
  *------------------------------*/
 
