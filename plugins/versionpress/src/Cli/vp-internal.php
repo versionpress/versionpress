@@ -25,14 +25,38 @@ class VPInternalCommand extends WP_CLI_Command {
 
 
     /**
-     * Restores a WP site from Git repo. Fails if the db exists.
+     * Restores a WP site from Git repo / working directory.
      *
      * ## OPTIONS
      *
      * --db=<name>
-     * : Name of the DB. Command fails if the database exists.
+     * : Name of the DB. Optional (the default is current dir name).
      *
-     * @synopsis --db=<name>
+     * --url=<siteurl>
+     * : Site URL. Optional (the default is http://localhost/<currentdir>).
+     *
+     *
+     * ## DESCRIPTION
+     *
+     * The simplest possible example just executes `site-restore` without any parameters.
+     * The assumptions are:
+     *
+     *    * The current directory must be reachable from the webserver as http://localhost/<cwd>
+     *    * MySQL server is available at localhost
+     *    * There is a root / no pwd user in it
+     *    * This command is executed from site root
+     *
+     * The command will then do the following:
+     *
+     *    * Create a db <dirname>, e.g., 'vp01'
+     *    * Configure WordPress to connect to this db as 'root' / no pwd
+     *    * Create WordPress tables in it and preconfigure it with site_url and home options
+     *    * Run VP synchronizers on the database
+     *
+     * Both DB name and site URL are configurable.
+     *
+     *
+     * @synopsis [--db=<name>] [--url=<siteurl>]
      *
      * @subcommand restore-site
      *
@@ -40,13 +64,16 @@ class VPInternalCommand extends WP_CLI_Command {
      */
     public function restoreSite($args, $assoc_args) {
 
+        $dbName = isset($assoc_args['db']) ? $assoc_args['db'] : basename(getcwd());
+
+
         if (!defined('WP_CONTENT_DIR')) {
             define('WP_CONTENT_DIR', 'xyz'); //doesn't matter, it's just to prevent the NOTICE in the require`d bootstrap.php
         }
         require_once(__DIR__ . '/../../bootstrap.php');
 
         // 1) Create wp-config.php
-        $configCmd = 'wp core config --dbname=' . escapeshellarg($assoc_args['db']) . ' --dbuser=root';
+        $configCmd = 'wp core config --dbname=' . escapeshellarg($dbName) . ' --dbuser=root';
 
         $process = new Process($configCmd);
         $process->run();
