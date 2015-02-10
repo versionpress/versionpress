@@ -30,7 +30,7 @@ class VPInternalCommand extends WP_CLI_Command {
      * ## OPTIONS
      *
      * --db=<name>
-     * : Name of the db, a new user in it and his password
+     * : Name of the DB. Command fails if the database exists.
      *
      * @synopsis --db=<name>
      *
@@ -80,7 +80,7 @@ class VPInternalCommand extends WP_CLI_Command {
 
 
 
-        // 3) Create WP tables
+        // 3) Create WP tables. The only important thing is site URL, all else will be rewritten later during synchronization.
         $createWpTablesCmd = 'wp core install --url=' . escapeshellarg("http://localhost/" . basename(getcwd())) . ' --title=x --admin_user=x --admin_password=x --admin_email=x@example.com';
         $process = new Process($createWpTablesCmd);
         $process->run();
@@ -92,8 +92,7 @@ class VPInternalCommand extends WP_CLI_Command {
         }
 
 
-        // Finally, clean the working copy
-
+        // 4) Clean the working copy - restores "db.php" and makes sure the dir is clean
         $cleanWDCmd = 'git reset --hard && git clean -xf wp-content/vpdb';
 
         $process = new Process($cleanWDCmd);
@@ -107,9 +106,9 @@ class VPInternalCommand extends WP_CLI_Command {
 
 
 
-        // The next couple of the steps need to be done after the WP is fully loaded; we can use finish-init-clone for that
+        // The next couple of the steps need to be done after the WP is fully loaded; we use `finish-init-clone` for that
 
-        $finishInitCloneCmd = 'wp --require=' . escapeshellarg(__FILE__) . ' vp-internal finish-init-clone --truncate-options';
+        $finishInitCloneCmd = 'wp --require=' . escapeshellarg(__FILE__) . ' vp-internal finish-init-clone';
 
         $process = new Process($finishInitCloneCmd);
         $process->run();
@@ -253,7 +252,7 @@ class VPInternalCommand extends WP_CLI_Command {
         global $wpdb;
 
         $sql = "SELECT concat('TRUNCATE TABLE `', TABLE_NAME, '`;') FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '" . DB_NAME . "'";
-        if ($assoc_args["truncate-options"]) {
+        if (isset($assoc_args["truncate-options"])) {
             $sql .= ";";
         } else {
             $sql .= " AND TABLE_NAME NOT LIKE '%options';";
