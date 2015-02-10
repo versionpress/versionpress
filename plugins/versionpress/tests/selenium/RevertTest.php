@@ -101,6 +101,46 @@ class RevertTest extends SeleniumTestCase {
         $commitAsserter->assertCleanWorkingDirectory();
     }
 
+    /**
+     * @test
+     * @testdox Clicking on Cancel only hides the popup
+     */
+    public function clickingOnCancelOnlyHidesThePopup() {
+        $this->loginIfNecessary();
+        $this->createTestPost();
+        $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        $this->jsClick("#versionpress-commits-table tr:nth-child(1) a[href*=vp_undo]");
+        $this->waitForAjax();
+        $this->jsClick("#popover-cancel-button");
+        $this->waitForAjax(); // there shouldn't be any AJAX request, but for sure...
+
+        $commitAsserter->assertNumCommits(0);
+        $commitAsserter->assertCleanWorkingDirectory();
+    }
+
+    /**
+     * @test
+     * @testdox OK button is disabled if the working directory is not clear
+     */
+    public function okButtonIsDisabledIfTheWorkingDirectoryIsNotClear() {
+        $this->loginIfNecessary();
+        $this->createTestPost();
+        $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+        touch(self::$config->getSitePath() . '/revert-test-file');
+
+        $this->jsClick("#versionpress-commits-table tr:nth-child(1) a[href*=vp_undo]");
+        $this->waitForAjax();
+        $this->jsClick("#popover-ok-button");
+        $this->waitForAjax(); // there shouldn't be any AJAX request, but for sure...
+
+        $commitAsserter->assertNumCommits(0);
+        unlink(self::$config->getSitePath() . '/revert-test-file');
+        $commitAsserter->assertCleanWorkingDirectory();
+    }
+
     //---------------------
     // Helper methods
     //---------------------
