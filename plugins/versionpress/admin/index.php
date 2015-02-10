@@ -217,6 +217,10 @@ function _vp_show_progress_message($progressMessage) {
                                 <span class="icon icon-notification"></span>
                                 3<sup>rd</sup> party plugins that manipulate the database are generally not supported until tested, please find out more about it <u>here</u>.
                             </li>
+                            <li>
+                                <span class="icon icon-notification"></span>
+                                Have a backup. Really. 
+                            </li>
                         </ul>
 
 
