@@ -142,6 +142,11 @@ class Reverter {
 
         $entityInfo = $this->dbSchemaInfo->getEntityInfo($entityName);
         $storage = $this->storageFactory->getStorage($entityName);
+
+        if (!$storage->exists($entityId)) {
+            return true;
+        }
+
         $entity = $storage->loadEntity($entityId);
 
         foreach ($entityInfo->references as $reference => $referencedEntityName) {
