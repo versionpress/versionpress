@@ -108,8 +108,8 @@ jQuery(document).ready(function($) {
         }
 
         var $buttonContainer = $('<div>').addClass('button-container');
-        var $okButton = $('<a class="button" href="#">Proceed</a>').attr('href', $link.attr('href'));
-        var $cancelButton = $('<a class="button cancel" href="#">Cancel</a>').click(function () { $link.webuiPopover('destroy'); });
+        var $okButton = $('<a class="button" href="#" id="popover-ok-button">Proceed</a>').attr('href', $link.attr('href'));
+        var $cancelButton = $('<a class="button cancel" href="#" id="popover-cancel-button">Cancel</a>').click(function () { $link.webuiPopover('destroy'); });
 
         if (disableOk) {
             $okButton.addClass('disabled');
