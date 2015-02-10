@@ -165,7 +165,7 @@ function _vp_show_progress_message($progressMessage) {
 
                 <h3>Welcome to VersionPress!</h3>
 
-                <p class="about-description">Please click the <i>Activate VersionPress</i> button below to start tracking the site – note that it will take a few moments, depending on the size of this site. You can then use the VersionPress menu item on the left to access all its features.</p>
+                <p class="about-description">VersionPress needs a one-time activation step that initializes its internal storage. <strong>This step is resource-intensive and might take a while</strong> if your site has many entities (posts, comments etc.). The site will be put in maintanenance mode until it finishes.</p>
 
                 <div class="checks-and-warnings">
 
@@ -211,15 +211,15 @@ function _vp_show_progress_message($progressMessage) {
                         <ul>
                             <li>
                                 <span class="icon icon-notification"></span>
-                                You are activating a preview version which is suitable for testing purposes only. If you encounter any issues please contact us at <a href="mailto:info@versionpress.net">info@versionpress.net</a>.
+                                You are activating a <strong>preview version</strong> which is suitable for testing purposes only. If you encounter any issues please let us know at <a href="mailto:info@versionpress.net">info@versionpress.net</a>.
                             </li>
                             <li>
                                 <span class="icon icon-notification"></span>
-                                3<sup>rd</sup> party plugins that manipulate the database are generally not supported until tested, please find out more about it <u>here</u>.
+                                Be careful when using <strong>third-party plugins</strong>. Some of them will work fine, some of them might be problematic in combination with VersionPress. <a href="http://docs.versionpress.net/en/feature-focus/external-plugins">Read more about it</a>.
                             </li>
                             <li>
                                 <span class="icon icon-notification"></span>
-                                Have a backup. Really. 
+                                <strong>Have a backup</strong>. Seriously.
                             </li>
                         </ul>
 
