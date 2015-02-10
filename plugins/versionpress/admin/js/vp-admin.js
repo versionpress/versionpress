@@ -99,16 +99,23 @@ jQuery(document).ready(function($) {
     function renderPopupContent($link, data) {
         var clearWorkingDirectory = data.clearWorkingDirectory;
         var $content = $('<div>');
+        var disableOk = false;
         $content.append($staticWarning);
 
         if (!clearWorkingDirectory) {
             $content.append("Please commit your changes");
-            return $content;
+            disableOk = true;
         }
 
-        var $buttonContainer = $('<div>').css('text-align', 'center');
+        var $buttonContainer = $('<div>').addClass('button-container');
         var $okButton = $('<a class="button" href="#">OK</a>').attr('href', $link.attr('href'));
         var $cancelButton = $('<a class="button cancel" href="#">Cancel</a>').click(function () { $link.webuiPopover('destroy'); });
+
+        if (disableOk) {
+            $okButton.addClass('disabled');
+            $okButton.click(function (e) { e.preventDefault(); return false; })
+        }
+
         $buttonContainer.append($okButton).append(' ').append($cancelButton);
         $content.append($buttonContainer);
         return $content;
