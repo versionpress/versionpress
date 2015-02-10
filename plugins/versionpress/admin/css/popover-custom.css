@@ -28,3 +28,11 @@
     margin-top: 15px;
     text-align: center;
 }
+
+.webui-popover .arrow {
+    overflow: auto;
+    left: auto;
+    margin-left: auto;
+    bottom: auto;
+    z-index: auto;
+}

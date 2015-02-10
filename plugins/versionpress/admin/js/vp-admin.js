@@ -72,21 +72,12 @@ jQuery(document).ready(function($) {
             closeable: true,
             width: 450,
             style: customRevertPopoverClass,
-            placement: 'top-left'
+            placement: 'left-bottom'
         });
 
-        function maybeHidePopover (e) {
-            var popopOverSelector = '.webui-popover-' + customRevertPopoverClass;
-            if ($(popopOverSelector).length > 0 && $(popopOverSelector).is(':visible') && jQuery(e.target).parents(popopOverSelector).length == 0 &&
-                !$(e.target).is($link) && $(e.target).parents(undoRollbackSelector).length == 0)
-            {
-                // Hide popover if the click was anywhere but in the link or the popover itself.
-                $link.webuiPopover('destroy');
-                $('body').off('click', maybeHidePopover);
-            }
-        };
-
-        $('body').on('click', maybeHidePopover);
+        $link.on('hidden.webui.popover', function () {
+            $link.webuiPopover('destroy');
+        });
 
         $link.webuiPopover('show');
     }
