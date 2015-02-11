@@ -75,14 +75,33 @@ class EntityInfo {
      *
      * @var array
      */
-    public $references;
+    public $references = array();
+
+    /**
+     * Just like $references, only for M:N relationships (with junction table).
+     * The key is composed from table name and column in the junction table.
+     * This kind of relationship has to be described in both entities.
+     *
+     * Post:
+     * array(
+     *       'term_taxonomy.term_taxonomy_id' => 'term_taxonomy',
+     *     )
+     *
+     * Term taxonomy:
+     * array(
+     *       'term_taxonomy.object_id' => 'post',
+     *     )
+     *
+     * @var array
+     */
+    public $mnReferences = array();
 
     /**
      * True if entity has references. Basically returns count($references) > 0.
      *
-     * @var
+     * @var bool
      */
-    public $hasReferences;
+    public $hasReferences = false;
 
     /**
      * Does the parsing and sets all properties
@@ -124,9 +143,11 @@ class EntityInfo {
         if (isset($schemaInfo['references'])) {
             $this->references = $schemaInfo['references'];
             $this->hasReferences = true;
-        } else {
-            $this->references = array();
-            $this->hasReferences = false;
+        }
+
+        if (isset($schemaInfo['mn-references'])) {
+            $this->mnReferences = $schemaInfo['mn-references'];
+            $this->hasReferences = true;
         }
     }
 }

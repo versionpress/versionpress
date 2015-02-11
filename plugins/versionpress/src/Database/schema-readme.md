@@ -8,6 +8,8 @@ Some essential information about database entities and their relationships is de
         references:
             post_author: user
             post_parent: post
+        mn-references:
+            term_relationships.term_taxonomy_id: term_taxonomy
 
     user:
         table: posts
@@ -44,4 +46,10 @@ WordPress db schema doesn't store foreign keys so we need to. An entity can have
     references:
         <my_column_name>: <foreign_entity_name>
 
-VersionPress knows what ID to be looking for in the foreign entity name because it is also described somewhere in the schema. 
+VersionPress knows what ID to be looking for in the foreign entity name because it is also described somewhere in the schema.
+
+Another type of references are the M:N references. Sometimes (for example between posts and term_taxonomies) we need to describe
+an M:N relationship (junction table in the SQL). To do that we can use this format
+
+    mn-references:
+        <junction_table_name>.<column_name>: <foreign_entity_name>

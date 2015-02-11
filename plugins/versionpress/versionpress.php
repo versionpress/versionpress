@@ -252,26 +252,36 @@ function vp_register_hooks() {
 function createUpdatePostTermsHook(Mirror $mirror, wpdb $wpdb) {
 
     return function ($postId) use ($mirror, $wpdb) {
-        $post = get_post($postId);
-        $postType = $post->post_type;
+        /** @var array $post */
+        $post = get_post($postId, ARRAY_A);
+
+        if (!$mirror->shouldBeSaved('post', $post)) {
+            return;
+        }
+
+        $postType = $post['post_type'];
         $taxonomies = get_object_taxonomies($postType);
 
         $vpIdTableName = $wpdb->prefix . 'vp_id';
 
         $postVpId = $wpdb->get_var("SELECT HEX(vp_id) FROM $vpIdTableName WHERE id = $postId AND `table` = 'posts'");
 
-        $postUpdateData = array('vp_id' => $postVpId);
+        $postUpdateData = array('vp_id' => $postVpId, 'vp_term_taxonomy' => array());
 
         foreach ($taxonomies as $taxonomy) {
             $terms = get_the_terms($postId, $taxonomy);
-            if ($terms)
-                $postUpdateData[$taxonomy] = array_map(function ($term) use ($wpdb, $vpIdTableName) {
-                    return $wpdb->get_var("SELECT HEX(vp_id) FROM $vpIdTableName WHERE id = {$term->term_id} AND `table` = 'terms'");
+            if ($terms) {
+                $referencedTaxonomies = array_map(function ($term) use ($wpdb, $vpIdTableName) {
+                    return $wpdb->get_var("SELECT HEX(vp_id) FROM $vpIdTableName WHERE id = {$term->term_taxonomy_id} AND `table` = 'term_taxonomy'");
                 }, $terms);
+
+                $postUpdateData['vp_term_taxonomy'] = array_merge($postUpdateData['vp_term_taxonomy'], $referencedTaxonomies);
+            }
         }
 
-        if (count($taxonomies) > 0)
+        if (count($taxonomies) > 0) {
             $mirror->save("post", $postUpdateData);
+        }
     };
 }
 
