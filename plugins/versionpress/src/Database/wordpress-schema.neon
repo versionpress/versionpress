@@ -4,6 +4,8 @@ post:
     references:
         post_author: user
         post_parent: post
+    mn-references:
+        term_relationships.term_taxonomy_id: term_taxonomy
 
 postmeta:
     id: meta_id
@@ -31,6 +33,8 @@ term_taxonomy:
     references:
         parent: term_taxonomy
         term_id: term
+    mn-references:
+        term_relationships.object_id: post
 
 usermeta:
     id: umeta_id
