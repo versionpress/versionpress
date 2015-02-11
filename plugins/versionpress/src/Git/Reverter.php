@@ -128,7 +128,8 @@ class Reverter {
         }
 
         foreach ($changeInfo->getChangeInfoList() as $subChangeInfo) {
-            if ($subChangeInfo instanceof EntityChangeInfo && !$this->checkEntityReferences($subChangeInfo)) {
+            if ($subChangeInfo instanceof EntityChangeInfo &&
+                !$this->checkEntityReferences($subChangeInfo->getEntityName(), $subChangeInfo->getEntityId())) {
                 return false;
             }
         }
@@ -136,28 +137,100 @@ class Reverter {
         return true;
     }
 
-    private function checkEntityReferences(EntityChangeInfo $changeInfo) {
-        $entityName = $changeInfo->getEntityName();
-        $entityId = $changeInfo->getEntityId();
-
+    /**
+     * Returns true if there is no reference constraint violation for given entity.
+     *
+     * @param $entityName
+     * @param $entityId
+     * @return bool
+     */
+    private function checkEntityReferences($entityName, $entityId) {
         $entityInfo = $this->dbSchemaInfo->getEntityInfo($entityName);
         $storage = $this->storageFactory->getStorage($entityName);
 
         if (!$storage->exists($entityId)) {
-            return true;
+            return !$this->existsSomeEntityWithReferenceTo($entityName, $entityId);
         }
 
         $entity = $storage->loadEntity($entityId);
 
         foreach ($entityInfo->references as $reference => $referencedEntityName) {
             $vpReference = "vp_$reference";
-            if (isset($entity[$vpReference])) {
-                $entityExists = $this->storageFactory->getStorage($referencedEntityName)->exists($entity[$vpReference]);
-                if (!$entityExists) return false;
+            if (!isset($entity[$vpReference])) {
+                continue;
+            }
+
+            $entityExists = $this->storageFactory->getStorage($referencedEntityName)->exists($entity[$vpReference]);
+            if (!$entityExists) {
+                return false;
+            }
+
+        }
+
+        foreach ($entityInfo->mnReferences as $reference => $referencedEntityName) {
+            $vpReference = "vp_$referencedEntityName";
+            if (!isset($entity[$vpReference])) {
+                continue;
+            }
+
+            foreach ($entity[$vpReference] as $referencedEntityId) {
+                $entityExists = $this->storageFactory->getStorage($referencedEntityName)->exists($referencedEntityId);
+                if (!$entityExists) {
+                    return false;
+                }
             }
         }
 
+
         return true;
+    }
+
+    /**
+     * Returns true if there is any entity with reference to the passed one.
+     *
+     * @param $entityName
+     * @param $entityId
+     * @return bool
+     */
+    private function existsSomeEntityWithReferenceTo($entityName, $entityId) {
+        $entityNames = $this->dbSchemaInfo->getAllEntityNames();
+
+        foreach ($entityNames as $otherEntityName) {
+            $otherEntityInfo = $this->dbSchemaInfo->getEntityInfo($otherEntityName);
+            $otherEntityReferences = $otherEntityInfo->references;
+            $otherEntityMnReferences = $otherEntityInfo->mnReferences;
+
+            $allReferences = array_merge($otherEntityReferences, $otherEntityMnReferences);
+
+            $reference = array_search($entityName, $allReferences);
+
+            if ($reference === false) {
+                continue;
+            }
+
+            $otherEntityStorage = $this->storageFactory->getStorage($otherEntityName);
+            $possiblyReferencingEntities = $otherEntityStorage->loadAll();
+
+            if (isset($otherEntityReferences[$reference])) { // 1:N reference
+                $vpReference = "vp_$reference";
+
+                foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
+                    if (isset($possiblyReferencingEntity[$vpReference]) && $possiblyReferencingEntity[$vpReference] === $entityId) {
+                        return true;
+                    }
+                }
+            } else { // M:N reference
+                $vpReference = "vp_$otherEntityName";
+                foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
+                    if (isset($possiblyReferencingEntity[$vpReference]) && array_search($entityId, $possiblyReferencingEntity[$vpReference]) !== false) {
+                        return true;
+                    }
+                }
+            }
+
+        }
+
+        return false;
     }
 
     /**
