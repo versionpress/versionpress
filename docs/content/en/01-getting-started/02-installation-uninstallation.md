@@ -120,14 +120,6 @@ There are two important things to note:
     * Note: VersionPress will only remove / backup the repository if it detects that it was VersionPress-initiated repository. If you created the Git repository manually before installing VersionPress the repository will not be touched.  
 
 
-## WP-CLI
-
-VersionPress comes with several WP-CLI commands that allow you to automate some of the work or execute certain features from command line.
-
-Please follow [WP-CLI installation instructions](https://github.com/wp-cli/wp-cli/wiki/Alternative-Install-Methods) and then refer to [this section](../feature-focus/wp-cli) for instructions on how to use the `wp vp` commands.
-
-
-
 ## VersionPress states at a glance
 
 To sum up the previous text, here are the states that the site can be in:
