@@ -6,8 +6,28 @@ namespace Utils;
 use Nette\Utils\Strings;
 use Symfony\Component\Process\Process;
 use VersionPress\Utils\RequirementsChecker;
+use VersionPress\VersionPress;
 
 class SystemInfo {
+
+    public static function getAllInfo() {
+        $output = array();
+        $output['summary'] = array();
+        $output['git-info'] = self::getGitInfo();
+        $output['wordpress-info'] = self::getWordPressInfo();
+        $output['php-info'] = self::getPhpInfo();
+
+        $output['summary']['wordpress-version'] = $output['wordpress-info']['wp-version'];
+        $output['summary']['versionpress-version'] = VersionPress::getVersion();
+        $output['summary']['operating-system'] = php_uname();
+        $output['summary']['php-version'] = phpversion();
+        $output['summary']['php-sapi'] = php_sapi_name();
+        $output['summary']['git-version'] = $output['git-info']['git-version'];
+        $output['summary']['git-binary'] = $output['git-info']['git-path'];
+
+        return $output;
+    }
+
 
 
     /**
@@ -32,7 +52,19 @@ class SystemInfo {
         $match = Strings::match($output, "~git version (\\d[\\d\\.]+\\d).*~");
         $version = $match[1];
 
+
+        $gitPath = 'unknown';
+
+        $osSpecificWhereCommand = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? "where" : "which";
+        $process = new Process("$osSpecificWhereCommand git");
+        $process->run();
+
+        if ($process->isSuccessful()) {
+            $gitPath = $process->getOutput();
+        }
+
         $info['git-version'] = $version;
+        $info['git-path'] = $gitPath;
         $info['versionpress-min-required-version'] = RequirementsChecker::GIT_MINIMUM_REQUIRED_VERSION;
         $info['matches-min-required-version'] = RequirementsChecker::gitMatchesMinimumRequiredVersion($version, RequirementsChecker::GIT_MINIMUM_REQUIRED_VERSION);
 
@@ -63,10 +95,39 @@ class SystemInfo {
         $info = array();
 
         $info['wp-version'] = get_bloginfo('version');
-        $info['installed-plugins'] = get_plugins();
-        $info['installed-themes'] = wp_get_themes();
+        $installedPlugins = get_plugins();
+        array_walk($installedPlugins, function(&$pluginInfo, $pluginFile) {
+
+            // only keep certain keys - disregard fields like description etc.
+            $keysToKeep = array('Name', 'PluginURI', 'Version', 'Author', 'AuthorURI');
+            $pluginInfo = array_intersect_key($pluginInfo, array_flip($keysToKeep));
+
+            // add info whether the plugin is active or not
+            $pluginInfo['__IsActive'] = is_plugin_active($pluginFile);
+
+        });
+        $info['installed-plugins'] = $installedPlugins;
+        $info['installed-themes'] = array_keys(wp_get_themes());
         $info['active-plugins'] = get_option('active_plugins');
-        $info['current-theme'] = wp_get_theme()->get_stylesheet();
+        $info['active-theme'] = self::getActiveThemeInfo();
+
+        return $info;
+    }
+
+    public static function getActiveThemeInfo() {
+        $info = array();
+        $wpTheme = wp_get_theme();
+
+        $info['stylesheet'] = $wpTheme->get_stylesheet();
+        $info['template'] = $wpTheme->get_template();
+        $parent = $wpTheme->parent();
+        $parentName = '';
+        if ($parent instanceof \WP_Theme) {
+            $parentName = $parent->get_template();
+        }
+        $info['parent'] = $parentName;
+        $info['Name'] = $wpTheme->get('Name');
+        $info['ThemeURI'] = $wpTheme->get('ThemeURI');
 
         return $info;
     }
@@ -114,6 +175,8 @@ class SystemInfo {
                 // the whole right side
                 $pi[$n][$m[1]] = @( (!isset($m[3])||$m[2]==$m[3])?$m[2]:array_slice($m,2) );
         }
+
+        $pi['Extensions'] = get_loaded_extensions();
 
         return $pi;
     }

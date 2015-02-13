@@ -5,7 +5,7 @@ use VersionPress\Utils\RequirementsChecker;
 
 defined('ABSPATH') or die("Direct access not allowed");
 
-$outputFormat = $_GET['f'];
+$outputFormat = isset($_GET['f']) ? $_GET['f'] : null;
 $supportedOutputFormats = array(
     've',
     'tc'
@@ -13,6 +13,8 @@ $supportedOutputFormats = array(
 if (!in_array($outputFormat, $supportedOutputFormats)) {
     $outputFormat = $supportedOutputFormats[0];
 }
+
+$systemInfo = SystemInfo::getAllInfo();
 
 function displaySystemInfoArray($array) {
 
@@ -80,18 +82,18 @@ function displaySystemInfoArray($array) {
 </div>
 
 
-<h2 id="git-info">Git</h2>
+<h2 id="summary">Quick summary</h2>
+<?php displaySystemInfoArray($systemInfo['summary']); ?>
 
-<?php displaySystemInfoArray(SystemInfo::getGitInfo()); ?>
+
+<h2 id="git-info">Git</h2>
+<?php displaySystemInfoArray($systemInfo['git-info']); ?>
 
 
 <h2 id="wordpress-info">WordPress</h2>
-
-<?php displaySystemInfoArray(SystemInfo::getWordPressInfo()); ?>
-
+<?php displaySystemInfoArray($systemInfo['wordpress-info']); ?>
 
 
 <h2 id="php-info">Server environment / PHP info</h2>
-
-<?php displaySystemInfoArray(SystemInfo::getPhpInfo()); ?>
+<?php displaySystemInfoArray($systemInfo['php-info']); ?>
 
