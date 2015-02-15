@@ -3,6 +3,7 @@
 namespace VersionPress\DI;
 
 use Committer;
+use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\MirroringDatabase;
 use VersionPress\Git\GitRepository;
@@ -43,6 +44,10 @@ class DIContainer {
             return self::$instance;
 
         self::$instance = $dic = new DIContainer();
+
+        $dic->register(VersionPressServices::VP_CONFIGURATION, function () {
+            return new VersionPressConfig();
+        });
 
         $dic->register(VersionPressServices::STORAGE_FACTORY, function () use ($dic) {
             return new StorageFactory(VERSIONPRESS_MIRRORING_DIR, $dic->resolve(VersionPressServices::DB_SCHEMA));
@@ -88,8 +93,10 @@ class DIContainer {
             );
         });
 
-        $dic->register(VersionPressServices::REPOSITORY, function () {
-            return new GitRepository(ABSPATH, VERSIONPRESS_TEMP_DIR);
+        $dic->register(VersionPressServices::REPOSITORY, function () use ($dic) {
+            /** @var VersionPressConfig $vpConfig */
+            $vpConfig = $dic->resolve(VersionPressServices::VP_CONFIGURATION);
+            return new GitRepository(ABSPATH, VERSIONPRESS_TEMP_DIR, "[VP] ", $vpConfig->gitBinary);
         });
 
         return self::$instance;

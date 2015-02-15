@@ -13,6 +13,7 @@ final class VersionPressServices {
     const SYNCHRONIZER_FACTORY = 'synchronizer-factory';
     const REVERTER = 'reverter';
     const REPOSITORY = 'repository';
+    const VP_CONFIGURATION = 'vp-configuration';
 
     private function __construct() {
     }

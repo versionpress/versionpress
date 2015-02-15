@@ -4,6 +4,8 @@ namespace VersionPress\Git;
 
 use Nette\Utils\Strings;
 use Symfony\Component\Process\Process;
+use VersionPress\DI\DIContainer;
+use VersionPress\DI\VersionPressServices;
 use VersionPress\Utils\FileSystem;
 
 /**
@@ -16,16 +18,19 @@ class GitRepository {
     private $authorEmail = "";
     private $tempDirectory;
     private $commitMessagePrefix;
+    private $gitBinary;
 
     /**
      * @param string $workingDirectoryRoot Filesystem path to working directory root (where the .git folder resides)
      * @param string $tempDirectory Directory used for commit message temp file
      * @param string $commitMessagePrefix Standard prefix applied to all commit messages
+     * @param string $gitBinary Git binary to use
      */
-    function __construct($workingDirectoryRoot, $tempDirectory = "./", $commitMessagePrefix = "[VP] ") {
+    function __construct($workingDirectoryRoot, $tempDirectory = "./", $commitMessagePrefix = "[VP] ", $gitBinary = "git") {
         $this->workingDirectoryRoot = $workingDirectoryRoot;
         $this->tempDirectory = $tempDirectory;
         $this->commitMessagePrefix = $commitMessagePrefix;
+        $this->gitBinary = $gitBinary;
     }
 
     /**
@@ -313,11 +318,10 @@ class GitRepository {
 
     /**
      * Run a Git command, either fully specified (e.g., 'git log') or just by the name (e.g., 'log').
-     * The comamnd can contain `sprintf()` markers, e.g., '%s', which are then replaced by shell-escaped
-     * args provided as further parameters to this method.
+     * The comamnd can contain `sprintf()` markers such as '%s' which are replaced by shell-escaped $args.
      *
      * Note: shell-escaping is actually pretty important even for things that are not paths, like revisions.
-     * For example, `git log HEAD^` will not work on Windows, `git log "HEAD^"` will. So the right
+     * For example, `git log HEAD^` will not work on Windows, only `git log "HEAD^"` will. So the right
      * approach is to provide `git log %s` as the $command and rev range as $args.
      *
      * @param string $command E.g., 'git log' or 'git add %s' (path will be shell-escaped) or just 'log'
@@ -327,9 +331,9 @@ class GitRepository {
      */
     private function runShellCommand($command, $args = '') {
 
-        if (!Strings::startsWith($command, "git ")) {
-            $command = "git " . $command;
-        }
+        // replace (optional) "git " with the configured git binary
+        $command = Strings::startsWith($command, "git ") ? substr($command, 4) : $command;
+        $command = escapeshellarg($this->gitBinary) . " " . $command;
 
         $functionArgs = func_get_args();
         array_shift($functionArgs); // Remove $command
