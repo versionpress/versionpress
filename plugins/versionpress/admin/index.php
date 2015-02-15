@@ -203,6 +203,8 @@ function _vp_show_progress_message($progressMessage) {
                             ?>
                         </ul>
 
+                        <div><a href="<?php echo admin_url('admin.php?page=versionpress/admin/system-info.php') ?>">(view full system info)</a></div>
+
                     </div>
 
                     <div class="right">
