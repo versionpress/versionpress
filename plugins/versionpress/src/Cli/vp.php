@@ -2,12 +2,11 @@
 // NOTE: VersionPress must be fully activated for these commands to be available
 
 namespace VersionPress\Cli;
-use Nette\Neon\Neon;
+
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Process\Process;
 use VersionPress\Utils\FileSystem;
-use VersionPress\Utils\StringUtils;
 use WP_CLI;
 use WP_CLI_Command;
 
