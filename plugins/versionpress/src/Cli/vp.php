@@ -2,9 +2,12 @@
 // NOTE: VersionPress must be fully activated for these commands to be available
 
 namespace VersionPress\Cli;
+use Nette\Neon\Neon;
+use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Process\Process;
 use VersionPress\Utils\FileSystem;
+use VersionPress\Utils\StringUtils;
 use WP_CLI;
 use WP_CLI_Command;
 
@@ -12,6 +15,52 @@ use WP_CLI_Command;
  * VersionPress CLI commands.
  */
 class VPCommand extends WP_CLI_Command {
+
+    /**
+     * Configures VersionPress
+     *
+     * ## OPTIONS
+     *
+     * <key>
+     * : The name of the option to set.
+     *
+     * [<value>]
+     * : The new value. If missing, just prints out the option.
+
+     */
+    public function config($args, $assoc_args) {
+
+        $configFile = VERSIONPRESS_PLUGIN_DIR . '/vpconfig.neon';
+        $configContents = "";
+        if (file_exists($configFile)) {
+            $configContents = file_get_contents($configFile);
+        }
+
+        $configContents = $this->updateConfigValue($configContents, $args[0], $args[1]);
+
+        file_put_contents($configFile, $configContents);
+
+    }
+
+    private function updateConfigValue($config, $key, $value) {
+
+        // General matching: https://regex101.com/r/sE2iB1/1
+        // Concrete example: https://regex101.com/r/sE2iB1/2
+
+        $re = "/^($key)(:\\s*)(\\S[^#\\r\\n]+)(\\h+#?.*)?$/m";
+        $subst = "$1$2$value$4";
+
+        $result = preg_replace($re, $subst, $config);
+
+        if ($result == $config) {
+            // value was not there, add it to the end
+            $result = $config . (Strings::endsWith($config, "\n") ? "" : "\n");
+            $result .= "$key: $value\n";
+        }
+
+        return $result;
+
+    }
 
     /**
      * Clones site to a new folder, database and Git branch.
