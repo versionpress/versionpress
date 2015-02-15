@@ -397,8 +397,6 @@ class Initializer {
             $this->repository->init();
             $this->installGitignore();
         }
-
-        $this->repository->assumeUnchanged('wp-config.php');
     }
 
 
@@ -432,7 +430,7 @@ class Initializer {
             $authorEmail = GitConfig::$wpcliUserEmail;
         }
 
-        $this->repository->add("*");
+        $this->repository->stageAll();
         $this->repository->commit($installationChangeInfo->getCommitMessage(), $authorName, $authorEmail);
     }
 

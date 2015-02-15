@@ -201,7 +201,7 @@ class Committer
                 continue;
             }
 
-            $this->repository->update($path);
+            $this->repository->stageAll($path);
         }
     }
 
