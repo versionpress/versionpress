@@ -68,14 +68,25 @@ if (isset($cliOptions['copy-vp-files'])) {
     $copyVpFilesBeforeClass = true;
 }
 
+$gitPath = null;
+$cliOptions = getopt("", array("git::"));
+if (isset($cliOptions['git'])) {
+    $gitPath = $cliOptions['git'];
+}
+if (!$gitPath && getenv('VP_GIT')) {
+    $gitPath = getenv('VP_GIT');
+}
+
+
 $setupBeforeClass = $setupBeforeClass || getenv('VP_FORCE_SETUP') == "before-class";
 $setupBeforeSuite = $setupBeforeSuite || getenv('VP_FORCE_SETUP') == "before-suite";
 $copyVpFilesBeforeClass = $copyVpFilesBeforeClass || getenv('VP_COPY_FILES');
 
 SeleniumTestCase::$forceSetup = $setupBeforeClass;
 SeleniumTestCase::$copyVpFilesBeforeClass = $copyVpFilesBeforeClass;
+SeleniumTestCase::$gitPath = $gitPath;
 
 if ($setupBeforeSuite) {
     echo "Setting up site before suite";
-    SeleniumTestCase::setUpSite(true);
+    SeleniumTestCase::setUpSite(true, $gitPath);
 }

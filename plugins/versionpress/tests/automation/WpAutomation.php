@@ -296,9 +296,17 @@ class WpAutomation {
 
     /**
      * Activates VersionPress plugin and runs the Initializer
+     *
+     * @param string|null $gitPath If Git path is non-null, it will be set as a custom config
+     *   option for that site. It is useful e.g. for testing with various Git versions.
      */
-    public static function initializeVersionPress() {
+    public static function initializeVersionPress($gitPath = null) {
         self::runWpCliCommand('plugin', 'activate', array('versionpress'));
+
+        if ($gitPath) {
+            self::runWpCliCommand('vp', 'config', array('git-binary', $gitPath));
+        }
+
         $code = 'global $versionPressContainer; $initializer = $versionPressContainer->resolve(VersionPress\DI\VersionPressServices::INITIALIZER); $initializer->initializeVersionPress();';
         self::runWpCliCommand('eval', array($code));
     }

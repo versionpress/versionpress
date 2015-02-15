@@ -38,6 +38,14 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
     public static $copyVpFilesBeforeClass;
 
     /**
+     * Set from phpunit-bootstrap.php if `--git=<path>` has been passed as a command line parameter
+     * or if 'VP_GIT' environment variable is present.
+     *
+     * @var string|null
+     */
+    public static $gitPath;
+
+    /**
      * If true, {@link loginIfNecessary} is called on {@link setUpSite}.
      *
      * @var bool
@@ -66,7 +74,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
     }
 
     public static function setUpBeforeClass() {
-        self::setUpSite(self::$forceSetup);
+        self::setUpSite(self::$forceSetup, self::$gitPath);
     }
 
     /**
@@ -74,15 +82,16 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
      * parametr may force this.
      *
      * @param bool $force Force all the automation actions to be taken regardless of the site state
+     * @param $gitPath
      */
-    public static function setUpSite($force) {
+    public static function setUpSite($force, $gitPath) {
         if ($force || !WpAutomation::isSiteSetUp()) {
             WpAutomation::setUpSite();
         }
 
         if ($force || !WpAutomation::isVersionPressInitialized()) {
             WpAutomation::copyVersionPressFiles();
-            WpAutomation::initializeVersionPress();
+            WpAutomation::initializeVersionPress($gitPath);
         } else if (self::$copyVpFilesBeforeClass) {
             WpAutomation::copyVersionPressFiles();
         }

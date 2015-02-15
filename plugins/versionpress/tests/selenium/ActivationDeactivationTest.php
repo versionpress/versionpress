@@ -152,6 +152,14 @@ class ActivationDeactivationTest extends SeleniumTestCase {
     {
         $this->url('wp-admin/plugins.php');
         $this->byCssSelector('#versionpress .activate a')->click();
+
+        $this->waitAfterRedirect();
+
+        if (self::$gitPath) {
+            WpAutomation::runWpCliCommand('vp', 'config', array('git-binary', self::$gitPath));
+        }
+
+
     }
 
 
