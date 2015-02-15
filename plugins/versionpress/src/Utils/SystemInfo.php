@@ -5,12 +5,19 @@ namespace Utils;
 
 use Nette\Utils\Strings;
 use Symfony\Component\Process\Process;
+use VersionPress\Configuration\VersionPressConfig;
+use VersionPress\DI\VersionPressServices;
 use VersionPress\Utils\RequirementsChecker;
 use VersionPress\VersionPress;
 
 class SystemInfo {
 
     public static function getAllInfo() {
+
+        global $versionPressContainer;
+        /** @var VersionPressConfig $vpConfig */
+        $vpConfig = $versionPressContainer->resolve(VersionPressServices::VP_CONFIGURATION);
+
         $output = array();
         $output['summary'] = array();
         $output['git-info'] = self::getGitInfo();
@@ -22,8 +29,9 @@ class SystemInfo {
         $output['summary']['operating-system'] = php_uname();
         $output['summary']['php-version'] = phpversion();
         $output['summary']['php-sapi'] = php_sapi_name();
+        $output['summary']['custom-vp-config'] = $vpConfig->customConfig;
         $output['summary']['git-version'] = $output['git-info']['git-version'];
-        $output['summary']['git-binary'] = $output['git-info']['git-path'];
+        $output['summary']['git-full-path'] = $output['git-info']['git-full-path'];
 
         return $output;
     }
@@ -36,9 +44,16 @@ class SystemInfo {
      * @return array
      */
     public static function getGitInfo() {
+
+        global $versionPressContainer;
+        /** @var VersionPressConfig $vpConfig */
+        $vpConfig = $versionPressContainer->resolve(VersionPressServices::VP_CONFIGURATION);
+        $gitBinary = $vpConfig->gitBinary;
+
+
         $info = array();
 
-        $process = new Process("git --version");
+        $process = new Process(escapeshellarg($gitBinary) . " --version");
         $process->run();
 
         $info['git-available'] = $process->getErrorOutput() === null;
@@ -53,18 +68,24 @@ class SystemInfo {
         $version = $match[1];
 
 
-        $gitPath = 'unknown';
 
-        $osSpecificWhereCommand = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? "where" : "which";
-        $process = new Process("$osSpecificWhereCommand git");
-        $process->run();
+        $gitPath = "unknown";
+        if ($gitBinary == "git") {
+            $osSpecificWhereCommand = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? "where" : "which";
+            $process = new Process("$osSpecificWhereCommand git");
+            $process->run();
 
-        if ($process->isSuccessful()) {
-            $gitPath = $process->getOutput();
+            if ($process->isSuccessful()) {
+                $gitPath = $process->getOutput();
+            }
+        } else {
+            $gitPath = $gitBinary;
         }
 
+
         $info['git-version'] = $version;
-        $info['git-path'] = $gitPath;
+        $info['git-binary-as-called-by-vp'] = $gitBinary;
+        $info['git-full-path'] = $gitPath;
         $info['versionpress-min-required-version'] = RequirementsChecker::GIT_MINIMUM_REQUIRED_VERSION;
         $info['matches-min-required-version'] = RequirementsChecker::gitMatchesMinimumRequiredVersion($version, RequirementsChecker::GIT_MINIMUM_REQUIRED_VERSION);
 
