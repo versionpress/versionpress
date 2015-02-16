@@ -4,8 +4,6 @@ namespace VersionPress\Git;
 
 use Nette\Utils\Strings;
 use Symfony\Component\Process\Process;
-use VersionPress\DI\DIContainer;
-use VersionPress\DI\VersionPressServices;
 use VersionPress\Utils\FileSystem;
 
 /**
@@ -64,7 +62,8 @@ class GitRepository {
         $tempCommitMessagePath = $this->tempDirectory . $tempCommitMessageFilename;
         file_put_contents($tempCommitMessagePath, $commitMessage);
 
-        $this->runShellCommand("git config user.name %s && git config user.email %s", $this->authorName, $this->authorEmail);
+        $this->runShellCommand("git config user.name %s", $this->authorName);
+        $this->runShellCommand("git config user.email %s", $this->authorEmail);
         $this->runShellCommand("git commit -F %s", $tempCommitMessagePath);
         FileSystem::remove($tempCommitMessagePath);
     }
