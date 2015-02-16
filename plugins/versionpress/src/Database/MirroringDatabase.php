@@ -57,6 +57,7 @@ class MirroringDatabase extends ExtendedWpdb {
         $data[$this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName] = $id;
 
         $data = $this->fillId($entityName, $data, $id);
+        $data = $this->replaceForeignKeysWithReferences($entityName, $data);
         $this->mirror->save($entityName, $data);
 
         $this->insert_id = $id; // it was reset by saving id and references
@@ -109,7 +110,9 @@ class MirroringDatabase extends ExtendedWpdb {
                     $data['vp_id'] = $vpId;
                 }
 
-                if ($this->dbSchemaInfo->getEntityInfo($entityName)->hasReferences) {
+                $data = $this->replaceForeignKeysWithReferences($entityName, $data);
+
+				if ($this->dbSchemaInfo->getEntityInfo($entityName)->hasReferences) {
                     $data = $this->saveReferences($entityName, $data);
                 }
 
@@ -117,7 +120,7 @@ class MirroringDatabase extends ExtendedWpdb {
             }
             return $result;
         }
-
+        $data = $this->replaceForeignKeysWithReferences($entityName, $data);
         $this->mirror->save($entityName, $data);
         return $result;
     }
@@ -301,5 +304,23 @@ class MirroringDatabase extends ExtendedWpdb {
         );
         $ids = $this->get_col($this->prepare($sql, $where));
         return $ids;
+    }
+
+    private function replaceForeignKeysWithReferences($entityName, $entity) {
+        $references = $this->dbSchemaInfo->getEntityInfo($entityName)->references;
+        $vpIdTable = $this->dbSchemaInfo->getPrefixedTableName('vp_id');
+
+        foreach ($references as $referenceName => $targetEntity) {
+            $targetTable = $this->dbSchemaInfo->getEntityInfo($targetEntity)->tableName;
+
+            if ($entity[$referenceName] > 0) {
+                $referenceVpId = $this->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=$entity[$referenceName]");
+                $entity['vp_' . $referenceName] = $referenceVpId;
+            }
+
+            unset($entity[$referenceName]);
+        }
+
+        return $entity;
     }
 }
