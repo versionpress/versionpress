@@ -26,7 +26,7 @@ use VersionPress\ChangeInfos\TermChangeInfo;
  */
 class TermTaxonomyStorage extends SingleFileStorage {
 
-    protected $notSavedFields = array('vp_term_id', 'count', 'term_id');
+    protected $notSavedFields = array('vp_term_id', 'count', 'term_id', 'term_taxonomy_id');
 
     private $currentlySavedTaxonomy;
 
@@ -111,6 +111,16 @@ class TermTaxonomyStorage extends SingleFileStorage {
 
     public function shouldBeSaved($data) {
         return !(count($data) === 2 && isset($data['count'], $data[$this->entityInfo->idColumnName]));
+    }
+
+    public function exists($id) {
+        $this->loadAll();
+        foreach ($this->entities as $term) {
+            if (isset($term['taxonomies']) && isset($term['taxonomies'][$id])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
