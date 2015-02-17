@@ -34,7 +34,7 @@ term_taxonomy:
         parent: term_taxonomy
         term_id: term
     mn-references:
-        term_relationships.object_id: post
+        @term_relationships.object_id: post
 
 usermeta:
     id: umeta_id

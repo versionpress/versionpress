@@ -1,6 +1,9 @@
 <?php
 
 namespace VersionPress\Database;
+use Nette\Utils\Arrays;
+use Nette\Utils\Strings;
+
 /**
  * Info about an entity. Basically represents a section of the NEON schema file -  find
  * the parsing logic in the constructor.
@@ -103,6 +106,8 @@ class EntityInfo {
      */
     public $hasReferences = false;
 
+    private $virtualReferences = array();
+
     /**
      * Does the parsing and sets all properties
      *
@@ -146,8 +151,18 @@ class EntityInfo {
         }
 
         if (isset($schemaInfo['mn-references'])) {
-            $this->mnReferences = $schemaInfo['mn-references'];
+            foreach ($schemaInfo['mn-references'] as $reference => $targetEntity) {
+                if (Strings::startsWith($reference, '@')) {
+                    $reference = Strings::substring($reference, 1);
+                    $this->virtualReferences[$reference] = true;
+                }
+                $this->mnReferences[$reference] = $targetEntity;
+            }
             $this->hasReferences = true;
         }
+    }
+
+    public function isVirtualReference($reference) {
+        return isset($this->virtualReferences[$reference]);
     }
 }

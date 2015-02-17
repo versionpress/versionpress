@@ -53,3 +53,8 @@ an M:N relationship (junction table in the SQL). To do that we can use this form
 
     mn-references:
         <junction_table_name>.<column_name>: <foreign_entity_name>
+        @<junction_table_name>.<column_name>: <foreign_entity_name>
+
+As you can see, the reference can be prefixed with shut-up operator. It means that the reference is virtual - the entity does not contain 
+the data but is's checked in Reverter. The reference is usually saved within the foreign entity (e.g. the `post` contains a list of `term_taxonomy` VPIDs
+but the `term_taxonomy` does NOT contain a list of `post` VPIDs).
