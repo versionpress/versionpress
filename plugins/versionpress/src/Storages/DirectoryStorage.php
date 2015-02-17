@@ -1,6 +1,11 @@
 <?php
 namespace VersionPress\Storages;
 
+use Nette\Utils\Strings;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RecursiveRegexIterator;
+use RegexIterator;
 use VersionPress\Filters\EntityFilter;
 use VersionPress\Utils\EntityUtils;
 use VersionPress\Utils\FileSystem;
@@ -64,6 +69,8 @@ abstract class DirectoryStorage extends Storage {
             $newEntity = array_merge($oldEntity, $diff);
             $newEntity = array_filter($newEntity, function ($value) { return $value !== false; });
 
+            /** @noinspection PhpUsageOfSilenceOperatorInspection */
+            @mkdir(dirname($this->getEntityFilename($vpid)), 0777, true); // intentionally @ - it's OK that the directory already exists
             file_put_contents($filename, $this->serializeEntity($vpid, $newEntity));
 
             return $this->createChangeInfo($oldEntity, $newEntity, !$isExistingEntity ? 'create' : 'edit');
@@ -106,7 +113,8 @@ abstract class DirectoryStorage extends Storage {
     }
 
     public function getEntityFilename($id) {
-        return $this->directory . '/' . $id . '.ini';
+        $vpidPath = Strings::substring($id, 0, 2) . '/' . $id;
+        return $this->directory . '/' . $vpidPath . '.ini';
     }
 
     protected function deserializeEntity($serializedEntity) {
@@ -128,13 +136,12 @@ abstract class DirectoryStorage extends Storage {
     private function getEntityFiles() {
         if (!is_dir($this->directory))
             return array();
-        $excludeList = array('.', '..');
-        $files = scandir($this->directory);
 
-        $directory = $this->directory;
-        return array_map(function ($filename) use ($directory) {
-            return $directory . '/' . $filename;
-        }, array_diff($files, $excludeList));
+        $directoryIterator = new RecursiveDirectoryIterator($this->directory);
+        $recursiveIterator = new RecursiveIteratorIterator($directoryIterator);
+        $iniFilesIterator = new RegexIterator($recursiveIterator, '~^.+\.ini$~i', RecursiveRegexIterator::GET_MATCH);
+
+        return array_keys(iterator_to_array($iniFilesIterator));
     }
 
     private function loadAllFromFiles($entityFiles) {

@@ -183,7 +183,7 @@ class CommitAsserter {
      *
      *  - %vpdb% expands to "wp-content/vpdb"
      *  - %VPID% expands to the VPID of the committed entity
-     *  - %vptag(TAG_NAME)% expands to the value of given TAG_NAME
+     *  - %VPID(TAG_NAME)% expands to VPID stored in given TAG_NAME
      *
      * Placeholders are case sensitive.
      *
@@ -310,19 +310,24 @@ class CommitAsserter {
         }
 
         $containsVpId = Strings::contains($path, "%VPID%");
-        $containsVpTag = Strings::contains($path, "%vptag");
+        $containsVpTag = Strings::contains($path, "%VPID(");
 
         if ($containsVpId || $containsVpTag) {
             $changeInfo = $this->getChangeInfo($this->getCommit($whichCommit));
 
             if ($containsVpId) {
-                $path = str_replace("%VPID%", ChangeInfoUtils::getVpid($changeInfo), $path);
+                $vpid = ChangeInfoUtils::getVpid($changeInfo);
+                $vpidPath = Strings::substring($vpid, 0, 2) . '/' . $vpid;
+                $path = str_replace("%VPID%", $vpidPath, $path);
             }
 
             if ($containsVpTag) {
                 $commitMessage = $changeInfo->getCommitMessage();
-                $path = preg_replace_callback('/(.*)%vptag\((.*)\)%(.*)/', function ($parts) use ($commitMessage) {
-                    return $parts[1] . $commitMessage->getVersionPressTag($parts[2]) . $parts[3];
+                $path = preg_replace_callback('/(.*)%VPID\((.*)\)%(.*)/', function ($parts) use ($commitMessage) {
+                    $vpid = $commitMessage->getVersionPressTag($parts[2]);
+                    $vpidPath = Strings::substring($vpid, 0, 2) . '/' . $vpid;
+
+                    return $parts[1] . $vpidPath . $parts[3];
                 }, $path);
             }
         }

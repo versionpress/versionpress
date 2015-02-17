@@ -81,7 +81,7 @@ class UsersTest extends SeleniumTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("usermeta/edit");
         $commitAsserter->assertCommitTag("VP-User-Login", $this->testUser['login']);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/users/%vptag(VP-User-Id)%.ini");
+        $commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID(VP-User-Id)%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
     }
 
