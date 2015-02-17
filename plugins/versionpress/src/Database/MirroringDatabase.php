@@ -147,11 +147,17 @@ class MirroringDatabase extends ExtendedWpdb {
                 }
 
                 if ($entityName === 'postmeta' && !isset($where['vp_post_id'])) {
-                    $where['vp_post_id'] = $this->get_var("select HEX(reference_vp_id) from {$this->dbSchemaInfo->getPrefixedTableName('vp_reference_details')} where `table` = 'postmeta' and id = " . $where[$idColumnName]);
+                    $vpIdTable = $this->dbSchemaInfo->getPrefixedTableName('vp_id');
+                    $postMetaTable = $this->dbSchemaInfo->getPrefixedTableName('postmeta');
+
+                    $where['vp_post_id'] = $this->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = 'posts' AND ID = (SELECT post_id FROM $postMetaTable WHERE meta_id = $id)");
                 }
 
                 if ($entityName === 'usermeta' && !isset($where['vp_user_id'])) {
-                    $where['vp_user_id'] = $this->get_var("select HEX(reference_vp_id) from {$this->dbSchemaInfo->getPrefixedTableName('vp_reference_details')} where `table` = 'usermeta' and id = " . $where[$idColumnName]);
+                    $vpIdTable = $this->dbSchemaInfo->getPrefixedTableName('vp_id');
+                    $userMetaTable = $this->dbSchemaInfo->getPrefixedTableName('usermeta');
+
+                    $where['vp_user_id'] = $this->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = 'users' AND ID = (SELECT user_id FROM $userMetaTable WHERE umeta_id = $id)");
                 }
 
                 $this->deleteId($entityName, $id);

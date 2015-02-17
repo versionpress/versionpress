@@ -137,8 +137,7 @@ function vp_register_hooks() {
 
     add_action('untrashed_post_comments', function ($postId) use ($wpdb, $dbSchemaInfo) {
         $commentsTable = $dbSchemaInfo->getPrefixedTableName("comment");
-        $referenceDetailsView = $dbSchemaInfo->getPrefixedTableName("vp_reference_details");
-        $commentStatusSql = "select c.comment_ID, c.comment_approved from {$referenceDetailsView} r join {$commentsTable} c on c.comment_ID = r.id where `table` = 'comments' and r.reference_id = {$postId}";
+        $commentStatusSql = "select comment_ID, comment_approved from {$commentsTable} where comment_post_ID = {$postId}";
         $comments = $wpdb->get_results($commentStatusSql, ARRAY_A);
 
         foreach ($comments as $comment) {
@@ -148,14 +147,14 @@ function vp_register_hooks() {
         }
     });
 
-    add_action('deleted_post_meta', function ($metaIds) use ($wpdb, $dbSchemaInfo) {
+    add_action('delete_post_meta', function ($metaIds) use ($wpdb, $dbSchemaInfo) {
         $idColumnName = $dbSchemaInfo->getEntityInfo("postmeta")->idColumnName;
         foreach ($metaIds as $metaId) {
             $wpdb->delete($dbSchemaInfo->getPrefixedTableName("postmeta"), array($idColumnName => $metaId), null, false);
         }
     });
 
-    add_action('deleted_user_meta', function ($metaIds) use ($wpdb, $dbSchemaInfo) {
+    add_action('delete_user_meta', function ($metaIds) use ($wpdb, $dbSchemaInfo) {
         $idColumnName = $dbSchemaInfo->getEntityInfo("usermeta")->idColumnName;
         foreach ($metaIds as $metaId) {
             $wpdb->delete($dbSchemaInfo->getPrefixedTableName("usermeta"), array($idColumnName => $metaId), null, false);
