@@ -1,7 +1,9 @@
 <?php
 namespace VersionPress\Database;
 
+use Nette\Utils\Arrays;
 use VersionPress\Storages\Mirror;
+use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\IdUtil;
 
 /**
@@ -48,10 +50,6 @@ class MirroringDatabase extends ExtendedWpdb {
         if ($this->dbSchemaInfo->getEntityInfo($entityName)->usesGeneratedVpids) {
             $data['vp_id'] = $this->generateId();
             $this->saveId($entityName, $id, $data['vp_id']);
-        }
-
-        if ($this->dbSchemaInfo->getEntityInfo($entityName)->hasReferences) {
-            $data = $this->saveReferences($entityName, $data);
         }
 
         $data[$this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName] = $id;
@@ -111,11 +109,6 @@ class MirroringDatabase extends ExtendedWpdb {
                 }
 
                 $data = $this->replaceForeignKeysWithReferences($entityName, $data);
-
-				if ($this->dbSchemaInfo->getEntityInfo($entityName)->hasReferences) {
-                    $data = $this->saveReferences($entityName, $data);
-                }
-
                 $this->mirror->save($entityName, $data);
             }
             return $result;
@@ -140,7 +133,6 @@ class MirroringDatabase extends ExtendedWpdb {
 
         if ($this->dbSchemaInfo->getEntityInfo($entityName)->usesGeneratedVpids) {
             $ids = array();
-            $hasReferences = $this->dbSchemaInfo->getEntityInfo($entityName)->hasReferences;
             $idColumnName = $this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName;
             if (isset($where[$idColumnName])) {
                 $ids[] = $where[$idColumnName];
@@ -162,10 +154,6 @@ class MirroringDatabase extends ExtendedWpdb {
                     $where['vp_user_id'] = $this->get_var("select HEX(reference_vp_id) from {$this->dbSchemaInfo->getPrefixedTableName('vp_reference_details')} where `table` = 'usermeta' and id = " . $where[$idColumnName]);
                 }
 
-                if ($hasReferences) {
-                    $this->deleteReferences($entityName, $id);
-                }
-
                 $this->deleteId($entityName, $id);
                 $this->mirror->delete($entityName, $where);
             }
@@ -181,32 +169,11 @@ class MirroringDatabase extends ExtendedWpdb {
         return substr($tableName, strlen($this->prefix));
     }
 
-    private function addTablePrefix($entityName) {
-        return $this->prefix . $entityName;
-    }
-
     private function saveId($entityName, $id, $vpId) {
         $vpIdTableName = $this->getVpIdTableName();
         $tableName = $this->dbSchemaInfo->getTableName($entityName);
         $query = "INSERT INTO $vpIdTableName (`vp_id`, `table`, `id`) VALUES (UNHEX('$vpId'), \"$tableName\", $id)";
         $this->query($query);
-    }
-
-    private function saveReference($entityName, $referenceName, $vpId, $id) {
-        $referenceId = $this->getReferenceId($entityName, $referenceName, $id);
-
-        if ($referenceId === null)
-            return null;
-
-        $this->creteReferenceRecord($entityName, $referenceName, $vpId, $referenceId);
-        return $referenceId;
-    }
-
-    private function deleteReferences($entityName, $id) {
-        $referencesTableName = $this->getVpReferenceTableName();
-        $vpId = $this->getVpId($entityName, $id);
-        $deleteQuery = "DELETE FROM $referencesTableName WHERE vp_id = UNHEX('$vpId')";
-        $this->query($deleteQuery);
     }
 
     private function deleteId($entityName, $id) {
@@ -217,39 +184,7 @@ class MirroringDatabase extends ExtendedWpdb {
     }
 
     private function getVpIdTableName() {
-        return $this->addTablePrefix('vp_id');
-    }
-
-    private function getVpReferenceTableName() {
-        return $this->addTablePrefix('vp_references');
-    }
-
-    private function creteReferenceRecord($entityName, $referenceName, $vpId, $referenceId) {
-        $vpReferenceTableName = $this->getVpReferenceTableName();
-        $tableName = $this->dbSchemaInfo->getTableName($entityName);
-        $query = "INSERT INTO $vpReferenceTableName (`table`, `reference`, `vp_id`, `reference_vp_id`)
-                    VALUES (\"$tableName\", \"$referenceName\", UNHEX('$vpId'), UNHEX('$referenceId'))
-                    ON DUPLICATE KEY UPDATE `reference_vp_id` = VALUES(reference_vp_id)";
-        $this->query($query);
-    }
-
-    private function getReferenceId($entityName, $referenceName, $id) {
-        $referencedEntityName = $this->dbSchemaInfo->getEntityInfo($entityName)->references[$referenceName];
-        $referencedTable = $this->dbSchemaInfo->getTableName($referencedEntityName);
-        $referenceId = $this->getVpId($referencedTable, $id);
-        return $referenceId;
-    }
-
-    private function saveReferences($entityName, $data) {
-        $references = $this->dbSchemaInfo->getEntityInfo($entityName)->references;
-        foreach ($references as $referenceName => $referenceInfo) {
-            if (isset($data[$referenceName]) && $data[$referenceName] > 0) {
-                $referenceId = $this->saveReference($entityName, $referenceName, $data['vp_id'], $data[$referenceName]);
-                $data['vp_' . $referenceName] = $referenceId;
-            }
-            unset($data[$referenceName]);
-        }
-        return $data;
+        return $this->dbSchemaInfo->getPrefixedTableName('vp_id');
     }
 
     private function generateId() {
