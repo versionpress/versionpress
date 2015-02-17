@@ -71,7 +71,6 @@ class Initializer {
         $this->createVersionPressTables();
         $this->lockDatabase();
         $this->createVpids();
-        $this->createVpidReferences();
         $this->saveDatabaseToStorages();
         $this->commitDatabase();
         $this->createGitRepository();
@@ -86,8 +85,6 @@ class Initializer {
         $table_prefix = $this->database->prefix;
         $process = array();
 
-        $process[] = "DROP VIEW IF EXISTS `{$table_prefix}vp_reference_details`";
-        $process[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_references`";
         $process[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_id`";
         $process[] = "CREATE TABLE `{$table_prefix}vp_id` (
           `vp_id` BINARY(16) NOT NULL,
@@ -97,24 +94,6 @@ class Initializer {
           UNIQUE KEY `table_id` (`table`,`id`),
           KEY `id` (`id`)
         ) ENGINE=InnoDB;";
-
-        $process[] = "CREATE TABLE `{$table_prefix}vp_references` (
-          `table` VARCHAR(64) NOT NULL,
-          `reference` VARCHAR(64) NOT NULL,
-          `vp_id` BINARY(16) NOT NULL,
-          `reference_vp_id` BINARY(16) NOT NULL,
-          PRIMARY KEY (`table`,`reference`,`vp_id`),
-          KEY `reference_vp_id` (`reference_vp_id`),
-          KEY `vp_id` (`vp_id`),
-          CONSTRAINT `ref_vp_id` FOREIGN KEY (`vp_id`) REFERENCES `{$table_prefix}vp_id` (`vp_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-          CONSTRAINT `ref_reference_vp_id` FOREIGN KEY (`reference_vp_id`) REFERENCES `{$table_prefix}vp_id` (`vp_id`) ON DELETE CASCADE ON UPDATE CASCADE
-        ) ENGINE=InnoDB;";
-
-        $process[] = "CREATE VIEW `{$table_prefix}vp_reference_details` AS
-          SELECT `vp_id`.*, `vp_ref`.`reference`, `vp_ref`.`reference_vp_id`, `vp_id_ref`.`id` `reference_id`
-          FROM `{$table_prefix}vp_id` `vp_id`
-          JOIN `{$table_prefix}vp_references` `vp_ref` ON `vp_id`.`vp_id` = `vp_ref`.`vp_id`
-          JOIN `{$table_prefix}vp_id` `vp_id_ref` ON `vp_ref`.`reference_vp_id` = `vp_id_ref`.`vp_id`;";
 
         foreach ($process as $query) {
             $this->database->query($query);
@@ -184,66 +163,6 @@ class Initializer {
             $query = "INSERT INTO {$this->getTableName('vp_id')} (`table`, id, vp_id) VALUES (\"$tableName\", $entityId, UNHEX('$vpId'))";
             $this->database->query($query);
             $this->idCache[$entityName][$entityId] = $vpId;
-        }
-    }
-
-    /**
-     * Creates mappings between VPIDs for all applicable entities (those that have VPIDs and reference
-     * other entitites with VPIDs). Stores those mappings into the `vp_references` table.
-     */
-    private function createVpidReferences() {
-
-        $entityNames = $this->dbSchema->getAllEntityNames();
-
-        foreach ($entityNames as $entityName) {
-            $this->createVpidReferencesForEntitiesOfType($entityName);
-            $this->reportProgressChange("Saved references for " . $entityName);
-        }
-
-        $this->reportProgressChange(InitializerStates::REFERENCES_CREATED);
-
-    }
-
-    /**
-     * If entity type identified by $entityName has references to other entity types, it creates a mapping
-     * between VPIDs for all the entities of the current type.
-     *
-     * @param string $entityName E.g., "post"
-     */
-    private function createVpidReferencesForEntitiesOfType($entityName) {
-
-        if (!$this->dbSchema->getEntityInfo($entityName)->hasReferences) {
-            return;
-        }
-
-        $references = $this->dbSchema->getEntityInfo($entityName)->references;
-
-        $idColumnName = $this->dbSchema->getEntityInfo($entityName)->idColumnName;
-        $referenceNames = array_keys($references);
-        $entities = $this->database->get_results("SELECT $idColumnName, " . join(", ", $referenceNames) . " FROM {$this->getTableName($entityName)}", ARRAY_A);
-
-        foreach ($entities as $entity) {
-            foreach ($references as $reference => $targetEntity) {
-                if ($entity[$reference] == 0) {
-                    continue;
-                }
-
-                $entityId = $entity[$idColumnName];
-                $referenceId = $entity[$reference];
-
-                if (!isset($this->idCache[$entityName][$entityId]) || !isset($this->idCache[$targetEntity][$referenceId])) {
-                    continue; // VersionPress is not tracking this entity
-                }
-
-                $vpId = $this->idCache[$entityName][$entityId];
-                $referenceVpId = $this->idCache[$targetEntity][$referenceId];
-
-                $tableName = $this->dbSchema->getTableName($entityName);
-
-                $query = "INSERT INTO {$this->getTableName('vp_references')} (`table`, reference, vp_id, reference_vp_id) " .
-                    "VALUES (\"$tableName\", \"$reference\", UNHEX('$vpId'), UNHEX('$referenceVpId'))";
-                $this->database->query($query);
-            }
         }
     }
 
@@ -344,9 +263,12 @@ class Initializer {
             $terms = get_the_terms($id, $taxonomy);
             if ($terms) {
                 $idCache = $this->idCache;
-                $post[$taxonomy] = array_map(function ($term) use ($idCache) {
-                    return $idCache['term'][$term->term_id];
+                $referencedTaxonomies = array_map(function ($term) use ($idCache) {
+                    return $idCache['term_taxonomy'][$term->term_taxonomy_id];
                 }, $terms);
+
+                $currentTaxonomies = isset($post['vp_term_taxonomy']) ? $post['vp_term_taxonomy'] : array();
+                $post['vp_term_taxonomy'] = array_merge($currentTaxonomies, $referencedTaxonomies);
             }
         }
 
@@ -367,7 +289,7 @@ class Initializer {
 
 
     /**
-     * Rolls back database if it was locked by `lockDatase()` and an unexpected shutdown occurred.
+     * Rolls back database if it was locked by `lockDatabase()` and an unexpected shutdown occurred.
      */
     private function rollbackDatabase() {
         if ($this->isDatabaseLocked) {

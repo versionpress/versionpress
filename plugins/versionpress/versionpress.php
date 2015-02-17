@@ -386,8 +386,6 @@ function vp_admin_post_confirm_deactivation() {
 
     $table_prefix = $wpdb->prefix;
 
-    $queries[] = "DROP VIEW IF EXISTS `{$table_prefix}vp_reference_details`";
-    $queries[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_references`";
     $queries[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_id`";
 
     $vpOptionsReflection = new ReflectionClass('VersionPress\Initialization\VersionPressOptions');
