@@ -11,7 +11,7 @@ class SynchronizationProcess {
      */
     private $synchronizerFactory;
 
-    private $defaultSynchronizationSequence = array('option', 'user', 'usermeta', 'post', 'postmeta', 'comment', 'term', 'term_taxonomy', 'term_relationship');
+    private $defaultSynchronizationSequence = array('option', 'user', 'usermeta', 'post', 'postmeta', 'comment', 'term', 'term_taxonomy');
 
     function __construct(SynchronizerFactory $synchronizerFactory) {
         $this->synchronizerFactory = $synchronizerFactory;
@@ -29,11 +29,21 @@ class SynchronizationProcess {
         }
 
         $synchronizationSequence = $this->sortEntitiesToSynchronize($entitiesToSynchronize);
+        $synchronizerFactory = $this->synchronizerFactory;
+        $synchronizationTasks = array_map(function ($synchronizerName) use ($synchronizerFactory) {
+            $synchronizer = $synchronizerFactory->createSynchronizer($synchronizerName);
+            return array ('synchronizer' => $synchronizer, 'task' => Synchronizer::SYNCHRONIZE_EVERYTHING);
+        }, $synchronizationSequence);
 
-        foreach ($synchronizationSequence as $synchronizerName) {
-            $this->synchronizerFactory
-                ->createSynchronizer($synchronizerName)
-                ->synchronize();
+        while (count($synchronizationTasks) > 0) {
+            $task = array_shift($synchronizationTasks);
+            /** @var Synchronizer $synchronizer */
+            $synchronizer = $task['synchronizer'];
+            $result = $synchronizer->synchronize($task['task']);
+
+            if ($result !== null) {
+                $synchronizationTasks[] = array('synchronizer' => $synchronizer, 'task' => $result);
+            }
         }
     }
 

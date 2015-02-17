@@ -243,7 +243,6 @@ class Reverter {
         if ($this->wasModified($modifiedFiles, 'posts')) {
             $entitiesToSynchronize[] = 'post';
             $entitiesToSynchronize[] = 'postmeta';
-            $entitiesToSynchronize[] = 'term_relationship';
         }
 
         if ($this->wasModified($modifiedFiles, 'comments')) {

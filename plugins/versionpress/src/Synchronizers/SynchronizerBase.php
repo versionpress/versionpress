@@ -14,6 +14,8 @@ use wpdb;
  */
 abstract class SynchronizerBase implements Synchronizer {
 
+    const SYNCHRONIZE_MN_REFERENCES = 'mn-references';
+
     private $entityName;
     private $idColumnName;
 
@@ -25,6 +27,9 @@ abstract class SynchronizerBase implements Synchronizer {
 
     /** @var DbSchemaInfo */
     private $dbSchema;
+
+    /** @var array|null */
+    private $entities = null;
 
     /**
      * @param Storage $storage Specific Synchronizers will use specific storage types, see VersionPress\Synchronizers\SynchronizerFactory
@@ -40,13 +45,35 @@ abstract class SynchronizerBase implements Synchronizer {
         $this->idColumnName = $dbSchema->getEntityInfo($this->entityName)->idColumnName;
     }
 
-    function synchronize() {
-        $entities = $this->loadEntitiesFromStorage();
-        $this->updateDatabase($entities);
-        $this->fixReferences($entities);
-        $this->doEntitySpecificActions();
+    function synchronize($task) {
+        $this->maybeInit();
+        $entities = $this->entities;
+
+        if ($task === Synchronizer::SYNCHRONIZE_EVERYTHING) {
+            $this->updateDatabase($entities);
+            $this->fixSimpleReferences($entities);
+            $fixedMnReferences = $this->fixMnReferences($entities);
+            $this->doEntitySpecificActions();
+
+            if (!$fixedMnReferences) {
+                return self::SYNCHRONIZE_MN_REFERENCES;
+            }
+        }
+
+        if ($task === self::SYNCHRONIZE_MN_REFERENCES) {
+            $this->fixMnReferences($entities);
+        }
+
+        return null;
     }
 
+    private function maybeInit() {
+        if ($this->entities !== null) {
+            return;
+        }
+
+        $this->entities = $this->loadEntitiesFromStorage();
+    }
 
     //--------------------------------------
     // Step 1 - loading entities from storage
@@ -215,81 +242,136 @@ abstract class SynchronizerBase implements Synchronizer {
 
 
     //--------------------------------------
-    // Step 2 - Fixing references
+    // Step 3 - Fixing references
     //--------------------------------------
 
-    private function fixReferences($entities) {
-
-        if (!($this->dbSchema->getEntityInfo($this->entityName)->hasReferences)) {
+    private function fixSimpleReferences($entities) {
+        if (!$this->dbSchema->getEntityInfo($this->entityName)->hasReferences) {
             return;
         }
 
-        $usedReferences = array();
         foreach ($entities as $entity) {
-            $referenceDetails = $this->fixReferencesOfOneEntity($entity);
-            $usedReferences = array_merge($usedReferences, $referenceDetails);
-        }
-
-        if (count($usedReferences) > 0) { // update reference table
-            $referenceTableName = $this->getPrefixedTableName('vp_references');
-
-            $insertQuery = "INSERT INTO {$referenceTableName} (" . join(array_keys($usedReferences[0]), ', ') . ")
-            VALUES (" . join(array_map(function ($values) {
-                    return join($values, ', ');
-                }, $usedReferences), '), (') . ")
-            ON DUPLICATE KEY UPDATE reference_vp_id = VALUES(reference_vp_id)";
-            $this->executeQuery($insertQuery);
-
-            $constraintOfAllExistingReferences = 'NOT((' . join(array_map(function ($a) {
-                    return join(ArrayUtils::parametrize($a), ' AND ');
-                }, $usedReferences), ') OR (') . '))';
-            $deleteQuery = "DELETE FROM {$referenceTableName} WHERE {$constraintOfAllExistingReferences} AND `table` = \"{$this->dbSchema->getTableName($this->entityName)}\"";
-            $this->executeQuery($deleteQuery);
-        }
-
-        $references = $this->dbSchema->getEntityInfo($this->entityName)->references;
-        foreach ($references as $reference => $_) { // update foreign keys by VersionPress references
-            $updateQuery = "UPDATE {$this->getPrefixedTableName($this->entityName)} entity SET `{$reference}` =
-            IFNULL((SELECT reference_id FROM {$this->getPrefixedTableName('vp_reference_details')} ref
-            WHERE ref.id=entity.{$this->idColumnName} AND `table` = \"{$this->dbSchema->getTableName($this->entityName)}\" and reference = \"{$reference}\"), entity.{$reference})";
-            $this->executeQuery($updateQuery);
+            $this->fixSimpleReferencesOfOneEntity($entity);
         }
     }
 
-    private function fixReferencesOfOneEntity($entity) {
-        $references = $this->getAllReferences($entity);
-        $tableName = $this->dbSchema->getTableName($this->entityName);
+    /**
+     * Fixes 1:N references
+     *
+     * @param $entity
+     */
+    private function fixSimpleReferencesOfOneEntity($entity) {
+        $entityInfo = $this->dbSchema->getEntityInfo($this->entityName);
+        $references = $entityInfo->references;
 
-        $referencesDetails = array();
-        foreach ($references as $referenceName => $reference) {
-            if ($reference == "")
-                continue;
-            $referencesDetails[] = array(
-                '`table`' => "\"" . $tableName . "\"",
-                'reference' => "\"" . $referenceName . "\"",
-                'vp_id' => 'UNHEX("' . $entity['vp_id'] . '")',
-                'reference_vp_id' => 'UNHEX("' . $reference . '")'
-            );
-        }
-
-        return $referencesDetails;
-    }
-
-    private function getAllReferences($entity) {
-        $references = array();
-        $referencesInfo = $this->dbSchema->getEntityInfo($this->entityName)->references;
-
-        foreach ($entity as $key => $value) {
-            if (Strings::startsWith($key, 'vp_')) {
-                $key = Strings::substring($key, 3);
-                if (isset($referencesInfo[$key]))
-                    $references[$key] = $value;
+        $referencesToUpdate = array();
+        foreach ($references as $reference => $referencedEntity) {
+            $vpReference = "vp_$reference";
+            if (isset($entity[$vpReference])) {
+                $referencesToUpdate[$reference] = $entity[$vpReference];
             }
         }
 
-        return $references;
+        if (count($referencesToUpdate) === 0) {
+            return;
+        }
+
+        $idMap = $this->getIdsForVpIds($referencesToUpdate);
+
+        $entityTable = $this->dbSchema->getPrefixedTableName($this->entityName);
+        $vpIdTable = $this->dbSchema->getPrefixedTableName('vp_id');
+        $idColumnName = $entityInfo->idColumnName;
+
+        $updateSql = "UPDATE $entityTable SET ";
+
+        $newReferences = array_map(function ($vpId) use ($idMap) {
+            return $idMap[$vpId];
+        }, $referencesToUpdate);
+        $updateSql .= join(", ", ArrayUtils::parametrize($newReferences));
+
+        $updateSql .= "WHERE $idColumnName=(SELECT id FROM $vpIdTable WHERE vp_id=UNHEX(\"$entity[vp_id]\"))";
+        $this->database->query($updateSql);
     }
 
+    private function fixMnReferences($entities) {
+        $entityInfo = $this->dbSchema->getEntityInfo($this->entityName);
+        $mnReferences = $entityInfo->mnReferences;
+
+        $referencesToSave = $this->getExistingMnReferences($entities);
+        $vpIdsToLoad = $this->getAllVpIdsUsedInReferences($referencesToSave);
+        $idMap = $this->getIdsForVpIds($vpIdsToLoad);
+        $hasAllIds = $this->idMapContainsAllVpIds($idMap, $vpIdsToLoad);
+
+        if (!$hasAllIds) {
+            return false;
+        }
+
+        foreach ($referencesToSave as $reference => $relations) {
+            if ($entityInfo->isVirtualReference($reference)) {
+                continue;
+            }
+
+            list($table, $targetColumn) = explode(".", $reference);
+            $prefixedTable = $this->dbSchema->getPrefixedTableName($table);
+            $this->database->query("TRUNCATE TABLE $prefixedTable");
+
+            $targetEntity = $mnReferences[$reference];
+            $sourceColumn = $this->getSourceColumn($targetEntity, $reference);
+
+            $valuesForInsert = array_map(function ($relation) use ($idMap) {
+                $sourceId = $idMap[$relation['vp_id']];
+                $targetId = $idMap[$relation['referenced_vp_id']];
+                return "($sourceId, $targetId)";
+            }, $relations);
+
+            $valuesString = join(", ", $valuesForInsert);
+            $insertSql = "INSERT INTO $prefixedTable ($sourceColumn, $targetColumn) VALUES $valuesString";
+            $this->database->query($insertSql);
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns name of column referencing synchronized entity in the junction table.
+     * Example:
+     * We are synchronizing posts with M:N reference to the taxonomies. The reference is defined
+     * as term_relationships.term_taxonomy_id => term_taxonomy. Name of column referencing term_taxonomy is obvious,
+     * it's term_taxonomy_id. However we need also name of column referencing the post. We can find this name
+     * in the definition of M:N references of term_taxonomy, where it's defined as term_relationships.object_id => post.
+     * So in the end we are looking for M:N reference to post with same junction table (term_relationships).
+     *
+     * @param $targetEntity
+     * @param $reference
+     * @return string
+     */
+    private function getSourceColumn($targetEntity, $reference) {
+        list($table) = explode(".", $reference);
+        $targetEntityMnReferences = $this->dbSchema->getEntityInfo($targetEntity)->mnReferences;
+        foreach ($targetEntityMnReferences as $reference => $referencedEntity) {
+            list($referencedTable, $referenceColumn) = explode(".", $reference);
+            if ($referencedTable === $table && $referencedEntity === $this->entityName) {
+                return $referenceColumn;
+            }
+        }
+
+        return null;
+    }
+
+    private function getIdsForVpIds($referencesToUpdate) {
+        if (count($referencesToUpdate) === 0) {
+            return array();
+        }
+
+        $vpIdTable = $this->dbSchema->getPrefixedTableName('vp_id');
+        $vpIds = array_map(function ($vpId) {
+            return 'UNHEX("' . $vpId . '")';
+        }, $referencesToUpdate);
+
+        $vpIdsRestriction = join(', ', $vpIds);
+
+        return $this->database->get_results("SELECT HEX(vp_id), id FROM $vpIdTable WHERE vp_id IN ($vpIdsRestriction)", ARRAY_MAP);
+    }
 
     //--------------------------------------
     // Step 4 - entity specific actions
@@ -324,5 +406,55 @@ abstract class SynchronizerBase implements Synchronizer {
         return $result;
     }
 
+    /**
+     * @param $entities
+     * @return array
+     */
+    private function getExistingMnReferences($entities) {
+        $entityInfo = $this->dbSchema->getEntityInfo($this->entityName);
+        $mnReferences = $entityInfo->mnReferences;
 
+        $referencesToFix = array();
+        foreach ($entities as $entity) {
+            foreach ($mnReferences as $reference => $referencedEntity) {
+                $vpReference = "vp_$referencedEntity";
+                if (!isset($entity[$vpReference]) || count($entity[$vpReference]) == 0) {
+                    continue;
+                }
+
+                foreach ($entity[$vpReference] as $referencedVpId) {
+                    $referencesToFix[$reference][] = array(
+                        'vp_id' => $entity['vp_id'],
+                        'referenced_vp_id' => $referencedVpId
+                    );
+                }
+            }
+        }
+        return $referencesToFix;
+    }
+
+    /**
+     * @param $referencesToSave
+     * @return array
+     */
+    private function getAllVpIdsUsedInReferences($referencesToSave) {
+        $vpIds = array();
+        foreach ($referencesToSave as $relations) {
+            foreach ($relations as $relation) {
+                $vpIds[] = $relation['vp_id'];
+                $vpIds[] = $relation['referenced_vp_id'];
+            }
+        }
+
+        return $vpIds;
+    }
+
+    private function idMapContainsAllVpIds($idMap, $vpIds) {
+        foreach ($vpIds as $vpId) {
+            if (!isset($idMap[$vpId])) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

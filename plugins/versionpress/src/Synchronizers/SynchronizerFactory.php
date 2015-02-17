@@ -40,7 +40,6 @@ class SynchronizerFactory {
             'usermeta' => 'VersionPress\Synchronizers\UserMetaSynchronizer',
             'term' => 'VersionPress\Synchronizers\TermsSynchronizer',
             'term_taxonomy' => 'VersionPress\Synchronizers\TermTaxonomySynchronizer',
-            'term_relationship' => 'VersionPress\Synchronizers\TermRelationshipsSynchronizer',
         );
 
         $synchronizerClass = $synchronizerClasses[$synchronizerName];

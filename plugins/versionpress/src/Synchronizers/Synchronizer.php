@@ -19,10 +19,20 @@ namespace VersionPress\Synchronizers;
  */
 interface Synchronizer {
 
+    const SYNCHRONIZE_EVERYTHING = 'everything';
+
     /**
      * Synchronizes entities from storage to the database. It generally only works with tracked
      * entities, i.e. the ignored (untracked) rows in the database are left untouched. The rows
-     * corresponding to tracked entities are in sync with the storage after this method is done.
+     * corresponding to tracked entities are usually in sync with the storage after this method
+     * is done. It may happen that the synchronizer cannot synchronize everything in the first
+     * pass. Because of this, the synchronize method takes a task for sychronization (usually
+     * "everything" for the first pass) and returns another task that isn't done yet. It's up
+     * to the SynchronizationProcess to call the synchronize method again with this task when
+     * the first pass is done.
+     *
+     * @param string $task
+     * @return string|null
      */
-    function synchronize();
+    function synchronize($task);
 }
