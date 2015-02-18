@@ -432,7 +432,9 @@ class WpAutomation {
      * @return string
      */
     public static function runWpCliCommand($command, $subcommand, $args = array()) {
-        $cliCommand = "wp $command";
+        $wpExecutable = realpath(__DIR__ . '/../../../../ext-libs/vendor/bin/wp');
+
+        $cliCommand = "$wpExecutable $command";
 
         if (is_array($subcommand)) {
             $args = $subcommand;
