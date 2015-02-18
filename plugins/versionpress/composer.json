@@ -16,19 +16,14 @@
         "phpunit/phpunit": "3.7.*",
         "phpunit/phpunit-selenium": "1.4.0",
         "janvoracek/comment-stripper": "dev-master",
-        "nette/database": "2.2.*"
+        "nette/database": "2.2.*",
+        "fzaninotto/faker": "1.4.*"
     },
     "license": "GPL",
     "authors": [
         {
             "name": "VersionPress Team",
             "email": "info@versionpress.net"
-        }
-    ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/JanVoracek/nette-minified"
         }
     ]
 }
