@@ -177,8 +177,10 @@ function _vp_show_progress_message($progressMessage) {
                             global $versionPressContainer;
                             /** @var GitRepository $repository */
                             $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+                            $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
+                            $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
 
-                            $requirementsChecker = new RequirementsChecker();
+                            $requirementsChecker = new RequirementsChecker($database, $schema);
                             $report = $requirementsChecker->getRequirements();
 
                             foreach ($report as $requirement) {

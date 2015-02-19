@@ -6,11 +6,24 @@ use Exception;
 use Nette\Utils\Strings;
 use Symfony\Component\Process\Process;
 use Utils\SystemInfo;
+use VersionPress\Database\DbSchemaInfo;
+use wpdb;
 
 class RequirementsChecker {
     private $requirements = array();
+    /**
+     * @var wpdb
+     */
+    private $database;
+    /**
+     * @var DbSchemaInfo
+     */
+    private $schema;
 
-    function __construct() {
+    function __construct(wpdb $database, DbSchemaInfo $schema) {
+
+        $this->database = $database;
+        $this->schema = $schema;
 
         // Markdown can be used in the 'help' field
 
@@ -81,9 +94,27 @@ class RequirementsChecker {
             'help' => 'It\'s highly recommended to secure `wp-content/plugins/log` and `wp-content/vpdb` directories from access via browser after activation!'
         );
 
+
+        $setTimeLimitEnabled = (false === strpos(ini_get("disable_functions"), "set_time_limit"));
+        $countOfEntities = $this->countEntities();
+
+        if ($setTimeLimitEnabled) {
+            $help = "The initialization will take a little longer. This website contains $countOfEntities entities, which is a lot.";
+        } else {
+            $help = "The initialization may not finish. This website contains $countOfEntities entities, which is a lot.";
+        }
+
+        $this->requirements[] = array(
+            'name' => 'Web size',
+            'level' => 'warning',
+            'fulfilled' => $countOfEntities < 500,
+            'help' => $help
+        );
+
         $this->everythingFulfilled = array_reduce($this->requirements, function ($carry, $requirement) {
             return $carry && ($requirement['fulfilled'] || $requirement['level'] === 'warning');
         }, true);
+
     }
 
     /**
@@ -184,5 +215,24 @@ class RequirementsChecker {
         $minimumRequiredVersion = $minimumRequiredVersion ? $minimumRequiredVersion : self::GIT_MINIMUM_REQUIRED_VERSION;
         return version_compare($gitVersion, $minimumRequiredVersion, ">=");
 
+    }
+
+    private function getNeededExecutionTime() {
+
+        $entityCount = $this->countEntities();
+        $okTreshold = 500 / 30; // entities per seconds
+        return $entityCount / $okTreshold;
+    }
+
+    private function countEntities() {
+        $entities = $this->schema->getAllEntityNames();
+        $totalEntitiesCount = 0;
+
+        foreach ($entities as $entity) {
+            $table = $this->schema->getPrefixedTableName($entity);
+            $totalEntitiesCount += $this->database->get_var("SELECT COUNT(*) FROM $table");
+        }
+
+        return $totalEntitiesCount;
     }
 }
