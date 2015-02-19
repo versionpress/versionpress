@@ -334,7 +334,7 @@ class WpAutomation {
         }
 
         $code = 'global $versionPressContainer; $initializer = $versionPressContainer->resolve(VersionPress\DI\VersionPressServices::INITIALIZER); $initializer->initializeVersionPress();';
-        self::runWpCliCommand('eval', array($code));
+        self::runWpCliCommand('eval', null, array($code));
     }
 
     /**
@@ -478,9 +478,10 @@ class WpAutomation {
      * Executes a WP-CLI command
      * http://wp-Cli.org/commands/
      *
-     * @param string $command
-     * @param string $subcommand
-     * @param array $args
+     * @param string $command Like "core"
+     * @param string $subcommand Like "config". Might be null, e.g. if the main command is "eval" there is no subcommand.
+     * @param array $args Like array("dbname" => "wordpress", "dbuser" => "wpuser", "positionalargument") which will produce
+     *   something like `--dbname='wordpress' --dbuser='wpuser' 'positionalargument'`
      * @return string
      */
     public static function runWpCliCommand($command, $subcommand, $args = array()) {
@@ -488,17 +489,15 @@ class WpAutomation {
 
         $cliCommand = "$wpExecutable $command";
 
-        if (is_array($subcommand)) {
-            $args = $subcommand;
-        } else {
+        if ($subcommand) {
             $cliCommand .= " $subcommand";
         }
 
         foreach ($args as $name => $value) {
-            if (is_int($name)) { // position based argument without name
-                $cliCommand .= " $value";
+            if (is_int($name)) { // positional argument
+                $cliCommand .= " " . self::vagrantSensitiveEscapeShellArg($value);
             } elseif ($value) {
-                $escapedValue = ProcessUtils::escapeshellarg($value, self::$config->getIsVagrant() ? "linux" : null);
+                $escapedValue = self::vagrantSensitiveEscapeShellArg($value);
                 $cliCommand .= " --$name=$escapedValue";
             } else {
                 $cliCommand .= " --$name";
@@ -506,6 +505,10 @@ class WpAutomation {
         }
 
         return self::exec($cliCommand);
+    }
+
+    private static function vagrantSensitiveEscapeShellArg($arg) {
+        return ProcessUtils::escapeshellarg($arg, self::$config->getIsVagrant() ? "linux" : null);
     }
 
     /**
