@@ -39,6 +39,10 @@ In practice, this means that you need to have a lot of control over your server 
 Here are notes on some of the requirements:
 
 
+### Git
+
+VersionPress takes a strategic dependency on [Git](http://git-scm.com/) which provides [many benefits](../feature-focus/git) but also requires this tool to be installed on the server and accessible from PHP. Make sure that `proc_open()` is enabled on the server and that the Git installation is in the PATH. (Since version 1.0-rc2, you can also explicitly tell VersionPress where to find the binary, see [Configuration](./configuration).)
+
 ### PHP 5.3
 
 WordPress can run on an old and [long unsupported](http://php.net/eol.php) PHP 5.2. We also started with this version but eventually dropped it so that we could use the newer language features and some 3<sup>rd</sup> party libraries that are 5.3+ only.
