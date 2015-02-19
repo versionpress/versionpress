@@ -87,7 +87,7 @@ class SystemInfo {
         $info['git-binary-as-called-by-vp'] = $gitBinary;
         $info['git-full-path'] = $gitPath;
         $info['versionpress-min-required-version'] = RequirementsChecker::GIT_MINIMUM_REQUIRED_VERSION;
-        $info['matches-min-required-version'] = RequirementsChecker::gitMatchesMinimumRequiredVersion($version, RequirementsChecker::GIT_MINIMUM_REQUIRED_VERSION);
+        $info['matches-min-required-version'] = RequirementsChecker::gitMatchesMinimumRequiredVersion($version);
 
         return $info;
 

@@ -42,10 +42,10 @@ class RequirementsChecker {
         );
 
         $this->requirements[] = array(
-            'name' => 'Git 1.9+ installed',
+            'name' => 'Git ' . self::GIT_MINIMUM_REQUIRED_VERSION . '+ installed',
             'level' => 'critical',
             'fulfilled' => $this->tryGit(),
-            'help' => 'Git must be installed on the server. The minimal required version is 1.9. Please [download](http://git-scm.com/) and install it.'
+            'help' => 'Git must be installed on the server. The minimal required version is ' . self::GIT_MINIMUM_REQUIRED_VERSION . '. Please [download](http://git-scm.com/) and install it.'
         );
 
         $this->requirements[] = array(
@@ -143,7 +143,7 @@ class RequirementsChecker {
     private function tryGit() {
         try {
             $gitVersion = SystemInfo::getGitVersion();
-            return self::gitMatchesMinimumRequiredVersion($gitVersion, "1.9");
+            return self::gitMatchesMinimumRequiredVersion($gitVersion);
         } catch (Exception $e) {
             return false;
         }
