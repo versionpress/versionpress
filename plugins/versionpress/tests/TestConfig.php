@@ -20,6 +20,7 @@ class TestConfig {
     private $adminEmail;
     private $adminPassword;
     private $afterRedirectWaitingTime;
+    private $isVagrant;
 
     function __construct(array $rawConfig) {
 
@@ -37,6 +38,7 @@ class TestConfig {
         $this->adminName = $rawConfig['admin-name'];
         $this->adminEmail = $rawConfig['admin-email'];
         $this->adminPassword = $rawConfig['admin-pass'];
+        $this->isVagrant = isset($rawConfig['is-vagrant']) ? $rawConfig['is-vagrant'] == "1" : false;
 
         // Automation
         $this->cleanInstallationsPath = $rawConfig['wp-clean-installations'];
@@ -148,5 +150,12 @@ class TestConfig {
      */
     public function getAfterRedirectWaitingTime() {
         return $this->afterRedirectWaitingTime;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsVagrant() {
+        return $this->isVagrant;
     }
 }

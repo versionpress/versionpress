@@ -10,3 +10,6 @@ test-config.*.ini
 
 # Various PHPUnit reporting formats
 phpunit-log.*
+
+# WP-CLI config
+wp-cli.local.yml

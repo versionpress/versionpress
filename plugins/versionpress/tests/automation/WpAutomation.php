@@ -1,6 +1,8 @@
 <?php
 
+use Nette\Utils\Strings;
 use VersionPress\Utils\FileSystem;
+use VersionPress\Utils\ProcessUtils;
 
 define('CONFIG_FILE', __DIR__ . '/../test-config.ini');
 is_file(CONFIG_FILE) or die('Create test-config.ini for automation to work');
@@ -15,6 +17,7 @@ WpAutomation::$config = new TestConfig(parse_ini_file(CONFIG_FILE));
  *  - NPM packages installed in <project_root>
  *  - Gulp (`gulp -v` works in console)
  *  - `test-config.ini` file created in `versionpress/tests`
+ *  - Vagrant configuration as described on the wiki
  *
  * Currently, WpAutomation is a set of static functions as of v1; other options will be considered for v2, see WP-56.
  *
@@ -87,7 +90,7 @@ class WpAutomation {
 
     public static function activateVersionPress() {
         $activateCommand = "wp plugin activate versionpress";
-        self::exec($activateCommand, self::$config->getSitePath());
+        self::exec($activateCommand);
     }
 
     public static function uninstallVersionPress() {
@@ -296,7 +299,7 @@ class WpAutomation {
     public static function deleteWidgets($widgets) {
         $widgets = trim(is_array($widgets) ? join(' ', $widgets) : $widgets);
         if (strlen($widgets) > 0) {
-            self::exec('wp widget delete ' . $widgets, self::$config->getSitePath());
+            self::exec('wp widget delete ' . $widgets);
         }
     }
 
@@ -434,14 +437,23 @@ class WpAutomation {
     }
 
     /**
-     * Executes a $command from $executionPath
+     * Executes a command. If the command is WP-CLI command (starts with "wp ...") it might be rewritten
+     * for remote execution on Vagrant depending on the config 'is-vagrant' value.
      *
      * @param string $command
-     * @param string $executionPath Working directory for the command
+     * @param string $executionPath Working directory for the command. If null, the path will be determined
+     *   automatically (for WP-CLI commands, it depends whether they will be run locally or on Vagrant).
      * @throws Exception When process execution is not successful
      * @return string
      */
-    private static function exec($command, $executionPath) {
+    private static function exec($command, $executionPath = null) {
+
+        $command = self::possiblyUpdateCommandForRemoteExecution($command);
+
+        if (!$executionPath) {
+            $executionPath = self::$config->getIsVagrant() ? __DIR__ . '/..' : self::$config->getSitePath();
+        }
+
         $process = new \Symfony\Component\Process\Process($command, $executionPath);
         $process->run();
 
@@ -451,7 +463,7 @@ class WpAutomation {
                 // e.g. WP-CLI outputs to STDOUT instead of STDERR
                 $msg = $process->getOutput();
             }
-            throw new Exception('Error executing cmd \'' . $command . '\': ' . $msg);
+            throw new Exception("Error executing cmd '$command' from working directory '$executionPath':\n$msg");
         }
 
         return $process->getOutput();
@@ -479,15 +491,41 @@ class WpAutomation {
 
         foreach ($args as $name => $value) {
             if (is_int($name)) { // position based argument without name
-                $cliCommand .= " \"$value\"";
+                $cliCommand .= " $value";
             } elseif ($value) {
-                $escapedValue = \Symfony\Component\Process\ProcessUtils::escapeArgument($value);
+                $escapedValue = ProcessUtils::escapeshellarg($value, self::$config->getIsVagrant() ? "linux" : null);
                 $cliCommand .= " --$name=$escapedValue";
             } else {
                 $cliCommand .= " --$name";
             }
         }
 
-        return self::exec($cliCommand, self::$config->getSitePath());
+        return self::exec($cliCommand);
+    }
+
+    /**
+     * If the given command is WP-CLI command (starts with "wp ") and the test environment
+     * is a Vagrant machine, updates the command to use WP-CLI-SSH instead.
+     *
+     * @param string $command
+     * @return string
+     */
+    private static function possiblyUpdateCommandForRemoteExecution($command) {
+
+        if (!Strings::startsWith($command, "wp ")) {
+            return $command;
+        }
+
+        $command = Strings::startsWith($command, "wp ") ? substr($command, 3) : $command;
+
+        if (self::$config->getIsVagrant()) {
+            $command = "wp ssh \"$command\" --host=vagrant";
+        } else {
+            $command = "wp $command";
+        }
+
+        return $command;
+
+
     }
 }

@@ -4,20 +4,20 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5a11fac224b783e90b176d7649c65b2e",
+    "hash": "82666632fe823a114a9a25265b75a08a",
     "packages": [
         {
             "name": "ifsnop/mysqldump-php",
-            "version": "v1.4.1",
+            "version": "v1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ifsnop/mysqldump-php.git",
-                "reference": "20027dd9c91c89ac986bbb8fd765176a0b027663"
+                "reference": "1ef0dc4032eb21d1372819b65eff49719a3127fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/20027dd9c91c89ac986bbb8fd765176a0b027663",
-                "reference": "20027dd9c91c89ac986bbb8fd765176a0b027663",
+                "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/1ef0dc4032eb21d1372819b65eff49719a3127fd",
+                "reference": "1ef0dc4032eb21d1372819b65eff49719a3127fd",
                 "shasum": ""
             },
             "require": {
@@ -56,7 +56,7 @@
                 "pdo",
                 "sqlite"
             ],
-            "time": "2014-10-02 20:06:38"
+            "time": "2015-02-05 16:56:40"
         },
         {
             "name": "michelf/php-markdown",
@@ -366,7 +366,7 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v2.6.3",
+            "version": "v2.6.4",
             "target-dir": "Symfony/Component/Filesystem",
             "source": {
                 "type": "git",
@@ -413,17 +413,17 @@
         },
         {
             "name": "symfony/process",
-            "version": "v2.5.9",
+            "version": "v2.5.10",
             "target-dir": "Symfony/Component/Process",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Process.git",
-                "reference": "3309098ce4d9b5e44c04e51bf4541ea466fbe343"
+                "reference": "7b6632c849f87a062301e853f03f71d726520b58"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Process/zipball/3309098ce4d9b5e44c04e51bf4541ea466fbe343",
-                "reference": "3309098ce4d9b5e44c04e51bf4541ea466fbe343",
+                "url": "https://api.github.com/repos/symfony/Process/zipball/7b6632c849f87a062301e853f03f71d726520b58",
+                "reference": "7b6632c849f87a062301e853f03f71d726520b58",
                 "shasum": ""
             },
             "require": {
@@ -456,7 +456,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "http://symfony.com",
-            "time": "2015-01-05 20:58:03"
+            "time": "2015-01-25 04:37:39"
         },
         {
             "name": "tracy/tracy",
@@ -1075,17 +1075,17 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.6.3",
+            "version": "v2.6.4",
             "target-dir": "Symfony/Component/Yaml",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml.git",
-                "reference": "82462a90848a52c2533aa6b598b107d68076b018"
+                "reference": "60ed7751671113cf1ee7d7778e691642c2e9acd8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/82462a90848a52c2533aa6b598b107d68076b018",
-                "reference": "82462a90848a52c2533aa6b598b107d68076b018",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/60ed7751671113cf1ee7d7778e691642c2e9acd8",
+                "reference": "60ed7751671113cf1ee7d7778e691642c2e9acd8",
                 "shasum": ""
             },
             "require": {
@@ -1118,13 +1118,67 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
-            "time": "2015-01-03 15:33:07"
+            "time": "2015-01-25 04:39:26"
+        },
+        {
+            "name": "x-team/wp-cli-ssh",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/xwp/wp-cli-ssh.git",
+                "reference": "7695c9ebea9ea9c51799ea88611aef0c0a4e5dba"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/xwp/wp-cli-ssh/zipball/7695c9ebea9ea9c51799ea88611aef0c0a4e5dba",
+                "reference": "7695c9ebea9ea9c51799ea88611aef0c0a4e5dba",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "wp-cli-ssh.php"
+                ]
+            },
+            "license": [
+                "GPLv2"
+            ],
+            "authors": [
+                {
+                    "name": "Jonathan Bardo",
+                    "email": "jonathan.bardo@x-team.com",
+                    "homepage": "https://github.com/jonathanbardo",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Weston Ruter",
+                    "email": "weston@x-team.com",
+                    "homepage": "http://weston.ruter.net",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Invoke WP-CLI on another server via SSH from local machine",
+            "homepage": "https://github.com/x-team/wp-cli-ssh",
+            "keywords": [
+                "remote",
+                "ssh",
+                "wp-cli"
+            ],
+            "support": {
+                "issues": "https://github.com/x-team/wp-cli-ssh/issues",
+                "source": "https://github.com/x-team/wp-cli-ssh"
+            },
+            "time": "2014-06-06 19:16:44"
         }
     ],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "janvoracek/comment-stripper": 20
+        "janvoracek/comment-stripper": 20,
+        "x-team/wp-cli-ssh": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
