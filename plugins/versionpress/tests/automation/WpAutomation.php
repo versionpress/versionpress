@@ -39,13 +39,7 @@ class WpAutomation {
      * Database as specified in the config file must exist and be accessible.
      *
      * It takes optional parameter entityCounts, that is an array containing
-     * an amount of generated entities. The structure is:
-     * array(
-     *   'post' => 500,
-     *   'comment' => 1300,
-     *   'user' => 50,
-     *   ...
-     * )
+     * an amount of generated entities - {@see populateSite}.
      *
      * @param array $entityCounts
      */
@@ -54,6 +48,7 @@ class WpAutomation {
         self::createConfigFile();
         self::clearDatabase();
         self::installWp();
+        self::populateSite($entityCounts);
     }
 
     /**
@@ -320,6 +315,35 @@ class WpAutomation {
 
         $code = 'global $versionPressContainer; $initializer = $versionPressContainer->resolve(VersionPress\DI\VersionPressServices::INITIALIZER); $initializer->initializeVersionPress();';
         self::runWpCliCommand('eval', array($code));
+    }
+
+    /**
+     * Populates the site with random entities. Their counts are specified by parameter $entityCounts:
+     * array(
+     *   'posts' => 100,
+     *   'comments => 500,
+     *   'options' => 50,
+     *   'users' => 10,
+     *   'terms' => 20
+     * )
+     *
+     * @param $entityCounts
+     * @throws Exception
+     */
+    public static function populateSite($entityCounts) {
+        if (count($entityCounts) == 0) {
+            return;
+        }
+
+        $vpAutomateFile = __DIR__ . '/vp-automate.php';
+
+        $entityParameters = "";
+        foreach ($entityCounts as $entity => $count) {
+            $entityParameters .= "--$entity=$count ";
+        }
+
+        $command = "wp --require=\"$vpAutomateFile\" vp-automate generate $entityParameters";
+        self::exec($command, self::$config->getSitePath());
     }
 
     /**
