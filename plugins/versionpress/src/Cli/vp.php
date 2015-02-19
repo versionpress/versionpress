@@ -25,11 +25,12 @@ class VPCommand extends WP_CLI_Command {
      *
      * [<value>]
      * : The new value. If missing, just prints out the option.
-
+     *
+     * @when before_wp_load
      */
     public function config($args, $assoc_args) {
 
-        $configFile = VERSIONPRESS_PLUGIN_DIR . '/vpconfig.neon';
+        $configFile = __DIR__ . '/../../vpconfig.neon';
         $configContents = "";
         if (file_exists($configFile)) {
             $configContents = file_get_contents($configFile);
@@ -42,6 +43,8 @@ class VPCommand extends WP_CLI_Command {
     }
 
     private function updateConfigValue($config, $key, $value) {
+
+        require_once(__DIR__ . '/../../vendor/nette/utils/src/Utils/Strings.php');
 
         // General matching: https://regex101.com/r/sE2iB1/1
         // Concrete example: https://regex101.com/r/sE2iB1/2
@@ -60,6 +63,7 @@ class VPCommand extends WP_CLI_Command {
         return $result;
 
     }
+
 
     /**
      * Clones site to a new folder, database and Git branch.

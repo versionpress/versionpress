@@ -81,11 +81,28 @@ class WpAutomation {
      * Copies VP files to the test site and possibly removes all old files from there. It does so using
      * a Gulp script which specifies which paths to include and which ones to ignore.
      * See <project_root>\gulpfile.js.
+     *
+     * @param bool $createConfigFile By default, creates a vpconfig file after the files are copied
+     * @throws Exception
      */
-    public static function copyVersionPressFiles() {
+    public static function copyVersionPressFiles($createConfigFile = true) {
         $versionPressDir = __DIR__ . '/../..';
         $gulpBaseDir = $versionPressDir . '/../..'; // project root as checked out from our repository
         self::exec('gulp test-deploy', $gulpBaseDir); // this also cleans the destination directory, see gulpfile.js "clean" task
+        if ($createConfigFile) {
+            self::createVpconfigFile();
+        }
+    }
+
+    /**
+     * Creates vpconfig file based on configuration in TestConfig
+     */
+    public static function createVpconfigFile() {
+        foreach (self::$config->vpConfig as $key => $value) {
+            if (isset($value)) {
+                self::runWpCliCommand("vp", "config", array($key, $value, "require" => "wp-content/plugins/versionpress/src/Cli/vp.php"));
+            }
+        }
     }
 
     public static function activateVersionPress() {

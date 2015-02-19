@@ -22,6 +22,9 @@ class TestConfig {
     private $afterRedirectWaitingTime;
     private $isVagrant;
 
+    // TODO other constants will become public as well and we'll get rid of getters
+    public $vpConfig;
+
     function __construct(array $rawConfig) {
 
         // DB
@@ -39,6 +42,10 @@ class TestConfig {
         $this->adminEmail = $rawConfig['admin-email'];
         $this->adminPassword = $rawConfig['admin-pass'];
         $this->isVagrant = isset($rawConfig['is-vagrant']) ? $rawConfig['is-vagrant'] == "1" : false;
+
+        // VP settings
+        $this->vpConfig = array();
+        $this->vpConfig['git-binary'] = isset($rawConfig['git-binary']) ? $rawConfig['git-binary'] : null;
 
         // Automation
         $this->cleanInstallationsPath = $rawConfig['wp-clean-installations'];
