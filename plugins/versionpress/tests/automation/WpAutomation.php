@@ -422,19 +422,7 @@ class WpAutomation {
      * Deletes all tables from the database.
      */
     private static function clearDatabase() {
-        $mysqli = new mysqli(
-            self::$config->getDbHost(),
-            self::$config->getDbUser(),
-            self::$config->getDbPassword(),
-            self::$config->getDbName()
-        );
-        $res = $mysqli->query('show tables');
-
-        /** @noinspection PhpAssignmentInConditionInspection */
-        while ($row = $res->fetch_row()) {
-            $dropTableSql = "DROP TABLE $row[0]";
-            $mysqli->query($dropTableSql);
-        }
+        self::runWpCliCommand("db", "reset", array("yes" => ""));
     }
 
     /**
