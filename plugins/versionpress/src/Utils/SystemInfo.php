@@ -30,8 +30,8 @@ class SystemInfo {
         $output['summary']['php-version'] = phpversion();
         $output['summary']['php-sapi'] = php_sapi_name();
         $output['summary']['custom-vp-config'] = $vpConfig->customConfig;
-        $output['summary']['git-version'] = $output['git-info']['git-version'];
-        $output['summary']['git-full-path'] = $output['git-info']['git-full-path'];
+        $output['summary']['git-version'] = isset($output['git-info']['git-version']) ? $output['git-info']['git-version'] : '';
+        $output['summary']['git-full-path'] = isset($output['git-info']['git-full-path']) ? $output['git-info']['git-full-path'] : '';
 
         return $output;
     }
@@ -56,9 +56,16 @@ class SystemInfo {
         $process = new Process(escapeshellarg($gitBinary) . " --version");
         $process->run();
 
+        $info['git-binary-as-configured'] = $gitBinary;
         $info['git-available'] = $process->getErrorOutput() === null;
 
         if ($info['git-available'] === false) {
+            $info['output'] = array(
+                'stdout' => trim($process->getOutput()),
+                'stderr' => trim($process->getErrorOutput())
+            );
+
+            $info['env-path'] = getenv('PATH');
             return $info;
         }
 
