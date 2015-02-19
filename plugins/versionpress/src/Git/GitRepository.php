@@ -74,7 +74,7 @@ class GitRepository {
      * @return bool
      */
     public function isVersioned() {
-        return $this->runShellCommandWithStandardOutput("git status -s") !== null;
+        return file_exists($this->workingDirectoryRoot . "/.git");
     }
 
     /**
