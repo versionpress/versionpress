@@ -66,6 +66,8 @@ class Initializer {
      * Main entry point
      */
     public function initializeVersionPress() {
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
+        @set_time_limit(0); // intentionally @ - if it's disabled we can't do anything but try the initialization
         $this->reportProgressChange(InitializerStates::START);
         vp_enable_maintenance();
         $this->createVersionPressTables();

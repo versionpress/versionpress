@@ -23,6 +23,8 @@ class SynchronizationProcess {
      * @param string[]|null $entitiesToSynchronize List of entities which will be synchronized
      */
     function synchronize($entitiesToSynchronize = null) {
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
+        @set_time_limit(0); // intentionally @ - if it's disabled we can't do anything but try the synchronization
 
         if ($entitiesToSynchronize === null) {
             $entitiesToSynchronize = $this->defaultSynchronizationSequence;
