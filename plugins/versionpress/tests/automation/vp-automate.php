@@ -78,12 +78,6 @@ class VpAutomateCommand extends WP_CLI_Command {
             'comments'
         );
 
-        $this->database->query("SET autocommit=0");
-        $this->database->query("SET unique_checks=0");
-        $this->database->query("SET foreign_key_checks=0");
-        $this->database->query("START TRANSACTION");
-        $this->database->query("BEGIN");
-
         foreach ($preferedOrder as $entity) {
             if (!isset($assoc_args[$entity])) {
                 continue;
@@ -91,11 +85,6 @@ class VpAutomateCommand extends WP_CLI_Command {
 
             $this->generateEntities($entity, $assoc_args[$entity]);
         }
-
-        $this->database->query("COMMIT");
-        $this->database->query("SET unique_checks=1");
-        $this->database->query("SET foreign_key_checks=1");
-
     }
 
     private function generateEntities($entity, $count) {
@@ -113,6 +102,10 @@ class VpAutomateCommand extends WP_CLI_Command {
         $chunks = array_chunk($insertQueries, 100);
         foreach ($chunks as $chunk) {
             $connection->multi_query(join(" ",  $chunk));
+            while ($connection->next_result()) // flush multi_queries
+            {
+                if (!$connection->more_results()) break;
+            }
         }
 
         WP_CLI::success("Queries ($entity): " . \Tracy\Debugger::timer());
