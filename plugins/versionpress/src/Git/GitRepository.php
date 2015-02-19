@@ -20,7 +20,7 @@ class GitRepository {
 
     /**
      * @param string $workingDirectoryRoot Filesystem path to working directory root (where the .git folder resides)
-     * @param string $tempDirectory Directory used for commit message temp file
+     * @param string $tempDirectory Directory used for commit message temp file. See commit().
      * @param string $commitMessagePrefix Standard prefix applied to all commit messages
      * @param string $gitBinary Git binary to use
      */
@@ -42,7 +42,11 @@ class GitRepository {
     }
 
     /**
-     * Creates a commit
+     * Creates a commit.
+     *
+     * Uses a temporary file to construct the commit message because on Windows, multi-line
+     * commit message cannot be created on CLI and it's generally a more flexible solution
+     * (very long commit messages, etc.).
      *
      * @param CommitMessage $message
      * @param string $authorName
