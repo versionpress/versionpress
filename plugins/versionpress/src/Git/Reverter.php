@@ -111,7 +111,7 @@ class Reverter {
         $posts = array();
 
         foreach ($modifiedFiles as $filename) {
-            $match = Strings::match($filename, '~/posts/(.*)\.ini~');
+            $match = Strings::match($filename, '~/posts/.*/(.*)\.ini~');
             if ($match) {
                 $posts[] = $match[1];
             }

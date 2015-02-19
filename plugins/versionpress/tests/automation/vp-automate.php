@@ -99,7 +99,8 @@ class VpAutomateCommand extends WP_CLI_Command {
         WP_CLI::success("Building queries ($entity): ". \Tracy\Debugger::timer());
 
         $connection = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-        $chunks = array_chunk($insertQueries, 100);
+        $connection->query("SET GLOBAL max_allowed_packet=100*1024*1024");
+        $chunks = array_chunk($insertQueries, 50);
         foreach ($chunks as $chunk) {
             $connection->multi_query(join(" ",  $chunk));
             while ($connection->next_result()) // flush multi_queries
@@ -295,9 +296,5 @@ class VpAutomateCommand extends WP_CLI_Command {
 }
 
 if (defined('WP_CLI') && WP_CLI) {
-    if (!class_exists('\Faker\Generator')) {
-        require_once(__DIR__ . '/../../vendor/autoload.php');
-    }
-
     WP_CLI::add_command('vp-automate', 'VpAutomateCommand');
 }
