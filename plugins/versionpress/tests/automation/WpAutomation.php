@@ -37,8 +37,19 @@ class WpAutomation {
      * the install script etc.
      *
      * Database as specified in the config file must exist and be accessible.
+     *
+     * It takes optional parameter entityCounts, that is an array containing
+     * an amount of generated entities. The structure is:
+     * array(
+     *   'post' => 500,
+     *   'comment' => 1300,
+     *   'user' => 50,
+     *   ...
+     * )
+     *
+     * @param array $entityCounts
      */
-    public static function setUpSite() {
+    public static function setUpSite($entityCounts = array()) {
         self::prepareFiles();
         self::createConfigFile();
         self::clearDatabase();

@@ -45,6 +45,7 @@ class VPTestCommand extends WP_CLI_Command {
     public function generate($args, $assoc_args) {
         global $wpdb;
         $this->faker = Faker\Factory::create();
+
         $this->database = $wpdb;
 
         $preferedOrder = array(
@@ -76,35 +77,48 @@ class VPTestCommand extends WP_CLI_Command {
     }
 
     private function generateEntities($entity, $count) {
+        $entities = array();
+        \Tracy\Debugger::timer();
         for($i = 0; $i < $count; $i++) {
-            $this->generateEntity($entity);
+            $entities[] = $this->generateEntity($entity);
         }
+
+        WP_CLI::success("Generating ($entity): " . \Tracy\Debugger::timer());
+        $insertQueries = $this->buildInsertQueries($this->database->prefix . $entity, $entities);
+        WP_CLI::success("Building queries ($entity): ". \Tracy\Debugger::timer());
+
+        $connection = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+        $chunks = array_chunk($insertQueries, 100);
+        foreach ($chunks as $chunk) {
+            $connection->multi_query(join(" ",  $chunk));
+        }
+
+        WP_CLI::success("Queries ($entity): " . \Tracy\Debugger::timer());
+
+        $connection->close();
     }
 
     private function generateEntity($entity) {
         switch($entity) {
             case 'options':
-                $this->generateOption();
-                break;
+                return $this->generateOption();
             case 'users':
-                $this->generateUser();
-                break;
+                return $this->generateUser();
             case 'terms':
-                $this->generateTerm();
-                break;
+                return $this->generateTerm();
             case 'posts':
-                $this->generatePost();
-                break;
+                return $this->generatePost();
             case 'comments':
-                $this->generateComment();
-                break;
+                return $this->generateComment();
         }
+        return null;
     }
 
     private function generateOption() {
         $optionName = "vp_random_" . \Nette\Utils\Random::generate(10, 'a-z');
         $optionValue = $this->faker->words(rand(1, 20));
         add_option($optionName, $optionValue);
+        return array();
     }
 
     private function generateUser() {
@@ -114,7 +128,7 @@ class VPTestCommand extends WP_CLI_Command {
         $userName = $this->faker->userName;
 
         $userdata = array(
-            'user_pass' => $this->faker->word,
+            'user_pass' => 'password',
             'user_login' => $userName,
             'user_nicename' => $fullName,
             'user_email' => $this->faker->email,
@@ -126,7 +140,7 @@ class VPTestCommand extends WP_CLI_Command {
         );
 
         wp_insert_user($userdata);
-
+        return array();
     }
 
     private function generateTerm() {
@@ -135,44 +149,30 @@ class VPTestCommand extends WP_CLI_Command {
         $name = $this->faker->word;
         $randomTaxonomy = self::randomEntry($taxonomies);
         wp_insert_term($name, $randomTaxonomy);
+        return array();
     }
 
     private function generatePost() {
         static $authors;
-        static $categories;
-        static $tags;
 
         if (!$authors) {
             $authors = array_map($this->getFieldFn('ID'), get_users());
-            $categories = array_map($this->getFieldFn('term_taxonomy_id'), get_categories());
-            $tags = array_map($this->getFieldFn('term_taxonomy_id'), get_tags());
         }
 
-        $titleLength = rand(2, 10); // words
-        $contentLength = rand(500, 10000); // characters
+        $contentLength = rand(50, 1000); // characters
 
+        $date = new DateTime();
         $post = $this->preparePost(array(
             "post_type" => "post",
             "post_status" => "publish",
-            "post_title" => join(' ', $this->faker->words($titleLength)),
-            "post_date" => $this->faker->dateTime->format('Y-m-d H:i:s'),
-            "post_content" => $this->faker->text($contentLength),
+            "post_title" => $this->generateLoremIpsum(1, false),
+            "post_date" => $date->format('Y-m-d H:i:s'),
+            "post_content" => $this->generateLoremIpsum($contentLength),
             "post_author" => self::randomEntry($authors)
         ));
 
+        return $post;
 
-        $this->database->insert($this->database->prefix . 'posts', $post);
-        $postId = $this->database->insert_id;
-
-        if (count($categories) > 0) {
-            $maximumCategories = ceil(count($categories) / 2);
-            wp_set_post_categories($postId, self::randomEntries($categories, rand(1, $maximumCategories)));
-        }
-
-        if (count($tags) > 0) {
-            $maximumTags = ceil(count($tags) / 2);
-            wp_set_post_tags($postId, self::randomEntries($tags, rand(1, $maximumTags)));
-        }
     }
 
     private function generateComment() {
@@ -184,21 +184,21 @@ class VPTestCommand extends WP_CLI_Command {
             $authors = array_map($this->getFieldFn('ID'), get_users());
         }
 
-        $commentLength = rand(40, 1000);
+        $commentLength = rand(2, 50);
         $hasUserId = rand(0, 10) < 7;
 
-        $comment = array(
+        $comment = $this->prepareComment(array(
             'comment_author' => $this->faker->name,
             'comment_author_email' => $this->faker->email,
             'comment_author_url' => $this->faker->url,
             'comment_date' => $this->faker->dateTime->format('Y-m-d H:i:s'),
-            'comment_content' => $this->faker->text($commentLength),
+            'comment_content' => $this->generateLoremIpsum($commentLength),
             'comment_approved' => 1,
             'comment_post_ID' => self::randomEntry($posts),
             'user_id' => $hasUserId ? self::randomEntry($authors) : 0
-        );
+        ));
 
-        wp_insert_comment($comment);
+        return $comment;
     }
 
     private static function randomEntry(array $array) {
@@ -219,20 +219,62 @@ class VPTestCommand extends WP_CLI_Command {
     private function preparePost($post) {
         $defaults = array(
             'post_date_gmt' => $post['post_date'],
-            'post_content' => '',
-            'post_title' => '',
-            'post_status' => 'publish',
-            'comment_status' => 'open',
-            'ping_status' => 'open',
             'post_name' => $this->faker->slug,
             'post_modified' => $post['post_date'],
             'post_modified_gmt' => $post['post_date'],
-            'post_parent' => 0,
             'guid' => $this->faker->uuid,
-            'post_type' => 'post',
         );
 
         return array_merge($defaults, $post);
+    }
+
+    private function prepareComment($comment) {
+        $defaults = array(
+            'comment_date_gmt' => $comment['comment_date'],
+        );
+
+        return array_merge($defaults, $comment);
+    }
+
+    private function buildInsertQueries($table, $entities) {
+        if (count($entities) == 0) {
+            return "";
+        }
+
+        $columns = "`" . join("`, `", array_keys($entities[0])) . "`";
+
+        $valueStrings = array_map(function ($entity) {
+            return "(" . join(", ", array_map(function ($value){
+                return is_string($value) ? "\"" . mysql_real_escape_string($value) . "\"" : $value;
+            }, $entity)) . ")";
+        }, $entities);
+
+
+        return array_map(function ($valuesString) use ($table, $columns) {
+            return "INSERT INTO $table ($columns) VALUES $valuesString;";
+        }, $valueStrings);
+    }
+
+    private function generateLoremIpsum($countOfSentences, $period = true) {
+        static $lipsum;
+        if (!$lipsum) {
+            $lipsum = array(
+                'lorem',        'ipsum',        'dolor',        'sit',          'amet',         'consectetur',
+                'adipiscing',   'elit',         'curabitur',    'vel',          'hendrerit',    'libero',
+                'eleifend',     'blandit',      'nunc',         'ornare',       'odio',         'ut',
+                'orci',         'gravida',      'imperdiet',    'nullam',       'purus',        'lacinia',
+                'a',            'pretium',      'quis',         'congue',       'praesent',     'sagittis');
+        }
+
+        $sentences = array();
+        for ($i = 0; $i < $countOfSentences; $i++) {
+            $sentenceLength = rand(5, 20);
+            $randomWords = array_intersect_key($lipsum, array_flip(array_rand($lipsum, $sentenceLength)));
+
+            $sentences[] = ucfirst(join(" ", $randomWords)) . ($period ? "." : "");
+        }
+
+        return join(" ", $sentences);
     }
 }
 
