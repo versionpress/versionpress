@@ -15,12 +15,12 @@ class PublicWebTest extends SeleniumTestCase {
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
         self::$autologin = false;
-        self::$testPostId = WpAutomation::createPost(self::$testPost);
+        self::$testPostId = self::$wpAutomation->createPost(self::$testPost);
     }
 
     public static function tearDownAfterClass() {
         parent::tearDownAfterClass();
-        WpAutomation::deletePost(self::$testPostId);
+        self::$wpAutomation->deletePost(self::$testPostId);
     }
 
     /**

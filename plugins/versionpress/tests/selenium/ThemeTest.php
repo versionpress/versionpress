@@ -51,7 +51,7 @@ class ThemeTest extends SeleniumTestCase {
      */
     public function switchingThemeCreatesThemeSwitchAction() {
         $this->url('wp-admin/themes.php');
-        $currentTheme = WpAutomation::getCurrentTheme();
+        $currentTheme = self::$wpAutomation->getCurrentTheme();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
         $this->byCssSelector('div[aria-describedby*=' . self::$themeInfo['stylesheet'] . '] a.activate')->click();
@@ -63,7 +63,7 @@ class ThemeTest extends SeleniumTestCase {
         $commitAsserter->assertCommitPath("M", "%vpdb%/options.ini");
         $commitAsserter->assertCleanWorkingDirectory();
 
-        WpAutomation::switchTheme($currentTheme);
+        self::$wpAutomation->switchTheme($currentTheme);
     }
 
     /**

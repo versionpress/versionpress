@@ -1,11 +1,7 @@
-# Only test-config.sample.ini is versioned; all other variants, specifically test-config.ini
-# and test-config.xyz.ini are ignored
-test-config.ini
-test-config.*.ini
-!test-config.sample.ini
+# TestConfig
+test-config.neon
 
-# Useful e.g. for creating WpAutomationRunner.local.php where there can be a single test method
-# for running WpAutomation methods
+# Useful e.g. for WpAutomationRunner.local.php for running WpAutomation methods
 *.local.php
 
 # Various PHPUnit reporting formats

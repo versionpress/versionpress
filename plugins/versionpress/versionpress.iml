@@ -7,6 +7,7 @@
       <sourceFolder url="file://$MODULE_DIR$/admin" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/log" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
+      <excludeFolder url="file://$MODULE_DIR$/tests/end2end" />
       <excludeFolder url="file://$MODULE_DIR$/tests/node_modules" />
       <excludeFolder url="file://$MODULE_DIR$/vendor" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />

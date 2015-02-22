@@ -14,36 +14,15 @@
 abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
 
     /**
-     * Configuration read from `test-config.ini` and set to this variable from phpunit-bootstrap.php.
-     *
      * @var TestConfig
      */
-    public static $config;
+    protected static $testConfig;
 
     /**
-     * Set from phpunit-bootstrap.php to true if `--force-setup=before-class` has been passed as a command line parameter
-     * or if 'VP_FORCE_SETUP' environment variable contains the "before-class" value. See phpunit-bootstrap.php for more.
-     *
-     * @var bool
+     * @var WpAutomation
      */
-    public static $forceSetup;
+    protected static $wpAutomation;
 
-
-    /**
-     * Set from phpunit-bootstrap.php to true if `--copy-vp-files=true` has been passed as a command line parameter
-     * or if 'VP_COPY_FILES' environment variable is present.
-     *
-     * @var bool
-     */
-    public static $copyVpFilesBeforeClass;
-
-    /**
-     * Set from phpunit-bootstrap.php if `--git=<path>` has been passed as a command line parameter
-     * or if 'VP_GIT' environment variable is present.
-     *
-     * @var string|null
-     */
-    public static $gitPath;
 
     /**
      * If true, {@link loginIfNecessary} is called on {@link setUpSite}.
@@ -60,21 +39,46 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
     public function __construct($name = NULL, array $data = array(), $dataName = '') {
         parent::__construct($name, $data, $dataName);
 
+        self::staticInitialization();
+
         $this->setBrowser("firefox");
 
         $capabilities = $this->getDesiredCapabilities();
-        if (self::$config->getFirefoxExecutable()) {
-            $capabilities["firefox_binary"] = self::$config->getFirefoxExecutable();
+        if (self::$testConfig->seleniumConfig->firefoxBinary) {
+            $capabilities["firefox_binary"] = self::$testConfig->seleniumConfig->firefoxBinary;
         }
         $this->setDesiredCapabilities($capabilities);
 
-        $this->setBrowserUrl(self::$config->getSiteUrl());
+        $this->setBrowserUrl(self::$testConfig->testSite->url);
 
-        $this->gitRepository = new \VersionPress\Git\GitRepository(self::$config->getSitePath());
+        $this->gitRepository = new \VersionPress\Git\GitRepository(self::$testConfig->testSite->path);
+    }
+
+    private static $staticInitializationDone = false;
+    /**
+     * Makes sure some static properties are initialized. Called from constructor and from static methods
+     * that might run before it.
+     */
+    private static function staticInitialization() {
+
+        if (self::$staticInitializationDone) {
+            return;
+        }
+
+        if (!self::$testConfig) {
+            self::$testConfig = new TestConfig(__DIR__ . '/../test-config.neon');
+        }
+
+        if (!self::$wpAutomation) {
+            self::$wpAutomation = new WpAutomation(self::$testConfig->testSite);
+        }
+
+        self::$staticInitializationDone = true;
+
     }
 
     public static function setUpBeforeClass() {
-        self::setUpSite(self::$forceSetup, self::$gitPath);
+        self::setUpSite(TestRunnerOptions::getInstance()->forceSetup == "before-class");
     }
 
     /**
@@ -82,18 +86,18 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
      * parametr may force this.
      *
      * @param bool $force Force all the automation actions to be taken regardless of the site state
-     * @param $gitPath
      */
-    public static function setUpSite($force, $gitPath) {
-        if ($force || !WpAutomation::isSiteSetUp()) {
-            WpAutomation::setUpSite();
+    public static function setUpSite($force) {
+
+        self::staticInitialization();
+
+        if ($force || !self::$wpAutomation->isSiteSetUp()) {
+            self::$wpAutomation->setUpSite();
         }
 
-        if ($force || !WpAutomation::isVersionPressInitialized()) {
-            WpAutomation::copyVersionPressFiles();
-            WpAutomation::initializeVersionPress($gitPath);
-        } else if (self::$copyVpFilesBeforeClass) {
-            WpAutomation::copyVersionPressFiles();
+        if ($force || !self::$wpAutomation->isVersionPressInitialized()) {
+            self::$wpAutomation->copyVersionPressFiles();
+            self::$wpAutomation->initializeVersionPress(self::$testConfig->testSite->vpConfig['git-binary']);
         }
 
     }
@@ -116,9 +120,9 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
             return;
         }
 
-        $this->byId('user_login')->value(self::$config->getAdminName());
+        $this->byId('user_login')->value(self::$testConfig->testSite->adminName);
         usleep(100 * 1000); // wait for change focus
-        $this->byId('user_pass')->value(self::$config->getAdminPassword());
+        $this->byId('user_pass')->value(self::$testConfig->testSite->adminPassword);
         $this->byId("loginform")->submit();
     }
 
@@ -246,7 +250,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
             return $testCase->executeScript("return document.readyState;") == "complete";
         }, $timeout);
 
-        usleep(self::$config->getAfterRedirectWaitingTime() * 1000);
+        usleep(self::$testConfig->seleniumConfig->postCommitWaitTime * 1000);
     }
 
     /**

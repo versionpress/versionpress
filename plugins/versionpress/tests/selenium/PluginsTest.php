@@ -29,17 +29,17 @@ class PluginsTest extends SeleniumTestCase {
 
         // possibly delete single-file Hello dolly
         try {
-            WpAutomation::runWpCliCommand('plugin', 'uninstall', array('hello'));
+            self::$wpAutomation->runWpCliCommand('plugin', 'uninstall', array('hello'));
         } catch (Exception $e) {
         }
 
         // possibly delete our testing plugin
         try {
-            WpAutomation::runWpCliCommand('plugin', 'uninstall', array('hello-dolly'));
+            self::$wpAutomation->runWpCliCommand('plugin', 'uninstall', array('hello-dolly'));
         } catch (Exception $e) {
         }
 
-        $process = new \Symfony\Component\Process\Process("git add -A && git commit -m " . escapeshellarg("Plugin setup"), self::$config->getSitePath());
+        $process = new \Symfony\Component\Process\Process("git add -A && git commit -m " . escapeshellarg("Plugin setup"), self::$testConfig->testSite->path);
         $process->run();
 
     }

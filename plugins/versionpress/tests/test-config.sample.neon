@@ -1,0 +1,51 @@
+# Test configuration, see TestConfig
+
+selenium:
+    firefox-binary: C:/Path/To/FirefoxPortable/App/Firefox/firefox.exe
+    post-commit-wait-time: 500
+
+# Default values for all sites, may be overwritten by a specific site
+common-site-config:
+    db:
+        table-prefix: wp_
+    wp-site:
+        admin-name: admin
+        admin-email: versionpress@example.com
+        admin-pass: admin
+        wp-version: 4.1
+    vp-config:
+        # all supported vpconfig values are listed here so that they are `isset()` but empty by default
+        git-binary:
+
+# One of the sites below, used as the current one
+test-site: vp01
+
+# Configured sites
+sites:
+
+    vp01:
+        type: local
+        db:
+            host: localhost
+            dbname: vp01
+            user: vp01
+            password: vp01
+        wp-site:
+            path: C:/wamp/www/vp01
+            url: http://localhost/vp01
+            title: "VP Test @ WampServer"
+
+    vagrant-php53:
+        type: vagrant
+        db:
+            host: localhost
+            dbname: wordpress
+            user: wordpress
+            password: wordpress
+        wp-site:
+            path: vagrant/wordpress/build
+            url: http://wordpress-php53.local
+            title: "VP Test @ Vagrant-PHP53"
+        vp-config:
+            git-binary: /usr/bin/git
+

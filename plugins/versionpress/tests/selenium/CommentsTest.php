@@ -62,7 +62,7 @@ class CommentsTest extends SeleniumTestCase {
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("comment/create");
-        $commitAsserter->assertCommitTag("VP-Comment-Author", self::$config->getAdminName());
+        $commitAsserter->assertCommitTag("VP-Comment-Author", self::$testConfig->testSite->adminName);
         $commitAsserter->assertCommitPath("A", "%vpdb%/comments/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
 
@@ -85,7 +85,7 @@ class CommentsTest extends SeleniumTestCase {
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("comment/edit");
-        $commitAsserter->assertCommitTag("VP-Comment-Author", self::$config->getAdminName());
+        $commitAsserter->assertCommitTag("VP-Comment-Author", self::$testConfig->testSite->adminName);
         $commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
 
@@ -248,7 +248,7 @@ class CommentsTest extends SeleniumTestCase {
             "post_author" => 1
         );
 
-        return WpAutomation::createPost($post);
+        return self::$wpAutomation->createPost($post);
     }
 
     /**

@@ -26,7 +26,7 @@ class RevertTest extends SeleniumTestCase {
      */
     public function undoRevertsOnlyOneCommit() {
         $this->loginIfNecessary();
-        WpAutomation::editOption('blogname', 'Blogname for undo test');
+        self::$wpAutomation->editOption('blogname', 'Blogname for undo test');
         $this->createTestPost();
         $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -68,8 +68,8 @@ class RevertTest extends SeleniumTestCase {
         $this->loginIfNecessary();
         $postId = $this->createTestPost();
         $commentId = $this->createCommentForPost($postId);
-        WpAutomation::deleteComment($commentId);
-        WpAutomation::deletePost($postId);
+        self::$wpAutomation->deleteComment($commentId);
+        self::$wpAutomation->deletePost($postId);
         $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
@@ -87,7 +87,7 @@ class RevertTest extends SeleniumTestCase {
         $this->loginIfNecessary();
         $postId = $this->createTestPost();
         $this->createCommentForPost($postId);
-        WpAutomation::editOption('blogname', 'Blogname for rollback test');
+        self::$wpAutomation->editOption('blogname', 'Blogname for rollback test');
         $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
@@ -129,7 +129,7 @@ class RevertTest extends SeleniumTestCase {
         $this->createTestPost();
         $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
         $commitAsserter = new CommitAsserter($this->gitRepository);
-        touch(self::$config->getSitePath() . '/revert-test-file');
+        touch(self::$testConfig->testSite->path . '/revert-test-file');
 
         $this->jsClick("#versionpress-commits-table tr:nth-child(1) a[href*=vp_undo]");
         $this->waitForAjax();
@@ -137,7 +137,7 @@ class RevertTest extends SeleniumTestCase {
         $this->waitForAjax(); // there shouldn't be any AJAX request, but for sure...
 
         $commitAsserter->assertNumCommits(0);
-        unlink(self::$config->getSitePath() . '/revert-test-file');
+        unlink(self::$testConfig->testSite->path . '/revert-test-file');
         $commitAsserter->assertCleanWorkingDirectory();
     }
 
@@ -155,7 +155,7 @@ class RevertTest extends SeleniumTestCase {
             "post_author" => 1
         );
 
-        return WpAutomation::createPost($post);
+        return self::$wpAutomation->createPost($post);
     }
 
     private function createCommentForPost($postId) {
@@ -169,7 +169,7 @@ class RevertTest extends SeleniumTestCase {
             "comment_post_ID" => $postId,
         );
 
-        return WpAutomation::createComment($comment);
+        return self::$wpAutomation->createComment($comment);
     }
 
     private function undoLastCommit() {

@@ -10,15 +10,15 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * We're overriding the default setUpBeforeClass()
      */
     public static function setUpBeforeClass() {
-        if (self::$forceSetup || !WpAutomation::isSiteSetUp()) {
-            WpAutomation::setUpSite();
+        if (TestRunnerOptions::getInstance()->forceSetup == "before-class" || !self::$wpAutomation->isSiteSetUp()) {
+            self::$wpAutomation->setUpSite();
         }
 
         try {
-            WpAutomation::uninstallVersionPress();
+            self::$wpAutomation->uninstallVersionPress();
         } catch (Exception $e) {}
-        
-        WpAutomation::copyVersionPressFiles();
+
+        self::$wpAutomation->copyVersionPressFiles();
     }
 
 
@@ -91,7 +91,7 @@ class ActivationDeactivationTest extends SeleniumTestCase {
         $this->byCssSelector('#cancel_deactivation')->click();
 
         $this->assertContains('wp-admin/plugins.php', $this->url());
-        $this->assertFileExists(self::$config->getSitePath() . '/wp-content/vpdb/.active');
+        $this->assertFileExists(self::$testConfig->testSite->path . '/wp-content/vpdb/.active');
 
     }
 
@@ -107,9 +107,9 @@ class ActivationDeactivationTest extends SeleniumTestCase {
         $this->byCssSelector('#confirm_deactivation')->click();
         $this->assertContains('wp-admin/plugins.php', $this->url());
 
-        $this->assertFileNotExists(self::$config->getSitePath() . '/wp-content/db.php');
-        $this->assertFileNotExists(self::$config->getSitePath() . '/wp-content/vpdb');
-        $this->assertFileExists(self::$config->getSitePath() . '/.git');
+        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/db.php');
+        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/vpdb');
+        $this->assertFileExists(self::$testConfig->testSite->path . '/.git');
 
     }
 
@@ -137,9 +137,9 @@ class ActivationDeactivationTest extends SeleniumTestCase {
 
         $this->waitForElement('.plugins-php #message.updated');
 
-        $this->assertFileNotExists(self::$config->getSitePath() . '/wp-content/db.php');
-        $this->assertFileNotExists(self::$config->getSitePath() . '/wp-content/plugins/versionpress');
-        $this->assertFileNotExists(self::$config->getSitePath() . '/.git');
+        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/db.php');
+        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/plugins/versionpress');
+        $this->assertFileNotExists(self::$testConfig->testSite->path . '/.git');
 
     }
 
@@ -152,14 +152,7 @@ class ActivationDeactivationTest extends SeleniumTestCase {
     {
         $this->url('wp-admin/plugins.php');
         $this->byCssSelector('#versionpress .activate a')->click();
-
         $this->waitAfterRedirect();
-
-        if (self::$gitPath) {
-            WpAutomation::runWpCliCommand('vp', 'config', array('git-binary', self::$gitPath));
-        }
-
-
     }
 
 

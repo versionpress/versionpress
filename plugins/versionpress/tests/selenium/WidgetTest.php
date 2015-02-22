@@ -6,7 +6,7 @@ class WidgetTest extends SeleniumTestCase {
         parent::setUpBeforeClass();
         self::clearSidebars();
         try {
-            WpAutomation::deleteOption('widget_calendar');
+            self::$wpAutomation->deleteOption('widget_calendar');
         } catch (Exception $e) {
             // It's ok. This option does not exist in the clear WP.
         }
@@ -95,13 +95,13 @@ class WidgetTest extends SeleniumTestCase {
     }
 
     private static function clearSidebars() {
-        $sidebars = WpAutomation::getSidebars();
+        $sidebars = self::$wpAutomation->getSidebars();
         if (count($sidebars) == 0) {
             self::fail('Tests can be run only with theme with sidebars');
         }
         foreach ($sidebars as $sidebar) {
-            $widgets = WpAutomation::getWidgets($sidebar);
-            WpAutomation::deleteWidgets($widgets);
+            $widgets = self::$wpAutomation->getWidgets($sidebar);
+            self::$wpAutomation->deleteWidgets($widgets);
         }
     }
 }
