@@ -44,6 +44,8 @@ class VPCommand extends WP_CLI_Command {
 
     private function updateConfigValue($config, $key, $value) {
 
+        // We don't use NEON decoding and encoding again as that removes comments etc.
+
         require_once(__DIR__ . '/../../vendor/nette/utils/src/Utils/Strings.php');
 
         // General matching: https://regex101.com/r/sE2iB1/1
@@ -52,9 +54,9 @@ class VPCommand extends WP_CLI_Command {
         $re = "/^($key)(:\\s*)(\\S[^#\\r\\n]+)(\\h+#?.*)?$/m";
         $subst = "$1$2$value$4";
 
-        $result = preg_replace($re, $subst, $config);
-
-        if ($result == $config) {
+        if (preg_match_all($re, $config, $matches)) {
+            $result = preg_replace($re, $subst, $config);
+        } else {
             // value was not there, add it to the end
             $result = $config . (Strings::endsWith($config, "\n") ? "" : "\n");
             $result .= "$key: $value\n";
