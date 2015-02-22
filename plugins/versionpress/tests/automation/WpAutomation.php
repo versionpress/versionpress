@@ -460,7 +460,7 @@ class WpAutomation {
      */
     private function exec($command, $executionPath = null, $autoSshTunnelling = true) {
 
-        $command = $this->possiblyUpdateCommandForRemoteExecution($command);
+        $command = $this->rewriteWpCliCommand($command);
 
         if (!$executionPath) {
             $executionPath = $this->siteConfig->isVagrant ? __DIR__ . '/..' : $this->siteConfig->path;
@@ -492,9 +492,8 @@ class WpAutomation {
      * @return string
      */
     public function runWpCliCommand($command, $subcommand, $args = array()) {
-        $wpExecutable = realpath(__DIR__ . '/../../../../ext-libs/vendor/bin/wp');
 
-        $cliCommand = "$wpExecutable $command";
+        $cliCommand = "wp $command";
 
         if ($subcommand) {
             $cliCommand .= " $subcommand";
@@ -519,28 +518,51 @@ class WpAutomation {
     }
 
     /**
-     * If the given command is WP-CLI command (starts with "wp ") and the test environment
-     * is a Vagrant machine, updates the command to use WP-CLI-SSH instead.
+     * Rewrites WP-CLI command to use a well-known binary and to possibly rewrite it for remote
+     * execution over SSH. If the command is not a WP-CLI command (doesn't start with "wp ..."),
+     * no rewriting is done.
      *
      * @param string $command
      * @return string
      */
-    private function possiblyUpdateCommandForRemoteExecution($command) {
+    private function rewriteWpCliCommand($command) {
 
         if (!Strings::startsWith($command, "wp ")) {
             return $command;
         }
 
-        $command = Strings::startsWith($command, "wp ") ? substr($command, 3) : $command;
+        $command = substr($command, 3); // strip "wp " prefix
 
         if ($this->siteConfig->isVagrant) {
-            $command = "wp ssh \"$command\" --host=vagrant";
-        } else {
-            $command = "wp $command";
+            $command = "ssh \"$command\" --host=vagrant";
         }
+
+        $command = "php " . escapeshellarg($this->getWpCli()) . " $command";
 
         return $command;
 
 
     }
+
+    /**
+     * Checks whether a WP-CLI binary is available, possibly downloads it and returns the path to it.
+     *
+     * We use a custom WP-CLI PHAR (latest stable) mainly because this is what wp-cli-ssh installs into Vagrant virtual
+     * machines and we want to get the same behavior both locally and in Vagrant boxes. The local custom binary
+     * is re-downloaded every day to keep it fresh (stable WP-CLI releases go out every couple of months).
+     *
+     * @return string The path to the custom WP-CLI PHAR.
+     */
+    private function getWpCli() {
+        $wpCliPath = sys_get_temp_dir() . '/wp-cli-latest-stable.phar';
+        if (!file_exists($wpCliPath) || $this->fileIsOlderThanDays($wpCliPath, 1)) {
+            file_put_contents($wpCliPath, fopen("https://github.com/wp-cli/builds/blob/gh-pages/phar/wp-cli.phar?raw=true", 'r'));
+        }
+        return $wpCliPath;
+    }
+
+    private function fileIsOlderThanDays($filePath, $days) {
+        return time() - filemtime($filePath) >= 60*60*24*$days;
+    }
+
 }
