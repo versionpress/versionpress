@@ -11,9 +11,9 @@ var zip = require('gulp-zip');
 var replace = require('gulp-replace');
 var fs = require('fs');
 var path = require('path');
-var iniParser = require('ini');
 var chalk = require('chalk');
 var removeLines = require('gulp-remove-lines');
+var neon = require('neon-js');
 
 /**
  * Version to be displayed both in WordPress administration and used as a suffix of the generated ZIP file
@@ -75,9 +75,13 @@ gulp.task('set-nightly-build', function() {
  * Sets `buildDir` and `buildType` so that the copy methods copies to the WP test site.
  */
 gulp.task('prepare-test-deploy', function() {
-    var testConfigStr = fs.readFileSync(vpDir + '/tests/test-config.ini', 'utf-8');
-    var testConfig = iniParser.parse(testConfigStr);
-    buildDir = testConfig["Site-Settings"]["site-path"] + "/wp-content/plugins/versionpress";
+    var testConfigStr = fs.readFileSync(vpDir + '/tests/test-config.neon', 'utf-8');
+    var testConfig = neon.decode(testConfigStr).toObject(true);
+    var sitePath = testConfig["sites"][testConfig["test-site"]]["wp-site"]["path"];
+    if (isRelative(sitePath)) {
+        sitePath = vpDir + '/tests/' + sitePath;
+    }
+    buildDir = sitePath + "/wp-content/plugins/versionpress";
 
     buildType = 'test-deploy'; // later influences the `prepare-src-definition` task
 });
@@ -228,6 +232,7 @@ gulp.task('clean-build', ['zip'], function (cb) {
 // Main callable tasks
 //--------------------------------------
 
+
 /**
  * Default task that exports production build
  */
@@ -246,8 +251,16 @@ gulp.task('nightly', ['set-nightly-build', 'clean-build']);
 
 /**
  * Task called from WpAutomation to copy the plugin files to the test directory
- * specified in `test-config.ini`. Basically does only the `copy` task.
+ * specified in `test-config.neon`. Basically does only the `copy` task.
  */
 gulp.task('test-deploy', ['prepare-test-deploy', 'copy']);
 
 
+
+//--------------------------------------
+// Helper functions
+//--------------------------------------
+
+function isRelative(sitePath) {
+    return path.normalize(sitePath) != path.resolve(sitePath);
+}
