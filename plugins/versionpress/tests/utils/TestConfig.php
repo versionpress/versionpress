@@ -57,7 +57,16 @@ class TestConfig {
             $this->sites[$siteId]->wpVersion = $rawSiteConfig['wp-site']['wp-version'];
 
             // VP config
-            $this->sites[$siteId]->vpConfig = isset($rawSiteConfig['vp-config']) ? $rawSiteConfig['vp-config'] : array();
+            $this->sites[$siteId]->vpConfig = $rawSiteConfig['vp-config'];
+
+            // If the site overrode a vp-config value, array_merge_recursive() caused that the key now
+            // contains array with two items, first being the empty value from common-site-config
+            // and the other one being the real one.
+            foreach ($this->sites[$siteId]->vpConfig as $key => $value) {
+                if (is_array($value)) {
+                    $this->sites[$siteId]->vpConfig[$key] = $value[1];
+                }
+            }
 
         }
 
