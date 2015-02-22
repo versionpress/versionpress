@@ -1,15 +1,7 @@
 <?php
 
 /**
- * Base class for VersionPress Selenium tests. It brings these three main "features":
- *
- *  1. `test-config.ini` is used for configuration
- *  2. The site is automatically set up before the tests are run (VersionPress is copied, activated and initialized
- *     as well). If you don't want this pass `--force-setup` on command line or override the `setUpBeforeClass()`
- *     method in subclass.
- *  3. Admin is automatically logged in before the tests are run. If you don't want this override
- *     the `setUpPage()` method in subclass.
- *  4.
+ * Base class for VersionPress Selenium tests
  */
 abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
 

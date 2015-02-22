@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Wrapper around test-config.ini
+ * Test config, loaded from test-config.neon
  */
 class TestConfig {
 
