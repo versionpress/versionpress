@@ -3,6 +3,8 @@
 use Nette\Caching\Storages\DevNullStorage;
 use Nette\Loaders\RobotLoader;
 use Tracy\Debugger;
+use VersionPress\Tests\Selenium\SeleniumTestCase;
+use VersionPress\Tests\Utils\TestRunnerOptions;
 
 require_once(__DIR__ . '/../vendor/autoload.php');
 require_once(__DIR__ . '/selenium/SeleniumTestCase.php');
