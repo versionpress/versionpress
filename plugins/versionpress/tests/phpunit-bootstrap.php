@@ -9,7 +9,6 @@ use VersionPress\Tests\Utils\TestRunnerOptions;
 require_once(__DIR__ . '/../vendor/autoload.php');
 require_once(__DIR__ . '/selenium/SeleniumTestCase.php');
 require_once(__DIR__ . '/selenium/PostTypeTestCase.php');
-require_once(__DIR__ . '/end2end/EndToEndTestCase.php');
 require_once(__DIR__ . '/utils/CommitAsserter.php');
 require_once(__DIR__ . '/utils/ChangeInfoUtils.php');
 require_once(__DIR__ . '/utils/TestConfig.php');
