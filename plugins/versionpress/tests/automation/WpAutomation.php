@@ -460,7 +460,7 @@ class WpAutomation {
      */
     private function exec($command, $executionPath = null, $autoSshTunnelling = true) {
 
-        $command = $this->rewriteWpCliCommand($command);
+        $command = $this->rewriteWpCliCommand($command, $autoSshTunnelling);
 
         if (!$executionPath) {
             $executionPath = $this->siteConfig->isVagrant ? __DIR__ . '/..' : $this->siteConfig->path;
@@ -523,9 +523,10 @@ class WpAutomation {
      * no rewriting is done.
      *
      * @param string $command
+     * @param $autoSshTunnelling
      * @return string
      */
-    private function rewriteWpCliCommand($command) {
+    private function rewriteWpCliCommand($command, $autoSshTunnelling) {
 
         if (!Strings::startsWith($command, "wp ")) {
             return $command;
@@ -533,7 +534,7 @@ class WpAutomation {
 
         $command = substr($command, 3); // strip "wp " prefix
 
-        if ($this->siteConfig->isVagrant) {
+        if ($this->siteConfig->isVagrant && $autoSshTunnelling) {
             $command = "ssh \"$command\" --host=vagrant";
         }
 
