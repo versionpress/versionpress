@@ -1,9 +1,6 @@
 # TestConfig
 test-config.neon
 
-# Useful e.g. for WpAutomationRunner.local.php for running WpAutomation methods
-*.local.php
-
 # Various PHPUnit reporting formats
 phpunit-log.*
 
