@@ -41,8 +41,10 @@ class TestConfig {
 
             $this->sites[$siteId] = new SiteConfig();
 
-            // Site type
-            $this->sites[$siteId]->isVagrant = $rawSiteConfig['type'] == "vagrant";
+            // General settings
+            $this->sites[$siteId]->name = $siteId;
+            $this->sites[$siteId]->host = $rawSiteConfig['host'];
+            $this->sites[$siteId]->isVagrant = $rawSiteConfig['host'] != "localhost";
 
             // DB config
             $this->sites[$siteId]->dbHost = $rawSiteConfig['db']['host'];
@@ -63,9 +65,9 @@ class TestConfig {
             // VP config
             $this->sites[$siteId]->vpConfig = $rawSiteConfig['vp-config'];
 
-            // If the site overrode a vp-config value, array_merge_recursive() caused that the key now
+            // If the site overrode a common config vp-config value, array_merge_recursive() caused that the key now
             // contains array with two items, first being the empty value from common-site-config
-            // and the other one being the real one.
+            // and the other one being the real one. We want just the real one.
             foreach ($this->sites[$siteId]->vpConfig as $key => $value) {
                 if (is_array($value)) {
                     $this->sites[$siteId]->vpConfig[$key] = $value[1];

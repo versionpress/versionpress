@@ -23,8 +23,9 @@ test-site: vp01
 # Configured sites
 sites:
 
+    # Local sites
     vp01:
-        type: local
+        host: localhost
         db:
             host: localhost
             dbname: vp01
@@ -35,8 +36,9 @@ sites:
             url: http://localhost/vp01
             title: "VP Test @ WampServer"
 
+    # Vagrant sites. The key must match a configuration in wp-cli.local.yml.
     vagrant-php53:
-        type: vagrant
+        host: wordpress-php53.local
         db:
             host: localhost
             dbname: wordpress
@@ -46,6 +48,34 @@ sites:
             path: vagrant/wordpress/build
             url: http://wordpress-php53.local
             title: "VP Test @ Vagrant-PHP53"
+        vp-config:
+            git-binary: /usr/bin/git
+
+    vagrant-php54:
+        host: wordpress-php54.local
+        db:
+            host: localhost
+            dbname: wordpress
+            user: wordpress
+            password: wordpress
+        wp-site:
+            path: vagrant/wordpress/build
+            url: http://wordpress-php54.local
+            title: "VP Test @ Vagrant-PHP54"
+        vp-config:
+            git-binary: /usr/bin/git
+
+    vagrant-php55:
+        host: wordpress-php55.local
+        db:
+            host: localhost
+            dbname: wordpress
+            user: wordpress
+            password: wordpress
+        wp-site:
+            path: vagrant/wordpress/build
+            url: http://wordpress-php55.local
+            title: "VP Test @ Vagrant-PHP55"
         vp-config:
             git-binary: /usr/bin/git
 

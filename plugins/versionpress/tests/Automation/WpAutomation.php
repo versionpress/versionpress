@@ -544,7 +544,7 @@ class WpAutomation {
         $command = substr($command, 3); // strip "wp " prefix
 
         if ($this->siteConfig->isVagrant && $autoSshTunnelling) {
-            $command = "ssh \"$command\" --host=vagrant";
+            $command = "ssh \"$command\" --host=" . escapeshellarg($this->siteConfig->name);
         }
 
         $command = "php " . escapeshellarg($this->getWpCli()) . " $command";

@@ -2,6 +2,18 @@ require:
   - ../vendor/x-team/wp-cli-ssh/wp-cli-ssh.php
 
 ssh:
-  vagrant:
+
+  # These keys can be used as a --host option of the 'wp ssh' command
+  # They should match the site config keys in test-config.neon
+
+  vagrant-php53:
     cmd: ssh -i C:\Users\Borek\.vagrant.d\insecure_private_key -q vagrant@wordpress-php53.local %cmd%
+    path: /vagrant/wordpress/build
+
+  vagrant-php54:
+    cmd: ssh -i C:\Users\Borek\.vagrant.d\insecure_private_key -q vagrant@wordpress-php54.local %cmd%
+    path: /vagrant/wordpress/build
+
+  vagrant-php55:
+    cmd: ssh -i C:\Users\Borek\.vagrant.d\insecure_private_key -q vagrant@wordpress-php55.local %cmd%
     path: /vagrant/wordpress/build
