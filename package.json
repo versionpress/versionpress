@@ -17,7 +17,7 @@
     "gulp-replace": "~0.4.0",
     "gulp-shell": "~0.2.9",
     "gulp-zip": "~2.0.1",
-    "neon-js": "git://github.com/agilio/neon-js",
+    "neon-js": "^1.0.0",
     "shelljs": "^0.3.0"
   },
   "scripts": {
