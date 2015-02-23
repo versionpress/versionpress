@@ -28,12 +28,20 @@ class TestConfig {
      */
     public $testSite;
 
+    /**
+     * Type of performers that will run the tests (selenium / wp-cli).
+     *
+     * @var string
+     */
+    public $end2endTestType;
+
     function __construct($configFile) {
         $rawConfig = Neon::decode(file_get_contents($configFile));
 
         $this->seleniumConfig = new SeleniumConfig();
         $this->seleniumConfig->firefoxBinary = $rawConfig['selenium']['firefox-binary'];
         $this->seleniumConfig->postCommitWaitTime = $rawConfig['selenium']['post-commit-wait-time'];
+        $this->end2endTestType = $rawConfig['end2end-test-type'];
 
         $this->sites = array();
         foreach ($rawConfig['sites'] as $siteId => $rawSiteConfig) {

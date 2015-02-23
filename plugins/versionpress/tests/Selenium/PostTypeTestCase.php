@@ -15,7 +15,7 @@ use VersionPress\Tests\Utils\CommitAsserter;
  * Note2: helper test methods are called runXyzTest(), not testXyz() because otherwise PHPUnit would consider
  * them real tests.
  */
-class PostTypeTestCase extends \VersionPress\Tests\Selenium\SeleniumTestCase {
+class PostTypeTestCase extends SeleniumTestCase {
 
     /**
      * @return string
