@@ -9,7 +9,8 @@
       <excludeFolder url="file://$MODULE_DIR$/temp" />
       <excludeFolder url="file://$MODULE_DIR$/tests/End2End" />
       <excludeFolder url="file://$MODULE_DIR$/tests/node_modules" />
-      <excludeFolder url="file://$MODULE_DIR$/tests/vagrant" />
+      <excludeFolder url="file://$MODULE_DIR$/tests/vagrant/.vagrant" />
+      <excludeFolder url="file://$MODULE_DIR$/tests/vagrant/wordpress" />
       <excludeFolder url="file://$MODULE_DIR$/vendor" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/janvoracek/comment-stripper" />
