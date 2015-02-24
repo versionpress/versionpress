@@ -41,10 +41,10 @@ class SynchronizationProcess {
             $task = array_shift($synchronizationTasks);
             /** @var Synchronizer $synchronizer */
             $synchronizer = $task['synchronizer'];
-            $result = $synchronizer->synchronize($task['task']);
+            $remainingTasks = $synchronizer->synchronize($task['task']);
 
-            if ($result !== null) {
-                $synchronizationTasks[] = array('synchronizer' => $synchronizer, 'task' => $result);
+            foreach ($remainingTasks as $remainingTask) {
+                $synchronizationTasks[] = array('synchronizer' => $synchronizer, 'task' => $remainingTask);
             }
         }
     }
@@ -59,6 +59,8 @@ class SynchronizationProcess {
      */
     private function sortEntitiesToSynchronize($entitiesToSynchronize) {
         $defaultSynchronizationSequence = $this->defaultSynchronizationSequence;
+        $entitiesToSynchronize = array_unique($entitiesToSynchronize);
+
         ArrayUtils::stablesort($entitiesToSynchronize, function ($entity1, $entity2) use ($defaultSynchronizationSequence) {
             $priority1 = array_search($entity1, $defaultSynchronizationSequence);
             $priority2 = array_search($entity2, $defaultSynchronizationSequence);

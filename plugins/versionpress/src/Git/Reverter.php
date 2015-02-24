@@ -247,6 +247,7 @@ class Reverter {
 
         if ($this->wasModified($modifiedFiles, 'comments')) {
             $entitiesToSynchronize[] = 'comment';
+            $entitiesToSynchronize[] = 'post'; // count of comments
         }
 
         if ($this->wasModified($modifiedFiles, 'users.ini')) {

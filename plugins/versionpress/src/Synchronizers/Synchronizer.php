@@ -27,12 +27,12 @@ interface Synchronizer {
      * corresponding to tracked entities are usually in sync with the storage after this method
      * is done. It may happen that the synchronizer cannot synchronize everything in the first
      * pass. Because of this, the synchronize method takes a task for sychronization (usually
-     * "everything" for the first pass) and returns another task that isn't done yet. It's up
-     * to the SynchronizationProcess to call the synchronize method again with this task when
-     * the first pass is done.
+     * "everything" for the first pass) and returns a list of tasks that aren't done yet. It's
+     * up to the SynchronizationProcess to call the synchronize method again with this tasks
+     * when the previous pass is done.
      *
      * @param string $task
-     * @return string|null
+     * @return string[]
      */
     function synchronize($task);
 }

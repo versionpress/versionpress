@@ -40,7 +40,12 @@ class PostsSynchronizer extends SynchronizerBase {
     }
 
     protected function doEntitySpecificActions() {
+        if ($this->passNumber == 1) {
+            return false;
+        }
+
         $this->fixCommentCounts();
+        return true;
     }
 
     private function fixCommentCounts() {

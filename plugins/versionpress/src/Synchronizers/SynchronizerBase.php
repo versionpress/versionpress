@@ -15,6 +15,7 @@ use wpdb;
 abstract class SynchronizerBase implements Synchronizer {
 
     const SYNCHRONIZE_MN_REFERENCES = 'mn-references';
+    const DO_ENTITY_SPECIFIC_ACTIONS = 'entity-specific-actions';
 
     private $entityName;
     private $idColumnName;
@@ -31,6 +32,8 @@ abstract class SynchronizerBase implements Synchronizer {
     /** @var array|null */
     private $entities = null;
 
+    protected $passNumber = 0;
+
     /**
      * @param Storage $storage Specific Synchronizers will use specific storage types, see VersionPress\Synchronizers\SynchronizerFactory
      * @param wpdb $database
@@ -46,17 +49,23 @@ abstract class SynchronizerBase implements Synchronizer {
     }
 
     function synchronize($task) {
+        $this->passNumber += 1;
         $this->maybeInit();
         $entities = $this->entities;
+        $remainingTasks = array();
 
         if ($task === Synchronizer::SYNCHRONIZE_EVERYTHING) {
             $this->updateDatabase($entities);
             $this->fixSimpleReferences($entities);
             $fixedMnReferences = $this->fixMnReferences($entities);
-            $this->doEntitySpecificActions();
+            $doneEntitySpecificActions = $this->doEntitySpecificActions();
+
+            if (!$doneEntitySpecificActions) {
+                $remainingTasks[] = self::DO_ENTITY_SPECIFIC_ACTIONS;
+            }
 
             if (!$fixedMnReferences) {
-                return self::SYNCHRONIZE_MN_REFERENCES;
+                $remainingTasks[] = self::SYNCHRONIZE_MN_REFERENCES;
             }
         }
 
@@ -64,7 +73,11 @@ abstract class SynchronizerBase implements Synchronizer {
             $this->fixMnReferences($entities);
         }
 
-        return null;
+        if ($task === self::DO_ENTITY_SPECIFIC_ACTIONS) {
+            $this->doEntitySpecificActions();
+        }
+
+        return $remainingTasks;
     }
 
     private function maybeInit() {
@@ -289,7 +302,7 @@ abstract class SynchronizerBase implements Synchronizer {
         }, $referencesToUpdate);
         $updateSql .= join(", ", ArrayUtils::parametrize($newReferences));
 
-        $updateSql .= "WHERE $idColumnName=(SELECT id FROM $vpIdTable WHERE vp_id=UNHEX(\"$entity[vp_id]\"))";
+        $updateSql .= " WHERE $idColumnName=(SELECT id FROM $vpIdTable WHERE vp_id=UNHEX(\"$entity[vp_id]\"))";
         $this->database->query($updateSql);
     }
 
@@ -380,8 +393,11 @@ abstract class SynchronizerBase implements Synchronizer {
     /**
      * Specific Synchronizers might do entity-specific actions, for example, VersionPress\Synchronizers\PostsSynchronizer
      * updates comment count in the database (something we don't track in the storage).
+     *
+     * @return bool If false, the method will be called again in a second pass.
      */
     protected function doEntitySpecificActions() {
+        return true;
     }
 
 

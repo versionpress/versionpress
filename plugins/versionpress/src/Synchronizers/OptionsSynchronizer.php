@@ -53,6 +53,7 @@ class OptionsSynchronizer implements Synchronizer {
 
         $deleteSql = "DELETE FROM {$this->tableName} WHERE option_name NOT IN(" . join(", ", $ignoredOptionNames) . ") OR option_name NOT LIKE '_%'";
         $this->database->query($deleteSql);
+        return array();
     }
 
 }
