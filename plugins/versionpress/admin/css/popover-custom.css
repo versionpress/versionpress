@@ -13,7 +13,7 @@
 .webui-popover .spinner {
     display: block;
     float: none;
-    margin: auto;
+    margin: 17px auto 6px;
 }
 
 .webui-popover .webui-popover-title .title-content {
@@ -35,4 +35,8 @@
     margin-left: auto;
     bottom: auto;
     z-index: auto;
+}
+
+.webui-popover-title em {
+    font-weight: normal;
 }

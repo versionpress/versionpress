@@ -29,8 +29,8 @@ jQuery(document).ready(function($) {
 
     var customRevertPopoverClass = "versionpress-revert-popover"; // used to identify the popover later
     var undoRollbackSelector = '.vp-undo, .vp-rollback';
-    var staticWarningText = "Watch out! This operation can be a little bit risky."
-    var $staticWarning = $("<div>").html(staticWarningText);
+    var staticWarningText = "Revert operations are a bit tricky, make sure you have a site backup."
+    var $staticWarning = $("<div'>").html(staticWarningText);
 
     $('body').on('click', undoRollbackSelector, function (e) {
         var $link = $(this);
@@ -60,7 +60,7 @@ jQuery(document).ready(function($) {
 
     function showRevertPopup ($link, data) {
         var type = $link.hasClass('vp-undo') ? 'undo' : 'rollback';
-        var title = type == 'undo' ? "Undo \"" + $link.data('commit-message') + '"' : "Rollback to " + $link.data('commit-date');
+        var title = type == 'undo' ? "Undo <em>" + $link.data('commit-message') + '</em>?' : "Rollback to <em>" + $link.data('commit-date') + "</em>?";
         var $content = $('<div>');
         $content.append($staticWarning);
         $content.append('<div class="spinner">');
