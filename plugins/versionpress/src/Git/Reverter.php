@@ -59,9 +59,6 @@ class Reverter {
             return RevertStatus::VIOLATED_REFERENTIAL_INTEGRITY;
         }
 
-        $affectedPosts = $this->getAffectedPosts($modifiedFiles);
-        $this->updateChangeDateForPosts($affectedPosts);
-
         $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_UNDO, $commitHash);
         $this->committer->forceChangeInfo($changeInfo);
         $this->committer->commit();
@@ -69,14 +66,14 @@ class Reverter {
         $entitiesToSynchronize = $this->detectEntitiesToSynchronize($modifiedFiles);
 
         $this->synchronize($entitiesToSynchronize);
+        $affectedPosts = $this->getAffectedPosts($modifiedFiles);
+        $this->updateChangeDateForPosts($affectedPosts);
+
         return RevertStatus::OK;
     }
 
     public function revertAll($commitHash) {
         $modifiedFiles = $this->repository->getModifiedFiles($commitHash);
-        $affectedPosts = $this->getAffectedPosts($modifiedFiles);
-
-        $this->updateChangeDateForPosts($affectedPosts);
 
         $this->repository->revertAll($commitHash);
 
@@ -91,6 +88,9 @@ class Reverter {
         $entitiesToSynchronize = $this->detectEntitiesToSynchronize($modifiedFiles);
 
         $this->synchronize($entitiesToSynchronize);
+        $affectedPosts = $this->getAffectedPosts($modifiedFiles);
+        $this->updateChangeDateForPosts($affectedPosts);
+
         return RevertStatus::OK;
     }
 
