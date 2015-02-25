@@ -185,6 +185,34 @@ class WpAutomation {
         $this->runWpCliCommand('comment', 'delete', $args);
     }
 
+    public function trashComment($id) {
+        $this->runWpCliCommand('comment', 'trash', array($id));
+    }
+
+    public function untrashComment($id) {
+        $this->runWpCliCommand('comment', 'untrash', array($id));
+    }
+
+    public function approveComment($id) {
+        $this->runWpCliCommand('comment', 'approve', array($id));
+    }
+
+    public function unapproveComment($id) {
+        $this->runWpCliCommand('comment', 'unapprove', array($id));
+    }
+
+    public function spamComment($id) {
+        $this->runWpCliCommand('comment', 'spam', array($id));
+    }
+
+    public function unspamComment($id) {
+        $this->runWpCliCommand('comment', 'unspam', array($id));
+    }
+
+    public function getComments() {
+        return json_decode($this->runWpCliCommand('comment', 'list', array('format' => 'json')));
+    }
+
     /**
      * Creates new user using WP-CLI. Returns ID of created user.
      *
