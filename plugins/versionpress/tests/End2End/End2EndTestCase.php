@@ -22,14 +22,14 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase {
         self::$testConfig = new TestConfig(__DIR__ . '/../test-config.neon');
 
         $class = get_called_class();
-        $performerType = implode('', array_map('ucfirst', explode('-', self::$testConfig->end2endTestType)));
+        $workerType = implode('', array_map('ucfirst', explode('-', self::$testConfig->end2endTestType)));
 
-        $performerClass = $class . $performerType . 'Performer';
-        $performer = new $performerClass(self::$testConfig);
+        $workerClass = $class . $workerType . 'Worker';
+        $worker = new $workerClass(self::$testConfig);
 
-        $propertyReflection = new \ReflectionProperty($class, 'performer');
+        $propertyReflection = new \ReflectionProperty($class, 'worker');
         $propertyReflection->setAccessible(true);
-        $propertyReflection->setValue(null, $performer);
+        $propertyReflection->setValue(null, $worker);
 
     }
 }

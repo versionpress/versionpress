@@ -2,7 +2,7 @@
 
 namespace VersionPress\Tests\End2End;
 
-class CommentTestSeleniumPerformer extends SeleniumPerformer implements ICommentTestPerformer {
+class CommentTestSeleniumWorker extends SeleniumWorker implements ICommentTestWorker {
 
     private $testPostId = 0;
 

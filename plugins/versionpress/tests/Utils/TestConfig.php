@@ -29,7 +29,7 @@ class TestConfig {
     public $testSite;
 
     /**
-     * Type of performers that will run the tests (selenium / wp-cli).
+     * Type of workers that will run the tests (selenium / wp-cli).
      *
      * @var string
      */

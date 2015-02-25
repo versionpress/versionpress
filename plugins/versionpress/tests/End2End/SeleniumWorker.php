@@ -53,7 +53,7 @@ use VersionPress\Tests\Utils\TestConfig;
  * @method void close() Close the current window and clear session data.
  * @method \PHPUnit_Extensions_Selenium2TestCase_Element active() Get the element on the page that currently has focus.
  */
-class SeleniumPerformer implements ITestPerformer {
+class SeleniumWorker implements ITestWorker {
     /** @var \PHPUnit_Extensions_Selenium2TestCase_Session */
     protected $session;
     /** @var \PHPUnit_Extensions_Selenium2TestCase_Session */
@@ -262,7 +262,7 @@ class SeleniumPerformer implements ITestPerformer {
      * @param int $timeout Milliseconds
      */
     protected function waitAfterRedirect($timeout = 5000) {
-        $this->waitUntilTrue(function (SeleniumPerformerBasedFakeTestCase $testCase) {
+        $this->waitUntilTrue(function (SeleniumWorkerBasedFakeTestCase $testCase) {
             return $testCase->executeScript("return document.readyState;") == "complete";
         }, $timeout);
 
@@ -276,7 +276,7 @@ class SeleniumPerformer implements ITestPerformer {
      * @param $timeout
      */
     protected function waitUntilTrue($callback, $timeout = null) {
-        $this->waitUntil(function (SeleniumPerformerBasedFakeTestCase $testCase) use ($callback) {
+        $this->waitUntil(function (SeleniumWorkerBasedFakeTestCase $testCase) use ($callback) {
             $result = call_user_func($callback, $testCase);
             return $result === true ? true : null;
         }, $timeout);
@@ -286,7 +286,7 @@ class SeleniumPerformer implements ITestPerformer {
      * Wait for all AJAX requests caused by jQuery are done.
      */
     protected function waitForAjax() {
-        $this->waitUntilTrue(function (SeleniumPerformerBasedFakeTestCase $testCase) {
+        $this->waitUntilTrue(function (SeleniumWorkerBasedFakeTestCase $testCase) {
             return $testCase->executeScript("return jQuery.active;") === 0;
         }, 5000);
     }
@@ -300,7 +300,7 @@ class SeleniumPerformer implements ITestPerformer {
      */
     protected function waitUntil($callback, $timeout = NULL)
     {
-        $waitUntil = new PHPUnit_Extensions_Selenium2TestCase_WaitUntil(new SeleniumPerformerBasedFakeTestCase($this));
+        $waitUntil = new PHPUnit_Extensions_Selenium2TestCase_WaitUntil(new SeleniumWorkerBasedFakeTestCase($this));
         return $waitUntil->run($callback, $timeout);
     }
 }
@@ -308,16 +308,16 @@ class SeleniumPerformer implements ITestPerformer {
 /**
  * @method executeScript
  */
-class SeleniumPerformerBasedFakeTestCase extends \PHPUnit_Extensions_Selenium2TestCase {
+class SeleniumWorkerBasedFakeTestCase extends \PHPUnit_Extensions_Selenium2TestCase {
 
-    /** @var SeleniumPerformer */
-    private $performer;
+    /** @var SeleniumWorker */
+    private $worker;
 
-    function __construct(SeleniumPerformer $performer) {
-        $this->performer = $performer;
+    function __construct(SeleniumWorker $worker) {
+        $this->worker = $worker;
     }
 
     public function __call($command, $arguments) {
-        return call_user_func_array(array($this->performer, $command) , $arguments);
+        return call_user_func_array(array($this->worker, $command) , $arguments);
     }
 }

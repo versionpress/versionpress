@@ -4,16 +4,10 @@ namespace VersionPress\Tests\End2End;
 
 use VersionPress\Tests\Utils\CommitAsserter;
 
-/**
- * Class CommentTest
- * @package VersionPress\Tests\End2End
- *
- */
 class CommentTest extends End2EndTestCase {
 
-
-    /** @var ICommentTestPerformer */
-    private static $performer;
+    /** @var ICommentTestWorker */
+    private static $worker;
 
     /**
      * Note: public comments from the same IP are throttled by default (one is allowed every 15 seconds),
@@ -29,11 +23,11 @@ class CommentTest extends End2EndTestCase {
      */
     public function publicCommentAwaitsModeration() {
 
-        self::$performer->prepare_createCommentAwaitingModeration();
+        self::$worker->prepare_createCommentAwaitingModeration();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        self::$performer->createCommentAwaitingModeration();
+        self::$worker->createCommentAwaitingModeration();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("comment/create-pending");

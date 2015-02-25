@@ -20,7 +20,7 @@ common-site-config:
 # One of the sites below, used as the current one
 test-site: vp01
 
-# Type of performers that will run the tests (selenium / wp-cli)
+# Type of workers that will run the tests (selenium / wp-cli)
 end2end-test-type: selenium
 
 # Configured sites

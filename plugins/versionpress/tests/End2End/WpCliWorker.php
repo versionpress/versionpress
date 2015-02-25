@@ -5,7 +5,7 @@ namespace VersionPress\Tests\End2End;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\TestConfig;
 
-class WpCliPerformer implements ITestPerformer {
+class WpCliWorker implements ITestWorker {
 
     protected $wpAutomation;
 
