@@ -254,7 +254,7 @@ class MirroringDatabase extends ExtendedWpdb {
         foreach ($references as $referenceName => $targetEntity) {
             $targetTable = $this->dbSchemaInfo->getEntityInfo($targetEntity)->tableName;
 
-            if ($entity[$referenceName] > 0) {
+            if (isset($entity[$referenceName]) && $entity[$referenceName] > 0) {
                 $referenceVpId = $this->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=$entity[$referenceName]");
                 $entity['vp_' . $referenceName] = $referenceVpId;
             }
