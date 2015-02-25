@@ -29,7 +29,7 @@ jQuery(document).ready(function($) {
 
     var customRevertPopoverClass = "versionpress-revert-popover"; // used to identify the popover later
     var undoRollbackSelector = '.vp-undo, .vp-rollback';
-    var staticWarningText = "Revert operations are a bit tricky, make sure you have a site backup."
+    var staticWarningText = "For EAP releases, please have a backup. <a href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback' target='_blank'>Lean more about reverts</a>"
     var $staticWarning = $("<div'>").html(staticWarningText);
 
     $('body').on('click', undoRollbackSelector, function (e) {
