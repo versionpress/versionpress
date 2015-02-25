@@ -60,7 +60,7 @@ jQuery(document).ready(function($) {
 
     function showRevertPopup ($link, data) {
         var type = $link.hasClass('vp-undo') ? 'undo' : 'rollback';
-        var title = type == 'undo' ? "Undo <em>" + $link.data('commit-message') + '</em>?' : "Rollback to <em>" + $link.data('commit-date') + "</em>?";
+        var title = type == 'undo' ? "Undo <em>" + $link.data('commit-message') + '</em> ?' : "Rollback to <em>" + $link.data('commit-date') + "</em> ?";
         var $content = $('<div>');
         $content.append($staticWarning);
         $content.append('<div class="spinner">');
