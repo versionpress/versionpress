@@ -128,7 +128,7 @@ class WpAutomation {
      * @return int
      */
     public function createPost(array $post) {
-        $post["porcelain"] = ""; // wp-Cli returns only id
+        $post["porcelain"] = null; // wp-Cli returns only id
         return intval($this->runWpCliCommand('post', 'create', $post));
     }
 
@@ -160,7 +160,7 @@ class WpAutomation {
      * @return int
      */
     public function createComment(array $comment) {
-        $comment["porcelain"] = "";  // wp-Cli returns only id
+        $comment["porcelain"] = null;  // wp-Cli returns only id
         return intval($this->runWpCliCommand("comment", "create", $comment));
     }
 
@@ -195,7 +195,7 @@ class WpAutomation {
         $args = array($user["user_login"], $user["user_email"]);
         unset($user["user_login"], $user["user_email"]);
         $args = array_merge($args, $user);
-        $args["porcelain"] = "";  // wp-Cli returns only id
+        $args["porcelain"] = null;  // wp-Cli returns only id
         return intval($this->runWpCliCommand("user", "create", $args));
     }
 
@@ -511,7 +511,7 @@ class WpAutomation {
         foreach ($args as $name => $value) {
             if (is_int($name)) { // positional argument
                 $cliCommand .= " " . $this->vagrantSensitiveEscapeShellArg($value);
-            } elseif ($value) {
+            } elseif ($value !== null) {
                 $escapedValue = $this->vagrantSensitiveEscapeShellArg($value);
                 $cliCommand .= " --$name=$escapedValue";
             } else {
