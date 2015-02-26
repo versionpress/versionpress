@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" autoUploadExternalChanges="true">
+  <component name="PublishConfigData" autoUpload="Always" serverName="VersionPress" autoUploadExternalChanges="true">
     <serverData>
-      <paths name="vp01">
+      <paths name="VersionPress">
         <serverdata>
           <mappings>
             <mapping deploy="." local="$PROJECT_DIR$/plugins/versionpress" web="/" />
           </mappings>
           <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/plugins/versionpress/tests" />
             <excludedPath local="true" path="$PROJECT_DIR$/plugins/versionpress/versionpress.iml" />
             <excludedPath local="true" path="$PROJECT_DIR$/plugins/versionpress/.gitignore" />
             <excludedPath local="true" path="$PROJECT_DIR$/plugins/versionpress/composer.json" />
