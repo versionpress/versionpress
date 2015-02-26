@@ -19,5 +19,6 @@ class WpAutomationRunnerSample extends \PHPUnit_Framework_TestCase {
 
         $wpAutomation->setUpSite();
         $wpAutomation->copyVersionPressFiles();
+        $wpAutomation->activateVersionPress();
     }
 }

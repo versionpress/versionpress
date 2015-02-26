@@ -1,17 +1,10 @@
 <?php
 
-namespace VersionPress\Tests\Selenium;
+namespace VersionPress\Tests\End2End\Pages;
 
-/**
- * Pages tests
- *
- * @testdox Pagesvia web:
- */
-class PagesViaWebTest extends PostTypeTestCase {
+use VersionPress\Tests\End2End\Utils\PostTypeTestCase;
 
-    public function getPostType() {
-        return "page";
-    }
+class PagesTest extends PostTypeTestCase {
 
     /**
      * @test
@@ -96,6 +89,4 @@ class PagesViaWebTest extends PostTypeTestCase {
     public function publishingDraftCreatesPostPublishAction() {
         $this->runPublishDraftTest();
     }
-
-
 }
