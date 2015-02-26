@@ -462,7 +462,7 @@ class WpAutomation {
      * Deletes all tables from the database.
      */
     private function clearDatabase() {
-        $this->runWpCliCommand("db", "reset", array("yes" => ""));
+        $this->runWpCliCommand("db", "reset", array("yes" => null));
     }
 
     /**

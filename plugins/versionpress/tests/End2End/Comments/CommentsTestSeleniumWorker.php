@@ -1,8 +1,10 @@
 <?php
 
-namespace VersionPress\Tests\End2End;
+namespace VersionPress\Tests\End2End\Comments;
 
-class CommentTestSeleniumWorker extends SeleniumWorker implements ICommentTestWorker {
+use VersionPress\Tests\End2End\Utils\SeleniumWorker;
+
+class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTestWorker {
 
     private $testPostId = 0;
 

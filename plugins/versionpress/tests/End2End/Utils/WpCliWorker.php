@@ -1,6 +1,6 @@
 <?php
 
-namespace VersionPress\Tests\End2End;
+namespace VersionPress\Tests\End2End\Utils;
 
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\TestConfig;

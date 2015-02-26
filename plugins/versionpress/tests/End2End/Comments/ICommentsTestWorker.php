@@ -1,8 +1,8 @@
 <?php
 
-namespace VersionPress\Tests\End2End;
+namespace VersionPress\Tests\End2End\Comments;
 
-interface ICommentTestWorker {
+interface ICommentsTestWorker {
     public function prepare_createCommentAwaitingModeration();
     public function createCommentAwaitingModeration();
 

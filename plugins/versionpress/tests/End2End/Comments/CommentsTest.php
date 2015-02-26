@@ -1,12 +1,13 @@
 <?php
 
-namespace VersionPress\Tests\End2End;
+namespace VersionPress\Tests\End2End\Comments;
 
+use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 
-class CommentTest extends End2EndTestCase {
+class CommentsTest extends End2EndTestCase {
 
-    /** @var ICommentTestWorker */
+    /** @var ICommentsTestWorker */
     private static $worker;
 
     /**

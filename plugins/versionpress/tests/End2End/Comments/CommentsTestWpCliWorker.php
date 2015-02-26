@@ -1,8 +1,10 @@
 <?php
 
-namespace VersionPress\Tests\End2End;
+namespace VersionPress\Tests\End2End\Comments;
 
-class CommentTestWpCliWorker extends WpCliWorker implements ICommentTestWorker {
+use VersionPress\Tests\End2End\Utils\WpCliWorker;
+
+class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker {
 
     private $testPostId = 0;
     private $lastCreatedComment;

@@ -1,7 +1,11 @@
 <?php
-
-namespace VersionPress\Tests\End2End;
-
+/**
+ * Created by PhpStorm.
+ * User: Jan
+ * Date: 26. 2. 2015
+ * Time: 9:33
+ */
+namespace VersionPress\Tests\End2End\Utils;
 use PHPUnit_Extensions_Selenium2TestCase_SessionStrategy_Isolated;
 use PHPUnit_Extensions_Selenium2TestCase_SessionStrategy_Shared;
 use PHPUnit_Extensions_Selenium2TestCase_URL;
@@ -9,7 +13,9 @@ use PHPUnit_Extensions_Selenium2TestCase_WaitUntil;
 use PHPUnit_Extensions_Selenium2TestCase_WebDriverException;
 use PHPUnit_Framework_Assert;
 use VersionPress\Tests\Automation\WpAutomation;
-use VersionPress\Tests\Selenium\SeleniumTestCase;
+use VersionPress\Tests\End2End\int;
+use VersionPress\Tests\End2End\mixed;
+use VersionPress\Tests\End2End\string;
 use VersionPress\Tests\Utils\TestConfig;
 
 /**
@@ -298,26 +304,8 @@ class SeleniumWorker implements ITestWorker {
      * @param null $timeout
      * @return mixed
      */
-    protected function waitUntil($callback, $timeout = NULL)
-    {
+    protected function waitUntil($callback, $timeout = NULL) {
         $waitUntil = new PHPUnit_Extensions_Selenium2TestCase_WaitUntil(new SeleniumWorkerBasedFakeTestCase($this));
         return $waitUntil->run($callback, $timeout);
-    }
-}
-
-/**
- * @method executeScript
- */
-class SeleniumWorkerBasedFakeTestCase extends \PHPUnit_Extensions_Selenium2TestCase {
-
-    /** @var SeleniumWorker */
-    private $worker;
-
-    function __construct(SeleniumWorker $worker) {
-        $this->worker = $worker;
-    }
-
-    public function __call($command, $arguments) {
-        return call_user_func_array(array($this->worker, $command) , $arguments);
     }
 }
