@@ -1,11 +1,15 @@
 <?php
 
-namespace VersionPress\Tests\Selenium;
+namespace VersionPress\Tests\End2End\Widgets;
 
 use Exception;
+use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 
-class WidgetTest extends SeleniumTestCase {
+class WidgetsTest extends End2EndTestCase {
+
+    /** @var IWidgetsWorker */
+    private static $worker;
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
@@ -22,14 +26,11 @@ class WidgetTest extends SeleniumTestCase {
      * @testdox Creating first widget of given type creates new option
      */
     public function creatingFirstWidgetOfGivenTypeCreatesOption() {
-        $this->url('wp-admin/widgets.php');
-        $this->jsClick("#widget-list .widget:contains('Calendar') .widget-control-edit");
-        $this->waitAfterRedirect();
+        self::$worker->prepare_createWidget();
+
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        $this->byCssSelector("form[action='widgets.php'] input[name*=title]")->value('Some widget');
-        $this->byCssSelector("form[action='widgets.php'] input[type=submit]")->click();
-        $this->waitAfterRedirect();
+        self::$worker->createWidget();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction('option/create');
@@ -44,14 +45,11 @@ class WidgetTest extends SeleniumTestCase {
      * @depends creatingFirstWidgetOfGivenTypeCreatesOption
      */
     public function creatingSecondWidgetOfGivenTypeUpdatesOption() {
-        $this->url('wp-admin/widgets.php');
-        $this->jsClick("#widget-list .widget:contains('Calendar') .widget-control-edit");
-        $this->waitAfterRedirect();
+        self::$worker->prepare_createWidget();
+
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        $this->byCssSelector("form[action='widgets.php'] input[name*=title]")->value('Other widget');
-        $this->byCssSelector("form[action='widgets.php'] input[type=submit]")->click();
-        $this->waitAfterRedirect();
+        self::$worker->createWidget();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction('option/edit');
@@ -65,13 +63,11 @@ class WidgetTest extends SeleniumTestCase {
      * @testdox Editing widget creates 'option/edit' action.
      */
     public function editingWidgetCreatesOptionEditAction() {
-        $this->url('wp-admin/widgets.php');
+        self::$worker->prepare_editWidget();
+
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        $this->jsClick('#widgets-right .widget-control-edit');
-        $this->executeScript("jQuery('#widgets-right .widget .widget-inside input[name*=title]').first().val('Edited title')");
-        $this->executeScript("jQuery('#widgets-right .widget .widget-inside input[type=submit]').first().click()");
-        $this->waitForAjax();
+        self::$worker->editWidget();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction('option/edit');
@@ -85,12 +81,11 @@ class WidgetTest extends SeleniumTestCase {
      * @testdox Deleting widget creates 'option/edit' action
      */
     public function deletingWidgetCreatesOptionEditAction() {
-        $this->url('wp-admin/widgets.php');
+        self::$worker->prepare_deleteWidget();
+
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        $this->jsClick('#widgets-right .widget-control-edit');
-        $this->executeScript("jQuery('#widgets-right .widget .widget-control-remove').first().click()");
-        $this->waitForAjax();
+        self::$worker->deleteWidget();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction('option/edit');
