@@ -1,30 +1,30 @@
 <?php
 
+namespace VersionPress\Tests\End2End\Media;
 
-namespace VersionPress\Tests\Selenium;
-
-use PHPUnit_Extensions_Selenium2TestCase_Keys;
+use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 
-class UploadsTest extends SeleniumTestCase {
+class MediaTest extends End2EndTestCase {
+
+    /** @var IMediaTestWorker */
+    private static $worker;
+
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+        self::$worker->setUploadedFilePath(__DIR__ . DIRECTORY_SEPARATOR . 'test-data' . DIRECTORY_SEPARATOR . 'test.png');
+    }
 
     /**
      * @test
      * @testdox Uploading file creates 'post/create' action
      */
     public function uploadingFileCreatesPostCreateAction() {
+        self::$worker->prepare_uploadFile();
+
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        // Couldn't find out how to automate the default (and more modern) upload.php so let's go via media-new.php
-        // see http://stackoverflow.com/q/27607453/21728
-        $this->url('wp-admin/media-new.php');
-        if (!$this->byCssSelector('#html-upload')->displayed()) {
-            $this->byCssSelector('.upload-flash-bypass a')->click();
-        }
-        $this->byCssSelector('#async-upload')->value(__DIR__ . DIRECTORY_SEPARATOR . 'test-data' . DIRECTORY_SEPARATOR . 'test.png'); // separator is actually OS-specific here
-        $this->byCssSelector('#html-upload')->click();
-
-        $this->waitForElement('.thumbnail', 3000);
+        self::$worker->uploadFile();
 
         $commitAsserter->ignoreCommits("usermeta/edit");
 
@@ -42,13 +42,11 @@ class UploadsTest extends SeleniumTestCase {
      * @depends uploadingFileCreatesPostCreateAction
      */
     public function editingFileNameCreatesPostEditAction() {
+        self::$worker->prepare_editFileName();
+
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        $this->byCssSelector('.attachment:first-child .thumbnail')->click(); // click must be on the .thumbnail element
-        $this->waitForElement('.edit-attachment-frame', 300);
-        $this->setValue('.setting[data-setting=title] input', 'updated image title');
-        $this->keys(PHPUnit_Extensions_Selenium2TestCase_Keys::TAB); // focus out, AJAX saves the image
-        $this->waitForAjax();
+        self::$worker->editFileName();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/edit");
@@ -63,11 +61,11 @@ class UploadsTest extends SeleniumTestCase {
      * @depends editingFileNameCreatesPostEditAction
      */
     public function deletingFileCreatesPostDeleteAction() {
+        self::$worker->prepare_deleteFile();
+
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        $this->byCssSelector('.delete-attachment')->click();
-        $this->acceptAlert();
-        $this->waitForAjax();
+        self::$worker->deleteFile();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/delete");
@@ -76,5 +74,4 @@ class UploadsTest extends SeleniumTestCase {
         $commitAsserter->assertCleanWorkingDirectory();
 
     }
-
 }

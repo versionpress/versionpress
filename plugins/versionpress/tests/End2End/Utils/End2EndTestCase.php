@@ -19,7 +19,7 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase {
     public function __construct($name = NULL, array $data = array(), $dataName = '') {
         parent::__construct($name, $data, $dataName);
         $this->staticInitialization();
-        self::$gitRepository = new GitRepository(self::$testConfig->testSite->path);
+        $this->gitRepository = new GitRepository(self::$testConfig->testSite->path);
         self::$wpAutomation = new WpAutomation(self::$testConfig->testSite);
     }
 
