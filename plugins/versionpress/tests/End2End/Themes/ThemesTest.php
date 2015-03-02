@@ -1,21 +1,20 @@
 <?php
 
-namespace VersionPress\Tests\Selenium;
+namespace VersionPress\Tests\End2End\Themes;
 
+use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 
-class ThemeTest extends SeleniumTestCase {
+class ThemesTest extends End2EndTestCase {
 
     /**
-     * Required keys are:
-     * zipfile: absolute path used for upload
-     * stylesheet: id of theme (usually sanitized name)
-     * name: name of plugin (saved in VP-Theme-Name tag)
-     * affected-path: directory or file that should be affected by installation / deleting
-     *
+     * @see IThemesTestWorker::setThemeInfo()
      * @var array
      */
     private static $themeInfo;
+
+    /** @var IThemesTestWorker */
+    private static $worker;
 
 
     public static function setupBeforeClass() {
@@ -27,6 +26,8 @@ class ThemeTest extends SeleniumTestCase {
             'name' => 'Test Theme',
             'affected-path' => 'test-theme/*',
         );
+
+        self::$worker->setThemeInfo(self::$themeInfo);
     }
 
     /**
@@ -34,13 +35,11 @@ class ThemeTest extends SeleniumTestCase {
      * @testdox Uploading theme creates 'theme/install' action
      */
     public function uploadingThemeCreatesThemeInstallAction() {
-        $this->url('wp-admin/theme-install.php?upload');
+        self::$worker->prepare_uploadTheme();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        $this->byCssSelector('input[name=themezip]')->value(self::$themeInfo['zipfile']);
-        $this->byCssSelector('#install-theme-submit')->click();
-        $this->waitAfterRedirect();
+        self::$worker->uploadTheme();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("theme/install");
@@ -54,12 +53,12 @@ class ThemeTest extends SeleniumTestCase {
      * @testdox Switching theme create 'theme/switch' action
      */
     public function switchingThemeCreatesThemeSwitchAction() {
-        $this->url('wp-admin/themes.php');
+        self::$worker->prepare_switchTheme();
         $currentTheme = self::$wpAutomation->getCurrentTheme();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
-        $this->byCssSelector('div[aria-describedby*=' . self::$themeInfo['stylesheet'] . '] a.activate')->click();
-        $this->waitAfterRedirect();
+
+        self::$worker->switchTheme();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("theme/switch");
@@ -75,14 +74,11 @@ class ThemeTest extends SeleniumTestCase {
      * @testdox Deleting theme creates 'theme/delete' action
      */
     public function deletingThemeCreatesThemeDeleteAction() {
-        $this->url('wp-admin/themes.php');
+        self::$worker->prepare_deleteTheme();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        $this->byCssSelector('div[aria-describedby*=' . self::$themeInfo['stylesheet'] . ']')->click();
-        $this->byCssSelector('a.delete-theme')->click();
-        $this->acceptAlert();
-        $this->waitAfterRedirect();
+        self::$worker->deleteTheme();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("theme/delete");

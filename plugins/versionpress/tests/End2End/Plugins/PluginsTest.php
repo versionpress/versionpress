@@ -19,7 +19,6 @@ class PluginsTest extends End2EndTestCase {
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
-        self::$worker->setPluginInfo(self::$pluginInfo);
 
         $testDataPath = __DIR__ . DIRECTORY_SEPARATOR . 'test-data' . DIRECTORY_SEPARATOR;
         self::$pluginInfo = array(
@@ -28,6 +27,8 @@ class PluginsTest extends End2EndTestCase {
             'name' => 'Hello Dolly',
             'affected-path' => 'hello-dolly/*',
         );
+
+        self::$worker->setPluginInfo(self::$pluginInfo);
 
         // possibly delete single-file Hello dolly
         try {
