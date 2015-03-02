@@ -1,27 +1,25 @@
 <?php
 
-namespace VersionPress\Tests\Selenium;
+namespace VersionPress\Tests\End2End\Plugins;
 
-use Exception;
+use Symfony\Component\Process\Process;
+use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 
-class PluginsTest extends SeleniumTestCase {
+class PluginsTest extends End2EndTestCase {
+
+    /** @var IPluginsTestWorker */
+    private static $worker;
 
     /**
-     * Required keys are:
-     * zipfile: absolute path used for upload
-     * css-id: id of row representing given plugin on 'wp-admin/plugins.php' page
-     * name: name of plugin (saved in VP-Plugin-Name tag)
-     * affected-path: directory or file that should be affected by installation / deleting
-     *
+     * @see IPluginsTestWorker::setPluginInfo()
      * @var array
      */
     private static $pluginInfo;
 
-
-    public static function setupBeforeClass() {
-
+    public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
+        self::$worker->setPluginInfo(self::$pluginInfo);
 
         $testDataPath = __DIR__ . DIRECTORY_SEPARATOR . 'test-data' . DIRECTORY_SEPARATOR;
         self::$pluginInfo = array(
@@ -34,18 +32,17 @@ class PluginsTest extends SeleniumTestCase {
         // possibly delete single-file Hello dolly
         try {
             self::$wpAutomation->runWpCliCommand('plugin', 'uninstall', array('hello'));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
         }
 
         // possibly delete our testing plugin
         try {
             self::$wpAutomation->runWpCliCommand('plugin', 'uninstall', array('hello-dolly'));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
         }
 
-        $process = new \Symfony\Component\Process\Process("git add -A && git commit -m " . escapeshellarg("Plugin setup"), self::$testConfig->testSite->path);
+        $process = new Process("git add -A && git commit -m " . escapeshellarg("Plugin setup"), self::$testConfig->testSite->path);
         $process->run();
-
     }
 
     /**
@@ -53,13 +50,11 @@ class PluginsTest extends SeleniumTestCase {
      * @testdox Uploading plugin creates 'plugin/install' action
      */
     public function uploadingPluginCreatesPluginInstallAction() {
-        $this->url('wp-admin/plugin-install.php?tab=upload');
+        self::$worker->prepare_installPlugin();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        $this->byCssSelector('#pluginzip')->value(self::$pluginInfo['zipfile']);
-        $this->byCssSelector('#install-plugin-submit')->click();
-        $this->waitAfterRedirect();
+        self::$worker->installPlugin();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("plugin/install");
@@ -74,11 +69,11 @@ class PluginsTest extends SeleniumTestCase {
      * @depends uploadingPluginCreatesPluginInstallAction
      */
     public function activatingPluginCreatesPluginActivateAction() {
-        $this->url("wp-admin/plugins.php");
+        self::$worker->prepare_activatePlugin();
+
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        $this->byCssSelector("#" . self::$pluginInfo['css-id'] . " .activate a")->click();
-        $this->waitAfterRedirect();
+        self::$worker->activatePlugin();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("plugin/activate");
@@ -93,11 +88,11 @@ class PluginsTest extends SeleniumTestCase {
      * @depends activatingPluginCreatesPluginActivateAction
      */
     public function deactivatingPluginCreatesPluginDeactivateAction() {
-        $this->url("wp-admin/plugins.php");
+        self::$worker->prepare_deactivatePlugin();
+
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        $this->byCssSelector("#" . self::$pluginInfo['css-id'] . " .deactivate a")->click();
-        $this->waitAfterRedirect();
+        self::$worker->deactivatePlugin();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("plugin/deactivate");
@@ -112,13 +107,10 @@ class PluginsTest extends SeleniumTestCase {
      * @depends deactivatingPluginCreatesPluginDeactivateAction
      */
     public function deletingPluginCreatesPluginDeleteAction() {
-
+        self::$worker->prepare_deletePlugin();
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        $this->byCssSelector("#" . self::$pluginInfo['css-id'] . " .delete a")->click();
-        $this->waitAfterRedirect();
-        $this->byCssSelector("#submit")->click();
-        $this->waitAfterRedirect();
+        self::$worker->deletePlugin();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("plugin/delete");

@@ -4,18 +4,23 @@ namespace VersionPress\Tests\End2End\Utils;
 
 use PHPUnit_Framework_TestCase;
 use VersionPress\Git\GitRepository;
+use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\TestConfig;
 
 class End2EndTestCase extends PHPUnit_Framework_TestCase {
 
     /** @var TestConfig */
     protected static $testConfig;
+    /** @var GitRepository */
     protected $gitRepository;
+    /** @var WpAutomation */
+    protected static $wpAutomation;
 
     public function __construct($name = NULL, array $data = array(), $dataName = '') {
         parent::__construct($name, $data, $dataName);
         $this->staticInitialization();
-        $this->gitRepository = new GitRepository(self::$testConfig->testSite->path);
+        self::$gitRepository = new GitRepository(self::$testConfig->testSite->path);
+        self::$wpAutomation = new WpAutomation(self::$testConfig->testSite);
     }
 
     private function staticInitialization() {
