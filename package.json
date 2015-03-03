@@ -12,6 +12,8 @@
     "coffee-script": "~1.7.1",
     "del": "~0.1.2",
     "gulp": "~3.8.7",
+    "gulp-composer": "^0.1.0",
+    "gulp-git": "^1.0.1",
     "gulp-remove-lines": "^0.1.0",
     "gulp-rename": "~1.2.0",
     "gulp-replace": "~0.4.0",
@@ -21,6 +23,7 @@
     "shelljs": "^0.3.0"
   },
   "scripts": {
+    "postinstall": "gulp init-dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

@@ -14,6 +14,8 @@ var path = require('path');
 var chalk = require('chalk');
 var removeLines = require('gulp-remove-lines');
 var neon = require('neon-js');
+var composer = require('gulp-composer');
+var git = require('gulp-git');
 
 /**
  * Version to be displayed both in WordPress administration and used as a suffix of the generated ZIP file
@@ -226,6 +228,22 @@ gulp.task('clean-build', ['zip'], function (cb) {
 	del(['build'], cb);
 });
 
+/**
+ * Installs Composer external libs.
+ */
+gulp.task('composer-install-dev', function() {
+    composer({ cwd: './ext-libs', bin: 'composer'});
+    composer({ cwd: './plugins/versionpress', bin: 'composer'});
+});
+
+/**
+ * Sets git to be case sensitive.
+ */
+gulp.task('git-config', function() {
+    git.exec({args: 'config core.ignorecase false'}, function (err, stdout) {
+        if(err) { console.log(err); }
+    });
+});
 
 
 //--------------------------------------
@@ -254,6 +272,12 @@ gulp.task('nightly', ['set-nightly-build', 'clean-build']);
  * specified in `test-config.neon`. Basically does only the `copy` task.
  */
 gulp.task('test-deploy', ['prepare-test-deploy', 'copy']);
+
+/**
+ * Inits dev environment.
+ * Install vendors, set env variables.
+ */
+gulp.task('init-dev', ['composer-install-dev', 'git-config']);
 
 
 
