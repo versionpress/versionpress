@@ -13,9 +13,7 @@ class WidgetsTestSeleniumWorker extends SeleniumWorker implements IWidgetsWorker
     }
 
     public function createWidget() {
-        static $widgetNumber = isset($widgetNumber) ? $widgetNumber + 1 : 1;
-
-        $this->byCssSelector("form[action='widgets.php'] input[name*=title]")->value("Calendar $widgetNumber");
+        $this->byCssSelector("form[action='widgets.php'] input[name*=title]")->value("Calendar");
         $this->byCssSelector("form[action='widgets.php'] input[type=submit]")->click();
         $this->waitAfterRedirect();
     }
