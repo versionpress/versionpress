@@ -6,7 +6,7 @@ use VersionPress\Tests\End2End\Utils\ITestWorker;
 
 interface IMediaTestWorker extends ITestWorker {
 
-    public function setUploadedFilePath($string);
+    public function setUploadedFilePath($filePath);
 
     public function prepare_uploadFile();
     public function uploadFile();

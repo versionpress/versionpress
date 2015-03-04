@@ -12,7 +12,7 @@ class MediaTest extends End2EndTestCase {
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
-        self::$worker->setUploadedFilePath(__DIR__ . DIRECTORY_SEPARATOR . 'test-data' . DIRECTORY_SEPARATOR . 'test.png');
+        self::$worker->setUploadedFilePath(realpath(__DIR__ . '/../test-data/test.png'));
     }
 
     /**
