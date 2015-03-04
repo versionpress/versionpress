@@ -4,7 +4,7 @@ namespace VersionPress\Tests\End2End\Widgets;
 
 use VersionPress\Tests\End2End\Utils\SeleniumWorker;
 
-class WidgetsTestSeleniumWorker extends SeleniumWorker implements IWidgetsWorker {
+class WidgetsTestSeleniumWorker extends SeleniumWorker implements IWidgetsTestWorker {
 
     public function prepare_createWidget() {
         $this->url('wp-admin/widgets.php');

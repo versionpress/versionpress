@@ -4,7 +4,7 @@ namespace VersionPress\Tests\End2End\Widgets;
 
 use VersionPress\Tests\End2End\Utils\ITestWorker;
 
-interface IWidgetsWorker extends ITestWorker {
+interface IWidgetsTestWorker extends ITestWorker {
 
     public function prepare_createWidget();
     public function createWidget();

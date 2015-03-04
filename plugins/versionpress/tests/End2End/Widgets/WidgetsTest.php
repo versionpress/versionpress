@@ -8,7 +8,7 @@ use VersionPress\Tests\Utils\CommitAsserter;
 
 class WidgetsTest extends End2EndTestCase {
 
-    /** @var IWidgetsWorker */
+    /** @var IWidgetsTestWorker */
     private static $worker;
 
     public static function setUpBeforeClass() {
