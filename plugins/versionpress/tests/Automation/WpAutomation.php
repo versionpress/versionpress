@@ -244,7 +244,7 @@ class WpAutomation {
      * @param $id
      */
     public function deleteUser($id) {
-        $args = array($id, 'yes' => '');
+        $args = array($id, 'yes' => null);
         $this->runWpCliCommand('user', 'delete', $args);
     }
 
@@ -357,6 +357,10 @@ class WpAutomation {
         if (strlen($widgets) > 0) {
             $this->exec('wp widget delete ' . $widgets);
         }
+    }
+
+    public function importMedia($files) {
+        return $this->runWpCliCommand('media', 'import', array($files, 'porcelain' => null));
     }
 
     /**
