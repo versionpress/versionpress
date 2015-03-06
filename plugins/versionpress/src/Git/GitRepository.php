@@ -286,6 +286,15 @@ class GitRepository {
         return $output;
     }
 
+    /**
+     * Returns true if there are no changes to commit.
+     *
+     * @return bool
+     */
+    public function isCleanWorkingDirectory() {
+        $status = $this->getStatus();
+        return empty($status);
+    }
 
     /**
      * Invokes {@see runShellCommand()} and returns its stdout output. The params are the same,

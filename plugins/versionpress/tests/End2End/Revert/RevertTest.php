@@ -117,7 +117,7 @@ class RevertTest extends End2EndTestCase {
      * @test
      * @testdox OK button is disabled if the working directory is not clean
      */
-    public function okButtonIsDisabledIfTheWorkingDirectoryIsNotClean() {
+    public function undoDoesNothingIfTheWorkingDirectoryIsNotClean() {
         self::$worker->prepare_undoWithNotCleanWorkingDirectory();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);

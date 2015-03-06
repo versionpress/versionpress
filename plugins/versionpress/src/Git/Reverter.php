@@ -44,6 +44,10 @@ class Reverter {
     }
 
     public function revert($commitHash) {
+        if (!$this->repository->isCleanWorkingDirectory()) {
+            return RevertStatus::NOT_CLEAN_WORKING_DIRECTORY;
+        }
+
         $modifiedFiles = $this->repository->getModifiedFiles(sprintf("%s~1..%s", $commitHash, $commitHash));
         $revertedCommit = $this->repository->getCommit($commitHash);
 
@@ -73,6 +77,10 @@ class Reverter {
     }
 
     public function revertAll($commitHash) {
+        if (!$this->repository->isCleanWorkingDirectory()) {
+            return RevertStatus::NOT_CLEAN_WORKING_DIRECTORY;
+        }
+
         $modifiedFiles = $this->repository->getModifiedFiles($commitHash);
 
         $this->repository->revertAll($commitHash);

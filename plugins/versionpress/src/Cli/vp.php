@@ -200,6 +200,11 @@ class VPCommand extends WP_CLI_Command {
             return;
         }
 
+        if ($status === RevertStatus::NOT_CLEAN_WORKING_DIRECTORY) {
+            WP_CLI::error("The working directory is not clean. Please commit your changes.");
+            return;
+        }
+
         WP_CLI::success("Done.");
     }
 
@@ -228,6 +233,11 @@ class VPCommand extends WP_CLI_Command {
 
         if ($status === RevertStatus::NOTHING_TO_COMMIT) {
             WP_CLI::error("Nothing to commit. Current state is the same as the one you want rollback to.");
+            return;
+        }
+
+        if ($status === RevertStatus::NOT_CLEAN_WORKING_DIRECTORY) {
+            WP_CLI::error("The working directory is not clean. Please commit your changes.");
             return;
         }
 
