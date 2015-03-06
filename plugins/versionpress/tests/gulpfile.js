@@ -4,6 +4,7 @@ var seleniumPlease = require('selenium-please');
 var chalk = require('chalk');
 var tcpPortUsed = require('tcp-port-used');
 var argv = require('yargs').argv;
+var path = require('path');
 
 // Run this task to get the help
 gulp.task('default', function() {
@@ -77,7 +78,7 @@ gulp.task('run-tests', function(cb) {
         }
 
         gulp.src('phpunit.xml')
-            .pipe(phpunit('..\\vendor\\bin\\phpunit.bat', {
+            .pipe(phpunit(path.join('..', 'vendor', 'bin', 'phpunit'), {
                 logTap: "./phpunit-log.tap.txt",
                 testdoxText: "./phpunit-log.textdox.txt",
                 verbose: true
