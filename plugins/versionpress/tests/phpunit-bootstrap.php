@@ -9,7 +9,7 @@ use VersionPress\Tests\Utils\TestRunnerOptions;
 require_once(__DIR__ . '/../vendor/autoload.php');
 Debugger::enable(Debugger::DEVELOPMENT, __DIR__ . '/../log');
 
-$testHelperCLasses = require(__DIR__ . '/test-helper-classes.php');
+$testHelperClasses = require(__DIR__ . '/test-helper-classes.php');
 
 $robotLoader = new RobotLoader();
 $robotLoader->addDirectory(__DIR__ . '/../src');
