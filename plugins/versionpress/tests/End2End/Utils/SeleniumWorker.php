@@ -13,9 +13,6 @@ use PHPUnit_Extensions_Selenium2TestCase_WaitUntil;
 use PHPUnit_Extensions_Selenium2TestCase_WebDriverException;
 use PHPUnit_Framework_Assert;
 use VersionPress\Tests\Automation\WpAutomation;
-use VersionPress\Tests\End2End\int;
-use VersionPress\Tests\End2End\mixed;
-use VersionPress\Tests\End2End\string;
 use VersionPress\Tests\Utils\TestConfig;
 
 /**
@@ -79,6 +76,7 @@ class SeleniumWorker implements ITestWorker {
         }
 
         $this->session = self::$sharedSession;
+        self::setUpPage();
     }
 
     private static function startSession() {
