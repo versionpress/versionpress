@@ -6,6 +6,9 @@ namespace VersionPress\Cli;
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Process\Process;
+use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\Reverter;
+use VersionPress\Git\RevertStatus;
 use VersionPress\Utils\FileSystem;
 use WP_CLI;
 use WP_CLI_Command;
@@ -165,6 +168,71 @@ class VPCommand extends WP_CLI_Command {
         return str_replace($originDirName, $cloneDirName, $originUrl);
     }
 
+    /**
+     * Reverts one commit
+     *
+     * ## OPTIONS
+     *
+     * <commit>
+     * : Hash of commit that will be reverted.
+     *
+     * ## EXAMPLES
+     *
+     *     wp vp undo a34bc28
+     *
+     * @synopsis <commit>
+     *
+     */
+    public function undo($args = array(), $assoc_args = array()) {
+        global $versionPressContainer;
+        /** @var Reverter $reverter */
+        $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
+
+        $status = $reverter->revert($args[0]);
+
+        if ($status === RevertStatus::VIOLATED_REFERENTIAL_INTEGRITY) {
+            WP_CLI::error("Violated referential integrity. Objects with missing references cannot be restored. For example we cannot restore comment where the related post was deleted.");
+            return;
+        }
+
+        if ($status === RevertStatus::MERGE_CONFLICT) {
+            WP_CLI::error("Merge conflict. Overwritten changes can not be reverted.");
+            return;
+        }
+
+        WP_CLI::success("Done.");
+    }
+
+
+    /**
+     * Rollbacks site to the same state as it was in the specified commit.
+     *
+     * ## OPTIONS
+     *
+     * <commit>
+     * : Hash of commit.
+     *
+     * ## EXAMPLES
+     *
+     *     wp vp undo a34bc28
+     *
+     * @synopsis <commit>
+     *
+     */
+    public function rollback($args = array(), $assoc_args = array()) {
+        global $versionPressContainer;
+        /** @var Reverter $reverter */
+        $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
+
+        $status = $reverter->revertAll($args[0]);
+
+        if ($status === RevertStatus::NOTHING_TO_COMMIT) {
+            WP_CLI::error("Nothing to commit. Current state is the same as the one you want rollback to.");
+            return;
+        }
+
+        WP_CLI::success("Done.");
+    }
 }
 
 if (defined('WP_CLI') && WP_CLI) {
