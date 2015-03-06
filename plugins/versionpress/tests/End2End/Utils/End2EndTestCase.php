@@ -6,6 +6,7 @@ use PHPUnit_Framework_TestCase;
 use VersionPress\Git\GitRepository;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\TestConfig;
+use VersionPress\Tests\Utils\TestRunnerOptions;
 
 class End2EndTestCase extends PHPUnit_Framework_TestCase {
 
@@ -32,6 +33,11 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase {
         }
     }
 
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+        self::setUpSite(TestRunnerOptions::getInstance()->forceSetup == "before-class");
+    }
+
     private function staticInitialization() {
         self::$testConfig = new TestConfig(__DIR__ . '/../../test-config.neon');
 
@@ -50,6 +56,24 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase {
         $propertyReflection = new \ReflectionProperty($class, 'worker');
         $propertyReflection->setAccessible(true);
         $propertyReflection->setValue(null, $worker);
+    }
+
+    /**
+     * Check if site is set up and VersionPress fully activated, and if not, do so. The $force
+     * parametr may force this.
+     *
+     * @param bool $force Force all the automation actions to be taken regardless of the site state
+     */
+    private static function setUpSite($force) {
+
+        if ($force || !self::$wpAutomation->isSiteSetUp()) {
+            self::$wpAutomation->setUpSite();
+        }
+
+        if ($force || !self::$wpAutomation->isVersionPressInitialized()) {
+            self::$wpAutomation->copyVersionPressFiles();
+            self::$wpAutomation->initializeVersionPress(self::$testConfig->testSite->vpConfig['git-binary']);
+        }
 
     }
 }
