@@ -20,9 +20,9 @@ class PluginsTest extends End2EndTestCase {
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
 
-        $testDataPath = __DIR__ . DIRECTORY_SEPARATOR . 'test-data' . DIRECTORY_SEPARATOR;
+        $testDataPath = __DIR__ . '/../test-data';
         self::$pluginInfo = array(
-            'zipfile' => $testDataPath . 'hello-dolly.1.6.zip',
+            'zipfile' => realpath($testDataPath . '/hello-dolly.1.6.zip'),
             'css-id' => 'hello-dolly',
             'name' => 'Hello Dolly',
             'affected-path' => 'hello-dolly/*',

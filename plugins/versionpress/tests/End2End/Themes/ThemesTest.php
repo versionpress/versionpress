@@ -19,9 +19,9 @@ class ThemesTest extends End2EndTestCase {
 
     public static function setupBeforeClass() {
         parent::setUpBeforeClass();
-        $testDataPath = __DIR__ . DIRECTORY_SEPARATOR . 'test-data' . DIRECTORY_SEPARATOR;
+        $testDataPath = __DIR__ . '/../test-data';
         self::$themeInfo = array(
-            'zipfile' => $testDataPath . 'test-theme.zip',
+            'zipfile' => realpath($testDataPath . '/test-theme.zip'),
             'stylesheet' => 'test-theme',
             'name' => 'Test Theme',
             'affected-path' => 'test-theme/*',
@@ -67,6 +67,7 @@ class ThemesTest extends End2EndTestCase {
         $commitAsserter->assertCleanWorkingDirectory();
 
         self::$wpAutomation->switchTheme($currentTheme);
+        file_get_contents(self::$testConfig->testSite->url . '/wp-admin/');
     }
 
     /**
