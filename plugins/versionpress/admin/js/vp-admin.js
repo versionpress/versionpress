@@ -29,14 +29,13 @@ jQuery(document).ready(function($) {
 
     var customRevertPopoverClass = "versionpress-revert-popover"; // used to identify the popover later
     var undoRollbackSelector = '.vp-undo, .vp-rollback';
-    var staticWarningText = "For EAP releases, please have a backup. <a href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback' target='_blank'>Lean more about reverts</a>"
+    var staticWarningText = "For EAP releases, please have a backup. <a href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback' target='_blank'>Learn more about reverts</a>. "
     var $staticWarning = $("<div'>").html(staticWarningText);
 
     $('body').on('click', undoRollbackSelector, function (e) {
         var $link = $(this);
         var type = $link.hasClass('vp-undo') ? 'undo' : 'rollback';
         var hash = $link.data('commit');
-
         var data = {
             action: 'vp_prepare_revert_popup',
             type: type,
