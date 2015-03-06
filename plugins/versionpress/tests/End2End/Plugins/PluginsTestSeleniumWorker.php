@@ -13,6 +13,7 @@ class PluginsTestSeleniumWorker extends SeleniumWorker implements IPluginsTestWo
     }
 
     public function prepare_installPlugin() {
+        $this->loginIfNecessary();
         $this->url('wp-admin/plugin-install.php?tab=upload');
     }
 
