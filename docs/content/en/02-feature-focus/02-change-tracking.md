@@ -27,6 +27,7 @@ Most of the time, VersionPress works silently, simply tracking all the important
 Most tracked changes involve database entities which are described below but some actions involve files as well. These are the common situations:
 
  - **Theme** installations, uninstallations and updates
+     - Note: theme files are often edited manually and externally, in some kind of editor, which is not (and cannot be) tracked by VersionPress automatically. Please see [Manual change tracking](#manual-change-tracking).
  - **Plugin** installations, uninstallations and updates
  - **WordPress core** updates
  - **Media** uploads
@@ -139,11 +140,13 @@ VersionPress tracks everything that goes into the standard WordPress tables, whi
 
 VersionPress uses the [Git version control system](./git) under the hood and **treats manual commits exactly the same as auto-generated commits**. This means that you can create Git commits however you want – on the command line, using some GUI tool etc. and those commits will show up in the main VersionPress table as any other changes, with the same options to [undo or rollback](./undo-and-rollback) those changes etc.
 
-An example where this could be utilized is editing a WordPress theme:
+We will have a user interface for creating commits manually in some future release but at the moment, you need to use the Git command-line interface or one of the GUI Git clients.
+
+An example of how to utilize manual change tracking is editing a WordPress theme:
 
  1. You open a theme file (e.g., `wp-content/themes/awesometheme/style.css`) in an editor of your choice
  2. You do some edits to the file and preview the changes in the browser
- 3. When happy with the result, you commit the changes using e.g. the command line:
+ 3. When happy with the result, you commit the changes using this command:
 
 <!-- end of list, http://meta.stackexchange.com/a/34325/136297 -->
 
