@@ -66,11 +66,12 @@ abstract class PostTypeTestWpCliWorker extends WpCliWorker implements IPostTypeT
     }
 
     public function prepare_createDraft() {
-        $this->testPost['post_status'] = 'draft';
     }
 
     public function createDraft() {
-        $this->postId = $this->wpAutomation->createPost($this->testPost);
+        $draft = $this->testPost;         // It's necessary to change the value in a local copy, not directly in the private
+        $draft['post_status'] = 'draft';  // field. Some PHPUnit magic shares the data between Pages and Posts tests.
+        $this->postId = $this->wpAutomation->createPost($draft);
     }
 
     public function prepare_previewDraft() {
