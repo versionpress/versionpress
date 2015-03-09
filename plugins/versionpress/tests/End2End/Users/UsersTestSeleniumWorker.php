@@ -13,7 +13,6 @@ class UsersTestSeleniumWorker extends SeleniumWorker implements IUsersTestWorker
     }
 
     public function prepare_createUser() {
-        $this->loginIfNecessary();
         $this->url('wp-admin/user-new.php');
     }
 

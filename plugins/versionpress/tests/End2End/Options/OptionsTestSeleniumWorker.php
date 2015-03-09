@@ -7,7 +7,6 @@ use VersionPress\Tests\End2End\Utils\SeleniumWorker;
 class OptionsTestSeleniumWorker extends SeleniumWorker implements IOptionsTestWorker {
 
     public function prepare_changeOption() {
-        $this->loginIfNecessary();
         $this->url('wp-admin/options-general.php');
     }
 
@@ -18,7 +17,6 @@ class OptionsTestSeleniumWorker extends SeleniumWorker implements IOptionsTestWo
     }
 
     public function prepare_changeMoreOptions() {
-        $this->loginIfNecessary();
         $this->url('wp-admin/options-general.php');
     }
 

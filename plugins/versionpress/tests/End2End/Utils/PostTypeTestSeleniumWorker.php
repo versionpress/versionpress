@@ -7,7 +7,6 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
     abstract public function getPostType();
 
     public function prepare_addPost() {
-        $this->loginIfNecessary();
     }
 
     public function addPost() {

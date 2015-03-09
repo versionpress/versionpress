@@ -14,7 +14,6 @@ class MediaTestSeleniumWorker extends SeleniumWorker implements IMediaTestWorker
     }
 
     public function prepare_uploadFile() {
-        $this->loginIfNecessary();
     }
 
     public function uploadFile() {

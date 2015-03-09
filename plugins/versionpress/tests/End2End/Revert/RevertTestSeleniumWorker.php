@@ -7,7 +7,6 @@ use VersionPress\Tests\End2End\Utils\SeleniumWorker;
 class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWorker {
 
     public function prepare_undoLastCommit() {
-        $this->loginIfNecessary();
         $this->createTestPost();
         $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
     }
@@ -17,7 +16,6 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
     }
 
     public function prepare_undoSecondCommit() {
-        $this->loginIfNecessary();
         self::$wpAutomation->editOption('blogname', 'Blogname for undo test');
         $this->createTestPost();
         $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
@@ -28,13 +26,11 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
     }
 
     public function prepare_undoRevertedCommit() {
-        $this->loginIfNecessary();
         $this->createTestPost();
         $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
     }
 
     public function prepare_tryRestoreEntityWithMissingReference() {
-        $this->loginIfNecessary();
         $postId = $this->createTestPost();
         $commentId = $this->createCommentForPost($postId);
         self::$wpAutomation->deleteComment($commentId);
@@ -48,7 +44,6 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
     }
 
     public function prepare_rollbackMoreChanges() {
-        $this->loginIfNecessary();
         $postId = $this->createTestPost();
         $this->createCommentForPost($postId);
         self::$wpAutomation->editOption('blogname', 'Blogname for rollback test');
@@ -60,7 +55,6 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
     }
 
     public function prepare_clickOnCancel() {
-        $this->loginIfNecessary();
         $this->createTestPost();
         $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
     }
@@ -73,7 +67,6 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
     }
 
     public function prepare_undoWithNotCleanWorkingDirectory() {
-        $this->loginIfNecessary();
         $this->createTestPost();
         $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
     }
