@@ -67,7 +67,6 @@ class ThemesTest extends End2EndTestCase {
         $commitAsserter->assertCleanWorkingDirectory();
 
         self::$wpAutomation->switchTheme($currentTheme);
-        file_get_contents(self::$testConfig->testSite->url . '/wp-admin/');
     }
 
     /**

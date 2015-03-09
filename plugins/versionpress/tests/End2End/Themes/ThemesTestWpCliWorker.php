@@ -24,7 +24,6 @@ class ThemesTestWpCliWorker extends WpCliWorker implements IThemesTestWorker {
 
     public function switchTheme() {
         $this->wpAutomation->runWpCliCommand('theme', 'activate', array($this->themeInfo['stylesheet']));
-        file_get_contents($this->testConfig->testSite->url . '/wp-admin/');
     }
 
     public function prepare_deleteTheme() {

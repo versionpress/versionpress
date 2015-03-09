@@ -115,7 +115,11 @@ function vp_register_hooks() {
     }, 10, 2);
 
     add_action('switch_theme', function () use ($committer) {
-        $committer->disableCommit(); // the change will be committed on next load
+        if (defined('WP_CLI') && WP_CLI) {
+            file_get_contents(admin_url()); //
+        } else {
+            $committer->disableCommit(); // the change will be committed on next load
+        }
     });
 
     add_action('after_switch_theme', function () use ($committer) {
