@@ -24,6 +24,7 @@ class PublicWebTest extends SeleniumTestCase {
 
     public static function tearDownAfterClass() {
         parent::tearDownAfterClass();
+        self::$autologin = true;
         self::$wpAutomation->deletePost(self::$testPostId);
     }
 
