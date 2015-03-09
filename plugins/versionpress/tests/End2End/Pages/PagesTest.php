@@ -38,7 +38,7 @@ class PagesTest extends PostTypeTestCase {
      * @test
      * @testdox Trashing page creates 'post/trash' action
      *
-     * @depends updatingPageViaQuickEditWorksEquallyWell
+     * @depends addingPageCreatesPostCreateAction
      */
     public function trashingPageCreatesPostTrashAction() {
         $this->runTrashPostTest();
@@ -88,7 +88,7 @@ class PagesTest extends PostTypeTestCase {
      * @test
      * @testdox Publishing draft creates 'post/publish' action
      *
-     * @depends previewingDraftDoesNotCreateCommit
+     * @depends creatingDraftCreatesPostDraftAction
      */
     public function publishingDraftCreatesPostPublishAction() {
         $this->runPublishDraftTest();

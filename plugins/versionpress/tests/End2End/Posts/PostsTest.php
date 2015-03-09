@@ -37,6 +37,8 @@ class PostsTest extends PostTypeTestCase {
     /**
      * @test
      * @testdox Trashing post creates 'post/trash' action
+     *
+     * @depends addingPostCreatesPostCreateAction
      */
     public function trashingPostCreatesPostTrashAction() {
         $this->runTrashPostTest();
@@ -55,6 +57,7 @@ class PostsTest extends PostTypeTestCase {
     /**
      * @test
      * @testdox Deleting post permanenly creates 'post/delete' action
+     *
      * @depends undoCreatesPostUntrashAction
      */
     public function deletePermanentlyCreatesPostDeleteAction() {
@@ -64,6 +67,7 @@ class PostsTest extends PostTypeTestCase {
     /**
      * @test
      * @testdox Creating draft creates 'post/draft' action
+     *
      * @depends deletePermanentlyCreatesPostDeleteAction
      */
     public function creatingDraftCreatesPostDraftAction() {
@@ -73,6 +77,7 @@ class PostsTest extends PostTypeTestCase {
     /**
      * @test
      * @testdox Previewing draft does not create a commit
+     *
      * @depends creatingDraftCreatesPostDraftAction
      */
     public function previewingDraftDoesNotCreateCommit() {
@@ -82,6 +87,8 @@ class PostsTest extends PostTypeTestCase {
     /**
      * @test
      * @testdox Publishing draft creates 'post/publish' action
+     *
+     * @depends creatingDraftCreatesPostDraftAction
      */
     public function publishingDraftCreatesPostPublishAction() {
         $this->runPublishDraftTest();
