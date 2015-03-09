@@ -38,7 +38,7 @@ abstract class PostTypeTestWpCliWorker extends WpCliWorker implements IPostTypeT
     }
 
     public function prepare_quickEditPost() {
-        throw new \PHPUnit_Framework_SkippedTestError('There is nothink like quick edit in the WP-CLI');
+        throw new \PHPUnit_Framework_SkippedTestError('There is nothing like quick edit in the WP-CLI');
     }
 
     public function quickEditPost() {
