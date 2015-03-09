@@ -36,7 +36,7 @@ class MediaTestSeleniumWorker extends SeleniumWorker implements IMediaTestWorker
         $this->byCssSelector('.attachment:first-child .thumbnail')->click(); // click must be on the .thumbnail element
         $this->waitForElement('.edit-attachment-frame', 300);
         $this->setValue('.setting[data-setting=title] input', 'updated image title');
-        $this->keys(PHPUnit_Extensions_Selenium2TestCase_Keys::TAB); // focus out, AJAX saves the image
+        $this->byCssSelector('.setting[data-setting=caption] textarea')->click(); // focus out, AJAX saves the image
         $this->waitForAjax();
     }
 
