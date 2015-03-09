@@ -22,6 +22,6 @@ class UninstallationUtil {
         /** @var GitRepository $repository */
         $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
         $initialCommit = $repository->getInitialCommit();
-        return ChangeInfoMatcher::matchesChangeInfo($initialCommit->getMessage(), 'VersionPress\ChangeInfos\VersionPressChangeInfo');
+        return $initialCommit && ChangeInfoMatcher::matchesChangeInfo($initialCommit->getMessage(), 'VersionPress\ChangeInfos\VersionPressChangeInfo');
     }
 }

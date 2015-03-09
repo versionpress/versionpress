@@ -17,18 +17,30 @@ class ActivationDeactivationTest extends SeleniumTestCase {
         if (TestRunnerOptions::getInstance()->forceSetup == "before-class" || !self::$wpAutomation->isSiteSetUp()) {
             self::$wpAutomation->setUpSite();
         }
-
-        try {
-            self::$wpAutomation->uninstallVersionPress();
-        } catch (Exception $e) {
-        }
-
-        self::$wpAutomation->copyVersionPressFiles();
     }
 
+    //----------------------------
+    // Delete unactivated plugin
+    //----------------------------
+
+    /**
+     * @test
+     */
+    public function completeUninstallationOfUnactivatedPluginRemovesAllFiles() {
+        self::_installVersionPress();
+        $this->url('wp-admin/plugins.php');
+        $this->byCssSelector('#versionpress .delete a')->click();
+        $this->byCssSelector('.wrap form:nth-of-type(1) input#submit')->click();
+
+        $this->waitForElement('.plugins-php #message.updated');
+
+        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/db.php');
+        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/plugins/versionpress');
+        $this->assertFileNotExists(self::$testConfig->testSite->path . '/.git');
+    }
 
     //----------------------------
-    // First, activation
+    // Activation
     //----------------------------
 
     /**
@@ -36,6 +48,7 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * @see vp_gettext_filter_plugin_activated() Nag string is constructed here
      */
     public function successfulActivationDisplaysInitializationHintInTheActivationMessage() {
+        self::_installVersionPress();
         $this->_activateVersionPress();
         $this->assertContains("VersionPress", $this->byCssSelector('#message.updated p')->text());
         $this->assertElementExists('#message.updated p a');
@@ -72,7 +85,7 @@ class ActivationDeactivationTest extends SeleniumTestCase {
 
 
     //----------------------------
-    // Now deactivation
+    // Deactivation
     //----------------------------
 
 
@@ -157,6 +170,15 @@ class ActivationDeactivationTest extends SeleniumTestCase {
         $this->url('wp-admin/plugins.php');
         $this->byCssSelector('#versionpress .activate a')->click();
         $this->waitAfterRedirect();
+    }
+
+    private static function _installVersionPress() {
+        try {
+            self::$wpAutomation->uninstallVersionPress();
+        } catch (Exception $e) {
+        }
+
+        self::$wpAutomation->copyVersionPressFiles();
     }
 
 
