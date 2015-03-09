@@ -30,8 +30,8 @@ class UsersTestWpCliWorker extends WpCliWorker implements IUsersTestWorker {
     }
 
     public function prepare_editUser() {
-        $user = json_decode($this->wpAutomation->runWpCliCommand('user', 'get', array($this->userId)));
-        $this->originalEmail = $user->email;
+        $user = json_decode($this->wpAutomation->runWpCliCommand('user', 'get', array($this->userId, 'format' => 'json')));
+        $this->originalEmail = $user->user_email;
         $this->wpAutomation->editUser($this->userId, array('user_email' => 'random.email' . Random::generate() . '@example.com'));
     }
 
@@ -42,7 +42,6 @@ class UsersTestWpCliWorker extends WpCliWorker implements IUsersTestWorker {
     public function prepare_editUsermeta() {
         $this->originalFirstName = trim($this->wpAutomation->runWpCliCommand('user', 'meta', array('get', $this->userId, 'first_name')));
         $this->wpAutomation->runWpCliCommand('user', 'meta', array('update', $this->userId, 'first_name', 'Random First Name ' . Random::generate()));
-
     }
 
     public function editUsermeta() {
