@@ -74,7 +74,11 @@ class PluginChangeInfo extends TrackedChangeInfo {
     }
 
     private function findPluginName() {
-        $plugins = get_plugins();
+        if (!function_exists('get_plugins')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+
+        $plugins = \get_plugins();
         return $plugins[$this->pluginFile]["Name"];
     }
 

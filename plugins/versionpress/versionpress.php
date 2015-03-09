@@ -177,31 +177,25 @@ function vp_register_hooks() {
        }
     });
     //----------------------------------------
-    // URL "hooks"
+    // URL and WP-CLI "hooks"
     //----------------------------------------
+
+    $requestDetector = new \VersionPress\Utils\RequestDetector();
 
     if (defined('DOING_AJAX') && DOING_AJAX && isset($_REQUEST['action']) && $_REQUEST['action'] === 'widgets-order') {
         $committer->usePostponedChangeInfos('widgets');
     }
 
-    if (basename($_SERVER['PHP_SELF']) === 'themes.php' && isset($_GET['action']) && $_GET['action'] === 'delete') {
-        $themeId = $_GET['stylesheet'];
+    if ($requestDetector->isThemeDeleteRequest()) {
+        $themeId = $requestDetector->getThemeStylesheet();
         $committer->forceChangeInfo(new ThemeChangeInfo($themeId, 'delete'));
     }
 
-    if (basename($_SERVER['PHP_SELF']) === 'plugins.php'
-        && isset($_GET['action']) && $_GET['action'] === 'delete-selected'
-        && isset($_REQUEST['verify-delete'])
-    ) {
-
-        if (!function_exists('get_plugins')) {
-            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+    if ($requestDetector->isPluginDeleteRequest()) {
+        $plugins = $requestDetector->getPluginNames();
+        foreach ($plugins as $plugin) {
+            $committer->forceChangeInfo(new PluginChangeInfo($plugin, 'delete'));
         }
-
-        $plugins = $_REQUEST['checked'];
-        $plugin = $plugins[0];
-
-        $committer->forceChangeInfo(new PluginChangeInfo($plugin, 'delete'));
     }
 
     if (basename($_SERVER['PHP_SELF']) === 'theme-editor.php' && isset($_GET['updated']) && $_GET['updated'] === 'true') {
