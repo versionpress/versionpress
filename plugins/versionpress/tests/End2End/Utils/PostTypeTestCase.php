@@ -2,7 +2,6 @@
 
 namespace VersionPress\Tests\End2End\Utils;
 
-use VersionPress\Tests\End2End\IPostsTestWorker;
 use VersionPress\Tests\Utils\CommitAsserter;
 
 /**
