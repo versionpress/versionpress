@@ -36,6 +36,7 @@ class WidgetsTestSeleniumWorker extends SeleniumWorker implements IWidgetsTestWo
     public function deleteWidget() {
         $this->jsClick('#widgets-right .widget-control-edit');
         $this->executeScript("jQuery('#widgets-right .widget .widget-control-remove').first().click()");
+        sleep(1); // waitForAjax does not wait for the ajax request in this case (who knows why...)
         $this->waitForAjax();
     }
 }
