@@ -45,7 +45,7 @@ class RequirementsChecker {
             'name' => 'Git ' . self::GIT_MINIMUM_REQUIRED_VERSION . '+ installed',
             'level' => 'critical',
             'fulfilled' => $this->tryGit(),
-            'help' => 'Git must be installed on the server. The minimal required version is ' . self::GIT_MINIMUM_REQUIRED_VERSION . '. Please [download](http://git-scm.com/) and install it.'
+            'help' => '[Git](http://git-scm.com/) must be installed on the server. If you think it is then the version number probably doesn\'t match or Git is not visible to the web server - please update your PATH or use `vpconfig`. <a href="http://docs.versionpress.net/en/getting-started/installation-uninstallation#git" target="_blank">Learn more</a>.'
         );
 
         $this->requirements[] = array(
