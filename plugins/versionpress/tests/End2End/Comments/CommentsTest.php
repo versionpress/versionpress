@@ -34,7 +34,7 @@ class CommentsTest extends End2EndTestCase {
         $commitAsserter->assertCommitAction("comment/create-pending");
         $commitAsserter->assertCommitPath("A", "%vpdb%/comments/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
-
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -54,7 +54,7 @@ class CommentsTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-Comment-Author", self::$testConfig->testSite->adminName);
         $commitAsserter->assertCommitPath("A", "%vpdb%/comments/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
-
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -74,7 +74,7 @@ class CommentsTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-Comment-Author", self::$testConfig->testSite->adminName);
         $commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
-
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -93,7 +93,7 @@ class CommentsTest extends End2EndTestCase {
         $commitAsserter->assertCommitAction("comment/trash");
         $commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
-
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -112,7 +112,7 @@ class CommentsTest extends End2EndTestCase {
         $commitAsserter->assertCommitAction("comment/untrash");
         $commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
-
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -131,7 +131,7 @@ class CommentsTest extends End2EndTestCase {
         $commitAsserter->assertCommitAction("comment/delete");
         $commitAsserter->assertCommitPath("D", "%vpdb%/comments/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
-
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -150,6 +150,7 @@ class CommentsTest extends End2EndTestCase {
         $commitAsserter->assertCommitAction("comment/unapprove");
         $commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -168,7 +169,7 @@ class CommentsTest extends End2EndTestCase {
         $commitAsserter->assertCommitAction("comment/approve");
         $commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
-
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -187,7 +188,7 @@ class CommentsTest extends End2EndTestCase {
         $commitAsserter->assertCommitAction("comment/spam");
         $commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
-
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -206,6 +207,6 @@ class CommentsTest extends End2EndTestCase {
         $commitAsserter->assertCommitAction("comment/unspam");
         $commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
-
+        $this->assertFilesEqualDatabase();
     }
 }

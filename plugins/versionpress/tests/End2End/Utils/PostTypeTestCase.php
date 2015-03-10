@@ -31,6 +31,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertCommitAction("post/create");
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     public function runUpdatePostTest() {
@@ -43,7 +44,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertCommitAction("post/edit");
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
         $commitAsserter->assertCleanWorkingDirectory();
-
+        $this->assertFilesEqualDatabase();
     }
 
     public function runUpdatePostViaQuickEditTest() {
@@ -56,6 +57,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertCommitsAreEquivalent();
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     public function runTrashPostTest() {
@@ -68,6 +70,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertCommitAction("post/trash");
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     public function runUndoTrashTest() {
@@ -80,7 +83,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertCommitAction("post/untrash");
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
         $commitAsserter->assertCleanWorkingDirectory();
-
+        $this->assertFilesEqualDatabase();
     }
 
     public function runDeletePostTest() {
@@ -94,7 +97,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertCommitAction("post/delete");
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
         $commitAsserter->assertCleanWorkingDirectory();
-
+        $this->assertFilesEqualDatabase();
     }
 
     public function runDraftTest() {
@@ -108,7 +111,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertCommitAction("post/draft");
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
         $commitAsserter->assertCleanWorkingDirectory();
-
+        $this->assertFilesEqualDatabase();
     }
 
     public function runPreviewDraftTest() {
@@ -120,7 +123,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
 
         $commitAsserter->assertNumCommits(0);
         $commitAsserter->assertCleanWorkingDirectory();
-
+        $this->assertFilesEqualDatabase();
     }
 
     public function runPublishDraftTest() {
@@ -134,7 +137,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertCommitAction("post/publish");
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
         $commitAsserter->assertCleanWorkingDirectory();
-
+        $this->assertFilesEqualDatabase();
     }
 
     private function getPostType() {

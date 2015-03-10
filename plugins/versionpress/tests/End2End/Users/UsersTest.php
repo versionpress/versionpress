@@ -39,6 +39,7 @@ class UsersTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
         $commitAsserter->assertCommitPath("A", "%vpdb%/users/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -58,6 +59,7 @@ class UsersTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
         $commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -77,6 +79,7 @@ class UsersTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
         $commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID(VP-User-Id)%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -96,5 +99,6 @@ class UsersTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
         $commitAsserter->assertCommitPath("D", "%vpdb%/users/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 }

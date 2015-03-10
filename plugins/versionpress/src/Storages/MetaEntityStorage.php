@@ -91,7 +91,7 @@ abstract class MetaEntityStorage extends Storage {
                     continue;
                 }
                 list ($key, $vpId) = explode('#', $field, 2);
-                $entities[] = $this->extractEntityFromParent($parent, $vpId);
+                $entities[$vpId] = $this->extractEntityFromParent($parent, $vpId);
             }
 
         }

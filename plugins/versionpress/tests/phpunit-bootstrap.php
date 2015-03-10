@@ -7,6 +7,7 @@ use VersionPress\Tests\Selenium\SeleniumTestCase;
 use VersionPress\Tests\Utils\TestRunnerOptions;
 
 require_once(__DIR__ . '/../vendor/autoload.php');
+require_once(__DIR__ . '/StorageTests/fakes.php');
 Debugger::enable(Debugger::DEVELOPMENT, __DIR__ . '/../log');
 
 $testHelperClasses = require(__DIR__ . '/test-helper-classes.php');

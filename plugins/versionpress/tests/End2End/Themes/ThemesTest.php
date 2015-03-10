@@ -46,6 +46,7 @@ class ThemesTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
         $commitAsserter->assertCommitPath("A", "wp-content/themes/" . self::$themeInfo['affected-path']);
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -65,6 +66,7 @@ class ThemesTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
         $commitAsserter->assertCommitPath("M", "%vpdb%/options.ini");
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
 
         self::$wpAutomation->switchTheme($currentTheme);
     }
@@ -85,5 +87,6 @@ class ThemesTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
         $commitAsserter->assertCommitPath("D", "wp-content/themes/" . self::$themeInfo['affected-path']);
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 }

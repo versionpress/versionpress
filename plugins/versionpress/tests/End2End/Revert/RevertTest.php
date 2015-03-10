@@ -26,6 +26,7 @@ class RevertTest extends End2EndTestCase {
         $commitAsserter->assertCountOfAffectedFiles(1);
         $commitAsserter->assertCommitPath('D', '%vpdb%/posts/*');
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -43,6 +44,7 @@ class RevertTest extends End2EndTestCase {
         $commitAsserter->assertCountOfAffectedFiles(1);
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -62,6 +64,7 @@ class RevertTest extends End2EndTestCase {
         $commitAsserter->assertCountOfAffectedFiles(1);
         $commitAsserter->assertCommitPath('A', '%vpdb%/posts/*');
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -76,7 +79,7 @@ class RevertTest extends End2EndTestCase {
         self::$worker->tryRestoreEntityWithMissingReference();
         $commitAsserter->assertNumCommits(0);
         $commitAsserter->assertCleanWorkingDirectory();
-
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -96,6 +99,7 @@ class RevertTest extends End2EndTestCase {
         $commitAsserter->assertCommitPath('D', '%vpdb%/comments/*');
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -111,6 +115,7 @@ class RevertTest extends End2EndTestCase {
 
         $commitAsserter->assertNumCommits(0);
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -128,5 +133,6 @@ class RevertTest extends End2EndTestCase {
         $commitAsserter->assertNumCommits(0);
         unlink(self::$testConfig->testSite->path . '/revert-test-file');
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 }

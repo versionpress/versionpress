@@ -100,7 +100,7 @@ class TermTaxonomyStorage extends SingleFileStorage {
             if (isset($term['taxonomies'])) {
                 foreach ($term['taxonomies'] as $taxonomy) {
                     $taxonomy['vp_term_id'] = $term['vp_id'];
-                    $taxonomies[] = $taxonomy;
+                    $taxonomies[$taxonomy['vp_id']] = $taxonomy;
                 }
             }
         }

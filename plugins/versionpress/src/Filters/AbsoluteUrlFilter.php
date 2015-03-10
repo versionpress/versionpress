@@ -12,8 +12,8 @@ class AbsoluteUrlFilter implements EntityFilter {
     const PLACEHOLDER = "<<[site-url]>>";
     private $siteUrl;
 
-    function __construct() {
-        $this->siteUrl = get_site_url();
+    function __construct($siteUrl = null) {
+        $this->siteUrl = $siteUrl ?: get_site_url();
     }
 
     /**

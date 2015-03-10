@@ -37,6 +37,7 @@ class WidgetsTest extends End2EndTestCase {
         $commitAsserter->assertCountOfAffectedFiles(1);
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -56,6 +57,7 @@ class WidgetsTest extends End2EndTestCase {
         $commitAsserter->assertCountOfAffectedFiles(1);
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -74,6 +76,7 @@ class WidgetsTest extends End2EndTestCase {
         $commitAsserter->assertCountOfAffectedFiles(1);
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -92,6 +95,7 @@ class WidgetsTest extends End2EndTestCase {
         $commitAsserter->assertCountOfAffectedFiles(1);
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     private static function clearSidebars() {

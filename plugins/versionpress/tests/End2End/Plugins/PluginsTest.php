@@ -62,6 +62,7 @@ class PluginsTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
         $commitAsserter->assertCommitPath("A", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -81,6 +82,7 @@ class PluginsTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
         $commitAsserter->assertCommitPath("M", "%vpdb%/options.ini");
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -100,6 +102,7 @@ class PluginsTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
         $commitAsserter->assertCommitPath("M", "%vpdb%/options.ini");
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
     /**
@@ -118,6 +121,7 @@ class PluginsTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
         $commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
         $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
     }
 
 }
