@@ -39,7 +39,7 @@ class OptionsSynchronizer implements Synchronizer {
 
         $this->database->query($syncQuery);
 
-        if (count($options) == 0) return;
+        if (count($options) == 0) return array();
 
         $ignoredOptionNames = array_map(function ($option) {
             return "\"" . $option['option_name'] . "\"";
