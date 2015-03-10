@@ -78,9 +78,20 @@ abstract class EntityChangeInfo extends TrackedChangeInfo {
         $change = array(
             "type" => "storage-file",
             "entity" => $this->getEntityName(),
-            "id" => $this->getEntityId()
+            "id" => $this->getEntityId(),
+            "parent-id" => $this->getParentId()
         );
 
         return array($change);
+    }
+
+    /**
+     * Used by meta-entity storages as performance optimalization.
+     * For example PostMetaChangeInfo returns VPID of related post.
+     *
+     * @return string|null
+     */
+    public function getParentId() {
+        return null;
     }
 }

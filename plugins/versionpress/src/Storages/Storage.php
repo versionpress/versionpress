@@ -36,10 +36,11 @@ abstract class Storage {
     /**
      * Load an entity by given VPID
      *
-     * @param $id string VPID
+     * @param string $id VPID
+     * @param string $parentId VPID of parent entity (for example post for postmeta)
      * @return array Array representing an entity
      */
-    abstract function loadEntity($id);
+    abstract function loadEntity($id, $parentId);
 
     /**
      * Loads all entities managed by this storage
@@ -76,9 +77,10 @@ abstract class Storage {
      * Returns a physical path to an INI file where the entity is stored
      *
      * @param string $id VPID
+     * @param string|null $parentId VPID of parent entity (for example post for postmeta)
      * @return string
      */
-    abstract function getEntityFilename($id);
+    abstract function getEntityFilename($id, $parentId);
 
     /**
      * Internal method to create a ChangeInfo. Though it is mostly an implementation
@@ -102,7 +104,8 @@ abstract class Storage {
      * Returns true if the entity exists.
      *
      * @param string $id VPID
+     * @param string|null $parentId VPID of parent entity (for example post for postmeta)
      * @return bool
      */
-    abstract function exists($id);
+    abstract function exists($id, $parentId);
 }

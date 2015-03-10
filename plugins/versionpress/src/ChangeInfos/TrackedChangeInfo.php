@@ -101,8 +101,8 @@ abstract class TrackedChangeInfo implements ChangeInfo {
      * An example:
      *
      *     array(
-     *         array("type" => "storage-file", "entity" => "post", "id" => VPID),
-     *         array("type" => "storage-file", "entity" => "comment", "id" => VPID),
+     *         array("type" => "storage-file", "entity" => "post", "id" => VPID, "parent-id" => null),
+     *         array("type" => "storage-file", "entity" => "usermeta", "id" => VPID, "parent-id" => user-VPID),
      *         array("type" => "path", "path" => "c:/wp/example.txt"),
      *         array("type" => "path", "path" => "c:/wp/folder/*")
      *     );

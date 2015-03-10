@@ -58,16 +58,6 @@ class UserMetaChangeInfo extends EntityChangeInfo {
         return new self($action, $entityId, $userLogin, $userMetaKey, $userVpId);
     }
 
-    public function getChangedFiles() {
-        return array(
-            array(
-                "type" => "storage-file",
-                "entity" => "user",
-                "id" => $this->userVpId
-            )
-        );
-    }
-
     public function getCustomTags() {
         return array(
             self::USER_LOGIN => $this->userLogin,
@@ -76,5 +66,7 @@ class UserMetaChangeInfo extends EntityChangeInfo {
         );
     }
 
-
+    public function getParentId() {
+        return $this->userVpId;
+    }
 }

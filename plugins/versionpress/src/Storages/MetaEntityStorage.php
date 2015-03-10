@@ -39,7 +39,7 @@ abstract class MetaEntityStorage extends Storage {
             return null;
         }
 
-        $oldParent = $this->parentStorage->loadEntity($data[$this->parentReferenceName]);
+        $oldParent = $this->parentStorage->loadEntity($data[$this->parentReferenceName], null);
         $oldEntity = $this->extractEntityFromParent($oldParent, $data['vp_id']);
 
         $transformedData = $this->transformToParentEntityField($data);
@@ -47,7 +47,7 @@ abstract class MetaEntityStorage extends Storage {
         $this->lastVpId = $data['vp_id'];
 
         $this->parentStorage->save($transformedData);
-        $newParent = $this->parentStorage->loadEntity($data[$this->parentReferenceName]);
+        $newParent = $this->parentStorage->loadEntity($data[$this->parentReferenceName], null);
         $newEntity = $this->extractEntityFromParent($newParent, $data['vp_id']);
 
         if (!$oldEntity) {
@@ -68,7 +68,7 @@ abstract class MetaEntityStorage extends Storage {
 
     public function delete($restriction) {
         $parentVpId = $restriction[$this->parentReferenceName];
-        $parent = $this->parentStorage->loadEntity($parentVpId);
+        $parent = $this->parentStorage->loadEntity($parentVpId, null);
         $fieldToDelete = $this->getJoinedKeyByVpId($parent, $restriction['vp_id']);
 
         $oldEntity = $this->extractEntityFromParent($parent, $restriction['vp_id']);
@@ -99,27 +99,20 @@ abstract class MetaEntityStorage extends Storage {
         return $entities;
     }
 
-    function exists($vpId) {
-        $parentvpId = $this->getParentVpId($vpId);
-        $parentExists = $this->parentStorage->exists($parentvpId);
+    function exists($vpId, $parentId) {
+        $parentExists = $this->parentStorage->exists($parentId, null);
         if (!$parentExists) {
             return false;
         }
-        return (bool)$this->getJoinedKeyByVpId($this->parentStorage->loadEntity($parentvpId), $vpId);
+        return (bool)$this->getJoinedKeyByVpId($this->parentStorage->loadEntity($parentId, null), $vpId);
     }
 
-    public function getEntityFilename($vpId) {
-        $parentVpId = $this->getParentVpId($vpId);
-        return $this->parentStorage->getEntityFilename($parentVpId);
+    public function getEntityFilename($vpId, $parentId) {
+        return $this->parentStorage->getEntityFilename($parentId, null);
     }
 
-    protected function isExistingEntity($vpId) {
-        return (bool)$this->loadEntity($vpId);
-    }
-
-    public function loadEntity($vpid) {
-        $parentVpId = $this->getParentVpId($vpid);
-        $parent = $this->parentStorage->loadEntity($parentVpId);
+    public function loadEntity($vpid, $parentId) {
+        $parent = $this->parentStorage->loadEntity($parentId, null);
         return $this->extractEntityFromParent($parent, $vpid);
     }
 
@@ -184,26 +177,6 @@ abstract class MetaEntityStorage extends Storage {
             }
         }
 
-        return null;
-    }
-
-    /**
-     * Returns VPID of parent entity of meta entity with given VPID.
-     * For now is the implementation totally non-optimized.
-     * @todo Proof of concept - optimize this method with some indexing mechanism.
-     *
-     * @param $vpid
-     * @return string|null
-     */
-    private function getParentVpId($vpid) {
-        $entities = $this->parentStorage->loadAll();
-        foreach ($entities as $entity) {
-            foreach ($entity as $field => $value) {
-                if (Strings::contains($field, $vpid)) {
-                    return $entity['vp_id'];
-                }
-            }
-        }
         return null;
     }
 

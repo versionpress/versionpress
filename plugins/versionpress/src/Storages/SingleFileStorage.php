@@ -86,7 +86,7 @@ abstract class SingleFileStorage extends Storage {
         }
     }
 
-    function loadEntity($id) {
+    function loadEntity($id, $parentId = null) {
         $this->loadEntities();
         return $this->entities[$id];
     }
@@ -102,7 +102,7 @@ abstract class SingleFileStorage extends Storage {
         }
     }
 
-    function exists($id) {
+    function exists($id, $parentId = null) {
         $this->loadEntities();
         return isset($this->entities[$id]);
     }
@@ -161,7 +161,7 @@ abstract class SingleFileStorage extends Storage {
         return true;
     }
 
-    function getEntityFilename($id) {
+    function getEntityFilename($id, $parentId = null) {
         return $this->file;
     }
 

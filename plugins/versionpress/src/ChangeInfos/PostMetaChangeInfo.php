@@ -74,16 +74,6 @@ class PostMetaChangeInfo extends EntityChangeInfo {
         return sprintf("%s %s %s", $verb, $subject, $rest);
     }
 
-    public function getChangedFiles() {
-        return array(
-            array(
-                "type" => "storage-file",
-                "entity" => "post",
-                "id" => $this->postVpId
-            )
-        );
-    }
-
     public function getCustomTags() {
         return array(
             self::POST_TITLE_TAG => $this->postTitle,
@@ -91,5 +81,9 @@ class PostMetaChangeInfo extends EntityChangeInfo {
             self::POST_META_KEY => $this->metaKey,
             self::POST_VPID_TAG => $this->postVpId,
         );
+    }
+
+    public function getParentId() {
+        return $this->postVpId;
     }
 }

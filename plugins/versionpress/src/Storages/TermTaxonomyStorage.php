@@ -80,7 +80,7 @@ class TermTaxonomyStorage extends SingleFileStorage {
 
     }
 
-    function loadEntity($id) {
+    function loadEntity($id, $parentId = null) {
         $this->loadEntities();
         foreach ($this->entities as $term) {
             if (isset($term['taxonomies']) && isset($term['taxonomies'][$id])){
@@ -113,7 +113,7 @@ class TermTaxonomyStorage extends SingleFileStorage {
         return !(count($data) === 2 && isset($data['count'], $data[$this->entityInfo->idColumnName]));
     }
 
-    public function exists($id) {
+    public function exists($id, $parentId = null) {
         $this->loadAll();
         foreach ($this->entities as $term) {
             if (isset($term['taxonomies']) && isset($term['taxonomies'][$id])) {

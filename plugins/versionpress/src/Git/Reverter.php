@@ -137,7 +137,7 @@ class Reverter {
 
         foreach ($changeInfo->getChangeInfoList() as $subChangeInfo) {
             if ($subChangeInfo instanceof EntityChangeInfo &&
-                !$this->checkEntityReferences($subChangeInfo->getEntityName(), $subChangeInfo->getEntityId())) {
+                !$this->checkEntityReferences($subChangeInfo->getEntityName(), $subChangeInfo->getEntityId(), $subChangeInfo->getParentId())) {
                 return false;
             }
         }
@@ -150,17 +150,18 @@ class Reverter {
      *
      * @param $entityName
      * @param $entityId
+     * @param $parentId
      * @return bool
      */
-    private function checkEntityReferences($entityName, $entityId) {
+    private function checkEntityReferences($entityName, $entityId, $parentId) {
         $entityInfo = $this->dbSchemaInfo->getEntityInfo($entityName);
         $storage = $this->storageFactory->getStorage($entityName);
 
-        if (!$storage->exists($entityId)) {
+        if (!$storage->exists($entityId, $parentId)) {
             return !$this->existsSomeEntityWithReferenceTo($entityName, $entityId);
         }
 
-        $entity = $storage->loadEntity($entityId);
+        $entity = $storage->loadEntity($entityId, $parentId);
 
         foreach ($entityInfo->references as $reference => $referencedEntityName) {
             $vpReference = "vp_$reference";
@@ -168,7 +169,7 @@ class Reverter {
                 continue;
             }
 
-            $entityExists = $this->storageFactory->getStorage($referencedEntityName)->exists($entity[$vpReference]);
+            $entityExists = $this->storageFactory->getStorage($referencedEntityName)->exists($entity[$vpReference], $parentId);
             if (!$entityExists) {
                 return false;
             }
@@ -182,7 +183,7 @@ class Reverter {
             }
 
             foreach ($entity[$vpReference] as $referencedEntityId) {
-                $entityExists = $this->storageFactory->getStorage($referencedEntityName)->exists($referencedEntityId);
+                $entityExists = $this->storageFactory->getStorage($referencedEntityName)->exists($referencedEntityId, $parentId);
                 if (!$entityExists) {
                     return false;
                 }

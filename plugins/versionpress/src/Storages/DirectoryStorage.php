@@ -112,7 +112,7 @@ abstract class DirectoryStorage extends Storage {
         FileSystem::mkdir($this->directory);
     }
 
-    public function getEntityFilename($id) {
+    public function getEntityFilename($id, $parentId = null) {
         $vpidPath = Strings::substring($id, 0, 2) . '/' . $id;
         return $this->directory . '/' . $vpidPath . '.ini';
     }
@@ -163,11 +163,11 @@ abstract class DirectoryStorage extends Storage {
         return $entity;
     }
 
-    public function exists($id) {
+    public function exists($id, $parentId = null) {
         return file_exists($this->getEntityFilename($id));
     }
 
-    public function loadEntity($vpid) {
+    public function loadEntity($vpid, $parentId = null) {
         $entities = $this->loadAllFromFiles(array($this->getEntityFilename($vpid)));
         return $entities[$vpid];
     }
