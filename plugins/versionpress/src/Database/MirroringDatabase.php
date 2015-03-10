@@ -77,11 +77,6 @@ class MirroringDatabase extends ExtendedWpdb {
 
         $data = array_merge($data, $where);
 
-        $shouldBeSaved = $this->mirror->shouldBeSaved($entityName, $data);
-        if (!$shouldBeSaved) {
-            return $result;
-        }
-
         if ($this->dbSchemaInfo->getEntityInfo($entityName)->usesGeneratedVpids) {
 
             $idColumnName = $this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName;
@@ -100,12 +95,15 @@ class MirroringDatabase extends ExtendedWpdb {
             foreach ($ids as $id) {
                 $vpId = $this->getVpId($entityName, $id);
 
+                $data['vp_id'] = $vpId;
+                $shouldBeSaved = $this->mirror->shouldBeSaved($entityName, $data);
+                if (!$shouldBeSaved) {
+                    continue;
+                }
 
                 if (!$vpId) {
                     $data['vp_id'] = $this->generateId();
                     $this->saveId($entityName, $id, $data['vp_id']);
-                } else {
-                    $data['vp_id'] = $vpId;
                 }
 
                 $data = $this->replaceForeignKeysWithReferences($entityName, $data);

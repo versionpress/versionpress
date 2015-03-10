@@ -110,7 +110,7 @@ class TermTaxonomyStorage extends SingleFileStorage {
 
 
     public function shouldBeSaved($data) {
-        return !(count($data) === 2 && isset($data['count'], $data[$this->entityInfo->idColumnName]));
+        return !(count($data) === 3 && isset($data['count'], $data[$this->entityInfo->idColumnName], $data['vp_id']));
     }
 
     public function exists($id, $parentId = null) {
