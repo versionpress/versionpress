@@ -97,7 +97,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
 
         if ($force || !self::$wpAutomation->isVersionPressInitialized()) {
             self::$wpAutomation->copyVersionPressFiles();
-            self::$wpAutomation->initializeVersionPress(self::$testConfig->testSite->vpConfig['git-binary']);
+            self::$wpAutomation->initializeVersionPress();
         }
 
     }

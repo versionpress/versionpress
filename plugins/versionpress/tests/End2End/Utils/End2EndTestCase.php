@@ -95,7 +95,7 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase {
 
         if ($force || !self::$wpAutomation->isVersionPressInitialized()) {
             self::$wpAutomation->copyVersionPressFiles();
-            self::$wpAutomation->initializeVersionPress(self::$testConfig->testSite->vpConfig['git-binary']);
+            self::$wpAutomation->initializeVersionPress();
         }
 
     }
