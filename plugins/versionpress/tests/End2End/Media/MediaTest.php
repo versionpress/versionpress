@@ -26,7 +26,7 @@ class MediaTest extends End2EndTestCase {
 
         self::$worker->uploadFile();
 
-        $commitAsserter->ignoreCommits("usermeta/edit");
+        $commitAsserter->ignoreCommits(array("usermeta/create", "usermeta/edit"));
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/create");
