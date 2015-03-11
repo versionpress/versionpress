@@ -101,7 +101,7 @@ class CommitAsserter {
         $commits = $this->getNonIgnoredCommits();
         $numActualCommits = count($commits);
         if ($numExpectedCommits !== $numActualCommits) {
-            PHPUnit_Framework_Assert::fail("There were $numActualCommits commit(s) while we expected $numExpectedCommits");
+            PHPUnit_Framework_Assert::fail("There were $numActualCommits commit(s) after {$this->startCommit->getShortHash()} while we expected $numExpectedCommits");
         }
     }
 
