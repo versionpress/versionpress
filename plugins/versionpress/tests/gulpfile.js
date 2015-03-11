@@ -20,14 +20,11 @@ gulp.task('default', function() {
         }
 
         console.log('');
-        console.log(chalk.cyan('Usage:') + ' ' + chalk.bold('gulp run-tests [--force-setup[=before-suite|before-class]] [--git=<path>]'));
+        console.log(chalk.cyan('Usage:') + ' ' + chalk.bold('gulp run-tests [--force-setup[=before-suite|before-class]]'));
         console.log('');
         console.log(chalk.cyan('Options:'));
         console.log('  ' + chalk.bold('--force-setup[=before-suite|before-class]'));
         console.log('    Force WP site refresh before suite or every Selenium test class. No value = same as \'before-suite\'.');
-        console.log('');
-        console.log('  ' + chalk.bold('--git=<path>'));
-        console.log('    Optionally pass Git executable to use for the tests. Allows testing against more Git versions.');
         console.log('');
         console.log(chalk.cyan('Notes:'));
         console.log('');
@@ -69,11 +66,6 @@ gulp.task('run-tests', function(cb) {
                 argv['force-setup'] = "before-suite";
             }
             process.env['VP_FORCE_SETUP'] = argv['force-setup'];
-        }
-
-
-        if (argv['git'] !== undefined) {
-            process.env['VP_GIT'] = argv['git'];
         }
 
         var phpUnitCmd = fs.realpathSync(path.join('..', 'vendor', 'bin', 'phpunit'));
