@@ -1,10 +1,11 @@
 var gulp = require('gulp');
-var phpunit = require('gulp-phpunit');
 var seleniumPlease = require('selenium-please');
 var chalk = require('chalk');
 var tcpPortUsed = require('tcp-port-used');
 var argv = require('yargs').argv;
 var path = require('path');
+var childProcess = require('child_process');
+var fs = require('fs');
 
 // Run this task to get the help
 gulp.task('default', function() {
@@ -57,8 +58,6 @@ gulp.task('run-tests', function(cb) {
 
         log: './node_modules/.bin/selenium.log',
 
-        debugJava: true,
-
         port: 4444
 
     }, function(err, selenium) {
@@ -77,22 +76,34 @@ gulp.task('run-tests', function(cb) {
             process.env['VP_GIT'] = argv['git'];
         }
 
-        gulp.src('phpunit.xml')
-            .pipe(phpunit(path.join('..', 'vendor', 'bin', 'phpunit'), {
-                logTap: "./phpunit-log.tap.txt",
-                testdoxText: "./phpunit-log.textdox.txt",
-                verbose: true
-            }))
-            .on('end', function() {
-                console.log("Tests done");
-                selenium.kill();
-                cb();
-            })
-            .on('error', function(err) {
-                console.log("Test failed");
-                selenium.kill();
-                cb();
-            });
+        var phpUnitCmd = fs.realpathSync(path.join('..', 'vendor', 'bin', 'phpunit'));
+        var isWindows = (process.platform.lastIndexOf('win') === 0);
+        if (isWindows) {
+            phpUnitCmd += ".bat";
+        }
+        var phpUnitCmdArgs = [
+            "--log-tap=./phpunit-log.tap.txt",
+            "--testdox-text=./phpunit-log.testdox.txt",
+            "--verbose",
+            "--colors"
+        ];
+
+
+        var phpunit = childProcess.spawn(phpUnitCmd, phpUnitCmdArgs);
+        phpunit.stdout.on('data', function(data) {
+            process.stdout.write(data);
+        });
+        phpunit.stdout.on('end', function(data) {
+            selenium.kill();
+            cb();
+        });
+
+        phpunit.on('error', function(err) {
+            console.log("Error");
+            console.log(err);
+            selenium.kill();
+            cb();
+        });
 
     });
 });
