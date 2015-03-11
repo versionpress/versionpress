@@ -30,4 +30,5 @@ PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
 if (TestRunnerOptions::getInstance()->forceSetup == "before-suite") {
     echo "Setting up site before suite";
     SeleniumTestCase::setUpSite(true);
+    echo "\n";
 }

@@ -80,12 +80,16 @@ gulp.task('run-tests', function(cb) {
             "--colors"
         ];
 
+        var outFile = fs.createWriteStream('phpunit-log.txt');
+
 
         var phpunit = childProcess.spawn(phpUnitCmd, phpUnitCmdArgs);
         phpunit.stdout.on('data', function(data) {
             process.stdout.write(data);
+            outFile.write(data);
         });
         phpunit.stdout.on('end', function(data) {
+            outFile.end();
             selenium.kill();
             cb();
         });
