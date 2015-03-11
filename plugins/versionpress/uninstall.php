@@ -11,6 +11,7 @@
  */
 
 use VersionPress\Utils\FileSystem;
+use VersionPress\Utils\SecurityUtils;
 use VersionPress\Utils\UninstallationUtil;
 
 defined('WP_UNINSTALL_PLUGIN') or die('Direct access not allowed');
@@ -23,8 +24,7 @@ if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
     if (!file_exists($backupsDir)) {
         FileSystem::mkdir($backupsDir);
         file_put_contents($backupsDir . '/.gitignore', 'git-backup-*');
-        FileSystem::copy(__DIR__ . '/src/Initialization/.htaccess.tpl', $backupsDir . '/.htaccess');
-        FileSystem::copy(__DIR__ . '/src/Initialization/web.tpl.config', $backupsDir . '/web.config');
+        SecurityUtils::protectDirectory($backupsDir);
     }
 
     $backupPath = $backupsDir . '/git-backup-' . date("YmdHis");

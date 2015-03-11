@@ -8,6 +8,7 @@ use VersionPress\Git\GitRepository;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\IdUtil;
+use VersionPress\Utils\SecurityUtils;
 use VersionPress\VersionPress;
 use wpdb;
 
@@ -392,8 +393,8 @@ class Initializer {
      * Copies the .htaccess and web.config files into the vpdb directory.
      */
     private function copyAccessRulesFiles() {
-        FileSystem::copy(__DIR__ . "/.htaccess.tpl", VERSIONPRESS_MIRRORING_DIR . "/.htaccess");
-        FileSystem::copy(__DIR__ . "/web.tpl.config", VERSIONPRESS_MIRRORING_DIR . "/web.config");
+        SecurityUtils::protectDirectory(ABSPATH . "/.git");
+        SecurityUtils::protectDirectory(VERSIONPRESS_MIRRORING_DIR);
     }
 
     /**
