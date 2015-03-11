@@ -41,16 +41,22 @@ Here are notes on some of the requirements:
 
 ### Git
 
-VersionPress takes a strategic dependency on [Git](http://git-scm.com/) which provides [many benefits](../feature-focus/git) but also requires this tool to be installed on the server and accessible from PHP. Make sure that `proc_open()` is enabled on the server and that the Git installation is in the PATH. (Since version 1.0-rc2, you can also explicitly tell VersionPress where to find the binary, see [Configuration](./configuration).)
+VersionPress takes a strategic dependency on [Git](http://git-scm.com/) which provides [many benefits](../feature-focus/git) but also requires this tool to be installed on the server and accessible from PHP. Make sure that `proc_open()` is enabled on the server and that the Git installation is in the PATH (if it's not, you can tell VersionPress where to find the binary via [Configuration](./configuration)).
+
+Git **1.9** and newer are supported. Do not attempt to make VersionPress run with older releases (1.7 and 1.8 are still quite popular), there are known issues with them.
 
 ### PHP 5.3
 
-WordPress can run on an old and [long unsupported](http://php.net/eol.php) PHP 5.2. We also started with this version but eventually dropped it so that we could use the newer language features and some 3<sup>rd</sup> party libraries that are 5.3+ only.
+WordPress can run on an old and [long unsupported](http://php.net/eol.php) PHP 5.2. We also started with this version but eventually dropped it so that we could use the newer language features and some 3<sup>rd</sup> party libraries that are 5.3+ only. We recommend using one of the [actively supported](http://php.net/supported-versions.php) PHP versions.
+
+Note: VersionPress is currently not being tested on HHVM.
 
 
-### The db.php "hook"
+### The db.php drop-in
 
-VersionPress currently uses the `wp-content/db.php` file to hook into some WordPress actions for the lack of better extensibility points (see [issue #29710](https://core.trac.wordpress.org/ticket/29710)). This means that VersionPress will conflict with other plugins that want to use this single extensibility point – thankfully there are not that many of them.
+VersionPress currently uses the `wp-content/db.php` file to hook into some WordPress actions for the lack of better extensibility points (see [WP issue #29710](https://core.trac.wordpress.org/ticket/29710) and [this suggestion](https://wordpress.org/ideas/topic/multiple-dbphp-files-for-plugins)). This means that VersionPress will conflict with other plugins that want to use db.php which are usually some debug or caching plugins.
+
+There is no easy way around this. We hope that WordPress will provide suitable hooks for us – you can go vote on the aforementioned ticket if this issue is important to you. 
 
 
 ### Path customizations
@@ -60,20 +66,26 @@ Some advanced users like having their plugins directory and other folders outsid
 
 ### Supported web servers
 
-Apache or IIS 7+ web servers are supported out of the box, other web server need manual configuration to prevent direct access from these locations:
+Apache 2.2+ and IIS 7+ are supported out of the box if they don't suppress custom rules in their global configuration (which they can). If the folders cannot be protected automatically, make sure direct access is denied for the following locations:
 
- - `wp-content/vpdb`
- - `<root>/.git` 
+ - `/wp-content/vpdb`
+ - `/wp-content/vpbackups`
+ - `/wp-content/plugins/versionpress`
+ - `/.git` 
 
 
 ### External libraries
 
-VersionPress depends on several external libraries e.g. for launching Git processes, working with the file system, etc. The nature of PHP is such that if some other plugin happens to include the same library but in an incompatible version, it might cause issues to VersionPress – or vice versa. There is not much we can do about it so here's just the list of those dependencies so that you can troubleshoot yourself if needs be:
+VersionPress depends on several external libraries for launching Git processes, working with the file system, etc. The nature of PHP is such that if some other plugin happens to include the same library but in an incompatible version, it might cause issues to VersionPress – or vice versa. There is not much we can do about it so here's just the list of those dependencies so that you know:
 
- - `nette/nette-minified`
- - `symfony/process`
- - `symfony/filesystem`
- - `michelf/php-markdown`
+ - `tracy/tracy` 2.2
+ - `nette/utils` 2.2
+ - `nette/robot-loader` 2.2
+ - `nette/neon` 2.2
+ - `symfony/process` 2.5
+ - `symfony/filesystem` 2.5
+ - `michelf/php-markdown` 1.4
+ - `ifsnop/mysqldump-php` 1.x
 
 
 ## Installation
