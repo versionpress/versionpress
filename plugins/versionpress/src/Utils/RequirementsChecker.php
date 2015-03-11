@@ -91,7 +91,7 @@ class RequirementsChecker {
             'name' => '.htaccess or web.config support',
             'level' => 'warning',
             'fulfilled' => $this->tryAccessControlFiles(),
-            'help' => 'It\'s highly recommended to secure `wp-content/plugins/log` and `wp-content/vpdb` directories from access via browser after activation!'
+            'help' => 'VersionPress automatically tries to secure certain locations, like `wp-content/vpdb`. You either don\'t have a supported web server or rules cannot be enforced. [Learn more](http://docs.versionpress.net/en/getting-started/installation-uninstallation#supported-web-servers).'
         );
 
 
