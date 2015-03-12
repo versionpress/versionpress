@@ -182,6 +182,7 @@ class VPCommand extends WP_CLI_Command {
      *
      * @synopsis <commit>
      *
+     * @when before_wp_load
      */
     public function undo($args = array(), $assoc_args = array()) {
         global $versionPressContainer;
@@ -219,9 +220,11 @@ class VPCommand extends WP_CLI_Command {
      *
      * ## EXAMPLES
      *
-     *     wp vp undo a34bc28
+     *     wp vp rollback a34bc28
      *
      * @synopsis <commit>
+     *
+     * @when before_wp_load
      *
      */
     public function rollback($args = array(), $assoc_args = array()) {
