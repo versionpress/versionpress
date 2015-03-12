@@ -22,8 +22,8 @@
         <p>
             For EAP releases, please have a backup.
             <a href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback' target='_blank'>
-                Learn more about reverts
-            </a>.
+                Learn more about reverts.
+            </a>
         </p>";
 
     $errors = ( !$clearWorkingDirectory ? "<p class='error'>Please commit your changes</p>" : "");
