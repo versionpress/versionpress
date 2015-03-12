@@ -231,17 +231,24 @@ gulp.task('clean-build', ['zip'], function (cb) {
 /**
  * Installs Composer external libs.
  */
-gulp.task('composer-install-dev', function() {
-    composer({ cwd: './ext-libs', bin: 'composer'});
-    composer({ cwd: './plugins/versionpress', bin: 'composer'});
+gulp.task('composer-install-ext-libs', function() {
+    return composer({ cwd: './ext-libs', bin: 'composer'});
+});
+
+/**
+ * Installs Composer external libs.
+ */
+gulp.task('composer-install-versionpress-libs', function() {
+    return composer({ cwd: './plugins/versionpress', bin: 'composer'});
 });
 
 /**
  * Sets git to be case sensitive.
  */
-gulp.task('git-config', function() {
-    git.exec({args: 'config core.ignorecase false'}, function (err, stdout) {
+gulp.task('git-config', ['composer-install-ext-libs', 'composer-install-versionpress-libs'], function(cb) {
+    return git.exec({args: 'config core.ignorecase false'}, function (err, stdout) {
         if(err) { console.log(err); }
+        cb();
     });
 });
 
@@ -277,9 +284,7 @@ gulp.task('test-deploy', ['prepare-test-deploy', 'copy']);
  * Inits dev environment.
  * Install vendors, set env variables.
  */
-gulp.task('init-dev', ['composer-install-dev', 'git-config']);
-
-
+gulp.task('init-dev', ['git-config']);
 
 //--------------------------------------
 // Helper functions
