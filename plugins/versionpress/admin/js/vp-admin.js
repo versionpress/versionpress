@@ -38,8 +38,7 @@ jQuery(document).ready(function($) {
         var data = {
             action: 'vp_show_undo_confirm',
             method: method,
-            commit: commit,
-            ajax: true
+            commit: commit
         }
 
         $.get(ajaxurl, data).then(function (data) {

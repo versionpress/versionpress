@@ -502,7 +502,7 @@ function vp_admin_menu() {
 add_action('admin_action_vp_show_undo_confirm', 'vp_show_undo_confirm');
 
 function vp_show_undo_confirm() {
-    if(isset($_GET['ajax'])) {
+    if(isAjax()) {
         require_once(WP_CONTENT_DIR . '/plugins/versionpress/admin/undo.php');
     } else {
         wp_redirect(admin_url('admin.php?page=versionpress/admin/undo.php&method=' . $_GET['method'] . '&commit=' . $_GET['commit']));
@@ -571,6 +571,10 @@ function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
 //----------------------------------
 // AJAX handling
 //----------------------------------
+
+function isAjax() {
+    return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
+}
 
 add_action('wp_ajax_hide_vp_welcome_panel', 'vp_ajax_hide_vp_welcome_panel');
 

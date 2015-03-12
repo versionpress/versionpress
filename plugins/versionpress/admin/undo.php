@@ -33,7 +33,7 @@
         "href='" . ( !$clearWorkingDirectory ? "javascript:;" : admin_url('admin.php?action=vp_' . $method . '&commit=' . $commit->getHash()) ) . "'>Proceed</a>";
     $buttonCancel = "<a " .
         "class='button cancel' ".
-        "href='" . (isset($_GET['ajax']) ? "javascript:;" : admin_url('admin.php?page=versionpress/admin/index.php')) . "'>Cancel</a>";
+        "href='" . (isAjax() ? "javascript:;" : admin_url('admin.php?page=versionpress/admin/index.php')) . "'>Cancel</a>";
 
     $body = "
         <div>
@@ -46,9 +46,8 @@
         </div>
     ";
 
-    if(isset($_GET['ajax'])) {
+    if(isAjax()) {
         $response = new stdClass();
-        $response->title = $title;
         $response->body = $body;
         echo json_encode($response);
         wp_die();
