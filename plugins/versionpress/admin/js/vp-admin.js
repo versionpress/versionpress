@@ -26,23 +26,23 @@ jQuery(document).ready(function($) {
         }
     }
 
-
     var customRevertPopoverClass = "versionpress-revert-popover"; // used to identify the popover later
     var undoRollbackSelector = '.vp-undo, .vp-rollback';
-    var staticWarningText = "For EAP releases, please have a backup. <a href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback' target='_blank'>Learn more about reverts</a>. "
-    var $staticWarning = $("<div'>").html(staticWarningText);
+    var cancelButtonSelector = '.button.cancel';
 
     $('body').on('click', undoRollbackSelector, function (e) {
         var $link = $(this);
-        var type = $link.hasClass('vp-undo') ? 'undo' : 'rollback';
-        var hash = $link.data('commit');
+        var method = $link.hasClass('vp-undo') ? 'undo' : 'rollback';
+        var commit = $link.data('commit');
+
         var data = {
-            action: 'vp_prepare_revert_popup',
-            type: type,
-            hash: hash
+            action: 'vp_show_undo_confirm',
+            method: method,
+            commit: commit,
+            ajax: true
         }
 
-        $.post(ajaxurl, data).then(function (data) {
+        $.get(ajaxurl, data).then(function (data) {
             if (typeof(data) === "string") {
                 data = JSON.parse(data);
             }
@@ -57,11 +57,10 @@ jQuery(document).ready(function($) {
         return false;
     });
 
-    function showRevertPopup ($link, data) {
+    function showRevertPopup ($link) {
         var type = $link.hasClass('vp-undo') ? 'undo' : 'rollback';
         var title = type == 'undo' ? "Undo <em>" + $link.data('commit-message') + '</em> ?' : "Rollback to <em>" + $link.data('commit-date') + "</em> ?";
         var $content = $('<div>');
-        $content.append($staticWarning);
         $content.append('<div class="spinner">');
 
         $link.webuiPopover({
@@ -83,31 +82,11 @@ jQuery(document).ready(function($) {
 
     function fillPopup($link, data) {
         var $popupContent = $('.webui-popover-' + customRevertPopoverClass + ' .webui-popover-content');
-        $popupContent.html(renderPopupContent($link, data));
-    }
+        $popupContent.html(data.body);
 
-    function renderPopupContent($link, data) {
-        var clearWorkingDirectory = data.clearWorkingDirectory;
-        var $content = $('<div>');
-        var disableOk = false;
-        $content.append($staticWarning);
-
-        if (!clearWorkingDirectory) {
-            $content.append("Please commit your changes");
-            disableOk = true;
-        }
-
-        var $buttonContainer = $('<div>').addClass('button-container');
-        var $okButton = $('<a class="button" href="#" id="popover-ok-button">Proceed</a>').attr('href', $link.attr('href'));
-        var $cancelButton = $('<a class="button cancel" href="#" id="popover-cancel-button">Cancel</a>').click(function () { $link.webuiPopover('destroy'); });
-
-        if (disableOk) {
-            $okButton.addClass('disabled');
-            $okButton.click(function (e) { e.preventDefault(); return false; })
-        }
-
-        $buttonContainer.append($okButton).append(' ').append($cancelButton);
-        $content.append($buttonContainer);
-        return $content;
+        $('.webui-popover-' + customRevertPopoverClass).on('click', cancelButtonSelector, function (e) {
+            $link.webuiPopover('destroy');
+            return false;
+        });
     }
 });

@@ -486,7 +486,8 @@ function vp_admin_menu() {
 
     $directAccessPages = array(
         'deactivate.php',
-        'system-info.php'
+        'system-info.php',
+        'undo.php'
     );
 
     global $_registered_pages;
@@ -496,6 +497,16 @@ function vp_admin_menu() {
         $_registered_pages[$hookname] = true;
     }
 
+}
+
+add_action('admin_action_vp_show_undo_confirm', 'vp_show_undo_confirm');
+
+function vp_show_undo_confirm() {
+    if(isset($_GET['ajax'])) {
+        require_once(WP_CONTENT_DIR . '/plugins/versionpress/admin/undo.php');
+    } else {
+        wp_redirect(admin_url('admin.php?page=versionpress/admin/undo.php&method=' . $_GET['method'] . '&commit=' . $_GET['commit']));
+    }
 }
 
 add_action('admin_action_vp_undo', 'vp_undo');
@@ -568,20 +579,7 @@ function vp_ajax_hide_vp_welcome_panel() {
     die(); // this is required to return a proper result
 }
 
-add_action('wp_ajax_vp_prepare_revert_popup', 'vp_prepare_revert_popup');
-
-function vp_prepare_revert_popup() {
-    global $versionPressContainer;
-    /** @var \VersionPress\Git\GitRepository $repository */
-    $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
-    $clearWorkingDirectory = $repository->getStatus() == null;
-
-    $ajaxResult = new stdClass();
-    $ajaxResult->clearWorkingDirectory = $clearWorkingDirectory;
-
-    echo json_encode($ajaxResult);
-    wp_die();
-}
+add_action('wp_ajax_vp_show_undo_confirm', 'vp_show_undo_confirm');
 
 //----------------------------------
 // Private functions

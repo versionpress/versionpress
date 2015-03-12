@@ -390,7 +390,7 @@ function _vp_show_progress_message($progressMessage) {
 
                 $changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
                 $undoSnippet = "<a " .
-                    "href='" . admin_url('admin.php?action=vp_undo&commit=' . $commit->getHash()) . "' " .
+                    "href='" . admin_url('admin.php?action=vp_show_undo_confirm&method=undo&commit=' . $commit->getHash()) . "' " .
                     "class='vp-undo' " .
                     "data-commit='" . $commit->getHash() . "' " .
                     "data-commit-message=\"" . htmlspecialchars($changeInfo->getChangeDescription()) . "\"" .
@@ -398,7 +398,7 @@ function _vp_show_progress_message($progressMessage) {
                     "title='Reverts changes done by this commit'>Undo this</a>";
 
                 $rollbackSnippet = "<a " .
-                    "href='" . admin_url('admin.php?action=vp_rollback&commit=' . $commit->getHash()) . "' " .
+                    "href='" . admin_url('admin.php?action=vp_show_undo_confirm&method=rollback&commit=' . $commit->getHash()) . "' " .
                     "class='vp-rollback' " .
                     "data-commit='" . $commit->getHash() . "' " .
                     "data-commit-date='" . $commitDate . "'" .
