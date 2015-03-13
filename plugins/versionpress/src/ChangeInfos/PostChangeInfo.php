@@ -21,7 +21,7 @@ class PostChangeInfo extends EntityChangeInfo {
     const POST_UPDATED_PROPERTIES_TAG = "VP-Post-UpdatedProperties";
 
     /**
-     * Change in these properties create "Edited post" description instead of "Updated post".
+     * Change in these properties creates "Edited post" description instead of "Updated post".
      *
      * @var array
      */
