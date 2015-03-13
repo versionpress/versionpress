@@ -501,13 +501,13 @@ function vp_admin_menu() {
 add_action('admin_action_vp_undo', 'vp_undo');
 
 function vp_undo() {
-    _vp_revert('revert');
+    _vp_revert('undo');
 }
 
 add_action('admin_action_vp_rollback', 'vp_rollback');
 
 function vp_rollback() {
-    _vp_revert('revertAll');
+    _vp_revert('rollback');
 }
 
 function _vp_revert($reverterMethod) {

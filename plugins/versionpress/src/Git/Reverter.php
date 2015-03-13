@@ -43,59 +43,36 @@ class Reverter {
         $this->storageFactory = $storageFactory;
     }
 
-    public function revert($commitHash) {
-        if (!$this->repository->isCleanWorkingDirectory()) {
-            return RevertStatus::NOT_CLEAN_WORKING_DIRECTORY;
-        }
-
-        $modifiedFiles = $this->repository->getModifiedFiles(sprintf("%s~1..%s", $commitHash, $commitHash));
-        $revertedCommit = $this->repository->getCommit($commitHash);
-
-
-        $vpIdsInModifiedFiles = $this->getAllVpIdsFromModifiedFiles($modifiedFiles);
-
-        if (!$this->repository->revert($commitHash)) {
-            return RevertStatus::MERGE_CONFLICT;
-        }
-
-        $referencesOk = $this->checkReferencesForRevertedCommit($revertedCommit);
-
-        if (!$referencesOk) {
-            $this->repository->abortRevert();
-            return RevertStatus::VIOLATED_REFERENTIAL_INTEGRITY;
-        }
-
-        $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_UNDO, $commitHash);
-        $this->committer->forceChangeInfo($changeInfo);
-        $this->committer->commit();
-
-        $vpIdsInModifiedFiles = array_merge($vpIdsInModifiedFiles, $this->getAllVpIdsFromModifiedFiles($modifiedFiles));
-        $vpIdsInModifiedFiles = array_unique($vpIdsInModifiedFiles, SORT_REGULAR);
-
-        $entitiesToSynchronize = $this->detectEntitiesToSynchronize($modifiedFiles, $vpIdsInModifiedFiles);
-
-        $this->synchronizationProcess->synchronize($entitiesToSynchronize);
-        $affectedPosts = $this->getAffectedPosts($modifiedFiles);
-        $this->updateChangeDateForPosts($affectedPosts);
-
-        return RevertStatus::OK;
+    public function undo($commitHash) {
+        return $this->_revert($commitHash, "undo");
     }
 
-    public function revertAll($commitHash) {
+    public function rollback($commitHash) {
+        return $this->_revert($commitHash, "rollback");
+    }
+
+    private function _revert($commitHash, $method) {
         if (!$this->repository->isCleanWorkingDirectory()) {
             return RevertStatus::NOT_CLEAN_WORKING_DIRECTORY;
         }
 
-        $modifiedFiles = $this->repository->getModifiedFiles($commitHash);
+        $commitHashForDiff = $method === "undo" ? sprintf("%s~1..%s", $commitHash, $commitHash) : $commitHash;
+        $modifiedFiles = $this->repository->getModifiedFiles($commitHashForDiff);
         $vpIdsInModifiedFiles = $this->getAllVpIdsFromModifiedFiles($modifiedFiles);
 
-        $this->repository->revertAll($commitHash);
+        if ($method === "undo") {
+            $status = $this->revertOneCommit($commitHash);
+            $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_UNDO, $commitHash);
 
-        if (!$this->repository->willCommit()) {
-            return RevertStatus::NOTHING_TO_COMMIT;
+        } else {
+            $status = $this->revertToCommit($commitHash);
+            $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_ROLLBACK, $commitHash);
         }
 
-        $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_ROLLBACK, $commitHash);
+        if ($status !== RevertStatus::OK) {
+            return $status;
+        }
+
         $this->committer->forceChangeInfo($changeInfo);
         $this->committer->commit();
 
@@ -299,5 +276,31 @@ class Reverter {
             $vpIds = array_merge($vpIds, array_map(function ($vpId) use ($parent) { return array('vp_id' => $vpId, 'parent' => $parent); }, $matches[0]));
         }
         return $vpIds;
+    }
+
+    private function revertOneCommit($commitHash) {
+        if (!$this->repository->revert($commitHash)) {
+            return RevertStatus::MERGE_CONFLICT;
+        }
+
+        $revertedCommit = $this->repository->getCommit($commitHash);
+        $referencesOk = $this->checkReferencesForRevertedCommit($revertedCommit);
+
+        if (!$referencesOk) {
+            $this->repository->abortRevert();
+            return RevertStatus::VIOLATED_REFERENTIAL_INTEGRITY;
+        }
+
+        return RevertStatus::OK;
+    }
+
+    private function revertToCommit($commitHash) {
+        $this->repository->revertAll($commitHash);
+
+        if (!$this->repository->willCommit()) {
+            return RevertStatus::NOTHING_TO_COMMIT;
+        }
+
+        return RevertStatus::OK;
     }
 }

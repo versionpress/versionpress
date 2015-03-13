@@ -189,7 +189,7 @@ class VPCommand extends WP_CLI_Command {
         /** @var Reverter $reverter */
         $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
 
-        $status = $reverter->revert($args[0]);
+        $status = $reverter->undo($args[0]);
 
         if ($status === RevertStatus::VIOLATED_REFERENTIAL_INTEGRITY) {
             WP_CLI::error("Violated referential integrity. Objects with missing references cannot be restored. For example we cannot restore comment where the related post was deleted.");
@@ -232,7 +232,7 @@ class VPCommand extends WP_CLI_Command {
         /** @var Reverter $reverter */
         $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
 
-        $status = $reverter->revertAll($args[0]);
+        $status = $reverter->rollback($args[0]);
 
         if ($status === RevertStatus::NOTHING_TO_COMMIT) {
             WP_CLI::error("Nothing to commit. Current state is the same as the one you want rollback to.");
