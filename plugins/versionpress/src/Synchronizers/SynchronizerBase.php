@@ -6,6 +6,7 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\ArrayUtils;
+use VersionPress\Utils\ReferenceUtils;
 use wpdb;
 
 /**
@@ -361,11 +362,10 @@ abstract class SynchronizerBase implements Synchronizer {
                 continue;
             }
 
-            list($table, $targetColumn) = explode(".", $reference);
-            $prefixedTable = $this->dbSchema->getPrefixedTableName($table);
-
-            $targetEntity = $mnReferences[$reference];
-            $sourceColumn = $this->getSourceColumn($targetEntity, $reference);
+            $referenceDetails = ReferenceUtils::getMnReferenceDetails($this->dbSchema, $this->entityName, $reference);
+            $prefixedTable = $this->dbSchema->getPrefixedTableName($referenceDetails['junction-table']);
+            $sourceColumn = $referenceDetails['source-column'];
+            $targetColumn = $referenceDetails['target-column'];
 
             $valuesForInsert = array_map(function ($relation) use ($idMap) {
                 $sourceId = $idMap[$relation['vp_id']];
@@ -392,32 +392,6 @@ abstract class SynchronizerBase implements Synchronizer {
         }
 
         return true;
-    }
-
-    /**
-     * Returns name of column referencing synchronized entity in the junction table.
-     * Example:
-     * We are synchronizing posts with M:N reference to the taxonomies. The reference is defined
-     * as term_relationships.term_taxonomy_id => term_taxonomy. Name of column referencing term_taxonomy is obvious,
-     * it's term_taxonomy_id. However we need also name of column referencing the post. We can find this name
-     * in the definition of M:N references of term_taxonomy, where it's defined as term_relationships.object_id => post.
-     * So in the end we are looking for M:N reference to post with same junction table (term_relationships).
-     *
-     * @param $targetEntity
-     * @param $reference
-     * @return string
-     */
-    private function getSourceColumn($targetEntity, $reference) {
-        list($table) = explode(".", $reference);
-        $targetEntityMnReferences = $this->dbSchema->getEntityInfo($targetEntity)->mnReferences;
-        foreach ($targetEntityMnReferences as $reference => $referencedEntity) {
-            list($referencedTable, $referenceColumn) = explode(".", $reference);
-            if ($referencedTable === $table && $referencedEntity === $this->entityName) {
-                return $referenceColumn;
-            }
-        }
-
-        return null;
     }
 
     private function getIdsForVpIds($referencesToUpdate) {

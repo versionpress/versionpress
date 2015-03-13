@@ -11,6 +11,8 @@ use VersionPress\Storages\StorageFactory;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\TestConfig;
 use VersionPress\Tests\Utils\TestRunnerOptions;
+use VersionPress\Utils\ArrayUtils;
+use VersionPress\Utils\ReferenceUtils;
 
 class End2EndTestCase extends PHPUnit_Framework_TestCase {
 
@@ -144,11 +146,69 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase {
                 $this->assertEquals($storageEntity[$column], $value, "Different values ({$entityName}[$column]: $id): DB = $value, storage = $storageEntity[$column]");
             }
         }
+
+        $missingReferences = array();
+        $exceedingReferences = array();
+
+        foreach ($entityInfo->mnReferences as $reference => $targetEntity) {
+            if ($entityInfo->isVirtualReference($reference)) {
+                continue;
+            }
+
+            $referenceDetails = ReferenceUtils::getMnReferenceDetails($this->schemaInfo, $entityName, $reference);
+            $sourceColumn = $referenceDetails['source-column'];
+            $targetColumn = $referenceDetails['target-column'];
+            $junctionTable = $referenceDetails['junction-table'];
+            $prefixedJunctionTable = $this->schemaInfo->getPrefixedTableName($junctionTable);
+            $prefixedVpIdTable = $this->schemaInfo->getPrefixedTableName('vp_id');
+            $sourceTable = $this->schemaInfo->getTableName($referenceDetails['source-entity']);
+            $targetTable = $this->schemaInfo->getTableName($referenceDetails['target-entity']);
+
+            $junctionTableContent = $this->fetchAll("SELECT HEX(s_vp_id.vp_id), HEX(t_vp_id.vp_id) FROM $prefixedJunctionTable j JOIN $prefixedVpIdTable s_vp_id ON j.$sourceColumn = s_vp_id.id AND s_vp_id.`table`='$sourceTable' JOIN $prefixedVpIdTable t_vp_id ON j.$targetColumn = t_vp_id.id AND t_vp_id.`table` = '$targetTable'", MYSQLI_NUM);
+
+            $checkedReferences = array();
+            $missingReferences[$junctionTable] = array();
+            foreach ($storageEntities as $storageEntity) {
+                if (!isset($storageEntity["vp_$targetEntity"])) {
+                    continue;
+                }
+
+                foreach ($storageEntity["vp_$targetEntity"] as $referenceVpId) {
+                    if (!ArrayUtils::any($junctionTableContent, function ($junctionRow) use ($storageEntity, $referenceVpId) {
+                        return $junctionRow[0] === $storageEntity['vp_id'] && $junctionRow[1] === $referenceVpId;
+                    })) {
+                        $missingReferences[$junctionTable][] = array($sourceColumn => $storageEntity['vp_id'], $targetColumn => $referenceVpId);
+                    }
+                    $checkedReferences[] = array($storageEntity['vp_id'], $referenceVpId);
+                }
+            }
+
+            $exceedingReferences[$junctionTable] = array_map(
+                function ($pair) use ($sourceColumn, $targetColumn) {
+                    return array($sourceColumn => $pair[0], $targetColumn => $pair[1]);
+                }, array_filter($junctionTableContent,
+                function ($pair) use ($checkedReferences) {
+                    foreach ($checkedReferences as $reference) {
+                        if ($reference[0] === $pair[0] && $reference[1] === $pair[1]) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
+            );
+        }
+
+        $this->reportResultOfMnReferenceCheck($missingReferences, "Missing");
+        $this->reportResultOfMnReferenceCheck($exceedingReferences, "Exceeding");
     }
 
     private function selectAll($table) {
-        $res = $this->database->query("SELECT * FROM $table");
-        return $res->fetch_all(MYSQLI_ASSOC);
+        return $this->fetchAll("SELECT * FROM $table");
+    }
+
+    private function fetchAll($query, $resultType = MYSQLI_ASSOC) {
+        $res = $this->database->query($query);
+        return $res->fetch_all($resultType);
     }
 
     private function getVpIdMap() {
@@ -208,5 +268,25 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase {
         }
 
         return $exceedingEntities;
+    }
+
+    private function reportResultOfMnReferenceCheck($referenceResult, $verb) {
+        foreach ($referenceResult as $junctionTable => $references) {
+            if (count($references) == 0) {
+                continue;
+            }
+
+            $list = "";
+            foreach ($references as $reference) {
+                $list .= "[";
+                foreach ($reference as $column => $vpId) {
+                    $list .= "$column = $vpId ";
+                }
+                $list .= "] ";
+            }
+
+
+            $this->fail(sprintf($verb . " M:N reference in table %s %s", $junctionTable, $list));
+        }
     }
 }
