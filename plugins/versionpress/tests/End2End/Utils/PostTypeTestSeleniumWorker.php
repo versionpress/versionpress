@@ -21,6 +21,9 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
     }
 
     public function updatePost() {
+        $titleField = $this->byCssSelector('form#post input#title');
+        $titleField->clear();
+        $titleField->value("Updated " . $this->getPostType());
         $this->setTinyMCEContent("Updated content");
         $this->byCssSelector('form#post #publish')->click();
         $this->waitAfterRedirect();

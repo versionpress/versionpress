@@ -43,6 +43,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/edit");
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
+        $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_content,post_title");
         $commitAsserter->assertCleanWorkingDirectory();
         $this->assertFilesEqualDatabase();
     }
@@ -56,6 +57,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitsAreEquivalent();
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
+        $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_title");
         $commitAsserter->assertCleanWorkingDirectory();
         $this->assertFilesEqualDatabase();
     }
@@ -69,6 +71,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/trash");
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
+        $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_status");
         $commitAsserter->assertCleanWorkingDirectory();
         $this->assertFilesEqualDatabase();
     }
@@ -82,6 +85,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/untrash");
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
+        $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_status");
         $commitAsserter->assertCleanWorkingDirectory();
         $this->assertFilesEqualDatabase();
     }
@@ -139,6 +143,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/publish");
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
+        $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_date,post_date_gmt,post_content,post_status,post_name");
         $commitAsserter->assertCleanWorkingDirectory();
         $this->assertFilesEqualDatabase();
     }

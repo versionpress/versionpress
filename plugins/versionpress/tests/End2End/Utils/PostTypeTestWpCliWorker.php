@@ -33,7 +33,10 @@ abstract class PostTypeTestWpCliWorker extends WpCliWorker implements IPostTypeT
     }
 
     public function updatePost() {
-        $change = array('post_content' => 'Edited post');
+        $change = array(
+            'post_content' => 'Updated content',
+            'post_title' => 'Updated ' . $this->getPostType()
+        );
         $this->wpAutomation->editPost($this->postId, $change);
     }
 
@@ -85,6 +88,12 @@ abstract class PostTypeTestWpCliWorker extends WpCliWorker implements IPostTypeT
     }
 
     public function publishDraft() {
-        $this->wpAutomation->editPost($this->postId, array('post_status' => 'publish'));
+        $this->wpAutomation->editPost($this->postId, array(
+            'post_date' => '2015-03-13 14:44:05',
+            'post_date_gmt' => '2015-03-13 14:44:05',
+            'post_content' => 'Updated content',
+            'post_name' => 'test-post',
+            'post_status' => 'publish'
+        ));
     }
 }
