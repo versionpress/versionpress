@@ -52,6 +52,8 @@ class Reverter {
         $revertedCommit = $this->repository->getCommit($commitHash);
 
 
+        $vpIdsInModifiedFiles = $this->getAllVpIdsFromModifiedFiles($modifiedFiles);
+
         if (!$this->repository->revert($commitHash)) {
             return RevertStatus::MERGE_CONFLICT;
         }
@@ -67,9 +69,12 @@ class Reverter {
         $this->committer->forceChangeInfo($changeInfo);
         $this->committer->commit();
 
-        $entitiesToSynchronize = $this->detectEntitiesToSynchronize($modifiedFiles);
+        $vpIdsInModifiedFiles = array_merge($vpIdsInModifiedFiles, $this->getAllVpIdsFromModifiedFiles($modifiedFiles));
+        $vpIdsInModifiedFiles = array_unique($vpIdsInModifiedFiles, SORT_REGULAR);
 
-        $this->synchronize($entitiesToSynchronize);
+        $entitiesToSynchronize = $this->detectEntitiesToSynchronize($modifiedFiles, $vpIdsInModifiedFiles);
+
+        $this->synchronizationProcess->synchronize($entitiesToSynchronize);
         $affectedPosts = $this->getAffectedPosts($modifiedFiles);
         $this->updateChangeDateForPosts($affectedPosts);
 
@@ -82,6 +87,7 @@ class Reverter {
         }
 
         $modifiedFiles = $this->repository->getModifiedFiles($commitHash);
+        $vpIdsInModifiedFiles = $this->getAllVpIdsFromModifiedFiles($modifiedFiles);
 
         $this->repository->revertAll($commitHash);
 
@@ -93,9 +99,12 @@ class Reverter {
         $this->committer->forceChangeInfo($changeInfo);
         $this->committer->commit();
 
-        $entitiesToSynchronize = $this->detectEntitiesToSynchronize($modifiedFiles);
+        $vpIdsInModifiedFiles = array_merge($vpIdsInModifiedFiles, $this->getAllVpIdsFromModifiedFiles($modifiedFiles));
+        $vpIdsInModifiedFiles = array_unique($vpIdsInModifiedFiles, SORT_REGULAR);
 
-        $this->synchronize($entitiesToSynchronize);
+        $entitiesToSynchronize = $this->detectEntitiesToSynchronize($modifiedFiles, $vpIdsInModifiedFiles);
+
+        $this->synchronizationProcess->synchronize($entitiesToSynchronize);
         $affectedPosts = $this->getAffectedPosts($modifiedFiles);
         $this->updateChangeDateForPosts($affectedPosts);
 
@@ -109,10 +118,6 @@ class Reverter {
             $sql = "update {$this->database->prefix}posts set post_modified = '{$date}', post_modified_gmt = '{$dateGmt}' where ID = (select id from {$this->database->prefix}vp_id where vp_id = unhex('{$vpId}'))";
             $this->database->query($sql);
         }
-    }
-
-    private function synchronize($entitiesToSynchronize) {
-        $this->synchronizationProcess->synchronize($entitiesToSynchronize);
     }
 
     private function getAffectedPosts($modifiedFiles) {
@@ -244,33 +249,20 @@ class Reverter {
 
     /**
      * @param string[] $modifiedFiles List of modified files
-     * @return string[] List of entity types
+     * @param string[][] $vpIdsInModifiedFiles List of VPIDs with their possible parents
+     * @return array List of storages which will be fully synchronized and list of VPIDs with their possible parents
+     *          which will be synchronized as well.
      */
-    private function detectEntitiesToSynchronize($modifiedFiles) {
-        $entitiesToSynchronize = array();
-
-        if ($this->wasModified($modifiedFiles, 'posts')) {
-            $entitiesToSynchronize[] = 'post';
-            $entitiesToSynchronize[] = 'postmeta';
-        }
-
-        if ($this->wasModified($modifiedFiles, 'comments')) {
-            $entitiesToSynchronize[] = 'comment';
-            $entitiesToSynchronize[] = 'post'; // count of comments
-        }
-
-        if ($this->wasModified($modifiedFiles, 'users.ini')) {
-            $entitiesToSynchronize[] = 'user';
-            $entitiesToSynchronize[] = 'usermeta';
-        }
+    private function detectEntitiesToSynchronize($modifiedFiles, $vpIdsInModifiedFiles) {
+        $entitiesToSynchronize = array('storages' => array(), 'entities' => $vpIdsInModifiedFiles);
 
         if ($this->wasModified($modifiedFiles, 'terms.ini')) {
-            $entitiesToSynchronize[] = 'term';
+            $entitiesToSynchronize['storages'][] = 'term';
             $entitiesToSynchronize[] = 'term_taxonomy';
         }
 
         if ($this->wasModified($modifiedFiles, 'options.ini')) {
-            $entitiesToSynchronize[] = 'option';
+            $entitiesToSynchronize['storages'][] = 'option';
         }
 
         return $entitiesToSynchronize;
@@ -287,5 +279,25 @@ class Reverter {
         return ArrayUtils::any($modifiedFiles, function ($file) use ($pathPart) {
             return Strings::contains($file, $pathPart);
         });
+    }
+
+    private function getAllVpIdsFromModifiedFiles($modifiedFiles) {
+        $vpIds = array();
+        $vpIdRegex = "/([\\da-f]{32})/i";
+
+        foreach ($modifiedFiles as $file) {
+            if (!is_file(ABSPATH . $file)) {
+                continue;
+            }
+
+            preg_match($vpIdRegex, $file, $matches);
+            /** @noinspection PhpUsageOfSilenceOperatorInspection */
+            $parent = @$matches[0];
+
+            $content = file_get_contents(ABSPATH . $file);
+            preg_match_all($vpIdRegex, $content, $matches);
+            $vpIds = array_merge($vpIds, array_map(function ($vpId) use ($parent) { return array('vp_id' => $vpId, 'parent' => $parent); }, $matches[0]));
+        }
+        return $vpIds;
     }
 }

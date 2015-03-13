@@ -26,7 +26,7 @@ class OptionsSynchronizer implements Synchronizer {
         $this->tableName = $dbSchema->getPrefixedTableName('option');
     }
 
-    function synchronize($task) {
+    function synchronize($task, $entitiesToSynchronize = null) {
         $options = $this->optionsStorage->loadAll();
         $syncQuery = "INSERT INTO {$this->tableName} (option_name, option_value, autoload) VALUES ";
         foreach ($options as $optionName => $values) {

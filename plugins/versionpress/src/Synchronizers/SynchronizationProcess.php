@@ -11,16 +11,17 @@ class SynchronizationProcess {
      */
     private $synchronizerFactory;
 
-    private $defaultSynchronizationSequence = array('option', 'user', 'usermeta', 'post', 'postmeta', 'comment', 'term', 'term_taxonomy');
+    private $defaultSynchronizationSequence = array('storages' => array('option', 'user', 'usermeta', 'post', 'postmeta', 'comment', 'term', 'term_taxonomy'));
 
     function __construct(SynchronizerFactory $synchronizerFactory) {
         $this->synchronizerFactory = $synchronizerFactory;
     }
 
     /**
-     * Runs synchronization for managed entities.
+     * Runs synchronization for managed entities. Takes storages and entities which will be synchronized.
      *
-     * @param string[]|null $entitiesToSynchronize List of entities which will be synchronized
+     * @param array|null $entitiesToSynchronize List of entities which will be synchronized
+     *          For example [storages => [options, terms], entities => [[vp_id => VPID1, parent => VPID2], ...]].
      */
     function synchronize($entitiesToSynchronize = null) {
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
@@ -30,21 +31,32 @@ class SynchronizationProcess {
             $entitiesToSynchronize = $this->defaultSynchronizationSequence;
         }
 
-        $synchronizationSequence = $this->sortEntitiesToSynchronize($entitiesToSynchronize);
+        $storageSynchronizationSequence = $this->sortStoragesToSynchronize($entitiesToSynchronize['storages']);
         $synchronizerFactory = $this->synchronizerFactory;
-        $synchronizationTasks = array_map(function ($synchronizerName) use ($synchronizerFactory) {
+
+        $synchronizationTasks = array();
+
+        if (isset($entitiesToSynchronize['entities'])) {
+            $allSynchronizers = $synchronizerFactory->getAllSupportedSynchronizers();
+            $synchronizationTasks = array_merge($synchronizationTasks, array_map(function ($synchronizerName) use ($entitiesToSynchronize, $synchronizerFactory) {
+                $synchronizer = $synchronizerFactory->createSynchronizer($synchronizerName);
+                return array('synchronizer' => $synchronizer, 'task' => Synchronizer::SYNCHRONIZE_EVERYTHING, 'entities' => $entitiesToSynchronize['entities']);
+            }, $allSynchronizers));
+        }
+
+        $synchronizationTasks = array_merge($synchronizationTasks, array_map(function ($synchronizerName) use ($synchronizerFactory) {
             $synchronizer = $synchronizerFactory->createSynchronizer($synchronizerName);
-            return array ('synchronizer' => $synchronizer, 'task' => Synchronizer::SYNCHRONIZE_EVERYTHING);
-        }, $synchronizationSequence);
+            return array ('synchronizer' => $synchronizer, 'task' => Synchronizer::SYNCHRONIZE_EVERYTHING, 'entities' => null);
+        }, $storageSynchronizationSequence));
 
         while (count($synchronizationTasks) > 0) {
             $task = array_shift($synchronizationTasks);
             /** @var Synchronizer $synchronizer */
             $synchronizer = $task['synchronizer'];
-            $remainingTasks = $synchronizer->synchronize($task['task']);
+            $remainingTasks = $synchronizer->synchronize($task['task'], $task['entities']);
 
             foreach ($remainingTasks as $remainingTask) {
-                $synchronizationTasks[] = array('synchronizer' => $synchronizer, 'task' => $remainingTask);
+                $synchronizationTasks[] = array('synchronizer' => $synchronizer, 'task' => $remainingTask, 'entities' => $task['entities']);
             }
         }
     }
@@ -57,7 +69,7 @@ class SynchronizationProcess {
      * @param string[] $entitiesToSynchronize
      * @return string[]
      */
-    private function sortEntitiesToSynchronize($entitiesToSynchronize) {
+    private function sortStoragesToSynchronize($entitiesToSynchronize) {
         $defaultSynchronizationSequence = $this->defaultSynchronizationSequence;
         $entitiesToSynchronize = array_unique($entitiesToSynchronize);
 

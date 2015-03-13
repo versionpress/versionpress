@@ -3,6 +3,7 @@ namespace VersionPress\Synchronizers;
 
 use Nette\Utils\Strings;
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\ArrayUtils;
 use wpdb;
@@ -34,6 +35,11 @@ abstract class SynchronizerBase implements Synchronizer {
 
     protected $passNumber = 0;
 
+    /** @var bool */
+    private $selectiveSynchronization;
+    private $entitiesToSynchronize;
+    private $deletedIds;
+
     /**
      * @param Storage $storage Specific Synchronizers will use specific storage types, see VersionPress\Synchronizers\SynchronizerFactory
      * @param wpdb $database
@@ -48,9 +54,12 @@ abstract class SynchronizerBase implements Synchronizer {
         $this->idColumnName = $dbSchema->getEntityInfo($this->entityName)->idColumnName;
     }
 
-    function synchronize($task) {
+    function synchronize($task, $entitiesToSynchronize = null) {
         $this->passNumber += 1;
-        $this->maybeInit();
+        $this->selectiveSynchronization = is_array($entitiesToSynchronize);
+        $this->entitiesToSynchronize = $entitiesToSynchronize;
+
+        $this->maybeInit($entitiesToSynchronize);
         $entities = $this->entities;
         $remainingTasks = array();
 
@@ -80,12 +89,12 @@ abstract class SynchronizerBase implements Synchronizer {
         return $remainingTasks;
     }
 
-    private function maybeInit() {
+    private function maybeInit($entitiesToSynchronize) {
         if ($this->entities !== null) {
             return;
         }
 
-        $this->entities = $this->loadEntitiesFromStorage();
+        $this->entities = $this->loadEntitiesFromStorage($entitiesToSynchronize);
     }
 
     //--------------------------------------
@@ -96,10 +105,26 @@ abstract class SynchronizerBase implements Synchronizer {
      * Loads entities from storage and gives subclasses the chance to transform them, see
      * {@see transformEntities()}.
      *
+     * @param $entitiesToSynchronize
      * @return array
      */
-    private function loadEntitiesFromStorage() {
-        $entities = $this->storage->loadAll();
+    private function loadEntitiesFromStorage($entitiesToSynchronize) {
+        if ($this->selectiveSynchronization) {
+            $entities = array();
+            if (!($this->storage instanceof MetaEntityStorage)) {
+                $entitiesToSynchronize = array_map(function ($entity) { $entity['parent'] = null; return $entity; }, $entitiesToSynchronize);
+                $entitiesToSynchronize = array_unique($entitiesToSynchronize, SORT_REGULAR);
+            }
+
+            foreach ($entitiesToSynchronize as $entityToSynchronize) {
+                if ($this->storage->exists($entityToSynchronize['vp_id'], $entityToSynchronize['parent'])) {
+                    $entities[] = $this->storage->loadEntity($entityToSynchronize['vp_id'], $entityToSynchronize['parent']);
+                }
+            }
+
+        } else {
+            $entities = $this->storage->loadAll();
+        }
         $entities = $this->transformEntities($entities);
         return $entities;
     }
@@ -234,14 +259,26 @@ abstract class SynchronizerBase implements Synchronizer {
     }
 
     private function deleteEntitiesWhichAreNotInStorage($entities) {
-        if (count($entities) == 0)
-            return;
-        $vpIds = array_map(function ($entity) {
-            return 'UNHEX("' . $entity['vp_id'] . '")';
-        }, $entities);
+        if ($this->selectiveSynchronization) {
+            $savedVpIds = array_map(function ($entity) { return $entity['vp_id']; }, $entities);
+            $vpIdsToSynchronize = array_map(function ($entity) { return $entity['vp_id']; }, $this->entitiesToSynchronize);
 
-        $ids = $this->database->get_col("SELECT id FROM {$this->getPrefixedTableName('vp_id')} " .
-            "WHERE `table` = \"{$this->dbSchema->getTableName($this->entityName)}\" AND vp_id NOT IN (" . join(",", $vpIds) . ")");
+            $sql = sprintf('SELECT id FROM %s WHERE `table` = "%s" ', $this->getPrefixedTableName('vp_id'), $this->dbSchema->getTableName($this->entityName));
+            $sql .= sprintf('AND HEX(vp_id) IN ("%s") ', join('", "', $vpIdsToSynchronize));
+            $sql .= sprintf('AND HEX(vp_id) NOT IN ("%s")', join('", "', $savedVpIds));
+
+            $ids = $this->database->get_col($sql);
+
+        } else {
+            $vpIdsUnhexed = array_map(function ($entity) {
+                return 'UNHEX("' . $entity['vp_id'] . '")';
+            }, $entities);
+
+            $ids = $this->database->get_col("SELECT id FROM {$this->getPrefixedTableName('vp_id')} " .
+                "WHERE `table` = \"{$this->dbSchema->getTableName($this->entityName)}\"" . (count($vpIdsUnhexed) > 0 ? "AND vp_id NOT IN (" . join(",", $vpIdsUnhexed) . ")" : ""));
+        }
+
+        $this->deletedIds = $ids;
 
         if (count($ids) == 0)
             return;
@@ -249,7 +286,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $idsString = join(',', $ids);
 
         $this->executeQuery("DELETE FROM {$this->getPrefixedTableName($this->entityName)} WHERE {$this->idColumnName} IN ({$idsString})");
-        $this->executeQuery("DELETE FROM {$this->getPrefixedTableName('vp_id')} WHERE `table` = \"{$this->dbSchema->getTableName($this->entityName)}\" AND id IN ({$idsString})"); // using cascade delete in mysql
+        $this->executeQuery("DELETE FROM {$this->getPrefixedTableName('vp_id')} WHERE `table` = \"{$this->dbSchema->getTableName($this->entityName)}\" AND id IN ({$idsString})");
     }
 
 
@@ -326,7 +363,6 @@ abstract class SynchronizerBase implements Synchronizer {
 
             list($table, $targetColumn) = explode(".", $reference);
             $prefixedTable = $this->dbSchema->getPrefixedTableName($table);
-            $this->database->query("TRUNCATE TABLE $prefixedTable");
 
             $targetEntity = $mnReferences[$reference];
             $sourceColumn = $this->getSourceColumn($targetEntity, $reference);
@@ -337,8 +373,21 @@ abstract class SynchronizerBase implements Synchronizer {
                 return "($sourceId, $targetId)";
             }, $relations);
 
+            $sql = sprintf("SELECT id FROM %s WHERE HEX(vp_id) IN ('%s')",
+                $this->dbSchema->getPrefixedTableName('vp_id'),
+                join("', '", array_map(function ($entity) { return $entity['vp_id']; }, $entities)));
+            $processedIds = array_merge($this->database->get_col($sql), $this->deletedIds);
+
+            if ($this->selectiveSynchronization) {
+                if (count($processedIds) > 0) {
+                    $this->database->query("DELETE FROM $prefixedTable WHERE $sourceColumn IN (" . join(", ", $processedIds) . ")");
+                }
+            } else {
+                $this->database->query("TRUNCATE TABLE $prefixedTable");
+            }
+
             $valuesString = join(", ", $valuesForInsert);
-            $insertSql = "INSERT INTO $prefixedTable ($sourceColumn, $targetColumn) VALUES $valuesString";
+            $insertSql = "INSERT IGNORE INTO $prefixedTable ($sourceColumn, $targetColumn) VALUES $valuesString";
             $this->database->query($insertSql);
         }
 

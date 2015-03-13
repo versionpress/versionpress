@@ -20,6 +20,17 @@ class SynchronizerFactory {
      */
     private $dbSchema;
 
+    private $synchronizerClasses = array(
+        'post' => 'VersionPress\Synchronizers\PostsSynchronizer',
+        'postmeta' => 'VersionPress\Synchronizers\PostMetaSynchronizer',
+        'comment' => 'VersionPress\Synchronizers\CommentsSynchronizer',
+        'option' => 'VersionPress\Synchronizers\OptionsSynchronizer',
+        'user' => 'VersionPress\Synchronizers\UsersSynchronizer',
+        'usermeta' => 'VersionPress\Synchronizers\UserMetaSynchronizer',
+        'term' => 'VersionPress\Synchronizers\TermsSynchronizer',
+        'term_taxonomy' => 'VersionPress\Synchronizers\TermTaxonomySynchronizer',
+    );
+
     function __construct(StorageFactory $storageFactory, wpdb $database, DbSchemaInfo $dbSchema) {
         $this->storageFactory = $storageFactory;
         $this->database = $database;
@@ -31,26 +42,15 @@ class SynchronizerFactory {
      * @return Synchronizer
      */
     public function createSynchronizer($synchronizerName) {
-        static $synchronizerClasses = array(
-            'post' => 'VersionPress\Synchronizers\PostsSynchronizer',
-            'postmeta' => 'VersionPress\Synchronizers\PostMetaSynchronizer',
-            'comment' => 'VersionPress\Synchronizers\CommentsSynchronizer',
-            'option' => 'VersionPress\Synchronizers\OptionsSynchronizer',
-            'user' => 'VersionPress\Synchronizers\UsersSynchronizer',
-            'usermeta' => 'VersionPress\Synchronizers\UserMetaSynchronizer',
-            'term' => 'VersionPress\Synchronizers\TermsSynchronizer',
-            'term_taxonomy' => 'VersionPress\Synchronizers\TermTaxonomySynchronizer',
-        );
-
-        $synchronizerClass = $synchronizerClasses[$synchronizerName];
+        $synchronizerClass = $this->synchronizerClasses[$synchronizerName];
         return new $synchronizerClass($this->getStorage($synchronizerName), $this->database, $this->dbSchema);
     }
 
-    private function getStorage($synchronizerName) {
-        static $synchronizerStorages = array(
-            'term_relationship' => 'post'
-        );
+    public function getAllSupportedSynchronizers() {
+        return array_keys($this->synchronizerClasses);
+    }
 
-        return $this->storageFactory->getStorage(isset($synchronizerStorages[$synchronizerName]) ? $synchronizerStorages[$synchronizerName] : $synchronizerName);
+    private function getStorage($synchronizerName) {
+        return $this->storageFactory->getStorage($synchronizerName);
     }
 }

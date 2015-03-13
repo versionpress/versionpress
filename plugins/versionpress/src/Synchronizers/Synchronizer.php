@@ -31,8 +31,12 @@ interface Synchronizer {
      * up to the SynchronizationProcess to call the synchronize method again with this tasks
      * when the previous pass is done.
      *
+     * If the $entitiesToSynchronize is null, the synchronizer will synchronize all entities.
+     * If it's an array, the synchronizer will synchronize only those entities.
+     *
      * @param string $task
+     * @param array $entitiesToSynchronize List of VPIDs and their possible parents {@see SynchronizationProcess::synchronize()}
      * @return string[]
      */
-    function synchronize($task);
+    function synchronize($task, $entitiesToSynchronize = null);
 }
