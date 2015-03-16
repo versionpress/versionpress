@@ -41,7 +41,7 @@ class UserMetaStorageTest extends \PHPUnit_Framework_TestCase {
     public function savedUserMetaEqualsLoadedPostMeta() {
         $this->userStorage->save($this->testingUser);
         $this->storage->save($this->testingUserMeta);
-        $loadedUserMeta = $this->storage->loadEntity($this->testingUserMeta['vp_id']);
+        $loadedUserMeta = $this->storage->loadEntity($this->testingUserMeta['vp_id'], $this->testingUser['vp_id']);
         $this->assertTrue($this->testingUserMeta == $loadedUserMeta);
     }
 

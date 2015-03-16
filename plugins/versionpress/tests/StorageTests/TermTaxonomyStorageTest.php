@@ -18,7 +18,6 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
     private $termStorage;
 
     private $testingTermTaxonomy = array(
-        "term_taxonomy_id" => 1,
         "taxonomy" => "category",
         "description" => "",
         "vp_id" => "2AEF07792E494B31A15FCB392E9D37B5",
@@ -26,7 +25,6 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
     );
 
     private $testingTerm = array(
-        "term_id" => 1,
         "name" => "Uncategorized",
         "slug" => "uncategorized",
         "term_group" => 0,
