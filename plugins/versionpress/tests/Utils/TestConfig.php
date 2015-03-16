@@ -35,6 +35,8 @@ class TestConfig {
      */
     public $end2endTestType;
 
+    public static $defaultConfigFile;
+
     function __construct($configFile) {
         $rawConfig = Neon::decode(file_get_contents($configFile));
 
@@ -85,8 +87,15 @@ class TestConfig {
         }
 
         $this->testSite = $this->sites[$rawConfig['test-site']];
+    }
 
-
+    /**
+     * Creates new instance of TestConfig from {@link TestConfig::$defaultConfigFile}.
+     *
+     * @return TestConfig
+     */
+    public static function createDefaultConfig() {
+        return new self(self::$defaultConfigFile);
     }
 
 }

@@ -10,7 +10,7 @@ class SecurityTest extends \PHPUnit_Framework_TestCase {
     private static $testConfig;
 
     public function __construct() {
-        self::$testConfig = new TestConfig(__DIR__ . '/../../test-config.neon');
+        self::$testConfig = TestConfig::createDefaultConfig();
     }
 
     /**

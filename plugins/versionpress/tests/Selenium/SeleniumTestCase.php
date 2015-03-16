@@ -66,7 +66,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
         }
 
         if (!self::$testConfig) {
-            self::$testConfig = new TestConfig(__DIR__ . '/../test-config.neon');
+            self::$testConfig = TestConfig::createDefaultConfig();
         }
 
         if (!self::$wpAutomation) {
