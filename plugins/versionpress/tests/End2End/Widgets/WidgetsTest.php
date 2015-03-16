@@ -5,6 +5,7 @@ namespace VersionPress\Tests\End2End\Widgets;
 use Exception;
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
+use VersionPress\Tests\Utils\DBAsserter;
 
 class WidgetsTest extends End2EndTestCase {
 
@@ -37,7 +38,7 @@ class WidgetsTest extends End2EndTestCase {
         $commitAsserter->assertCountOfAffectedFiles(1);
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -57,7 +58,7 @@ class WidgetsTest extends End2EndTestCase {
         $commitAsserter->assertCountOfAffectedFiles(1);
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -76,7 +77,7 @@ class WidgetsTest extends End2EndTestCase {
         $commitAsserter->assertCountOfAffectedFiles(1);
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -95,7 +96,7 @@ class WidgetsTest extends End2EndTestCase {
         $commitAsserter->assertCountOfAffectedFiles(1);
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     private static function clearSidebars() {

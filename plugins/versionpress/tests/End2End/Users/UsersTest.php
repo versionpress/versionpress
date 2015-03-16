@@ -4,6 +4,7 @@ namespace VersionPress\Tests\End2End\Users;
 
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
+use VersionPress\Tests\Utils\DBAsserter;
 
 class UsersTest extends End2EndTestCase {
 
@@ -39,7 +40,7 @@ class UsersTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
         $commitAsserter->assertCommitPath("A", "%vpdb%/users/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -59,7 +60,7 @@ class UsersTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
         $commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -79,7 +80,7 @@ class UsersTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
         $commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID(VP-User-Id)%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -99,6 +100,6 @@ class UsersTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
         $commitAsserter->assertCommitPath("D", "%vpdb%/users/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 }

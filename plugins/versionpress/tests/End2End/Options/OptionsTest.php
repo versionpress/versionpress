@@ -4,6 +4,7 @@ namespace VersionPress\Tests\End2End\Options;
 
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
+use VersionPress\Tests\Utils\DBAsserter;
 
 class OptionsTest extends End2EndTestCase {
 
@@ -25,7 +26,7 @@ class OptionsTest extends End2EndTestCase {
         $commitAsserter->assertCommitAction('option/edit');
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -43,6 +44,6 @@ class OptionsTest extends End2EndTestCase {
         $commitAsserter->assertCommitAction('option/edit');
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 }

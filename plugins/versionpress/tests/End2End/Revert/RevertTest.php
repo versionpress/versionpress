@@ -4,6 +4,7 @@ namespace VersionPress\Tests\End2End\Revert;
 
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
+use VersionPress\Tests\Utils\DBAsserter;
 
 class RevertTest extends End2EndTestCase {
 
@@ -26,7 +27,7 @@ class RevertTest extends End2EndTestCase {
         $commitAsserter->assertCountOfAffectedFiles(1);
         $commitAsserter->assertCommitPath('D', '%vpdb%/posts/*');
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -44,7 +45,7 @@ class RevertTest extends End2EndTestCase {
         $commitAsserter->assertCountOfAffectedFiles(1);
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -64,7 +65,7 @@ class RevertTest extends End2EndTestCase {
         $commitAsserter->assertCountOfAffectedFiles(1);
         $commitAsserter->assertCommitPath('A', '%vpdb%/posts/*');
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -79,7 +80,7 @@ class RevertTest extends End2EndTestCase {
         self::$worker->tryRestoreEntityWithMissingReference();
         $commitAsserter->assertNumCommits(0);
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -99,7 +100,7 @@ class RevertTest extends End2EndTestCase {
         $commitAsserter->assertCommitPath('D', '%vpdb%/comments/*');
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -115,7 +116,7 @@ class RevertTest extends End2EndTestCase {
 
         $commitAsserter->assertNumCommits(0);
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -133,6 +134,6 @@ class RevertTest extends End2EndTestCase {
         $commitAsserter->assertNumCommits(0);
         unlink(self::$testConfig->testSite->path . '/revert-test-file');
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 }

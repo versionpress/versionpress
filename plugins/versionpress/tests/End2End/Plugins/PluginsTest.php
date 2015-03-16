@@ -5,6 +5,7 @@ namespace VersionPress\Tests\End2End\Plugins;
 use Symfony\Component\Process\Process;
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
+use VersionPress\Tests\Utils\DBAsserter;
 
 class PluginsTest extends End2EndTestCase {
 
@@ -62,7 +63,7 @@ class PluginsTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
         $commitAsserter->assertCommitPath("A", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -82,7 +83,7 @@ class PluginsTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
         $commitAsserter->assertCommitPath("M", "%vpdb%/options.ini");
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -102,7 +103,7 @@ class PluginsTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
         $commitAsserter->assertCommitPath("M", "%vpdb%/options.ini");
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -121,7 +122,7 @@ class PluginsTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
         $commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
 }

@@ -33,7 +33,7 @@ class MediaTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
         $commitAsserter->assertCommitPath("A", "wp-content/uploads/*");
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -52,7 +52,7 @@ class MediaTest extends End2EndTestCase {
         $commitAsserter->assertCommitAction("post/edit");
         $commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
@@ -72,6 +72,6 @@ class MediaTest extends End2EndTestCase {
         $commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
         $commitAsserter->assertCommitPath("D", "wp-content/uploads/*");
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 }

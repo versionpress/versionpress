@@ -14,7 +14,7 @@ class WpAutomationRunnerSample extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function runAutomation() {
-        $testConfig = new TestConfig(__DIR__ . '/../test-config.neon');
+        $testConfig = TestConfig::createDefaultConfig();
         $wpAutomation = new WpAutomation($testConfig->testSite);
 
         $wpAutomation->setUpSite();

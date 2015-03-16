@@ -22,12 +22,6 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase {
     protected $gitRepository;
     /** @var WpAutomation */
     protected static $wpAutomation;
-    /** @var \mysqli */
-    private $database;
-    /** @var DbSchemaInfo */
-    private $schemaInfo;
-    /** @var StorageFactory */
-    private $storageFactory;
 
     private static $skipAllBecauseOfMissingWorker = false;
 
@@ -36,19 +30,6 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase {
         $this->staticInitialization();
         $this->gitRepository = new GitRepository(self::$testConfig->testSite->path);
         self::$wpAutomation = new WpAutomation(self::$testConfig->testSite);
-
-        $dbHost = self::$testConfig->testSite->dbHost;
-        $dbUser = self::$testConfig->testSite->dbUser;
-        $dbPassword = self::$testConfig->testSite->dbPassword;
-        $dbName = self::$testConfig->testSite->dbName;
-        $this->database = new \mysqli($dbHost, $dbUser, $dbPassword, $dbName);
-
-        $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
-        $schemaReflection = new \ReflectionClass('VersionPress\Database\DbSchemaInfo');
-        $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.neon';
-        $this->schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix);
-
-        $this->storageFactory = new StorageFactory($vpdbPath, $this->schemaInfo);
     }
 
     protected function setUp() {
