@@ -2,15 +2,23 @@
     <testsuites>
 
         <testsuite name="Unit Tests">
-            <directory>unit</directory>
+            <directory>Unit</directory>
+        </testsuite>
+
+        <testsuite name="Storage Tests">
+            <directory>StorageTests</directory>
+        </testsuite>
+
+        <testsuite name="Synchronizer Tests">
+            <directory>SynchronizerTests</directory>
         </testsuite>
 
         <testsuite name="End 2 End">
-            <directory>end2end</directory>
+            <directory>End2End</directory>
         </testsuite>
 
         <testsuite name="Selenium Tests">
-            <directory>selenium</directory>
+            <directory>Selenium</directory>
         </testsuite>
 
     </testsuites>

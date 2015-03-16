@@ -225,7 +225,7 @@ abstract class SynchronizerBase implements Synchronizer {
         foreach ($updateData as $key => $value) {
             if ($key == $this->idColumnName) continue;
             if (Strings::startsWith($key, 'vp_')) continue;
-            $query .= " `$key` = " . (is_numeric($value) ? $value : '"' . esc_sql($value) . '"') . ',';
+            $query .= " `$key` = " . (is_numeric($value) ? $value : '"' . $this->database->_escape($value) . '"') . ',';
         }
         $query[strlen($query) - 1] = ' '; // strip the last comma
         $query .= " WHERE filtered_vp_id.vp_id = UNHEX('$id')";
@@ -245,7 +245,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $query = "INSERT INTO {$this->getPrefixedTableName($this->entityName)} ({$columnsString}) VALUES (";
 
         foreach ($columns as $column) {
-            $query .= (is_numeric($entity[$column]) ? $entity[$column] : '"' . esc_sql($entity[$column]) . '"') . ", ";
+            $query .= (is_numeric($entity[$column]) ? $entity[$column] : '"' . $this->database->_escape($entity[$column]) . '"') . ", ";
         }
 
         $query[strlen($query) - 2] = ' '; // strip the last comma
