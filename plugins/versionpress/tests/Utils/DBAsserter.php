@@ -78,6 +78,14 @@ class DBAsserter {
                     continue;
                 }
 
+                if (is_string($storageEntity[$column])) {
+                    $storageEntity[$column] = str_replace("\r\n", "\n", $storageEntity[$column]);
+                }
+
+                if (is_string($value)) {
+                    $value = str_replace("\r\n", "\n", $value);
+                }
+
                 if ($storageEntity[$column] != $value) {
                     throw new \PHPUnit_Framework_AssertionFailedError("Different values ({$entityName}[$column]: $id): DB = $value, storage = $storageEntity[$column]");
                 }
