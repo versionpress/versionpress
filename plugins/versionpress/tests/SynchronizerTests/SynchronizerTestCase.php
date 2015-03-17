@@ -3,6 +3,7 @@
 namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Database\ExtendedWpdb;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\DBAsserter;
@@ -39,7 +40,8 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
         $dbUser = self::$testConfig->testSite->dbUser;
         $dbPassword = self::$testConfig->testSite->dbPassword;
         $dbName = self::$testConfig->testSite->dbName;
-        self::$wpdb = new \wpdb($dbUser, $dbPassword, $dbName, $dbHost);
+        self::$wpdb = new ExtendedWpdb($dbUser, $dbPassword, $dbName, $dbHost);
+        self::$wpdb->set_prefix(self::$testConfig->testSite->dbTablePrefix);
     }
 
     private static function setUpSite() {

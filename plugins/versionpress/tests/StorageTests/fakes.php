@@ -8,5 +8,6 @@
  * @return string
  */
 function get_site_url() {
-    return "";
+    $config = \VersionPress\Tests\Utils\TestConfig::createDefaultConfig();
+    return $config->testSite->url;
 }

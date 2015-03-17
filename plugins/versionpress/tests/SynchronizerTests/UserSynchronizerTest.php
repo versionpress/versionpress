@@ -13,7 +13,7 @@ class UserSynchronizerTest extends SynchronizerTestCase {
     private $storage;
     /** @var UsersSynchronizer */
     private $synchronizer;
-    private $vpId;
+    private static $vpId;
 
     protected function setUp() {
         parent::setUp();
@@ -27,7 +27,7 @@ class UserSynchronizerTest extends SynchronizerTestCase {
      */
     public function synchronizerAddsNewUserToDatabase() {
         $user = EntityUtils::prepareUser();
-        $this->vpId = $user['vp_id'];
+        self::$vpId = $user['vp_id'];
         $this->storage->save($user);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
@@ -38,7 +38,7 @@ class UserSynchronizerTest extends SynchronizerTestCase {
      * @testdox Synchronizer updates changed user in the database
      */
     public function synchronizerUpdatesChangedUserInDatabase() {
-        $this->storage->save(EntityUtils::prepareUser($this->vpId, array('user_email' => 'changed.email@example.com')));
+        $this->storage->save(EntityUtils::prepareUser(self::$vpId, array('user_email' => 'changed.email@example.com')));
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -48,7 +48,7 @@ class UserSynchronizerTest extends SynchronizerTestCase {
      * @testdox Synchronizer removes deleted user from the database
      */
     public function synchronizerRemovesDeletedUserFromDatabase() {
-        $this->storage->delete(EntityUtils::prepareUser($this->vpId));
+        $this->storage->delete(EntityUtils::prepareUser(self::$vpId));
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
