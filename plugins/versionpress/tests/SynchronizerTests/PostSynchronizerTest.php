@@ -37,13 +37,7 @@ class PostSynchronizerTest extends SynchronizerTestCase {
      * @testdox Synchronizer adds new post to the database
      */
     public function synchronizerAddsNewPostToDatabase() {
-        $author = EntityUtils::prepareUser();
-        self::$authorVpId = $author['vp_id'];
-        $this->userStorage->save($author);
-        $post = EntityUtils::preparePost(null, self::$authorVpId);
-        self::$vpId = $post['vp_id'];
-        $this->storage->save($post);
-
+        $this->createPost();
         $this->userSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
 
@@ -55,7 +49,7 @@ class PostSynchronizerTest extends SynchronizerTestCase {
      * @testdox Synchronizer updates changed post in the database
      */
     public function synchronizerUpdatesChangedPostInDatabase() {
-        $this->storage->save(EntityUtils::preparePost(self::$vpId, null, array('post_status' => 'trash')));
+        $this->editPost();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -65,12 +59,74 @@ class PostSynchronizerTest extends SynchronizerTestCase {
      * @testdox Synchronizer removes deleted post from the database
      */
     public function synchronizerRemovesDeletedPostFromDatabase() {
-        $this->storage->delete(EntityUtils::preparePost(self::$vpId));
-        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
-        DBAsserter::assertFilesEqualDatabase();
+        $this->deletePost();
 
-        $this->userStorage->delete(EntityUtils::prepareUser(self::$authorVpId));
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->userSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Synchronizer adds new post to the database (selective synchronization)
+     */
+    public function synchronizerAddsNewPostToDatabase_selective() {
+        $entitiesToSynchronize = $this->createPost();
+        $this->userSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
+
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Synchronizer updates changed post in the database (selective synchronization)
+     */
+    public function synchronizerUpdatesChangedPostInDatabase_selective() {
+        $entitiesToSynchronize = $this->editPost();
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Synchronizer removes deleted post from the database (selective synchronization)
+     */
+    public function synchronizerRemovesDeletedPostFromDatabase_selective() {
+        $entitiesToSynchronize = $this->deletePost();
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
+        $this->userSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    private function createPost() {
+        $author = EntityUtils::prepareUser();
+        self::$authorVpId = $author['vp_id'];
+        $this->userStorage->save($author);
+        $post = EntityUtils::preparePost(null, self::$authorVpId);
+        self::$vpId = $post['vp_id'];
+        $this->storage->save($post);
+
+        return array(
+            array('vp_id' => self::$authorVpId, 'parent' => self::$authorVpId),
+            array('vp_id' => self::$vpId, 'parent' => self::$vpId),
+        );
+    }
+
+    private function editPost() {
+        $this->storage->save(EntityUtils::preparePost(self::$vpId, null, array('post_status' => 'trash')));
+        return array(
+            array('vp_id' => self::$vpId, 'parent' => self::$vpId),
+        );
+    }
+
+    private function deletePost() {
+        $this->storage->delete(EntityUtils::preparePost(self::$vpId));
+        $this->userStorage->delete(EntityUtils::prepareUser(self::$authorVpId));
+
+        return array(
+            array('vp_id' => self::$authorVpId, 'parent' => self::$authorVpId),
+            array('vp_id' => self::$vpId, 'parent' => self::$vpId),
+        );
     }
 }
