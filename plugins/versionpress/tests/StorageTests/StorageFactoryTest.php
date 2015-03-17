@@ -9,10 +9,27 @@ use VersionPress\Storages\StorageFactory;
 
 class StorageFactoryTest extends \PHPUnit_Framework_TestCase {
 
+    /**
+     * @test
+     * @testdox Factory creates right storages
+     */
     public function testBanan() {
+        $storages = array(
+            'post' => 'VersionPress\Storages\PostStorage',
+            'comment' => 'VersionPress\Storages\CommentStorage',
+            'option' => 'VersionPress\Storages\OptionsStorage',
+            'term' => 'VersionPress\Storages\TermsStorage',
+            'term_taxonomy' => 'VersionPress\Storages\TermTaxonomyStorage',
+            'user' => 'VersionPress\Storages\UserStorage',
+            'usermeta' => 'VersionPress\Storages\UserMetaStorage',
+            'postmeta' => 'VersionPress\Storages\PostMetaStorage',
+        );
+
         $factory = new StorageFactory(__DIR__ . '/vpdb', new DbSchemaInfo(__DIR__ . '/../../src/Database/wordpress-schema.neon', 'wp_'));
-        $postMetaStorage = $factory->getStorage('postmeta');
-        $this->assertInstanceOf('VersionPress\Storages\PostMetaStorage', $postMetaStorage);
+        foreach ($storages as $entityName => $expectedClass) {
+            $this->assertInstanceOf($expectedClass, $factory->getStorage($entityName));
+        }
+
     }
 }
 
