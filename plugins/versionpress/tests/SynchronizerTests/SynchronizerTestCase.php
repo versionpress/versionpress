@@ -4,6 +4,7 @@ namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\StorageFactory;
+use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Tests\Utils\TestConfig;
 use VersionPress\Utils\FileSystem;
@@ -21,10 +22,10 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
-
-        DBAsserter::assertFilesEqualDatabase();
-
         self::$testConfig = TestConfig::createDefaultConfig();
+
+        self::assertVersionPressIsActive();
+        DBAsserter::assertFilesEqualDatabase();
 
         $schemaReflection = new \ReflectionClass('VersionPress\Database\DbSchemaInfo');
         $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.neon';
@@ -39,6 +40,13 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
         $dbPassword = self::$testConfig->testSite->dbPassword;
         $dbName = self::$testConfig->testSite->dbName;
         self::$wpdb = new \wpdb($dbUser, $dbPassword, $dbName, $dbHost);
+    }
+
+    private static function assertVersionPressIsActive() {
+        $wpAutomation = new WpAutomation(self::$testConfig->testSite);
+        if (!$wpAutomation->isSiteSetUp() || !$wpAutomation->isVersionPressInitialized()) {
+            throw new \PHPUnit_Framework_AssertionFailedError("Synchronizer tests can be run only on WP site with initialized VersionPress");
+        }
     }
 
 }
