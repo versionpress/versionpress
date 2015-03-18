@@ -1,5 +1,6 @@
 <?php
     use VersionPress\Git\GitRepository;
+    use VersionPress\Git\Reverter;
     use VersionPress\DI\VersionPressServices;
     use VersionPress\ChangeInfos\ChangeInfoMatcher;
 
@@ -8,7 +9,10 @@
     global $versionPressContainer;
     /** @var GitRepository $repository */
     $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
-    $clearWorkingDirectory = $repository->getStatus() == null;
+    /** @var Reverter $reverter */
+    $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
+
+    $canRevert = $reverter->canRevert();
     $commit = $repository->getCommit($_GET['commit']);
     $changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
 
@@ -26,12 +30,12 @@
             </a>
         </p>";
 
-    $errors = ( !$clearWorkingDirectory ? "<p class='error'>Please commit your changes</p>" : "");
+    $errors = ( !$canRevert ? "<p class='error'>Please commit your changes</p>" : "");
 
     $buttonProceed = "<a " .
-        "class='button " . ( !$clearWorkingDirectory ? "disabled" : "") . "' " .
+        "class='button " . ( !$canRevert ? "disabled" : "") . "' " .
         "id='popover-ok-button' ".
-        "href='" . ( !$clearWorkingDirectory ? "javascript:;" : admin_url('admin.php?action=vp_' . $method . '&commit=' . $commit->getHash()) ) . "'>Proceed</a>";
+        "href='" . ( !$canRevert ? "javascript:;" : admin_url('admin.php?action=vp_' . $method . '&commit=' . $commit->getHash()) ) . "'>Proceed</a>";
     $buttonCancel = "<a " .
         "class='button cancel' ".
         "id='popover-cancel-button' ".

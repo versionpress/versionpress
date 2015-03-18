@@ -34,6 +34,9 @@ class Reverter {
     /** @var StorageFactory */
     private $storageFactory;
 
+    /** @var int */
+    const DELETE_ORPHANED_POSTS_SECONDS = 60;
+
     public function __construct(SynchronizationProcess $synchronizationProcess, wpdb $database, Committer $committer, GitRepository $repository, DbSchemaInfo $dbSchemaInfo, StorageFactory $storageFactory) {
         $this->synchronizationProcess = $synchronizationProcess;
         $this->database = $database;
@@ -51,8 +54,15 @@ class Reverter {
         return $this->_revert($commitHash, "rollback");
     }
 
+    public function canRevert() {
+        if(!$this->repository->isCleanWorkingDirectory()) {
+            $this->clearOrphanedPosts();
+        }
+        return $this->repository->isCleanWorkingDirectory();
+    }
+
     private function _revert($commitHash, $method) {
-        if (!$this->repository->isCleanWorkingDirectory()) {
+        if (!$this->canRevert()) {
             return RevertStatus::NOT_CLEAN_WORKING_DIRECTORY;
         }
 
@@ -302,5 +312,19 @@ class Reverter {
         }
 
         return RevertStatus::OK;
+    }
+
+    /**
+     * Deletes orphaned files older than 1 minute (due to postponed commits, that has not been used)
+     */
+    private function clearOrphanedPosts() {
+        $deleteTimestamp = time() - self::DELETE_ORPHANED_POSTS_SECONDS; // Older than 1 minute
+        $wpdb = $this->database;
+        $orphanedMenuItems = $wpdb->get_col($wpdb->prepare("SELECT ID FROM $wpdb->posts AS p LEFT JOIN $wpdb->postmeta AS m ON p.ID = m.post_id WHERE post_type = 'nav_menu_item' AND post_status = 'draft' AND meta_key = '_menu_item_orphaned' AND meta_value < '%d'", $deleteTimestamp ) );
+
+        foreach( (array) $orphanedMenuItems as $menuItemId ) {
+            wp_delete_post($menuItemId, true);
+            $this->committer->discardPostponedCommit('menu-item-' . $menuItemId);
+        }
     }
 }

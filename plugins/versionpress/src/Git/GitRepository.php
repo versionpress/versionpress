@@ -278,11 +278,18 @@ class GitRepository {
      *
      * Clean working directory returns an empty string.
      *
-     * @return string
+     * @param $array bool Return result as array
+     * @return string|array[string]
      */
-    public function getStatus() {
-        $gitCmd = "git status --porcelain";
+    public function getStatus($array = false) {
+        $gitCmd = "git status --porcelain -uall";
         $output = $this->runShellCommandWithStandardOutput($gitCmd);
+        if($array) {
+            $output = explode("\n", $output); // Consider using -z and explode by NUL
+            foreach ($output as $k => $line) {
+                $output[$k] = explode(" ", trim($line), 2);
+            }
+        }
         return $output;
     }
 

@@ -85,4 +85,12 @@ class Mirror {
         return $storage->shouldBeSaved($data);
     }
 
+    /**
+     * Dumps a list of {@see VersionPress\ChangeInfos\ChangeInfo} objects captured by this mirror.
+     * Capturing new changes starts again from this point.
+     */
+    public function flushChangeList() {
+        $this->changeList = array();
+    }
+
 }

@@ -88,11 +88,14 @@ class Committer
 
         if ($this->commitPostponed) {
             $this->postponeChangeInfo($changeInfo);
-            return;
+            $this->commitPostponed = false;
+            $this->postponeKey = null;
+        } else {
+            $this->stageRelatedFiles($changeInfo);
+            $this->repository->commit($changeInfo->getCommitMessage(), $authorName, $authorEmail);
         }
 
-        $this->stageRelatedFiles($changeInfo);
-        $this->repository->commit($changeInfo->getCommitMessage(), $authorName, $authorEmail);
+        $this->mirror->flushChangeList();
     }
 
     /**
@@ -129,15 +132,30 @@ class Committer
     }
 
     /**
+     * Unsets previously postponed commit.
+     *
+     * @param string $key Key for postponedChangeInfos commit
+     */
+    public function discardPostponedCommit($key) {
+        $postponed = $this->loadPostponedChangeInfos();
+        if(isset($postponed[$key])) {
+            unset($postponed[$key]);
+            $this->savePostponedChangeInfos($postponed);
+        }
+    }
+
+    /**
      * Prepends previously postponedChangeInfos ChangeInfo objects to the current one.
      *
-     * @param string $key
+     * @param string $key Key for postponedChangeInfos commit
      */
     public function usePostponedChangeInfos($key) {
         $postponed = $this->loadPostponedChangeInfos();
-        $this->postponedChangeInfos = $postponed[$key];
-        unset($postponed[$key]);
-        $this->savePostponedChangeInfos($postponed);
+        if(isset($postponed[$key])) {
+            $this->postponedChangeInfos = array_merge($this->postponedChangeInfos, $postponed[$key]);
+            unset($postponed[$key]);
+            $this->savePostponedChangeInfos($postponed);
+        }
     }
 
     /**
@@ -216,7 +234,7 @@ class Committer
             $postponed[$this->postponeKey] = array();
         }
 
-        $postponed[$this->postponeKey] = array_merge($postponed[$this->postponeKey], $changeInfoEnvelope->getChangeInfoList());
+        $postponed[$this->postponeKey] = $changeInfoEnvelope->getChangeInfoList();
         $this->savePostponedChangeInfos($postponed);
     }
 
@@ -225,8 +243,11 @@ class Committer
      */
     private function loadPostponedChangeInfos() {
         $file = VERSIONPRESS_TEMP_DIR . '/' . $this->fileForPostpone;
-        $serializedPostponedChangeInfos = file_get_contents($file);
-        return unserialize($serializedPostponedChangeInfos);
+        if(is_file($file)) {
+            $serializedPostponedChangeInfos = file_get_contents($file);
+            return unserialize($serializedPostponedChangeInfos);
+        }
+        return array();
     }
 
     /**

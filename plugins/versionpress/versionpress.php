@@ -198,6 +198,16 @@ function vp_register_hooks() {
            $committer->usePostponedChangeInfos('permalinks');
        }
     });
+
+    add_action('wp_update_nav_menu_item', function($menu_id, $menu_item_db_id) use ($committer) {
+        $key = 'menu-item-' . $menu_item_db_id;
+        if (defined('DOING_AJAX') && DOING_AJAX && $_POST['action'] === 'add-menu-item') {
+            $committer->postponeCommit($key);
+            $committer->commit();
+        } elseif ($_POST['action'] === 'update') {
+            $committer->usePostponedChangeInfos($key);
+        }
+    }, 10, 2);
     //----------------------------------------
     // URL and WP-CLI "hooks"
     //----------------------------------------
