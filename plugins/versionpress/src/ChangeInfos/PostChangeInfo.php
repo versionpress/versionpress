@@ -28,7 +28,7 @@ class PostChangeInfo extends EntityChangeInfo {
     private static $CONTENT_PROPERTIES = array("post_content", "post_title");
 
     /**
-     * Type of the post - "post" or "page"
+     * Type of the post - "post", "page" or "nav_menu_item"
      *
      * @var string
      */
@@ -65,6 +65,9 @@ class PostChangeInfo extends EntityChangeInfo {
     }
 
     public function getChangeDescription() {
+        if($this->postType === "nav_menu_item") {
+            return "Updated menu items";
+        }
         switch ($this->getAction()) {
             case "create":
                 return "Created {$this->postType} '{$this->postTitle}'";
