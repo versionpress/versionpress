@@ -17,15 +17,15 @@ class EntityUtils {
         }
 
         return array_merge(array(
-            "user_login" => "JohnTester",
+            "user_login" => "JoeTester",
             "user_pass" => '$P$B3hfEaUjEIkzHqzDHQ5kCALiUGv3rt1',
-            "user_nicename" => "JohnTester",
-            "user_email" => "johntester@example.com",
+            "user_nicename" => "JoeTester",
+            "user_email" => "joetester@example.com",
             "user_url" => "",
             "user_registered" => "2015-02-02 14:19:58",
             "user_activation_key" => "",
             "user_status" => 0,
-            "display_name" => "JohnTester",
+            "display_name" => "JoeTester",
             "vp_id" => $vpId,
         ), $userValues);
     }
