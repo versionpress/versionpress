@@ -24,7 +24,7 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
         parent::setUpBeforeClass();
         self::$testConfig = TestConfig::createDefaultConfig();
 
-        self::assertVersionPressIsActive();
+        self::setUpSite();
         DBAsserter::assertFilesEqualDatabase();
 
         $schemaReflection = new \ReflectionClass('VersionPress\Database\DbSchemaInfo');
@@ -42,10 +42,14 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
         self::$wpdb = new \wpdb($dbUser, $dbPassword, $dbName, $dbHost);
     }
 
-    private static function assertVersionPressIsActive() {
+    private static function setUpSite() {
         $wpAutomation = new WpAutomation(self::$testConfig->testSite);
-        if (!$wpAutomation->isSiteSetUp() || !$wpAutomation->isVersionPressInitialized()) {
-            throw new \PHPUnit_Framework_AssertionFailedError("Synchronizer tests can be run only on WP site with initialized VersionPress");
+        if (!$wpAutomation->isSiteSetUp()) {
+            $wpAutomation->setUpSite();
+        }
+        if (!$wpAutomation->isVersionPressInitialized()) {
+            $wpAutomation->copyVersionPressFiles();
+            $wpAutomation->initializeVersionPress();
         }
     }
 
