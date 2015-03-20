@@ -60,7 +60,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
     }
 
     public function clickOnCancel() {
-        $this->jsClick("#versionpress-commits-table tr:nth-child(1) a[href*=vp_undo]");
+        $this->jsClick("#versionpress-commits-table tr:nth-child(1) a.vp-undo");
         $this->waitForAjax();
         $this->jsClick("#popover-cancel-button");
         $this->waitForAjax(); // there shouldn't be any AJAX request, but for sure...
@@ -107,14 +107,14 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
     }
 
     private function undoNthCommit($whichCommit) {
-        $this->jsClick("#versionpress-commits-table tr:nth-child($whichCommit) a[href*=vp_undo]");
+        $this->jsClick("#versionpress-commits-table tr:nth-child($whichCommit) a.vp-undo");
         $this->waitForAjax();
         $this->jsClick("#popover-ok-button");
         $this->waitAfterRedirect(10000);
     }
 
     private function rollbackToNthCommit($whichCommit) {
-        $this->jsClick("#versionpress-commits-table tr:nth-child($whichCommit) a[href*=vp_rollback]");
+        $this->jsClick("#versionpress-commits-table tr:nth-child($whichCommit) a.vp-rollback");
         $this->waitForAjax();
         $this->jsClick("#popover-ok-button");
         $this->waitAfterRedirect(10000);
