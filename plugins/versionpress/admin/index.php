@@ -14,14 +14,14 @@ use VersionPress\VersionPress;
 
 defined('ABSPATH') or die("Direct access not allowed");
 
-wp_enqueue_style('versionpress_admin_style', plugins_url( 'css/style.css' , __FILE__ ));
-wp_enqueue_style('versionpress_admin_icons', plugins_url( 'icons/style.css' , __FILE__ ));
-wp_enqueue_style('versionpress_popover_style', plugins_url('admin/css/jquery.webui-popover.min.css', __FILE__));
-wp_enqueue_style('versionpress_popover_custom_style', plugins_url('admin/css/popover-custom.css', __FILE__));
+wp_enqueue_style('versionpress_admin_style', plugins_url( 'public/css/style.css' , __FILE__ ));
+wp_enqueue_style('versionpress_admin_icons', plugins_url( 'public/icons/style.css' , __FILE__ ));
+wp_enqueue_style('versionpress_popover_style', plugins_url('admin/public/css/jquery.webui-popover.min.css', __FILE__));
+wp_enqueue_style('versionpress_popover_custom_style', plugins_url('admin/public/css/popover-custom.css', __FILE__));
 
 wp_enqueue_script('jquery');
-wp_enqueue_script('versionpress_popover_script', plugins_url('admin/js/jquery.webui-popover.min.js', __FILE__), 'jquery');
-wp_enqueue_script('versionpress_admin_script', plugins_url( 'js/vp-admin.js' , __FILE__ ));
+wp_enqueue_script('versionpress_popover_script', plugins_url('admin/public/js/jquery.webui-popover.min.js', __FILE__), 'jquery');
+wp_enqueue_script('versionpress_admin_script', plugins_url( 'public/js/vp-admin.js' , __FILE__ ));
 
 /**
  * Function executed from VersionPress\Initialization\Initializer that is given the progress message, decides
