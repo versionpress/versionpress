@@ -30,9 +30,11 @@
 
     $buttonProceed = "<a " .
         "class='button " . ( !$clearWorkingDirectory ? "disabled" : "") . "' " .
+        "id='popover-ok-button' ".
         "href='" . ( !$clearWorkingDirectory ? "javascript:;" : admin_url('admin.php?action=vp_' . $method . '&commit=' . $commit->getHash()) ) . "'>Proceed</a>";
     $buttonCancel = "<a " .
         "class='button cancel' ".
+        "id='popover-cancel-button' ".
         "href='" . (isAjax() ? "javascript:;" : admin_url('admin.php?page=versionpress/admin/index.php')) . "'>Cancel</a>";
 
     $body = "
