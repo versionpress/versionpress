@@ -44,7 +44,7 @@ class PostChangeInfo extends EntityChangeInfo {
      */
     private $postUpdatedProperties;
 
-    public function __construct($action, $entityId, $postType, $postTitle, $postUpdatedProperties) {
+    public function __construct($action, $entityId, $postType, $postTitle, $postUpdatedProperties = array()) {
         parent::__construct("post", $action, $entityId);
         $this->postType = $postType;
         $this->postTitle = $postTitle;
