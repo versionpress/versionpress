@@ -69,7 +69,6 @@ class Initializer {
     public function initializeVersionPress() {
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
         @set_time_limit(0); // intentionally @ - if it's disabled we can't do anything but try the initialization
-        $this->disableOutputBuffering();
 
         $this->reportProgressChange(InitializerStates::START);
         vp_enable_maintenance();
@@ -404,34 +403,6 @@ class Initializer {
      */
     private function installGitignore() {
         FileSystem::copy(__DIR__ . '/.gitignore.tpl', ABSPATH . '.gitignore', false);
-    }
-
-    /**
-     * Multiple methods of disabling output buffering.
-     * @see http://www.binarytides.com/php-output-content-browser-realtime-buffering/
-     */
-    private function disableOutputBuffering() {
-        // Turn off output buffering
-        ini_set('output_buffering', 'off');
-        // Turn off PHP output compression
-        ini_set('zlib.output_compression', false);
-
-        // Flush (send) the output buffer and turn off output buffering
-        /** @noinspection PhpUsageOfSilenceOperatorInspection */
-        while (@ob_end_flush());
-
-        // Implicitly flush the buffer(s)
-        ini_set('implicit_flush', true);
-        ob_implicit_flush(true);
-
-        //prevent apache from buffering it for deflate/gzip
-        header("Content-type: text/plain");
-        header('Cache-Control: no-cache'); // recommended to prevent caching of event data.
-
-        for($i = 0; $i < 1000; $i++) echo ' ';
-
-        ob_flush();
-        flush();
     }
 
 }

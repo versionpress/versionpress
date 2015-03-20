@@ -291,6 +291,8 @@ register_activation_hook(__FILE__, 'vp_activate');
 register_deactivation_hook(__FILE__, 'vp_deactivate');
 add_action('admin_post_cancel_deactivation', 'vp_admin_post_cancel_deactivation');
 add_action('admin_post_confirm_deactivation', 'vp_admin_post_confirm_deactivation');
+add_action('send_headers', 'vp_send_headers');
+
 if (get_transient('vp_just_activated')) {
     add_filter('gettext', 'vp_gettext_filter_plugin_activated', 10, 3);
 }
@@ -402,6 +404,40 @@ function vp_admin_post_confirm_deactivation() {
         wp_redirect(admin_url("plugins.php"));
     }
 
+}
+
+function vp_send_headers() {
+    if (isset($_GET['init_versionpress']) && !VersionPress::isActive()) {
+        _vp_disable_output_buffering();
+    }
+}
+
+/**
+ * Multiple methods of disabling output buffering.
+ * @see http://www.binarytides.com/php-output-content-browser-realtime-buffering/
+ */
+function _vp_disable_output_buffering() {
+    // Turn off output buffering
+    ini_set('output_buffering', 'off');
+    // Turn off PHP output compression
+    ini_set('zlib.output_compression', false);
+
+    // Flush (send) the output buffer and turn off output buffering
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
+    while (@ob_end_flush()) ;
+
+    // Implicitly flush the buffer(s)
+    ini_set('implicit_flush', true);
+    ob_implicit_flush(true);
+
+    //prevent apache from buffering it for deflate/gzip
+    header("Content-type: text/plain");
+    header('Cache-Control: no-cache'); // recommended to prevent caching of event data.
+
+    for ($i = 0; $i < 1000; $i++) echo ' ';
+
+    ob_flush();
+    flush();
 }
 
 add_action('admin_post_vp_send_bug_report', 'vp_send_bug_report');

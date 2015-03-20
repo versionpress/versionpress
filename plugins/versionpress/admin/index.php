@@ -115,7 +115,7 @@ function _vp_show_progress_message($progressMessage) {
 
     <?php
 
-    if (isset($_GET['init']) && !VersionPress::isActive()) {
+    if (isset($_GET['init_versionpress']) && !VersionPress::isActive()) {
     ?>
 
         <div class="welcome-panel">
@@ -235,7 +235,7 @@ function _vp_show_progress_message($progressMessage) {
                 <div style="text-align: center;">
                 <?php
                     if ($requirementsChecker->isEverythingFulfilled()) {
-                        $activationUrl = admin_url('admin.php?page=versionpress/admin/index.php&init');
+                        $activationUrl = admin_url('admin.php?page=versionpress/admin/index.php&init_versionpress');
                         $buttonClass = "button-primary";
                     } else {
                         $activationUrl = "#";
