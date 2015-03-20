@@ -7,7 +7,7 @@ use VersionPress\Storages\StorageFactory;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Tests\Utils\TestConfig;
-use VersionPress\Utils\FileSystem;
+use Symfony\Component\Process\Process;
 
 class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
 
@@ -51,6 +51,11 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
             $wpAutomation->copyVersionPressFiles();
             $wpAutomation->initializeVersionPress();
         }
+    }
+
+    public static function tearDownAfterClass() {
+        $process = new Process("git add -A && git commit -m " . escapeshellarg("Synchronizer tests created files"), self::$testConfig->testSite->path);
+        $process->run();
     }
 
 }
