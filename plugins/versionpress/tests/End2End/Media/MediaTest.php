@@ -4,6 +4,7 @@ namespace VersionPress\Tests\End2End\Media;
 
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
+use VersionPress\Tests\Utils\DBAsserter;
 
 class MediaTest extends End2EndTestCase {
 
