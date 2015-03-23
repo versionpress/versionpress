@@ -5,6 +5,8 @@ namespace ChangeInfos\Sorting;
 
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\OptionChangeInfo;
+use VersionPress\ChangeInfos\PostChangeInfo;
+use VersionPress\ChangeInfos\TermChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\Utils\ArrayUtils;
@@ -68,6 +70,14 @@ class NaiveSortingStrategy implements SortingStrategy {
 
         if ($changeInfo1 instanceof OptionChangeInfo) {
             return $this->compareOptionChangeInfo($changeInfo1, $changeInfo2);
+        }
+
+        if ($changeInfo1 instanceof TermChangeInfo) {
+            return $this->compareTermChangeInfo($changeInfo1, $changeInfo2);
+        }
+
+        if ($changeInfo1 instanceof PostChangeInfo) {
+            return $this->comparePostChangeInfo($changeInfo1, $changeInfo2);
         }
 
 
@@ -137,5 +147,49 @@ class NaiveSortingStrategy implements SortingStrategy {
         // Finally, sort by alphabet. It is the options order in the databse and rougly OK
         // until we work out something better.
         return strcmp($changeInfo1->getEntityId(), $changeInfo2->getEntityId());
+    }
+
+    /**
+     * @param TermChangeInfo $changeInfo1
+     * @param TermChangeInfo $changeInfo2
+     * @return int
+     */
+    private function compareTermChangeInfo($changeInfo1, $changeInfo2) {
+        // For two VersionPress\ChangeInfos\TermChangeInfo objects, the "delete" one wins
+        if ($changeInfo1->getAction() == "delete") {
+            return -1;
+        } else if ($changeInfo2->getAction() == "delete") {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    /**
+     * @param PostChangeInfo $changeInfo1
+     * @param PostChangeInfo $changeInfo2
+     * @return int
+     */
+    private function comparePostChangeInfo($changeInfo1, $changeInfo2) {
+        /*
+         * TODO: Needs refactor
+         * For two VersionPress\ChangeInfos\PostChangeInfo objects, the action precendence is
+         *  "create" > "delete" > "edit" > all other actions
+         */
+        if ($changeInfo1->getAction() == "create") {
+            return -3;
+        } else if ($changeInfo2->getAction() == "create") {
+            return 3;
+        } else if ($changeInfo1->getAction() == "delete") {
+            return -2;
+        } else if ($changeInfo2->getAction() == "delete") {
+            return 2;
+        } else if ($changeInfo1->getAction() == "edit") {
+            return -1;
+        } else if ($changeInfo2->getAction() == "edit") {
+            return 1;
+        }
+
+        return 0;
     }
 }
