@@ -29,10 +29,12 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
     }
 
     public function createComment() {
+        $author = $this->testConfig->testSite->adminName;
+        $email = $this->testConfig->testSite->adminEmail;
         $comment = array(
-            'comment_author' => 'admin',
-            'comment_author_email' => 'admin@example.com',
-            'comment_content' => 'Comment by admin',
+            'comment_author' => $author,
+            'comment_author_email' => $email,
+            'comment_content' => 'Comment by ' . $author,
             'user_id' => 1,
             'comment_post_ID' => $this->testPostId
         );
@@ -44,8 +46,9 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
     }
 
     public function editComment() {
+        $author = $this->testConfig->testSite->adminName;
         $comment = array(
-            'comment_content' => 'Updated comment by admin',
+            'comment_content' => 'Updated comment by ' . $author,
         );
         $this->wpAutomation->editComment($this->lastCreatedComment, $comment);
     }
