@@ -587,10 +587,18 @@ class WpAutomation {
      *
      * @return string The path to the custom WP-CLI PHAR.
      */
-    private function getWpCli() {
+    public function getWpCli() {
         $wpCliPath = sys_get_temp_dir() . '/wp-cli-latest-stable.phar';
+        $wpCliTmpPath = $wpCliPath . '.tmp';
         if (!file_exists($wpCliPath) || $this->fileIsOlderThanDays($wpCliPath, 1)) {
-            file_put_contents($wpCliPath, fopen("https://github.com/wp-cli/builds/blob/gh-pages/phar/wp-cli.phar?raw=true", 'r'));
+            file_put_contents($wpCliTmpPath, fopen("https://github.com/wp-cli/builds/blob/gh-pages/phar/wp-cli.phar?raw=true", 'r'));
+            $checksum = trim(file_get_contents('https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar.md5'));
+
+            if ($checksum != md5_file($wpCliTmpPath)) {
+                trigger_error("Wrong checksum of WP-CLI PHAR", E_USER_NOTICE);
+            } else {
+                rename($wpCliTmpPath, $wpCliPath);
+            }
         }
         return $wpCliPath;
     }
