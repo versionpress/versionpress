@@ -137,10 +137,6 @@ abstract class SingleFileStorage extends Storage {
      * Loads all entities from a file to the $this->entities if they were not already loaded
      */
     protected function loadEntities() {
-        if ($this->entities) {
-            return;
-        }
-
         if (is_file($this->file)) {
             $entities = IniSerializer::deserialize(file_get_contents($this->file));
             $this->entities = $entities;
