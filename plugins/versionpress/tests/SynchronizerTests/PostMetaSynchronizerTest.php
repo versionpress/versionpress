@@ -2,26 +2,24 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
-use Nette\Utils\Random;
-use VersionPress\Storages\CommentStorage;
+use VersionPress\Storages\PostMetaStorage;
 use VersionPress\Storages\PostStorage;
 use VersionPress\Storages\UserStorage;
-use VersionPress\Synchronizers\CommentsSynchronizer;
+use VersionPress\Synchronizers\PostMetaSynchronizer;
 use VersionPress\Synchronizers\PostsSynchronizer;
 use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Synchronizers\UsersSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
-use VersionPress\Utils\IdUtil;
 
-class CommentSynchronizerTest extends SynchronizerTestCase {
-    /** @var CommentStorage */
+class PostMetaSynchronizerTest extends SynchronizerTestCase {
+    /** @var PostMetaStorage */
     private $storage;
     /** @var PostStorage */
     private $postStorage;
     /** @var UserStorage */
     private $userStorage;
-    /** @var CommentsSynchronizer */
+    /** @var PostMetaSynchronizer */
     private $synchronizer;
     /** @var PostsSynchronizer */
     private $postSynchronizer;
@@ -33,20 +31,20 @@ class CommentSynchronizerTest extends SynchronizerTestCase {
 
     protected function setUp() {
         parent::setUp();
-        $this->storage = self::$storageFactory->getStorage('comment');
+        $this->storage = self::$storageFactory->getStorage('postmeta');
         $this->postStorage = self::$storageFactory->getStorage('post');
         $this->userStorage = self::$storageFactory->getStorage('user');
-        $this->synchronizer = new CommentsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo);
+        $this->synchronizer = new PostMetaSynchronizer($this->storage, self::$wpdb, self::$schemaInfo);
         $this->postSynchronizer = new PostsSynchronizer($this->postStorage, self::$wpdb, self::$schemaInfo);
         $this->userSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo);
     }
 
     /**
      * @test
-     * @testdox Synchronizer adds new comment to the database
+     * @testdox Synchronizer adds new postmeta to the database
      */
-    public function synchronizerAddsNewCommentToDatabase() {
-        $this->createComment();
+    public function synchronizerAddsNewPostMetaToDatabase() {
+        $this->createPostMeta();
         $this->userSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->postSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
@@ -56,20 +54,20 @@ class CommentSynchronizerTest extends SynchronizerTestCase {
 
     /**
      * @test
-     * @testdox Synchronizer updates changed comment in the database
+     * @testdox Synchronizer updates changed postmeta in the database
      */
-    public function synchronizerUpdatesChangedCommentInDatabase() {
-        $this->editComment();
+    public function synchronizerUpdatesChangedPostMetaInDatabase() {
+        $this->editPostMeta();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
      * @test
-     * @testdox Synchronizer removes deleted comment from the database
+     * @testdox Synchronizer removes deleted postmeta from the database
      */
-    public function synchronizerRemovesDeletedCommentFromDatabase() {
-        $this->deleteComment();
+    public function synchronizerRemovesDeletedPostMetaFromDatabase() {
+        $this->deletePostMeta();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->postSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->userSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
@@ -78,10 +76,10 @@ class CommentSynchronizerTest extends SynchronizerTestCase {
 
     /**
      * @test
-     * @testdox Synchronizer adds new comment to the database (selective synchronization)
+     * @testdox Synchronizer adds new postmeta to the database (selective synchronization)
      */
-    public function synchronizerAddsNewCommentToDatabase_selective() {
-        $entitiesToSynchronize = $this->createComment();
+    public function synchronizerAddsNewPostMetaToDatabase_selective() {
+        $entitiesToSynchronize = $this->createPostMeta();
         $this->userSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         $this->postSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
@@ -91,27 +89,27 @@ class CommentSynchronizerTest extends SynchronizerTestCase {
 
     /**
      * @test
-     * @testdox Synchronizer updates changed comment in the database (selective synchronization)
+     * @testdox Synchronizer updates changed postmeta in the database (selective synchronization)
      */
-    public function synchronizerUpdatesChangedCommentInDatabase_selective() {
-        $entitiesToSynchronize = $this->editComment();
+    public function synchronizerUpdatesChangedPostMetaInDatabase_selective() {
+        $entitiesToSynchronize = $this->editPostMeta();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         DBAsserter::assertFilesEqualDatabase();
     }
 
     /**
      * @test
-     * @testdox Synchronizer removes deleted comment from the database (selective synchronization)
+     * @testdox Synchronizer removes deleted postmeta from the database (selective synchronization)
      */
-    public function synchronizerRemovesDeletedCommentFromDatabase_selective() {
-        $entitiesToSynchronize = $this->deleteComment();
+    public function synchronizerRemovesDeletedPostMetaFromDatabase_selective() {
+        $entitiesToSynchronize = $this->deletePostMeta();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         $this->postSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         $this->userSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    private function createComment() {
+    private function createPostMeta() {
         $author = EntityUtils::prepareUser();
         self::$authorVpId = $author['vp_id'];
         $this->userStorage->save($author);
@@ -120,33 +118,33 @@ class CommentSynchronizerTest extends SynchronizerTestCase {
         self::$postVpId = $post['vp_id'];
         $this->postStorage->save($post);
 
-        $comment = EntityUtils::prepareComment(null, self::$postVpId, self::$authorVpId);
-        self::$vpId = $comment['vp_id'];
-        $this->storage->save($comment);
+        $postmeta = EntityUtils::preparePostMeta(null, self::$postVpId, 'some-meta', 'some value');
+        self::$vpId = $postmeta['vp_id'];
+        $this->storage->save($postmeta);
 
         return array(
             array('vp_id' => self::$authorVpId, 'parent' => self::$authorVpId),
             array('vp_id' => self::$postVpId, 'parent' => self::$postVpId),
-            array('vp_id' => self::$vpId, 'parent' => self::$vpId),
+            array('vp_id' => self::$vpId, 'parent' => self::$postVpId),
         );
     }
 
-    private function editComment() {
-        $this->storage->save(EntityUtils::prepareComment(self::$vpId, null, null, array('comment_approved' => '0')));
+    private function editPostMeta() {
+        $this->storage->save(EntityUtils::preparePostMeta(self::$vpId, self::$postVpId, 'some-meta', 'another value'));
         return array(
-            array('vp_id' => self::$vpId, 'parent' => self::$vpId),
+            array('vp_id' => self::$vpId, 'parent' => self::$postVpId),
         );
     }
 
-    private function deleteComment() {
-        $this->storage->delete(EntityUtils::prepareComment(self::$vpId));
+    private function deletePostMeta() {
+        $this->storage->delete(EntityUtils::preparePostMeta(self::$vpId, self::$postVpId));
         $this->postStorage->delete(EntityUtils::preparePost(self::$postVpId));
         $this->userStorage->delete(EntityUtils::prepareUser(self::$authorVpId));
 
         return array(
             array('vp_id' => self::$authorVpId, 'parent' => self::$authorVpId),
             array('vp_id' => self::$postVpId, 'parent' => self::$postVpId),
-            array('vp_id' => self::$vpId, 'parent' => self::$vpId),
+            array('vp_id' => self::$vpId, 'parent' => self::$postVpId),
         );
     }
 }

@@ -87,6 +87,30 @@ class EntityUtils {
         return $usermeta;
     }
 
+    public static function preparePostMeta($vpId = null, $postVpId = null, $key = null, $value = null) {
+        if ($vpId === null) {
+            $vpId = IdUtil::newId();
+        }
+
+        $usermeta = array(
+            'vp_id' => $vpId
+        );
+
+        if ($postVpId !== null) {
+            $usermeta['vp_post_id'] = $postVpId;
+        }
+
+        if ($key !== null) {
+            $usermeta['meta_key'] = $key;
+        }
+
+        if ($value !== null) {
+            $usermeta['meta_value'] = $value;
+        }
+
+        return $usermeta;
+    }
+
     public static function prepareComment($vpId = null, $postVpId = null, $authorVpId = null, $commentValues = array()) {
         if ($vpId === null) {
             $vpId = IdUtil::newId();
