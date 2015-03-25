@@ -33,16 +33,15 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
         $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.neon';
         self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix);
 
-        $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
-        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo);
-
-
         $dbHost = self::$testConfig->testSite->dbHost;
         $dbUser = self::$testConfig->testSite->dbUser;
         $dbPassword = self::$testConfig->testSite->dbPassword;
         $dbName = self::$testConfig->testSite->dbName;
         self::$wpdb = new ExtendedWpdb($dbUser, $dbPassword, $dbName, $dbHost);
         self::$wpdb->set_prefix(self::$testConfig->testSite->dbTablePrefix);
+
+        $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
+        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$wpdb);
     }
 
     private static function setUpSite() {

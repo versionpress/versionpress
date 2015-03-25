@@ -5,6 +5,7 @@ namespace VersionPress\DI;
 use Committer;
 use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Database\ExtendedWpdb;
 use VersionPress\Database\MirroringDatabase;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
@@ -49,8 +50,12 @@ class DIContainer {
             return new VersionPressConfig();
         });
 
+        $dic->register(VersionPressServices::PLAIN_WPDB, function () {
+            return new ExtendedWpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
+        });
+
         $dic->register(VersionPressServices::STORAGE_FACTORY, function () use ($dic) {
-            return new StorageFactory(VERSIONPRESS_MIRRORING_DIR, $dic->resolve(VersionPressServices::DB_SCHEMA));
+            return new StorageFactory(VERSIONPRESS_MIRRORING_DIR, $dic->resolve(VersionPressServices::DB_SCHEMA), $dic->resolve(VersionPressServices::PLAIN_WPDB));
         });
 
         $dic->register(VersionPressServices::MIRROR, function () use ($dic) {

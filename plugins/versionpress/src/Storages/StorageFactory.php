@@ -14,15 +14,19 @@ class StorageFactory {
 
     private $storages = array();
     const ENTITY_INFO = '%entityInfo%';
+    /** @var \wpdb */
+    private $database;
 
     /**
      * @param string $vpdbDir Path to the `wp-content/vpdb` directory
      * @param DbSchemaInfo $dbSchemaInfo Passed to storages
+     * @param $database
      */
-    function __construct($vpdbDir, $dbSchemaInfo) {
+    function __construct($vpdbDir, $dbSchemaInfo, $database) {
         $this->vpdbDir = $vpdbDir;
         $this->initStorageClasses();
         $this->dbSchemaInfo = $dbSchemaInfo;
+        $this->database = $database;
     }
 
     /**
@@ -52,7 +56,7 @@ class StorageFactory {
 
     private function initStorageClasses() {
         $this->addStorageClassInfo('post', 'VersionPress\Storages\PostStorage', '%vpdb%/posts', self::ENTITY_INFO);
-        $this->addStorageClassInfo('comment', 'VersionPress\Storages\CommentStorage', '%vpdb%/comments', self::ENTITY_INFO);
+        $this->addStorageClassInfo('comment', 'VersionPress\Storages\CommentStorage', '%vpdb%/comments', self::ENTITY_INFO, '%database%');
         $this->addStorageClassInfo('option', 'VersionPress\Storages\OptionsStorage', '%vpdb%/options.ini', self::ENTITY_INFO);
         $this->addStorageClassInfo('term', 'VersionPress\Storages\TermsStorage', '%vpdb%/terms.ini', self::ENTITY_INFO);
         $this->addStorageClassInfo('term_taxonomy', 'VersionPress\Storages\TermTaxonomyStorage', '%vpdb%/terms.ini', self::ENTITY_INFO);
@@ -99,6 +103,10 @@ class StorageFactory {
                 $matches = Strings::match($arg, '%storage\((.*)\)%');
                 $entity = $matches[1];
                 $arg = $this->getStorage($entity);
+            }
+
+            if (is_string($arg) && $arg === '%database%') {
+                $arg = $this->database;
             }
 
             $expandedArgs[] = $arg;

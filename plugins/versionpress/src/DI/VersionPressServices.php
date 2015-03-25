@@ -14,6 +14,7 @@ final class VersionPressServices {
     const REVERTER = 'reverter';
     const REPOSITORY = 'repository';
     const VP_CONFIGURATION = 'vp-configuration';
+    const PLAIN_WPDB = 'wpdb';
 
     private function __construct() {
     }

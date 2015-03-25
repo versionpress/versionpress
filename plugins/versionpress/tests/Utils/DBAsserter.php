@@ -35,13 +35,14 @@ class DBAsserter {
         $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.neon';
         self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix);
 
-        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo);
-
         $dbHost = self::$testConfig->testSite->dbHost;
         $dbUser = self::$testConfig->testSite->dbUser;
         $dbPassword = self::$testConfig->testSite->dbPassword;
         $dbName = self::$testConfig->testSite->dbName;
         self::$database = new \mysqli($dbHost, $dbUser, $dbPassword, $dbName);
+
+        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$database);
+
     }
 
     private static function assertEntitiesEqualDatabase($entityName) {

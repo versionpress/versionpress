@@ -86,4 +86,30 @@ class EntityUtils {
 
         return $usermeta;
     }
+
+    public static function prepareComment($vpId = null, $postVpId = null, $authorVpId = null, $commentValues = array()) {
+        if ($vpId === null) {
+            $vpId = IdUtil::newId();
+        }
+
+        $comment = array_merge(array(
+            'comment_author' => 'Joe Tester',
+            'comment_author_email' => 'joetester@example.com',
+            'comment_author_url' => '',
+            'comment_date' => '2012-12-12 12:12:12',
+            'comment_content' => 'Some content',
+            'comment_approved' => 1,
+            'vp_id' => $vpId,
+        ), $commentValues);
+
+        if ($postVpId !== null) {
+            $comment['vp_comment_post_ID'] = $postVpId;
+        }
+
+        if ($authorVpId !== null) {
+            $comment['vp_user_id'] = $authorVpId;
+        }
+
+        return $comment;
+    }
 }

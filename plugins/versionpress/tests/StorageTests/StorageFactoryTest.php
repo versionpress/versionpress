@@ -13,7 +13,7 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase {
      * @test
      * @testdox Factory creates right storages
      */
-    public function testBanan() {
+    public function factoryCreatesRightStorages() {
         $storages = array(
             'post' => 'VersionPress\Storages\PostStorage',
             'comment' => 'VersionPress\Storages\CommentStorage',
@@ -25,7 +25,7 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase {
             'postmeta' => 'VersionPress\Storages\PostMetaStorage',
         );
 
-        $factory = new StorageFactory(__DIR__ . '/vpdb', new DbSchemaInfo(__DIR__ . '/../../src/Database/wordpress-schema.neon', 'wp_'));
+        $factory = new StorageFactory(__DIR__ . '/vpdb', new DbSchemaInfo(__DIR__ . '/../../src/Database/wordpress-schema.neon', 'wp_'), null);
         foreach ($storages as $entityName => $expectedClass) {
             $this->assertInstanceOf($expectedClass, $factory->getStorage($entityName));
         }

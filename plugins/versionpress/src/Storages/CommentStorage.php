@@ -3,9 +3,20 @@
 namespace VersionPress\Storages;
 
 use VersionPress\ChangeInfos\CommentChangeInfo;
+use VersionPress\Database\ExtendedWpdb;
 use VersionPress\Utils\EntityUtils;
 
 class CommentStorage extends DirectoryStorage {
+    /**
+     * @var ExtendedWpdb
+     */
+    private $database;
+
+    function __construct($directory, $entityInfo, $database) {
+        parent::__construct($directory, $entityInfo);
+        $this->database = $database;
+    }
+
 
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
 
@@ -40,8 +51,10 @@ class CommentStorage extends DirectoryStorage {
 
         $author = $newEntity["comment_author"];
 
-        global $wpdb;
-        $result = $wpdb->get_row("SELECT post_title FROM {$wpdb->prefix}posts JOIN {$wpdb->prefix}vp_id ON {$wpdb->prefix}posts.ID = {$wpdb->prefix}vp_id.id WHERE vp_id = UNHEX('$newEntity[vp_comment_post_ID]')");
+        $postTable = $this->database->prefix . 'posts';
+        $vpIdTable = $this->database->prefix . 'vp_id';
+        $result = $this->database->get_row("SELECT post_title FROM {$postTable} JOIN {$vpIdTable} ON {$postTable}.ID = {$vpIdTable}.id WHERE vp_id = UNHEX('$newEntity[vp_comment_post_ID]')");
+
         $postTitle = $result->post_title;
 
         return new CommentChangeInfo($action, $newEntity["vp_id"], $author, $postTitle);
