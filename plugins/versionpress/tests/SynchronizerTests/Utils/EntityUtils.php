@@ -157,4 +157,29 @@ class EntityUtils {
 
         return $term;
     }
+
+    public static function prepareTermTaxonomy($vpId = null, $termVpId = null, $taxonomy = null, $description = null) {
+        if ($vpId === null) {
+            $vpId = IdUtil::newId();
+        }
+
+        $termTaxonomy = array(
+            'vp_id' => $vpId
+        );
+
+        if ($termVpId !== null) {
+            $termTaxonomy['vp_term_id'] = $termVpId;
+        }
+
+        if ($taxonomy !== null) {
+            $termTaxonomy['taxonomy'] = $taxonomy;
+        }
+
+        if ($description !== null) {
+            $termTaxonomy['description'] = $description;
+        }
+
+        return $termTaxonomy;
+
+    }
 }
