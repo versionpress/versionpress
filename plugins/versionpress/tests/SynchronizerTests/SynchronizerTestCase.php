@@ -4,6 +4,7 @@ namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ExtendedWpdb;
+use VersionPress\Git\GitRepository;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\DBAsserter;
@@ -56,7 +57,7 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
     }
 
     public static function tearDownAfterClass() {
-        $process = new Process("git add -A && git commit -m " . escapeshellarg("Synchronizer tests created files"), self::$testConfig->testSite->path);
+        $process = new Process("git add -A && git commit -m " . escapeshellarg("Commited changes made by " . get_class()), self::$testConfig->testSite->path);
         $process->run();
     }
 

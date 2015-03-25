@@ -62,4 +62,28 @@ class EntityUtils {
 
         return $post;
     }
+
+    public static function prepareUserMeta($vpId = null, $userVpId = null, $key = null, $value = null) {
+        if ($vpId === null) {
+            $vpId = IdUtil::newId();
+        }
+
+        $usermeta = array(
+            'vp_id' => $vpId
+        );
+
+        if ($userVpId !== null) {
+            $usermeta['vp_user_id'] = $userVpId;
+        }
+
+        if ($key !== null) {
+            $usermeta['meta_key'] = $key;
+        }
+
+        if ($value !== null) {
+            $usermeta['meta_value'] = $value;
+        }
+
+        return $usermeta;
+    }
 }
