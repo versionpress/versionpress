@@ -136,4 +136,25 @@ class EntityUtils {
 
         return $comment;
     }
+
+    public static function prepareTerm($vpId, $name = null, $slug = null) {
+        if ($vpId === null) {
+            $vpId = IdUtil::newId();
+        }
+
+        $term = array(
+            'vp_id' => $vpId,
+            'term_group' => 0
+        );
+
+        if (isset($name)) {
+            $term['name'] = $name;
+        }
+
+        if (isset($slug)) {
+            $term['slug'] = $slug;
+        }
+
+        return $term;
+    }
 }
