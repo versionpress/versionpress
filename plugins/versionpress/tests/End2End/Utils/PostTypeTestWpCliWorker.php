@@ -96,4 +96,13 @@ abstract class PostTypeTestWpCliWorker extends WpCliWorker implements IPostTypeT
             'post_status' => 'publish'
         ));
     }
+
+    public function prepare_previewUnsavedPost() {
+        throw new \PHPUnit_Framework_SkippedTestError('There is nothing like preview in the WP-CLI');
+    }
+
+    public function previewUnsavedPost() {
+    }
+
+
 }

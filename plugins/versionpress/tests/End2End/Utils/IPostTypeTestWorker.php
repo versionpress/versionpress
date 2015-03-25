@@ -32,4 +32,7 @@ interface IPostTypeTestWorker extends ITestWorker {
     public function publishDraft();
 
     public function getPostType();
+
+    public function prepare_previewUnsavedPost();
+    public function previewUnsavedPost();
 }

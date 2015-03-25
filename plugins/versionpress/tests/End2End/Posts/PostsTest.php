@@ -86,6 +86,15 @@ class PostsTest extends PostTypeTestCase {
 
     /**
      * @test
+     * @testdox Previewing unsaved post creates a draft
+     *
+     */
+    public function previewingUnsavedPostCreatesDraft() {
+        $this->runPreviewUnsavedPostTest();
+    }
+
+    /**
+     * @test
      * @testdox Publishing draft creates 'post/publish' action
      *
      * @depends creatingDraftCreatesPostDraftAction

@@ -99,6 +99,21 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
         $this->waitForElement('#message.updated');
     }
 
+    public function prepare_previewUnsavedPost() {
+        $this->url($this->getPostTypeScreenUrl());
+        $this->prepareTestPost();
+    }
+
+    public function previewUnsavedPost() {
+        $previewLink = $this->byCssSelector('form#post #post-preview');
+        $previewWindowId = $previewLink->attribute('target');
+        $previewLink->click();
+        $this->window($previewWindowId);
+        $this->closeWindow();
+        $this->window('');
+    }
+
+
     /**
      * @return string
      */

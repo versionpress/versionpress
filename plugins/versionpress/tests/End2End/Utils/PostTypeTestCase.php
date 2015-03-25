@@ -134,6 +134,20 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         // to create a commit just to update that (seems more like a strange behavior of WP than anything else).
     }
 
+    public function runPreviewUnsavedPostTest() {
+        self::$worker->prepare_previewUnsavedPost();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->previewUnsavedPost();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/draft");
+        $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
+        $this->assertFilesEqualDatabase();
+    }
+
     public function runPublishDraftTest() {
         self::$worker->prepare_publishDraft();
 
