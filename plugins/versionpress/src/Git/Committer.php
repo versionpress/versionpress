@@ -1,6 +1,7 @@
 <?php
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\EntityChangeInfo;
+use VersionPress\ChangeInfos\PostChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\Git\GitConfig;
 use VersionPress\Git\GitRepository;
@@ -60,14 +61,14 @@ class Committer
 
         if (count($this->forcedChangeInfos) > 0) {
             FileSystem::remove(get_home_path() . 'versionpress.maintenance'); // todo: this shouldn't be here...
-            $changeInfo = new ChangeInfoEnvelope($this->forcedChangeInfos);
+            $changeInfo = new ChangeInfoEnvelope($this->preprocessChangeInfoList($this->forcedChangeInfos));
             $this->forcedChangeInfos = array();
         } elseif ($this->shouldCommit()) {
             $changeList =  array_merge($this->postponedChangeInfos, $this->mirror->getChangeList());
             if (empty($changeList)) {
                 return;
             }
-            $changeInfo = new ChangeInfoEnvelope($changeList);
+            $changeInfo = new ChangeInfoEnvelope($this->preprocessChangeInfoList($changeList));
         } else {
             return;
         }
@@ -96,6 +97,33 @@ class Committer
         }
 
         $this->mirror->flushChangeList();
+    }
+
+    /**
+     * If both 'post/draft' and 'post/publish' actions exist for the same entity, replace them with one 'post/create' action.
+     *
+     * @param TrackedChangeInfo[] $changeInfoList
+     * @return TrackedChangeInfo[]
+     */
+    private function preprocessChangeInfoList($changeInfoList) {
+        $entities = array();
+        foreach ($changeInfoList as $key => $changeInfo) {
+            if ($changeInfo instanceof PostChangeInfo && in_array($changeInfo->getAction(), array("draft", "publish"))) {
+                if (!is_array($entities[$changeInfo->getEntityId()]))
+                    $entities[$changeInfo->getEntityId()] = array();
+                $entities[$changeInfo->getEntityId()][$changeInfo->getAction()] = $key;
+            }
+        }
+        foreach($entities as $entityId => $changeInfos) {
+            if(count($changeInfos) == 2) {
+                /** @var PostChangeInfo $publish */
+                $publish = $changeInfoList[$changeInfos["publish"]];
+                unset($changeInfoList[$changeInfos["draft"]]);
+                unset($changeInfoList[$changeInfos["publish"]]);
+                $changeInfoList[] = new PostChangeInfo("create", $publish->getEntityId(), $publish->getPostType(), $publish->getPostTitle());
+            }
+        }
+        return $changeInfoList;
     }
 
     /**

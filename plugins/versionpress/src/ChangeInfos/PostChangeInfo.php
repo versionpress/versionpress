@@ -51,6 +51,14 @@ class PostChangeInfo extends EntityChangeInfo {
         $this->postUpdatedProperties = implode(",",$postUpdatedProperties);
     }
 
+    public function getPostType() {
+        return $this->postType;
+    }
+
+    public function getPostTitle() {
+        return $this->postTitle;
+    }
+
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
 
