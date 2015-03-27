@@ -29,8 +29,8 @@ class RequestDetector {
         }
 
         return basename($_SERVER['PHP_SELF']) === 'plugins.php'
-            && $this->queryVariableEquals('action', 'delete-selected')
-            && isset($_REQUEST['verify-delete']);
+        && ($this->queryVariableEquals('action', 'delete-selected') || $this->postVariableEquals('action', 'delete-selected'))
+        && isset($_REQUEST['verify-delete']);
     }
 
     /**
@@ -48,6 +48,10 @@ class RequestDetector {
 
     private function queryVariableEquals($name, $value) {
         return isset($_GET[$name]) && $_GET[$name] === $value;
+    }
+
+    private function postVariableEquals($name, $value) {
+        return isset($_POST[$name]) && $_POST[$name] === $value;
     }
 
     public function getPluginNames() {

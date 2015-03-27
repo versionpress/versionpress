@@ -93,7 +93,7 @@ class PluginChangeInfo extends TrackedChangeInfo {
         }
         $pluginChange = array("type" => "path", "path" => $path);
 
-        $optionChange = array("type" => "storage-file", "entity" => "option", "id" => "");
+        $optionChange = array("type" => "storage-file", "entity" => "option", "id" => "", "parent-id" => "");
 
         return array($pluginChange, $optionChange);
     }
