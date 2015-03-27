@@ -201,11 +201,19 @@ function vp_register_hooks() {
 
     add_action('wp_update_nav_menu_item', function($menu_id, $menu_item_db_id) use ($committer) {
         $key = 'menu-item-' . $menu_item_db_id;
-        if (defined('DOING_AJAX') && DOING_AJAX && $_POST['action'] === 'add-menu-item') {
+        if (defined('DOING_AJAX') && DOING_AJAX && isset($_POST['action']) && $_POST['action'] === 'add-menu-item') {
             $committer->postponeCommit($key);
             $committer->commit();
-        } elseif ($_POST['action'] === 'update') {
+        } elseif (isset($_POST['action']) && $_POST['action'] === 'update') {
             $committer->usePostponedChangeInfos($key);
+        }
+        if (!defined('DOING_AJAX')) {
+            /** @var MirroringDatabase $wpdb */
+            global $wpdb, $versionPressContainer;
+            /** @var Mirror $mirror */
+            $mirror = $versionPressContainer->resolve(VersionPressServices::MIRROR);
+            $func = createUpdatePostTermsHook($mirror, $wpdb);
+            $func($menu_item_db_id);
         }
     }, 10, 2);
     //----------------------------------------

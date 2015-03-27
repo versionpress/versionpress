@@ -364,6 +364,77 @@ class WpAutomation {
     }
 
     /**
+     * Creates new menu using WP-CLI. Returns ID of created menu.
+     *
+     * @param string $name
+     * @return int
+     */
+    public function createMenu($name) {
+        $menu = array(
+            $name,
+            "porcelain" => null);
+        return intval($this->runWpCliCommand("menu", "create", $menu));
+    }
+
+    /**
+     * Changes the menu using WP-CLI.
+     *
+     * @param $id
+     * @param $name
+     */
+    public function editMenu($id, $name) {
+        $changes = array(
+            "nav_menu",
+            $id,
+            "name" => $name);
+        $this->runWpCliCommand("term", "update", $changes);
+    }
+
+    /**
+     * Adds menu item using WP-CLI. Returns ID of created menu item.
+     *
+     * @param int|string $menu
+     * @param string $type post|custom|term
+     * @param array $item
+     * @return int
+     */
+    public function addMenuItem($menu, $type, $item) {
+        array_unshift($item, $menu);
+        $item["porcelain"] = null;
+        return intval($this->runWpCliCommand("menu", "item add-".$type, $item));
+    }
+
+    /**
+     * Updates menu item using WP-CLI.
+     *
+     * @param int $id
+     * @param array $changes
+     * @return int
+     */
+    public function editMenuItem($id, $changes) {
+        array_unshift($changes, $id);
+        $this->runWpCliCommand("menu", "item update", $changes);
+    }
+
+    /**
+     * Removes menu item using WP-CLI.
+     *
+     * @param int $id
+     */
+    public function removeMenuItem($id) {
+        $this->runWpCliCommand("menu", "item delete", array($id));
+    }
+
+    /**
+     * Deletes menu item using WP-CLI.
+     *
+     * @param int|string $menu
+     */
+    public function deleteMenu($menu) {
+        $this->runWpCliCommand("menu", "delete", array($menu));
+    }
+
+    /**
      * Activates VersionPress plugin and runs the Initializer
      */
     public function initializeVersionPress() {

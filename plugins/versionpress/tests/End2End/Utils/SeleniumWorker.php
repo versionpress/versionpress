@@ -64,7 +64,7 @@ class SeleniumWorker implements ITestWorker {
     /** @var WpAutomation */
     protected static $wpAutomation;
     /** @var TestConfig */
-    private static $testConfig;
+    protected static $testConfig;
 
     protected static $autologin = true;
 

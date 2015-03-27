@@ -225,6 +225,15 @@ class CommitAsserter {
         }
     }
 
+    public function assertCountOfUntrackedFiles($count) {
+        $gitStatus = $this->gitRepository->getStatus(true);
+        $countOfUntrackedFiles = count($gitStatus);
+        if ($countOfUntrackedFiles != $count) {
+            $adverb = $countOfUntrackedFiles < $count ? "less" : "more";
+            PHPUnit_Framework_Assert::fail("In the working directory is $adverb untracked files ($countOfUntrackedFiles) then expected ($count)");
+        }
+    }
+
     public function assertCleanWorkingDirectory() {
         $gitStatus = $this->gitRepository->getStatus();
         if (!empty($gitStatus)) {
