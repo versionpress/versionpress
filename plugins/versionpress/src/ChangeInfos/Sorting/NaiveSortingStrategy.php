@@ -20,9 +20,9 @@ class NaiveSortingStrategy implements SortingStrategy {
     private $priorityOrder = array(
         'VersionPress\ChangeInfos\WordPressUpdateChangeInfo',
         'VersionPress\ChangeInfos\VersionPressChangeInfo',
+        'VersionPress\ChangeInfos\UserChangeInfo',
         'VersionPress\ChangeInfos\PostChangeInfo',
         'VersionPress\ChangeInfos\CommentChangeInfo',
-        'VersionPress\ChangeInfos\UserChangeInfo',
         'VersionPress\ChangeInfos\RevertChangeInfo',
         'VersionPress\ChangeInfos\PluginChangeInfo',
         'VersionPress\ChangeInfos\ThemeChangeInfo',
@@ -78,6 +78,14 @@ class NaiveSortingStrategy implements SortingStrategy {
             }
 
             if ($changeInfo2->getAction() === "create") {
+                return 1;
+            }
+            // Then "delete" action
+            if ($changeInfo1->getAction() === "delete") {
+                return -1;
+            }
+
+            if ($changeInfo2->getAction() === "delete") {
                 return 1;
             }
 
