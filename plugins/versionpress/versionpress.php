@@ -191,8 +191,10 @@ function vp_register_hooks() {
     }
 
     if ($requestDetector->isThemeDeleteRequest()) {
-        $themeId = $requestDetector->getThemeStylesheet();
-        $committer->forceChangeInfo(new ThemeChangeInfo($themeId, 'delete'));
+        $themeIds = $requestDetector->getThemeStylesheets();
+        foreach ($themeIds as $themeId) {
+            $committer->forceChangeInfo(new ThemeChangeInfo($themeId, 'delete'));
+        }
     }
 
     if ($requestDetector->isPluginDeleteRequest()) {

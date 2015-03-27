@@ -83,11 +83,11 @@ class RequestDetector {
         return $plugins;
     }
 
-    public function getThemeStylesheet() {
+    public function getThemeStylesheets() {
         if (!$this->isWpCli) {
             return $_GET['stylesheet'];
         }
 
-        return $this->wpCliArguments[2]; // theme delete <stylesheet>
+        return array_slice($this->wpCliArguments, 2); // theme delete <stylesheet>
     }
 }
