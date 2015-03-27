@@ -91,8 +91,16 @@ function vp_register_hooks() {
         }
 
         if (!($hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'update')) return; // handled by different hook
-        $pluginName = $hook_extra['plugin'];
-        $committer->forceChangeInfo(new PluginChangeInfo($pluginName, 'update'));
+
+        if (isset($hook_extra['bulk']) && $hook_extra['bulk'] === true) {
+            $plugins = $hook_extra['plugins'];
+        } else {
+            $plugins = array($hook_extra['plugin']);
+        }
+
+        foreach ($plugins as $plugin) {
+            $committer->forceChangeInfo(new PluginChangeInfo($plugin, 'update'));
+        }
     }, 10, 2);
 
     add_action('added_option', function ($name) use ($wpdb, $mirror) {
