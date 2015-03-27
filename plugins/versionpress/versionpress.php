@@ -84,10 +84,16 @@ function vp_register_hooks() {
 
     add_action('upgrader_process_complete', function ($upgrader, $hook_extra) use ($committer) {
         if ($hook_extra['type'] === 'theme') {
-            $themeId = $upgrader->result['destination_name'];
-            $themeName = isset($upgrader->skin->api, $upgrader->skin->api->name) ? $upgrader->skin->api->name : wp_get_theme($themeId)->get('Name');
-            $action = $hook_extra['action']; // can be "install" or "update", see WP_Upgrader and search for `'hook_extra' =>`
-            $committer->forceChangeInfo(new ThemeChangeInfo($themeId, $action, $themeName));
+            $themes = (isset($hook_extra['bulk']) && $hook_extra['bulk'] === true) ? $hook_extra['themes'] : array($upgrader->result['destination_name']);
+            foreach ($themes as $theme) {
+                $themeName = wp_get_theme($theme)->get('Name');
+                if ($themeName === $theme && isset($upgrader->skin->api, $upgrader->skin->api->name)) {
+                    $themeName =  $upgrader->skin->api->name;
+                }
+
+                $action = $hook_extra['action']; // can be "install" or "update", see WP_Upgrader and search for `'hook_extra' =>`
+                $committer->forceChangeInfo(new ThemeChangeInfo($theme, $action, $themeName));
+            }
         }
 
         if (!($hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'update')) return; // handled by different hook
