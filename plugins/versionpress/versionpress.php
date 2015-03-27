@@ -110,8 +110,9 @@ function vp_register_hooks() {
 
     add_filter('upgrader_pre_install', function ($_, $hook_extra) use ($committer) {
         if (!($hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'install')) return;
+
         $pluginsBeforeInstallation = get_plugins();
-        add_filter('upgrader_post_install', function ($_, $hook_extra) use ($pluginsBeforeInstallation, $committer) {
+        $postInstallHook = function ($_, $hook_extra) use ($pluginsBeforeInstallation, $committer, &$postInstallHook) {
             if (!($hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'install')) return;
             wp_cache_delete('plugins', 'plugins');
             $pluginsAfterInstallation = get_plugins();
@@ -119,7 +120,10 @@ function vp_register_hooks() {
             reset($installedPlugin);
             $pluginName = key($installedPlugin);
             $committer->forceChangeInfo(new PluginChangeInfo($pluginName, 'install'));
-        }, 10, 2);
+            remove_filter('upgrader_post_install', $postInstallHook);
+        };
+
+        add_filter('upgrader_post_install', $postInstallHook, 10, 2);
     }, 10, 2);
 
     add_action('switch_theme', function () use ($committer) {
