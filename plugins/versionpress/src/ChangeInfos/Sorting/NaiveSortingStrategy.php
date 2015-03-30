@@ -177,13 +177,17 @@ class NaiveSortingStrategy implements SortingStrategy {
          *  "create" > "delete" > "edit" > all other actions
          */
         if ($changeInfo1->getAction() == "create") {
-            return -3;
+            return -1;
         } else if ($changeInfo2->getAction() == "create") {
-            return 3;
+            return 1;
         } else if ($changeInfo1->getAction() == "delete") {
-            return -2;
+            return -1;
         } else if ($changeInfo2->getAction() == "delete") {
-            return 2;
+            return 1;
+        } else if ($changeInfo1->getAction() == "draft") {
+            return -1;
+        } else if ($changeInfo2->getAction() == "draft") {
+            return 1;
         } else if ($changeInfo1->getAction() == "edit") {
             return -1;
         } else if ($changeInfo2->getAction() == "edit") {
