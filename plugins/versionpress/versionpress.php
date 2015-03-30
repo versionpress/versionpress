@@ -216,6 +216,9 @@ function vp_register_hooks() {
             $func($menu_item_db_id);
         }
     }, 10, 2);
+
+    add_action('set_object_terms', createUpdatePostTermsHook($mirror, $wpdb));;
+
     //----------------------------------------
     // URL and WP-CLI "hooks"
     //----------------------------------------
