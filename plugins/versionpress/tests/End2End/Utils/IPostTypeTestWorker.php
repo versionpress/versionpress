@@ -35,4 +35,7 @@ interface IPostTypeTestWorker extends ITestWorker {
 
     public function prepare_previewUnsavedPost();
     public function previewUnsavedPost();
+
+    public function prepare_createTagInEditationForm();
+    public function createTagInEditationForm();
 }

@@ -2,9 +2,8 @@
 use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\EntityChangeInfo;
-use VersionPress\ChangeInfos\PostChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
-use VersionPress\Git\ChangeInfoPreprocessors\PostChangeInfoPreprocessor;
+use VersionPress\Git\ChangeInfoPreprocessors\ChangeInfoPreprocessor;
 use VersionPress\Git\GitConfig;
 use VersionPress\Git\GitRepository;
 use VersionPress\Storages\Mirror;
@@ -113,8 +112,23 @@ class Committer
      * @return TrackedChangeInfo[][]
      */
     private function preprocessChangeInfoList($changeInfoList) {
-        $postChangeInfoPreprocessor = new PostChangeInfoPreprocessor();
-        return $postChangeInfoPreprocessor->process($changeInfoList);
+        $preprocessors = array(
+            'VersionPress\Git\ChangeInfoPreprocessors\PostChangeInfoPreprocessor',
+            'VersionPress\Git\ChangeInfoPreprocessors\PostTermSplittingPreprocessor',
+        );
+
+        $changeInfoLists = array($changeInfoList);
+        foreach ($preprocessors as $preprocessorClass) {
+            /** @var ChangeInfoPreprocessor $preprocessor */
+            $preprocessor = new $preprocessorClass();
+            $processedLists = array();
+            foreach ($changeInfoLists as $changeInfoList) {
+                $processedLists = array_merge($processedLists, $preprocessor->process($changeInfoList));
+            }
+            $changeInfoLists = $processedLists;
+        }
+
+        return $changeInfoLists;
     }
 
     /**

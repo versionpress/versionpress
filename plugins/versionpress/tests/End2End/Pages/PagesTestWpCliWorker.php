@@ -9,4 +9,12 @@ class PagesTestWpCliWorker extends PostTypeTestWpCliWorker {
     public function getPostType() {
         return "page";
     }
+
+    public function prepare_createTagInEditationForm() {
+        throw new \PHPUnit_Framework_SkippedTestError("Pages don't have tags or categories to assign.");
+    }
+
+    public function createTagInEditationForm() {
+        throw new \PHPUnit_Framework_SkippedTestError("Pages don't have tags or categories to assign.");
+    }
 }

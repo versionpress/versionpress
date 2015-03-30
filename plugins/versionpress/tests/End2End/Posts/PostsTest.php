@@ -3,6 +3,8 @@
 namespace VersionPress\Tests\End2End\Posts;
 
 use VersionPress\Tests\End2End\Utils\PostTypeTestCase;
+use VersionPress\Tests\Utils\CommitAsserter;
+use VersionPress\Tests\Utils\DBAsserter;
 
 class PostsTest extends PostTypeTestCase {
 
@@ -101,5 +103,25 @@ class PostsTest extends PostTypeTestCase {
      */
     public function publishingDraftCreatesPostPublishAction() {
         $this->runPublishDraftTest();
+    }
+
+    /**
+     * @test
+     * @testdox Creating tag in the editation form creates separate commit
+     */
+    public function creatingTagInEditationFormCreatesSeparateCommit() {
+        self::$worker->prepare_createTagInEditationForm();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->createTagInEditationForm();
+
+        $commitAsserter->assertNumCommits(2);
+        $commitAsserter->assertCommitAction('post/edit');
+        $commitAsserter->assertCommitAction('term/create', 1);
+        $commitAsserter->assertCommitTag("VP-Post-Type", self::$worker->getPostType());
+        $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "vp_term_taxonomy");
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
     }
 }

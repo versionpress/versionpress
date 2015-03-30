@@ -117,7 +117,7 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
     /**
      * @return string
      */
-    private function getPostTypeScreenUrl() {
+    protected function getPostTypeScreenUrl() {
         return 'wp-admin/edit.php?post_type=' . $this->getPostType() . '&orderby=date&order=desc';
     }
 

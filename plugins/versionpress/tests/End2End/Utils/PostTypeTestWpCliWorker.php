@@ -6,7 +6,7 @@ use VersionPress\Tests\Utils\TestConfig;
 
 abstract class PostTypeTestWpCliWorker extends WpCliWorker implements IPostTypeTestWorker {
 
-    private $testPost = array(
+    protected $testPost = array(
         "post_type" => "post",
         "post_status" => "publish",
         "post_title" => "Test post",
@@ -103,6 +103,4 @@ abstract class PostTypeTestWpCliWorker extends WpCliWorker implements IPostTypeT
 
     public function previewUnsavedPost() {
     }
-
-
 }
