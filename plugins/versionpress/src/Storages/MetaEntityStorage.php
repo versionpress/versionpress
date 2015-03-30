@@ -35,7 +35,7 @@ abstract class MetaEntityStorage extends Storage {
 
     public function save($data) {
 
-        if (!$this->shouldBeSaved($data)) {
+        if (!$this->shouldBeSaved($data) || !$this->parentStorage->exists($data[$this->parentReferenceName], null)) {
             return null;
         }
 
@@ -208,7 +208,7 @@ abstract class MetaEntityStorage extends Storage {
     }
 
     function shouldBeSaved($data) {
-        return true;
+        return isset($data[$this->parentReferenceName]) && $this->parentStorage->exists($data[$this->parentReferenceName], null);
     }
 
     function prepareStorage() {

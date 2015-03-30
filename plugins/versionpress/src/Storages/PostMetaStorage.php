@@ -30,6 +30,6 @@ class PostMetaStorage extends MetaEntityStorage {
             '_encloseme'
         );
 
-        return !in_array($data['meta_key'], $ignoredMeta);
+        return parent::shouldBeSaved($data) && !in_array($data['meta_key'], $ignoredMeta);
     }
 }
