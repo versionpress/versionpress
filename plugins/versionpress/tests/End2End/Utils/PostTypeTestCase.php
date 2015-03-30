@@ -145,7 +145,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertCommitAction("post/draft");
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
         $commitAsserter->assertCleanWorkingDirectory();
-        $this->assertFilesEqualDatabase();
+        DBAsserter::assertFilesEqualDatabase();
     }
 
     public function runPublishDraftTest() {
