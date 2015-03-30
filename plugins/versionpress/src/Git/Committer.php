@@ -1,8 +1,10 @@
 <?php
+use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\PostChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
+use VersionPress\Git\ChangeInfoPreprocessors\PostChangeInfoPreprocessor;
 use VersionPress\Git\GitConfig;
 use VersionPress\Git\GitRepository;
 use VersionPress\Storages\Mirror;
@@ -61,15 +63,21 @@ class Committer
 
         if (count($this->forcedChangeInfos) > 0) {
             FileSystem::remove(get_home_path() . 'versionpress.maintenance'); // todo: this shouldn't be here...
-            $changeInfo = new ChangeInfoEnvelope($this->preprocessChangeInfoList($this->forcedChangeInfos));
+            $changeInfoList = $this->forcedChangeInfos;
             $this->forcedChangeInfos = array();
         } elseif ($this->shouldCommit()) {
-            $changeList =  array_merge($this->postponedChangeInfos, $this->mirror->getChangeList());
-            if (empty($changeList)) {
+            $changeInfoList =  array_merge($this->postponedChangeInfos, $this->mirror->getChangeList());
+            if (empty($changeInfoList)) {
                 return;
             }
-            $changeInfo = new ChangeInfoEnvelope($this->preprocessChangeInfoList($changeList));
         } else {
+            return;
+        }
+
+        if ($this->commitPostponed) {
+            $this->postponeChangeInfo($changeInfoList);
+            $this->commitPostponed = false;
+            $this->postponeKey = null;
             return;
         }
 
@@ -87,13 +95,12 @@ class Committer
             $authorEmail = "nonadmin@example.com";
         }
 
-        if ($this->commitPostponed) {
-            $this->postponeChangeInfo($changeInfo);
-            $this->commitPostponed = false;
-            $this->postponeKey = null;
-        } else {
-            $this->stageRelatedFiles($changeInfo);
-            $this->repository->commit($changeInfo->getCommitMessage(), $authorName, $authorEmail);
+        $changeInfoLists = $this->preprocessChangeInfoList($changeInfoList);
+
+        foreach ($changeInfoLists as $listToCommit) {
+            $changeInfoEnvelope = new ChangeInfoEnvelope($listToCommit);
+            $this->stageRelatedFiles($changeInfoEnvelope);
+            $this->repository->commit($changeInfoEnvelope->getCommitMessage(), $authorName, $authorEmail);
         }
 
         $this->mirror->flushChangeList();
@@ -103,27 +110,11 @@ class Committer
      * If both 'post/draft' and 'post/publish' actions exist for the same entity, replace them with one 'post/create' action.
      *
      * @param TrackedChangeInfo[] $changeInfoList
-     * @return TrackedChangeInfo[]
+     * @return TrackedChangeInfo[][]
      */
     private function preprocessChangeInfoList($changeInfoList) {
-        $entities = array();
-        foreach ($changeInfoList as $key => $changeInfo) {
-            if ($changeInfo instanceof PostChangeInfo && in_array($changeInfo->getAction(), array("draft", "publish"))) {
-                if (!is_array($entities[$changeInfo->getEntityId()]))
-                    $entities[$changeInfo->getEntityId()] = array();
-                $entities[$changeInfo->getEntityId()][$changeInfo->getAction()] = $key;
-            }
-        }
-        foreach($entities as $entityId => $changeInfos) {
-            if(count($changeInfos) == 2) {
-                /** @var PostChangeInfo $publish */
-                $publish = $changeInfoList[$changeInfos["publish"]];
-                unset($changeInfoList[$changeInfos["draft"]]);
-                unset($changeInfoList[$changeInfos["publish"]]);
-                $changeInfoList[] = new PostChangeInfo("create", $publish->getEntityId(), $publish->getPostType(), $publish->getPostTitle());
-            }
-        }
-        return $changeInfoList;
+        $postChangeInfoPreprocessor = new PostChangeInfoPreprocessor();
+        return $postChangeInfoPreprocessor->process($changeInfoList);
     }
 
     /**
@@ -253,16 +244,16 @@ class Committer
     }
 
     /**
-     * @param ChangeInfoEnvelope $changeInfoEnvelope
+     * @param ChangeInfo[] $changeInfoList
      */
-    private function postponeChangeInfo($changeInfoEnvelope) {
+    private function postponeChangeInfo($changeInfoList) {
         $postponed = $this->loadPostponedChangeInfos();
 
         if (!isset($postponed[$this->postponeKey])) {
             $postponed[$this->postponeKey] = array();
         }
 
-        $postponed[$this->postponeKey] = $changeInfoEnvelope->getChangeInfoList();
+        $postponed[$this->postponeKey] = $changeInfoList;
         $this->savePostponedChangeInfos($postponed);
     }
 
