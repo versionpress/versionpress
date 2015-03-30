@@ -20,6 +20,13 @@ class RequirementsChecker {
      */
     private $schema;
 
+    /** @var string[] */
+    private static $supportedPlugins = array(
+        'Akismet',
+        'Hello Dolly',
+        'VersionPress',
+    );
+
     function __construct(wpdb $database, DbSchemaInfo $schema) {
 
         $this->database = $database;
@@ -109,6 +116,16 @@ class RequirementsChecker {
             'level' => 'warning',
             'fulfilled' => $countOfEntities < 500,
             'help' => $help
+        );
+
+        $unsupportedPluginsCount = $this->testExternalPlugins();
+        $externalPluginsHelp = "You run $unsupportedPluginsCount external ". ($unsupportedPluginsCount == 1 ? "plugin" : "plugins") ." we have not tested yet. <a href='http://docs.versionpress.net/en/feature-focus/external-plugins'>Read more about 3rd party plugins support.</a>";
+
+        $this->requirements[] = array(
+            'name' => 'External plugins',
+            'level' => 'warning',
+            'fulfilled' => $unsupportedPluginsCount == 0,
+            'help' => $externalPluginsHelp
         );
 
         $this->everythingFulfilled = array_reduce($this->requirements, function ($carry, $requirement) {
@@ -234,5 +251,19 @@ class RequirementsChecker {
         }
 
         return $totalEntitiesCount;
+    }
+
+    /**
+     * @return int Number of unsupported plugins.
+     */
+    private function testExternalPlugins() {
+        $plugins = get_plugins();
+        $unsupportedPluginsCount = 0;
+        foreach($plugins as $plugin) {
+            if(!in_array($plugin['Name'], self::$supportedPlugins)) {
+                $unsupportedPluginsCount++;
+            }
+        }
+        return $unsupportedPluginsCount;
     }
 }
