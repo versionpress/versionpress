@@ -2,6 +2,7 @@
 
 namespace VersionPress\Tests\Automation;
 
+use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Tests\Utils\TestConfig;
 
 /**
@@ -20,5 +21,12 @@ class WpAutomationRunnerSample extends \PHPUnit_Framework_TestCase {
         $wpAutomation->setUpSite();
         $wpAutomation->copyVersionPressFiles();
         $wpAutomation->activateVersionPress();
+    }
+
+    /**
+     * @test
+     */
+    public function runDBAsserter() {
+        DBAsserter::assertFilesEqualDatabase();
     }
 }
