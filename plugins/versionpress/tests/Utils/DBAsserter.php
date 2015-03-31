@@ -50,10 +50,10 @@ class DBAsserter {
         $entityInfo = self::$schemaInfo->getEntityInfo($entityName);
 
         $allDbEntities = self::selectAll(self::$schemaInfo->getPrefixedTableName($entityName));
+        $idMap = self::getVpIdMap();
+        $allDbEntities = self::replaceForeignKeys($entityName, $allDbEntities, $idMap);
         $dbEntities = array_filter($allDbEntities, array($storage, 'shouldBeSaved'));
 
-        $idMap = self::getVpIdMap();
-        $dbEntities = self::replaceForeignKeys($entityName, $dbEntities, $idMap);
 
         $urlFilter = new AbsoluteUrlFilter(self::$testConfig->testSite->url);
         $storageEntities = array_map(function ($entity) use ($urlFilter) { return $urlFilter->restore($entity); }, $storage->loadAll());
@@ -171,14 +171,16 @@ class DBAsserter {
         foreach ($dbEntities as $entity) {
             foreach (self::$schemaInfo->getEntityInfo($entityName)->references as $column => $targetEntity) {
                 if ($entity[$column] != "0") {
-                    $entity["vp_$column"] = $idMap[self::$schemaInfo->getTableName($targetEntity)][$entity[$column]];
+                    /** @noinspection PhpUsageOfSilenceOperatorInspection The target entity might not be saved by VersionPress */
+                    $entity["vp_$column"] = @$idMap[self::$schemaInfo->getTableName($targetEntity)][$entity[$column]];
                 }
                 unset($entity[$column]);
             }
 
             if (!self::$schemaInfo->getEntityInfo($entityName)->hasNaturalVpid) {
                 $idColumnName = self::$schemaInfo->getEntityInfo($entityName)->idColumnName;
-                $entity['vp_id'] = $idMap[self::$schemaInfo->getTableName($entityName)][$entity[$idColumnName]];
+                /** @noinspection PhpUsageOfSilenceOperatorInspection The entity might not be saved by VersionPress, so it might not have a VPID */
+                $entity['vp_id'] = @$idMap[self::$schemaInfo->getTableName($entityName)][$entity[$idColumnName]];
                 if (!empty($entity['vp_id'])) {
                     unset($entity[$idColumnName]);
                 }

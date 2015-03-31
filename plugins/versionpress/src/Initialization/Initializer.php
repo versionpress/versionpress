@@ -6,6 +6,7 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Git\GitConfig;
 use VersionPress\Git\GitRepository;
 use VersionPress\Storages\StorageFactory;
+use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\IdUtil;
 use VersionPress\Utils\SecurityUtils;
@@ -74,7 +75,6 @@ class Initializer {
         vp_enable_maintenance();
         $this->createVersionPressTables();
         $this->lockDatabase();
-        $this->createVpids();
         $this->saveDatabaseToStorages();
         $this->commitDatabase();
         $this->createGitRepository();
@@ -129,21 +129,6 @@ class Initializer {
     }
 
     /**
-     * Creates VPIDs for all entities that have a WordPress ID and stores them into `vp_id` table.
-     */
-    private function createVpids() {
-
-        $entityNames = $this->dbSchema->getAllEntityNames();
-
-        foreach ($entityNames as $entityName) {
-            $this->createVpidsForEntitiesOfType($entityName);
-            $this->reportProgressChange("Created identifiers for " . $entityName);
-        }
-
-        $this->reportProgressChange(InitializerStates::VPIDS_CREATED);
-    }
-
-    /**
      * If entity type identified by $entityName defines an ID column, creates a mapping between WordPress ID and VPID
      * for all entities (db rows) of such type.
      *
@@ -159,6 +144,7 @@ class Initializer {
         $tableName = $this->dbSchema->getTableName($entityName);
         $prefixedTableName = $this->dbSchema->getPrefixedTableName($entityName);
         $entities = $this->database->get_results("SELECT * FROM $prefixedTableName", ARRAY_A);
+        $entities = $this->replaceForeignKeysWithReferencesInAllEntities($entityName, $entities);
 
         foreach ($entities as $entity) {
             if (!$this->storageFactory->getStorage($entityName)->shouldBeSaved($entity)) continue;
@@ -177,8 +163,9 @@ class Initializer {
 
         FileSystem::mkdir(VERSIONPRESS_MIRRORING_DIR);
 
-        $storageNames = $this->storageFactory->getAllSupportedStorages();
-        foreach ($storageNames as $entityName) {
+        $entityNames = SynchronizationProcess::sortStoragesToSynchronize($this->storageFactory->getAllSupportedStorages());
+        foreach ($entityNames as $entityName) {
+            $this->createVpidsForEntitiesOfType($entityName);
             $this->saveEntitiesOfTypeToStorage($entityName);
             $this->reportProgressChange("All " . $entityName . " saved into files");
         }
@@ -193,11 +180,12 @@ class Initializer {
     private function saveEntitiesOfTypeToStorage($entityName) {
         $storage = $this->storageFactory->getStorage($entityName);
         $entities = $this->database->get_results("SELECT * FROM {$this->getTableName($entityName)}", ARRAY_A);
+        $entities = $this->replaceForeignKeysWithReferencesInAllEntities($entityName, $entities);
+
         $entities = array_filter($entities, function ($entity) use ($storage) {
             return $storage->shouldBeSaved($entity);
         });
         $entities = $this->extendEntitiesWithVpids($entityName, $entities);
-        $entities = $this->replaceForeignKeysWithReferencesInAllEntities($entityName, $entities);
         $entities = $this->doEntitySpecificActions($entityName, $entities);
         $storage->prepareStorage();
         $storage->saveAll($entities);

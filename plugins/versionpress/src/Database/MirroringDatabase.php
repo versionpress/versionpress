@@ -42,6 +42,7 @@ class MirroringDatabase extends ExtendedWpdb {
         if (!$entityInfo) return $result;
 
         $entityName = $entityInfo->entityName;
+        $data = $this->replaceForeignKeysWithReferences($entityName, $data);
         $shouldBeSaved = $this->mirror->shouldBeSaved($entityName, $data);
 
         if (!$shouldBeSaved)
@@ -55,7 +56,6 @@ class MirroringDatabase extends ExtendedWpdb {
         $data[$this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName] = $id;
 
         $data = $this->fillId($entityName, $data, $id);
-        $data = $this->replaceForeignKeysWithReferences($entityName, $data);
         $this->mirror->save($entityName, $data);
 
         $this->insert_id = $id; // it was reset by saving id and references
@@ -96,18 +96,39 @@ class MirroringDatabase extends ExtendedWpdb {
                 $vpId = $this->getVpId($entityName, $id);
 
                 $data['vp_id'] = $vpId;
+                $data = $this->replaceForeignKeysWithReferences($entityName, $data);
+
                 $shouldBeSaved = $this->mirror->shouldBeSaved($entityName, $data);
                 if (!$shouldBeSaved) {
                     continue;
                 }
+
+                $savePostmeta = !$vpId && $entityName === 'post';
 
                 if (!$vpId) {
                     $data['vp_id'] = $this->generateId();
                     $this->saveId($entityName, $id, $data['vp_id']);
                 }
 
-                $data = $this->replaceForeignKeysWithReferences($entityName, $data);
                 $this->mirror->save($entityName, $data);
+
+                if (!$savePostmeta) {
+                    continue;
+                }
+
+                $postmeta = $this->get_results("SELECT meta_id, meta_key, meta_value FROM {$this->postmeta} WHERE post_id = {$id}", ARRAY_A);
+                foreach ($postmeta as $meta) {
+                    $meta['vp_post_id'] = $data['vp_id'];
+
+                    if (!$this->mirror->shouldBeSaved('postmeta', $meta)) {
+                        continue;
+                    }
+
+                    $meta['vp_id'] = $this->generateId();
+                    $this->saveId('postmeta', $meta['meta_id'], $meta['vp_id']);
+                    $this->mirror->save('postmeta', $meta);
+                }
+
             }
             return $result;
         }

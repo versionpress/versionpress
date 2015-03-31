@@ -11,7 +11,7 @@ class SynchronizationProcess {
      */
     private $synchronizerFactory;
 
-    private $defaultSynchronizationSequence = array('storages' => array('option', 'user', 'usermeta', 'post', 'postmeta', 'comment', 'term', 'term_taxonomy'));
+    private static $defaultSynchronizationSequence = array('storages' => array('option', 'user', 'usermeta', 'term', 'term_taxonomy', 'post', 'postmeta', 'comment'));
 
     function __construct(SynchronizerFactory $synchronizerFactory) {
         $this->synchronizerFactory = $synchronizerFactory;
@@ -28,7 +28,7 @@ class SynchronizationProcess {
         @set_time_limit(0); // intentionally @ - if it's disabled we can't do anything but try the synchronization
 
         if ($entitiesToSynchronize === null) {
-            $entitiesToSynchronize = $this->defaultSynchronizationSequence;
+            $entitiesToSynchronize = self::$defaultSynchronizationSequence;
         }
 
         $storageSynchronizationSequence = $this->sortStoragesToSynchronize($entitiesToSynchronize['storages']);
@@ -69,8 +69,8 @@ class SynchronizationProcess {
      * @param string[] $entitiesToSynchronize
      * @return string[]
      */
-    private function sortStoragesToSynchronize($entitiesToSynchronize) {
-        $defaultSynchronizationSequence = $this->defaultSynchronizationSequence;
+    public static function sortStoragesToSynchronize($entitiesToSynchronize) {
+        $defaultSynchronizationSequence = self::$defaultSynchronizationSequence['storages'];
         $entitiesToSynchronize = array_unique($entitiesToSynchronize);
 
         ArrayUtils::stablesort($entitiesToSynchronize, function ($entity1, $entity2) use ($defaultSynchronizationSequence) {
