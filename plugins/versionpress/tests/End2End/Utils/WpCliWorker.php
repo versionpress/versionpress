@@ -15,4 +15,14 @@ class WpCliWorker implements ITestWorker {
         $this->wpAutomation = new WpAutomation($testConfig->testSite);
         $this->testConfig = $testConfig;
     }
+
+    /**
+     * Returns relative path of given path to the WP site.
+     *
+     * @param $absolutePath
+     * @return string
+     */
+    protected function getRelativePath($absolutePath) {
+        return PathUtils::getRelativePath($this->testConfig->testSite->path, $absolutePath);
+    }
 }

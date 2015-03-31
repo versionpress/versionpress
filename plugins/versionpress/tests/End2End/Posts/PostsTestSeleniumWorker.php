@@ -2,6 +2,7 @@
 
 namespace VersionPress\Tests\End2End\Posts;
 
+use Nette\Utils\Random;
 use VersionPress\Tests\End2End\Utils\PostTypeTestSeleniumWorker;
 
 class PostsTestSeleniumWorker extends PostTypeTestSeleniumWorker {
@@ -17,7 +18,7 @@ class PostsTestSeleniumWorker extends PostTypeTestSeleniumWorker {
     }
 
     public function createTagInEditationForm() {
-        $this->byCssSelector('#new-tag-post_tag')->value('some-tag');
+        $this->byCssSelector('#new-tag-post_tag')->value(Random::generate());
         $this->jsClickAndWait('#post_tag .tagadd');
         $this->byCssSelector('form#post #publish')->click();
         $this->waitAfterRedirect();

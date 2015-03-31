@@ -101,6 +101,7 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
 
     public function prepare_previewUnsavedPost() {
         $this->url($this->getPostTypeScreenUrl());
+        $this->acceptAlert();
         $this->prepareTestPost();
     }
 
@@ -113,6 +114,33 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
         $this->window('');
     }
 
+    public function prepare_setFeaturedImageForUnsavedPost() {
+        $this->url($this->getPostTypeScreenUrl());
+        $this->byCssSelector('.edit-php #wpbody-content .wrap a.add-new-h2')->click();
+        $this->waitAfterRedirect();
+
+        $imagePath = PathUtils::getRelativePath(self::$testConfig->testSite->path, __DIR__ . '/../test-data/test.png');
+        self::$wpAutomation->importMedia($imagePath);
+    }
+
+    public function setFeaturedImageForUnsavedPost() {
+        $this->byCssSelector('#set-post-thumbnail')->click();
+        $this->waitForAjax();
+        $this->byCssSelector('.media-router .media-menu-item:nth-of-type(2)')->click();
+        $this->waitForAjax();
+        $this->byCssSelector('.thumbnail:first-of-type')->click();
+        $this->byCssSelector('a.media-button')->click();
+    }
+
+    public function prepare_makeDraftFromUnsavedPost() {
+    }
+
+    public function makeDraftFromUnsavedPost() {
+        $this->byCssSelector('form#post input#title')->value('Test ' . $this->getPostType() . ' with featured image');
+        $this->byCssSelector('button#content-tmce')->click(); // set focus somewhere outside the title
+        sleep(1);
+        $this->waitForAjax();
+    }
 
     /**
      * @return string

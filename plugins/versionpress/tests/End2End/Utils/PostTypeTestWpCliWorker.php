@@ -103,4 +103,18 @@ abstract class PostTypeTestWpCliWorker extends WpCliWorker implements IPostTypeT
 
     public function previewUnsavedPost() {
     }
+
+    public function prepare_setFeaturedImageForUnsavedPost() {
+        throw new \PHPUnit_Framework_SkippedTestError('Featured image cannot be assigned to unexisting post using WP-CLI');
+    }
+
+    public function setFeaturedImageForUnsavedPost() {
+    }
+
+    public function prepare_makeDraftFromUnsavedPost() {
+        throw new \PHPUnit_Framework_SkippedTestError('Featured image cannot be assigned to unexisting post using WP-CLI');
+    }
+
+    public function makeDraftFromUnsavedPost() {
+    }
 }

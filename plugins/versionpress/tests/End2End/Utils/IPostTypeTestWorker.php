@@ -38,4 +38,10 @@ interface IPostTypeTestWorker extends ITestWorker {
 
     public function prepare_createTagInEditationForm();
     public function createTagInEditationForm();
+
+    public function prepare_setFeaturedImageForUnsavedPost();
+    public function setFeaturedImageForUnsavedPost();
+
+    public function prepare_makeDraftFromUnsavedPost();
+    public function makeDraftFromUnsavedPost();
 }

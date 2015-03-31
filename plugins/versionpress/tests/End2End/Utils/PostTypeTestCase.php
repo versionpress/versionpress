@@ -163,6 +163,34 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         DBAsserter::assertFilesEqualDatabase();
     }
 
+    public function runSetFeaturedImageForUnsavedPostTest() {
+        self::$worker->prepare_setFeaturedImageForUnsavedPost();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->setFeaturedImageForUnsavedPost();
+
+        $commitAsserter->assertNumCommits(0);
+        $commitAsserter->assertCleanWorkingDirectory();
+        // In this case we dont want to check the integrity with database. There is one extra postmeta in the database
+        // representing the relation to the featured image.
+    }
+
+
+    public function runMakeDraftFromUnsavedPostWithFeaturedImageTest() {
+        self::$worker->prepare_makeDraftFromUnsavedPost();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->makeDraftFromUnsavedPost();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('post/draft');
+        $commitAsserter->assertCommitAction('postmeta/create', 0, true);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
     private function getPostType() {
         return self::$worker->getPostType();
     }
