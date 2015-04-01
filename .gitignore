@@ -1,6 +1,9 @@
 # IDEA project files
 /.idea/workspace.xml
 /.idea/tasks.xml
+/.idea/deployment.xml
+/.idea/jsLibraryMappings.xml
+/.idea/watcherTasks.xml
 
 # Build dirs
 /build

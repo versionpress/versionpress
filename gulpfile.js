@@ -243,9 +243,21 @@ gulp.task('composer-install-versionpress-libs', function() {
 });
 
 /**
+ * Inits projects settings files from templates.
+ */
+gulp.task('init-project-settings-files', function() {
+    return gulp.src('./.idea/*.tpl.xml')
+            .pipe(rename(function(path) {
+                var len = path.basename.length;
+                path.basename = path.basename.substr(0, len-8) + path.basename.substr(len-4); // cut '.tpl' from the filename
+            }))
+            .pipe(gulp.dest('./.idea'));
+});
+
+/**
  * Sets git to be case sensitive.
  */
-gulp.task('git-config', ['composer-install-ext-libs', 'composer-install-versionpress-libs'], function(cb) {
+gulp.task('git-config', ['composer-install-ext-libs', 'composer-install-versionpress-libs', 'init-project-settings-files'], function(cb) {
     return git.exec({args: 'config core.ignorecase false'}, function (err, stdout) {
         if(err) { console.log(err); }
         cb();
