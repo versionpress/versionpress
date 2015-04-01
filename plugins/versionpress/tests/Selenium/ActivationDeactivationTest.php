@@ -3,6 +3,7 @@ namespace VersionPress\Tests\Selenium;
 
 use Exception;
 use VersionPress\Initialization\InitializationConfig;
+use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Tests\Utils\TestRunnerOptions;
 
 /**
@@ -82,7 +83,13 @@ class ActivationDeactivationTest extends SeleniumTestCase {
         $this->waitForElement('#versionpress-commits-table', InitializationConfig::REDIRECT_AFTER_MS + 3000);
     }
 
-
+    /**
+     * @test
+     * @depends successfulActivationRedirectsToMainVersionPressTable
+     */
+    public function afterDeactivationTheFilesystemMatchDatabase() {
+        DBAsserter::assertFilesEqualDatabase();
+    }
 
     //----------------------------
     // Deactivation
