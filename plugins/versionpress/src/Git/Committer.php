@@ -77,6 +77,7 @@ class Committer
             $this->postponeChangeInfo($changeInfoList);
             $this->commitPostponed = false;
             $this->postponeKey = null;
+            $this->mirror->flushChangeList();
             return;
         }
 
