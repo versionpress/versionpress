@@ -42,3 +42,10 @@ Plugins that are known to cause serious issues:
 ### Jetpack
 
 Jetpack is actually a collection of plugins, most of which work fine. Some sub-plugins are of category 2 above, i.e., the actions are technically tracked but the descriptions could be improved.
+
+<div class="warning">
+  <strong>Jetpack 3.4 and security reports</strong>
+  <p>JetPack 3.4 introduced a new <a href="http://jetpack.me/2015/03/17/jetpack-3-4-protect-secure-and-simplify/">security feature</a> that sends report every 15 minutes and writes the timestamp in the database, **even if the "Protect" module is disabled**. This means that VersionPress will create a meaningless commit every 15 minutes which is undesirable. The current solution is to manually update the code in <code><a href="http://jetpack.wp-a2z.org/oik_api/jetpackperform_security_reporting/">Jetpack::perform_security_reporting()</a></code> to either disable the functionality or to prolong the period, e.g. to <code>1 * DAY_IN_SECONDS</code>. We will have a fix in a future VersionPress update.</p>
+</div>
+
+
