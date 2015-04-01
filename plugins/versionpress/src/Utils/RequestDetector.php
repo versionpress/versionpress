@@ -85,7 +85,7 @@ class RequestDetector {
 
     public function getThemeStylesheets() {
         if (!$this->isWpCli) {
-            return $_GET['stylesheet'];
+            return array($_GET['stylesheet']);
         }
 
         return array_slice($this->wpCliArguments, 2); // theme delete <stylesheet>
