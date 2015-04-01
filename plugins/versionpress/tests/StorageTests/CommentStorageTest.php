@@ -4,6 +4,7 @@ namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\EntityInfo;
 use VersionPress\Storages\CommentStorage;
+use VersionPress\Tests\End2End\Utils\AnonymousObject;
 use VersionPress\Utils\FileSystem;
 
 class CommentStorageTest extends \PHPUnit_Framework_TestCase {
@@ -58,23 +59,12 @@ class CommentStorageTest extends \PHPUnit_Framework_TestCase {
             )
         ));
         mkdir(__DIR__ . '/comments');
-        $this->storage = new CommentStorage(__DIR__ . '/comments', $entityInfo);
+        $wpdbFake = new AnonymousObject(array('prefix' => '', 'get_row' => function () { return new AnonymousObject(array('post_title' => '')); }));
+        $this->storage = new CommentStorage(__DIR__ . '/comments', $entityInfo, $wpdbFake);
     }
 
     protected function tearDown() {
         parent::tearDown();
         FileSystem::remove(__DIR__ . '/comments');
-    }
-}
-
-global $wpdb;
-$wpdb = new wpdbFake;
-
-class wpdbFake {
-    public $prefix;
-    function get_row() {
-        $fakePost = new \stdClass();
-        $fakePost->post_title = "";
-        return $fakePost;
     }
 }
