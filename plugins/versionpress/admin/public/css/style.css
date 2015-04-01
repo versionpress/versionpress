@@ -109,3 +109,12 @@ h2.vp-deactivation-header {
 
 .deactivation-buttons .cancel-deactivation {
 }
+
+.undo-warning {
+    padding-left: 24px;
+}
+
+.undo-warning .icon {
+    position: absolute;
+    margin: 3px 0 0 -24px;
+}
