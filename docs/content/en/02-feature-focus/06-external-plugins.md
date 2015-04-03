@@ -32,9 +32,12 @@ Plugins that are known to work fine, or very close to that, are:
 
 ## Unsupported plugins 
 
-Plugins that are known to cause serious issues:
+Plugins that are known to cause issues:
 
- - (We will update this section based on user reports)
+ - [ACF](http://www.advancedcustomfields.com/)
+     - ACF is a popular plugin to manage custom post types and field, and while we support custom post types and fields, ACF does some work on top of that that currently causes VersionPress issues. We will be adding support for this popular plugin in a future update.
+
+Note: the list above is not complete.
 
 
 ## Partially supported plugins

@@ -38,6 +38,13 @@ to see the list of all VersionPress commands available.
 <dt>vp clone</dt>
 <dd>Clones site to a new folder, database and Git branch. See [Cloning a site](../sync/cloning).</dd>
 
+<dt>vp undo &lt;commit></dt>
+<dd>Undos a commit</dd>
+
+<dt>vp rollback &lt;commit></dt>
+<dd>Reverts the site to a previous state</dd>
+
+
 </dl>
 
 

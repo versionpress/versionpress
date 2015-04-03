@@ -45,7 +45,9 @@ The biggest added value of VersionPress is in *database change tracking*. This s
 
 #### Posts
 
-*Posts* are the main pieces of content in WordPress which includes both posts and pages by default but also some other post types as well. 
+*Posts* are the main pieces of content in WordPress which includes both posts and pages by default but also some other post types as well.
+
+**Custom post types and fields** are generally supported, however, some of the external plugins around that functionality like [ACF](http://www.advancedcustomfields.com/) because they do additional stuff on top of just managing custom types and fields. We will be adding support for such plugins in some future update.
 
 Tracked actions:
 
@@ -60,9 +62,10 @@ Tracked actions:
 
 Special treatment:
 
- * We don't track "revisions" in the WordPress sense, i.e. posts of a special type `revision`. Git versions are our "revisions".
- * Drafts are treated specially because WordPress updates them quite often (easily after every keystroke when typing a title). VersionPress ignores most of such attempts to create new "versions" and only stores a new revision when the draft is saved or eventually published as a full post.
- * Attachments are special types of posts too. VersionPress tracks both the database change related to these post types as well as files created on the disk.
+ * We don't track WordPress **revisions**, i.e., posts of a type `revision`. Git versions are our revisions – more powerful, space efficient etc.
+ * **Drafts** are treated specially because WordPress updates them unnecessarily often. VersionPress ignores most of the internal updates and only stores a new revisions when a draft is saved or eventually published as a full post.
+     * (In more detail, the draft is first stored by VersionPress when the post state changes from `auto-draft` to `draft`. This happens either after title is filled in and the field loses focus, or after a couple of seconds timeout. The next revision of that draft is then created every time the user clicks *Save draft*, or, eventually, when he/she publishes the post. New revision is *not* created when the user clicks *Preview*.)  
+ * **Attachments** are special types of posts too. VersionPress tracks both the database change related to these post types as well as files created on the disk.
 
 ##### Postmeta
 
