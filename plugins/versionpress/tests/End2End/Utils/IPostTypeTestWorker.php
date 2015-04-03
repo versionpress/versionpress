@@ -27,6 +27,8 @@ interface IPostTypeTestWorker extends ITestWorker {
 
     public function prepare_previewDraft();
     public function previewDraft();
+    public function cleanup_previewDraft();
+
 
     public function prepare_publishDraft();
     public function publishDraft();
@@ -44,4 +46,5 @@ interface IPostTypeTestWorker extends ITestWorker {
 
     public function prepare_makeDraftFromUnsavedPost();
     public function makeDraftFromUnsavedPost();
+
 }

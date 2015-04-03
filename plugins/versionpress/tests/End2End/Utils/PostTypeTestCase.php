@@ -132,6 +132,8 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         // This time we DO NOT want to assert that files equal database. It's because previewing
         // the post updates `post_date` and similar fields in the database while we don't want
         // to create a commit just to update that (seems more like a strange behavior of WP than anything else).
+        // Plus we have to call a clean-up method that saves the draft because of the integrity for subsequent tests.
+        self::$worker->cleanup_previewDraft();
     }
 
     public function runPreviewUnsavedPostTest() {
@@ -173,7 +175,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertNumCommits(0);
         $commitAsserter->assertCleanWorkingDirectory();
         // In this case we dont want to check the integrity with database. There is one extra postmeta in the database
-        // representing the relation to the featured image.
+        // representing the relation to the featured image. It will be saved in the following test.
     }
 
 

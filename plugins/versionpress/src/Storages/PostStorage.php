@@ -8,6 +8,9 @@ use VersionPress\Utils\EntityUtils;
 
 class PostStorage extends DirectoryStorage {
 
+    /** @var bool[] */
+    private $existenceCache = array();
+
     function __construct($directory, $entityInfo) {
         parent::__construct($directory, $entityInfo);
         $this->addFilter(new AbsoluteUrlFilter());
@@ -22,7 +25,7 @@ class PostStorage extends DirectoryStorage {
         if (isset($data['post_status']) && ($data['post_status'] === 'auto-draft'))
             return false;
 
-        $isExistingEntity = isset($data['vp_id']) && $this->exists($data['vp_id']);
+        $isExistingEntity = $this->entityExistedBeforeThisRequest($data);
 
         // Don't save revisions and drafts
         if ($isExistingEntity && isset($_POST['wp-preview']) && $_POST['wp-preview'] === 'dopreview') // ignore saving draft on preview
@@ -31,10 +34,7 @@ class PostStorage extends DirectoryStorage {
         if ($isExistingEntity && isset($data['post_status']) && ($data['post_status'] === 'draft' && defined('DOING_AJAX') && DOING_AJAX === true)) // ignoring ajax autosaves
             return false;
 
-        if (!$isExistingEntity && !isset($data['post_type']))
-            return false;
-
-        if (!$isExistingEntity && $data['post_type'] === 'attachment' && !isset($data['post_title']))
+        if (!$isExistingEntity && isset($data['post_type']) && $data['post_type'] === 'attachment' && !isset($data['post_title']))
             return false;
 
         return true;
@@ -72,5 +72,18 @@ class PostStorage extends DirectoryStorage {
         $type = $newEntity['post_type'];
 
         return new PostChangeInfo($action, $newEntity['vp_id'], $type, $title, array_keys($diff));
+    }
+
+    private function entityExistedBeforeThisRequest($data) {
+        if (!isset($data['vp_id'])) {
+            return false;
+        }
+
+        $id = $data['vp_id'];
+        if (!isset($this->existenceCache[$id])) {
+            $this->existenceCache[$id] = $this->exists($id);
+        }
+
+        return $this->existenceCache[$id];
     }
 }

@@ -88,22 +88,21 @@ class PostsTest extends PostTypeTestCase {
 
     /**
      * @test
-     * @testdox Previewing unsaved post creates a draft
-     *
-     */
-    public function previewingUnsavedPostCreatesDraft() {
-        $this->markTestSkipped('Temporarily skipped');
-        $this->runPreviewUnsavedPostTest();
-    }
-
-    /**
-     * @test
      * @testdox Publishing draft creates 'post/publish' action
      *
      * @depends creatingDraftCreatesPostDraftAction
      */
     public function publishingDraftCreatesPostPublishAction() {
         $this->runPublishDraftTest();
+    }
+
+    /**
+     * @test
+     * @testdox Previewing unsaved post creates a draft
+     *
+     */
+    public function previewingUnsavedPostCreatesDraft() {
+        $this->runPreviewUnsavedPostTest();
     }
 
     /**

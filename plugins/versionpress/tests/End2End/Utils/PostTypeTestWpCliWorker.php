@@ -84,6 +84,9 @@ abstract class PostTypeTestWpCliWorker extends WpCliWorker implements IPostTypeT
     public function previewDraft() {
     }
 
+    public function cleanup_previewDraft() {
+    }
+
     public function prepare_publishDraft() {
     }
 
