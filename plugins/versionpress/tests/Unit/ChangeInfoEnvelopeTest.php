@@ -71,7 +71,7 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase {
         $wordPressUpdateChangeInfo2 = new WordPressUpdateChangeInfo("4.1");
 
         $normalPriorityPostChangeInfo1 = new PostChangeInfo("edit", "postChangeInfo1VPID", "post", "Test title 1");
-        $normalPriorityPostChangeInfo2 = new PostChangeInfo("delete", "postChangeInfo2VPID", "post", "Test title 2");
+        $normalPriorityPostChangeInfo2 = new PostChangeInfo("edit", "postChangeInfo2VPID", "post", "Test title 2");
 
         return array(
             array(
