@@ -75,9 +75,17 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
     }
 
     public function prepare_unapproveComment() {
-        $comments = $this->wpAutomation->getComments();
-        $lastComment = end($comments);
-        $this->lastCreatedComment = $lastComment->comment_ID;
+        $author = $this->testConfig->testSite->adminName;
+        $email = $this->testConfig->testSite->adminEmail;
+        $comment = array(
+            'comment_author' => $author,
+            'comment_author_email' => $email,
+            'comment_content' => 'Comment by ' . $author,
+            'user_id' => 1,
+            'comment_post_ID' => $this->testPostId
+        );
+
+        $this->lastCreatedComment = $this->wpAutomation->createComment($comment);
     }
 
     public function unapproveComment() {
