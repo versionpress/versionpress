@@ -122,7 +122,9 @@ class CommentSynchronizerTest extends SynchronizerTestCase {
 
         $comment = EntityUtils::prepareComment(null, self::$postVpId, self::$authorVpId);
         self::$vpId = $comment['vp_id'];
-        $this->storage->save($comment);
+        /** @noinspection PhpUsageOfSilenceOperatorInspection The SQL query does not return a post because the storage
+         * is not yet synchronized. It's OK in this case. */
+        @$this->storage->save($comment);
 
         return array(
             array('vp_id' => self::$authorVpId, 'parent' => self::$authorVpId),
