@@ -123,6 +123,10 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
         $this->url($this->getPostTypeScreenUrl());
         $this->byCssSelector('.edit-php #wpbody-content .wrap a.add-new-h2')->click();
         $this->waitAfterRedirect();
+        $attachments = json_decode(self::$wpAutomation->runWpCliCommand('post', 'list', array('post_type' => 'attachment', 'format' => 'json')));
+        if (count($attachments) > 0) {
+            return;
+        }
 
         $imagePath = PathUtils::getRelativePath(self::$testConfig->testSite->path, __DIR__ . '/../test-data/test.png');
         self::$wpAutomation->importMedia($imagePath);

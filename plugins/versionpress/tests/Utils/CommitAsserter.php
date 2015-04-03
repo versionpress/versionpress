@@ -210,6 +210,19 @@ class CommitAsserter {
     }
 
     /**
+     * Calls {@link assertCommitPath} for every item of given array.
+     * The first item in the nested array equals the type of change, the second one is the changed path.
+     *
+     * @param $changes
+     * @param int $whichCommit See $whichCommitParameter documentation. "HEAD" by default.
+     */
+    public function assertCommitPaths($changes, $whichCommit = 0) {
+        foreach ($changes as $change) {
+            $this->assertCommitPath($change[0], $change[1], $whichCommit);
+        }
+    }
+
+    /**
      * Asserts that commit affected exact number of files (no matter the type).
      *
      * @param int $count Expected count of affected files.
@@ -348,5 +361,4 @@ class CommitAsserter {
 
         return $path;
     }
-
 }

@@ -19,6 +19,7 @@ class RevertTestWpCliWorker extends WpCliWorker implements IRevertTestWorker {
 
     public function prepare_undoLastCommit() {
         $this->createTestPost();
+        return array(array('D', '%vpdb%/posts/*'));
     }
 
     public function undoLastCommit() {
@@ -31,6 +32,7 @@ class RevertTestWpCliWorker extends WpCliWorker implements IRevertTestWorker {
     public function prepare_undoSecondCommit() {
         $this->wpAutomation->editOption('blogname', 'Random blogname for undo test ' . Random::generate());
         $this->createTestPost();
+        return array(array('M', '%vpdb%/options.ini'));
     }
 
     public function undoSecondCommit() {
@@ -41,6 +43,7 @@ class RevertTestWpCliWorker extends WpCliWorker implements IRevertTestWorker {
 
     public function prepare_undoRevertedCommit() {
         $this->createTestPost();
+        return array(array('A', '%vpdb%/posts/*'));
     }
 
     public function prepare_tryRestoreEntityWithMissingReference() {
@@ -60,6 +63,11 @@ class RevertTestWpCliWorker extends WpCliWorker implements IRevertTestWorker {
         $postId = $this->createTestPost();
         $this->createCommentForPost($postId);
         $this->wpAutomation->editOption('blogname', 'Random blogname for rollback test ' . Random::generate());
+        return array(
+            array('D', '%vpdb%/posts/*'),
+            array('D', '%vpdb%/comments/*'),
+            array('M', '%vpdb%/options.ini'),
+        );
     }
 
     public function rollbackMoreChanges() {

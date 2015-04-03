@@ -9,6 +9,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
     public function prepare_undoLastCommit() {
         $this->createTestPost();
         $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
+        return array(array('D', '%vpdb%/posts/*'));
     }
 
     public function undoLastCommit() {
@@ -19,6 +20,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         self::$wpAutomation->editOption('blogname', 'Blogname for undo test');
         $this->createTestPost();
         $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
+        return array(array('M', '%vpdb%/options.ini'));
     }
 
     public function undoSecondCommit() {
@@ -28,6 +30,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
     public function prepare_undoRevertedCommit() {
         $this->createTestPost();
         $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
+        return array(array('A', '%vpdb%/posts/*'));
     }
 
     public function prepare_tryRestoreEntityWithMissingReference() {
@@ -48,6 +51,11 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         $this->createCommentForPost($postId);
         self::$wpAutomation->editOption('blogname', 'Blogname for rollback test');
         $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
+        return array(
+            array('D', '%vpdb%/posts/*'),
+            array('D', '%vpdb%/comments/*'),
+            array('M', '%vpdb%/options.ini'),
+        );
     }
 
     public function rollbackMoreChanges() {

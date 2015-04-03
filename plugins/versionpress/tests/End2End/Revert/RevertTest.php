@@ -16,7 +16,7 @@ class RevertTest extends End2EndTestCase {
      * @testdox Undo reverts changes in given commit
      */
     public function undoRevertChangesInGivenCommit() {
-        self::$worker->prepare_undoLastCommit();
+        $changes = self::$worker->prepare_undoLastCommit();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
@@ -24,8 +24,8 @@ class RevertTest extends End2EndTestCase {
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction('versionpress/undo');
-        $commitAsserter->assertCountOfAffectedFiles(1);
-        $commitAsserter->assertCommitPath('D', '%vpdb%/posts/*');
+        $commitAsserter->assertCountOfAffectedFiles(count($changes));
+        $commitAsserter->assertCommitPaths($changes);
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -35,15 +35,15 @@ class RevertTest extends End2EndTestCase {
      * @testdox Undo reverts only one commit
      */
     public function undoRevertsOnlyOneCommit() {
-        self::$worker->prepare_undoSecondCommit();
+        $changes = self::$worker->prepare_undoSecondCommit();
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         self::$worker->undoSecondCommit();
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction('versionpress/undo');
-        $commitAsserter->assertCountOfAffectedFiles(1);
-        $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
+        $commitAsserter->assertCountOfAffectedFiles(count($changes));
+        $commitAsserter->assertCommitPaths($changes);
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -53,7 +53,7 @@ class RevertTest extends End2EndTestCase {
      * @testdox Undo commit can be also reverted.
      */
     public function undoCommitCanBeAlsoReverted() {
-        self::$worker->prepare_undoRevertedCommit();
+        $changes = self::$worker->prepare_undoRevertedCommit();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
@@ -62,8 +62,8 @@ class RevertTest extends End2EndTestCase {
 
         $commitAsserter->assertNumCommits(2);
         $commitAsserter->assertCommitAction('versionpress/undo');
-        $commitAsserter->assertCountOfAffectedFiles(1);
-        $commitAsserter->assertCommitPath('A', '%vpdb%/posts/*');
+        $commitAsserter->assertCountOfAffectedFiles(count($changes));
+        $commitAsserter->assertCommitPaths($changes);
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -88,17 +88,15 @@ class RevertTest extends End2EndTestCase {
      * @testdox Rollback reverts all changes made after chosen commit
      */
     public function rollbackRevertsAllChangesMadeAfterChosenCommit() {
-        self::$worker->prepare_rollbackMoreChanges();
+        $changes = self::$worker->prepare_rollbackMoreChanges();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         self::$worker->rollbackMoreChanges();
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction('versionpress/rollback');
-        $commitAsserter->assertCountOfAffectedFiles(3);
-        $commitAsserter->assertCommitPath('D', '%vpdb%/posts/*');
-        $commitAsserter->assertCommitPath('D', '%vpdb%/comments/*');
-        $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
+        $commitAsserter->assertCountOfAffectedFiles(count($changes));
+        $commitAsserter->assertCommitPaths($changes);
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
