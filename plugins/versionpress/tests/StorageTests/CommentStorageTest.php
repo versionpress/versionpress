@@ -58,6 +58,9 @@ class CommentStorageTest extends \PHPUnit_Framework_TestCase {
                 )
             )
         ));
+        if (file_exists(__DIR__ . '/comments')) {
+            FileSystem::remove(__DIR__ . '/comments');
+        }
         mkdir(__DIR__ . '/comments');
         $wpdbFake = new AnonymousObject(array('prefix' => '', 'get_row' => function () { return new AnonymousObject(array('post_title' => '')); }));
         $this->storage = new CommentStorage(__DIR__ . '/comments', $entityInfo, $wpdbFake);
