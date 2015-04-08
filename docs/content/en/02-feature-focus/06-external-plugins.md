@@ -28,16 +28,16 @@ Plugins that are known to work fine, or very close to that, are:
  - All plugins that don't manipulate the database
  - Hello Dolly :-)
  - Akismet
+ - ACF
 
 
 ## Unsupported plugins 
 
-Plugins that are known to cause issues:
+This (incomplete!) section lists plugins that are known to cause issues.
 
- - [ACF](http://www.advancedcustomfields.com/)
-     - ACF is a popular plugin to manage custom post types and field, and while we support custom post types and fields, ACF does some work on top of that that currently causes VersionPress issues. We will be adding support for this popular plugin in a future update.
+### W3 Total Cache (and other caching plugins)
 
-Note: the list above is not complete.
+VersionPress currently uses the `wp-content/db.php` file to hook into some WordPress actions for the lack of better extensibility points (see [WP issue #29710](https://core.trac.wordpress.org/ticket/29710) and [this suggestion](https://wordpress.org/ideas/topic/multiple-dbphp-files-for-plugins)). This means that VersionPress will conflict with other plugins that want to use db.php which is the case of W3 Total Cache and possibly other caching plugins. We will work with the WordPress community to resolve this.
 
 
 ## Partially supported plugins
