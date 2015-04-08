@@ -48,6 +48,13 @@ WordPress db schema doesn't store foreign keys so we need to. An entity can have
 
 VersionPress knows what ID to be looking for in the foreign entity name because it is also described somewhere in the schema.
 
+When the reference to entity depends on another column value, use value-reference. It is neccessary to specify column where is the dependency (source column), 
+column where is the foreign id itself (value column) and all possibilities of foreign entity names depending on values in source column. 
+
+    value-references:
+        <source_column_name>@<value_column_name>:
+            <source_column_value>: <foreign_entity_name>
+
 Another type of references are the M:N references. Sometimes (for example between posts and term_taxonomies) we need to describe
 an M:N relationship (junction table in the SQL). To do that we can use this format
 
