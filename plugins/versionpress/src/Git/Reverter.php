@@ -12,6 +12,7 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\ArrayUtils;
+use VersionPress\Utils\ReferenceUtils;
 use wpdb;
 
 class Reverter {
@@ -182,6 +183,17 @@ class Reverter {
             }
         }
 
+        foreach ($entityInfo->valueReferences as $reference => $referencedEntityName) {
+            list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
+            if (!isset($entity[$sourceColumn]) || $entity[$sourceColumn] != $sourceValue || !isset($entity[$valueColumn])) {
+                continue;
+            }
+
+            $entityExists = $this->storageFactory->getStorage($referencedEntityName)->exists($entity[$valueColumn], $parentId);
+            if (!$entityExists) {
+                return false;
+            }
+        }
 
         return true;
     }
@@ -200,8 +212,9 @@ class Reverter {
             $otherEntityInfo = $this->dbSchemaInfo->getEntityInfo($otherEntityName);
             $otherEntityReferences = $otherEntityInfo->references;
             $otherEntityMnReferences = $otherEntityInfo->mnReferences;
+            $otherEntityValueReferences = $otherEntityInfo->valueReferences;
 
-            $allReferences = array_merge($otherEntityReferences, $otherEntityMnReferences);
+            $allReferences = array_merge($otherEntityReferences, $otherEntityMnReferences, $otherEntityValueReferences);
 
             $reference = array_search($entityName, $allReferences);
 
@@ -220,10 +233,18 @@ class Reverter {
                         return true;
                     }
                 }
-            } else { // M:N reference
+            } elseif (isset($otherEntityMnReferences[$reference])) { // M:N reference
                 $vpReference = "vp_$otherEntityName";
                 foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
                     if (isset($possiblyReferencingEntity[$vpReference]) && array_search($entityId, $possiblyReferencingEntity[$vpReference]) !== false) {
+                        return true;
+                    }
+                }
+            } elseif (isset($otherEntityValueReferences[$reference])) { // Value reference
+                list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
+
+                foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
+                    if (isset($possiblyReferencingEntity[$sourceColumn]) && $possiblyReferencingEntity[$sourceColumn] == $sourceValue && isset($possiblyReferencingEntity[$valueColumn]) && $possiblyReferencingEntity[$valueColumn] === $entityId) {
                         return true;
                     }
                 }

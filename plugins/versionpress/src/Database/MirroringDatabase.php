@@ -5,6 +5,7 @@ use Nette\Utils\Arrays;
 use VersionPress\Storages\Mirror;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\IdUtil;
+use VersionPress\Utils\ReferenceUtils;
 
 /**
  * Mirroring database sends every change in DB (insert, update, delete) to file mirror
@@ -267,10 +268,10 @@ class MirroringDatabase extends ExtendedWpdb {
     }
 
     private function replaceForeignKeysWithReferences($entityName, $entity) {
-        $references = $this->dbSchemaInfo->getEntityInfo($entityName)->references;
+        $entityInfo = $this->dbSchemaInfo->getEntityInfo($entityName);
         $vpIdTable = $this->dbSchemaInfo->getPrefixedTableName('vp_id');
 
-        foreach ($references as $referenceName => $targetEntity) {
+        foreach ($entityInfo->references as $referenceName => $targetEntity) {
             $targetTable = $this->dbSchemaInfo->getEntityInfo($targetEntity)->tableName;
 
             if (isset($entity[$referenceName]) && $entity[$referenceName] > 0) {
@@ -279,6 +280,16 @@ class MirroringDatabase extends ExtendedWpdb {
             }
 
             unset($entity[$referenceName]);
+        }
+
+        foreach ($entityInfo->valueReferences as $referenceName => $targetEntity) {
+            $targetTable = $this->dbSchemaInfo->getEntityInfo($targetEntity)->tableName;
+            list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
+
+            if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn]) && $entity[$valueColumn] > 0) {
+                $referenceVpId = $this->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=".$entity[$valueColumn]);
+                $entity[$valueColumn] = $referenceVpId;
+            }
         }
 
         return $entity;

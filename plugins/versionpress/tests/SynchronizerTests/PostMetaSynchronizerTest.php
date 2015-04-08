@@ -27,6 +27,7 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase {
     private $userSynchronizer;
     private static $authorVpId;
     private static $postVpId;
+    private static $post2VpId;
     private static $vpId;
 
     protected function setUp() {
@@ -118,19 +119,29 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase {
         self::$postVpId = $post['vp_id'];
         $this->postStorage->save($post);
 
-        $postmeta = EntityUtils::preparePostMeta(null, self::$postVpId, 'some-meta', 'some value');
+        $post2 = EntityUtils::preparePost(null, self::$authorVpId);
+        self::$post2VpId = $post2['vp_id'];
+        $this->postStorage->save($post2);
+
+        /**
+         * This postmeta has a value reference to another post.
+         * @see wordpress-schema.neon
+         * @var array
+         */
+        $postmeta = EntityUtils::preparePostMeta(null, self::$postVpId, '_thumbnail_id', self::$post2VpId);
         self::$vpId = $postmeta['vp_id'];
         $this->storage->save($postmeta);
 
         return array(
             array('vp_id' => self::$authorVpId, 'parent' => self::$authorVpId),
             array('vp_id' => self::$postVpId, 'parent' => self::$postVpId),
+            array('vp_id' => self::$post2VpId, 'parent' => self::$post2VpId),
             array('vp_id' => self::$vpId, 'parent' => self::$postVpId),
         );
     }
 
     private function editPostMeta() {
-        $this->storage->save(EntityUtils::preparePostMeta(self::$vpId, self::$postVpId, 'some-meta', 'another value'));
+        $this->storage->save(EntityUtils::preparePostMeta(self::$vpId, self::$postVpId, '_thumbnail_id', self::$postVpId));
         return array(
             array('vp_id' => self::$vpId, 'parent' => self::$postVpId),
         );
@@ -139,11 +150,13 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase {
     private function deletePostMeta() {
         $this->storage->delete(EntityUtils::preparePostMeta(self::$vpId, self::$postVpId));
         $this->postStorage->delete(EntityUtils::preparePost(self::$postVpId));
+        $this->postStorage->delete(EntityUtils::preparePost(self::$post2VpId));
         $this->userStorage->delete(EntityUtils::prepareUser(self::$authorVpId));
 
         return array(
             array('vp_id' => self::$authorVpId, 'parent' => self::$authorVpId),
             array('vp_id' => self::$postVpId, 'parent' => self::$postVpId),
+            array('vp_id' => self::$post2VpId, 'parent' => self::$post2VpId),
             array('vp_id' => self::$vpId, 'parent' => self::$postVpId),
         );
     }

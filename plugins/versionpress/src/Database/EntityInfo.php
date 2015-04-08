@@ -100,6 +100,19 @@ class EntityInfo {
     public $mnReferences = array();
 
     /**
+     * The same as $references, only for dependent columns.
+     * The key consists of name of column, where reference source is stored with its value and column, where is name of referenced entities.
+     *
+     *     array(
+     *       'meta_key=_thumbnail_id@meta_value' => 'post',
+     *       'meta_key=menu_object_item_id@meta_value' => 'post',
+     *     )
+     *
+     * @var array
+     */
+    public $valueReferences = array();
+
+    /**
      * True if entity has references. Basically returns count($references) > 0.
      *
      * @var bool
@@ -157,6 +170,17 @@ class EntityInfo {
                     $this->virtualReferences[$reference] = true;
                 }
                 $this->mnReferences[$reference] = $targetEntity;
+            }
+            $this->hasReferences = true;
+        }
+
+        if (isset($schemaInfo['value-references'])) {
+            foreach ($schemaInfo['value-references'] as $key => $references) {
+                list($keyCol, $valueCol) = explode('@', $key);
+                foreach($references as $reference => $targetEntity) {
+                    $key = $keyCol . '=' . $reference . '@' . $valueCol;
+                    $this->valueReferences[$key] = $targetEntity;
+                }
             }
             $this->hasReferences = true;
         }

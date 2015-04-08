@@ -303,6 +303,7 @@ abstract class SynchronizerBase implements Synchronizer {
 
         foreach ($entities as $entity) {
             $this->fixSimpleReferencesOfOneEntity($entity);
+            $this->fixValueReferencesOfOneEntity($entity);
         }
     }
 
@@ -320,6 +321,45 @@ abstract class SynchronizerBase implements Synchronizer {
             $vpReference = "vp_$reference";
             if (isset($entity[$vpReference])) {
                 $referencesToUpdate[$reference] = $entity[$vpReference];
+            }
+        }
+
+        if (count($referencesToUpdate) === 0) {
+            return;
+        }
+
+        $idMap = $this->getIdsForVpIds($referencesToUpdate);
+
+        $entityTable = $this->dbSchema->getPrefixedTableName($this->entityName);
+        $vpIdTable = $this->dbSchema->getPrefixedTableName('vp_id');
+        $idColumnName = $entityInfo->idColumnName;
+
+        $updateSql = "UPDATE $entityTable SET ";
+
+        $newReferences = array_map(function ($vpId) use ($idMap) {
+            return $idMap[$vpId];
+        }, $referencesToUpdate);
+        $updateSql .= join(", ", ArrayUtils::parametrize($newReferences));
+
+        $updateSql .= " WHERE $idColumnName=(SELECT id FROM $vpIdTable WHERE vp_id=UNHEX(\"$entity[vp_id]\"))";
+        $this->database->query($updateSql);
+    }
+
+    /**
+     * Fixes value references
+     *
+     * @param $entity
+     */
+    private function fixValueReferencesOfOneEntity($entity) {
+        $entityInfo = $this->dbSchema->getEntityInfo($this->entityName);
+        $references = $entityInfo->valueReferences;
+
+        $referencesToUpdate = array();
+        foreach ($references as $reference => $referencedEntity) {
+            list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
+
+            if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn])) {
+                $referencesToUpdate[$valueColumn] = $entity[$valueColumn];
             }
         }
 

@@ -11,6 +11,10 @@ postmeta:
     id: meta_id
     references:
         post_id: post
+    value-references:
+        meta_key@meta_value:
+            _thumbnail_id: post
+            _menu_item_object_id: post
 
 comment:
     table: comments

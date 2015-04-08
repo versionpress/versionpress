@@ -28,6 +28,23 @@ class ReferenceUtils {
     }
 
     /**
+     * Returns parsed info about the value reference.
+     *
+     * @param string $reference
+     * @return array The details has keys 'source-column', 'source-value', 'value-column'
+     */
+    public static function getValueReferenceDetails($reference) {
+        list($keyCol, $valueColumn) = explode("@", $reference);
+        list($sourceColumn, $sourceValue) = explode("=", $keyCol);
+
+        return array(
+            'source-column' => $sourceColumn,
+            'source-value'  => $sourceValue,
+            'value-column' => $valueColumn,
+        );
+    }
+
+    /**
      * Returns name of column referencing synchronized entity in the junction table.
      * Example:
      * We are synchronizing posts with M:N reference to the taxonomies. The reference is defined

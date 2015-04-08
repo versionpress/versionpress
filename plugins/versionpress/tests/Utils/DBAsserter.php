@@ -177,6 +177,15 @@ class DBAsserter {
                 unset($entity[$column]);
             }
 
+            foreach (self::$schemaInfo->getEntityInfo($entityName)->valueReferences as $reference => $targetEntity) {
+                list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
+                if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn]) && $entity[$valueColumn] != "0") {
+                    /** @noinspection PhpUsageOfSilenceOperatorInspection The target entity might not be saved by VersionPress */
+                    $entity["vp_$valueColumn"] = @$idMap[self::$schemaInfo->getTableName($targetEntity)][$entity[$valueColumn]];
+                }
+                unset($entity[$valueColumn]);
+            }
+
             if (!self::$schemaInfo->getEntityInfo($entityName)->hasNaturalVpid) {
                 $idColumnName = self::$schemaInfo->getEntityInfo($entityName)->idColumnName;
                 /** @noinspection PhpUsageOfSilenceOperatorInspection The entity might not be saved by VersionPress, so it might not have a VPID */
