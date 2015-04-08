@@ -248,8 +248,7 @@ gulp.task('composer-install-versionpress-libs', function() {
 gulp.task('init-project-settings-files', function() {
     return gulp.src('./.idea/*.tpl.xml')
             .pipe(rename(function(path) {
-                var len = path.basename.length;
-                path.basename = path.basename.substr(0, len-8) + path.basename.substr(len-4); // cut '.tpl' from the filename
+                path.basename = path.basename.substr(0, path.basename.length-4); // cut '.tpl' from the filename
             }))
             .pipe(gulp.dest('./.idea'));
 });
