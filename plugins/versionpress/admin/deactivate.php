@@ -4,9 +4,6 @@ use VersionPress\Utils\UninstallationUtil;
 
 defined('ABSPATH') or die("Direct access not allowed");
 
-wp_enqueue_style('versionpress_admin_style', plugins_url( 'public/css/style.css' , __FILE__ ));
-wp_enqueue_style('versionpress_admin_deactivation_icons', plugins_url( 'public/icons/style.css' , __FILE__ ));
-
 /**
  * Small helper function that outputs every button in its own form. We do this
  * to be able to submit a value of a button in a hidden field so that that the make POST-handling code
