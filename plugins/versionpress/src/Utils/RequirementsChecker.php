@@ -22,9 +22,10 @@ class RequirementsChecker {
 
     /** @var string[] */
     private static $supportedPlugins = array(
-        'Akismet',
-        'Hello Dolly',
-        'VersionPress',
+        'akismet/akismet.php',
+        'hello-dolly/hello.php',
+        'hello.php',
+        'versionpress/versionpress.php',
     );
 
     function __construct(wpdb $database, DbSchemaInfo $schema) {
@@ -257,10 +258,10 @@ class RequirementsChecker {
      * @return int Number of unsupported plugins.
      */
     private function testExternalPlugins() {
-        $plugins = get_plugins();
+        $plugins = get_option('active_plugins');
         $unsupportedPluginsCount = 0;
         foreach($plugins as $plugin) {
-            if(!in_array($plugin['Name'], self::$supportedPlugins)) {
+            if(!in_array($plugin, self::$supportedPlugins)) {
                 $unsupportedPluginsCount++;
             }
         }
