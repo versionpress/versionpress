@@ -228,7 +228,26 @@ function vp_register_hooks() {
         }
     }, 10, 2);
 
-    add_action('set_object_terms', createUpdatePostTermsHook($mirror, $wpdb));;
+    add_action('set_object_terms', createUpdatePostTermsHook($mirror, $wpdb));
+
+    add_filter('plugin_install_action_links', function ($links, $plugin) {
+        $warningLink = '<span class="vp-compatibility-popup %s" data-plugin-name="' . $plugin['name'] . '"><span class="icon icon-warning"></span></span>';
+        if (isset(\VersionPress\Utils\RequirementsChecker::$compatiblePlugins[$plugin['slug']])) {
+            $cssClass = 'vp-compatible';
+            $compatibilityAdjective = 'Compatible';
+        } elseif (isset(\VersionPress\Utils\RequirementsChecker::$incompatiblePlugins[$plugin['slug']])) {
+            $cssClass = 'vp-incompatible';
+            $compatibilityAdjective = 'Incompatible';
+            $links[] = sprintf($warningLink, $cssClass);
+        } else {
+            $cssClass = 'vp-untested';
+            $compatibilityAdjective = 'Untested';
+            $links[] = sprintf($warningLink, $cssClass);
+        }
+
+        $links[] = '<span class="vp-compatibility ' . $cssClass . '"><span class="hide-without-js"><strong> ' . $compatibilityAdjective . ' </strong> with </span>VersionPress</span>';
+        return $links;
+    }, 10, 2);
 
     //----------------------------------------
     // URL and WP-CLI "hooks"
