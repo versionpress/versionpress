@@ -117,6 +117,8 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
         $this->window($previewWindowId);
         $this->closeWindow();
         $this->window('');
+        $this->url($this->getPostTypeScreenUrl());
+        $this->acceptAlert();
     }
 
     public function prepare_setFeaturedImageForUnsavedPost() {
