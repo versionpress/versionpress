@@ -1,6 +1,6 @@
 # About EAP
 
-Early Access Program (EAP) is a program under which we release VersionPress for the first couple of versions. It explicitly marks the plugin as relatively immature, although we try to do as much testing before every release as possible. You can find the program details on the main [versionpress.net](http://versionpress.net/) website, from the technical perspective there are the main points:
+Early Access Program (EAP) is a program under which we release VersionPress for the first couple of versions. It explicitly marks the plugin as relatively immature, although we try to do as much testing before every release as possible. You can find the program details on the main [versionpress.net](http://versionpress.net/) website and **[join the program](http://versionpress.net/#get)** there, from the technical perspective there are the main points:
 
  - **Keep site backup at all times**. We really mean this. VersionPress revert operations manipulate the database and if there are any kind of issues the site may be left in a broken state. We try to do our best to prevent that but for EAP releases, backups are mandatory.
 
