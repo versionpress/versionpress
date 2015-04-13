@@ -6,7 +6,9 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use RegexIterator;
+use VersionPress\Database\EntityInfo;
 use VersionPress\Filters\EntityFilter;
+use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\EntityUtils;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\IniSerializer;
@@ -29,6 +31,7 @@ abstract class DirectoryStorage extends Storage {
     /** @var EntityFilter[] */
     private $filters = array();
 
+    /** @var EntityInfo */
     private $entityInfo;
 
     function __construct($directory, $entityInfo) {
@@ -118,18 +121,20 @@ abstract class DirectoryStorage extends Storage {
     }
 
     protected function deserializeEntity($serializedEntity) {
-
-        $data = IniSerializer::deserialize($serializedEntity);
-        if (empty($data)) {
-            return $data;
-        } else {
-            $deserialized = IniSerializer::deserialize($serializedEntity);
-            return reset($deserialized);
+        $entity = IniSerializer::deserialize($serializedEntity);
+        if (count($entity) == 0) {
+            return $entity;
         }
 
+        $vpid = key($entity);
+        $flattenEntity = $entity[$vpid];
+        $flattenEntity[$this->entityInfo->vpidColumnName] = $vpid;
+
+        return $flattenEntity;
     }
 
     protected function serializeEntity($vpid, $entity) {
+        unset ($entity[$this->entityInfo->vpidColumnName]);
         return IniSerializer::serialize(array($vpid => $entity));
     }
 
@@ -145,18 +150,9 @@ abstract class DirectoryStorage extends Storage {
     }
 
     private function loadAllFromFiles($entityFiles) {
-        $entities = array();
-        $indexedEntities = array();
-
-        foreach ($entityFiles as $file) {
-            $entities[] = $this->deserializeEntity(file_get_contents($file));
-        }
-
-        foreach ($entities as $entity) {
-            $indexedEntities[$entity['vp_id']] = $entity;
-        }
-
-        return $indexedEntities;
+        $entities = array_map(array($this, 'deserializeEntity'), array_map('file_get_contents', $entityFiles));
+        $vpIds = ArrayUtils::column($entities, $this->entityInfo->vpidColumnName);
+        return array_combine($vpIds, $entities);
     }
 
     protected function removeUnwantedColumns($entity) {
@@ -167,9 +163,9 @@ abstract class DirectoryStorage extends Storage {
         return file_exists($this->getEntityFilename($id));
     }
 
-    public function loadEntity($vpid, $parentId = null) {
-        $entities = $this->loadAllFromFiles(array($this->getEntityFilename($vpid)));
-        return $entities[$vpid];
+    public function loadEntity($id, $parentId = null) {
+        $entities = $this->loadAllFromFiles(array($this->getEntityFilename($id)));
+        return $entities[$id];
     }
 
     protected function applyFilters($data) {

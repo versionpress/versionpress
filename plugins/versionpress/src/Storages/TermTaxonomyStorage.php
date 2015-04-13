@@ -2,6 +2,7 @@
 namespace VersionPress\Storages;
 
 use VersionPress\ChangeInfos\TermChangeInfo;
+use VersionPress\Utils\IniSerializer;
 
 /**
  * Quite an untypical storage. Stores taxonomy together with terms, as INI sections
@@ -121,6 +122,40 @@ class TermTaxonomyStorage extends SingleFileStorage {
             }
         }
         return false;
+    }
+
+    protected function loadEntities() {
+        if (is_file($this->file)) {
+            $entities = IniSerializer::deserialize(file_get_contents($this->file));
+
+            foreach ($entities as $id => &$entity) {
+                $entity['vp_id'] = $id;
+                if (isset ($entity['taxonomies'])) {
+                    foreach ($entity['taxonomies'] as $taxonomyId => &$taxonomy) {
+                        $taxonomy['vp_id'] = $taxonomyId;
+                    }
+                }
+            }
+
+            $this->entities = $entities;
+        } else {
+            $this->entities = array();
+        }
+    }
+
+    protected function saveEntities() {
+        $entities = $this->entities;
+        foreach ($entities as &$entity) {
+            unset ($entity['vp_id']);
+            if (isset ($entity['taxonomies'])) {
+                foreach ($entity['taxonomies'] as &$taxonomy) {
+                    unset ($taxonomy['vp_id']);
+                }
+            }
+        }
+
+        $serializedEntities = IniSerializer::serialize($entities);
+        file_put_contents($this->file, $serializedEntities);
     }
 
     /**

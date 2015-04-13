@@ -22,7 +22,7 @@ class OptionsStorageTest extends \PHPUnit_Framework_TestCase {
     public function savedOptionEqualsLoadedOption() {
         $this->storage->save($this->testingOption);
         $loadedOption = $this->storage->loadEntity($this->testingOption['option_name']);
-        $this->assertTrue($this->testingOption == $loadedOption);
+        $this->assertEquals($this->testingOption, $loadedOption);
     }
 
     /**
@@ -32,7 +32,17 @@ class OptionsStorageTest extends \PHPUnit_Framework_TestCase {
         $this->storage->save($this->testingOption);
         $loadedOptions = $this->storage->loadAll();
         $this->assertTrue(count($loadedOptions) === 1);
-        $this->assertTrue($this->testingOption == reset($loadedOptions));
+        $this->assertEquals($this->testingOption, reset($loadedOptions));
+    }
+
+    /**
+     * @test
+     */
+    public function savedOptionDoesNotContainOptionNameKey() {
+        $this->storage->save($this->testingOption);
+        $fileName = $this->storage->getEntityFilename($this->testingOption['option_name']);
+        $content = file_get_contents($fileName);
+        $this->assertFalse(strpos($content, 'option_name'), 'Option contains an option_name key');
     }
 
     protected function setUp() {

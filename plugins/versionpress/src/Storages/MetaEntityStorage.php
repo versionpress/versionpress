@@ -111,9 +111,9 @@ abstract class MetaEntityStorage extends Storage {
         return $this->parentStorage->getEntityFilename($parentId, null);
     }
 
-    public function loadEntity($vpid, $parentId) {
+    public function loadEntity($id, $parentId) {
         $parent = $this->parentStorage->loadEntity($parentId, null);
-        return $this->extractEntityFromParent($parent, $vpid);
+        return $this->extractEntityFromParent($parent, $id);
     }
 
     protected function createChangeInfo($oldParentEntity, $newParentEntity, $action) {

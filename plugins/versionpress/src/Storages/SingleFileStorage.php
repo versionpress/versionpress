@@ -114,12 +114,12 @@ abstract class SingleFileStorage extends Storage {
      * Updates entity on index $id with values in $data. Fields listed in $this->notSavedFields
      * are ignored.
      *
-     * @param string $id
+     * @param string $vpid
      * @param array $data key => value
      */
-    private function updateEntity($id, $data) {
+    private function updateEntity($vpid, $data) {
 
-        if (!$this->entityInfo->hasNaturalVpid) { // keeping natural id is ok, it does not vary across staging / produciton
+        if ($this->entityInfo->usesGeneratedVpids) { // keeping natural id is ok, it does not vary across staging / produciton
             unset($data[$this->entityInfo->idColumnName]);
         }
 
@@ -128,7 +128,7 @@ abstract class SingleFileStorage extends Storage {
         }
 
         foreach ($data as $field => $value) {
-            $this->entities[$id][$field] = $value;
+            $this->entities[$vpid][$field] = $value;
         }
 
     }
@@ -139,6 +139,11 @@ abstract class SingleFileStorage extends Storage {
     protected function loadEntities() {
         if (is_file($this->file)) {
             $entities = IniSerializer::deserialize(file_get_contents($this->file));
+
+            foreach ($entities as $id => &$entity) {
+                $entity[$this->entityInfo->vpidColumnName] = $id;
+            }
+
             $this->entities = $entities;
         } else {
             $this->entities = array();
@@ -149,8 +154,13 @@ abstract class SingleFileStorage extends Storage {
      * Saves all entities to a file
      */
     protected function saveEntities() {
-        $entities = IniSerializer::serialize($this->entities);
-        file_put_contents($this->file, $entities);
+        $entities = $this->entities;
+        foreach ($entities as &$entity) {
+            unset ($entity[$this->entityInfo->vpidColumnName]);
+        }
+
+        $serializedEntities = IniSerializer::serialize($entities);
+        file_put_contents($this->file, $serializedEntities);
     }
 
     public function shouldBeSaved($data) {

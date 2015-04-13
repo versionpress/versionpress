@@ -23,7 +23,7 @@ class TermsStorageTest extends \PHPUnit_Framework_TestCase {
     public function savedTermEqualsLoadedTerm() {
         $this->storage->save($this->testingTerm);
         $loadedTerm = $this->storage->loadEntity($this->testingTerm['vp_id']);
-        $this->assertTrue($this->testingTerm == $loadedTerm);
+        $this->assertEquals($this->testingTerm, $loadedTerm);
     }
 
     /**
@@ -33,7 +33,17 @@ class TermsStorageTest extends \PHPUnit_Framework_TestCase {
         $this->storage->save($this->testingTerm);
         $loadedTerms = $this->storage->loadAll();
         $this->assertTrue(count($loadedTerms) === 1);
-        $this->assertTrue($this->testingTerm == reset($loadedTerms));
+        $this->assertEquals($this->testingTerm, reset($loadedTerms));
+    }
+
+    /**
+     * @test
+     */
+    public function savedTermDoesNotContainVpIdKey() {
+        $this->storage->save($this->testingTerm);
+        $fileName = $this->storage->getEntityFilename($this->testingTerm['vp_id']);
+        $content = file_get_contents($fileName);
+        $this->assertFalse(strpos($content, 'vp_id'), 'Entity contains a vp_id key');
     }
 
     protected function setUp() {

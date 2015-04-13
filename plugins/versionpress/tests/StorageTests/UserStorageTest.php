@@ -42,6 +42,16 @@ class UserStorageTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->testingUser == reset($loadedUsers));
     }
 
+    /**
+     * @test
+     */
+    public function savedUserDoesNotContainVpIdKey() {
+        $this->storage->save($this->testingUser);
+        $fileName = $this->storage->getEntityFilename($this->testingUser['vp_id']);
+        $content = file_get_contents($fileName);
+        $this->assertFalse(strpos($content, 'vp_id'), 'Entity contains a vp_id key');
+    }
+
     protected function setUp() {
         parent::setUp();
         $entityInfo = new EntityInfo(array(

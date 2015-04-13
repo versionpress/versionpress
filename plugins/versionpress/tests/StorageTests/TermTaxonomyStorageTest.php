@@ -38,7 +38,7 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
         $this->termStorage->save($this->testingTerm);
         $this->storage->save($this->testingTermTaxonomy);
         $loadedTermTaxonomy = $this->storage->loadEntity($this->testingTermTaxonomy['vp_id']);
-        $this->assertTrue($this->testingTermTaxonomy == $loadedTermTaxonomy);
+        $this->assertEquals($this->testingTermTaxonomy, $loadedTermTaxonomy);
     }
 
     /**
@@ -49,7 +49,18 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
         $this->storage->save($this->testingTermTaxonomy);
         $loadedTermTaxonomies = $this->storage->loadAll();
         $this->assertTrue(count($loadedTermTaxonomies) === 1);
-        $this->assertTrue($this->testingTermTaxonomy == reset($loadedTermTaxonomies));
+        $this->assertEquals($this->testingTermTaxonomy, reset($loadedTermTaxonomies));
+    }
+
+    /**
+     * @test
+     */
+    public function savedTaxonomyDoesNotContainVpIdKey() {
+        $this->termStorage->save($this->testingTerm);
+        $this->storage->save($this->testingTermTaxonomy);
+        $fileName = $this->termStorage->getEntityFilename($this->testingTerm['vp_id']);
+        $content = file_get_contents($fileName);
+        $this->assertFalse(strpos($content, 'vp_id'), 'Entity contains a vp_id key');
     }
 
     protected function setUp() {

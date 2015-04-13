@@ -33,7 +33,7 @@ class CommentStorageTest extends \PHPUnit_Framework_TestCase {
     public function savedCommentEqualsLoadedComment() {
         $this->storage->save($this->testingComment);
         $loadedComment = $this->storage->loadEntity($this->testingComment['vp_id']);
-        $this->assertTrue($this->testingComment == $loadedComment);
+        $this->assertEquals($this->testingComment, $loadedComment);
     }
 
     /**
@@ -44,6 +44,16 @@ class CommentStorageTest extends \PHPUnit_Framework_TestCase {
         $loadedComments = $this->storage->loadAll();
         $this->assertTrue(count($loadedComments) === 1);
         $this->assertTrue($this->testingComment == reset($loadedComments));
+    }
+
+    /**
+     * @test
+     */
+    public function savedCommentDoesNotContainVpIdKey() {
+        $this->storage->save($this->testingComment);
+        $fileName = $this->storage->getEntityFilename($this->testingComment['vp_id']);
+        $content = file_get_contents($fileName);
+        $this->assertFalse(strpos($content, 'vp_id'), 'Entity contains a vp_id key');
     }
 
     protected function setUp() {
