@@ -7,15 +7,15 @@ use VersionPress\Utils\IniSerializer;
 use VersionPress\Utils\StringUtils;
 
 /**
- * Test cases for reported issues
+ * Test cases for reported issue WP-284
  */
-class IniSerializerIssuesTest extends PHPUnit_Framework_TestCase {
+class IniSerializer_IssueWP284Test extends PHPUnit_Framework_TestCase {
 
 
     /**
      * @test
      */
-    public function issueWP284_justSerializedValue() {
+    public function justSerializedValue() {
 
         // All HTML replaced wtih empty string
 
@@ -48,7 +48,7 @@ INI
     /**
      * @test
      */
-    public function issueWP284_justFirstHtml() {
+    public function justFirstHtml() {
 
         $data = array(
             "avia_options_enfold" => array(
@@ -253,7 +253,7 @@ INI
     /**
      * @test
      */
-    public function issueWP284_justSecondHtml() {
+    public function justSecondHtml() {
 
         $data = array(
             "avia_options_enfold" => array(
@@ -479,7 +479,7 @@ INI
     /**
      * @test
      */
-    public function issueWP284_justThirdHtml() {
+    public function justThirdHtml() {
 
         $data = array(
             "avia_options_enfold" => array(
@@ -683,7 +683,7 @@ INI
     /**
      * @test
      */
-    public function issueWP284_combinationOfSerializationAndBlankLines() {
+    public function combinationOfSerializationAndBlankLines() {
 
         $data = array(
             "avia_options_enfold" => array(
@@ -715,7 +715,7 @@ INI
     /**
      * @test
      */
-    public function issueWP284_combinationOfSerializationAndHtml() {
+    public function combinationOfSerializationAndHtml() {
 
         $data = array(
             "avia_options_enfold" => array(
@@ -751,7 +751,7 @@ INI
     /**
      * @test
      */
-    public function issueWP284_full() {
+    public function full() {
 
         $data = array(
             "avia_options_enfold" => array(

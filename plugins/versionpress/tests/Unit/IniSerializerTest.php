@@ -7,7 +7,7 @@ use VersionPress\Utils\IniSerializer;
 use VersionPress\Utils\StringUtils;
 
 /**
- * Tests covering IniSerializer. There is also {@link IniSerializerIssuesTest} which contains
+ * Tests covering IniSerializer. There are also IniSerializer_Issue* tests which contain
  * tests cases for reported issues.
  */
 class IniSerializerTest extends PHPUnit_Framework_TestCase {
