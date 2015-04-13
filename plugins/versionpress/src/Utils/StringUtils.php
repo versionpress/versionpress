@@ -29,7 +29,7 @@ class StringUtils {
      * @return string CRLF line endings
      */
     public static function crlfize($str) {
-        return str_replace("\n", "\r\n", $str);
+        return str_replace("\n", "\r\n", str_replace("\r\n", "\n", $str));
     }
 
 }

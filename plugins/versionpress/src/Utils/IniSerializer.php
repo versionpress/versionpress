@@ -195,8 +195,8 @@ class IniSerializer {
     private static function getReplacedEolString($str, $direction) {
 
         $replacement = array(
-            "\n" => "{{{EOL-LF}}}",
-            "\r" => "{{{EOL-CR}}}",
+            "\n" => "<<<[EOL-LF]>>>",
+            "\r" => "<<<[EOL-CR]>>>",
         );
 
         $from = ($direction == "charsToPlaceholders") ? array_keys($replacement) : array_values($replacement);

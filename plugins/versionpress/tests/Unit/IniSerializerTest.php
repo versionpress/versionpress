@@ -410,6 +410,27 @@ INI
     /**
      * @test
      */
+    public function newLineHandling_NewLineAfterStringMark() {
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+key1 = "$
+"
+
+INI
+        );
+
+        $data = array("Section" => array(
+            "key1" => StringUtils::crlfize("$
+")
+        ));
+
+        $this->assertEquals($data, IniSerializer::deserialize($ini));
+        $this->assertEquals($ini, IniSerializer::serialize($data));
+    }
+
+    /**
+     * @test
+     */
     public function specialCharactersAreTakenLiterally() {
 
         // e.g., "\n" should not have any special meaning
