@@ -142,4 +142,21 @@ class PostsTest extends PostTypeTestCase {
     public function turningUnsavedPostWithFeaturedImageIntoDraftSavesTheFeaturedImage() {
         $this->runMakeDraftFromUnsavedPostWithFeaturedImageTest();
     }
+
+    /**
+     * @test
+     * @testdox Changing post format updates its taxonomy
+     */
+    public function changingPostFormatUpdatesItsTaxonomy() {
+        self::$worker->prepare_changePostFormat();
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+        self::$worker->changePostFormat();
+
+        $commitAsserter->ignoreCommits('term/create');
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('post/edit');
+        $commitAsserter->assertCommitTag('VP-Post-UpdatedProperties', 'vp_term_taxonomy');
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
 }

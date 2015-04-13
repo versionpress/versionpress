@@ -174,7 +174,7 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
     /**
      * From the main page for given post type, clicks "Add new" and fills in the post title and content
      */
-    private function prepareTestPost() {
+    protected function prepareTestPost() {
         $this->byCssSelector('.edit-php #wpbody-content .wrap a.add-new-h2')->click();
         $this->waitAfterRedirect();
         $this->byCssSelector('form#post input#title')->value("Test " . $this->getPostType());

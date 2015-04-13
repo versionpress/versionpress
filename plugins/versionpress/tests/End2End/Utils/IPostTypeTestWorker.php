@@ -47,4 +47,7 @@ interface IPostTypeTestWorker extends ITestWorker {
     public function prepare_makeDraftFromUnsavedPost();
     public function makeDraftFromUnsavedPost();
 
+    public function prepare_changePostFormat();
+    public function changePostFormat();
+
 }

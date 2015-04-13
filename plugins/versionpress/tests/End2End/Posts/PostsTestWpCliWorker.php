@@ -20,4 +20,12 @@ class PostsTestWpCliWorker extends PostTypeTestWpCliWorker {
     public function createTagInEditationForm() {
         $this->wpAutomation->runWpCliCommand('post', 'term', array('add', $this->postId, 'post_tag', Random::generate()));
     }
+
+    public function prepare_changePostFormat() {
+        throw new \PHPUnit_Framework_SkippedTestError("Post format cannot be changed using WP-CLI.");
+    }
+
+    public function changePostFormat() {
+
+    }
 }

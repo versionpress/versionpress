@@ -24,4 +24,17 @@ class PostsTestSeleniumWorker extends PostTypeTestSeleniumWorker {
         $this->waitAfterRedirect();
     }
 
+    public function prepare_changePostFormat() {
+        $this->url($this->getPostTypeScreenUrl());
+        $this->prepareTestPost();
+
+        $this->byCssSelector('form#post #publish')->click();
+        $this->waitAfterRedirect();
+    }
+
+    public function changePostFormat() {
+        $this->byCssSelector('input[type=radio]#post-format-quote')->click();
+        $this->byCssSelector('form#post #publish')->click();
+        $this->waitAfterRedirect();
+    }
 }

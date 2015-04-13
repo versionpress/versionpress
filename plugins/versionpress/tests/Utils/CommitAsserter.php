@@ -79,11 +79,7 @@ class CommitAsserter {
      * @param string|string[] $action An action like "usermeta/edit", or an array of them
      */
     public function ignoreCommits($action) {
-        if (is_string($action)) {
-            $this->ignoreCommitsWithActions = array($action);
-        } else {
-            $this->ignoreCommitsWithActions = $action;
-        }
+            $this->ignoreCommitsWithActions = (array) $action;
     }
 
 
