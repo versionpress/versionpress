@@ -17,6 +17,7 @@ class GitRepository {
     private $tempDirectory;
     private $commitMessagePrefix;
     private $gitBinary;
+    private $gitProcessTimeout = 60;
 
     /**
      * @param string $workingDirectoryRoot Filesystem path to working directory root (where the .git folder resides)
@@ -382,6 +383,7 @@ class GitRepository {
         }
 
         $process = new Process($cmd, $this->workingDirectoryRoot);
+        $process->setTimeout($this->gitProcessTimeout);
         $process->run();
 
         $result = array(
@@ -397,4 +399,11 @@ class GitRepository {
         return $result;
     }
 
+    /**
+     * Changes the timeout of {@link \Symfony\Component\Process\Process}
+     * @param int $gitProcessTimeout
+     */
+    public function setGitProcessTimeout($gitProcessTimeout) {
+        $this->gitProcessTimeout = $gitProcessTimeout;
+    }
 }

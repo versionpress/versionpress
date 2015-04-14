@@ -57,6 +57,8 @@ class Initializer {
 
     private $idCache;
 
+    private $executionStartTime;
+
     function __construct(wpdb $wpdb, DbSchemaInfo $dbSchema, StorageFactory $storageFactory, GitRepository $repository) {
         $this->database = $wpdb;
         $this->dbSchema = $dbSchema;
@@ -70,6 +72,7 @@ class Initializer {
     public function initializeVersionPress() {
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
         @set_time_limit(0); // intentionally @ - if it's disabled we can't do anything but try the initialization
+        $this->adjustGitProcessTimeout();
 
         $this->reportProgressChange(InitializerStates::START);
         vp_enable_maintenance();
@@ -393,4 +396,9 @@ class Initializer {
         FileSystem::copy(__DIR__ . '/.gitignore.tpl', ABSPATH . '.gitignore', false);
     }
 
+    private function adjustGitProcessTimeout() {
+        $maxExecutionTime = ini_get('max_execution_time');
+        $processTimeout = $maxExecutionTime > 0 ? $maxExecutionTime / 2 : 5 * 60;
+        $this->repository->setGitProcessTimeout($processTimeout);
+    }
 }
