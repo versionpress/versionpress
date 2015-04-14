@@ -225,8 +225,10 @@ class Initializer {
         foreach ($references as $referenceName => $targetEntity) {
 
             if ($entity[$referenceName] > 0) {
-                $referenceId = $this->idCache[$targetEntity][$entity[$referenceName]];
-                $entity['vp_' . $referenceName] = $referenceId;
+                if ($entityName !== $targetEntity || isset($this->idCache[$targetEntity])) { // skip replacing for post_parent while generating VPIDs (WP-357)
+                    $referenceId = $this->idCache[$targetEntity][$entity[$referenceName]];
+                    $entity['vp_' . $referenceName] = $referenceId;
+                }
             }
 
             unset($entity[$referenceName]);

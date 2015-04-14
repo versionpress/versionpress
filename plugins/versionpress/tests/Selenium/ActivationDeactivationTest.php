@@ -79,7 +79,7 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      */
     public function successfulActivationRedirectsToMainVersionPressTable() {
         $this->byCssSelector('#activate-versionpress-btn')->click();
-        $this->waitAfterRedirect(15000);
+        $this->waitAfterRedirect(30000);
         $this->waitForElement('#versionpress-commits-table', InitializationConfig::REDIRECT_AFTER_MS + 3000);
     }
 
