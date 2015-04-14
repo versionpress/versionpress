@@ -1,6 +1,7 @@
 <?php
 namespace VersionPress\Initialization;
 
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use VersionPress\ChangeInfos\VersionPressChangeInfo;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Git\GitConfig;
@@ -64,6 +65,7 @@ class Initializer {
         $this->dbSchema = $dbSchema;
         $this->storageFactory = $storageFactory;
         $this->repository = $repository;
+        $this->executionStartTime = microtime(true);
     }
 
     /**
@@ -76,16 +78,20 @@ class Initializer {
 
         $this->reportProgressChange(InitializerStates::START);
         vp_enable_maintenance();
-        $this->createVersionPressTables();
-        $this->lockDatabase();
-        $this->saveDatabaseToStorages();
-        $this->commitDatabase();
-        $this->createGitRepository();
-        $this->activateVersionPress();
-        $this->copyAccessRulesFiles();
-        $this->doInitializationCommit();
-        vp_disable_maintenance();
-        $this->reportProgressChange(InitializerStates::FINISHED);
+        try {
+            $this->createVersionPressTables();
+            $this->lockDatabase();
+            $this->saveDatabaseToStorages();
+            $this->commitDatabase();
+            $this->createGitRepository();
+            $this->activateVersionPress();
+            $this->copyAccessRulesFiles();
+            $this->doInitializationCommit();
+            vp_disable_maintenance();
+            $this->reportProgressChange(InitializerStates::FINISHED);
+        } catch (InitializationAbortedException $ex) {
+            $this->reportProgressChange(InitializerStates::ABORTED);
+        }
     }
 
     public function createVersionPressTables() {
@@ -156,6 +162,7 @@ class Initializer {
             $query = "INSERT INTO {$this->getTableName('vp_id')} (`table`, id, vp_id) VALUES (\"$tableName\", $entityId, UNHEX('$vpId'))";
             $this->database->query($query);
             $this->idCache[$entityName][$entityId] = $vpId;
+            $this->checkTimeout();
         }
     }
 
@@ -163,6 +170,10 @@ class Initializer {
      * Saves all eligible entities into the file system storage (the 'db' folder)
      */
     private function saveDatabaseToStorages() {
+
+        if (is_dir(VERSIONPRESS_MIRRORING_DIR)) {
+            FileSystem::remove(VERSIONPRESS_MIRRORING_DIR);
+        }
 
         FileSystem::mkdir(VERSIONPRESS_MIRRORING_DIR);
 
@@ -191,7 +202,11 @@ class Initializer {
         $entities = $this->extendEntitiesWithVpids($entityName, $entities);
         $entities = $this->doEntitySpecificActions($entityName, $entities);
         $storage->prepareStorage();
-        $storage->saveAll($entities);
+        foreach ($entities as $entity) {
+            $storage->save($entity);
+            $this->checkTimeout();
+        }
+
     }
 
     private function replaceForeignKeysWithReferencesInAllEntities($entityName, $entities) {
@@ -325,6 +340,7 @@ class Initializer {
 
 
     private function doInitializationCommit() {
+        $this->checkTimeout();
 
         // Since WP-217 the `.active` file contains not the SHA1 of the first commit that VersionPress
         // created but the one before that (which may be an empty string if VersionPress's commit
@@ -347,8 +363,12 @@ class Initializer {
             $authorEmail = GitConfig::$wpcliUserEmail;
         }
 
-        $this->repository->stageAll();
-        $this->repository->commit($installationChangeInfo->getCommitMessage(), $authorName, $authorEmail);
+        try {
+            $this->repository->stageAll();
+            $this->repository->commit($installationChangeInfo->getCommitMessage(), $authorName, $authorEmail);
+        } catch (ProcessTimedOutException $ex) {
+            $this->abortInitialization();
+        }
     }
 
 
@@ -400,5 +420,33 @@ class Initializer {
         $maxExecutionTime = ini_get('max_execution_time');
         $processTimeout = $maxExecutionTime > 0 ? $maxExecutionTime / 2 : 5 * 60;
         $this->repository->setGitProcessTimeout($processTimeout);
+    }
+
+    private function checkTimeout() {
+        if ($this->timeoutIsClose()) {
+            $this->abortInitialization();
+        }
+    }
+
+    private function timeoutIsClose() {
+        $maxExecutionTime = intval(ini_get('max_execution_time'));
+
+        if ($maxExecutionTime === 0) {
+            return false;
+        }
+
+        $executionTime = microtime(true) - $this->executionStartTime;
+        $remainingTime = $maxExecutionTime - $executionTime;
+
+        return $remainingTime < 3; // in seconds
+    }
+
+    private function abortInitialization() {
+        vp_disable_maintenance();
+        if (VersionPress::isActive()) {
+            @unlink(WP_CONTENT_DIR . '/db.php');
+            @unlink(VERSIONPRESS_ACTIVATION_FILE);
+        }
+        throw new InitializationAbortedException();
     }
 }

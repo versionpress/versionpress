@@ -101,12 +101,6 @@ abstract class DirectoryStorage extends Storage {
         return $entities;
     }
 
-    function saveAll($entities) {
-        foreach ($entities as $entity) {
-            $this->save($entity);
-        }
-    }
-
     public function shouldBeSaved($data) {
         return true;
     }

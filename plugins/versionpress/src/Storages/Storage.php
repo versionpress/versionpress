@@ -66,14 +66,6 @@ abstract class Storage {
     abstract function prepareStorage();
 
     /**
-     * Only used by VersionPress\Initialization\Initializer, possibly remove?
-     *
-     * @param $entities
-     */
-    abstract function saveAll($entities);
-
-
-    /**
      * Returns a physical path to an INI file where the entity is stored
      *
      * @param string $id VPID

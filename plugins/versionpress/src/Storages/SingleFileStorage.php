@@ -96,12 +96,6 @@ abstract class SingleFileStorage extends Storage {
         return $this->entities;
     }
 
-    function saveAll($entities) {
-        foreach ($entities as $entity) {
-            $this->save($entity);
-        }
-    }
-
     function exists($id, $parentId = null) {
         $this->loadEntities();
         return isset($this->entities[$id]);

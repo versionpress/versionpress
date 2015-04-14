@@ -21,4 +21,6 @@ class InitializerStates {
     const CREATING_INITIAL_COMMIT = "Creating initialization commit in the repository";
 
     const FINISHED = "All finished, VersionPress is ready";
+
+    const ABORTED = "Initialization aborted because of reaching maximum execution time";
 }
