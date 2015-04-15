@@ -1,6 +1,6 @@
 # How VersionPress Works #
 
-Sometimes, the best way to understand a product is to have a brief idea of how it works, internally. That way, you know what actions are safe, what is possibly problematic and so on. This page should provide that brief overview.
+Sometimes, the best way to understand a product is to have a brief idea of how it works, internally. That way, you know what actions are safe, what is possibly dangerous and so on. This page provides a brief overview.
 
 
 ## High level overview ##
@@ -9,7 +9,7 @@ WordPress site with VersionPress installed and activated contains three main par
 
 * **WordPress itself**, i.e. the PHP code and MySQL database
 * **[Git](./git) repository** that manages the historic revisions
-* **Our plugin** that translates WordPress data into the Git format and does all the other things like providing the admin pages etc.
+* **The VersionPress plugin** that translates WordPress data into the Git format and does all the other things like providing the admin pages, undo buttons etc.
 
 One important point here is that our code actually implements very little versioning logic itself. Instead, we depend heavily on Git which was an important strategic decision. This has many advantages but also poses some new challenges as described [here](./git).
 

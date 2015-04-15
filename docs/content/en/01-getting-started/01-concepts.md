@@ -5,16 +5,16 @@ VersionPress brings true version control to the world of WordPress. It is a fair
 
 ## Version control ##
 
-Version control simply means that **historic revisions of some content are stored**. It has many forms, from simple Undo buttons in text editors to advanced systems for managing documents but the basic principle is really that simple.
+Version control simply means that **historic revisions of some content are stored**. It has many forms, from simple Undo buttons in text editors to advanced systems for managing documents but the basic principle is really simple.
 
 <figure>
   <img src="../../media/version-control.png" alt="Version Control" /> 
   <figcaption>© linode from their <a href="https://www.linode.com/docs/applications/development/introduction-to-version-control">very nice intro</a></figcaption>
 </figure>
 
-The interesting thing about version control is that **its effects are usually much more valuable than one would think**. Take Wikipedia, for example. Its content versioning is not just some boring technical thing, it completely changed the way human knowledge is gathered and shared. Another example is WordPress itself – it would be nowhere near today if its developers couldn't collaborate using an open source version control system (called Subversion in that particular case).     
+One interesting thing about version control is that **its effects are usually much more valuable than one would think**. Take Wikipedia, for example. Its content versioning is not just some boring technical thing, it completely changed the way human knowledge is gathered and shared. Another example is WordPress itself – it would be nowhere near today if its developers couldn't collaborate using an open source version control system (Subversion in their specific case).     
 
-**VersionPress brings true version control to WordPress *sites*.** While historically, actions like updating plugins, removing users or something similar changed the site irreversibly (and could break it if the update wasn't intended or e.g. the new plugin version misbehaved), VersionPress adds a simple way to undo those changes.
+**VersionPress brings true version control to WordPress *sites*.** While historically, actions like updating plugins, removing users or something similar changed the site irreversibly (and could break it if the update was buggy), VersionPress adds a simple way to undo those changes.
 
 The underlying technology is actually pretty smart and can do much more than that. For example, *staging* is typically a hard thing but VersionPress makes that a breeze using the same techniques that power the Undo. It's just another example of the above: if you have solid version control many hard tasks suddenly appear simple. That's what VersionPress is about.
 
@@ -41,7 +41,7 @@ There are some terms that you will see often both in this documentation and in t
 <dd>Another, more technical word for a change in the Git terminology.</dd>
 
 <dt>entity</dt>
-<dd>For example a post or a comment. These are things that VersionPress tracks. We use this rather abstract term instead of e.g. a "database row" because not all tracked entities do necessarily need to be database rows etc.</dd>
+<dd>For example a post or a comment. These are things that VersionPress tracks. We use this rather abstract term instead of e.g. a "database row" because not all tracked entities do necessarily need to be database rows.</dd>
 
 </dl>
 

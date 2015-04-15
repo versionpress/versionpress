@@ -34,14 +34,14 @@ These are the main situations that prevent Undo from doing its job:
 
 Undo will not work when **the change being reverted is in *conflict* with some more recent change**. For example, you want to undo a blog post update for a post that has been deleted in the meantime. Or that text change is in conflict with some newer edit done by some of your colleagues or by yourself. In such cases, no technology can know what's the right way to resolve the conflict. For example, in the text conflict situation it is up to the editor to compare the two versions and choose the better one.
 
-When VersionPress encounters a conflict – and it can detect them reliably – it will just report this to the user and stop doing the revert.
+When VersionPress encounters a conflict – and it can detect them reliably – it will just report this to the user and stop doing the revert. We don't have a conflict resolution UI yet – it might come in a future update.
 
 
 ### Invalid entity references
 
-Say that you delete a *comment*, want VersionPress to restore it but the related *post* no longer exists. VersionPress will see this as a **logical conflict in relations between two entities** and will reject the revert.
+Say that you delete a *comment*, want VersionPress to restore it but the related *post* no longer exists. VersionPress will see this as a **logical conflict in relations between two entities** and will reject the revert. In other words, VersionPress checks "foreign keys" before it proceeds with the undo.
 
-To "fix" this, first restore the related entity (e.g., that post) and only then the original entity (e.g., the comment).
+To fix this, first restore the related entity (e.g., the post) and only then the original entity (e.g., the comment).
 
 
 ### Uncommitted files

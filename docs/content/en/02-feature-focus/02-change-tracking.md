@@ -47,7 +47,7 @@ The biggest added value of VersionPress is in *database change tracking*. This s
 
 *Posts* are the main pieces of content in WordPress which includes both posts and pages by default but also some other post types as well.
 
-**Custom post types and fields** are generally supported, however, some of the external plugins around that functionality like [ACF](http://www.advancedcustomfields.com/) because they do additional stuff on top of just managing custom types and fields. We will be adding support for such plugins in some future update.
+**Custom post types and fields** are generally supported and also work with popular plugins like [ACF](http://www.advancedcustomfields.com/).
 
 Tracked actions:
 
