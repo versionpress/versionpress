@@ -2,9 +2,13 @@
 namespace VersionPress\Tests\Selenium;
 
 use Exception;
+use Icecave\SemVer\Comparator;
+use Icecave\SemVer\Version;
 use VersionPress\Initialization\InitializationConfig;
 use VersionPress\Tests\Utils\DBAsserter;
+use VersionPress\Tests\Utils\TestConfig;
 use VersionPress\Tests\Utils\TestRunnerOptions;
+use VersionPress\Tests\Utils\WpVersionComparer;
 
 /**
  * Tests VersionPress deactivation / reactivation / uninstallation flow.
@@ -98,13 +102,19 @@ class ActivationDeactivationTest extends SeleniumTestCase {
 
     /**
      * @test
-     * @depends successfulActivationRedirectsToMainVersionPressTable
      */
     public function deactivateShowsConfirmationScreen() {
         $this->url('wp-admin/plugins.php');
         $this->byCssSelector('#versionpress .deactivate a')->click();
 
-        $this->assertContains('versionpress/admin/deactivate.php', $this->url());
+
+        if (WpVersionComparer::compare(TestConfig::createDefaultConfig()->testSite->wpVersion, '4.2-beta1') < 0) {
+            $deactivationUrl = 'versionpress/admin/deactivate.php';
+        } else {
+            $deactivationUrl = 'versionpress%2Fadmin%2Fdeactivate.php';
+        }
+
+        $this->assertContains($deactivationUrl, $this->url());
     }
 
     /**
@@ -127,7 +137,14 @@ class ActivationDeactivationTest extends SeleniumTestCase {
     public function confirmingDeactivationFullyDeactivatesVersionPress() {
 
         $this->byCssSelector('#versionpress .deactivate a')->click();
-        $this->assertContains('versionpress/admin/deactivate.php', $this->url());
+
+        if (WpVersionComparer::compare(TestConfig::createDefaultConfig()->testSite->wpVersion, '4.2-beta1') < 0) {
+            $deactivationUrl = 'versionpress/admin/deactivate.php';
+        } else {
+            $deactivationUrl = 'versionpress%2Fadmin%2Fdeactivate.php';
+        }
+
+        $this->assertContains($deactivationUrl, $this->url());
 
         $this->byCssSelector('#confirm_deactivation')->click();
         $this->assertContains('wp-admin/plugins.php', $this->url());

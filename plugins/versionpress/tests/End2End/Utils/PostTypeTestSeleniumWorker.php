@@ -2,6 +2,8 @@
 
 namespace VersionPress\Tests\End2End\Utils;
 
+use Nette\Utils\Strings;
+
 abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPostTypeTestWorker {
 
     abstract public function getPostType();

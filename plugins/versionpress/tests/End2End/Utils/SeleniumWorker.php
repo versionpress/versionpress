@@ -6,6 +6,7 @@
  * Time: 9:33
  */
 namespace VersionPress\Tests\End2End\Utils;
+use Nette\Utils\Strings;
 use PHPUnit_Extensions_Selenium2TestCase_SessionStrategy_Isolated;
 use PHPUnit_Extensions_Selenium2TestCase_SessionStrategy_Shared;
 use PHPUnit_Extensions_Selenium2TestCase_URL;
@@ -236,7 +237,13 @@ class SeleniumWorker implements ITestWorker {
      * @param string $text
      */
     protected function setTinyMCEContent($text) {
-        $this->executeScript("tinyMCE.activeEditor.setContent('$text')");
+        try {
+            $this->executeScript("tinyMCE.activeEditor.setContent('$text')");
+        } catch (\PHPUnit_Extensions_Selenium2TestCase_WebDriverException $ex) {
+            if (!Strings::startsWith($ex->getMessage(), "TypeError: c is undefined")) {
+                throw $ex;
+            }
+        }
     }
 
     /**
