@@ -24,15 +24,15 @@ The server environment must match certain requirements, some of which are checke
 
 Minimum system requirements are (as a general rule, **we recommend using the latest versions of everything**):
 
- - WordPress 3.9 or higher
+ - WordPress 4.1 or higher (3.9+ should work but is not thoroughly tested)
  - PHP 5.3 or higher
- - Git 1.9 or higher installed on the server *(checked automatically before activation)*
- - Apache or IIS 7+ web server *(checked automatically before activation)*
- - Safe mode turned off *(checked automatically before activation)*
- - `proc_open()` enabled *(checked automatically before activation)*
- - Write permissions in the site root and everywhere under it *(checked automatically before activation)*
- - No `wp-content/db.php` on the disk *(checked automatically before activation)*
- - No path customizations (e.g., custom location for `wp-content`) *(checked automatically before activation)*
+ - Git 1.9 or higher installed on the server
+ - Apache or IIS 7+ web server
+ - Safe mode turned off
+ - `proc_open()` enabled
+ - Write permissions in the site root and everywhere under it
+ - No `wp-content/db.php` on the disk
+ - No path customizations (e.g., custom location for `wp-content`)
 
 In practice, this means that you need to have a lot of control over your server environment for the current version of VersionPress. We will be adding support for common shared hosting over time.
 
@@ -90,7 +90,7 @@ VersionPress depends on several external libraries for launching Git processes, 
 
 ## Installation
 
-The installation is pretty standard, just note the last step:
+VersionPress can be obtained via the main [versionpress.net website](http://versionpress.net/). When you have the ZIP file, the installation is pretty standard:
 
 1. Log in to the admin screens
 2. Go to *Plugins > Add New > Upload*
@@ -111,14 +111,7 @@ Upon successful activation, you should see a screen like this:
 
 ## Update / upgrade
 
-The update process is manual at the moment, and actually very simple:
-
- 1. Get the latest version of VersionPress
- 2. Replace the folder `wp-content/plugins/versionpress` with the new version
-
-However, not that **some versions might require specific steps** so please always consult the [release notes](../release-notes).
-
-
+The update process is manual at the moment and always described in the **release notes** for the new version. We generally strive for updatable releases but in some cases, especially during the EAP period, you might need to disable the plugin, remove it and install it fresh. Again, [release notes](../release-notes) will tell you what to do. 
 
 
 ## Uninstallation
