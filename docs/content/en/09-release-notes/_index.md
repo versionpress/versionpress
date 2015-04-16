@@ -1,8 +1,8 @@
 # Release Notes
 
-The current release is **[1.0-rc3](./release-notes/1.0-rc3)**, released on 09-Apr-2015, and it is an [EAP release](getting-started/about-eap). VersionPress can be obtained via the main **[versionpress.net](http://versionpress.net/)** site.
+The current release is **[1.0](./release-notes/1.0)**, released on 16-Apr-2015, and it is an [EAP release](getting-started/about-eap). VersionPress can be obtained via the main **[versionpress.net](http://versionpress.net/)** site.
 
- * [1.0-rc3 full release notes](./release-notes/1.0-rc3)
+ * [1.0 full release notes](./release-notes/1.0)
  * [Roadmap](./release-notes/roadmap)
 
 
