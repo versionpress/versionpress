@@ -3,6 +3,7 @@
 namespace VersionPress\Storages;
 
 use VersionPress\ChangeInfos\OptionChangeInfo;
+use VersionPress\Utils\IniSerializer;
 
 class OptionsStorage extends SingleFileStorage {
 
@@ -22,5 +23,19 @@ class OptionsStorage extends SingleFileStorage {
 
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
         return new OptionChangeInfo($action, $newEntity[$this->entityInfo->idColumnName]);
+    }
+
+    protected function loadEntities() {
+        if (is_file($this->file)) {
+            $entities = IniSerializer::deserializeFlat(file_get_contents($this->file));
+
+            foreach ($entities as $id => &$entity) {
+                $entity[$this->entityInfo->vpidColumnName] = $id;
+            }
+
+            $this->entities = $entities;
+        } else {
+            $this->entities = array();
+        }
     }
 }
