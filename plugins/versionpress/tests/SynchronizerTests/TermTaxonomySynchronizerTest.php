@@ -62,6 +62,34 @@ class TermTaxonomySynchronizerTest extends SynchronizerTestCase {
         DBAsserter::assertFilesEqualDatabase();
     }
 
+    /**
+     * @test
+     * @testdox Synchronizer adds two term taxonomies with same taxonomy
+     */
+    public function synchronizerAddsTwoTermTaxonomiesWithTheSameTaxonomy() {
+        $term1 = EntityUtils::prepareTerm(null, 'Some term', 'some-term');
+        $term2 = EntityUtils::prepareTerm(null, 'Other term', 'other-term');
+        $this->termStorage->save($term1);
+        $this->termStorage->save($term2);
+
+        $termTaxonomy1 = EntityUtils::prepareTermTaxonomy(null, $term1['vp_id'], 'category', 'Some description');
+        $termTaxonomy2 = EntityUtils::prepareTermTaxonomy(null, $term2['vp_id'], 'category', 'Other description');
+        $this->storage->save($termTaxonomy1);
+        $this->storage->save($termTaxonomy2);
+
+        $this->termSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        DBAsserter::assertFilesEqualDatabase();
+
+        // cleanup
+        $this->storage->delete($termTaxonomy1);
+        $this->storage->delete($termTaxonomy2);
+        $this->termStorage->delete($term1);
+        $this->termStorage->delete($term2);
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->termSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+    }
+
     private function createTermTaxonomy() {
         $term = EntityUtils::prepareTerm(null, 'Some term', 'some-term');
         self::$termVpId = $term['vp_id'];
