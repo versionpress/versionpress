@@ -628,5 +628,23 @@ INI
 
     }
 
+    //--------------------------------
+    // Flat data (options)
+    //--------------------------------
 
+    /**
+     * @test
+     */
+    public function sectionWithDotInName() {
+        $data = array("Section.Name" => array("key" => "value"));
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section.Name]
+key = "value"
+
+INI
+        );
+
+        $this->assertEquals($ini, IniSerializer::serialize($data));
+        $this->assertEquals($data, IniSerializer::deserializeFlat($ini));
+    }
 }

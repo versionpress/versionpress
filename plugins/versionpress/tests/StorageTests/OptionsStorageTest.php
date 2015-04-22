@@ -45,6 +45,21 @@ class OptionsStorageTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse(strpos($content, 'option_name'), 'Option contains an option_name key');
     }
 
+    /**
+     * @test
+     */
+    public function storageSupportsOptionsWithDotsInName() {
+        $testingOption = array(
+            "option_name" => "some option with . in name",
+            "option_value" => "some value",
+            "autoload" => "yes",
+        );
+
+        $this->storage->save($testingOption);
+        $loadedOption = $this->storage->loadEntity($testingOption['option_name']);
+        $this->assertEquals($testingOption, $loadedOption);
+    }
+
     protected function setUp() {
         parent::setUp();
         $entityInfo = new EntityInfo(array(
