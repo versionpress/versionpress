@@ -621,7 +621,6 @@ if (VersionPress::isActive()) {
 }
 
 add_action('admin_enqueue_scripts', 'vp_enqueue_styles_and_scripts');
-add_action('wp_enqueue_scripts', 'vp_enqueue_styles_and_scripts');
 function vp_enqueue_styles_and_scripts() {
     wp_enqueue_style('versionpress_popover_style', plugins_url('admin/public/css/jquery.webui-popover.min.css', __FILE__));
     wp_enqueue_style('versionpress_popover_custom_style', plugins_url('admin/public/css/popover-custom.css', __FILE__));
