@@ -30,12 +30,16 @@ class WpAutomation {
 
     /** @var SiteConfig */
     private $siteConfig;
+    /** @var string */
+    private $wpCliVersion;
 
     /**
      * @param SiteConfig $siteConfig
+     * @param string $wpCliVersion
      */
-    function __construct($siteConfig) {
+    function __construct($siteConfig, $wpCliVersion) {
         $this->siteConfig = $siteConfig;
+        $this->wpCliVersion = $wpCliVersion;
     }
 
 
@@ -661,20 +665,25 @@ class WpAutomation {
      * @return string The path to the custom WP-CLI PHAR.
      */
     public function getWpCli() {
-        $wpCliPath = sys_get_temp_dir() . '/wp-cli-latest-stable.phar';
-        $wpCliTmpPath = $wpCliPath . '.tmp';
-        if (!file_exists($wpCliPath) || $this->fileIsOlderThanDays($wpCliPath, 1)) {
-            $pharResource = @fopen("https://github.com/wp-cli/builds/blob/gh-pages/phar/wp-cli.phar?raw=true", 'r');
-            if ($pharResource) {
-                file_put_contents($wpCliTmpPath, $pharResource);
-                $checksum = trim(file_get_contents('https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar.md5'));
+        $wpCliName = "wp-cli-{$this->wpCliVersion}.phar";
 
-                if ($checksum != md5_file($wpCliTmpPath)) {
-                    trigger_error("Wrong checksum of WP-CLI PHAR", E_USER_NOTICE);
-                } else {
-                    rename($wpCliTmpPath, $wpCliPath);
-                }
-            } // else we're probably offline or there was some kind of network error
+
+        $wpCliPath = sys_get_temp_dir() . '/' . $wpCliName;
+        $wpCliTmpPath = $wpCliPath . '.tmp';
+
+        if (!file_exists($wpCliPath) || ($this->wpCliVersion === "latest-stable" && $this->fileIsOlderThanDays($wpCliPath, 1))) {
+            $pharResource = @fopen($this->getWpCliDownloadUrl(), 'r');
+            if (!$pharResource) {
+                return $wpCliPath; // we're probably offline or there was some kind of network error
+            }
+
+            file_put_contents($wpCliTmpPath, $pharResource);
+
+            if ($this->wpCliVersion === "latest-stable" && !$this->checkLatestStableChecksum($wpCliTmpPath)) {
+                trigger_error("Wrong checksum of WP-CLI PHAR", E_USER_NOTICE);
+            } else {
+                rename($wpCliTmpPath, $wpCliPath);
+            }
         }
         return $wpCliPath;
     }
@@ -683,4 +692,16 @@ class WpAutomation {
         return time() - filemtime($filePath) >= 60 * 60 * 24 * $days;
     }
 
+    private function getWpCliDownloadUrl() {
+        if ($this->wpCliVersion === "latest-stable") {
+            return "https://github.com/wp-cli/builds/blob/gh-pages/phar/wp-cli.phar?raw=true";
+        } else {
+            return "https://github.com/wp-cli/wp-cli/releases/download/v{$this->wpCliVersion}/wp-cli-{$this->wpCliVersion}.phar";
+        }
+    }
+
+    private function checkLatestStableChecksum($wpCliTmpPath) {
+        $checksum = trim(file_get_contents('https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar.md5'));
+        return $checksum == md5_file($wpCliTmpPath);
+    }
 }

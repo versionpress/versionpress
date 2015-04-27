@@ -35,6 +35,13 @@ class TestConfig {
      */
     public $end2endTestType;
 
+    /**
+     * Version of WP-CLI that will be used (e.g. 0.19.0 / latest-stable)
+     *
+     * @var string
+     */
+    public $wpCliVersion;
+
     public static $defaultConfigFile;
 
     function __construct($configFile) {
@@ -44,6 +51,7 @@ class TestConfig {
         $this->seleniumConfig->firefoxBinary = $rawConfig['selenium']['firefox-binary'];
         $this->seleniumConfig->postCommitWaitTime = $rawConfig['selenium']['post-commit-wait-time'];
         $this->end2endTestType = $rawConfig['end2end-test-type'];
+        $this->wpCliVersion = $rawConfig['wp-cli-version'];
 
         $this->sites = array();
         foreach ($rawConfig['sites'] as $siteId => $rawSiteConfig) {
