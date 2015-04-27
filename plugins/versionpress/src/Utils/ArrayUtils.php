@@ -161,4 +161,42 @@ class ArrayUtils {
         }
         return $resultArray;
     }
+
+    /**
+     * Transforms and groups data in array
+     * $mapFn emits key and value. These values are grouped by their keys and passed into $reduceFn
+     * which can transform the group and emit result.
+     *
+     * $mapFn    has signature ($item, $mapEmit) where $item is item from data and $mapEmit is emit function
+     * $reduceFn has signature ($key, $items, $reduceEmit) where $key is the key the data are grouped by,
+     *           $items is the group and $reduce emit is an emit function
+     * $mapEmit has signature ($key, $value) where $key is the key the data are grouped by and $value is a transformed item
+     * $reduceEmit has signature ($obj) where $obj is the transformed group
+     *
+     * @param $data
+     * @param $mapFn
+     * @param $reduceFn
+     */
+    public static function mapreduce($data, $mapFn, $reduceFn) {
+        $mapResult = array();
+        $reduceResult = array();
+
+        $mapEmit = function ($key, $value) use (&$mapResult) {
+          $mapResult[$key][] = $value;
+        };
+
+        $reduceEmit = function ($obj) use (&$reduceResult) {
+          $reduceResult[] = $obj;
+        };
+
+        foreach ($data as $item) {
+            $mapFn($item, $mapEmit);
+        }
+
+        foreach ($mapResult as $key => $value) {
+            $reduceFn($key, $mapResult[$key], $reduceEmit);
+        }
+
+        return $reduceResult;
+    }
 }
