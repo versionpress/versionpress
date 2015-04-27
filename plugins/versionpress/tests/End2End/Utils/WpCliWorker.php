@@ -12,7 +12,7 @@ class WpCliWorker implements ITestWorker {
     protected $testConfig;
 
     public function __construct(TestConfig $testConfig) {
-        $this->wpAutomation = new WpAutomation($testConfig->testSite);
+        $this->wpAutomation = new WpAutomation($testConfig->testSite, $testConfig->wpCliVersion);
         $this->testConfig = $testConfig;
     }
 

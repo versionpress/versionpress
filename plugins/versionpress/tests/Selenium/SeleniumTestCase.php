@@ -70,7 +70,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
         }
 
         if (!self::$wpAutomation) {
-            self::$wpAutomation = new WpAutomation(self::$testConfig->testSite);
+            self::$wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
         }
 
         self::$staticInitializationDone = true;
