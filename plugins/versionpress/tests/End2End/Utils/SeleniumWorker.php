@@ -97,7 +97,7 @@ class SeleniumWorker implements ITestWorker {
 
         $strategy = new PHPUnit_Extensions_Selenium2TestCase_SessionStrategy_Shared(new PHPUnit_Extensions_Selenium2TestCase_SessionStrategy_Isolated());
         self::$sharedSession = $strategy->session($parameters);
-        self::$wpAutomation = new WpAutomation(self::$testConfig->testSite);
+        self::$wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
     }
 
     function __call($name, $arguments) {

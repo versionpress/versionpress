@@ -45,7 +45,7 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
     }
 
     private static function setUpSite() {
-        $wpAutomation = new WpAutomation(self::$testConfig->testSite);
+        $wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
         if (!$wpAutomation->isSiteSetUp()) {
             $wpAutomation->setUpSite();
         }

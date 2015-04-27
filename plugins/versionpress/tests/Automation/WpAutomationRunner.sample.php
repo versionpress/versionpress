@@ -21,7 +21,7 @@ class WpAutomationRunnerSample extends \PHPUnit_Framework_TestCase {
      */
     public function runAutomation() {
         $testConfig = TestConfig::createDefaultConfig();
-        $wpAutomation = new WpAutomation($testConfig->testSite);
+        $wpAutomation = new WpAutomation($testConfig->testSite, $testConfig->wpCliVersion);
 
         $wpAutomation->setUpSite();
         $wpAutomation->copyVersionPressFiles();
