@@ -522,6 +522,8 @@ class WpAutomation {
         if ($this->siteConfig->dbPassword) $args["dbpass"] = $this->siteConfig->dbPassword;
         if ($this->siteConfig->dbHost) $args["dbhost"] = $this->siteConfig->dbHost;
 
+        $args["skip-salts"] = null;
+
         $this->runWpCliCommand("core", "config", $args);
     }
 
@@ -662,14 +664,17 @@ class WpAutomation {
         $wpCliPath = sys_get_temp_dir() . '/wp-cli-latest-stable.phar';
         $wpCliTmpPath = $wpCliPath . '.tmp';
         if (!file_exists($wpCliPath) || $this->fileIsOlderThanDays($wpCliPath, 1)) {
-            file_put_contents($wpCliTmpPath, fopen("https://github.com/wp-cli/builds/blob/gh-pages/phar/wp-cli.phar?raw=true", 'r'));
-            $checksum = trim(file_get_contents('https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar.md5'));
+            $pharResource = @fopen("https://github.com/wp-cli/builds/blob/gh-pages/phar/wp-cli.phar?raw=true", 'r');
+            if ($pharResource) {
+                file_put_contents($wpCliTmpPath, $pharResource);
+                $checksum = trim(file_get_contents('https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar.md5'));
 
-            if ($checksum != md5_file($wpCliTmpPath)) {
-                trigger_error("Wrong checksum of WP-CLI PHAR", E_USER_NOTICE);
-            } else {
-                rename($wpCliTmpPath, $wpCliPath);
-            }
+                if ($checksum != md5_file($wpCliTmpPath)) {
+                    trigger_error("Wrong checksum of WP-CLI PHAR", E_USER_NOTICE);
+                } else {
+                    rename($wpCliTmpPath, $wpCliPath);
+                }
+            } // else we're probably offline or there was some kind of network error
         }
         return $wpCliPath;
     }
