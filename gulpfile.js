@@ -248,7 +248,10 @@ gulp.task('composer-install-versionpress-libs', function() {
 gulp.task('init-project-settings-files', function() {
     return gulp.src('./.idea/*.tpl.xml')
             .pipe(rename(function(path) {
-                path.basename = path.basename.substr(0, path.basename.length-4); // cut '.tpl' from the filename
+                var targetName = path.basename.substr(0, path.basename.length - 4) // cut '.tpl' from the filename
+                if (!fs.existsSync(targetName)) {
+                    path.basename = targetName; 
+                }
             }))
             .pipe(gulp.dest('./.idea'));
 });
@@ -259,7 +262,11 @@ gulp.task('init-project-settings-files', function() {
 gulp.task('git-config', ['composer-install-ext-libs', 'composer-install-versionpress-libs', 'init-project-settings-files'], function(cb) {
     return git.exec({args: 'config core.ignorecase false'}, function (err, stdout) {
         if(err) { console.log(err); }
-        cb();
+
+        git.exec({args: 'config merge.ff false'}, function (err, stdout) {
+            if(err) { console.log(err); }
+            cb();
+        });
     });
 });
 
