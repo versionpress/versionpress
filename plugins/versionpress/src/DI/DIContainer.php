@@ -7,6 +7,7 @@ use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ExtendedWpdb;
 use VersionPress\Database\MirroringDatabase;
+use VersionPress\Database\VpidRepository;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
 use VersionPress\Initialization\Initializer;
@@ -19,7 +20,7 @@ class DIContainer {
     /** @var DIContainer */
     private static $instance;
     private $providers;
-    private $instances;
+    private $services;
 
     public function register($name, $serviceProvider) {
         $this->providers[$name] = $serviceProvider;
@@ -30,11 +31,11 @@ class DIContainer {
      * @return mixed Service instance
      */
     public function resolve($name) {
-        if (!isset($this->instances[$name])) {
+        if (!isset($this->services[$name])) {
             $provider = $this->providers[$name];
-            $this->instances[$name] = $provider();
+            $this->services[$name] = $provider();
         }
-        return $this->instances[$name];
+        return $this->services[$name];
     }
 
     /**
@@ -102,6 +103,10 @@ class DIContainer {
             /** @var VersionPressConfig $vpConfig */
             $vpConfig = $dic->resolve(VersionPressServices::VP_CONFIGURATION);
             return new GitRepository(ABSPATH, VERSIONPRESS_TEMP_DIR, "[VP] ", $vpConfig->gitBinary);
+        });
+
+        $dic->register(VersionPressServices::VPID_REPOSITORY, function () use ($dic) {
+            return new VpidRepository($dic->resolve(VersionPressServices::DATABASE), $dic->resolve(VersionPressServices::DB_SCHEMA));
         });
 
         return self::$instance;

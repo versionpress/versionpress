@@ -36,10 +36,10 @@ class MenusTest extends End2EndTestCase {
 
     /**
      * @test
-     * @testdox Editing menu creates 'term/edit' action
+     * @testdox Renaming menu creates 'term/rename' action
      * @depends addingMenuCreatesTermCreateAction
      */
-    public function editingMenuCreatesTermEditAction() {
+    public function renamingMenuCreatesTermRenameAction() {
         self::$worker->prepare_editMenu();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -47,17 +47,16 @@ class MenusTest extends End2EndTestCase {
         self::$worker->editMenu();
 
         $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("term/edit");
+        $commitAsserter->assertCommitAction("term/rename");
         $commitAsserter->assertCommitPath('M', "%vpdb%/terms.ini");
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
-
     /**
      * @test
      * @testdox Adding menu item creates 'post/create' action
-     * @depends editingMenuCreatesTermEditAction
+     * @depends renamingMenuCreatesTermRenameAction
      */
     public function addingMenuItemCreatesPostCreateAction() {
         self::$worker->prepare_addMenuItem();
