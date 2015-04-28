@@ -9,7 +9,6 @@ Author URI: http://versionpress.net/
 License: GPLv2 or later
 */
 
-use Tracy\Debugger;
 use VersionPress\ChangeInfos\PluginChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\VersionPressChangeInfo;

@@ -2,6 +2,7 @@
 
 namespace VersionPress\Tests\Utils;
 
+use VersionPress\ChangeInfos\BulkChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\EntityChangeInfo;
@@ -104,7 +105,11 @@ class ChangeInfoUtils {
 
         if ($changeInfo instanceof ChangeInfoEnvelope) {
             /** @var ChangeInfoEnvelope $changeInfo */
-            $sortedChangeInfos = $changeInfo->getSortedChangeInfoList();
+            $sortedChangeInfos = $changeInfo->getReorganizedInfoList();
+            if ($sortedChangeInfos[0] instanceof BulkChangeInfo) {
+                $ungroupedChangeInfos = $sortedChangeInfos[0]->getChangeInfos();
+                return $ungroupedChangeInfos[0];
+            }
             return $sortedChangeInfos[0];
         } else {
             return $changeInfo;
