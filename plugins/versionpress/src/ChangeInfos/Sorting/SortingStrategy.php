@@ -4,6 +4,7 @@ namespace ChangeInfos\Sorting;
 
 
 use Nette\Utils\Strings;
+use VersionPress\ChangeInfos\BulkChangeInfo;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\OptionChangeInfo;
 use VersionPress\ChangeInfos\PostChangeInfo;
@@ -69,24 +70,26 @@ class SortingStrategy {
 
         // From here both ChangeInfo objects are instance of the same class
 
-        if ($changeInfo1 instanceof ThemeChangeInfo) {
+        if ($changeInfo1 instanceof ThemeChangeInfo && $changeInfo2 instanceof ThemeChangeInfo) {
             return $this->compareThemeChangeInfo($changeInfo1, $changeInfo2);
         }
 
-        if ($changeInfo1 instanceof OptionChangeInfo) {
+        if ($changeInfo1 instanceof OptionChangeInfo && $changeInfo2 instanceof OptionChangeInfo) {
             return $this->compareOptionChangeInfo($changeInfo1, $changeInfo2);
         }
 
-        if ($changeInfo1 instanceof TermChangeInfo) {
+        if ($changeInfo1 instanceof TermChangeInfo && $changeInfo2 instanceof TermChangeInfo) {
             return $this->compareTermChangeInfo($changeInfo1, $changeInfo2);
         }
 
-        if ($changeInfo1 instanceof PostChangeInfo) {
+        if ($changeInfo1 instanceof PostChangeInfo && $changeInfo2 instanceof PostChangeInfo) {
             return $this->comparePostChangeInfo($changeInfo1, $changeInfo2);
         }
 
-
-        if ($changeInfo1 instanceof EntityChangeInfo) {
+        if (($changeInfo1 instanceof EntityChangeInfo && $changeInfo2 instanceof EntityChangeInfo)
+         || ($changeInfo1 instanceof EntityChangeInfo && $changeInfo2 instanceof BulkChangeInfo)
+         || ($changeInfo1 instanceof BulkChangeInfo && $changeInfo2 instanceof EntityChangeInfo)
+         || ($changeInfo1 instanceof BulkChangeInfo && $changeInfo2 instanceof BulkChangeInfo)) {
             // Generally, the "create" action takes precedence
             if ($changeInfo1->getAction() === "create") {
                 return -1;

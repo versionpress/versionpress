@@ -48,7 +48,7 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase {
     }
 
     /** @test */
-    public function banan() {
+    public function bulkChangeInfoDoesNotAffectChangeInfoOrder() {
         $higherPriorityPostChangeInfo = new PostChangeInfo("create", "1234567890", "post", "Test title");
         $lowerPriorityPostChangeInfo1 = new PostChangeInfo("edit", "1234567890", "post", "Other title");
         $lowerPriorityPostChangeInfo2 = new PostChangeInfo("edit", "1234567890", "post", "Different title");
