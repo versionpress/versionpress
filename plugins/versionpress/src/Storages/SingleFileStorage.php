@@ -52,13 +52,16 @@ abstract class SingleFileStorage extends Storage {
 
         if ($isNew) {
             $this->entities[$vpid] = array();
+            $oldEntity = null;
+        } else {
+            $oldEntity = $originalEntities[$vpid];
         }
 
         $this->updateEntity($vpid, $data);
 
         if ($this->entities != $originalEntities) {
             $this->saveEntities();
-            return $this->createChangeInfo(null, $this->entities[$vpid], $isNew ? 'create' : 'edit');
+            return $this->createChangeInfo($oldEntity, $this->entities[$vpid], $isNew ? 'create' : 'edit');
         } else {
             return null;
         }
@@ -80,7 +83,7 @@ abstract class SingleFileStorage extends Storage {
 
         if ($this->entities != $originalEntities) {
             $this->saveEntities();
-            return $this->createChangeInfo(null, $entity, 'delete');
+            return $this->createChangeInfo($entity, $entity, 'delete');
         } else {
             return null;
         }
