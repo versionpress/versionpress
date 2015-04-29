@@ -1,2 +1,9 @@
-Allow From All
-Satisfy Any
+# Apache 2.2
+<IfModule !mod_authz_core.c>
+    Allow from all
+</IfModule>
+
+# Apache 2.4
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
