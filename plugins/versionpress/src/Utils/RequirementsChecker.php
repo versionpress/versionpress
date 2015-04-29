@@ -96,7 +96,7 @@ class RequirementsChecker {
         );
 
         $this->requirements[] = array(
-            'name' => '.htaccess or web.config support',
+            'name' => 'Access rules can be installed',
             'level' => 'warning',
             'fulfilled' => $this->tryAccessControlFiles(),
             'help' => 'VersionPress automatically tries to secure certain locations, like `wp-content/vpdb`. You either don\'t have a supported web server or rules cannot be enforced. [Learn more](http://docs.versionpress.net/en/getting-started/installation-uninstallation#supported-web-servers).'
