@@ -38,14 +38,14 @@ class UserMetaChangeInfo extends EntityChangeInfo {
 
     public function getChangeDescription() {
         if ($this->getAction() === "create") {
-            return "New option '{$this->userMetaKey}' for user '{$this->userLogin}'";
+            return "New user-meta '{$this->userMetaKey}' for user '{$this->userLogin}'";
         }
 
         if ($this->getAction() === "delete") {
-            return "Deleted option '{$this->userMetaKey}' for user '{$this->userLogin}'";
+            return "Deleted user-meta '{$this->userMetaKey}' for user '{$this->userLogin}'";
         }
 
-        return "Edited option '{$this->userMetaKey}' for user '{$this->userLogin}'";
+        return "Edited user-meta '{$this->userMetaKey}' for user '{$this->userLogin}'";
     }
 
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
