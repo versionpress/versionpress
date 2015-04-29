@@ -66,7 +66,11 @@ Some advanced users like having their plugins directory and other folders outsid
 
 ### Supported web servers
 
-Apache 2.2+ and IIS 7+ are supported out of the box if they don't suppress custom rules in their global configuration (which they can). If the folders cannot be protected automatically, make sure direct access is denied for the following locations:
+Apache 2.2+, IIS 7+ and nginx are supported. 
+
+For Apache and IIS we automatically install access rules to protect direct access to certain locations. For nginx, please include `wp-content/plugins/versionpress/versionpress-nginx.conf` to your virtual host config.
+
+If the locations cannot be protected automatically (e.g., due to global configuration), make sure direct access is denied for the following locations:
 
  - `/wp-content/vpdb`
  - `/wp-content/vpbackups`
