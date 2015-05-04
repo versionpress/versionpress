@@ -193,6 +193,71 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         DBAsserter::assertFilesEqualDatabase();
     }
 
+    public function runEditationOfMultiplePostsCreatesBulkAction() {
+        self::$worker->prepare_changeStatusOfTwoPosts();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->changeStatusOfTwoPosts();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('post/edit', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    public function runTrashingMultiplePostsCreatesBulkAction() {
+        self::$worker->prepare_moveTwoPostsInTrash();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->moveTwoPostsInTrash();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('post/trash', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    public function runUntrashingMultiplePostsCreatesBulkAction() {
+        self::$worker->prepare_moveTwoPostsFromTrash();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->moveTwoPostsFromTrash();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('post/untrash', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    public function runDeletingMultiplePostsCreatesBulkAction() {
+        self::$worker->prepare_deleteTwoPosts();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->deleteTwoPosts();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('post/delete', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    public function runPublishingMultiplePostsCreatesBulkAction() {
+        self::$worker->prepare_publishTwoPosts();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->publishTwoPosts();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('post/publish', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
     private function getPostType() {
         return self::$worker->getPostType();
     }

@@ -120,4 +120,56 @@ abstract class PostTypeTestWpCliWorker extends WpCliWorker implements IPostTypeT
 
     public function makeDraftFromUnsavedPost() {
     }
+
+    public function prepare_changeStatusOfTwoPosts() {
+        $this->postId = array();
+        $this->postId[] = $this->wpAutomation->createPost($this->testPost);
+        $this->postId[] = $this->wpAutomation->createPost($this->testPost);
+    }
+
+    public function changeStatusOfTwoPosts() {
+        $this->wpAutomation->runWpCliCommand('post', 'update', array_merge($this->postId, array('post_status' => 'private')));
+    }
+
+    public function prepare_moveTwoPostsInTrash() {
+        $this->postId = array();
+        $this->postId[] = $this->wpAutomation->createPost($this->testPost);
+        $this->postId[] = $this->wpAutomation->createPost($this->testPost);
+    }
+
+    public function moveTwoPostsInTrash() {
+        $this->wpAutomation->runWpCliCommand('post', 'delete', $this->postId);
+    }
+
+    public function prepare_moveTwoPostsFromTrash() {
+        $trashedPost = array_merge($this->testPost, array('post_status' => 'trash'));
+        $this->postId = array();
+        $this->postId[] = $this->wpAutomation->createPost($trashedPost);
+        $this->postId[] = $this->wpAutomation->createPost($trashedPost);
+    }
+
+    public function moveTwoPostsFromTrash() {
+        $this->wpAutomation->runWpCliCommand('post', 'update', array_merge($this->postId, array('post_status' => 'publish')));
+    }
+
+    public function prepare_deleteTwoPosts() {
+        $this->postId = array();
+        $this->postId[] = $this->wpAutomation->createPost($this->testPost);
+        $this->postId[] = $this->wpAutomation->createPost($this->testPost);
+    }
+
+    public function deleteTwoPosts() {
+        $this->wpAutomation->runWpCliCommand('post', 'delete', array_merge($this->postId, array('force' => null)));
+    }
+
+    public function prepare_publishTwoPosts() {
+        $draft = array_merge($this->testPost, array('post_status' => 'draft'));
+        $this->postId = array();
+        $this->postId[] = $this->wpAutomation->createPost($draft);
+        $this->postId[] = $this->wpAutomation->createPost($draft);
+    }
+
+    public function publishTwoPosts() {
+        $this->wpAutomation->runWpCliCommand('post', 'update', array_merge($this->postId, array('post_status' => 'publish')));
+    }
 }

@@ -2,8 +2,6 @@
 
 namespace VersionPress\Tests\End2End\Utils;
 
-use Nette\Utils\Strings;
-
 abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPostTypeTestWorker {
 
     abstract public function getPostType();
@@ -181,5 +179,65 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
         $this->waitAfterRedirect();
         $this->byCssSelector('form#post input#title')->value("Test " . $this->getPostType());
         $this->setTinyMCEContent("Test content");
+    }
+
+    public function prepare_changeStatusOfTwoPosts() {
+        $this->url($this->getPostTypeScreenUrl());
+        $this->changeStatusOfTwoLastPosts('publish');
+    }
+
+    public function changeStatusOfTwoPosts() {
+        $this->changeStatusOfTwoLastPosts('private');
+    }
+
+    private function changeStatusOfTwoLastPosts($status) {
+        $this->performBulkActionWithTwoLastPosts('edit');
+
+        // change status and submit
+        $this->select($this->byCssSelector('#bulk-edit [name=_status]'))->selectOptionByValue($status);
+        $this->jsClickAndWait('#bulk_edit');
+    }
+
+    public function prepare_moveTwoPostsInTrash() {
+
+    }
+
+    public function moveTwoPostsInTrash() {
+        $this->url($this->getPostTypeScreenUrl());
+        $this->performBulkActionWithTwoLastPosts('trash');
+    }
+
+    public function prepare_moveTwoPostsFromTrash() {
+    }
+
+    public function moveTwoPostsFromTrash() {
+        $this->url($this->getPostTypeScreenUrl() . '&post_status=trash'); // open trash
+        $this->performBulkActionWithTwoLastPosts('untrash');
+    }
+
+    public function prepare_deleteTwoPosts() {
+    }
+
+    public function deleteTwoPosts() {
+        $this->url($this->getPostTypeScreenUrl() . '&post_status=trash'); // open trash
+        $this->performBulkActionWithTwoLastPosts('delete');
+    }
+
+    public function prepare_publishTwoPosts() {
+        $this->url($this->getPostTypeScreenUrl());
+        $this->changeStatusOfTwoLastPosts('draft');
+    }
+
+    public function publishTwoPosts() {
+        $this->changeStatusOfTwoLastPosts('publish');
+    }
+
+    private function performBulkActionWithTwoLastPosts($action) {
+        // select two last posts
+        $this->jsClick('table.posts tbody tr:nth-child(1) .check-column input[type=checkbox]');
+        $this->jsClick('table.posts tbody tr:nth-child(2) .check-column input[type=checkbox]');
+        // choose bulk edit
+        $this->select($this->byId('bulk-action-selector-top'))->selectOptionByValue($action);
+        $this->jsClickAndWait('#doaction');
     }
 }
