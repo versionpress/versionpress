@@ -50,6 +50,10 @@ abstract class MetaEntityStorage extends Storage {
         $newParent = $this->parentStorage->loadEntity($data[$this->parentReferenceName], null);
         $newEntity = $this->extractEntityFromParent($newParent, $data['vp_id']);
 
+        if ($oldEntity == $newEntity) {
+            return null;
+        }
+
         if (!$oldEntity) {
             $action = 'create';
         } else {
