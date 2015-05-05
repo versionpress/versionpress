@@ -31,17 +31,17 @@ class OptionsTest extends End2EndTestCase {
 
     /**
      * @test
-     * @testdox Changing more option creates 'option/edit' action
+     * @testdox Changing more option creates bulk 'option/edit' action
      */
     public function changingMoreOptionsCreatesOptionEditAction() {
-        self::$worker->prepare_changeMoreOptions();
+        self::$worker->prepare_changeTwoOptions();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        self::$worker->changeMoreOptions();
+        self::$worker->changeTwoOptions();
 
         $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction('option/edit');
+        $commitAsserter->assertBulkAction('option/edit', 2);
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
