@@ -10,15 +10,19 @@ class OptionsStorage extends SingleFileStorage {
     protected $notSavedFields = array('option_id');
 
     public function shouldBeSaved($data) {
+        $blacklist = array(
+            'cron',          // Cron, siteurl and home are specific for environment, so they're not saved, too.
+            'home',
+            'siteurl',
+            'db_upgraded',
+            'recently_edited',
+            'auto_updater.lock',
+            'can_compress_scripts',
+            'auto_core_update_notified',
+        );
+
         $id = $data[$this->entityInfo->idColumnName];
-        return !(substr($id, 0, 1) === '_' // With underscore begins all transient settings - there's no need to save them
-            || $id === 'cron'          // Cron, siteurl and home are specific for environment, so they're not saved, too.
-            || $id === 'siteurl'
-            || $id === 'home'
-            || $id === 'db_upgraded'
-            || $id === 'auto_updater.lock'
-            || $id === 'recently_edited'
-            || $id === 'can_compress_scripts');
+        return !($this->isTransientOption($id) || in_array($id, $blacklist));
     }
 
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
@@ -37,5 +41,9 @@ class OptionsStorage extends SingleFileStorage {
         } else {
             $this->entities = array();
         }
+    }
+
+    private function isTransientOption($id) {
+        return substr($id, 0, 1) === '_'; // All transient options begin with underscore - there's no need to save them
     }
 }
