@@ -56,7 +56,7 @@ class PostMetaChangeInfo extends EntityChangeInfo {
 
     public function getChangeDescription() {
         $verb = "Edited";
-        $subject = "option '{$this->metaKey}'";
+        $subject = "post-meta '{$this->metaKey}'";
         $rest = "for {$this->postType} '{$this->postTitle}'";
 
         if ($this->metaKey === "_thumbnail_id") { // featured image
