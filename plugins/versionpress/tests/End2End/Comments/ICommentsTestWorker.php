@@ -32,4 +32,28 @@ interface ICommentsTestWorker {
 
     public function prepare_markAsNotSpam();
     public function markAsNotSpam();
+
+    public function prepare_editTwoComments();
+    public function editTwoComments();
+
+    public function prepare_deleteTwoComments();
+    public function deleteTwoComments();
+
+    public function prepare_moveTwoCommentsInTrash();
+    public function moveTwoCommentsInTrash();
+
+    public function prepare_moveTwoCommentsFromTrash();
+    public function moveTwoCommentsFromTrash();
+
+    public function prepare_markTwoCommentsAsSpam();
+    public function markTwoCommentsAsSpam();
+
+    public function prepare_markTwoSpamCommentsAsNotSpam();
+    public function markTwoSpamCommentsAsNotSpam();
+
+    public function prepare_unapproveTwoComments();
+    public function unapproveTwoComments();
+
+    public function prepare_approveTwoComments();
+    public function approveTwoComments();
 }
