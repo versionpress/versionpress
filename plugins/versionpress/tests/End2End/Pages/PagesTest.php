@@ -93,4 +93,44 @@ class PagesTest extends PostTypeTestCase {
     public function publishingDraftCreatesPostPublishAction() {
         $this->runPublishDraftTest();
     }
+
+    /**
+     * @test
+     * @testdox Editation multiple pages creates bulk action
+     */
+    public function editationOfMultiplePagesCreatesBulkAction() {
+        $this->runEditationOfMultiplePostsCreatesBulkAction();
+    }
+
+    /**
+     * @test
+     * @testdox Trashing multiple pages creates bulk action
+     */
+    public function trashingOfMultiplePagesCreatesBulkAction() {
+        $this->runTrashingMultiplePostsCreatesBulkAction();
+    }
+
+    /**
+     * @test
+     * @testdox Untrashing multiple pages creates bulk action
+     */
+    public function untrashingOfMultiplePagesCreatesBulkAction() {
+        $this->runUntrashingMultiplePostsCreatesBulkAction();
+    }
+
+    /**
+     * @test
+     * @testdox Deleting multiple pages creates bulk action
+     */
+    public function deletingOfMultiplePagesCreatesBulkAction() {
+        $this->runDeletingMultiplePostsCreatesBulkAction();
+    }
+
+    /**
+     * @test
+     * @testdox Publishing multiple pages creates bulk action
+     */
+    public function publishingOfMultiplePagesCreatesBulkAction() {
+        $this->runPublishingMultiplePostsCreatesBulkAction();
+    }
 }

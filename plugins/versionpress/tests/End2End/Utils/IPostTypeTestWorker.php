@@ -50,4 +50,18 @@ interface IPostTypeTestWorker extends ITestWorker {
     public function prepare_changePostFormat();
     public function changePostFormat();
 
+    public function prepare_changeStatusOfTwoPosts();
+    public function changeStatusOfTwoPosts();
+
+    public function prepare_moveTwoPostsInTrash();
+    public function moveTwoPostsInTrash();
+
+    public function prepare_moveTwoPostsFromTrash();
+    public function moveTwoPostsFromTrash();
+
+    public function prepare_deleteTwoPosts();
+    public function deleteTwoPosts();
+
+    public function prepare_publishTwoPosts();
+    public function publishTwoPosts();
 }

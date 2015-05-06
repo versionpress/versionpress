@@ -210,4 +210,140 @@ class CommentsTest extends End2EndTestCase {
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
+
+    /**
+     * @test
+     * @testdox Editing multiple comments creates bulk action
+     */
+    public function editingMultipleCommentsCreatesBulkAction() {
+        self::$worker->prepare_editTwoComments();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->editTwoComments();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('comment/edit', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Deleting multiple comments creates bulk action
+     */
+    public function deletingMultipleCommentsCreatesBulkAction() {
+        self::$worker->prepare_deleteTwoComments();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->deleteTwoComments();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('comment/delete', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Trashing multiple comments creates bulk action
+     */
+    public function trashingMultipleCommentsCreatesBulkAction() {
+        self::$worker->prepare_moveTwoCommentsInTrash();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->moveTwoCommentsInTrash();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('comment/trash', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Untrashing multiple comments creates bulk action
+     */
+    public function untrashingMultipleCommentsCreatesBulkAction() {
+        self::$worker->prepare_moveTwoCommentsFromTrash();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->moveTwoCommentsFromTrash();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('comment/untrash', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Marking multiple comments as spam creates bulk action
+     */
+    public function markingMultipleCommentsAsSpamCreatesBulkAction() {
+        self::$worker->prepare_markTwoCommentsAsSpam();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->markTwoCommentsAsSpam();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('comment/spam', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Marking multiple spam comments as not spam creates bulk action
+     */
+    public function markingMultipleSpamCommentsAsNotSpamCreatesBulkAction() {
+        self::$worker->prepare_markTwoSpamCommentsAsNotSpam();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->markTwoSpamCommentsAsNotSpam();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('comment/unspam', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Unapproving multiple comments creates bulk action
+     */
+    public function unapprovingMultipleCommentsCreatesBulkAction() {
+        self::$worker->prepare_unapproveTwoComments();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->unapproveTwoComments();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('comment/unapprove', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Approving multiple comments creates bulk action
+     */
+    public function approvingMultipleCommentsCreatesBulkAction() {
+        self::$worker->prepare_approveTwoComments();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->approveTwoComments();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('comment/approve', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
 }

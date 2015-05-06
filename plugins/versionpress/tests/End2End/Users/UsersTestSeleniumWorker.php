@@ -2,11 +2,14 @@
 
 namespace VersionPress\Tests\End2End\Users;
 
+use Nette\Utils\Random;
+use Nette\Utils\Strings;
 use VersionPress\Tests\End2End\Utils\SeleniumWorker;
 
 class UsersTestSeleniumWorker extends SeleniumWorker implements IUsersTestWorker {
 
     private $testUser;
+    private $userIds = array();
 
     public function setTestUser($testUser) {
         $this->testUser = $testUser;
@@ -64,5 +67,66 @@ class UsersTestSeleniumWorker extends SeleniumWorker implements IUsersTestWorker
         $this->byCssSelector('#delete_option0')->click();
         $this->byCssSelector('#updateusers')->submit();
         $this->waitAfterRedirect();
+    }
+
+    public function prepare_editTwoUsers() {
+        throw new \PHPUnit_Framework_SkippedTestError("There is no way to edit multiple users in the GUI");
+    }
+
+    public function editTwoUsers() {
+    }
+
+
+    public function prepare_deleteTwoUsers() {
+        $this->userIds = array();
+        $this->userIds[] = self::$wpAutomation->createUser($this->prepareTestUser());
+        $this->userIds[] = self::$wpAutomation->createUser($this->prepareTestUser());
+    }
+
+    public function deleteTwoUsers() {
+        $this->url('wp-admin/users.php');
+
+        foreach ($this->userIds as $id) {
+            $this->jsClick("#user-$id .check-column input[type=checkbox]");
+        }
+
+        $this->select($this->byId('bulk-action-selector-top'))->selectOptionByValue('delete');
+        $this->jsClickAndWait('#doaction');
+        $this->byCssSelector('#delete_option0')->click();
+        $this->byCssSelector('#updateusers')->submit();
+        $this->waitAfterRedirect();
+    }
+
+    private function prepareTestUser() {
+        return array(
+            'user_login' => 'bulk_' . Random::generate(),
+            'user_email' => 'bulk.' . Random::generate() . '@example.com',
+            'user_pass' => Random::generate(),
+            'first_name' => Random::generate(),
+            'last_name' => Random::generate(),
+        );
+    }
+
+    public function prepare_editTwoUsermeta() {
+        $this->userIds = self::$wpAutomation->createUser($this->prepareTestUser());
+
+        $this->url('wp-admin/users.php');
+        $this->jsClick("#user-{$this->userIds} .username a");
+        $this->waitAfterRedirect();
+    }
+
+    public function editTwoUsermeta() {
+        $this->byCssSelector('#first_name')->value(Random::generate());
+        $this->byCssSelector('#last_name')->value(Random::generate());
+
+        $this->byCssSelector('#your-profile')->submit();
+        $this->waitAfterRedirect();
+    }
+
+    public function tearDownAfterClass() {
+        $users = json_decode(self::$wpAutomation->runWpCliCommand('user', 'list', array('format' => 'json')));
+        $userLogins = array_map(function ($user) { return $user->user_login; }, $users);
+        $usersForBulkTests = array_filter($userLogins, function ($login) { return Strings::startsWith($login, 'bulk_'); });
+        self::$wpAutomation->runWpCliCommand('user', 'delete', array_merge($usersForBulkTests, array('yes' => null)));
     }
 }

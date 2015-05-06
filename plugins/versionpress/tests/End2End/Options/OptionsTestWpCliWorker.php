@@ -19,10 +19,10 @@ class OptionsTestWpCliWorker extends WpCliWorker implements IOptionsTestWorker
         $this->wpAutomation->editOption('blogname', $this->originalBlogName);
     }
 
-    public function prepare_changeMoreOptions() {
+    public function prepare_changeTwoOptions() {
         throw new \PHPUnit_Framework_SkippedTestError("More options cannot be changed at once using WP-CLI");
     }
 
-    public function changeMoreOptions() {
+    public function changeTwoOptions() {
     }
 }

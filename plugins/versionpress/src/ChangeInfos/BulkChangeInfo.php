@@ -50,7 +50,7 @@ abstract class BulkChangeInfo implements ChangeInfo {
         return $this->changeInfos[0]->getAction();
     }
 
-    private function getEntityName() {
+    public function getEntityName() {
         return $this->changeInfos[0]->getEntityName();
     }
 }

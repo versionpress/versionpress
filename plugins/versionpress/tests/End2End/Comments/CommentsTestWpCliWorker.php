@@ -125,4 +125,120 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
 
         return $this->wpAutomation->createPost($post);
     }
+
+    public function prepare_editTwoComments() {
+        $this->lastCreatedComment = array();
+        $comment = $this->prepareTestComment();
+
+        $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
+        $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
+    }
+
+    public function editTwoComments() {
+        $this->wpAutomation->runWpCliCommand('comment', 'update', array_merge($this->lastCreatedComment, array('comment_content' => 'Changed content')));
+    }
+
+    private function prepareTestComment() {
+        $author = $this->testConfig->testSite->adminName;
+        $email = $this->testConfig->testSite->adminEmail;
+
+        if (!$this->testPostId) {
+            $this->testPostId = $this->createTestPost();
+        }
+
+        return array(
+            'comment_author' => $author,
+            'comment_author_email' => $email,
+            'comment_content' => 'Comment by ' . $author,
+            'user_id' => 1,
+            'comment_post_ID' => $this->testPostId
+        );
+    }
+
+    public function prepare_deleteTwoComments() {
+        $this->lastCreatedComment = array();
+        $comment = $this->prepareTestComment();
+
+        $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
+        $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
+    }
+
+    public function deleteTwoComments() {
+        $this->wpAutomation->runWpCliCommand('comment', 'delete', array_merge($this->lastCreatedComment, array('force' => null)));
+    }
+
+    public function prepare_moveTwoCommentsInTrash() {
+        $this->lastCreatedComment = array();
+        $comment = $this->prepareTestComment();
+
+        $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
+        $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
+    }
+
+    public function moveTwoCommentsInTrash() {
+        $this->wpAutomation->runWpCliCommand('comment', 'delete', $this->lastCreatedComment);
+    }
+
+    public function prepare_moveTwoCommentsFromTrash() {
+        $this->lastCreatedComment = array();
+        $trashedComment = $this->prepareTestComment();
+        $trashedComment['comment_approved'] = 'trash';
+
+        $this->lastCreatedComment[] = $this->wpAutomation->createComment($trashedComment);
+        $this->lastCreatedComment[] = $this->wpAutomation->createComment($trashedComment);
+    }
+
+    public function moveTwoCommentsFromTrash() {
+        $this->wpAutomation->runWpCliCommand('comment', 'update', array_merge($this->lastCreatedComment, array('comment_approved' => 1)));
+    }
+
+    public function prepare_markTwoCommentsAsSpam() {
+        $this->lastCreatedComment = array();
+        $comment = $this->prepareTestComment();
+
+        $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
+        $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
+    }
+
+    public function markTwoCommentsAsSpam() {
+        $this->wpAutomation->runWpCliCommand('comment', 'update', array_merge($this->lastCreatedComment, array('comment_approved' => 'spam')));
+    }
+
+    public function prepare_markTwoSpamCommentsAsNotSpam() {
+        $this->lastCreatedComment = array();
+        $trashedComment = $this->prepareTestComment();
+        $trashedComment['comment_approved'] = 'spam';
+
+        $this->lastCreatedComment[] = $this->wpAutomation->createComment($trashedComment);
+        $this->lastCreatedComment[] = $this->wpAutomation->createComment($trashedComment);
+    }
+
+    public function markTwoSpamCommentsAsNotSpam() {
+        $this->wpAutomation->runWpCliCommand('comment', 'update', array_merge($this->lastCreatedComment, array('comment_approved' => 1)));
+    }
+
+    public function prepare_unapproveTwoComments() {
+        $this->lastCreatedComment = array();
+        $comment = $this->prepareTestComment();
+
+        $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
+        $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
+    }
+
+    public function unapproveTwoComments() {
+        $this->wpAutomation->runWpCliCommand('comment', 'update', array_merge($this->lastCreatedComment, array('comment_approved' => 0)));
+    }
+
+    public function prepare_approveTwoComments() {
+        $this->lastCreatedComment = array();
+        $comment = $this->prepareTestComment();
+        $comment['comment_approved'] = 0;
+
+        $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
+        $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
+    }
+
+    public function approveTwoComments() {
+        $this->wpAutomation->runWpCliCommand('comment', 'update', array_merge($this->lastCreatedComment, array('comment_approved' => 1)));
+    }
 }
