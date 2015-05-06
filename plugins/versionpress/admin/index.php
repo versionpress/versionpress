@@ -227,11 +227,11 @@ function _vp_show_progress_message($progressMessage) {
                         <ul>
                             <li>
                                 <span class="icon icon-notification"></span>
-                                You are activating a <strong>preview version</strong> which is suitable for testing purposes only. If you encounter any issues please let us know at <a href="mailto:info@versionpress.net">info@versionpress.net</a>.
+                                You are activating an <strong>Early Access version</strong>. If you encounter any issues please let us know at info@versionpress.net. <a href="http://docs.versionpress.net/en/getting-started/about-eap">Learn more about EAP</a>.
                             </li>
                             <li>
                                 <span class="icon icon-notification"></span>
-                                Be careful when using <strong>third-party plugins</strong>. Some of them will work fine, some of them might be problematic in combination with VersionPress. <a href="http://docs.versionpress.net/en/feature-focus/external-plugins">Read more about it</a>.
+                                Be careful when using <strong>third-party plugins</strong>. Some of them work fine, some might be problematic in combination with VersionPress. <a href="http://docs.versionpress.net/en/feature-focus/external-plugins">Learn more</a>.
                             </li>
                             <li>
                                 <span class="icon icon-notification"></span>
