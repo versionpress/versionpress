@@ -49,11 +49,27 @@ class RequirementsChecker {
             'help' => 'PHP function `proc_open()` must be enabled as VersionPress uses it to execute Git commands. Please update your php.ini.'
         );
 
+        $gitCheckResult = $this->tryGit();
+
+        switch ($gitCheckResult) {
+
+            case "no-git":
+                $gitHelpMessage = '[Git](http://git-scm.com/) must be installed on the server. If you think it is then it\'s probably not visible to the web server user – please update its PATH. Alternatively, [configure VersionPress](http://docs.versionpress.net/en/getting-started/configuration#git-binary) to use specific Git binary. [Learn more](http://docs.versionpress.net/en/getting-started/installation-uninstallation#git).';
+                break;
+
+            case "wrong-version":
+                $gitHelpMessage = 'Git version ' . SystemInfo::getGitVersion() . ' detected with which there are known issues. Please install at least version ' . self::GIT_MINIMUM_REQUIRED_VERSION . ' (this can be done side-by-side and VersionPress can be [configured](http://docs.versionpress.net/en/getting-started/configuration#git-binary) to use that specific Git version). [Learn more](http://docs.versionpress.net/en/getting-started/installation-uninstallation#git).';
+                break;
+
+            default:
+                $gitHelpMessage = "";
+        }
+
         $this->requirements[] = array(
             'name' => 'Git ' . self::GIT_MINIMUM_REQUIRED_VERSION . '+ installed',
             'level' => 'critical',
-            'fulfilled' => $this->tryGit(),
-            'help' => '[Git](http://git-scm.com/) must be installed on the server. If you think it is then the version number probably doesn\'t match or Git is not visible to the web server - please update your PATH or use `vpconfig`. <a href="http://docs.versionpress.net/en/getting-started/installation-uninstallation#git" target="_blank">Learn more</a>.'
+            'fulfilled' => $gitCheckResult == "ok",
+            'help' => $gitHelpMessage
         );
 
         $this->requirements[] = array(
@@ -158,12 +174,15 @@ class RequirementsChecker {
         }
     }
 
+    /**
+     * @return string "ok", "no-git" or "wrong-version"
+     */
     private function tryGit() {
         try {
             $gitVersion = SystemInfo::getGitVersion();
-            return self::gitMatchesMinimumRequiredVersion($gitVersion);
+            return self::gitMatchesMinimumRequiredVersion($gitVersion) ? "ok" : "wrong-version";
         } catch (Exception $e) {
-            return false;
+            return "no-git";
         }
     }
 
