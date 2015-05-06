@@ -199,4 +199,18 @@ class ArrayUtils {
 
         return $reduceResult;
     }
+
+    /**
+     * Extends array_map function with keys.
+     * The $mapFn takes two params - $value and $key.
+     *
+     * @param callable $mapFn
+     * @param array $array
+     * @return array
+     */
+    public static function map($mapFn, $array) {
+        return array_map(function ($key) use ($mapFn, $array) {
+            return $mapFn($array[$key], $key);
+        }, array_keys($array));
+    }
 }

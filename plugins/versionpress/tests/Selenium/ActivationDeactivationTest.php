@@ -91,7 +91,7 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * @test
      * @depends successfulActivationRedirectsToMainVersionPressTable
      */
-    public function afterDeactivationTheFilesystemMatchDatabase() {
+    public function afterActivationTheFilesystemMatchDatabase() {
         DBAsserter::assertFilesEqualDatabase();
     }
 
