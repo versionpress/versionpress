@@ -86,8 +86,11 @@ class TermTaxonomySynchronizerTest extends SynchronizerTestCase {
         $this->storage->delete($termTaxonomy2);
         $this->termStorage->delete($term1);
         $this->termStorage->delete($term2);
-        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
-        $this->termSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        // We need new instances because of caching in SynchronizerBase::maybeInit
+        $termSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo);
+        $termTaxonomySynchronizer = new TermTaxonomySynchronizer($this->storage, self::$wpdb, self::$schemaInfo);
+        $termTaxonomySynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $termSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
     }
 
     private function createTermTaxonomy() {
