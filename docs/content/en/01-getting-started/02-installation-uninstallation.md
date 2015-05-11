@@ -115,8 +115,23 @@ Upon successful activation, you should see a screen like this:
 
 ## Update / upgrade
 
-The update process is manual at the moment and always described in the **release notes** for the new version. We generally strive for updatable releases but in some cases, especially during the EAP period, you might need to disable the plugin, remove it and install it fresh. Again, [release notes](../release-notes) will tell you what to do. 
+The update process is manual at the moment and always described in the [release notes](../release-notes) for a specific version. We will have an automated upgrade method in the future.
 
+### Manual upgrade
+
+Manual upgrade is always described in the release notes for the release, including info about how to do it, which versions are upgradable etc. Generally, do this:
+
+ 1. Put the site in a [maintenance mode](http://www.hongkiat.com/blog/wordpress-maintenance/)
+ 2. Replace the `wp-content/plugins/versionpress` directory on the server
+ 3. Do any version-specific changes that are described in the [release notes](../release-notes)
+ 4. Disable the maintenance mode
+
+This keeps the VersionPress repository in place and active which means that you will be able to revert the older changes, go back to the states done by the previous version of VersionPress, etc. If you decide to deactivate, delete and re-upload VersionPress it will create a new repository for you which is typically not something you'd want. (See the end of this page for an overview of possible VersionPress states.)
+
+
+### Automated upgrade
+
+This is coming in a future update of VersionPress. See the [roadmap](../release-notes/roadmap).
 
 ## Uninstallation
 
