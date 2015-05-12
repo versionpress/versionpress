@@ -1,6 +1,7 @@
 <?php
 
 namespace VersionPress\Cli;
+
 use Symfony\Component\Process\Process;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Synchronizers\SynchronizationProcess;
@@ -22,131 +23,6 @@ use wpdb;
  *
  */
 class VPInternalCommand extends WP_CLI_Command {
-
-
-    /**
-     * Restores a WP site from Git repo / working directory.
-     *
-     * ## OPTIONS
-     *
-     * --db=<name>
-     * : Name of the DB. Optional (the default is current dir name).
-     *
-     * --url=<siteurl>
-     * : Site URL. Optional (the default is http://localhost/<currentdir>).
-     *
-     *
-     * ## DESCRIPTION
-     *
-     * The simplest possible example just executes `site-restore` without any parameters.
-     * The assumptions are:
-     *
-     *    * The current directory must be reachable from the webserver as http://localhost/<cwd>
-     *    * MySQL server is available at localhost
-     *    * There is a root / no pwd user in it
-     *    * This command is executed from site root
-     *
-     * The command will then do the following:
-     *
-     *    * Create a db <dirname>, e.g., 'vp01'
-     *    * Configure WordPress to connect to this db as 'root' / no pwd
-     *    * Create WordPress tables in it and preconfigure it with site_url and home options
-     *    * Run VP synchronizers on the database
-     *
-     * Both DB name and site URL are configurable.
-     *
-     *
-     * @synopsis [--db=<name>] [--url=<siteurl>]
-     *
-     * @subcommand restore-site
-     *
-     * @when before_wp_load
-     */
-    public function restoreSite($args, $assoc_args) {
-
-        $dbName = isset($assoc_args['db']) ? $assoc_args['db'] : basename(getcwd());
-
-
-        if (!defined('WP_CONTENT_DIR')) {
-            define('WP_CONTENT_DIR', 'xyz'); //doesn't matter, it's just to prevent the NOTICE in the require`d bootstrap.php
-        }
-        require_once(__DIR__ . '/../../bootstrap.php');
-
-        // 1) Create wp-config.php
-        $configCmd = 'wp core config --dbname=' . escapeshellarg($dbName) . ' --dbuser=root';
-
-        $process = new Process($configCmd);
-        $process->run();
-        if (!$process->isSuccessful()) {
-            WP_CLI::log("Failed creating wp-config.php");
-            WP_CLI::error($process->getErrorOutput());
-        } else {
-            WP_CLI::success("wp-config.php created");
-        }
-
-
-        // 2) Create db
-        $createDbCommand = 'wp db create';
-
-        $process = new Process($createDbCommand);
-        $process->run();
-        if (!$process->isSuccessful()) {
-            WP_CLI::log("Failed creating DB");
-            WP_CLI::error($process->getErrorOutput());
-        } else {
-            WP_CLI::success("DB created");
-        }
-
-
-        // 3) Disable VersionPress tracking
-        $dbphpFile = 'wp-content/db.php';
-        if (file_exists($dbphpFile)) {
-            unlink($dbphpFile);
-        }
-        // will be restored at the end of this method
-
-
-
-        // 3) Create WP tables. The only important thing is site URL, all else will be rewritten later during synchronization.
-        $createWpTablesCmd = 'wp core install --url=' . escapeshellarg("http://localhost/" . basename(getcwd())) . ' --title=x --admin_user=x --admin_password=x --admin_email=x@example.com';
-        $process = new Process($createWpTablesCmd);
-        $process->run();
-        if (!$process->isSuccessful()) {
-            WP_CLI::log("Failed creating WP tables.");
-            WP_CLI::error($process->getErrorOutput());
-        } else {
-            WP_CLI::success("WP tables created");
-        }
-
-
-        // 4) Clean the working copy - restores "db.php" and makes sure the dir is clean
-        $cleanWDCmd = 'git reset --hard && git clean -xf wp-content/vpdb';
-
-        $process = new Process($cleanWDCmd);
-        $process->run();
-        if (!$process->isSuccessful()) {
-            WP_CLI::log("Could not clean working directory");
-            WP_CLI::error($process->getErrorOutput());
-        } else {
-            WP_CLI::success("Working directory reset");
-        }
-
-
-
-        // The next couple of the steps need to be done after the WP is fully loaded; we use `finish-init-clone` for that
-
-        $finishInitCloneCmd = 'wp --require=' . escapeshellarg(__FILE__) . ' vp-internal finish-init-clone';
-
-        $process = new Process($finishInitCloneCmd);
-        $process->run();
-        WP_CLI::log($process->getOutput());
-        if (!$process->isSuccessful()) {
-            WP_CLI::error("Could not finish site restore");
-        }
-
-
-    }
-
 
     /**
      * Initializes a clone
@@ -273,7 +149,7 @@ class VPInternalCommand extends WP_CLI_Command {
     public function finishInitClone($args, $assoc_args) {
 
 
-        // 5) Truncate tables
+        // Truncate tables
 
         /** @var wpdb $wpdb */
         global $wpdb;
@@ -294,7 +170,7 @@ class VPInternalCommand extends WP_CLI_Command {
         WP_CLI::success("Truncated DB tables");
 
 
-        // 6) Create VersionPress tables
+        // Create VersionPress tables
 
         global $versionPressContainer;
         /** @var \VersionPress\Initialization\Initializer $initializer */
@@ -304,7 +180,7 @@ class VPInternalCommand extends WP_CLI_Command {
         WP_CLI::success("VersionPress tables created");
 
 
-        // 7) Run synchronization
+        // Run synchronization
 
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
@@ -312,7 +188,6 @@ class VPInternalCommand extends WP_CLI_Command {
         WP_CLI::success("Git -> db synchronization run");
 
     }
-
 }
 
 if (defined('WP_CLI') && WP_CLI) {

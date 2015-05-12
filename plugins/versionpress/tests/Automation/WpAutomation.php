@@ -4,6 +4,7 @@ namespace VersionPress\Tests\Automation;
 
 use Exception;
 use Nette\Utils\Strings;
+use Symfony\Component\Process\Process;
 use VersionPress\Tests\Utils\SiteConfig;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\ProcessUtils;
@@ -559,10 +560,11 @@ class WpAutomation {
      *   says the site is a Vagrant site. In rare cases like "wp core download" we need to run WP-CLI locally even
      *   though the site is "remote" and setting this parameter to false enables that.
      *
+     * @param bool $debug
      * @return string When process execution is not successful
      * @throws Exception
      */
-    private function exec($command, $executionPath = null, $autoSshTunnelling = true) {
+    private function exec($command, $executionPath = null, $autoSshTunnelling = true, $debug = false) {
 
         $command = $this->rewriteWpCliCommand($command, $autoSshTunnelling);
 
@@ -570,7 +572,21 @@ class WpAutomation {
             $executionPath = $this->siteConfig->isVagrant ? __DIR__ . '/..' : $this->siteConfig->path;
         }
 
-        $process = new \Symfony\Component\Process\Process($command, $executionPath);
+        // Changing env variables for debugging
+        // We don't need the xdebug enabled in the subprocesses,
+        // but sometimes on the other hand we need it enabled only in the subprocess.
+        $isDebug = isset($_SERVER["XDEBUG_CONFIG"]);
+        if ($isDebug == $debug) {
+            $env = null; // same as this process
+        } elseif ($debug) {
+            $env = $_SERVER;
+            $env["XDEBUG_CONFIG"] = "idekey=xdebug"; // turn debug on
+        } else {
+            $env = $_SERVER;
+            unset($env["XDEBUG_CONFIG"]); // turn debug off
+        }
+
+        $process = new Process($command, $executionPath, $env);
         $process->run();
 
         if (!$process->isSuccessful()) {
@@ -593,9 +609,11 @@ class WpAutomation {
      * @param string $subcommand Like "config". Might be null, e.g. if the main command is "eval" there is no subcommand.
      * @param array $args Like array("dbname" => "wordpress", "dbuser" => "wpuser", "positionalargument") which will produce
      *   something like `--dbname='wordpress' --dbuser='wpuser' 'positionalargument'`
+     * @param bool $debug
      * @return string
+     * @throws Exception
      */
-    public function runWpCliCommand($command, $subcommand, $args = array()) {
+    public function runWpCliCommand($command, $subcommand, $args = array(), $debug = false) {
 
         $cliCommand = "wp $command";
 
@@ -614,7 +632,7 @@ class WpAutomation {
             }
         }
 
-        return $this->exec($cliCommand);
+        return $this->exec($cliCommand, null, true, $debug);
     }
 
     private function vagrantSensitiveEscapeShellArg($arg) {
