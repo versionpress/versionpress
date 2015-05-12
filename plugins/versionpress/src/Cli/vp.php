@@ -69,6 +69,177 @@ class VPCommand extends WP_CLI_Command {
 
     }
 
+    /**
+     * Restores a WP site from Git repo / working directory.
+     *
+     * ## OPTIONS
+     *
+     * [--siteurl=<url>]
+     * : The address of the restored site. Default: http://localhost/<cwd>
+     *
+     * [--dbname=<dbname>]
+     * : Set the database name.
+     *
+     * [--dbuser=<dbuser>]
+     * : Set the database user.
+     *
+     * [--dbpass=<dbpass>]
+     * : Set the database user password.
+     *
+     * [--dbhost=<dbhost>]
+     * : Set the database host. Default: 'localhost'
+     *
+     * [--dbprefix=<dbprefix>]
+     * : Set the database table prefix. Default: 'wp_'
+     *
+     * [--dbcharset=<dbcharset>]
+     * : Set the database charset. Default: 'utf8'
+     *
+     * [--dbcollate=<dbcollate>]
+     * : Set the database collation. Default: ''
+     *
+     * [--yes]
+     * : Answer yes to the confirmation message.
+     *
+     * ## DESCRIPTION
+     *
+     * The simplest possible example just executes `site-restore` without any parameters.
+     * The assumptions are:
+     *
+     *    * The current directory must be reachable from the webserver as http://localhost/<cwd>
+     *    * Credentials for the MySQL server are in the wp-config.php
+     *
+     * The command will then do the following:
+     *
+     *    * Create a db <dirname>, e.g., 'vp01'
+     *    * Optionally configure WordPress to connect to this DB
+     *    * Create WordPress tables in it and preconfigure it with site_url and home options
+     *    * Run VP synchronizers on the database
+     *
+     * All DB credentials and site URL are configurable.
+     *
+     * @subcommand restore-site
+     *
+     * @when before_wp_load
+     */
+    public function restoreSite($args, $assoc_args) {
+        $url = @$assoc_args['siteurl'] ?: ('http://localhost/' . basename(getcwd()));
+
+        if (!isset($assoc_args['siteurl'])) {
+            WP_CLI::confirm("The site URL will be set to '$url'. Proceed?", $assoc_args);
+        }
+
+        if (!defined('WP_CONTENT_DIR')) {
+            define('WP_CONTENT_DIR', 'xyz'); //doesn't matter, it's just to prevent the NOTICE in the require`d bootstrap.php
+        }
+        require_once(__DIR__ . '/../../bootstrap.php');
+
+        if (file_exists(ABSPATH . 'wp-config.php')) {
+            if ($this->issetConfigOption($assoc_args)) {
+                WP_CLI::error("Site settings was loaded from wp-config.php. If you want to reconfigure the site, please delete the wp-config.php file");
+            }
+        } else {
+            $this->configSite($assoc_args);
+        }
+
+        $this->createDb($assoc_args);
+
+
+        // Disable VersionPress tracking
+        $dbphpFile = 'wp-content/db.php';
+        if (file_exists($dbphpFile)) {
+            unlink($dbphpFile);
+        }
+        // will be restored at the end of this method
+
+
+        // Create WP tables. The only important thing is site URL, all else will be rewritten later during synchronization.
+        $installArgs = array(
+            'url' => $url,
+            'title' => 'x',
+            'admin_user' => 'x',
+            'admin_password' => 'x',
+            'admin_email' => 'x@example.com',
+        );
+
+        $process = VPCommandUtils::runWpCliCommand('core', 'install', $installArgs);
+        if (!$process->isSuccessful()) {
+            WP_CLI::log("Failed creating WP tables.");
+            WP_CLI::error($process->getErrorOutput());
+        } else {
+            WP_CLI::success("WP tables created");
+        }
+
+
+        // Clean the working copy - restores "db.php" and makes sure the dir is clean
+        $cleanWDCmd = 'git reset --hard && git clean -xf wp-content/vpdb';
+
+        $process = VPCommandUtils::exec($cleanWDCmd);
+        if (!$process->isSuccessful()) {
+            WP_CLI::log("Could not clean working directory");
+            WP_CLI::error($process->getErrorOutput());
+        } else {
+            WP_CLI::success("Working directory reset");
+        }
+
+
+        // The next couple of the steps need to be done after the WP is fully loaded; we use `finish-init-clone` for that
+        // The main reason for this is that we need properly set WP_CONTENT_DIR constant for reading from storages
+        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-init-clone', array('require' => __DIR__ . '/vp-internal.php'));
+        WP_CLI::log($process->getOutput());
+        if (!$process->isSuccessful()) {
+            WP_CLI::error("Could not finish site restore");
+        }
+    }
+
+    /**
+     * Returns true if there is some config option in the assoc_args.
+     *
+     * @param $assoc_args
+     * @return bool
+     */
+    private function issetConfigOption($assoc_args) {
+        $configOptions = array('dbname', 'dbuser', 'dbpass', 'dbhost', 'dbprefix', 'dbcharset', 'dbcollate');
+        $specifiedOptions = array_keys($assoc_args);
+        return count(array_intersect($specifiedOptions, $configOptions)) > 0;
+    }
+
+    private function createDb($assoc_args, $force = false) {
+        $process = $force ? VPCommandUtils::runWpCliCommand('db', 'reset', array('yes' => null)) : VPCommandUtils::runWpCliCommand('db', 'create');
+
+        if (!$process->isSuccessful()) {
+            $msg = $process->getErrorOutput();
+            if (Strings::contains($msg, '1007')) {
+                WP_CLI::confirm('The database already exists. Do you want to drop it?', $assoc_args);
+                $this->createDb($assoc_args, true);
+            } else {
+                WP_CLI::log("Failed creating DB");
+            }
+        } else {
+            WP_CLI::success("DB created");
+        }
+    }
+
+    private function configSite($assoc_args) {
+        $configArgs = array();
+        $configArgs['dbname'] = @$assoc_args['dbname'] ?: basename(getcwd());
+        $configArgs['dbuser'] = @$assoc_args['dbuser'] ?: 'root';
+        $configArgs['dbpass'] = @$assoc_args['dbpass'] ?: '';
+        $configArgs['dbhost'] = @$assoc_args['dbhost'] ?: '127.0.0.1';
+        $configArgs['dbprefix'] = @$assoc_args['dbprefix'] ?: 'wp_';
+        $configArgs['dbcharset'] = @$assoc_args['dbcharset'] ?: 'utf8';
+        $configArgs['dbcollate'] = @$assoc_args['dbcollate'] ?: '';
+
+
+        // Create wp-config.php
+        $process = VPCommandUtils::runWpCliCommand('core', 'config', $configArgs);
+        if (!$process->isSuccessful()) {
+            WP_CLI::log("Failed creating wp-config.php");
+            WP_CLI::error($process->getErrorOutput());
+        } else {
+            WP_CLI::success("wp-config.php created");
+        }
+    }
 
     /**
      * Clones site to a new folder, database and Git branch.
