@@ -28,6 +28,8 @@ class OptionsSynchronizer implements Synchronizer {
 
     function synchronize($task, $entitiesToSynchronize = null) {
         $options = $this->optionsStorage->loadAll();
+        if (count($options) == 0) return array();
+
         $syncQuery = "INSERT INTO {$this->tableName} (option_name, option_value, autoload) VALUES ";
         foreach ($options as $optionName => $values) {
             if (!isset($values['autoload'])) $values['autoload'] = 'yes'; // default value
@@ -38,8 +40,6 @@ class OptionsSynchronizer implements Synchronizer {
         $syncQuery .= " ON DUPLICATE KEY UPDATE option_value = VALUES(option_value), autoload = VALUES(autoload);";
 
         $this->database->query($syncQuery);
-
-        if (count($options) == 0) return array();
 
         $ignoredOptionNames = array_map(function ($option) {
             return "\"" . $option['option_name'] . "\"";

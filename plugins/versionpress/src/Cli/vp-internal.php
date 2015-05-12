@@ -131,8 +131,7 @@ class VPInternalCommand extends WP_CLI_Command {
         // Clean the working copy - restores "db.php" and makes sure the dir is clean
         $cleanWDCmd = 'git reset --hard && git clean -xf wp-content/vpdb';
 
-        $process = new Process($cleanWDCmd);
-        $process->run();
+        $process = $this->exec($cleanWDCmd);
         if (!$process->isSuccessful()) {
             WP_CLI::log("Could not clean working directory");
             WP_CLI::error($process->getErrorOutput());
@@ -142,6 +141,7 @@ class VPInternalCommand extends WP_CLI_Command {
 
 
         // The next couple of the steps need to be done after the WP is fully loaded; we use `finish-init-clone` for that
+        // The main reason for this is that we need properly set WP_CONTENT_DIR constant for reading from storages
         $process = $this->runWpCliCommand('vp-internal', 'finish-init-clone', array('require' => __FILE__));
         WP_CLI::log($process->getOutput());
         if (!$process->isSuccessful()) {
@@ -340,7 +340,17 @@ class VPInternalCommand extends WP_CLI_Command {
     }
 
     private function exec($command) {
-        $process = new Process($command, ABSPATH);
+        // Changing env variables for debugging
+        // If we run another wp-cli command from our command, it breaks and never continues (with xdebug).
+        // So we need to turn xdebug off for all "nested" commands.
+        if (isset($_SERVER["XDEBUG_CONFIG"])) {
+            $env = $_SERVER;
+            unset($env["XDEBUG_CONFIG"]);
+        } else {
+            $env = null;
+        }
+
+        $process = new Process($command, ABSPATH, $env);
         $process->run();
         return $process;
     }
