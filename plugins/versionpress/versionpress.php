@@ -47,17 +47,6 @@ if (defined('VP_MAINTENANCE')) {
 
 if (VersionPress::isActive()) {
     vp_register_hooks();
-
-    if (is_admin()) {
-        wp_enqueue_style('versionpress_admin_style', plugins_url( 'admin/public/css/style.css' , __FILE__ ));
-        wp_enqueue_style('versionpress_admin_icons', plugins_url( 'admin/public/icons/style.css' , __FILE__ ));
-        wp_enqueue_style('versionpress_popover_style', plugins_url('admin/public/css/jquery.webui-popover.min.css', __FILE__));
-        wp_enqueue_style('versionpress_popover_custom_style', plugins_url('admin/public/css/popover-custom.css', __FILE__));
-
-        wp_enqueue_script('jquery');
-        wp_enqueue_script('versionpress_popover_script', plugins_url('admin/public/js/jquery.webui-popover.min.js', __FILE__), 'jquery');
-        wp_enqueue_script('versionpress_admin_script', plugins_url( 'admin/public/js/vp-admin.js' , __FILE__ ));
-    }
 }
 
 function vp_register_hooks() {
@@ -740,4 +729,19 @@ function vp_enable_maintenance() {
 
 function vp_disable_maintenance() {
     FileSystem::remove(ABSPATH . '/.maintenance');
+}
+
+//----------------------------------
+// CSS & JS
+//----------------------------------
+
+if (is_admin()) {
+    wp_enqueue_style('versionpress_admin_style', plugins_url( 'admin/public/css/style.css' , __FILE__ ));
+    wp_enqueue_style('versionpress_admin_icons', plugins_url( 'admin/public/icons/style.css' , __FILE__ ));
+    wp_enqueue_style('versionpress_popover_style', plugins_url('admin/public/css/jquery.webui-popover.min.css', __FILE__));
+    wp_enqueue_style('versionpress_popover_custom_style', plugins_url('admin/public/css/popover-custom.css', __FILE__));
+
+    wp_enqueue_script('jquery');
+    wp_enqueue_script('versionpress_popover_script', plugins_url('admin/public/js/jquery.webui-popover.min.js', __FILE__), 'jquery');
+    wp_enqueue_script('versionpress_admin_script', plugins_url( 'admin/public/js/vp-admin.js' , __FILE__ ));
 }
