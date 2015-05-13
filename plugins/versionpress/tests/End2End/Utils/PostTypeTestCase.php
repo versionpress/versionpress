@@ -2,8 +2,10 @@
 
 namespace VersionPress\Tests\End2End\Utils;
 
+use PHPUnit_Framework_AssertionFailedError;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
+use VersionPress\Tests\Utils\WpVersionComparer;
 
 /**
  * Contains the actual logic for post-type tests (posts tests, pages tests etc.) as a set of methods.
@@ -58,7 +60,14 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitsAreEquivalent();
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
-        $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_title");
+        try {
+            $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_title");
+        } catch (PHPUnit_Framework_AssertionFailedError $e) {
+            // Since WP 4.2 there is a bug in WP.
+            // The ping_status might be changed by the quick edit form.
+            // Reported here: https://core.trac.wordpress.org/ticket/31977
+            $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_title,ping_status");
+        }
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }

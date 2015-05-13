@@ -182,11 +182,19 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
     }
 
     public function prepare_changeStatusOfTwoPosts() {
-        $this->url($this->getPostTypeScreenUrl());
-        $this->changeStatusOfTwoLastPosts('publish');
+        $post = array(
+            "post_type" => $this->getPostType(),
+            "post_status" => "publish",
+            "post_title" => "Test post",
+            "post_content" => "Test post",
+            "post_author" => 1
+        );
+        self::$wpAutomation->createPost($post);
+        self::$wpAutomation->createPost($post);
     }
 
     public function changeStatusOfTwoPosts() {
+        $this->url($this->getPostTypeScreenUrl());
         $this->changeStatusOfTwoLastPosts('private');
     }
 
@@ -199,7 +207,15 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
     }
 
     public function prepare_moveTwoPostsInTrash() {
-
+        $post = array(
+            "post_type" => $this->getPostType(),
+            "post_status" => "publish",
+            "post_title" => "Test post",
+            "post_content" => "Test post",
+            "post_author" => 1
+        );
+        self::$wpAutomation->createPost($post);
+        self::$wpAutomation->createPost($post);
     }
 
     public function moveTwoPostsInTrash() {
@@ -216,6 +232,15 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
     }
 
     public function prepare_deleteTwoPosts() {
+        $trashedPost = array(
+            "post_type" => $this->getPostType(),
+            "post_status" => "trash",
+            "post_title" => "Test post",
+            "post_content" => "Test post",
+            "post_author" => 1
+        );
+        self::$wpAutomation->createPost($trashedPost);
+        self::$wpAutomation->createPost($trashedPost);
     }
 
     public function deleteTwoPosts() {
@@ -234,8 +259,9 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
 
     private function performBulkActionWithTwoLastPosts($action) {
         // select two last posts
-        $this->jsClick('table.posts tbody tr:nth-child(1) .check-column input[type=checkbox]');
-        $this->jsClick('table.posts tbody tr:nth-child(2) .check-column input[type=checkbox]');
+        $tableClass = $this->getPostType() . 's';
+        $this->jsClick("table.$tableClass tbody tr:nth-child(1) .check-column input[type=checkbox]");
+        $this->jsClick("table.$tableClass tbody tr:nth-child(2) .check-column input[type=checkbox]");
         // choose bulk edit
         $this->select($this->byId('bulk-action-selector-top'))->selectOptionByValue($action);
         $this->jsClickAndWait('#doaction');
