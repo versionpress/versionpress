@@ -252,7 +252,10 @@ function vp_register_hooks() {
         return $links;
     }, 10, 2);
 
-    add_filter('plugin_row_meta', function ($plugin_meta, $plugin_file) {
+    add_filter('plugin_row_meta', function ($plugin_meta, $plugin_file, $plugin_data, $status) {
+        if ($status === "dropins") {
+            return $plugin_meta;
+        }
         $compatibility = CompatibilityChecker::testCompatibilityByPluginFile($plugin_file);
 
         if ($compatibility === CompatibilityResult::COMPATIBLE) {
@@ -268,7 +271,7 @@ function vp_register_hooks() {
         $plugin_meta[] = '<span><strong> ' . $compatibilityAdjective . ' </strong> with VersionPress</span>';
 
         return $plugin_meta;
-    }, 10, 2);
+    }, 10, 4);
 
     add_filter('plugin_action_links', function ($actions, $plugin_file) {
         if (CompatibilityChecker::testCompatibilityByPluginFile($plugin_file) === CompatibilityResult::INCOMPATIBLE) {
