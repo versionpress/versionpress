@@ -22,6 +22,8 @@ use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Storages\Mirror;
 use VersionPress\Utils\BugReporter;
+use VersionPress\Utils\CompatibilityChecker;
+use VersionPress\Utils\CompatibilityResult;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\IdUtil;
 use VersionPress\VersionPress;
@@ -217,7 +219,55 @@ function vp_register_hooks() {
         }
     }, 10, 2);
 
-    add_action('set_object_terms', createUpdatePostTermsHook($mirror, $wpdb));;
+    add_action('set_object_terms', createUpdatePostTermsHook($mirror, $wpdb));
+
+    add_filter('plugin_install_action_links', function ($links, $plugin) {
+        $warningLink = '<span class="vp-compatibility-popup %s" data-plugin-name="' . $plugin['name'] . '"><span class="icon icon-warning"></span></span>';
+        $compatibility = CompatibilityChecker::testCompatibilityBySlug($plugin['slug']);
+        if ($compatibility === CompatibilityResult::COMPATIBLE) {
+            $cssClass = 'vp-compatible';
+            $compatibilityAdjective = 'Compatible';
+        } elseif ($compatibility === CompatibilityResult::INCOMPATIBLE) {
+            $cssClass = 'vp-incompatible';
+            $compatibilityAdjective = 'Incompatible';
+            $links[] = sprintf($warningLink, $cssClass);
+        } else {
+            $cssClass = 'vp-untested';
+            $compatibilityAdjective = 'Untested';
+            $links[] = sprintf($warningLink, $cssClass);
+        }
+
+        $links[] = '<span class="vp-compatibility ' . $cssClass . '"><span class="hide-without-js"><strong> ' . $compatibilityAdjective . ' </strong> with </span>VersionPress</span>';
+        return $links;
+    }, 10, 2);
+
+    add_filter('plugin_row_meta', function ($plugin_meta, $plugin_file, $plugin_data, $status) {
+        if ($status === "dropins") {
+            return $plugin_meta;
+        }
+        $compatibility = CompatibilityChecker::testCompatibilityByPluginFile($plugin_file);
+
+        if ($compatibility === CompatibilityResult::COMPATIBLE) {
+            $compatibilityAdjective = '&check; Compatible';
+        } elseif ($compatibility === CompatibilityResult::INCOMPATIBLE) {
+            $compatibilityAdjective = 'Incompatible';
+        } elseif ($compatibility === CompatibilityResult::UNTESTED) {
+            $compatibilityAdjective = 'Untested';
+        } else {
+            return $plugin_meta;
+        }
+
+        $plugin_meta[] = '<span><strong> ' . $compatibilityAdjective . ' </strong> with VersionPress</span>';
+
+        return $plugin_meta;
+    }, 10, 4);
+
+    add_filter('plugin_action_links', function ($actions, $plugin_file) {
+        if (CompatibilityChecker::testCompatibilityByPluginFile($plugin_file) === CompatibilityResult::INCOMPATIBLE) {
+            $actions['activate'] = "<span class=\"vp-plugin-list vp-incompatible\">$actions[activate]</span>";
+        }
+        return $actions;
+    }, 10, 2);
 
     //----------------------------------------
     // URL and WP-CLI "hooks"
@@ -679,4 +729,19 @@ function vp_enable_maintenance() {
 
 function vp_disable_maintenance() {
     FileSystem::remove(ABSPATH . '/.maintenance');
+}
+
+//----------------------------------
+// CSS & JS
+//----------------------------------
+
+if (is_admin()) {
+    wp_enqueue_style('versionpress_admin_style', plugins_url( 'admin/public/css/style.css' , __FILE__ ));
+    wp_enqueue_style('versionpress_admin_icons', plugins_url( 'admin/public/icons/style.css' , __FILE__ ));
+    wp_enqueue_style('versionpress_popover_style', plugins_url('admin/public/css/jquery.webui-popover.min.css', __FILE__));
+    wp_enqueue_style('versionpress_popover_custom_style', plugins_url('admin/public/css/popover-custom.css', __FILE__));
+
+    wp_enqueue_script('jquery');
+    wp_enqueue_script('versionpress_popover_script', plugins_url('admin/public/js/jquery.webui-popover.min.js', __FILE__), 'jquery');
+    wp_enqueue_script('versionpress_admin_script', plugins_url( 'admin/public/js/vp-admin.js' , __FILE__ ));
 }

@@ -88,4 +88,40 @@ jQuery(document).ready(function($) {
             return false;
         });
     }
+
+    $('.vp-compatibility').each(function () {
+        var $label = $(this);
+        var $parentCard = $label.parents('.plugin-card');
+        var $originalCompatibilityColumn = $parentCard.find('.column-compatibility');
+        var $vpCompatibilityColumn = $originalCompatibilityColumn.clone().empty();
+
+        $label.detach().appendTo($vpCompatibilityColumn);
+        $originalCompatibilityColumn.after($vpCompatibilityColumn);
+        $label.find('.hide-without-js').show();
+    });
+
+    $('.vp-compatibility-popup').each(function () {
+        var $el = $(this);
+        var pluginName = $el.data('plugin-name');
+        var incompatible = $el.hasClass('vp-incompatible');
+        var title = incompatible ? 'This will not end well' : 'This might not end well';
+        var content = pluginName + (incompatible ? ' is not compatible with VersionPress' : ' was not yet tested with VersionPress') + '.';
+        $el.attr('title', content);
+
+        $el.webuiPopover({
+            title: title,
+            cache: false,
+            content: content,
+            closeable: true,
+            width: 450,
+            style: customRevertPopoverClass,
+            placement: 'left'
+        });
+    });
+
+    $('.vp-plugin-list.vp-incompatible').each(function () {
+        $(this).find("a").click(function(e) {
+            return confirm("This plugin is not compatible with VersionPress. Its activation will cause deactivation of VersionPress. Do you really want to activate this plugin?");
+        });
+    });
 });

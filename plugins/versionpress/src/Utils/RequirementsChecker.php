@@ -21,11 +21,16 @@ class RequirementsChecker {
     private $schema;
 
     /** @var string[] */
-    private static $supportedPlugins = array(
-        'akismet/akismet.php',
-        'hello-dolly/hello.php',
-        'hello.php',
-        'versionpress/versionpress.php',
+    public static $compatiblePlugins = array(
+        'akismet' => 'akismet/akismet.php',
+        'advanced-custom-fields' => 'advanced-custom-fields/acf.php',
+        'hello-dolly' => 'hello-dolly/hello.php',
+        '_hello-dolly' => 'hello.php',
+        'versionpress' => 'versionpress/versionpress.php',
+    );
+
+    public static $incompatiblePlugins = array(
+        'wp-super-cache' => 'wp-super-cache/wp-cache.php'
     );
 
     function __construct(wpdb $database, DbSchemaInfo $schema) {
@@ -261,7 +266,7 @@ class RequirementsChecker {
         $plugins = get_option('active_plugins');
         $unsupportedPluginsCount = 0;
         foreach($plugins as $plugin) {
-            if(!in_array($plugin, self::$supportedPlugins)) {
+            if(!in_array($plugin, self::$compatiblePlugins)) {
                 $unsupportedPluginsCount++;
             }
         }

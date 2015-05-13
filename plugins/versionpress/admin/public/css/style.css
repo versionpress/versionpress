@@ -118,3 +118,50 @@ h2.vp-deactivation-header {
     position: absolute;
     margin: 3px 0 0 -24px;
 }
+
+/*-------------------------------------
+ * Styles for admin/plugin-install.php
+ *------------------------------------*/
+
+.plugin-card .column-compatibility {
+    margin-bottom: 4px;
+}
+
+.plugin-card .vp-compatibility::before {
+    font: 400 20px/.5 dashicons;
+    speak: none;
+    padding: 0;
+    top: 4px;
+    left: -2px;
+    position: relative;
+    vertical-align: top;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-decoration: none!important;
+    color: #444;
+}
+
+.plugin-card .vp-compatibility.vp-compatible::before {
+    content: '\f147';
+}
+
+.plugin-card .vp-compatibility.vp-incompatible::before {
+    content: '\f158';
+}
+
+.plugin-card .vp-compatibility.vp-untested::before {
+
+}
+
+.plugin-card .vp-compatibility .hide-without-js {
+    display: none;
+}
+
+.plugin-card .vp-compatibility-popup span {
+    font-size: 200%;
+    cursor: pointer;
+}
+
+.webui-popover h3 {
+    clear: none;
+}
