@@ -22,6 +22,8 @@ use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Storages\Mirror;
 use VersionPress\Utils\BugReporter;
+use VersionPress\Utils\CompatibilityChecker;
+use VersionPress\Utils\CompatibilityResult;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\IdUtil;
 use VersionPress\VersionPress;
@@ -232,10 +234,11 @@ function vp_register_hooks() {
 
     add_filter('plugin_install_action_links', function ($links, $plugin) {
         $warningLink = '<span class="vp-compatibility-popup %s" data-plugin-name="' . $plugin['name'] . '"><span class="icon icon-warning"></span></span>';
-        if (isset(\VersionPress\Utils\RequirementsChecker::$compatiblePlugins[$plugin['slug']])) {
+        $compatibility = CompatibilityChecker::testCompatibilityBySlug($plugin['slug']);
+        if ($compatibility === CompatibilityResult::COMPATIBLE) {
             $cssClass = 'vp-compatible';
             $compatibilityAdjective = 'Compatible';
-        } elseif (isset(\VersionPress\Utils\RequirementsChecker::$incompatiblePlugins[$plugin['slug']])) {
+        } elseif ($compatibility === CompatibilityResult::INCOMPATIBLE) {
             $cssClass = 'vp-incompatible';
             $compatibilityAdjective = 'Incompatible';
             $links[] = sprintf($warningLink, $cssClass);
@@ -247,6 +250,31 @@ function vp_register_hooks() {
 
         $links[] = '<span class="vp-compatibility ' . $cssClass . '"><span class="hide-without-js"><strong> ' . $compatibilityAdjective . ' </strong> with </span>VersionPress</span>';
         return $links;
+    }, 10, 2);
+
+    add_filter('plugin_row_meta', function ($plugin_meta, $plugin_file) {
+        $compatibility = CompatibilityChecker::testCompatibilityByPluginFile($plugin_file);
+
+        if ($compatibility === CompatibilityResult::COMPATIBLE) {
+            $compatibilityAdjective = '&check; Compatible';
+        } elseif ($compatibility === CompatibilityResult::INCOMPATIBLE) {
+            $compatibilityAdjective = 'Incompatible';
+        } elseif ($compatibility === CompatibilityResult::UNTESTED) {
+            $compatibilityAdjective = 'Untested';
+        } else {
+            return $plugin_meta;
+        }
+
+        $plugin_meta[] = '<span><strong> ' . $compatibilityAdjective . ' </strong> with VersionPress</span>';
+
+        return $plugin_meta;
+    }, 10, 2);
+
+    add_filter('plugin_action_links', function ($actions, $plugin_file) {
+        if (CompatibilityChecker::testCompatibilityByPluginFile($plugin_file) === CompatibilityResult::INCOMPATIBLE) {
+            $actions['activate'] = "<span class=\"vp-plugin-list vp-incompatible\">$actions[activate]</span>";
+        }
+        return $actions;
     }, 10, 2);
 
     //----------------------------------------

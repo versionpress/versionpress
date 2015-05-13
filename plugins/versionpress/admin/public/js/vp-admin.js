@@ -118,4 +118,10 @@ jQuery(document).ready(function($) {
             placement: 'left'
         });
     });
+
+    $('.vp-plugin-list.vp-incompatible').each(function () {
+        $(this).find("a").click(function(e) {
+            return confirm("This plugin is not compatible with VersionPress. Its activation will cause deactivation of VersionPress. Do you really want to activate this plugin?");
+        });
+    });
 });
