@@ -161,3 +161,7 @@ h2.vp-deactivation-header {
     font-size: 200%;
     cursor: pointer;
 }
+
+.webui-popover h3 {
+    clear: none;
+}
