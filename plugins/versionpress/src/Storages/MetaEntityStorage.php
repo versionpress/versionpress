@@ -18,8 +18,8 @@ abstract class MetaEntityStorage extends Storage {
 
     private $lastVpId;
 
-    private $keyName;
-    private $valueName;
+    protected $keyName;
+    protected $valueName;
     private $parentReferenceName;
 
     /** @var Storage */
@@ -139,7 +139,7 @@ abstract class MetaEntityStorage extends Storage {
      * @param $vpId
      * @return string
      */
-    private function createJoinedKey($key, $vpId) {
+    protected function createJoinedKey($key, $vpId) {
         return sprintf('%s#%s', $key, $vpId);
     }
 
@@ -152,7 +152,7 @@ abstract class MetaEntityStorage extends Storage {
      * @param $key
      * @return array
      */
-    private function splitJoinedKey($key) {
+    protected function splitJoinedKey($key) {
         $splittedKey = explode('#', $key, 2);
         return array(
             $this->keyName => $splittedKey[0],

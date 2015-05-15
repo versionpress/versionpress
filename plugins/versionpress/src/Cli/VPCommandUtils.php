@@ -5,7 +5,7 @@ namespace VersionPress\Cli;
 use Symfony\Component\Process\Process;
 
 class VPCommandUtils {
-    public static function runWpCliCommand($command, $subcommand, $args = array()) {
+    public static function runWpCliCommand($command, $subcommand, $args = array(), $cwd = null) {
 
         $cliCommand = "wp $command";
 
@@ -23,10 +23,10 @@ class VPCommandUtils {
             }
         }
 
-        return self::exec($cliCommand);
+        return self::exec($cliCommand, $cwd);
     }
 
-    public static function exec($command) {
+    public static function exec($command, $cwd = null) {
         // Changing env variables for debugging
         // If we run another wp-cli command from our command, it breaks and never continues (with xdebug).
         // So we need to turn xdebug off for all "nested" commands.
@@ -37,7 +37,7 @@ class VPCommandUtils {
             $env = null;
         }
 
-        $process = new Process($command, ABSPATH, $env);
+        $process = new Process($command, $cwd, $env);
         $process->run();
         return $process;
     }

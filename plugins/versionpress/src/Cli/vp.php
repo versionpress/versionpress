@@ -191,6 +191,7 @@ class VPCommand extends WP_CLI_Command {
         // The main reason for this is that we need properly set WP_CONTENT_DIR constant for reading from storages
         $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-init-clone', array('require' => __DIR__ . '/vp-internal.php'));
         WP_CLI::log($process->getOutput());
+        WP_CLI::log($process->getErrorOutput());
         if (!$process->isSuccessful()) {
             WP_CLI::error("Could not finish site restore");
         }
@@ -251,22 +252,29 @@ class VPCommand extends WP_CLI_Command {
      * ## OPTIONS
      *
      * --name=<name>
-     * : Name of the clone. Used as a suffix for new folder, a suffix for new
-     * database and a name of the new Git branch. See example below.
+     * : Name of the clone. Used as a suffix for new folder, a suffix of db prefix
+     * and a name of the new Git branch. See example below.
+     *
+     * --siteurl=<url>
+     * : URL of new website. By default the command tries to search in URL the name of directory
+     * where the website is located and replace it with new directory name.
+     * E.g. if you have website in directory called "wordpress" and it runs at http://wordpress.local,
+     * the new URL will be http://wordpress-<name>.local.
      *
      * --force
      * : Forces cloning even if the target folder / database already exist.
      *
      * ## EXAMPLES
      *
-     * Let's say we have a site in folder `wp01` that uses database called `wp01db`. The command
+     * Let's say we have a site in folder `wordpress` that uses database called `wordpress`
+     * with tables prefixed with `wp_`. The command
      *
      *     wp vp clone --name=test
      *
-     * creates a copy of the site in `wp01_test`, a new Git branch called `test`
-     * and a new database `wp01db_test`.
+     * creates a copy of the site in `wordpress-test`, a new Git branch called `test`
+     * and the tables in database `wordpress` will be prefixed with `wp_test_`.
      *
-     * @synopsis --name=<name> [--force]
+     * @synopsis --name=<name> [--siteurl=<url>] [--force]
      *
      * @subcommand clone
      */
@@ -274,9 +282,16 @@ class VPCommand extends WP_CLI_Command {
         $name = $assoc_args['name'];
 
         $currentWpPath = get_home_path();
-        $cloneDirName = sprintf("%s_%s", basename($currentWpPath), $name);
+        $cloneDirName = sprintf("%s-%s", basename($currentWpPath), $name);
         $clonePath = dirname($currentWpPath) . '/' . $cloneDirName;
-        $cloneUrl = $this->getCloneUrl(get_site_url(), basename($currentWpPath), $cloneDirName);
+
+        $currentUrl = get_site_url();
+        if (!Strings::contains($currentUrl, basename($currentWpPath))) {
+            WP_CLI::error("The command cannot derive default clone URL. Please specify the --url parameter.");
+        }
+
+
+        $cloneUrl = isset($assoc_args['siteurl']) ? $assoc_args['siteurl'] : $this->getCloneUrl(get_site_url(), basename($currentWpPath), $cloneDirName);
 
         if (is_dir($clonePath) && !array_key_exists('force', $assoc_args)) {
             WP_CLI::error("Directory '" . basename($clonePath) . "' already exists. Use --force to overwrite it or use another clone name.");
@@ -290,6 +305,7 @@ class VPCommand extends WP_CLI_Command {
             }
         }
 
+        // Clone the site
         $cloneCommand = sprintf("git clone %s %s", escapeshellarg($currentWpPath), escapeshellarg($clonePath));
 
         $process = new Process($cloneCommand, $currentWpPath);
@@ -304,27 +320,36 @@ class VPCommand extends WP_CLI_Command {
 
         WP_CLI::success("Site files cloned");
 
-
-        $configureCloneCmd = 'wp --require=' . escapeshellarg($clonePath . '/wp-content/plugins/versionpress/src/Cli/vp-internal.php');
-        $configureCloneCmd .= ' vp-internal init-clone --name=' . escapeshellarg($name);
-        $configureCloneCmd .= ' --site-url=' . escapeshellarg($cloneUrl);
-        if (array_key_exists('force', $assoc_args)) {
-            $configureCloneCmd .= ' --force-db';
-        }
-        $configureCloneCmd .= " --debug";
-
-        $process = new Process($configureCloneCmd, $clonePath);
+        // Create a new Git branch
+        $createBranchCommand = 'git checkout -b ' . escapeshellarg($name);
+        $process = new Process($createBranchCommand, $clonePath);
         $process->run();
 
         if (!$process->isSuccessful()) {
-            WP_CLI::log($process->getOutput()); // WP-CLI sends it to STDOUT, not STDERR
-            WP_CLI::error("Initializing clone failed");
+            WP_CLI::error("Failed creating branch on clone, message: " . $process->getErrorOutput());
         } else {
-            WP_CLI::log($process->getOutput());
+            WP_CLI::success("New Git branch created");
         }
 
-        WP_CLI::success("Cloning done. Find your clone in '" . basename($clonePath) . "'.");
+        // Copy & Update wp-config
+        $wpConfigFile = $clonePath . '/wp-config.php';
+        copy($currentWpPath . '/wp-config.php', $wpConfigFile);
 
+        $config = file_get_contents($wpConfigFile);
+
+        // https://regex101.com/r/oO7gX7/1 - just remove the "g" modifier which is there for testing only
+        $re = "/^(\\\$table_prefix\\s*=\\s*['\"].*)(['\"];)/m";
+        $config = preg_replace($re, "$1{$name}_$2", $config, 1);
+
+        file_put_contents($wpConfigFile, $config);
+        WP_CLI::success("wp-config.php updated");
+
+        FileSystem::copyDir(VERSIONPRESS_PLUGIN_DIR, $clonePath . '/wp-content/plugins/versionpress');
+        WP_CLI::success("Copied VersionPress");
+
+        $process = VPCommandUtils::runWpCliCommand('vp', 'restore-site', array('siteurl' => $cloneUrl, 'yes' => null, 'require' => __FILE__), $clonePath);
+        WP_CLI::log($process->getOutput());
+        WP_CLI::log($process->getErrorOutput());
     }
 
     /**

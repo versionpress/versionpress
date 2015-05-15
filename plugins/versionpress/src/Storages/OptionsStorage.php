@@ -2,12 +2,22 @@
 
 namespace VersionPress\Storages;
 
+use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\OptionChangeInfo;
 use VersionPress\Utils\IniSerializer;
 
 class OptionsStorage extends SingleFileStorage {
 
+    /** @var string */
+    private $dbPrefix;
+    const PREFIX_PLACEHOLDER = "<<table-prefix>>";
+
     protected $notSavedFields = array('option_id');
+
+    function __construct($file, $entityInfo, $dbPrefix) {
+        parent::__construct($file, $entityInfo);
+        $this->dbPrefix = $dbPrefix;
+    }
 
     public function shouldBeSaved($data) {
         $blacklist = array(
@@ -31,7 +41,12 @@ class OptionsStorage extends SingleFileStorage {
 
     protected function loadEntities() {
         if (is_file($this->file)) {
-            $entities = IniSerializer::deserializeFlat(file_get_contents($this->file));
+            $entitiesWithPlaceholders = IniSerializer::deserializeFlat(file_get_contents($this->file));
+            $entities = array();
+
+            foreach ($entitiesWithPlaceholders as $id => $entity) {
+                $entities[$this->maybeReplacePlaceholderWithPrefix($id)] = $entity;
+            }
 
             foreach ($entities as $id => &$entity) {
                 $entity[$this->entityInfo->vpidColumnName] = $id;
@@ -45,5 +60,35 @@ class OptionsStorage extends SingleFileStorage {
 
     private function isTransientOption($id) {
         return substr($id, 0, 1) === '_'; // All transient options begin with underscore - there's no need to save them
+    }
+
+    protected function saveEntities() {
+        $originalEntities = $this->entities;
+        $entitiesWithPlaceholders = array();
+
+        foreach ($originalEntities as $id => $entity) {
+            $id = $this->maybeReplacePrefixWithPlaceholder($id);
+            $entitiesWithPlaceholders[$id] = $entity;
+            $entitiesWithPlaceholders[$id]['option_name'] = $id;
+        }
+
+        $this->entities = $entitiesWithPlaceholders;
+
+        parent::saveEntities();
+        $this->entities = $originalEntities;
+    }
+
+    private function maybeReplacePrefixWithPlaceholder($key) {
+        if (Strings::startsWith($key, $this->dbPrefix)) {
+            return self::PREFIX_PLACEHOLDER . Strings::substring($key, Strings::length($this->dbPrefix));
+        }
+        return $key;
+    }
+
+    private function maybeReplacePlaceholderWithPrefix($key) {
+        if (Strings::startsWith($key, self::PREFIX_PLACEHOLDER)) {
+            return $this->dbPrefix . Strings::substring($key, Strings::length(self::PREFIX_PLACEHOLDER));
+        }
+        return $key;
     }
 }
