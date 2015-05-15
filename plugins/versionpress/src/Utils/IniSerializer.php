@@ -138,10 +138,15 @@ class IniSerializer {
      * @return array Array structure corresponding to the nested INI format
      */
     public static function deserialize($string) {
+        $deserialized = self::deserializeFlat($string);
+        $deserialized = self::recursive_parse($deserialized);
+        return $deserialized;
+    }
+
+    public static function deserializeFlat($string) {
         $string = self::eolWorkaround_addPlaceholders($string);
         $deserialized = parse_ini_string($string, true);
         $deserialized = self::eolWorkaround_removePlaceholders($deserialized);
-        $deserialized = self::recursive_parse($deserialized);
         return $deserialized;
     }
 

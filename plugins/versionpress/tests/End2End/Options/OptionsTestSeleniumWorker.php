@@ -16,11 +16,11 @@ class OptionsTestSeleniumWorker extends SeleniumWorker implements IOptionsTestWo
         $this->waitAfterRedirect();
     }
 
-    public function prepare_changeMoreOptions() {
+    public function prepare_changeTwoOptions() {
         $this->url('wp-admin/options-general.php');
     }
 
-    public function changeMoreOptions() {
+    public function changeTwoOptions() {
         $this->byCssSelector('#blogname')->value(' edit');
         $this->byCssSelector('#blogdescription')->value(' edit');
 

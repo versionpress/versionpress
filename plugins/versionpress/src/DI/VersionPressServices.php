@@ -15,6 +15,7 @@ final class VersionPressServices {
     const REPOSITORY = 'repository';
     const VP_CONFIGURATION = 'vp-configuration';
     const PLAIN_WPDB = 'wpdb';
+    const VPID_REPOSITORY = 'vpid-repository';
 
     private function __construct() {
     }

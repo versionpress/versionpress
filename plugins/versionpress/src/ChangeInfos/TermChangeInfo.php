@@ -36,11 +36,13 @@ class TermChangeInfo extends EntityChangeInfo {
     }
 
     public function getChangeDescription() {
-        $taxonomy = $this->formatTaxonomyName();
+        $taxonomy = $this->getTaxonomyName();
 
         switch ($this->getAction()) {
             case "create":
                 return "New {$taxonomy} '{$this->termName}'";
+            case "delete":
+                return "Deleted {$taxonomy} '{$this->termName}'";
             case "rename":
                 return Strings::firstUpper($taxonomy) . " '{$this->oldTermName}' renamed to '{$this->termName}'";
         }
@@ -71,7 +73,7 @@ class TermChangeInfo extends EntityChangeInfo {
         return $tags;
     }
 
-    private function formatTaxonomyName() {
+    public function getTaxonomyName() {
         return str_replace("_", " ", $this->taxonomy);
     }
 

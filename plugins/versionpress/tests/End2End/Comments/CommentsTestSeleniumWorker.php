@@ -140,4 +140,102 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
         $this->url('wp-admin/edit-comments.php?comment_status=spam');
         $this->jsClickAndWait('#the-comment-list tr:first-child .unspam a');
     }
+
+    public function prepare_editTwoComments() {
+        throw new \PHPUnit_Framework_SkippedTestError('There is no way to edit more comments at once using selenium');
+    }
+
+    public function editTwoComments() {
+    }
+
+    public function prepare_deleteTwoComments() {
+        $trashedComment = $this->prepareTestComment();
+        $trashedComment['comment_approved'] = 'trash';
+
+        self::$wpAutomation->createComment($trashedComment);
+        self::$wpAutomation->createComment($trashedComment);
+    }
+
+    public function deleteTwoComments() {
+        $this->url('wp-admin/edit-comments.php?comment_status=trash');
+        $this->performBulkActionWithTwoLastComments('delete');
+    }
+
+    public function prepare_moveTwoCommentsInTrash() {
+        $trashedComment = $this->prepareTestComment();
+
+        self::$wpAutomation->createComment($trashedComment);
+        self::$wpAutomation->createComment($trashedComment);
+    }
+
+    public function moveTwoCommentsInTrash() {
+        $this->url('wp-admin/edit-comments.php');
+        $this->performBulkActionWithTwoLastComments('trash');
+    }
+
+    public function prepare_moveTwoCommentsFromTrash() {
+    }
+
+    public function moveTwoCommentsFromTrash() {
+        $this->url('wp-admin/edit-comments.php?comment_status=trash');
+        $this->performBulkActionWithTwoLastComments('untrash');
+    }
+
+    public function prepare_markTwoCommentsAsSpam() {
+    }
+
+    public function markTwoCommentsAsSpam() {
+        $this->url('wp-admin/edit-comments.php');
+        $this->performBulkActionWithTwoLastComments('spam');
+    }
+
+    public function prepare_markTwoSpamCommentsAsNotSpam() {
+    }
+
+    public function markTwoSpamCommentsAsNotSpam() {
+        $this->url('wp-admin/edit-comments.php?comment_status=spam');
+        $this->performBulkActionWithTwoLastComments('unspam');
+    }
+
+    private function performBulkActionWithTwoLastComments($action) {
+        // select two last comments
+        $this->jsClick('table.comments tbody tr:nth-child(1) .check-column input[type=checkbox]');
+        $this->jsClick('table.comments tbody tr:nth-child(2) .check-column input[type=checkbox]');
+        // choose bulk edit
+        $this->select($this->byId('bulk-action-selector-top'))->selectOptionByValue($action);
+        $this->jsClickAndWait('#doaction');
+    }
+
+    public function prepare_unapproveTwoComments() {
+    }
+
+    public function unapproveTwoComments() {
+        $this->url('wp-admin/edit-comments.php');
+        $this->performBulkActionWithTwoLastComments('unapprove');
+    }
+
+    public function prepare_approveTwoComments() {
+    }
+
+    public function approveTwoComments() {
+        $this->url('wp-admin/edit-comments.php?comment_status=moderated');
+        $this->performBulkActionWithTwoLastComments('approve');
+    }
+
+    private function prepareTestComment() {
+        $author = self::$testConfig->testSite->adminName;
+        $email = self::$testConfig->testSite->adminEmail;
+
+        if (!$this->testPostId) {
+            $this->testPostId = $this->createTestPost();
+        }
+
+        return array(
+            'comment_author' => $author,
+            'comment_author_email' => $email,
+            'comment_content' => 'Comment by ' . $author,
+            'user_id' => 1,
+            'comment_post_ID' => $this->testPostId
+        );
+    }
 }

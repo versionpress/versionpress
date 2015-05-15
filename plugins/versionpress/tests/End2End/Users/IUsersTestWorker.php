@@ -19,4 +19,15 @@ interface IUsersTestWorker extends ITestWorker {
 
     public function prepare_deleteUser();
     public function deleteUser();
+
+    public function prepare_editTwoUsers();
+    public function editTwoUsers();
+
+    public function prepare_deleteTwoUsers();
+    public function deleteTwoUsers();
+
+    public function prepare_editTwoUsermeta();
+    public function editTwoUsermeta();
+
+    public function tearDownAfterClass();
 }

@@ -4,34 +4,32 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "13e7733e108139b36f439873b1113b2e",
+    "hash": "5abb319d30c45782e9dd56225cac9350",
     "packages": [
         {
-            "name": "ifsnop/mysqldump-php",
-            "version": "v1.5",
+            "name": "imnotjames/curlfile-compat",
+            "version": "0.0.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/ifsnop/mysqldump-php.git",
-                "reference": "1ef0dc4032eb21d1372819b65eff49719a3127fd"
+                "url": "https://github.com/imnotjames/curlfile-compat.git",
+                "reference": "e23e417e5c420dc64a2e9212262beb22ac7f5389"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/1ef0dc4032eb21d1372819b65eff49719a3127fd",
-                "reference": "1ef0dc4032eb21d1372819b65eff49719a3127fd",
+                "url": "https://api.github.com/repos/imnotjames/curlfile-compat/zipball/e23e417e5c420dc64a2e9212262beb22ac7f5389",
+                "reference": "e23e417e5c420dc64a2e9212262beb22ac7f5389",
                 "shasum": ""
             },
-            "require": {
-                "php": ">=5.3.0"
-            },
             "require-dev": {
-                "phpunit/phpunit": "3.7.*",
-                "squizlabs/php_codesniffer": "1.*"
+                "phpunit/phpunit": "4.*",
+                "satooshi/php-coveralls": "dev-master"
             },
             "type": "library",
             "autoload": {
-                "psr-4": {
-                    "Ifsnop\\": "src/Ifsnop/"
-                }
+                "files": [
+                    "src/imnotjames/CURLFile.php",
+                    "src/CURLFile.php"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -39,24 +37,19 @@
             ],
             "authors": [
                 {
-                    "name": "Diego Torres",
-                    "homepage": "https://github.com/ifsnop",
-                    "role": "Developer"
+                    "name": "James Ward",
+                    "email": "james@notjam.es",
+                    "homepage": "http://notjam.es/"
                 }
             ],
-            "description": "This is a php version of linux's mysqldump in terminal \"$ mysqldump -u username -p...\"",
-            "homepage": "https://github.com/ifsnop/mysqldump-php",
+            "description": "Compatibility library with CURLFile from PHP 5.5",
+            "homepage": "https://github.com/imnotjames/curlfile-compat",
             "keywords": [
-                "backup",
-                "database",
-                "dump",
-                "export",
-                "mysql",
-                "mysqldump",
-                "pdo",
-                "sqlite"
+                "curl",
+                "curlfile",
+                "file upload"
             ],
-            "time": "2015-02-05 16:56:40"
+            "time": "2014-06-28 15:19:17"
         },
         {
             "name": "michelf/php-markdown",
@@ -736,6 +729,58 @@
                 "version"
             ],
             "time": "2015-03-09 04:51:38"
+        },
+        {
+            "name": "ifsnop/mysqldump-php",
+            "version": "v1.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ifsnop/mysqldump-php.git",
+                "reference": "1ef0dc4032eb21d1372819b65eff49719a3127fd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ifsnop/mysqldump-php/zipball/1ef0dc4032eb21d1372819b65eff49719a3127fd",
+                "reference": "1ef0dc4032eb21d1372819b65eff49719a3127fd",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*",
+                "squizlabs/php_codesniffer": "1.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ifsnop\\": "src/Ifsnop/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Diego Torres",
+                    "homepage": "https://github.com/ifsnop",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This is a php version of linux's mysqldump in terminal \"$ mysqldump -u username -p...\"",
+            "homepage": "https://github.com/ifsnop/mysqldump-php",
+            "keywords": [
+                "backup",
+                "database",
+                "dump",
+                "export",
+                "mysql",
+                "mysqldump",
+                "pdo",
+                "sqlite"
+            ],
+            "time": "2015-02-05 16:56:40"
         },
         {
             "name": "janvoracek/comment-stripper",

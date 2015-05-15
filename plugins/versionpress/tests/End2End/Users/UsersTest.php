@@ -102,4 +102,61 @@ class UsersTest extends End2EndTestCase {
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
+
+    /**
+     * @test
+     * @testdox Editing multiple users creates bulk action
+     */
+    public function editingMultipleUsersCreatesBulkAction() {
+        self::$worker->prepare_editTwoUsers();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->editTwoUsers();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction("user/edit", 2);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Deleting multiple users creates bulk action
+     */
+    public function deletingMultipleUsersCreatesBulkAction() {
+        self::$worker->prepare_deleteTwoUsers();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->deleteTwoUsers();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction("user/delete", 2);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+
+    /**
+     * @test
+     * @testdox Editing multiple usermeta creates bulk action
+     */
+    public function editingMultipleUsermetaCreatesBulkAction() {
+        self::$worker->prepare_editTwoUsermeta();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->editTwoUsermeta();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction("usermeta/edit", 2);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    public static function tearDownAfterClass() {
+        parent::tearDownAfterClass();
+        self::$worker->tearDownAfterClass();
+    }
 }

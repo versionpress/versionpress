@@ -8,6 +8,7 @@ use VersionPress\Git\GitConfig;
 use VersionPress\Git\GitRepository;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Synchronizers\SynchronizationProcess;
+use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\IdUtil;
 use VersionPress\Utils\SecurityUtils;
@@ -155,13 +156,19 @@ class Initializer {
         $entities = $this->database->get_results("SELECT * FROM $prefixedTableName", ARRAY_A);
         $entities = $this->replaceForeignKeysWithReferencesInAllEntities($entityName, $entities);
 
-        foreach ($entities as $entity) {
-            if (!$this->storageFactory->getStorage($entityName)->shouldBeSaved($entity)) continue;
-            $entityId = $entity[$idColumnName];
-            $vpId = IdUtil::newId();
-            $query = "INSERT INTO {$this->getTableName('vp_id')} (`table`, id, vp_id) VALUES (\"$tableName\", $entityId, UNHEX('$vpId'))";
+        $storage = $this->storageFactory->getStorage($entityName);
+        $entities = array_filter($entities, function ($entity) use ($storage) { return $storage->shouldBeSaved($entity); });
+        $chunks = array_chunk($entities, 1000);
+        $this->idCache[$entityName] = array();
+
+        foreach ($chunks as $entitiesInChunk) {
+            $wordpressIds = ArrayUtils::column($entitiesInChunk, $idColumnName);
+            $vpIds = array_map(array('VersionPress\Utils\IdUtil', 'newId'), $entitiesInChunk);
+            $idPairs = array_combine($wordpressIds, $vpIds);
+            $this->idCache[$entityName] = $this->idCache[$entityName] + $idPairs; // merge arrays with preserving keys
+            $sqlValues = join(', ', ArrayUtils::map(function ($vpId, $id) use ($tableName) { return "('$tableName', $id, UNHEX('$vpId'))"; }, $idPairs));
+            $query = "INSERT INTO {$this->getTableName('vp_id')} (`table`, id, vp_id) VALUES $sqlValues";
             $this->database->query($query);
-            $this->idCache[$entityName][$entityId] = $vpId;
             $this->checkTimeout();
         }
     }

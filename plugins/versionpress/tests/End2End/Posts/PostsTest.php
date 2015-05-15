@@ -159,4 +159,44 @@ class PostsTest extends PostTypeTestCase {
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
+
+    /**
+     * @test
+     * @testdox Editation multiple posts creates bulk action
+     */
+    public function editationOfMultiplePostsCreatesBulkAction() {
+        $this->runEditationOfMultiplePostsCreatesBulkAction();
+    }
+
+    /**
+     * @test
+     * @testdox Trashing multiple posts creates bulk action
+     */
+    public function trashingOfMultiplePostsCreatesBulkAction() {
+        $this->runTrashingMultiplePostsCreatesBulkAction();
+    }
+
+    /**
+     * @test
+     * @testdox Untrashing multiple posts creates bulk action
+     */
+    public function untrashingOfMultiplePostsCreatesBulkAction() {
+        $this->runUntrashingMultiplePostsCreatesBulkAction();
+    }
+
+    /**
+     * @test
+     * @testdox Deleting multiple posts creates bulk action
+     */
+    public function deletingOfMultiplePostsCreatesBulkAction() {
+        $this->runDeletingMultiplePostsCreatesBulkAction();
+    }
+
+    /**
+     * @test
+     * @testdox Publishing multiple posts creates bulk action
+     */
+    public function publishingOfMultiplePostsCreatesBulkAction() {
+        $this->runPublishingMultiplePostsCreatesBulkAction();
+    }
 }

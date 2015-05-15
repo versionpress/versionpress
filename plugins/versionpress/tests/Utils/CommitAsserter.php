@@ -5,6 +5,7 @@ namespace VersionPress\Tests\Utils;
 use Exception;
 use Nette\Utils\Strings;
 use PHPUnit_Framework_Assert;
+use VersionPress\ChangeInfos\BulkChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\ChangeInfoMatcher;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
@@ -132,6 +133,38 @@ class CommitAsserter {
             }
         }
 
+    }
+
+    /**
+     * Asserts that commit is a bulk action. Asserts the action and number of grouped change info objects.
+     *
+     * @param string $expectedAction Expected action, e.g., "post/edit" or "plugin/activate".
+     * @param int $expectedCountOfGroupedActions
+     */
+    public function assertBulkAction($expectedAction, $expectedCountOfGroupedActions) {
+        $commit = $this->getCommit(0);
+        $changeInfoEnvelope = $this->getChangeInfo($commit);
+
+        $changeInfoContainsAction = ChangeInfoUtils::containsAction($changeInfoEnvelope, $expectedAction);
+        if (!$changeInfoContainsAction) {
+            PHPUnit_Framework_Assert::fail("Action '$expectedAction' not found in commit {$commit->getShortHash()}");
+        }
+
+        $changeInfoList = $changeInfoEnvelope->getReorganizedInfoList();
+        $firstChangeInfo = $changeInfoList[0];
+
+        if(!($firstChangeInfo instanceof BulkChangeInfo)) {
+            PHPUnit_Framework_Assert::fail("Commit is not a bulk action");
+        }
+
+        if (ChangeInfoUtils::getFullAction($firstChangeInfo) !== $expectedAction) {
+            PHPUnit_Framework_Assert::fail("Bulk action '{$firstChangeInfo->getAction()}' expected to be '{$expectedAction}'");
+        }
+
+        $countOfGroupedActions = count($firstChangeInfo->getChangeInfos());
+        if ($countOfGroupedActions !== $expectedCountOfGroupedActions) {
+            PHPUnit_Framework_Assert::fail("Expected that bulk action contains $expectedCountOfGroupedActions actions instead of $countOfGroupedActions.");
+        }
     }
 
     /**

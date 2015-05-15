@@ -9,13 +9,13 @@ Author URI: http://versionpress.net/
 License: GPLv2 or later
 */
 
-use Tracy\Debugger;
 use VersionPress\ChangeInfos\PluginChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\VersionPressChangeInfo;
 use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\MirroringDatabase;
+use VersionPress\Database\VpidRepository;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
@@ -58,13 +58,15 @@ function vp_register_hooks() {
     $mirror = $versionPressContainer->resolve(VersionPressServices::MIRROR);
     /** @var DbSchemaInfo $dbSchemaInfo */
     $dbSchemaInfo = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
+    /** @var VpidRepository $vpidRepository */
+    $vpidRepository = $versionPressContainer->resolve(VersionPressServices::VPID_REPOSITORY);
 
     /**
      *  Hook for saving taxonomies into files
      *  WordPress creates plain INSERT query and executes it using wpdb::query method instead of wpdb::insert.
      *  It's too difficult to parse every INSERT query, that's why the WordPress hook is used.
      */
-    add_action('save_post', createUpdatePostTermsHook($mirror, $wpdb));
+    add_action('save_post', createUpdatePostTermsHook($mirror, $wpdb, $vpidRepository));
 
     add_filter('update_feedback', function () {
         touch(get_home_path() . 'versionpress.maintenance');
@@ -214,12 +216,19 @@ function vp_register_hooks() {
             global $wpdb, $versionPressContainer;
             /** @var Mirror $mirror */
             $mirror = $versionPressContainer->resolve(VersionPressServices::MIRROR);
-            $func = createUpdatePostTermsHook($mirror, $wpdb);
+            $vpidRepository = $versionPressContainer->resolve(VersionPressServices::VPID_REPOSITORY);
+            $func = createUpdatePostTermsHook($mirror, $wpdb, $vpidRepository);
             $func($menu_item_db_id);
         }
     }, 10, 2);
 
-    add_action('set_object_terms', createUpdatePostTermsHook($mirror, $wpdb));
+    add_action('pre_delete_term', function ($termId, $taxonomy) use ($committer, $vpidRepository) {
+        $termVpid = $vpidRepository->getVpidForEntity('term', $termId);
+        $term = get_term($termId, $taxonomy);
+        $committer->forceChangeInfo(new \VersionPress\ChangeInfos\TermChangeInfo('delete', $termVpid, $term->name, $taxonomy));
+    }, 10, 2);
+
+    add_action('set_object_terms', createUpdatePostTermsHook($mirror, $wpdb, $vpidRepository));
 
     add_filter('plugin_install_action_links', function ($links, $plugin) {
         $warningLink = '<span class="vp-compatibility-popup %s" data-plugin-name="' . $plugin['name'] . '"><span class="icon icon-warning"></span></span>';
@@ -337,9 +346,9 @@ function vp_register_hooks() {
     register_shutdown_function(array($committer, 'commit'));
 }
 
-function createUpdatePostTermsHook(Mirror $mirror, wpdb $wpdb) {
+function createUpdatePostTermsHook(Mirror $mirror, wpdb $wpdb, VpidRepository $vpidRepository) {
 
-    return function ($postId) use ($mirror, $wpdb) {
+    return function ($postId) use ($mirror, $wpdb, $vpidRepository) {
         /** @var array $post */
         $post = get_post($postId, ARRAY_A);
 
@@ -350,17 +359,15 @@ function createUpdatePostTermsHook(Mirror $mirror, wpdb $wpdb) {
         $postType = $post['post_type'];
         $taxonomies = get_object_taxonomies($postType);
 
-        $vpIdTableName = $wpdb->prefix . 'vp_id';
-
-        $postVpId = $wpdb->get_var("SELECT HEX(vp_id) FROM $vpIdTableName WHERE id = $postId AND `table` = 'posts'");
+        $postVpId = $vpidRepository->getVpidForEntity('post', $postId);
 
         $postUpdateData = array('vp_id' => $postVpId, 'vp_term_taxonomy' => array());
 
         foreach ($taxonomies as $taxonomy) {
             $terms = get_the_terms($postId, $taxonomy);
             if ($terms) {
-                $referencedTaxonomies = array_map(function ($term) use ($wpdb, $vpIdTableName) {
-                    return $wpdb->get_var("SELECT HEX(vp_id) FROM $vpIdTableName WHERE id = {$term->term_taxonomy_id} AND `table` = 'term_taxonomy'");
+                $referencedTaxonomies = array_map(function ($term) use ($wpdb, $vpidRepository) {
+                    return $vpidRepository->getVpidForEntity('term_taxonomy', $term->term_taxonomy_id);
                 }, $terms);
 
                 $postUpdateData['vp_term_taxonomy'] = array_merge($postUpdateData['vp_term_taxonomy'], $referencedTaxonomies);
@@ -671,7 +678,6 @@ if (VersionPress::isActive()) {
 }
 
 add_action('admin_enqueue_scripts', 'vp_enqueue_styles_and_scripts');
-add_action('wp_enqueue_scripts', 'vp_enqueue_styles_and_scripts');
 function vp_enqueue_styles_and_scripts() {
     wp_enqueue_style('versionpress_popover_style', plugins_url('admin/public/css/jquery.webui-popover.min.css', __FILE__));
     wp_enqueue_style('versionpress_popover_custom_style', plugins_url('admin/public/css/popover-custom.css', __FILE__));

@@ -9,6 +9,6 @@ interface IOptionsTestWorker extends ITestWorker {
     public function prepare_changeOption();
     public function changeOption();
 
-    public function prepare_changeMoreOptions();
-    public function changeMoreOptions();
+    public function prepare_changeTwoOptions();
+    public function changeTwoOptions();
 }

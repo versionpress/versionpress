@@ -1,7 +1,9 @@
 <?php
 namespace VersionPress\ChangeInfos;
 
+use Nette\Utils\Strings;
 use VersionPress\Git\CommitMessage;
+use VersionPress\Utils\StringUtils;
 
 /**
  * Option changes like creating or updating them.
@@ -26,15 +28,7 @@ class OptionChangeInfo extends EntityChangeInfo {
     }
 
     function getChangeDescription() {
-
-        $messages = array(
-            "create" => "New option '{$this->getEntityId()}'",
-            "edit" => "Changed option '{$this->getEntityId()}'",
-            "delete" => "Deleted option '{$this->getEntityId()}'"
-        );
-
-        return $messages[$this->getAction()];
-
+        return Strings::capitalize(StringUtils::verbToPastTense($this->getAction())) . " option '{$this->getEntityId()}'";
     }
 
     static function buildFromCommitMessage(CommitMessage $commitMessage) {
