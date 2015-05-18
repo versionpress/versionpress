@@ -6,6 +6,7 @@ namespace VersionPress\Cli;
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Process\Process;
+use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
@@ -132,6 +133,9 @@ class VPCommand extends WP_CLI_Command {
         if (!defined('WP_CONTENT_DIR')) {
             define('WP_CONTENT_DIR', 'xyz'); //doesn't matter, it's just to prevent the NOTICE in the require`d bootstrap.php
         }
+
+        $this->defineGlobalTablePrefix();
+
         require_once(__DIR__ . '/../../bootstrap.php');
 
         if (file_exists(ABSPATH . 'wp-config.php')) {
@@ -142,7 +146,7 @@ class VPCommand extends WP_CLI_Command {
             $this->configSite($assoc_args);
         }
 
-        $this->createDb($assoc_args);
+        $this->prepareDatabase($assoc_args);
 
 
         // Disable VersionPress tracking
@@ -204,20 +208,20 @@ class VPCommand extends WP_CLI_Command {
         return count(array_intersect($specifiedOptions, $configOptions)) > 0;
     }
 
-    private function createDb($assoc_args, $force = false) {
-        $process = $force ? VPCommandUtils::runWpCliCommand('db', 'reset', array('yes' => null)) : VPCommandUtils::runWpCliCommand('db', 'create');
-
+    private function prepareDatabase($assoc_args) {
+        $process = VPCommandUtils::runWpCliCommand('db', 'create');
         if (!$process->isSuccessful()) {
             $msg = $process->getErrorOutput();
-            if (Strings::contains($msg, '1007')) {
-                WP_CLI::confirm('The database already exists. Do you want to drop it?', $assoc_args);
-                $this->createDb($assoc_args, true);
+            if (Strings::contains($msg, '1007')) { // Database exists
+                if (!isset($assoc_args['yes']))
+                    WP_CLI::confirm("Tables for this site already exist. Do you want to drop them?");
+                $this->dropTables();
             } else {
-                WP_CLI::log("Failed creating DB");
+                WP_CLI::error("Failed creating DB");
             }
-        } else {
-            WP_CLI::success("DB created");
         }
+
+        WP_CLI::success("DB created");
     }
 
     private function configSite($assoc_args) {
@@ -416,6 +420,41 @@ class VPCommand extends WP_CLI_Command {
         }
 
         WP_CLI::success("Done.");
+    }
+    private function dropTables() {
+        global $versionPressContainer;
+        $tables = array(
+            'users',
+            'usermeta',
+            'posts',
+            'comments',
+            'links',
+            'options',
+            'postmeta',
+            'terms',
+            'term_taxonomy',
+            'term_relationships',
+            'commentmeta',
+            'vp_id',
+        );
+
+        /** @var DbSchemaInfo $schema */
+        $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
+        $tables = array_map(array($schema, 'getPrefixedTableName'), $tables);
+        var_dump($tables);
+        foreach ($tables as $table) {
+            VPCommandUtils::runWpCliCommand('db', 'query', array("DROP TABLE IF EXISTS `$table`"));
+        }
+    }
+
+
+    private function defineGlobalTablePrefix() {
+        global $table_prefix;
+        $wpConfigPath = ABSPATH . 'wp-config.php';
+        $wpConfigLines = file_get_contents($wpConfigPath);
+        // https://regex101.com/r/oO7gX7/2
+        preg_match("/^\\\$table_prefix\\s*=\\s*['\"](.*)['\"];/m", $wpConfigLines, $matches);
+        $table_prefix = $matches[1];
     }
 }
 
