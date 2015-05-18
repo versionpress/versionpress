@@ -77,4 +77,9 @@ class TermChangeInfo extends EntityChangeInfo {
         return str_replace("_", " ", $this->taxonomy);
     }
 
+    public function getChangedFiles() {
+        $changes = parent::getChangedFiles();
+        $changes[] = array("type" => "storage-file", "entity" => "option", "id" => "", "parent-id" => ""); // sometimes term change can affect option (e.g. deleting menu)
+        return $changes;
+    }
 }
