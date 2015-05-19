@@ -7,13 +7,13 @@ const expect = chai.expect;
 
 describe('HomePage', () => {
   it('displays the title', () => {
-    const TestUtils = React.addons.TestUtils;
+    const testUtils = React.addons.TestUtils;
 
-    const homepage = TestUtils.renderIntoDocument(
+    const homepage = testUtils.renderIntoDocument(
       React.createElement(HomePage)
     );
 
-    const heading = TestUtils.findRenderedDOMComponentWithTag(homepage, 'h1').getDOMNode();
+    const heading = testUtils.findRenderedDOMComponentWithTag(homepage, 'h1').getDOMNode();
 
     expect(heading.textContent).to.equal('Hello world');
   });

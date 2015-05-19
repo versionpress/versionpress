@@ -6,7 +6,7 @@ import routes = require('./routes');
 
 const app = document.getElementById('app');
 
-Router.run(routes.AppRoute, Router.HashLocation, (Handler) => {
+Router.run(routes.appRoute, Router.HashLocation, (Handler) => {
   React.render(
     React.createElement(Handler),
     app

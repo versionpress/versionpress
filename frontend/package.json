@@ -2,11 +2,18 @@
   "name": "frontend",
   "main": "build/app.js",
   "version": "0.0.1",
+  "config": {
+    "loglevel": "warn"
+  },
   "scripts": {
-    "test": "./node_modules/karma/bin/karma start config/karma.conf.js --single-run",
-    "test:watch": "./node_modules/karma/bin/karma start config/karma.conf.js",
-    "start": "NODE_ENV=development node ./config/webpack-dev-server.js",
-    "build": "NODE_ENV=production node ./config/webpack-build.js"
+    "clean": "rimraf build/*",
+    "prebuild": "npm run clean",
+    "build": "NODE_ENV=production node ./config/webpack-build.js",
+    "dev": "NODE_ENV=development node ./config/webpack-dev-server.js",
+    "lint": "gulp tslint",
+    "pretest": "npm run lint",
+    "test": "karma start config/karma.conf.js --single-run",
+    "test:watch": "karma start config/karma.conf.js"
   },
   "author": "",
   "license": "GPL",
@@ -19,6 +26,7 @@
     "node-notifier": "^4.2.1",
     "react": "^0.13.2",
     "react-router": "^0.13.3",
+    "rimraf": "^2.3.4",
     "style-loader": "^0.12.2",
     "ts-jsx-loader": "^0.2.0",
     "ts-loader": "0.4.2",
@@ -28,6 +36,7 @@
   "devDependencies": {
     "chai": "^2.3.0",
     "core-js": "^0.9.8",
+    "gulp-tslint": "^3.0.1-beta",
     "karma": "^0.12.31",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^0.1.11",
@@ -39,6 +48,7 @@
     "karma-webpack": "^1.5.1",
     "mocha": "^2.2.4",
     "react-hot-loader": "^1.2.6",
+    "tslint": "^2.1.1",
     "webpack-dev-server": "^1.8.2"
   }
 }

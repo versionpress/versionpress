@@ -2,10 +2,10 @@
 
 import React = require('react');
 
-class HomePage extends React.Component<any,any> {
+class HomePage extends React.Component<any, any> {
 
   render() {
-    return React.DOM.h1(null, 'Hello world.');
+    return React.DOM.h1(null, 'Hello world');
   }
 }
 
