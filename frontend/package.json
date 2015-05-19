@@ -3,6 +3,8 @@
   "main": "build/app.js",
   "version": "0.0.1",
   "scripts": {
+    "test": "./node_modules/karma/bin/karma start config/karma.conf.js --single-run",
+    "test:watch": "./node_modules/karma/bin/karma start config/karma.conf.js",
     "start": "NODE_ENV=development node ./config/webpack-dev-server.js",
     "build": "NODE_ENV=production node ./config/webpack-build.js"
   },
@@ -24,6 +26,18 @@
     "webpack": "^1.8.11"
   },
   "devDependencies": {
+    "chai": "^2.3.0",
+    "core-js": "^0.9.8",
+    "karma": "^0.12.31",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^0.1.11",
+    "karma-cli": "0.0.4",
+    "karma-firefox-launcher": "^0.1.6",
+    "karma-mocha": "^0.1.10",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "karma-sourcemap-loader": "^0.3.4",
+    "karma-webpack": "^1.5.1",
+    "mocha": "^2.2.4",
     "react-hot-loader": "^1.2.6",
     "webpack-dev-server": "^1.8.2"
   }
