@@ -13,7 +13,7 @@ class ExtendedWpdb extends wpdb {
     function __construct($dbuser, $dbpassword, $dbname, $dbhost) {
         global $table_prefix;
         parent::__construct($dbuser, $dbpassword, $dbname, $dbhost);
-        $this->prefix = $table_prefix;
+        $this->set_prefix($table_prefix);
     }
 
     function get_row($query = null, $output = OBJECT, $y = 0) {

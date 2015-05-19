@@ -147,24 +147,20 @@ class VPInternalCommand extends WP_CLI_Command {
      *
      */
     public function finishInitClone($args, $assoc_args) {
-
+        global $versionPressContainer;
 
         // Truncate tables
 
         /** @var wpdb $wpdb */
-        global $wpdb;
+        $wpdb = $versionPressContainer->resolve(VersionPressServices::PLAIN_WPDB);
+        $tables = $wpdb->tables();
 
-        $sql = "SELECT concat('TRUNCATE TABLE `', TABLE_NAME, '`;') FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '" . DB_NAME . "'";
-        if (isset($assoc_args["truncate-options"])) {
-            $sql .= ";";
-        } else {
-            $sql .= " AND TABLE_NAME NOT LIKE '%options';";
+        if (!isset($assoc_args["truncate-options"])) {
+            $tables = array_filter($tables, function ($table) use ($wpdb) { return $table !== $wpdb->options; });
         }
 
-        $results = $wpdb->get_results($sql, ARRAY_N);
-
-        foreach ($results as $subResult) {
-            $truncateCmd = $subResult[0];
+        foreach ($tables as $table) {
+            $truncateCmd = "TRUNCATE TABLE `$table`";
             $wpdb->query($truncateCmd);
         }
         WP_CLI::success("Truncated DB tables");
@@ -172,7 +168,6 @@ class VPInternalCommand extends WP_CLI_Command {
 
         // Create VersionPress tables
 
-        global $versionPressContainer;
         /** @var \VersionPress\Initialization\Initializer $initializer */
         $initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);
         $initializer->createVersionPressTables();

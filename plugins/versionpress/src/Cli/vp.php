@@ -441,7 +441,7 @@ class VPCommand extends WP_CLI_Command {
         /** @var DbSchemaInfo $schema */
         $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
         $tables = array_map(array($schema, 'getPrefixedTableName'), $tables);
-        var_dump($tables);
+
         foreach ($tables as $table) {
             VPCommandUtils::runWpCliCommand('db', 'query', array("DROP TABLE IF EXISTS `$table`"));
         }
