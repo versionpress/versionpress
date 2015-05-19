@@ -1,10 +1,15 @@
 /// <reference path='../typings/tsd.d.ts' />
 
 import React = require('react');
+import Router = require('react-router');
+import routes = require('./routes');
 
 const app = document.getElementById('app');
 
-React.render(
-  React.DOM.h1(null, "Hello world!"),
-  app
-);
+Router.run(routes.AppRoute, Router.HashLocation, (Handler) => {
+  React.render(
+    React.createElement(Handler),
+    app
+  );
+});
+
