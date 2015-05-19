@@ -1,0 +1,9 @@
+# IDEA project files
+/.idea/workspace.xml
+/.idea/tasks.xml
+/.idea/dictionaries
+/.idea/watcherTasks.xml
+
+# Build dirs
+/build
+/node_modules
