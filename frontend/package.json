@@ -8,8 +8,8 @@
   "scripts": {
     "clean": "rimraf build/*",
     "prebuild": "npm run clean",
-    "build": "NODE_ENV=production node ./config/webpack-build.js",
-    "dev": "NODE_ENV=development node ./config/webpack-dev-server.js",
+    "build": "node ./config/webpack-build.js",
+    "dev": "node ./config/webpack-dev-server.js",
     "lint": "gulp tslint",
     "pretest": "npm run lint",
     "test": "karma start config/karma.conf.js --single-run",

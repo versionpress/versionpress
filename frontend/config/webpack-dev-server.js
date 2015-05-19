@@ -5,6 +5,8 @@ var webpack = require('webpack');
 var WebpackDevServer = require('webpack-dev-server');
 var webpackConfig = require('./webpack.config.js')(true);
 
+process.env.NODE_ENV = 'development';
+
 new WebpackDevServer(webpack(webpackConfig), {
   hot: true,
   publicPath: webpackConfig.output.publicPath,
