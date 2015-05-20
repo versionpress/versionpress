@@ -5,11 +5,11 @@ import React = require('react');
 import request = require('superagent');
 
 interface CommitsTableProps {
-  commits: Commit[]
+  commits: Commit[];
 }
 
 interface CommitsTableState {
-  commits: Commit[]
+  commits: Commit[];
 }
 
 class CommitsTable extends React.Component<CommitsTableProps, CommitsTableState>  {
@@ -55,8 +55,8 @@ class CommitsTable extends React.Component<CommitsTableProps, CommitsTableState>
     return React.DOM.div(null,
       React.DOM.table(null,
         React.DOM.tr(null,
-          React.DOM.th(null, "Date"),
-          React.DOM.th(null, "Message"),
+          React.DOM.th(null, 'Date'),
+          React.DOM.th(null, 'Message'),
           React.DOM.th()
         ),
         this.state.commits.map((commit: Commit) => {
@@ -77,7 +77,7 @@ class CommitsTable extends React.Component<CommitsTableProps, CommitsTableState>
                   }, 'Rollback to commit')
                 : ''
             )
-          )
+          );
         })
       )
     );

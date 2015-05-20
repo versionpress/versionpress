@@ -6,7 +6,7 @@ import request = require('superagent');
 import CommitsTable = require('../Commits/CommitsTable.react');
 
 interface HomePageState {
-  commits: Commit[]
+  commits: Commit[];
 }
 
 class HomePage extends React.Component<any, HomePageState> {
