@@ -7,3 +7,8 @@
 # Build dirs
 /build
 /node_modules
+
+# TypeScript definition files
+/typings/*
+!/typings/typings.d.ts
+!/typings/es6.d.ts

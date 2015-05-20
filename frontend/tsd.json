@@ -1,0 +1,33 @@
+{
+  "version": "v4",
+  "repo": "vasek17/DefinitelyTyped",
+  "ref": "master",
+  "path": "typings",
+  "bundle": "typings/tsd.d.ts",
+  "installed": {
+    "superagent/superagent.d.ts": {
+      "commit": "75903dbb9edbd1af3b2d12db56df4becab543879"
+    },
+    "node/node.d.ts": {
+      "commit": "75903dbb9edbd1af3b2d12db56df4becab543879"
+    },
+    "moment/moment.d.ts": {
+      "commit": "d67c5e3e1a1291ab58dcaace6ce76f69e860d33c"
+    },
+    "chai/chai.d.ts": {
+      "commit": "d67c5e3e1a1291ab58dcaace6ce76f69e860d33c"
+    },
+    "mocha/mocha.d.ts": {
+      "commit": "d67c5e3e1a1291ab58dcaace6ce76f69e860d33c"
+    },
+    "react/react-addons.d.ts": {
+      "commit": "d67c5e3e1a1291ab58dcaace6ce76f69e860d33c"
+    },
+    "react/react.d.ts": {
+      "commit": "d67c5e3e1a1291ab58dcaace6ce76f69e860d33c"
+    },
+    "react-router/react-router.d.ts": {
+      "commit": "403894c47328ead23d90b576d564558fda447dd2"
+    }
+  }
+}

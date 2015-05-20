@@ -6,6 +6,7 @@
     "loglevel": "warn"
   },
   "scripts": {
+    "postinstall": "tsd reinstall --save",
     "clean": "rimraf build/*",
     "prebuild": "npm run clean",
     "build": "node ./config/webpack-build.js",
@@ -48,6 +49,7 @@
     "karma-webpack": "^1.5.1",
     "mocha": "^2.2.4",
     "react-hot-loader": "^1.2.6",
+    "tsd": "^0.6.0",
     "tslint": "^2.1.1",
     "webpack-dev-server": "^1.8.2"
   }

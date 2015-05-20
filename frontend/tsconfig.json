@@ -4,10 +4,10 @@
   },
   "filesGlob": [
     "src/**/*.ts",
-    "typings/tsd.d.ts",
+    "typings/typings.d.ts",
     "!./node_modules/**/*.ts"
   ],
   "files": [
-    "typings/tsd.d.ts"
+    "typings/typings.d.ts"
   ]
 }
