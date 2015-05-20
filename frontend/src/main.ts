@@ -1,4 +1,4 @@
-/// <reference path='../typings/tsd.d.ts' />
+/// <reference path='../typings/typings.d.ts' />
 
 import React = require('react');
 import Router = require('react-router');
@@ -8,7 +8,7 @@ const app = document.getElementById('app');
 
 Router.run(routes.appRoute, Router.HashLocation, (Handler) => {
   React.render(
-    React.createElement(Handler),
+    React.createElement(Handler, {}),
     app
   );
 });
