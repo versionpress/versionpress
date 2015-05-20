@@ -97,8 +97,6 @@ module.exports = function (isDevelopment) {
     output: output,
     plugins: plugins,
     resolve: {
-      root: path.join(__dirname, 'src'),
-      modulesDirectories: ['node_modules'],
       extensions: ['', '.js', '.json', '.ts']
     }
   }
