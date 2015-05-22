@@ -75,31 +75,31 @@ class VPCommand extends WP_CLI_Command {
      *
      * ## OPTIONS
      *
-     * [--siteurl=<url>]
+     * --siteurl=<url>
      * : The address of the restored site. Default: http://localhost/<cwd>
      *
-     * [--dbname=<dbname>]
+     * --dbname=<dbname>
      * : Set the database name.
      *
-     * [--dbuser=<dbuser>]
+     * --dbuser=<dbuser>
      * : Set the database user.
      *
-     * [--dbpass=<dbpass>]
+     * --dbpass=<dbpass>
      * : Set the database user password.
      *
-     * [--dbhost=<dbhost>]
+     * --dbhost=<dbhost>
      * : Set the database host. Default: 'localhost'
      *
-     * [--dbprefix=<dbprefix>]
+     * --dbprefix=<dbprefix>
      * : Set the database table prefix. Default: 'wp_'
      *
-     * [--dbcharset=<dbcharset>]
+     * --dbcharset=<dbcharset>
      * : Set the database charset. Default: 'utf8'
      *
-     * [--dbcollate=<dbcollate>]
+     * --dbcollate=<dbcollate>
      * : Set the database collation. Default: ''
      *
-     * [--yes]
+     * --yes
      * : Answer yes to the confirmation message.
      *
      * ## DESCRIPTION
@@ -118,6 +118,8 @@ class VPCommand extends WP_CLI_Command {
      *    * Run VP synchronizers on the database
      *
      * All DB credentials and site URL are configurable.
+     *
+     * @synopsis [--siteurl=<url>] [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--yes]
      *
      * @subcommand restore-site
      *
@@ -210,12 +212,16 @@ class VPCommand extends WP_CLI_Command {
     }
 
     private function prepareDatabase($assoc_args) {
+        require_once ABSPATH . 'wp-config.php';
+        global $table_prefix;
+
         $process = VPCommandUtils::runWpCliCommand('db', 'create');
         if (!$process->isSuccessful()) {
             $msg = $process->getErrorOutput();
-            if (Strings::contains($msg, '1007')) { // Database exists
-                if (!isset($assoc_args['yes']))
-                    WP_CLI::confirm("Tables for this site already exist. Do you want to drop them?");
+            if (Strings::contains($msg, '1007')) { // It's OK. The database already exists.
+                if (!isset($assoc_args['yes'])) {
+                    $this->checkTables(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $table_prefix);
+                }
                 $this->dropTables();
             } else {
                 WP_CLI::error("Failed creating DB");
@@ -261,8 +267,8 @@ class VPCommand extends WP_CLI_Command {
      * E.g. if you have website in directory called "wordpress" and it runs at http://wordpress.local,
      * the new URL will be http://wordpress-<name>.local.
      *
-     * --force
-     * : Forces cloning even if the target folder / database already exist.
+     * --yes
+     * : Answer yes to the confirmation message.
      *
      * ## EXAMPLES
      *
@@ -271,10 +277,10 @@ class VPCommand extends WP_CLI_Command {
      *
      *     wp vp clone --name=test
      *
-     * creates a copy of the site in `wordpress-test`, a new Git branch called `test`
+     * creates a copy of the site in `test`, a new Git branch called `test`
      * and the tables in database `wordpress` will be prefixed with `wp_test_`.
      *
-     * @synopsis --name=<name> [--siteurl=<url>] [--force]
+     * @synopsis --name=<name> [--siteurl=<url>] [--yes]
      *
      * @subcommand clone
      */
@@ -282,7 +288,7 @@ class VPCommand extends WP_CLI_Command {
         $name = $assoc_args['name'];
 
         $currentWpPath = get_home_path();
-        $cloneDirName = sprintf("%s-%s", basename($currentWpPath), $name);
+        $cloneDirName = $name;
         $clonePath = dirname($currentWpPath) . '/' . $cloneDirName;
 
         $currentUrl = get_site_url();
@@ -290,16 +296,25 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::error("The command cannot derive default clone URL. Please specify the --url parameter.");
         }
 
-
         $cloneUrl = isset($assoc_args['siteurl']) ? $assoc_args['siteurl'] : $this->getCloneUrl(get_site_url(), basename($currentWpPath), $cloneDirName);
 
-        if (is_dir($clonePath) && !array_key_exists('force', $assoc_args)) {
-            WP_CLI::error("Directory '" . basename($clonePath) . "' already exists. Use --force to overwrite it or use another clone name.");
+        if (is_dir($clonePath) && !isset($assoc_args['yes'])) {
+            WP_CLI::confirm("Directory '" . basename($clonePath) . "' already exists. It will be deleted before cloning. Proceed?");
         }
+
+        global $table_prefix;
+        $dbUser = DB_USER;
+        $dbPassword = DB_PASSWORD;
+        $dbName = DB_NAME;
+        $dbHost = DB_HOST;
+        $dbPrefix = $table_prefix . $name . "_";
+
+        $this->checkTables($dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix);
+
 
         if (is_dir($clonePath)) {
             try {
-                FileSystem::remove($clonePath);
+                FileSystem::removeContent($clonePath);
             } catch (IOException $e) {
                 WP_CLI::error("Could not delete directory '" . basename($clonePath) . "'. Please do it manually.");
             }
@@ -462,7 +477,6 @@ class VPCommand extends WP_CLI_Command {
             'commentmeta',
             'vp_id',
         );
-
         /** @var DbSchemaInfo $schema */
         $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
         $tables = array_map(array($schema, 'getPrefixedTableName'), $tables);
@@ -475,11 +489,24 @@ class VPCommand extends WP_CLI_Command {
 
     private function defineGlobalTablePrefix() {
         global $table_prefix;
+
+        define('SHORTINIT', true);
         $wpConfigPath = ABSPATH . 'wp-config.php';
         $wpConfigLines = file_get_contents($wpConfigPath);
         // https://regex101.com/r/oO7gX7/2
         preg_match("/^\\\$table_prefix\\s*=\\s*['\"](.*)['\"];/m", $wpConfigLines, $matches);
         $table_prefix = $matches[1];
+    }
+
+    private function checkTables($dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix) {
+        $wpdb = new \wpdb($dbUser, $dbPassword, $dbName, $dbHost);
+        $wpdb->set_prefix($dbPrefix);
+        $tables = $wpdb->get_col("SHOW TABLES LIKE '{$dbPrefix}_%'");
+        $wpTables = array_intersect($tables, $wpdb->tables());
+        $wpTablesExists = count($wpTables) > 0;
+        if ($wpTablesExists) {
+            WP_CLI::confirm("Tables for this site already exist. They will be dropped. Proceed?");
+        }
     }
 }
 
