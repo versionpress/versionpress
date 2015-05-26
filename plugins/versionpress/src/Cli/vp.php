@@ -75,31 +75,31 @@ class VPCommand extends WP_CLI_Command {
      *
      * ## OPTIONS
      *
-     * [--siteurl=<url>]
+     * --siteurl=<url>
      * : The address of the restored site. Default: http://localhost/<cwd>
      *
-     * [--dbname=<dbname>]
+     * --dbname=<dbname>
      * : Set the database name.
      *
-     * [--dbuser=<dbuser>]
+     * --dbuser=<dbuser>
      * : Set the database user.
      *
-     * [--dbpass=<dbpass>]
+     * --dbpass=<dbpass>
      * : Set the database user password.
      *
-     * [--dbhost=<dbhost>]
+     * --dbhost=<dbhost>
      * : Set the database host. Default: 'localhost'
      *
-     * [--dbprefix=<dbprefix>]
+     * --dbprefix=<dbprefix>
      * : Set the database table prefix. Default: 'wp_'
      *
-     * [--dbcharset=<dbcharset>]
+     * --dbcharset=<dbcharset>
      * : Set the database charset. Default: 'utf8'
      *
-     * [--dbcollate=<dbcollate>]
+     * --dbcollate=<dbcollate>
      * : Set the database collation. Default: ''
      *
-     * [--yes]
+     * --yes
      * : Answer yes to the confirmation message.
      *
      * ## DESCRIPTION
@@ -118,6 +118,8 @@ class VPCommand extends WP_CLI_Command {
      *    * Run VP synchronizers on the database
      *
      * All DB credentials and site URL are configurable.
+     *
+     * @synopsis [--siteurl=<url>] [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--yes]
      *
      * @subcommand restore-site
      *
@@ -191,6 +193,7 @@ class VPCommand extends WP_CLI_Command {
         // The main reason for this is that we need properly set WP_CONTENT_DIR constant for reading from storages
         $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-init-clone', array('require' => __DIR__ . '/vp-internal.php'));
         WP_CLI::log($process->getOutput());
+        WP_CLI::log($process->getErrorOutput());
         if (!$process->isSuccessful()) {
             WP_CLI::error("Could not finish site restore");
         }
@@ -212,9 +215,13 @@ class VPCommand extends WP_CLI_Command {
         $process = VPCommandUtils::runWpCliCommand('db', 'create');
         if (!$process->isSuccessful()) {
             $msg = $process->getErrorOutput();
-            if (Strings::contains($msg, '1007')) { // Database exists
-                if (!isset($assoc_args['yes']))
-                    WP_CLI::confirm("Tables for this site already exist. Do you want to drop them?");
+            if (Strings::contains($msg, '1007')) { // It's OK. The database already exists.
+                if (!isset($assoc_args['yes'])) {
+                    defined('SHORTINIT') or define('SHORTINIT', true);
+                    require_once ABSPATH . 'wp-config.php';
+                    global $table_prefix;
+                    $this->checkTables(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $table_prefix);
+                }
                 $this->dropTables();
             } else {
                 WP_CLI::error("Failed creating DB");
@@ -251,45 +258,92 @@ class VPCommand extends WP_CLI_Command {
      * ## OPTIONS
      *
      * --name=<name>
-     * : Name of the clone. Used as a suffix for new folder, a suffix for new
-     * database and a name of the new Git branch. See example below.
+     * : Name of the clone. Used as a suffix for new folder, a suffix of db prefix
+     * and a name of the new Git branch. See example below.
      *
-     * --force
-     * : Forces cloning even if the target folder / database already exist.
+     * --siteurl=<url>
+     * : URL of new website. By default the command tries to search in URL the name of directory
+     * where the website is located and replace it with new directory name.
+     * E.g. if you have website in directory called "wordpress" and it runs at http://wordpress.local,
+     * the new URL will be http://wordpress-<name>.local.
+     *
+     * --dbname=<dbname>
+     * : Set the database name for the clone.
+     *
+     * --dbuser=<dbuser>
+     * : Set the database user for the clone.
+     *
+     * --dbpass=<dbpass>
+     * : Set the database user password for the clone.
+     *
+     * --dbhost=<dbhost>
+     * : Set the database host for the clone.
+     *
+     * --dbprefix=<dbprefix>
+     * : Set the database table prefix for the clone.
+     *
+     * --dbcharset=<dbcharset>
+     * : Set the database charset for the clone.
+     *
+     * --dbcollate=<dbcollate>
+     * : Set the database collation for the clone.
+     *
+     * --yes
+     * : Answer yes to the confirmation message.
      *
      * ## EXAMPLES
      *
-     * Let's say we have a site in folder `wp01` that uses database called `wp01db`. The command
+     * Let's say we have a site in folder `wordpress` that uses database called `wordpress`
+     * with tables prefixed with `wp_`. The command
      *
      *     wp vp clone --name=test
      *
-     * creates a copy of the site in `wp01_test`, a new Git branch called `test`
-     * and a new database `wp01db_test`.
+     * creates a copy of the site in `test`, a new Git branch called `test`
+     * and the tables in database `wordpress` will be prefixed with `wp_test_`.
      *
-     * @synopsis --name=<name> [--force]
+     * @synopsis --name=<name> [--siteurl=<url>] [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--yes]
      *
      * @subcommand clone
      */
     public function clone_($args = array(), $assoc_args = array()) {
+        global $table_prefix;
+
         $name = $assoc_args['name'];
 
         $currentWpPath = get_home_path();
-        $cloneDirName = sprintf("%s_%s", basename($currentWpPath), $name);
+        $cloneDirName = $name;
         $clonePath = dirname($currentWpPath) . '/' . $cloneDirName;
-        $cloneUrl = $this->getCloneUrl(get_site_url(), basename($currentWpPath), $cloneDirName);
 
-        if (is_dir($clonePath) && !array_key_exists('force', $assoc_args)) {
-            WP_CLI::error("Directory '" . basename($clonePath) . "' already exists. Use --force to overwrite it or use another clone name.");
+        $cloneDbUser = isset($assoc_args['dbuser']) ? $assoc_args['dbuser'] : DB_USER;
+        $cloneDbPassword = isset($assoc_args['dbpass']) ? $assoc_args['dbpass'] : DB_PASSWORD;
+        $cloneDbName = isset($assoc_args['dbname']) ? $assoc_args['dbname'] : DB_NAME;
+        $cloneDbHost = isset($assoc_args['dbhost']) ? $assoc_args['dbhost'] : DB_HOST;
+        $cloneDbPrefix = isset($assoc_args['dbprefix']) ? $assoc_args['dbprefix'] : ($table_prefix . $name . '_');
+        $cloneDbCharset = isset($assoc_args['dbcharset']) ? $assoc_args['dbcharset'] : DB_CHARSET;
+        $cloneDbCollate = isset($assoc_args['dbcollate']) ? $assoc_args['dbcollate'] : DB_COLLATE;
+
+        $currentUrl = get_site_url();
+        if (!Strings::contains($currentUrl, basename($currentWpPath))) {
+            WP_CLI::error("The command cannot derive default clone URL. Please specify the --url parameter.");
         }
+
+        $cloneUrl = isset($assoc_args['siteurl']) ? $assoc_args['siteurl'] : $this->getCloneUrl(get_site_url(), basename($currentWpPath), $cloneDirName);
+
+        if (is_dir($clonePath) && !isset($assoc_args['yes'])) {
+            WP_CLI::confirm("Directory '" . basename($clonePath) . "' already exists. It will be deleted before cloning. Proceed?");
+        }
+
+        $this->checkTables($cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix);
 
         if (is_dir($clonePath)) {
             try {
-                FileSystem::remove($clonePath);
+                FileSystem::removeContent($clonePath);
             } catch (IOException $e) {
                 WP_CLI::error("Could not delete directory '" . basename($clonePath) . "'. Please do it manually.");
             }
         }
 
+        // Clone the site
         $cloneCommand = sprintf("git clone %s %s", escapeshellarg($currentWpPath), escapeshellarg($clonePath));
 
         $process = new Process($cloneCommand, $currentWpPath);
@@ -304,27 +358,29 @@ class VPCommand extends WP_CLI_Command {
 
         WP_CLI::success("Site files cloned");
 
-
-        $configureCloneCmd = 'wp --require=' . escapeshellarg($clonePath . '/wp-content/plugins/versionpress/src/Cli/vp-internal.php');
-        $configureCloneCmd .= ' vp-internal init-clone --name=' . escapeshellarg($name);
-        $configureCloneCmd .= ' --site-url=' . escapeshellarg($cloneUrl);
-        if (array_key_exists('force', $assoc_args)) {
-            $configureCloneCmd .= ' --force-db';
-        }
-        $configureCloneCmd .= " --debug";
-
-        $process = new Process($configureCloneCmd, $clonePath);
+        // Create a new Git branch
+        $createBranchCommand = 'git checkout -b ' . escapeshellarg($name);
+        $process = new Process($createBranchCommand, $clonePath);
         $process->run();
 
         if (!$process->isSuccessful()) {
-            WP_CLI::log($process->getOutput()); // WP-CLI sends it to STDOUT, not STDERR
-            WP_CLI::error("Initializing clone failed");
+            WP_CLI::error("Failed creating branch on clone, message: " . $process->getErrorOutput());
         } else {
-            WP_CLI::log($process->getOutput());
+            WP_CLI::success("New Git branch created");
         }
 
-        WP_CLI::success("Cloning done. Find your clone in '" . basename($clonePath) . "'.");
+        // Copy & Update wp-config
+        $wpConfigFile = $clonePath . '/wp-config.php';
+        copy($currentWpPath . '/wp-config.php', $wpConfigFile);
 
+        $this->updateConfig($wpConfigFile, $cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $cloneDbCharset, $cloneDbCollate);
+
+        FileSystem::copyDir(VERSIONPRESS_PLUGIN_DIR, $clonePath . '/wp-content/plugins/versionpress');
+        WP_CLI::success("Copied VersionPress");
+
+        $process = VPCommandUtils::runWpCliCommand('vp', 'restore-site', array('siteurl' => $cloneUrl, 'yes' => null, 'require' => __FILE__), $clonePath);
+        WP_CLI::log($process->getOutput());
+        WP_CLI::log($process->getErrorOutput());
     }
 
     /**
@@ -437,7 +493,6 @@ class VPCommand extends WP_CLI_Command {
             'commentmeta',
             'vp_id',
         );
-
         /** @var DbSchemaInfo $schema */
         $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
         $tables = array_map(array($schema, 'getPrefixedTableName'), $tables);
@@ -450,11 +505,52 @@ class VPCommand extends WP_CLI_Command {
 
     private function defineGlobalTablePrefix() {
         global $table_prefix;
+
         $wpConfigPath = ABSPATH . 'wp-config.php';
         $wpConfigLines = file_get_contents($wpConfigPath);
         // https://regex101.com/r/oO7gX7/2
         preg_match("/^\\\$table_prefix\\s*=\\s*['\"](.*)['\"];/m", $wpConfigLines, $matches);
         $table_prefix = $matches[1];
+    }
+
+    private function checkTables($dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix) {
+        $wpdb = new \wpdb($dbUser, $dbPassword, $dbName, $dbHost);
+        $wpdb->set_prefix($dbPrefix);
+        $tables = $wpdb->get_col("SHOW TABLES LIKE '{$dbPrefix}_%'");
+        $wpTables = array_intersect($tables, $wpdb->tables());
+        $wpTablesExists = count($wpTables) > 0;
+        if ($wpTablesExists) {
+            WP_CLI::confirm("Tables for this site already exist. They will be dropped. Proceed?");
+        }
+    }
+
+    private function updateConfig($wpConfigFile, $dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $dbCharset, $dbCollate) {
+        $config = file_get_contents($wpConfigFile);
+
+        // https://regex101.com/r/oO7gX7/3 - just remove the "g" modifier which is there for testing only
+        $re = "/^(\\\$table_prefix\\s*=\\s*['\"]).*(['\"];)$/m";
+        $config = preg_replace($re, "\${1}{$dbPrefix}\${2}", $config, 1);
+
+        https://regex101.com/r/zD3mJ4/1 - just remove the "g" modifier which is there for testing only
+        $defineRegexPattern = "/^(define\\s*\\(\\s*['\"]%s['\"]\\s*,\\s*['\"]).*(['\"]\\s*\\)\\s*;)$/m";
+
+        $replacements = array(
+            "DB_NAME" => $dbName,
+            "DB_USER" => $dbUser,
+            "DB_PASSWORD" => $dbPassword,
+            "DB_HOST" => $dbHost,
+            "DB_CHARSET" => $dbCharset,
+            "DB_COLLATE" => $dbCollate,
+        );
+
+        foreach ($replacements as $constant => $value) {
+            $re = sprintf($defineRegexPattern, $constant);
+            $config = preg_replace($re, "\${1}{$value}\${2}", $config, 1);
+        }
+
+
+        file_put_contents($wpConfigFile, $config);
+        WP_CLI::success("wp-config.php updated");
     }
 }
 

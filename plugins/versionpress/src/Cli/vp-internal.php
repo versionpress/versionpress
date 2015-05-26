@@ -71,8 +71,9 @@ class VPInternalCommand extends WP_CLI_Command {
         $wpConfigFile = ABSPATH . 'wp-config.php';
         $config = file_get_contents($wpConfigFile);
 
-        // http://regex101.com/r/fS0zG2/1 - just remove the "g" modifier which is there for testing only
-        $config = preg_replace("/^(define\\s*\\(\\s*['\"]DB_NAME['\"]\\s*\\,\\s*['\"])(.*)(['\"].*)$/m", "$1$dbName$3", $config, 1);
+        // https://regex101.com/r/oO7gX7/1 - just remove the "g" modifier which is there for testing only
+        $re = "/^(\\\$table_prefix\\s*=\\s*['\"].*)(['\"];)/m";
+        $config = preg_replace($re, "$1$dbName$3", $config, 1);
 
         file_put_contents($wpConfigFile, $config);
         WP_CLI::success("wp-config.php updated");

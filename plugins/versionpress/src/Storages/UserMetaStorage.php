@@ -8,8 +8,13 @@ use VersionPress\Utils\ArrayUtils;
 
 class UserMetaStorage extends MetaEntityStorage {
 
-    function __construct(UserStorage $userStorage) {
+    /** @var string */
+    private $dbPrefix;
+    const PREFIX_PLACEHOLDER = "<<table-prefix>>";
+
+    function __construct(UserStorage $userStorage, $dbPrefix) {
         parent::__construct($userStorage, 'meta_key', 'meta_value', 'vp_user_id');
+        $this->dbPrefix = $dbPrefix;
     }
 
     public function shouldBeSaved($data) {
@@ -33,6 +38,17 @@ class UserMetaStorage extends MetaEntityStorage {
         return (isset($data['meta_key']) && Strings::endsWith($data['meta_key'], $suffix));
     }
 
+    protected function createJoinedKey($key, $vpId) {
+        $key = $this->maybeReplacePrefixWithPlaceholder($key);
+        return parent::createJoinedKey($key, $vpId);
+    }
+
+    protected function splitJoinedKey($key) {
+        $splitKey = parent::splitJoinedKey($key);
+        $splitKey[$this->keyName] = $this->maybeReplacePlaceholderWithPrefix($splitKey[$this->keyName]);
+        return $splitKey;
+    }
+
     protected function createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action) {
         $userMetaVpId = $newEntity['vp_id'];
         $userLogin = $newParentEntity['user_login'];
@@ -40,5 +56,19 @@ class UserMetaStorage extends MetaEntityStorage {
         $userVpId = $newParentEntity['vp_id'];
 
         return new UserMetaChangeInfo($action, $userMetaVpId, $userLogin, $userMetaKey, $userVpId);
+    }
+
+    private function maybeReplacePrefixWithPlaceholder($key) {
+        if (Strings::startsWith($key, $this->dbPrefix)) {
+            return self::PREFIX_PLACEHOLDER . Strings::substring($key, Strings::length($this->dbPrefix));
+        }
+        return $key;
+    }
+
+    private function maybeReplacePlaceholderWithPrefix($key) {
+        if (Strings::startsWith($key, self::PREFIX_PLACEHOLDER)) {
+            return $this->dbPrefix . Strings::substring($key, Strings::length(self::PREFIX_PLACEHOLDER));
+        }
+        return $key;
     }
 }
