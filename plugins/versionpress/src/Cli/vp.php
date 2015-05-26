@@ -212,14 +212,14 @@ class VPCommand extends WP_CLI_Command {
     }
 
     private function prepareDatabase($assoc_args) {
-        require_once ABSPATH . 'wp-config.php';
-        global $table_prefix;
-
         $process = VPCommandUtils::runWpCliCommand('db', 'create');
         if (!$process->isSuccessful()) {
             $msg = $process->getErrorOutput();
             if (Strings::contains($msg, '1007')) { // It's OK. The database already exists.
                 if (!isset($assoc_args['yes'])) {
+                    defined('SHORTINIT') or define('SHORTINIT', true);
+                    require_once ABSPATH . 'wp-config.php';
+                    global $table_prefix;
                     $this->checkTables(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $table_prefix);
                 }
                 $this->dropTables();
@@ -267,6 +267,27 @@ class VPCommand extends WP_CLI_Command {
      * E.g. if you have website in directory called "wordpress" and it runs at http://wordpress.local,
      * the new URL will be http://wordpress-<name>.local.
      *
+     * --dbname=<dbname>
+     * : Set the database name for the clone.
+     *
+     * --dbuser=<dbuser>
+     * : Set the database user for the clone.
+     *
+     * --dbpass=<dbpass>
+     * : Set the database user password for the clone.
+     *
+     * --dbhost=<dbhost>
+     * : Set the database host for the clone.
+     *
+     * --dbprefix=<dbprefix>
+     * : Set the database table prefix for the clone.
+     *
+     * --dbcharset=<dbcharset>
+     * : Set the database charset for the clone.
+     *
+     * --dbcollate=<dbcollate>
+     * : Set the database collation for the clone.
+     *
      * --yes
      * : Answer yes to the confirmation message.
      *
@@ -280,16 +301,26 @@ class VPCommand extends WP_CLI_Command {
      * creates a copy of the site in `test`, a new Git branch called `test`
      * and the tables in database `wordpress` will be prefixed with `wp_test_`.
      *
-     * @synopsis --name=<name> [--siteurl=<url>] [--yes]
+     * @synopsis --name=<name> [--siteurl=<url>] [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--yes]
      *
      * @subcommand clone
      */
     public function clone_($args = array(), $assoc_args = array()) {
+        global $table_prefix;
+
         $name = $assoc_args['name'];
 
         $currentWpPath = get_home_path();
         $cloneDirName = $name;
         $clonePath = dirname($currentWpPath) . '/' . $cloneDirName;
+
+        $cloneDbUser = isset($assoc_args['dbuser']) ? $assoc_args['dbuser'] : DB_USER;
+        $cloneDbPassword = isset($assoc_args['dbpass']) ? $assoc_args['dbpass'] : DB_PASSWORD;
+        $cloneDbName = isset($assoc_args['dbname']) ? $assoc_args['dbname'] : DB_NAME;
+        $cloneDbHost = isset($assoc_args['dbhost']) ? $assoc_args['dbhost'] : DB_HOST;
+        $cloneDbPrefix = isset($assoc_args['dbprefix']) ? $assoc_args['dbprefix'] : ($table_prefix . $name . '_');
+        $cloneDbCharset = isset($assoc_args['dbcharset']) ? $assoc_args['dbcharset'] : DB_CHARSET;
+        $cloneDbCollate = isset($assoc_args['dbcollate']) ? $assoc_args['dbcollate'] : DB_COLLATE;
 
         $currentUrl = get_site_url();
         if (!Strings::contains($currentUrl, basename($currentWpPath))) {
@@ -302,15 +333,7 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::confirm("Directory '" . basename($clonePath) . "' already exists. It will be deleted before cloning. Proceed?");
         }
 
-        global $table_prefix;
-        $dbUser = DB_USER;
-        $dbPassword = DB_PASSWORD;
-        $dbName = DB_NAME;
-        $dbHost = DB_HOST;
-        $dbPrefix = $table_prefix . $name . "_";
-
-        $this->checkTables($dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix);
-
+        $this->checkTables($cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix);
 
         if (is_dir($clonePath)) {
             try {
@@ -350,14 +373,7 @@ class VPCommand extends WP_CLI_Command {
         $wpConfigFile = $clonePath . '/wp-config.php';
         copy($currentWpPath . '/wp-config.php', $wpConfigFile);
 
-        $config = file_get_contents($wpConfigFile);
-
-        // https://regex101.com/r/oO7gX7/1 - just remove the "g" modifier which is there for testing only
-        $re = "/^(\\\$table_prefix\\s*=\\s*['\"].*)(['\"];)/m";
-        $config = preg_replace($re, "$1{$name}_$2", $config, 1);
-
-        file_put_contents($wpConfigFile, $config);
-        WP_CLI::success("wp-config.php updated");
+        $this->updateConfig($wpConfigFile, $cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $cloneDbCharset, $cloneDbCollate);
 
         FileSystem::copyDir(VERSIONPRESS_PLUGIN_DIR, $clonePath . '/wp-content/plugins/versionpress');
         WP_CLI::success("Copied VersionPress");
@@ -490,7 +506,6 @@ class VPCommand extends WP_CLI_Command {
     private function defineGlobalTablePrefix() {
         global $table_prefix;
 
-        define('SHORTINIT', true);
         $wpConfigPath = ABSPATH . 'wp-config.php';
         $wpConfigLines = file_get_contents($wpConfigPath);
         // https://regex101.com/r/oO7gX7/2
@@ -507,6 +522,35 @@ class VPCommand extends WP_CLI_Command {
         if ($wpTablesExists) {
             WP_CLI::confirm("Tables for this site already exist. They will be dropped. Proceed?");
         }
+    }
+
+    private function updateConfig($wpConfigFile, $dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $dbCharset, $dbCollate) {
+        $config = file_get_contents($wpConfigFile);
+
+        // https://regex101.com/r/oO7gX7/3 - just remove the "g" modifier which is there for testing only
+        $re = "/^(\\\$table_prefix\\s*=\\s*['\"]).*(['\"];)$/m";
+        $config = preg_replace($re, "\${1}{$dbPrefix}\${2}", $config, 1);
+
+        https://regex101.com/r/zD3mJ4/1 - just remove the "g" modifier which is there for testing only
+        $defineRegexPattern = "/^(define\\s*\\(\\s*['\"]%s['\"]\\s*,\\s*['\"]).*(['\"]\\s*\\)\\s*;)$/m";
+
+        $replacements = array(
+            "DB_NAME" => $dbName,
+            "DB_USER" => $dbUser,
+            "DB_PASSWORD" => $dbPassword,
+            "DB_HOST" => $dbHost,
+            "DB_CHARSET" => $dbCharset,
+            "DB_COLLATE" => $dbCollate,
+        );
+
+        foreach ($replacements as $constant => $value) {
+            $re = sprintf($defineRegexPattern, $constant);
+            $config = preg_replace($re, "\${1}{$value}\${2}", $config, 1);
+        }
+
+
+        file_put_contents($wpConfigFile, $config);
+        WP_CLI::success("wp-config.php updated");
     }
 }
 
