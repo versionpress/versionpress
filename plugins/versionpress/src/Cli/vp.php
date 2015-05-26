@@ -123,16 +123,24 @@ class VPCommand extends WP_CLI_Command {
      * @when before_wp_load
      */
     public function restoreSite($args, $assoc_args) {
-        $url = @$assoc_args['siteurl'] ?: ('http://localhost/' . basename(getcwd()));
-
-        if (!isset($assoc_args['siteurl'])) {
-            WP_CLI::confirm("The site URL will be set to '$url'. Proceed?", $assoc_args);
-        }
-
         if (!defined('WP_CONTENT_DIR')) {
             define('WP_CONTENT_DIR', 'xyz'); //doesn't matter, it's just to prevent the NOTICE in the require`d bootstrap.php
         }
         require_once(__DIR__ . '/../../bootstrap.php');
+
+        $process = VPCommandUtils::runWpCliCommand('core', 'is-installed');
+        if ($process->isSuccessful()) {
+            WP_CLI::confirm("It looks like the site is OK. Do you really want to run the 'restore-site' command?");
+            $defaultUrl = trim(VPCommandUtils::runWpCliCommand('option', 'get', array('siteurl'))->getOutput());
+        } else {
+            $defaultUrl = 'http://localhost/' . basename(getcwd());
+        }
+
+        $url = @$assoc_args['siteurl'] ?: $defaultUrl;
+
+        if (!isset($assoc_args['siteurl'])) {
+            WP_CLI::confirm("The site URL will be set to '$url'. Proceed?", $assoc_args);
+        }
 
         if (file_exists(ABSPATH . 'wp-config.php')) {
             if ($this->issetConfigOption($assoc_args)) {
