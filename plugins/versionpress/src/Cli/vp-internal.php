@@ -4,6 +4,7 @@ namespace VersionPress\Cli;
 
 use Symfony\Component\Process\Process;
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\GitRepository;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use WP_CLI;
 use WP_CLI_Command;
@@ -183,6 +184,60 @@ class VPInternalCommand extends WP_CLI_Command {
         $syncProcess->synchronize();
         WP_CLI::success("Git -> db synchronization run");
 
+    }
+
+    /**
+     * Finishes push. Saves uncommited changes into stash, resets working directory, pops back changes from stash and
+     * runs synchronization.
+     *
+     * @subcommand finish-push
+     *
+     */
+    public function finishPush($args, $assoc_args) {
+        global $versionPressContainer;
+
+        /** @var GitRepository $repository */
+        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+        $lastCommitHash = $repository->getLastCommitHash();
+
+        $cleanWorkingDirectory = VPCommandUtils::exec("git diff --shortstat")->getOutput() === "";
+
+        // Stash save
+        if (!$cleanWorkingDirectory) {
+            $stashSaveCommand = "git stash save";
+            $process = VPCommandUtils::exec($stashSaveCommand);
+            if ($process->isSuccessful()) {
+                WP_CLI::success("Uncommited changes saved into stash");
+            } else {
+                WP_CLI::error("Uncommitted changes couldn't be saved into stash");
+            }
+        }
+
+        // Git reset
+        $resetCommand = "git reset --hard";
+        $process = VPCommandUtils::exec($resetCommand);
+        if ($process->isSuccessful()) {
+            WP_CLI::success("Reset working directory");
+        } else {
+            WP_CLI::error("Working directory couldn't be reset");
+        }
+
+        // Run synchronization
+        /** @var SynchronizationProcess $syncProcess */
+        $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
+        $syncProcess->synchronize();
+        WP_CLI::success("VersionPress has synchronized the database with filesystem");
+
+        // Stash pop
+        if (!$cleanWorkingDirectory) {
+            $stashSaveCommand = "git stash pop";
+            $process = VPCommandUtils::exec($stashSaveCommand);
+            if ($process->isSuccessful()) {
+                WP_CLI::success("Uncommited changes popped from stash");
+            } else {
+                WP_CLI::error("Uncommitted changes couldn't be popped from stash. Error: " . $process->getErrorOutput());
+            }
+        }
     }
 }
 

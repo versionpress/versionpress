@@ -253,13 +253,12 @@ class VPCommand extends WP_CLI_Command {
     }
 
     /**
-     * Clones site to a new folder, database and Git branch.
+     * Clones site to a new folder and database.
      *
      * ## OPTIONS
      *
      * --name=<name>
-     * : Name of the clone. Used as a suffix for new folder, a suffix of db prefix
-     * and a name of the new Git branch. See example below.
+     * : Name of the clone. Used as a suffix for new folder and a suffix of db prefix. See example below.
      *
      * --siteurl=<url>
      * : URL of new website. By default the command tries to search in URL the name of directory
@@ -298,8 +297,8 @@ class VPCommand extends WP_CLI_Command {
      *
      *     wp vp clone --name=test
      *
-     * creates a copy of the site in `test`, a new Git branch called `test`
-     * and the tables in database `wordpress` will be prefixed with `wp_test_`.
+     * creates a copy of the site in `test` and the tables in database `wordpress`
+     * will be prefixed with `wp_test_`.
      *
      * @synopsis --name=<name> [--siteurl=<url>] [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--yes]
      *
@@ -357,40 +356,6 @@ class VPCommand extends WP_CLI_Command {
 
         WP_CLI::success("Site files cloned");
 
-        // Create a new Git branch
-        $createBranchCommand = 'git checkout -b ' . escapeshellarg($name);
-        $process = VPCommandUtils::exec($createBranchCommand, $clonePath);
-
-        if (!$process->isSuccessful()) {
-            WP_CLI::error("Failed creating branch on clone, message: " . $process->getErrorOutput());
-        } else {
-            WP_CLI::success("New Git branch created");
-        }
-
-        // Try to add or change a path to the remote repository
-        $addRemoteCommand = sprintf('git remote add %s %s', escapeshellarg($name), $clonePath);
-        $process = VPCommandUtils::exec($addRemoteCommand);
-
-        if (!$process->isSuccessful()) {
-            $error = $process->getErrorOutput();
-            if (Strings::contains($error, "already exists")) {
-                $currentUrl = $this->getRemoteUrl($name);
-                if ($currentUrl !== $clonePath) {
-                    $setRemoteUrlCommand = sprintf('git remote set-url %s %s', escapeshellarg($name), escapeshellarg($clonePath));
-                    $process = VPCommandUtils::exec($setRemoteUrlCommand);
-                    if (!$process->isSuccessful()) {
-                        WP_CLI::error("Clone couldn't be set up as a remote repository: " . $process->getErrorOutput());
-                    } else {
-                        WP_CLI::success("Clone set up as a remote repository");
-                    }
-                }
-            } else {
-                WP_CLI::error("Clone couldn't be set up as a remote repository: " . $process->getErrorOutput());
-            }
-        } else {
-            WP_CLI::success("Clone set up as a remote repository");
-        }
-
         // Copy & Update wp-config
         $wpConfigFile = $clonePath . '/wp-config.php';
         copy($currentWpPath . '/wp-config.php', $wpConfigFile);
@@ -424,33 +389,42 @@ class VPCommand extends WP_CLI_Command {
     }
 
     /**
-     * Merges changes from clone.
+     * Pulls changes from remote repository and pushes it all back.
      *
      * ## OPTIONS
      *
-     * <name>
-     * : Name of the clone.
+     * --remote=<name>
+     * : Name of the remote. Default is 'origin'.
      *
+     * @synopsis [--remote=<name>]
      */
-    public function merge($args = array(), $assoc_args = array()) {
-        $cloneName = $args[0];
+    public function push($args = array(), $assoc_args = array()) {
+        $remoteName = isset($assoc_args['remote']) ? $assoc_args['remote'] : 'origin';
 
-        $fetchCommand = "git fetch $cloneName";
-        $process = new Process($fetchCommand);
-        $process->run();
+        $pullCommand = "git pull $remoteName";
+        $process = VPCommandUtils::exec($pullCommand);
+
         if ($process->isSuccessful()) {
-            WP_CLI::log("Fetched changes from $cloneName");
+            WP_CLI::success("Pulled changes from $remoteName");
         } else {
-            WP_CLI::error("Changes from $cloneName couldn't be fetched. Error: " . $process->getErrorOutput());
+            WP_CLI::error("Changes from $remoteName couldn't be pulled. Error: " . $process->getErrorOutput());
         }
 
-        $mergeCommand = "git merge $cloneName/$cloneName";
-        $process = new Process($mergeCommand);
-        $process->run();
+        $pushCommand = "git push $remoteName";
+        $process = VPCommandUtils::exec($pushCommand);
         if ($process->isSuccessful()) {
-            WP_CLI::log("Changes successfully merged");
+            WP_CLI::success("Changes successfully pushed");
         } else {
-            WP_CLI::error("Changes couldn't be merged. Error: " . $process->getErrorOutput());
+            WP_CLI::error("Changes couldn't be pushed. Error: " . $process->getErrorOutput());
+        }
+
+        $remotePath = $this->getRemoteUrl($remoteName);
+        $process =VPCommandUtils::runWpCliCommand('vp-internal', 'finish-push', array('require' => 'wp-content/plugins/versionpress/src/Cli/vp-internal.php'), $remotePath);
+        if ($process->isSuccessful()) {
+            WP_CLI::log($process->getOutput());
+            WP_CLI::success("Remote repository synchronized");
+        } else {
+            WP_CLI::error("Remote repository couldn't be synchronized. Error: " . $process->getErrorOutput());
         }
     }
 
