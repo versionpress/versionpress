@@ -346,8 +346,7 @@ class VPCommand extends WP_CLI_Command {
         // Clone the site
         $cloneCommand = sprintf("git clone %s %s", escapeshellarg($currentWpPath), escapeshellarg($clonePath));
 
-        $process = new Process($cloneCommand, $currentWpPath);
-        $process->run();
+        $process = VPCommandUtils::exec($cloneCommand, $currentWpPath);
 
         if (!$process->isSuccessful()) {
             WP_CLI::log($process->getErrorOutput());
@@ -360,13 +359,36 @@ class VPCommand extends WP_CLI_Command {
 
         // Create a new Git branch
         $createBranchCommand = 'git checkout -b ' . escapeshellarg($name);
-        $process = new Process($createBranchCommand, $clonePath);
-        $process->run();
+        $process = VPCommandUtils::exec($createBranchCommand, $clonePath);
 
         if (!$process->isSuccessful()) {
             WP_CLI::error("Failed creating branch on clone, message: " . $process->getErrorOutput());
         } else {
             WP_CLI::success("New Git branch created");
+        }
+
+        // Try to add or change a path to the remote repository
+        $addRemoteCommand = sprintf('git remote add %s %s', escapeshellarg($name), $clonePath);
+        $process = VPCommandUtils::exec($addRemoteCommand);
+
+        if (!$process->isSuccessful()) {
+            $error = $process->getErrorOutput();
+            if (Strings::contains($error, "already exists")) {
+                $currentUrl = $this->getRemoteUrl($name);
+                if ($currentUrl !== $clonePath) {
+                    $setRemoteUrlCommand = sprintf('git remote set-url %s %s', escapeshellarg($name), escapeshellarg($clonePath));
+                    $process = VPCommandUtils::exec($setRemoteUrlCommand);
+                    if (!$process->isSuccessful()) {
+                        WP_CLI::error("Clone couldn't be set up as a remote repository: " . $process->getErrorOutput());
+                    } else {
+                        WP_CLI::success("Clone set up as a remote repository");
+                    }
+                }
+            } else {
+                WP_CLI::error("Clone couldn't be set up as a remote repository: " . $process->getErrorOutput());
+            }
+        } else {
+            WP_CLI::success("Clone set up as a remote repository");
         }
 
         // Copy & Update wp-config
@@ -375,9 +397,11 @@ class VPCommand extends WP_CLI_Command {
 
         $this->updateConfig($wpConfigFile, $cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $cloneDbCharset, $cloneDbCollate);
 
+        // Copy VersionPress
         FileSystem::copyDir(VERSIONPRESS_PLUGIN_DIR, $clonePath . '/wp-content/plugins/versionpress');
         WP_CLI::success("Copied VersionPress");
 
+        // Kick off the site
         $process = VPCommandUtils::runWpCliCommand('vp', 'restore-site', array('siteurl' => $cloneUrl, 'yes' => null, 'require' => __FILE__), $clonePath);
         WP_CLI::log($process->getOutput());
         WP_CLI::log($process->getErrorOutput());
@@ -397,6 +421,37 @@ class VPCommand extends WP_CLI_Command {
      */
     private function getCloneUrl($originUrl, $originDirName, $cloneDirName) {
         return str_replace($originDirName, $cloneDirName, $originUrl);
+    }
+
+    /**
+     * Merges changes from clone.
+     *
+     * ## OPTIONS
+     *
+     * <name>
+     * : Name of the clone.
+     *
+     */
+    public function merge($args = array(), $assoc_args = array()) {
+        $cloneName = $args[0];
+
+        $fetchCommand = "git fetch $cloneName";
+        $process = new Process($fetchCommand);
+        $process->run();
+        if ($process->isSuccessful()) {
+            WP_CLI::log("Fetched changes from $cloneName");
+        } else {
+            WP_CLI::error("Changes from $cloneName couldn't be fetched. Error: " . $process->getErrorOutput());
+        }
+
+        $mergeCommand = "git merge $cloneName/$cloneName";
+        $process = new Process($mergeCommand);
+        $process->run();
+        if ($process->isSuccessful()) {
+            WP_CLI::log("Changes successfully merged");
+        } else {
+            WP_CLI::error("Changes couldn't be merged. Error: " . $process->getErrorOutput());
+        }
     }
 
     /**
@@ -551,6 +606,29 @@ class VPCommand extends WP_CLI_Command {
 
         file_put_contents($wpConfigFile, $config);
         WP_CLI::success("wp-config.php updated");
+    }
+
+    private function getRemoteUrl($name) {
+        $listRemotesCommand = "git remote -v";
+        $remotesRaw = VPCommandUtils::exec($listRemotesCommand)->getOutput();
+
+        // https://regex101.com/r/iQ4kG4/2
+        $numberOfMatches = preg_match_all("/^([[:alnum:]]+)\\s+(.*) \\(fetch\\)$/m", $remotesRaw, $matches);
+        if ($numberOfMatches === 0) {
+            return null;
+        }
+
+        $remotes = array();
+        foreach ($matches[1] as $i => $cloneName) {
+            $url = $matches[2][$i];
+            $remotes[$cloneName] = $url;
+        }
+
+        if (isset($remotes[$name])) {
+            return $remotes[$name];
+        }
+
+        return null;
     }
 }
 
