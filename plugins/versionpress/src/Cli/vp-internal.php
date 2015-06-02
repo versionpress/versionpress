@@ -187,6 +187,22 @@ class VPInternalCommand extends WP_CLI_Command {
     }
 
     /**
+     * Turns on or off the maintenance mode.
+     *
+     * <mode>
+     * : Desired state of maintenance mode. Possible values are 'on' or 'off'.
+     *
+     */
+    public function maintenance($args) {
+        $mode = $args[0];
+        if ($mode === 'on') {
+            vp_enable_maintenance();
+        } else {
+            vp_disable_maintenance();
+        }
+    }
+
+    /**
      * Finishes push. Saves uncommited changes into stash, resets working directory, pops back changes from stash and
      * runs synchronization.
      *
@@ -196,24 +212,7 @@ class VPInternalCommand extends WP_CLI_Command {
     public function finishPush($args, $assoc_args) {
         global $versionPressContainer;
 
-        /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
-        $lastCommitHash = $repository->getLastCommitHash();
-
-        $cleanWorkingDirectory = VPCommandUtils::exec("git diff --shortstat")->getOutput() === "";
-
-        // Stash save
-        if (!$cleanWorkingDirectory) {
-            $stashSaveCommand = "git stash save";
-            $process = VPCommandUtils::exec($stashSaveCommand);
-            if ($process->isSuccessful()) {
-                WP_CLI::success("Uncommited changes saved into stash");
-            } else {
-                WP_CLI::error("Uncommitted changes couldn't be saved into stash");
-            }
-        }
-
-        // Git reset
+        // Git reset - "loads" changes from index
         $resetCommand = "git reset --hard";
         $process = VPCommandUtils::exec($resetCommand);
         if ($process->isSuccessful()) {
@@ -226,18 +225,9 @@ class VPInternalCommand extends WP_CLI_Command {
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
         $syncProcess->synchronize();
-        WP_CLI::success("VersionPress has synchronized the database with filesystem");
+        WP_CLI::success("The database has been synchronized with filesystem");
 
-        // Stash pop
-        if (!$cleanWorkingDirectory) {
-            $stashSaveCommand = "git stash pop";
-            $process = VPCommandUtils::exec($stashSaveCommand);
-            if ($process->isSuccessful()) {
-                WP_CLI::success("Uncommited changes popped from stash");
-            } else {
-                WP_CLI::error("Uncommitted changes couldn't be popped from stash. Error: " . $process->getErrorOutput());
-            }
-        }
+        vp_disable_maintenance();
     }
 }
 

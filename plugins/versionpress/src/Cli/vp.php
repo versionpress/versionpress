@@ -19,6 +19,8 @@ use WP_CLI_Command;
  */
 class VPCommand extends WP_CLI_Command {
 
+    const VP_INTERNAL_COMMAND_PATH = 'wp-content/plugins/versionpress/src/Cli/vp-internal.php';
+
     /**
      * Configures VersionPress
      *
@@ -191,7 +193,7 @@ class VPCommand extends WP_CLI_Command {
 
         // The next couple of the steps need to be done after the WP is fully loaded; we use `finish-init-clone` for that
         // The main reason for this is that we need properly set WP_CONTENT_DIR constant for reading from storages
-        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-init-clone', array('require' => __DIR__ . '/vp-internal.php'));
+        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-init-clone', array('require' => self::VP_INTERNAL_COMMAND_PATH));
         WP_CLI::log($process->getOutput());
         WP_CLI::log($process->getErrorOutput());
         if (!$process->isSuccessful()) {
@@ -401,13 +403,22 @@ class VPCommand extends WP_CLI_Command {
     public function push($args = array(), $assoc_args = array()) {
         $remoteName = isset($assoc_args['remote']) ? $assoc_args['remote'] : 'origin';
 
+        $remotePath = $this->getRemoteUrl($remoteName);
+
+        if ($remotePath === null) {
+            WP_CLI::error("Remote '$remoteName' not found.");
+        }
+
+        $this->switchMaintenance('on', $remotePath);
+
         $pullCommand = "git pull $remoteName";
         $process = VPCommandUtils::exec($pullCommand);
 
         if ($process->isSuccessful()) {
             WP_CLI::success("Pulled changes from $remoteName");
         } else {
-            WP_CLI::error("Changes from $remoteName couldn't be pulled. Error: " . $process->getErrorOutput());
+            $this->switchMaintenance('off', $remotePath);
+            WP_CLI::error("Changes from $remoteName couldn't be pulled.\nDetail: " . $process->getOutput());
         }
 
         $pushCommand = "git push $remoteName";
@@ -415,16 +426,17 @@ class VPCommand extends WP_CLI_Command {
         if ($process->isSuccessful()) {
             WP_CLI::success("Changes successfully pushed");
         } else {
-            WP_CLI::error("Changes couldn't be pushed. Error: " . $process->getErrorOutput());
+            $this->switchMaintenance('off', $remotePath);
+            WP_CLI::error("Changes couldn't be pushed.\nDetail: " . $process->getErrorOutput());
         }
 
-        $remotePath = $this->getRemoteUrl($remoteName);
-        $process =VPCommandUtils::runWpCliCommand('vp-internal', 'finish-push', array('require' => 'wp-content/plugins/versionpress/src/Cli/vp-internal.php'), $remotePath);
+        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-push', array('require' => self::VP_INTERNAL_COMMAND_PATH), $remotePath);
         if ($process->isSuccessful()) {
             WP_CLI::log($process->getOutput());
             WP_CLI::success("Remote repository synchronized");
         } else {
-            WP_CLI::error("Remote repository couldn't be synchronized. Error: " . $process->getErrorOutput());
+            $this->switchMaintenance('off', $remotePath);
+            WP_CLI::error("Remote repository couldn't be synchronized.\nDetail: " . $process->getErrorOutput());
         }
     }
 
@@ -603,6 +615,18 @@ class VPCommand extends WP_CLI_Command {
         }
 
         return null;
+    }
+
+    private function switchMaintenance($mode, $remote = null) {
+        $remotePath = $remote ? $this->getRemoteUrl($remote) : null;
+        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'maintenance', array($mode, 'require' => self::VP_INTERNAL_COMMAND_PATH), $remotePath);
+        $preposition = $mode == 'on' ? 'to' : 'from';
+
+        if ($process->isSuccessful()) {
+            WP_CLI::success("Remote site switched $preposition the maintenance mode");
+        } else {
+            WP_CLI::error("Remote site couldn't be switched $preposition the maintenance mode");
+        }
     }
 }
 
