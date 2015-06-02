@@ -4,6 +4,7 @@ namespace VersionPress\Cli;
 
 use Symfony\Component\Process\Process;
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\GitRepository;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use WP_CLI;
 use WP_CLI_Command;
@@ -183,6 +184,50 @@ class VPInternalCommand extends WP_CLI_Command {
         $syncProcess->synchronize();
         WP_CLI::success("Git -> db synchronization run");
 
+    }
+
+    /**
+     * Turns on or off the maintenance mode.
+     *
+     * <mode>
+     * : Desired state of maintenance mode. Possible values are 'on' or 'off'.
+     *
+     */
+    public function maintenance($args) {
+        $mode = $args[0];
+        if ($mode === 'on') {
+            vp_enable_maintenance();
+        } else {
+            vp_disable_maintenance();
+        }
+    }
+
+    /**
+     * Finishes push. Saves uncommited changes into stash, resets working directory, pops back changes from stash and
+     * runs synchronization.
+     *
+     * @subcommand finish-push
+     *
+     */
+    public function finishPush($args, $assoc_args) {
+        global $versionPressContainer;
+
+        // Git reset - "loads" changes from index
+        $resetCommand = "git reset --hard";
+        $process = VPCommandUtils::exec($resetCommand);
+        if ($process->isSuccessful()) {
+            WP_CLI::success("Reset working directory");
+        } else {
+            WP_CLI::error("Working directory couldn't be reset");
+        }
+
+        // Run synchronization
+        /** @var SynchronizationProcess $syncProcess */
+        $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
+        $syncProcess->synchronize();
+        WP_CLI::success("The database has been synchronized with filesystem");
+
+        vp_disable_maintenance();
     }
 }
 

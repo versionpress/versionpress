@@ -19,6 +19,8 @@ use WP_CLI_Command;
  */
 class VPCommand extends WP_CLI_Command {
 
+    const VP_INTERNAL_COMMAND_PATH = 'wp-content/plugins/versionpress/src/Cli/vp-internal.php';
+
     /**
      * Configures VersionPress
      *
@@ -199,7 +201,7 @@ class VPCommand extends WP_CLI_Command {
 
         // The next couple of the steps need to be done after the WP is fully loaded; we use `finish-init-clone` for that
         // The main reason for this is that we need properly set WP_CONTENT_DIR constant for reading from storages
-        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-init-clone', array('require' => __DIR__ . '/vp-internal.php'));
+        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-init-clone', array('require' => self::VP_INTERNAL_COMMAND_PATH));
         WP_CLI::log($process->getOutput());
         WP_CLI::log($process->getErrorOutput());
         if (!$process->isSuccessful()) {
@@ -261,13 +263,12 @@ class VPCommand extends WP_CLI_Command {
     }
 
     /**
-     * Clones site to a new folder, database and Git branch.
+     * Clones site to a new folder and database.
      *
      * ## OPTIONS
      *
      * --name=<name>
-     * : Name of the clone. Used as a suffix for new folder, a suffix of db prefix
-     * and a name of the new Git branch. See example below.
+     * : Name of the clone. Used as a suffix for new folder and a suffix of db prefix. See example below.
      *
      * --siteurl=<url>
      * : URL of new website. By default the command tries to search in URL the name of directory
@@ -306,8 +307,8 @@ class VPCommand extends WP_CLI_Command {
      *
      *     wp vp clone --name=test
      *
-     * creates a copy of the site in `test`, a new Git branch called `test`
-     * and the tables in database `wordpress` will be prefixed with `wp_test_`.
+     * creates a copy of the site in `test` and the tables in database `wordpress`
+     * will be prefixed with `wp_test_`.
      *
      * @synopsis --name=<name> [--siteurl=<url>] [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--yes]
      *
@@ -354,8 +355,7 @@ class VPCommand extends WP_CLI_Command {
         // Clone the site
         $cloneCommand = sprintf("git clone %s %s", escapeshellarg($currentWpPath), escapeshellarg($clonePath));
 
-        $process = new Process($cloneCommand, $currentWpPath);
-        $process->run();
+        $process = VPCommandUtils::exec($cloneCommand, $currentWpPath);
 
         if (!$process->isSuccessful()) {
             WP_CLI::log($process->getErrorOutput());
@@ -366,26 +366,17 @@ class VPCommand extends WP_CLI_Command {
 
         WP_CLI::success("Site files cloned");
 
-        // Create a new Git branch
-        $createBranchCommand = 'git checkout -b ' . escapeshellarg($name);
-        $process = new Process($createBranchCommand, $clonePath);
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            WP_CLI::error("Failed creating branch on clone, message: " . $process->getErrorOutput());
-        } else {
-            WP_CLI::success("New Git branch created");
-        }
-
         // Copy & Update wp-config
         $wpConfigFile = $clonePath . '/wp-config.php';
         copy($currentWpPath . '/wp-config.php', $wpConfigFile);
 
         $this->updateConfig($wpConfigFile, $cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $cloneDbCharset, $cloneDbCollate);
 
+        // Copy VersionPress
         FileSystem::copyDir(VERSIONPRESS_PLUGIN_DIR, $clonePath . '/wp-content/plugins/versionpress');
         WP_CLI::success("Copied VersionPress");
 
+        // Kick off the site
         $process = VPCommandUtils::runWpCliCommand('vp', 'restore-site', array('siteurl' => $cloneUrl, 'yes' => null, 'require' => __FILE__), $clonePath);
         WP_CLI::log($process->getOutput());
         WP_CLI::log($process->getErrorOutput());
@@ -405,6 +396,56 @@ class VPCommand extends WP_CLI_Command {
      */
     private function getCloneUrl($originUrl, $originDirName, $cloneDirName) {
         return str_replace($originDirName, $cloneDirName, $originUrl);
+    }
+
+    /**
+     * Pulls changes from remote repository and pushes it all back.
+     *
+     * ## OPTIONS
+     *
+     * --remote=<name>
+     * : Name of the remote. Default is 'origin'.
+     *
+     * @synopsis [--remote=<name>]
+     */
+    public function push($args = array(), $assoc_args = array()) {
+        $remoteName = isset($assoc_args['remote']) ? $assoc_args['remote'] : 'origin';
+
+        $remotePath = $this->getRemoteUrl($remoteName);
+
+        if ($remotePath === null) {
+            WP_CLI::error("Remote '$remoteName' not found.");
+        }
+
+        $this->switchMaintenance('on', $remotePath);
+
+        $pullCommand = "git pull $remoteName";
+        $process = VPCommandUtils::exec($pullCommand);
+
+        if ($process->isSuccessful()) {
+            WP_CLI::success("Pulled changes from $remoteName");
+        } else {
+            $this->switchMaintenance('off', $remotePath);
+            WP_CLI::error("Changes from $remoteName couldn't be pulled.\nDetail: " . $process->getOutput());
+        }
+
+        $pushCommand = "git push $remoteName";
+        $process = VPCommandUtils::exec($pushCommand);
+        if ($process->isSuccessful()) {
+            WP_CLI::success("Changes successfully pushed");
+        } else {
+            $this->switchMaintenance('off', $remotePath);
+            WP_CLI::error("Changes couldn't be pushed.\nDetail: " . $process->getErrorOutput());
+        }
+
+        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-push', array('require' => self::VP_INTERNAL_COMMAND_PATH), $remotePath);
+        if ($process->isSuccessful()) {
+            WP_CLI::log($process->getOutput());
+            WP_CLI::success("Remote repository synchronized");
+        } else {
+            $this->switchMaintenance('off', $remotePath);
+            WP_CLI::error("Remote repository couldn't be synchronized.\nDetail: " . $process->getErrorOutput());
+        }
     }
 
     /**
@@ -559,6 +600,41 @@ class VPCommand extends WP_CLI_Command {
 
         file_put_contents($wpConfigFile, $config);
         WP_CLI::success("wp-config.php updated");
+    }
+
+    private function getRemoteUrl($name) {
+        $listRemotesCommand = "git remote -v";
+        $remotesRaw = VPCommandUtils::exec($listRemotesCommand)->getOutput();
+
+        // https://regex101.com/r/iQ4kG4/2
+        $numberOfMatches = preg_match_all("/^([[:alnum:]]+)\\s+(.*) \\(fetch\\)$/m", $remotesRaw, $matches);
+        if ($numberOfMatches === 0) {
+            return null;
+        }
+
+        $remotes = array();
+        foreach ($matches[1] as $i => $cloneName) {
+            $url = $matches[2][$i];
+            $remotes[$cloneName] = $url;
+        }
+
+        if (isset($remotes[$name])) {
+            return $remotes[$name];
+        }
+
+        return null;
+    }
+
+    private function switchMaintenance($mode, $remote = null) {
+        $remotePath = $remote ? $this->getRemoteUrl($remote) : null;
+        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'maintenance', array($mode, 'require' => self::VP_INTERNAL_COMMAND_PATH), $remotePath);
+        $preposition = $mode == 'on' ? 'to' : 'from';
+
+        if ($process->isSuccessful()) {
+            WP_CLI::success("Remote site switched $preposition the maintenance mode");
+        } else {
+            WP_CLI::error("Remote site couldn't be switched $preposition the maintenance mode");
+        }
     }
 }
 
