@@ -358,6 +358,16 @@ class VPCommand extends WP_CLI_Command {
 
         WP_CLI::success("Site files cloned");
 
+        // Enable pushing
+        $configCommand = "git config receive.denyCurrentBranch ignore";
+        $process = VPCommandUtils::exec($configCommand);
+
+        if ($process->isSuccessful()) {
+            WP_CLI::success("Enabled pushing to the original repository");
+        } else {
+            WP_CLI::error("Cannot enable pushing to the original repository");
+        }
+
         // Copy & Update wp-config
         $wpConfigFile = $clonePath . '/wp-config.php';
         copy($currentWpPath . '/wp-config.php', $wpConfigFile);
