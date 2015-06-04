@@ -448,8 +448,71 @@ INI
 
     }
 
+    /**
+     * @test
+     * @dataProvider specialCharactersProvider
+     */
+    public function specialCharactersInSectionName($specialCharacter) {
+
+        $data = array("Sect{$specialCharacter}ion" => array("somekey" => "value"));
+        $ini = StringUtils::crlfize(<<<INI
+[Sect{$specialCharacter}ion]
+somekey = "value"
+
+INI
+        );
+
+        $this->assertEquals($ini, IniSerializer::serialize($data));
+        $this->assertEquals($data, IniSerializer::deserialize($ini));
+
+    }
+
+    /**
+     * @test
+     */
+    public function squareBracketsInArrayKey() {
+
+        $data = array("Section" => array("some[]key" => array(0 => "some value", 1 => "other value")));
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+some[]key[0] = "some value"
+some[]key[1] = "other value"
+
+INI
+        );
+
+        $this->assertEquals($ini, IniSerializer::serialize($data));
+        $this->assertEquals($data, IniSerializer::deserialize($ini));
+
+    }
 
 
+    /**
+     * @test
+     * @dataProvider specialCharactersProvider
+     */
+    public function specialCharacterInKey($specialCharacter) {
+
+        $data = array("Section" => array("some{$specialCharacter}key" => "value"));
+        $ini = StringUtils::crlfize(<<<INI
+[Section]
+some{$specialCharacter}key = "value"
+
+INI
+        );
+
+        $this->assertEquals($ini, IniSerializer::serialize($data));
+        $this->assertEquals($data, IniSerializer::deserialize($ini));
+
+    }
+
+    public function specialCharactersProvider() {
+        return array_map(function ($specialChar) { return array($specialChar);},
+            array(
+                "\\", "\"", "[]", "$", "%","'", ";", "+", "-", "/", "#", "&", "!",
+                "~", "^", "`", "?", ":", ",", "*", "<", ">", "(", ")", "@", "{", "}",
+                "|", "_", " ", "\t", "ěščřžýáíéúůóďťňôâĺ", "茶", "русский", "حصان", "="));
+    }
 
     //--------------------------------
     // Subsections
