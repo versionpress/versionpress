@@ -67,7 +67,7 @@ class UserMetaStorageTest extends \PHPUnit_Framework_TestCase {
 
         mkdir(__DIR__ . '/users');
         $this->userStorage = new UserStorage(__DIR__ . '/users', $userInfo);
-        $this->storage = new UserMetaStorage($this->userStorage);
+        $this->storage = new UserMetaStorage($this->userStorage, 'prefix_');
     }
 
     protected function tearDown() {

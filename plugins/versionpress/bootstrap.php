@@ -34,5 +34,5 @@ global $wpdb, $versionPressContainer;
 $versionPressContainer = DIContainer::getConfiguredInstance();
 
 if (file_exists(VERSIONPRESS_ACTIVATION_FILE)) {
-    $wpdb = $versionPressContainer->resolve(VersionPressServices::DATABASE);
+    //$wpdb = $versionPressContainer->resolve(VersionPressServices::PLAIN_WPDB);
 }

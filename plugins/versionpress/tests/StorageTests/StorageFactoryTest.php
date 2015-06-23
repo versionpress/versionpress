@@ -25,7 +25,10 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase {
             'postmeta' => 'VersionPress\Storages\PostMetaStorage',
         );
 
-        $factory = new StorageFactory(__DIR__ . '/vpdb', new DbSchemaInfo(__DIR__ . '/../../src/Database/wordpress-schema.neon', 'wp_'), null);
+        /** @var \wpdb $wpdbStub */
+        $wpdbStub = $this->getMockBuilder('\wpdb')->disableOriginalConstructor()->getMock();
+
+        $factory = new StorageFactory(__DIR__ . '/vpdb', new DbSchemaInfo(__DIR__ . '/../../src/Database/wordpress-schema.neon', 'wp_'), $wpdbStub);
         foreach ($storages as $entityName => $expectedClass) {
             $this->assertInstanceOf($expectedClass, $factory->getStorage($entityName));
         }

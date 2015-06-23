@@ -10,7 +10,7 @@ use VersionPress\Utils\ReferenceUtils;
 /**
  * Mirroring database sends every change in DB (insert, update, delete) to file mirror
  */
-class MirroringDatabase extends ExtendedWpdb {
+class MirroringDatabase {
 
     /**
      * @var Mirror
@@ -22,32 +22,35 @@ class MirroringDatabase extends ExtendedWpdb {
      */
     private $dbSchemaInfo;
 
-    function __construct($dbUser, $dbPassword, $dbName, $dbHost, Mirror $mirror, DbSchemaInfo $dbSchemaInfo) {
-        parent::__construct($dbUser, $dbPassword, $dbName, $dbHost);
+    /**
+     * @var \wpdb
+     */
+    private $database;
+
+    function __construct(\wpdb $database, Mirror $mirror, DbSchemaInfo $dbSchemaInfo) {
+        $this->database = $database;
         $this->mirror = $mirror;
         $this->dbSchemaInfo = $dbSchemaInfo;
     }
 
-    function insert($table, $data, $format = null) {
-
-        $result = parent::insert($table, $data, $format);
+    function insert($table, $data) {
 
         if (defined('VP_DEACTIVATING')) {
-            return $result;
+            return;
         }
 
-        $id = $this->insert_id;
+        $id = $this->database->insert_id;
         $tableName = $this->stripTablePrefix($table);
         $entityInfo = $this->dbSchemaInfo->getEntityInfoByTableName($tableName);
 
-        if (!$entityInfo) return $result;
+        if (!$entityInfo) return;
 
         $entityName = $entityInfo->entityName;
         $data = $this->replaceForeignKeysWithReferences($entityName, $data);
         $shouldBeSaved = $this->mirror->shouldBeSaved($entityName, $data);
 
         if (!$shouldBeSaved)
-            return $result;
+            return;
 
         if ($this->dbSchemaInfo->getEntityInfo($entityName)->usesGeneratedVpids) {
             $data['vp_id'] = $this->generateId();
@@ -60,19 +63,16 @@ class MirroringDatabase extends ExtendedWpdb {
         $this->mirror->save($entityName, $data);
 
         $this->insert_id = $id; // it was reset by saving id and references
-        return $result;
     }
 
-    function update($table, $data, $where, $format = null, $where_format = null, $updateDatabase = true) {
-        $result = $updateDatabase ? parent::update($table, $data, $where, $format, $where_format) : false;
-
+    function update($table, $data, $where) {
         if (defined('VP_DEACTIVATING')) {
-            return $result;
+            return;
         }
 
         $entityInfo = $this->dbSchemaInfo->getEntityInfoByTableName($this->stripTablePrefix($table));
 
-        if (!$entityInfo) return $result;
+        if (!$entityInfo) return;
 
         $entityName = $entityInfo->entityName;
 
@@ -117,7 +117,7 @@ class MirroringDatabase extends ExtendedWpdb {
                     continue;
                 }
 
-                $postmeta = $this->get_results("SELECT meta_id, meta_key, meta_value FROM {$this->postmeta} WHERE post_id = {$id}", ARRAY_A);
+                $postmeta = $this->database->get_results("SELECT meta_id, meta_key, meta_value FROM {$this->database->postmeta} WHERE post_id = {$id}", ARRAY_A);
                 foreach ($postmeta as $meta) {
                     $meta['vp_post_id'] = $data['vp_id'];
 
@@ -131,23 +131,21 @@ class MirroringDatabase extends ExtendedWpdb {
                 }
 
             }
-            return $result;
+            return;
         }
         $data = $this->replaceForeignKeysWithReferences($entityName, $data);
         $this->mirror->save($entityName, $data);
-        return $result;
+        return;
     }
 
-    function delete($table, $where, $where_format = null, $updateDatabase = true) {
-        $result = $updateDatabase ? parent::delete($table, $where, $where_format) : false;
-
+    function delete($table, $where) {
         if (defined('VP_DEACTIVATING')) {
-            return $result;
+            return;
         }
 
         $entityInfo = $this->dbSchemaInfo->getEntityInfoByTableName($this->stripTablePrefix(($table)));
 
-        if (!$entityInfo) return $result;
+        if (!$entityInfo) return;
 
         $entityName = $entityInfo->entityName;
 
@@ -170,43 +168,43 @@ class MirroringDatabase extends ExtendedWpdb {
                     $vpIdTable = $this->dbSchemaInfo->getPrefixedTableName('vp_id');
                     $postMetaTable = $this->dbSchemaInfo->getPrefixedTableName('postmeta');
 
-                    $where['vp_post_id'] = $this->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = 'posts' AND ID = (SELECT post_id FROM $postMetaTable WHERE meta_id = $id)");
+                    $where['vp_post_id'] = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = 'posts' AND ID = (SELECT post_id FROM $postMetaTable WHERE meta_id = $id)");
                 }
 
                 if ($entityName === 'usermeta' && !isset($where['vp_user_id'])) {
                     $vpIdTable = $this->dbSchemaInfo->getPrefixedTableName('vp_id');
                     $userMetaTable = $this->dbSchemaInfo->getPrefixedTableName('usermeta');
 
-                    $where['vp_user_id'] = $this->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = 'users' AND ID = (SELECT user_id FROM $userMetaTable WHERE umeta_id = $id)");
+                    $where['vp_user_id'] = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = 'users' AND ID = (SELECT user_id FROM $userMetaTable WHERE umeta_id = $id)");
                 }
 
                 $this->deleteId($entityName, $id);
                 $this->mirror->delete($entityName, $where);
             }
 
-            return $result;
+            return;
         }
 
         $this->mirror->delete($entityName, $where);
-        return $result;
+        return;
     }
 
     private function stripTablePrefix($tableName) {
-        return substr($tableName, strlen($this->prefix));
+        return substr($tableName, strlen($this->database->prefix));
     }
 
     private function saveId($entityName, $id, $vpId) {
         $vpIdTableName = $this->getVpIdTableName();
         $tableName = $this->dbSchemaInfo->getTableName($entityName);
         $query = "INSERT INTO $vpIdTableName (`vp_id`, `table`, `id`) VALUES (UNHEX('$vpId'), \"$tableName\", $id)";
-        $this->query($query);
+        $this->database->query($query);
     }
 
     private function deleteId($entityName, $id) {
         $vpIdTableName = $this->getVpIdTableName();
         $tableName = $this->dbSchemaInfo->getTableName($entityName);
         $deleteQuery = "DELETE FROM $vpIdTableName WHERE `table` = \"$tableName\" AND id = $id";
-        $this->query($deleteQuery);
+        $this->database->query($deleteQuery);
     }
 
     private function getVpIdTableName() {
@@ -229,17 +227,17 @@ class MirroringDatabase extends ExtendedWpdb {
         $vpIdTableName = $this->getVpIdTableName();
         $tableName = $this->dbSchemaInfo->getTableName($entityName);
         $getVpIdSql = "SELECT HEX(vp_id) FROM $vpIdTableName WHERE `table` = \"$tableName\" AND id = $id";
-        return $this->get_var($getVpIdSql);
+        return $this->database->get_var($getVpIdSql);
     }
 
     private function getUsermetaId($user_id, $meta_key) {
-        $getMetaIdSql = "SELECT umeta_id FROM {$this->prefix}usermeta WHERE meta_key = \"$meta_key\" AND user_id = $user_id";
-        return $this->get_var($getMetaIdSql);
+        $getMetaIdSql = "SELECT umeta_id FROM {$this->database->prefix}usermeta WHERE meta_key = \"$meta_key\" AND user_id = $user_id";
+        return $this->database->get_var($getMetaIdSql);
     }
 
     private function getPostMetaId($post_id, $meta_key) {
-        $getMetaIdSql = "SELECT meta_id FROM {$this->prefix}postmeta WHERE meta_key = \"$meta_key\" AND post_id = $post_id";
-        return $this->get_var($getMetaIdSql);
+        $getMetaIdSql = "SELECT meta_id FROM {$this->database->prefix}postmeta WHERE meta_key = \"$meta_key\" AND post_id = $post_id";
+        return $this->database->get_var($getMetaIdSql);
     }
 
     /**
@@ -263,7 +261,7 @@ class MirroringDatabase extends ExtendedWpdb {
                 array_keys($where)
             )
         );
-        $ids = $this->get_col($this->prepare($sql, $where));
+        $ids = $this->database->get_col($this->database->prepare($sql, $where));
         return $ids;
     }
 
@@ -275,7 +273,7 @@ class MirroringDatabase extends ExtendedWpdb {
             $targetTable = $this->dbSchemaInfo->getEntityInfo($targetEntity)->tableName;
 
             if (isset($entity[$referenceName]) && $entity[$referenceName] > 0) {
-                $referenceVpId = $this->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=$entity[$referenceName]");
+                $referenceVpId = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=$entity[$referenceName]");
                 $entity['vp_' . $referenceName] = $referenceVpId;
             }
 
@@ -287,7 +285,7 @@ class MirroringDatabase extends ExtendedWpdb {
             list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
 
             if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn]) && $entity[$valueColumn] > 0) {
-                $referenceVpId = $this->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=".$entity[$valueColumn]);
+                $referenceVpId = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=".$entity[$valueColumn]);
                 $entity[$valueColumn] = $referenceVpId;
             }
         }

@@ -180,7 +180,7 @@ function _vp_show_progress_message($progressMessage) {
                             global $versionPressContainer;
                             /** @var GitRepository $repository */
                             $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
-                            $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
+                            $database = $versionPressContainer->resolve(VersionPressServices::PLAIN_WPDB);
                             $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
 
                             $requirementsChecker = new RequirementsChecker($database, $schema);

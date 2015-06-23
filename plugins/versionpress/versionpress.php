@@ -50,7 +50,6 @@ if (VersionPress::isActive()) {
 }
 
 function vp_register_hooks() {
-    /** @var MirroringDatabase $wpdb */
     global $wpdb, $versionPressContainer;
     /** @var Committer $committer */
     $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
@@ -61,12 +60,27 @@ function vp_register_hooks() {
     /** @var VpidRepository $vpidRepository */
     $vpidRepository = $versionPressContainer->resolve(VersionPressServices::VPID_REPOSITORY);
 
+    /** @var MirroringDatabase $mirroringDatabase */
+    $mirroringDatabase = $versionPressContainer->resolve(VersionPressServices::DATABASE);
+
+    add_action('wpdb_after_insert', function ($table, $data) use ($mirroringDatabase) {
+        $mirroringDatabase->insert($table, $data);
+    }, 10, 2);
+
+    add_action('wpdb_after_update', function ($table, $data, $where) use ($mirroringDatabase) {
+        $mirroringDatabase->update($table, $data, $where);
+    }, 10, 3);
+
+    add_action('wpdb_after_delete', function ($table, $where) use ($mirroringDatabase) {
+        $mirroringDatabase->delete($table, $where);
+    }, 10, 2);
+
     /**
      *  Hook for saving taxonomies into files
      *  WordPress creates plain INSERT query and executes it using wpdb::query method instead of wpdb::insert.
      *  It's too difficult to parse every INSERT query, that's why the WordPress hook is used.
      */
-    add_action('save_post', createUpdatePostTermsHook($mirror, $wpdb, $vpidRepository));
+    add_action('save_post', createUpdatePostTermsHook($mirror, $vpidRepository));
 
     add_filter('update_feedback', function () {
         touch(get_home_path() . 'versionpress.maintenance');
@@ -161,29 +175,29 @@ function vp_register_hooks() {
         });
     });
 
-    add_action('untrashed_post_comments', function ($postId) use ($wpdb, $dbSchemaInfo) {
+    add_action('untrashed_post_comments', function ($postId) use ($wpdb, $dbSchemaInfo, $mirroringDatabase) {
         $commentsTable = $dbSchemaInfo->getPrefixedTableName("comment");
         $commentStatusSql = "select comment_ID, comment_approved from {$commentsTable} where comment_post_ID = {$postId}";
         $comments = $wpdb->get_results($commentStatusSql, ARRAY_A);
 
         foreach ($comments as $comment) {
-            $wpdb->update($commentsTable,
+            $mirroringDatabase->update($commentsTable,
                 array("comment_approved" => $comment["comment_approved"]),
-                array("comment_ID" => $comment["comment_ID"]), null, null, false);
+                array("comment_ID" => $comment["comment_ID"]));
         }
     });
 
-    add_action('delete_post_meta', function ($metaIds) use ($wpdb, $dbSchemaInfo) {
+    add_action('delete_post_meta', function ($metaIds) use ($mirroringDatabase, $dbSchemaInfo) {
         $idColumnName = $dbSchemaInfo->getEntityInfo("postmeta")->idColumnName;
         foreach ($metaIds as $metaId) {
-            $wpdb->delete($dbSchemaInfo->getPrefixedTableName("postmeta"), array($idColumnName => $metaId), null, false);
+            $mirroringDatabase->delete($dbSchemaInfo->getPrefixedTableName("postmeta"), array($idColumnName => $metaId));
         }
     });
 
-    add_action('delete_user_meta', function ($metaIds) use ($wpdb, $dbSchemaInfo) {
+    add_action('delete_user_meta', function ($metaIds) use ($mirroringDatabase, $dbSchemaInfo) {
         $idColumnName = $dbSchemaInfo->getEntityInfo("usermeta")->idColumnName;
         foreach ($metaIds as $metaId) {
-            $wpdb->delete($dbSchemaInfo->getPrefixedTableName("usermeta"), array($idColumnName => $metaId), null, false);
+            $mirroringDatabase->delete($dbSchemaInfo->getPrefixedTableName("usermeta"), array($idColumnName => $metaId));
         }
     });
 
@@ -212,12 +226,11 @@ function vp_register_hooks() {
             $committer->usePostponedChangeInfos($key);
         }
         if (!defined('DOING_AJAX')) {
-            /** @var MirroringDatabase $wpdb */
-            global $wpdb, $versionPressContainer;
+            global $versionPressContainer;
             /** @var Mirror $mirror */
             $mirror = $versionPressContainer->resolve(VersionPressServices::MIRROR);
             $vpidRepository = $versionPressContainer->resolve(VersionPressServices::VPID_REPOSITORY);
-            $func = createUpdatePostTermsHook($mirror, $wpdb, $vpidRepository);
+            $func = createUpdatePostTermsHook($mirror, $vpidRepository);
             $func($menu_item_db_id);
         }
     }, 10, 2);
@@ -228,7 +241,7 @@ function vp_register_hooks() {
         $committer->forceChangeInfo(new \VersionPress\ChangeInfos\TermChangeInfo('delete', $termVpid, $term->name, $taxonomy));
     }, 10, 2);
 
-    add_action('set_object_terms', createUpdatePostTermsHook($mirror, $wpdb, $vpidRepository));
+    add_action('set_object_terms', createUpdatePostTermsHook($mirror, $vpidRepository));
 
     add_filter('plugin_install_action_links', function ($links, $plugin) {
         $warningLink = '<span class="vp-compatibility-popup %s" data-plugin-name="' . $plugin['name'] . '"><span class="icon icon-warning"></span></span>';
@@ -346,9 +359,9 @@ function vp_register_hooks() {
     register_shutdown_function(array($committer, 'commit'));
 }
 
-function createUpdatePostTermsHook(Mirror $mirror, wpdb $wpdb, VpidRepository $vpidRepository) {
+function createUpdatePostTermsHook(Mirror $mirror, VpidRepository $vpidRepository) {
 
-    return function ($postId) use ($mirror, $wpdb, $vpidRepository) {
+    return function ($postId) use ($mirror, $vpidRepository) {
         /** @var array $post */
         $post = get_post($postId, ARRAY_A);
 
@@ -366,7 +379,7 @@ function createUpdatePostTermsHook(Mirror $mirror, wpdb $wpdb, VpidRepository $v
         foreach ($taxonomies as $taxonomy) {
             $terms = get_the_terms($postId, $taxonomy);
             if ($terms) {
-                $referencedTaxonomies = array_map(function ($term) use ($wpdb, $vpidRepository) {
+                $referencedTaxonomies = array_map(function ($term) use ($vpidRepository) {
                     return $vpidRepository->getVpidForEntity('term_taxonomy', $term->term_taxonomy_id);
                 }, $terms);
 

@@ -69,7 +69,7 @@ class OptionsStorageTest extends \PHPUnit_Framework_TestCase {
             )
         ));
 
-        $this->storage = new OptionsStorage(__DIR__ . '/options.ini', $entityInfo);
+        $this->storage = new OptionsStorage(__DIR__ . '/options.ini', $entityInfo, 'prefix_');
     }
 
     protected function tearDown() {
