@@ -14,7 +14,7 @@ use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\VersionPressChangeInfo;
 use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Database\MirroringDatabase;
+use VersionPress\Database\WpdbMirrorBridge;
 use VersionPress\Database\VpidRepository;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Reverter;
@@ -60,20 +60,23 @@ function vp_register_hooks() {
     /** @var VpidRepository $vpidRepository */
     $vpidRepository = $versionPressContainer->resolve(VersionPressServices::VPID_REPOSITORY);
 
-    /** @var MirroringDatabase $mirroringDatabase */
-    $mirroringDatabase = $versionPressContainer->resolve(VersionPressServices::DATABASE);
+    /** @var WpdbMirrorBridge $mirroringDatabase */
+    $mirroringDatabase = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
 
-    add_action('wpdb_after_insert', function ($table, $data) use ($mirroringDatabase) {
-        $mirroringDatabase->insert($table, $data);
-    }, 10, 2);
 
-    add_action('wpdb_after_update', function ($table, $data, $where) use ($mirroringDatabase) {
-        $mirroringDatabase->update($table, $data, $where);
-    }, 10, 3);
+    if (!defined('VP_DEACTIVATING')) {
+        add_action('wpdb_after_insert', function ($table, $data) use ($mirroringDatabase) {
+            $mirroringDatabase->insert($table, $data);
+        }, 10, 2);
 
-    add_action('wpdb_after_delete', function ($table, $where) use ($mirroringDatabase) {
-        $mirroringDatabase->delete($table, $where);
-    }, 10, 2);
+        add_action('wpdb_after_update', function ($table, $data, $where) use ($mirroringDatabase) {
+            $mirroringDatabase->update($table, $data, $where);
+        }, 10, 3);
+
+        add_action('wpdb_after_delete', function ($table, $where) use ($mirroringDatabase) {
+            $mirroringDatabase->delete($table, $where);
+        }, 10, 2);
+    }
 
     /**
      *  Hook for saving taxonomies into files

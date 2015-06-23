@@ -16,7 +16,7 @@ abstract class Storage {
      *
      * @param array $data Associative array with values to save. On `insert`, the $data will contain full entity data
      *                    plus things like VPID. On further updates, the data will typically contain just the updated values
-     *                    and a VPID (assigned in {@link VersionPress\Database\MirroringDatabase} so that the appropriate file could
+     *                    and a VPID (assigned in {@link VersionPress\Database\WpdbMirrorBridge} so that the appropriate file could
      *                    be located).
      * @return ChangeInfo|null Null indicates that the save operation didn't really change anything (may happen). Otherwise,
      *                         the ChangeInfo object is returned.
