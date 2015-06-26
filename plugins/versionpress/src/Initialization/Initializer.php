@@ -342,7 +342,7 @@ class Initializer {
 
 
     private function activateVersionPress() {
-        copy(VERSIONPRESS_PLUGIN_DIR . '/_db.php', WP_CONTENT_DIR . '/db.php');
+        WpdbReplacer::replaceMethods();
         touch(VERSIONPRESS_ACTIVATION_FILE);
         $this->reportProgressChange(InitializerStates::VERSIONPRESS_ACTIVATED);
     }

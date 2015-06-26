@@ -86,7 +86,8 @@ class VersionPressChangeInfo extends TrackedChangeInfo {
             case "deactivate":
                 return array(
                     array("type" => "path", "path" => VERSIONPRESS_MIRRORING_DIR . "/*"),
-                    array("type" => "path", "path" => WP_CONTENT_DIR . "/db.php"),
+                    array("type" => "path", "path" => ABSPATH . WPINC . "/wp-db.php"),
+                    array("type" => "path", "path" => ABSPATH . WPINC . "/wp-db.php.original"),
                 );
             default:
                 return array(array("type" => "path", "path" => "*"));

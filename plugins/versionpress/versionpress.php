@@ -20,6 +20,7 @@ use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\VersionPressOptions;
+use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Storages\Mirror;
 use VersionPress\Utils\BugReporter;
 use VersionPress\Utils\CompatibilityChecker;
@@ -47,6 +48,16 @@ if (defined('VP_MAINTENANCE')) {
 
 if (VersionPress::isActive()) {
     vp_register_hooks();
+
+
+//----------------------------------
+// Replacing wpdb
+//----------------------------------
+    register_shutdown_function(function () {
+        if (!WpdbReplacer::isReplaced()) {
+            WpdbReplacer::replaceMethods();
+        }
+    });
 }
 
 function vp_register_hooks() {
@@ -93,6 +104,10 @@ function vp_register_hooks() {
         /** @var string $wp_version */
         $changeInfo = new WordPressUpdateChangeInfo($wp_version);
         $committer->forceChangeInfo($changeInfo);
+
+        if (!WpdbReplacer::isReplaced()) {
+            WpdbReplacer::replaceMethods();
+        }
     });
 
     add_action('activated_plugin', function ($pluginName) use ($committer) {
@@ -472,12 +487,8 @@ function vp_admin_post_confirm_deactivation() {
 
     define('VP_DEACTIVATING', true);
 
-    if (!file_exists(WP_CONTENT_DIR . '/db.php')) {
-        require_once(WP_CONTENT_DIR . '/plugins/versionpress/bootstrap.php');
-    }
-
-    if (file_exists(WP_CONTENT_DIR . '/db.php')) {
-        FileSystem::remove(WP_CONTENT_DIR . '/db.php');
+    if (WpdbReplacer::isReplaced()) {
+        WpdbReplacer::restoreOriginal();
     }
 
     if (file_exists(VERSIONPRESS_ACTIVATION_FILE)) {
