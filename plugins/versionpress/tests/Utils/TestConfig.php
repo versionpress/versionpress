@@ -79,6 +79,7 @@ class TestConfig {
             $this->sites[$siteId]->adminPassword = $rawSiteConfig['wp-site']['admin-pass'];
             $this->sites[$siteId]->adminEmail = $rawSiteConfig['wp-site']['admin-email'];
             $this->sites[$siteId]->wpVersion = $rawSiteConfig['wp-site']['wp-version'];
+            $this->sites[$siteId]->wpLocale = isset($rawSiteConfig['wp-site']['wp-locale']) ? $rawSiteConfig['wp-site']['wp-locale'] : null;
 
             // VP config
             $this->sites[$siteId]->vpConfig = $rawSiteConfig['vp-config'];

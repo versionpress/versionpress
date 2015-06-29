@@ -497,7 +497,11 @@ class WpAutomation {
             $downloadPath = $this->getCleanInstallationPath();
             FileSystem::mkdir($downloadPath);
             $wpVersion = $this->siteConfig->wpVersion;
+            $wpLocale = $this->siteConfig->wpLocale;
             $downloadCommand = "wp core download --path=\"$downloadPath\" --version=$wpVersion";
+            if ($wpLocale) {
+                $downloadCommand .= " --locale=$wpLocale";
+            }
 
             $this->exec($downloadCommand, null, false);
         }
