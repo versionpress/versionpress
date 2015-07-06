@@ -13,6 +13,7 @@ common-site-config:
         admin-email: versionpress@example.com
         admin-pass: admin
         wp-version: 4.1
+        wp-locale: en_US
     vp-config:
         # all supported vpconfig values are listed here so that they are `isset()` but empty by default
         git-binary:

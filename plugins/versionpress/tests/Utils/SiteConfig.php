@@ -111,6 +111,11 @@ class SiteConfig {
      */
     public $wpVersion;
 
+    /**
+     * @var string
+     */
+    public $wpLocale;
+
 
     //----------------------
     // VersionPress config
