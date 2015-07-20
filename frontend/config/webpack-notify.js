@@ -21,7 +21,7 @@ module.exports = function () {
     if (!error) {
       return;
     }
-    var loc = error.error.loc;
+    var loc = error.location;
     var msg;
     if (loc) {
       msg = getLocMessage(error, loc);

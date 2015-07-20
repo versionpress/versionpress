@@ -1,4 +1,4 @@
-/// <reference path='../../typings/typings.d.ts' />
+/// <reference path='../../typings/tsd.d.ts' />
 
 import React = require('react');
 import ReactRouter = require('react-router');

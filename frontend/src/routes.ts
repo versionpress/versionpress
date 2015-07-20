@@ -1,4 +1,4 @@
-/// <reference path='../typings/typings.d.ts' />
+/// <reference path='../typings/tsd.d.ts' />
 
 import App = require('./app/App.react');
 import HomePage = require('./pages/HomePage.react');
