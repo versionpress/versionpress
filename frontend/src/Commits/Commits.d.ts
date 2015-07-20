@@ -4,4 +4,5 @@ interface Commit {
   hash: string;
   canUndo: boolean;
   canRollback: boolean;
+  isEnabled: boolean;
 }
