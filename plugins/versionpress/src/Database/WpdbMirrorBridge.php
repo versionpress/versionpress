@@ -160,7 +160,7 @@ class WpdbMirrorBridge {
         $savePostmeta = !$vpId && $entityName === 'post'; // the post exists in DB for a while but until now it wasn't tracked, so we have to save its postmeta
 
         if (!$vpId) {
-            $this->vpidRepository->identifyEntity($entityName, $data, $id);
+            $data = $this->vpidRepository->identifyEntity($entityName, $data, $id);
         }
 
         $this->mirror->save($entityName, $data);
