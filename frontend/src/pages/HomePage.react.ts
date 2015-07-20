@@ -4,6 +4,7 @@
 import React = require('react');
 import request = require('superagent');
 import CommitsTable = require('../Commits/CommitsTable.react');
+import config = require('../config');
 
 interface HomePageState {
   commits: Commit[];
@@ -19,9 +20,8 @@ class HomePage extends React.Component<any, HomePageState> {
   }
 
   componentDidMount() {
-    alert('did mount');
     request
-      .get('http://localhost/agilio/wordpress/wp-json/versionpress/commits')
+      .get(config.apiBaseUrl + '/commits')
       .accept('application/json')
       .end((err: any, res: request.Response) => {
         this.setState({
