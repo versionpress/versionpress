@@ -51,7 +51,7 @@
     "no-duplicate-variable": true,
     "no-empty": true,
     "no-eval": true,
-    "no-string-literal": true,
+    "no-string-literal": false,
     "no-switch-case-fall-through": true,
     "no-trailing-comma": true,
     "no-trailing-whitespace": true,
@@ -59,7 +59,7 @@
     "no-unused-expression": true,
     "no-unused-variable": true,
     "no-use-before-declare": true,
-    "no-var-requires": true,
+    "no-var-requires": false,
     "one-line": [
       true,
       "check-open-brace",
