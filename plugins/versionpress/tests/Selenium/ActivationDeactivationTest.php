@@ -96,6 +96,29 @@ class ActivationDeactivationTest extends SeleniumTestCase {
     }
 
     //----------------------------
+    // Automatic reactivation
+    //----------------------------
+
+    /**
+     * @test
+     *
+     */
+    public function versionPressRestoresMethodsInWpdbAfterReplacingWithOriginal() {
+        $isReplacedCall = 'echo VersionPress\Initialization\WpdbReplacer::isReplaced();';
+        $restoreCall = 'VersionPress\Initialization\WpdbReplacer::restoreOriginal();';
+
+
+        $isReplaced = (bool)self::$wpAutomation->runWpCliCommand('eval', null, $isReplacedCall);
+        $this->assertTrue($isReplaced);
+
+        $isReplaced = (bool)self::$wpAutomation->runWpCliCommand('eval', null, $restoreCall.$isReplacedCall);
+        $this->assertFalse($isReplaced);
+
+        $isReplaced = (bool)self::$wpAutomation->runWpCliCommand('eval', null, $isReplacedCall);
+        $this->assertTrue($isReplaced);
+    }
+
+    //----------------------------
     // Deactivation
     //----------------------------
 
