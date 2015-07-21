@@ -19,7 +19,7 @@ module.exports = function (isDevelopment) {
   var loaders = [
     {
       exclude: /node_modules/,
-      loaders: ['react-hot','ts-loader','ts-jsx-loader'],
+      loaders: ['react-hot','ts-loader'],
       test: /\.ts$/
     },
     {
