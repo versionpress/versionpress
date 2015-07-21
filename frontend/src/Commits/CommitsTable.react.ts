@@ -11,6 +11,7 @@ require('./CommitsTable.less');
 const DOM = React.DOM;
 
 interface CommitsTableProps {
+  currentPage: number;
   pages: number[];
   commits: Commit[];
   onUndo: React.MouseEventHandler;
@@ -20,6 +21,9 @@ interface CommitsTableProps {
 class CommitsTable extends React.Component<CommitsTableProps, any>  {
 
   render() {
+    const prevPage = this.props.currentPage - 1;
+    const nextPage = this.props.currentPage + 1;
+
     return DOM.table({className: 'vp-table widefat fixed'},
       DOM.thead(null,
         DOM.tr(null,
@@ -40,19 +44,42 @@ class CommitsTable extends React.Component<CommitsTableProps, any>  {
       ),
       DOM.tfoot(null,
         DOM.tr(null,
-          DOM.td({className: 'vp-table-pagination', colSpan: 3},
+          DOM.td({className: 'vp-table-pagination', colSpan: 2},
             this.props.pages.map((page: number) => {
+              page += 1;
               return React.createElement(ReactRouter.Link, <ReactRouter.LinkProp> {
                 activeClassName: 'active',
                 key: page,
-                to: page === 0
+                to: page === 1
                   ? routes.defaultRoute.props.name
                   : routes.pageRoute.props.name,
-                params: page === 0
-                  ? {}
+                params: page === 1
+                  ? null
                   : { page: page }
               }, page);
             })
+          ),
+          DOM.td({className: 'vp-table-pagination-actions'},
+            this.props.pages.indexOf(prevPage - 1) !== -1
+              ? React.createElement(ReactRouter.Link, <ReactRouter.LinkProp> {
+                to: prevPage === 1
+                  ? routes.defaultRoute.props.name
+                  : routes.pageRoute.props.name,
+                params: prevPage === 1
+                  ? null
+                  : { page: prevPage }
+              }, '< prev')
+              : null,
+            this.props.pages.indexOf(nextPage - 1) !== -1
+              ? React.createElement(ReactRouter.Link, <ReactRouter.LinkProp> {
+                to: nextPage === 1
+                  ? routes.defaultRoute.props.name
+                  : routes.pageRoute.props.name,
+                params: nextPage === 1
+                  ? null
+                  : { page: nextPage }
+              }, 'next >')
+              : null
           )
         )
       )

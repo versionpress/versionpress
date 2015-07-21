@@ -59,14 +59,16 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     const progressBar = <ProgressBar> this.refs['progress'];
     progressBar.progress(0);
 
-    if (parseInt(params.page, 10) === 0) {
+    const page = (parseInt(params.page, 10) - 1) || 0;
+
+    if (page === 0) {
       const router = <ReactRouter.Context> this.context.router;
       router.transitionTo(routes.defaultRoute.props.name);
     }
 
     request
       .get(config.apiBaseUrl + '/commits')
-      .query(params)
+      .query({page: page})
       .accept('application/json')
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
@@ -139,8 +141,9 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       DOM.h1({className: 'vp-header'}, 'VersionPress'),
       this.state.message
         ? React.createElement(FlashMessage, <FlashMessage.Props>this.state.message)
-        : '',
+        : null,
       React.createElement(CommitsTable, <CommitsTable.Props>{
+        currentPage: parseInt(this.props.params.page, 10) || 1,
         pages: this.state.pages,
         commits: this.state.commits,
         onUndo: this.undoCommit.bind(this),
