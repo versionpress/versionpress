@@ -712,6 +712,27 @@ function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
 // AJAX handling
 //----------------------------------
 
+header("Access-Control-Allow-Headers: origin, content-type, accept");
+
+add_filter( 'allowed_http_origin', '__return_true' );
+
+add_filter( 'wp_headers', array( 'vp_send_cors_headers' ), 11, 1 );
+function vp_send_cors_headers( $headers ) {
+    $headers['Access-Control-Allow-Origin'] = get_http_origin();
+    $headers['Access-Control-Allow-Credentials'] = 'true';
+
+    if ( 'OPTIONS' == $_SERVER['REQUEST_METHOD'] ) {
+        if ( isset( $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'] ) ) {
+            $headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
+        }
+
+        if ( isset( $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'] ) ) {
+            $headers['Access-Control-Allow-Headers'] = $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'];
+        }
+    }
+    return $headers;
+}
+
 function isAjax() {
     return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
 }

@@ -8,6 +8,7 @@ use VersionPress\Git\GitLogPaginator;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
+use VersionPress\Utils\BugReporter;
 
 class VersionPressApi {
 
@@ -42,6 +43,9 @@ class VersionPressApi {
         );
         $routes[$this->base . '/rollback'] = array(
             array( array( $this, 'rollbackToCommit' ), \WP_JSON_Server::READABLE ),
+        );
+        $routes[$this->base . '/submit-bug'] = array(
+            array( array( $this, 'submitBug' ), \WP_JSON_Server::CREATABLE | \WP_JSON_Server::ACCEPT_JSON ),
         );
         return $routes;
     }
@@ -131,6 +135,28 @@ class VersionPressApi {
             return $this->getError($revertStatus);
         }
         return true;
+    }
+
+    /**
+     * @param array[string] $data
+     * @return boolean|\WP_Error
+     */
+    public function submitBug($data) {
+        $email = $data['email'];
+        $description = $data['description'];
+
+        $bugReporter = new BugReporter('http://versionpress.net/report-problem');
+        $reportedSuccessfully = $bugReporter->reportBug($email, $description);
+
+        if ($reportedSuccessfully) {
+            return true;
+        } else {
+            return new \WP_Error(
+                'error',
+                'There was a problem with sending bug report. Please try it again. Thank you.',
+                array('status' => 403)
+            );
+        }
     }
 
     /**
