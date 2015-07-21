@@ -24,7 +24,7 @@ module.exports = function (isDevelopment) {
     },
     {
       loader: 'url-loader?limit=32768',
-      test: /\.(gif|jpg|png|woff|woff2|eot|ttf|svg)$/
+      test: /\.(gif|jpg|png|woff|woff2|eot|ttf|svg)(\?.*)?$/
     }
   ];
 
