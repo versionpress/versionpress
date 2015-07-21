@@ -80,6 +80,7 @@ class TestConfig {
             $this->sites[$siteId]->adminEmail = $rawSiteConfig['wp-site']['admin-email'];
             $this->sites[$siteId]->wpVersion = $rawSiteConfig['wp-site']['wp-version'];
             $this->sites[$siteId]->wpLocale = isset($rawSiteConfig['wp-site']['wp-locale']) ? $rawSiteConfig['wp-site']['wp-locale'] : null;
+			$this->sites[$siteId]->wpAutoupdate = $rawSiteConfig['wp-site']['wp-autoupdate'];
 
             // VP config
             $this->sites[$siteId]->vpConfig = $rawSiteConfig['vp-config'];
