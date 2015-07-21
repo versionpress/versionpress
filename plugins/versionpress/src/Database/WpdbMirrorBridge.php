@@ -108,8 +108,6 @@ class WpdbMirrorBridge {
             $this->vpidRepository->deleteId($entityName, $id);
             $this->mirror->delete($entityName, $where);
         }
-
-        $this->mirror->delete($entityName, $where);
     }
 
     private function getUsermetaId($user_id, $meta_key) {
@@ -177,7 +175,7 @@ class WpdbMirrorBridge {
                 continue;
             }
 
-            $this->vpidRepository->identifyEntity('postmeta', $meta, $meta['meta_id']);
+            $meta = $this->vpidRepository->identifyEntity('postmeta', $meta, $meta['meta_id']);
             $this->mirror->save('postmeta', $meta);
         }
     }
@@ -187,11 +185,12 @@ class WpdbMirrorBridge {
         $ids = array();
 
         if ($entityName === 'usermeta') {
-            $ids[] = $this->getUsermetaId($data['user_id'], $data['meta_key']);
-            return $ids;
+            return array($this->getUsermetaId($data['user_id'], $data['meta_key']));
         } elseif ($entityName === 'postmeta') {
-            $ids[] = $this->getPostMetaId($data['post_id'], $data['meta_key']);
-            return $ids;
+            if (isset($data['meta_id'])) {
+                return array($ids[] = $data['meta_id']);
+            }
+            return array($this->getPostMetaId($data['post_id'], $data['meta_key']));
         } elseif (isset($where[$idColumnName])) {
             $ids[] = $where[$idColumnName];
             return $ids;
