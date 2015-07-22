@@ -61,6 +61,11 @@ class WpAutomation {
         $this->createConfigFile();
         $this->clearDatabase();
         $this->installWp();
+
+        if (!$this->siteConfig->wpAutoupdate) {
+            $this->disableAutoUpdate();
+        }
+
         $this->populateSite($entityCounts);
     }
 
@@ -725,5 +730,9 @@ class WpAutomation {
     private function checkLatestStableChecksum($wpCliTmpPath) {
         $checksum = trim(file_get_contents('https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar.md5'));
         return $checksum == md5_file($wpCliTmpPath);
+    }
+
+    private function disableAutoUpdate() {
+        file_put_contents($this->siteConfig->path . '/wp-config.php', "\ndefine( 'AUTOMATIC_UPDATER_DISABLED', false );\n", FILE_APPEND);
     }
 }

@@ -14,6 +14,7 @@ common-site-config:
         admin-pass: admin
         wp-version: 4.1
         wp-locale: en_US
+        wp-autoupdate: false
     vp-config:
         # all supported vpconfig values are listed here so that they are `isset()` but empty by default
         git-binary:
