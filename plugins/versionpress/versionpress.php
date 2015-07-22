@@ -27,6 +27,7 @@ use VersionPress\Utils\CompatibilityChecker;
 use VersionPress\Utils\CompatibilityResult;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\IdUtil;
+use VersionPress\Utils\UninstallationUtil;
 use VersionPress\VersionPress;
 
 defined('ABSPATH') or die("Direct access not allowed");
@@ -59,6 +60,15 @@ if (VersionPress::isActive()) {
         }
     });
 }
+
+//----------------------------------
+// Auto-update
+//----------------------------------
+
+add_filter('automatic_updates_is_vcs_checkout', function () {
+    $forceUpdate = UninstallationUtil::uninstallationShouldRemoveGitRepo(); // first commit was created by VersionPress
+    return !$forceUpdate; // 'false' forces the update
+});
 
 function vp_register_hooks() {
     global $wpdb, $versionPressContainer;
