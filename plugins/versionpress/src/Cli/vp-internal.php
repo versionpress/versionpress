@@ -154,7 +154,7 @@ class VPInternalCommand extends WP_CLI_Command {
         // Truncate tables
 
         /** @var wpdb $wpdb */
-        $wpdb = $versionPressContainer->resolve(VersionPressServices::PLAIN_WPDB);
+        $wpdb = $versionPressContainer->resolve(VersionPressServices::WPDB);
         $tables = $wpdb->tables();
 
         if (!isset($assoc_args["truncate-options"])) {

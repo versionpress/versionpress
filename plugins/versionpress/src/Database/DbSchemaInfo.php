@@ -103,6 +103,17 @@ class DbSchemaInfo {
     }
 
     /**
+     * Returns EntityInfo for a given table name with prefix (e.g., "wp_posts" or "wp_commentmeta")
+     *
+     * @param $tableName
+     * @return EntityInfo
+     */
+    public function getEntityInfoByPrefixedTableName($tableName) {
+        $tableName = substr($tableName, strlen($this->prefix));
+        return $this->getEntityInfoByTableName($tableName);
+    }
+
+    /**
      * Returns true if given name is an entity (is defined in schema).
      * Useful for prefixing VP tables.
      *

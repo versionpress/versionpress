@@ -631,7 +631,7 @@ class WpAutomation {
             $cliCommand .= " $subcommand";
         }
 
-        foreach ($args as $name => $value) {
+        foreach ((array)$args as $name => $value) {
             if (is_int($name)) { // positional argument
                 $cliCommand .= " " . $this->vagrantSensitiveEscapeShellArg($value);
             } elseif ($value !== null) {

@@ -1,4 +1,4 @@
-<?php
+<?php // Enhanced by VersionPress
 
 define("WP_DEBUG", false);
 define("WP_DEBUG_DISPLAY", false);

@@ -39,9 +39,12 @@ class DBAsserter {
         $dbUser = self::$testConfig->testSite->dbUser;
         $dbPassword = self::$testConfig->testSite->dbPassword;
         $dbName = self::$testConfig->testSite->dbName;
+        $dbPrefix = self::$testConfig->testSite->dbTablePrefix;
         self::$database = new \mysqli($dbHost, $dbUser, $dbPassword, $dbName);
+        $wpdb = new \wpdb($dbHost, $dbUser, $dbPassword, $dbName);
+        $wpdb->set_prefix($dbPrefix);
 
-        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$database);
+        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, $wpdb);
 
     }
 
