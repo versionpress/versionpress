@@ -733,6 +733,6 @@ class WpAutomation {
     }
 
     private function disableAutoUpdate() {
-        file_put_contents($this->siteConfig->path . '/wp-config.php', "\ndefine( 'AUTOMATIC_UPDATER_DISABLED', false );\n", FILE_APPEND);
+        file_put_contents($this->siteConfig->path . '/wp-config.php', "\ndefine( 'AUTOMATIC_UPDATER_DISABLED', true );\n", FILE_APPEND);
     }
 }
