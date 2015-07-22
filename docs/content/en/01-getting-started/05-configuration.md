@@ -44,11 +44,33 @@ This section lists all the supported config options.
 
 *Default: `git`*
 
-By default, VersionPress calls just `git` which leaves the path resolution up to the operating system. That might be problematic on some server configurations which use different `PATH` configurations for different users (the web server user might not be the same user under which you are logged in), there might be some `PATH` caching involved etc. If VersionPress cannot detect Git for some reason, use this option.
+By default, VersionPress calls just `git` which leaves the path resolution up to the operating system. That might be problematic on some server configurations which use different `PATH` for different users (the web server user might not be the same user under which you are logged in), there might be some `PATH` caching involved, etc. If VersionPress cannot detect Git for some reason, use this option.
 
 Example:
 
-    # Always use absolute paths!
+    # regarding paths, please read notes below!
     
-    git-binary: /path/to/git         # Linux / Mac OS
-    git-binary: C:\path\to\git.exe   # On Windows, use single backslashes 
+    git-binary: /path/to/git            # Linux / Mac OS
+    git-binary: 'C:\path to\git.exe'    # Windows
+
+
+Important notes about paths:
+
+ - Putting **single quotes around the path makes it safe**, however, it's not strictly necessary if the path is simple. This is usually the case on Linux / MacOS where the path typically looks like `/usr/bin/git` or similar.
+ - **On Windows**, the Git binary is usually `C:\Program Files (x86)\Git\bin\git.exe`. Here, **quoting is required** as `(...)` has a special meaning in NEON. Here are examples of valid and invalid paths on Windows:
+
+
+        # OK:
+        git-binary: 'C:\Program Files (x86)\Git\bin\git.exe'  # recommended
+        git-binary: 'C:/Program Files (x86)/Git/bin/git.exe'  # forward slashes work as well
+        git-binary: "C:/Program Files (x86)/Git/bin/git.exe"  # even with doublequotes
+        git-binary: "C:\\Program Files\\Git\\bin\\git.exe"    # double quotes + escaping
+        git-binary: C:\Git\git.exe                            # simpler paths without quotes
+        git-binary: C:\My Git\git.exe                         # spaces are not a problem
+    
+        # Will not work:
+        git-binary: C:\Program Files (x86)\Git\bin\git.exe
+        git-binary: "C:\Program Files (x86)\Git\bin\git.exe"
+
+
+    You can test whether the path will be parsed correctly in [NEON playground](http://ne-on.org/).
