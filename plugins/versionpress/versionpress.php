@@ -71,21 +71,21 @@ function vp_register_hooks() {
     /** @var VpidRepository $vpidRepository */
     $vpidRepository = $versionPressContainer->resolve(VersionPressServices::VPID_REPOSITORY);
 
-    /** @var WpdbMirrorBridge $mirroringDatabase */
-    $mirroringDatabase = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
+    /** @var WpdbMirrorBridge $wpdbMirrorBridge */
+    $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
 
 
     if (!defined('VP_DEACTIVATING')) {
-        add_action('wpdb_after_insert', function ($table, $data) use ($mirroringDatabase) {
-            $mirroringDatabase->insert($table, $data);
+        add_action('wpdb_after_insert', function ($table, $data) use ($wpdbMirrorBridge) {
+            $wpdbMirrorBridge->insert($table, $data);
         }, 10, 2);
 
-        add_action('wpdb_after_update', function ($table, $data, $where) use ($mirroringDatabase) {
-            $mirroringDatabase->update($table, $data, $where);
+        add_action('wpdb_after_update', function ($table, $data, $where) use ($wpdbMirrorBridge) {
+            $wpdbMirrorBridge->update($table, $data, $where);
         }, 10, 3);
 
-        add_action('wpdb_after_delete', function ($table, $where) use ($mirroringDatabase) {
-            $mirroringDatabase->delete($table, $where);
+        add_action('wpdb_after_delete', function ($table, $where) use ($wpdbMirrorBridge) {
+            $wpdbMirrorBridge->delete($table, $where);
         }, 10, 2);
     }
 
@@ -193,29 +193,29 @@ function vp_register_hooks() {
         });
     });
 
-    add_action('untrashed_post_comments', function ($postId) use ($wpdb, $dbSchemaInfo, $mirroringDatabase) {
+    add_action('untrashed_post_comments', function ($postId) use ($wpdb, $dbSchemaInfo, $wpdbMirrorBridge) {
         $commentsTable = $dbSchemaInfo->getPrefixedTableName("comment");
         $commentStatusSql = "select comment_ID, comment_approved from {$commentsTable} where comment_post_ID = {$postId}";
         $comments = $wpdb->get_results($commentStatusSql, ARRAY_A);
 
         foreach ($comments as $comment) {
-            $mirroringDatabase->update($commentsTable,
+            $wpdbMirrorBridge->update($commentsTable,
                 array("comment_approved" => $comment["comment_approved"]),
                 array("comment_ID" => $comment["comment_ID"]));
         }
     });
 
-    add_action('delete_post_meta', function ($metaIds) use ($mirroringDatabase, $dbSchemaInfo) {
+    add_action('delete_post_meta', function ($metaIds) use ($wpdbMirrorBridge, $dbSchemaInfo) {
         $idColumnName = $dbSchemaInfo->getEntityInfo("postmeta")->idColumnName;
         foreach ($metaIds as $metaId) {
-            $mirroringDatabase->delete($dbSchemaInfo->getPrefixedTableName("postmeta"), array($idColumnName => $metaId));
+            $wpdbMirrorBridge->delete($dbSchemaInfo->getPrefixedTableName("postmeta"), array($idColumnName => $metaId));
         }
     });
 
-    add_action('delete_user_meta', function ($metaIds) use ($mirroringDatabase, $dbSchemaInfo) {
+    add_action('delete_user_meta', function ($metaIds) use ($wpdbMirrorBridge, $dbSchemaInfo) {
         $idColumnName = $dbSchemaInfo->getEntityInfo("usermeta")->idColumnName;
         foreach ($metaIds as $metaId) {
-            $mirroringDatabase->delete($dbSchemaInfo->getPrefixedTableName("usermeta"), array($idColumnName => $metaId));
+            $wpdbMirrorBridge->delete($dbSchemaInfo->getPrefixedTableName("usermeta"), array($idColumnName => $metaId));
         }
     });
 
