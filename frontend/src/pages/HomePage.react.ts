@@ -80,7 +80,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
           });
         } else {
           this.setState({
-            pages: res.body.pages,
+            pages: res.body.pages.map(c => c + 1),
             commits: <Commit[]>res.body.commits,
             message: null,
             loading: false

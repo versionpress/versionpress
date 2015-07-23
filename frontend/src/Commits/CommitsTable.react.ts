@@ -47,7 +47,6 @@ class CommitsTable extends React.Component<CommitsTableProps, any>  {
         DOM.tr(null,
           DOM.td({className: 'vp-table-pagination', colSpan: 2},
             this.props.pages.map((page: number) => {
-              page += 1;
               return React.createElement(ReactRouter.Link, <ReactRouter.LinkProp> {
                 activeClassName: 'active',
                 key: page,
@@ -61,7 +60,7 @@ class CommitsTable extends React.Component<CommitsTableProps, any>  {
             })
           ),
           DOM.td({className: 'vp-table-pagination-actions'},
-            this.props.pages.indexOf(prevPage - 1) !== -1
+            this.props.pages.indexOf(prevPage) !== -1
               ? React.createElement(ReactRouter.Link, <ReactRouter.LinkProp> {
                 to: prevPage === 1
                   ? routes.home
@@ -71,7 +70,7 @@ class CommitsTable extends React.Component<CommitsTableProps, any>  {
                   : { page: prevPage }
               }, '< prev')
               : null,
-            this.props.pages.indexOf(nextPage - 1) !== -1
+            this.props.pages.indexOf(nextPage) !== -1
               ? React.createElement(ReactRouter.Link, <ReactRouter.LinkProp> {
                 to: nextPage === 1
                   ? routes.home
