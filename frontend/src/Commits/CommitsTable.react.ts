@@ -3,12 +3,13 @@
 
 import React = require('react');
 import ReactRouter = require('react-router');
-import routes = require('../routes');
 import CommitsTableRow = require('./CommitsTableRow.react');
+import config = require('../config');
 
 require('./CommitsTable.less');
 
 const DOM = React.DOM;
+const routes = config.routes;
 
 interface CommitsTableProps {
   currentPage: number;
@@ -51,8 +52,8 @@ class CommitsTable extends React.Component<CommitsTableProps, any>  {
                 activeClassName: 'active',
                 key: page,
                 to: page === 1
-                  ? routes.defaultRoute.props.name
-                  : routes.pageRoute.props.name,
+                  ? routes.home
+                  : routes.page,
                 params: page === 1
                   ? null
                   : { page: page }
@@ -63,8 +64,8 @@ class CommitsTable extends React.Component<CommitsTableProps, any>  {
             this.props.pages.indexOf(prevPage - 1) !== -1
               ? React.createElement(ReactRouter.Link, <ReactRouter.LinkProp> {
                 to: prevPage === 1
-                  ? routes.defaultRoute.props.name
-                  : routes.pageRoute.props.name,
+                  ? routes.home
+                  : routes.page,
                 params: prevPage === 1
                   ? null
                   : { page: prevPage }
@@ -73,8 +74,8 @@ class CommitsTable extends React.Component<CommitsTableProps, any>  {
             this.props.pages.indexOf(nextPage - 1) !== -1
               ? React.createElement(ReactRouter.Link, <ReactRouter.LinkProp> {
                 to: nextPage === 1
-                  ? routes.defaultRoute.props.name
-                  : routes.pageRoute.props.name,
+                  ? routes.home
+                  : routes.page,
                 params: nextPage === 1
                   ? null
                   : { page: nextPage }

@@ -3,7 +3,6 @@
 
 import React = require('react');
 import ReactRouter = require('react-router');
-import routes = require('../routes');
 import request = require('superagent');
 import CommitsTable = require('../Commits/CommitsTable.react');
 import FlashMessage = require('../common/FlashMessage.react');
@@ -15,8 +14,10 @@ import config = require('../config');
 require('./HomePage.less');
 
 const DOM = React.DOM;
+const routes = config.routes;
 
 interface HomePageProps {
+  router: ReactRouter.Context;
   params: {
     page?: string
   };
@@ -46,10 +47,6 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     };
   }
 
-  static contextTypes = {
-    router: React.PropTypes.func.isRequired
-  };
-
   componentDidMount() {
     this.fetchData();
   }
@@ -66,8 +63,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     const page = (parseInt(params.page, 10) - 1) || 0;
 
     if (page === 0) {
-      const router = <ReactRouter.Context> this.context.router;
-      router.transitionTo(routes.defaultRoute.props.name);
+      this.props.router.transitionTo(routes.home);
     }
 
     request

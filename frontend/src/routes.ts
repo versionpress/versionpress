@@ -4,14 +4,13 @@ import App = require('./app/App.react');
 import HomePage = require('./pages/HomePage.react');
 import NotFoundPage = require('./pages/NotFoundPage.react');
 import React = require('react');
-import Router = require('react-router');
+import ReactRouter = require('react-router');
+import config = require('./config');
 
-export const pageRoute = React.createElement(Router.Route, {name: 'page', path: 'page/:page', handler: HomePage});
-export const defaultRoute = React.createElement(Router.DefaultRoute, {name: 'home', handler: HomePage});
-export const notFoundRoute = React.createElement(Router.NotFoundRoute, {name: 'not-found', handler: NotFoundPage});
+export const routes = config.routes;
 
-export const appRoute = React.createElement(Router.Route, {path: '/', handler: App},
-  pageRoute,
-  defaultRoute,
-  notFoundRoute
+export const appRoute = React.createElement(ReactRouter.Route, {path: '/', handler: App},
+  React.createElement(ReactRouter.Route, {name: routes.page, path: 'page/:page', handler: HomePage}),
+  React.createElement(ReactRouter.DefaultRoute, {name: routes.home, handler: HomePage}),
+  React.createElement(ReactRouter.NotFoundRoute, {name: routes.notFound, handler: NotFoundPage})
 );
