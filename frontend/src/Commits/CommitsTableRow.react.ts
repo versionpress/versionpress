@@ -27,15 +27,17 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, any>  {
       }, moment(commit.date).fromNow()),
       DOM.td({className: 'column-message'}, commit.message),
       DOM.td({className: 'column-actions'},
-        commit.canUndo
+        commit.canUndo && commit.isEnabled
           ? DOM.a({
+              className: 'vp-table-undo',
               href: '#',
               onClick: this.props.onUndo,
               'data-hash': commit.hash
             }, 'Undo')
           : '',
-        commit.canRollback
+        commit.canRollback && commit.isEnabled
           ? DOM.a({
+              className: 'vp-table-rollback',
               href: '#',
               onClick: this.props.onRollback,
               'data-hash': commit.hash

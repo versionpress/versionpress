@@ -194,4 +194,8 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
 
 }
 
+module HomePage {
+  export interface Props extends HomePageProps {}
+}
+
 export = HomePage;
