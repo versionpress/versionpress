@@ -12,10 +12,10 @@
       "commit": "8c9ede30fca2a095018e70940806cc9c8aa122f6"
     },
     "react/react-addons.d.ts": {
-      "commit": "8c9ede30fca2a095018e70940806cc9c8aa122f6"
+      "commit": "0b3c1591f9266ef507dc5e8cfcbd2ce4ca957227"
     },
     "react/react.d.ts": {
-      "commit": "8c9ede30fca2a095018e70940806cc9c8aa122f6"
+      "commit": "0b3c1591f9266ef507dc5e8cfcbd2ce4ca957227"
     },
     "mocha/mocha.d.ts": {
       "commit": "172964b865679c553bb7d82bc5ff62e5f891d381"
