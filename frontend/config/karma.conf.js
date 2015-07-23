@@ -1,12 +1,13 @@
 'use strict';
 
+var webpackConfig = require('./webpack.config.js')(true);
+
 module.exports = function(config) {
   config.set({
 
-		//browsers: ['PhantomJS', 'Firefox', 'Chrome'],
-		browsers: ['PhantomJS'],
+		browsers: ['Chrome'],
 
-		frameworks: ['mocha', 'chai'],
+		frameworks: ['mocha', 'chai-sinon'],
 
 		singleRun: false,
 
@@ -22,14 +23,8 @@ module.exports = function(config) {
 
 		webpack: {
 			devtool: 'inline-source-map',
-			module: {
-				loaders: [
-					{ test: /\.ts$/, loader: 'ts-loader' }
-				]
-			},
-      resolve: {
-        extensions: ['', '.js', '.json', '.ts']
-      }
+			module: webpackConfig.module,
+      resolve: webpackConfig.resolve
 		},
 
 		webpackServer: {
@@ -39,10 +34,8 @@ module.exports = function(config) {
 		plugins: [
       require('karma-webpack'),
 			'karma-mocha',
-			'karma-chai',
-			'karma-phantomjs-launcher',
+			'karma-chai-sinon',
 			'karma-chrome-launcher',
-			'karma-firefox-launcher',
 			'karma-sourcemap-loader'
 		]
   });
