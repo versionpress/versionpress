@@ -262,11 +262,7 @@ gulp.task('init-project-settings-files', function() {
 gulp.task('git-config', ['composer-install-ext-libs', 'composer-install-versionpress-libs', 'init-project-settings-files'], function(cb) {
     return git.exec({args: 'config core.ignorecase false'}, function (err, stdout) {
         if(err) { console.log(err); }
-
-        git.exec({args: 'config merge.ff false'}, function (err, stdout) {
-            if(err) { console.log(err); }
-            cb();
-        });
+        cb();
     });
 });
 
