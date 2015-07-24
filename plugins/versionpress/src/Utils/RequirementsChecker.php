@@ -85,13 +85,11 @@ class RequirementsChecker {
         );
 
         $this->requirements[] = array(
-            'name' => 'db.php hook',
+            'name' => 'wpdb hook',
             'level' => 'critical',
-            'fulfilled' => !is_file(WP_CONTENT_DIR . '/db.php'),
-            'help' => 'For VersionPress to do its magic, it needs to create a `wp-content/db.php` file and put some code there. ' .
-                'However, this file is already occupied, possibly by some other plugin. Debugger plugins often do this so if you can, please disable them ' .
-                'and remove the `db.php` file physically. If you can\'t, we have plans on how to deal with this and will ' .
-                'ship a solution as part of some future VersionPress udpate (it is high on our priority list and should be fixed before the final 1.0 release).'
+            'fulfilled' => is_writable(ABSPATH . WPINC . '/wp-db.php'),
+            'help' => 'For VersionPress to do its magic, it needs to change the `wpdb` class and put some code there. ' .
+                'To do so it needs write access to the `wp-includes/wp-db.php` file. Please update the permissions.'
         );
 
         $this->requirements[] = array(
