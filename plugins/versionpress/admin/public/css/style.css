@@ -62,6 +62,24 @@
     margin-top: 2px;
 }
 
+#vp-service-panel {
+    display: none;
+}
+
+#vp-service-panel.displayed {
+    display: block;
+}
+
+#vp-service-panel-button {
+    font-size: 16px;
+    float: right;
+    padding: 2px 12px;
+}
+
+.welcome-panel {
+    padding: 23px 10px;
+}
+
 
 /*------------------------------
  * Styles for admin/deactivate.php
