@@ -44,7 +44,7 @@
     $buttonCancel = "<a " .
         "class='button cancel' ".
         "id='popover-cancel-button' ".
-        "href='" . (isAjax() ? "javascript:;" : admin_url('admin.php?page=versionpress/admin/index.php')) . "'>Cancel</a>";
+        "href='" . (isAjax() ? "javascript:;" : menu_page_url('versionpress', false)) . "'>Cancel</a>";
 
     $body = "
         <div>

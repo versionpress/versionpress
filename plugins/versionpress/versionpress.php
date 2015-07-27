@@ -436,7 +436,7 @@ if (get_transient('vp_just_activated')) {
 function vp_gettext_filter_plugin_activated($translation, $text, $domain) {
     if ($text == 'Plugin <strong>activated</strong>.' && get_transient('vp_just_activated')) {
         delete_transient('vp_just_activated');
-        return 'VersionPress activated. <strong><a href="' . admin_url('admin.php?page=versionpress/admin/index.php') . '" style="text-decoration: underline; font-size: 1.03em;">Continue here</a></strong> to start tracking the site.';
+        return 'VersionPress activated. <strong><a href="' . menu_page_url('versionpress', false) . '" style="text-decoration: underline; font-size: 1.03em;">Continue here</a></strong> to start tracking the site.';
     } else {
         return $translation;
     }
@@ -574,7 +574,7 @@ function vp_send_bug_report() {
     $reportedSuccessfully = $bugReporter->reportBug($email, $description);
 
     $result = $reportedSuccessfully ? "ok" : "err";
-    wp_redirect(admin_url("admin.php?page=versionpress/admin/index.php&bug-report=$result"));
+    wp_redirect(add_query_arg('bug-report', $result, menu_page_url('versionpress', false)));
 }
 
 add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are just one step less important :) */);
@@ -585,6 +585,7 @@ add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are
 function vp_activation_nag() {
 
     if (VersionPress::isActive() ||
+        get_current_screen()->id == "versionpress" ||
         get_current_screen()->id == "versionpress/admin/index" ||
         get_current_screen()->id == "versionpress/admin/deactivate"
     ) {
@@ -596,7 +597,7 @@ function vp_activation_nag() {
     }
 
 
-    echo "<div class='update-nag vp-activation-nag'>VersionPress is installed but not yet tracking this site. <a href='" . admin_url('admin.php?page=versionpress/admin/index.php') . "'>Please finish the activation.</a></div>";
+    echo "<div class='update-nag vp-activation-nag'>VersionPress is installed but not yet tracking this site. <a href='" . menu_page_url('versionpress', false) . "'>Please finish the activation.</a></div>";
 
 }
 
@@ -633,8 +634,8 @@ function vp_admin_menu() {
         'VersionPress',
         'VersionPress',
         'manage_options',
-        'versionpress/admin/index.php',
-        '',
+        'versionpress',
+        'versionpress_page',
         null,
         0.001234987
     );
@@ -647,7 +648,8 @@ function vp_admin_menu() {
     $directAccessPages = array(
         'deactivate.php',
         'system-info.php',
-        'undo.php'
+        'undo.php',
+        'index.php'
     );
 
     global $_registered_pages;
@@ -657,6 +659,19 @@ function vp_admin_menu() {
         $_registered_pages[$hookname] = true;
     }
 
+}
+
+function versionpress_page() {
+    require_once(WP_CONTENT_DIR . '/plugins/versionpress/admin/index.php');
+}
+
+add_action('admin_init', 'vp_admin_init');
+
+function vp_admin_init() {
+    if (basename($_SERVER['PHP_SELF']) === 'admin.php' && isset($_GET['page']) && $_GET['page'] === 'versionpress') {
+        wp_redirect(menu_page_url('versionpress', false) . '/');
+        exit;
+    }
 }
 
 add_action('admin_action_vp_show_undo_confirm', 'vp_show_undo_confirm');
@@ -690,10 +705,10 @@ function _vp_revert($reverterMethod) {
     vp_enable_maintenance();
     $revertStatus = call_user_func(array($reverter, $reverterMethod), $commitHash);
     vp_disable_maintenance();
-    $adminPage = 'admin.php?page=versionpress/admin/index.php';
+    $adminPage = menu_page_url('versionpress', false);
 
     if ($revertStatus !== RevertStatus::OK) {
-        wp_redirect(admin_url($adminPage . '&error=' . $revertStatus));
+        wp_redirect(add_query_arg('error', $revertStatus, $adminPage));
     } else {
         wp_redirect($adminPage);
     }

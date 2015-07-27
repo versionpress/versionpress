@@ -193,7 +193,7 @@ if ($showWelcomePanel === "") {
                 elseif ($i > 0) $divider = "|";
 
                 $links .= " " . $divider . " ";
-                $pageUrl = add_query_arg('vp-page', $pageNumber, menu_page_url('versionpress'));
+                $pageUrl = add_query_arg('vp-page', $pageNumber, menu_page_url('versionpress', false));
                 if ($pageNumber == $page) {
                     $links .= $pageNumber + 1;
                 } else {

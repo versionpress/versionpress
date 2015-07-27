@@ -8,7 +8,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
 
     public function prepare_undoLastCommit() {
         $this->createTestPost();
-        $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
+        $this->url(menu_page_url('versionpress', false));
         return array(array('D', '%vpdb%/posts/*'));
     }
 
@@ -19,7 +19,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
     public function prepare_undoSecondCommit() {
         self::$wpAutomation->editOption('blogname', 'Blogname for undo test');
         $this->createTestPost();
-        $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
+        $this->url(menu_page_url('versionpress', false));
         return array(array('M', '%vpdb%/options.ini'));
     }
 
@@ -29,7 +29,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
 
     public function prepare_undoRevertedCommit() {
         $this->createTestPost();
-        $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
+        $this->url(menu_page_url('versionpress', false));
         return array(array('A', '%vpdb%/posts/*'));
     }
 
@@ -38,7 +38,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         $commentId = $this->createCommentForPost($postId);
         self::$wpAutomation->deleteComment($commentId);
         self::$wpAutomation->deletePost($postId);
-        $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
+        $this->url(menu_page_url('versionpress', false));
     }
 
     public function tryRestoreEntityWithMissingReference() {
@@ -50,7 +50,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         $postId = $this->createTestPost();
         $this->createCommentForPost($postId);
         self::$wpAutomation->editOption('blogname', 'Blogname for rollback test');
-        $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
+        $this->url(menu_page_url('versionpress', false));
         return array(
             array('D', '%vpdb%/posts/*'),
             array('D', '%vpdb%/comments/*'),
@@ -64,7 +64,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
 
     public function prepare_clickOnCancel() {
         $this->createTestPost();
-        $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
+        $this->url(menu_page_url('versionpress', false));
     }
 
     public function clickOnCancel() {
@@ -76,7 +76,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
 
     public function prepare_undoWithNotCleanWorkingDirectory() {
         $this->createTestPost();
-        $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
+        $this->url(menu_page_url('versionpress', false));
     }
 
     //---------------------
