@@ -63,6 +63,27 @@ class WordPressUpdateChangeInfo extends TrackedChangeInfo {
     }
 
     public function getChangedFiles() {
-        return array(array("type" => "path", "path" => "*"));
+        $adminPath = str_replace( get_bloginfo( 'url' ) . '/', ABSPATH, get_admin_url() ); // https://gist.github.com/andrezrv/f7a083627f3bd89c3d9e
+        return array(
+            array("type" => "path", "path" => "index.php"),
+            array("type" => "path", "path" => "license.txt"),
+            array("type" => "path", "path" => "readme.html"),
+            array("type" => "path", "path" => "wp-activate.php"),
+            array("type" => "path", "path" => "wp-blog-header.php"),
+            array("type" => "path", "path" => "wp-comments-post.php"),
+            array("type" => "path", "path" => "wp-config-sample.php"),
+            array("type" => "path", "path" => "wp-cron.php"),
+            array("type" => "path", "path" => "wp-links-opml.php"),
+            array("type" => "path", "path" => "wp-load.php"),
+            array("type" => "path", "path" => "wp-login.php"),
+            array("type" => "path", "path" => "wp-mail.php"),
+            array("type" => "path", "path" => "wp-settings.php"),
+            array("type" => "path", "path" => "wp-signup.php"),
+            array("type" => "path", "path" => "wp-trackback.php"),
+            array("type" => "path", "path" => "xmlrpc.php"),
+            array("type" => "path", "path" => ABSPATH . WPINC . '/*'),
+            array("type" => "path", "path" => $adminPath . '*'),
+            array("type" => "path", "path" => WP_CONTENT_DIR . '/themes/twenty*'),
+        );
     }
 }
