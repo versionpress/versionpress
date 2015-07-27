@@ -42,7 +42,7 @@ function stubContext(BaseComponent, context) {
 
     render() {
       this._wrappedElement = React.createElement(BaseComponent,
-        React.__spread({}, this.state, this.props)
+        Object.assign({}, this.state, this.props)
       );
       this._wrappedParentElement = React.createElement(
         StubbedContextParent,
@@ -53,7 +53,7 @@ function stubContext(BaseComponent, context) {
     }
   });
 
-  BaseComponent.contextTypes = React.__spread({}, BaseComponent.contextTypes, _contextTypes);
+  BaseComponent.contextTypes = Object.assign({}, BaseComponent.contextTypes, _contextTypes);
 
   return StubbedContextHandler;
 }

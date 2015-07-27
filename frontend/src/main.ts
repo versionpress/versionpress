@@ -4,6 +4,8 @@ import React = require('react');
 import Router = require('react-router');
 import routes = require('./routes');
 
+require('core-js');
+
 const app = document.getElementById('vp');
 
 Router.run(routes.appRoute, Router.HashLocation, (handler) => {

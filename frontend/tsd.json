@@ -40,6 +40,9 @@
     },
     "karma-chai-sinon/karma-chai-sinon.d.ts": {
       "commit": "bf5ead10d2e309458d0bd07eff57779462171b6d"
+    },
+    "core-js/core-js.d.ts": {
+      "commit": "b6f89b5f6deaf556843d554709c694156f8c6ccc"
     }
   }
 }
