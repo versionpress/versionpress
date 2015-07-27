@@ -9,6 +9,8 @@ import FlashMessage = require('../common/FlashMessage.react');
 import ProgressBar = require('../common/ProgressBar.react');
 import ServicePanel = require('../ServicePanel/ServicePanel.react');
 import ServicePanelButton = require('../ServicePanel/ServicePanelButton.react');
+import revertDialog = require('../Commits/revertDialog');
+import moment = require('moment');
 import config = require('../config');
 
 require('./HomePage.less');
@@ -45,6 +47,9 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       loading: true,
       displayServicePanel: false
     };
+
+    this.onUndo = this.onUndo.bind(this);
+    this.onRollback = this.onRollback.bind(this);
   }
 
   componentDidMount() {
@@ -89,9 +94,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       });
   }
 
-  undoCommit(e) {
-    e.preventDefault();
-    const hash = e.target.getAttribute('data-hash');
+  undoCommit(hash: string) {
     const progressBar = <ProgressBar> this.refs['progress'];
     progressBar.progress(0);
     this.setState({ loading: true });
@@ -112,9 +115,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       });
   }
 
-  rollbackToCommit(e) {
-    e.preventDefault();
-    const hash = e.target.getAttribute('data-hash');
+  rollbackToCommit(hash: string) {
     const progressBar = <ProgressBar> this.refs['progress'];
     progressBar.progress(0);
     this.setState({ loading: true });
@@ -168,6 +169,24 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       });
   }
 
+  onUndo(e) {
+    e.preventDefault();
+    const hash = e.target.getAttribute('data-hash');
+    const message = e.target.getAttribute('data-message');
+    const title = DOM.span(null, 'Undo ', DOM.em(null, message), ' ?');
+
+    revertDialog.revertDialog.call(this, title, () => this.undoCommit(hash));
+  }
+
+  onRollback(e) {
+    e.preventDefault();
+    const hash = e.target.getAttribute('data-hash');
+    const date = moment(e.target.getAttribute('data-date')).format('LLL');
+    const title = DOM.span(null, 'Roll back to ', DOM.em(null, date), ' ?');
+
+    revertDialog.revertDialog.call(this, title, () => this.rollbackToCommit(hash));
+  }
+
   render() {
     return DOM.div({className: this.state.loading ? 'loading' : ''},
       React.createElement(ProgressBar, {ref: 'progress'}),
@@ -186,8 +205,8 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
         currentPage: parseInt(this.props.params.page, 10) || 1,
         pages: this.state.pages,
         commits: this.state.commits,
-        onUndo: this.undoCommit.bind(this),
-        onRollback: this.rollbackToCommit.bind(this)
+        onUndo: this.onUndo,
+        onRollback: this.onRollback
       })
     );
   }

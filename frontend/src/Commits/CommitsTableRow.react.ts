@@ -32,7 +32,8 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, any>  {
               className: 'vp-table-undo',
               href: '#',
               onClick: this.props.onUndo,
-              'data-hash': commit.hash
+              'data-hash': commit.hash,
+              'data-message': commit.message
             }, 'Undo this')
           : '',
         commit.canRollback && commit.isEnabled
@@ -40,7 +41,8 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, any>  {
               className: 'vp-table-rollback',
               href: '#',
               onClick: this.props.onRollback,
-              'data-hash': commit.hash
+              'data-hash': commit.hash,
+              'data-date': commit.date
             }, 'Roll back to this')
           : ''
       )

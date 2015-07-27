@@ -44,6 +44,9 @@ class VersionPressApi {
         $routes[$this->base . '/rollback'] = array(
             array(array($this, 'rollbackToCommit'), \WP_JSON_Server::READABLE),
         );
+        $routes[$this->base . '/can-revert'] = array(
+            array(array($this, 'canRevert'), \WP_JSON_Server::READABLE),
+        );
         $routes[$this->base . '/submit-bug'] = array(
             array(array($this, 'submitBug'), \WP_JSON_Server::CREATABLE | \WP_JSON_Server::ACCEPT_JSON),
         );
@@ -115,6 +118,19 @@ class VersionPressApi {
      */
     public function rollbackToCommit($commit) {
         return $this->revertCommit('rollback', $commit);
+    }
+
+    /**
+     * @return boolean|\WP_Error
+     */
+    public function canRevert() {
+        global $versionPressContainer;
+        /** @var GitRepository $repository */
+        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+        /** @var Reverter $reverter */
+        $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
+
+        return $reverter->canRevert();
     }
 
     /**
