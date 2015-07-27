@@ -33,7 +33,7 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, any>  {
               href: '#',
               onClick: this.props.onUndo,
               'data-hash': commit.hash
-            }, 'Undo')
+            }, 'Undo this')
           : '',
         commit.canRollback && commit.isEnabled
           ? DOM.a({
@@ -41,7 +41,7 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, any>  {
               href: '#',
               onClick: this.props.onRollback,
               'data-hash': commit.hash
-            }, 'Rollback to commit')
+            }, 'Roll back to this')
           : ''
       )
     );

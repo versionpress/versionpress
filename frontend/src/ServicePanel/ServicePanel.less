@@ -106,13 +106,22 @@
   }
 
   &-input {
-    line-height: 1.5;
-    width: 300px;
-    padding: 5px;
+    input,
+    textarea {
+      line-height: 1.5;
+      width: 300px;
+      padding: 5px;
+      display: block;
+    }
 
-    textarea& {
+    textarea {
       height: 6em;
       resize: none;
+    }
+
+    &[data-description]:after {
+      display: block;
+      content: attr(data-description);
     }
   }
 }

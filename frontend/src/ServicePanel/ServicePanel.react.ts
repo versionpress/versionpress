@@ -43,25 +43,26 @@ class ServicePanel extends React.Component<ServicePanelProps, any> {
             className: 'ServicePanel-label',
             htmlFor: 'ServicePanel-email'
           }, 'Email'),
-          DOM.input({
-            className: 'ServicePanel-input',
-            id: 'ServicePanel-email',
-            name: 'email',
-            type: 'email',
-            dataDescription: 'We will respond you to this email.'
-          })
+          DOM.div({className: 'ServicePanel-input', 'data-description': 'We will respond you to this email.'},
+            DOM.input({
+              id: 'ServicePanel-email',
+              name: 'email',
+              type: 'email'
+            })
+          )
         ),
         DOM.div({className: 'ServicePanel-row'},
           DOM.label({
             className: 'ServicePanel-label',
             htmlFor: 'ServicePanel-description'
           }, 'Bug description'),
-          DOM.textarea({
-            className: 'ServicePanel-input',
-            name: 'description',
-            id: 'ServicePanel-description',
-            dataDescription: 'Please tell us what you were doing when the bug occured.'
-          })
+          DOM.div({className: 'ServicePanel-input', 'data-description': 'Please tell us what you were doing when the bug occured.'},
+            DOM.textarea({
+              className: 'ServicePanel-input',
+              name: 'description',
+              id: 'ServicePanel-description'
+            })
+          )
         ),
         DOM.input({
           className: 'button submit',
