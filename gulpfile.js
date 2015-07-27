@@ -283,9 +283,20 @@ gulp.task('init-project-settings-files', function() {
 /**
  * Inits the frontend project.
  */
-gulp.task('init-frontend', shell.task([
-    'npm install'
-], {cwd: frontendDir}));
+gulp.task('init-frontend', function() {
+    var configPath = frontendDir + '/src/config.local.sample.ts';
+    var targetName = configPath.replace('.sample', '');
+    if (fs.existsSync(targetName)) {
+        targetName = configPath;
+    }
+
+    return gulp.src(configPath)
+        .pipe(rename(targetName))
+        .pipe(gulp.dest('.'))
+        .pipe(shell([
+            'npm install'
+        ], {cwd: frontendDir}));
+});
 
 /**
  * Sets git to be case sensitive.
