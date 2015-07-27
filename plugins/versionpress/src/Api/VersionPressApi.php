@@ -36,16 +36,16 @@ class VersionPressApi {
      */
     public function register_routes($routes = array()) {
         $routes[$this->base . '/commits'] = array(
-            array( array( $this, 'getCommits' ), \WP_JSON_Server::READABLE ),
+            array(array($this, 'getCommits'), \WP_JSON_Server::READABLE),
         );
         $routes[$this->base . '/undo'] = array(
-            array( array( $this, 'undoCommit' ), \WP_JSON_Server::READABLE ),
+            array(array($this, 'undoCommit'), \WP_JSON_Server::READABLE),
         );
         $routes[$this->base . '/rollback'] = array(
-            array( array( $this, 'rollbackToCommit' ), \WP_JSON_Server::READABLE ),
+            array(array($this, 'rollbackToCommit'), \WP_JSON_Server::READABLE),
         );
         $routes[$this->base . '/submit-bug'] = array(
-            array( array( $this, 'submitBug' ), \WP_JSON_Server::CREATABLE | \WP_JSON_Server::ACCEPT_JSON ),
+            array(array($this, 'submitBug'), \WP_JSON_Server::CREATABLE | \WP_JSON_Server::ACCEPT_JSON),
         );
         return $routes;
     }
@@ -140,7 +140,7 @@ class VersionPressApi {
     }
 
     /**
-     * @param array[string] $data
+     * @param string[] $data
      * @return boolean|\WP_Error
      */
     public function submitBug($data) {
