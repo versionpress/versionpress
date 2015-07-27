@@ -12,3 +12,6 @@
 /typings/*
 !/typings/typings.d.ts
 !/typings/es6.d.ts
+
+# Local config files
+/src/config.local.ts

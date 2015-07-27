@@ -1,5 +1,7 @@
+import localConfig = require('./config.local');
+
 var config = {
-  apiBaseUrl: 'http://localhost/agilio/wordpress/wp-json/versionpress',
+  apiBaseUrl: window['apiBaseUrl'] || localConfig['apiBaseUrl'] || '',
   routes: {
     page: 'page',
     home: 'home',
