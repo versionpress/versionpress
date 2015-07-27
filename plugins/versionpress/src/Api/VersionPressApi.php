@@ -60,6 +60,8 @@ class VersionPressApi {
         $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
         $gitLogPaginator = new GitLogPaginator($repository);
         $gitLogPaginator->setCommitsPerPage(25);
+
+        $page = intval($page);
         $commits = $gitLogPaginator->getPage($page);
 
         if(empty($commits)) {
