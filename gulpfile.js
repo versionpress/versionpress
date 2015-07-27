@@ -153,7 +153,7 @@ gulp.task('frontend-build', shell.task([
  */
 gulp.task('frontend-deploy', ['copy', 'frontend-build'], function(cb) {
     var src = frontendDir + '/build/**';
-    var dist = buildDir + '/admin/build';
+    var dist = buildDir + '/admin/public/gui';
     var srcOptions = {dot: true};
     return gulp.src(src, srcOptions).pipe(gulp.dest(dist));
 });
