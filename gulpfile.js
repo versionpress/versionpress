@@ -232,7 +232,7 @@ gulp.task('clean-build', ['zip'], function (cb) {
  * Installs Composer external libs.
  */
 gulp.task('composer-install-ext-libs', function() {
-    return composer({ cwd: './ext-libs', bin: 'composer'});
+    return composer('update', { cwd: './ext-libs', bin: 'composer'});
 });
 
 /**
