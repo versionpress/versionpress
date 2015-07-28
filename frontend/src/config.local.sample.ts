@@ -2,6 +2,8 @@
 
 var config = {
 
+  apiBaseUrl: 'http://localhost/wordpress/wp-json/versionpress'
+
 };
 
 export = config;
