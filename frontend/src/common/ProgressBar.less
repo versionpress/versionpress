@@ -1,0 +1,45 @@
+@color: #2299dd;
+@zIndex: 1031;
+
+.ProgressBar {
+  pointer-events: none;
+
+  .hide {
+    display: none;
+  }
+
+  &-bar {
+    background: @color;
+    position: fixed;
+    z-index: @zIndex;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    transition: all 200ms ease;
+  }
+
+  &-spinner {
+    display: block;
+    position: fixed;
+    z-index: @zIndex;
+    top: 15px;
+    right: 30px;
+
+    &-icon {
+      width: 18px;
+      height: 18px;
+      border: solid 2px transparent;
+      border-top-color: @color;
+      border-left-color: @color;
+      border-radius: 50%;
+
+      animation: ProgressBarSpinner 400ms linear infinite;
+    }
+  }
+}
+
+@keyframes ProgressBarSpinner {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

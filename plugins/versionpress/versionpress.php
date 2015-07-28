@@ -9,6 +9,7 @@ Author URI: http://versionpress.net/
 License: GPLv2 or later
 */
 
+use VersionPress\Api\VersionPressApi;
 use VersionPress\ChangeInfos\PluginChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\VersionPressChangeInfo;
@@ -778,3 +779,34 @@ if (is_admin()) {
     wp_enqueue_script('versionpress_popover_script', plugins_url('admin/public/js/jquery.webui-popover.min.js', __FILE__), 'jquery');
     wp_enqueue_script('versionpress_admin_script', plugins_url( 'admin/public/js/vp-admin.js' , __FILE__ ));
 }
+
+//---------------------------------
+// API
+//---------------------------------
+header("Access-Control-Allow-Headers: origin, content-type, accept");
+
+add_filter('allowed_http_origin', '__return_true');
+
+add_filter('wp_headers', 'vp_send_cors_headers', 11, 1);
+function vp_send_cors_headers($headers) {
+    $headers['Access-Control-Allow-Origin'] = get_http_origin();
+    $headers['Access-Control-Allow-Credentials'] = 'true';
+
+    if ('OPTIONS' == $_SERVER['REQUEST_METHOD']) {
+        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
+            $headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
+        }
+
+        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
+            $headers['Access-Control-Allow-Headers'] = $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'];
+        }
+    }
+    return $headers;
+}
+
+function versionpress_api_init($server) {
+    global $vpApi;
+    $vpApi = new VersionPressApi($server);
+    add_filter('json_endpoints', array($vpApi, 'register_routes'));
+}
+add_action('wp_json_server_before_serve', 'versionpress_api_init');

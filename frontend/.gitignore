@@ -1,0 +1,17 @@
+# IDEA project files
+/.idea/workspace.xml
+/.idea/tasks.xml
+/.idea/dictionaries
+/.idea/watcherTasks.xml
+
+# Build dirs
+/build
+/node_modules
+
+# TypeScript definition files
+/typings/*
+!/typings/typings.d.ts
+!/typings/es6.d.ts
+
+# Local config files
+/src/config.local.ts
