@@ -19,8 +19,9 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, any>  {
       return DOM.tr(null);
     }
     const commit = this.props.commit;
+    const className = 'alternate ' + (commit.isEnabled ? '' : 'disabled');
 
-    return DOM.tr({className: (commit.isEnabled ? '' : 'disabled')},
+    return DOM.tr({className: className},
       DOM.td({
         className: 'column-date',
         title: moment(commit.date).format('LLL')
