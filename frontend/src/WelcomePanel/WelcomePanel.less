@@ -8,3 +8,39 @@
     margin: 23px 0 10px;
   }
 }
+
+.welcome-panel .about-description {
+  margin: 23px 0 10px;
+}
+
+.welcome-panel-close {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  padding: 20px 15px 0 3px;
+  font-size: 13px;
+  text-decoration: none;
+  line-height: 1;
+
+  &:before {
+    position: absolute;
+    left: -18px;
+    margin: 0;
+    margin-top: -2px;
+    transition: all .1s ease-in-out;
+    background: 0 0;
+    color: #bbb;
+    content: '\f153';
+    display: block !important;
+    font: 400 16px/1 'dashicons';
+    speak: none;
+    height: 20px;
+    text-align: center;
+    width: 20px;
+    -webkit-font-smoothing: antialiased !important;
+  }
+
+  &:hover:before {
+    color: #c00;
+  }
+}
