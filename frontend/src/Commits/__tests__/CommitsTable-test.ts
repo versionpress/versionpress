@@ -50,22 +50,4 @@ describe('CommitsTable', () => {
     expect(pagination[0].props.children.length).to.equal(props.pages.length);
   });
 
-  it('should render the next page link correctly', () => {
-    props.currentPage = props.pages[0];
-    const component = utils.render(React.createElement(CommitsTable, props));
-    const pagination = utils.getChildrenByClass(component, 'vp-table-pagination-actions', 3);
-    expect(pagination.length).to.equal(1);
-    const children = pagination[0].props.children.filter(c => c);
-    expect(children.length).to.equal(1);
-  });
-
-  it('should render the prev page link correctly', () => {
-    props.currentPage = props.pages[props.pages.length - 1];
-    const component = utils.render(React.createElement(CommitsTable, props));
-    const pagination = utils.getChildrenByClass(component, 'vp-table-pagination-actions', 3);
-    expect(pagination.length).to.equal(1);
-    const children = pagination[0].props.children.filter(c => c);
-    expect(children.length).to.equal(1);
-  });
-
 });

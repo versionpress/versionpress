@@ -22,9 +22,6 @@ interface CommitsTableProps {
 class CommitsTable extends React.Component<CommitsTableProps, any>  {
 
   render() {
-    const prevPage = this.props.currentPage - 1;
-    const nextPage = this.props.currentPage + 1;
-
     return DOM.table({className: 'vp-table widefat fixed'},
       DOM.thead(null,
         DOM.tr(null,
@@ -45,7 +42,7 @@ class CommitsTable extends React.Component<CommitsTableProps, any>  {
       ),
       DOM.tfoot(null,
         DOM.tr(null,
-          DOM.td({className: 'vp-table-pagination', colSpan: 2},
+          DOM.td({className: 'vp-table-pagination', colSpan: 3},
             this.props.pages.map((page: number) => {
               return React.createElement(ReactRouter.Link, <ReactRouter.LinkProp> {
                 activeClassName: 'active',
@@ -58,28 +55,6 @@ class CommitsTable extends React.Component<CommitsTableProps, any>  {
                   : { page: page }
               }, page);
             })
-          ),
-          DOM.td({className: 'vp-table-pagination-actions'},
-            this.props.pages.indexOf(prevPage) !== -1
-              ? React.createElement(ReactRouter.Link, <ReactRouter.LinkProp> {
-                to: prevPage === 1
-                  ? routes.home
-                  : routes.page,
-                params: prevPage === 1
-                  ? null
-                  : { page: prevPage }
-              }, '< prev')
-              : null,
-            this.props.pages.indexOf(nextPage) !== -1
-              ? React.createElement(ReactRouter.Link, <ReactRouter.LinkProp> {
-                to: nextPage === 1
-                  ? routes.home
-                  : routes.page,
-                params: nextPage === 1
-                  ? null
-                  : { page: nextPage }
-              }, 'next >')
-              : null
           )
         )
       )
