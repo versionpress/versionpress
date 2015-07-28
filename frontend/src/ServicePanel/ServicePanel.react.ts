@@ -28,47 +28,49 @@ class ServicePanel extends React.Component<ServicePanelProps, any> {
   }
 
   render() {
-    const className = 'ServicePanel welcome-panel' + (this.props.display ? '' : ' hide');
+    const className = 'ServicePanel-wrapper' + (this.props.display ? '' : ' ServicePanel-wrapper--hide');
 
     return DOM.div({className: className},
-      DOM.h3(null, 'VersionPress Service Panel'),
-      DOM.h4(null, 'Bug report'),
-      DOM.form({
-        action: '',
-        method: 'post',
-        onSubmit: this.onSubmit.bind(this)
-      },
-        DOM.div({className: 'ServicePanel-row'},
-          DOM.label({
-            className: 'ServicePanel-label',
-            htmlFor: 'ServicePanel-email'
-          }, 'Email'),
-          DOM.div({className: 'ServicePanel-input', 'data-description': 'We will respond you to this email.'},
-            DOM.input({
-              id: 'ServicePanel-email',
-              name: 'email',
-              type: 'email'
-            })
-          )
-        ),
-        DOM.div({className: 'ServicePanel-row'},
-          DOM.label({
-            className: 'ServicePanel-label',
-            htmlFor: 'ServicePanel-description'
-          }, 'Bug description'),
-          DOM.div({className: 'ServicePanel-input', 'data-description': 'Please tell us what you were doing when the bug occured.'},
-            DOM.textarea({
-              className: 'ServicePanel-input',
-              name: 'description',
-              id: 'ServicePanel-description'
-            })
-          )
-        ),
-        DOM.input({
-          className: 'button submit',
-          type: 'submit',
-          value: 'Send bug report'
-        })
+      DOM.div({className: 'ServicePanel welcome-panel'},
+        DOM.h3(null, 'VersionPress Service Panel'),
+        DOM.h4(null, 'Bug report'),
+        DOM.form({
+          action: '',
+          method: 'post',
+          onSubmit: this.onSubmit.bind(this)
+        },
+          DOM.div({className: 'ServicePanel-row'},
+            DOM.label({
+              className: 'ServicePanel-label',
+              htmlFor: 'ServicePanel-email'
+            }, 'Email'),
+            DOM.div({className: 'ServicePanel-input', 'data-description': 'We will respond you to this email.'},
+              DOM.input({
+                id: 'ServicePanel-email',
+                name: 'email',
+                type: 'email'
+              })
+            )
+          ),
+          DOM.div({className: 'ServicePanel-row'},
+            DOM.label({
+              className: 'ServicePanel-label',
+              htmlFor: 'ServicePanel-description'
+            }, 'Bug description'),
+            DOM.div({className: 'ServicePanel-input', 'data-description': 'Please tell us what you were doing when the bug occured.'},
+              DOM.textarea({
+                className: 'ServicePanel-input',
+                name: 'description',
+                id: 'ServicePanel-description'
+              })
+            )
+          ),
+          DOM.input({
+            className: 'button submit',
+            type: 'submit',
+            value: 'Send bug report'
+          })
+        )
       )
     );
   }
