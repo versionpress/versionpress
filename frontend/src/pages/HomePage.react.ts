@@ -9,6 +9,7 @@ import FlashMessage = require('../common/FlashMessage.react');
 import ProgressBar = require('../common/ProgressBar.react');
 import ServicePanel = require('../ServicePanel/ServicePanel.react');
 import ServicePanelButton = require('../ServicePanel/ServicePanelButton.react');
+import WelcomePanel = require('../WelcomePanel/WelcomePanel.react');
 import revertDialog = require('../Commits/revertDialog');
 import moment = require('moment');
 import config = require('../config');
@@ -34,6 +35,7 @@ interface HomePageState {
   };
   loading?: boolean;
   displayServicePanel?: boolean;
+  displayWelcomePanel?: boolean;
 }
 
 class HomePage extends React.Component<HomePageProps, HomePageState> {
@@ -45,7 +47,8 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       commits: [],
       message: null,
       loading: true,
-      displayServicePanel: false
+      displayServicePanel: false,
+      displayWelcomePanel: false
     };
 
     this.onUndo = this.onUndo.bind(this);
@@ -53,14 +56,15 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   }
 
   componentDidMount() {
-    this.fetchData();
+    this.fetchWelcomePanel();
+    this.fetchCommits();
   }
 
   componentWillReceiveProps(nextProps: HomePageProps) {
-    this.fetchData(nextProps.params);
+    this.fetchCommits(nextProps.params);
   }
 
-  fetchData(params = this.props.params) {
+  fetchCommits(params = this.props.params) {
     this.setState({ loading: true });
     const progressBar = <ProgressBar> this.refs['progress'];
     progressBar.progress(0);
@@ -94,6 +98,23 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       });
   }
 
+  fetchWelcomePanel() {
+    request
+      .get(config.apiBaseUrl + '/display-welcome-panel')
+      .accept('application/json')
+      .end((err: any, res: request.Response) => {
+        if (res.body) {
+          this.setState({
+            displayWelcomePanel: true
+          });
+        } else {
+          this.setState({
+            displayWelcomePanel: false
+          });
+        }
+      });
+  }
+
   undoCommit(hash: string) {
     const progressBar = <ProgressBar> this.refs['progress'];
     progressBar.progress(0);
@@ -110,7 +131,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
             loading: false
           });
         } else {
-          this.fetchData();
+          this.fetchCommits();
         }
       });
   }
@@ -131,7 +152,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
             loading: false
           });
         } else {
-          this.fetchData();
+          this.fetchCommits();
         }
       });
   }
@@ -187,6 +208,22 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     revertDialog.revertDialog.call(this, title, () => this.rollbackToCommit(hash));
   }
 
+  onWelcomePanelHide(e) {
+    e.preventDefault();
+    const progressBar = <ProgressBar> this.refs['progress'];
+    progressBar.progress(0);
+
+    request
+      .post(config.apiBaseUrl + '/hide-welcome-panel')
+      .accept('application/json')
+      .on('progress', (e) => progressBar.progress(e.percent))
+      .end((err: any, res: request.Response) => {
+        this.setState({
+          displayWelcomePanel: false
+        });
+      });
+  }
+
   render() {
     return DOM.div({className: this.state.loading ? 'loading' : ''},
       React.createElement(ProgressBar, {ref: 'progress'}),
@@ -201,6 +238,9 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
         display: this.state.displayServicePanel,
         onSubmit: this.sendBugReport.bind(this)
       }),
+      this.state.displayWelcomePanel
+        ? React.createElement(WelcomePanel, <WelcomePanel.Props>{ onHide: this.onWelcomePanelHide.bind(this) })
+        : null,
       React.createElement(CommitsTable, <CommitsTable.Props>{
         currentPage: parseInt(this.props.params.page, 10) || 1,
         pages: this.state.pages,

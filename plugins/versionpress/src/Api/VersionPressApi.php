@@ -8,6 +8,7 @@ use VersionPress\Git\GitLogPaginator;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
+use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Utils\BugReporter;
 
 class VersionPressApi {
@@ -49,6 +50,12 @@ class VersionPressApi {
         );
         $routes[$this->base . '/submit-bug'] = array(
             array(array($this, 'submitBug'), \WP_JSON_Server::CREATABLE | \WP_JSON_Server::ACCEPT_JSON),
+        );
+        $routes[$this->base . '/display-welcome-panel'] = array(
+            array(array($this, 'displayWelcomePanel'), \WP_JSON_Server::READABLE),
+        );
+        $routes[$this->base . '/hide-welcome-panel'] = array(
+            array(array($this, 'hideWelcomePanel'), \WP_JSON_Server::CREATABLE | \WP_JSON_Server::ACCEPT_JSON),
         );
         return $routes;
     }
@@ -175,6 +182,22 @@ class VersionPressApi {
                 array('status' => 403)
             );
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function displayWelcomePanel() {
+        $showWelcomePanel = get_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, true);
+        return $showWelcomePanel === "";
+    }
+
+    /**
+     * @return bool
+     */
+    public function hideWelcomePanel() {
+        update_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, "0");
+        return true;
     }
 
     /**
