@@ -103,7 +103,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       .get(config.apiBaseUrl + '/display-welcome-panel')
       .accept('application/json')
       .end((err: any, res: request.Response) => {
-        if (res.body) {
+        if (res) {
           this.setState({
             displayWelcomePanel: true
           });
@@ -210,18 +210,15 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
 
   onWelcomePanelHide(e) {
     e.preventDefault();
-    const progressBar = <ProgressBar> this.refs['progress'];
-    progressBar.progress(0);
+
+    this.setState({
+      displayWelcomePanel: false
+    });
 
     request
       .post(config.apiBaseUrl + '/hide-welcome-panel')
       .accept('application/json')
-      .on('progress', (e) => progressBar.progress(e.percent))
-      .end((err: any, res: request.Response) => {
-        this.setState({
-          displayWelcomePanel: false
-        });
-      });
+      .end((err: any, res: request.Response) => {});
   }
 
   render() {
