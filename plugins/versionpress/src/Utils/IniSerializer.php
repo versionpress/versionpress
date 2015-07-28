@@ -25,6 +25,26 @@ namespace VersionPress\Utils;
  */
 class IniSerializer {
 
+    private static $sanitizedChars = array(
+        "[" => "<<<lbrac>>>",
+        "]" => "<<<rbrac>>>",
+        "\"" => "<<<dblquot>>>",
+        "'" => "<<<quot>>>",
+        ";" => "<<<semicol>>>",
+        "$" => "<<<string>>>",
+        "&" => "<<<amp>>>",
+        "~" => "<<<tilde>>>",
+        "^" => "<<<power>>>",
+        "!" => "<<<exclmark>>>",
+        "(" => "<<<lparent>>>",
+        ")" => "<<<rparent>>>",
+        "{" => "<<<lcurly>>>",
+        "}" => "<<<rcurly>>>",
+        "|" => "<<<pipe>>>",
+        "\t" => "<<<tab>>>",
+        "=" => "<<<eq>>>",
+    );
+
     /**
      * Serializes sectioned data array into an INI string
      *
@@ -144,9 +164,11 @@ class IniSerializer {
     }
 
     public static function deserializeFlat($string) {
+        $string = self::sanitizeSectionsAndKeys_addPlaceholders($string);
         $string = self::eolWorkaround_addPlaceholders($string);
         $deserialized = parse_ini_string($string, true);
         $deserialized = self::eolWorkaround_removePlaceholders($deserialized);
+        $deserialized = self::sanitizeSectionsAndKeys_removePlaceholders($deserialized);
         return $deserialized;
     }
 
@@ -311,4 +333,35 @@ class IniSerializer {
         return $returnArray;
     }
 
+    private static function sanitizeSectionsAndKeys_addPlaceholders($string) {
+        $sanitizedChars = self::$sanitizedChars;
+        // Replace brackets in section names
+        // https://regex101.com/r/bT2nO7/2
+        $string = preg_replace_callback("/^\\[(.*)\\]/m", function ($match) use ($sanitizedChars) {
+            $sectionWithPlaceholders = strtr($match[1], $sanitizedChars);
+            return "[$sectionWithPlaceholders]";
+        }, $string);
+
+        // Replace brackets and quotes in keys
+        // https://regex101.com/r/iD5oO0/2
+        $string = preg_replace_callback("/^(.*?)(\\[[^\\]]*\\])? = /m", function ($match) use ($sanitizedChars) {
+            $keyWithPlaceholders = strtr($match[1], $sanitizedChars);
+            return $keyWithPlaceholders . (isset($match[2]) ? $match[2] : "") . " = ";
+        }, $string);
+
+        return $string;
+    }
+
+    private static function sanitizeSectionsAndKeys_removePlaceholders($deserialized) {
+        $result = array();
+        foreach ($deserialized as $key => $value) {
+            $key = strtr($key, array_flip(self::$sanitizedChars));
+            if (is_array($value)) {
+                $result[$key] = self::sanitizeSectionsAndKeys_removePlaceholders($value);
+            } else {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
 }
