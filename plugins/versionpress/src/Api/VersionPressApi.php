@@ -106,7 +106,7 @@ class VersionPressApi {
 
     /**
      * @param string $commit
-     * @return boolean|\WP_Error
+     * @return bool|\WP_Error
      */
     public function undoCommit($commit) {
         return $this->revertCommit('undo', $commit);
@@ -114,14 +114,14 @@ class VersionPressApi {
 
     /**
      * @param string $commit
-     * @return boolean|\WP_Error
+     * @return bool|\WP_Error
      */
     public function rollbackToCommit($commit) {
         return $this->revertCommit('rollback', $commit);
     }
 
     /**
-     * @return boolean|\WP_Error
+     * @return bool|\WP_Error
      */
     public function canRevert() {
         global $versionPressContainer;
@@ -136,7 +136,7 @@ class VersionPressApi {
     /**
      * @param string $reverterMethod
      * @param string $commit
-     * @return boolean|\WP_Error
+     * @return bool|\WP_Error
      */
     public function revertCommit($reverterMethod, $commit) {
         global $versionPressContainer;
@@ -157,7 +157,7 @@ class VersionPressApi {
 
     /**
      * @param string[] $data
-     * @return boolean|\WP_Error
+     * @return bool|\WP_Error
      */
     public function submitBug($data) {
         $email = $data['email'];
