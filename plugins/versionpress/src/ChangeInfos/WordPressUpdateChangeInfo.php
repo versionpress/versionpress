@@ -65,6 +65,9 @@ class WordPressUpdateChangeInfo extends TrackedChangeInfo {
     public function getChangedFiles() {
         $adminPath = str_replace( get_bloginfo( 'url' ) . '/', ABSPATH, get_admin_url() ); // https://gist.github.com/andrezrv/f7a083627f3bd89c3d9e
         return array(
+            // All files from WP root
+            // Git can't add only files from current directory (non-recursively), so we have to add them manually.
+            // It should be OK because the list of files didn't change since at least Jan 2013.
             array("type" => "path", "path" => "index.php"),
             array("type" => "path", "path" => "license.txt"),
             array("type" => "path", "path" => "readme.html"),
@@ -81,8 +84,12 @@ class WordPressUpdateChangeInfo extends TrackedChangeInfo {
             array("type" => "path", "path" => "wp-signup.php"),
             array("type" => "path", "path" => "wp-trackback.php"),
             array("type" => "path", "path" => "xmlrpc.php"),
+
+            // wp-includes and wp-admin directories
             array("type" => "path", "path" => ABSPATH . WPINC . '/*'),
             array("type" => "path", "path" => $adminPath . '*'),
+
+            // WP themes - we bet that all WP themes begin with "twenty"
             array("type" => "path", "path" => WP_CONTENT_DIR . '/themes/twenty*'),
         );
     }
