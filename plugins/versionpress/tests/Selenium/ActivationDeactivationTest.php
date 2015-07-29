@@ -39,7 +39,7 @@ class ActivationDeactivationTest extends SeleniumTestCase {
 
         $this->waitForElement('.plugins-php #message.updated');
 
-        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/db.php');
+        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-includes/wpdb.php.original');
         $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/plugins/versionpress');
         $this->assertFileNotExists(self::$testConfig->testSite->path . '/.git');
     }
@@ -81,15 +81,25 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * @test
      * @depends visitingVersionPressScreenShowsInitializationInformation
      */
-    public function successfulActivationRedirectsToMainVersionPressTable() {
+    public function successfulActivationRedirectsToMainVersionPressTableAndAltersWpdbClass() {
+        $wpdbFile = self::$testConfig->testSite->path . '/wp-includes/wp-db.php';
+        $wpdbOriginalFile = $wpdbFile . '.original';
+        $this->assertFileNotExists($wpdbOriginalFile);
+        $hashBeforeInit = md5_file($wpdbFile);
+
         $this->byCssSelector('#activate-versionpress-btn')->click();
         $this->waitAfterRedirect(30000);
         $this->waitForElement('#versionpress-commits-table', InitializationConfig::REDIRECT_AFTER_MS + 3000);
+
+        $hashAfterInit = md5_file($wpdbFile);
+        $hashOfOriginal = md5_file($wpdbOriginalFile);
+        $this->assertNotEquals($hashBeforeInit, $hashAfterInit);
+        $this->assertEquals($hashBeforeInit, $hashOfOriginal);
     }
 
     /**
      * @test
-     * @depends successfulActivationRedirectsToMainVersionPressTable
+     * @depends successfulActivationRedirectsToMainVersionPressTableAndAltersWpdbClass
      */
     public function afterActivationTheFilesystemMatchDatabase() {
         DBAsserter::assertFilesEqualDatabase();
@@ -172,7 +182,7 @@ class ActivationDeactivationTest extends SeleniumTestCase {
         $this->byCssSelector('#confirm_deactivation')->click();
         $this->assertContains('wp-admin/plugins.php', $this->url());
 
-        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/db.php');
+        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-includes/wpdb.php.original');
         $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/vpdb');
         $this->assertFileExists(self::$testConfig->testSite->path . '/.git');
 
@@ -202,7 +212,7 @@ class ActivationDeactivationTest extends SeleniumTestCase {
 
         $this->waitForElement('.plugins-php #message.updated');
 
-        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/db.php');
+        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-includes/wpdb.php.original');
         $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/plugins/versionpress');
         $this->assertFileNotExists(self::$testConfig->testSite->path . '/.git');
 
