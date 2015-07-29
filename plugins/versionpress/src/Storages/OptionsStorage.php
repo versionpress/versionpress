@@ -40,22 +40,20 @@ class OptionsStorage extends SingleFileStorage {
     }
 
     protected function loadEntities() {
-        if (is_file($this->file)) {
-            $entitiesWithPlaceholders = IniSerializer::deserializeFlat(file_get_contents($this->file));
-            $entities = array();
+        parent::loadEntities();
 
-            foreach ($entitiesWithPlaceholders as $id => $entity) {
-                $entities[$this->maybeReplacePlaceholderWithPrefix($id)] = $entity;
-            }
+        $entitiesWithPlaceholders = $this->entities;
+        $entities = array();
 
-            foreach ($entities as $id => &$entity) {
-                $entity[$this->entityInfo->vpidColumnName] = $id;
-            }
-
-            $this->entities = $entities;
-        } else {
-            $this->entities = array();
+        foreach ($entitiesWithPlaceholders as $id => $entity) {
+            $entities[$this->maybeReplacePlaceholderWithPrefix($id)] = $entity;
         }
+
+        foreach ($entities as $id => &$entity) {
+            $entity[$this->entityInfo->vpidColumnName] = $id;
+        }
+
+        $this->entities = $entities;
     }
 
     private function isTransientOption($id) {

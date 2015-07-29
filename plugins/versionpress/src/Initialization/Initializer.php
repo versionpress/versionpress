@@ -6,6 +6,10 @@ use VersionPress\ChangeInfos\VersionPressChangeInfo;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Git\GitConfig;
 use VersionPress\Git\GitRepository;
+use VersionPress\Storages\DirectoryStorage;
+use VersionPress\Storages\MetaEntityStorage;
+use VersionPress\Storages\SingleFileStorage;
+use VersionPress\Storages\Storage;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\ArrayUtils;
@@ -200,20 +204,63 @@ class Initializer {
      */
     private function saveEntitiesOfTypeToStorage($entityName) {
         $storage = $this->storageFactory->getStorage($entityName);
-        $entities = $this->database->get_results("SELECT * FROM {$this->getTableName($entityName)}", ARRAY_A);
+
+        $entities = $this->getEntitiesFromDatabase($entityName);
         $entities = $this->replaceForeignKeysWithReferencesInAllEntities($entityName, $entities);
 
-        $entities = array_filter($entities, function ($entity) use ($storage) {
+        $entities = array_values(array_filter($entities, function ($entity) use ($storage) {
             return $storage->shouldBeSaved($entity);
-        });
+        }));
+
         $entities = $this->extendEntitiesWithVpids($entityName, $entities);
         $entities = $this->doEntitySpecificActions($entityName, $entities);
         $storage->prepareStorage();
+
+        if ($storage instanceof DirectoryStorage) {
+            $this->saveDirectoryStorageEntities($storage, $entities);
+        }
+
+        if ($storage instanceof SingleFileStorage) {
+            $this->saveSingleFileStorageEntities($storage, $entities);
+        }
+
+        if ($storage instanceof MetaEntityStorage) {
+            $entityInfo = $this->dbSchema->getEntityInfo($entityName);
+            $parentReference = "vp_" . key($entityInfo->references);
+
+            $this->saveMetaEntities($storage, $entities, $parentReference);
+        }
+    }
+
+    private function saveDirectoryStorageEntities(DirectoryStorage $storage, $entities) {
         foreach ($entities as $entity) {
             $storage->save($entity);
             $this->checkTimeout();
         }
+    }
 
+    private function saveSingleFileStorageEntities(SingleFileStorage $storage, $entities) {
+        foreach ($entities as $entity) {
+            $storage->saveLater($entity);
+        }
+        $storage->commit();
+        $this->checkTimeout();
+    }
+
+    private function saveMetaEntities(MetaEntityStorage $storage, $entities, $parentReference) {
+        if (count($entities) == 0) {
+            return;
+        }
+
+        $lastParent = $entities[0][$parentReference];
+        foreach ($entities as $entity) {
+            if ($entity[$parentReference] !== $lastParent) {
+                $storage->commit();
+                $this->checkTimeout();
+            }
+            $storage->saveLater($entity);
+        }
+        $storage->commit();
     }
 
     private function replaceForeignKeysWithReferencesInAllEntities($entityName, $entities) {
@@ -457,5 +504,20 @@ class Initializer {
             @unlink(VERSIONPRESS_ACTIVATION_FILE);
         }
         throw new InitializationAbortedException();
+    }
+
+    /**
+     * @param $entityName
+     * @return mixed
+     */
+    private function getEntitiesFromDatabase($entityName) {
+        if ($this->storageFactory->getStorage($entityName) instanceof MetaEntityStorage) {
+            $entityInfo = $this->dbSchema->getEntityInfo($entityName);
+            $parentReference = key($entityInfo->references);
+
+            return $this->database->get_results("SELECT * FROM {$this->getTableName($entityName)} ORDER BY {$parentReference}", ARRAY_A);
+        }
+
+        return $this->database->get_results("SELECT * FROM {$this->getTableName($entityName)}", ARRAY_A);
     }
 }

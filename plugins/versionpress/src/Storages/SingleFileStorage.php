@@ -19,9 +19,9 @@ abstract class SingleFileStorage extends Storage {
     /**
      * All entities from this storage. Available after loadEntities() has been called.
      *
-     * @var array
+     * @var array|null
      */
-    protected $entities;
+    protected $entities = null;
 
     /**
      * Array of fields that should be ignored / not saved in storage
@@ -30,12 +30,17 @@ abstract class SingleFileStorage extends Storage {
      */
     protected $notSavedFields = array();
 
-    function __construct($file, $entityInfo) {
+    private $uncommittedEntities;
+
+    /** @var bool */
+    private $batchMode;
+
+    public function __construct($file, $entityInfo) {
         $this->file = $file;
         $this->entityInfo = $entityInfo;
     }
 
-    function save($data) {
+    public function save($data) {
         if (!$this->shouldBeSaved($data))
             return null;
 
@@ -68,7 +73,7 @@ abstract class SingleFileStorage extends Storage {
 
     }
 
-    function delete($restriction) {
+    public function delete($restriction) {
         if (!$this->shouldBeSaved($restriction)) {
             return null;
         }
@@ -89,22 +94,36 @@ abstract class SingleFileStorage extends Storage {
         }
     }
 
-    function loadEntity($id, $parentId = null) {
+    public function saveLater($data) {
+        $this->uncommittedEntities[] = $data;
+    }
+
+    public function commit() {
+        $this->batchMode = true;
+        foreach ($this->uncommittedEntities as $entity) {
+            $this->save($entity);
+        }
+        $this->batchMode = false;
+        $this->saveEntities();
+        $this->uncommittedEntities = null;
+    }
+
+    public function loadEntity($id, $parentId = null) {
         $this->loadEntities();
         return $this->entities[$id];
     }
 
-    function loadAll() {
+    public function loadAll() {
         $this->loadEntities();
         return $this->entities;
     }
 
-    function exists($id, $parentId = null) {
+    public function exists($id, $parentId = null) {
         $this->loadEntities();
         return isset($this->entities[$id]);
     }
 
-    function prepareStorage() {
+    public function prepareStorage() {
     }
 
     /**
@@ -134,6 +153,10 @@ abstract class SingleFileStorage extends Storage {
      * Loads all entities from a file to the $this->entities if they were not already loaded
      */
     protected function loadEntities() {
+        if ($this->batchMode && $this->entities != null) {
+            return;
+        }
+
         if (is_file($this->file)) {
             $entities = IniSerializer::deserialize(file_get_contents($this->file));
 
@@ -151,6 +174,10 @@ abstract class SingleFileStorage extends Storage {
      * Saves all entities to a file
      */
     protected function saveEntities() {
+        if ($this->batchMode) {
+            return;
+        }
+
         $entities = $this->entities;
         foreach ($entities as &$entity) {
             unset ($entity[$this->entityInfo->vpidColumnName]);
@@ -164,7 +191,7 @@ abstract class SingleFileStorage extends Storage {
         return true;
     }
 
-    function getEntityFilename($id, $parentId = null) {
+    public function getEntityFilename($id, $parentId = null) {
         return $this->file;
     }
 

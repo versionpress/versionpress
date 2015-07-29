@@ -25,6 +25,8 @@ abstract class MetaEntityStorage extends Storage {
     /** @var Storage */
     private $parentStorage;
 
+    private $saveQueue;
+
 
     function __construct(Storage $parentStorage, $keyName, $valueName, $parentReferenceName) {
         $this->parentStorage = $parentStorage;
@@ -35,7 +37,7 @@ abstract class MetaEntityStorage extends Storage {
 
     public function save($data) {
 
-        if (!$this->shouldBeSaved($data) || !$this->parentStorage->exists($data[$this->parentReferenceName], null)) {
+        if (!$this->shouldBeSaved($data)) {
             return null;
         }
 
@@ -76,6 +78,15 @@ abstract class MetaEntityStorage extends Storage {
 
         $this->parentStorage->save($parent);
         return $this->createChangeInfoWithParentEntity($oldEntity, $oldEntity, $oldParentEntity, $newParentEntity, 'delete');
+    }
+
+    public function saveLater($data) {
+        $transformedData = $this->transformToParentEntityField($data);
+        $this->parentStorage->saveLater($transformedData);
+    }
+
+    public function commit() {
+        $this->parentStorage->commit();
     }
 
     public function loadAll() {
