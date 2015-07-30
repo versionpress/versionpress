@@ -56,7 +56,7 @@ if (VersionPress::isActive()) {
 // Replacing wpdb
 //----------------------------------
     register_shutdown_function(function () {
-        if (!WpdbReplacer::isReplaced()) {
+        if (!WpdbReplacer::isReplaced() && !defined('VP_DEACTIVATING')) {
             WpdbReplacer::replaceMethods();
         }
     });
@@ -85,20 +85,6 @@ function vp_register_hooks() {
     /** @var WpdbMirrorBridge $wpdbMirrorBridge */
     $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
 
-
-    if (!defined('VP_DEACTIVATING')) {
-        add_action('wpdb_after_insert', function ($table, $data) use ($wpdbMirrorBridge) {
-            $wpdbMirrorBridge->insert($table, $data);
-        }, 10, 2);
-
-        add_action('wpdb_after_update', function ($table, $data, $where) use ($wpdbMirrorBridge) {
-            $wpdbMirrorBridge->update($table, $data, $where);
-        }, 10, 3);
-
-        add_action('wpdb_after_delete', function ($table, $where) use ($wpdbMirrorBridge) {
-            $wpdbMirrorBridge->delete($table, $where);
-        }, 10, 2);
-    }
 
     /**
      *  Hook for saving taxonomies into files
@@ -512,9 +498,11 @@ function vp_admin_post_confirm_deactivation() {
     global $versionPressContainer;
     /** @var Committer $committer */
     $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
-
     $committer->forceChangeInfo(new VersionPressChangeInfo("deactivate"));
 
+    /** @var WpdbMirrorBridge $wpdbMirrorBridge */
+    $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
+    $wpdbMirrorBridge->disable();
 
 
     global $wpdb;
