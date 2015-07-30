@@ -7,6 +7,10 @@ Many of our early users run VersionPress on dedicated / virtual servers that all
 
 ## Supported hosts
 
+### SiteGround
+
+[SiteGround](https://www.siteground.com/) is a popular WordPress host and it fully supports VersionPress.
+
 ### FastComet
 
 [FastComet](http://www.fastcomet.com/) is an SSD cloud hosting with CloudFlare & 24/7 Premium Support. VersionPress works fine there without needing to do anything else.
