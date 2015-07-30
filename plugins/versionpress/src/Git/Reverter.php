@@ -38,9 +38,9 @@ class Reverter {
     /** @var int */
     const DELETE_ORPHANED_POSTS_SECONDS = 60;
 
-    public function __construct(SynchronizationProcess $synchronizationProcess, wpdb $database, Committer $committer, GitRepository $repository, DbSchemaInfo $dbSchemaInfo, StorageFactory $storageFactory) {
+    public function __construct(SynchronizationProcess $synchronizationProcess, $wpdb, Committer $committer, GitRepository $repository, DbSchemaInfo $dbSchemaInfo, StorageFactory $storageFactory) {
         $this->synchronizationProcess = $synchronizationProcess;
-        $this->database = $database;
+        $this->database = $wpdb;
         $this->committer = $committer;
         $this->repository = $repository;
         $this->dbSchemaInfo = $dbSchemaInfo;

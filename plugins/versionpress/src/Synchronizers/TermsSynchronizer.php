@@ -10,8 +10,8 @@ class TermsSynchronizer extends SynchronizerBase {
 
     private $dbSchema;
 
-    function __construct(Storage $storage, wpdb $database, DbSchemaInfo $dbSchema) {
-        parent::__construct($storage, $database, $dbSchema, 'term');
+    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema) {
+        parent::__construct($storage, $wpdb, $dbSchema, 'term');
         $this->dbSchema = $dbSchema;
     }
 

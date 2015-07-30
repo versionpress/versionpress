@@ -10,8 +10,8 @@ use wpdb;
  * a couple of properties to be set).
  */
 class UsersSynchronizer extends SynchronizerBase {
-    function __construct(Storage $storage, wpdb $database, DbSchemaInfo $dbSchema) {
-        parent::__construct($storage, $database, $dbSchema, 'user');
+    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema) {
+        parent::__construct($storage, $wpdb, $dbSchema, 'user');
     }
 
     protected function filterEntities($entities) {

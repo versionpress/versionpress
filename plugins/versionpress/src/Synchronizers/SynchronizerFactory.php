@@ -31,9 +31,9 @@ class SynchronizerFactory {
         'term_taxonomy' => 'VersionPress\Synchronizers\TermTaxonomySynchronizer',
     );
 
-    function __construct(StorageFactory $storageFactory, wpdb $database, DbSchemaInfo $dbSchema) {
+    function __construct(StorageFactory $storageFactory, $wpdb, DbSchemaInfo $dbSchema) {
         $this->storageFactory = $storageFactory;
-        $this->database = $database;
+        $this->database = $wpdb;
         $this->dbSchema = $dbSchema;
     }
 

@@ -33,9 +33,9 @@ class RequirementsChecker {
         'wp-super-cache' => 'wp-super-cache/wp-cache.php'
     );
 
-    function __construct(wpdb $database, DbSchemaInfo $schema) {
+    function __construct($wpdb, DbSchemaInfo $schema) {
 
-        $this->database = $database;
+        $this->database = $wpdb;
         $this->schema = $schema;
 
         // Markdown can be used in the 'help' field

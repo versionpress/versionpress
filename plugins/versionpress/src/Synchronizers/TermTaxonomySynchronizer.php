@@ -11,9 +11,9 @@ class TermTaxonomySynchronizer extends SynchronizerBase {
     /** @var wpdb */
     private $database;
 
-    function __construct(Storage $storage, wpdb $database, DbSchemaInfo $dbSchema) {
-        parent::__construct($storage, $database, $dbSchema, 'term_taxonomy');
-        $this->database = $database;
+    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema) {
+        parent::__construct($storage, $wpdb, $dbSchema, 'term_taxonomy');
+        $this->database = $wpdb;
     }
 
     function synchronize($task, $entitiesToSynchronize = null) {

@@ -7,7 +7,7 @@ use VersionPress\Storages\Storage;
 use wpdb;
 
 class PostMetaSynchronizer extends SynchronizerBase {
-    function __construct(Storage $storage, wpdb $database, DbSchemaInfo $dbSchema) {
-        parent::__construct($storage, $database, $dbSchema, 'postmeta');
+    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema) {
+        parent::__construct($storage, $wpdb, $dbSchema, 'postmeta');
     }
 }
