@@ -8,15 +8,14 @@ use VersionPress\Utils\EntityUtils;
 
 class CommentStorage extends DirectoryStorage {
     /**
-     * @var ExtendedWpdb
+     * @var \wpdb
      */
     private $database;
 
-    function __construct($directory, $entityInfo, $database) {
+    function __construct($directory, $entityInfo, $wpdb) {
         parent::__construct($directory, $entityInfo);
-        $this->database = $database;
+        $this->database = $wpdb;
     }
-
 
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
 

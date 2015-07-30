@@ -28,8 +28,8 @@ class WpdbMirrorBridge {
      */
     private $vpidRepository;
 
-    function __construct(\wpdb $database, Mirror $mirror, DbSchemaInfo $dbSchemaInfo, VpidRepository $vpidRepository) {
-        $this->database = $database;
+    function __construct($wpdb, Mirror $mirror, DbSchemaInfo $dbSchemaInfo, VpidRepository $vpidRepository) {
+        $this->database = $wpdb;
         $this->mirror = $mirror;
         $this->dbSchemaInfo = $dbSchemaInfo;
         $this->vpidRepository = $vpidRepository;

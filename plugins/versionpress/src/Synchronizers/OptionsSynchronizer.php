@@ -20,9 +20,9 @@ class OptionsSynchronizer implements Synchronizer {
 
     private $tableName;
 
-    function __construct(Storage $optionsStorage, wpdb $database, DbSchemaInfo $dbSchema) {
+    function __construct(Storage $optionsStorage, $wpdb, DbSchemaInfo $dbSchema) {
         $this->optionsStorage = $optionsStorage;
-        $this->database = $database;
+        $this->database = $wpdb;
         $this->tableName = $dbSchema->getPrefixedTableName('option');
     }
 

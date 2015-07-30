@@ -21,12 +21,12 @@ class StorageFactory {
     /**
      * @param string $vpdbDir Path to the `wp-content/vpdb` directory
      * @param DbSchemaInfo $dbSchemaInfo Passed to storages
-     * @param $database
+     * @param \wpdb $wpdb
      */
-    function __construct($vpdbDir, DbSchemaInfo $dbSchemaInfo, \wpdb $database) {
+    function __construct($vpdbDir, DbSchemaInfo $dbSchemaInfo, $wpdb) {
         $this->vpdbDir = $vpdbDir;
         $this->dbSchemaInfo = $dbSchemaInfo;
-        $this->database = $database;
+        $this->database = $wpdb;
         $this->initStorageClasses();
     }
 
