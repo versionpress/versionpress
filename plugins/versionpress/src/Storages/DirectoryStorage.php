@@ -34,12 +34,14 @@ abstract class DirectoryStorage extends Storage {
     /** @var EntityInfo */
     private $entityInfo;
 
-    function __construct($directory, $entityInfo) {
+    private $uncommittedEntities = array();
+
+    public function __construct($directory, $entityInfo) {
         $this->directory = $directory;
         $this->entityInfo = $entityInfo;
     }
 
-    function save($data) {
+    public function save($data) {
         $vpid = $data[$this->entityInfo->vpidColumnName];
 
         if (!$vpid) {
@@ -84,7 +86,7 @@ abstract class DirectoryStorage extends Storage {
 
     }
 
-    function delete($restriction) {
+    public function delete($restriction) {
         $fileName = $this->getEntityFilename($restriction['vp_id']);
         if (is_file($fileName)) {
             $entity = $this->loadEntity($restriction['vp_id']);
@@ -95,7 +97,27 @@ abstract class DirectoryStorage extends Storage {
         }
     }
 
-    function loadAll() {
+    public function saveLater($data) {
+        $vpid = $data[$this->entityInfo->vpidColumnName];
+
+        if (!isset($this->uncommittedEntities[$vpid])) {
+            $this->uncommittedEntities[$vpid] = array();
+        }
+
+        $originalEntity = $this->uncommittedEntities[$vpid];
+        $newEntity = array_merge($originalEntity, $data);
+        $this->uncommittedEntities[$vpid] = $newEntity;
+    }
+
+    public function commit() {
+        foreach ($this->uncommittedEntities as $entity) {
+            $this->save($entity);
+        }
+
+        $this->uncommittedEntities = array();
+    }
+
+    public function loadAll() {
         $entityFiles = $this->getEntityFiles();
         $entities = $this->loadAllFromFiles($entityFiles);
         return $entities;

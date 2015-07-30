@@ -81,7 +81,7 @@ class TermTaxonomyStorage extends SingleFileStorage {
 
     }
 
-    function loadEntity($id, $parentId = null) {
+    public function loadEntity($id, $parentId = null) {
         $this->loadEntities();
         foreach ($this->entities as $term) {
             if (isset($term['taxonomies']) && isset($term['taxonomies'][$id])){
@@ -93,7 +93,7 @@ class TermTaxonomyStorage extends SingleFileStorage {
         return null;
     }
 
-    function loadAll() {
+    public function loadAll() {
         $this->loadEntities();
         $taxonomies = array();
 
@@ -125,28 +125,23 @@ class TermTaxonomyStorage extends SingleFileStorage {
     }
 
     protected function loadEntities() {
-        if (is_file($this->file)) {
-            $entities = IniSerializer::deserialize(file_get_contents($this->file));
+        parent::loadEntities();
+        $entities = $this->entities;
 
-            foreach ($entities as $id => &$entity) {
-                $entity['vp_id'] = $id;
-                if (isset ($entity['taxonomies'])) {
-                    foreach ($entity['taxonomies'] as $taxonomyId => &$taxonomy) {
-                        $taxonomy['vp_id'] = $taxonomyId;
-                    }
+        foreach ($entities as $id => &$entity) {
+            if (isset ($entity['taxonomies'])) {
+                foreach ($entity['taxonomies'] as $taxonomyId => &$taxonomy) {
+                    $taxonomy['vp_id'] = $taxonomyId;
                 }
             }
-
-            $this->entities = $entities;
-        } else {
-            $this->entities = array();
         }
+
+        $this->entities = $entities;
     }
 
     protected function saveEntities() {
         $entities = $this->entities;
         foreach ($entities as &$entity) {
-            unset ($entity['vp_id']);
             if (isset ($entity['taxonomies'])) {
                 foreach ($entity['taxonomies'] as &$taxonomy) {
                     unset ($taxonomy['vp_id']);
@@ -154,8 +149,8 @@ class TermTaxonomyStorage extends SingleFileStorage {
             }
         }
 
-        $serializedEntities = IniSerializer::serialize($entities);
-        file_put_contents($this->file, $serializedEntities);
+        $this->entities = $entities;
+        parent::saveEntities();
     }
 
     /**
