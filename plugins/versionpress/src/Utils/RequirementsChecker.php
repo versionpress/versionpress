@@ -81,7 +81,7 @@ class RequirementsChecker {
             'name' => 'Write access on the filesystem',
             'level' => 'critical',
             'fulfilled' => $this->tryWrite(),
-            'help' => 'VersionPress needs write access in the site root, its nested directories and the system temp directory. Please update the permissions.'
+            'help' => 'VersionPress needs write access in the site root, its nested directories and the <abbr title="' . sys_get_temp_dir() . '" style="border-bottom: 1px dotted; border-color: inherit;">system temp directory</abbr>. Please update the permissions.'
         );
 
         $this->requirements[] = array(
