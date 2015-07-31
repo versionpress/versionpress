@@ -9,8 +9,6 @@
  * @TODO fix this doc block (Make it better maybe?)
  */
 
-add_action( 'wp_enqueue_scripts', 'vp_rest_register_scripts', -100 );
-add_action( 'admin_enqueue_scripts', 'vp_rest_register_scripts', -100 );
 add_action( 'xmlrpc_rsd_apis', 'vp_rest_output_rsd' );
 add_action( 'wp_head', 'vp_rest_output_link_wp_head', 10, 0 );
 add_action( 'template_redirect', 'vp_rest_output_link_header', 11, 0 );
@@ -20,20 +18,6 @@ add_action( 'auth_cookie_bad_username', 'vp_rest_cookie_collect_status' );
 add_action( 'auth_cookie_bad_hash',     'vp_rest_cookie_collect_status' );
 add_action( 'auth_cookie_valid',        'vp_rest_cookie_collect_status' );
 add_filter( 'vp_rest_authentication_errors', 'vp_rest_cookie_check_errors', 100 );
-
-
-
-/**
- * Register API Javascript helpers.
- *
- * @see wp_register_scripts()
- */
-function vp_rest_register_scripts() {
-    wp_register_script( 'wp-api', plugins_url( 'wp-api.js', __FILE__ ), array( 'jquery', 'backbone', 'underscore' ), '1.1', true );
-
-    $settings = array( 'root' => esc_url_raw( get_vp_rest_url() ), 'nonce' => wp_create_nonce( 'wp_rest' ) );
-    wp_localize_script( 'wp-api', 'WP_API_Settings', $settings );
-}
 
 /**
  * Add the API URL to the WP RSD endpoint.
