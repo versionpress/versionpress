@@ -13,65 +13,98 @@ use VersionPress\Utils\BugReporter;
 
 class VersionPressApi {
 
-    /** @var \WP_JSON_ResponseHandler */
-    protected $server;
-
-    /** @var string */
-    protected $base = '/versionpress';
-
-    /** @var string */
-    protected $type = 'versionpress';
-
-    /**
-     * @param \WP_JSON_ResponseHandler $server Server object
-     */
-    function __construct(\WP_JSON_ResponseHandler $server) {
-        $this->server = $server;
-    }
-
     /**
      * Register the VersionPress related routes
-     *
-     * @param array $routes Existing routes
-     * @return array Modified routes
      */
-    public function register_routes($routes = array()) {
-        $routes[$this->base . '/commits'] = array(
-            array(array($this, 'getCommits'), \WP_JSON_Server::READABLE),
-        );
-        $routes[$this->base . '/undo'] = array(
-            array(array($this, 'undoCommit'), \WP_JSON_Server::READABLE),
-        );
-        $routes[$this->base . '/rollback'] = array(
-            array(array($this, 'rollbackToCommit'), \WP_JSON_Server::READABLE),
-        );
-        $routes[$this->base . '/can-revert'] = array(
-            array(array($this, 'canRevert'), \WP_JSON_Server::READABLE),
-        );
-        $routes[$this->base . '/submit-bug'] = array(
-            array(array($this, 'submitBug'), \WP_JSON_Server::CREATABLE | \WP_JSON_Server::ACCEPT_JSON),
-        );
-        $routes[$this->base . '/display-welcome-panel'] = array(
-            array(array($this, 'displayWelcomePanel'), \WP_JSON_Server::READABLE),
-        );
-        $routes[$this->base . '/hide-welcome-panel'] = array(
-            array(array($this, 'hideWelcomePanel'), \WP_JSON_Server::CREATABLE | \WP_JSON_Server::ACCEPT_JSON),
-        );
-        return $routes;
+    public function register_routes() {
+        $version = '2';
+        $namespace = 'versionpress/v' . $version;
+
+        register_rest_route($namespace, '/commits', array(
+            array(
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => array($this, 'getCommits'),
+                'args' => array(
+                    'page' => array(
+                        'default' => '0'
+                    )
+                )
+            )
+        ));
+
+        register_rest_route($namespace, '/undo', array(
+            array(
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => array($this, 'undoCommit'),
+                'args' => array(
+                    'commit' => array(
+                        'required' => true
+                    )
+                )
+            )
+        ));
+
+        register_rest_route($namespace, '/rollback', array(
+            array(
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => array($this, 'rollbackToCommit'),
+                'args' => array(
+                    'commit' => array(
+                        'required' => true
+                    )
+                )
+            )
+        ));
+
+        register_rest_route($namespace, '/can-revert', array(
+            array(
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => array($this, 'canRevert')
+            )
+        ));
+
+        register_rest_route($namespace, '/submit-bug', array(
+            array(
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => array($this, 'submitBug'),
+                'args' => array(
+                    'email' => array(
+                        'required' => true
+                    ),
+                    'description' => array(
+                        'required' => true
+                    )
+                )
+            )
+        ));
+
+        register_rest_route($namespace, '/display-welcome-panel', array(
+            array(
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => array($this, 'displayWelcomePanel')
+            )
+        ));
+
+        register_rest_route($namespace, '/hide-welcome-panel', array(
+            array(
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => array($this, 'hideWelcomePanel')
+            )
+        ));
     }
 
     /**
-     * @param int $page
-     * @return array|\WP_Error
+     * @param \WP_REST_Request $request
+     * @return \WP_REST_Response|\WP_Error
      */
-    public function getCommits($page = 0) {
+    public function getCommits(\WP_REST_Request $request) {
         global $versionPressContainer;
         /** @var GitRepository $repository */
         $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
         $gitLogPaginator = new GitLogPaginator($repository);
         $gitLogPaginator->setCommitsPerPage(25);
 
-        $page = intval($page);
+        $page = intval($request['page']);
         $commits = $gitLogPaginator->getPage($page);
 
         if(empty($commits)) {
@@ -105,30 +138,30 @@ class VersionPressApi {
             );
             $isFirstCommit = false;
         }
-        return array(
+        return new \WP_REST_Response(array(
             'pages' => $gitLogPaginator->getPrettySteps($page),
             'commits' => $result
-        );
+        ));
     }
 
     /**
-     * @param string $commit
-     * @return bool|\WP_Error
+     * @param \WP_REST_Request $request
+     * @return \WP_REST_Response|\WP_Error
      */
-    public function undoCommit($commit) {
-        return $this->revertCommit('undo', $commit);
+    public function undoCommit(\WP_REST_Request $request) {
+        return $this->revertCommit('undo', $request['commit']);
     }
 
     /**
-     * @param string $commit
-     * @return bool|\WP_Error
+     * @param \WP_REST_Request $request
+     * @return \WP_REST_Response|\WP_Error
      */
-    public function rollbackToCommit($commit) {
-        return $this->revertCommit('rollback', $commit);
+    public function rollbackToCommit(\WP_REST_Request $request) {
+        return $this->revertCommit('rollback', $request['commit']);
     }
 
     /**
-     * @return bool|\WP_Error
+     * @return \WP_REST_Response|\WP_Error
      */
     public function canRevert() {
         global $versionPressContainer;
@@ -137,13 +170,13 @@ class VersionPressApi {
         /** @var Reverter $reverter */
         $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
 
-        return $reverter->canRevert();
+        return new \WP_REST_Response($reverter->canRevert());
     }
 
     /**
      * @param string $reverterMethod
      * @param string $commit
-     * @return bool|\WP_Error
+     * @return \WP_REST_Response|\WP_Error
      */
     public function revertCommit($reverterMethod, $commit) {
         global $versionPressContainer;
@@ -159,22 +192,22 @@ class VersionPressApi {
         if ($revertStatus !== RevertStatus::OK) {
             return $this->getError($revertStatus);
         }
-        return true;
+        return new \WP_REST_Response(true);
     }
 
     /**
-     * @param string[] $data
-     * @return bool|\WP_Error
+     * @param \WP_REST_Request $request
+     * @return \WP_REST_Response|\WP_Error
      */
-    public function submitBug($data) {
-        $email = $data['email'];
-        $description = $data['description'];
+    public function submitBug(\WP_REST_Request $request) {
+        $email = $request['email'];
+        $description = $request['description'];
 
         $bugReporter = new BugReporter('http://versionpress.net/report-problem');
         $reportedSuccessfully = $bugReporter->reportBug($email, $description);
 
         if ($reportedSuccessfully) {
-            return true;
+            return new \WP_REST_Response(true);
         } else {
             return new \WP_Error(
                 'error',
@@ -185,19 +218,19 @@ class VersionPressApi {
     }
 
     /**
-     * @return bool
+     * @return \WP_REST_Response
      */
     public function displayWelcomePanel() {
         $showWelcomePanel = get_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, true);
-        return $showWelcomePanel === "";
+        return new \WP_REST_Response($showWelcomePanel === "");
     }
 
     /**
-     * @return bool
+     * @return \WP_REST_Response
      */
     public function hideWelcomePanel() {
         update_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, "0");
-        return true;
+        return new \WP_REST_Response(null, 204);
     }
 
     /**

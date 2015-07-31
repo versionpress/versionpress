@@ -793,7 +793,8 @@ if (is_admin()) {
 //---------------------------------
 // API
 //---------------------------------
-header("Access-Control-Allow-Headers: origin, content-type, accept");
+header('Access-Control-Allow-Headers: origin, content-type, accept');
+header('Access-Control-Allow-Origin: *');
 
 add_filter('allowed_http_origin', '__return_true');
 
@@ -814,9 +815,9 @@ function vp_send_cors_headers($headers) {
     return $headers;
 }
 
-function versionpress_api_init($server) {
+function versionpress_api_init() {
     global $vpApi;
-    $vpApi = new VersionPressApi($server);
-    add_filter('json_endpoints', array($vpApi, 'register_routes'));
+    $vpApi = new VersionPressApi;
+    $vpApi->register_routes();
 }
-add_action('wp_json_server_before_serve', 'versionpress_api_init');
+add_action('rest_api_init', 'versionpress_api_init');
