@@ -17,8 +17,7 @@ class VersionPressApi {
      * Register the VersionPress related routes
      */
     public function register_routes() {
-        $version = '2';
-        $namespace = 'versionpress/v' . $version;
+        $namespace = 'versionpress';
 
         register_rest_route($namespace, '/commits', array(
             array(
