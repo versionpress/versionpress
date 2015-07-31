@@ -793,6 +793,8 @@ if (is_admin()) {
 //---------------------------------
 // API
 //---------------------------------
+require("src/Api/lib/plugin.php");
+
 header('Access-Control-Allow-Headers: origin, content-type, accept');
 header('Access-Control-Allow-Origin: *');
 
@@ -820,4 +822,4 @@ function versionpress_api_init() {
     $vpApi = new VersionPressApi;
     $vpApi->register_routes();
 }
-add_action('rest_api_init', 'versionpress_api_init');
+add_action('vp_rest_api_init', 'versionpress_api_init');

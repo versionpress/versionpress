@@ -19,9 +19,9 @@ class VersionPressApi {
     public function register_routes() {
         $namespace = 'versionpress';
 
-        register_rest_route($namespace, '/commits', array(
+        register_vp_rest_route($namespace, '/commits', array(
             array(
-                'methods' => \WP_REST_Server::READABLE,
+                'methods' => WP_REST_Server::READABLE,
                 'callback' => array($this, 'getCommits'),
                 'args' => array(
                     'page' => array(
@@ -31,9 +31,9 @@ class VersionPressApi {
             )
         ));
 
-        register_rest_route($namespace, '/undo', array(
+        register_vp_rest_route($namespace, '/undo', array(
             array(
-                'methods' => \WP_REST_Server::READABLE,
+                'methods' => WP_REST_Server::READABLE,
                 'callback' => array($this, 'undoCommit'),
                 'args' => array(
                     'commit' => array(
@@ -43,9 +43,9 @@ class VersionPressApi {
             )
         ));
 
-        register_rest_route($namespace, '/rollback', array(
+        register_vp_rest_route($namespace, '/rollback', array(
             array(
-                'methods' => \WP_REST_Server::READABLE,
+                'methods' => WP_REST_Server::READABLE,
                 'callback' => array($this, 'rollbackToCommit'),
                 'args' => array(
                     'commit' => array(
@@ -55,16 +55,16 @@ class VersionPressApi {
             )
         ));
 
-        register_rest_route($namespace, '/can-revert', array(
+        register_vp_rest_route($namespace, '/can-revert', array(
             array(
-                'methods' => \WP_REST_Server::READABLE,
+                'methods' => WP_REST_Server::READABLE,
                 'callback' => array($this, 'canRevert')
             )
         ));
 
-        register_rest_route($namespace, '/submit-bug', array(
+        register_vp_rest_route($namespace, '/submit-bug', array(
             array(
-                'methods' => \WP_REST_Server::CREATABLE,
+                'methods' => WP_REST_Server::CREATABLE,
                 'callback' => array($this, 'submitBug'),
                 'args' => array(
                     'email' => array(
@@ -77,26 +77,26 @@ class VersionPressApi {
             )
         ));
 
-        register_rest_route($namespace, '/display-welcome-panel', array(
+        register_vp_rest_route($namespace, '/display-welcome-panel', array(
             array(
-                'methods' => \WP_REST_Server::READABLE,
+                'methods' => WP_REST_Server::READABLE,
                 'callback' => array($this, 'displayWelcomePanel')
             )
         ));
 
-        register_rest_route($namespace, '/hide-welcome-panel', array(
+        register_vp_rest_route($namespace, '/hide-welcome-panel', array(
             array(
-                'methods' => \WP_REST_Server::CREATABLE,
+                'methods' => WP_REST_Server::CREATABLE,
                 'callback' => array($this, 'hideWelcomePanel')
             )
         ));
     }
 
     /**
-     * @param \WP_REST_Request $request
-     * @return \WP_REST_Response|\WP_Error
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response|\WP_Error
      */
-    public function getCommits(\WP_REST_Request $request) {
+    public function getCommits(WP_REST_Request $request) {
         global $versionPressContainer;
         /** @var GitRepository $repository */
         $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
@@ -137,30 +137,30 @@ class VersionPressApi {
             );
             $isFirstCommit = false;
         }
-        return new \WP_REST_Response(array(
+        return new WP_REST_Response(array(
             'pages' => $gitLogPaginator->getPrettySteps($page),
             'commits' => $result
         ));
     }
 
     /**
-     * @param \WP_REST_Request $request
-     * @return \WP_REST_Response|\WP_Error
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response|\WP_Error
      */
-    public function undoCommit(\WP_REST_Request $request) {
+    public function undoCommit(WP_REST_Request $request) {
         return $this->revertCommit('undo', $request['commit']);
     }
 
     /**
-     * @param \WP_REST_Request $request
-     * @return \WP_REST_Response|\WP_Error
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response|\WP_Error
      */
-    public function rollbackToCommit(\WP_REST_Request $request) {
+    public function rollbackToCommit(WP_REST_Request $request) {
         return $this->revertCommit('rollback', $request['commit']);
     }
 
     /**
-     * @return \WP_REST_Response|\WP_Error
+     * @return WP_REST_Response|\WP_Error
      */
     public function canRevert() {
         global $versionPressContainer;
@@ -169,13 +169,13 @@ class VersionPressApi {
         /** @var Reverter $reverter */
         $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
 
-        return new \WP_REST_Response($reverter->canRevert());
+        return new WP_REST_Response($reverter->canRevert());
     }
 
     /**
      * @param string $reverterMethod
      * @param string $commit
-     * @return \WP_REST_Response|\WP_Error
+     * @return WP_REST_Response|\WP_Error
      */
     public function revertCommit($reverterMethod, $commit) {
         global $versionPressContainer;
@@ -191,14 +191,14 @@ class VersionPressApi {
         if ($revertStatus !== RevertStatus::OK) {
             return $this->getError($revertStatus);
         }
-        return new \WP_REST_Response(true);
+        return new WP_REST_Response(true);
     }
 
     /**
-     * @param \WP_REST_Request $request
-     * @return \WP_REST_Response|\WP_Error
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response|\WP_Error
      */
-    public function submitBug(\WP_REST_Request $request) {
+    public function submitBug(WP_REST_Request $request) {
         $email = $request['email'];
         $description = $request['description'];
 
@@ -206,7 +206,7 @@ class VersionPressApi {
         $reportedSuccessfully = $bugReporter->reportBug($email, $description);
 
         if ($reportedSuccessfully) {
-            return new \WP_REST_Response(true);
+            return new WP_REST_Response(true);
         } else {
             return new \WP_Error(
                 'error',
@@ -217,19 +217,19 @@ class VersionPressApi {
     }
 
     /**
-     * @return \WP_REST_Response
+     * @return WP_REST_Response
      */
     public function displayWelcomePanel() {
         $showWelcomePanel = get_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, true);
-        return new \WP_REST_Response($showWelcomePanel === "");
+        return new WP_REST_Response($showWelcomePanel === "");
     }
 
     /**
-     * @return \WP_REST_Response
+     * @return WP_REST_Response
      */
     public function hideWelcomePanel() {
         update_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, "0");
-        return new \WP_REST_Response(null, 204);
+        return new WP_REST_Response(null, 204);
     }
 
     /**
