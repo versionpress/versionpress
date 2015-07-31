@@ -1,27 +1,17 @@
 {
     "name": "versionpress/versionpress-libs",
     "description": "Libraries referenced by PhpStorm but not actually dependencies",
-    "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "name": "wp-api/wp-api",
-                "version": "1.2.2",
-                "source": {
-                    "url": "https://github.com/wp-api/wp-api.git",
-                    "type": "git",
-                    "reference": "one-dot-two-dot-two"
-                }
-            }
-        }
-    ],
+    "minimum-stability": "beta",
     "require-dev": {
         "johnpbloch/wordpress": "4.0.1",
         "wp-cli/wp-cli": "~0.18",
-        "wp-api/wp-api": "1.2.2"
+        "wp-api/wp-api": "2.*"
     },
     "extra": {
-        "wordpress-install-dir": "wordpress"
+        "wordpress-install-dir": "wordpress",
+        "installer-paths": {
+            "vendor/{$name}/": ["type:wordpress-plugin"]
+        }
     },
     "authors": [
         {
