@@ -72,7 +72,7 @@ function vp_rest_output_link_header() {
  * for logged in users. However, the API has to check nonces
  * for each request to ensure users are not vulnerable to CSRF.
  *
- * @global mixed $wp_vp_rest_auth_cookie
+ * @global mixed $vp_rest_auth_cookie
  *
  * @param WP_Error|mixed $result Error from another authentication handler,
  *                               null if we should handle it, or another
@@ -85,21 +85,21 @@ function vp_rest_cookie_check_errors( $result ) {
         return $result;
     }
 
-    global $wp_vp_rest_auth_cookie;
+    global $vp_rest_auth_cookie;
 
     /*
      * Is cookie authentication being used? (If we get an auth
      * error, but we're still logged in, another authentication
      * must have been used.)
      */
-    if ( true !== $wp_vp_rest_auth_cookie && is_user_logged_in() ) {
+    if ( true !== $vp_rest_auth_cookie && is_user_logged_in() ) {
         return $result;
     }
 
     // Is there a nonce?
     $nonce = null;
-    if ( isset( $_REQUEST['_wp_vp_rest_nonce'] ) ) {
-        $nonce = $_REQUEST['_wp_vp_rest_nonce'];
+    if ( isset( $_REQUEST['_vp_rest_nonce'] ) ) {
+        $nonce = $_REQUEST['_vp_rest_nonce'];
     } elseif ( isset( $_SERVER['HTTP_X_WP_NONCE'] ) ) {
         $nonce = $_SERVER['HTTP_X_WP_NONCE'];
     }
@@ -126,19 +126,19 @@ function vp_rest_cookie_check_errors( $result ) {
  * use by {@see vp_rest_cookie_check_errors}.
  *
  * @see current_action()
- * @global mixed $wp_vp_rest_auth_cookie
+ * @global mixed $vp_rest_auth_cookie
  */
 function vp_rest_cookie_collect_status() {
-    global $wp_vp_rest_auth_cookie;
+    global $vp_rest_auth_cookie;
 
     $status_type = current_action();
 
     if ( 'auth_cookie_valid' !== $status_type ) {
-        $wp_vp_rest_auth_cookie = substr( $status_type, 12 );
+        $vp_rest_auth_cookie = substr( $status_type, 12 );
         return;
     }
 
-    $wp_vp_rest_auth_cookie = true;
+    $vp_rest_auth_cookie = true;
 }
 
 /**
