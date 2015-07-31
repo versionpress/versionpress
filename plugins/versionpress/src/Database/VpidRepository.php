@@ -14,8 +14,8 @@ class VpidRepository {
     /** @var string */
     private $vpidTableName;
 
-    public function __construct(wpdb $database, DbSchemaInfo $schemaInfo) {
-        $this->database = $database;
+    public function __construct($wpdb, DbSchemaInfo $schemaInfo) {
+        $this->database = $wpdb;
         $this->schemaInfo = $schemaInfo;
         $this->vpidTableName = $schemaInfo->getPrefixedTableName('vp_id');
     }

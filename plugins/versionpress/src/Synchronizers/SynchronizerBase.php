@@ -43,13 +43,13 @@ abstract class SynchronizerBase implements Synchronizer {
 
     /**
      * @param Storage $storage Specific Synchronizers will use specific storage types, see VersionPress\Synchronizers\SynchronizerFactory
-     * @param wpdb $database
+     * @param wpdb $wpdb
      * @param DbSchemaInfo $dbSchema
      * @param string $entityName Constructors in subclasses provide this
      */
-    function __construct(Storage $storage, wpdb $database, DbSchemaInfo $dbSchema, $entityName) {
+    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, $entityName) {
         $this->storage = $storage;
-        $this->database = $database;
+        $this->database = $wpdb;
         $this->dbSchema = $dbSchema;
         $this->entityName = $entityName;
         $this->idColumnName = $dbSchema->getEntityInfo($this->entityName)->idColumnName;
