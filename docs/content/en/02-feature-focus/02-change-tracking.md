@@ -134,6 +134,16 @@ Tracked actions:
 Defines meaning for terms. Tracked together with terms.
 
 
+#### Widgets
+
+Widgets are technically entries in the `options` table and are fully supported.
+
+
+#### Menus
+
+Menus are technically stored as half terms (the menu itself), half posts (menu items) and are fully supported.  
+
+
 #### Other entities
 
 VersionPress tracks everything that goes into the standard WordPress tables, which often covers even 3rd party WP plugins if they use features like custom post types etc. VersionPress doesn't track any custom database tables by default.
