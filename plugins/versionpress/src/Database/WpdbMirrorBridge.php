@@ -28,6 +28,9 @@ class WpdbMirrorBridge {
      */
     private $vpidRepository;
 
+    /** @var bool */
+    private $disabled;
+
     function __construct($wpdb, Mirror $mirror, DbSchemaInfo $dbSchemaInfo, VpidRepository $vpidRepository) {
         $this->database = $wpdb;
         $this->mirror = $mirror;
@@ -36,6 +39,10 @@ class WpdbMirrorBridge {
     }
 
     function insert($table, $data) {
+        if ($this->disabled) {
+            return;
+        }
+
         $id = $this->database->insert_id;
         $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($table);
 
@@ -56,6 +63,10 @@ class WpdbMirrorBridge {
     }
 
     function update($table, $data, $where) {
+        if ($this->disabled) {
+            return;
+        }
+
         $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($table);
 
         if (!$entityInfo) {
@@ -80,6 +91,9 @@ class WpdbMirrorBridge {
     }
 
     function delete($table, $where) {
+        if ($this->disabled) {
+            return;
+        }
 
         $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($table);
 
@@ -209,6 +223,13 @@ class WpdbMirrorBridge {
 
         $where["vp_{$parent}_id"] = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '{$parentTable}' AND ID = (SELECT {$parent}_id FROM $postMetaTable WHERE {$idColumnName} = $id)");
         return $where;
+    }
+
+    /**
+     * Disables all actions. Useful for deactivating VersionPress.
+     */
+    public function disable() {
+        $this->disabled = true;
     }
 
 }
