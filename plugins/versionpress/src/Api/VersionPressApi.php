@@ -10,6 +10,9 @@ use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Utils\BugReporter;
+use VersionPress\Api\BundledWpApi\WP_REST_Server;
+use VersionPress\Api\BundledWpApi\WP_REST_Request;
+use VersionPress\Api\BundledWpApi\WP_REST_Response;
 
 class VersionPressApi {
 

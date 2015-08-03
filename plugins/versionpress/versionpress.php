@@ -793,7 +793,7 @@ if (is_admin()) {
 //---------------------------------
 // API
 //---------------------------------
-require("src/Api/lib/plugin.php");
+require("src/Api/BundledWpApi/plugin.php");
 
 header('Access-Control-Allow-Headers: origin, content-type, accept');
 header('Access-Control-Allow-Origin: *');

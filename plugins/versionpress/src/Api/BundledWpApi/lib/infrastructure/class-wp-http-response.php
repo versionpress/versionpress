@@ -1,6 +1,6 @@
 <?php
 
-namespace VersionPress\Api;
+namespace VersionPress\Api\BundledWpApi;
 
 class WP_HTTP_Response implements WP_HTTP_ResponseInterface {
     /**

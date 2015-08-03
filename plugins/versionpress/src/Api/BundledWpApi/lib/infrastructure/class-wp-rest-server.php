@@ -7,7 +7,7 @@
  * @package WordPress
  */
 
-namespace VersionPress\Api;
+namespace VersionPress\Api\BundledWpApi;
 
 use WP_Error;
 use JsonSerializable;

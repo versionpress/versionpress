@@ -1,4 +1,13 @@
 <?php
+/**
+ * Plugin Name: WP REST API
+ * Description: JSON-based REST API for WordPress, developed as part of GSoC 2013.
+ * Author: WP REST API Team
+ * Author URI: http://wp-api.org
+ * Version: 2.0-beta3
+ * Plugin URI: https://github.com/WP-API/WP-API
+ * License: GPL2+
+ */
 
 /**
  * Version number for our API.
@@ -10,21 +19,21 @@ define( 'VP_REST_API_VERSION', '2.0-beta3' );
 /**
  * Include our files for the API.
  */
-include_once( dirname( __FILE__ ) . '/infrastructure/class-jsonserializable.php' );
+include_once( dirname( __FILE__ ) . '/lib/infrastructure/class-jsonserializable.php' );
 
-include_once( dirname( __FILE__ ) . '/infrastructure/class-wp-rest-server.php' );
+include_once( dirname( __FILE__ ) . '/lib/infrastructure/class-wp-rest-server.php' );
 
-include_once( dirname( __FILE__ ) . '/infrastructure/class-wp-http-responseinterface.php' );
-include_once( dirname( __FILE__ ) . '/infrastructure/class-wp-http-response.php' );
-include_once( dirname( __FILE__ ) . '/infrastructure/class-wp-rest-response.php' );
-require_once( dirname( __FILE__ ) . '/infrastructure/class-wp-rest-request.php' );
+include_once( dirname( __FILE__ ) . '/lib/infrastructure/class-wp-http-responseinterface.php' );
+include_once( dirname( __FILE__ ) . '/lib/infrastructure/class-wp-http-response.php' );
+include_once( dirname( __FILE__ ) . '/lib/infrastructure/class-wp-rest-response.php' );
+require_once( dirname( __FILE__ ) . '/lib/infrastructure/class-wp-rest-request.php' );
 
 include_once( dirname( __FILE__ ) . '/extras.php' );
 
-use VersionPress\Api\WP_REST_Server;
-use VersionPress\Api\WP_REST_Response;
-use VersionPress\Api\WP_REST_Request;
-use VersionPress\Api\WP_HTTP_ResponseInterface;
+use VersionPress\Api\BundledWpApi\WP_REST_Server;
+use VersionPress\Api\BundledWpApi\WP_REST_Response;
+use VersionPress\Api\BundledWpApi\WP_REST_Request;
+use VersionPress\Api\BundledWpApi\WP_HTTP_ResponseInterface;
 
 /**
  * Register a REST API route
@@ -147,7 +156,7 @@ function vp_rest_api_loaded() {
     global $vp_rest_server;
 
     // Allow for a plugin to insert a different class to handle requests.
-    $vp_rest_server_class = apply_filters( 'vp_rest_server_class', 'VersionPress\\Api\\WP_REST_Server' );
+    $vp_rest_server_class = apply_filters( 'vp_rest_server_class', 'VersionPress\\Api\\BundledWpApi\\WP_REST_Server' );
     $vp_rest_server = new $vp_rest_server_class;
 
     /**

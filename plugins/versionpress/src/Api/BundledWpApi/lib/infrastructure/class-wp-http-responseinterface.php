@@ -1,6 +1,6 @@
 <?php
 
-namespace VersionPress\Api;
+namespace VersionPress\Api\BundledWpApi;
 
 use JsonSerializable;
 
