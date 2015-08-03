@@ -45,8 +45,8 @@ use VersionPress\Api\BundledWpApi\WP_HTTP_ResponseInterface;
  */
 function register_vp_rest_route( $namespace, $route, $args = array(), $override = false ) {
 
-    /** @var WP_REST_Server $vp_rest_server */
-    global $vp_rest_server;
+    /** @var WP_REST_Server $wp_vp_rest_server */
+    global $wp_vp_rest_server;
 
     if ( isset( $args['callback'] ) ) {
         // Upgrade a single set to multiple
@@ -63,7 +63,7 @@ function register_vp_rest_route( $namespace, $route, $args = array(), $override 
     }
 
     $full_route = '/' . trim( $namespace, '/' ) . '/' . trim( $route, '/' );
-    $vp_rest_server->register_route( $namespace, $full_route, $args, $override );
+    $wp_vp_rest_server->register_route( $namespace, $full_route, $args, $override );
 }
 
 /**
@@ -128,7 +128,7 @@ add_action( 'vp_rest_api_init', 'vp_rest_api_default_filters', 10, 1 );
  * Load the REST API.
  *
  * @todo Extract code that should be unit tested into isolated methods such as
- *       the vp_rest_server_class filter and serving requests. This would also
+ *       the wp_vp_rest_server_class filter and serving requests. This would also
  *       help for code re-use by `wp-json` endpoint. Note that we can't unit
  *       test any method that calls die().
  */
@@ -152,12 +152,12 @@ function vp_rest_api_loaded() {
      */
     define( 'VP_REST_REQUEST', true );
 
-    /** @var WP_REST_Server $vp_rest_server */
-    global $vp_rest_server;
+    /** @var WP_REST_Server $wp_vp_rest_server */
+    global $wp_vp_rest_server;
 
     // Allow for a plugin to insert a different class to handle requests.
-    $vp_rest_server_class = apply_filters( 'vp_rest_server_class', 'VersionPress\\Api\\BundledWpApi\\WP_REST_Server' );
-    $vp_rest_server = new $vp_rest_server_class;
+    $wp_vp_rest_server_class = apply_filters( 'wp_vp_rest_server_class', 'VersionPress\\Api\\BundledWpApi\\WP_REST_Server' );
+    $wp_vp_rest_server = new $wp_vp_rest_server_class;
 
     /**
      * Fires when preparing to serve an API request.
@@ -166,12 +166,12 @@ function vp_rest_api_loaded() {
      * action rather than another action to ensure they're only loaded when
      * needed.
      *
-     * @param WP_REST_Server $vp_rest_server Server object.
+     * @param WP_REST_Server $wp_vp_rest_server Server object.
      */
-    do_action( 'vp_rest_api_init', $vp_rest_server );
+    do_action( 'vp_rest_api_init', $wp_vp_rest_server );
 
     // Fire off the request.
-    $vp_rest_server->serve_request( $GLOBALS['wp']->query_vars['vp_rest_route'] );
+    $wp_vp_rest_server->serve_request( $GLOBALS['wp']->query_vars['vp_rest_route'] );
 
     // We're done.
     die();
@@ -301,9 +301,9 @@ function vp_rest_url( $path = '', $scheme = 'json' ) {
  * @return WP_REST_Response
  */
 function vp_rest_do_request( $request ) {
-    global $vp_rest_server;
+    global $wp_vp_rest_server;
     $request = vp_rest_ensure_request( $request );
-    return $vp_rest_server->dispatch( $request );
+    return $wp_vp_rest_server->dispatch( $request );
 }
 
 /**
