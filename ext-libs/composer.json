@@ -3,15 +3,11 @@
     "description": "Libraries referenced by PhpStorm but not actually dependencies",
     "minimum-stability": "beta",
     "require-dev": {
-        "johnpbloch/wordpress": "4.0.1",
-        "wp-cli/wp-cli": "~0.18",
-        "wp-api/wp-api": "2.*"
+        "johnpbloch/wordpress": "4.1.*",
+        "wp-cli/wp-cli": "~0.18"
     },
     "extra": {
-        "wordpress-install-dir": "wordpress",
-        "installer-paths": {
-            "vendor/{$name}/": ["type:wordpress-plugin"]
-        }
+        "wordpress-install-dir": "wordpress"
     },
     "authors": [
         {

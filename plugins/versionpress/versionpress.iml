@@ -56,7 +56,6 @@
           <root url="file://$MODULE_DIR$/vendor/phpunit/phpunit" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/php-file-iterator" />
           <root url="file://$MODULE_DIR$/vendor/x-team/wp-cli-ssh" />
-          <root url="file://$MODULE_DIR$/../../ext-libs/vendor/json-rest-api" />
         </CLASSES>
         <SOURCES>
           <root url="file://$MODULE_DIR$/vendor/phpunit/phpunit-selenium" />
@@ -85,7 +84,6 @@
           <root url="file://$MODULE_DIR$/vendor/phpunit/phpunit" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/php-file-iterator" />
           <root url="file://$MODULE_DIR$/vendor/x-team/wp-cli-ssh" />
-          <root url="file://$MODULE_DIR$/../../ext-libs/vendor/json-rest-api" />
         </SOURCES>
       </library>
     </orderEntry>
