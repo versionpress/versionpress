@@ -77,7 +77,7 @@ class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker
         $wpdb->query($wpdb->prepare("UPDATE $wpdb->postmeta SET meta_value = meta_value - $deleteOrphanedFilesSeconds WHERE meta_key='_menu_item_orphaned' ORDER BY meta_id DESC LIMIT 1", array()));
     }
     public function deleteOrphanedMenuItems() {
-        $this->url(menu_page_url('versionpress', false));
+        $this->url('wp-admin/admin.php?page=versionpress/');
         $this->acceptAlert();
         $this->byCssSelector('.vp-undo:first-of-type')->click();
         $this->waitForAjax();
