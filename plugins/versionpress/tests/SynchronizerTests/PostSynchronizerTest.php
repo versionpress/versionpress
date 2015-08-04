@@ -47,10 +47,10 @@ class PostSynchronizerTest extends SynchronizerTestCase {
         $this->termStorage = self::$storageFactory->getStorage('term');
         $this->termTaxonomyStorage = self::$storageFactory->getStorage('term_taxonomy');
 
-        $this->synchronizer = new PostsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo);
-        $this->userSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo);
-        $this->termSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo);
-        $this->termTaxonomySynchronizer = new TermTaxonomySynchronizer($this->termTaxonomyStorage, self::$wpdb, self::$schemaInfo);
+        $this->synchronizer = new PostsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->userSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->termSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->termTaxonomySynchronizer = new TermTaxonomySynchronizer($this->termTaxonomyStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
     }
 
     /**

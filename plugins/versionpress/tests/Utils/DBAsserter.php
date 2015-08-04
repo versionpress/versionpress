@@ -3,7 +3,7 @@
 namespace VersionPress\Tests\Utils;
 
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Filters\AbsoluteUrlFilter;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\ReferenceUtils;
@@ -58,7 +58,7 @@ class DBAsserter {
         $dbEntities = array_filter($allDbEntities, array($storage, 'shouldBeSaved'));
 
 
-        $urlFilter = new AbsoluteUrlFilter(self::$testConfig->testSite->url);
+        $urlFilter = new AbsoluteUrlReplacer(self::$testConfig->testSite->url);
         $storageEntities = array_map(function ($entity) use ($urlFilter) { return $urlFilter->restore($entity); }, $storage->loadAll());
         $countOfentitiesInDb = count($dbEntities);
         $countOfentitiesInStorage = count($storageEntities);

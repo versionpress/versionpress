@@ -158,7 +158,7 @@ abstract class SingleFileStorage extends Storage {
         }
 
         if (is_file($this->file)) {
-            $entities = IniSerializer::deserialize(file_get_contents($this->file));
+            $entities = $this->deserializeEntities(file_get_contents($this->file));
 
             foreach ($entities as $id => &$entity) {
                 $entity[$this->entityInfo->vpidColumnName] = $id;
@@ -193,6 +193,10 @@ abstract class SingleFileStorage extends Storage {
 
     public function getEntityFilename($id, $parentId = null) {
         return $this->file;
+    }
+
+    protected function deserializeEntities($fileContent) {
+        return IniSerializer::deserialize($fileContent);
     }
 
 }

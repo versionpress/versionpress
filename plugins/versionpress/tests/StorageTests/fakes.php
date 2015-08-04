@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Used by AbsoluteUrlFilter.
+ * Used by AbsoluteUrlReplacer.
  *
  * @hack
  * @private

@@ -28,9 +28,6 @@ abstract class DirectoryStorage extends Storage {
     /** @var string */
     private $directory;
 
-    /** @var EntityFilter[] */
-    private $filters = array();
-
     /** @var EntityInfo */
     private $entityInfo;
 
@@ -53,7 +50,6 @@ abstract class DirectoryStorage extends Storage {
             unset($data[$this->entityInfo->idColumnName]);
         }
         $data = $this->removeUnwantedColumns($data);
-        $data = $this->applyFilters($data);
 
         if (!$this->shouldBeSaved($data)) {
             return null;
@@ -182,17 +178,5 @@ abstract class DirectoryStorage extends Storage {
     public function loadEntity($id, $parentId = null) {
         $entities = $this->loadAllFromFiles(array($this->getEntityFilename($id)));
         return $entities[$id];
-    }
-
-    protected function applyFilters($data) {
-        foreach ($this->filters as $filter) {
-            $data = $filter->apply($data);
-        }
-
-        return $data;
-    }
-
-    protected function addFilter(EntityFilter $filter) {
-        $this->filters[] = $filter;
     }
 }

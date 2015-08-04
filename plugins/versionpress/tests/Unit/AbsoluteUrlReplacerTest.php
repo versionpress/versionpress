@@ -2,18 +2,18 @@
 
 namespace VersionPress\Tests\Unit;
 
-use VersionPress\Filters\AbsoluteUrlFilter;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 
-class AbsoluteUrlFilterTest extends \PHPUnit_Framework_TestCase {
+class AbsoluteUrlReplacerTest extends \PHPUnit_Framework_TestCase {
 
     const REPLACED_URL = 'http://wp.example.com/';
 
-    /** @var AbsoluteUrlFilter */
+    /** @var \VersionPress\Utils\AbsoluteUrlReplacer */
     private $filter;
 
     protected function setUp() {
         parent::setUp();
-        $this->filter = new AbsoluteUrlFilter(self::REPLACED_URL);
+        $this->filter = new AbsoluteUrlReplacer(self::REPLACED_URL);
     }
 
     /**
@@ -23,11 +23,12 @@ class AbsoluteUrlFilterTest extends \PHPUnit_Framework_TestCase {
      * @param $entity
      * @param $entityWithReplacedUrls
      */
-    public function filterReplacesUrlWithPlaceholder($entity, $entityWithReplacedUrls) {
-        $result = $this->filter->apply($entity);
+    public function itReplacesUrlWithPlaceholder($entity, $entityWithReplacedUrls) {
+        $result = $this->filter->replace($entity);
         $this->assertEquals($entityWithReplacedUrls, $result);
     }
 
+
     /**
      * @test
      * @dataProvider entityDataProvider
@@ -35,7 +36,7 @@ class AbsoluteUrlFilterTest extends \PHPUnit_Framework_TestCase {
      * @param $entity
      * @param $entityWithReplacedUrls
      */
-    public function filterRestoresUrl($entity, $entityWithReplacedUrls) {
+    public function itRestoresUrl($entity, $entityWithReplacedUrls) {
         $result = $this->filter->restore($entityWithReplacedUrls);
         $this->assertEquals($entity, $result);
     }
@@ -46,7 +47,7 @@ class AbsoluteUrlFilterTest extends \PHPUnit_Framework_TestCase {
         $simpleObject->someUrl = self::REPLACED_URL;
 
         $replacedSimpleObject = new \stdClass();
-        $replacedSimpleObject->someUrl = AbsoluteUrlFilter::PLACEHOLDER;
+        $replacedSimpleObject->someUrl = AbsoluteUrlReplacer::PLACEHOLDER;
 
 
         $complexObject = new \stdClass();
@@ -55,36 +56,36 @@ class AbsoluteUrlFilterTest extends \PHPUnit_Framework_TestCase {
         $complexObject->obj->url = self::REPLACED_URL;
 
         $replacedComplexObject = new \stdClass();
-        $replacedComplexObject->props = array('some' . AbsoluteUrlFilter::PLACEHOLDER . 'url');
+        $replacedComplexObject->props = array('some' . AbsoluteUrlReplacer::PLACEHOLDER . 'url');
         $replacedComplexObject->obj = new \stdClass();
-        $replacedComplexObject->obj->url = AbsoluteUrlFilter::PLACEHOLDER;
+        $replacedComplexObject->obj->url = AbsoluteUrlReplacer::PLACEHOLDER;
 
 
         return array(
             array(
                 array('url' => self::REPLACED_URL),
-                array('url' => AbsoluteUrlFilter::PLACEHOLDER)
+                array('url' => AbsoluteUrlReplacer::PLACEHOLDER)
             ),
             array(
                 array('url' => self::REPLACED_URL, 'foo' => self::REPLACED_URL),
-                array('url' => AbsoluteUrlFilter::PLACEHOLDER, 'foo' => AbsoluteUrlFilter::PLACEHOLDER)
+                array('url' => AbsoluteUrlReplacer::PLACEHOLDER, 'foo' => AbsoluteUrlReplacer::PLACEHOLDER)
             ),
             array(
                 array('url' => self::REPLACED_URL, 'guid' => self::REPLACED_URL), // guid should not be replaced
-                array('url' => AbsoluteUrlFilter::PLACEHOLDER, 'guid' => self::REPLACED_URL)
+                array('url' => AbsoluteUrlReplacer::PLACEHOLDER, 'guid' => self::REPLACED_URL)
             ),
             array(
                 array('url' => 'some string with url ' . self::REPLACED_URL . ' inside'),
-                array('url' => 'some string with url ' . AbsoluteUrlFilter::PLACEHOLDER . ' inside')
+                array('url' => 'some string with url ' . AbsoluteUrlReplacer::PLACEHOLDER . ' inside')
             ),
 
             array(
                 array('url' => serialize('some serialized string with url ' . self::REPLACED_URL . ' inside')),
-                array('url' => serialize('some serialized string with url ' . AbsoluteUrlFilter::PLACEHOLDER . ' inside'))
+                array('url' => serialize('some serialized string with url ' . AbsoluteUrlReplacer::PLACEHOLDER . ' inside'))
             ),
             array(
                 array('url' => serialize(array('some serialized array with url ', self::REPLACED_URL, 'inside'))),
-                array('url' => serialize(array('some serialized array with url ', AbsoluteUrlFilter::PLACEHOLDER, 'inside')))
+                array('url' => serialize(array('some serialized array with url ', AbsoluteUrlReplacer::PLACEHOLDER, 'inside')))
             ),
             array(
                 array('obj' => serialize($simpleObject)),

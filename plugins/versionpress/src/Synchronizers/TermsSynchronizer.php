@@ -4,14 +4,15 @@ namespace VersionPress\Synchronizers;
 
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\Storage;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 use wpdb;
 
 class TermsSynchronizer extends SynchronizerBase {
 
     private $dbSchema;
 
-    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema) {
-        parent::__construct($storage, $wpdb, $dbSchema, 'term');
+    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer) {
+        parent::__construct($storage, $wpdb, $dbSchema, $urlReplacer, 'term');
         $this->dbSchema = $dbSchema;
     }
 

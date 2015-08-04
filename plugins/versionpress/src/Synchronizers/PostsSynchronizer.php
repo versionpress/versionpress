@@ -3,25 +3,20 @@ namespace VersionPress\Synchronizers;
 
 use Nette\Utils\Strings;
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Filters\AbsoluteUrlFilter;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Storages\Storage;
 use wpdb;
 
 /**
- * Posts synchronizer. Uses VersionPress\Filters\AbsoluteUrlFilter to restore local URLs and fixes
- * comment counts for restored posts.
+ * Posts synchronizer. Fixes comment counts for restored posts.
  */
 class PostsSynchronizer extends SynchronizerBase {
-
-    /** @var AbsoluteUrlFilter */
-    private $filter;
 
     /** @var wpdb */
     private $database;
 
-    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema) {
-        parent::__construct($storage, $wpdb, $dbSchema, 'post');
-        $this->filter = new AbsoluteUrlFilter();
+    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer) {
+        parent::__construct($storage, $wpdb, $dbSchema, $urlReplacer, 'post');
         $this->database = $wpdb;
     }
 
@@ -32,7 +27,6 @@ class PostsSynchronizer extends SynchronizerBase {
             $entityClone = $entity;
             unset($entityClone['category'], $entityClone['post_tag']); // categories and tags are synchronized by TermRelationshipsSynchronizer
             $entityClone = $this->removePostMeta($entityClone);
-            $entityClone = $this->filter->restore($entityClone);
             $filteredEntities[] = $entityClone;
         }
 

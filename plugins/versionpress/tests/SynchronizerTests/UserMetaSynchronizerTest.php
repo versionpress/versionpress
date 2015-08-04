@@ -26,8 +26,8 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('usermeta');
         $this->userStorage = self::$storageFactory->getStorage('user');
-        $this->synchronizer = new UserMetaSynchronizer($this->storage, self::$wpdb, self::$schemaInfo);
-        $this->userSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo);
+        $this->synchronizer = new UserMetaSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->userSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
     }
 
     /**

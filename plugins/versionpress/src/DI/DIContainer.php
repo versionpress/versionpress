@@ -8,6 +8,7 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ExtendedWpdb;
 use VersionPress\Database\WpdbMirrorBridge;
 use VersionPress\Database\VpidRepository;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
 use VersionPress\Initialization\Initializer;
@@ -65,7 +66,7 @@ class DIContainer {
         });
 
         $dic->register(VersionPressServices::MIRROR, function () use ($dic) {
-            return new Mirror($dic->resolve(VersionPressServices::STORAGE_FACTORY));
+            return new Mirror($dic->resolve(VersionPressServices::STORAGE_FACTORY), new AbsoluteUrlReplacer(get_site_url()));
         });
 
         $dic->register(VersionPressServices::DB_SCHEMA, function () {
@@ -103,7 +104,8 @@ class DIContainer {
             return new SynchronizerFactory(
                 $dic->resolve(VersionPressServices::STORAGE_FACTORY),
                 $dic->resolve(VersionPressServices::WPDB),
-                $dic->resolve(VersionPressServices::DB_SCHEMA)
+                $dic->resolve(VersionPressServices::DB_SCHEMA),
+                new AbsoluteUrlReplacer(get_site_url())
             );
         });
 

@@ -35,9 +35,9 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase {
         $this->storage = self::$storageFactory->getStorage('postmeta');
         $this->postStorage = self::$storageFactory->getStorage('post');
         $this->userStorage = self::$storageFactory->getStorage('user');
-        $this->synchronizer = new PostMetaSynchronizer($this->storage, self::$wpdb, self::$schemaInfo);
-        $this->postSynchronizer = new PostsSynchronizer($this->postStorage, self::$wpdb, self::$schemaInfo);
-        $this->userSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo);
+        $this->synchronizer = new PostMetaSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->postSynchronizer = new PostsSynchronizer($this->postStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->userSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
     }
 
     /**

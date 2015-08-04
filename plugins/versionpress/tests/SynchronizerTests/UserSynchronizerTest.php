@@ -18,7 +18,7 @@ class UserSynchronizerTest extends SynchronizerTestCase {
     protected function setUp() {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('user');
-        $this->synchronizer = new UsersSynchronizer($this->storage, self::$wpdb, self::$schemaInfo);
+        $this->synchronizer = new UsersSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
     }
 
     /**

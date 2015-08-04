@@ -1,19 +1,17 @@
 <?php
 
-namespace VersionPress\Filters;
+namespace VersionPress\Utils;
 
 /**
  * Replaces absolute site URL with placeholder
- *
- * @uses get_site_url()
  */
-class AbsoluteUrlFilter implements EntityFilter {
+class AbsoluteUrlReplacer {
 
     const PLACEHOLDER = "<<[site-url]>>";
     private $siteUrl;
 
-    function __construct($siteUrl = null) {
-        $this->siteUrl = $siteUrl ?: get_site_url();
+    function __construct($siteUrl) {
+        $this->siteUrl = $siteUrl;
     }
 
     /**
@@ -22,7 +20,7 @@ class AbsoluteUrlFilter implements EntityFilter {
      * @param array $entity
      * @return array
      */
-    function apply($entity) {
+    function replace($entity) {
         foreach ($entity as $field => $value) {
             if ($field === "guid") continue; // guids cannot be changed even they are in form of URL
             if (isset($entity[$field])) {
@@ -68,7 +66,8 @@ class AbsoluteUrlFilter implements EntityFilter {
     }
 
     private function isSerializedValue($value) {
-        $test = @unserialize(($value));
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
+        $test = @unserialize(($value)); // it throws an error and returns false if $value is not a serialized object
         return ($test !== false || $test === 'b:0;') ? true : false;
     }
 
