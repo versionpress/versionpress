@@ -48,10 +48,54 @@ class AbsoluteUrlFilter implements EntityFilter {
     }
 
     private function replaceLocalUrls($value) {
-        return is_string($value) ? str_replace($this->siteUrl, self::PLACEHOLDER, $value) : $value;
+        if ($this->isSerializedValue($value)) {
+            $unserializedValue = unserialize($value);
+            $replacedValue = $this->replaceRecursively($unserializedValue, array($this, 'replaceLocalUrls'));
+            return serialize($replacedValue);
+        } else {
+            return is_string($value) ? str_replace($this->siteUrl, self::PLACEHOLDER, $value) : $value;
+        }
     }
 
     private function replacePlaceholders($value) {
-        return is_string($value) ? str_replace(self::PLACEHOLDER, $this->siteUrl, $value) : $value;
+        if ($this->isSerializedValue($value)) {
+            $unserializedValue = unserialize($value);
+            $replacedValue = $this->replaceRecursively($unserializedValue, array($this, 'replacePlaceholders'));
+            return serialize($replacedValue);
+        } else {
+            return is_string($value) ? str_replace(self::PLACEHOLDER, $this->siteUrl, $value) : $value;
+        }
+    }
+
+    private function isSerializedValue($value) {
+        $test = @unserialize(($value));
+        return ($test !== false || $test === 'b:0;') ? true : false;
+    }
+
+    /**
+     * @param mixed $value Can be string, array or even an object or all this combined
+     * @param callable $replaceFn Takes one parameter - the "haystack" and return replaced string.
+     * @return string
+     */
+    private function replaceRecursively($value, $replaceFn) {
+        if (is_string($value)) {
+            return $replaceFn($value);
+        } else if (is_array($value)) {
+            $tmp = array();
+            foreach ($value as $key => $arrayValue) {
+                $tmp[$key] = $this->replaceRecursively($arrayValue, $replaceFn);
+            }
+            return $tmp;
+        } else if (is_object($value)) {
+            $r = new \ReflectionObject($value);
+            $p = $r->getProperties();
+            foreach ($p as $prop) {
+                $prop->setAccessible(true);
+                $prop->setValue($value, $this->replaceRecursively($prop->getValue($value), $replaceFn));
+            }
+            return $value;
+        } else {
+            return $value;
+        }
     }
 }
