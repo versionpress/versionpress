@@ -5,7 +5,6 @@ namespace VersionPress\DI;
 use Committer;
 use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Database\ExtendedWpdb;
 use VersionPress\Database\WpdbMirrorBridge;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -66,7 +65,10 @@ class DIContainer {
         });
 
         $dic->register(VersionPressServices::MIRROR, function () use ($dic) {
-            return new Mirror($dic->resolve(VersionPressServices::STORAGE_FACTORY), new AbsoluteUrlReplacer(get_site_url()));
+            return new Mirror(
+                $dic->resolve(VersionPressServices::STORAGE_FACTORY),
+                $dic->resolve(VersionPressServices::URL_REPLACER)
+            );
         });
 
         $dic->register(VersionPressServices::DB_SCHEMA, function () {
@@ -96,7 +98,8 @@ class DIContainer {
                 $dic->resolve(VersionPressServices::WPDB),
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::STORAGE_FACTORY),
-                $dic->resolve(VersionPressServices::REPOSITORY)
+                $dic->resolve(VersionPressServices::REPOSITORY),
+                $dic->resolve(VersionPressServices::URL_REPLACER)
             );
         });
 
@@ -105,7 +108,7 @@ class DIContainer {
                 $dic->resolve(VersionPressServices::STORAGE_FACTORY),
                 $dic->resolve(VersionPressServices::WPDB),
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
-                new AbsoluteUrlReplacer(get_site_url())
+                $dic->resolve(VersionPressServices::URL_REPLACER)
             );
         });
 
@@ -135,6 +138,10 @@ class DIContainer {
                 $dic->resolve(VersionPressServices::WPDB),
                 $dic->resolve(VersionPressServices::DB_SCHEMA)
             );
+        });
+
+        $dic->register(VersionPressServices::URL_REPLACER, function () {
+            return new AbsoluteUrlReplacer(get_site_url());
         });
 
         return self::$instance;

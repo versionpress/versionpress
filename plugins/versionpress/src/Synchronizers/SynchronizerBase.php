@@ -173,7 +173,8 @@ abstract class SynchronizerBase implements Synchronizer {
      * @return mixed
      */
     protected function filterEntities($entities) {
-        return $entities;
+        $urlReplacer = $this->urlReplacer;
+        return array_map(function ($entity) use ($urlReplacer) { return $urlReplacer->restore($entity); }, $entities);
     }
 
 

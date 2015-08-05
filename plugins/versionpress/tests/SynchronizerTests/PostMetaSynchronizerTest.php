@@ -11,6 +11,7 @@ use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Synchronizers\UsersSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class PostMetaSynchronizerTest extends SynchronizerTestCase {
     /** @var PostMetaStorage */
@@ -58,7 +59,17 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase {
      * @testdox Synchronizer updates changed postmeta in the database
      */
     public function synchronizerUpdatesChangedPostMetaInDatabase() {
-        $this->editPostMeta();
+        $this->editPostMeta('_thumbnail_id', self::$postVpId);
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Synchronizer replaces absolute URLs
+     */
+    public function synchronizerReplacesAbsoluteUrls() {
+        $this->editPostMeta('some_meta', AbsoluteUrlReplacer::PLACEHOLDER);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -93,7 +104,7 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase {
      * @testdox Synchronizer updates changed postmeta in the database (selective synchronization)
      */
     public function synchronizerUpdatesChangedPostMetaInDatabase_selective() {
-        $entitiesToSynchronize = $this->editPostMeta();
+        $entitiesToSynchronize = $this->editPostMeta('_thumbnail_id', self::$postVpId);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -140,8 +151,8 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase {
         );
     }
 
-    private function editPostMeta() {
-        $this->storage->save(EntityUtils::preparePostMeta(self::$vpId, self::$postVpId, '_thumbnail_id', self::$postVpId));
+    private function editPostMeta($key, $value) {
+        $this->storage->save(EntityUtils::preparePostMeta(self::$vpId, self::$postVpId, $key, $value));
         return array(
             array('vp_id' => self::$vpId, 'parent' => self::$postVpId),
         );

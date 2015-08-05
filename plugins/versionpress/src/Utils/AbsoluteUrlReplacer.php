@@ -1,6 +1,7 @@
 <?php
 
 namespace VersionPress\Utils;
+use Tracy\Debugger;
 
 /**
  * Replaces absolute site URL with placeholder
@@ -10,7 +11,7 @@ class AbsoluteUrlReplacer {
     const PLACEHOLDER = "<<[site-url]>>";
     private $siteUrl;
 
-    function __construct($siteUrl) {
+    public function __construct($siteUrl) {
         $this->siteUrl = $siteUrl;
     }
 
@@ -20,7 +21,7 @@ class AbsoluteUrlReplacer {
      * @param array $entity
      * @return array
      */
-    function replace($entity) {
+    public function replace($entity) {
         foreach ($entity as $field => $value) {
             if ($field === "guid") continue; // guids cannot be changed even they are in form of URL
             if (isset($entity[$field])) {
@@ -36,7 +37,7 @@ class AbsoluteUrlReplacer {
      * @param array $entity
      * @return array
      */
-    function restore($entity) {
+    public function restore($entity) {
         foreach ($entity as $field => $value) {
             if (isset($entity[$field])) {
                 $entity[$field] = $this->replacePlaceholders($value);
@@ -78,7 +79,7 @@ class AbsoluteUrlReplacer {
      */
     private function replaceRecursively($value, $replaceFn) {
         if (is_string($value)) {
-            return $replaceFn($value);
+            return call_user_func($replaceFn, $value);
         } else if (is_array($value)) {
             $tmp = array();
             foreach ($value as $key => $arrayValue) {

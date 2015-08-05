@@ -58,8 +58,8 @@ class DBAsserter {
         $dbEntities = array_filter($allDbEntities, array($storage, 'shouldBeSaved'));
 
 
-        $urlFilter = new AbsoluteUrlReplacer(self::$testConfig->testSite->url);
-        $storageEntities = array_map(function ($entity) use ($urlFilter) { return $urlFilter->restore($entity); }, $storage->loadAll());
+        $urlReplacer = new AbsoluteUrlReplacer(self::$testConfig->testSite->url);
+        $storageEntities = array_map(function ($entity) use ($urlReplacer) { return $urlReplacer->restore($entity); }, $storage->loadAll());
         $countOfentitiesInDb = count($dbEntities);
         $countOfentitiesInStorage = count($storageEntities);
 

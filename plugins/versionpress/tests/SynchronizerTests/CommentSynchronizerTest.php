@@ -12,6 +12,7 @@ use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Synchronizers\UsersSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\IdUtil;
 
 class CommentSynchronizerTest extends SynchronizerTestCase {
@@ -60,6 +61,16 @@ class CommentSynchronizerTest extends SynchronizerTestCase {
      */
     public function synchronizerUpdatesChangedCommentInDatabase() {
         $this->editComment();
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Synchronizer replaces absolute URLs
+     */
+    public function synchronizerReplacesAbsoluteUrls() {
+        $this->editComment('comment_content', AbsoluteUrlReplacer::PLACEHOLDER);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -133,8 +144,8 @@ class CommentSynchronizerTest extends SynchronizerTestCase {
         );
     }
 
-    private function editComment() {
-        $this->storage->save(EntityUtils::prepareComment(self::$vpId, null, null, array('comment_approved' => '0')));
+    private function editComment($key = 'comment_content', $value = 'another content') {
+        $this->storage->save(EntityUtils::prepareComment(self::$vpId, null, null, array($key => $value)));
         return array(
             array('vp_id' => self::$vpId, 'parent' => self::$vpId),
         );

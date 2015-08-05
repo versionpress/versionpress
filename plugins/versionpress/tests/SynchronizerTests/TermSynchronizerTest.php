@@ -7,6 +7,7 @@ use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Synchronizers\TermsSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class TermSynchronizerTest extends SynchronizerTestCase {
     /** @var TermsStorage */
@@ -37,6 +38,16 @@ class TermSynchronizerTest extends SynchronizerTestCase {
      */
     public function synchronizerUpdatesChangedTermInDatabase() {
         $this->editTerm();
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Synchronizer replaces absolute URLs
+     */
+    public function synchronizerReplacesAbsoluteUrls() {
+        $this->editTerm(AbsoluteUrlReplacer::PLACEHOLDER);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -88,8 +99,8 @@ class TermSynchronizerTest extends SynchronizerTestCase {
         return array(array('vp_id' => self::$vpId, 'parent' => self::$vpId));
     }
 
-    private function editTerm() {
-        $this->storage->save(EntityUtils::prepareTerm(self::$vpId, 'Another name'));
+    private function editTerm($name = 'Another name') {
+        $this->storage->save(EntityUtils::prepareTerm(self::$vpId, $name));
         return array(array('vp_id' => self::$vpId, 'parent' => self::$vpId));
     }
 

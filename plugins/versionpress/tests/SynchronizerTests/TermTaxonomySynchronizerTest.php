@@ -9,6 +9,7 @@ use VersionPress\Synchronizers\TermsSynchronizer;
 use VersionPress\Synchronizers\TermTaxonomySynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class TermTaxonomySynchronizerTest extends SynchronizerTestCase {
     /** @var TermTaxonomyStorage */
@@ -47,6 +48,16 @@ class TermTaxonomySynchronizerTest extends SynchronizerTestCase {
      */
     public function synchronizerUpdatesChangedTermTaxonomyInDatabase() {
         $this->editTermTaxonomy();
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Synchronizer replaces absolute URLs
+     */
+    public function synchronizerReplacesAbsoluteUrls() {
+        $this->editTermTaxonomy(AbsoluteUrlReplacer::PLACEHOLDER);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -108,8 +119,8 @@ class TermTaxonomySynchronizerTest extends SynchronizerTestCase {
         );
     }
 
-    private function editTermTaxonomy() {
-        $this->storage->save(EntityUtils::prepareTermTaxonomy(self::$vpId, self::$termVpId, 'category', 'Another description'));
+    private function editTermTaxonomy($description = 'Another description') {
+        $this->storage->save(EntityUtils::prepareTermTaxonomy(self::$vpId, self::$termVpId, 'category', $description));
         return array(array('vp_id' => self::$vpId, 'parent' => self::$termVpId));
     }
 
