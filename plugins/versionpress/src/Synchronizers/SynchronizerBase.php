@@ -454,7 +454,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $vpIdsRestriction = join(', ', $vpIds);
 
         $result = $this->database->get_results("SELECT HEX(vp_id), id FROM $vpIdTable WHERE vp_id IN ($vpIdsRestriction)", ARRAY_N);
-        return array_combine(array_column($result, 0), array_column($result, 1));
+        return array_combine(ArrayUtils::column($result, 0), ArrayUtils::column($result, 1));
     }
 
     //--------------------------------------
