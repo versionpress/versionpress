@@ -6,6 +6,7 @@ import ReactContextStub = require('../../common/__tests__/ReactContextStub');
 import HomePage = require('../HomePage.react');
 import utils = require('../../common/__tests__/utils');
 import CommitsTable = require('../../Commits/CommitsTable.react');
+import config = require('../../config');
 
 const testUtils = React.addons.TestUtils;
 
@@ -49,9 +50,16 @@ describe('HomePage', () => {
     const component = <React.DOMComponent<React.HTMLAttributes>> testUtils.renderIntoDocument(
       React.createElement(handler, props)
     );
-    fakeServer.requests[0].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(fakeData));
+    fakeServer.respondWith('GET', config.apiBaseUrl + '/commits?page=1', [
+        200, { 'Content-Type': 'application/json' }, JSON.stringify(fakeData)]
+    );
+    fakeServer.respondWith('GET', config.apiBaseUrl + '/display-welcome-panel', [
+        200, { 'Content-Type': 'application/json' }, JSON.stringify(true)]
+    );
+    fakeServer.respond();
 
     const commitsTable = testUtils.findRenderedComponentWithType(component, CommitsTable);
+
     expect(commitsTable.props.pages.length).to.equal(fakeData.pages.length);
     expect(commitsTable.props.commits.length).to.equal(fakeData.commits.length);
     expect(commitsTable.props.currentPage).to.equal(parseInt(props.params.page, 10));
