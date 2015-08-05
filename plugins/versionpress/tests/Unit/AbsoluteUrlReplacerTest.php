@@ -28,7 +28,6 @@ class AbsoluteUrlReplacerTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($entityWithReplacedUrls, $result);
     }
 
-
     /**
      * @test
      * @dataProvider entityDataProvider
