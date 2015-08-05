@@ -164,11 +164,11 @@ class IniSerializer {
     }
 
     public static function deserializeFlat($string) {
-        $string = self::sanitizeSectionsAndKeys_addPlaceholders($string);
         $string = self::eolWorkaround_addPlaceholders($string);
+        $string = self::sanitizeSectionsAndKeys_addPlaceholders($string);
         $deserialized = parse_ini_string($string, true);
-        $deserialized = self::eolWorkaround_removePlaceholders($deserialized);
         $deserialized = self::sanitizeSectionsAndKeys_removePlaceholders($deserialized);
+        $deserialized = self::eolWorkaround_removePlaceholders($deserialized);
         return $deserialized;
     }
 
