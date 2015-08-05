@@ -61,6 +61,13 @@ var distDir = './dist';
 var vpDir = './plugins/versionpress';
 
 /**
+ * Frontend source directory
+ *
+ * @type {string}
+ */
+var frontendDir = './frontend';
+
+/**
  * Array of globs that will be used in gulp.src() to copy files from source to destination.
  * Prepared in `prepare-src-definition`.
  *
@@ -132,6 +139,23 @@ gulp.task('clean', function (cb) {
 gulp.task('copy', ['clean', 'prepare-src-definition'], function (cb) {
     var srcOptions = {dot: true, base: vpDir};
     return gulp.src(srcDef, srcOptions).pipe(gulp.dest(buildDir));
+});
+
+/**
+ * Builds the frontend.
+ */
+gulp.task('frontend-build', shell.task([
+    'npm run build'
+], {cwd: frontendDir}));
+
+/**
+ * Deploys the frontend.
+ */
+gulp.task('frontend-deploy', ['copy', 'frontend-build'], function(cb) {
+    var src = frontendDir + '/build/**';
+    var dist = buildDir + '/admin/public/gui';
+    var srcOptions = {dot: true};
+    return gulp.src(src, srcOptions).pipe(gulp.dest(dist));
 });
 
 /**
@@ -257,9 +281,27 @@ gulp.task('init-project-settings-files', function() {
 });
 
 /**
+ * Inits the frontend project.
+ */
+gulp.task('init-frontend', function() {
+    var configPath = frontendDir + '/src/config.local.sample.ts';
+    var targetName = configPath.replace('.sample', '');
+    if (fs.existsSync(targetName)) {
+        targetName = configPath;
+    }
+
+    return gulp.src(configPath)
+        .pipe(rename(targetName))
+        .pipe(gulp.dest('.'))
+        .pipe(shell([
+            'npm install'
+        ], {cwd: frontendDir}));
+});
+
+/**
  * Sets git to be case sensitive.
  */
-gulp.task('git-config', ['composer-install-ext-libs', 'composer-install-versionpress-libs', 'init-project-settings-files'], function(cb) {
+gulp.task('git-config', function(cb) {
     return git.exec({args: 'config core.ignorecase false'}, function (err, stdout) {
         if(err) { console.log(err); }
         cb();
@@ -292,13 +334,13 @@ gulp.task('nightly', ['set-nightly-build', 'clean-build']);
  * Task called from WpAutomation to copy the plugin files to the test directory
  * specified in `test-config.neon`. Basically does only the `copy` task.
  */
-gulp.task('test-deploy', ['prepare-test-deploy', 'copy']);
+gulp.task('test-deploy', ['prepare-test-deploy', 'copy', 'frontend-deploy']);
 
 /**
  * Inits dev environment.
  * Install vendors, set env variables.
  */
-gulp.task('init-dev', ['git-config']);
+gulp.task('init-dev', ['git-config', 'composer-install-ext-libs', 'composer-install-versionpress-libs', 'init-project-settings-files', 'init-frontend']);
 
 //--------------------------------------
 // Helper functions
