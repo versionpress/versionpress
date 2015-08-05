@@ -7,6 +7,3 @@
 
 # Git binary. Expects Git in PATH by default, can be updated to use custom location
 git-binary: git
-
-# GUI version: html, javascript
-gui: html
