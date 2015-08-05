@@ -6,15 +6,15 @@
     "loglevel": "warn"
   },
   "scripts": {
-    "postinstall": "tsd reinstall --save",
-    "clean": "rimraf build/*",
+    "postinstall": "./node_modules/.bin/tsd reinstall --save",
+    "clean": "./node_modules/.bin/rimraf build/*",
     "prebuild": "npm run clean",
     "build": "node ./config/webpack-build.js",
     "dev": "node ./config/webpack-dev-server.js",
     "lint": "gulp tslint",
     "pretest": "npm run lint",
-    "test": "karma start config/karma.conf.js --single-run",
-    "test:watch": "karma start config/karma.conf.js"
+    "test": "./node_modules/.bin/karma start ./config/karma.conf.js --single-run",
+    "test:watch": "./node_modules/.bin/karma start ./config/karma.conf.js"
   },
   "author": "",
   "license": "GPL",
