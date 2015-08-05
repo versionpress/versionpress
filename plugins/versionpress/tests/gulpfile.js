@@ -1,11 +1,11 @@
 var gulp = require('gulp');
-var seleniumPlease = require('selenium-please');
 var chalk = require('chalk');
 var tcpPortUsed = require('tcp-port-used');
 var argv = require('yargs').argv;
 var path = require('path');
 var childProcess = require('child_process');
 var fs = require('fs');
+var selenium = require('selenium-standalone');
 
 // Run this task to get the help
 gulp.task('default', function() {
@@ -41,66 +41,68 @@ gulp.task('default', function() {
 });
 
 gulp.task('run-tests', function(cb) {
+    // check for more recent versions of selenium here:
+    // http://selenium-release.storage.googleapis.com/index.html
+    var seleniumVersion = '2.47.1';
 
+    selenium.install({
+        version: seleniumVersion,
+        baseURL: 'http://selenium-release.storage.googleapis.com',
+        drivers: {},
+        logger: function(message) {
+            console.log(message)
+        }
+    }, function(err) {
+        if (err) return cb(err);
 
-    seleniumPlease({
+        selenium.start({
+            version: seleniumVersion
+        }, function(err, child) {
+            if (err) return cb(err);
 
-        selenium: {
-            // see http://selenium-release.storage.googleapis.com/index.html
-            url: 'http://selenium-release.storage.googleapis.com/2.44/selenium-server-standalone-2.44.0.jar',
-            file: './node_modules/.bin/selenium-server-standalone-2.44.0.jar'
-        },
+            if (argv['force-setup'] !== undefined) {
 
-        drivers: [], // in other words, use phantomjs only (see selenium-please/libs/run.js)
-
-        log: './node_modules/.bin/selenium.log',
-
-        port: 4444
-
-    }, function(err, selenium) {
-
-        if (argv['force-setup'] !== undefined) {
-
-            if (argv['force-setup'] === true) {
-                // just --force-setup without any value, default to before-suite
-                argv['force-setup'] = "before-suite";
+                if (argv['force-setup'] === true) {
+                    // just --force-setup without any value, default to before-suite
+                    argv['force-setup'] = "before-suite";
+                }
+                process.env['VP_FORCE_SETUP'] = argv['force-setup'];
             }
-            process.env['VP_FORCE_SETUP'] = argv['force-setup'];
-        }
 
-        var phpUnitCmd = fs.realpathSync(path.join('..', 'vendor', 'bin', 'phpunit'));
-        var isWindows = (process.platform.lastIndexOf('win') === 0);
-        if (isWindows) {
-            phpUnitCmd += ".bat";
-        }
-        var phpUnitCmdArgs = [
-            "--log-tap=./phpunit-log.tap.txt",
-            "--testdox-text=./phpunit-log.testdox.txt",
-            "--verbose",
-            "--colors"
-        ];
+            var phpUnitCmd = fs.realpathSync(path.join('..', 'vendor', 'bin', 'phpunit'));
+            var isWindows = (process.platform.lastIndexOf('win') === 0);
+            if (isWindows) {
+                phpUnitCmd += ".bat";
+            }
+            var phpUnitCmdArgs = [
+                "--log-tap=./phpunit-log.tap.txt",
+                "--testdox-text=./phpunit-log.testdox.txt",
+                "--verbose",
+                "--colors"
+            ];
 
-        var outFile = fs.createWriteStream('phpunit-log.txt');
+            var outFile = fs.createWriteStream('phpunit-log.txt');
 
 
-        var phpunit = childProcess.spawn(phpUnitCmd, phpUnitCmdArgs);
-        phpunit.stdout.on('data', function(data) {
-            process.stdout.write(data);
-            outFile.write(data);
-        });
-        phpunit.stdout.on('end', function(data) {
-            outFile.end();
-            selenium.kill();
-            cb();
-        });
+            var phpunit = childProcess.spawn(phpUnitCmd, phpUnitCmdArgs);
+            phpunit.stdout.on('data', function(data) {
+                process.stdout.write(data);
+                outFile.write(data);
+            });
+            phpunit.stdout.on('end', function(data) {
+                outFile.end();
+                child.kill();
+                cb();
+            });
 
-        phpunit.on('error', function(err) {
-            console.log("Error");
-            console.log(err);
-            selenium.kill();
-            cb();
-        });
+            phpunit.on('error', function(err) {
+                console.log("Error");
+                console.log(err);
+                child.kill();
+                cb();
+            });
+        })
+    })
 
-    });
 });
 
