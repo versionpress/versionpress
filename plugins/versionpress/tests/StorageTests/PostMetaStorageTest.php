@@ -86,5 +86,3 @@ class PostMetaStorageTest extends \PHPUnit_Framework_TestCase {
         FileSystem::remove(__DIR__ . '/posts');
     }
 }
-
-require_once(__DIR__ . '/fakes.php');

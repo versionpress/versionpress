@@ -35,5 +35,3 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase {
 
     }
 }
-
-require_once('fakes.php');
