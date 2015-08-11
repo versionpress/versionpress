@@ -54,8 +54,9 @@ class TermTaxonomyStorage extends SingleFileStorage {
         $this->updateTaxonomy($termId, $taxonomyVpid, $data);
 
         if ($this->entities[$termId]['taxonomies'] != $originalTaxonomies) {
+            $changeInfo = $this->createChangeInfo(null, $this->entities[$termId], $isNew ? 'create' : 'edit');
             $this->saveEntities();
-            return $this->createChangeInfo(null, $this->entities[$termId], $isNew ? 'create' : 'edit');
+            return $changeInfo;
         } else {
             return null;
         }
