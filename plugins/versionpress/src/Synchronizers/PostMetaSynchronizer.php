@@ -4,10 +4,11 @@ namespace VersionPress\Synchronizers;
 
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\Storage;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 use wpdb;
 
 class PostMetaSynchronizer extends SynchronizerBase {
-    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema) {
-        parent::__construct($storage, $wpdb, $dbSchema, 'postmeta');
+    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer) {
+        parent::__construct($storage, $wpdb, $dbSchema, $urlReplacer, 'postmeta');
     }
 }

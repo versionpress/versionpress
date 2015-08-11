@@ -14,6 +14,7 @@ use VersionPress\Synchronizers\TermTaxonomySynchronizer;
 use VersionPress\Synchronizers\UsersSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\IdUtil;
 
 class PostSynchronizerTest extends SynchronizerTestCase {
@@ -47,10 +48,10 @@ class PostSynchronizerTest extends SynchronizerTestCase {
         $this->termStorage = self::$storageFactory->getStorage('term');
         $this->termTaxonomyStorage = self::$storageFactory->getStorage('term_taxonomy');
 
-        $this->synchronizer = new PostsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo);
-        $this->userSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo);
-        $this->termSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo);
-        $this->termTaxonomySynchronizer = new TermTaxonomySynchronizer($this->termTaxonomyStorage, self::$wpdb, self::$schemaInfo);
+        $this->synchronizer = new PostsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->userSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->termSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->termTaxonomySynchronizer = new TermTaxonomySynchronizer($this->termTaxonomyStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
     }
 
     /**
@@ -71,6 +72,16 @@ class PostSynchronizerTest extends SynchronizerTestCase {
      */
     public function synchronizerUpdatesChangedPostInDatabase() {
         $this->editPost();
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Synchronizer replaces absolute URLs
+     */
+    public function synchronizerReplacesAbsoluteUrls() {
+        $this->editPost('post_content', AbsoluteUrlReplacer::PLACEHOLDER);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -188,8 +199,8 @@ class PostSynchronizerTest extends SynchronizerTestCase {
         );
     }
 
-    private function editPost() {
-        $this->storage->save(EntityUtils::preparePost(self::$vpId, null, array('post_status' => 'trash')));
+    private function editPost($key = 'post_status', $value = 'trash') {
+        $this->storage->save(EntityUtils::preparePost(self::$vpId, null, array($key => $value)));
         return array(
             array('vp_id' => self::$vpId, 'parent' => self::$vpId),
         );

@@ -4,6 +4,7 @@ namespace VersionPress\Synchronizers;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\OptionsStorage;
 use VersionPress\Storages\Storage;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 use wpdb;
 
 /**
@@ -17,12 +18,15 @@ class OptionsSynchronizer implements Synchronizer {
 
     /** @var wpdb */
     private $database;
+    /** @var AbsoluteUrlReplacer */
+    private $urlReplacer;
 
     private $tableName;
 
-    function __construct(Storage $optionsStorage, $wpdb, DbSchemaInfo $dbSchema) {
+    function __construct(Storage $optionsStorage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer) {
         $this->optionsStorage = $optionsStorage;
         $this->database = $wpdb;
+        $this->urlReplacer = $urlReplacer;
         $this->tableName = $dbSchema->getPrefixedTableName('option');
     }
 
@@ -32,6 +36,7 @@ class OptionsSynchronizer implements Synchronizer {
 
         $syncQuery = "INSERT INTO {$this->tableName} (option_name, option_value, autoload) VALUES ";
         foreach ($options as $optionName => $values) {
+            $values = $this->urlReplacer->restore($values);
             if (!isset($values['autoload'])) $values['autoload'] = 'yes'; // default value
             $syncQuery .= "(\"$optionName\", \"" . $this->database->_real_escape($values['option_value']) . "\", \"$values[autoload]\"),";
         }

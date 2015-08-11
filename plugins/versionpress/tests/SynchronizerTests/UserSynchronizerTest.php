@@ -7,6 +7,7 @@ use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Synchronizers\UsersSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class UserSynchronizerTest extends SynchronizerTestCase {
     /** @var UserStorage */
@@ -18,7 +19,7 @@ class UserSynchronizerTest extends SynchronizerTestCase {
     protected function setUp() {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('user');
-        $this->synchronizer = new UsersSynchronizer($this->storage, self::$wpdb, self::$schemaInfo);
+        $this->synchronizer = new UsersSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
     }
 
     /**
@@ -37,6 +38,16 @@ class UserSynchronizerTest extends SynchronizerTestCase {
      */
     public function synchronizerUpdatesChangedUserInDatabase() {
         $this->editUser();
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Synchronizer replaces absolute URLs
+     */
+    public function synchronizerReplacesAbsoluteUrls() {
+        $this->editUser('some_property', AbsoluteUrlReplacer::PLACEHOLDER);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -88,8 +99,8 @@ class UserSynchronizerTest extends SynchronizerTestCase {
         return array(array('vp_id' => self::$vpId, 'parent' => self::$vpId));
     }
 
-    private function editUser() {
-        $this->storage->save(EntityUtils::prepareUser(self::$vpId, array('user_email' => 'changed.email@example.com')));
+    private function editUser($key = 'user_email', $value = 'changed.email@example.com') {
+        $this->storage->save(EntityUtils::prepareUser(self::$vpId, array($key => $value)));
         return array(array('vp_id' => self::$vpId, 'parent' => self::$vpId));
     }
 

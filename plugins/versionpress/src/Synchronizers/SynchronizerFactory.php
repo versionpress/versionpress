@@ -4,6 +4,7 @@ namespace VersionPress\Synchronizers;
 
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\StorageFactory;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 use wpdb;
 
 class SynchronizerFactory {
@@ -20,6 +21,9 @@ class SynchronizerFactory {
      */
     private $dbSchema;
 
+    /** @var AbsoluteUrlReplacer */
+    private $urlReplacer;
+
     private $synchronizerClasses = array(
         'post' => 'VersionPress\Synchronizers\PostsSynchronizer',
         'postmeta' => 'VersionPress\Synchronizers\PostMetaSynchronizer',
@@ -31,10 +35,11 @@ class SynchronizerFactory {
         'term_taxonomy' => 'VersionPress\Synchronizers\TermTaxonomySynchronizer',
     );
 
-    function __construct(StorageFactory $storageFactory, $wpdb, DbSchemaInfo $dbSchema) {
+    function __construct(StorageFactory $storageFactory, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer) {
         $this->storageFactory = $storageFactory;
         $this->database = $wpdb;
         $this->dbSchema = $dbSchema;
+        $this->urlReplacer = $urlReplacer;
     }
 
     /**
@@ -43,7 +48,7 @@ class SynchronizerFactory {
      */
     public function createSynchronizer($synchronizerName) {
         $synchronizerClass = $this->synchronizerClasses[$synchronizerName];
-        return new $synchronizerClass($this->getStorage($synchronizerName), $this->database, $this->dbSchema);
+        return new $synchronizerClass($this->getStorage($synchronizerName), $this->database, $this->dbSchema, $this->urlReplacer);
     }
 
     public function getAllSupportedSynchronizers() {

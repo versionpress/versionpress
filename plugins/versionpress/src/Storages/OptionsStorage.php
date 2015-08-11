@@ -89,4 +89,8 @@ class OptionsStorage extends SingleFileStorage {
         }
         return $key;
     }
+
+    protected function deserializeEntities($fileContent) {
+        return IniSerializer::deserializeFlat($fileContent);
+    }
 }

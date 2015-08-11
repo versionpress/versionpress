@@ -5,6 +5,7 @@ use Nette\Utils\Strings;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Storages\Storage;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\ReferenceUtils;
 use wpdb;
@@ -31,6 +32,9 @@ abstract class SynchronizerBase implements Synchronizer {
     /** @var DbSchemaInfo */
     private $dbSchema;
 
+    /** @var AbsoluteUrlReplacer */
+    private $urlReplacer;
+
     /** @var array|null */
     private $entities = null;
 
@@ -45,12 +49,14 @@ abstract class SynchronizerBase implements Synchronizer {
      * @param Storage $storage Specific Synchronizers will use specific storage types, see VersionPress\Synchronizers\SynchronizerFactory
      * @param wpdb $wpdb
      * @param DbSchemaInfo $dbSchema
+     * @param AbsoluteUrlReplacer $urlReplacer
      * @param string $entityName Constructors in subclasses provide this
      */
-    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, $entityName) {
+    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, $entityName) {
         $this->storage = $storage;
         $this->database = $wpdb;
         $this->dbSchema = $dbSchema;
+        $this->urlReplacer = $urlReplacer;
         $this->entityName = $entityName;
         $this->idColumnName = $dbSchema->getEntityInfo($this->entityName)->idColumnName;
     }
@@ -167,7 +173,8 @@ abstract class SynchronizerBase implements Synchronizer {
      * @return mixed
      */
     protected function filterEntities($entities) {
-        return $entities;
+        $urlReplacer = $this->urlReplacer;
+        return array_map(function ($entity) use ($urlReplacer) { return $urlReplacer->restore($entity); }, $entities);
     }
 
 
@@ -447,7 +454,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $vpIdsRestriction = join(', ', $vpIds);
 
         $result = $this->database->get_results("SELECT HEX(vp_id), id FROM $vpIdTable WHERE vp_id IN ($vpIdsRestriction)", ARRAY_N);
-        return array_combine(array_column($result, 0), array_column($result, 1));
+        return array_combine(ArrayUtils::column($result, 0), ArrayUtils::column($result, 1));
     }
 
     //--------------------------------------

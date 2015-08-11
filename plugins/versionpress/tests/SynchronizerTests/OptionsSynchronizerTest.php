@@ -8,6 +8,7 @@ use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Tests\Utils\TestConfig;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class OptionsSynchronizerTest extends SynchronizerTestCase {
 
@@ -19,7 +20,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase {
     protected function setUp() {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('option');
-        $this->synchronizer = new OptionsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo);
+        $this->synchronizer = new OptionsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
     }
 
     /**
@@ -38,6 +39,16 @@ class OptionsSynchronizerTest extends SynchronizerTestCase {
      */
     public function synchronizerUpdatesChangedOptionInDatabase() {
         $this->storage->save(EntityUtils::prepareOption('foo', 'another value'));
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Synchronizer replaces URLs
+     */
+    public function synchronizerReplacesUrls() {
+        $this->storage->save(EntityUtils::prepareOption('foo', AbsoluteUrlReplacer::PLACEHOLDER));
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
