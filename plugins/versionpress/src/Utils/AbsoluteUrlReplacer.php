@@ -69,7 +69,7 @@ class AbsoluteUrlReplacer {
     private function isSerializedValue($value) {
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
         $test = @unserialize(($value)); // it throws an error and returns false if $value is not a serialized object
-        return $test !== false || $test === 'b:0;';
+        return $test !== false || $value === 'b:0;';
     }
 
     /**
