@@ -2,7 +2,7 @@
 
 var config = {
 
-  apiBaseUrl: 'http://localhost/wordpress/vp-json/versionpress'
+  apiBaseUrl: 'http://localhost/wordpress'
 
 };
 
