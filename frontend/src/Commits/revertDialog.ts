@@ -3,7 +3,7 @@
 import React = require('react');
 import portal = require('../common/portal');
 import request = require('superagent');
-import WPApi = require('../services/WPApi');
+import WpApi = require('../services/WpApi');
 
 const DOM = React.DOM;
 
@@ -11,7 +11,7 @@ export function revertDialog(title: React.ReactNode, okHandler: Function) {
   portal.confirmDialog(title, '', () => {}, () => {}, {loading: true});
 
   request
-    .get(WPApi.getApiLink('can-revert'))
+    .get(WpApi.getApiLink('can-revert'))
     .set('Accept', 'application/json')
     .end((err: any, res: request.Response) => {
       if (res.body) {
