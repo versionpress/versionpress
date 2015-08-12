@@ -76,10 +76,9 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       this.props.router.transitionTo(routes.home);
     }
 
-    request
-      .get(WpApi.getApiLink('commits'))
+    WpApi
+      .get('commits')
       .query({page: page})
-      .accept('application/json')
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
@@ -100,9 +99,8 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   }
 
   fetchWelcomePanel() {
-    request
-      .get(WpApi.getApiLink('display-welcome-panel'))
-      .accept('application/json')
+    WpApi
+      .get('display-welcome-panel')
       .end((err: any, res: request.Response) => {
         if (res.body) {
           this.setState({
@@ -120,10 +118,9 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     const progressBar = <ProgressBar> this.refs['progress'];
     progressBar.progress(0);
     this.setState({ loading: true });
-    request
-      .get(WpApi.getApiLink('undo'))
+    WpApi
+      .get('undo')
       .query({commit: hash})
-      .set('Accept', 'application/json')
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
@@ -141,10 +138,9 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     const progressBar = <ProgressBar> this.refs['progress'];
     progressBar.progress(0);
     this.setState({ loading: true });
-    request
-      .get(WpApi.getApiLink('rollback'))
+    WpApi
+      .get('rollback')
       .query({commit: hash})
-      .set('Accept', 'application/json')
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
@@ -168,10 +164,9 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     const progressBar = <ProgressBar> this.refs['progress'];
     progressBar.progress(0);
 
-    request
-      .post(WpApi.getApiLink('/submit-bug'))
+    WpApi
+      .post('submit-bug')
       .send(values)
-      .set('Accept', 'application/json')
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
@@ -216,9 +211,8 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       displayWelcomePanel: false
     });
 
-    request
-      .post(WpApi.getApiLink('hide-welcome-panel'))
-      .accept('application/json')
+    WpApi
+      .post('hide-welcome-panel')
       .end((err: any, res: request.Response) => {
         this.fetchCommits();
       });

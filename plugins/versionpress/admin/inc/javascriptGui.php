@@ -3,6 +3,7 @@
     var apiUrlPrefix = '<?php echo vp_rest_get_url_prefix(); ?>';
     var apiQueryParam = 'vp_rest_route';
     var apiPrettyPermalinks = <?php echo get_option('permalink_structure') ? 'true' : 'false' ?>;
+    var apiNonce = '<?php echo wp_create_nonce('wp_rest') ?>';
 </script>
 
 <?php
