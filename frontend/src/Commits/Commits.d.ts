@@ -5,4 +5,11 @@ interface Commit {
   canUndo: boolean;
   canRollback: boolean;
   isEnabled: boolean;
+  changes: Change[];
+}
+
+interface Change {
+  type: string;
+  action: string;
+  name: string;
 }

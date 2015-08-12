@@ -3,6 +3,9 @@
 namespace VersionPress\Api;
 
 use VersionPress\ChangeInfos\ChangeInfoMatcher;
+use VersionPress\ChangeInfos\EntityChangeInfo;
+use VersionPress\ChangeInfos\OptionChangeInfo;
+use VersionPress\ChangeInfos\PluginChangeInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitLogPaginator;
 use VersionPress\Git\GitRepository;
@@ -130,13 +133,27 @@ class VersionPressApi {
             $changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
             $isEnabled = $canUndoCommit || $canRollbackToThisCommit || $commit->getHash() === $initialCommitHash;
 
+
+            $changedFiles = $commit->getChangedFiles();
+            $fileChanges = array_map(function ($changedFile) {
+                $status = $changedFile['status'];
+                $filename = $changedFile['path'];
+
+                return array(
+                    'type' => 'file',
+                    'action' => $status === 'A' ? 'add' : ($status === 'M' ? 'modify' : 'delete'),
+                    'name' => $filename,
+                );
+            }, $changedFiles);
+
             $result[] = array(
                 "hash" => $commit->getHash(),
                 "date" => $commit->getDate()->format('c'),
                 "message" => $changeInfo->getChangeDescription(),
                 "canUndo" => $canUndoCommit,
                 "canRollback" => $canRollbackToThisCommit,
-                "isEnabled" => $isEnabled
+                "isEnabled" => $isEnabled,
+                "changes" => array_merge($this->convertChangeInfoList($changeInfo->getChangeInfoList()), $fileChanges),
             );
             $isFirstCommit = false;
         }
@@ -264,5 +281,34 @@ class VersionPressApi {
             $error['message'],
             array('status' => $error['status'])
         );
+    }
+
+    private function convertChangeInfoList($getChangeInfoList) {
+        return array_map(array($this, 'convertChangeInfo'), $getChangeInfoList);
+    }
+
+    private function convertChangeInfo($changeInfo) {
+        $change = array();
+
+        if ($changeInfo instanceof EntityChangeInfo) {
+            $change = array(
+                'type' => $changeInfo->getEntityName(),
+                'action' => $changeInfo->getAction(),
+                'name' => $changeInfo->getEntityId(),
+            );
+        }
+
+        if ($changeInfo instanceof PluginChangeInfo) {
+            $pluginTags = $changeInfo->getCustomTags();
+            $pluginName = $pluginTags[PluginChangeInfo::PLUGIN_NAME_TAG];
+
+            $change = array(
+                'type' => 'plugin',
+                'action' => $changeInfo->getAction(),
+                'name' => $pluginName,
+            );
+        }
+
+        return $change;
     }
 }

@@ -14,19 +14,31 @@ interface CommitsTableRowProps {
 
 class CommitsTableRow extends React.Component<CommitsTableRowProps, any>  {
 
+  public state = {displayDetails: false};
+
   render() {
     if (this.props.commit === null) {
       return DOM.tr(null);
     }
     const commit = this.props.commit;
     const className = 'alternate ' + (commit.isEnabled ? '' : 'disabled');
+    const detailsClass = 'details ' + (this.state.displayDetails === true ? 'show' : 'hide');
 
-    return DOM.tr({className: className},
+    const details = DOM.table(null, commit.changes.map((change: Change) => {
+      return DOM.tr(null, DOM.td(null, change.type), DOM.td(null, change.action), DOM.td(null, change.name));
+    }));
+
+    return DOM.tr({className: className, onClick: () => this.setState({displayDetails: !this.state.displayDetails})},
       DOM.td({
         className: 'column-date',
         title: moment(commit.date).format('LLL')
       }, moment(commit.date).fromNow()),
-      DOM.td({className: 'column-message'}, commit.message),
+      DOM.td({className: 'column-message'},
+        DOM.span({}, commit.message),
+        DOM.div({className: detailsClass},
+          DOM.strong({}, 'Details:'),
+            DOM.div({}, details))
+      ),
       DOM.td({className: 'column-actions'},
         commit.canUndo && commit.isEnabled
           ? DOM.a({
