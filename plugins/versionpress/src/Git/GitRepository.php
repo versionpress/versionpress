@@ -123,14 +123,16 @@ class GitRepository {
 
         $commitDelimiter = chr(29);
         $dataDelimiter = chr(30);
+        $statusDelimiter = chr(31);
 
-        $logCommand = "git log --pretty=format:\"%%H|delimiter|%%aD|delimiter|%%ar|delimiter|%%an|delimiter|%%ae|delimiter|%%s|delimiter|%%b|end|\"";
+        $logCommand = "git log --pretty=format:\"|begin|%%H|delimiter|%%aD|delimiter|%%ar|delimiter|%%an|delimiter|%%ae|delimiter|%%s|delimiter|%%b|end|\" --name-status";
         if (!empty($gitrevisions)) {
             $logCommand .= " " . escapeshellarg($gitrevisions);
         }
 
+        $logCommand = str_replace("|begin|", $commitDelimiter, $logCommand);
         $logCommand = str_replace("|delimiter|", $dataDelimiter, $logCommand);
-        $logCommand = str_replace("|end|", $commitDelimiter, $logCommand);
+        $logCommand = str_replace("|end|", $statusDelimiter, $logCommand);
         $log = trim($this->runShellCommandWithStandardOutput($logCommand), $commitDelimiter);
 
         if ($log == "") {
@@ -139,8 +141,9 @@ class GitRepository {
             $commits = explode($commitDelimiter, $log);
         }
         
-        return array_map(function ($rawCommit) {
-            return Commit::buildFromString(trim($rawCommit));
+        return array_map(function ($rawCommitAndStatus) use ($statusDelimiter) {
+            list($rawCommit, $rawStatus) = explode($statusDelimiter, $rawCommitAndStatus);
+            return Commit::buildFromString(trim($rawCommit), trim($rawStatus));
         }, $commits);
 
     }

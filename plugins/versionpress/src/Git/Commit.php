@@ -23,15 +23,18 @@ class Commit {
     /** @var CommitMessage */
     private $message;
 
+    /** @var array */
+    private $changedFiles;
 
     /**
      * Creates instance from string matching pattern:
      * <hash><div><date><div><relative-date><div><author-name><div><author-email><div><message-head><div><message-body>
      * where <div> is record separator character (ascii ordinary number 30)
      * @param $rawCommit string
+     * @param $rawStatus string
      * @return Commit
      */
-    public static function buildFromString($rawCommit) {
+    public static function buildFromString($rawCommit, $rawStatus) {
         list($hash, $date, $relativeDate, $authorName, $authorEmail, $messageHead, $messageBody) = explode(chr(30), $rawCommit);
         $commit = new Commit();
         $commit->hash = $hash;
@@ -40,6 +43,12 @@ class Commit {
         $commit->authorName = $authorName;
         $commit->authorEmail = $authorEmail;
         $commit->message = new CommitMessage($messageHead, $messageBody);
+
+        foreach (explode("\n", $rawStatus) as $line) {
+            list($status, $path) = explode("\t", $line);
+            $commit->changedFiles[] = array("status" => $status, "path" => $path);
+        }
+
         return $commit;
     }
 
@@ -92,5 +101,12 @@ class Commit {
      */
     public function getMessage() {
         return $this->message;
+    }
+
+    /**
+     * @return array Array of things like `array("status" => "M", "path" => "wp-content/vpdb/something.ini" )`
+     */
+    public function getChangedFiles() {
+        return $this->changedFiles;
     }
 }
