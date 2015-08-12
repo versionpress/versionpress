@@ -102,7 +102,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     WpApi
       .get('display-welcome-panel')
       .end((err: any, res: request.Response) => {
-        if (res.body) {
+        if (res.body === true) {
           this.setState({
             displayWelcomePanel: true
           });

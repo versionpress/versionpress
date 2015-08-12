@@ -31,7 +31,10 @@ class VersionPressApi {
                 'page' => array(
                     'default' => '0'
                 )
-            )
+            ),
+            'permission_callback' => function() {
+                return current_user_can('manage_options');
+            }
         ));
 
         register_vp_rest_route($namespace, '/undo', array(
@@ -41,7 +44,10 @@ class VersionPressApi {
                 'commit' => array(
                     'required' => true
                 )
-            )
+            ),
+            'permission_callback' => function() {
+                return current_user_can('manage_options');
+            }
         ));
 
         register_vp_rest_route($namespace, '/rollback', array(
@@ -51,12 +57,18 @@ class VersionPressApi {
                 'commit' => array(
                     'required' => true
                 )
-            )
+            ),
+            'permission_callback' => function() {
+                return current_user_can('manage_options');
+            }
         ));
 
         register_vp_rest_route($namespace, '/can-revert', array(
             'methods' => WP_REST_Server::READABLE,
-            'callback' => array($this, 'canRevert')
+            'callback' => array($this, 'canRevert'),
+            'permission_callback' => function() {
+                return current_user_can('manage_options');
+            }
         ));
 
         register_vp_rest_route($namespace, '/submit-bug', array(
@@ -69,17 +81,26 @@ class VersionPressApi {
                 'description' => array(
                     'required' => true
                 )
-            )
+            ),
+            'permission_callback' => function() {
+                return current_user_can('manage_options');
+            }
         ));
 
         register_vp_rest_route($namespace, '/display-welcome-panel', array(
             'methods' => WP_REST_Server::READABLE,
-            'callback' => array($this, 'displayWelcomePanel')
+            'callback' => array($this, 'displayWelcomePanel'),
+            'permission_callback' => function() {
+                return current_user_can('manage_options');
+            }
         ));
 
         register_vp_rest_route($namespace, '/hide-welcome-panel', array(
             'methods' => WP_REST_Server::CREATABLE,
-            'callback' => array($this, 'hideWelcomePanel')
+            'callback' => array($this, 'hideWelcomePanel'),
+            'permission_callback' => function() {
+                return current_user_can('manage_options');
+            }
         ));
     }
 
