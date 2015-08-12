@@ -3,6 +3,9 @@ import localConfig = require('./config.local');
 var config = {
 
   apiBaseUrl: window['apiBaseUrl'] || localConfig['apiBaseUrl'] || '',
+  apiUrlPrefix: window['apiUrlPrefix'] || localConfig['apiUrlPrefix'] || 'vp-json',
+  apiQueryParam: window['apiQueryParam'] || localConfig['apiQueryParam'] || 'vp_rest_route',
+  apiPrettyPermalinks: window['apiPrettyPermalinks'] || localConfig['apiPrettyPermalinks'] || false,
 
   routes: {
     page: 'page',
