@@ -2,6 +2,8 @@
 
 namespace VersionPress\Api;
 
+require_once ABSPATH . 'wp-admin/includes/file.php';
+
 use VersionPress\ChangeInfos\ChangeInfoMatcher;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitLogPaginator;
