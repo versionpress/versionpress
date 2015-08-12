@@ -25,75 +25,61 @@ class VersionPressApi {
         $namespace = 'versionpress';
 
         register_vp_rest_route($namespace, '/commits', array(
-            array(
-                'methods' => WP_REST_Server::READABLE,
-                'callback' => array($this, 'getCommits'),
-                'args' => array(
-                    'page' => array(
-                        'default' => '0'
-                    )
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => array($this, 'getCommits'),
+            'args' => array(
+                'page' => array(
+                    'default' => '0'
                 )
             )
         ));
 
         register_vp_rest_route($namespace, '/undo', array(
-            array(
-                'methods' => WP_REST_Server::READABLE,
-                'callback' => array($this, 'undoCommit'),
-                'args' => array(
-                    'commit' => array(
-                        'required' => true
-                    )
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => array($this, 'undoCommit'),
+            'args' => array(
+                'commit' => array(
+                    'required' => true
                 )
             )
         ));
 
         register_vp_rest_route($namespace, '/rollback', array(
-            array(
-                'methods' => WP_REST_Server::READABLE,
-                'callback' => array($this, 'rollbackToCommit'),
-                'args' => array(
-                    'commit' => array(
-                        'required' => true
-                    )
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => array($this, 'rollbackToCommit'),
+            'args' => array(
+                'commit' => array(
+                    'required' => true
                 )
             )
         ));
 
         register_vp_rest_route($namespace, '/can-revert', array(
-            array(
-                'methods' => WP_REST_Server::READABLE,
-                'callback' => array($this, 'canRevert')
-            )
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => array($this, 'canRevert')
         ));
 
         register_vp_rest_route($namespace, '/submit-bug', array(
-            array(
-                'methods' => WP_REST_Server::CREATABLE,
-                'callback' => array($this, 'submitBug'),
-                'args' => array(
-                    'email' => array(
-                        'required' => true
-                    ),
-                    'description' => array(
-                        'required' => true
-                    )
+            'methods' => WP_REST_Server::CREATABLE,
+            'callback' => array($this, 'submitBug'),
+            'args' => array(
+                'email' => array(
+                    'required' => true
+                ),
+                'description' => array(
+                    'required' => true
                 )
             )
         ));
 
         register_vp_rest_route($namespace, '/display-welcome-panel', array(
-            array(
-                'methods' => WP_REST_Server::READABLE,
-                'callback' => array($this, 'displayWelcomePanel')
-            )
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => array($this, 'displayWelcomePanel')
         ));
 
         register_vp_rest_route($namespace, '/hide-welcome-panel', array(
-            array(
-                'methods' => WP_REST_Server::CREATABLE,
-                'callback' => array($this, 'hideWelcomePanel')
-            )
+            'methods' => WP_REST_Server::CREATABLE,
+            'callback' => array($this, 'hideWelcomePanel')
         ));
     }
 
