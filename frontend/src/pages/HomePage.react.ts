@@ -219,7 +219,9 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     request
       .post(WpApi.getApiLink('hide-welcome-panel'))
       .accept('application/json')
-      .end((err: any, res: request.Response) => {});
+      .end((err: any, res: request.Response) => {
+        this.fetchCommits();
+      });
   }
 
   render() {
