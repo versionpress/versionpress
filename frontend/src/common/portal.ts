@@ -7,7 +7,6 @@ import ConfirmDialog = require('./ConfirmDialog.react');
 var portalNode;
 
 export function confirmDialog(title: React.ReactNode, body: React.ReactNode, okHandler, cancelHandler, options) {
-  console.log('portal-confirmDialog');
   options = options || {};
   if (okHandler) {
     options.okButtonClickHandler = okHandler;
@@ -30,7 +29,6 @@ export function openPortal(children) {
 }
 
 export function closePortal() {
-  console.log('portal-closePortal');
   if (portalNode && portalNode.parentNode && close) {
     React.unmountComponentAtNode(portalNode);
     portalNode.parentNode.removeChild(portalNode);
