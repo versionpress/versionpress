@@ -2,11 +2,13 @@
 
 namespace VersionPress\Api;
 
+use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\ChangeInfoMatcher;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\OptionChangeInfo;
 use VersionPress\ChangeInfos\PluginChangeInfo;
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\Commit;
 use VersionPress\Git\GitLogPaginator;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
@@ -134,17 +136,7 @@ class VersionPressApi {
             $isEnabled = $canUndoCommit || $canRollbackToThisCommit || $commit->getHash() === $initialCommitHash;
 
 
-            $changedFiles = $commit->getChangedFiles();
-            $fileChanges = array_map(function ($changedFile) {
-                $status = $changedFile['status'];
-                $filename = $changedFile['path'];
-
-                return array(
-                    'type' => 'file',
-                    'action' => $status === 'A' ? 'add' : ($status === 'M' ? 'modify' : 'delete'),
-                    'name' => $filename,
-                );
-            }, $changedFiles);
+            $fileChanges = $this->getFileChanges($commit);
 
             $result[] = array(
                 "hash" => $commit->getHash(),
@@ -310,5 +302,33 @@ class VersionPressApi {
         }
 
         return $change;
+    }
+
+    /**
+     * @param Commit $commit
+     * @return array
+     */
+    private function getFileChanges(Commit $commit) {
+        $changedFiles = $commit->getChangedFiles();
+
+        $changedFiles = array_filter($changedFiles, function ($changedFile) {
+            $path = str_replace('\\', '/', ABSPATH . $changedFile['path']);
+            $vpdbPath = str_replace('\\', '/', VERSIONPRESS_MIRRORING_DIR);
+
+            return !Strings::startsWith($path, $vpdbPath);
+        });
+
+        $fileChanges = array_map(function ($changedFile) {
+            $status = $changedFile['status'];
+            $filename = $changedFile['path'];
+
+            return array(
+                'type' => 'file',
+                'action' => $status === 'A' ? 'add' : ($status === 'M' ? 'modify' : 'delete'),
+                'name' => $filename,
+            );
+        }, $changedFiles);
+
+        return $fileChanges;
     }
 }
