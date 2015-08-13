@@ -12,9 +12,16 @@ interface CommitsTableRowProps {
   onRollback: React.MouseEventHandler;
 }
 
-class CommitsTableRow extends React.Component<CommitsTableRowProps, any>  {
+interface CommitsTableRowState {
+  displayDetails: boolean;
+}
 
-  public state = {displayDetails: false};
+class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTableRowState> {
+
+  constructor() {
+    super();
+    this.state = {displayDetails: false};
+  }
 
   render() {
     if (this.props.commit === null) {
@@ -34,29 +41,29 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, any>  {
         title: moment(commit.date).format('LLL')
       }, moment(commit.date).fromNow()),
       DOM.td({className: 'column-message'},
-        DOM.span({}, commit.message),
+        DOM.span(null, commit.message),
         DOM.div({className: detailsClass},
-          DOM.strong({}, 'Details:'),
-            DOM.div({}, details))
+          DOM.strong(null, 'Details:'),
+          DOM.div(null, details))
       ),
       DOM.td({className: 'column-actions'},
         commit.canUndo && commit.isEnabled
           ? DOM.a({
-              className: 'vp-table-undo',
-              href: '#',
-              onClick: this.props.onUndo,
-              'data-hash': commit.hash,
-              'data-message': commit.message
-            }, 'Undo this')
+          className: 'vp-table-undo',
+          href: '#',
+          onClick: this.props.onUndo,
+          'data-hash': commit.hash,
+          'data-message': commit.message
+        }, 'Undo this')
           : '',
         commit.canRollback && commit.isEnabled
           ? DOM.a({
-              className: 'vp-table-rollback',
-              href: '#',
-              onClick: this.props.onRollback,
-              'data-hash': commit.hash,
-              'data-date': commit.date
-            }, 'Roll back to this')
+          className: 'vp-table-rollback',
+          href: '#',
+          onClick: this.props.onRollback,
+          'data-hash': commit.hash,
+          'data-date': commit.date
+        }, 'Roll back to this')
           : ''
       )
     );
@@ -65,7 +72,8 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, any>  {
 }
 
 module CommitsTableRow {
-  export interface Props extends CommitsTableRowProps {}
+  export interface Props extends CommitsTableRowProps {
+  }
 }
 
 export = CommitsTableRow;
