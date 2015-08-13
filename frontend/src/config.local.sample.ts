@@ -2,7 +2,9 @@
 
 var config = {
 
-  apiBaseUrl: 'http://localhost/wordpress'
+  api: {
+    root: 'http://localhost/wordpress'
+  }
 
 };
 

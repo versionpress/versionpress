@@ -1,11 +1,15 @@
 import localConfig = require('./config.local');
 
-var config = {
+require('core-js/es6/object');
 
-  apiBaseUrl: window['apiBaseUrl'] || localConfig['apiBaseUrl'] || '',
-  apiUrlPrefix: window['apiUrlPrefix'] || localConfig['apiUrlPrefix'] || 'vp-json',
-  apiQueryParam: window['apiQueryParam'] || localConfig['apiQueryParam'] || 'vp_rest_route',
-  apiPrettyPermalinks: window['apiPrettyPermalinks'] || localConfig['apiPrettyPermalinks'] || false,
+const defaultConfig = {
+
+  api: {
+    root: '',
+    urlPrefix: 'vp-json',
+    queryParam: 'vp_rest_route',
+    prettyPermalinks: false
+  },
 
   routes: {
     page: 'page',
@@ -15,4 +19,9 @@ var config = {
 
 };
 
+const VpApiConfig = {
+  api: window['VP_API_Config'] || {}
+};
+
+const config = Object.assign(defaultConfig, localConfig, VpApiConfig);
 export = config;

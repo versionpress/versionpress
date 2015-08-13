@@ -50,10 +50,10 @@ describe('HomePage', () => {
     const component = <React.DOMComponent<React.HTMLAttributes>> testUtils.renderIntoDocument(
       React.createElement(handler, props)
     );
-    fakeServer.respondWith('GET', config.apiBaseUrl + '/commits?page=1', [
+    fakeServer.respondWith('GET', config.api.root + '/commits?page=1', [
         200, { 'Content-Type': 'application/json' }, JSON.stringify(fakeData)]
     );
-    fakeServer.respondWith('GET', config.apiBaseUrl + '/display-welcome-panel', [
+    fakeServer.respondWith('GET', config.api.root + '/display-welcome-panel', [
         200, { 'Content-Type': 'application/json' }, JSON.stringify(true)]
     );
     fakeServer.respond();
