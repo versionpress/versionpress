@@ -30,7 +30,7 @@ export function openPortal(children) {
 
 export function closePortal() {
   if (portalNode && portalNode.parentNode && close) {
-    React.unmountComponentAtNode(portalNode);
+    React.unmountComponentAtNode(portalNode.parentNode);
     portalNode.parentNode.removeChild(portalNode);
     portalNode = null;
   }

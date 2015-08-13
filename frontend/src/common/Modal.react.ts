@@ -1,6 +1,7 @@
 /// <reference path='../../typings/tsd.d.ts' />
 
 import React = require('react');
+import portal = require('./portal');
 
 require('./Modal.less');
 
@@ -76,12 +77,8 @@ class Modal extends React.Component<ModalProps, any> {
 
     if (typeof this.props.closeModalCallback === 'function') {
       this.props.closeModalCallback();
-    } else {
-      setTimeout(() => {
-        const node = <any> React.findDOMNode(this);
-        React.unmountComponentAtNode(node.parentNode);
-      }, 1);
     }
+    portal.closePortal();
   }
 
 }
