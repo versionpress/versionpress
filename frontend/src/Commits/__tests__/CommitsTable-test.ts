@@ -20,7 +20,8 @@ describe('CommitsTable', () => {
       hash: 'abcdef',
       canUndo: true,
       canRollback: true,
-      isEnabled: true
+      isEnabled: true,
+      changes: []
     };
     props = {
       currentPage: 1,

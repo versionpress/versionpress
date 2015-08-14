@@ -4,6 +4,8 @@
 import React = require('react');
 import moment = require('moment');
 
+import DiffPanel = require('./DiffPanel.react');
+
 const DOM = React.DOM;
 
 interface CommitsTableRowProps {
@@ -31,7 +33,7 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTable
     const className = 'alternate ' + (commit.isEnabled ? '' : 'disabled');
     const detailsClass = 'details ' + (this.state.displayDetails === true ? 'show' : 'hide');
 
-    const details = DOM.table(null, commit.changes.map((change: Change) => {
+    const detailsTable = DOM.table(null, commit.changes.map((change: Change) => {
       return DOM.tr(null, DOM.td(null, change.type), DOM.td(null, change.action), DOM.td(null, change.name));
     }));
 
@@ -44,7 +46,12 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTable
         DOM.span(null, commit.message),
         DOM.div({className: detailsClass},
           DOM.strong(null, 'Details:'),
-          DOM.div(null, details))
+          DOM.div(null,
+            detailsTable,
+            DOM.a({className: 'more-details'}, 'More details\u2026')
+          ),
+          React.createElement(DiffPanel)
+        )
       ),
       DOM.td({className: 'column-actions'},
         commit.canUndo && commit.isEnabled
