@@ -15,14 +15,14 @@ interface CommitsTableRowProps {
 }
 
 interface CommitsTableRowState {
-  displayDetails: boolean;
+  displayDetails: string;
 }
 
 class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTableRowState> {
 
   constructor() {
     super();
-    this.state = {displayDetails: false};
+    this.state = {displayDetails: 'none'};
   }
 
   render() {
@@ -31,13 +31,13 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTable
     }
     const commit = this.props.commit;
     const className = 'alternate ' + (commit.isEnabled ? '' : 'disabled');
-    const detailsClass = 'details ' + (this.state.displayDetails === true ? 'show' : 'hide');
+    const detailsClass = 'details ' + (this.state.displayDetails !== 'none' ? 'show' : 'hide');
 
-    const detailsTable = DOM.table(null, commit.changes.map((change: Change) => {
+    const overviewTable = DOM.table(null, commit.changes.map((change: Change) => {
       return DOM.tr(null, DOM.td(null, change.type), DOM.td(null, change.action), DOM.td(null, change.name));
     }));
 
-    return DOM.tr({className: className, onClick: () => this.setState({displayDetails: !this.state.displayDetails})},
+    return DOM.tr({className: className, onClick: () => this.setState({displayDetails: this.state.displayDetails === 'none' ? 'overview' : 'none'})},
       DOM.td({
         className: 'column-date',
         title: moment(commit.date).format('LLL')
@@ -45,12 +45,11 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTable
       DOM.td({className: 'column-message'},
         DOM.span(null, commit.message),
         DOM.div({className: detailsClass},
-          DOM.strong(null, 'Details:'),
-          DOM.div(null,
-            detailsTable,
-            DOM.a({className: 'more-details'}, 'More details\u2026')
-          ),
-          React.createElement(DiffPanel)
+          DOM.a({onClick: (e) => {this.setState({displayDetails: 'overview'}); e.stopPropagation(); }}, 'Overview'),
+          ' \u00b7 ',
+          DOM.a({onClick: (e) => {this.setState({displayDetails: 'full-diff'}); e.stopPropagation(); }}, 'Full diff'),
+          this.state.displayDetails === 'overview' ? overviewTable : null,
+          this.state.displayDetails === 'full-diff' ? React.createElement(DiffPanel) : null
         )
       ),
       DOM.td({className: 'column-actions'},

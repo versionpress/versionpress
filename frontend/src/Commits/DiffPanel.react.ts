@@ -176,7 +176,7 @@ class DiffPanel extends React.Component<any, any> {
     return DOM.div(null,
       diffs.map(diff =>
         DOM.div({className: 'diff'},
-          DOM.h4(null, (diff.from === '/dev/null' ? diff.to : diff.from).substr(2)), this.formatChunks(diff.chunks)
+          DOM.h4({className: 'heading'}, (diff.from === '/dev/null' ? diff.to : diff.from).substr(2)), this.formatChunks(diff.chunks)
         )
       )
     );
@@ -199,7 +199,7 @@ class DiffPanel extends React.Component<any, any> {
           DOM.tr({className: 'line'},
             DOM.td({className: 'line-left ' + l.type}, this.replaceLeadingSpacesWithHardSpaces(l.content)),
             DOM.td({className: 'line-separator'}),
-            DOM.td({className: 'line-right' + r.type}, this.replaceLeadingSpacesWithHardSpaces(r.content))
+            DOM.td({className: 'line-right ' + r.type}, this.replaceLeadingSpacesWithHardSpaces(r.content))
           )
         )
       )
@@ -255,15 +255,15 @@ class DiffPanel extends React.Component<any, any> {
         result.push(
           DOM.table({className: 'chunk-separator'},
             DOM.tbody(null,
-              DOM.tr(null,
-                DOM.td(null, DOM.span(null, '\u00B7\u00B7\u00B7')),
-                DOM.td(null),
-                DOM.td(null, DOM.span(null, '\u00B7\u00B7\u00B7'))
+              DOM.tr({className: 'line'},
+                DOM.td({className: 'line-left'}, DOM.span({className: 'hellip'}, '\u00B7\u00B7\u00B7')),
+                DOM.td({className: 'line-separator'}),
+                DOM.td({className: 'line-right'}, DOM.span({className: 'hellip'}, '\u00B7\u00B7\u00B7'))
               ),
-              DOM.tr(null,
-                DOM.td(null),
-                DOM.td(null),
-                DOM.td(null)
+              DOM.tr({className: 'line'},
+                DOM.td({className: 'line-left'}),
+                DOM.td({className: 'line-separator'}),
+                DOM.td({className: 'line-right'})
               )
             )
           )
