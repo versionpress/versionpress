@@ -16,10 +16,10 @@ if (isset($_GET['init_versionpress']) && !VersionPress::isActive()) {
     require_once("inc/activate.php");
 } elseif (!VersionPress::isActive()) {
     require_once("inc/activationPanel.php");
-} elseif ($vpConfig->mergedConfig['gui'] === 'javascript') {
-    require_once("inc/javascriptGUI.php");
-} else {
+} elseif ($vpConfig->mergedConfig['gui'] === 'html') {
     require_once("inc/admin.php");
+} else {
+    require_once("inc/javascriptGUI.php");
 }
 ?>
 </div>
