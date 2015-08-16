@@ -3,10 +3,10 @@ import config = require('../config');
 const WpApi = {
 
   getApiLink: (endpoint: string) => {
-    if (config.apiPrettyPermalinks) {
-      return config.apiBaseUrl + '/' + config.apiUrlPrefix + '/versionpress/' + endpoint;
+    if (config.api.prettyPermalinks) {
+      return config.api.root + '/' + config.api.urlPrefix + '/versionpress/' + endpoint;
     } else {
-      return config.apiBaseUrl + '/?' + config.apiQueryParam + '=/versionpress/' + endpoint;
+      return config.api.root + '/?' + config.api.queryParam + '=/versionpress/' + endpoint;
     }
   }
 
