@@ -73,7 +73,8 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * @depends nagIsDisplayedOnSubsequentRequests
      */
     public function visitingVersionPressScreenShowsInitializationInformation() {
-        $this->url('wp-admin/admin.php?page=versionpress/admin/index.php');
+        self::$wpAutomation->runWpCliCommand('vp', 'config', array('gui', 'html'));
+        $this->url('wp-admin/admin.php?page=versionpress/');
         $this->assertElementExists('#activate-versionpress-btn');
     }
 

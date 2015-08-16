@@ -6,10 +6,10 @@ import request = require('superagent');
 const WpApi = {
 
   getApiLink: (endpoint: string) => {
-    if (config.apiPrettyPermalinks) {
-      return config.apiBaseUrl + '/' + config.apiUrlPrefix + '/versionpress/' + endpoint;
+    if (config.api.prettyPermalinks) {
+      return config.api.root + '/' + config.api.urlPrefix + '/versionpress/' + endpoint;
     } else {
-      return config.apiBaseUrl + '/?' + config.apiQueryParam + '=/versionpress/' + endpoint;
+      return config.api.root + '/?' + config.api.queryParam + '=/versionpress/' + endpoint;
     }
   },
 
@@ -18,8 +18,8 @@ const WpApi = {
       .get(WpApi.getApiLink(endpoint))
       .accept('application/json');
 
-    return config.apiNonce
-      ? req.set('X-WP-Nonce', config.apiNonce)
+    return config.api.nonce
+      ? req.set('X-WP-Nonce', config.api.nonce)
       : req;
   },
 
@@ -28,8 +28,8 @@ const WpApi = {
       .post(WpApi.getApiLink(endpoint))
       .accept('application/json');
 
-    return config.apiNonce
-      ? req.set('X-WP-Nonce', config.apiNonce)
+    return config.api.nonce
+      ? req.set('X-WP-Nonce', config.api.nonce)
       : req;
   }
 

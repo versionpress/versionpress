@@ -8,6 +8,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
 
     public function prepare_undoLastCommit() {
         $this->createTestPost();
+        self::$wpAutomation->runWpCliCommand('vp', 'config', array('gui', 'html'));
         $this->url('wp-admin/admin.php?page=versionpress/');
         return array(array('D', '%vpdb%/posts/*'));
     }
@@ -19,6 +20,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
     public function prepare_undoSecondCommit() {
         self::$wpAutomation->editOption('blogname', 'Blogname for undo test');
         $this->createTestPost();
+        self::$wpAutomation->runWpCliCommand('vp', 'config', array('gui', 'html'));
         $this->url('wp-admin/admin.php?page=versionpress/');
         return array(array('M', '%vpdb%/options.ini'));
     }
@@ -29,6 +31,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
 
     public function prepare_undoRevertedCommit() {
         $this->createTestPost();
+        self::$wpAutomation->runWpCliCommand('vp', 'config', array('gui', 'html'));
         $this->url('wp-admin/admin.php?page=versionpress/');
         return array(array('A', '%vpdb%/posts/*'));
     }
@@ -38,6 +41,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         $commentId = $this->createCommentForPost($postId);
         self::$wpAutomation->deleteComment($commentId);
         self::$wpAutomation->deletePost($postId);
+        self::$wpAutomation->runWpCliCommand('vp', 'config', array('gui', 'html'));
         $this->url('wp-admin/admin.php?page=versionpress/');
     }
 
@@ -50,6 +54,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         $postId = $this->createTestPost();
         $this->createCommentForPost($postId);
         self::$wpAutomation->editOption('blogname', 'Blogname for rollback test');
+        self::$wpAutomation->runWpCliCommand('vp', 'config', array('gui', 'html'));
         $this->url('wp-admin/admin.php?page=versionpress/');
         return array(
             array('D', '%vpdb%/posts/*'),
@@ -64,6 +69,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
 
     public function prepare_clickOnCancel() {
         $this->createTestPost();
+        self::$wpAutomation->runWpCliCommand('vp', 'config', array('gui', 'html'));
         $this->url('wp-admin/admin.php?page=versionpress/');
     }
 
@@ -76,6 +82,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
 
     public function prepare_undoWithNotCleanWorkingDirectory() {
         $this->createTestPost();
+        self::$wpAutomation->runWpCliCommand('vp', 'config', array('gui', 'html'));
         $this->url('wp-admin/admin.php?page=versionpress/');
     }
 
