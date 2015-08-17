@@ -91,7 +91,7 @@ jQuery(document).ready(function($) {
 
     var customCompatibilityPopoverClass = "versionpress-compatibility-popover"; // used to identify the popover later
 
-    $('.vp-compatibility').each(function () {
+    $('.plugin-install .vp-compatibility').each(function () {
         var $label = $(this);
         var $parentCard = $label.parents('.plugin-card');
         var $originalCompatibilityColumn = $parentCard.find('.column-compatibility');
@@ -136,6 +136,18 @@ jQuery(document).ready(function($) {
             });
 
             return false;
+        });
+    });
+
+    $('.vp-plugin-list.vp-untested').each(function () {
+        $(this).find("a").click(function(e) {
+            return confirm("This plugin was not yet tested with VersionPress. Some functionality may not work as intended.");
+        });
+    });
+
+    $('.vp-plugin-list.vp-incompatible').each(function () {
+        $(this).find("a").click(function(e) {
+            return confirm("This plugin is not compatible with VersionPress. Its activation will cause deactivation of VersionPress. Do you really want to activate this plugin?");
         });
     });
 });

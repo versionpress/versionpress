@@ -285,23 +285,32 @@ function vp_register_hooks() {
         $compatibility = CompatibilityChecker::testCompatibilityByPluginFile($plugin_file);
 
         if ($compatibility === CompatibilityResult::COMPATIBLE) {
-            $compatibilityAdjective = '&check; Compatible';
+            $cssClass = 'vp-compatible';
+            $compatibilityAdjective = 'Compatible';
         } elseif ($compatibility === CompatibilityResult::INCOMPATIBLE) {
+            $cssClass = 'vp-incompatible';
             $compatibilityAdjective = 'Incompatible';
         } elseif ($compatibility === CompatibilityResult::UNTESTED) {
-            $compatibilityAdjective = 'Untested';
+            $cssClass = 'vp-untested';
+            $compatibilityAdjective = '<abbr title="This plugin was not yet tested with VersionPress. Some functionality may not work as intended.">Untested</abbr>';
         } else {
             return $plugin_meta;
         }
 
-        $plugin_meta[] = '<span><strong> ' . $compatibilityAdjective . ' </strong> with VersionPress</span>';
+        $plugin_meta[] = '<span class="vp-compatibility ' . $cssClass . '"><strong>' . $compatibilityAdjective . '</strong> with VersionPress</span>';
 
         return $plugin_meta;
     }, 10, 4);
 
     add_filter('plugin_action_links', function ($actions, $plugin_file) {
-        if (CompatibilityChecker::testCompatibilityByPluginFile($plugin_file) === CompatibilityResult::INCOMPATIBLE) {
-            $actions['activate'] = "<span class=\"vp-plugin-list vp-incompatible\">$actions[activate]</span>";
+        $compatibility = CompatibilityChecker::testCompatibilityByPluginFile($plugin_file);
+
+        if (isset($actions['activate'])) {
+            if ($compatibility === CompatibilityResult::UNTESTED) {
+                $actions['activate'] = "<span class=\"vp-plugin-list vp-untested\">$actions[activate]</span>";
+            } elseif ($compatibility === CompatibilityResult::INCOMPATIBLE) {
+                $actions['activate'] = "<span class=\"vp-plugin-list vp-incompatible\">$actions[activate]</span>";
+            }
         }
         return $actions;
     }, 10, 2);

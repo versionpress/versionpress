@@ -141,12 +141,12 @@ h2.vp-deactivation-header {
  * Styles for admin/plugin-install.php
  *------------------------------------*/
 
-.plugin-card .vp-compatibility {
+.plugin-install .vp-compatibility {
     display: block;
     margin-top: 7px;
 }
 
-.plugin-card .vp-compatibility::before {
+.vp-compatibility::before {
     font: 400 20px/.5 dashicons;
     speak: none;
     padding: 0;
@@ -160,26 +160,21 @@ h2.vp-deactivation-header {
     color: #444;
 }
 
-.plugin-card .vp-compatibility.vp-compatible::before {
+.vp-compatibility.vp-compatible::before {
     content: '\f147';
 }
 
-.plugin-card .vp-compatibility.vp-incompatible::before {
+.vp-compatibility.vp-incompatible::before {
     content: '\f158';
 }
 
-.plugin-card .vp-compatibility.vp-untested abbr {
+.vp-compatibility.vp-untested abbr {
     cursor: help;
     border-bottom: 1px dotted #777;
 }
 
-.plugin-card .vp-compatibility .hide-without-js {
+.vp-compatibility .hide-without-js {
     display: none;
-}
-
-.plugin-card .vp-compatibility-popup span {
-    font-size: 200%;
-    cursor: pointer;
 }
 
 .webui-popover h3 {
