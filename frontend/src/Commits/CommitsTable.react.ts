@@ -4,6 +4,7 @@
 import React = require('react');
 import ReactRouter = require('react-router');
 import CommitsTableRow = require('./CommitsTableRow.react');
+import CommitsTableRowDetails = require('./CommitsTableRowDetails.react');
 import config = require('../config');
 
 require('./CommitsTable.less');
@@ -30,16 +31,14 @@ class CommitsTable extends React.Component<CommitsTableProps, any>  {
           DOM.th({className: 'column-actions'})
         )
       ),
-      DOM.tbody(null,
-        this.props.commits.map((commit: Commit) => {
-          return React.createElement(CommitsTableRow, <CommitsTableRow.Props> {
-            key: commit.hash,
-            commit: commit,
-            onUndo: this.props.onUndo,
-            onRollback: this.props.onRollback
-          });
+      this.props.commits.map((commit: Commit) => {
+        return React.createElement(CommitsTableRow, <CommitsTableRow.Props> {
+          key: commit.hash,
+          commit: commit,
+          onUndo: this.props.onUndo,
+          onRollback: this.props.onRollback
         })
-      ),
+      }),
       DOM.tfoot(null,
         DOM.tr(null,
           DOM.td({className: 'vp-table-pagination', colSpan: 3},
