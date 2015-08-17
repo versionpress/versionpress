@@ -141,8 +141,9 @@ h2.vp-deactivation-header {
  * Styles for admin/plugin-install.php
  *------------------------------------*/
 
-.plugin-card .column-compatibility {
-    margin-bottom: 4px;
+.plugin-card .vp-compatibility {
+    display: block;
+    margin-top: 7px;
 }
 
 .plugin-card .vp-compatibility::before {
@@ -167,8 +168,9 @@ h2.vp-deactivation-header {
     content: '\f158';
 }
 
-.plugin-card .vp-compatibility.vp-untested::before {
-
+.plugin-card .vp-compatibility.vp-untested abbr {
+    cursor: help;
+    border-bottom: 1px dotted #777;
 }
 
 .plugin-card .vp-compatibility .hide-without-js {

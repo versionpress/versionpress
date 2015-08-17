@@ -259,7 +259,7 @@ function vp_register_hooks() {
     add_action('set_object_terms', createUpdatePostTermsHook($mirror, $vpidRepository));
 
     add_filter('plugin_install_action_links', function ($links, $plugin) {
-        $warningLink = '<span class="vp-compatibility-popup %s" data-plugin-name="' . $plugin['name'] . '"><span class="icon icon-warning"></span></span>';
+        $warningLink = '<span class="vp-compatibility-popup %s" data-plugin-name="' . $plugin['name'] . '"></span>';
         $compatibility = CompatibilityChecker::testCompatibilityBySlug($plugin['slug']);
         if ($compatibility === CompatibilityResult::COMPATIBLE) {
             $cssClass = 'vp-compatible';

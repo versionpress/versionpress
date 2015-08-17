@@ -89,6 +89,8 @@ jQuery(document).ready(function($) {
         });
     }
 
+    var customCompatibilityPopoverClass = "versionpress-compatibility-popover"; // used to identify the popover later
+
     $('.vp-compatibility').each(function () {
         var $label = $(this);
         var $parentCard = $label.parents('.plugin-card');
@@ -102,26 +104,38 @@ jQuery(document).ready(function($) {
 
     $('.vp-compatibility-popup').each(function () {
         var $el = $(this);
+        var $list = $(this).parents('ul');
+        var $installButton = $list.find('.install-now');
         var pluginName = $el.data('plugin-name');
         var incompatible = $el.hasClass('vp-incompatible');
         var title = incompatible ? 'This will not end well' : 'This might not end well';
-        var content = pluginName + (incompatible ? ' is not compatible with VersionPress' : ' was not yet tested with VersionPress') + '.';
+        var content = pluginName + '<strong>' +
+            (incompatible ? ' is not compatible' : ' was not yet tested') + '</strong> with VersionPress.<br>' +
+            (incompatible ? 'These plugins will not work correctly when using together.' : 'Some functionality may not work as intended.');
+        var buttons = '<br><br>' +
+            '<a class="button vp-install-now" href="' + $installButton.attr('href') + '">Install</a> ' +
+            '<a class="button vp-cancel">Cancel</a>';
         $el.attr('title', content);
 
-        $el.webuiPopover({
+        $installButton.webuiPopover({
             title: title,
             cache: false,
-            content: content,
+            content: content + buttons,
             closeable: true,
             width: 450,
-            style: customRevertPopoverClass,
-            placement: 'left'
+            style: customCompatibilityPopoverClass,
+            placement: 'auto'
         });
-    });
 
-    $('.vp-plugin-list.vp-incompatible').each(function () {
-        $(this).find("a").click(function(e) {
-            return confirm("This plugin is not compatible with VersionPress. Its activation will cause deactivation of VersionPress. Do you really want to activate this plugin?");
+        $installButton.on('click', function(e) {
+            e.stopImmediatePropagation();
+
+            $('.webui-popover-' + customCompatibilityPopoverClass).on('click', '.vp-cancel', function (e) {
+                $installButton.webuiPopover('hide');
+                return false;
+            });
+
+            return false;
         });
     });
 });
