@@ -12,6 +12,7 @@ use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Utils\BugReporter;
+use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\Api\BundledWpApi\WP_REST_Server;
 use VersionPress\Api\BundledWpApi\WP_REST_Request;
 use VersionPress\Api\BundledWpApi\WP_REST_Response;
@@ -32,9 +33,7 @@ class VersionPressApi {
                     'default' => '0'
                 )
             ),
-            'permission_callback' => function() {
-                return current_user_can('manage_options');
-            }
+            'permission_callback' => array($this, 'permissionsCheck')
         ));
 
         register_vp_rest_route($namespace, '/undo', array(
@@ -45,9 +44,7 @@ class VersionPressApi {
                     'required' => true
                 )
             ),
-            'permission_callback' => function() {
-                return current_user_can('manage_options');
-            }
+            'permission_callback' => array($this, 'permissionsCheck')
         ));
 
         register_vp_rest_route($namespace, '/rollback', array(
@@ -58,17 +55,13 @@ class VersionPressApi {
                     'required' => true
                 )
             ),
-            'permission_callback' => function() {
-                return current_user_can('manage_options');
-            }
+            'permission_callback' => array($this, 'permissionsCheck')
         ));
 
         register_vp_rest_route($namespace, '/can-revert', array(
             'methods' => WP_REST_Server::READABLE,
             'callback' => array($this, 'canRevert'),
-            'permission_callback' => function() {
-                return current_user_can('manage_options');
-            }
+            'permission_callback' => array($this, 'permissionsCheck')
         ));
 
         register_vp_rest_route($namespace, '/submit-bug', array(
@@ -82,25 +75,19 @@ class VersionPressApi {
                     'required' => true
                 )
             ),
-            'permission_callback' => function() {
-                return current_user_can('manage_options');
-            }
+            'permission_callback' => array($this, 'permissionsCheck')
         ));
 
         register_vp_rest_route($namespace, '/display-welcome-panel', array(
             'methods' => WP_REST_Server::READABLE,
             'callback' => array($this, 'displayWelcomePanel'),
-            'permission_callback' => function() {
-                return current_user_can('manage_options');
-            }
+            'permission_callback' => array($this, 'permissionsCheck')
         ));
 
         register_vp_rest_route($namespace, '/hide-welcome-panel', array(
             'methods' => WP_REST_Server::CREATABLE,
             'callback' => array($this, 'hideWelcomePanel'),
-            'permission_callback' => function() {
-                return current_user_can('manage_options');
-            }
+            'permission_callback' => array($this, 'permissionsCheck')
         ));
     }
 
@@ -273,5 +260,17 @@ class VersionPressApi {
             $error['message'],
             array('status' => $error['status'])
         );
+    }
+
+    /**
+     * @param WP_REST_Request $request
+     * @return \WP_Error|bool
+     */
+    public function permissionsCheck(WP_REST_Request $request) {
+        global $versionPressContainer;
+        /** @var VersionPressConfig $vpConfig */
+        $vpConfig = $versionPressContainer->resolve(VersionPressServices::VP_CONFIGURATION);
+
+        return ! $vpConfig->mergedConfig['requireApiAuth'] || current_user_can('manage_options');
     }
 }
