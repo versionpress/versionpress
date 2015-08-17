@@ -1,5 +1,5 @@
 /// <reference path='../typings/tsd.d.ts' />
-/// <reference path='./config.d.ts' />
+/// <reference path='./VersionPressConfig.d.ts' />
 
 import localConfig = require('./config.local');
 
