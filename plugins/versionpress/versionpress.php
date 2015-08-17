@@ -798,7 +798,7 @@ if (is_admin()) {
 //---------------------------------
 require("src/Api/BundledWpApi/plugin.php");
 
-header('Access-Control-Allow-Headers: origin, content-type, accept');
+header('Access-Control-Allow-Headers: origin, content-type, accept, X-WP-Nonce');
 header('Access-Control-Allow-Origin: *');
 
 add_filter('allowed_http_origin', '__return_true');

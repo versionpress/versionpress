@@ -1,4 +1,7 @@
+/// <reference path='../../typings/tsd.d.ts' />
+
 import config = require('../config');
+import request = require('superagent');
 
 const WpApi = {
 
@@ -8,6 +11,26 @@ const WpApi = {
     } else {
       return config.api.root + '/?' + config.api.queryParam + '=/versionpress/' + endpoint;
     }
+  },
+
+  get: (endpoint: string) => {
+    const req = request
+      .get(WpApi.getApiLink(endpoint))
+      .accept('application/json');
+
+    return config.api.nonce
+      ? req.set('X-WP-Nonce', config.api.nonce)
+      : req;
+  },
+
+  post: (endpoint: string) => {
+    const req = request
+      .post(WpApi.getApiLink(endpoint))
+      .accept('application/json');
+
+    return config.api.nonce
+      ? req.set('X-WP-Nonce', config.api.nonce)
+      : req;
   }
 
 };

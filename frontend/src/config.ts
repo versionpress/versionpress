@@ -8,7 +8,8 @@ const defaultConfig = {
     root: '',
     urlPrefix: 'vp-json',
     queryParam: 'vp_rest_route',
-    prettyPermalinks: false
+    prettyPermalinks: false,
+    nonce: null
   },
 
   routes: {
