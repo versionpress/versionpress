@@ -1,8 +1,11 @@
+/// <reference path='../typings/tsd.d.ts' />
+/// <reference path='./config.d.ts' />
+
 import localConfig = require('./config.local');
 
 require('core-js/es6/object');
 
-const defaultConfig = {
+const defaultConfig: VersionPressConfig = {
 
   api: {
     root: '',
@@ -23,5 +26,5 @@ const VpApiConfig = {
   api: window['VP_API_Config'] || {}
 };
 
-const config = Object.assign(defaultConfig, localConfig, VpApiConfig);
+const config: VersionPressConfig = Object.assign(defaultConfig, localConfig, VpApiConfig);
 export = config;
