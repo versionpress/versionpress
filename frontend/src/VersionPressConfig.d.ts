@@ -5,6 +5,7 @@ interface VersionPressConfig {
     urlPrefix: string;
     queryParam: string;
     prettyPermalinks: boolean;
+    nonce: string;
   };
 
   routes: {

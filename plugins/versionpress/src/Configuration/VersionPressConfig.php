@@ -14,7 +14,10 @@ use Nette\Neon\Neon;
  */
 class VersionPressConfig {
 
-    public $defaults = array();
+    public $defaults = array(
+        'gui' => 'javascript'
+    );
+
     public $customConfig = array();
     public $mergedConfig = array();
 
@@ -25,7 +28,7 @@ class VersionPressConfig {
         $defaultsFile = VERSIONPRESS_PLUGIN_DIR . '/vpconfig.defaults.neon';
         $customConfigFile = VERSIONPRESS_PLUGIN_DIR . '/vpconfig.neon';
 
-        $this->defaults = Neon::decode(file_get_contents($defaultsFile));
+        $this->defaults = array_merge($this->defaults, Neon::decode(file_get_contents($defaultsFile)));
 
         if (file_exists($customConfigFile)) {
             $this->customConfig = Neon::decode(file_get_contents($customConfigFile));

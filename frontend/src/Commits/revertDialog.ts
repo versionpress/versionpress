@@ -10,9 +10,8 @@ const DOM = React.DOM;
 export function revertDialog(title: React.ReactNode, okHandler: Function) {
   portal.confirmDialog(title, '', () => {}, () => {}, {loading: true});
 
-  request
-    .get(WpApi.getApiLink('can-revert'))
-    .set('Accept', 'application/json')
+  WpApi
+    .get('can-revert')
     .end((err: any, res: request.Response) => {
       if (res.body) {
         const body = DOM.div(null,
@@ -25,7 +24,7 @@ export function revertDialog(title: React.ReactNode, okHandler: Function) {
           )
         );
         portal.confirmDialog(title, body, okHandler, () => {}, {});
-    } else {
+      } else {
         const body = DOM.div(null,
           DOM.p({className: 'undo-warning'},
             DOM.span({className: 'icon icon-warning'}),
