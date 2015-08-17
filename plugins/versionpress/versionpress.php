@@ -270,11 +270,11 @@ function vp_register_hooks() {
             $links[] = sprintf($warningLink, $cssClass);
         } else {
             $cssClass = 'vp-untested';
-            $compatibilityAdjective = 'Untested';
+            $compatibilityAdjective = '<abbr title="This plugin was not yet tested with VersionPress. Some functionality may not work as intended.">Untested</abbr>';
             $links[] = sprintf($warningLink, $cssClass);
         }
 
-        $links[] = '<span class="vp-compatibility ' . $cssClass . '"><span class="hide-without-js"><strong> ' . $compatibilityAdjective . ' </strong> with </span>VersionPress</span>';
+        $links[] = '<span class="vp-compatibility ' . $cssClass . '"><span class="hide-without-js"><strong>' . $compatibilityAdjective . '</strong> with </span>VersionPress</span>';
         return $links;
     }, 10, 2);
 
