@@ -9,6 +9,7 @@ use VersionPress\Synchronizers\UserMetaSynchronizer;
 use VersionPress\Synchronizers\UsersSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class UserMetaSynchronizerTest extends SynchronizerTestCase {
     /** @var UserMetaStorage */
@@ -26,8 +27,8 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('usermeta');
         $this->userStorage = self::$storageFactory->getStorage('user');
-        $this->synchronizer = new UserMetaSynchronizer($this->storage, self::$wpdb, self::$schemaInfo);
-        $this->userSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo);
+        $this->synchronizer = new UserMetaSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->userSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
     }
 
     /**
@@ -47,6 +48,16 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
      */
     public function synchronizerUpdatesChangedUserMetaInDatabase() {
         $this->editUserMeta();
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Synchronizer replaces absolute URLs
+     */
+    public function synchronizerReplacesAbsoluteUrls() {
+        $this->editUserMeta('some-meta', AbsoluteUrlReplacer::PLACEHOLDER);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -108,8 +119,8 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
         );
     }
 
-    private function editUserMeta() {
-        $this->storage->save(EntityUtils::prepareUserMeta(self::$vpId, self::$userVpId, 'some-meta', 'another value'));
+    private function editUserMeta($key = 'some-meta', $value = 'another value') {
+        $this->storage->save(EntityUtils::prepareUserMeta(self::$vpId, self::$userVpId, $key, $value));
         return array(
             array('vp_id' => self::$vpId, 'parent' => self::$userVpId),
         );

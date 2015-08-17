@@ -1,10 +1,16 @@
+<?php
+$apiConfig = array(
+    'root' => get_site_url(),
+    'urlPrefix' => vp_rest_get_url_prefix(),
+    'queryParam' => 'vp_rest_route',
+    'prettyPermalinks' => get_option('permalink_structure'),
+    'nonce' => wp_create_nonce('wp_rest')
+);
+?>
 <script>
-    var apiBaseUrl = '<?php
-        echo get_site_url() . '/' . vp_rest_get_url_prefix() . '/versionpress' ;
-    ?>';
+    var VP_API_Config = <?php echo json_encode($apiConfig); ?>
 </script>
 
 <?php
-
 wp_enqueue_style('versionpress_gui_style', plugins_url('../public/gui/app.css', __FILE__));
 wp_enqueue_script('versionpress_gui_script', plugins_url('../public/gui/app.js', __FILE__));

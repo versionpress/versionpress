@@ -67,12 +67,12 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
         parent::setUp();
         $termInfo = new EntityInfo(array(
             'term' => array(
-                'table' => 'termss',
+                'table' => 'terms',
                 'id' => 'term_id',
             )
         ));
 
-        $termTaxonomyInfo = array(
+        $termTaxonomyInfo = new EntityInfo(array(
             'term_taxonomy' => array(
                 'id' => 'term_taxonomy_id',
                 'references' => array(
@@ -80,7 +80,7 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
                     'term_id' => 'term'
                 )
             )
-        );
+        ));
 
         $this->termStorage = new TermsStorage(__DIR__ . '/terms.ini', $termInfo);
         $this->storage = new TermTaxonomyStorage(__DIR__ . '/terms.ini', $termTaxonomyInfo);

@@ -12,6 +12,7 @@ use VersionPress\Storages\SingleFileStorage;
 use VersionPress\Storages\Storage;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Synchronizers\SynchronizationProcess;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\IdUtil;
@@ -61,15 +62,20 @@ class Initializer {
      */
     private $repository;
 
-    private $idCache;
+    /**
+     * @var AbsoluteUrlReplacer
+     */
+    private $urlReplacer;
 
+    private $idCache;
     private $executionStartTime;
 
-    function __construct($wpdb, DbSchemaInfo $dbSchema, StorageFactory $storageFactory, GitRepository $repository) {
+    function __construct($wpdb, DbSchemaInfo $dbSchema, StorageFactory $storageFactory, GitRepository $repository, AbsoluteUrlReplacer $urlReplacer) {
         $this->database = $wpdb;
         $this->dbSchema = $dbSchema;
         $this->storageFactory = $storageFactory;
         $this->repository = $repository;
+        $this->urlReplacer = $urlReplacer;
         $this->executionStartTime = microtime(true);
     }
 
@@ -212,7 +218,9 @@ class Initializer {
             return $storage->shouldBeSaved($entity);
         }));
 
+        $urlReplacer = $this->urlReplacer;
         $entities = $this->extendEntitiesWithVpids($entityName, $entities);
+        $entities = array_map(function ($entity) use ($urlReplacer) { return $urlReplacer->replace($entity); }, $entities);
         $entities = $this->doEntitySpecificActions($entityName, $entities);
         $storage->prepareStorage();
 

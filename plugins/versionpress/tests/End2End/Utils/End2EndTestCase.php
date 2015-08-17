@@ -5,7 +5,7 @@ namespace VersionPress\Tests\End2End\Utils;
 use PHPUnit_Framework_TestCase;
 use Tracy\Debugger;
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Filters\AbsoluteUrlFilter;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Git\GitRepository;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Tests\Automation\WpAutomation;

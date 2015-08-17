@@ -2,6 +2,7 @@
 namespace VersionPress\Storages;
 
 use VersionPress\ChangeInfos\TrackedChangeInfo;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 
 /**
  * Reflects database changes to storages. It is a facade / entry point to a set
@@ -15,8 +16,12 @@ class Mirror {
     /** @var TrackedChangeInfo[] */
     private $changeList = array();
 
-    function __construct(StorageFactory $storageFactory) {
+    /** @var AbsoluteUrlReplacer */
+    private $urlReplacer;
+
+    function __construct(StorageFactory $storageFactory, AbsoluteUrlReplacer $urlReplacer) {
         $this->storageFactory = $storageFactory;
+        $this->urlReplacer = $urlReplacer;
     }
 
     /**
@@ -33,6 +38,7 @@ class Mirror {
             return;
         }
 
+        $data = $this->urlReplacer->replace($data);
         $changeInfo = $storage->save($data);
         if ($changeInfo) {
             $this->changeList[] = $changeInfo;

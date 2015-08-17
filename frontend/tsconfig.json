@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "module": "commonjs"
+    "module": "commonjs",
+    "sourceMap": true
   },
   "filesGlob": [
     "src/**/*.ts",

@@ -3,7 +3,7 @@
 namespace VersionPress\Storages;
 
 use VersionPress\ChangeInfos\PostChangeInfo;
-use VersionPress\Filters\AbsoluteUrlFilter;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\EntityUtils;
 
 class PostStorage extends DirectoryStorage {
@@ -13,7 +13,6 @@ class PostStorage extends DirectoryStorage {
 
     function __construct($directory, $entityInfo) {
         parent::__construct($directory, $entityInfo);
-        $this->addFilter(new AbsoluteUrlFilter());
     }
 
 

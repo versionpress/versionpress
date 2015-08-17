@@ -10,6 +10,7 @@ use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Tests\Utils\TestConfig;
 use Symfony\Component\Process\Process;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
 
@@ -21,6 +22,8 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
     protected static $storageFactory;
     /** @var \wpdb */
     protected static $wpdb;
+    /** @var AbsoluteUrlReplacer */
+    protected static $urlReplacer;
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
@@ -42,6 +45,7 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
 
         $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
         self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$wpdb);
+        self::$urlReplacer = new AbsoluteUrlReplacer(self::$testConfig->testSite->url);
     }
 
     private static function setUpSite() {

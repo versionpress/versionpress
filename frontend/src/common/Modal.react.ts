@@ -1,6 +1,7 @@
 /// <reference path='../../typings/tsd.d.ts' />
 
 import React = require('react');
+import portal = require('./portal');
 
 require('./Modal.less');
 
@@ -60,16 +61,12 @@ class Modal extends React.Component<ModalProps, any> {
   }
 
   keyDownHandler(e) {
-    console.log('Modal-keyDownHandler');
-    console.log(e.keyCode);
-    console.log(this.props.showCloseIcon);
     if (e.keyCode === 27 && this.props.showCloseIcon) {
       this.closeModalHandler(e);
     }
   }
 
   backgroundClickHandler(e) {
-    console.log('Modal-backgroundClickHandler');
     if (this.props.backgroundClickToClose && e.target.getAttribute('data-clickcatcher')) {
       this.closeModalHandler(e);
     }
@@ -77,16 +74,11 @@ class Modal extends React.Component<ModalProps, any> {
 
   closeModalHandler(e) {
     e.stopPropagation();
-    console.log('Modal-closeModalHandler');
 
     if (typeof this.props.closeModalCallback === 'function') {
       this.props.closeModalCallback();
-    } else {
-      setTimeout(() => {
-        const node = <any> React.findDOMNode(this);
-        React.unmountComponentAtNode(node.parentNode);
-      }, 1);
     }
+    portal.closePortal();
   }
 
 }

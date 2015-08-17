@@ -9,6 +9,7 @@ use VersionPress\Synchronizers\TermsSynchronizer;
 use VersionPress\Synchronizers\TermTaxonomySynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class TermTaxonomySynchronizerTest extends SynchronizerTestCase {
     /** @var TermTaxonomyStorage */
@@ -26,8 +27,8 @@ class TermTaxonomySynchronizerTest extends SynchronizerTestCase {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('term_taxonomy');
         $this->termStorage = self::$storageFactory->getStorage('term');
-        $this->synchronizer = new TermTaxonomySynchronizer($this->storage, self::$wpdb, self::$schemaInfo);
-        $this->termSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo);
+        $this->synchronizer = new TermTaxonomySynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->termSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
     }
 
     /**
@@ -47,6 +48,16 @@ class TermTaxonomySynchronizerTest extends SynchronizerTestCase {
      */
     public function synchronizerUpdatesChangedTermTaxonomyInDatabase() {
         $this->editTermTaxonomy();
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Synchronizer replaces absolute URLs
+     */
+    public function synchronizerReplacesAbsoluteUrls() {
+        $this->editTermTaxonomy(AbsoluteUrlReplacer::PLACEHOLDER);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -87,8 +98,8 @@ class TermTaxonomySynchronizerTest extends SynchronizerTestCase {
         $this->termStorage->delete($term1);
         $this->termStorage->delete($term2);
         // We need new instances because of caching in SynchronizerBase::maybeInit
-        $termSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo);
-        $termTaxonomySynchronizer = new TermTaxonomySynchronizer($this->storage, self::$wpdb, self::$schemaInfo);
+        $termSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $termTaxonomySynchronizer = new TermTaxonomySynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
         $termTaxonomySynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $termSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
     }
@@ -108,8 +119,8 @@ class TermTaxonomySynchronizerTest extends SynchronizerTestCase {
         );
     }
 
-    private function editTermTaxonomy() {
-        $this->storage->save(EntityUtils::prepareTermTaxonomy(self::$vpId, self::$termVpId, 'category', 'Another description'));
+    private function editTermTaxonomy($description = 'Another description') {
+        $this->storage->save(EntityUtils::prepareTermTaxonomy(self::$vpId, self::$termVpId, 'category', $description));
         return array(array('vp_id' => self::$vpId, 'parent' => self::$termVpId));
     }
 

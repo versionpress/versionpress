@@ -89,7 +89,7 @@ module.exports = function (isDevelopment) {
   return {
     cache: isDevelopment,
     debug: isDevelopment,
-    devtool: isDevelopment ? '#eval-source-map' : false,
+    devtool: isDevelopment ? 'inline-source-map' : false,
     entry: entry,
     module: {
       loaders: loaders

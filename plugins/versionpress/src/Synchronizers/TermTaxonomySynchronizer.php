@@ -4,6 +4,7 @@ namespace VersionPress\Synchronizers;
 
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\Storage;
+use VersionPress\Utils\AbsoluteUrlReplacer;
 use wpdb;
 
 class TermTaxonomySynchronizer extends SynchronizerBase {
@@ -11,8 +12,8 @@ class TermTaxonomySynchronizer extends SynchronizerBase {
     /** @var wpdb */
     private $database;
 
-    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema) {
-        parent::__construct($storage, $wpdb, $dbSchema, 'term_taxonomy');
+    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer) {
+        parent::__construct($storage, $wpdb, $dbSchema, $urlReplacer, 'term_taxonomy');
         $this->database = $wpdb;
     }
 

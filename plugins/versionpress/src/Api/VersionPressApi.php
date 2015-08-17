@@ -2,8 +2,9 @@
 
 namespace VersionPress\Api;
 
-use Nette\Utils\Strings;
-use VersionPress\ChangeInfos\ChangeInfoMatcher;
+require_once ABSPATH . 'wp-admin/includes/file.php';
+
+use Nette\Utils\Strings;use VersionPress\ChangeInfos\ChangeInfoMatcher;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\OptionChangeInfo;
 use VersionPress\ChangeInfos\PluginChangeInfo;
@@ -28,50 +29,53 @@ class VersionPressApi {
         $namespace = 'versionpress';
 
         register_vp_rest_route($namespace, '/commits', array(
-            array(
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => array($this, 'getCommits'),
                 'args' => array(
                     'page' => array(
                         'default' => '0'
                     )
-                )
-            )
+            ),
+            'permission_callback' => function() {
+                return current_user_can('manage_options');
+            }
         ));
 
         register_vp_rest_route($namespace, '/undo', array(
-            array(
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => array($this, 'undoCommit'),
                 'args' => array(
                     'commit' => array(
                         'required' => true
                     )
-                )
-            )
+            ),
+            'permission_callback' => function() {
+                return current_user_can('manage_options');
+            }
         ));
 
         register_vp_rest_route($namespace, '/rollback', array(
-            array(
                 'methods' => WP_REST_Server::READABLE,
                 'callback' => array($this, 'rollbackToCommit'),
                 'args' => array(
                     'commit' => array(
                         'required' => true
                     )
-                )
-            )
+            ),
+            'permission_callback' => function() {
+                return current_user_can('manage_options');
+            }
         ));
 
         register_vp_rest_route($namespace, '/can-revert', array(
-            array(
                 'methods' => WP_REST_Server::READABLE,
-                'callback' => array($this, 'canRevert')
-            )
+            'callback' => array($this, 'canRevert'),
+            'permission_callback' => function() {
+                return current_user_can('manage_options');
+            }
         ));
 
         register_vp_rest_route($namespace, '/submit-bug', array(
-            array(
                 'methods' => WP_REST_Server::CREATABLE,
                 'callback' => array($this, 'submitBug'),
                 'args' => array(
@@ -81,22 +85,26 @@ class VersionPressApi {
                     'description' => array(
                         'required' => true
                     )
-                )
-            )
+            ),
+            'permission_callback' => function() {
+                return current_user_can('manage_options');
+            }
         ));
 
         register_vp_rest_route($namespace, '/display-welcome-panel', array(
-            array(
                 'methods' => WP_REST_Server::READABLE,
-                'callback' => array($this, 'displayWelcomePanel')
-            )
+            'callback' => array($this, 'displayWelcomePanel'),
+            'permission_callback' => function() {
+                return current_user_can('manage_options');
+            }
         ));
 
         register_vp_rest_route($namespace, '/hide-welcome-panel', array(
-            array(
                 'methods' => WP_REST_Server::CREATABLE,
-                'callback' => array($this, 'hideWelcomePanel')
-            )
+            'callback' => array($this, 'hideWelcomePanel'),
+            'permission_callback' => function() {
+                return current_user_can('manage_options');
+            }
         ));
     }
 
