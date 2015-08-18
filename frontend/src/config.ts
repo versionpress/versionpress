@@ -1,9 +1,8 @@
 /// <reference path='../typings/tsd.d.ts' />
 /// <reference path='./VersionPressConfig.d.ts' />
 
+import _ = require('lodash');
 import localConfig = require('./config.local');
-
-require('core-js/es6/object');
 
 const defaultConfig: VersionPressConfig = {
 
@@ -27,5 +26,6 @@ const VpApiConfig = {
   api: window['VP_API_Config'] || {}
 };
 
-const config: VersionPressConfig = Object.assign(defaultConfig, localConfig, VpApiConfig);
+var config = <VersionPressConfig> _.merge(defaultConfig, localConfig, VpApiConfig);
+
 export = config;
