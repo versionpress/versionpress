@@ -13,7 +13,7 @@ interface CommitsTableRowSummaryProps {
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
   onDetailsLevelChanged: (detailsLevel) => any
-  details: string;
+  detailsLevel: string;
 }
 
 class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps, {}> {
@@ -27,7 +27,7 @@ class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps
       return DOM.tr(null);
     }
     const commit = this.props.commit;
-    const className = 'alternate' + (commit.isEnabled ? '' : ' disabled') + (this.props.details !== 'none' ? ' displayed-details' : '');
+    const className = 'alternate' + (commit.isEnabled ? '' : ' disabled') + (this.props.detailsLevel !== 'none' ? ' displayed-details' : '');
 
     return DOM.tr({className: className, onClick: () => this.toggleDetails()},
       DOM.td({
@@ -36,9 +36,9 @@ class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps
       }, moment(commit.date).fromNow()),
       DOM.td({className: 'column-message'},
         DOM.span(null, commit.message),
-        this.props.details !== 'none' ? DOM.div({className: 'detail-buttons'},
-          DOM.button({disabled: this.props.details === 'overview', onClick: (e) => {this.changeDetailsLevel('overview'); e.stopPropagation();}}, 'Overview'),
-          DOM.button({disabled: this.props.details === 'full-diff', onClick: (e) => {this.changeDetailsLevel('full-diff'); e.stopPropagation();}}, 'Full diff')
+        this.props.detailsLevel !== 'none' ? DOM.div({className: 'detail-buttons'},
+          DOM.button({disabled: this.props.detailsLevel === 'overview', onClick: (e) => {this.changeDetailsLevel('overview'); e.stopPropagation();}}, 'Overview'),
+          DOM.button({disabled: this.props.detailsLevel === 'full-diff', onClick: (e) => {this.changeDetailsLevel('full-diff'); e.stopPropagation();}}, 'Full diff')
         ) : null
       ),
       DOM.td({className: 'column-actions'},
@@ -65,7 +65,7 @@ class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps
   }
 
   private toggleDetails() {
-    this.props.onDetailsLevelChanged(this.props.details === 'none' ? 'overview' : 'none');
+    this.props.onDetailsLevelChanged(this.props.detailsLevel === 'none' ? 'overview' : 'none');
   }
 
   private changeDetailsLevel(detailsLevel) {

@@ -18,6 +18,7 @@ interface CommitsTableProps {
   commits: Commit[];
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
+  diffProvider: {getDiff: (hash: string) => Promise<string>};
 }
 
 class CommitsTable extends React.Component<CommitsTableProps, any>  {
@@ -36,7 +37,8 @@ class CommitsTable extends React.Component<CommitsTableProps, any>  {
           key: commit.hash,
           commit: commit,
           onUndo: this.props.onUndo,
-          onRollback: this.props.onRollback
+          onRollback: this.props.onRollback,
+          diffProvider: this.props.diffProvider
         })
       }),
       DOM.tfoot(null,

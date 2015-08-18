@@ -29,7 +29,6 @@ class DiffParser {
     }
 
     if (collectedLines.length > 0 && diff !== null) {
-      // ...
       diff.chunks = DiffParser.parseFileDiff(collectedLines);
       diffs.push(diff);
     }

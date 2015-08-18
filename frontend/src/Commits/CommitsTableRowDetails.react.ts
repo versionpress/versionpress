@@ -10,9 +10,8 @@ const DOM = React.DOM;
 
 interface CommitsTableRowDetailsProps {
   commit: Commit;
-  onUndo: React.MouseEventHandler;
-  onRollback: React.MouseEventHandler;
-  details: string;
+  detailsLevel: string;
+  diff?: string;
 }
 
 class CommitsTableRowDetails extends React.Component<CommitsTableRowDetailsProps, {}> {
@@ -23,7 +22,7 @@ class CommitsTableRowDetails extends React.Component<CommitsTableRowDetailsProps
   }
 
   render() {
-    if (this.props.commit === null || this.props.details === 'none') {
+    if (this.props.commit === null || this.props.detailsLevel === 'none') {
       return DOM.tr(null);
     }
     const commit = this.props.commit;
@@ -45,13 +44,13 @@ class CommitsTableRowDetails extends React.Component<CommitsTableRowDetailsProps
     const fullDiffRow = DOM.tr({className: className},
       DOM.td({colSpan: 3},
         DOM.div({className: detailsClass},
-          this.props.details === 'overview' ? overviewTable : null,
-          this.props.details === 'full-diff' ? React.createElement(DiffPanel, {ref: 'full-diff'}) : null
+          this.props.detailsLevel === 'overview' ? overviewTable : null,
+          this.props.detailsLevel === 'full-diff' ? React.createElement(DiffPanel, <DiffPanel.Props>{diff: this.props.diff}) : null
         )
       )
     );
 
-    return this.props.details === 'overview' ? overviewRow : fullDiffRow;
+    return this.props.detailsLevel === 'overview' ? overviewRow : fullDiffRow;
   }
 
 }

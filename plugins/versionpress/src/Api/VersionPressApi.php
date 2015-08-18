@@ -4,7 +4,9 @@ namespace VersionPress\Api;
 
 require_once ABSPATH . 'wp-admin/includes/file.php';
 
-use Nette\Utils\Strings;use VersionPress\ChangeInfos\ChangeInfoMatcher;
+use Nette\Utils\Strings;
+use VersionPress\ChangeInfos\ChangeInfoEnvelope;
+use VersionPress\ChangeInfos\ChangeInfoMatcher;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\OptionChangeInfo;
 use VersionPress\ChangeInfos\PluginChangeInfo;
@@ -70,6 +72,19 @@ class VersionPressApi {
         register_vp_rest_route($namespace, '/can-revert', array(
                 'methods' => WP_REST_Server::READABLE,
             'callback' => array($this, 'canRevert'),
+            'permission_callback' => function() {
+                return current_user_can('manage_options');
+            }
+        ));
+
+        register_vp_rest_route($namespace, '/diff', array(
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => array($this, 'getDiff'),
+            'args' => array(
+                'commit' => array(
+                    'required' => true
+                )
+            ),
             'permission_callback' => function() {
                 return current_user_can('manage_options');
             }
@@ -145,6 +160,7 @@ class VersionPressApi {
 
 
             $fileChanges = $this->getFileChanges($commit);
+            $changeInfoList = $changeInfo instanceof ChangeInfoEnvelope ? $changeInfo->getChangeInfoList() : array();
 
             $result[] = array(
                 "hash" => $commit->getHash(),
@@ -153,7 +169,7 @@ class VersionPressApi {
                 "canUndo" => $canUndoCommit,
                 "canRollback" => $canRollbackToThisCommit,
                 "isEnabled" => $isEnabled,
-                "changes" => array_merge($this->convertChangeInfoList($changeInfo->getChangeInfoList()), $fileChanges),
+                "changes" => array_merge($this->convertChangeInfoList($changeInfoList), $fileChanges),
             );
             $isFirstCommit = false;
         }
@@ -212,6 +228,15 @@ class VersionPressApi {
             return $this->getError($revertStatus);
         }
         return new WP_REST_Response(true);
+    }
+
+    public function getDiff(WP_REST_Request $request) {
+        global $versionPressContainer;
+        /** @var GitRepository $repository */
+        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+        $hash = $request['commit'];
+        $diff = $repository->getDiff($hash);
+        return new WP_REST_Response(array('diff' => $diff));
     }
 
     /**

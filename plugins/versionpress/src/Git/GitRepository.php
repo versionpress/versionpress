@@ -308,6 +308,18 @@ class GitRepository {
     }
 
     /**
+     * Returns diff for given commit
+     *
+     * @param string $hash
+     * @return string
+     */
+    public function getDiff($hash) {
+        $gitCmd = "git diff $hash~1 $hash";
+        $output = $this->runShellCommandWithStandardOutput($gitCmd);
+        return $output;
+    }
+
+    /**
      * Invokes {@see runShellCommand()} and returns its stdout output. The params are the same,
      * only the return type is string instead of an array.
      *

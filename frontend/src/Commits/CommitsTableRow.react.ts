@@ -11,17 +11,19 @@ interface CommitsTableRowProps {
   commit: Commit;
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
+  diffProvider: {getDiff: (hash: string) => Promise<string>};
 }
 
 interface CommitsTableRowState {
-  displayDetails: string;
+  detailsLevel: string;
+  diff?: string;
 }
 
 class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTableRowState> {
 
   constructor() {
     super();
-    this.state = {displayDetails: 'none'};
+    this.state = {detailsLevel: 'none'};
   }
 
   render() {
@@ -30,18 +32,30 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTable
         commit: this.props.commit,
         onUndo: this.props.onUndo,
         onRollback: this.props.onRollback,
-        onDetailsLevelChanged: details => this.setState({displayDetails: details}),
-        details: this.state.displayDetails
+        onDetailsLevelChanged: detailsLevel => this.changeDetailsLevel(detailsLevel),
+        detailsLevel: this.state.detailsLevel
       }),
       React.createElement(CommitsTableRowDetails, <CommitsTableRowDetails.Props>{
         commit: this.props.commit,
-        details: this.state.displayDetails
+        detailsLevel: this.state.detailsLevel,
+        diff: this.state.diff
       })
     );
   }
 
   private changeDetailsLevel(detailsLevel: string) {
-    this.setState({displayDetails: detailsLevel});
+    if (detailsLevel === 'full-diff' && !this.state.diff) {
+      this.props.diffProvider.getDiff(this.props.commit.hash)
+        .then(diff => this.setState(
+          {
+            detailsLevel: detailsLevel,
+            diff: diff
+          }
+        )
+      );
+    } else {
+      this.setState({detailsLevel: detailsLevel});
+    }
   }
 }
 
