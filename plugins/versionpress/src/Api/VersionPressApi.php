@@ -33,7 +33,7 @@ class VersionPressApi {
                     'default' => '0'
                 )
             ),
-            'permission_callback' => array($this, 'permissionsCheck')
+            'permission_callback' => array($this, 'checkPermissions')
         ));
 
         register_vp_rest_route($namespace, '/undo', array(
@@ -44,7 +44,7 @@ class VersionPressApi {
                     'required' => true
                 )
             ),
-            'permission_callback' => array($this, 'permissionsCheck')
+            'permission_callback' => array($this, 'checkPermissions')
         ));
 
         register_vp_rest_route($namespace, '/rollback', array(
@@ -55,13 +55,13 @@ class VersionPressApi {
                     'required' => true
                 )
             ),
-            'permission_callback' => array($this, 'permissionsCheck')
+            'permission_callback' => array($this, 'checkPermissions')
         ));
 
         register_vp_rest_route($namespace, '/can-revert', array(
             'methods' => WP_REST_Server::READABLE,
             'callback' => array($this, 'canRevert'),
-            'permission_callback' => array($this, 'permissionsCheck')
+            'permission_callback' => array($this, 'checkPermissions')
         ));
 
         register_vp_rest_route($namespace, '/submit-bug', array(
@@ -75,19 +75,19 @@ class VersionPressApi {
                     'required' => true
                 )
             ),
-            'permission_callback' => array($this, 'permissionsCheck')
+            'permission_callback' => array($this, 'checkPermissions')
         ));
 
         register_vp_rest_route($namespace, '/display-welcome-panel', array(
             'methods' => WP_REST_Server::READABLE,
             'callback' => array($this, 'displayWelcomePanel'),
-            'permission_callback' => array($this, 'permissionsCheck')
+            'permission_callback' => array($this, 'checkPermissions')
         ));
 
         register_vp_rest_route($namespace, '/hide-welcome-panel', array(
             'methods' => WP_REST_Server::CREATABLE,
             'callback' => array($this, 'hideWelcomePanel'),
-            'permission_callback' => array($this, 'permissionsCheck')
+            'permission_callback' => array($this, 'checkPermissions')
         ));
     }
 
@@ -266,7 +266,7 @@ class VersionPressApi {
      * @param WP_REST_Request $request
      * @return \WP_Error|bool
      */
-    public function permissionsCheck(WP_REST_Request $request) {
+    public function checkPermissions(WP_REST_Request $request) {
         global $versionPressContainer;
         /** @var VersionPressConfig $vpConfig */
         $vpConfig = $versionPressContainer->resolve(VersionPressServices::VP_CONFIGURATION);
