@@ -17,12 +17,16 @@ class DiffParser {
           diffs.push(diff);
         }
 
-        diff = {from: lineMatch[1], to: nextLineMatch[1]};
+        diff = {from: lineMatch[1], to: nextLineMatch[1], type: 'plain'};
         collectedLines = [];
         i++; // Skip the +++ line
 
       } else if (line.match(/^diff --git|index/)) {
         // Skip line
+      } else if (line.match(/^Binary files .* differ/)) {
+        let binaryFilesMatch = line.match(/^Binary files (.*) and (.*) differ/);
+        diffs.push({from: binaryFilesMatch[1], to: binaryFilesMatch[2], chunks: [], type: 'binary'});
+        collectedLines = [];
       } else {
         collectedLines.push(line);
       }

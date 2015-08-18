@@ -17,13 +17,14 @@ class DiffPanel extends React.Component<DiffPanelProps, any> {
     return DOM.div(null,
       diffs.map(diff =>
         DOM.div({className: 'diff'},
-          DOM.h4({className: 'heading'}, (diff.from === '/dev/null' ? diff.to : diff.from).substr(2)), this.formatChunks(diff.chunks)
+          DOM.h4({className: 'heading'}, (diff.from === '/dev/null' ? diff.to : diff.from).substr(2)),
+          diff.type === 'plain' ? DiffPanel.formatChunks(diff.chunks) : DiffPanel.formatInfoForBinaryFileDiff(diff)
         )
       )
     );
   }
 
-  private createTableFromChunk(chunk) {
+  private static createTableFromChunk(chunk) {
     let [left, right] = DiffPanel.divideToLeftAndRightColumn(chunk);
 
     let mapTwoArrays = (a1: any[], a2: any[], fn: (a: any, b: any) => any) => {
@@ -85,10 +86,10 @@ class DiffPanel extends React.Component<DiffPanelProps, any> {
     return [left, right];
   }
 
-  private formatChunks(chunks: any[]) {
+  private static formatChunks(chunks: any[]) {
     let result = [];
     let chunkTables = chunks.map(chunk =>
-        this.createTableFromChunk(chunk)
+        DiffPanel.createTableFromChunk(chunk)
     );
 
     for(let i = 0; i < chunkTables.length; i++) {
@@ -124,6 +125,20 @@ class DiffPanel extends React.Component<DiffPanelProps, any> {
 
     let numberOfSpaces = match[1].length;
     return "\u00a0".repeat(numberOfSpaces) + content.substr(numberOfSpaces);
+  }
+
+  private static formatInfoForBinaryFileDiff(diff) {
+    var message;
+
+    if (diff.from === '/dev/null') {
+      message = 'Added binary file';
+    } else if (diff.to === '/dev/null') {
+      message = 'Deleted binary file';
+    } else {
+      message = 'Changed binary file';
+    }
+
+    return DOM.div({className: 'binary-file-info'}, message);
   }
 }
 

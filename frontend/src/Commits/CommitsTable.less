@@ -138,11 +138,18 @@
     margin-bottom: 40px;
 
     .heading {
-      background: #fff;
+      background: @borderColor;
       margin: 0;
       border: 1px solid @borderColor;
       border-bottom: 0;
-      padding: 20px;
+      padding: 10px;
+    }
+
+    .binary-file-info {
+      font-style: italic;
+      background: #fff;
+      border: 1px solid @borderColor;
+      padding: 10px;
     }
 
     .line {
@@ -160,6 +167,7 @@
 
       &-left, &-right {
         border-left: 1px solid @borderColor;
+        border-right: 1px solid @borderColor;
         height: 16pt;
         font-family: monospace;
         background: #fff;
