@@ -1,4 +1,5 @@
 /// <reference path='../../typings/tsd.d.ts' />
+/// <reference path='../common/Diff.d.ts' />
 
 import React = require('react');
 import DiffParser = require('../common/DiffParser');
@@ -25,10 +26,10 @@ class DiffPanel extends React.Component<DiffPanelProps, any> {
     );
   }
 
-  private static createTableFromChunk(chunk) {
+  private static createTableFromChunk(chunk: Chunk) {
     let [left, right] = DiffPanel.divideToLeftAndRightColumn(chunk);
 
-    let mapTwoArrays = (a1: any[], a2: any[], fn: (a: any, b: any) => any) => {
+    let mapTwoArrays = <T,U>(a1: T[], a2: U[], fn: (a: T, b: U) => any) => {
       let result = [];
       for(let i = 0; i < a1.length; i++) {
         result.push(fn(a1[i], a2[i]));
@@ -77,10 +78,10 @@ class DiffPanel extends React.Component<DiffPanelProps, any> {
     return [leftContent, rightContent];
   }
 
-  private static divideToLeftAndRightColumn(chunk) {
+  private static divideToLeftAndRightColumn(chunk: Chunk): [Line[], Line[]] {
     let lines = chunk.lines;
-    let left = [];
-    let right = [];
+    let left: Line[] = [];
+    let right: Line[] = [];
 
     for (let i = 0; i < lines.length; i++) {
       let line = lines[i];

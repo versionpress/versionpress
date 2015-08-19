@@ -1,9 +1,9 @@
 class DiffParser {
-  public static parse(rawDiff: string) {
+  public static parse(rawDiff: string): Diff[] {
     let lines = rawDiff.split(/\r\n|\r|\n/);
-    let diffs = [];
-    let diff: any = null;
-    let collectedLines = [];
+    let diffs: Diff[] = [];
+    let diff: Diff = null;
+    let collectedLines: string[] = [];
 
     for (let i = 0; i < lines.length; i++) {
       let line = lines[i];
@@ -17,7 +17,7 @@ class DiffParser {
           diffs.push(diff);
         }
 
-        diff = {from: lineMatch[1], to: nextLineMatch[1], type: 'plain'};
+        diff = {from: lineMatch[1], to: nextLineMatch[1], type: 'plain', chunks: []};
         collectedLines = [];
         i++; // Skip the +++ line
 
@@ -40,9 +40,10 @@ class DiffParser {
     return diffs;
   }
 
-  private static parseFileDiff(lines: string[]) {
-    let chunks = [];
-    let chunk = {lines: []};
+  private static parseFileDiff(lines: string[]): Chunk[] {
+    let chunks: Chunk[] = [];
+    let chunk: Chunk = {lines: []};
+
     for (let i = 0; i < lines.length; i++) {
       let line = lines[i];
       if (line.match(/^@@/)) {
