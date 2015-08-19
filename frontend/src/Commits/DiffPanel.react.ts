@@ -2,6 +2,7 @@
 
 import React = require('react');
 import DiffParser = require('../common/DiffParser');
+import JsDiff = require('diff');
 
 const DOM = React.DOM;
 
@@ -37,15 +38,43 @@ class DiffPanel extends React.Component<DiffPanelProps, any> {
 
     return DOM.table({className: 'chunk'},
       DOM.tbody(null,
-        mapTwoArrays(left, right, (l, r) =>
-          DOM.tr({className: 'line'},
-            DOM.td({className: 'line-left ' + l.type}, DiffPanel.replaceLeadingSpacesWithHardSpaces(l.content)),
-            DOM.td({className: 'line-separator'}),
-            DOM.td({className: 'line-right ' + r.type}, DiffPanel.replaceLeadingSpacesWithHardSpaces(r.content))
-          )
+        mapTwoArrays(left, right, (l, r) => {
+            let leftContent: any = DiffPanel.replaceLeadingSpacesWithHardSpaces(l.content);
+            let rightContent: any = DiffPanel.replaceLeadingSpacesWithHardSpaces(r.content);
+
+            if (l.type === 'removed' && r.type === 'added') {
+              [leftContent, rightContent] = this.highlightInlineDiff(leftContent, rightContent);
+            }
+
+            return DOM.tr({className: 'line'},
+              DOM.td({className: 'line-left ' + l.type}, leftContent),
+              DOM.td({className: 'line-separator'}),
+              DOM.td({className: 'line-right ' + r.type}, rightContent)
+            )
+          }
         )
       )
     )
+  }
+
+  private static highlightInlineDiff(leftContent, rightContent) {
+
+    let highlightLine = (diffPart: JsDiff.IDiffResult, shouldBeHighlighted: () => boolean, color: string) => {
+      if (shouldBeHighlighted()) {
+        return DOM.span({style: {backgroundColor: color}}, diffPart.value);
+      } else if (!diffPart.added && !diffPart.removed) {
+        return DOM.span(null, diffPart.value);
+      }
+
+      return DOM.span(null);
+    };
+
+    let lineDiff = JsDiff.diffWords(leftContent, rightContent);
+
+    leftContent = lineDiff.map(diffPart => highlightLine(diffPart, () => !!diffPart.removed, '#f8cbcb'));
+    rightContent = lineDiff.map(diffPart => highlightLine(diffPart, () => !!diffPart.added, '#a6f3a6'));
+
+    return [leftContent, rightContent];
   }
 
   private static divideToLeftAndRightColumn(chunk) {

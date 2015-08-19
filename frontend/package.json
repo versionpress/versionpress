@@ -23,6 +23,7 @@
     "chai": "^3.2.0",
     "core-js": "^1.0.0",
     "css-loader": "^0.15.5",
+    "diff": "^2.0.2",
     "extract-text-webpack-plugin": "^0.8.2",
     "file-loader": "^0.8.4",
     "gulp-util": "^3.0.6",
