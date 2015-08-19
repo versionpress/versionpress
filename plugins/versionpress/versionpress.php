@@ -585,7 +585,7 @@ add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are
 function vp_activation_nag() {
 
     if (VersionPress::isActive() ||
-        get_current_screen()->id == "versionpress" ||
+        get_current_screen()->id == "toplevel_page_versionpress" ||
         get_current_screen()->id == "versionpress/admin/index" ||
         get_current_screen()->id == "versionpress/admin/deactivate"
     ) {
