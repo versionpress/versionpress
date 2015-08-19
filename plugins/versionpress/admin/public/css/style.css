@@ -220,6 +220,11 @@ tr.disabled {
     opacity: 0.5;
 }
 
+tr.note {
+    background-color: #dedede;
+    text-align: center;
+}
+
 #vp-service-panel {
     display: none;
 }

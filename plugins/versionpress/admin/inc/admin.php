@@ -135,7 +135,15 @@ if ($showWelcomePanel === "") {
     $canUndoCommit = $repository->wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
     $isFirstCommit = $page === 0;
 
-    foreach ($commits as $commit) {
+    if (!$canUndoCommit && $commits[0]->getHash() !== $initialCommitHash) {
+        echo "
+        <tr class=\"post-1 type-post status-publish format-standard hentry category-uncategorized alternate note level-0\">
+            <td colspan=\"3\">VersionPress is not able to undo changes made before it has been activated.</td>
+        </tr>
+        ";
+    }
+
+    foreach ($commits as $key => $commit) {
         $canUndoCommit = $canUndoCommit && ($commit->getHash() !== $initialCommitHash);
         $canRollbackToThisCommit = !$isFirstCommit && ($canUndoCommit || $commit->getHash() === $initialCommitHash);
         $commitDate = $commit->getDate()->format('d-M-y H:i:s');
@@ -172,6 +180,14 @@ if ($showWelcomePanel === "") {
                 $versioningSnippet
             </td>
         </tr>";
+
+        if ($commit->getHash() === $initialCommitHash && $key < count($commits) - 1) {
+            echo "
+            <tr class=\"post-1 type-post status-publish format-standard hentry category-uncategorized alternate note level-0\">
+                <td colspan=\"3\">VersionPress is not able to undo changes made before it has been activated.</td>
+            </tr>
+            ";
+        }
 
         $isFirstCommit = false;
     }
