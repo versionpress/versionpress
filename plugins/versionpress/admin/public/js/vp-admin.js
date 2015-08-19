@@ -108,7 +108,7 @@ jQuery(document).ready(function($) {
         }
         var pluginName = $element.data('plugin-name');
         var incompatible = $element.hasClass('vp-incompatible');
-        var title = incompatible ? 'This will not end well' : 'This might not end well';
+        var title = incompatible ? 'This will not end well' : 'Warning';
         var content = '<p>' + pluginName + '<strong>' +
             (incompatible ? ' is not compatible' : ' was not yet tested') + '</strong> with VersionPress.<br>' +
             (incompatible ? 'These plugins will not work correctly when using together.' : 'Some functionality may not work as intended.') + '</p>' +
