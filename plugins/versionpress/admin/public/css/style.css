@@ -183,3 +183,53 @@ h2.vp-deactivation-header {
 .webui-popover h3 {
     clear: none;
 }
+
+.vp-index .welcome-panel {
+    padding-bottom: 23px;
+    margin-top: 20px;
+}
+
+.vp-index .welcome-panel p {
+    color: inherit;
+}
+
+.vp-index .welcome-panel .about-description {
+    margin: 23px 0 10px;
+}
+
+.vp-index .welcome-panel ul {
+    list-style: none;
+    padding-left: 40px;
+}
+
+.vp-index .welcome-panel ul li {
+    position: relative;
+}
+
+.vp-index .welcome-panel ul .icon {
+    position: absolute;
+    left: -25px;
+    top: 6px;
+}
+
+.vp-index #vp-page-header {
+    margin-bottom: 15px;
+}
+
+tr.disabled {
+    opacity: 0.5;
+}
+
+#vp-service-panel {
+    display: none;
+}
+
+#vp-service-panel.displayed {
+    display: block;
+}
+
+#vp-service-panel-button {
+    font-size: 16px;
+    float: right;
+    padding: 2px 12px;
+}
