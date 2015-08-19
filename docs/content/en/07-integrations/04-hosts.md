@@ -11,19 +11,19 @@ As described on the [installation page](../getting-started/installation-uninstal
 
 Here are a couple of hosts that we or our users confirmed work fine with VersionPress:
 
- - [SiteGround](https://www.siteground.com/) - a popular WordPress host
- - [FastComet](http://www.fastcomet.com/) - SSD cloud hosting with CloudFlare & 24/7 Premium Support
- - [Byte](https://www.byte.nl/) - performance webhosting in Netherlands
- - [WebFaction](https://www.webfaction.com/) - hosting for developers
- - [Uberspace](https://uberspace.de/) - German hosting company (have Git 1.7 pre-installed, upgradable to 1.9+) 
+ - [FastComet](http://www.fastcomet.com/) – SSD cloud hosting with CloudFlare & 24/7 Premium Support
+ - [SiteGround](https://www.siteground.com/) – a popular WordPress host
+ - [Byte](https://www.byte.nl/) – performance webhosting in Netherlands
+ - [WebFaction](https://www.webfaction.com/) – hosting for developers
+ - [Uberspace](https://uberspace.de/) – hosting space in Germany (Git 1.7 pre-installed, upgradable to 1.9+) 
 
 
 
 ## Unsupported hosts
 
-Here are some of the hosts that don't support VersionPress at the moment. If you are their customer, **please let them know**. If they see more demand for VersionPress they might add support for it.
+Here are some unsupported hosts for the moment. If you are their customer, please let them know that you'd be interested in VersionPress support – if they see more demand for it they might add support for it.
 
- - WP Engine – they have intentionally restricted environment that doesn't allow `proc_open()`. We acknowledge that WPE is important to our users and are actively looking into how to possibly support it.
- - DreamHost
- - FlyWheel – they don't have Git installed
+ - **WP Engine** – they have intentionally restricted environment that doesn't allow `proc_open()`. We acknowledge that WPE is important to our users and are actively looking into how to support it.
+ - **DreamHost**
+ - **FlyWheel** – they don't have Git installed
 
