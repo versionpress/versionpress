@@ -233,3 +233,22 @@ tr.disabled {
     float: right;
     padding: 2px 12px;
 }
+
+/*------------------------------
+ * Styles for plugins.php
+ *------------------------------*/
+.vp-update-message {
+    margin: -1px 0 1px 0 !important;
+    padding-top: 10px !important;
+    padding-left: 70px !important;
+    background-color: inherit;
+}
+
+.vp-update-message a {
+    text-decoration: underline !important;
+}
+
+.vp-plugin-update {
+    border-left: 4px solid #d54e21 !important;
+    overflow: visible !important;
+}
