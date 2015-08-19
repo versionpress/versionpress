@@ -109,9 +109,10 @@ jQuery(document).ready(function($) {
         var pluginName = $element.data('plugin-name');
         var incompatible = $element.hasClass('vp-incompatible');
         var title = incompatible ? 'This will not end well' : 'This might not end well';
-        var content = pluginName + '<strong>' +
+        var content = '<p>' + pluginName + '<strong>' +
             (incompatible ? ' is not compatible' : ' was not yet tested') + '</strong> with VersionPress.<br>' +
-            (incompatible ? 'These plugins will not work correctly when using together.' : 'Some functionality may not work as intended.');
+            (incompatible ? 'These plugins will not work correctly when using together.' : 'Some functionality may not work as intended.') + '</p>' +
+            '<p><a href="http://docs.versionpress.net/en/integrations/plugins" target="_blank">Learn more</a></p>';
         var buttons = '<div class="vp-compatibility-popup-buttons">' +
             '<a class="button button-primary vp-install-now" href="' + $button.attr('href') + '">' + buttonText + '</a> ' +
             '<a class="button vp-cancel">Cancel</a>' +

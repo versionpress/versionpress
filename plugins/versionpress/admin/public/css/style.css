@@ -194,3 +194,8 @@ h2.vp-deactivation-header {
     float: right;
     margin-left: 3px;
 }
+
+.webui-popover-versionpress-compatibility-popover .webui-popover-content p {
+    margin-top: .5em;
+    margin-bottom: .5em;
+}
