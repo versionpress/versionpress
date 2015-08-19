@@ -111,7 +111,7 @@ jQuery(document).ready(function($) {
         var title = incompatible ? 'This will not end well' : 'Warning';
         var content = '<p>' + pluginName + '<strong>' +
             (incompatible ? ' is not compatible' : ' was not yet tested') + '</strong> with VersionPress.<br>' +
-            (incompatible ? 'These plugins will not work correctly when using together.' : 'Some functionality may not work as intended.') + '</p>' +
+            (incompatible ? 'These plugins will not work correctly when used together.' : 'Some functionality may not work as intended.') + '</p>' +
             '<p><a href="http://docs.versionpress.net/en/integrations/plugins" target="_blank">Learn more</a></p>';
         var buttons = '<div class="vp-compatibility-popup-buttons">' +
             '<a class="button button-primary vp-install-now" href="' + $button.attr('href') + '">' + buttonText + '</a> ' +
