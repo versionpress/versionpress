@@ -12,45 +12,34 @@ interface CommitsTableRowDetailsProps {
   commit: Commit;
   detailsLevel: string;
   diff?: string;
+  loading?: boolean;
 }
 
 class CommitsTableRowDetails extends React.Component<CommitsTableRowDetailsProps, {}> {
-
-  constructor() {
-    super();
-    this.state = {display: 'none'};
-  }
 
   render() {
     if (this.props.commit === null || this.props.detailsLevel === 'none') {
       return DOM.tr(null);
     }
     const commit = this.props.commit;
-    const className = 'alternate details-row' + (commit.isEnabled ? '' : 'disabled');
-    const detailsClass = 'details show';
+    const className = 'alternate details-row' + (commit.isEnabled ? '' : 'disabled') + (this.props.loading ? ' loading' : '');
+    const detailsClass = 'details';
 
     const overviewTable = DOM.table(null, commit.changes.map((change: Change) => {
       return DOM.tr(null, DOM.td(null, change.type), DOM.td(null, change.action), DOM.td(null, change.name));
     }));
 
-    const overviewRow = DOM.tr({className: className},
-      DOM.td(null),
-      DOM.td(null,
-        DOM.div({className: detailsClass}, overviewTable)
-      ),
-      DOM.td(null)
+    const overviewElement = DOM.div({className: detailsClass + ' overview'}, overviewTable);
+
+    const fullDiffElement = DOM.div({className: detailsClass},
+      React.createElement(DiffPanel, <DiffPanel.Props>{diff: this.props.diff})
     );
 
-    const fullDiffRow = DOM.tr({className: className},
+    return DOM.tr({className: className},
       DOM.td({colSpan: 3},
-        DOM.div({className: detailsClass},
-          this.props.detailsLevel === 'overview' ? overviewTable : null,
-          this.props.detailsLevel === 'full-diff' ? React.createElement(DiffPanel, <DiffPanel.Props>{diff: this.props.diff}) : null
-        )
+        this.props.detailsLevel === 'overview' ? overviewElement : fullDiffElement
       )
     );
-
-    return this.props.detailsLevel === 'overview' ? overviewRow : fullDiffRow;
   }
 
 }
