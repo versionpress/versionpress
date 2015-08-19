@@ -265,7 +265,7 @@ function vp_register_hooks() {
             $compatibilityAdjective = 'Compatible';
         } elseif ($compatibility === CompatibilityResult::INCOMPATIBLE) {
             $cssClass = 'vp-incompatible';
-            $compatibilityAdjective = '<a href="http://docs.versionpress.net/en/integrations/plugins" title="This plugin is not compatible with VersionPress. These plugins will not work correctly when using together.">Incompatible</a>';
+            $compatibilityAdjective = '<a href="http://docs.versionpress.net/en/integrations/plugins" target="_blank" title="This plugin is not compatible with VersionPress. These plugins will not work correctly when using together.">Incompatible</a>';
         } else {
             $cssClass = 'vp-untested';
             $compatibilityAdjective = '<abbr title="This plugin was not yet tested with VersionPress. Some functionality may not work as intended.">Untested</abbr>';
@@ -287,7 +287,7 @@ function vp_register_hooks() {
             $compatibilityAdjective = 'Compatible';
         } elseif ($compatibility === CompatibilityResult::INCOMPATIBLE) {
             $cssClass = 'vp-incompatible';
-            $compatibilityAdjective = '<a href="http://docs.versionpress.net/en/integrations/plugins" title="This plugin is not compatible with VersionPress. These plugins will not work correctly when using together.">Incompatible</a>';
+            $compatibilityAdjective = '<a href="http://docs.versionpress.net/en/integrations/plugins" target="_blank" title="This plugin is not compatible with VersionPress. These plugins will not work correctly when using together.">Incompatible</a>';
         } elseif ($compatibility === CompatibilityResult::UNTESTED) {
             $cssClass = 'vp-untested';
             $compatibilityAdjective = '<abbr title="This plugin was not yet tested with VersionPress. Some functionality may not work as intended.">Untested</abbr>';
