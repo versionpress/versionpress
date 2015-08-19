@@ -665,15 +665,6 @@ function versionpress_page() {
     require_once(WP_CONTENT_DIR . '/plugins/versionpress/admin/index.php');
 }
 
-add_action('admin_init', 'vp_admin_init');
-
-function vp_admin_init() {
-    if (basename($_SERVER['PHP_SELF']) === 'admin.php' && isset($_GET['page']) && $_GET['page'] === 'versionpress') {
-        wp_redirect(menu_page_url('versionpress', false) . '/');
-        exit;
-    }
-}
-
 add_action('admin_action_vp_show_undo_confirm', 'vp_show_undo_confirm');
 
 function vp_show_undo_confirm() {
