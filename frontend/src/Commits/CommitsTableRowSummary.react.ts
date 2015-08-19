@@ -27,7 +27,7 @@ class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps
       return DOM.tr(null);
     }
     const commit = this.props.commit;
-    const className = 'alternate' + (commit.isEnabled ? '' : ' disabled') + (this.props.detailsLevel !== 'none' ? ' displayed-details' : '');
+    const className = (commit.isEnabled ? '' : 'disabled') + (this.props.detailsLevel !== 'none' ? ' displayed-details' : '');
 
     return DOM.tr({className: className, onClick: () => this.toggleDetails()},
       DOM.td({

@@ -26,8 +26,8 @@ class CommitsTableRowDetails extends React.Component<CommitsTableRowDetailsProps
       return DOM.tr(null);
     }
     const commit = this.props.commit;
-    const className = 'alternate details-row' + (commit.isEnabled ? '' : 'disabled');
-    const detailsClass = 'details show';
+    const className = 'details-row' + (commit.isEnabled ? '' : 'disabled');
+    const detailsClass = 'details';
 
     const overviewTable = DOM.table(null, commit.changes.map((change: Change) => {
       return DOM.tr(null, DOM.td(null, change.type), DOM.td(null, change.action), DOM.td(null, change.name));

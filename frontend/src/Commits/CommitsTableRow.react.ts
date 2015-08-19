@@ -15,8 +15,9 @@ interface CommitsTableRowProps {
 }
 
 interface CommitsTableRowState {
-  detailsLevel: string;
+  detailsLevel?: string;
   diff?: string;
+  error?: string;
 }
 
 class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTableRowState> {
@@ -35,11 +36,17 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTable
         onDetailsLevelChanged: detailsLevel => this.changeDetailsLevel(detailsLevel),
         detailsLevel: this.state.detailsLevel
       }),
-      React.createElement(CommitsTableRowDetails, <CommitsTableRowDetails.Props>{
+      this.state.error ? this.renderError() : React.createElement(CommitsTableRowDetails, <CommitsTableRowDetails.Props>{
         commit: this.props.commit,
         detailsLevel: this.state.detailsLevel,
         diff: this.state.diff
       })
+    );
+  }
+
+  renderError() {
+    return DOM.tr({className: 'details-row error'},
+      DOM.td({colSpan: 3}, this.state.error)
     );
   }
 
@@ -49,12 +56,14 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTable
         .then(diff => this.setState(
           {
             detailsLevel: detailsLevel,
-            diff: diff
-          }
-        )
-      );
+            diff: diff,
+            error: null
+          })
+      ).catch(err => {
+          this.setState({detailsLevel: detailsLevel, error: err.message});
+        });
     } else {
-      this.setState({detailsLevel: detailsLevel});
+      this.setState({detailsLevel: detailsLevel, error: null});
     }
   }
 }

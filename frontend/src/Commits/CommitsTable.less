@@ -22,7 +22,7 @@
       word-wrap: break-word;
     }
     
-    tr.alternate {
+    tbody tr {
       background-color: #f9f9f9;
     }
 
@@ -127,8 +127,15 @@
     }
   }
 
-  .details-row td {
-    border-top: 0;
+  .details-row {
+    &.error {
+      text-align: center;
+      background-color: #eee;
+    }
+
+    & td {
+      border-top: 0;
+    }
   }
 
   .diff {
