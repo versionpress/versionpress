@@ -7,7 +7,7 @@ import utils = require('../../common/__tests__/utils');
 
 const testUtils = React.addons.TestUtils;
 
-describe('CommitsTableRow', () => {
+describe('CommitsTableNote', () => {
   var onUndo: Sinon.SinonSpy;
   var onRollback: Sinon.SinonSpy;
   var props: CommitsTableRow.Props;
@@ -21,7 +21,8 @@ describe('CommitsTableRow', () => {
       hash: 'abcdef',
       canUndo: true,
       canRollback: true,
-      isEnabled: true
+      isEnabled: true,
+      isInitial: false
     };
     props = {
       commit: commit,

@@ -5,4 +5,5 @@ interface Commit {
   canUndo: boolean;
   canRollback: boolean;
   isEnabled: boolean;
+  isInitial: boolean;
 }
