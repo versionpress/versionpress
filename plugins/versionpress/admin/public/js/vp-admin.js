@@ -102,23 +102,22 @@ jQuery(document).ready(function($) {
         $label.find('.hide-without-js').show();
     });
 
-    $('.vp-compatibility-popup').each(function () {
-        var $el = $(this);
-        var $list = $(this).parents('ul');
-        var $installButton = $list.find('.install-now');
-        var pluginName = $el.data('plugin-name');
-        var incompatible = $el.hasClass('vp-incompatible');
+    function showCompatibilityPopup($element, $button, buttonText) {
+        if ($element.hasClass('vp-compatible')) {
+            return;
+        }
+        var pluginName = $element.data('plugin-name');
+        var incompatible = $element.hasClass('vp-incompatible');
         var title = incompatible ? 'This will not end well' : 'This might not end well';
         var content = pluginName + '<strong>' +
             (incompatible ? ' is not compatible' : ' was not yet tested') + '</strong> with VersionPress.<br>' +
             (incompatible ? 'These plugins will not work correctly when using together.' : 'Some functionality may not work as intended.');
         var buttons = '<div class="vp-compatibility-popup-buttons">' +
-            '<a class="button button-primary vp-install-now" href="' + $installButton.attr('href') + '">Install</a> ' +
+            '<a class="button button-primary vp-install-now" href="' + $button.attr('href') + '">' + buttonText + '</a> ' +
             '<a class="button vp-cancel">Cancel</a>' +
             '</div>';
-        $el.attr('title', content);
 
-        $installButton.webuiPopover({
+        $button.webuiPopover({
             title: title,
             cache: false,
             content: content + buttons,
@@ -128,27 +127,31 @@ jQuery(document).ready(function($) {
             placement: 'auto'
         });
 
-        $installButton.on('click', function(e) {
+        $button.on('click', function(e) {
             e.stopImmediatePropagation();
 
             $('.webui-popover-' + customCompatibilityPopoverClass).on('click', '.vp-cancel', function (e) {
-                $installButton.webuiPopover('hide');
+                $button.webuiPopover('hide');
                 return false;
             });
 
             return false;
         });
+    }
+
+    $('.plugin-install .vp-compatibility').each(function () {
+        var $el = $(this);
+        var $list = $(this).closest('.plugin-card');
+        var $installButton = $list.find('.install-now');
+
+        showCompatibilityPopup($el, $installButton, 'Install');
     });
 
-    $('.vp-plugin-list.vp-untested').each(function () {
-        $(this).find("a").click(function(e) {
-            return confirm("This plugin was not yet tested with VersionPress. Some functionality may not work as intended.");
-        });
-    });
+    $('.plugins .vp-compatibility').each(function () {
+        var $el = $(this);
+        var $list = $(this).closest('tr');
+        var $activateButton = $list.find('.activate a');
 
-    $('.vp-plugin-list.vp-incompatible').each(function () {
-        $(this).find("a").click(function(e) {
-            return confirm("This plugin is not compatible with VersionPress. Its activation will cause deactivation of VersionPress. Do you really want to activate this plugin?");
-        });
+        showCompatibilityPopup($el, $activateButton, 'Activate');
     });
 });

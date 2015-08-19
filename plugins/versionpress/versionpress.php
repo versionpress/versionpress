@@ -259,22 +259,21 @@ function vp_register_hooks() {
     add_action('set_object_terms', createUpdatePostTermsHook($mirror, $vpidRepository));
 
     add_filter('plugin_install_action_links', function ($links, $plugin) {
-        $warningLink = '<span class="vp-compatibility-popup %s" data-plugin-name="' . $plugin['name'] . '"></span>';
         $compatibility = CompatibilityChecker::testCompatibilityBySlug($plugin['slug']);
         if ($compatibility === CompatibilityResult::COMPATIBLE) {
             $cssClass = 'vp-compatible';
             $compatibilityAdjective = 'Compatible';
         } elseif ($compatibility === CompatibilityResult::INCOMPATIBLE) {
             $cssClass = 'vp-incompatible';
-            $links[] = sprintf($warningLink, $cssClass);
             $compatibilityAdjective = '<a href="http://docs.versionpress.net/en/integrations/plugins" title="This plugin is not compatible with VersionPress. These plugins will not work correctly when using together.">Incompatible</a>';
         } else {
             $cssClass = 'vp-untested';
             $compatibilityAdjective = '<abbr title="This plugin was not yet tested with VersionPress. Some functionality may not work as intended.">Untested</abbr>';
-            $links[] = sprintf($warningLink, $cssClass);
         }
 
-        $links[] = '<span class="vp-compatibility ' . $cssClass . '"><span class="hide-without-js"><strong>' . $compatibilityAdjective . '</strong> with </span>VersionPress</span>';
+        $compatibilityNotice = '<span class="vp-compatibility %s" data-plugin-name="%s"><strong>%s</strong> with VersionPress</span>';
+        $links[] = sprintf($compatibilityNotice, $cssClass, $plugin['name'], $compatibilityAdjective);
+
         return $links;
     }, 10, 2);
 
@@ -283,7 +282,6 @@ function vp_register_hooks() {
             return $plugin_meta;
         }
         $compatibility = CompatibilityChecker::testCompatibilityByPluginFile($plugin_file);
-
         if ($compatibility === CompatibilityResult::COMPATIBLE) {
             $cssClass = 'vp-compatible';
             $compatibilityAdjective = 'Compatible';
@@ -297,7 +295,8 @@ function vp_register_hooks() {
             return $plugin_meta;
         }
 
-        $plugin_meta[] = '<span class="vp-compatibility ' . $cssClass . '"><strong>' . $compatibilityAdjective . '</strong> with VersionPress</span>';
+        $compatibilityNotice = '<span class="vp-compatibility %s" data-plugin-name="%s"><strong>%s</strong> with VersionPress</span>';
+        $plugin_meta[] = sprintf($compatibilityNotice, $cssClass, $plugin_data['Name'], $compatibilityAdjective);
 
         return $plugin_meta;
     }, 10, 4);
