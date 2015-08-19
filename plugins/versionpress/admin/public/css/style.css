@@ -180,3 +180,12 @@ h2.vp-deactivation-header {
 .webui-popover h3 {
     clear: none;
 }
+
+.vp-compatibility-popup-buttons {
+    margin-top: 1em;
+}
+
+.vp-compatibility-popup-buttons .button {
+    float: right;
+    margin-left: 3px;
+}
