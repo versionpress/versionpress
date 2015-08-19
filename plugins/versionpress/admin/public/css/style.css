@@ -168,13 +168,9 @@ h2.vp-deactivation-header {
     content: '\f158';
 }
 
-.vp-compatibility.vp-incompatible a {
+.vp-compatibility.vp-incompatible a,
+.vp-compatibility.vp-untested a {
     color: inherit;
-    border-bottom: 1px dotted #777;
-}
-
-.vp-compatibility.vp-untested abbr {
-    cursor: help;
     border-bottom: 1px dotted #777;
 }
 
