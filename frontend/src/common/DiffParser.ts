@@ -21,7 +21,7 @@ class DiffParser {
         collectedLines = [];
         i++; // Skip the +++ line
 
-      } else if (line.match(/^diff --git|index/)) {
+      } else if (line.match(/^(diff --git|index)/)) {
         // Skip line
       } else if (line.match(/^Binary files .* differ/)) {
         let binaryFilesMatch = line.match(/^Binary files (.*) and (.*) differ/);
