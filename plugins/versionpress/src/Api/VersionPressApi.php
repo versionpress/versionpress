@@ -8,8 +8,11 @@ use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\ChangeInfoMatcher;
 use VersionPress\ChangeInfos\EntityChangeInfo;
-use VersionPress\ChangeInfos\OptionChangeInfo;
 use VersionPress\ChangeInfos\PluginChangeInfo;
+use VersionPress\ChangeInfos\RevertChangeInfo;
+use VersionPress\ChangeInfos\ThemeChangeInfo;
+use VersionPress\ChangeInfos\VersionPressChangeInfo;
+use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Commit;
 use VersionPress\Git\GitLogPaginator;
@@ -236,6 +239,14 @@ class VersionPressApi {
         $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
         $hash = $request['commit'];
         $diff = $repository->getDiff($hash);
+
+        if (strlen($diff) > 50 * 1024) { // 50 kB is maximum size for diff (see WP-49)
+            return new \WP_Error(
+                'error',
+                'The diff is too large to show here. Please use some git client. Thank you.',
+                array('status' => 403));
+        }
+
         return new WP_REST_Response(array('diff' => $diff));
     }
 
@@ -331,6 +342,43 @@ class VersionPressApi {
                 'type' => 'plugin',
                 'action' => $changeInfo->getAction(),
                 'name' => $pluginName,
+            );
+        }
+
+        if ($changeInfo instanceof ThemeChangeInfo) {
+            $themeTags = $changeInfo->getCustomTags();
+            $themeName = $themeTags[ThemeChangeInfo::THEME_NAME_TAG];
+
+            $change = array(
+                'type' => 'theme',
+                'action' => $changeInfo->getAction(),
+                'name' => $themeName
+            );
+        }
+
+        if ($changeInfo instanceof RevertChangeInfo) {
+
+            $change = array(
+                'type' => $changeInfo->getEntityName(),
+                'action' => $changeInfo->getAction(),
+                'name' => ''
+
+            );
+        }
+
+        if ($changeInfo instanceof WordPressUpdateChangeInfo) {
+            $change = array(
+                'type' => $changeInfo->getEntityName(),
+                'action' => $changeInfo->getAction(),
+                'name' => $changeInfo->getNewVersion()
+            );
+        }
+
+        if ($changeInfo instanceof VersionPressChangeInfo) {
+            $change = array(
+                'type' => $changeInfo->getEntityName(),
+                'action' => $changeInfo->getAction(),
+                'name' => ''
             );
         }
 
