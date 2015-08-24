@@ -48,10 +48,19 @@ class VpidRepository {
         }
 
         foreach ($entityInfo->valueReferences as $referenceName => $targetEntity) {
-            $targetTable = $this->schemaInfo->getEntityInfo($targetEntity)->tableName;
             list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
 
             if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn]) && $entity[$valueColumn] > 0) {
+
+                if ($targetEntity[0] === '@') {
+                    $entityNameProvider = substr($targetEntity, 1);
+                    $targetEntity = call_user_func($entityNameProvider, $entity);
+                    if (!$targetEntity) {
+                        continue;
+                    }
+                }
+                $targetTable = $this->schemaInfo->getEntityInfo($targetEntity)->tableName;
+
                 $referenceVpId = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=".$entity[$valueColumn]);
                 $entity[$valueColumn] = $referenceVpId;
             }

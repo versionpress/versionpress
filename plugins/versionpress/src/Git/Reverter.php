@@ -189,6 +189,14 @@ class Reverter {
                 continue;
             }
 
+            if ($referencedEntityName[0] === '@') {
+                $entityNameProvider = substr($referencedEntityName, 1); // strip the '@'
+                $referencedEntityName = call_user_func($entityNameProvider, $entity);
+                if (!$referencedEntityName) {
+                    continue;
+                }
+            }
+
             $entityExists = $this->storageFactory->getStorage($referencedEntityName)->exists($entity[$valueColumn], $parentId);
             if (!$entityExists) {
                 return false;
@@ -218,7 +226,7 @@ class Reverter {
 
             $reference = array_search($entityName, $allReferences);
 
-            if ($reference === false) {
+            if ($reference === false) { // Other entity is not referencing $entityName
                 continue;
             }
 
