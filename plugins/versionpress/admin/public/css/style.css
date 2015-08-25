@@ -239,14 +239,22 @@ tr.disabled {
  *------------------------------*/
 .vp-update-message {
     margin: -1px 0 1px 0 !important;
-    padding-left: 70px !important;
+    padding-left: 43px !important;
     background-color: #f7fcfe !important;
 }
 
+.branch-4-3 .vp-update-message {
+    padding-left: 70px !important;
+}
+
 .vp-update-message:before {
-    content: '\f534' !important;
+    content: '\f153' !important;
     color: #000 !important;
     padding-bottom: 3px;
+}
+
+.branch-4-3 .vp-update-message:before {
+    content: '\f534' !important;
 }
 
 .vp-update-message a {
