@@ -610,7 +610,7 @@ function vp_update_message($file, $plugin_data) {
 
     $wp_list_table = _get_list_table('WP_Plugins_List_Table');
     $activationUrl = menu_page_url('versionpress', false);
-    echo '<tr class="plugin-update-tr vp-plugin-update-tr active" id="xyz"><td colspan="' . esc_attr( $wp_list_table->get_column_count() ) . '" class="vp-plugin-update plugin-update colspanchange"><div class="update-message vp-update-message">';
+    echo '<tr class="plugin-update-tr vp-plugin-update-tr updated"><td colspan="' . esc_attr( $wp_list_table->get_column_count() ) . '" class="vp-plugin-update plugin-update colspanchange"><div class="update-message vp-update-message">';
     echo 'VersionPress is installed but not yet tracking this site. <a href="' . $activationUrl . '">Please finish the activation.</a>';
     echo '</div></td></tr>';
 }

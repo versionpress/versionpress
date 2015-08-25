@@ -239,9 +239,14 @@ tr.disabled {
  *------------------------------*/
 .vp-update-message {
     margin: -1px 0 1px 0 !important;
-    padding-top: 10px !important;
     padding-left: 70px !important;
-    background-color: inherit;
+    background-color: #f7fcfe !important;
+}
+
+.vp-update-message:before {
+    content: '\f534' !important;
+    color: #000 !important;
+    padding-bottom: 3px;
 }
 
 .vp-update-message a {
@@ -249,6 +254,6 @@ tr.disabled {
 }
 
 .vp-plugin-update {
-    border-left: 4px solid #d54e21 !important;
+    border-left: 4px solid #00a0d2 !important;
     overflow: visible !important;
 }
