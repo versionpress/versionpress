@@ -22,8 +22,12 @@ class UsersTestSeleniumWorker extends SeleniumWorker implements IUsersTestWorker
     public function createUser() {
         $this->byCssSelector('#user_login')->value($this->testUser['login']);
         $this->byCssSelector('#email')->value($this->testUser['email']);
-        $this->byCssSelector('#pass1')->value($this->testUser['password']);
-        $this->byCssSelector('#pass2')->value($this->testUser['password']);
+
+        if ($this->isWpVersionLowerThan('4.3-alpha1')) { // WP 4.3 uses auto-generated passwords
+            $this->byCssSelector('#pass1')->value($this->testUser['password']);
+            $this->byCssSelector('#pass2')->value($this->testUser['password']);
+        }
+
         $this->byCssSelector('#createuser')->submit();
         $this->waitAfterRedirect();
     }

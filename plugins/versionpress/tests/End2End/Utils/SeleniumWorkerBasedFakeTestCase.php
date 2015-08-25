@@ -5,7 +5,7 @@ namespace VersionPress\Tests\End2End\Utils;
 use VersionPress\Tests\End2End\Utils;
 
 /**
- * @method executeScript
+ * @method executeScript($script)
  */
 class SeleniumWorkerBasedFakeTestCase extends \PHPUnit_Extensions_Selenium2TestCase {
 
