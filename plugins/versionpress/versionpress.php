@@ -817,24 +817,3 @@ function versionpress_api_init() {
     $vpApi->register_routes();
 }
 add_action('vp_rest_api_init', 'versionpress_api_init');
-
-
-function vp_get_menu_reference($postmeta) {
-    global $versionPressContainer;
-    /** @var \VersionPress\Storages\StorageFactory $storageFactory */
-    $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
-    /** @var \VersionPress\Storages\PostMetaStorage $postmetaStorage */
-    $postmetaStorage = $storageFactory->getStorage('postmeta');
-    $menuItemTypePostmeta = $postmetaStorage->loadEntityByName('_menu_item_type', $postmeta['vp_post_id']);
-    $menuItemType = $menuItemTypePostmeta['meta_value'];
-
-    if ($menuItemType === 'taxonomy') {
-        return 'term_taxonomy';
-    }
-
-    if ($menuItemType === 'post_type') {
-        return 'post';
-    }
-
-    return null; // custom url or unknown target
-}

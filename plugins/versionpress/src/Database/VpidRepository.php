@@ -2,6 +2,7 @@
 
 namespace VersionPress\Database;
 
+use VersionPress\DI\VersionPressServices;
 use VersionPress\Utils\IdUtil;
 use VersionPress\Utils\ReferenceUtils;
 use wpdb;
@@ -101,5 +102,32 @@ class VpidRepository {
             $data[$idColumnName] = $id;
         }
         return $data;
+    }
+
+    /**
+     * Function used in wordpress-schema.neon.
+     * Maps menu item with given postmeta (_menu_item_object_id) to target entity (post/category/custom url).
+     *
+     * @param $postmeta
+     * @return null|string
+     */
+    public static function getMenuReference($postmeta) {
+        global $versionPressContainer;
+        /** @var \VersionPress\Storages\StorageFactory $storageFactory */
+        $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
+        /** @var \VersionPress\Storages\PostMetaStorage $postmetaStorage */
+        $postmetaStorage = $storageFactory->getStorage('postmeta');
+        $menuItemTypePostmeta = $postmetaStorage->loadEntityByName('_menu_item_type', $postmeta['vp_post_id']);
+        $menuItemType = $menuItemTypePostmeta['meta_value'];
+
+        if ($menuItemType === 'taxonomy') {
+            return 'term_taxonomy';
+        }
+
+        if ($menuItemType === 'post_type') {
+            return 'post';
+        }
+
+        return null; // custom url or unknown target
     }
 }
