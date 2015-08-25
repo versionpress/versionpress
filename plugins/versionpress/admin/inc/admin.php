@@ -135,12 +135,14 @@ if ($showWelcomePanel === "") {
     $canUndoCommit = $repository->wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
     $isFirstCommit = $page === 0;
 
-    if (!$canUndoCommit && $commits[0]->getHash() !== $initialCommitHash) {
-        echo "
+    $disabledCommitsMessage = "
         <tr class=\"post-1 type-post status-publish format-standard hentry category-uncategorized alternate note level-0\">
             <td colspan=\"3\">VersionPress is not able to undo changes made before it has been activated.</td>
         </tr>
         ";
+
+    if (!$canUndoCommit && $commits[0]->getHash() !== $initialCommitHash) {
+        echo $disabledCommitsMessage;
     }
 
     foreach ($commits as $key => $commit) {
@@ -182,11 +184,7 @@ if ($showWelcomePanel === "") {
         </tr>";
 
         if ($commit->getHash() === $initialCommitHash && $key < count($commits) - 1) {
-            echo "
-            <tr class=\"post-1 type-post status-publish format-standard hentry category-uncategorized alternate note level-0\">
-                <td colspan=\"3\">VersionPress is not able to undo changes made before it has been activated.</td>
-            </tr>
-            ";
+            echo $disabledCommitsMessage;
         }
 
         $isFirstCommit = false;
