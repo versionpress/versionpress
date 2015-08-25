@@ -7,7 +7,7 @@ import utils = require('../../common/__tests__/utils');
 
 const testUtils = React.addons.TestUtils;
 
-describe('CommitsTableNote', () => {
+describe('CommitsTableRow', () => {
   var onUndo: Sinon.SinonSpy;
   var onRollback: Sinon.SinonSpy;
   var props: CommitsTableRow.Props;
