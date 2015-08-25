@@ -15,6 +15,7 @@ postmeta:
         meta_key@meta_value:
             _thumbnail_id: post
             _menu_item_object_id: post
+            _menu_item_menu_item_parent: post
 
 comment:
     table: comments
