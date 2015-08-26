@@ -189,8 +189,8 @@ class IniSerializer {
      */
     private static function eolWorkaround_addPlaceholders($iniString) {
 
-        // https://regex101.com/r/cJ6eN0/3
-        $stringValueRegEx = "/\"(.*)(?<!\\\\)\"/sU";
+        // https://regex101.com/r/cJ6eN0/4
+        $stringValueRegEx = "/[ =]\"(.*)(?<!\\\\)\"/sU";
 
         $iniString = preg_replace_callback($stringValueRegEx, array('self', 'replace_eol_callback'), $iniString);
 
