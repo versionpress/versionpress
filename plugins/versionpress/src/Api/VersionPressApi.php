@@ -5,6 +5,9 @@ namespace VersionPress\Api;
 require_once ABSPATH . 'wp-admin/includes/file.php';
 
 use Nette\Utils\Strings;
+use VersionPress\Api\BundledWpApi\WP_REST_Request;
+use VersionPress\Api\BundledWpApi\WP_REST_Response;
+use VersionPress\Api\BundledWpApi\WP_REST_Server;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\ChangeInfoMatcher;
 use VersionPress\ChangeInfos\EntityChangeInfo;
@@ -13,6 +16,7 @@ use VersionPress\ChangeInfos\RevertChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\VersionPressChangeInfo;
 use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
+use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Commit;
 use VersionPress\Git\GitLogPaginator;
@@ -21,10 +25,6 @@ use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Utils\BugReporter;
-use VersionPress\Configuration\VersionPressConfig;
-use VersionPress\Api\BundledWpApi\WP_REST_Server;
-use VersionPress\Api\BundledWpApi\WP_REST_Request;
-use VersionPress\Api\BundledWpApi\WP_REST_Response;
 
 class VersionPressApi {
 
@@ -35,40 +35,40 @@ class VersionPressApi {
         $namespace = 'versionpress';
 
         register_vp_rest_route($namespace, '/commits', array(
-                'methods' => WP_REST_Server::READABLE,
-                'callback' => array($this, 'getCommits'),
-                'args' => array(
-                    'page' => array(
-                        'default' => '0'
-                    )
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => array($this, 'getCommits'),
+            'args' => array(
+                'page' => array(
+                    'default' => '0'
+                )
             ),
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
         register_vp_rest_route($namespace, '/undo', array(
-                'methods' => WP_REST_Server::READABLE,
-                'callback' => array($this, 'undoCommit'),
-                'args' => array(
-                    'commit' => array(
-                        'required' => true
-                    )
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => array($this, 'undoCommit'),
+            'args' => array(
+                'commit' => array(
+                    'required' => true
+                )
             ),
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
         register_vp_rest_route($namespace, '/rollback', array(
-                'methods' => WP_REST_Server::READABLE,
-                'callback' => array($this, 'rollbackToCommit'),
-                'args' => array(
-                    'commit' => array(
-                        'required' => true
-                    )
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => array($this, 'rollbackToCommit'),
+            'args' => array(
+                'commit' => array(
+                    'required' => true
+                )
             ),
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
         register_vp_rest_route($namespace, '/can-revert', array(
-                'methods' => WP_REST_Server::READABLE,
+            'methods' => WP_REST_Server::READABLE,
             'callback' => array($this, 'canRevert'),
             'permission_callback' => array($this, 'checkPermissions')
         ));
@@ -85,27 +85,27 @@ class VersionPressApi {
         ));
 
         register_vp_rest_route($namespace, '/submit-bug', array(
-                'methods' => WP_REST_Server::CREATABLE,
-                'callback' => array($this, 'submitBug'),
-                'args' => array(
-                    'email' => array(
-                        'required' => true
-                    ),
-                    'description' => array(
-                        'required' => true
-                    )
+            'methods' => WP_REST_Server::CREATABLE,
+            'callback' => array($this, 'submitBug'),
+            'args' => array(
+                'email' => array(
+                    'required' => true
+                ),
+                'description' => array(
+                    'required' => true
+                )
             ),
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
         register_vp_rest_route($namespace, '/display-welcome-panel', array(
-                'methods' => WP_REST_Server::READABLE,
+            'methods' => WP_REST_Server::READABLE,
             'callback' => array($this, 'displayWelcomePanel'),
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
         register_vp_rest_route($namespace, '/hide-welcome-panel', array(
-                'methods' => WP_REST_Server::CREATABLE,
+            'methods' => WP_REST_Server::CREATABLE,
             'callback' => array($this, 'hideWelcomePanel'),
             'permission_callback' => array($this, 'checkPermissions')
         ));
@@ -125,7 +125,7 @@ class VersionPressApi {
         $page = intval($request['page']);
         $commits = $gitLogPaginator->getPage($page);
 
-        if(empty($commits)) {
+        if (empty($commits)) {
             return new \WP_Error('notice', 'No more commits to show.', array('status' => 403));
         }
 
@@ -140,7 +140,7 @@ class VersionPressApi {
         $isFirstCommit = $page === 0;
 
         $result = array();
-        foreach($commits as $commit) {
+        foreach ($commits as $commit) {
             $canUndoCommit = $canUndoCommit && ($commit->getHash() !== $initialCommitHash);
             $canRollbackToThisCommit = !$isFirstCommit && ($canUndoCommit || $commit->getHash() === $initialCommitHash);
             $changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
@@ -314,7 +314,7 @@ class VersionPressApi {
         /** @var VersionPressConfig $vpConfig */
         $vpConfig = $versionPressContainer->resolve(VersionPressServices::VP_CONFIGURATION);
 
-        return ! $vpConfig->mergedConfig['requireApiAuth'] || current_user_can('manage_options');
+        return !$vpConfig->mergedConfig['requireApiAuth'] || current_user_can('manage_options');
     }
 
     private function convertChangeInfoList($getChangeInfoList) {
