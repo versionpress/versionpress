@@ -36,25 +36,26 @@ class CommitsTable extends React.Component<CommitsTableProps, any>  {
           DOM.th({className: 'column-actions'})
         )
       ),
-        displayTopNote
-          ? this.renderNote()
-          : null
-        ,
-        this.props.commits.map((commit: Commit, index: number) => {
-          const row = React.createElement(CommitsTableRow, <CommitsTableRow.Props> {
+      displayTopNote
+        ? this.renderNote()
+        : null
+      ,
+      this.props.commits.map((commit: Commit, index: number) => {
+        const row = React.createElement(CommitsTableRow, <CommitsTableRow.Props> {
           key: commit.hash,
           commit: commit,
           onUndo: this.props.onUndo,
           onRollback: this.props.onRollback,
           diffProvider: this.props.diffProvider
-          if (commit.isInitial && index < this.props.commits.length - 1) {
-            return [
-              row,
-              this.renderNote()
-            ];
-          }
-          return row;
-        })
+        });
+
+        if (commit.isInitial && index < this.props.commits.length - 1) {
+          return [
+            row,
+            this.renderNote()
+          ];
+        }
+        return row;
       }),
       DOM.tfoot(null,
         DOM.tr(null,
