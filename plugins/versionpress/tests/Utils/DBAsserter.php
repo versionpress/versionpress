@@ -3,6 +3,7 @@
 namespace VersionPress\Tests\Utils;
 
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\DI\DIContainer;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\ArrayUtils;
@@ -17,6 +18,8 @@ class DBAsserter {
     private static $testConfig;
     /** @var \mysqli */
     private static $database;
+    /** @var \wpdb */
+    private static $wpdb;
 
 
     public static function assertFilesEqualDatabase() {
@@ -25,6 +28,7 @@ class DBAsserter {
         foreach ($entityNames as $entityName) {
             self::assertEntitiesEqualDatabase($entityName);
         }
+        self::clearGlobalVariables();
     }
 
     private static function staticInitialization() {
@@ -41,13 +45,17 @@ class DBAsserter {
         $dbName = self::$testConfig->testSite->dbName;
         $dbPrefix = self::$testConfig->testSite->dbTablePrefix;
         self::$database = new \mysqli($dbHost, $dbUser, $dbPassword, $dbName);
-        $wpdb = new \wpdb($dbHost, $dbUser, $dbPassword, $dbName);
-        $wpdb->set_prefix($dbPrefix);
+        self::$wpdb = new \wpdb($dbHost, $dbUser, $dbPassword, $dbName);
+        self::$wpdb->set_prefix($dbPrefix);
 
-        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, $wpdb);
+        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$wpdb);
 
+        self::defineGlobalVariables();
     }
 
+    /**
+     * @param $entityName
+     */
     private static function assertEntitiesEqualDatabase($entityName) {
         $storage = self::$storageFactory->getStorage($entityName);
         $entityInfo = self::$schemaInfo->getEntityInfo($entityName);
@@ -183,10 +191,15 @@ class DBAsserter {
             foreach (self::$schemaInfo->getEntityInfo($entityName)->valueReferences as $reference => $targetEntity) {
                 list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
                 if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn]) && $entity[$valueColumn] != "0") {
-                    /** @noinspection PhpUsageOfSilenceOperatorInspection The target entity might not be saved by VersionPress */
-                    $entity["vp_$valueColumn"] = @$idMap[self::$schemaInfo->getTableName($targetEntity)][$entity[$valueColumn]];
+                    if ($targetEntity[0] === '@') {
+                        $entityNameProvider = substr($targetEntity, 1);
+                        $targetEntity = call_user_func($entityNameProvider, $entity);
+                    }
+
+                    if (self::isInIdMap($idMap, $targetEntity, $entity[$valueColumn])) {
+                        $entity[$valueColumn] = $idMap[self::$schemaInfo->getTableName($targetEntity)][$entity[$valueColumn]];
+                    }
                 }
-                unset($entity[$valueColumn]);
             }
 
             if (!self::$schemaInfo->getEntityInfo($entityName)->hasNaturalVpid) {
@@ -247,5 +260,29 @@ class DBAsserter {
 
             throw new \PHPUnit_Framework_AssertionFailedError(sprintf($verb . " M:N reference in table %s %s", $junctionTable, $list));
         }
+    }
+
+    private static function isInIdMap($idMap, $targetEntity, $id) {
+        return isset($idMap[self::$schemaInfo->getTableName($targetEntity)])
+        && isset($idMap[self::$schemaInfo->getTableName($targetEntity)][$id]);
+    }
+
+    /**
+     * Defines global constants, container and wpdb dynamic mapping of value references.
+     * It's not pretty, but makes the mapping functions very flexible (they can have various dependecies).
+     */
+    private static function defineGlobalVariables() {
+        global $versionPressContainer, $wpdb;
+
+        defined('VERSIONPRESS_PLUGIN_DIR') || define('VERSIONPRESS_PLUGIN_DIR', self::$testConfig->testSite->path . '/wp-content/plugins/versionpress');
+        defined('VERSIONPRESS_MIRRORING_DIR') || define('VERSIONPRESS_MIRRORING_DIR', self::$testConfig->testSite->path . '/wp-content/vpdb');
+        $versionPressContainer = DIContainer::getConfiguredInstance();
+        $wpdb = self::$wpdb;
+    }
+
+    private static function clearGlobalVariables() {
+        global $versionPressContainer, $wpdb;
+        $versionPressContainer = null;
+        $wpdb = null;
     }
 }
