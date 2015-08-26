@@ -8,22 +8,25 @@ use VersionPress\ChangeInfos\PostChangeInfo;
 class PostChangeInfoPreprocessor implements ChangeInfoPreprocessor {
 
     /**
-     * Processes the ChangeInfo list and returns one or more
-     * new lists.
+     * If both 'post/draft' and 'post/publish' actions exist for the same entity, replace them with one 'post/create' action.
      *
      * @param ChangeInfo[] $changeInfoList
      * @return ChangeInfo[][]
      */
     function process($changeInfoList) {
         $entities = array();
+
+        // 1) Find all post/draft and post/publish actions and group their indices in $changeInfoList by VPID
         foreach ($changeInfoList as $key => $changeInfo) {
             if ($changeInfo instanceof PostChangeInfo && in_array($changeInfo->getAction(), array("draft", "publish"))) {
-                if (!isset($entities[$changeInfo->getEntityId()]))
+                if (!isset($entities[$changeInfo->getEntityId()])) {
                     $entities[$changeInfo->getEntityId()] = array();
+                }
                 $entities[$changeInfo->getEntityId()][$changeInfo->getAction()] = $key;
             }
         }
 
+        // 2) Replace combination of post/draft and post/publish with single post/create action
         foreach($entities as $entityId => $changeInfos) {
             if(count($changeInfos) == 2) {
                 /** @var PostChangeInfo $publish */

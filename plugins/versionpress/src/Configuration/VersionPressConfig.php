@@ -15,7 +15,8 @@ use Nette\Neon\Neon;
 class VersionPressConfig {
 
     public $defaults = array(
-        'gui' => 'javascript'
+        'gui' => 'javascript',
+        'requireApiAuth' => true
     );
 
     public $customConfig = array();

@@ -2,6 +2,8 @@
 
 namespace VersionPress\Tests\End2End\Utils;
 
+use VersionPress\Tests\Utils\WpVersionComparer;
+
 abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPostTypeTestWorker {
 
     abstract public function getPostType();
@@ -39,7 +41,7 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
         $titleField = $this->byCssSelector('#the-list tr.inline-edit-row input.ptitle');
         $titleField->clear();
         $titleField->value("Quick-edited post title");
-        $this->jsClickAndWait('#the-list tr.inline-edit-row a.save');
+        $this->jsClickAndWait('#the-list tr.inline-edit-row .save');
     }
 
     public function prepare_trashPost() {
@@ -123,7 +125,8 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
 
     public function prepare_setFeaturedImageForUnsavedPost() {
         $this->url($this->getPostTypeScreenUrl());
-        $this->byCssSelector('.edit-php #wpbody-content .wrap a.add-new-h2')->click();
+        $addNewSelector = $this->isWpVersionLowerThan('4.3-alpha1') ? '.edit-php #wpbody-content .wrap a.add-new-h2' : '.edit-php #wpbody-content .wrap a.page-title-action';
+        $this->byCssSelector($addNewSelector)->click();
         $this->waitAfterRedirect();
         $attachments = json_decode(self::$wpAutomation->runWpCliCommand('post', 'list', array('post_type' => 'attachment', 'format' => 'json')));
         if (count($attachments) > 0) {
@@ -140,7 +143,7 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
         $this->byCssSelector('.media-router .media-menu-item:nth-of-type(2)')->click();
         $this->waitForAjax();
         $this->byCssSelector('.thumbnail:first-of-type')->click();
-        $this->byCssSelector('a.media-button')->click();
+        $this->byCssSelector('.media-button')->click();
     }
 
     public function prepare_makeDraftFromUnsavedPost() {
@@ -175,7 +178,8 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
      * From the main page for given post type, clicks "Add new" and fills in the post title and content
      */
     protected function prepareTestPost() {
-        $this->byCssSelector('.edit-php #wpbody-content .wrap a.add-new-h2')->click();
+        $addNewSelector = $this->isWpVersionLowerThan('4.3-alpha1') ? '.edit-php #wpbody-content .wrap a.add-new-h2' : '.edit-php #wpbody-content .wrap a.page-title-action';
+        $this->byCssSelector($addNewSelector)->click();
         $this->waitAfterRedirect();
         $this->byCssSelector('form#post input#title')->value("Test " . $this->getPostType());
         $this->setTinyMCEContent("Test content");

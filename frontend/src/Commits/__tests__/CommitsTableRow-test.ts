@@ -21,7 +21,8 @@ describe('CommitsTableRow', () => {
       hash: 'abcdef',
       canUndo: true,
       canRollback: true,
-      isEnabled: true
+      isEnabled: true,
+      isInitial: false
     };
     props = {
       commit: commit,

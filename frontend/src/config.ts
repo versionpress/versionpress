@@ -1,14 +1,17 @@
+/// <reference path='../typings/tsd.d.ts' />
+/// <reference path='./VersionPressConfig.d.ts' />
+
+import _ = require('lodash');
 import localConfig = require('./config.local');
 
-require('core-js/es6/object');
-
-const defaultConfig = {
+const defaultConfig: VersionPressConfig = {
 
   api: {
     root: '',
     urlPrefix: 'vp-json',
     queryParam: 'vp_rest_route',
-    prettyPermalinks: false
+    prettyPermalinks: false,
+    nonce: null
   },
 
   routes: {
@@ -23,5 +26,6 @@ const VpApiConfig = {
   api: window['VP_API_Config'] || {}
 };
 
-const config = Object.assign(defaultConfig, localConfig, VpApiConfig);
+var config = <VersionPressConfig> _.merge(defaultConfig, localConfig, VpApiConfig);
+
 export = config;

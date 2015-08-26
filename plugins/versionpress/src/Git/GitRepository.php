@@ -25,7 +25,7 @@ class GitRepository {
      * @param string $commitMessagePrefix Standard prefix applied to all commit messages
      * @param string $gitBinary Git binary to use
      */
-    function __construct($workingDirectoryRoot, $tempDirectory = "./", $commitMessagePrefix = "[VP] ", $gitBinary = "git") {
+    function __construct($workingDirectoryRoot, $tempDirectory = ".", $commitMessagePrefix = "[VP] ", $gitBinary = "git") {
         $this->workingDirectoryRoot = $workingDirectoryRoot;
         $this->tempDirectory = $tempDirectory;
         $this->commitMessagePrefix = $commitMessagePrefix;
@@ -64,7 +64,7 @@ class GitRepository {
         if ($body != null) $commitMessage .= "\n\n" . $body;
 
         $tempCommitMessageFilename = md5(rand());
-        $tempCommitMessagePath = $this->tempDirectory . $tempCommitMessageFilename;
+        $tempCommitMessagePath = $this->tempDirectory . '/' . $tempCommitMessageFilename;
         file_put_contents($tempCommitMessagePath, $commitMessage);
 
         $this->runShellCommand("git config user.name %s", $this->authorName);
@@ -232,7 +232,7 @@ class GitRepository {
      * @return mixed
      */
     public function getChildCommit($commitHash) {
-        $cmd = "git log --reverse --ancestry-path --format=%%H $commitHash^..";
+        $cmd = "git log --reverse --ancestry-path --format=%%H $commitHash..";
         $result = $this->runShellCommandWithStandardOutput($cmd);
         list($childHash) = explode("\n", $result);
         return $childHash;

@@ -236,7 +236,7 @@ gulp.task('disable-debugger', ['rename-phpstrip-back'], function (cb) {
 /**
  * Builds the final ZIP in the `distDir` folder.
  */
-gulp.task('zip', ['persist-plugin-comment', 'disable-debugger', 'remove-composer-files'], function (cb) {
+gulp.task('zip', ['persist-plugin-comment', 'disable-debugger', 'remove-composer-files', 'frontend-deploy'], function (cb) {
     return gulp.src(buildDir + '/**', {dot: true}).
         pipe(rename(function (path) {
             path.dirname = 'versionpress/' + path.dirname;

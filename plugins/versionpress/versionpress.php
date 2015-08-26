@@ -593,7 +593,7 @@ add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are
 function vp_activation_nag() {
 
     if (VersionPress::isActive() ||
-        get_current_screen()->id == "versionpress" ||
+        get_current_screen()->id == "toplevel_page_versionpress" ||
         get_current_screen()->id == "versionpress/admin/index" ||
         get_current_screen()->id == "versionpress/admin/deactivate"
     ) {
@@ -671,15 +671,6 @@ function vp_admin_menu() {
 
 function versionpress_page() {
     require_once(WP_CONTENT_DIR . '/plugins/versionpress/admin/index.php');
-}
-
-add_action('admin_init', 'vp_admin_init');
-
-function vp_admin_init() {
-    if (basename($_SERVER['PHP_SELF']) === 'admin.php' && isset($_GET['page']) && $_GET['page'] === 'versionpress') {
-        wp_redirect(menu_page_url('versionpress', false) . '/');
-        exit;
-    }
 }
 
 add_action('admin_action_vp_show_undo_confirm', 'vp_show_undo_confirm');
@@ -806,7 +797,7 @@ if (is_admin()) {
 //---------------------------------
 require("src/Api/BundledWpApi/plugin.php");
 
-header('Access-Control-Allow-Headers: origin, content-type, accept');
+header('Access-Control-Allow-Headers: origin, content-type, accept, X-WP-Nonce');
 header('Access-Control-Allow-Origin: *');
 
 add_filter('allowed_http_origin', '__return_true');

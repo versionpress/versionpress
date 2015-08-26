@@ -12,6 +12,7 @@ use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Utils\BugReporter;
+use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\Api\BundledWpApi\WP_REST_Server;
 use VersionPress\Api\BundledWpApi\WP_REST_Request;
 use VersionPress\Api\BundledWpApi\WP_REST_Response;
@@ -25,75 +26,68 @@ class VersionPressApi {
         $namespace = 'versionpress';
 
         register_vp_rest_route($namespace, '/commits', array(
-            array(
-                'methods' => WP_REST_Server::READABLE,
-                'callback' => array($this, 'getCommits'),
-                'args' => array(
-                    'page' => array(
-                        'default' => '0'
-                    )
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => array($this, 'getCommits'),
+            'args' => array(
+                'page' => array(
+                    'default' => '0'
                 )
-            )
+            ),
+            'permission_callback' => array($this, 'checkPermissions')
         ));
 
         register_vp_rest_route($namespace, '/undo', array(
-            array(
-                'methods' => WP_REST_Server::READABLE,
-                'callback' => array($this, 'undoCommit'),
-                'args' => array(
-                    'commit' => array(
-                        'required' => true
-                    )
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => array($this, 'undoCommit'),
+            'args' => array(
+                'commit' => array(
+                    'required' => true
                 )
-            )
+            ),
+            'permission_callback' => array($this, 'checkPermissions')
         ));
 
         register_vp_rest_route($namespace, '/rollback', array(
-            array(
-                'methods' => WP_REST_Server::READABLE,
-                'callback' => array($this, 'rollbackToCommit'),
-                'args' => array(
-                    'commit' => array(
-                        'required' => true
-                    )
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => array($this, 'rollbackToCommit'),
+            'args' => array(
+                'commit' => array(
+                    'required' => true
                 )
-            )
+            ),
+            'permission_callback' => array($this, 'checkPermissions')
         ));
 
         register_vp_rest_route($namespace, '/can-revert', array(
-            array(
-                'methods' => WP_REST_Server::READABLE,
-                'callback' => array($this, 'canRevert')
-            )
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => array($this, 'canRevert'),
+            'permission_callback' => array($this, 'checkPermissions')
         ));
 
         register_vp_rest_route($namespace, '/submit-bug', array(
-            array(
-                'methods' => WP_REST_Server::CREATABLE,
-                'callback' => array($this, 'submitBug'),
-                'args' => array(
-                    'email' => array(
-                        'required' => true
-                    ),
-                    'description' => array(
-                        'required' => true
-                    )
+            'methods' => WP_REST_Server::CREATABLE,
+            'callback' => array($this, 'submitBug'),
+            'args' => array(
+                'email' => array(
+                    'required' => true
+                ),
+                'description' => array(
+                    'required' => true
                 )
-            )
+            ),
+            'permission_callback' => array($this, 'checkPermissions')
         ));
 
         register_vp_rest_route($namespace, '/display-welcome-panel', array(
-            array(
-                'methods' => WP_REST_Server::READABLE,
-                'callback' => array($this, 'displayWelcomePanel')
-            )
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => array($this, 'displayWelcomePanel'),
+            'permission_callback' => array($this, 'checkPermissions')
         ));
 
         register_vp_rest_route($namespace, '/hide-welcome-panel', array(
-            array(
-                'methods' => WP_REST_Server::CREATABLE,
-                'callback' => array($this, 'hideWelcomePanel')
-            )
+            'methods' => WP_REST_Server::CREATABLE,
+            'callback' => array($this, 'hideWelcomePanel'),
+            'permission_callback' => array($this, 'checkPermissions')
         ));
     }
 
@@ -138,7 +132,8 @@ class VersionPressApi {
                 "message" => $changeInfo->getChangeDescription(),
                 "canUndo" => $canUndoCommit,
                 "canRollback" => $canRollbackToThisCommit,
-                "isEnabled" => $isEnabled
+                "isEnabled" => $isEnabled,
+                "isInitial" => $commit->getHash() === $initialCommitHash
             );
             $isFirstCommit = false;
         }
@@ -266,5 +261,17 @@ class VersionPressApi {
             $error['message'],
             array('status' => $error['status'])
         );
+    }
+
+    /**
+     * @param WP_REST_Request $request
+     * @return \WP_Error|bool
+     */
+    public function checkPermissions(WP_REST_Request $request) {
+        global $versionPressContainer;
+        /** @var VersionPressConfig $vpConfig */
+        $vpConfig = $versionPressContainer->resolve(VersionPressServices::VP_CONFIGURATION);
+
+        return ! $vpConfig->mergedConfig['requireApiAuth'] || current_user_can('manage_options');
     }
 }
