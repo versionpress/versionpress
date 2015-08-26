@@ -314,7 +314,14 @@ class GitRepository {
      * @return string
      */
     public function getDiff($hash) {
-        $gitCmd = "git diff $hash~1 $hash";
+        if ($this->getInitialCommit()->getHash() === $hash) {
+            // Inspired by: http://stackoverflow.com/a/25064285
+            $emptyTreeHash = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
+            $gitCmd = "git diff-tree -p $emptyTreeHash $hash";
+        } else {
+            $gitCmd = "git diff $hash~1 $hash";
+        }
+
         $output = $this->runShellCommandWithStandardOutput($gitCmd);
         return $output;
     }
