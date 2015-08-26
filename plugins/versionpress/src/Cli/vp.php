@@ -3,6 +3,7 @@
 
 namespace VersionPress\Cli;
 
+use Nette\Neon\Neon;
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Process\Process;
@@ -40,6 +41,12 @@ class VPCommand extends WP_CLI_Command {
         $configContents = "";
         if (file_exists($configFile)) {
             $configContents = file_get_contents($configFile);
+        }
+
+        if (count($args) === 1) {
+            $config = Neon::decode($configContents);
+            WP_CLI::out(@$config[$args[0]]);
+            return;
         }
 
         $configContents = $this->updateConfigValue($configContents, $args[0], $args[1]);

@@ -63,7 +63,6 @@ class Committer
         if (count($this->forcedChangeInfos) > 0) {
             FileSystem::remove(get_home_path() . 'versionpress.maintenance'); // todo: this shouldn't be here...
             $changeInfoList = $this->forcedChangeInfos;
-            $this->forcedChangeInfos = array();
         } elseif ($this->shouldCommit()) {
             $changeInfoList =  array_merge($this->postponedChangeInfos, $this->mirror->getChangeList());
             if (empty($changeInfoList)) {
@@ -77,7 +76,7 @@ class Committer
             $this->postponeChangeInfo($changeInfoList);
             $this->commitPostponed = false;
             $this->postponeKey = null;
-            $this->mirror->flushChangeList();
+            $this->flushChangeLists();
             return;
         }
 
@@ -97,18 +96,25 @@ class Committer
 
         $changeInfoLists = $this->preprocessChangeInfoList($changeInfoList);
 
+        if (count($this->forcedChangeInfos) === 1) {
+            // If there is one forced change info, we can commit all changes made by change info objects emitted from
+            // storages. If there will be more forced change info objects in the future, we have to come up with
+            // something smarter. For now, it solves WP-430.
+            $this->stageRelatedFiles(new ChangeInfoEnvelope($this->mirror->getChangeList()));
+        }
+
         foreach ($changeInfoLists as $listToCommit) {
             $changeInfoEnvelope = new ChangeInfoEnvelope($listToCommit);
             $this->stageRelatedFiles($changeInfoEnvelope);
             $this->repository->commit($changeInfoEnvelope->getCommitMessage(), $authorName, $authorEmail);
         }
 
-        $this->mirror->flushChangeList();
+        $this->flushChangeLists();
     }
 
     /**
-     * If both 'post/draft' and 'post/publish' actions exist for the same entity, replace them with one 'post/create' action.
-     *
+     * Removes some ChangeInfo objects and replaces them with another. For example, it replaces post/draft and post/publish
+     * actions with single post/create action.
      * @param TrackedChangeInfo[] $changeInfoList
      * @return TrackedChangeInfo[][]
      */
@@ -291,5 +297,10 @@ class Committer
         $file = VERSIONPRESS_TEMP_DIR . '/'. $this->fileForPostpone;
         $serializedPostponedChangeInfos = serialize($postponedChangeInfos);
         file_put_contents($file, $serializedPostponedChangeInfos);
+    }
+
+    private function flushChangeLists() {
+        $this->mirror->flushChangeList();
+        $this->forcedChangeInfos = array();
     }
 }

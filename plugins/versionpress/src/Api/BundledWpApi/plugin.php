@@ -93,7 +93,7 @@ function vp_rest_api_register_rewrites() {
 function vp_rest_api_maybe_flush_rewrites() {
     $version = get_option( 'vp_rest_api_plugin_version', null );
 
-    if ( true || empty( $version ) || VP_REST_API_VERSION !== $version ) {
+    if ( empty( $version ) || VP_REST_API_VERSION !== $version ) {
         flush_rewrite_rules();
         update_option( 'vp_rest_api_plugin_version', VP_REST_API_VERSION );
     }
