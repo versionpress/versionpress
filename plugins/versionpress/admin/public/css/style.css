@@ -141,11 +141,12 @@ h2.vp-deactivation-header {
  * Styles for admin/plugin-install.php
  *------------------------------------*/
 
-.plugin-card .column-compatibility {
-    margin-bottom: 4px;
+.plugin-install .vp-compatibility {
+    display: block;
+    margin-top: 7px;
 }
 
-.plugin-card .vp-compatibility::before {
+.vp-compatibility::before {
     font: 400 20px/.5 dashicons;
     speak: none;
     padding: 0;
@@ -159,29 +160,40 @@ h2.vp-deactivation-header {
     color: #444;
 }
 
-.plugin-card .vp-compatibility.vp-compatible::before {
+.vp-compatibility.vp-compatible::before {
     content: '\f147';
 }
 
-.plugin-card .vp-compatibility.vp-incompatible::before {
+.vp-compatibility.vp-incompatible::before {
     content: '\f158';
 }
 
-.plugin-card .vp-compatibility.vp-untested::before {
-
+.vp-compatibility.vp-incompatible a,
+.vp-compatibility.vp-untested a {
+    color: inherit;
+    border-bottom: 1px dotted #777;
 }
 
-.plugin-card .vp-compatibility .hide-without-js {
+.vp-compatibility .hide-without-js {
     display: none;
-}
-
-.plugin-card .vp-compatibility-popup span {
-    font-size: 200%;
-    cursor: pointer;
 }
 
 .webui-popover h3 {
     clear: none;
+}
+
+.vp-compatibility-popup-buttons {
+    margin-top: 1em;
+}
+
+.vp-compatibility-popup-buttons .button {
+    float: right;
+    margin-left: 3px;
+}
+
+.webui-popover-versionpress-compatibility-popover .webui-popover-content p {
+    margin-top: .5em;
+    margin-bottom: .5em;
 }
 
 .vp-index .welcome-panel {
