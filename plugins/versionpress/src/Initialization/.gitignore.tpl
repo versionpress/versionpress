@@ -12,6 +12,7 @@
 /wp-content/plugins/versionpress/
 !/wp-content/mu-plugins/
 !/wp-content/themes/
+!/wp-content/languages/
 !/wp-content/uploads/
 !/wp-content/vpdb/
 
