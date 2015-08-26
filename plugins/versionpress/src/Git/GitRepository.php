@@ -232,7 +232,7 @@ class GitRepository {
      * @return mixed
      */
     public function getChildCommit($commitHash) {
-        $cmd = "git log --reverse --ancestry-path --format=%%H $commitHash^..";
+        $cmd = "git log --reverse --ancestry-path --format=%%H $commitHash..";
         $result = $this->runShellCommandWithStandardOutput($cmd);
         list($childHash) = explode("\n", $result);
         return $childHash;
