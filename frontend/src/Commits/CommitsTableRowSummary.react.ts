@@ -65,7 +65,9 @@ class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps
   }
 
   private toggleDetails() {
-    this.props.onDetailsLevelChanged(this.props.detailsLevel === 'none' ? 'overview' : 'none');
+    if (this.props.commit.isEnabled) {
+      this.props.onDetailsLevelChanged(this.props.detailsLevel === 'none' ? 'overview' : 'none');
+    }
   }
 
   private changeDetailsLevel(detailsLevel) {
