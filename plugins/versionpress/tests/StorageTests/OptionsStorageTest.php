@@ -4,6 +4,7 @@ namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\EntityInfo;
 use VersionPress\Storages\OptionsStorage;
+use VersionPress\Tests\Utils\ArrayAsserter;
 use VersionPress\Utils\FileSystem;
 
 class OptionsStorageTest extends \PHPUnit_Framework_TestCase {
@@ -22,7 +23,7 @@ class OptionsStorageTest extends \PHPUnit_Framework_TestCase {
     public function savedOptionEqualsLoadedOption() {
         $this->storage->save($this->testingOption);
         $loadedOption = $this->storage->loadEntity($this->testingOption['option_name']);
-        $this->assertEquals($this->testingOption, $loadedOption);
+        ArrayAsserter::assertSimilar($this->testingOption, $loadedOption);
     }
 
     /**
@@ -32,7 +33,7 @@ class OptionsStorageTest extends \PHPUnit_Framework_TestCase {
         $this->storage->save($this->testingOption);
         $loadedOptions = $this->storage->loadAll();
         $this->assertTrue(count($loadedOptions) === 1);
-        $this->assertEquals($this->testingOption, reset($loadedOptions));
+        ArrayAsserter::assertSimilar($this->testingOption, reset($loadedOptions));
     }
 
     /**
@@ -57,7 +58,33 @@ class OptionsStorageTest extends \PHPUnit_Framework_TestCase {
 
         $this->storage->save($testingOption);
         $loadedOption = $this->storage->loadEntity($testingOption['option_name']);
-        $this->assertEquals($testingOption, $loadedOption);
+        ArrayAsserter::assertSimilar($testingOption, $loadedOption);
+    }
+
+    /**
+     * Test covers part of for WP-428
+     *
+     * @test
+     */
+    public function vpidShouldBeReplaceableWithZero() {
+        $testingOption = array(
+            'option_name' => 'some_option',
+            'option_value' => 'FE00B4B4D5FE4FD4ACAFF9D11A78F44E',
+            'autoload' => 'yes'
+        );
+
+        $updatedOption = array(
+            'option_name' => 'some_option',
+            'option_value' => 0
+        );
+
+        $expectedOption = array_merge($testingOption, $updatedOption);
+
+        $this->storage->save($testingOption);
+        $this->storage->save($updatedOption);
+
+        $loadedOption = $this->storage->loadEntity($testingOption['option_name']);
+        ArrayAsserter::assertSimilar($expectedOption, $loadedOption);
     }
 
     protected function setUp() {

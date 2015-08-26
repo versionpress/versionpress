@@ -167,6 +167,7 @@ class IniSerializer {
         $string = self::eolWorkaround_addPlaceholders($string);
         $string = self::sanitizeSectionsAndKeys_addPlaceholders($string);
         $deserialized = parse_ini_string($string, true);
+        $deserialized = self::restoreTypesOfValues($deserialized);
         $deserialized = self::sanitizeSectionsAndKeys_removePlaceholders($deserialized);
         $deserialized = self::eolWorkaround_removePlaceholders($deserialized);
         return $deserialized;
@@ -358,6 +359,20 @@ class IniSerializer {
             $key = strtr($key, array_flip(self::$sanitizedChars));
             if (is_array($value)) {
                 $result[$key] = self::sanitizeSectionsAndKeys_removePlaceholders($value);
+            } else {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
+
+    private static function restoreTypesOfValues($deserialized) {
+        $result = array();
+        foreach ($deserialized as $key => $value) {
+            if (is_array($value)) {
+                $result[$key] = self::restoreTypesOfValues($value);
+            } else if (is_numeric($value)) {
+                $result[$key] = $value + 0;
             } else {
                 $result[$key] = $value;
             }
