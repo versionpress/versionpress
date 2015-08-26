@@ -4,6 +4,7 @@
 import React = require('react');
 import ReactRouter = require('react-router');
 import CommitsTableRow = require('./CommitsTableRow.react');
+import CommitsTableNote = require('./CommitsTableNote.react');
 import CommitsTableRowDetails = require('./CommitsTableRowDetails.react');
 import config = require('../config');
 
@@ -24,6 +25,9 @@ interface CommitsTableProps {
 class CommitsTable extends React.Component<CommitsTableProps, any>  {
 
   render() {
+    const firstCommit = this.props.commits[0];
+    const displayTopNote = firstCommit && !firstCommit.canUndo && !firstCommit.isInitial;
+
     return DOM.table({className: 'vp-table widefat fixed'},
       DOM.thead(null,
         DOM.tr(null,
@@ -32,13 +36,24 @@ class CommitsTable extends React.Component<CommitsTableProps, any>  {
           DOM.th({className: 'column-actions'})
         )
       ),
-      this.props.commits.map((commit: Commit) => {
-        return React.createElement(CommitsTableRow, <CommitsTableRow.Props> {
+        displayTopNote
+          ? this.renderNote()
+          : null
+        ,
+        this.props.commits.map((commit: Commit, index: number) => {
+          const row = React.createElement(CommitsTableRow, <CommitsTableRow.Props> {
           key: commit.hash,
           commit: commit,
           onUndo: this.props.onUndo,
           onRollback: this.props.onRollback,
           diffProvider: this.props.diffProvider
+          if (commit.isInitial && index < this.props.commits.length - 1) {
+            return [
+              row,
+              this.renderNote()
+            ];
+          }
+          return row;
         })
       }),
       DOM.tfoot(null,
@@ -60,6 +75,13 @@ class CommitsTable extends React.Component<CommitsTableProps, any>  {
         )
       )
     );
+  }
+
+  renderNote() {
+    return React.createElement(CommitsTableNote, <CommitsTableNote.Props> {
+      key: 'note',
+      message: 'VersionPress is not able to undo changes made before it has been activated.'
+    })
   }
 
 }

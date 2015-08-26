@@ -15,6 +15,7 @@ use PHPUnit_Extensions_Selenium2TestCase_WebDriverException;
 use PHPUnit_Framework_Assert;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\TestConfig;
+use VersionPress\Tests\Utils\WpVersionComparer;
 
 /**
  * @method void acceptAlert() Press OK on an alert, or confirms a dialog
@@ -312,5 +313,9 @@ class SeleniumWorker implements ITestWorker {
     protected function waitUntil($callback, $timeout = NULL) {
         $waitUntil = new PHPUnit_Extensions_Selenium2TestCase_WaitUntil(new SeleniumWorkerBasedFakeTestCase($this));
         return $waitUntil->run($callback, $timeout);
+    }
+
+    protected function isWpVersionLowerThan($version) {
+        return WpVersionComparer::compare(self::$testConfig->testSite->wpVersion, $version) < 0;
     }
 }

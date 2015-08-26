@@ -44,6 +44,9 @@
     "core-js/core-js.d.ts": {
       "commit": "b6f89b5f6deaf556843d554709c694156f8c6ccc"
     },
+    "lodash/lodash.d.ts": {
+      "commit": "b6f89b5f6deaf556843d554709c694156f8c6ccc"
+    },
     "diff/diff.d.ts": {
       "commit": "b6f89b5f6deaf556843d554709c694156f8c6ccc"
     }

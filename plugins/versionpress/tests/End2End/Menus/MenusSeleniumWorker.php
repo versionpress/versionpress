@@ -8,13 +8,12 @@ use VersionPress\Tests\End2End\Utils\SeleniumWorker;
 
 class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker {
 
-    private $testPageId = 0;
-
     public function prepare_createMenu() {
     }
 
     public function createMenu() {
         $this->url('wp-admin/nav-menus.php?action=edit&menu=0');
+        $this->byCssSelector('#menu-name')->clear();
         $this->byCssSelector('#menu-name')->value('Test menu');
         $this->byCssSelector('#save_menu_header')->click();
         $this->waitAfterRedirect();

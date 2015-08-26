@@ -21,6 +21,7 @@ describe('CommitsTable', () => {
       canUndo: true,
       canRollback: true,
       isEnabled: true,
+      isInitial: false,
       changes: []
     };
     props = {

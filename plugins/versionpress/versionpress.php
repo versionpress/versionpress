@@ -259,22 +259,21 @@ function vp_register_hooks() {
     add_action('set_object_terms', createUpdatePostTermsHook($mirror, $vpidRepository));
 
     add_filter('plugin_install_action_links', function ($links, $plugin) {
-        $warningLink = '<span class="vp-compatibility-popup %s" data-plugin-name="' . $plugin['name'] . '"><span class="icon icon-warning"></span></span>';
         $compatibility = CompatibilityChecker::testCompatibilityBySlug($plugin['slug']);
         if ($compatibility === CompatibilityResult::COMPATIBLE) {
             $cssClass = 'vp-compatible';
             $compatibilityAdjective = 'Compatible';
         } elseif ($compatibility === CompatibilityResult::INCOMPATIBLE) {
             $cssClass = 'vp-incompatible';
-            $compatibilityAdjective = 'Incompatible';
-            $links[] = sprintf($warningLink, $cssClass);
+            $compatibilityAdjective = '<a href="http://docs.versionpress.net/en/integrations/plugins" target="_blank" title="This plugin is not compatible with VersionPress. These plugins will not work correctly when used together.">Incompatible</a>';
         } else {
             $cssClass = 'vp-untested';
-            $compatibilityAdjective = 'Untested';
-            $links[] = sprintf($warningLink, $cssClass);
+            $compatibilityAdjective = '<a href="http://docs.versionpress.net/en/integrations/plugins" target="_blank" title="This plugin was not yet tested with VersionPress. Some functionality may not work as intended.">Untested</a>';
         }
 
-        $links[] = '<span class="vp-compatibility ' . $cssClass . '"><span class="hide-without-js"><strong> ' . $compatibilityAdjective . ' </strong> with </span>VersionPress</span>';
+        $compatibilityNotice = '<span class="vp-compatibility %s" data-plugin-name="%s"><strong>%s</strong> with VersionPress</span>';
+        $links[] = sprintf($compatibilityNotice, $cssClass, $plugin['name'], $compatibilityAdjective);
+
         return $links;
     }, 10, 2);
 
@@ -283,25 +282,34 @@ function vp_register_hooks() {
             return $plugin_meta;
         }
         $compatibility = CompatibilityChecker::testCompatibilityByPluginFile($plugin_file);
-
         if ($compatibility === CompatibilityResult::COMPATIBLE) {
-            $compatibilityAdjective = '&check; Compatible';
+            $cssClass = 'vp-compatible';
+            $compatibilityAdjective = 'Compatible';
         } elseif ($compatibility === CompatibilityResult::INCOMPATIBLE) {
-            $compatibilityAdjective = 'Incompatible';
+            $cssClass = 'vp-incompatible';
+            $compatibilityAdjective = '<a href="http://docs.versionpress.net/en/integrations/plugins" target="_blank" title="This plugin is not compatible with VersionPress. These plugins will not work correctly when used together.">Incompatible</a>';
         } elseif ($compatibility === CompatibilityResult::UNTESTED) {
-            $compatibilityAdjective = 'Untested';
+            $cssClass = 'vp-untested';
+            $compatibilityAdjective = '<a href="http://docs.versionpress.net/en/integrations/plugins" target="_blank" title="This plugin was not yet tested with VersionPress. Some functionality may not work as intended.">Untested</a>';
         } else {
             return $plugin_meta;
         }
 
-        $plugin_meta[] = '<span><strong> ' . $compatibilityAdjective . ' </strong> with VersionPress</span>';
+        $compatibilityNotice = '<span class="vp-compatibility %s" data-plugin-name="%s"><strong>%s</strong> with VersionPress</span>';
+        $plugin_meta[] = sprintf($compatibilityNotice, $cssClass, $plugin_data['Name'], $compatibilityAdjective);
 
         return $plugin_meta;
     }, 10, 4);
 
     add_filter('plugin_action_links', function ($actions, $plugin_file) {
-        if (CompatibilityChecker::testCompatibilityByPluginFile($plugin_file) === CompatibilityResult::INCOMPATIBLE) {
-            $actions['activate'] = "<span class=\"vp-plugin-list vp-incompatible\">$actions[activate]</span>";
+        $compatibility = CompatibilityChecker::testCompatibilityByPluginFile($plugin_file);
+
+        if (isset($actions['activate'])) {
+            if ($compatibility === CompatibilityResult::UNTESTED) {
+                $actions['activate'] = "<span class=\"vp-plugin-list vp-untested\">$actions[activate]</span>";
+            } elseif ($compatibility === CompatibilityResult::INCOMPATIBLE) {
+                $actions['activate'] = "<span class=\"vp-plugin-list vp-incompatible\">$actions[activate]</span>";
+            }
         }
         return $actions;
     }, 10, 2);
@@ -585,7 +593,7 @@ add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are
 function vp_activation_nag() {
 
     if (VersionPress::isActive() ||
-        get_current_screen()->id == "versionpress" ||
+        get_current_screen()->id == "toplevel_page_versionpress" ||
         get_current_screen()->id == "versionpress/admin/index" ||
         get_current_screen()->id == "versionpress/admin/deactivate"
     ) {
@@ -663,15 +671,6 @@ function vp_admin_menu() {
 
 function versionpress_page() {
     require_once(WP_CONTENT_DIR . '/plugins/versionpress/admin/index.php');
-}
-
-add_action('admin_init', 'vp_admin_init');
-
-function vp_admin_init() {
-    if (basename($_SERVER['PHP_SELF']) === 'admin.php' && isset($_GET['page']) && $_GET['page'] === 'versionpress') {
-        wp_redirect(menu_page_url('versionpress', false) . '/');
-        exit;
-    }
 }
 
 add_action('admin_action_vp_show_undo_confirm', 'vp_show_undo_confirm');
