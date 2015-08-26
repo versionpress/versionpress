@@ -132,7 +132,8 @@ class VersionPressApi {
                 "message" => $changeInfo->getChangeDescription(),
                 "canUndo" => $canUndoCommit,
                 "canRollback" => $canRollbackToThisCommit,
-                "isEnabled" => $isEnabled
+                "isEnabled" => $isEnabled,
+                "isInitial" => $commit->getHash() === $initialCommitHash
             );
             $isFirstCommit = false;
         }
