@@ -601,9 +601,9 @@ function vp_activation_nag() {
 
 }
 
-add_action("after_plugin_row_versionpress/versionpress.php", 'vp_update_message', 10, 2);
+add_action("after_plugin_row_versionpress/versionpress.php", 'vp_display_activation_notice', 10, 2);
 
-function vp_update_message($file, $plugin_data) {
+function vp_display_activation_notice($file, $plugin_data) {
     if (VersionPress::isActive()) {
         return;
     }
