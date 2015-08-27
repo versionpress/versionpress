@@ -148,7 +148,7 @@ function vp_register_hooks() {
     });
 
     add_filter('upgrader_pre_install', function ($_, $hook_extra) use ($committer) {
-        if (!($hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'install')) return;
+        if (!(isset($hook_extra['type']) && $hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'install')) return;
 
         $pluginsBeforeInstallation = get_plugins();
         $postInstallHook = function ($_, $hook_extra) use ($pluginsBeforeInstallation, $committer, &$postInstallHook) {
