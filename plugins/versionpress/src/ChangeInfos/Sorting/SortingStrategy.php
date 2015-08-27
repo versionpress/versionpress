@@ -11,6 +11,7 @@ use VersionPress\ChangeInfos\PostChangeInfo;
 use VersionPress\ChangeInfos\TermChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
+use VersionPress\ChangeInfos\TranslationChangeInfo;
 use VersionPress\Utils\ArrayUtils;
 
 class SortingStrategy {
@@ -32,6 +33,7 @@ class SortingStrategy {
         'VersionPress\ChangeInfos\PluginChangeInfo',
         'VersionPress\ChangeInfos\ThemeChangeInfo',
         'VersionPress\ChangeInfos\TermChangeInfo',
+        'VersionPress\ChangeInfos\TranslationChangeInfo',
         'VersionPress\ChangeInfos\OptionChangeInfo',
         'VersionPress\ChangeInfos\PostMetaChangeInfo',
         'VersionPress\ChangeInfos\UserMetaChangeInfo',
@@ -84,6 +86,10 @@ class SortingStrategy {
 
         if ($changeInfo1 instanceof PostChangeInfo && $changeInfo2 instanceof PostChangeInfo) {
             return $this->comparePostChangeInfo($changeInfo1, $changeInfo2);
+        }
+
+        if ($changeInfo1 instanceof TranslationChangeInfo && $changeInfo2 instanceof TranslationChangeInfo) {
+            return $this->compareTranslationChangeInfo($changeInfo1, $changeInfo2);
         }
 
         if (($changeInfo1 instanceof EntityChangeInfo && $changeInfo2 instanceof EntityChangeInfo)
@@ -199,6 +205,22 @@ class SortingStrategy {
         } else if ($changeInfo1->getAction() == "edit") {
             return -1;
         } else if ($changeInfo2->getAction() == "edit") {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    /**
+     * @param TranslationChangeInfo $changeInfo1
+     * @param TranslationChangeInfo $changeInfo2
+     * @return int
+     */
+    private function compareTranslationChangeInfo($changeInfo1, $changeInfo2) {
+        // For two VersionPress\ChangeInfos\TranslationChangeInfo objects, the "switch" one wins
+        if ($changeInfo1->getAction() == "switch") {
+            return -1;
+        } else if ($changeInfo2->getAction() == "switch") {
             return 1;
         }
 

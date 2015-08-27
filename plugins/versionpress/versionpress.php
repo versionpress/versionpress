@@ -11,6 +11,7 @@ License: GPLv2 or later
 
 use VersionPress\Api\VersionPressApi;
 use VersionPress\ChangeInfos\PluginChangeInfo;
+use VersionPress\ChangeInfos\TranslationChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\VersionPressChangeInfo;
 use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
@@ -165,6 +166,24 @@ function vp_register_hooks() {
         add_filter('upgrader_post_install', $postInstallHook, 10, 2);
     }, 10, 2);
 
+    add_filter('upgrader_pre_download', function($reply, $_, $upgrader) use ($committer) {
+        if (!isset($upgrader->skin->language_update)) return $reply;
+
+        $postInstallHook = function ($_, $hook_extra) use ($committer, &$postInstallHook) {
+            if (!isset($hook_extra['language_update_type'])) return;
+            $type = $hook_extra['language_update_type'];
+            $language = $hook_extra['language_update']->language;
+
+            $name = $type === "core" ? null : $hook_extra['language_update']->slug;
+
+            $committer->forceChangeInfo(new TranslationChangeInfo("update", $language, $type, $name));
+            remove_filter('upgrader_post_install', $postInstallHook);
+        };
+
+        add_filter('upgrader_post_install', $postInstallHook, 10, 2);
+        return false;
+    }, 10, 3);
+
     add_action('switch_theme', function () use ($committer) {
         if (defined('WP_CLI') && WP_CLI) {
             file_get_contents(admin_url()); //
@@ -226,11 +245,13 @@ function vp_register_hooks() {
         $committer->postponeCommit('permalinks');
     });
 
-    add_action('update_option', function ($option) use ($committer) {
+    add_action('update_option', function ($option, $old_value, $value) use ($committer) {
        if ($option === 'rewrite_rules') {
            $committer->usePostponedChangeInfos('permalinks');
+       } else if ($option === 'WPLANG') {
+           $committer->forceChangeInfo(new TranslationChangeInfo("switch", $value));
        }
-    });
+    }, 10, 3);
 
     add_action('wp_update_nav_menu_item', function($menu_id, $menu_item_db_id) use ($committer) {
         $key = 'menu-item-' . $menu_item_db_id;

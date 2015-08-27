@@ -21,6 +21,7 @@ class ChangeInfoMatcher {
         "versionpress/(undo|rollback)/.*" => 'VersionPress\ChangeInfos\RevertChangeInfo',
 
         // WordPress core actions:
+        "translation/.*" => 'VersionPress\ChangeInfos\TranslationChangeInfo',
         "plugin/.*" => 'VersionPress\ChangeInfos\PluginChangeInfo',
         "theme/.*" => 'VersionPress\ChangeInfos\ThemeChangeInfo',
         "wordpress/update/.*" => 'VersionPress\ChangeInfos\WordPressUpdateChangeInfo',
