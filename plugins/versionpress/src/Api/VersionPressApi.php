@@ -14,6 +14,7 @@ use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\PluginChangeInfo;
 use VersionPress\ChangeInfos\RevertChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
+use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\VersionPressChangeInfo;
 use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
 use VersionPress\Configuration\VersionPressConfig;
@@ -324,60 +325,30 @@ class VersionPressApi {
     private function convertChangeInfo($changeInfo) {
         $change = array();
 
+        if ($changeInfo instanceof TrackedChangeInfo) {
+            $change['type'] = $changeInfo->getEntityName();
+            $change['action'] = $changeInfo->getAction();
+            $change['tags'] = $changeInfo->getCustomTags();
+        }
+
         if ($changeInfo instanceof EntityChangeInfo) {
-            $change = array(
-                'type' => $changeInfo->getEntityName(),
-                'action' => $changeInfo->getAction(),
-                'name' => $changeInfo->getEntityId(),
-            );
+            $change['name'] = $changeInfo->getEntityId();
         }
 
         if ($changeInfo instanceof PluginChangeInfo) {
             $pluginTags = $changeInfo->getCustomTags();
             $pluginName = $pluginTags[PluginChangeInfo::PLUGIN_NAME_TAG];
-
-            $change = array(
-                'type' => 'plugin',
-                'action' => $changeInfo->getAction(),
-                'name' => $pluginName,
-            );
+            $change['name'] = $pluginName;
         }
 
         if ($changeInfo instanceof ThemeChangeInfo) {
             $themeTags = $changeInfo->getCustomTags();
             $themeName = $themeTags[ThemeChangeInfo::THEME_NAME_TAG];
-
-            $change = array(
-                'type' => 'theme',
-                'action' => $changeInfo->getAction(),
-                'name' => $themeName
-            );
-        }
-
-        if ($changeInfo instanceof RevertChangeInfo) {
-
-            $change = array(
-                'type' => $changeInfo->getEntityName(),
-                'action' => $changeInfo->getAction(),
-                'name' => ''
-
-            );
+            $change['name'] = $themeName;
         }
 
         if ($changeInfo instanceof WordPressUpdateChangeInfo) {
-            $change = array(
-                'type' => $changeInfo->getEntityName(),
-                'action' => $changeInfo->getAction(),
-                'name' => $changeInfo->getNewVersion()
-            );
-        }
-
-        if ($changeInfo instanceof VersionPressChangeInfo) {
-            $change = array(
-                'type' => $changeInfo->getEntityName(),
-                'action' => $changeInfo->getAction(),
-                'name' => ''
-            );
+            $change['name'] = $changeInfo->getNewVersion();
         }
 
         return $change;

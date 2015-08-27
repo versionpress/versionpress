@@ -13,4 +13,5 @@ interface Change {
   type: string;
   action: string;
   name: string;
+  tags: any;
 }

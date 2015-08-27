@@ -4,6 +4,7 @@
 import React = require('react');
 import moment = require('moment');
 
+import CommitOverview = require('./CommitOverview.react');
 import DiffPanel = require('./DiffPanel.react');
 
 const DOM = React.DOM;
@@ -29,14 +30,12 @@ class CommitsTableRowDetails extends React.Component<CommitsTableRowDetailsProps
     const className = 'details-row' + (commit.isEnabled ? '' : 'disabled');
     const detailsClass = 'details';
 
-    const overviewTable = DOM.table(null, commit.changes.map((change: Change) => {
-      return DOM.tr(null, DOM.td(null, change.type), DOM.td(null, change.action), DOM.td(null, change.name));
-    }));
+    const overview = React.createElement(CommitOverview, <CommitOverview.Props>{commit: commit});
 
     const overviewRow = DOM.tr({className: className},
       DOM.td(null),
       DOM.td(null,
-        DOM.div({className: detailsClass}, overviewTable)
+        DOM.div({className: detailsClass}, overview)
       ),
       DOM.td(null)
     );
@@ -44,8 +43,7 @@ class CommitsTableRowDetails extends React.Component<CommitsTableRowDetailsProps
     const fullDiffRow = DOM.tr({className: className},
       DOM.td({colSpan: 3},
         DOM.div({className: detailsClass},
-          this.props.detailsLevel === 'overview' ? overviewTable : null,
-          this.props.detailsLevel === 'full-diff' ? React.createElement(DiffPanel, <DiffPanel.Props>{diff: this.props.diff}) : null
+          React.createElement(DiffPanel, <DiffPanel.Props>{diff: this.props.diff})
         )
       )
     );
