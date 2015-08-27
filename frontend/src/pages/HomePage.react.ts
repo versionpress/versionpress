@@ -259,7 +259,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
         : null,
       this.state.displayUpdateNotice
         ? DOM.div({className: 'updateNotice'},
-          DOM.span(null, 'There are newer commits available.'),
+          DOM.span(null, 'There are newer changes available.'),
           DOM.a({ href: '#', onClick: (e) => { e.preventDefault(); this.fetchCommits(); } }, 'Refresh now.')
         ) : null,
       React.createElement(CommitsTable, <CommitsTable.Props>{
