@@ -64,7 +64,7 @@ abstract class SingleFileStorage extends Storage {
 
         $this->updateEntity($vpid, $data);
 
-        if ($this->entities != $originalEntities) {
+        if ($this->entities !== $originalEntities) {
             $this->saveEntities();
             return $this->createChangeInfo($oldEntity, $this->entities[$vpid], $isNew ? 'create' : 'edit');
         } else {
@@ -86,7 +86,7 @@ abstract class SingleFileStorage extends Storage {
 
         unset($this->entities[$vpid]);
 
-        if ($this->entities != $originalEntities) {
+        if ($this->entities !== $originalEntities) {
             $this->saveEntities();
             return $this->createChangeInfo($entity, $entity, 'delete');
         } else {

@@ -49,3 +49,6 @@ usermeta:
 option:
     table: options
     vpid: option_name
+    value-references:
+        option_name@option_value:
+            site_icon: post
