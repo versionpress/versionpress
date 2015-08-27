@@ -250,3 +250,35 @@ tr.note {
     float: right;
     padding: 2px 12px;
 }
+
+/*------------------------------
+ * Styles for plugins.php
+ *------------------------------*/
+.vp-update-message {
+    margin: -1px 0 1px 0 !important;
+    padding-left: 43px !important;
+    background-color: #f7fcfe !important;
+}
+
+.branch-4-3 .vp-update-message {
+    padding-left: 70px !important;
+}
+
+.vp-update-message:before {
+    content: '\f153' !important;
+    color: #000 !important;
+    padding-bottom: 3px;
+}
+
+.branch-4-3 .vp-update-message:before {
+    content: '\f534' !important;
+}
+
+.vp-update-message a {
+    text-decoration: underline !important;
+}
+
+.vp-plugin-update {
+    border-left: 4px solid #00a0d2 !important;
+    overflow: visible !important;
+}
