@@ -30,7 +30,7 @@ class CommitOverview extends React.Component<CommitOverviewProps, {}> {
           lines.forEach(line => displayedLines.push(line));
         } else {
           let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changesByTypeAndAction[type][action], countOfDuplicates);
-          let line = CommitOverview.renderOverviewLine(action, changedEntities);
+          let line = CommitOverview.renderOverviewLine(type, action, changedEntities);
           displayedLines.push(line);
         }
       }
@@ -58,20 +58,20 @@ class CommitOverview extends React.Component<CommitOverviewProps, {}> {
     for (let user in metaByUser) {
       let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(metaByUser[user], countOfDuplicates);
 
-      let line = CommitOverview.renderOverviewLine(action, changedEntities, [' for ', DOM.span({className: 'type'}, 'user'), ' ', user]);
+      let line = CommitOverview.renderOverviewLine('usermeta', action, changedEntities, [' for ', DOM.span({className: 'type'}, 'user'), ' ', user]);
       lines.push(line);
     }
 
     return lines;
   }
 
-  static renderOverviewLine(action: string, entities: string[]|React.DOMElement<any>[], suffix: any = null) {
+  static renderOverviewLine(type: string, action: string, entities: string[]|React.DOMElement<any>[], suffix: any = null) {
     let capitalizedVerb = StringUtils.capitalize(StringUtils.verbToPastTense(action));
 
     return DOM.span(null,
       capitalizedVerb,
       ' ',
-      DOM.span({className: 'type'}, 'usermeta'),
+      DOM.span({className: 'type'}, type),
       ' ',
       ArrayUtils.interspace(entities, ', '),
       suffix
