@@ -1,11 +1,9 @@
 /// <reference path='../../typings/tsd.d.ts' />
 
-/* tslint:disable:variable-name */
-
 import config = require('../config');
 import request = require('superagent');
 
-function getApiLink(endpoint: string) {
+export function getApiLink(endpoint: string) {
   if (config.api.prettyPermalinks) {
     return config.api.root + '/' + config.api.urlPrefix + '/versionpress/' + endpoint;
   } else {
