@@ -1,5 +1,6 @@
 /// <reference path='../typings/tsd.d.ts' />
 /// <reference path='./VersionPressConfig.d.ts' />
+/* tslint:disable:variable-name */
 
 import _ = require('lodash');
 import localConfig = require('./config.local');
