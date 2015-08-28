@@ -633,14 +633,15 @@ add_filter('wp_insert_post_data', 'vp_generate_post_guid', '99', 2);
  * @return array
  */
 function vp_generate_post_guid($data, $postarr) {
-    if (!VersionPress::isActive()) return $data;
+    if (!VersionPress::isActive()) {
+        return $data;
+    }
 
     if (empty($postarr['ID'])) { // it's insert not update
-        $data['guid'] = IdUtil::newUuid();
-    } elseif (preg_match("~^https?://[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$~i", $data['guid'])) { // it's guid
-        // strip the protocol (it's created by sanitize_post function)
-        $data['guid'] = preg_replace("~^https?://(.*)$~i", "$1", $data['guid']);
+        $protocol = is_ssl() ? 'https://' : 'http://';
+        $data['guid'] = $protocol . IdUtil::newUuid();
     }
+
     return $data;
 }
 
