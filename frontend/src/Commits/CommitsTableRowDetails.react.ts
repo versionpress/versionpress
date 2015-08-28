@@ -2,7 +2,6 @@
 /// <reference path='./Commits.d.ts' />
 
 import React = require('react');
-import moment = require('moment');
 
 import CommitOverview = require('./CommitOverview.react');
 import DiffPanel = require('./DiffPanel.react');

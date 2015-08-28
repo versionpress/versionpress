@@ -5,7 +5,6 @@ import React = require('react');
 import ReactRouter = require('react-router');
 import CommitsTableRow = require('./CommitsTableRow.react');
 import CommitsTableNote = require('./CommitsTableNote.react');
-import CommitsTableRowDetails = require('./CommitsTableRowDetails.react');
 import config = require('../config');
 
 require('./CommitsTable.less');
@@ -82,7 +81,7 @@ class CommitsTable extends React.Component<CommitsTableProps, any>  {
     return React.createElement(CommitsTableNote, <CommitsTableNote.Props> {
       key: 'note',
       message: 'VersionPress is not able to undo changes made before it has been activated.'
-    })
+    });
   }
 
 }

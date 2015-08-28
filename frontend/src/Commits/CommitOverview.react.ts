@@ -2,7 +2,6 @@
 /// <reference path='./Commits.d.ts' />
 
 import React = require('react');
-import moment = require('moment');
 import ArrayUtils = require('../common/ArrayUtils');
 import StringUtils = require('../common/StringUtils');
 
@@ -54,11 +53,11 @@ class CommitOverview extends React.Component<CommitOverviewProps, {}> {
     let lines = [];
     let metaByUser = ArrayUtils.groupBy(changedMeta, c => c.tags['VP-User-Login']);
 
-
     for (let user in metaByUser) {
       let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(metaByUser[user], countOfDuplicates);
 
-      let line = CommitOverview.renderOverviewLine('usermeta', action, changedEntities, [' for ', DOM.span({className: 'type'}, 'user'), ' ', user]);
+      let lineSuffix = [' for ', DOM.span({className: 'type'}, 'user'), ' ', user];
+      let line = CommitOverview.renderOverviewLine('usermeta', action, changedEntities, lineSuffix);
       lines.push(line);
     }
 

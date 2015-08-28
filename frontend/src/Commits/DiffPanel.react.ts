@@ -13,25 +13,12 @@ interface DiffPanelProps {
 
 class DiffPanel extends React.Component<DiffPanelProps, any> {
 
-  render() {
-    let diffs = DiffParser.parse(this.props.diff);
-
-    return DOM.div(null,
-      diffs.map(diff =>
-        DOM.div({className: 'diff'},
-          DOM.h4({className: 'heading'}, (diff.from === '/dev/null' ? diff.to : diff.from).substr(2)),
-          diff.type === 'plain' ? DiffPanel.formatChunks(diff.chunks) : DiffPanel.formatInfoForBinaryFileDiff(diff)
-        )
-      )
-    );
-  }
-
   private static createTableFromChunk(chunk: Chunk) {
     let [left, right] = DiffPanel.divideToLeftAndRightColumn(chunk);
 
-    let mapTwoArrays = <T,U>(a1: T[], a2: U[], fn: (a: T, b: U) => any) => {
+    let mapTwoArrays = <T, U>(a1: T[], a2: U[], fn: (a: T, b: U) => any) => {
       let result = [];
-      for(let i = 0; i < a1.length; i++) {
+      for (let i = 0; i < a1.length; i++) {
         result.push(fn(a1[i], a2[i]));
       }
       return result;
@@ -51,11 +38,11 @@ class DiffPanel extends React.Component<DiffPanelProps, any> {
               DOM.td({className: 'line-left ' + l.type}, leftContent),
               DOM.td({className: 'line-separator'}),
               DOM.td({className: 'line-right ' + r.type}, rightContent)
-            )
+            );
           }
         )
       )
-    )
+    );
   }
 
   private static highlightInlineDiff(leftContent, rightContent) {
@@ -122,7 +109,7 @@ class DiffPanel extends React.Component<DiffPanelProps, any> {
         DiffPanel.createTableFromChunk(chunk)
     );
 
-    for(let i = 0; i < chunkTables.length; i++) {
+    for (let i = 0; i < chunkTables.length; i++) {
       result.push(chunkTables[i]);
       if (chunkTables[i + 1]) {
         result.push(
@@ -148,13 +135,13 @@ class DiffPanel extends React.Component<DiffPanelProps, any> {
   }
 
   private static replaceLeadingSpacesWithHardSpaces(content: string): string {
-    let match = content.match(/^( +)/); // all leading spaces
+    let match = content.match(/^( +)/); // All leading spaces
     if (!match) {
       return content;
     }
 
     let numberOfSpaces = match[1].length;
-    return "\u00a0".repeat(numberOfSpaces) + content.substr(numberOfSpaces);
+    return '\u00a0'.repeat(numberOfSpaces) + content.substr(numberOfSpaces);
   }
 
   private static formatInfoForBinaryFileDiff(diff) {
@@ -169,6 +156,19 @@ class DiffPanel extends React.Component<DiffPanelProps, any> {
     }
 
     return DOM.div({className: 'binary-file-info'}, message);
+  }
+
+  render() {
+    let diffs = DiffParser.parse(this.props.diff);
+
+    return DOM.div(null,
+      diffs.map(diff =>
+          DOM.div({className: 'diff'},
+            DOM.h4({className: 'heading'}, (diff.from === '/dev/null' ? diff.to : diff.from).substr(2)),
+            diff.type === 'plain' ? DiffPanel.formatChunks(diff.chunks) : DiffPanel.formatInfoForBinaryFileDiff(diff)
+          )
+      )
+    );
   }
 }
 

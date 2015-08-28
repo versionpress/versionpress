@@ -1,7 +1,7 @@
 interface Diff {
   from: string;
   to: string;
-  type: string; // plain | binary
+  type: string; // Possible values: plain | binary
   chunks: Chunk[];
 }
 
@@ -10,6 +10,6 @@ interface Chunk {
 }
 
 interface Line {
-  type: string; // unchanged | added | removed
+  type: string; // Possible values: unchanged | added | removed
   content: string;
 }

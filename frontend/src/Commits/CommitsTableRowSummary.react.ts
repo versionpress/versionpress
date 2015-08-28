@@ -4,15 +4,13 @@
 import React = require('react');
 import moment = require('moment');
 
-import DiffPanel = require('./DiffPanel.react');
-
 const DOM = React.DOM;
 
 interface CommitsTableRowSummaryProps {
   commit: Commit;
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
-  onDetailsLevelChanged: (detailsLevel) => any
+  onDetailsLevelChanged: (detailsLevel) => any;
   detailsLevel: string;
 }
 
@@ -37,8 +35,16 @@ class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps
       DOM.td({className: 'column-message'},
         DOM.span(null, commit.message),
         this.props.detailsLevel !== 'none' ? DOM.div({className: 'detail-buttons'},
-          DOM.button({disabled: this.props.detailsLevel === 'overview', onClick: (e) => {this.changeDetailsLevel('overview'); e.stopPropagation();}}, 'Overview'),
-          DOM.button({disabled: this.props.detailsLevel === 'full-diff', onClick: (e) => {this.changeDetailsLevel('full-diff'); e.stopPropagation();}}, 'Full diff')
+          DOM.button({disabled: this.props.detailsLevel === 'overview', onClick: (e) => {
+              this.changeDetailsLevel('overview');
+              e.stopPropagation();
+            }
+          }, 'Overview'),
+          DOM.button({disabled: this.props.detailsLevel === 'full-diff', onClick: (e) => {
+              this.changeDetailsLevel('full-diff');
+              e.stopPropagation();
+            }
+          }, 'Full diff')
         ) : null
       ),
       DOM.td({className: 'column-actions'},

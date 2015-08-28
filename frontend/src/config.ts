@@ -22,10 +22,10 @@ const defaultConfig: VersionPressConfig = {
 
 };
 
-const VpApiConfig = {
+const vpApiConfig = {
   api: window['VP_API_Config'] || {}
 };
 
-var config = <VersionPressConfig> _.merge(defaultConfig, localConfig, VpApiConfig);
+var config = <VersionPressConfig> _.merge(defaultConfig, localConfig, vpApiConfig);
 
 export = config;
