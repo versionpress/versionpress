@@ -2,6 +2,7 @@
 
 namespace VersionPress\Database;
 
+use VersionPress\DI\VersionPressServices;
 use VersionPress\Utils\IdUtil;
 use VersionPress\Utils\ReferenceUtils;
 use wpdb;
@@ -48,10 +49,19 @@ class VpidRepository {
         }
 
         foreach ($entityInfo->valueReferences as $referenceName => $targetEntity) {
-            $targetTable = $this->schemaInfo->getEntityInfo($targetEntity)->tableName;
             list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
 
             if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn]) && $entity[$valueColumn] > 0) {
+
+                if ($targetEntity[0] === '@') {
+                    $entityNameProvider = substr($targetEntity, 1);
+                    $targetEntity = call_user_func($entityNameProvider, $entity);
+                    if (!$targetEntity) {
+                        continue;
+                    }
+                }
+                $targetTable = $this->schemaInfo->getEntityInfo($targetEntity)->tableName;
+
                 $referenceVpId = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=".$entity[$valueColumn]);
                 $entity[$valueColumn] = $referenceVpId;
             }
@@ -92,5 +102,32 @@ class VpidRepository {
             $data[$idColumnName] = $id;
         }
         return $data;
+    }
+
+    /**
+     * Function used in wordpress-schema.neon.
+     * Maps menu item with given postmeta (_menu_item_object_id) to target entity (post/category/custom url).
+     *
+     * @param $postmeta
+     * @return null|string
+     */
+    public static function getMenuReference($postmeta) {
+        global $versionPressContainer;
+        /** @var \VersionPress\Storages\StorageFactory $storageFactory */
+        $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
+        /** @var \VersionPress\Storages\PostMetaStorage $postmetaStorage */
+        $postmetaStorage = $storageFactory->getStorage('postmeta');
+        $menuItemTypePostmeta = $postmetaStorage->loadEntityByName('_menu_item_type', $postmeta['vp_post_id']);
+        $menuItemType = $menuItemTypePostmeta['meta_value'];
+
+        if ($menuItemType === 'taxonomy') {
+            return 'term_taxonomy';
+        }
+
+        if ($menuItemType === 'post_type') {
+            return 'post';
+        }
+
+        return null; // custom url or unknown target
     }
 }

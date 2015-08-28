@@ -1,5 +1,7 @@
 /// <reference path='../../typings/tsd.d.ts' />
 
+/* tslint:disable:variable-name */
+
 import config = require('../config');
 import request = require('superagent');
 

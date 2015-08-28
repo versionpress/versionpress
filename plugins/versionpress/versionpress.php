@@ -148,7 +148,7 @@ function vp_register_hooks() {
     });
 
     add_filter('upgrader_pre_install', function ($_, $hook_extra) use ($committer) {
-        if (!($hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'install')) return;
+        if (!(isset($hook_extra['type']) && $hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'install')) return;
 
         $pluginsBeforeInstallation = get_plugins();
         $postInstallHook = function ($_, $hook_extra) use ($pluginsBeforeInstallation, $committer, &$postInstallHook) {
@@ -608,6 +608,21 @@ function vp_activation_nag() {
     echo "<div class='update-nag vp-activation-nag'>VersionPress is installed but not yet tracking this site. <a href='" . menu_page_url('versionpress', false) . "'>Please finish the activation.</a></div>";
 
 }
+
+add_action("after_plugin_row_versionpress/versionpress.php", 'vp_display_activation_notice', 10, 2);
+
+function vp_display_activation_notice($file, $plugin_data) {
+    if (VersionPress::isActive()) {
+        return;
+    }
+
+    $wp_list_table = _get_list_table('WP_Plugins_List_Table');
+    $activationUrl = menu_page_url('versionpress', false);
+    echo '<tr class="plugin-update-tr vp-plugin-update-tr updated"><td colspan="' . esc_attr( $wp_list_table->get_column_count() ) . '" class="vp-plugin-update plugin-update colspanchange"><div class="update-message vp-update-message">';
+    echo 'VersionPress is installed but not yet tracking this site. <a href="' . $activationUrl . '">Please finish the activation.</a>';
+    echo '</div></td></tr>';
+}
+
 
 add_filter('wp_insert_post_data', 'vp_generate_post_guid', '99', 2);
 /**

@@ -25,9 +25,6 @@ abstract class MetaEntityStorage extends Storage {
     /** @var Storage */
     private $parentStorage;
 
-    private $saveQueue;
-
-
     function __construct(Storage $parentStorage, $keyName, $valueName, $parentReferenceName) {
         $this->parentStorage = $parentStorage;
         $this->keyName = $keyName;
@@ -42,7 +39,7 @@ abstract class MetaEntityStorage extends Storage {
         }
 
         $oldParent = $this->parentStorage->loadEntity($data[$this->parentReferenceName], null);
-        $oldEntity = $this->extractEntityFromParent($oldParent, $data['vp_id']);
+        $oldEntity = $this->extractEntityFromParentByVpId($oldParent, $data['vp_id']);
 
         $transformedData = $this->transformToParentEntityField($data);
 
@@ -50,7 +47,7 @@ abstract class MetaEntityStorage extends Storage {
 
         $this->parentStorage->save($transformedData);
         $newParent = $this->parentStorage->loadEntity($data[$this->parentReferenceName], null);
-        $newEntity = $this->extractEntityFromParent($newParent, $data['vp_id']);
+        $newEntity = $this->extractEntityFromParentByVpId($newParent, $data['vp_id']);
 
         if ($oldEntity == $newEntity) {
             return null;
@@ -70,7 +67,7 @@ abstract class MetaEntityStorage extends Storage {
         $parent = $this->parentStorage->loadEntity($parentVpId, null);
         $fieldToDelete = $this->getJoinedKeyByVpId($parent, $restriction['vp_id']);
 
-        $oldEntity = $this->extractEntityFromParent($parent, $restriction['vp_id']);
+        $oldEntity = $this->extractEntityFromParentByVpId($parent, $restriction['vp_id']);
         $oldParentEntity = $parent;
 
         $parent[$fieldToDelete] = false; // mark for deletion
@@ -99,7 +96,7 @@ abstract class MetaEntityStorage extends Storage {
                     continue;
                 }
                 list ($key, $vpId) = explode('#', $field, 2);
-                $entities[$vpId] = $this->extractEntityFromParent($parent, $vpId);
+                $entities[$vpId] = $this->extractEntityFromParentByVpId($parent, $vpId);
             }
 
         }
@@ -121,12 +118,17 @@ abstract class MetaEntityStorage extends Storage {
 
     public function loadEntity($id, $parentId) {
         $parent = $this->parentStorage->loadEntity($parentId, null);
-        return $this->extractEntityFromParent($parent, $id);
+        return $this->extractEntityFromParentByVpId($parent, $id);
+    }
+
+    public function loadEntityByName($name, $parentId) {
+        $parent = $this->parentStorage->loadEntity($parentId, null);
+        return $this->extractEntityFromParentByName($parent, $name);
     }
 
     protected function createChangeInfo($oldParentEntity, $newParentEntity, $action) {
-        $oldEntity = $this->extractEntityFromParent($oldParentEntity, $this->lastVpId);
-        $newEntity = $this->extractEntityFromParent($newParentEntity, $this->lastVpId);
+        $oldEntity = $this->extractEntityFromParentByVpId($oldParentEntity, $this->lastVpId);
+        $newEntity = $this->extractEntityFromParentByVpId($newParentEntity, $this->lastVpId);
         return $this->createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action);
     }
 
@@ -189,11 +191,28 @@ abstract class MetaEntityStorage extends Storage {
     }
 
     /**
+     * Finds a joined key with given VPID within the parent entity.
+     *
+     * @param $parent
+     * @param $name
+     * @return string|null
+     */
+    private function getJoinedKeyByName($parent, $name) {
+        foreach ($parent as $field => $value) {
+            if (Strings::startsWith($field, "$name#")) {
+                return $field;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @param $parentEntity
      * @param $vpId
      * @return array|null
      */
-    protected function extractEntityFromParent($parentEntity, $vpId) {
+    protected function extractEntityFromParentByVpId($parentEntity, $vpId) {
         if (!$parentEntity) {
             return null;
         }
@@ -204,6 +223,24 @@ abstract class MetaEntityStorage extends Storage {
             return null;
         }
 
+        return $this->extractEntityFromParent($parentEntity, $joinedKey);
+    }
+
+    protected function extractEntityFromParentByName($parentEntity, $name) {
+        if (!$parentEntity) {
+            return null;
+        }
+
+        $joinedKey = $this->getJoinedKeyByName($parentEntity, $name);
+
+        if (!$joinedKey) {
+            return null;
+        }
+
+        return $this->extractEntityFromParent($parentEntity, $joinedKey);
+    }
+
+    private function extractEntityFromParent($parentEntity, $joinedKey) {
         $splittedKey = $this->splitJoinedKey($joinedKey);
         $entity = array(
             $this->keyName => $splittedKey[$this->keyName],

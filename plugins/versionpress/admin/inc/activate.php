@@ -75,10 +75,10 @@ use VersionPress\VersionPress;
         <?php
         if ($successfullyInitialized) { ?>
             <p class="initialization-done">All done, we're now redirecting you (or <a
-                    href="<?php admin_url('admin.php?page=versionpress/admin/index.php') ?>">click here</a>).
+                    href="<?php menu_page_url('versionpress', false) ?>">click here</a>).
             </p>
         <?php
-            JsRedirect::redirect(admin_url('admin.php?page=versionpress/admin/index.php'), InitializationConfig::REDIRECT_AFTER_MS);
+            JsRedirect::redirect(menu_page_url('versionpress', false), InitializationConfig::REDIRECT_AFTER_MS);
         } else { ?>
             <p class="initialization-done">
                 Ouch. The initialization took too long and was terminated by the server.<br>
