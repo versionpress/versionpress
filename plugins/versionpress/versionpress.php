@@ -35,6 +35,7 @@ use VersionPress\VersionPress;
 defined('ABSPATH') or die("Direct access not allowed");
 
 require_once(__DIR__ . '/bootstrap.php');
+require_once( ABSPATH . 'wp-admin/includes/translation-install.php' );
 
 if (defined('WP_CLI') && WP_CLI) {
     WP_CLI::add_command('vp', 'VersionPress\Cli\VPCommand');
@@ -172,7 +173,7 @@ function vp_register_hooks() {
         $postInstallHook = function ($_, $hook_extra) use ($committer, &$postInstallHook) {
             if (!isset($hook_extra['language_update_type'])) return;
             $type = $hook_extra['language_update_type'];
-            $language = $hook_extra['language_update']->language;
+            $language = $hook_extra['language_update']->native_name;
 
             $name = $type === "core" ? null : $hook_extra['language_update']->slug;
 
@@ -249,7 +250,12 @@ function vp_register_hooks() {
        if ($option === 'rewrite_rules') {
            $committer->usePostponedChangeInfos('permalinks');
        } else if ($option === 'WPLANG') {
-           $committer->forceChangeInfo(new TranslationChangeInfo("switch", $value));
+           $translations = wp_get_available_translations();
+           $language = isset($translations[$value])
+               ? $translations[$value]['native_name']
+               : 'English (United States)';
+
+           $committer->forceChangeInfo(new TranslationChangeInfo("switch", $language));
        }
     }, 10, 3);
 

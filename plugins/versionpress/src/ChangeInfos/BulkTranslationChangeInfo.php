@@ -11,8 +11,8 @@ class BulkTranslationChangeInfo extends BulkChangeInfo {
         $languages = array();
         /** @var TranslationChangeInfo $changeInfo */
         foreach ($this->changeInfos as $changeInfo) {
-            if (!in_array($changeInfo->getLanguageCode(), $languages)) {
-                $languages[] = $changeInfo->getLanguageCode();
+            if (!in_array($changeInfo->getLanguage(), $languages)) {
+                $languages[] = $changeInfo->getLanguage();
             }
         }
 
