@@ -11,9 +11,18 @@ interface CommitOverviewProps {
   commit: Commit;
 }
 
-class CommitOverview extends React.Component<CommitOverviewProps, {}> {
+interface CommitOverviewState {
+  expandedLists: string[];
+}
 
-  private static formatChanges(changes: Change[]) {
+class CommitOverview extends React.Component<CommitOverviewProps, CommitOverviewState> {
+
+  constructor(props: CommitOverviewProps, context: any) {
+    super(props, context);
+    this.state = {expandedLists: []};
+  }
+
+  private formatChanges(changes: Change[]) {
     let displayedLines = [];
     let changesByTypeAndAction = ArrayUtils.groupBy(
       ArrayUtils.filterDuplicates(changes, change => change.type + '|||' + change.action + '|||' + change.name),
@@ -27,13 +36,13 @@ class CommitOverview extends React.Component<CommitOverviewProps, {}> {
         let lines: any[];
 
         if (type === 'usermeta') {
-          lines = CommitOverview.getLinesForUsermeta(changesByTypeAndAction[type][action], countOfDuplicates, action);
+          lines = this.getLinesForUsermeta(changesByTypeAndAction[type][action], countOfDuplicates, action);
         } else if (type === 'postmeta') {
-          lines = CommitOverview.getLinesForPostmeta(changesByTypeAndAction[type][action], countOfDuplicates, action);
+          lines = this.getLinesForPostmeta(changesByTypeAndAction[type][action], countOfDuplicates, action);
         } else if (type === 'versionpress' && (action === 'undo' || action === 'rollback')) {
-          lines = CommitOverview.getLinesForRevert(changesByTypeAndAction[type][action], action);
+          lines = this.getLinesForRevert(changesByTypeAndAction[type][action], action);
         } else {
-          lines = CommitOverview.getLinesForOtherChanges(changesByTypeAndAction[type][action], countOfDuplicates, type, action);
+          lines = this.getLinesForOtherChanges(changesByTypeAndAction[type][action], countOfDuplicates, type, action);
         }
 
         displayedLines = displayedLines.concat(lines);
@@ -54,15 +63,15 @@ class CommitOverview extends React.Component<CommitOverviewProps, {}> {
     });
   }
 
-  private static getLinesForUsermeta(changedMeta: Change[], countOfDuplicates, action: string) {
-    return CommitOverview.getLinesForMeta('usermeta', 'user', 'VP-User-Login', changedMeta, countOfDuplicates, action);
+  private getLinesForUsermeta(changedMeta: Change[], countOfDuplicates, action: string) {
+    return this.getLinesForMeta('usermeta', 'user', 'VP-User-Login', changedMeta, countOfDuplicates, action);
   }
 
-  private static getLinesForPostmeta(changedMeta: Change[], countOfDuplicates, action: string) {
-    return CommitOverview.getLinesForMeta('postmeta', 'post', 'VP-Post-Id', changedMeta, countOfDuplicates, action);
+  private getLinesForPostmeta(changedMeta: Change[], countOfDuplicates, action: string) {
+    return this.getLinesForMeta('postmeta', 'post', 'VP-Post-Title', changedMeta, countOfDuplicates, action);
   }
 
-  private static getLinesForMeta(entityName, parentEntity, groupByTag, changedMeta: Change[], countOfDuplicates, action: string) {
+  private getLinesForMeta(entityName, parentEntity, groupByTag, changedMeta: Change[], countOfDuplicates, action: string) {
     let lines = [];
     let metaByTag = ArrayUtils.groupBy(changedMeta, c => c.tags[groupByTag]);
 
@@ -70,14 +79,14 @@ class CommitOverview extends React.Component<CommitOverviewProps, {}> {
       let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(metaByTag[tagValue], countOfDuplicates);
 
       let lineSuffix = [' for ', DOM.span({className: 'type'}, parentEntity), ' ', tagValue];
-      let line = CommitOverview.renderOverviewLine(entityName, action, changedEntities, lineSuffix);
+      let line = this.renderOverviewLine(entityName, action, changedEntities, lineSuffix);
       lines.push(line);
     }
 
     return lines;
   }
 
-  private static getLinesForRevert(changes: Change[], action) {
+  private getLinesForRevert(changes: Change[], action) {
     let change = changes[0]; // Both undo and rollback are always only 1 change.
     let commitDetails = change.tags['VP-Commit-Details'];
     if (action === 'undo') {
@@ -88,23 +97,61 @@ class CommitOverview extends React.Component<CommitOverviewProps, {}> {
     }
   }
 
-  private static getLinesForOtherChanges(changes, countOfDuplicates, type, action) {
+  private getLinesForOtherChanges(changes, countOfDuplicates, type, action) {
     let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changes, countOfDuplicates);
-    let line = CommitOverview.renderOverviewLine(type, action, changedEntities);
+    let line = this.renderOverviewLine(type, action, changedEntities);
     return [line];
   }
 
-  private static renderOverviewLine(type: string, action: string, entities: string[]|React.DOMElement<any>[], suffix: any = null) {
+  private renderOverviewLine(type: string, action: string, entities: any[], suffix: any = null) {
     let capitalizedVerb = StringUtils.capitalize(StringUtils.verbToPastTense(action));
+
+    if (entities.length < 5) {
+      return DOM.span(null,
+        capitalizedVerb,
+        ' ',
+        DOM.span({className: 'type'}, type),
+        ' ',
+        ArrayUtils.interspace(entities, ', '),
+        suffix
+      );
+    }
+
+    let listKey = `${type}|||${action}|||${suffix}`;
+    let entityList;
+    if (this.state.expandedLists.indexOf(listKey) > -1) {
+      entityList = DOM.ul(null,
+        entities.map(entity => DOM.li(null, entity)),
+        DOM.li(null, DOM.a({onClick: () => this.expandList(listKey)}, 'show less...'))
+      );
+    } else {
+      entityList = DOM.ul(null,
+        entities.slice(0, 5).map(entity => DOM.li(null, entity)),
+        DOM.li(null, DOM.a({onClick: () => this.collapseList(listKey)}, 'show more...'))
+      );
+    }
 
     return DOM.span(null,
       capitalizedVerb,
       ' ',
       DOM.span({className: 'type'}, type),
       ' ',
-      ArrayUtils.interspace(entities, ', '),
-      suffix
+      suffix,
+      entityList
     );
+  }
+
+  private expandList(listKey) {
+    let expandedLists = this.state.expandedLists;
+    let index = expandedLists.indexOf(listKey);
+    let newExpandedLists = expandedLists.slice(0, index).concat(expandedLists.slice(index + 1));
+    this.setState({expandedLists: newExpandedLists});
+  }
+
+  private collapseList(listKey) {
+    let expandedLists = this.state.expandedLists;
+    let newExpandedLists = expandedLists.concat([listKey]);
+    this.setState({expandedLists: newExpandedLists});
   }
 
   private static getUserFriendlyName(change: Change) {
@@ -124,11 +171,15 @@ class CommitOverview extends React.Component<CommitOverviewProps, {}> {
       return change.tags['VP-Post-Title'];
     }
 
+    if (change.type === 'term') {
+      return change.tags['VP-Term-Name'];
+    }
+
     return change.name;
   }
 
   render() {
-    return DOM.ul({className: 'overview-list'}, CommitOverview.formatChanges(this.props.commit.changes).map(line => DOM.li(null, line)));
+    return DOM.ul({className: 'overview-list'}, this.formatChanges(this.props.commit.changes).map(line => DOM.li(null, line)));
   }
 }
 
