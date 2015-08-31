@@ -13,7 +13,7 @@ interface CommitOverviewProps {
 
 class CommitOverview extends React.Component<CommitOverviewProps, {}> {
 
-  static formatChanges(changes: Change[]) {
+  private static formatChanges(changes: Change[]) {
     let displayedLines = [];
     let changesByTypeAndAction = ArrayUtils.groupBy(
       ArrayUtils.filterDuplicates(changes, change => change.type + '|||' + change.action + '|||' + change.name),
@@ -24,21 +24,24 @@ class CommitOverview extends React.Component<CommitOverviewProps, {}> {
 
     for (let type in changesByTypeAndAction) {
       for (let action in changesByTypeAndAction[type]) {
+        let lines: any[];
+
         if (type === 'usermeta') {
-          let lines = CommitOverview.getLinesForUsermeta(changesByTypeAndAction[type][action], countOfDuplicates, action);
-          lines.forEach(line => displayedLines.push(line));
+          lines = CommitOverview.getLinesForUsermeta(changesByTypeAndAction[type][action], countOfDuplicates, action);
+        } else if (type === 'postmeta') {
+          lines = CommitOverview.getLinesForPostmeta(changesByTypeAndAction[type][action], countOfDuplicates, action);
         } else {
-          let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changesByTypeAndAction[type][action], countOfDuplicates);
-          let line = CommitOverview.renderOverviewLine(type, action, changedEntities);
-          displayedLines.push(line);
+          lines = CommitOverview.getLinesForOtherChanges(changesByTypeAndAction[type][action], countOfDuplicates, type, action);
         }
+
+        displayedLines = displayedLines.concat(lines);
       }
     }
 
     return displayedLines;
   }
 
-  static renderEntityNamesWithDuplicates(changes: Change[], countOfDuplicates): React.DOMElement<React.HTMLAttributes>[] {
+  private static renderEntityNamesWithDuplicates(changes: Change[], countOfDuplicates): React.DOMElement<React.HTMLAttributes>[] {
     return changes.map((change: Change) => {
       let duplicatesOfChange = countOfDuplicates[change.type][change.action][change.name];
       let duplicatesSuffix = duplicatesOfChange > 1 ? (' (' + duplicatesOfChange + '×)') : '';
@@ -49,22 +52,36 @@ class CommitOverview extends React.Component<CommitOverviewProps, {}> {
     });
   }
 
-  static getLinesForUsermeta(changedMeta: Change[], countOfDuplicates, action: string) {
+  private static getLinesForUsermeta(changedMeta: Change[], countOfDuplicates, action: string) {
+    return CommitOverview.getLinesForMeta('usermeta', 'user', 'VP-User-Login', changedMeta, countOfDuplicates, action);
+  }
+
+  private static getLinesForPostmeta(changedMeta: Change[], countOfDuplicates, action: string) {
+    return CommitOverview.getLinesForMeta('postmeta', 'post', 'VP-Post-Id', changedMeta, countOfDuplicates, action);
+  }
+
+  private static getLinesForMeta(entityName, parentEntity, groupByTag, changedMeta: Change[], countOfDuplicates, action: string) {
     let lines = [];
-    let metaByUser = ArrayUtils.groupBy(changedMeta, c => c.tags['VP-User-Login']);
+    let metaByTag = ArrayUtils.groupBy(changedMeta, c => c.tags[groupByTag]);
 
-    for (let user in metaByUser) {
-      let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(metaByUser[user], countOfDuplicates);
+    for (let tagValue in metaByTag) {
+      let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(metaByTag[tagValue], countOfDuplicates);
 
-      let lineSuffix = [' for ', DOM.span({className: 'type'}, 'user'), ' ', user];
-      let line = CommitOverview.renderOverviewLine('usermeta', action, changedEntities, lineSuffix);
+      let lineSuffix = [' for ', DOM.span({className: 'type'}, parentEntity), ' ', tagValue];
+      let line = CommitOverview.renderOverviewLine(entityName, action, changedEntities, lineSuffix);
       lines.push(line);
     }
 
     return lines;
   }
 
-  static renderOverviewLine(type: string, action: string, entities: string[]|React.DOMElement<any>[], suffix: any = null) {
+  private static getLinesForOtherChanges(changes, countOfDuplicates, type, action) {
+    let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changes, countOfDuplicates);
+    let line = CommitOverview.renderOverviewLine(type, action, changedEntities);
+    return [line];
+  }
+
+  private static renderOverviewLine(type: string, action: string, entities: string[]|React.DOMElement<any>[], suffix: any = null) {
     let capitalizedVerb = StringUtils.capitalize(StringUtils.verbToPastTense(action));
 
     return DOM.span(null,
@@ -77,13 +94,17 @@ class CommitOverview extends React.Component<CommitOverviewProps, {}> {
     );
   }
 
-  static getUserFriendlyName(change: Change) {
+  private static getUserFriendlyName(change: Change) {
     if (change.type === 'user') {
       return change.tags['VP-User-Login'];
     }
 
     if (change.type === 'usermeta') {
       return change.tags['VP-UserMeta-Key'];
+    }
+
+    if (change.type === 'postmeta') {
+      return change.tags['VP-PostMeta-Key'];
     }
 
     if (change.type === 'post') {

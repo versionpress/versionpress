@@ -1,4 +1,12 @@
 export function verbToPastTense(verb: string) {
+  if (verb.match(/.*[aeiouy]y$/)) {
+    return verb + 'ed';
+  }
+
+  if (verb.slice(-1) === 'y') {
+    return verb.substr(0, verb.length - 1) + 'ied';
+  }
+
   return verb + (verb.slice(-1) === 'e' ? 'd' : 'ed');
 }
 
