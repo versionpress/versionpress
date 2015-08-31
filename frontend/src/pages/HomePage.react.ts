@@ -37,6 +37,7 @@ interface HomePageState {
   loading?: boolean;
   displayServicePanel?: boolean;
   displayWelcomePanel?: boolean;
+  displayUpdateNotice?: boolean;
 }
 
 class HomePage extends React.Component<HomePageProps, HomePageState> {
@@ -49,11 +50,15 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       message: null,
       loading: true,
       displayServicePanel: false,
-      displayWelcomePanel: false
+      displayWelcomePanel: false,
+      displayUpdateNotice: false
     };
 
     this.onUndo = this.onUndo.bind(this);
     this.onRollback = this.onRollback.bind(this);
+    this.checkUpdate = this.checkUpdate.bind(this);
+
+    setInterval(this.checkUpdate, 10000);
   }
 
   componentDidMount() {
@@ -85,14 +90,16 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
           this.setState({
             commits: [],
             message: res.body[0],
-            loading: false
+            loading: false,
+            displayUpdateNotice: false
           });
         } else {
           this.setState({
             pages: res.body.pages.map(c => c + 1),
             commits: <Commit[]>res.body.commits,
             message: null,
-            loading: false
+            loading: false,
+            displayUpdateNotice: false
           });
         }
       });
@@ -112,6 +119,21 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
           });
         }
       });
+  }
+
+  checkUpdate() {
+    if (! this.props.params.page) { // First page
+      WpApi
+        .get('should-update')
+        .query({latestCommit: this.state.commits[0].hash})
+        .end((err:any, res:request.Response) => {
+          if (res.body === true) {
+            this.setState({displayUpdateNotice: true});
+          } else {
+            this.setState({displayUpdateNotice: false});
+          }
+        })
+    }
   }
 
   undoCommit(hash: string) {
@@ -235,6 +257,11 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       this.state.displayWelcomePanel
         ? React.createElement(WelcomePanel, <WelcomePanel.Props>{ onHide: this.onWelcomePanelHide.bind(this) })
         : null,
+      this.state.displayUpdateNotice
+        ? DOM.div({className: 'updateNotice'},
+          DOM.span(null, 'There are newer changes available.'),
+          DOM.a({ href: '#', onClick: (e) => { e.preventDefault(); this.fetchCommits(); } }, 'Refresh now.')
+        ) : null,
       React.createElement(CommitsTable, <CommitsTable.Props>{
         currentPage: parseInt(this.props.params.page, 10) || 1,
         pages: this.state.pages,

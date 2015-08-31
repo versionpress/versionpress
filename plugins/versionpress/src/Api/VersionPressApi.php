@@ -89,6 +89,12 @@ class VersionPressApi {
             'callback' => array($this, 'hideWelcomePanel'),
             'permission_callback' => array($this, 'checkPermissions')
         ));
+
+        register_vp_rest_route($namespace, '/should-update', array(
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => array($this, 'shouldUpdate'),
+            'permission_callback' => array($this, 'checkPermissions')
+        ));
     }
 
     /**
@@ -230,6 +236,16 @@ class VersionPressApi {
     public function hideWelcomePanel() {
         update_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, "0");
         return new WP_REST_Response(null, 204);
+    }
+
+    public function shouldUpdate(WP_REST_Request $request) {
+        global $versionPressContainer;
+        /** @var GitRepository $repository */
+        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+
+        $latestCommit = $request['latestCommit'];
+
+        return new WP_REST_Response($repository->wasCreatedAfter("HEAD", $latestCommit));
     }
 
     /**
