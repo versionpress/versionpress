@@ -22,6 +22,16 @@ interface CommitsTableProps {
 
 class CommitsTable extends React.Component<CommitsTableProps, any>  {
 
+  private refreshInterval;
+
+  componentDidMount(): void {
+    this.refreshInterval = setInterval(() => this.forceUpdate(), 60 * 1000);
+  }
+
+  componentWillUnmount(): void {
+    clearInterval(this.refreshInterval);
+  }
+
   render() {
     const firstCommit = this.props.commits[0];
     const displayTopNote = firstCommit && !firstCommit.canUndo && !firstCommit.isInitial;
