@@ -42,6 +42,10 @@ class RevertChangeInfo extends TrackedChangeInfo {
         return $this->action;
     }
 
+    public function getCommitHash() {
+        return $this->commitHash;
+    }
+
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $tags = $commitMessage->getVersionPressTags();
         list(, $action, $commitHash) = explode("/", $tags[TrackedChangeInfo::ACTION_TAG], 3);

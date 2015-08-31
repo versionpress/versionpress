@@ -29,6 +29,19 @@ use VersionPress\Utils\BugReporter;
 
 class VersionPressApi {
 
+    /** @var GitRepository */
+    private $gitRepository;
+    /** @var Reverter */
+    private $reverter;
+    /** @var VersionPressConfig */
+    private $vpConfig;
+
+    public function __construct(GitRepository $gitRepository, Reverter $reverter, VersionPressConfig $vpConfig) {
+        $this->gitRepository = $gitRepository;
+        $this->reverter = $reverter;
+        $this->vpConfig = $vpConfig;
+    }
+
     /**
      * Register the VersionPress related routes
      */
@@ -123,10 +136,7 @@ class VersionPressApi {
      * @return WP_REST_Response|\WP_Error
      */
     public function getCommits(WP_REST_Request $request) {
-        global $versionPressContainer;
-        /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
-        $gitLogPaginator = new GitLogPaginator($repository);
+        $gitLogPaginator = new GitLogPaginator($this->gitRepository);
         $gitLogPaginator->setCommitsPerPage(25);
 
         $page = intval($request['page']);
@@ -138,12 +148,12 @@ class VersionPressApi {
 
         $preActivationHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
         if (empty($preActivationHash)) {
-            $initialCommitHash = $repository->getInitialCommit()->getHash();
+            $initialCommitHash = $this->gitRepository->getInitialCommit()->getHash();
         } else {
-            $initialCommitHash = $repository->getChildCommit($preActivationHash);
+            $initialCommitHash = $this->gitRepository->getChildCommit($preActivationHash);
         }
 
-        $canUndoCommit = $repository->wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
+        $canUndoCommit = $this->gitRepository->wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
         $isFirstCommit = $page === 0;
 
         $result = array();
@@ -195,13 +205,7 @@ class VersionPressApi {
      * @return WP_REST_Response|\WP_Error
      */
     public function canRevert() {
-        global $versionPressContainer;
-        /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
-        /** @var Reverter $reverter */
-        $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
-
-        return new WP_REST_Response($reverter->canRevert());
+        return new WP_REST_Response($this->reverter->canRevert());
     }
 
     /**
@@ -210,14 +214,8 @@ class VersionPressApi {
      * @return WP_REST_Response|\WP_Error
      */
     public function revertCommit($reverterMethod, $commit) {
-        global $versionPressContainer;
-        /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
-        /** @var Reverter $reverter */
-        $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
-
         vp_enable_maintenance();
-        $revertStatus = call_user_func(array($reverter, $reverterMethod), $commit);
+        $revertStatus = call_user_func(array($this->reverter, $reverterMethod), $commit);
         vp_disable_maintenance();
 
         if ($revertStatus !== RevertStatus::OK) {
@@ -227,11 +225,8 @@ class VersionPressApi {
     }
 
     public function getDiff(WP_REST_Request $request) {
-        global $versionPressContainer;
-        /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
         $hash = $request['commit'];
-        $diff = $repository->getDiff($hash);
+        $diff = $this->gitRepository->getDiff($hash);
 
         if (strlen($diff) > 50 * 1024) { // 50 kB is maximum size for diff (see WP-49)
             return new \WP_Error(
@@ -305,7 +300,7 @@ class VersionPressApi {
             RevertStatus::NOTHING_TO_COMMIT => array(
                 'class' => 'updated',
                 'message' => 'There was nothing to commit. Current state is the same as the one you want rollback to.',
-                'status' => 200
+                'status' => 403
             ),
             RevertStatus::VIOLATED_REFERENTIAL_INTEGRITY => array(
                 'class' => 'error',
@@ -327,11 +322,7 @@ class VersionPressApi {
      * @return \WP_Error|bool
      */
     public function checkPermissions(WP_REST_Request $request) {
-        global $versionPressContainer;
-        /** @var VersionPressConfig $vpConfig */
-        $vpConfig = $versionPressContainer->resolve(VersionPressServices::VP_CONFIGURATION);
-
-        return !$vpConfig->mergedConfig['requireApiAuth'] || current_user_can('manage_options');
+        return !$this->vpConfig->mergedConfig['requireApiAuth'] || current_user_can('manage_options');
     }
 
     private function convertChangeInfoList($getChangeInfoList) {
@@ -365,6 +356,14 @@ class VersionPressApi {
 
         if ($changeInfo instanceof WordPressUpdateChangeInfo) {
             $change['name'] = $changeInfo->getNewVersion();
+        }
+
+        if ($changeInfo instanceof RevertChangeInfo) {
+            $commit = $this->gitRepository->getCommit($changeInfo->getCommitHash());
+            $change['tags']['VP-Commit-Details'] = array(
+                'message' => $commit->getMessage()->getSubject(),
+                'date' => $commit->getDate()->format(\DateTime::ISO8601)
+            );
         }
 
         return $change;

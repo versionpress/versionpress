@@ -30,6 +30,8 @@ class CommitOverview extends React.Component<CommitOverviewProps, {}> {
           lines = CommitOverview.getLinesForUsermeta(changesByTypeAndAction[type][action], countOfDuplicates, action);
         } else if (type === 'postmeta') {
           lines = CommitOverview.getLinesForPostmeta(changesByTypeAndAction[type][action], countOfDuplicates, action);
+        } else if (type === 'versionpress' && (action === 'undo' || action === 'rollback')) {
+          lines = CommitOverview.getLinesForRevert(changesByTypeAndAction[type][action], action);
         } else {
           lines = CommitOverview.getLinesForOtherChanges(changesByTypeAndAction[type][action], countOfDuplicates, type, action);
         }
@@ -73,6 +75,17 @@ class CommitOverview extends React.Component<CommitOverviewProps, {}> {
     }
 
     return lines;
+  }
+
+  private static getLinesForRevert(changes: Change[], action) {
+    let change = changes[0]; // Both undo and rollback are always only 1 change.
+    let commitDetails = change.tags['VP-Commit-Details'];
+    if (action === 'undo') {
+      let date = commitDetails['date'];
+      return [`Reverted change was made ${moment(date).fromNow()} (${moment(date).format('LLL')})`];
+    } else {
+      return [`The state is same as it was in "${commitDetails['message']}"`];
+    }
   }
 
   private static getLinesForOtherChanges(changes, countOfDuplicates, type, action) {
