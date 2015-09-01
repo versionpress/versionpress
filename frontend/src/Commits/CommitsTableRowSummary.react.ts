@@ -16,10 +16,6 @@ interface CommitsTableRowSummaryProps {
 
 class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps, {}> {
 
-  constructor() {
-    super();
-  }
-
   render() {
     if (this.props.commit === null) {
       return null;
