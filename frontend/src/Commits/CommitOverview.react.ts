@@ -38,7 +38,7 @@ class CommitOverview extends React.Component<CommitOverviewProps, {}> {
     return displayedLines;
   }
 
-  static renderEntityNamesWithDuplicates(changes: Change[], countOfDuplicates) {
+  static renderEntityNamesWithDuplicates(changes: Change[], countOfDuplicates): React.DOMElement<React.HTMLAttributes>[] {
     return changes.map((change: Change) => {
       let duplicatesOfChange = countOfDuplicates[change.type][change.action][change.name];
       let duplicatesSuffix = duplicatesOfChange > 1 ? (' (' + duplicatesOfChange + '×)') : '';
