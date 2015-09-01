@@ -173,11 +173,12 @@ function vp_register_hooks() {
         $postInstallHook = function ($_, $hook_extra) use ($committer, &$postInstallHook) {
             if (!isset($hook_extra['language_update_type'])) return;
             $type = $hook_extra['language_update_type'];
-            $language = $hook_extra['language_update']->native_name;
+            $languageCode = $hook_extra['language_update']->language;
+            $languageName = $hook_extra['language_update']->native_name;
 
             $name = $type === "core" ? null : $hook_extra['language_update']->slug;
 
-            $committer->forceChangeInfo(new TranslationChangeInfo("update", $language, $type, $name));
+            $committer->forceChangeInfo(new TranslationChangeInfo("update", $languageCode, $languageName, $type, $name));
             remove_filter('upgrader_post_install', $postInstallHook);
         };
 
@@ -246,16 +247,16 @@ function vp_register_hooks() {
         $committer->postponeCommit('permalinks');
     });
 
-    add_action('update_option', function ($option, $old_value, $value) use ($committer) {
+    add_action('update_option', function ($option, $_, $value) use ($committer) {
        if ($option === 'rewrite_rules') {
            $committer->usePostponedChangeInfos('permalinks');
        } else if ($option === 'WPLANG') {
            $translations = wp_get_available_translations();
-           $language = isset($translations[$value])
+           $languageName = isset($translations[$value])
                ? $translations[$value]['native_name']
                : 'English (United States)';
 
-           $committer->forceChangeInfo(new TranslationChangeInfo("switch", $language));
+           $committer->forceChangeInfo(new TranslationChangeInfo("switch", $value, $languageName));
        }
     }, 10, 3);
 

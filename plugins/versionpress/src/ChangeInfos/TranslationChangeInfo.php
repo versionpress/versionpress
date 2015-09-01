@@ -11,7 +11,8 @@ use VersionPress\Utils\StringUtils;
  * VP tags:
  *
  *     VP-Action: translation/(switch|update)
- *     VP-Language: English (United States)
+ *     VP-Language-Code: en_US
+ *     VP-Language-Name: English (United States)
  *     VP-Translation-Type: (core|theme|plugin)
  *     VP-Translation-Name: akismet
  *
@@ -19,7 +20,8 @@ use VersionPress\Utils\StringUtils;
 class TranslationChangeInfo extends TrackedChangeInfo {
 
     private static $OBJECT_TYPE = "translation";
-    const LANGUAGE_TAG = "VP-Language";
+    const LANGUAGE_CODE_TAG = "VP-Language-Code";
+    const LANGUAGE_NAME_TAG = "VP-Language-Name";
     const TRANSLATION_TYPE_TAG = "VP-Translation-Type";
     const TRANSLATION_NAME_TAG = "VP-Translation-Name";
 
@@ -27,7 +29,10 @@ class TranslationChangeInfo extends TrackedChangeInfo {
     private $action;
 
     /** @var string */
-    private $language;
+    private $languageCode;
+
+    /** @var string */
+    private $languageName;
 
     /** @var string */
     private $type;
@@ -37,13 +42,15 @@ class TranslationChangeInfo extends TrackedChangeInfo {
 
     /**
      * @param string $action See VP-Action tag documentation in the class docs
-     * @param string $language Translation language
+     * @param string $languageCode Code of the translation language
+     * @param string $languageName The translation language
      * @param string $type See VP-Translation-Type tag documentation in the class docs
      * @param string $name Additional name information for types plugin, theme
      */
-    public function __construct($action, $language, $type = 'core', $name = null) {
+    public function __construct($action, $languageCode, $languageName,  $type = 'core', $name = null) {
         $this->action = $action;
-        $this->language = $language;
+        $this->languageCode = $languageCode ? $languageCode : 'en_US';
+        $this->languageName = $languageName;
         $this->type = $type;
         $this->name = $name;
     }
@@ -56,26 +63,26 @@ class TranslationChangeInfo extends TrackedChangeInfo {
         return $this->action;
     }
 
-    public function getLanguage() {
-        return $this->language;
+    public function getLanguageCode() {
+        return $this->languageCode;
     }
 
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
         $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
-        $language = $commitMessage->getVersionPressTag(self::LANGUAGE_TAG);
+        $languageCode = $commitMessage->getVersionPressTag(self::LANGUAGE_CODE_TAG);
+        $languageName = $commitMessage->getVersionPressTag(self::LANGUAGE_NAME_TAG);
         $type = $commitMessage->getVersionPressTag(self::TRANSLATION_TYPE_TAG);
         $name = $commitMessage->getVersionPressTag(self::TRANSLATION_NAME_TAG);
         list(, $action) = explode("/", $actionTag, 2);
-        return new self($action, $language, $type, $name);
+        return new self($action, $languageCode, $languageName, $type, $name);
     }
 
     public function getChangeDescription() {
-
         if ($this->action === 'switch') {
-            return "Language switched to '{$this->language}'";
+            return "Language switched to '{$this->languageName}'";
         }
 
-        return Strings::capitalize(StringUtils::verbToPastTense($this->action)) . " translation '{$this->language}'";
+        return Strings::capitalize(StringUtils::verbToPastTense($this->action)) . " translation '{$this->languageName}'";
     }
 
     protected function getActionTagValue() {
@@ -84,7 +91,8 @@ class TranslationChangeInfo extends TrackedChangeInfo {
 
     public function getCustomTags() {
         return array(
-            self::LANGUAGE_TAG => $this->language,
+            self::LANGUAGE_CODE_TAG => $this->languageCode,
+            self::LANGUAGE_NAME_TAG => $this->languageName,
             self::TRANSLATION_TYPE_TAG => $this->type,
             self::TRANSLATION_NAME_TAG => $this->name
         );
