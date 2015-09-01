@@ -22,7 +22,7 @@ class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps
 
   render() {
     if (this.props.commit === null) {
-      return DOM.tr(null);
+      return null;
     }
     const commit = this.props.commit;
     const className = (commit.isEnabled ? '' : 'disabled') + (this.props.detailsLevel !== 'none' ? ' displayed-details' : '');
