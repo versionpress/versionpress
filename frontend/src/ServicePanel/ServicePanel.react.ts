@@ -11,7 +11,7 @@ interface ServicePanelProps {
   onSubmit: (values: Object) => boolean;
 }
 
-class ServicePanel extends React.Component<ServicePanelProps, any> {
+class ServicePanel extends React.Component<ServicePanelProps, {}> {
 
   onSubmit(e: React.SyntheticEvent) {
     e.preventDefault();

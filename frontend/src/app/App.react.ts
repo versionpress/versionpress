@@ -5,7 +5,7 @@ import ReactRouter = require('react-router');
 
 require('./App.less');
 
-class App extends React.Component<any, any> {
+class App extends React.Component<{}, {}> {
 
   static contextTypes = {
     router: React.PropTypes.func.isRequired

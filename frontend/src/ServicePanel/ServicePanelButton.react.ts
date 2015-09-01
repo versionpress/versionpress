@@ -10,7 +10,7 @@ interface ServicePanelButtonProps {
   onClick: React.MouseEventHandler;
 }
 
-class ServicePanelButton extends React.Component<ServicePanelButtonProps, any> {
+class ServicePanelButton extends React.Component<ServicePanelButtonProps, {}> {
 
   render() {
     return DOM.button({

@@ -11,7 +11,7 @@ interface ProgressBarState {
   progress?: number;
 }
 
-class ProgressBar extends React.Component<any, ProgressBarState> {
+class ProgressBar extends React.Component<{}, ProgressBarState> {
 
   constructor() {
     super();

@@ -10,7 +10,7 @@ interface WelcomePanelProps {
   onHide: React.MouseEventHandler;
 }
 
-class WelcomePanel extends React.Component<WelcomePanelProps, any> {
+class WelcomePanel extends React.Component<WelcomePanelProps, {}> {
 
   render() {
     return DOM.div({className: 'WelcomePanel welcome-panel'},

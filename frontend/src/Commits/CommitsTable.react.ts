@@ -21,7 +21,7 @@ interface CommitsTableProps {
   diffProvider: {getDiff: (hash: string) => Promise<string>};
 }
 
-class CommitsTable extends React.Component<CommitsTableProps, any>  {
+class CommitsTable extends React.Component<CommitsTableProps, {}>  {
 
   render() {
     const firstCommit = this.props.commits[0];

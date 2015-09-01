@@ -11,7 +11,7 @@ interface FlashMessageProps {
   message: string;
 }
 
-class FlashMessage extends React.Component<FlashMessageProps, any> {
+class FlashMessage extends React.Component<FlashMessageProps, {}> {
 
   render() {
     if (this.props.code === null) {
