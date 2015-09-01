@@ -53,8 +53,7 @@ class CommitsTableRowDetails extends React.Component<CommitsTableRowDetailsProps
 }
 
 module CommitsTableRowDetails {
-  export interface Props extends CommitsTableRowDetailsProps {
-  }
+  export interface Props extends CommitsTableRowDetailsProps {}
 }
 
 export = CommitsTableRowDetails;

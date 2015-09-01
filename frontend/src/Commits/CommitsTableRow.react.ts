@@ -59,7 +59,7 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTable
             diff: diff,
             error: null
           })
-      ).catch(err => {
+        ).catch(err => {
           this.setState({detailsLevel: detailsLevel, error: err.message});
         });
     } else {
@@ -69,8 +69,7 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTable
 }
 
 module CommitsTableRow {
-  export interface Props extends CommitsTableRowProps {
-  }
+  export interface Props extends CommitsTableRowProps {}
 }
 
 export = CommitsTableRow;

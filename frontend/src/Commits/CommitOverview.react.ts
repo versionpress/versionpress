@@ -99,8 +99,7 @@ class CommitOverview extends React.Component<CommitOverviewProps, {}> {
 }
 
 module CommitOverview {
-  export interface Props extends CommitOverviewProps {
-  }
+  export interface Props extends CommitOverviewProps {}
 }
 
 export = CommitOverview;

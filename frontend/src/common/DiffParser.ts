@@ -1,4 +1,7 @@
+/// <reference path='Diff.d.ts' />
+
 class DiffParser {
+
   public static parse(rawDiff: string): Diff[] {
     let lines = rawDiff.split(/\r\n|\r|\n/);
     let diffs: Diff[] = [];

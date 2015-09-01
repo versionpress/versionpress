@@ -173,8 +173,7 @@ class DiffPanel extends React.Component<DiffPanelProps, any> {
 }
 
 module DiffPanel {
-  export interface Props extends DiffPanelProps {
-  }
+  export interface Props extends DiffPanelProps {}
 }
 
 export = DiffPanel;

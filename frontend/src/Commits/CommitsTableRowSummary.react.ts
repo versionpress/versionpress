@@ -82,8 +82,7 @@ class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps
 }
 
 module CommitsTableRowSummary {
-  export interface Props extends CommitsTableRowSummaryProps {
-  }
+  export interface Props extends CommitsTableRowSummaryProps {}
 }
 
 export = CommitsTableRowSummary;
