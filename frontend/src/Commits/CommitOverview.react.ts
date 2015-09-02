@@ -125,9 +125,10 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
         DOM.li(null, DOM.a({onClick: () => this.expandList(listKey)}, 'show less...'))
       );
     } else {
+      let displayedListLength = 3;
       entityList = DOM.ul(null,
-        entities.slice(0, 5).map(entity => DOM.li(null, entity)),
-        DOM.li(null, DOM.a({onClick: () => this.collapseList(listKey)}, 'show more...'))
+        entities.slice(0, displayedListLength).map(entity => DOM.li(null, entity)),
+        DOM.li(null, DOM.a({onClick: () => this.collapseList(listKey)}, 'show ', entities.length - displayedListLength, ' more...'))
       );
     }
 
