@@ -21,14 +21,16 @@ describe('CommitsTable', () => {
       canUndo: true,
       canRollback: true,
       isEnabled: true,
-      isInitial: false
+      isInitial: false,
+      changes: []
     };
     props = {
       currentPage: 1,
       pages: [1, 2, 3, 4, 5],
       commits: [commit, commit],
       onUndo: onUndo,
-      onRollback: onRollback
+      onRollback: onRollback,
+      diffProvider: {getDiff: (hash) => new Promise<string>(() => '')}
     };
     done();
   });
@@ -41,7 +43,12 @@ describe('CommitsTable', () => {
 
   it('should render the commits', () => {
     const component = utils.render(React.createElement(CommitsTable, props));
-    expect(utils.getChildrenByType(component, CommitsTableRow, 2).length).to.equal(props.commits.length);
+
+    function getChildrenByType(component, type, depth) {
+      return utils.getChildren(component, depth).filter(c => c.type === type);
+    }
+
+    expect(getChildrenByType(component, CommitsTableRow, 2).length).to.equal(props.commits.length);
   });
 
   it('should render the pagination correctly', () => {

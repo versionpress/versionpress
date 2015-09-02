@@ -18,9 +18,10 @@ interface CommitsTableProps {
   commits: Commit[];
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
+  diffProvider: {getDiff: (hash: string) => Promise<string>};
 }
 
-class CommitsTable extends React.Component<CommitsTableProps, any>  {
+class CommitsTable extends React.Component<CommitsTableProps, {}>  {
 
   render() {
     const firstCommit = this.props.commits[0];
@@ -34,27 +35,27 @@ class CommitsTable extends React.Component<CommitsTableProps, any>  {
           DOM.th({className: 'column-actions'})
         )
       ),
-      DOM.tbody(null,
-        displayTopNote
-          ? this.renderNote()
-          : null
-        ,
-        this.props.commits.map((commit: Commit, index: number) => {
-          const row = React.createElement(CommitsTableRow, <CommitsTableRow.Props> {
-            key: commit.hash,
-            commit: commit,
-            onUndo: this.props.onUndo,
-            onRollback: this.props.onRollback
-          });
-          if (commit.isInitial && index < this.props.commits.length - 1) {
-            return [
-              row,
-              this.renderNote()
-            ];
-          }
-          return row;
-        })
-      ),
+      displayTopNote
+        ? this.renderNote()
+        : null
+      ,
+      this.props.commits.map((commit: Commit, index: number) => {
+        const row = React.createElement(CommitsTableRow, <CommitsTableRow.Props> {
+          key: commit.hash,
+          commit: commit,
+          onUndo: this.props.onUndo,
+          onRollback: this.props.onRollback,
+          diffProvider: this.props.diffProvider
+        });
+
+        if (commit.isInitial && index < this.props.commits.length - 1) {
+          return [
+            row,
+            this.renderNote()
+          ];
+        }
+        return row;
+      }),
       DOM.tfoot(null,
         DOM.tr(null,
           DOM.td({className: 'vp-table-pagination', colSpan: 3},

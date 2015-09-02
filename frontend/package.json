@@ -22,6 +22,7 @@
     "autoprefixer-loader": "^2.0.0",
     "core-js": "^1.1.1",
     "css-loader": "^0.16.0",
+    "diff": "^2.0.2",
     "extract-text-webpack-plugin": "^0.8.2",
     "file-loader": "^0.8.4",
     "gulp-util": "^3.0.6",

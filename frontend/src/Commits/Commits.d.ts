@@ -6,4 +6,12 @@ interface Commit {
   canRollback: boolean;
   isEnabled: boolean;
   isInitial: boolean;
+  changes: Change[];
+}
+
+interface Change {
+  type: string;
+  action: string;
+  name: string;
+  tags: any;
 }

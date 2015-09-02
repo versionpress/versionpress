@@ -22,7 +22,7 @@
       word-wrap: break-word;
     }
     
-    tr.alternate {
+    tbody tr {
       background-color: #f9f9f9;
     }
 
@@ -62,6 +62,18 @@
     border-bottom: 1px solid #ccc;
   }
 
+  tbody td {
+    cursor: pointer;
+  }
+
+  .detail-buttons {
+    float: right;
+  }
+
+  .displayed-details td {
+    border-bottom: 0;
+  }
+
   .column-date {
     width: 135px;
   }
@@ -83,6 +95,7 @@
   tr {
     &.disabled {
       opacity: 0.5;
+      cursor: default;
     }
 
     &.note {
@@ -104,6 +117,137 @@
 
     a + a {
       .separator;
+    }
+  }
+
+  .details {
+    table {
+      border-spacing: 0;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    tr:first-of-type td {
+      border-top: 1px solid #ccc;
+    }
+  }
+
+  .details-row {
+    &.error {
+      text-align: center;
+      background-color: #eee;
+    }
+
+    & td {
+      border-top: 0;
+    }
+
+    .overview-list {
+      list-style: none;
+      padding-left: 20px;
+      margin: 0;
+
+      .type {
+        font-weight: bold;
+      }
+    }
+  }
+
+  .diff {
+
+    @borderColor: #eee;
+
+    margin-bottom: 40px;
+
+    .heading {
+      background: @borderColor;
+      margin: 0;
+      border: 1px solid @borderColor;
+      border-bottom: 0;
+      padding: 10px;
+    }
+
+    .binary-file-info {
+      font-style: italic;
+      background: #fff;
+      border: 1px solid @borderColor;
+      padding: 10px;
+    }
+
+    .line {
+      background: white;
+
+      &:first-of-type {
+        .line-left, .line-right, .line-separator {
+          border-top: 1px solid @borderColor;
+        }
+      }
+
+      &-left, &-right, &-separator {
+        border-bottom: 1px solid @borderColor;
+      }
+
+      &-left, &-right {
+        border-left: 1px solid @borderColor;
+        border-right: 1px solid @borderColor;
+        height: 16pt;
+        font-family: monospace;
+        background: #fff;
+        width: 49%;
+        padding: 0 0 0 15px;
+
+        &.added {
+          background: #eaffea;
+        }
+
+        &.removed {
+          background: #feecec;
+        }
+
+        &.empty {
+          background: #f9f9f9;
+        }
+      }
+
+      &-separator {
+        width: 2%;
+        background: @borderColor;
+      }
+
+    }
+
+    .chunk {
+      border-spacing: 0;
+      table-layout: fixed;
+      width: 100%;
+      margin: 0;
+    }
+
+    .chunk-separator {
+      .chunk;
+
+      .line:first-of-type td {
+        border-top: 0;
+        overflow: visible;
+      }
+
+      .line:last-of-type td {
+        border-bottom: 0;
+      }
+
+      .hellip {
+        display: inline-block;
+        background: #f5f5f5;
+        border: 1px solid @borderColor;
+        color: #707070;
+        padding-left: 5px;
+        padding-right: 5px;
+        border-radius: 5px;
+        font-size: 80%;
+        position: relative;
+        top: 50%;
+        z-index: 1;
+      }
     }
   }
 }

@@ -8,7 +8,7 @@ interface CommitsTableNoteProps {
   message: string;
 }
 
-class CommitsTableNote extends React.Component<CommitsTableNoteProps, any>  {
+class CommitsTableNote extends React.Component<CommitsTableNoteProps, {}>  {
 
   render() {
     return DOM.tr({className: 'note'},

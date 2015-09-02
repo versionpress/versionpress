@@ -2,7 +2,8 @@
 /// <reference path='./Commits.d.ts' />
 
 import React = require('react');
-import moment = require('moment');
+import CommitsTableRowSummary = require('./CommitsTableRowSummary.react');
+import CommitsTableRowDetails = require('./CommitsTableRowDetails.react');
 
 const DOM = React.DOM;
 
@@ -10,46 +11,61 @@ interface CommitsTableRowProps {
   commit: Commit;
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
+  diffProvider: {getDiff: (hash: string) => Promise<string>};
 }
 
-class CommitsTableRow extends React.Component<CommitsTableRowProps, any>  {
+interface CommitsTableRowState {
+  detailsLevel?: string;
+  diff?: string;
+  error?: string;
+}
+
+class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTableRowState> {
+
+  constructor() {
+    super();
+    this.state = {detailsLevel: 'none'};
+  }
 
   render() {
-    if (this.props.commit === null) {
-      return DOM.tr(null);
-    }
-    const commit = this.props.commit;
-    const className = 'alternate ' + (commit.isEnabled ? '' : 'disabled');
-
-    return DOM.tr({className: className},
-      DOM.td({
-        className: 'column-date',
-        title: moment(commit.date).format('LLL')
-      }, moment(commit.date).fromNow()),
-      DOM.td({className: 'column-message'}, commit.message),
-      DOM.td({className: 'column-actions'},
-        commit.canUndo && commit.isEnabled
-          ? DOM.a({
-              className: 'vp-table-undo',
-              href: '#',
-              onClick: this.props.onUndo,
-              'data-hash': commit.hash,
-              'data-message': commit.message
-            }, 'Undo this')
-          : '',
-        commit.canRollback && commit.isEnabled
-          ? DOM.a({
-              className: 'vp-table-rollback',
-              href: '#',
-              onClick: this.props.onRollback,
-              'data-hash': commit.hash,
-              'data-date': commit.date
-            }, 'Roll back to this')
-          : ''
-      )
+    return DOM.tbody(null,
+      React.createElement(CommitsTableRowSummary, <CommitsTableRowSummary.Props>{
+        commit: this.props.commit,
+        onUndo: this.props.onUndo,
+        onRollback: this.props.onRollback,
+        onDetailsLevelChanged: detailsLevel => this.changeDetailsLevel(detailsLevel),
+        detailsLevel: this.state.detailsLevel
+      }),
+      this.state.error ? this.renderError() : React.createElement(CommitsTableRowDetails, <CommitsTableRowDetails.Props>{
+        commit: this.props.commit,
+        detailsLevel: this.state.detailsLevel,
+        diff: this.state.diff
+      })
     );
   }
 
+  renderError() {
+    return DOM.tr({className: 'details-row error'},
+      DOM.td({colSpan: 3}, this.state.error)
+    );
+  }
+
+  private changeDetailsLevel(detailsLevel: string) {
+    if (detailsLevel === 'full-diff' && !this.state.diff) {
+      this.props.diffProvider.getDiff(this.props.commit.hash)
+        .then(diff => this.setState(
+          {
+            detailsLevel: detailsLevel,
+            diff: diff,
+            error: null
+          })
+        ).catch(err => {
+          this.setState({detailsLevel: detailsLevel, error: err.message});
+        });
+    } else {
+      this.setState({detailsLevel: detailsLevel, error: null});
+    }
+  }
 }
 
 module CommitsTableRow {

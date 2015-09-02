@@ -14,6 +14,7 @@ import revertDialog = require('../Commits/revertDialog');
 import moment = require('moment');
 import config = require('../config');
 import WpApi = require('../services/WpApi');
+import Promise = require('core-js/es6/promise');
 
 require('./HomePage.less');
 
@@ -176,6 +177,21 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       });
   }
 
+  getDiff(hash: string) {
+    return new Promise(function(resolve, reject) {
+      WpApi
+        .get('diff')
+        .query({commit: hash})
+        .end((err, res: request.Response) => {
+          if (err) {
+            reject(res.body[0]);
+          } else {
+            resolve(res.body.diff);
+          }
+        });
+    });
+  }
+
   toggleServicePanel() {
     this.setState({
       displayServicePanel: !this.state.displayServicePanel
@@ -267,7 +283,8 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
         pages: this.state.pages,
         commits: this.state.commits,
         onUndo: this.onUndo,
-        onRollback: this.onRollback
+        onRollback: this.onRollback,
+        diffProvider: { getDiff: this.getDiff }
       })
     );
   }

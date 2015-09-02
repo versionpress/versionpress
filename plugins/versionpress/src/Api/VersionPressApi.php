@@ -4,18 +4,28 @@ namespace VersionPress\Api;
 
 require_once ABSPATH . 'wp-admin/includes/file.php';
 
+use Nette\Utils\Strings;
+use VersionPress\Api\BundledWpApi\WP_REST_Request;
+use VersionPress\Api\BundledWpApi\WP_REST_Response;
+use VersionPress\Api\BundledWpApi\WP_REST_Server;
+use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\ChangeInfoMatcher;
+use VersionPress\ChangeInfos\EntityChangeInfo;
+use VersionPress\ChangeInfos\PluginChangeInfo;
+use VersionPress\ChangeInfos\RevertChangeInfo;
+use VersionPress\ChangeInfos\ThemeChangeInfo;
+use VersionPress\ChangeInfos\TrackedChangeInfo;
+use VersionPress\ChangeInfos\VersionPressChangeInfo;
+use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
+use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\Commit;
 use VersionPress\Git\GitLogPaginator;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Utils\BugReporter;
-use VersionPress\Configuration\VersionPressConfig;
-use VersionPress\Api\BundledWpApi\WP_REST_Server;
-use VersionPress\Api\BundledWpApi\WP_REST_Request;
-use VersionPress\Api\BundledWpApi\WP_REST_Response;
 
 class VersionPressApi {
 
@@ -61,6 +71,17 @@ class VersionPressApi {
         register_vp_rest_route($namespace, '/can-revert', array(
             'methods' => WP_REST_Server::READABLE,
             'callback' => array($this, 'canRevert'),
+            'permission_callback' => array($this, 'checkPermissions')
+        ));
+
+        register_vp_rest_route($namespace, '/diff', array(
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => array($this, 'getDiff'),
+            'args' => array(
+                'commit' => array(
+                    'required' => true
+                )
+            ),
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
@@ -111,7 +132,7 @@ class VersionPressApi {
         $page = intval($request['page']);
         $commits = $gitLogPaginator->getPage($page);
 
-        if(empty($commits)) {
+        if (empty($commits)) {
             return new \WP_Error('notice', 'No more commits to show.', array('status' => 403));
         }
 
@@ -126,11 +147,15 @@ class VersionPressApi {
         $isFirstCommit = $page === 0;
 
         $result = array();
-        foreach($commits as $commit) {
+        foreach ($commits as $commit) {
             $canUndoCommit = $canUndoCommit && ($commit->getHash() !== $initialCommitHash);
             $canRollbackToThisCommit = !$isFirstCommit && ($canUndoCommit || $commit->getHash() === $initialCommitHash);
             $changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
             $isEnabled = $canUndoCommit || $canRollbackToThisCommit || $commit->getHash() === $initialCommitHash;
+
+
+            $fileChanges = $this->getFileChanges($commit);
+            $changeInfoList = $changeInfo instanceof ChangeInfoEnvelope ? $changeInfo->getChangeInfoList() : array();
 
             $result[] = array(
                 "hash" => $commit->getHash(),
@@ -139,7 +164,8 @@ class VersionPressApi {
                 "canUndo" => $canUndoCommit,
                 "canRollback" => $canRollbackToThisCommit,
                 "isEnabled" => $isEnabled,
-                "isInitial" => $commit->getHash() === $initialCommitHash
+                "isInitial" => $commit->getHash() === $initialCommitHash,
+                "changes" => array_merge($this->convertChangeInfoList($changeInfoList), $fileChanges),
             );
             $isFirstCommit = false;
         }
@@ -198,6 +224,23 @@ class VersionPressApi {
             return $this->getError($revertStatus);
         }
         return new WP_REST_Response(true);
+    }
+
+    public function getDiff(WP_REST_Request $request) {
+        global $versionPressContainer;
+        /** @var GitRepository $repository */
+        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+        $hash = $request['commit'];
+        $diff = $repository->getDiff($hash);
+
+        if (strlen($diff) > 50 * 1024) { // 50 kB is maximum size for diff (see WP-49)
+            return new \WP_Error(
+                'error',
+                'The diff is too large to show here. Please use some git client. Thank you.',
+                array('status' => 403));
+        }
+
+        return new WP_REST_Response(array('diff' => $diff));
     }
 
     /**
@@ -288,6 +331,70 @@ class VersionPressApi {
         /** @var VersionPressConfig $vpConfig */
         $vpConfig = $versionPressContainer->resolve(VersionPressServices::VP_CONFIGURATION);
 
-        return ! $vpConfig->mergedConfig['requireApiAuth'] || current_user_can('manage_options');
+        return !$vpConfig->mergedConfig['requireApiAuth'] || current_user_can('manage_options');
+    }
+
+    private function convertChangeInfoList($getChangeInfoList) {
+        return array_map(array($this, 'convertChangeInfo'), $getChangeInfoList);
+    }
+
+    private function convertChangeInfo($changeInfo) {
+        $change = array();
+
+        if ($changeInfo instanceof TrackedChangeInfo) {
+            $change['type'] = $changeInfo->getEntityName();
+            $change['action'] = $changeInfo->getAction();
+            $change['tags'] = $changeInfo->getCustomTags();
+        }
+
+        if ($changeInfo instanceof EntityChangeInfo) {
+            $change['name'] = $changeInfo->getEntityId();
+        }
+
+        if ($changeInfo instanceof PluginChangeInfo) {
+            $pluginTags = $changeInfo->getCustomTags();
+            $pluginName = $pluginTags[PluginChangeInfo::PLUGIN_NAME_TAG];
+            $change['name'] = $pluginName;
+        }
+
+        if ($changeInfo instanceof ThemeChangeInfo) {
+            $themeTags = $changeInfo->getCustomTags();
+            $themeName = $themeTags[ThemeChangeInfo::THEME_NAME_TAG];
+            $change['name'] = $themeName;
+        }
+
+        if ($changeInfo instanceof WordPressUpdateChangeInfo) {
+            $change['name'] = $changeInfo->getNewVersion();
+        }
+
+        return $change;
+    }
+
+    /**
+     * @param Commit $commit
+     * @return array
+     */
+    private function getFileChanges(Commit $commit) {
+        $changedFiles = $commit->getChangedFiles();
+
+        $changedFiles = array_filter($changedFiles, function ($changedFile) {
+            $path = str_replace('\\', '/', ABSPATH . $changedFile['path']);
+            $vpdbPath = str_replace('\\', '/', VERSIONPRESS_MIRRORING_DIR);
+
+            return !Strings::startsWith($path, $vpdbPath);
+        });
+
+        $fileChanges = array_map(function ($changedFile) {
+            $status = $changedFile['status'];
+            $filename = $changedFile['path'];
+
+            return array(
+                'type' => 'file',
+                'action' => $status === 'A' ? 'add' : ($status === 'M' ? 'modify' : 'delete'),
+                'name' => $filename,
+            );
+        }, $changedFiles);
+
+        return $fileChanges;
     }
 }

@@ -123,14 +123,16 @@ class GitRepository {
 
         $commitDelimiter = chr(29);
         $dataDelimiter = chr(30);
+        $statusDelimiter = chr(31);
 
-        $logCommand = "git log --pretty=format:\"%%H|delimiter|%%aD|delimiter|%%ar|delimiter|%%an|delimiter|%%ae|delimiter|%%s|delimiter|%%b|end|\"";
+        $logCommand = "git log --pretty=format:\"|begin|%%H|delimiter|%%aD|delimiter|%%ar|delimiter|%%an|delimiter|%%ae|delimiter|%%s|delimiter|%%b|end|\" --name-status";
         if (!empty($gitrevisions)) {
             $logCommand .= " " . escapeshellarg($gitrevisions);
         }
 
+        $logCommand = str_replace("|begin|", $commitDelimiter, $logCommand);
         $logCommand = str_replace("|delimiter|", $dataDelimiter, $logCommand);
-        $logCommand = str_replace("|end|", $commitDelimiter, $logCommand);
+        $logCommand = str_replace("|end|", $statusDelimiter, $logCommand);
         $log = trim($this->runShellCommandWithStandardOutput($logCommand), $commitDelimiter);
 
         if ($log == "") {
@@ -139,8 +141,9 @@ class GitRepository {
             $commits = explode($commitDelimiter, $log);
         }
         
-        return array_map(function ($rawCommit) {
-            return Commit::buildFromString(trim($rawCommit));
+        return array_map(function ($rawCommitAndStatus) use ($statusDelimiter) {
+            list($rawCommit, $rawStatus) = explode($statusDelimiter, $rawCommitAndStatus);
+            return Commit::buildFromString(trim($rawCommit), trim($rawStatus));
         }, $commits);
 
     }
@@ -302,6 +305,25 @@ class GitRepository {
     public function isCleanWorkingDirectory() {
         $status = $this->getStatus();
         return empty($status);
+    }
+
+    /**
+     * Returns diff for given commit
+     *
+     * @param string $hash
+     * @return string
+     */
+    public function getDiff($hash) {
+        if ($this->getInitialCommit()->getHash() === $hash) {
+            // Inspired by: http://stackoverflow.com/a/25064285
+            $emptyTreeHash = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
+            $gitCmd = "git diff-tree -p $emptyTreeHash $hash";
+        } else {
+            $gitCmd = "git diff $hash~1 $hash";
+        }
+
+        $output = $this->runShellCommandWithStandardOutput($gitCmd);
+        return $output;
     }
 
     /**

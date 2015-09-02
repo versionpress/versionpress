@@ -18,7 +18,7 @@ interface ConfirmDialogProps {
   loading?: boolean;
 }
 
-class ConfirmDialog extends React.Component<ConfirmDialogProps, any> {
+class ConfirmDialog extends React.Component<ConfirmDialogProps, {}> {
 
   constructor(props) {
     super(props);

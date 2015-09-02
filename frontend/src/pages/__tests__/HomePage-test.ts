@@ -6,7 +6,7 @@ import ReactContextStub = require('../../common/__tests__/ReactContextStub');
 import HomePage = require('../HomePage.react');
 import utils = require('../../common/__tests__/utils');
 import CommitsTable = require('../../Commits/CommitsTable.react');
-import config = require('../../config');
+import WpApi = require('../../services/WpApi');
 
 const testUtils = React.addons.TestUtils;
 
@@ -50,10 +50,15 @@ describe('HomePage', () => {
     const component = <React.DOMComponent<React.HTMLAttributes>> testUtils.renderIntoDocument(
       React.createElement(handler, props)
     );
-    fakeServer.respondWith('GET', config.api.root + '/commits?page=1', [
+
+    let commitsUrl = WpApi.getApiLink('commits');
+    commitsUrl += ((commitsUrl.indexOf('?') > -1) ? '&' : '?') + 'page=1';
+    let displayPanelUrl = WpApi.getApiLink('display-welcome-panel');
+
+    fakeServer.respondWith('GET', commitsUrl, [
         200, { 'Content-Type': 'application/json' }, JSON.stringify(fakeData)]
     );
-    fakeServer.respondWith('GET', config.api.root + '/display-welcome-panel', [
+    fakeServer.respondWith('GET', displayPanelUrl, [
         200, { 'Content-Type': 'application/json' }, JSON.stringify(true)]
     );
     fakeServer.respond();

@@ -4,7 +4,7 @@ import React = require('react');
 
 const DOM = React.DOM;
 
-class NotFoundPage extends React.Component<any, any> {
+class NotFoundPage extends React.Component<{}, {}> {
 
   render() {
     return DOM.div(null,
