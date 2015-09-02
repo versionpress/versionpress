@@ -42,7 +42,9 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
         } else if (type === 'versionpress' && (action === 'undo' || action === 'rollback')) {
           lines = this.getLinesForRevert(changesByTypeAndAction[type][action], action);
         } else if (type === 'comment') {
-          lines = this.getLinesForComments(changesByTypeAndAction[type][action], countOfDuplicates, action);
+          lines = this.getLinesForComments(changesByTypeAndAction[type][action], action);
+        } else if (type === 'post') {
+          lines = this.getLinesForPosts(changesByTypeAndAction[type][action], countOfDuplicates, action);
         } else {
           lines = this.getLinesForOtherChanges(changesByTypeAndAction[type][action], countOfDuplicates, type, action);
         }
@@ -73,7 +75,7 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
     return this.getLinesForMeta('postmeta', 'post', 'VP-Post-Title', changedMeta, countOfDuplicates, action);
   }
 
-  private getLinesForComments(changedComments: Change[], countOfDuplicates, action: string) {
+  private getLinesForComments(changedComments: Change[], action: string) {
     let lines = [];
     let commentsByPosts = ArrayUtils.groupBy(changedComments, c => c.tags['VP-Comment-PostTitle']);
 
@@ -118,6 +120,20 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
 
     return lines;
   }
+
+  private getLinesForPosts(changedPosts: Change[], countOfDuplicates, action: string) {
+    let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changedPosts, countOfDuplicates);
+    let suffix = null;
+
+    if (action === 'trash' || action === 'untrash') {
+      suffix = action === 'trash' ? ' to trash' : ' from trash';
+      action = 'move';
+    }
+
+    let line = this.renderOverviewLine('post', action, changedEntities, suffix);
+    return [line];
+  }
+
 
   private getLinesForMeta(entityName, parentEntity, groupByTag, changedMeta: Change[], countOfDuplicates, action: string) {
     let lines = [];
