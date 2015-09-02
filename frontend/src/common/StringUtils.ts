@@ -1,3 +1,5 @@
+import ArrayUtils = require('./ArrayUtils');
+
 export function verbToPastTense(verb: string) {
   if (verb.match(/.*[aeiouy]y$/)) {
     return verb + 'ed';
@@ -12,4 +14,9 @@ export function verbToPastTense(verb: string) {
 
 export function capitalize(word: string) {
   return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
+
+export function join(array: any[], separator: string = ', ' , lastSeparator: string = ' and ') {
+  return ArrayUtils.interspace(array, separator, lastSeparator).join('');
 }

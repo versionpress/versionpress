@@ -41,6 +41,8 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
           lines = this.getLinesForPostmeta(changesByTypeAndAction[type][action], countOfDuplicates, action);
         } else if (type === 'versionpress' && (action === 'undo' || action === 'rollback')) {
           lines = this.getLinesForRevert(changesByTypeAndAction[type][action], action);
+        } else if (type === 'comment') {
+          lines = this.getLinesForComments(changesByTypeAndAction[type][action], countOfDuplicates, action);
         } else {
           lines = this.getLinesForOtherChanges(changesByTypeAndAction[type][action], countOfDuplicates, type, action);
         }
@@ -69,6 +71,52 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
 
   private getLinesForPostmeta(changedMeta: Change[], countOfDuplicates, action: string) {
     return this.getLinesForMeta('postmeta', 'post', 'VP-Post-Title', changedMeta, countOfDuplicates, action);
+  }
+
+  private getLinesForComments(changedComments: Change[], countOfDuplicates, action: string) {
+    let lines = [];
+    let commentsByPosts = ArrayUtils.groupBy(changedComments, c => c.tags['VP-Comment-PostTitle']);
+
+    for (let postTitle in commentsByPosts) {
+      let capitalizedVerb = StringUtils.capitalize(StringUtils.verbToPastTense(action));
+      let numberOfComments = commentsByPosts[postTitle].length;
+      let authors = ArrayUtils.filterDuplicates(commentsByPosts[postTitle].map(change => change.tags['VP-Comment-Author']));
+      let authorsString = StringUtils.join(authors);
+      let suffix = '';
+
+      if (action === 'spam' || action === 'unspam') {
+        capitalizedVerb = 'Marked';
+        suffix = action === 'spam' ? ' as spam' : ' as not spam';
+      }
+
+      if (action === 'trash' || action === 'untrash') {
+        capitalizedVerb = 'Moved';
+        suffix = action === 'trash' ? ' to trash' : ' from trash';
+      }
+
+      if (action === 'create-pending') {
+        capitalizedVerb = 'Created';
+      }
+
+      let line = DOM.span(null,
+        capitalizedVerb,
+        ' ',
+        numberOfComments === 1 ? '' : (numberOfComments + ' '),
+        DOM.span({className: 'type'}, numberOfComments === 1 ? 'comment' : 'comments'),
+        ' by ',
+        DOM.span({className: 'type'}, 'user'),
+        ' ',
+        authorsString,
+        ' for ',
+        DOM.span({className: 'type'}, 'post'),
+        ' ',
+        postTitle,
+        suffix
+      );
+      lines.push(line);
+    }
+
+    return lines;
   }
 
   private getLinesForMeta(entityName, parentEntity, groupByTag, changedMeta: Change[], countOfDuplicates, action: string) {
@@ -112,7 +160,7 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
         ' ',
         DOM.span({className: 'type'}, type),
         ' ',
-        ArrayUtils.interspace(entities, ', '),
+        ArrayUtils.interspace(entities, ', ', ' and '),
         suffix
       );
     }

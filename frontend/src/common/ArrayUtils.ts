@@ -50,14 +50,20 @@ export function groupBy<T>(array: T[], keyExtractorFn: (T) => string|string[]) {
 /**
  * Returns new array with separator between every two items of input array.
  */
-export function interspace(array: any[], separator: any) {
+export function interspace(array: any[], separator: any, lastSeparator: any = separator) {
   if (array.length === 0) {
     return [];
   }
 
-  return array.slice(1).reduce(function(xs, x, i) {
+  let interleavedArray = array.slice(1).reduce(function(xs, x, i) {
     return xs.concat([separator, x]);
   }, [array[0]]);
+
+  if (array.length > 1) {
+    interleavedArray[interleavedArray.length - 2] = lastSeparator
+  }
+
+  return interleavedArray;
 }
 
 /**
@@ -65,7 +71,7 @@ export function interspace(array: any[], separator: any) {
  * for every item.
  *
  */
-export function filterDuplicates<T>(array: T[], hashFn: (T) => string) {
+export function filterDuplicates<T>(array: T[], hashFn: (T) => string = item => item) {
   let uniqueHashSet = [];
 
   return array.filter(item => {
