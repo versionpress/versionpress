@@ -10,7 +10,7 @@ const defaultConfig: VersionPressConfig = {
     root: '',
     urlPrefix: 'vp-json',
     queryParam: 'vp_rest_route',
-    prettyPermalinks: false,
+    permalinkStructure: false,
     nonce: null
   },
 

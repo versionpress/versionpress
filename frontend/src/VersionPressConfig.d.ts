@@ -4,7 +4,7 @@ interface VersionPressConfig {
     root?: string;
     urlPrefix?: string;
     queryParam?: string;
-    prettyPermalinks?: boolean;
+    permalinkStructure?: boolean|string;
     nonce?: string;
   };
 
