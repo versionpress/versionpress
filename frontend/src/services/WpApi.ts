@@ -4,7 +4,9 @@ import config = require('../config');
 import request = require('superagent');
 
 export function getApiLink(endpoint: string) {
-  if (config.api.prettyPermalinks) {
+  if (/^\/index.php\/.*/.test(<string> config.api.permalinkStructure)) {
+    return config.api.root + '/index.php/' + config.api.urlPrefix + '/versionpress/' + endpoint;
+  } else if (config.api.permalinkStructure) {
     return config.api.root + '/' + config.api.urlPrefix + '/versionpress/' + endpoint;
   } else {
     return config.api.root + '/?' + config.api.queryParam + '=/versionpress/' + endpoint;
