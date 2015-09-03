@@ -13,9 +13,9 @@ class TranslationsTest extends End2EndTestCase {
 
     /**
      * @test
-     * @testdox Switching language creates 'translation/switch' action
+     * @testdox Switching language creates 'translation/activate' action
      */
-    public function switchingLanguageCreatesLanguageSwitchAction() {
+    public function switchingLanguageCreatesLanguageActivateAction() {
         self::$worker->prepare_switchLanguage();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -23,7 +23,7 @@ class TranslationsTest extends End2EndTestCase {
         self::$worker->switchLanguage();
 
         $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction('translation/switch');
+        $commitAsserter->assertCommitAction('translation/activate');
         $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();

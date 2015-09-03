@@ -217,10 +217,10 @@ class SortingStrategy {
      * @return int
      */
     private function compareTranslationChangeInfo($changeInfo1, $changeInfo2) {
-        // For two VersionPress\ChangeInfos\TranslationChangeInfo objects, the "switch" one wins
-        if ($changeInfo1->getAction() == "switch") {
+        // For two VersionPress\ChangeInfos\TranslationChangeInfo objects, the "activate" one wins
+        if ($changeInfo1->getAction() == "activate") {
             return -1;
-        } else if ($changeInfo2->getAction() == "switch") {
+        } else if ($changeInfo2->getAction() == "activate") {
             return 1;
         }
 

@@ -250,15 +250,20 @@ function vp_register_hooks() {
     add_action('update_option', function ($option, $_, $value) use ($committer) {
        if ($option === 'rewrite_rules') {
            $committer->usePostponedChangeInfos('permalinks');
-       } else if ($option === 'WPLANG') {
-           $translations = wp_get_available_translations();
-           $languageName = isset($translations[$value])
-               ? $translations[$value]['native_name']
-               : 'English (United States)';
-
-           $committer->forceChangeInfo(new TranslationChangeInfo("switch", $value, $languageName));
        }
     }, 10, 3);
+
+    $activatedLanguage = function ($_, $value) use ($committer) {
+        $translations = wp_get_available_translations();
+        $languageName = isset($translations[$value])
+            ? $translations[$value]['native_name']
+            : 'English (United States)';
+
+        /** @var Committer $committer */
+        $committer->forceChangeInfo(new TranslationChangeInfo("activate", $value, $languageName));
+    };
+    add_action('add_option_WPLANG', $activatedLanguage, 10, 2);
+    add_action('update_option_WPLANG', $activatedLanguage, 10, 2);
 
     add_action('wp_update_nav_menu_item', function($menu_id, $menu_item_db_id) use ($committer) {
         $key = 'menu-item-' . $menu_item_db_id;
