@@ -1,7 +1,6 @@
 <?php
 use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
-use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\Git\ChangeInfoPreprocessors\ChangeInfoPreprocessor;
 use VersionPress\Git\GitConfig;
@@ -14,8 +13,7 @@ use VersionPress\Utils\FileSystem;
  * Creates commits using the `GitStatic` class. By default, it detects the change from the `$mirror` object
  * but it can also be forced by calling the `forceChangeInfo()` method.
  */
-class Committer
-{
+class Committer {
 
     /**
      * @var Mirror
@@ -45,8 +43,7 @@ class Committer
     private $fileForPostpone = 'postponed-commits';
     private $postponedChangeInfos = array();
 
-    public function __construct(Mirror $mirror, GitRepository $repository, StorageFactory $storageFactory)
-    {
+    public function __construct(Mirror $mirror, GitRepository $repository, StorageFactory $storageFactory) {
         $this->mirror = $mirror;
         $this->repository = $repository;
         $this->storageFactory = $storageFactory;
@@ -56,14 +53,13 @@ class Committer
      * Checks if there is any change in the `$mirror` and commits it. If there was a forced
      * change set, it takes precedence.
      */
-    public function commit()
-    {
+    public function commit() {
         if ($this->commitDisabled) return;
 
         if (count($this->forcedChangeInfos) > 0) {
             $changeInfoList = $this->forcedChangeInfos;
         } elseif ($this->shouldCommit()) {
-            $changeInfoList =  array_merge($this->postponedChangeInfos, $this->mirror->getChangeList());
+            $changeInfoList = array_merge($this->postponedChangeInfos, $this->mirror->getChangeList());
             if (empty($changeInfoList)) {
                 return;
             }
@@ -150,16 +146,14 @@ class Committer
      *
      * @param TrackedChangeInfo $changeInfo
      */
-    public function forceChangeInfo(TrackedChangeInfo $changeInfo)
-    {
+    public function forceChangeInfo(TrackedChangeInfo $changeInfo) {
         $this->forcedChangeInfos[] = $changeInfo;
     }
 
     /**
      * All `commit()` calls are ignored after calling this method.
      */
-    public function disableCommit()
-    {
+    public function disableCommit() {
         $this->commitDisabled = true;
     }
 
@@ -181,7 +175,7 @@ class Committer
      */
     public function discardPostponedCommit($key) {
         $postponed = $this->loadPostponedChangeInfos();
-        if(isset($postponed[$key])) {
+        if (isset($postponed[$key])) {
             unset($postponed[$key]);
             $this->savePostponedChangeInfos($postponed);
         }
@@ -194,7 +188,7 @@ class Committer
      */
     public function usePostponedChangeInfos($key) {
         $postponed = $this->loadPostponedChangeInfos();
-        if(isset($postponed[$key])) {
+        if (isset($postponed[$key])) {
             $this->postponedChangeInfos = array_merge($this->postponedChangeInfos, $postponed[$key]);
             unset($postponed[$key]);
             $this->savePostponedChangeInfos($postponed);
@@ -208,13 +202,11 @@ class Committer
      *
      * @return bool
      */
-    private function shouldCommit()
-    {
+    private function shouldCommit() {
         return !$this->existsMaintenanceFile();
     }
 
-    private function existsMaintenanceFile()
-    {
+    private function existsMaintenanceFile() {
         $maintenanceFile = ABSPATH . 'versionpress.maintenance';
         return file_exists($maintenanceFile);
     }
@@ -271,7 +263,7 @@ class Committer
      */
     private function loadPostponedChangeInfos() {
         $file = VERSIONPRESS_TEMP_DIR . '/' . $this->fileForPostpone;
-        if(is_file($file)) {
+        if (is_file($file)) {
             $serializedPostponedChangeInfos = file_get_contents($file);
             return unserialize($serializedPostponedChangeInfos);
         }
@@ -282,7 +274,7 @@ class Committer
      * @param TrackedChangeInfo[key][] $postponedChangeInfos
      */
     private function savePostponedChangeInfos($postponedChangeInfos) {
-        $file = VERSIONPRESS_TEMP_DIR . '/'. $this->fileForPostpone;
+        $file = VERSIONPRESS_TEMP_DIR . '/' . $this->fileForPostpone;
         $serializedPostponedChangeInfos = serialize($postponedChangeInfos);
         file_put_contents($file, $serializedPostponedChangeInfos);
     }
