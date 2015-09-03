@@ -6,6 +6,26 @@ use VersionPress\Initialization\Initializer;
 use VersionPress\Utils\JsRedirect;
 use VersionPress\VersionPress;
 
+/**
+ * Function executed from VersionPress\Initialization\Initializer that is given the progress message, decides
+ * whether it is suitable for output and if so, calls `show_message()` (WP function).
+ *
+ * @param string $progressMessage
+ */
+function _vp_show_progress_message($progressMessage) {
+
+    // We currently only output messages that are defined in VersionPress\Initialization\InitializerStates
+    // which captures the main progress points without too many details
+
+    $initializerStatesReflection = new ReflectionClass('VersionPress\Initialization\InitializerStates');
+    $progressConstantValues = array_values($initializerStatesReflection->getConstants());
+    if (in_array($progressMessage, $progressConstantValues)) {
+        /** @noinspection PhpParamsInspection */
+        /** @noinspection PhpInternalEntityUsedInspection */
+        show_message($progressMessage);
+    }
+}
+
 ?>
 
 <style>
