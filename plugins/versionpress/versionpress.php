@@ -835,9 +835,13 @@ function vp_send_cors_headers($headers) {
     return $headers;
 }
 
+add_action('vp_rest_api_init', 'versionpress_api_init');
 function versionpress_api_init() {
-    global $vpApi;
-    $vpApi = new VersionPressApi;
+    global $versionPressContainer;
+    $gitRepository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+    $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
+    $vpConfig = $versionPressContainer->resolve(VersionPressServices::VP_CONFIGURATION);
+
+    $vpApi = new VersionPressApi($gitRepository, $reverter, $vpConfig);
     $vpApi->register_routes();
 }
-add_action('vp_rest_api_init', 'versionpress_api_init');
