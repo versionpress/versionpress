@@ -61,7 +61,6 @@ class Committer
         if ($this->commitDisabled) return;
 
         if (count($this->forcedChangeInfos) > 0) {
-            FileSystem::remove(get_home_path() . 'versionpress.maintenance'); // todo: this shouldn't be here...
             $changeInfoList = $this->forcedChangeInfos;
         } elseif ($this->shouldCommit()) {
             $changeInfoList =  array_merge($this->postponedChangeInfos, $this->mirror->getChangeList());
@@ -107,6 +106,10 @@ class Committer
             $changeInfoEnvelope = new ChangeInfoEnvelope($listToCommit);
             $this->stageRelatedFiles($changeInfoEnvelope);
             $this->repository->commit($changeInfoEnvelope->getCommitMessage(), $authorName, $authorEmail);
+        }
+
+        if (count($this->forcedChangeInfos) === 1 && $this->forcedChangeInfos[0] instanceof \VersionPress\ChangeInfos\WordPressUpdateChangeInfo) {
+            FileSystem::remove(ABSPATH . 'versionpress.maintenance');
         }
 
         $this->flushChangeLists();
@@ -207,28 +210,13 @@ class Committer
      */
     private function shouldCommit()
     {
-        if ($this->dbWasUpdated() && $this->existsMaintenanceFile())
-            return false;
-        return true;
-    }
-
-    private function dbWasUpdated()
-    {
-        $changes = $this->mirror->getChangeList();
-        foreach ($changes as $change) {
-            if ($change instanceof EntityChangeInfo &&
-                $change->getEntityName() == 'option' &&
-                $change->getEntityId() == 'db_version'
-            )
-                return true;
-        }
-        return false;
+        return !$this->existsMaintenanceFile();
     }
 
     private function existsMaintenanceFile()
     {
-        $maintenanceFilePattern = get_home_path() . '*.maintenance';
-        return count(glob($maintenanceFilePattern)) > 0;
+        $maintenanceFile = ABSPATH . 'versionpress.maintenance';
+        return file_exists($maintenanceFile);
     }
 
     /**
