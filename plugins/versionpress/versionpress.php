@@ -169,16 +169,22 @@ function vp_register_hooks() {
 
     add_filter('upgrader_pre_download', function($reply, $_, $upgrader) use ($committer) {
         if (!isset($upgrader->skin->language_update)) return $reply;
+        $languages = get_available_languages();
 
-        $postInstallHook = function ($_, $hook_extra) use ($committer, &$postInstallHook) {
+        $postInstallHook = function ($_, $hook_extra) use ($committer, $languages, &$postInstallHook) {
             if (!isset($hook_extra['language_update_type'])) return;
+            $translations = wp_get_available_translations();
+
             $type = $hook_extra['language_update_type'];
             $languageCode = $hook_extra['language_update']->language;
-            $languageName = $hook_extra['language_update']->native_name;
+            $languageName = isset($translations[$languageCode])
+                ? $translations[$languageCode]['native_name']
+                : 'English (United States)';
 
             $name = $type === "core" ? null : $hook_extra['language_update']->slug;
 
-            $committer->forceChangeInfo(new TranslationChangeInfo("update", $languageCode, $languageName, $type, $name));
+            $action = in_array($languageCode, $languages) ? "update" : "install";
+            $committer->forceChangeInfo(new TranslationChangeInfo($action, $languageCode, $languageName, $type, $name));
             remove_filter('upgrader_post_install', $postInstallHook);
         };
 

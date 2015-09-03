@@ -10,7 +10,7 @@ use VersionPress\Utils\StringUtils;
  *
  * VP tags:
  *
- *     VP-Action: translation/(activate|update)
+ *     VP-Action: translation/(activate|install|update)
  *     VP-Language-Code: en_US
  *     VP-Language-Name: English (United States)
  *     VP-Translation-Type: (core|theme|plugin)
