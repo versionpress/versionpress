@@ -127,13 +127,13 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       WpApi
         .get('should-update')
         .query({latestCommit: this.state.commits[0].hash})
-        .end((err:any, res:request.Response) => {
+        .end((err: any, res: request.Response) => {
           if (res.body === true) {
             this.setState({displayUpdateNotice: true});
           } else {
             this.setState({displayUpdateNotice: false});
           }
-        })
+        });
     }
   }
 

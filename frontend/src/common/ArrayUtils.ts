@@ -60,7 +60,7 @@ export function interspace(array: any[], separator: any, lastSeparator: any = se
   }, [array[0]]);
 
   if (array.length > 1) {
-    interleavedArray[interleavedArray.length - 2] = lastSeparator
+    interleavedArray[interleavedArray.length - 2] = lastSeparator;
   }
 
   return interleavedArray;
