@@ -163,9 +163,26 @@
   }
 
   .details-row {
+    position: relative;
+
     &.error {
       text-align: center;
       background-color: #eee;
+    }
+
+    &.loading {
+      td * {
+        display: none;
+      }
+
+      td .details-row-loader {
+        display: block;
+      }
+    }
+
+    &-loader {
+      .loading2;
+      margin: 10px auto;
     }
 
     td {
