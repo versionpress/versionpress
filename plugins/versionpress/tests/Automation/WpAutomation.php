@@ -601,7 +601,7 @@ class WpAutomation {
             unset($env["XDEBUG_CONFIG"]); // turn debug off
         }
 
-        $process = new Process($command, $executionPath, $env);
+        $process = new Process($command, $executionPath, $env, null, 180);
         $process->run();
 
         if (!$process->isSuccessful()) {
