@@ -112,7 +112,7 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
         ' for ',
         DOM.span({className: 'type'}, 'post'),
         ' ',
-        postTitle,
+        DOM.span({className: 'CommitOverview-identifier'}, postTitle),
         suffix
       );
       lines.push(line);
@@ -142,7 +142,12 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
     for (let tagValue in metaByTag) {
       let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(metaByTag[tagValue], countOfDuplicates);
 
-      let lineSuffix = [' for ', DOM.span({className: 'type'}, parentEntity), ' ', tagValue];
+      let lineSuffix = [
+        ' for ',
+        DOM.span({className: 'type'}, parentEntity),
+        ' ',
+        DOM.span({className: 'CommitOverview-identifier'}, tagValue)
+      ];
       let line = this.renderOverviewLine(entityName, action, changedEntities, lineSuffix);
       lines.push(line);
     }
