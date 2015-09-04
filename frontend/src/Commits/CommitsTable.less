@@ -58,10 +58,10 @@
     border-bottom: 1px solid #ccc;
   }
 
-  tbody td {
+  & > tbody > tr > td {
     cursor: pointer;
   }
-  
+
   tbody tr {
     background-color: #f9f9f9;
   }
@@ -138,8 +138,15 @@
       background-color: #eee;
     }
 
-    & td {
+    td {
       border-top: 0;
+    }
+
+    & > td {
+      cursor: inherit;
+      a {
+        cursor: pointer;
+      }
     }
 
     .overview-list {
