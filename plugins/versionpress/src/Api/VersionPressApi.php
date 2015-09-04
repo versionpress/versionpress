@@ -231,7 +231,7 @@ class VersionPressApi {
         if (strlen($diff) > 50 * 1024) { // 50 kB is maximum size for diff (see WP-49)
             return new \WP_Error(
                 'error',
-                'The diff is too large to show here. Please use some git client. Thank you.',
+                'The diff is too large to show here. Please use some Git client. Thank you.',
                 array('status' => 403));
         }
 
