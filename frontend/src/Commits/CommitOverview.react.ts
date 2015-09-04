@@ -174,7 +174,7 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
       return DOM.span(null,
         capitalizedVerb,
         ' ',
-        DOM.span({className: 'type'}, type),
+        DOM.span({className: 'type'}, entities.length === 1 ? type : StringUtils.pluralize(type)),
         ' ',
         ArrayUtils.interspace(entities, ', ', ' and '),
         suffix
@@ -199,7 +199,7 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
     return DOM.span(null,
       capitalizedVerb,
       ' ',
-      DOM.span({className: 'type'}, type),
+      DOM.span({className: 'type'}, StringUtils.pluralize(type)),
       ' ',
       suffix,
       entityList
