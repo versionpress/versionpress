@@ -190,14 +190,13 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
     let entityList;
     if (this.state.expandedLists.indexOf(listKey) > -1) {
       entityList = DOM.ul(null,
-        entities.map(entity => DOM.li(null, entity)),
-        DOM.li(null, DOM.a({onClick: () => this.expandList(listKey)}, 'show less...'))
+        entities.map(entity => DOM.li(null, entity))
       );
     } else {
       let displayedListLength = 3;
       entityList = DOM.ul(null,
         entities.slice(0, displayedListLength).map(entity => DOM.li(null, entity)),
-        DOM.li(null, DOM.a({onClick: () => this.collapseList(listKey)}, 'show ', entities.length - displayedListLength, ' more...'))
+        DOM.li(null, DOM.a({onClick: () => this.expandList(listKey)}, 'show ', entities.length - displayedListLength, ' more...'))
       );
     }
 
@@ -212,13 +211,6 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
   }
 
   private expandList(listKey) {
-    let expandedLists = this.state.expandedLists;
-    let index = expandedLists.indexOf(listKey);
-    let newExpandedLists = expandedLists.slice(0, index).concat(expandedLists.slice(index + 1));
-    this.setState({expandedLists: newExpandedLists});
-  }
-
-  private collapseList(listKey) {
     let expandedLists = this.state.expandedLists;
     let newExpandedLists = expandedLists.concat([listKey]);
     this.setState({expandedLists: newExpandedLists});
