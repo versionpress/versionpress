@@ -377,6 +377,16 @@ function vp_register_hooks() {
         }
     }
 
+    if ($requestDetector->isCoreLanguageUninstallRequest()) {
+        $languageCode = $requestDetector->getLanguageCode();
+        $translations = wp_get_available_translations();
+        $languageName = isset($translations[$languageCode])
+            ? $translations[$languageCode]['native_name']
+            : 'English (United States)';
+
+        $committer->forceChangeInfo(new TranslationChangeInfo('uninstall', $languageCode, $languageName, 'core'));
+    }
+
     if (basename($_SERVER['PHP_SELF']) === 'theme-editor.php' && isset($_GET['updated']) && $_GET['updated'] === 'true') {
         $committer->forceChangeInfo(new ThemeChangeInfo($_GET['theme'], 'edit'));
     }
