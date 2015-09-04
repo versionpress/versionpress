@@ -49,7 +49,7 @@ class GitRepository {
      * commit message cannot be created on CLI and it's generally a more flexible solution
      * (very long commit messages, etc.).
      *
-     * @param CommitMessage $message
+     * @param CommitMessage|string $message
      * @param string $authorName
      * @param string $authorEmail
      */
@@ -57,9 +57,14 @@ class GitRepository {
         $this->authorName = $authorName;
         $this->authorEmail = $authorEmail;
 
-        $subject = $message->getSubject();
-        $body = $message->getBody();
-        $commitMessage = $this->commitMessagePrefix . $subject;
+        if (is_string($message)) {
+            $commitMessage = $message;
+            $body = null;
+        } else {
+            $subject = $message->getSubject();
+            $body = $message->getBody();
+            $commitMessage = $this->commitMessagePrefix . $subject;
+        }
 
         if ($body != null) $commitMessage .= "\n\n" . $body;
 
@@ -289,6 +294,10 @@ class GitRepository {
         $gitCmd = "git status --porcelain -uall";
         $output = $this->runShellCommandWithStandardOutput($gitCmd);
         if($array) {
+            if ($output === null) {
+                return array();
+            }
+
             $output = explode("\n", $output); // Consider using -z and explode by NUL
             foreach ($output as $k => $line) {
                 $output[$k] = explode(" ", trim($line), 2);
@@ -308,16 +317,19 @@ class GitRepository {
     }
 
     /**
-     * Returns diff for given commit
+     * Returns diff for given commit.
+     * If null, returns diff of working directory and HEAD
      *
      * @param string $hash
      * @return string
      */
-    public function getDiff($hash) {
+    public function getDiff($hash = null) {
         if ($this->getInitialCommit()->getHash() === $hash) {
             // Inspired by: http://stackoverflow.com/a/25064285
             $emptyTreeHash = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
             $gitCmd = "git diff-tree -p $emptyTreeHash $hash";
+        } else if ($hash === null) {
+            $gitCmd = "git diff HEAD";
         } else {
             $gitCmd = "git diff $hash~1 $hash";
         }
