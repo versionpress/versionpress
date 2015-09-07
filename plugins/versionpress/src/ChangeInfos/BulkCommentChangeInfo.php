@@ -5,9 +5,11 @@ namespace VersionPress\ChangeInfos;
 class BulkCommentChangeInfo extends BulkChangeInfo {
 
     public function getChangeDescription() {
+        if ($this->count === 1) {
+            return $this->changeInfos[0]->getChangeDescription();
+        }
+
         switch ($this->getAction()) {
-            case "delete":
-                return "Deleted $this->count comments";
             case "trash":
                 return "Moved $this->count comments into trash";
             case "untrash":
@@ -16,10 +18,6 @@ class BulkCommentChangeInfo extends BulkChangeInfo {
                 return "Marked $this->count comments as spam";
             case "unspam":
                 return "Marked $this->count comments as not spam";
-            case "approve":
-                return "Approved $this->count comments";
-            case "unapprove":
-                return "Unapproved $this->count comments";
         }
 
         return parent::getChangeDescription();
