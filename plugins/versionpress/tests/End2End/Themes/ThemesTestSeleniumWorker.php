@@ -12,6 +12,10 @@ class ThemesTestSeleniumWorker extends SeleniumWorker implements IThemesTestWork
         self::$themeInfo = $themeInfo;
     }
 
+    public function setSecondThemeInfo($themeInfo) {
+        // we don't need second theme - selenium worker does not support bulk operations
+    }
+
     public function prepare_uploadTheme() {
         $this->url('wp-admin/theme-install.php?upload');
     }
@@ -40,5 +44,19 @@ class ThemesTestSeleniumWorker extends SeleniumWorker implements IThemesTestWork
         $this->byCssSelector('a.delete-theme')->click();
         $this->acceptAlert();
         $this->waitAfterRedirect();
+    }
+
+    public function prepare_uploadTwoThemes() {
+        throw new \PHPUnit_Framework_SkippedTestError('There is no way to upload more themes at once using selenium');
+    }
+
+    public function uploadTwoThemes() {
+    }
+
+    public function prepare_deleteTwoThemes() {
+        throw new \PHPUnit_Framework_SkippedTestError('There is no way to delete more themes at once using selenium');
+    }
+
+    public function deleteTwoThemes() {
     }
 }

@@ -13,6 +13,7 @@ class ThemesTest extends End2EndTestCase {
      * @var array
      */
     private static $themeInfo;
+    private static $secondThemeInfo;
 
     /** @var IThemesTestWorker */
     private static $worker;
@@ -28,7 +29,15 @@ class ThemesTest extends End2EndTestCase {
             'affected-path' => 'test-theme/*',
         );
 
+        self::$secondThemeInfo = array(
+            'zipfile' => realpath($testDataPath . '/test-theme-2.zip'),
+            'stylesheet' => 'test-theme-2',
+            'name' => 'Test Theme 2',
+            'affected-path' => 'test-theme-2/*',
+        );
+
         self::$worker->setThemeInfo(self::$themeInfo);
+        self::$worker->setSecondThemeInfo(self::$secondThemeInfo);
     }
 
     /**
@@ -87,6 +96,42 @@ class ThemesTest extends End2EndTestCase {
         $commitAsserter->assertCommitAction("theme/delete");
         $commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
         $commitAsserter->assertCommitPath("D", "wp-content/themes/" . self::$themeInfo['affected-path']);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Uploading two themes creates a bulk action
+     */
+    public function uploadingTwoThemesCreatesBulkAction() {
+        self::$worker->prepare_uploadTwoThemes();
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->uploadTwoThemes();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('theme/install', 2);
+        $commitAsserter->assertCommitPath("A", "wp-content/themes/" . self::$themeInfo['affected-path']);
+        $commitAsserter->assertCommitPath("A", "wp-content/themes/" . self::$secondThemeInfo['affected-path']);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Deleting two themes creates a bulk action
+     */
+    public function deletingTwoThemesCreatesBulkAction() {
+        self::$worker->prepare_deleteTwoThemes();
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->deleteTwoThemes();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('theme/delete', 2);
+        $commitAsserter->assertCommitPath("D", "wp-content/themes/" . self::$themeInfo['affected-path']);
+        $commitAsserter->assertCommitPath("D", "wp-content/themes/" . self::$secondThemeInfo['affected-path']);
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
