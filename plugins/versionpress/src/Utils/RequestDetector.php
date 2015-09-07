@@ -25,7 +25,7 @@ class RequestDetector {
 
     public function isPluginDeleteRequest() {
         if ($this->isWpCli) {
-            return $this->isWpCliCommand(array('plugin', 'delete'));
+            return $this->isWpCliCommand(array('plugin', 'delete')) || $this->isWpCliCommand(array('plugin', 'uninstall'));
         }
 
         return basename($_SERVER['PHP_SELF']) === 'plugins.php'
