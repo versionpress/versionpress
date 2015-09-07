@@ -18,6 +18,12 @@ class PluginsTest extends End2EndTestCase {
      */
     private static $pluginInfo;
 
+    /**
+     * Plugin info for bulk operations
+     * @var array
+     */
+    private static $secondPluginInfo;
+
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
 
@@ -29,7 +35,15 @@ class PluginsTest extends End2EndTestCase {
             'affected-path' => 'hello-dolly/*',
         );
 
+        self::$secondPluginInfo = array(
+            'zipfile' => realpath($testDataPath . '/hello-dolly.1.6-2.zip'),
+            'css-id' => 'hello-dolly-2',
+            'name' => 'Hello Dolly 2',
+            'affected-path' => 'hello-dolly-2/*',
+        );
+
         self::$worker->setPluginInfo(self::$pluginInfo);
+        self::$worker->setSecondPluginInfo(self::$secondPluginInfo);
 
         // possibly delete single-file Hello dolly
         try {
@@ -37,9 +51,10 @@ class PluginsTest extends End2EndTestCase {
         } catch (\Exception $e) {
         }
 
-        // possibly delete our testing plugin
+        // possibly delete our testing plugins
         try {
             self::$wpAutomation->runWpCliCommand('plugin', 'uninstall', array('hello-dolly'));
+            self::$wpAutomation->runWpCliCommand('plugin', 'uninstall', array('hello-dolly-2'));
         } catch (\Exception $e) {
         }
 
@@ -125,4 +140,73 @@ class PluginsTest extends End2EndTestCase {
         DBAsserter::assertFilesEqualDatabase();
     }
 
+    /**
+     * @test
+     * @testdox Installing two plugins creates a bulk action
+     */
+    public function installingTwoPluginsCreatesBulkAction() {
+        self::$worker->prepare_installTwoPlugins();
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->installTwoPlugins();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('plugin/install', 2);
+        $commitAsserter->assertCommitPath("A", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
+        $commitAsserter->assertCommitPath("A", "wp-content/plugins/" . self::$secondPluginInfo['affected-path']);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Activation of two plugins creates a bulk action
+     */
+    public function activatingTwoPluginsCreatesBulkAction() {
+        self::$worker->prepare_activateTwoPlugins();
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->activateTwoPlugins();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('plugin/activate', 2);
+        $commitAsserter->assertCommitPath("M", "%vpdb%/options.ini");
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Deactivation of two plugins creates a bulk action
+     */
+    public function deactivatingTwoPluginsCreatesBulkAction() {
+        self::$worker->prepare_deactivateTwoPlugins();
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->deactivateTwoPlugins();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('plugin/deactivate', 2);
+        $commitAsserter->assertCommitPath("M", "%vpdb%/options.ini");
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Uninstalling two plugins creates a bulk action
+     */
+    public function uninstallingTwoPluginsCreatesBulkAction() {
+        self::$worker->prepare_uninstallTwoPlugins();
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->uninstallTwoPlugins();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('plugin/delete', 2);
+        $commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
+        $commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$secondPluginInfo['affected-path']);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
 }
