@@ -111,19 +111,15 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       .get('display-welcome-panel')
       .end((err: any, res: request.Response) => {
         if (res.body === true) {
-          this.setState({
-            displayWelcomePanel: true
-          });
+          this.setState({displayWelcomePanel: true});
         } else {
-          this.setState({
-            displayWelcomePanel: false
-          });
+          this.setState({displayWelcomePanel: false});
         }
       });
   }
 
   checkUpdate() {
-    if (! this.props.params.page) { // First page
+    if (!this.props.params.page) { // First page
       WpApi
         .get('should-update')
         .query({latestCommit: this.state.commits[0].hash})
@@ -147,10 +143,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({
-            message: res.body[0],
-            loading: false
-          });
+          this.setState({message: res.body[0], loading: false});
         } else {
           this.fetchCommits();
         }
@@ -167,10 +160,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({
-            message: res.body[0],
-            loading: false
-          });
+          this.setState({message: res.body[0], loading: false});
         } else {
           this.fetchCommits();
         }
@@ -193,9 +183,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   }
 
   toggleServicePanel() {
-    this.setState({
-      displayServicePanel: !this.state.displayServicePanel
-    });
+    this.setState({displayServicePanel: !this.state.displayServicePanel});
   }
 
   sendBugReport(values: Object) {
@@ -208,9 +196,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({
-            message: res.body[0]
-          });
+          this.setState({message: res.body[0]});
         } else {
           this.setState({
             displayServicePanel: false,
@@ -245,9 +231,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   onWelcomePanelHide(e) {
     e.preventDefault();
 
-    this.setState({
-      displayWelcomePanel: false
-    });
+    this.setState({displayWelcomePanel: false});
 
     WpApi
       .post('hide-welcome-panel')
