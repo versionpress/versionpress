@@ -47,7 +47,7 @@ class CommitPanelCommit extends React.Component<CommitPanelCommitProps, CommitPa
           autoFocus: true,
           className: 'CommitPanel-commit-input',
           name: 'message',
-          placeholder: 'Manual commit'
+          placeholder: 'Commit message...'
         }),
         DOM.input({
           className: 'button button-primary CommitPanel-commit-button',
