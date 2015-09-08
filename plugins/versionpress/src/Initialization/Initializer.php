@@ -4,6 +4,7 @@ namespace VersionPress\Initialization;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use VersionPress\ChangeInfos\VersionPressChangeInfo;
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Database\VpidRepository;
 use VersionPress\Git\GitConfig;
 use VersionPress\Git\GitRepository;
 use VersionPress\Storages\DirectoryStorage;
@@ -67,15 +68,20 @@ class Initializer {
      */
     private $urlReplacer;
 
+    /**
+     * @var VpidRepository
+     */
+    private $vpidRepository;
     private $idCache;
     private $executionStartTime;
 
-    function __construct($wpdb, DbSchemaInfo $dbSchema, StorageFactory $storageFactory, GitRepository $repository, AbsoluteUrlReplacer $urlReplacer) {
+    function __construct($wpdb, DbSchemaInfo $dbSchema, StorageFactory $storageFactory, GitRepository $repository, AbsoluteUrlReplacer $urlReplacer, VpidRepository $vpidRepository) {
         $this->database = $wpdb;
         $this->dbSchema = $dbSchema;
         $this->storageFactory = $storageFactory;
         $this->repository = $repository;
         $this->urlReplacer = $urlReplacer;
+        $this->vpidRepository = $vpidRepository;
         $this->executionStartTime = microtime(true);
     }
 
@@ -272,31 +278,10 @@ class Initializer {
     }
 
     private function replaceForeignKeysWithReferencesInAllEntities($entityName, $entities) {
-        if (!$this->dbSchema->getEntityInfo($entityName)->hasReferences) {
-            return $entities;
-        }
-
-        $_this = $this;
-        return array_map(function ($entity) use ($entityName, $_this) {
-            return $_this->replaceForeignKeysWithReferences($entityName, $entity);
+        $vpidRepository = $this->vpidRepository;
+        return array_map(function ($entity) use ($vpidRepository, $entityName) {
+            return $vpidRepository->replaceForeignKeysWithReferences($entityName, $entity);
         }, $entities);
-    }
-
-    public function replaceForeignKeysWithReferences($entityName, $entity) {
-        $references = $this->dbSchema->getEntityInfo($entityName)->references;
-        foreach ($references as $referenceName => $targetEntity) {
-
-            if ($entity[$referenceName] > 0) {
-                if ($entityName !== $targetEntity || isset($this->idCache[$targetEntity])) { // skip replacing for post_parent while generating VPIDs (WP-357)
-                    $referenceId = $this->idCache[$targetEntity][$entity[$referenceName]];
-                    $entity['vp_' . $referenceName] = $referenceId;
-                }
-            }
-
-            unset($entity[$referenceName]);
-        }
-
-        return $entity;
     }
 
     private function extendEntitiesWithVpids($entityName, $entities) {
