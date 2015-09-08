@@ -339,6 +339,18 @@ class GitRepository {
     }
 
     /**
+     * Discards all modifications made to files in working directory.
+     * Also deletes untracked files.
+     *
+     * @return boolean
+     */
+    public function clearWorkingDirectory() {
+        $this->runShellCommand("git clean -f");
+        $this->runShellCommand("git checkout -- .");
+        return $this->isCleanWorkingDirectory();
+    }
+
+    /**
      * Invokes {@see runShellCommand()} and returns its stdout output. The params are the same,
      * only the return type is string instead of an array.
      *

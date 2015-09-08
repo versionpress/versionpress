@@ -146,6 +146,12 @@ class VersionPressApi {
             ),
             'permission_callback' => array($this, 'checkPermissions')
         ));
+
+        register_vp_rest_route($namespace, '/discard-changes', array(
+            'methods' => WP_REST_Server::CREATABLE,
+            'callback' => array($this, 'discardChanges'),
+            'permission_callback' => array($this, 'checkPermissions')
+        ));
     }
 
     /**
@@ -358,6 +364,20 @@ class VersionPressApi {
         $this->gitRepository->stageAll();
         $this->gitRepository->commit($request['commit-message'], $authorName, $authorEmail);
         return new WP_REST_Response(true);
+    }
+
+    /**
+     * Discards all changes in working directory.
+     * @return WP_REST_Response
+     */
+    public function discardChanges() {
+        global $versionPressContainer;
+        /** @var GitRepository $repository */
+        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+
+        $result = $repository->clearWorkingDirectory();
+
+        return new WP_REST_Response($result);
     }
 
     /**
