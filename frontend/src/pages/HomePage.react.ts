@@ -244,7 +244,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
             displayCommitPanel: false,
             message: {
               code: 'updated',
-              message: 'Changes has been committed.'
+              message: 'Changes have been committed.'
             }
           });
           this.fetchCommits();
