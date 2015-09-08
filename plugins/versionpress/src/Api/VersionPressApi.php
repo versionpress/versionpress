@@ -15,11 +15,11 @@ use VersionPress\ChangeInfos\PluginChangeInfo;
 use VersionPress\ChangeInfos\RevertChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
-use VersionPress\ChangeInfos\VersionPressChangeInfo;
 use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
 use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Commit;
+use VersionPress\Git\CommitMessage;
 use VersionPress\Git\GitLogPaginator;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
@@ -92,7 +92,7 @@ class VersionPressApi {
             'callback' => array($this, 'getDiff'),
             'args' => array(
                 'commit' => array(
-                    'required' => true
+                    'default' => null
                 )
             ),
             'permission_callback' => array($this, 'checkPermissions')
@@ -127,6 +127,29 @@ class VersionPressApi {
         register_vp_rest_route($namespace, '/should-update', array(
             'methods' => WP_REST_Server::READABLE,
             'callback' => array($this, 'shouldUpdate'),
+            'permission_callback' => array($this, 'checkPermissions')
+        ));
+
+        register_vp_rest_route($namespace, '/git-status', array(
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => array($this, 'getGitStatus'),
+            'permission_callback' => array($this, 'checkPermissions')
+        ));
+
+        register_vp_rest_route($namespace, '/commit', array(
+            'methods' => WP_REST_Server::CREATABLE,
+            'callback' => array($this, 'commit'),
+            'args' => array(
+                'commit-message' => array(
+                    'required' => true
+                )
+            ),
+            'permission_callback' => array($this, 'checkPermissions')
+        ));
+
+        register_vp_rest_route($namespace, '/discard-changes', array(
+            'methods' => WP_REST_Server::CREATABLE,
+            'callback' => array($this, 'discardChanges'),
             'permission_callback' => array($this, 'checkPermissions')
         ));
     }
@@ -224,6 +247,13 @@ class VersionPressApi {
         return new WP_REST_Response(true);
     }
 
+    /**
+     * Returns diff of given commit.
+     * If there's provided no commit hash, returns diff of working directory and HEAD.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response|\WP_Error
+     */
     public function getDiff(WP_REST_Request $request) {
         $hash = $request['commit'];
         $diff = $this->gitRepository->getDiff($hash);
@@ -284,6 +314,70 @@ class VersionPressApi {
         $latestCommit = $request['latestCommit'];
 
         return new WP_REST_Response($repository->wasCreatedAfter("HEAD", $latestCommit));
+    }
+
+    /**
+     * Returns list of files with modification types.
+     *
+     * Example:
+     * [
+     *  ["A", "some-file.txt"],
+     *  ["M", "other-file.txt"]
+     * ]
+     *
+     * Modification types:
+     * ?? - untracked file
+     * A - added file
+     * M - modified file
+     * D - deleted file
+     *
+     * @return WP_REST_Response
+     */
+    public function getGitStatus() {
+        global $versionPressContainer;
+        /** @var GitRepository $repository */
+        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+
+        return new WP_REST_Response($repository->getStatus(true));
+    }
+
+    /**
+     * Creates manual commit. Adds everything to stage.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response|\WP_Error
+     */
+    public function commit(WP_REST_Request $request) {
+        $currentUser = wp_get_current_user();
+        if ($currentUser->ID === 0) {
+            return new \WP_Error(
+                'error',
+                'You don\'t have permission to do this.',
+                array('status' => 403));
+        }
+
+        /** @noinspection PhpUndefinedFieldInspection */
+        $authorName = $currentUser->display_name;
+        /** @noinspection PhpUndefinedFieldInspection */
+        $authorEmail = $currentUser->user_email;
+
+        $this->gitRepository->stageAll();
+        $this->gitRepository->commit($request['commit-message'], $authorName, $authorEmail);
+        return new WP_REST_Response(true);
+    }
+
+    /**
+     * Discards all changes in working directory.
+     * @return WP_REST_Response
+     */
+    public function discardChanges() {
+        global $versionPressContainer;
+        /** @var GitRepository $repository */
+        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+
+        $result = $repository->clearWorkingDirectory();
+
+        return new WP_REST_Response($result);
     }
 
     /**
