@@ -10,6 +10,7 @@ import ProgressBar = require('../common/ProgressBar.react');
 import ServicePanel = require('../ServicePanel/ServicePanel.react');
 import ServicePanelButton = require('../ServicePanel/ServicePanelButton.react');
 import WelcomePanel = require('../WelcomePanel/WelcomePanel.react');
+import CommitPanel = require('../CommitPanel/CommitPanel.react');
 import revertDialog = require('../Commits/revertDialog');
 import moment = require('moment');
 import config = require('../config');
@@ -39,6 +40,7 @@ interface HomePageState {
   displayServicePanel?: boolean;
   displayWelcomePanel?: boolean;
   displayUpdateNotice?: boolean;
+  displayCommitPanel?: boolean;
 }
 
 class HomePage extends React.Component<HomePageProps, HomePageState> {
@@ -52,7 +54,8 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       loading: true,
       displayServicePanel: false,
       displayWelcomePanel: false,
-      displayUpdateNotice: false
+      displayUpdateNotice: false,
+      displayCommitPanel: false
     };
 
     this.onUndo = this.onUndo.bind(this);
@@ -102,6 +105,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
             loading: false,
             displayUpdateNotice: false
           });
+          this.checkUpdate();
         }
       });
   }
@@ -111,30 +115,23 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       .get('display-welcome-panel')
       .end((err: any, res: request.Response) => {
         if (res.body === true) {
-          this.setState({
-            displayWelcomePanel: true
-          });
+          this.setState({displayWelcomePanel: true});
         } else {
-          this.setState({
-            displayWelcomePanel: false
-          });
+          this.setState({displayWelcomePanel: false});
         }
       });
   }
 
   checkUpdate() {
-    if (! this.props.params.page) { // First page
-      WpApi
-        .get('should-update')
-        .query({latestCommit: this.state.commits[0].hash})
-        .end((err: any, res: request.Response) => {
-          if (res.body === true) {
-            this.setState({displayUpdateNotice: true});
-          } else {
-            this.setState({displayUpdateNotice: false});
-          }
+    WpApi
+      .get('should-update')
+      .query({latestCommit: this.state.commits[0].hash})
+      .end((err: any, res: request.Response) => {
+        this.setState({
+          displayUpdateNotice: !this.props.params.page && res.body.update === true,
+          displayCommitPanel: res.body.cleanWorkingDirectory !== true
         });
-    }
+      });
   }
 
   undoCommit(hash: string) {
@@ -147,10 +144,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({
-            message: res.body[0],
-            loading: false
-          });
+          this.setState({message: res.body[0], loading: false});
         } else {
           document.location.reload();
         }
@@ -167,21 +161,33 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({
-            message: res.body[0],
-            loading: false
-          });
+          this.setState({message: res.body[0], loading: false});
         } else {
           document.location.reload();
         }
       });
   }
 
+  getGitStatus() {
+    return new Promise(function(resolve, reject) {
+      WpApi
+        .get('git-status')
+        .end((err, res: request.Response) => {
+          if (err) {
+            reject(res.body[0]);
+          } else {
+            resolve(res.body);
+          }
+        });
+    });
+  }
+
   getDiff(hash: string) {
+    const query = hash === '' ? null : {commit: hash};
     return new Promise(function(resolve, reject) {
       WpApi
         .get('diff')
-        .query({commit: hash})
+        .query(query)
         .end((err, res: request.Response) => {
           if (err) {
             reject(res.body[0]);
@@ -193,9 +199,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   }
 
   toggleServicePanel() {
-    this.setState({
-      displayServicePanel: !this.state.displayServicePanel
-    });
+    this.setState({displayServicePanel: !this.state.displayServicePanel});
   }
 
   sendBugReport(values: Object) {
@@ -208,15 +212,63 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({
-            message: res.body[0]
-          });
+          this.setState({message: res.body[0]});
         } else {
           this.setState({
             displayServicePanel: false,
             message: {
               code: 'updated',
               message: 'Bug report was sent. Thank you.'
+            }
+          });
+        }
+        return !err;
+      });
+  }
+
+  onCommit(message: string) {
+    const progressBar = <ProgressBar> this.refs['progress'];
+    progressBar.progress(0);
+
+    const values = { 'commit-message': message };
+
+    WpApi
+      .post('commit')
+      .send(values)
+      .on('progress', (e) => progressBar.progress(e.percent))
+      .end((err: any, res: request.Response) => {
+        if (err) {
+          this.setState({message: res.body[0]});
+        } else {
+          this.setState({
+            displayCommitPanel: false,
+            message: {
+              code: 'updated',
+              message: 'Changes have been committed.'
+            }
+          });
+          this.fetchCommits();
+        }
+        return !err;
+      });
+  }
+
+  onDiscard() {
+    const progressBar = <ProgressBar> this.refs['progress'];
+    progressBar.progress(0);
+
+    WpApi
+      .post('discard-changes')
+      .on('progress', (e) => progressBar.progress(e.percent))
+      .end((err: any, res: request.Response) => {
+        if (err) {
+          this.setState({message: res.body[0]});
+        } else {
+          this.setState({
+            displayCommitPanel: false,
+            message: {
+              code: 'updated',
+              message: 'Changes have been discarded.'
             }
           });
         }
@@ -245,9 +297,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   onWelcomePanelHide(e) {
     e.preventDefault();
 
-    this.setState({
-      displayWelcomePanel: false
-    });
+    this.setState({displayWelcomePanel: false});
 
     WpApi
       .post('hide-welcome-panel')
@@ -270,6 +320,14 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
         display: this.state.displayServicePanel,
         onSubmit: this.sendBugReport.bind(this)
       }),
+      this.state.displayCommitPanel
+        ? React.createElement(CommitPanel, <CommitPanel.Props>{
+          diffProvider: { getDiff: this.getDiff },
+          gitStatusProvider: { getGitStatus: this.getGitStatus },
+          onCommit: this.onCommit.bind(this),
+          onDiscard: this.onDiscard.bind(this)
+        })
+        : null,
       this.state.displayWelcomePanel
         ? React.createElement(WelcomePanel, <WelcomePanel.Props>{ onHide: this.onWelcomePanelHide.bind(this) })
         : null,

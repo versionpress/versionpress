@@ -313,7 +313,10 @@ class VersionPressApi {
 
         $latestCommit = $request['latestCommit'];
 
-        return new WP_REST_Response($repository->wasCreatedAfter("HEAD", $latestCommit));
+        return new WP_REST_Response(array(
+            "update" => $repository->wasCreatedAfter("HEAD", $latestCommit),
+            "cleanWorkingDirectory" => $repository->isCleanWorkingDirectory()
+        ));
     }
 
     /**

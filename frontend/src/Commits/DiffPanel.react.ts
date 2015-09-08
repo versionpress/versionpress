@@ -5,6 +5,8 @@ import React = require('react');
 import DiffParser = require('../common/DiffParser');
 import JsDiff = require('diff');
 
+require('./DiffPanel.less');
+
 const DOM = React.DOM;
 
 interface DiffPanelProps {
@@ -159,11 +161,14 @@ class DiffPanel extends React.Component<DiffPanelProps, any> {
   }
 
   render() {
+    if (this.props.diff === null) {
+      return DOM.div(null);
+    }
     let diffs = DiffParser.parse(this.props.diff);
 
     return DOM.div(null,
       diffs.map(diff =>
-          DOM.div({className: 'diff'},
+          DOM.div({className: 'DiffPanel'},
             DOM.h4({className: 'heading'}, (diff.from === '/dev/null' ? diff.to : diff.from).substr(2)),
             diff.type === 'plain' ? DiffPanel.formatChunks(diff.chunks) : DiffPanel.formatInfoForBinaryFileDiff(diff)
           )
