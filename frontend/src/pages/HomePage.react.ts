@@ -152,7 +152,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
             loading: false
           });
         } else {
-          this.fetchCommits();
+          document.location.reload();
         }
       });
   }
@@ -172,7 +172,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
             loading: false
           });
         } else {
-          this.fetchCommits();
+          document.location.reload();
         }
       });
   }
