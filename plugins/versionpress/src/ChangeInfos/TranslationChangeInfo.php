@@ -79,7 +79,7 @@ class TranslationChangeInfo extends TrackedChangeInfo {
 
     public function getChangeDescription() {
         if ($this->action === 'activate') {
-            return "Language switched to '{$this->languageName}'";
+            return "Site language switched to '{$this->languageName}'";
         }
 
         return Strings::capitalize(StringUtils::verbToPastTense($this->action)) . " translation '{$this->languageName}'";
