@@ -13,6 +13,7 @@ use VersionPress\ChangeInfos\PostChangeInfo;
 use VersionPress\ChangeInfos\PostMetaChangeInfo;
 use VersionPress\ChangeInfos\TermChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
+use VersionPress\ChangeInfos\TranslationChangeInfo;
 use VersionPress\ChangeInfos\UserChangeInfo;
 use VersionPress\ChangeInfos\UserMetaChangeInfo;
 use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
@@ -144,10 +145,17 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase {
             ),
             array(
                 array(
+                    new TranslationChangeInfo('update', 'en_US', 'theme', 'twentythirteen'),
+                    new TranslationChangeInfo('update', 'en_US', 'theme', 'twentyfifteen'),
+                ),
+                'VersionPress\ChangeInfos\BulkTranslationChangeInfo'
+            ),
+            array(
+                array(
                     new PostChangeInfo('trash', '1234567890', 'post', 'Some post'),
                     new PostChangeInfo('trash', '0987654321', 'post', 'Other post'),
                     new PostChangeInfo('trash', 'ABCDEFEDCB', 'post', 'Different post'),
-                    ),
+                ),
                 'VersionPress\ChangeInfos\BulkPostChangeInfo'
             ),
             array(

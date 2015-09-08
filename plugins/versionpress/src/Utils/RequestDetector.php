@@ -33,6 +33,10 @@ class RequestDetector {
         && isset($_REQUEST['verify-delete']);
     }
 
+    public function isCoreLanguageUninstallRequest() {
+        return $this->isWpCliCommand(array('core', 'language', 'uninstall'));
+    }
+
     /**
      * @param $command
      * @return bool
@@ -81,6 +85,14 @@ class RequestDetector {
         }
 
         return $plugins;
+    }
+
+    public function getLanguageCode() {
+        if (!$this->isWpCli) {
+            return null;
+        }
+
+        return $this->wpCliArguments[3]; // core language uninstall <language>
     }
 
     public function getThemeStylesheets() {

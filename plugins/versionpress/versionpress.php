@@ -11,6 +11,7 @@ License: GPLv2 or later
 
 use VersionPress\Api\VersionPressApi;
 use VersionPress\ChangeInfos\PluginChangeInfo;
+use VersionPress\ChangeInfos\TranslationChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\VersionPressChangeInfo;
 use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
@@ -34,6 +35,7 @@ use VersionPress\VersionPress;
 defined('ABSPATH') or die("Direct access not allowed");
 
 require_once(__DIR__ . '/bootstrap.php');
+require_once( ABSPATH . 'wp-admin/includes/translation-install.php' );
 
 if (defined('WP_CLI') && WP_CLI) {
     WP_CLI::add_command('vp', 'VersionPress\Cli\VPCommand');
@@ -165,6 +167,31 @@ function vp_register_hooks() {
         add_filter('upgrader_post_install', $postInstallHook, 10, 2);
     }, 10, 2);
 
+    add_filter('upgrader_pre_download', function($reply, $_, $upgrader) use ($committer) {
+        if (!isset($upgrader->skin->language_update)) return $reply;
+        $languages = get_available_languages();
+
+        $postInstallHook = function ($_, $hook_extra) use ($committer, $languages, &$postInstallHook) {
+            if (!isset($hook_extra['language_update_type'])) return;
+            $translations = wp_get_available_translations();
+
+            $type = $hook_extra['language_update_type'];
+            $languageCode = $hook_extra['language_update']->language;
+            $languageName = isset($translations[$languageCode])
+                ? $translations[$languageCode]['native_name']
+                : 'English (United States)';
+
+            $name = $type === "core" ? null : $hook_extra['language_update']->slug;
+
+            $action = in_array($languageCode, $languages) ? "update" : "install";
+            $committer->forceChangeInfo(new TranslationChangeInfo($action, $languageCode, $languageName, $type, $name));
+            remove_filter('upgrader_post_install', $postInstallHook);
+        };
+
+        add_filter('upgrader_post_install', $postInstallHook, 10, 2);
+        return false;
+    }, 10, 3);
+
     add_action('switch_theme', function () use ($committer) {
         if (defined('WP_CLI') && WP_CLI) {
             file_get_contents(admin_url()); //
@@ -226,11 +253,23 @@ function vp_register_hooks() {
         $committer->postponeCommit('permalinks');
     });
 
-    add_action('update_option', function ($option) use ($committer) {
+    add_action('update_option', function ($option, $_, $value) use ($committer) {
        if ($option === 'rewrite_rules') {
            $committer->usePostponedChangeInfos('permalinks');
        }
-    });
+    }, 10, 3);
+
+    $activatedLanguage = function ($_, $value) use ($committer) {
+        $translations = wp_get_available_translations();
+        $languageName = isset($translations[$value])
+            ? $translations[$value]['native_name']
+            : 'English (United States)';
+
+        /** @var Committer $committer */
+        $committer->forceChangeInfo(new TranslationChangeInfo("activate", $value, $languageName));
+    };
+    add_action('add_option_WPLANG', $activatedLanguage, 10, 2);
+    add_action('update_option_WPLANG', $activatedLanguage, 10, 2);
 
     add_action('wp_update_nav_menu_item', function($menu_id, $menu_item_db_id) use ($committer) {
         $key = 'menu-item-' . $menu_item_db_id;
@@ -336,6 +375,16 @@ function vp_register_hooks() {
         foreach ($plugins as $plugin) {
             $committer->forceChangeInfo(new PluginChangeInfo($plugin, 'delete'));
         }
+    }
+
+    if ($requestDetector->isCoreLanguageUninstallRequest()) {
+        $languageCode = $requestDetector->getLanguageCode();
+        $translations = wp_get_available_translations();
+        $languageName = isset($translations[$languageCode])
+            ? $translations[$languageCode]['native_name']
+            : 'English (United States)';
+
+        $committer->forceChangeInfo(new TranslationChangeInfo('uninstall', $languageCode, $languageName, 'core'));
     }
 
     if (basename($_SERVER['PHP_SELF']) === 'theme-editor.php' && isset($_GET['updated']) && $_GET['updated'] === 'true') {
