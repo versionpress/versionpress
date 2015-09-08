@@ -1,0 +1,144 @@
+@import '../common/forms';
+@import '../common/mixins';
+
+.CommitPanel {
+  margin: 20px 0;
+  background: #fff;
+  box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
+
+  &-notice {
+    border-color: #7ad03a;
+    border-left: 4px solid #ffba00;
+    padding: 1em;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
+
+    p {
+      margin: 0 0 .75em 0;
+      padding: 2px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    &-toggle {
+      cursor: pointer;
+      text-decoration: underline;
+      margin-left: 10px;
+    }
+
+    &-buttons {
+      float: right;
+
+      button.button {
+        line-height: 18px;
+        height: 20px;
+        box-shadow: none;
+        background: #f7f7f7;
+        border-color: #b5b5b5 !important;
+        color: #555 !important;
+
+        &:first-child {
+          border-radius: 3px 0 0 3px;
+        }
+
+        &:nth-child(2) {
+          margin-left: -1px;
+          border-radius: 0 3px 3px 0;
+        }
+
+        &:disabled {
+          box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+          background: #ccc !important;
+          text-shadow: none !important;
+          color: #555 !important;
+          border-color: #b5b5b5 !important;
+        }
+
+        &:hover {
+          background-color: rgba(0, 0, 0, .1);
+        }
+      }
+    }
+  }
+
+  &-details,
+  &-error {
+    padding: 20px;
+    background: #eee;
+    border: 1px solid #ccc;
+    box-shadow: inset 0 5px 5px -5px rgba(0, 0, 0, 0.25),
+                inset 0 -4px 4px -4px rgba(0, 0, 0, 0.15);
+
+    a {
+      cursor: pointer;
+    }
+  }
+
+  &-details {
+    &.loading {
+      * {
+        display: none;
+      }
+
+      .CommitPanel-details-loader {
+        display: block;
+      }
+    }
+
+    &-loader {
+      .loading2;
+      margin: 10px auto;
+    }
+  }
+
+  &-overview {
+    ul {
+      list-style: none;
+      line-height: 1.65;
+    }
+
+    ul,
+    li {
+      padding: 0;
+      margin: 0;
+    }
+
+    strong {
+      width: 55px;
+      float: left;
+      text-align: right;
+      margin-right: 10px;
+    }
+  }
+
+  &-error {
+    p {
+      margin: 0;
+    }
+  }
+
+  &-commit {
+    a&-button.button {
+      margin-right: .5em;
+      line-height: 24px;
+      height: 26px;
+      padding: 0 8px 1px;
+    }
+
+    input.button {
+      margin-right: .5em;
+    }
+
+    &-input {
+      line-height: 1.5;
+      width: 550px;
+      padding: 5px;
+      display: block;
+      margin-bottom: 1em;
+
+      textarea& {
+        height: 6em;
+        resize: none;
+      }
+    }
+  }
+}

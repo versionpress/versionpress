@@ -161,6 +161,9 @@ class DiffPanel extends React.Component<DiffPanelProps, any> {
   }
 
   render() {
+    if (this.props.diff === null) {
+      return DOM.div(null);
+    }
     let diffs = DiffParser.parse(this.props.diff);
 
     return DOM.div(null,
