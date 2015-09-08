@@ -19,7 +19,7 @@ abstract class BulkChangeInfo implements ChangeInfo {
      */
     public function __construct(array $changeInfos) {
         $this->changeInfos = $changeInfos;
-        $this->count = count($changeInfos);
+        $this->count = $this->countUniqueChanges($changeInfos);
     }
 
     public static function buildFromCommitMessage(CommitMessage $commitMessage) {
@@ -40,6 +40,10 @@ abstract class BulkChangeInfo implements ChangeInfo {
     }
 
     public function getChangeDescription() {
+        if ($this->count === 1) {
+            return $this->changeInfos[0]->getChangeDescription();
+        }
+
         return sprintf("%s %d %s",
             Strings::capitalize(StringUtils::verbToPastTense($this->getAction())),
             $this->count,
@@ -52,5 +56,28 @@ abstract class BulkChangeInfo implements ChangeInfo {
 
     public function getEntityName() {
         return $this->changeInfos[0]->getEntityName();
+    }
+
+    /**
+     * @param TrackedChangeInfo[] $changeInfos
+     * @return int
+     */
+    private function countUniqueChanges($changeInfos) {
+        if (!($changeInfos[0] instanceof EntityChangeInfo)) {
+            return count($changeInfos);
+        }
+
+        /** @var EntityChangeInfo[] $changeInfos */
+        $numberOfUniqueChanges = 0;
+        $uniqueEntities = array();
+
+        foreach ($changeInfos as $changeInfo) {
+            if (!in_array($changeInfo->getEntityId(), $uniqueEntities)) {
+                $numberOfUniqueChanges += 1;
+                $uniqueEntities[] = $changeInfo->getEntityId();
+            }
+        }
+
+        return $numberOfUniqueChanges;
     }
 }
