@@ -11,6 +11,7 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
+use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Utils\FileSystem;
 use WP_CLI;
 use WP_CLI_Command;
@@ -136,7 +137,8 @@ class VPCommand extends WP_CLI_Command {
      */
     public function restoreSite($args, $assoc_args) {
         if (!defined('WP_CONTENT_DIR')) {
-            define('WP_CONTENT_DIR', 'xyz'); //doesn't matter, it's just to prevent the NOTICE in the require`d bootstrap.php
+            define('WP_CONTENT_DIR', ABSPATH . 'wp-content');
+            define('WPINC', 'wp-includes');
         }
 
         $this->defineGlobalTablePrefix();
@@ -169,11 +171,8 @@ class VPCommand extends WP_CLI_Command {
 
 
         // Disable VersionPress tracking
-        $dbphpFile = 'wp-content/db.php';
-        if (file_exists($dbphpFile)) {
-            unlink($dbphpFile);
-        }
-        // will be restored at the end of this method
+        WpdbReplacer::restoreOriginal();
+        unlink(VERSIONPRESS_ACTIVATION_FILE);
 
 
         // Create WP tables. The only important thing is site URL, all else will be rewritten later during synchronization.
@@ -194,10 +193,10 @@ class VPCommand extends WP_CLI_Command {
         }
 
 
-        // Clean the working copy - restores "db.php" and makes sure the dir is clean
-        $cleanWDCmd = 'git reset --hard && git clean -xf wp-content/vpdb';
+        // Restores "wp-db.php", "wp-db.php.original" and ".active"
+        $resetCmd = 'git reset --hard';
 
-        $process = VPCommandUtils::exec($cleanWDCmd);
+        $process = VPCommandUtils::exec($resetCmd);
         if (!$process->isSuccessful()) {
             WP_CLI::log("Could not clean working directory");
             WP_CLI::error($process->getErrorOutput());
