@@ -2,6 +2,8 @@
 
 import React = require('react');
 
+import portal = require('../common/portal');
+
 const DOM = React.DOM;
 
 interface CommitPanelCommitProps {
@@ -35,7 +37,7 @@ class CommitPanelCommit extends React.Component<CommitPanelCommitProps, CommitPa
       }, 'Commit changes'),
       DOM.a({
         className: 'button CommitPanel-commit-button',
-        onClick: () => this.props.onDiscard()
+        onClick: this.onDiscard.bind(this)
       }, 'Discard changes')
     );
   }
@@ -72,6 +74,16 @@ class CommitPanelCommit extends React.Component<CommitPanelCommitProps, CommitPa
     if (this.props.onCommit(message)) {
       e.target['message'].value = '';
     }
+  }
+
+  onDiscard(e: React.MouseEvent) {
+    e.preventDefault();
+
+    const body = DOM.div(null,
+      'This action cannot be undone, are you sure?'
+    );
+
+    portal.confirmDialog('Warning', body, this.props.onDiscard, () => {}, {});
   }
 
   private displayForm() {
