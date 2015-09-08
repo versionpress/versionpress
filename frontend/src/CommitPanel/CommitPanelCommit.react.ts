@@ -30,7 +30,7 @@ class CommitPanelCommit extends React.Component<CommitPanelCommitProps, CommitPa
   private renderButtons() {
     return DOM.div({className: 'CommitPanel-commit'},
       DOM.a({
-        className: 'button CommitPanel-commit-button',
+        className: 'button button-primary CommitPanel-commit-button',
         onClick: () => this.displayForm()
       }, 'Commit changes'),
       DOM.a({
@@ -50,7 +50,7 @@ class CommitPanelCommit extends React.Component<CommitPanelCommitProps, CommitPa
           placeholder: 'Manual commit'
         }),
         DOM.input({
-          className: 'button CommitPanel-commit-button',
+          className: 'button button-primary CommitPanel-commit-button',
           type: 'submit',
           value: 'Commit'
         }),
