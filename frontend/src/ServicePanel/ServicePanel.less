@@ -34,18 +34,20 @@
     max-height: 500px;
     margin: 20px 0;
 
-    transition-property: max-height;
+    transition-property: margin, max-height;
     transition-duration: 1s;
     transition-timing-function: ease-out-in;
 
     &--hide {
       max-height: 0;
+      margin: 0;
     }
   }
 
 
   &.welcome-panel {
     margin-top: 0;
+    margin-bottom: 0;
     padding-bottom: 20px;
   }
 
