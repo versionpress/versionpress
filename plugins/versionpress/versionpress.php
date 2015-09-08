@@ -259,17 +259,28 @@ function vp_register_hooks() {
        }
     }, 10, 3);
 
-    $activatedLanguage = function ($_, $value) use ($committer) {
-        $translations = wp_get_available_translations();
-        $languageName = isset($translations[$value])
-            ? $translations[$value]['native_name']
-            : 'English (United States)';
 
-        /** @var Committer $committer */
+    function _vp_get_language_name_by_code($code) {
+        $translations = wp_get_available_translations();
+        return isset($translations[$code])
+            ? $translations[$code]['native_name']
+            : 'English (United States)';
+    }
+
+    add_action('add_option_WPLANG', function ($option, $value) use ($committer) {
+        $defaultLanguage = defined('WPLANG') ? WPLANG : '';
+        if ($value === $defaultLanguage) {
+            return; // It's just submitted settings form without changing language
+        }
+
+        $languageName = _vp_get_language_name_by_code($value);
         $committer->forceChangeInfo(new TranslationChangeInfo("activate", $value, $languageName));
-    };
-    add_action('add_option_WPLANG', $activatedLanguage, 10, 2);
-    add_action('update_option_WPLANG', $activatedLanguage, 10, 2);
+    }, 10, 2);
+
+    add_action('update_option_WPLANG', function ($oldValue, $newValue) use ($committer) {
+        $languageName = _vp_get_language_name_by_code($newValue);
+        $committer->forceChangeInfo(new TranslationChangeInfo("activate", $newValue, $languageName));
+    }, 10, 2);
 
     add_action('wp_update_nav_menu_item', function($menu_id, $menu_item_db_id) use ($committer) {
         $key = 'menu-item-' . $menu_item_db_id;
