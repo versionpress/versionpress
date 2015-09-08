@@ -268,7 +268,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
             displayCommitPanel: false,
             message: {
               code: 'updated',
-              message: 'Changes has been discarded.'
+              message: 'Changes have been discarded.'
             }
           });
         }

@@ -60,7 +60,7 @@ class CommitPanelCommit extends React.Component<CommitPanelCommitProps, CommitPa
           className: 'button CommitPanel-commit-button',
           onClick: () => this.hideForm(),
           type: 'button',
-          value: 'Close'
+          value: 'Cancel'
         })
       )
     );
