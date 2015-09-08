@@ -1,23 +1,25 @@
-# Merging Sites #
+# Merging Sites
 
-After you [created a clone](./cloning) of a site and done all the changes and testing there, you **push** those changes back to the original site. As part of this push, a **merge** happens that combines the contents of both sites into a single working entity.
+After you [created a clone](./cloning) of a site and tested all the changes, you **push** those changes back to the original site. As part of this push, a **merge** happens that combines the contents of both sites back into a single site again.
 
-VersionPress supports two methods of merging – either from command line using WP-CLI or from the admin pages.
+Thought the actual process is a merging, the command that initiates it is called a `push`.
 
 
-## WP-CLI method ##
+## WP-CLI command
 
 This method merges a clone into the original site from command line using WP-CLI. You need to have [WP-CLI installed and working](../feature-focus/wp-cli) on your computer / server. 
 
 
-Merging is executed from the root of your cloned site like this:
+Merging is started from the root *of the cloned site* (!) using this command:
 
     wp vp push
 
-This will apply all changes made in the clone to the original site.
+For the full details of the command options, run:
+
+    wp help vp push
 
 
 ## GUI method ##
 
-To be implemented
+GUI method will be added in some future update of VersionPress.
 
