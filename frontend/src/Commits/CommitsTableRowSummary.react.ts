@@ -46,21 +46,21 @@ class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps
       DOM.td({className: 'column-actions'},
         commit.canUndo && commit.isEnabled
           ? DOM.a({
-          className: 'vp-table-undo',
-          href: '#',
-          onClick: (e) => { this.props.onUndo(e); e.stopPropagation(); },
-          'data-hash': commit.hash,
-          'data-message': commit.message
-        }, 'Undo this')
+            className: 'vp-table-undo',
+            href: '#',
+            onClick: (e) => { this.props.onUndo(e); e.stopPropagation(); },
+            'data-hash': commit.hash,
+            'data-message': commit.message
+          }, 'Undo this')
           : '',
         commit.canRollback && commit.isEnabled
           ? DOM.a({
-          className: 'vp-table-rollback',
-          href: '#',
-          onClick: (e) => { this.props.onRollback(e); e.stopPropagation(); },
-          'data-hash': commit.hash,
-          'data-date': commit.date
-        }, 'Roll back to this')
+            className: 'vp-table-rollback',
+            href: '#',
+            onClick: (e) => { this.props.onRollback(e); e.stopPropagation(); },
+            'data-hash': commit.hash,
+            'data-date': commit.date
+          }, 'Roll back to this')
           : ''
       )
     );
