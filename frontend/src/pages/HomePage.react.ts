@@ -256,7 +256,26 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   }
 
   onDiscard() {
-    // TBD
+    const progressBar = <ProgressBar> this.refs['progress'];
+    progressBar.progress(0);
+
+    WpApi
+      .post('discard-changes')
+      .on('progress', (e) => progressBar.progress(e.percent))
+      .end((err: any, res: request.Response) => {
+        if (err) {
+          this.setState({message: res.body[0]});
+        } else {
+          this.setState({
+            displayCommitPanel: false,
+            message: {
+              code: 'updated',
+              message: 'Changes has been discarded.'
+            }
+          });
+        }
+        return !err;
+      });
   }
 
   onUndo(e) {
