@@ -42,14 +42,13 @@ class CommitPanel extends React.Component<CommitPanelProps, CommitPanelState> {
           onDetailsLevelChanged: detailsLevel => this.changeDetailsLevel(detailsLevel),
           detailsLevel: this.state.detailsLevel
         }),
-        React.createElement(CommitPanelCommit, <CommitPanelCommit.Props>{
-          onCommit: this.props.onCommit,
-          onDiscard: this.props.onDiscard
-        })
+        this.state.detailsLevel !== 'none'
+          ? React.createElement(CommitPanelCommit, <CommitPanelCommit.Props>{
+            onCommit: this.props.onCommit,
+            onDiscard: this.props.onDiscard
+          }): null
       ),
-      this.state.error
-        ? this.renderError()
-        : this.renderDetails()
+      this.renderDetails()
     );
   }
 
@@ -60,18 +59,36 @@ class CommitPanel extends React.Component<CommitPanelProps, CommitPanelState> {
   }
 
   private renderDetails() {
-    if (this.state.detailsLevel === 'none') {
+    if (!this.state.error && this.state.detailsLevel === 'none') {
       return null;
     }
-
     const className = 'CommitPanel-details' + (this.state.loading ? ' loading' : '');
+    const content = this.state.detailsLevel === 'overview'
+      ? React.createElement(CommitPanelOverview, <CommitPanelOverview.Props>{gitStatus: this.state.gitStatus})
+      : React.createElement(CommitPanelDetails, <CommitPanelDetails.Props>{diff: this.state.diff});
 
     return DOM.div({className: className},
+      this.renderToggle(),
       this.state.loading ? DOM.div({className: 'CommitPanel-details-loader'}, null) : null,
-      this.state.detailsLevel === 'overview'
-        ? React.createElement(CommitPanelOverview, <CommitPanelOverview.Props>{gitStatus: this.state.gitStatus})
-        : React.createElement(CommitPanelDetails, <CommitPanelDetails.Props>{diff: this.state.diff})
-    );
+      this.state.error
+        ? this.renderError()
+        : content
+    )
+  }
+
+  private renderToggle() {
+    return this.state.detailsLevel !== 'none' ? DOM.div({className: 'CommitPanel-details-buttons'},
+      DOM.button({
+        className: 'button',
+        disabled: this.state.detailsLevel === 'overview',
+        onClick: () => this.changeDetailsLevel('overview')
+      }, 'Overview'),
+      DOM.button({
+        className: 'button',
+        disabled: this.state.detailsLevel === 'full-diff',
+        onClick: () => this.changeDetailsLevel('full-diff')
+      }, 'Full diff')
+    ) : null;
   }
 
   private changeDetailsLevel(detailsLevel: string) {

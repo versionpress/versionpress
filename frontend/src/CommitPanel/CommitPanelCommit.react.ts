@@ -78,12 +78,10 @@ class CommitPanelCommit extends React.Component<CommitPanelCommitProps, CommitPa
 
   onDiscard(e: React.MouseEvent) {
     e.preventDefault();
+    const body = DOM.div(null, 'This action cannot be undone, are you sure?');
+    const options = { okButtonText: 'Proceed' };
 
-    const body = DOM.div(null,
-      'This action cannot be undone, are you sure?'
-    );
-
-    portal.confirmDialog('Warning', body, this.props.onDiscard, () => {}, {});
+    portal.confirmDialog('Warning', body, this.props.onDiscard, () => {}, options);
   }
 
   private displayForm() {

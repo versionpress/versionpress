@@ -23,24 +23,8 @@ class CommitPanelNotice extends React.Component<CommitPanelNoticeProps, {}> {
         'Click here to ' +
         (this.props.detailsLevel === 'none' ? 'show' : 'hide')
         + ' changes.'
-      ),
-      this.renderButtons()
+      )
     );
-  }
-
-  private renderButtons() {
-    return this.props.detailsLevel !== 'none' ? DOM.div({className: 'CommitPanel-notice-buttons'},
-      DOM.button({
-        className: 'button',
-        disabled: this.props.detailsLevel === 'overview',
-        onClick: () => this.changeDetailsLevel('overview')
-      }, 'Overview'),
-      DOM.button({
-        className: 'button',
-        disabled: this.props.detailsLevel === 'full-diff',
-        onClick: () => this.changeDetailsLevel('full-diff')
-      }, 'Full diff')
-    ) : null;
   }
 
   private toggleDetails() {
