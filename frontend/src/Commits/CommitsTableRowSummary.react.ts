@@ -31,12 +31,12 @@ class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps
       DOM.td({className: 'column-message'},
         DOM.span(null, commit.message),
         this.props.detailsLevel !== 'none' ? DOM.div({className: 'detail-buttons'},
-          DOM.button({disabled: this.props.detailsLevel === 'overview', onClick: (e) => {
+          DOM.button({className: 'button', disabled: this.props.detailsLevel === 'overview', onClick: (e) => {
               this.changeDetailsLevel('overview');
               e.stopPropagation();
             }
           }, 'Overview'),
-          DOM.button({disabled: this.props.detailsLevel === 'full-diff', onClick: (e) => {
+          DOM.button({className: 'button', disabled: this.props.detailsLevel === 'full-diff', onClick: (e) => {
               this.changeDetailsLevel('full-diff');
               e.stopPropagation();
             }

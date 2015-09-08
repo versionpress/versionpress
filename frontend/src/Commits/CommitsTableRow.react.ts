@@ -18,6 +18,7 @@ interface CommitsTableRowState {
   detailsLevel?: string;
   diff?: string;
   error?: string;
+  loading?: boolean;
 }
 
 class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTableRowState> {
@@ -39,7 +40,8 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTable
       this.state.error ? this.renderError() : React.createElement(CommitsTableRowDetails, <CommitsTableRowDetails.Props>{
         commit: this.props.commit,
         detailsLevel: this.state.detailsLevel,
-        diff: this.state.diff
+        diff: this.state.diff,
+        loading: this.state.loading
       })
     );
   }
@@ -52,18 +54,20 @@ class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTable
 
   private changeDetailsLevel(detailsLevel: string) {
     if (detailsLevel === 'full-diff' && !this.state.diff) {
+      this.setState({loading: true});
       this.props.diffProvider.getDiff(this.props.commit.hash)
         .then(diff => this.setState(
           {
             detailsLevel: detailsLevel,
             diff: diff,
-            error: null
+            error: null,
+            loading: false
           })
         ).catch(err => {
-          this.setState({detailsLevel: detailsLevel, error: err.message});
+          this.setState({detailsLevel: detailsLevel, error: err.message, loading: false});
         });
     } else {
-      this.setState({detailsLevel: detailsLevel, error: null});
+      this.setState({detailsLevel: detailsLevel, error: null, loading: false});
     }
   }
 }

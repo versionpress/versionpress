@@ -12,6 +12,7 @@ interface CommitsTableRowDetailsProps {
   commit: Commit;
   detailsLevel: string;
   diff?: string;
+  loading?: boolean;
 }
 
 class CommitsTableRowDetails extends React.Component<CommitsTableRowDetailsProps, {}> {
@@ -26,7 +27,7 @@ class CommitsTableRowDetails extends React.Component<CommitsTableRowDetailsProps
       return DOM.tr(null);
     }
     const commit = this.props.commit;
-    const className = 'details-row' + (commit.isEnabled ? '' : 'disabled');
+    const className = 'details-row' + (commit.isEnabled ? '' : 'disabled') + (this.props.loading ? ' loading' : '');
     const detailsClass = 'details';
 
     const overview = React.createElement(CommitOverview, <CommitOverview.Props>{commit: commit});
@@ -34,6 +35,7 @@ class CommitsTableRowDetails extends React.Component<CommitsTableRowDetailsProps
     const overviewRow = DOM.tr({className: className},
       DOM.td(null),
       DOM.td(null,
+        this.props.loading ? DOM.div({className: 'details-row-loader'}, null) : null,
         DOM.div({className: detailsClass}, overview)
       ),
       DOM.td(null)

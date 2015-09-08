@@ -22,6 +22,45 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
     this.state = {expandedLists: []};
   }
 
+  private static renderEntityNamesWithDuplicates(changes: Change[], countOfDuplicates): React.DOMElement<React.HTMLAttributes>[] {
+    return changes.map((change: Change) => {
+      let duplicatesOfChange = countOfDuplicates[change.type][change.action][change.name];
+      let duplicatesSuffix = duplicatesOfChange > 1 ? (' (' + duplicatesOfChange + '×)') : '';
+      return DOM.span(null,
+        DOM.span({className: 'CommitOverview-identifier'}, CommitOverview.getUserFriendlyName(change)),
+        duplicatesSuffix
+      );
+    });
+  }
+
+  private static getUserFriendlyName(change: Change) {
+    if (change.type === 'user') {
+      return change.tags['VP-User-Login'];
+    }
+
+    if (change.type === 'usermeta') {
+      return change.tags['VP-UserMeta-Key'];
+    }
+
+    if (change.type === 'postmeta') {
+      return change.tags['VP-PostMeta-Key'];
+    }
+
+    if (change.type === 'post') {
+      return change.tags['VP-Post-Title'];
+    }
+
+    if (change.type === 'term') {
+      return change.tags['VP-Term-Name'];
+    }
+
+    return change.name;
+  }
+
+  render() {
+    return DOM.ul({className: 'overview-list'}, this.formatChanges(this.props.commit.changes).map(line => DOM.li(null, line)));
+  }
+
   private formatChanges(changes: Change[]) {
     let displayedLines = [];
     let changesByTypeAndAction = ArrayUtils.groupBy(
@@ -54,17 +93,6 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
     }
 
     return displayedLines;
-  }
-
-  private static renderEntityNamesWithDuplicates(changes: Change[], countOfDuplicates): React.DOMElement<React.HTMLAttributes>[] {
-    return changes.map((change: Change) => {
-      let duplicatesOfChange = countOfDuplicates[change.type][change.action][change.name];
-      let duplicatesSuffix = duplicatesOfChange > 1 ? (' (' + duplicatesOfChange + '×)') : '';
-      return DOM.span(null,
-        DOM.span(null, CommitOverview.getUserFriendlyName(change)),
-        duplicatesSuffix
-      );
-    });
   }
 
   private getLinesForUsermeta(changedMeta: Change[], countOfDuplicates, action: string) {
@@ -112,7 +140,7 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
         ' for ',
         DOM.span({className: 'type'}, 'post'),
         ' ',
-        postTitle,
+        DOM.span({className: 'CommitOverview-identifier'}, postTitle),
         suffix
       );
       lines.push(line);
@@ -134,7 +162,6 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
     return [line];
   }
 
-
   private getLinesForMeta(entityName, parentEntity, groupByTag, changedMeta: Change[], countOfDuplicates, action: string) {
     let lines = [];
     let metaByTag = ArrayUtils.groupBy(changedMeta, c => c.tags[groupByTag]);
@@ -142,7 +169,12 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
     for (let tagValue in metaByTag) {
       let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(metaByTag[tagValue], countOfDuplicates);
 
-      let lineSuffix = [' for ', DOM.span({className: 'type'}, parentEntity), ' ', tagValue];
+      let lineSuffix = [
+        ' for ',
+        DOM.span({className: 'type'}, parentEntity),
+        ' ',
+        DOM.span({className: 'CommitOverview-identifier'}, tagValue)
+      ];
       let line = this.renderOverviewLine(entityName, action, changedEntities, lineSuffix);
       lines.push(line);
     }
@@ -174,7 +206,7 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
       return DOM.span(null,
         capitalizedVerb,
         ' ',
-        DOM.span({className: 'type'}, type),
+        DOM.span({className: 'type'}, entities.length === 1 ? type : StringUtils.pluralize(type)),
         ' ',
         ArrayUtils.interspace(entities, ', ', ' and '),
         suffix
@@ -185,21 +217,20 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
     let entityList;
     if (this.state.expandedLists.indexOf(listKey) > -1) {
       entityList = DOM.ul(null,
-        entities.map(entity => DOM.li(null, entity)),
-        DOM.li(null, DOM.a({onClick: () => this.expandList(listKey)}, 'show less...'))
+        entities.map(entity => DOM.li(null, entity))
       );
     } else {
       let displayedListLength = 3;
       entityList = DOM.ul(null,
         entities.slice(0, displayedListLength).map(entity => DOM.li(null, entity)),
-        DOM.li(null, DOM.a({onClick: () => this.collapseList(listKey)}, 'show ', entities.length - displayedListLength, ' more...'))
+        DOM.li(null, DOM.a({onClick: () => this.expandList(listKey)}, 'show ', entities.length - displayedListLength, ' more...'))
       );
     }
 
     return DOM.span(null,
       capitalizedVerb,
       ' ',
-      DOM.span({className: 'type'}, type),
+      DOM.span({className: 'type'}, StringUtils.pluralize(type)),
       ' ',
       suffix,
       entityList
@@ -208,44 +239,10 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
 
   private expandList(listKey) {
     let expandedLists = this.state.expandedLists;
-    let index = expandedLists.indexOf(listKey);
-    let newExpandedLists = expandedLists.slice(0, index).concat(expandedLists.slice(index + 1));
-    this.setState({expandedLists: newExpandedLists});
-  }
-
-  private collapseList(listKey) {
-    let expandedLists = this.state.expandedLists;
     let newExpandedLists = expandedLists.concat([listKey]);
     this.setState({expandedLists: newExpandedLists});
   }
 
-  private static getUserFriendlyName(change: Change) {
-    if (change.type === 'user') {
-      return change.tags['VP-User-Login'];
-    }
-
-    if (change.type === 'usermeta') {
-      return change.tags['VP-UserMeta-Key'];
-    }
-
-    if (change.type === 'postmeta') {
-      return change.tags['VP-PostMeta-Key'];
-    }
-
-    if (change.type === 'post') {
-      return change.tags['VP-Post-Title'];
-    }
-
-    if (change.type === 'term') {
-      return change.tags['VP-Term-Name'];
-    }
-
-    return change.name;
-  }
-
-  render() {
-    return DOM.ul({className: 'overview-list'}, this.formatChanges(this.props.commit.changes).map(line => DOM.li(null, line)));
-  }
 }
 
 module CommitOverview {
