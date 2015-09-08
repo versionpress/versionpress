@@ -55,7 +55,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       displayServicePanel: false,
       displayWelcomePanel: false,
       displayUpdateNotice: false,
-      displayCommitPanel: true
+      displayCommitPanel: false
     };
 
     this.onUndo = this.onUndo.bind(this);
@@ -105,6 +105,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
             loading: false,
             displayUpdateNotice: false
           });
+          this.checkUpdate();
         }
       });
   }
@@ -122,18 +123,15 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   }
 
   checkUpdate() {
-    if (!this.props.params.page) { // First page
-      WpApi
-        .get('should-update')
-        .query({latestCommit: this.state.commits[0].hash})
-        .end((err: any, res: request.Response) => {
-          if (res.body === true) {
-            this.setState({displayUpdateNotice: true});
-          } else {
-            this.setState({displayUpdateNotice: false});
-          }
+    WpApi
+      .get('should-update')
+      .query({latestCommit: this.state.commits[0].hash})
+      .end((err: any, res: request.Response) => {
+        this.setState({
+          displayUpdateNotice: !this.props.params.page && res.body.update === true,
+          displayCommitPanel: res.body.cleanWorkingDirectory !== true
         });
-    }
+      });
   }
 
   undoCommit(hash: string) {
