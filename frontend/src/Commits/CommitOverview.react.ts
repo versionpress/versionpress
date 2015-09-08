@@ -2,6 +2,7 @@
 /// <reference path='./Commits.d.ts' />
 
 import React = require('react');
+import moment = require('moment');
 import ArrayUtils = require('../common/ArrayUtils');
 import StringUtils = require('../common/StringUtils');
 
@@ -64,7 +65,7 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
   private formatChanges(changes: Change[]) {
     let displayedLines = [];
     let changesByTypeAndAction = ArrayUtils.groupBy(
-      ArrayUtils.filterDuplicates(changes, change => change.type + '|||' + change.action + '|||' + change.name),
+      ArrayUtils.filterDuplicates<Change>(changes, change => change.type + '|||' + change.action + '|||' + change.name),
         change => [change.type, change.action]
     );
 
