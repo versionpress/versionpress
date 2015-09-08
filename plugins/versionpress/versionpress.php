@@ -94,7 +94,7 @@ function vp_register_hooks() {
     add_action('save_post', createUpdatePostTermsHook($mirror, $vpidRepository));
 
     add_filter('update_feedback', function () {
-        touch(get_home_path() . 'versionpress.maintenance');
+        touch(ABSPATH . 'versionpress.maintenance');
     });
     add_action('_core_updated_successfully', function () use ($committer) {
         require(ABSPATH . 'wp-includes/version.php'); // load constants (like $wp_version)
