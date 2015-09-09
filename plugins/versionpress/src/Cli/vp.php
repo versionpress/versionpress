@@ -433,7 +433,7 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::error("Remote '$remoteName' not found.");
         }
 
-        $this->switchMaintenance('on', $remotePath);
+        $this->switchMaintenance('on', $remoteName);
 
         $pullCommand = "git pull $remoteName";
         $process = VPCommandUtils::exec($pullCommand);
@@ -441,7 +441,7 @@ class VPCommand extends WP_CLI_Command {
         if ($process->isSuccessful()) {
             WP_CLI::success("Pulled changes from $remoteName");
         } else {
-            $this->switchMaintenance('off', $remotePath);
+            $this->switchMaintenance('off', $remoteName);
             WP_CLI::error("Changes from $remoteName couldn't be pulled.\nDetail: " . $process->getOutput());
         }
 
@@ -450,7 +450,7 @@ class VPCommand extends WP_CLI_Command {
         if ($process->isSuccessful()) {
             WP_CLI::success("Changes successfully pushed");
         } else {
-            $this->switchMaintenance('off', $remotePath);
+            $this->switchMaintenance('off', $remoteName);
             WP_CLI::error("Changes couldn't be pushed.\nDetail: " . $process->getErrorOutput());
         }
 
@@ -459,7 +459,7 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::log($process->getOutput());
             WP_CLI::success("Remote repository synchronized");
         } else {
-            $this->switchMaintenance('off', $remotePath);
+            $this->switchMaintenance('off', $remoteName);
             WP_CLI::error("Remote repository couldn't be synchronized.\nDetail: " . $process->getErrorOutput());
         }
     }
