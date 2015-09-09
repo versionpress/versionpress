@@ -6,6 +6,7 @@ interface Commit {
   canRollback: boolean;
   isEnabled: boolean;
   isInitial: boolean;
+  isMerge: boolean;
   changes: Change[];
 }
 

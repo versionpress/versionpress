@@ -23,6 +23,9 @@ class Commit {
     /** @var CommitMessage */
     private $message;
 
+    /** @var boolean */
+    private $isMerge;
+
     /** @var array */
     private $changedFiles;
 
@@ -35,13 +38,14 @@ class Commit {
      * @return Commit
      */
     public static function buildFromString($rawCommit, $rawStatus) {
-        list($hash, $date, $relativeDate, $authorName, $authorEmail, $messageHead, $messageBody) = explode(chr(30), $rawCommit);
+        list($hash, $date, $relativeDate, $authorName, $authorEmail, $parentHashes, $messageHead, $messageBody) = explode(chr(30), $rawCommit);
         $commit = new Commit();
         $commit->hash = $hash;
         $commit->date = new DateTime($date);
         $commit->relativeDate = $relativeDate;
         $commit->authorName = $authorName;
         $commit->authorEmail = $authorEmail;
+        $commit->isMerge = strpos($parentHashes, ' ') !== false;
         $commit->message = new CommitMessage($messageHead, $messageBody);
 
         foreach (explode("\n", $rawStatus) as $line) {
@@ -101,6 +105,13 @@ class Commit {
      */
     public function getMessage() {
         return $this->message;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isMerge() {
+        return $this->isMerge;
     }
 
     /**

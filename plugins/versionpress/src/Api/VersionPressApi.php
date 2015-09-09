@@ -198,6 +198,7 @@ class VersionPressApi {
                 "canRollback" => $canRollbackToThisCommit,
                 "isEnabled" => $isEnabled,
                 "isInitial" => $commit->getHash() === $initialCommitHash,
+                "isMerge" => $commit->isMerge(),
                 "changes" => array_merge($this->convertChangeInfoList($changeInfoList), $fileChanges),
             );
             $isFirstCommit = false;

@@ -29,6 +29,7 @@ class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps
         title: moment(commit.date).format('LLL')
       }, moment(commit.date).fromNow()),
       DOM.td({className: 'column-message'},
+        commit.isMerge ? DOM.span({className: 'merge-icon', title: 'Merge commit'}, 'M') : null,
         DOM.span(null, commit.message),
         this.props.detailsLevel !== 'none' ? DOM.div({className: 'detail-buttons'},
           DOM.button({className: 'button', disabled: this.props.detailsLevel === 'overview', onClick: (e) => {
