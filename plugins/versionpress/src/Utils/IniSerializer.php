@@ -145,8 +145,12 @@ class IniSerializer {
     }
 
     private static function escapeString($str) {
-        $str = str_replace('\\', '\\\\', $str); // single backslash to two, as in single-quoted PHP strings, see WP-289
-        $str = str_replace('"', '\"', $str); // escape double quotes, must be done after backslashes
+        $str = str_replace('"', '\"', $str); // escape double quotes
+        return $str;
+    }
+
+    private static function unescapeString($str) {
+        $str = str_replace('\"', '"', $str); // unescape double quotes
         return $str;
     }
 
@@ -166,7 +170,7 @@ class IniSerializer {
     public static function deserializeFlat($string) {
         $string = self::eolWorkaround_addPlaceholders($string);
         $string = self::sanitizeSectionsAndKeys_addPlaceholders($string);
-        $deserialized = parse_ini_string($string, true);
+        $deserialized = parse_ini_string($string, true, INI_SCANNER_RAW);
         $deserialized = self::restoreTypesOfValues($deserialized);
         $deserialized = self::sanitizeSectionsAndKeys_removePlaceholders($deserialized);
         $deserialized = self::eolWorkaround_removePlaceholders($deserialized);
@@ -374,7 +378,7 @@ class IniSerializer {
             } else if (is_numeric($value)) {
                 $result[$key] = $value + 0;
             } else {
-                $result[$key] = $value;
+                $result[$key] = self::unescapeString($value);
             }
         }
         return $result;
