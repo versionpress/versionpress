@@ -63,6 +63,13 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
   }
 
   private formatChanges(changes: Change[]) {
+    if (changes.length === 0) {
+      if (this.props.commit.isMerge) {
+        return [DOM.em(null, 'This is a merge commit. No files were changed in this commit.')];
+      }
+      return [DOM.em(null, 'No files were changed in this commit.')];
+    }
+
     let displayedLines = [];
     let changesByTypeAndAction = ArrayUtils.groupBy(
       ArrayUtils.filterDuplicates<Change>(changes, change => change.type + '|||' + change.action + '|||' + change.name),
