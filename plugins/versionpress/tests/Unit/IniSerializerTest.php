@@ -115,7 +115,8 @@ INI
      */
     public function numericStringsSerializedAsNumbers() {
 
-        $data = array("Section" => array("key1" => 0, "key2" => 1, "key3" => 11.1));
+        $data = array("Section" => array("key1" => "0", "key2" => "1", "key3" => "11.1"));
+        $deserializedData = array("Section" => array("key1" => 0, "key2" => 1, "key3" => 11.1));
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
 key1 = 0
@@ -126,7 +127,7 @@ INI
         );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
-        $this->assertSame($data, IniSerializer::deserialize($ini));
+        $this->assertSame($deserializedData, IniSerializer::deserialize($ini));
 
     }
 
