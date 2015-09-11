@@ -45,7 +45,7 @@ class IniSerializerTest extends PHPUnit_Framework_TestCase {
      *
      *   1. Section must be present
      *   2. ... and non-empty
-     *   3. There must be a value, at least an empty string (`key = `) throws.
+     *   3. There must be a value, at least an empty string (`key = ` throws)
      *   4. There must be an empty line after the section
      *
      * @test
