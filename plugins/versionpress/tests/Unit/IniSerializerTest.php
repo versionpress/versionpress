@@ -154,6 +154,8 @@ INI
     // Escaping / special characters
     //--------------------------------
 
+    // Note: since WP-458 this has been simplified as INI_SCANNER_RAW is used for parse_ini_string()
+    // Previously, backslashes were a bit tricky, see WP-289.
 
     /**
      * @test
@@ -459,7 +461,7 @@ INI
 key1 = "\n"
 
 INI
-        ); // two backslashes because of how backslashes are serialized, see backslash_* tests
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));

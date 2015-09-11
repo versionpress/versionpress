@@ -144,13 +144,27 @@ class IniSerializer {
         return $output;
     }
 
+    /**
+     * Called when serializing data into an INI string. The only character that needs special handling is a double
+     * quotation mark, see e.g. WP-284. All others are fine since using INI_SCANNER_RAW (WP-458).
+     *
+     * @param $str
+     * @return mixed
+     */
     private static function escapeString($str) {
-        $str = str_replace('"', '\"', $str); // escape double quotes
+        $str = str_replace('"', '\"', $str);
         return $str;
     }
 
+    /**
+     * The opposite to escapeString(), called when INI strings are restored back to arrays. Again,
+     * the only char that needs special handling is the double quotation mark.
+     *
+     * @param $str
+     * @return mixed
+     */
     private static function unescapeString($str) {
-        $str = str_replace('\"', '"', $str); // unescape double quotes
+        $str = str_replace('\"', '"', $str);
         return $str;
     }
 
