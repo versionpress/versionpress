@@ -130,7 +130,7 @@ class GitRepository {
         $dataDelimiter = chr(30);
         $statusDelimiter = chr(31);
 
-        $logCommand = "git log --pretty=format:\"|begin|%%H|delimiter|%%aD|delimiter|%%ar|delimiter|%%an|delimiter|%%ae|delimiter|%%s|delimiter|%%b|end|\" --name-status";
+        $logCommand = "git log --pretty=format:\"|begin|%%H|delimiter|%%aD|delimiter|%%ar|delimiter|%%an|delimiter|%%ae|delimiter|%%P|delimiter|%%s|delimiter|%%b|end|\" --name-status";
         if (!empty($gitrevisions)) {
             $logCommand .= " " . escapeshellarg($gitrevisions);
         }
