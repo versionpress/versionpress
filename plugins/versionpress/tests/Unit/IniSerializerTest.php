@@ -155,6 +155,8 @@ INI
     // Escaping / special characters
     //--------------------------------
 
+    // Note: since WP-458 this has been simplified as INI_SCANNER_RAW is used for parse_ini_string()
+    // Previously, backslashes were a bit tricky, see WP-289.
 
     /**
      * @test
@@ -168,7 +170,7 @@ INI
         );
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
-key1 = "My \\ site"
+key1 = "My \ site"
 
 INI
         );
@@ -190,7 +192,7 @@ INI
         );
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
-key1 = "My \\\\ site"
+key1 = "My \\ site"
 
 INI
         );
@@ -212,7 +214,7 @@ INI
         );
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
-key1 = "My \\\\\\ site"
+key1 = "My \\\ site"
 
 INI
         );
@@ -234,7 +236,7 @@ INI
         );
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
-key1 = "Value \\"
+key1 = "Value \"
 
 INI
         );
@@ -329,6 +331,24 @@ INI
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
 
+    }
+
+    /**
+     * @test
+     */
+    public function dollarSignInsideQuotes() {
+        $data = array("Section" => array("key1" => 'some$value', "key2" => 'another${value'));
+
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+key1 = "some$value"
+key2 = "another${value"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
     }
 
     /**
@@ -439,10 +459,10 @@ INI
         $data = array("Section" => array("key1" => '\n'));
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
-key1 = "\\n"
+key1 = "\n"
 
 INI
-        ); // two backslashes because of how backslashes are serialized, see backslash_* tests
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -507,12 +527,37 @@ INI
 
     }
 
+
+    /**
+     * @test
+     * @dataProvider specialCharactersInValueProvider
+     */
+    public function specialCharacterInValue($specialCharacter) {
+
+        $data = array("Section" => array("somekey" => "val{$specialCharacter}ue"));
+        $ini = StringUtils::crlfize(<<<INI
+[Section]
+somekey = "val{$specialCharacter}ue"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+
+    }
+
     public function specialCharactersProvider() {
         return array_map(function ($specialChar) { return array($specialChar);},
             array(
                 "\\", "\"", "[]", "$", "%","'", ";", "+", "-", "/", "#", "&", "!",
                 "~", "^", "`", "?", ":", ",", "*", "<", ">", "(", ")", "@", "{", "}",
                 "|", "_", " ", "\t", "ěščřžýáíéúůóďťňôâĺ", "茶", "русский", "حصان", "="));
+    }
+
+    public function specialCharactersInValueProvider() {
+        // Double quotes are escaped see WP-458
+        return array_filter($this->specialCharactersProvider(), function($val) { return $val[0] !== "\""; });
     }
 
     //--------------------------------

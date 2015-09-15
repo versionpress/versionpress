@@ -144,9 +144,27 @@ class IniSerializer {
         return $output;
     }
 
+    /**
+     * Called when serializing data into an INI string. The only character that needs special handling is a double
+     * quotation mark, see e.g. WP-284. All others are fine since using INI_SCANNER_RAW (WP-458).
+     *
+     * @param $str
+     * @return mixed
+     */
     private static function escapeString($str) {
-        $str = str_replace('\\', '\\\\', $str); // single backslash to two, as in single-quoted PHP strings, see WP-289
-        $str = str_replace('"', '\"', $str); // escape double quotes, must be done after backslashes
+        $str = str_replace('"', '\"', $str);
+        return $str;
+    }
+
+    /**
+     * The opposite to escapeString(), called when INI strings are restored back to arrays. Again,
+     * the only char that needs special handling is the double quotation mark.
+     *
+     * @param $str
+     * @return mixed
+     */
+    private static function unescapeString($str) {
+        $str = str_replace('\"', '"', $str);
         return $str;
     }
 
@@ -166,7 +184,7 @@ class IniSerializer {
     public static function deserializeFlat($string) {
         $string = self::eolWorkaround_addPlaceholders($string);
         $string = self::sanitizeSectionsAndKeys_addPlaceholders($string);
-        $deserialized = parse_ini_string($string, true);
+        $deserialized = parse_ini_string($string, true, INI_SCANNER_RAW);
         $deserialized = self::restoreTypesOfValues($deserialized);
         $deserialized = self::sanitizeSectionsAndKeys_removePlaceholders($deserialized);
         $deserialized = self::eolWorkaround_removePlaceholders($deserialized);
@@ -374,7 +392,7 @@ class IniSerializer {
             } else if (is_numeric($value)) {
                 $result[$key] = $value + 0;
             } else {
-                $result[$key] = $value;
+                $result[$key] = self::unescapeString($value);
             }
         }
         return $result;
