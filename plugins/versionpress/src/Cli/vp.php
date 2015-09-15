@@ -478,36 +478,26 @@ class VPCommand extends WP_CLI_Command {
     }
 
     /**
-     * TODO This will be updated soon to follow the new pull / push structure. Leaving
-     * the old implementation here for now..
+     * Pushes changes to another site clone
      *
      * ## OPTIONS
      *
-     * --remote=<name>
-     * : Name of the remote. Default is 'origin'.
+     * [--remote=<nameOrPath>]
+     * : Name or path of the remote. Defaults to "origin".
      *
-     * @synopsis [--remote=<name>]
+     * @synopsis [--remote=<nameOrPath>]
      */
     public function push($args = array(), $assoc_args = array()) {
         $remoteName = isset($assoc_args['remote']) ? $assoc_args['remote'] : 'origin';
-
         $remotePath = $this->getRemoteUrl($remoteName);
-
         if ($remotePath === null) {
-            WP_CLI::error("Remote '$remoteName' not found.");
+            $remotePath = $remoteName;
+            if (!is_dir($remotePath)) {
+                WP_CLI::error("'$remotePath' is not a valid path to a WP site");
+            }
         }
 
         $this->switchMaintenance('on', $remoteName);
-
-        $pullCommand = "git pull $remoteName";
-        $process = VPCommandUtils::exec($pullCommand);
-
-        if ($process->isSuccessful()) {
-            WP_CLI::success("Pulled changes from $remoteName");
-        } else {
-            $this->switchMaintenance('off', $remoteName);
-            WP_CLI::error("Changes from $remoteName couldn't be pulled.\nDetail: " . $process->getOutput());
-        }
 
         $pushCommand = "git push $remoteName";
         $process = VPCommandUtils::exec($pushCommand);
@@ -515,16 +505,16 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::success("Changes successfully pushed");
         } else {
             $this->switchMaintenance('off', $remoteName);
-            WP_CLI::error("Changes couldn't be pushed.\nDetail: " . $process->getErrorOutput());
+            WP_CLI::error("Changes couldn't be pushed. Details:\n\n" . $process->getErrorOutput());
         }
 
         $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-push', array('require' => self::VP_INTERNAL_COMMAND_PATH), $remotePath);
         if ($process->isSuccessful()) {
-            WP_CLI::log($process->getOutput());
             WP_CLI::success("Remote repository synchronized");
+            // maintenance mode was already disabled in the 'finish-push' command
         } else {
             $this->switchMaintenance('off', $remoteName);
-            WP_CLI::error("Remote repository couldn't be synchronized.\nDetail: " . $process->getErrorOutput());
+            WP_CLI::error("Remote repository couldn't be synchronized. Details:\n\n" . $process->getErrorOutput());
         }
     }
 
