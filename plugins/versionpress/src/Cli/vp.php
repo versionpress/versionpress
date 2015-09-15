@@ -12,6 +12,7 @@ use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\WpdbReplacer;
+use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\FileSystem;
 use WP_CLI;
 use WP_CLI_Command;
@@ -147,7 +148,7 @@ class VPCommand extends WP_CLI_Command {
 
         $process = VPCommandUtils::runWpCliCommand('core', 'is-installed');
         if ($process->isSuccessful()) {
-            WP_CLI::confirm("It looks like the site is OK. Do you really want to run the 'restore-site' command?");
+            WP_CLI::confirm("It looks like the site is OK. Do you really want to run the 'restore-site' command?", $assoc_args);
             $defaultUrl = trim(VPCommandUtils::runWpCliCommand('option', 'get', array('siteurl'))->getOutput());
         } else {
             $defaultUrl = 'http://localhost/' . basename(getcwd());
@@ -344,11 +345,11 @@ class VPCommand extends WP_CLI_Command {
 
         $cloneUrl = isset($assoc_args['siteurl']) ? $assoc_args['siteurl'] : $this->getCloneUrl(get_site_url(), basename($currentWpPath), $cloneDirName);
 
-        if (is_dir($clonePath) && !isset($assoc_args['yes'])) {
-            WP_CLI::confirm("Directory '" . basename($clonePath) . "' already exists. It will be deleted before cloning. Proceed?");
+        if (is_dir($clonePath)) {
+            WP_CLI::confirm("Directory '" . basename($clonePath) . "' already exists. It will be deleted before cloning. Proceed?", $assoc_args);
         }
 
-        $this->checkTables($cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix);
+        $this->checkTables($cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $assoc_args);
 
         if (is_dir($clonePath)) {
             try {
@@ -367,10 +368,28 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::log($process->getErrorOutput());
             WP_CLI::error("Cloning Git repo failed");
         } else {
-            WP_CLI::log($process->getOutput());
+            WP_CLI::success("Site files cloned");
         }
 
-        WP_CLI::success("Site files cloned");
+        // Adding the clone as a remote for the convenience of the `vp pull` command - it's `--remote`
+        // parameter can then be just the name of the clone, not a path to it
+        $addRemoteCommand = sprintf("git remote add %s %s", escapeshellarg($name), escapeshellarg($clonePath));
+        $process = VPCommandUtils::exec($addRemoteCommand, $currentWpPath);
+
+        if (!$process->isSuccessful()) {
+            WP_CLI::confirm("Remote '$name' already exists, will be re-used. Proceed?", $assoc_args);
+
+            $addRemoteCommand = str_replace(" add ", " set-url ", $addRemoteCommand);
+            $process = VPCommandUtils::exec($addRemoteCommand, $currentWpPath);
+            if (!$process->isSuccessful()) {
+                WP_CLI::error("Could not update remote's URL");
+            } else {
+                WP_CLI::success("Updated remote configuration");
+            }
+        } else {
+            WP_CLI::success("Clone added as a remote");
+        }
+
 
         // Enable pushing
         $configCommand = "git config receive.denyCurrentBranch ignore";
@@ -392,10 +411,13 @@ class VPCommand extends WP_CLI_Command {
         FileSystem::copyDir(VERSIONPRESS_PLUGIN_DIR, $clonePath . '/wp-content/plugins/versionpress');
         WP_CLI::success("Copied VersionPress");
 
-        // Kick off the site
+        // Finish the process by doing the standard restore-site
         $process = VPCommandUtils::runWpCliCommand('vp', 'restore-site', array('siteurl' => $cloneUrl, 'yes' => null, 'require' => __FILE__), $clonePath);
-        WP_CLI::log($process->getOutput());
-        WP_CLI::log($process->getErrorOutput());
+        if ($process->isSuccessful()) {
+            WP_CLI::log($process->getOutput());
+        } else {
+            WP_CLI::log($process->getErrorOutput());
+        }
     }
 
     /**
@@ -415,7 +437,49 @@ class VPCommand extends WP_CLI_Command {
     }
 
     /**
-     * Pulls changes from remote repository and pushes it all back.
+     * Pulls changes from remote repository.
+     *
+     * ## OPTIONS
+     *
+     * [--remote=<name or path or URL>]
+     * : Might be a name, path or an URL of the remote, just like in `git pull`.
+     * Defaults to "origin".
+     *
+     * @synopsis [--remote=<name>]
+     */
+    public function pull($args = array(), $assoc_args = array()) {
+
+        global $versionPressContainer;
+
+        $remote = isset($assoc_args['remote']) ? $assoc_args['remote'] : 'origin';
+        $this->switchMaintenance('on');
+
+        $branchToPullFrom = 'master'; // hardcoded until we support custom branches
+        $pullCommand = 'git pull ' . escapeshellarg($remote) . ' ' . $branchToPullFrom;
+        $process = VPCommandUtils::exec($pullCommand);
+
+        if ($process->isSuccessful()) {
+            WP_CLI::success("Pulled changes from $remote");
+        } else {
+            $this->switchMaintenance('off');
+            WP_CLI::error("Changes from $remote couldn't be pulled. Details:\n\n" . $process->getOutput());
+        }
+
+        // Run synchronization
+        /** @var SynchronizationProcess $syncProcess */
+        $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
+        $syncProcess->synchronize();
+        WP_CLI::success("Synchronized database");
+
+        $this->switchMaintenance('off');
+
+        WP_CLI::success("All done");
+
+    }
+
+    /**
+     * TODO This will be updated soon to follow the new pull / push structure. Leaving
+     * the old implementation here for now..
      *
      * ## OPTIONS
      *
@@ -578,14 +642,14 @@ class VPCommand extends WP_CLI_Command {
         $table_prefix = $matches[1];
     }
 
-    private function checkTables($dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix) {
+    private function checkTables($dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $assoc_args) {
         $wpdb = new \wpdb($dbUser, $dbPassword, $dbName, $dbHost);
         $wpdb->set_prefix($dbPrefix);
         $tables = $wpdb->get_col("SHOW TABLES LIKE '{$dbPrefix}_%'");
         $wpTables = array_intersect($tables, $wpdb->tables());
         $wpTablesExists = count($wpTables) > 0;
         if ($wpTablesExists) {
-            WP_CLI::confirm("Tables for this site already exist. They will be dropped. Proceed?");
+            WP_CLI::confirm("Tables for this site already exist. They will be dropped. Proceed?", $assoc_args);
         }
     }
 
@@ -618,6 +682,13 @@ class VPCommand extends WP_CLI_Command {
         WP_CLI::success("wp-config.php updated");
     }
 
+    /**
+     * Returns URL for a remote name, or null if the remote isn't configured.
+     * For example, for "origin", it might return "https://github.com/project/repo.git".
+     *
+     * @param string $name Remote name, e.g., "origin"
+     * @return string|null Remote URL, or null if remote isn't configured
+     */
     private function getRemoteUrl($name) {
         $listRemotesCommand = "git remote -v";
         $remotesRaw = VPCommandUtils::exec($listRemotesCommand)->getOutput();
@@ -641,10 +712,18 @@ class VPCommand extends WP_CLI_Command {
         return null;
     }
 
-    private function switchMaintenance($mode, $remote = null) {
-        $remotePath = $remote ? $this->getRemoteUrl($remote) : null;
-        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'maintenance', array($mode, 'require' => self::VP_INTERNAL_COMMAND_PATH), $remotePath);
-        $preposition = $mode == 'on' ? 'to' : 'from';
+    /**
+     * Switches the maintenance mode on or off for a site specified by a remote.
+     * The remote must be "local" - on the same filesystem. If no remote name is
+     * given, the current site's maintenance mode is switched.
+     *
+     * @param string $onOrOff "on" | "off"
+     * @param string|null $remoteName
+     */
+    private function switchMaintenance($onOrOff, $remoteName = null) {
+        $remotePath = $remoteName ? $this->getRemoteUrl($remoteName) : null;
+        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'maintenance', array($onOrOff, 'require' => self::VP_INTERNAL_COMMAND_PATH), $remotePath);
+        $preposition = $onOrOff == 'on' ? 'to' : 'from';
 
         if ($process->isSuccessful()) {
             WP_CLI::success("Remote site switched $preposition the maintenance mode");
