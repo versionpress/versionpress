@@ -5,6 +5,7 @@
 /.idea/jsLibraryMappings.xml
 /.idea/watcherTasks.xml
 /.idea/misc.xml
+/.idea/webServers.xml
 
 # Build dirs
 /build
