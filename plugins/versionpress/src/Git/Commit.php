@@ -24,7 +24,7 @@ class Commit {
     private $message;
 
     /** @var array */
-    private $changedFiles;
+    private $changedFiles = array();
 
     /**
      * Creates instance from string matching pattern:
@@ -43,6 +43,10 @@ class Commit {
         $commit->authorName = $authorName;
         $commit->authorEmail = $authorEmail;
         $commit->message = new CommitMessage($messageHead, $messageBody);
+
+        if ($rawStatus === "") {
+            return $commit;
+        }
 
         foreach (explode("\n", $rawStatus) as $line) {
             list($status, $path) = explode("\t", $line);
