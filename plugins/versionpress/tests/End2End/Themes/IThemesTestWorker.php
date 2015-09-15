@@ -13,9 +13,16 @@ interface IThemesTestWorker extends ITestWorker {
      *                           name: name of plugin (saved in VP-Theme-Name tag)
      *                           affected-path: directory or file that should be affected by installation / deleting
      *
-     * @return mixed
+     * @return void
      */
     public function setThemeInfo($themeInfo);
+
+    /**
+     * @see IThemesTestWorker::setThemeInfo
+     * @param $themeInfo
+     * @return void
+     */
+    public function setSecondThemeInfo($themeInfo);
 
     public function prepare_uploadTheme();
     public function uploadTheme();
@@ -25,4 +32,10 @@ interface IThemesTestWorker extends ITestWorker {
 
     public function prepare_deleteTheme();
     public function deleteTheme();
+
+    public function prepare_uploadTwoThemes();
+    public function uploadTwoThemes();
+
+    public function prepare_deleteTwoThemes();
+    public function deleteTwoThemes();
 }

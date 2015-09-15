@@ -18,6 +18,13 @@ interface IPluginsTestWorker extends ITestWorker {
      */
     public function setPluginInfo($pluginInfo);
 
+    /**
+     * @see IPluginsTestWorker::setPluginInfo
+     * @param array $secondPluginInfo
+     * @return void
+     */
+    public function setSecondPluginInfo($secondPluginInfo);
+
     public function prepare_installPlugin();
     public function installPlugin();
 
@@ -29,4 +36,16 @@ interface IPluginsTestWorker extends ITestWorker {
 
     public function prepare_deletePlugin();
     public function deletePlugin();
+
+    public function prepare_installTwoPlugins();
+    public function installTwoPlugins();
+
+    public function prepare_activateTwoPlugins();
+    public function activateTwoPlugins();
+
+    public function prepare_deactivateTwoPlugins();
+    public function deactivateTwoPlugins();
+
+    public function prepare_uninstallTwoPlugins();
+    public function uninstallTwoPlugins();
 }
