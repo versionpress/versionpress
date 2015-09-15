@@ -240,6 +240,7 @@ class Initializer {
 
         if ($storage instanceof MetaEntityStorage) {
             $entityInfo = $this->dbSchema->getEntityInfo($entityName);
+            reset($entityInfo->references);
             $parentReference = "vp_" . key($entityInfo->references);
 
             $this->saveMetaEntities($storage, $entities, $parentReference);
