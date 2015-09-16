@@ -371,7 +371,7 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::success("Site files cloned");
         }
 
-        // Adding the clone as a remote for the convenience of the `vp pull` command - it's `--remote`
+        // Adding the clone as a remote for the convenience of the `vp pull` command - its `--remote`
         // parameter can then be just the name of the clone, not a path to it
         $addRemoteCommand = sprintf("git remote add %s %s", escapeshellarg($name), escapeshellarg($clonePath));
         $process = VPCommandUtils::exec($addRemoteCommand, $currentWpPath);
@@ -437,15 +437,14 @@ class VPCommand extends WP_CLI_Command {
     }
 
     /**
-     * Pulls changes from remote repository.
+     * Pulls changes from another clone
      *
      * ## OPTIONS
      *
-     * [--remote=<name or path or URL>]
-     * : Might be a name, path or an URL of the remote, just like in `git pull`.
-     * Defaults to "origin".
+     * [--remote=<nameOrPathOrURL>]
+     * : Name, path or an URL of the remote, just like in `git pull`. Defaults to "origin".
      *
-     * @synopsis [--remote=<name>]
+     * @synopsis [--remote=<nameOrPathOrURL>]
      */
     public function pull($args = array(), $assoc_args = array()) {
 
@@ -478,7 +477,7 @@ class VPCommand extends WP_CLI_Command {
     }
 
     /**
-     * Pushes changes to another site clone
+     * Pushes changes to another clone
      *
      * ## OPTIONS
      *
