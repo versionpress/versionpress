@@ -98,11 +98,13 @@ function vp_register_hooks() {
     add_filter('update_feedback', function () {
         touch(ABSPATH . 'versionpress.maintenance');
     });
-    add_action('_core_updated_successfully', function () use ($committer) {
+    add_action('_core_updated_successfully', function () use ($committer, $mirror) {
         require(ABSPATH . 'wp-includes/version.php'); // load constants (like $wp_version)
         /** @var string $wp_version */
         $changeInfo = new WordPressUpdateChangeInfo($wp_version);
         $committer->forceChangeInfo($changeInfo);
+
+        $mirror->save('option', array('option_name' => 'db_version', 'option_value' => get_option('db_version'))); // We have to re-save the option because WP upgrader uses $wpdb->query()
 
         if (!WpdbReplacer::isReplaced()) {
             WpdbReplacer::replaceMethods();
