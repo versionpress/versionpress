@@ -19,7 +19,7 @@ For example, if it was run in `C:\www\mysite` on a site that was served as `http
  * Git-cloned the files there
  * Created database tables prefixed with `wp_test_...`
  * Filled it with data
- * Updated the site URL to be `http://localhost/site01-test`
+ * Updated the site URL to be `http://localhost/mysite-test`
 
 The URL and database settings are all configurable, run the following command to see the full help:
 
