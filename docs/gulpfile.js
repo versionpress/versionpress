@@ -19,6 +19,7 @@ gulp.task('default', function (cb) {
     gutil.log(' ' + gutil.colors.green('gulp copy-docs') + ' Copies docs to docssite');
     gutil.log(' ' + gutil.colors.green('gulp watch') + '     Copies docs on every change, plus BrowserSync');
     gutil.log('');
+    gutil.log('For the `watch` task ' + gutil.colors.yellow('Visual Studio 2015') + ' needs to be installed');
 });
 
 
