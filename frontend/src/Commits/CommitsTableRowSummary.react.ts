@@ -30,7 +30,7 @@ class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps
       }, moment(commit.date).fromNow()),
       DOM.td({className: 'column-message'},
         commit.isMerge ? DOM.span({className: 'merge-icon', title: 'Merge commit'}, 'M') : null,
-        DOM.span(null, commit.message),
+        this.renderMessage(commit.message),
         this.props.detailsLevel !== 'none' ? DOM.div({className: 'detail-buttons'},
           DOM.button({className: 'button', disabled: this.props.detailsLevel === 'overview', onClick: (e) => {
               this.changeDetailsLevel('overview');
@@ -75,6 +75,18 @@ class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps
 
   private changeDetailsLevel(detailsLevel) {
     this.props.onDetailsLevelChanged(detailsLevel);
+  }
+
+  private renderMessage(message: string) {
+    const messageChunks = /(.*)'(.*)'(.*)/.exec(message);
+    if (!messageChunks || messageChunks.length < 4) {
+      return DOM.span(null, message);
+    }
+    return DOM.span(null,
+      messageChunks[1] !== '' ? this.renderMessage(messageChunks[1]) : null,
+      messageChunks[2] !== '' ? DOM.span({className: 'identifier'}, messageChunks[2]) : null,
+      messageChunks[3] !== '' ? this.renderMessage(messageChunks[3]) : null
+    );
   }
 }
 
