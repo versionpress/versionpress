@@ -423,9 +423,9 @@ class VPCommand extends WP_CLI_Command {
     /**
      * Examples (clone name "test"):
      *
-     *   http://localhost/vp01  ->  http://localhost/vp01_test
-     *   http://vp01            ->  http://vp01_test
-     *   http://www.vp01.dev    ->  http://www.vp01_test.dev
+     *   http://localhost/vp01  ->  http://localhost/test
+     *   http://vp01            ->  http://test
+     *   http://www.vp01.dev    ->  http://www.test.dev
      *
      * @param string $originUrl
      * @param string $originDirName
