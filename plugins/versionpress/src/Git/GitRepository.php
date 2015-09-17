@@ -229,8 +229,9 @@ class GitRepository {
      * @return bool
      */
     public function wasCreatedAfter($commitHash, $afterWhichCommitHash) {
-        $cmd = "git log $afterWhichCommitHash..$commitHash --oneline";
-        return $this->runShellCommandWithStandardOutput($cmd) != null;
+        $range = sprintf("%s..%s", $afterWhichCommitHash, $commitHash);
+        $cmd = "git log %s --oneline";
+        return $this->runShellCommandWithStandardOutput($cmd, $range) != null;
     }
 
     /**
@@ -240,8 +241,9 @@ class GitRepository {
      * @return mixed
      */
     public function getChildCommit($commitHash) {
-        $cmd = "git log --reverse --ancestry-path --format=%%H $commitHash..";
-        $result = $this->runShellCommandWithStandardOutput($cmd);
+        $range = "$commitHash..";
+        $cmd = "git log --reverse --ancestry-path --format=%%H %s";
+        $result = $this->runShellCommandWithStandardOutput($cmd, $range);
         list($childHash) = explode("\n", $result);
         return $childHash;
     }
@@ -331,7 +333,8 @@ class GitRepository {
         } else if ($hash === null) {
             $gitCmd = "git diff HEAD";
         } else {
-            $gitCmd = "git diff $hash~1 $hash";
+            $escapedHash = escapeshellarg($hash);
+            $gitCmd = "git diff $escapedHash~1 $escapedHash";
         }
 
         $output = $this->runShellCommandWithStandardOutput($gitCmd);
