@@ -28,7 +28,7 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
       let duplicatesOfChange = countOfDuplicates[change.type][change.action][change.name];
       let duplicatesSuffix = duplicatesOfChange > 1 ? (' (' + duplicatesOfChange + '×)') : '';
       return DOM.span(null,
-        DOM.span({className: 'CommitOverview-identifier'}, CommitOverview.getUserFriendlyName(change)),
+        DOM.span({className: 'identifier'}, CommitOverview.getUserFriendlyName(change)),
         duplicatesSuffix
       );
     });
@@ -144,11 +144,11 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
         ' by ',
         DOM.span({className: 'type'}, 'user'),
         ' ',
-        authorsString,
+        DOM.span({className: 'identifier'}, authorsString),
         ' for ',
         DOM.span({className: 'type'}, 'post'),
         ' ',
-        DOM.span({className: 'CommitOverview-identifier'}, postTitle),
+        DOM.span({className: 'identifier'}, postTitle),
         suffix
       );
       lines.push(line);
@@ -181,7 +181,7 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
         ' for ',
         DOM.span({className: 'type'}, parentEntity),
         ' ',
-        DOM.span({className: 'CommitOverview-identifier'}, tagValue)
+        DOM.span({className: 'identifier'}, tagValue)
       ];
       let line = this.renderOverviewLine(entityName, action, changedEntities, lineSuffix);
       lines.push(line);
