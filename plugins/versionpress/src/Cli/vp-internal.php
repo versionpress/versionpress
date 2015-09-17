@@ -91,8 +91,7 @@ class VPInternalCommand extends WP_CLI_Command {
     }
 
     /**
-     * Finishes push. Saves uncommited changes into stash, resets working directory, pops back changes from stash and
-     * runs synchronization.
+     * Finishes `vp push`
      *
      * @subcommand finish-push
      *
@@ -100,7 +99,7 @@ class VPInternalCommand extends WP_CLI_Command {
     public function finishPush($args, $assoc_args) {
         global $versionPressContainer;
 
-        // Git reset - "loads" changes from index
+        // Update working copy
         $resetCommand = "git reset --hard";
         $process = VPCommandUtils::exec($resetCommand);
         if ($process->isSuccessful()) {
