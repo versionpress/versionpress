@@ -1,7 +1,6 @@
 <?php
 
 namespace VersionPress\Utils;
-use Tracy\Debugger;
 
 /**
  * Replaces absolute site URL with placeholder
@@ -10,6 +9,7 @@ class AbsoluteUrlReplacer {
 
     const PLACEHOLDER = "<<[site-url]>>";
     private $siteUrl;
+    private $replacedObjects = array();
 
     public function __construct($siteUrl) {
         $this->siteUrl = $siteUrl;
@@ -22,6 +22,8 @@ class AbsoluteUrlReplacer {
      * @return array
      */
     public function replace($entity) {
+        $this->replacedObjects = array();
+
         foreach ($entity as $field => $value) {
             if ($field === "guid") continue; // guids cannot be changed even they are in form of URL
             if (isset($entity[$field])) {
@@ -38,6 +40,8 @@ class AbsoluteUrlReplacer {
      * @return array
      */
     public function restore($entity) {
+        $this->replacedObjects = array();
+
         foreach ($entity as $field => $value) {
             if (isset($entity[$field])) {
                 $entity[$field] = $this->replacePlaceholders($value);
@@ -86,7 +90,9 @@ class AbsoluteUrlReplacer {
                 $tmp[$key] = $this->replaceRecursively($arrayValue, $replaceFn);
             }
             return $tmp;
-        } else if (is_object($value)) {
+        } else if (is_object($value) && !in_array(spl_object_hash($value), $this->replacedObjects)) {
+            $this->replacedObjects[] = spl_object_hash($value); // protection against cyclic references
+
             $r = new \ReflectionObject($value);
             $p = $r->getProperties();
             foreach ($p as $prop) {
