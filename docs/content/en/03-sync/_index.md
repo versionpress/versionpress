@@ -1,11 +1,11 @@
 # Sync / Team Workflows
 
-VersionPress is powerful not only when it comes to managing a single site but maybe even more so when multiple *clones* come into play. This section describes the sync feature in detail.
+This sections discusses how VersionPress handles multiple site instances like *staging* and *live*, cloning and merging between them, etc.
 
 <div class="note">
  
   **Available since VersionPress 2.0**
  
-  The functionality described in this section is available as of the [2.0 release](./release-notes/2.0).
+  The functionality described in this section is available since the [2.0 release](./release-notes/2.0).
  
 </div>

@@ -1,31 +1,31 @@
 # Cloning a Site #
 
-Cloning a site creates an entirely separate WordPress installation that just happens to look exactly the same as the original site. Technically, both the files and the database are brand new, not connected to the original site in any way.
-
-Do any updates you wish in the clone and when done, [push](./merging) them back to the original site.
+Cloning a site creates a separate WordPress instance that looks like the original one but doesn't share any of its files or database tables. Making changes in the clone doesn't affect the original site in any way, until those changes are [merged](./merging) back.
 
 
-## WP-CLI command
+## The 'clone' command
 
-Currently, the cloning functionality is exposed via a WP-CLI command only. You need to have [WP-CLI installed and working](../feature-focus/wp-cli) on your computer / server.
+Currently, the cloning functionality is exposed via a WP-CLI command. You need to have [WP-CLI installed and working](../feature-focus/wp-cli) on your machine.
 
-Cloning is started from the root of the original site by executing this command:
+Cloning is started from the root of the site by executing the **vp clone** command. In its simplest form, it only needs the `--name` parameter:
 
-    wp vp clone --name=test
+    wp vp clone --name=staging
 
-For example, if it was run in `C:\www\mysite` on a site that was served as `http://localhost/mysite`, the command did the following:
+If the site was `C:\www\mysite` and it was served as `http://localhost/mysite`, the command did the following:
 
- * Created a new folder `C:\www\mysite-test`
- * Git-cloned the files there
- * Created database tables prefixed with `wp_test_...`
- * Filled it with data
- * Updated the site URL to be `http://localhost/mysite-test`
+ * Created a new folder `C:\www\staging` and cloned the site files there
+ * Created database tables prefixed with `wp_staging_...` and filled them with data
+ * Made the site available at `http://localhost/staging`
 
-The URL and database settings are all configurable, run the following command to see the full help:
+The original site also stored a named reference to the clone so for instance, you can later [pull](./merging) from the clone by executing a command like `wp vp pull --from=staging`.
 
-    wp help vp clone
+The URL and database settings are all configurable so for example, you could run the command like this:
+
+    wp vp clone --name=staging
+                --dbname=staging_db
+                --dbuser=...
+                --siteurl=http://staging.mysite.dev/
 
 
-## GUI method ##
+Full help is available by running `wp help vp clone`.
 
-In a future update of VersionPress, we will have a GUI method to achieve the same.

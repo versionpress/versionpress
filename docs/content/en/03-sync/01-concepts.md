@@ -1,54 +1,45 @@
 # Concepts
 
-Previous sections of this documentation focused on using VersionPress on a single site, or more precisely, on a single WordPress installation. It offers many useful features there but where VersionPress truly shines is when it comes to **multiple WordPress installations** (*clones* of the main site) and **synchronization** between them.
+Previous sections focused on using VersionPress on a single site, or more precisely, on a single site *instance*. It offers many useful features there but where it truly shines is when it comes to **multiple instances** (*clones* of the WP site, *environments* if you will) and **synchronization** between them.
 
 <div class="note">
  
-  **Note about terminology**
+  **Terminology**
  
-  The terms *clone* or a WP *instance* or WP *installation* all mean the same – simply a copy of a site that can run independently. From the VersionPress' point of view, all clones are equal, even though we, human beings, like to call certain installations as "main", "master" or whatever. VersionPress doesn't care.  
+  The terms *clone*, *WP instance*, *installation*, *environment* etc. all represent the same concept and are used interchangeably here.
  
 </div>
 
 
-## Why multiple clones
+## Why multiple instances
 
-There are two main reasons why you would want to have two or more instances of a site:
+There are two main reasons why you would want to have two or more instances of a WordPress site:
 
- 1. Safe testing environment (a technique also called *staging*)
+ 1. Safe testing environment (*staging*)
  2. Team workflows
 
+A **safe testing environment** is essential when you have a larger or risky change like trying out a new plugin, changing a theme or upgrading WordPress. While it is true that VersionPress greatly helps with the Undo / Rollback functionality even on the live site, it is even better to test those changes beforehand. The technique of this is sometimes broadly referred to as staging.
 
-### Testing environment (staging)
+Another common scenario is **team work**. On many projects, several people cooperate to get the work done, from developers, designers to copywriters. The best way to organize such work is to have a separate environment for each person involved so that there is no interference or disruption during the development period.
 
-A safe testing environment is essential when you have a larger or risky change for the site like trying out a new plugin, changing a theme or upgrading WordPress to a newer version. While it is true that VersionPress greatly helps with the Undo / Rollback functionality even on the live site, testing these changes first is a much better idea.
+There is a **common problem** though: while it is simple to create multiple instances of a site, it is generally very hard to *merge* them back together. And you need a merge because simply replacing one site with another could lose newer changes there.
 
-
-### Team workflows 
-
-Another common scenario where site synchronization is very useful is team work. On bigger projects, it is common that several people cooperate to get the site done, from developers, designers to copywriters. If each of them can have their own clone of a site that is not being messed up with by anyone else, they can focus on their work and VersionPress will then take care of the difficult and often painful experience of merging the work back together.
+That's where VersionPress comes in.
 
 
-## Cloning and merging
+## Cloning and merging with VersionPress
 
-Both of the cases above are backed by the same approach – creating clones and merging them back. It is really this simple and there is only a few concepts to understand.
+Let's discuss a workflow that seems basic but actually covers almost any real-world scenario – you can use it for staging, team work, hosting the repository on GitHub, almost anything.
 
-For instance, if you want to test some changes safely:
+**(1)** You start by **[cloning a site](./cloning)**. That creates a new site instance that looks exactly like the original one but with its own files and database tables. Technically, it is a separate WordPress installation.
 
- 1. You first **clone** the site to a new, safe location
- 2. You test the changes there
- 3. From the clone, you **push** the changes back to the main site
+**(2)** Then you **do the work** there. You can experiment with new stuff, you can break things, it doesn't matter as the environment is completely separate and safe. If things go too crazy, you can always start over and clone from the origin again.
 
-The push will attempt to automatically **merge** the sites, i.e., if the files or the database changed in both instances, VersionPress will attempt keep changes from both of them. This will work automatically unless there is a conflict.
+Then, at some point, you're happy with the result and  you're going to **(3)** **[merge](./merging)** the changes back. In VersionPress' (and Git's) terminology, you're going to **push** or **pull** changes between environments.
 
-A **conflict** is a situation where two people made a conflicting change to the same piece of data; for instance, if Alice changed the site title to "I like this new title" while Bob changed it to "This is way better", there is a conflict that needs to be resolved. *(Like in real life; wait, this is real life!)*
+In most cases, the merge will be fully automatic and painless. However, a **conflict** might also occur. This happens when two different edits are done to the same piece of data, for example, when two copywriters edit the same paragraph or the site title is updated differently in two environments.
 
-**Conflict resolution** always needs to be done manually because there is a true, logical conflict in people's intentions. Conflict resolution always happens in the clone so that the original site is not affected. After the conflict is resolved, you push / merge again which will now succeed.
+**(4)** In such case, the **conflict needs to be resolved**. This is always a human work and currently, we do not have a user interface for that but because VersionPress is powered by Git and very close to it, you can (and currently need to) do it manually. When the conflict is resolved, you commit the result and run a special synchronization command as discussed in the [merging](./merging) topic again.
 
-*The truth is that conflict resolution is not always easy, neither in real life nor in software. We currently do not have an user interface that would help with this so you need to drop to Git to resolve the conflicts manually. But we will make the experience smoother in some future update.*
-
-And that's all you need to understand. Now, you just need to know how to do that, and that is described in these topics:
-
- - [Cloning a site](./cloning)
- - [Merging two sites](./merging)
+That's all there is to it, really. Happy cloning & merging!
 
