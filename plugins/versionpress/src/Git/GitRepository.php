@@ -324,12 +324,27 @@ class GitRepository {
      * @return string
      */
     public function getDiff($hash = null) {
+        if ($hash === null) {
+            $status = $this->getStatus(true);
+            $this->runShellCommand("git add -AN");
+            $diff = $this->runShellCommandWithStandardOutput("git diff HEAD");
+            $filesToReset = array_map(function ($file) {
+                return $file[1];
+            }, array_filter($status, function ($file) {
+                return $file[0] === '??'; // unstaged
+            }));
+
+            if (count($filesToReset) > 0) {
+                $this->runShellCommand(sprintf("git reset HEAD %s", join(" ", array_map('escapeshellarg', $filesToReset))));
+            }
+
+            return $diff;
+        }
+
         if ($this->getInitialCommit()->getHash() === $hash) {
             // Inspired by: http://stackoverflow.com/a/25064285
             $emptyTreeHash = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
             $gitCmd = "git diff-tree -p $emptyTreeHash $hash";
-        } else if ($hash === null) {
-            $gitCmd = "git diff HEAD";
         } else {
             $gitCmd = "git diff $hash~1 $hash";
         }

@@ -51,7 +51,7 @@ class CommitPanelOverview extends React.Component<CommitPanelOverviewProps, Comm
   private getActionVerb(action: string) {
     if (action === 'M') {
       return 'Modified';
-    } else if (action === '??' || action === 'A') {
+    } else if (action === '??' || action === 'A' || action === 'AM') {
       return 'Added';
     } else if (action === 'D') {
       return 'Deleted';
