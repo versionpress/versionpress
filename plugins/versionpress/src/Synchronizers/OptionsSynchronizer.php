@@ -2,7 +2,6 @@
 namespace VersionPress\Synchronizers;
 
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Storages\OptionsStorage;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use wpdb;
@@ -13,7 +12,7 @@ use wpdb;
  */
 class OptionsSynchronizer implements Synchronizer {
 
-    /** @var OptionsStorage */
+    /** @var Storage */
     private $optionsStorage;
 
     /** @var wpdb */
