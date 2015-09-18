@@ -134,15 +134,7 @@ abstract class DirectoryStorage extends Storage {
 
     protected function deserializeEntity($serializedEntity) {
         $entity = IniSerializer::deserialize($serializedEntity);
-        if (count($entity) == 0) {
-            return $entity;
-        }
-
-        $vpid = key($entity);
-        $flattenEntity = $entity[$vpid];
-        $flattenEntity[$this->entityInfo->vpidColumnName] = $vpid;
-
-        return $flattenEntity;
+        return $this->flattenEntity($entity);
     }
 
     protected function serializeEntity($vpid, $entity) {
@@ -178,5 +170,18 @@ abstract class DirectoryStorage extends Storage {
     public function loadEntity($id, $parentId = null) {
         $entities = $this->loadAllFromFiles(array($this->getEntityFilename($id)));
         return $entities[$id];
+    }
+
+    protected function flattenEntity($entity) {
+        if (count($entity) === 0) {
+            return $entity;
+        }
+
+        reset($entity);
+        $vpid = key($entity);
+        $flatEntity = $entity[$vpid];
+        $flatEntity[$this->entityInfo->vpidColumnName] = $vpid;
+
+        return $flatEntity;
     }
 }
