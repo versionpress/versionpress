@@ -460,8 +460,49 @@ class VPCommand extends WP_CLI_Command {
         if ($process->isSuccessful()) {
             WP_CLI::success("Pulled changes from $remote");
         } else {
-            $this->switchMaintenance('off');
-            WP_CLI::error("Changes from $remote couldn't be pulled. Details:\n\n" . $process->getOutput());
+
+            if (stripos($process->getOutput(), 'automatic merge failed') !== false) {
+                WP_CLI::warning("");
+                WP_CLI::warning("CONFLICTS DETECTED. Your options:");
+                WP_CLI::warning("");
+                WP_CLI::warning(" 1) Keep the conflicts. You will be able to resolve them manually.");
+                WP_CLI::warning(" 2) Abort the process. The site will look like you never ran the pull.");
+                WP_CLI::warning("");
+
+                fwrite(STDOUT, "Choose 1 or 2: " );
+                $answer = trim(fgets(STDIN));
+
+                if ($answer == "1") {
+                    WP_CLI::success("You've chosen to keep the conflicts on the disk. MAINTENANCE MODE IS STILL ON.");
+                    WP_CLI::success("");
+                    WP_CLI::success("Do this now:");
+                    WP_CLI::success("");
+                    WP_CLI::success(" 1. Resolve the conflicts manually as in a standard Git workflow");
+                    WP_CLI::success(" 2. Stage and `git commit` the changes");
+                    WP_CLI::success(" 3. Return here and run `wp vp apply-changes`");
+                    WP_CLI::success("");
+                    WP_CLI::success("That last step will turn the maintenance mode off.");
+                    exit();
+
+                } else {
+
+                    $process = VPCommandUtils::exec('git merge --abort');
+                    if ($process->isSuccessful()) {
+                        $this->switchMaintenance('off');
+                        WP_CLI::success("Pull aborted, your site is now clean and running");
+                        exit();
+                    } else {
+                        WP_CLI::error("Aborting pull failed, do it manually by executing 'git merge --abort'", false);
+                        WP_CLI::error("and also don't fortget to turn off the maintenance mode.");
+                    }
+                }
+
+
+            } else { // not a merge conflict, some other error
+                $this->switchMaintenance('off');
+                WP_CLI::error("Changes from $remote couldn't be pulled. Details:\n\n" . $process->getOutput());
+            }
+
         }
 
         // Run synchronization
