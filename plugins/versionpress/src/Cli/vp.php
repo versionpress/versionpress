@@ -497,7 +497,8 @@ class VPCommand extends WP_CLI_Command {
                         WP_CLI::success("Pull aborted, your site is now clean and running");
                         exit();
                     } else {
-                        WP_CLI::error("Aborting pull failed. Do it manually by executing 'git merge --abort'");
+                        WP_CLI::error("Aborting pull failed, do it manually by executing 'git merge --abort'", false);
+                        WP_CLI::error("and also don't fortget to turn off the maintenance mode.");
                     }
                 }
 
