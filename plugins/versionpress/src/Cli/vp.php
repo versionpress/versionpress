@@ -463,15 +463,10 @@ class VPCommand extends WP_CLI_Command {
 
             if (stripos($process->getOutput(), 'automatic merge failed') !== false) {
                 WP_CLI::warning("");
-                WP_CLI::warning("    =====  CONFLICTS DETECTED  =====");
+                WP_CLI::warning("CONFLICTS DETECTED. Your options:");
                 WP_CLI::warning("");
-                WP_CLI::warning("Your options:");
-                WP_CLI::warning("");
-                WP_CLI::warning(" 1) Keep the conflict. This will keep conflicting files on the disk and maintenance");
-                WP_CLI::warning("    mode on. Choose this if you want to start resolving conflicts now.");
-                WP_CLI::warning("");
-                WP_CLI::warning(" 2) Abort the change. This will remove all local modifications and switch the maintenance");
-                WP_CLI::warning("    mode off. The site will look like you never ran the pull.");
+                WP_CLI::warning(" 1) Keep the conflicts. You will be able to resolve them manually.");
+                WP_CLI::warning(" 2) Abort the process. The site will look like you never ran the pull.");
                 WP_CLI::warning("");
 
                 fwrite(STDOUT, "Choose 1 or 2: " );
@@ -486,7 +481,7 @@ class VPCommand extends WP_CLI_Command {
                     WP_CLI::success(" 2. Stage and `git commit` the changes");
                     WP_CLI::success(" 3. Return here and run `wp vp apply-changes`");
                     WP_CLI::success("");
-                    WP_CLI::success("That last step will turn the maintenance mode OFF.");
+                    WP_CLI::success("That last step will turn the maintenance mode off.");
                     exit();
 
                 } else {
