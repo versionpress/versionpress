@@ -132,6 +132,10 @@ abstract class DirectoryStorage extends Storage {
         return $this->directory . '/' . $vpidPath . '.ini';
     }
 
+    public function getPathCommonToAllEntities() {
+        return $this->directory;
+    }
+
     protected function deserializeEntity($serializedEntity) {
         $entity = IniSerializer::deserialize($serializedEntity);
         return $this->flattenEntity($entity);

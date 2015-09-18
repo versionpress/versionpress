@@ -109,7 +109,7 @@ class TranslationChangeInfo extends TrackedChangeInfo {
 
         $filesChange = array("type" => "path", "path" => $path);
 
-        $optionChange = array("type" => "storage-file", "entity" => "option", "id" => "", "parent-id" => "");
+        $optionChange = array("type" => "all-storage-files", "entity" => "option");
 
         return array($filesChange, $optionChange);
     }

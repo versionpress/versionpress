@@ -277,7 +277,7 @@ class Reverter {
             $entitiesToSynchronize[] = 'term_taxonomy';
         }
 
-        if ($this->wasModified($modifiedFiles, 'options.ini')) {
+        if ($this->wasModified($modifiedFiles, 'options')) {
             $entitiesToSynchronize['storages'][] = 'option';
         }
 

@@ -77,6 +77,8 @@ abstract class Storage {
      */
     public abstract function getEntityFilename($id, $parentId);
 
+    public abstract function getPathCommonToAllEntities();
+
     /**
      * Internal method to create a ChangeInfo. Though it is mostly an implementation
      * detail of the `save()` and `delete()` methods, most storages create ChangeInfos
