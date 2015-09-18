@@ -20,6 +20,10 @@ if (isset($_GET['error'])) {
             'class' => 'error',
             'message' => 'Error: Objects with missing references cannot be restored. For example we cannot restore comment where the related post was deleted.'
         ),
+        RevertStatus::REVERTING_MERGE_COMMIT => array(
+            'class' => 'error',
+            'message' => 'Error: It is not possible to undo merge commit.'
+        ),
     );
 
     $error = $errors[$_GET['error']];
