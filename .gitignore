@@ -14,3 +14,4 @@ node_modules
 
 # Other
 Thumbs.db
+npm-debug.log
