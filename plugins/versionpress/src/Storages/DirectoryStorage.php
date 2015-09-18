@@ -7,7 +7,6 @@ use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use RegexIterator;
 use VersionPress\Database\EntityInfo;
-use VersionPress\Filters\EntityFilter;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\EntityUtils;
 use VersionPress\Utils\FileSystem;
@@ -83,9 +82,9 @@ abstract class DirectoryStorage extends Storage {
     }
 
     public function delete($restriction) {
-        $fileName = $this->getEntityFilename($restriction['vp_id']);
+        $fileName = $this->getEntityFilename($restriction[$this->entityInfo->idColumnName]);
         if (is_file($fileName)) {
-            $entity = $this->loadEntity($restriction['vp_id']);
+            $entity = $this->loadEntity($restriction[$this->entityInfo->idColumnName]);
             FileSystem::remove($fileName);
             return $this->createChangeInfo($entity, $entity, 'delete');
         } else {

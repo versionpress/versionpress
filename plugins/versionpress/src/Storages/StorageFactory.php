@@ -58,7 +58,7 @@ class StorageFactory {
     private function initStorageClasses() {
         $this->addStorageClassInfo('post', 'VersionPress\Storages\PostStorage', '%vpdb%/posts', self::ENTITY_INFO);
         $this->addStorageClassInfo('comment', 'VersionPress\Storages\CommentStorage', '%vpdb%/comments', self::ENTITY_INFO, '%database%');
-        $this->addStorageClassInfo('option', 'VersionPress\Storages\OptionsStorage', '%vpdb%/options.ini', self::ENTITY_INFO, $this->database->prefix);
+        $this->addStorageClassInfo('option', 'VersionPress\Storages\OptionDirectoryStorage', '%vpdb%/options', self::ENTITY_INFO, $this->database->prefix);
         $this->addStorageClassInfo('term', 'VersionPress\Storages\TermsStorage', '%vpdb%/terms.ini', self::ENTITY_INFO);
         $this->addStorageClassInfo('term_taxonomy', 'VersionPress\Storages\TermTaxonomyStorage', '%vpdb%/terms.ini', self::ENTITY_INFO);
         $this->addStorageClassInfo('user', 'VersionPress\Storages\UserStorage', '%vpdb%/users', self::ENTITY_INFO);

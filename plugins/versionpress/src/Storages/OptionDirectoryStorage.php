@@ -10,7 +10,7 @@ class OptionDirectoryStorage extends DirectoryStorage {
 
     const PREFIX_PLACEHOLDER = "<<table-prefix>>";
 
-    public static $optionBlacklist = array(
+    public static $optionsBlacklist = array(
         'cron',          // Cron, siteurl and home are specific for environment, so they're not saved, too.
         'home',
         'siteurl',
@@ -30,6 +30,11 @@ class OptionDirectoryStorage extends DirectoryStorage {
         parent::__construct($directory, $entityInfo);
         $this->entityInfo = $entityInfo;
         $this->tablePrefix = $tablePrefix;
+    }
+
+    public function save($data) {
+        unset($data['option_id']);
+        return parent::save($data);
     }
 
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
@@ -52,7 +57,7 @@ class OptionDirectoryStorage extends DirectoryStorage {
 
     public function shouldBeSaved($data) {
         $id = $data[$this->entityInfo->idColumnName];
-        return !($this->isTransientOption($id) || in_array($id, self::$optionBlacklist));
+        return !($this->isTransientOption($id) || in_array($id, self::$optionsBlacklist));
     }
 
     private function isTransientOption($id) {

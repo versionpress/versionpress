@@ -116,6 +116,10 @@ abstract class MetaEntityStorage extends Storage {
         return $this->parentStorage->getEntityFilename($parentId, null);
     }
 
+    public function getPathCommonToAllEntities() {
+        return $this->parentStorage->getPathCommonToAllEntities();
+    }
+
     public function loadEntity($id, $parentId) {
         $parent = $this->parentStorage->loadEntity($parentId, null);
         return $this->extractEntityFromParentByVpId($parent, $id);
