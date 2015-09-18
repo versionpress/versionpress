@@ -192,8 +192,7 @@ class GitRepository {
      * @param $commitHash
      */
     public function revertAll($commitHash) {
-        $commitRange = sprintf("%s..HEAD", $commitHash);
-        $this->runShellCommand("git revert -n %s", $commitRange);
+        $this->runShellCommand("git checkout %s .", $commitHash);
     }
 
     /**
