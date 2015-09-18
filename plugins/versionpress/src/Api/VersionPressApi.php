@@ -176,16 +176,16 @@ class VersionPressApi {
             $initialCommitHash = $this->gitRepository->getChildCommit($preActivationHash);
         }
 
-        $idChildOfInitialCommit = $this->gitRepository->wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
+        $isChildOfInitialCommit = $this->gitRepository->wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
         $isFirstCommit = $page === 0;
 
         $result = array();
         foreach ($commits as $commit) {
-            $idChildOfInitialCommit = $idChildOfInitialCommit && ($commit->getHash() !== $initialCommitHash);
-            $canUndoCommit = $idChildOfInitialCommit && !$commit->isMerge();
-            $canRollbackToThisCommit = !$isFirstCommit && ($idChildOfInitialCommit || $commit->getHash() === $initialCommitHash);
+            $isChildOfInitialCommit = $isChildOfInitialCommit && ($commit->getHash() !== $initialCommitHash);
+            $canUndoCommit = $isChildOfInitialCommit && !$commit->isMerge();
+            $canRollbackToThisCommit = !$isFirstCommit && ($isChildOfInitialCommit || $commit->getHash() === $initialCommitHash);
             $changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
-            $isEnabled = $idChildOfInitialCommit || $canRollbackToThisCommit || $commit->getHash() === $initialCommitHash;
+            $isEnabled = $isChildOfInitialCommit || $canRollbackToThisCommit || $commit->getHash() === $initialCommitHash;
 
             $fileChanges = $this->getFileChanges($commit);
             $changeInfoList = $changeInfo instanceof ChangeInfoEnvelope ? $changeInfo->getChangeInfoList() : array();
