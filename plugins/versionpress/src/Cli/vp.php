@@ -477,6 +477,32 @@ class VPCommand extends WP_CLI_Command {
     }
 
     /**
+     * Applies changes from the disk to the database.
+     *
+     * It happens under the maintenance mode.
+     *
+     * @subcommand apply-changes
+     */
+    public function applyChanges($args = array(), $assoc_args = array()) {
+
+        global $versionPressContainer;
+
+        $this->switchMaintenance('on');
+
+        /** @var SynchronizationProcess $syncProcess */
+        $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
+        $syncProcess->synchronize();
+        WP_CLI::success("Database updated");
+
+        $this->switchMaintenance('off');
+
+        WP_CLI::success("All done");
+
+
+
+    }
+
+    /**
      * Pushes changes to another clone
      *
      * ## OPTIONS
@@ -717,7 +743,7 @@ class VPCommand extends WP_CLI_Command {
         if ($process->isSuccessful()) {
             WP_CLI::success("Remote site switched $preposition the maintenance mode");
         } else {
-            WP_CLI::error("Remote site couldn't be switched $preposition the maintenance mode");
+            WP_CLI::error("Remote site couldn't be switched $preposition the maintenance mode. Details:\n\n" . $process->getErrorOutput());
         }
     }
 }
