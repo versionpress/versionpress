@@ -441,16 +441,16 @@ class VPCommand extends WP_CLI_Command {
      *
      * ## OPTIONS
      *
-     * [--remote=<nameOrPathOrURL>]
+     * [--from=<nameOrPathOrURL>]
      * : Name, path or an URL of the remote, just like in `git pull`. Defaults to "origin".
      *
-     * @synopsis [--remote=<nameOrPathOrURL>]
+     * @synopsis [--from=<nameOrPathOrURL>]
      */
     public function pull($args = array(), $assoc_args = array()) {
 
         global $versionPressContainer;
 
-        $remote = isset($assoc_args['remote']) ? $assoc_args['remote'] : 'origin';
+        $remote = isset($assoc_args['from']) ? $assoc_args['from'] : 'origin';
         $this->switchMaintenance('on');
 
         $branchToPullFrom = 'master'; // hardcoded until we support custom branches
@@ -548,13 +548,13 @@ class VPCommand extends WP_CLI_Command {
      *
      * ## OPTIONS
      *
-     * [--remote=<nameOrPath>]
+     * [--to=<nameOrPath>]
      * : Name or path of the remote. Defaults to "origin".
      *
-     * @synopsis [--remote=<nameOrPath>]
+     * @synopsis [--to=<nameOrPath>]
      */
     public function push($args = array(), $assoc_args = array()) {
-        $remoteName = isset($assoc_args['remote']) ? $assoc_args['remote'] : 'origin';
+        $remoteName = isset($assoc_args['to']) ? $assoc_args['to'] : 'origin';
         $remotePath = $this->getRemoteUrl($remoteName);
         if ($remotePath === null) {
             $remotePath = $remoteName;
