@@ -74,7 +74,7 @@ class ThemesTest extends End2EndTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("theme/switch");
         $commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/options.ini");
+        $commitAsserter->assertCommitPath(array("A", "M"), "%vpdb%/options/cu/current_theme.ini");
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
 

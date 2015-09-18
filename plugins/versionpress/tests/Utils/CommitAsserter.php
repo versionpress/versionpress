@@ -221,7 +221,7 @@ class CommitAsserter {
      *
      * Placeholders are case sensitive.
      *
-     * @param string $type Standard git "M" (modified), "A" (added), "D" (deleted) etc.
+     * @param string $type Standard git "M" (modified), "A" (added), "D" (deleted) etc. or array of actions for more possibilities.
      * @param string $path Path relative to repo root. Supports wildcards, e.g. "wp-content/uploads/*",
      *   and placeholders, e.g., "%vpdb%/posts/%VPID%.ini"
      * @param int $whichCommit See $whichCommitParameter documentation. "HEAD" by default.
@@ -231,7 +231,7 @@ class CommitAsserter {
         $path = $this->expandPath($path, $whichCommit);
         $affectedFiles = $this->gitRepository->getModifiedFilesWithStatus($revRange);
         $matchingPaths = array_filter($affectedFiles, function ($item) use ($type, $path) {
-            return $item["status"] == $type && fnmatch($path, $item["path"]);
+            return in_array($item["status"], (array)$type) && fnmatch($path, $item["path"]);
         });
         if (count($matchingPaths) == 0) {
             PHPUnit_Framework_Assert::fail("Commit didn't affect path '$path' with change of type '$type'");

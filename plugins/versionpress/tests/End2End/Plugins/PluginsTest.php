@@ -96,7 +96,7 @@ class PluginsTest extends End2EndTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("plugin/activate");
         $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/options.ini");
+        $commitAsserter->assertCommitPath("M", "%vpdb%/options/ac/active_plugins.ini");
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -116,7 +116,7 @@ class PluginsTest extends End2EndTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("plugin/deactivate");
         $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/options.ini");
+        $commitAsserter->assertCommitPath("M", "%vpdb%/options/ac/active_plugins.ini");
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -170,7 +170,7 @@ class PluginsTest extends End2EndTestCase {
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertBulkAction('plugin/activate', 2);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/options.ini");
+        $commitAsserter->assertCommitPath("M", "%vpdb%/options/ac/active_plugins.ini");
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -187,7 +187,7 @@ class PluginsTest extends End2EndTestCase {
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertBulkAction('plugin/deactivate', 2);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/options.ini");
+        $commitAsserter->assertCommitPath("M", "%vpdb%/options/ac/active_plugins.ini");
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }

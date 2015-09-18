@@ -32,7 +32,7 @@ class RevertTestWpCliWorker extends WpCliWorker implements IRevertTestWorker {
     public function prepare_undoSecondCommit() {
         $this->wpAutomation->editOption('blogname', 'Random blogname for undo test ' . Random::generate());
         $this->createTestPost();
-        return array(array('M', '%vpdb%/options.ini'));
+        return array(array('M', '%vpdb%/options/%VPID%.ini'));
     }
 
     public function undoSecondCommit() {
@@ -66,7 +66,7 @@ class RevertTestWpCliWorker extends WpCliWorker implements IRevertTestWorker {
         return array(
             array('D', '%vpdb%/posts/*'),
             array('D', '%vpdb%/comments/*'),
-            array('M', '%vpdb%/options.ini'),
+            array('M', '%vpdb%/options/%VPID%.ini'),
         );
     }
 

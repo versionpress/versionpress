@@ -24,7 +24,7 @@ class OptionsTest extends End2EndTestCase {
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction('option/edit');
-        $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
+        $commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -42,7 +42,7 @@ class OptionsTest extends End2EndTestCase {
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertBulkAction('option/edit', 2);
-        $commitAsserter->assertCommitPath('M', '%vpdb%/options.ini');
+        $commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
