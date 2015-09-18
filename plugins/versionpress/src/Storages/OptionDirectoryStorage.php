@@ -10,6 +10,17 @@ class OptionDirectoryStorage extends DirectoryStorage {
 
     const PREFIX_PLACEHOLDER = "<<table-prefix>>";
 
+    public static $optionBlacklist = array(
+        'cron',          // Cron, siteurl and home are specific for environment, so they're not saved, too.
+        'home',
+        'siteurl',
+        'db_upgraded',
+        'recently_edited',
+        'auto_updater.lock',
+        'can_compress_scripts',
+        'auto_core_update_notified',
+    );
+
     /** @var EntityInfo */
     private $entityInfo;
     /** @var string */
@@ -40,20 +51,8 @@ class OptionDirectoryStorage extends DirectoryStorage {
     }
 
     public function shouldBeSaved($data) {
-        $blacklist = array(
-            'cron',          // Cron, siteurl and home are specific for environment, so they're not saved, too.
-            'home',
-            'siteurl',
-            'db_upgraded',
-            'recently_edited',
-            'auto_updater.lock',
-            'can_compress_scripts',
-            'auto_core_update_notified',
-        );
-
         $id = $data[$this->entityInfo->idColumnName];
-
-        return !($this->isTransientOption($id) || in_array($id, $blacklist));
+        return !($this->isTransientOption($id) || in_array($id, self::$optionBlacklist));
     }
 
     private function isTransientOption($id) {

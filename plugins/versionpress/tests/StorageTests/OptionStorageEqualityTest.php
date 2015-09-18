@@ -36,18 +36,7 @@ class OptionStorageEqualityTest extends \PHPUnit_Framework_TestCase {
         $simpleOption = array('option_name' => 'foo', 'option_value' => 'bar', 'autoload' => 'yes');
         $optionWithPrefix = array('option_name' => self::TABLE_PREFIX . 'foo', 'option_value' => 'bar', 'autoload' => 'yes');
 
-        $blacklist = array(
-            'cron',
-            'home',
-            'siteurl',
-            'db_upgraded',
-            'recently_edited',
-            'auto_updater.lock',
-            'can_compress_scripts',
-            'auto_core_update_notified',
-        );
-
-        $blacklistedOptions = array_map(function ($optionName) { return array('option_name' => $optionName, 'option_value' => 'bar', 'autoload' => 'yes'); }, $blacklist);
+        $blacklistedOptions = array_map(function ($optionName) { return array('option_name' => $optionName, 'option_value' => 'bar', 'autoload' => 'yes'); }, OptionDirectoryStorage::$optionBlacklist);
         $transientOption = array('option_name' => '_foo', 'option_value' => 'bar', 'autoload' => 'yes');
 
         $allOptions = array_merge(array($simpleOption, $optionWithPrefix, $transientOption), $blacklistedOptions);

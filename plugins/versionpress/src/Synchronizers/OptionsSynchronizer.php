@@ -50,11 +50,7 @@ class OptionsSynchronizer implements Synchronizer {
             return "\"" . $option['option_name'] . "\"";
         }, $options);
 
-        $ignoredOptionNames[] = '"cron"';
-        $ignoredOptionNames[] = '"siteurl"';
-        $ignoredOptionNames[] = '"home"';
-        $ignoredOptionNames[] = '"db_upgraded"';
-        $ignoredOptionNames[] = '"auto_updater.lock"';
+        $ignoredOptionNames = array_merge($ignoredOptionNames, OptionDirectoryStorage::$optionBlacklist);
 
         $deleteSql = "DELETE FROM {$this->tableName} WHERE option_name NOT IN(" . join(", ", $ignoredOptionNames) . ") OR option_name NOT LIKE '_%'";
         $this->database->query($deleteSql);
