@@ -622,6 +622,11 @@ class VPCommand extends WP_CLI_Command {
             return;
         }
 
+        if ($status === RevertStatus::REVERTING_MERGE_COMMIT) {
+            WP_CLI::error("Cannot undo a merge commit.");
+            return;
+        }
+
         WP_CLI::success("Done.");
     }
 

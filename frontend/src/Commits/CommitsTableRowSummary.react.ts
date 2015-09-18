@@ -3,6 +3,7 @@
 
 import React = require('react');
 import moment = require('moment');
+import portal = require('../common/portal');
 
 const DOM = React.DOM;
 
@@ -45,11 +46,16 @@ class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps
         ) : null
       ),
       DOM.td({className: 'column-actions'},
-        commit.canUndo && commit.isEnabled
+        (commit.canUndo || commit.isMerge) && commit.isEnabled
           ? DOM.a({
-            className: 'vp-table-undo',
+            className: 'vp-table-undo ' + (commit.isMerge ? 'disabled' : ''),
             href: '#',
-            onClick: (e) => { this.props.onUndo(e); e.stopPropagation(); },
+            onClick: commit.isMerge
+              ? (e) => { this.renderUndoMergeDialog(); e.stopPropagation(); }
+              : (e) => { this.props.onUndo(e); e.stopPropagation(); },
+            title: commit.isMerge
+              ? 'Merge commit cannot be undone.'
+              : null,
             'data-hash': commit.hash,
             'data-message': commit.message
           }, 'Undo this')
@@ -65,6 +71,18 @@ class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps
           : ''
       )
     );
+  }
+
+  private renderUndoMergeDialog() {
+    const body = DOM.p(null,
+      'Merge commit is a special type of commit that cannot be undone. ',
+      DOM.a({
+          href: 'http://docs.versionpress.net/en/feature-focus/undo-and-rollback#merge-commits',
+          target: '_blank'
+        }, 'Learn more'
+      )
+    );
+    portal.alertDialog('This is a merge commit', body);
   }
 
   private toggleDetails() {

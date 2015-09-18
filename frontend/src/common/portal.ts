@@ -6,6 +6,15 @@ import ConfirmDialog = require('./ConfirmDialog.react');
 
 var portalNode;
 
+export function alertDialog(title: React.ReactNode, body: React.ReactNode) {
+  closePortal();
+  openPortal(
+    React.createElement(Modal, <Modal.Props> {title: title},
+      body
+    )
+  );
+}
+
 export function confirmDialog(title: React.ReactNode, body: React.ReactNode, okHandler, cancelHandler, options) {
   options = options || {};
   if (okHandler) {
@@ -17,7 +26,7 @@ export function confirmDialog(title: React.ReactNode, body: React.ReactNode, okH
   closePortal();
   openPortal(
     React.createElement(Modal, <Modal.Props> {title: title},
-      React.createElement(ConfirmDialog, Object.assign({}, {message: body}, options))
+      React.createElement(ConfirmDialog, <ConfirmDialog.Props> Object.assign({}, {message: body}, options))
     )
   );
 }

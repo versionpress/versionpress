@@ -318,6 +318,10 @@ class Reverter {
     }
 
     private function revertOneCommit($commitHash) {
+        $commit = $this->repository->getCommit($commitHash);
+        if ($commit->isMerge()) {
+            return RevertStatus::REVERTING_MERGE_COMMIT;
+        }
         if (!$this->repository->revert($commitHash)) {
             return RevertStatus::MERGE_CONFLICT;
         }
