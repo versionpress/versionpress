@@ -47,3 +47,18 @@ To fix this, first restore the related entity (e.g., the post) and only then the
 ### Uncommitted files
 
 The last scenario where revert will not work is uncommited changes somewhere in the site files. For example, if you manually edited a theme file and haven't committed this change to Git, revert will be rejected because your changes could be possibly lost. In technical terms, **working directory must be clean for reverts to work.**
+
+
+### Merge commits
+
+Merge commits join two lines of development back together. For example, if you did some changes in the live environment and some other changes in the staging environment, doing a [pull](../sync/merging) creates a merge commit.
+
+Merge commits cannot be undone because there is no opposite state to them, i.e., there is no logical "reverse change" that we could apply to the current state of the site.
+
+<div class="note">
+ 
+  **Note to Git users**
+ 
+  In Git, you can get rid of the merge commit by doing e.g. `git reset --hard` and it's still the way in VersionPress if you want to **get rid of** a merge. However, the semantics of an **undo** are different, as described above.
+ 
+</div> 
