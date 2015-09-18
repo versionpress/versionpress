@@ -167,7 +167,13 @@ gulp.task('frontend-deploy', ['copy', 'frontend-build'], function(cb) {
 gulp.task('strip-comments', ['copy'], function (cb) {
 	var stripCmd = (vpDir + '/vendor/bin/strip').replace(/\//g, path.sep);
 
-    return gulp.src(buildDir + '/**/*.php', {read: false}).
+    var phpFilesToStrip = [
+        buildDir + '/**/*.php',
+        '!' + buildDir + '/src/Cli/vp.php',
+        '!' + buildDir + '/src/Cli/vp-internal.php'
+    ];
+
+    return gulp.src(phpFilesToStrip, {read: false}).
         pipe(shell([stripCmd + ' <%= file.path %> > <%= file.path %>-strip']));
 });
 
