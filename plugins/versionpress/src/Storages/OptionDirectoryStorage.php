@@ -77,4 +77,10 @@ class OptionDirectoryStorage extends DirectoryStorage {
         }
         return $key;
     }
+
+    public function getEntityFilename($optionName, $parentId = null) {
+        $sanitizedOptionName = urlencode($optionName);
+        $sanitizedOptionName = str_replace('.', '%2E', $sanitizedOptionName);
+        return parent::getEntityFilename($sanitizedOptionName, $parentId);
+    }
 }
