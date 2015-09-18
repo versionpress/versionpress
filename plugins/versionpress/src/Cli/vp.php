@@ -460,7 +460,6 @@ class VPCommand extends WP_CLI_Command {
         if ($process->isSuccessful()) {
             WP_CLI::success("Pulled changes from $remote");
         } else {
-            $this->switchMaintenance('off');
 
             if (stripos($process->getOutput(), 'automatic merge failed') !== false) {
                 WP_CLI::warning("");
@@ -494,6 +493,7 @@ class VPCommand extends WP_CLI_Command {
 
                     $process = VPCommandUtils::exec('git merge --abort');
                     if ($process->isSuccessful()) {
+                        $this->switchMaintenance('off');
                         WP_CLI::success("Pull aborted, your site is now clean and running");
                         exit();
                     } else {
@@ -503,6 +503,7 @@ class VPCommand extends WP_CLI_Command {
 
 
             } else { // not a merge conflict, some other error
+                $this->switchMaintenance('off');
                 WP_CLI::error("Changes from $remote couldn't be pulled. Details:\n\n" . $process->getOutput());
             }
 
