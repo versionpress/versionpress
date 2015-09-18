@@ -8,12 +8,13 @@ Welcome to [VersionPress](http://versionpress.net/) documentation. VersionPress 
 </figure>
 
 <div class="note">
-  <strong>Note</strong>
-  <p>VersionPress is currently in its [early stage](./en/getting-started/about-eap) and these docs, like everything else, will improve over time.</p>
+  <strong>BETA!</strong>
+  <p>We are currently updating these docs to version 2.0 which is expected to ship at the end of September / start of October 2015. Please bear with us in the meantime.</p>
 </div>
 
 These docs are divided into a couple of sections:
 
 * [Getting Started](./en/getting-started) – brief introduction to VersionPress
 * [Feature Focus](./en/feature-focus) – discusses most important feature areas in more detail
+* [Sync / Workflows](./en/sync) – how VersionPress helps with multiple environments like live and staging
 * [Release Notes](./en/release-note) – details of all releases
