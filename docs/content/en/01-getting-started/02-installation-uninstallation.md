@@ -34,7 +34,7 @@ Minimum system requirements are (as a general rule, **we recommend using the lat
  - No `wp-content/db.php` on the disk
  - No path customizations (e.g., custom location for `wp-content`)
 
-In practice, this means that you need to have a lot of control over your server environment for the current version of VersionPress. We will be adding support for common shared hosting over time.
+On top of that, if you want to use the [multi-instance / sync features](../sync) of VersionPress 2.0, probably even more control over the requirement will be required. In practice, this means that you need to have a lot of control over your server environment and custom server / VPS is your best bet. See also the section on [hosting providers](../integrations/hosts).
 
 Here are notes on some of the requirements:
 
