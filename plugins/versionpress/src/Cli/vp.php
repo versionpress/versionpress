@@ -14,6 +14,7 @@ use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\FileSystem;
+use VersionPress\Utils\ProcessUtils;
 use WP_CLI;
 use WP_CLI_Command;
 
@@ -149,7 +150,7 @@ class VPCommand extends WP_CLI_Command {
         $process = VPCommandUtils::runWpCliCommand('core', 'is-installed');
         if ($process->isSuccessful()) {
             WP_CLI::confirm("It looks like the site is OK. Do you really want to run the 'restore-site' command?", $assoc_args);
-            $defaultUrl = trim(VPCommandUtils::runWpCliCommand('option', 'get', array('siteurl'))->getOutput());
+            $defaultUrl = trim(ProcessUtils::getOutput(VPCommandUtils::runWpCliCommand('option', 'get', array('siteurl'))));
         } else {
             $defaultUrl = 'http://localhost/' . basename(getcwd());
         }
@@ -188,7 +189,7 @@ class VPCommand extends WP_CLI_Command {
         $process = VPCommandUtils::runWpCliCommand('core', 'install', $installArgs);
         if (!$process->isSuccessful()) {
             WP_CLI::log("Failed creating WP tables.");
-            WP_CLI::error($process->getErrorOutput());
+            WP_CLI::error(ProcessUtils::getOutput($process));
         } else {
             WP_CLI::success("WP tables created");
         }
@@ -200,7 +201,7 @@ class VPCommand extends WP_CLI_Command {
         $process = VPCommandUtils::exec($resetCmd);
         if (!$process->isSuccessful()) {
             WP_CLI::log("Could not clean working directory");
-            WP_CLI::error($process->getErrorOutput());
+            WP_CLI::error(ProcessUtils::getOutput($process));
         } else {
             WP_CLI::success("Working directory reset");
         }
@@ -209,8 +210,7 @@ class VPCommand extends WP_CLI_Command {
         // The next couple of the steps need to be done after the WP is fully loaded; we use `finish-init-clone` for that
         // The main reason for this is that we need properly set WP_CONTENT_DIR constant for reading from storages
         $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-init-clone', array('require' => self::VP_INTERNAL_COMMAND_PATH));
-        WP_CLI::log($process->getOutput());
-        WP_CLI::log($process->getErrorOutput());
+        WP_CLI::log(ProcessUtils::getOutput($process));
         if (!$process->isSuccessful()) {
             WP_CLI::error("Could not finish site restore");
         }
@@ -231,7 +231,7 @@ class VPCommand extends WP_CLI_Command {
     private function prepareDatabase($assoc_args) {
         $process = VPCommandUtils::runWpCliCommand('db', 'create');
         if (!$process->isSuccessful()) {
-            $msg = $process->getErrorOutput();
+            $msg = ProcessUtils::getOutput($process);
             if (Strings::contains($msg, '1007')) { // It's OK. The database already exists.
                 if (!isset($assoc_args['yes'])) {
                     defined('SHORTINIT') or define('SHORTINIT', true);
@@ -263,7 +263,7 @@ class VPCommand extends WP_CLI_Command {
         $process = VPCommandUtils::runWpCliCommand('core', 'config', $configArgs);
         if (!$process->isSuccessful()) {
             WP_CLI::log("Failed creating wp-config.php");
-            WP_CLI::error($process->getErrorOutput());
+            WP_CLI::error(ProcessUtils::getOutput($process));
         } else {
             WP_CLI::success("wp-config.php created");
         }
@@ -365,7 +365,7 @@ class VPCommand extends WP_CLI_Command {
         $process = VPCommandUtils::exec($cloneCommand, $currentWpPath);
 
         if (!$process->isSuccessful()) {
-            WP_CLI::log($process->getErrorOutput());
+            WP_CLI::error(ProcessUtils::getOutput($process), false);
             WP_CLI::error("Cloning Git repo failed");
         } else {
             WP_CLI::success("Site files cloned");
@@ -413,11 +413,7 @@ class VPCommand extends WP_CLI_Command {
 
         // Finish the process by doing the standard restore-site
         $process = VPCommandUtils::runWpCliCommand('vp', 'restore-site', array('siteurl' => $cloneUrl, 'yes' => null, 'require' => __FILE__), $clonePath);
-        if ($process->isSuccessful()) {
-            WP_CLI::log($process->getOutput());
-        } else {
-            WP_CLI::log($process->getErrorOutput());
-        }
+        WP_CLI::log(ProcessUtils::getOutput($process));
     }
 
     /**
@@ -461,7 +457,7 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::success("Pulled changes from $remote");
         } else {
 
-            if (stripos($process->getOutput(), 'automatic merge failed') !== false) {
+            if (stripos(ProcessUtils::getOutput($process), 'automatic merge failed') !== false) {
                 WP_CLI::warning("");
                 WP_CLI::warning("CONFLICTS DETECTED. Your options:");
                 WP_CLI::warning("");
@@ -500,7 +496,7 @@ class VPCommand extends WP_CLI_Command {
 
             } else { // not a merge conflict, some other error
                 $this->switchMaintenance('off');
-                WP_CLI::error("Changes from $remote couldn't be pulled. Details:\n\n" . $process->getOutput());
+                WP_CLI::error("Changes from $remote couldn't be pulled. Details:\n\n" . ProcessUtils::getOutput($process));
             }
 
         }
@@ -571,7 +567,7 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::success("Changes successfully pushed");
         } else {
             $this->switchMaintenance('off', $remoteName);
-            WP_CLI::error("Changes couldn't be pushed. Details:\n\n" . $process->getErrorOutput());
+            WP_CLI::error("Changes couldn't be pushed. Details:\n\n" . ProcessUtils::getOutput($process));
         }
 
         $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-push', array('require' => self::VP_INTERNAL_COMMAND_PATH), $remotePath);
@@ -580,7 +576,7 @@ class VPCommand extends WP_CLI_Command {
             // maintenance mode was already disabled in the 'finish-push' command
         } else {
             $this->switchMaintenance('off', $remoteName);
-            WP_CLI::error("Remote repository couldn't be synchronized. Details:\n\n" . $process->getErrorOutput());
+            WP_CLI::error("Remote repository couldn't be synchronized. Details:\n\n" . ProcessUtils::getOutput($process));
         }
     }
 
@@ -752,7 +748,7 @@ class VPCommand extends WP_CLI_Command {
      */
     private function getRemoteUrl($name) {
         $listRemotesCommand = "git remote -v";
-        $remotesRaw = VPCommandUtils::exec($listRemotesCommand)->getOutput();
+        $remotesRaw = ProcessUtils::getOutput(VPCommandUtils::exec($listRemotesCommand));
 
         // https://regex101.com/r/iQ4kG4/2
         $numberOfMatches = preg_match_all("/^([[:alnum:]]+)\\s+(.*) \\(fetch\\)$/m", $remotesRaw, $matches);
@@ -789,7 +785,7 @@ class VPCommand extends WP_CLI_Command {
         if ($process->isSuccessful()) {
             WP_CLI::success("Remote site switched $preposition the maintenance mode");
         } else {
-            WP_CLI::error("Remote site couldn't be switched $preposition the maintenance mode. Details:\n\n" . $process->getErrorOutput());
+            WP_CLI::error("Remote site couldn't be switched $preposition the maintenance mode. Details:\n\n" . ProcessUtils::getOutput($process));
         }
     }
 }
