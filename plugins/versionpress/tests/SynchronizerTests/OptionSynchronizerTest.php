@@ -2,25 +2,25 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
-use VersionPress\Storages\OptionsStorage;
-use VersionPress\Synchronizers\OptionsSynchronizer;
+use VersionPress\Storages\OptionStorage;
+use VersionPress\Synchronizers\OptionSynchronizer;
 use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Tests\Utils\TestConfig;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 
-class OptionsSynchronizerTest extends SynchronizerTestCase {
+class OptionSynchronizerTest extends SynchronizerTestCase {
 
-    /** @var OptionsStorage */
+    /** @var OptionStorage */
     private $storage;
-    /** @var OptionsSynchronizer */
+    /** @var OptionSynchronizer */
     private $synchronizer;
 
     protected function setUp() {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('option');
-        $this->synchronizer = new OptionsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->synchronizer = new OptionSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
     }
 
     /**

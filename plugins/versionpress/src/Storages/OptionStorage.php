@@ -6,7 +6,7 @@ use VersionPress\ChangeInfos\OptionChangeInfo;
 use VersionPress\Database\EntityInfo;
 use VersionPress\Utils\IniSerializer;
 
-class OptionDirectoryStorage extends DirectoryStorage {
+class OptionStorage extends DirectoryStorage {
 
     const PREFIX_PLACEHOLDER = "<<table-prefix>>";
 

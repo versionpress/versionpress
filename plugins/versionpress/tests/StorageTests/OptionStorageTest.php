@@ -3,12 +3,12 @@
 namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\EntityInfo;
-use VersionPress\Storages\OptionsStorage;
+use VersionPress\Storages\OptionStorage;
 use VersionPress\Tests\Utils\ArrayAsserter;
 use VersionPress\Utils\FileSystem;
 
-class OptionsStorageTest extends \PHPUnit_Framework_TestCase {
-    /** @var OptionsStorage */
+class OptionStorageTest extends \PHPUnit_Framework_TestCase {
+    /** @var OptionStorage */
     private $storage;
 
     private $testingOption = array(
@@ -49,6 +49,17 @@ class OptionsStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
+    public function savedOptionDoesNotContainOptionId() {
+        $optionWithId = array_merge(array('option_id' => 1), $this->testingOption);
+        $this->storage->save($optionWithId);
+        $fileName = $this->storage->getEntityFilename($this->testingOption['option_name']);
+        $content = file_get_contents($fileName);
+        $this->assertFalse(strpos($content, 'option_id'), 'Option contains option_id');
+    }
+
+    /**
+     * @test
+     */
     public function storageSupportsOptionsWithDotsInName() {
         $testingOption = array(
             "option_name" => "some option with . in name",
@@ -59,6 +70,41 @@ class OptionsStorageTest extends \PHPUnit_Framework_TestCase {
         $this->storage->save($testingOption);
         $loadedOption = $this->storage->loadEntity($testingOption['option_name']);
         ArrayAsserter::assertSimilar($testingOption, $loadedOption);
+    }
+
+    /**
+     * @test
+     * @dataProvider specialNamesProvider
+     */
+    public function optionNameCanContainSpecialChars($optionName) {
+        $option = array(
+            'option_name' => $optionName,
+            'option_value' => 'foo',
+            'autoload' => 'yes',
+        );
+
+        $this->storage->save($option);
+        $loadedOption = $this->storage->loadEntity($optionName);
+        ArrayAsserter::assertSimilar($option, $loadedOption);
+    }
+
+    public function specialNamesProvider() {
+        return array(
+            array('name_with_<'),
+            array('name_with_>'),
+            array('name_with_:'),
+            array('name_with_?'),
+            array('name_with_*'),
+            array('name_with_|'),
+            array('name_with_"'),
+            array('name_with_/'),
+            array('name_with_\\'),
+            array('.'),
+            array('..'),
+            array(' '),
+            array('+'),
+            array('%2B'),
+        );
     }
 
     /**
@@ -96,11 +142,11 @@ class OptionsStorageTest extends \PHPUnit_Framework_TestCase {
             )
         ));
 
-        $this->storage = new OptionsStorage(__DIR__ . '/options.ini', $entityInfo, 'prefix_');
+        $this->storage = new OptionStorage(__DIR__ . '/options', $entityInfo, 'prefix_');
     }
 
     protected function tearDown() {
         parent::tearDown();
-        FileSystem::remove(__DIR__ . '/options.ini');
+        FileSystem::remove(__DIR__ . '/options');
     }
 }

@@ -28,7 +28,7 @@ class SynchronizerFactory {
         'post' => 'VersionPress\Synchronizers\PostsSynchronizer',
         'postmeta' => 'VersionPress\Synchronizers\PostMetaSynchronizer',
         'comment' => 'VersionPress\Synchronizers\CommentsSynchronizer',
-        'option' => 'VersionPress\Synchronizers\OptionsSynchronizer',
+        'option' => 'VersionPress\Synchronizers\OptionSynchronizer',
         'user' => 'VersionPress\Synchronizers\UsersSynchronizer',
         'usermeta' => 'VersionPress\Synchronizers\UserMetaSynchronizer',
         'term' => 'VersionPress\Synchronizers\TermsSynchronizer',

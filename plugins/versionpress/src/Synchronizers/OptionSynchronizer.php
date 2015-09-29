@@ -2,7 +2,7 @@
 namespace VersionPress\Synchronizers;
 
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Storages\OptionDirectoryStorage;
+use VersionPress\Storages\OptionStorage;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\ArrayUtils;
@@ -12,10 +12,10 @@ use wpdb;
  * Options synchronizer. Skips transient options and a couple of hardcoded values like
  * `cron` or `siteurl`, see the `synchronize()` method.
  */
-class OptionsSynchronizer implements Synchronizer {
+class OptionSynchronizer implements Synchronizer {
 
     /** @var Storage */
-    private $optionsStorage;
+    private $optionStorage;
 
     /** @var wpdb */
     private $database;
@@ -24,15 +24,15 @@ class OptionsSynchronizer implements Synchronizer {
 
     private $tableName;
 
-    function __construct(Storage $optionsStorage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer) {
-        $this->optionsStorage = $optionsStorage;
+    function __construct(Storage $optionStorage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer) {
+        $this->optionStorage = $optionStorage;
         $this->database = $wpdb;
         $this->urlReplacer = $urlReplacer;
         $this->tableName = $dbSchema->getPrefixedTableName('option');
     }
 
     function synchronize($task, $entitiesToSynchronize = null) {
-        $options = $this->optionsStorage->loadAll();
+        $options = $this->optionStorage->loadAll();
         if (count($options) == 0) return array();
 
         $syncQuery = "INSERT INTO {$this->tableName} (option_name, option_value, autoload) VALUES ";
@@ -48,7 +48,7 @@ class OptionsSynchronizer implements Synchronizer {
         $this->database->query($syncQuery);
 
         $ignoredOptionNames = ArrayUtils::column($options, 'option_name');
-        $ignoredOptionNames = array_merge($ignoredOptionNames, OptionDirectoryStorage::$optionsBlacklist);
+        $ignoredOptionNames = array_merge($ignoredOptionNames, OptionStorage::$optionsBlacklist);
 
         $ignoredOptionNames = array_map(function ($optionName) {
             return "\"$optionName\"";

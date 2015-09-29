@@ -17,7 +17,7 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase {
         $storages = array(
             'post' => 'VersionPress\Storages\PostStorage',
             'comment' => 'VersionPress\Storages\CommentStorage',
-            'option' => 'VersionPress\Storages\OptionsStorage',
+            'option' => 'VersionPress\Storages\OptionStorage',
             'term' => 'VersionPress\Storages\TermsStorage',
             'term_taxonomy' => 'VersionPress\Storages\TermTaxonomyStorage',
             'user' => 'VersionPress\Storages\UserStorage',
