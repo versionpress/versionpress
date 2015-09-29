@@ -5,6 +5,7 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\OptionDirectoryStorage;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
+use VersionPress\Utils\ArrayUtils;
 use wpdb;
 
 /**
@@ -46,11 +47,12 @@ class OptionsSynchronizer implements Synchronizer {
 
         $this->database->query($syncQuery);
 
-        $ignoredOptionNames = array_map(function ($option) {
-            return "\"" . $option['option_name'] . "\"";
-        }, $options);
-
+        $ignoredOptionNames = ArrayUtils::column($options, 'option_name');
         $ignoredOptionNames = array_merge($ignoredOptionNames, OptionDirectoryStorage::$optionsBlacklist);
+
+        $ignoredOptionNames = array_map(function ($optionName) {
+            return "\"$optionName\"";
+        }, $ignoredOptionNames);
 
         $deleteSql = "DELETE FROM {$this->tableName} WHERE option_name NOT IN(" . join(", ", $ignoredOptionNames) . ") OR option_name NOT LIKE '_%'";
         $this->database->query($deleteSql);
