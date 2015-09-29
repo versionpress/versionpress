@@ -19,7 +19,7 @@ if (isset($_GET['init_versionpress']) && !VersionPress::isActive()) {
 } elseif ($vpConfig->mergedConfig['gui'] === 'html') {
     require_once("inc/admin.php");
 } else {
-    require_once("inc/javascriptGUI.php");
+    require_once("inc/javascriptGui.php");
 }
 ?>
 </div>
