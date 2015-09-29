@@ -37,7 +37,6 @@
           <root url="file://$MODULE_DIR$/vendor/icecave/parity" />
           <root url="file://$MODULE_DIR$/vendor/icecave/repr" />
           <root url="file://$MODULE_DIR$/vendor/icecave/semver" />
-          <root url="file://$MODULE_DIR$/vendor/ifsnop/mysqldump-php" />
           <root url="file://$MODULE_DIR$/vendor/imnotjames/curlfile-compat" />
           <root url="file://$MODULE_DIR$/vendor/janvoracek/comment-stripper" />
           <root url="file://$MODULE_DIR$/vendor/michelf/php-markdown" />
@@ -73,7 +72,6 @@
           <root url="file://$MODULE_DIR$/vendor/icecave/parity" />
           <root url="file://$MODULE_DIR$/vendor/icecave/repr" />
           <root url="file://$MODULE_DIR$/vendor/icecave/semver" />
-          <root url="file://$MODULE_DIR$/vendor/ifsnop/mysqldump-php" />
           <root url="file://$MODULE_DIR$/vendor/imnotjames/curlfile-compat" />
           <root url="file://$MODULE_DIR$/vendor/janvoracek/comment-stripper" />
           <root url="file://$MODULE_DIR$/vendor/michelf/php-markdown" />

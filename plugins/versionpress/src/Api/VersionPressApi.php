@@ -176,16 +176,16 @@ class VersionPressApi {
             $initialCommitHash = $this->gitRepository->getChildCommit($preActivationHash);
         }
 
-        $canUndoCommit = $this->gitRepository->wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
+        $isChildOfInitialCommit = $this->gitRepository->wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
         $isFirstCommit = $page === 0;
 
         $result = array();
         foreach ($commits as $commit) {
-            $canUndoCommit = $canUndoCommit && ($commit->getHash() !== $initialCommitHash);
-            $canRollbackToThisCommit = !$isFirstCommit && ($canUndoCommit || $commit->getHash() === $initialCommitHash);
+            $isChildOfInitialCommit = $isChildOfInitialCommit && ($commit->getHash() !== $initialCommitHash);
+            $canUndoCommit = $isChildOfInitialCommit && !$commit->isMerge();
+            $canRollbackToThisCommit = !$isFirstCommit && ($isChildOfInitialCommit || $commit->getHash() === $initialCommitHash);
             $changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
-            $isEnabled = $canUndoCommit || $canRollbackToThisCommit || $commit->getHash() === $initialCommitHash;
-
+            $isEnabled = $isChildOfInitialCommit || $canRollbackToThisCommit || $commit->getHash() === $initialCommitHash;
 
             $fileChanges = $this->getFileChanges($commit);
             $changeInfoList = $changeInfo instanceof ChangeInfoEnvelope ? $changeInfo->getChangeInfoList() : array();
@@ -403,6 +403,11 @@ class VersionPressApi {
             RevertStatus::VIOLATED_REFERENTIAL_INTEGRITY => array(
                 'class' => 'error',
                 'message' => 'Error: Objects with missing references cannot be restored. For example we cannot restore comment where the related post was deleted.',
+                'status' => 403
+            ),
+            RevertStatus::REVERTING_MERGE_COMMIT => array(
+                'class' => 'error',
+                'message' => 'Error: It is not possible to undo merge commit.',
                 'status' => 403
             ),
         );

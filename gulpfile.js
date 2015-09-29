@@ -129,7 +129,7 @@ gulp.task('prepare-src-definition', function () {
  * Cleans buildDir and distDir
  */
 gulp.task('clean', function (cb) {
-    del([buildDir, distDir], {force: true} , cb);
+    return del([buildDir, distDir], {force: true});
 });
 
 
@@ -144,7 +144,7 @@ gulp.task('copy', ['clean', 'prepare-src-definition'], function (cb) {
 /**
  * Builds the frontend.
  */
-gulp.task('frontend-build', shell.task([
+gulp.task('frontend-build', ['copy'], shell.task([
     'npm run build'
 ], {cwd: frontendDir}));
 
@@ -167,7 +167,13 @@ gulp.task('frontend-deploy', ['copy', 'frontend-build'], function(cb) {
 gulp.task('strip-comments', ['copy'], function (cb) {
 	var stripCmd = (vpDir + '/vendor/bin/strip').replace(/\//g, path.sep);
 
-    return gulp.src(buildDir + '/**/*.php', {read: false}).
+    var phpFilesToStrip = [
+        buildDir + '/**/*.php',
+        '!' + buildDir + '/src/Cli/vp.php',
+        '!' + buildDir + '/src/Cli/vp-internal.php'
+    ];
+
+    return gulp.src(phpFilesToStrip, {read: false}).
         pipe(shell([stripCmd + ' <%= file.path %> > <%= file.path %>-strip']));
 });
 
@@ -183,7 +189,7 @@ gulp.task('rename-phpstrip-back', ['strip-comments'], function (cb) {
  * Removes *.php-strip files
  */
 gulp.task('remove-phpstrip-files', ['rename-phpstrip-back'], function (cb) {
-    del(buildDir + '/**/*.php-strip', cb);
+    return del(buildDir + '/**/*.php-strip');
 });
 
 /**
@@ -195,7 +201,7 @@ gulp.task('composer-install', ['remove-phpstrip-files'], shell.task(['composer i
  * Removes composer.json|lock after the `composer-install` task is done
  */
 gulp.task('remove-composer-files', ['composer-install'], function (cb) {
-    del([buildDir + '/composer.json', buildDir + '/composer.lock'], cb);
+    return del([buildDir + '/composer.json', buildDir + '/composer.lock']);
 });
 
 /**
@@ -249,7 +255,7 @@ gulp.task('zip', ['persist-plugin-comment', 'disable-debugger', 'remove-composer
  * After the ZIP has been built, cleans the build directory
  */
 gulp.task('clean-build', ['zip'], function (cb) {
-	del(['build'], cb);
+	return del(['build']);
 });
 
 /**

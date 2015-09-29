@@ -35,7 +35,7 @@ class CommitsTable extends React.Component<CommitsTableProps, {}>  {
 
   render() {
     const firstCommit = this.props.commits[0];
-    const displayTopNote = firstCommit && !firstCommit.canUndo && !firstCommit.isInitial;
+    const displayTopNote = firstCommit && !firstCommit.isEnabled;
 
     return DOM.table({className: 'vp-table widefat fixed'},
       DOM.thead(null,

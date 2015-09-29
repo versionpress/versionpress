@@ -60,6 +60,14 @@ class AbsoluteUrlReplacerTest extends \PHPUnit_Framework_TestCase {
         $replacedComplexObject->obj->url = AbsoluteUrlReplacer::PLACEHOLDER;
 
 
+        $objectWithCyclicReference = new \stdClass();
+        $objectWithCyclicReference->cyclicReference = $objectWithCyclicReference;
+        $objectWithCyclicReference->someUrl = self::REPLACED_URL;
+
+        $replacedObjectWithCyclicReference = new \stdClass();
+        $replacedObjectWithCyclicReference->cyclicReference = $replacedObjectWithCyclicReference;
+        $replacedObjectWithCyclicReference->someUrl = AbsoluteUrlReplacer::PLACEHOLDER;
+
         return array(
             array(
                 array('url' => self::REPLACED_URL),
@@ -93,6 +101,10 @@ class AbsoluteUrlReplacerTest extends \PHPUnit_Framework_TestCase {
             array(
                 array('obj' => serialize($complexObject)),
                 array('obj' => serialize($replacedComplexObject))
+            ),
+            array(
+                array('obj' => serialize($objectWithCyclicReference)),
+                array('obj' => serialize($replacedObjectWithCyclicReference))
             ),
         );
     }

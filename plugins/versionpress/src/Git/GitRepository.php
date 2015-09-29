@@ -192,8 +192,7 @@ class GitRepository {
      * @param $commitHash
      */
     public function revertAll($commitHash) {
-        $commitRange = sprintf("%s..HEAD", $commitHash);
-        $this->runShellCommand("git revert -n %s", $commitRange);
+        $this->runShellCommand("git checkout %s .", $commitHash);
     }
 
     /**
@@ -229,8 +228,9 @@ class GitRepository {
      * @return bool
      */
     public function wasCreatedAfter($commitHash, $afterWhichCommitHash) {
-        $cmd = "git log $afterWhichCommitHash..$commitHash --oneline";
-        return $this->runShellCommandWithStandardOutput($cmd) != null;
+        $range = sprintf("%s..%s", $afterWhichCommitHash, $commitHash);
+        $cmd = "git log %s --oneline";
+        return $this->runShellCommandWithStandardOutput($cmd, $range) != null;
     }
 
     /**
@@ -240,8 +240,9 @@ class GitRepository {
      * @return mixed
      */
     public function getChildCommit($commitHash) {
-        $cmd = "git log --reverse --ancestry-path --format=%%H $commitHash..";
-        $result = $this->runShellCommandWithStandardOutput($cmd);
+        $range = "$commitHash..";
+        $cmd = "git log --reverse --ancestry-path --format=%%H %s";
+        $result = $this->runShellCommandWithStandardOutput($cmd, $range);
         list($childHash) = explode("\n", $result);
         return $childHash;
     }
@@ -324,14 +325,30 @@ class GitRepository {
      * @return string
      */
     public function getDiff($hash = null) {
+        if ($hash === null) {
+            $status = $this->getStatus(true);
+            $this->runShellCommand("git add -AN");
+            $diff = $this->runShellCommandWithStandardOutput("git diff HEAD");
+            $filesToReset = array_map(function ($file) {
+                return $file[1];
+            }, array_filter($status, function ($file) {
+                return $file[0] === '??'; // unstaged
+            }));
+
+            if (count($filesToReset) > 0) {
+                $this->runShellCommand(sprintf("git reset HEAD %s", join(" ", array_map('escapeshellarg', $filesToReset))));
+            }
+
+            return $diff;
+        }
+
         if ($this->getInitialCommit()->getHash() === $hash) {
             // Inspired by: http://stackoverflow.com/a/25064285
             $emptyTreeHash = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
             $gitCmd = "git diff-tree -p $emptyTreeHash $hash";
-        } else if ($hash === null) {
-            $gitCmd = "git diff HEAD";
         } else {
-            $gitCmd = "git diff $hash~1 $hash";
+            $escapedHash = escapeshellarg($hash);
+            $gitCmd = "git diff $escapedHash~1 $escapedHash";
         }
 
         $output = $this->runShellCommandWithStandardOutput($gitCmd);

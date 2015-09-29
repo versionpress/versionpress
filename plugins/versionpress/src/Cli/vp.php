@@ -423,9 +423,9 @@ class VPCommand extends WP_CLI_Command {
     /**
      * Examples (clone name "test"):
      *
-     *   http://localhost/vp01  ->  http://localhost/vp01_test
-     *   http://vp01            ->  http://vp01_test
-     *   http://www.vp01.dev    ->  http://www.vp01_test.dev
+     *   http://localhost/vp01  ->  http://localhost/test
+     *   http://vp01            ->  http://test
+     *   http://www.vp01.dev    ->  http://www.test.dev
      *
      * @param string $originUrl
      * @param string $originDirName
@@ -441,16 +441,16 @@ class VPCommand extends WP_CLI_Command {
      *
      * ## OPTIONS
      *
-     * [--remote=<nameOrPathOrURL>]
+     * [--from=<nameOrPathOrURL>]
      * : Name, path or an URL of the remote, just like in `git pull`. Defaults to "origin".
      *
-     * @synopsis [--remote=<nameOrPathOrURL>]
+     * @synopsis [--from=<nameOrPathOrURL>]
      */
     public function pull($args = array(), $assoc_args = array()) {
 
         global $versionPressContainer;
 
-        $remote = isset($assoc_args['remote']) ? $assoc_args['remote'] : 'origin';
+        $remote = isset($assoc_args['from']) ? $assoc_args['from'] : 'origin';
         $this->switchMaintenance('on');
 
         $branchToPullFrom = 'master'; // hardcoded until we support custom branches
@@ -460,8 +460,49 @@ class VPCommand extends WP_CLI_Command {
         if ($process->isSuccessful()) {
             WP_CLI::success("Pulled changes from $remote");
         } else {
-            $this->switchMaintenance('off');
-            WP_CLI::error("Changes from $remote couldn't be pulled. Details:\n\n" . $process->getOutput());
+
+            if (stripos($process->getOutput(), 'automatic merge failed') !== false) {
+                WP_CLI::warning("");
+                WP_CLI::warning("CONFLICTS DETECTED. Your options:");
+                WP_CLI::warning("");
+                WP_CLI::warning(" 1) Keep the conflicts. You will be able to resolve them manually.");
+                WP_CLI::warning(" 2) Abort the process. The site will look like you never ran the pull.");
+                WP_CLI::warning("");
+
+                fwrite(STDOUT, "Choose 1 or 2: " );
+                $answer = trim(fgets(STDIN));
+
+                if ($answer == "1") {
+                    WP_CLI::success("You've chosen to keep the conflicts on the disk. MAINTENANCE MODE IS STILL ON.");
+                    WP_CLI::success("");
+                    WP_CLI::success("Do this now:");
+                    WP_CLI::success("");
+                    WP_CLI::success(" 1. Resolve the conflicts manually as in a standard Git workflow");
+                    WP_CLI::success(" 2. Stage and `git commit` the changes");
+                    WP_CLI::success(" 3. Return here and run `wp vp apply-changes`");
+                    WP_CLI::success("");
+                    WP_CLI::success("That last step will turn the maintenance mode off.");
+                    exit();
+
+                } else {
+
+                    $process = VPCommandUtils::exec('git merge --abort');
+                    if ($process->isSuccessful()) {
+                        $this->switchMaintenance('off');
+                        WP_CLI::success("Pull aborted, your site is now clean and running");
+                        exit();
+                    } else {
+                        WP_CLI::error("Aborting pull failed, do it manually by executing 'git merge --abort'", false);
+                        WP_CLI::error("and also don't fortget to turn off the maintenance mode.");
+                    }
+                }
+
+
+            } else { // not a merge conflict, some other error
+                $this->switchMaintenance('off');
+                WP_CLI::error("Changes from $remote couldn't be pulled. Details:\n\n" . $process->getOutput());
+            }
+
         }
 
         // Run synchronization
@@ -477,17 +518,43 @@ class VPCommand extends WP_CLI_Command {
     }
 
     /**
+     * Applies changes from the disk to the database.
+     *
+     * It happens under the maintenance mode.
+     *
+     * @subcommand apply-changes
+     */
+    public function applyChanges($args = array(), $assoc_args = array()) {
+
+        global $versionPressContainer;
+
+        $this->switchMaintenance('on');
+
+        /** @var SynchronizationProcess $syncProcess */
+        $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
+        $syncProcess->synchronize();
+        WP_CLI::success("Database updated");
+
+        $this->switchMaintenance('off');
+
+        WP_CLI::success("All done");
+
+
+
+    }
+
+    /**
      * Pushes changes to another clone
      *
      * ## OPTIONS
      *
-     * [--remote=<nameOrPath>]
+     * [--to=<nameOrPath>]
      * : Name or path of the remote. Defaults to "origin".
      *
-     * @synopsis [--remote=<nameOrPath>]
+     * @synopsis [--to=<nameOrPath>]
      */
     public function push($args = array(), $assoc_args = array()) {
-        $remoteName = isset($assoc_args['remote']) ? $assoc_args['remote'] : 'origin';
+        $remoteName = isset($assoc_args['to']) ? $assoc_args['to'] : 'origin';
         $remotePath = $this->getRemoteUrl($remoteName);
         if ($remotePath === null) {
             $remotePath = $remoteName;
@@ -552,6 +619,11 @@ class VPCommand extends WP_CLI_Command {
 
         if ($status === RevertStatus::NOT_CLEAN_WORKING_DIRECTORY) {
             WP_CLI::error("The working directory is not clean. Please commit your changes.");
+            return;
+        }
+
+        if ($status === RevertStatus::REVERTING_MERGE_COMMIT) {
+            WP_CLI::error("Cannot undo a merge commit.");
             return;
         }
 
@@ -717,7 +789,7 @@ class VPCommand extends WP_CLI_Command {
         if ($process->isSuccessful()) {
             WP_CLI::success("Remote site switched $preposition the maintenance mode");
         } else {
-            WP_CLI::error("Remote site couldn't be switched $preposition the maintenance mode");
+            WP_CLI::error("Remote site couldn't be switched $preposition the maintenance mode. Details:\n\n" . $process->getErrorOutput());
         }
     }
 }

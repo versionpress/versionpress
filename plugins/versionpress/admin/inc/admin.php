@@ -20,6 +20,10 @@ if (isset($_GET['error'])) {
             'class' => 'error',
             'message' => 'Error: Objects with missing references cannot be restored. For example we cannot restore comment where the related post was deleted.'
         ),
+        RevertStatus::REVERTING_MERGE_COMMIT => array(
+            'class' => 'error',
+            'message' => 'Error: It is not possible to undo merge commit.'
+        ),
     );
 
     $error = $errors[$_GET['error']];
@@ -132,7 +136,7 @@ if ($showWelcomePanel === "") {
     $page = isset($_GET['vp-page']) ? intval($_GET['vp-page']) : 0;
     $commits = $gitLogPaginator->getPage($page);
 
-    $canUndoCommit = $repository->wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
+    $isChildOfInitialCommit = $repository->wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
     $isFirstCommit = $page === 0;
 
     $disabledCommitsMessage = "
@@ -141,13 +145,14 @@ if ($showWelcomePanel === "") {
         </tr>
         ";
 
-    if (!$canUndoCommit && $commits[0]->getHash() !== $initialCommitHash) {
+    if (!$isChildOfInitialCommit && $commits[0]->getHash() !== $initialCommitHash) {
         echo $disabledCommitsMessage;
     }
 
     foreach ($commits as $key => $commit) {
-        $canUndoCommit = $canUndoCommit && ($commit->getHash() !== $initialCommitHash);
-        $canRollbackToThisCommit = !$isFirstCommit && ($canUndoCommit || $commit->getHash() === $initialCommitHash);
+        $isChildOfInitialCommit = $isChildOfInitialCommit && ($commit->getHash() !== $initialCommitHash);
+        $canUndoCommit = $isChildOfInitialCommit && !$commit->isMerge();
+        $canRollbackToThisCommit = !$isFirstCommit && ($isChildOfInitialCommit || $commit->getHash() === $initialCommitHash);
         $commitDate = $commit->getDate()->format('d-M-y H:i:s');
 
         $changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
@@ -171,7 +176,7 @@ if ($showWelcomePanel === "") {
         if ($canUndoCommit) $versioningSnippet .= $undoSnippet;
         if ($canUndoCommit && $canRollbackToThisCommit) $versioningSnippet .= "&nbsp;|&nbsp;";
         if ($canRollbackToThisCommit) $versioningSnippet .= $rollbackSnippet;
-        $isEnabled = $canUndoCommit || $canRollbackToThisCommit || $commit->getHash() === $initialCommitHash;
+        $isEnabled = $isChildOfInitialCommit || $canRollbackToThisCommit || $commit->getHash() === $initialCommitHash;
 
         $message = $changeInfo->getChangeDescription();
         echo "
