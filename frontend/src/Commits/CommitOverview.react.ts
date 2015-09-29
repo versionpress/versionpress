@@ -88,6 +88,8 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
           lines = this.getLinesForPostmeta(changesByTypeAndAction[type][action], countOfDuplicates, action);
         } else if (type === 'versionpress' && (action === 'undo' || action === 'rollback')) {
           lines = this.getLinesForRevert(changesByTypeAndAction[type][action], action);
+        } else if (type === 'versionpress' && (action === 'activate' || action === 'deactivate')) {
+          lines = this.getLinesForVersionPress(changesByTypeAndAction[type][action], action);
         } else if (type === 'comment') {
           lines = this.getLinesForComments(changesByTypeAndAction[type][action], action);
         } else if (type === 'post') {
@@ -199,6 +201,16 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
     } else {
       return [`The state is same as it was in "${commitDetails['message']}"`];
     }
+  }
+
+  private getLinesForVersionPress(changes: Change[], action) {
+    let change = changes[0];
+    let line = DOM.span(null,
+      StringUtils.capitalize(StringUtils.verbToPastTense(action)),
+      ' ',
+      DOM.span({className: 'identifier'}, 'VersionPress')
+    );
+    return [line];
   }
 
   private getLinesForOtherChanges(changes, countOfDuplicates, type, action) {
