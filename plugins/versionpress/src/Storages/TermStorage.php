@@ -5,7 +5,7 @@ namespace VersionPress\Storages;
 use VersionPress\ChangeInfos\TermChangeInfo;
 use VersionPress\Utils\EntityUtils;
 
-class TermsStorage extends SingleFileStorage {
+class TermStorage extends SingleFileStorage {
 
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
         $diff = EntityUtils::getDiff($oldEntity, $newEntity);

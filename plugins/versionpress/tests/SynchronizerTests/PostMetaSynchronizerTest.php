@@ -23,9 +23,9 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase {
     /** @var PostMetaSynchronizer */
     private $synchronizer;
     /** @var PostsSynchronizer */
-    private $postSynchronizer;
+    private $postsSynchronizer;
     /** @var UsersSynchronizer */
-    private $userSynchronizer;
+    private $usersSynchronizer;
     private static $authorVpId;
     private static $postVpId;
     private static $post2VpId;
@@ -37,8 +37,8 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase {
         $this->postStorage = self::$storageFactory->getStorage('post');
         $this->userStorage = self::$storageFactory->getStorage('user');
         $this->synchronizer = new PostMetaSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
-        $this->postSynchronizer = new PostsSynchronizer($this->postStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
-        $this->userSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->postsSynchronizer = new PostsSynchronizer($this->postStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->usersSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
     }
 
     /**
@@ -47,8 +47,8 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase {
      */
     public function synchronizerAddsNewPostMetaToDatabase() {
         $this->createPostMeta();
-        $this->userSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
-        $this->postSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->postsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
 
         DBAsserter::assertFilesEqualDatabase();
@@ -81,8 +81,8 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase {
     public function synchronizerRemovesDeletedPostMetaFromDatabase() {
         $this->deletePostMeta();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
-        $this->postSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
-        $this->userSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->postsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -92,8 +92,8 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase {
      */
     public function synchronizerAddsNewPostMetaToDatabase_selective() {
         $entitiesToSynchronize = $this->createPostMeta();
-        $this->userSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
-        $this->postSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
+        $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
+        $this->postsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
 
         DBAsserter::assertFilesEqualDatabase();
@@ -116,8 +116,8 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase {
     public function synchronizerRemovesDeletedPostMetaFromDatabase_selective() {
         $entitiesToSynchronize = $this->deletePostMeta();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
-        $this->postSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
-        $this->userSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
+        $this->postsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
+        $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         DBAsserter::assertFilesEqualDatabase();
     }
 

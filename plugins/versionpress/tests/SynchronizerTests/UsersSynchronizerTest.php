@@ -9,7 +9,7 @@ use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 
-class UserSynchronizerTest extends SynchronizerTestCase {
+class UsersSynchronizerTest extends SynchronizerTestCase {
     /** @var UserStorage */
     private $storage;
     /** @var UsersSynchronizer */

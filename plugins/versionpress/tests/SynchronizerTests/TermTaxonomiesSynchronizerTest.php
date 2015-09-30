@@ -2,24 +2,24 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
-use VersionPress\Storages\TermsStorage;
+use VersionPress\Storages\TermStorage;
 use VersionPress\Storages\TermTaxonomyStorage;
 use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Synchronizers\TermsSynchronizer;
-use VersionPress\Synchronizers\TermTaxonomySynchronizer;
+use VersionPress\Synchronizers\TermTaxonomiesSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 
-class TermTaxonomySynchronizerTest extends SynchronizerTestCase {
+class TermTaxonomiesSynchronizerTest extends SynchronizerTestCase {
     /** @var TermTaxonomyStorage */
     private $storage;
-    /** @var TermsStorage */
+    /** @var TermStorage */
     private $termStorage;
-    /** @var TermTaxonomySynchronizer */
+    /** @var TermTaxonomiesSynchronizer */
     private $synchronizer;
     /** @var TermsSynchronizer */
-    private $termSynchronizer;
+    private $termsSynchronizer;
     private static $vpId;
     private static $termVpId;
 
@@ -27,8 +27,8 @@ class TermTaxonomySynchronizerTest extends SynchronizerTestCase {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('term_taxonomy');
         $this->termStorage = self::$storageFactory->getStorage('term');
-        $this->synchronizer = new TermTaxonomySynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
-        $this->termSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->synchronizer = new TermTaxonomiesSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->termsSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
     }
 
     /**
@@ -37,7 +37,7 @@ class TermTaxonomySynchronizerTest extends SynchronizerTestCase {
      */
     public function synchronizerAddsNewTermTaxonomyToDatabase() {
         $this->createTermTaxonomy();
-        $this->termSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->termsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -69,7 +69,7 @@ class TermTaxonomySynchronizerTest extends SynchronizerTestCase {
     public function synchronizerRemovesDeletedTermTaxonomyFromDatabase() {
         $this->deleteTermTaxonomy();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
-        $this->termSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->termsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -88,7 +88,7 @@ class TermTaxonomySynchronizerTest extends SynchronizerTestCase {
         $this->storage->save($termTaxonomy1);
         $this->storage->save($termTaxonomy2);
 
-        $this->termSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->termsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
 
@@ -98,10 +98,10 @@ class TermTaxonomySynchronizerTest extends SynchronizerTestCase {
         $this->termStorage->delete($term1);
         $this->termStorage->delete($term2);
         // We need new instances because of caching in SynchronizerBase::maybeInit
-        $termSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
-        $termTaxonomySynchronizer = new TermTaxonomySynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
-        $termTaxonomySynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
-        $termSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $termsSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $termTaxonomiesSynchronizer = new TermTaxonomiesSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $termTaxonomiesSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $termsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
     }
 
     private function createTermTaxonomy() {

@@ -2,15 +2,15 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
-use VersionPress\Storages\TermsStorage;
+use VersionPress\Storages\TermStorage;
 use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Synchronizers\TermsSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 
-class TermSynchronizerTest extends SynchronizerTestCase {
-    /** @var TermsStorage */
+class TermsSynchronizerTest extends SynchronizerTestCase {
+    /** @var TermStorage */
     private $storage;
     /** @var TermsSynchronizer */
     private $synchronizer;

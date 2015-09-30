@@ -19,7 +19,7 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
     /** @var UserMetaSynchronizer */
     private $synchronizer;
     /** @var UsersSynchronizer */
-    private $userSynchronizer;
+    private $usersSynchronizer;
     private static $vpId;
     private static $userVpId;
 
@@ -28,7 +28,7 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
         $this->storage = self::$storageFactory->getStorage('usermeta');
         $this->userStorage = self::$storageFactory->getStorage('user');
         $this->synchronizer = new UserMetaSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
-        $this->userSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->usersSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
     }
 
     /**
@@ -37,7 +37,7 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
      */
     public function synchronizerAddsNewUserMetaToDatabase() {
         $this->createUserMeta();
-        $this->userSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -69,7 +69,7 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
     public function synchronizerRemovesDeletedUserMetaFromDatabase() {
         $this->deleteUserMeta();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
-        $this->userSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -79,7 +79,7 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
      */
     public function synchronizerAddsNewUserMetaToDatabase_selective() {
         $entitiesToSynchronize = $this->createUserMeta();
-        $this->userSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
+        $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -101,7 +101,7 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
     public function synchronizerRemovesDeletedUserMetaFromDatabase_selective() {
         $entitiesToSynchronize = $this->deleteUserMeta();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
-        $this->userSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
+        $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         DBAsserter::assertFilesEqualDatabase();
     }
 

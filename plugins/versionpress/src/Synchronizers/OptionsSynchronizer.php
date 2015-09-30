@@ -12,7 +12,7 @@ use wpdb;
  * Options synchronizer. Skips transient options and a couple of hardcoded values like
  * `cron` or `siteurl`, see the `synchronize()` method.
  */
-class OptionSynchronizer implements Synchronizer {
+class OptionsSynchronizer implements Synchronizer {
 
     /** @var Storage */
     private $optionStorage;

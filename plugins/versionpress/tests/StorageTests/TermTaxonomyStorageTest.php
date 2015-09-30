@@ -5,7 +5,7 @@ namespace VersionPress\Tests\StorageTests;
 use VersionPress\Database\EntityInfo;
 use VersionPress\Storages\PostMetaStorage;
 use VersionPress\Storages\PostStorage;
-use VersionPress\Storages\TermsStorage;
+use VersionPress\Storages\TermStorage;
 use VersionPress\Storages\TermTaxonomyStorage;
 use VersionPress\Storages\UserMetaStorage;
 use VersionPress\Storages\UserStorage;
@@ -14,7 +14,7 @@ use VersionPress\Utils\FileSystem;
 class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
     /** @var TermTaxonomyStorage */
     private $storage;
-    /** @var TermsStorage */
+    /** @var TermStorage */
     private $termStorage;
 
     private $testingTermTaxonomy = array(
@@ -82,7 +82,7 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
             )
         ));
 
-        $this->termStorage = new TermsStorage(__DIR__ . '/terms.ini', $termInfo);
+        $this->termStorage = new TermStorage(__DIR__ . '/terms.ini', $termInfo);
         $this->storage = new TermTaxonomyStorage(__DIR__ . '/terms.ini', $termTaxonomyInfo);
     }
 
