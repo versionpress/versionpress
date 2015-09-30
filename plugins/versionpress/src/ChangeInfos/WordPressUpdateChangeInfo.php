@@ -91,6 +91,9 @@ class WordPressUpdateChangeInfo extends TrackedChangeInfo {
 
             // WP themes - we bet that all WP themes begin with "twenty"
             array("type" => "path", "path" => WP_CONTENT_DIR . '/themes/twenty*'),
+
+            // Translations
+            array("type" => "path", "path" => WP_CONTENT_DIR . '/languages/*'),
         );
     }
 }
