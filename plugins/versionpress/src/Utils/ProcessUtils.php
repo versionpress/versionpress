@@ -30,27 +30,6 @@ class ProcessUtils {
     }
 
     /**
-     * Similar to $process->getOutput() and $process->getErrorOutput() but this method doesn't care
-     * where the output came from (external programs will sometimes incorrectly return error output
-     * via STDOUT).
-     *
-     * This method will typically be called from `!$process->isSuccessful` branch so we first check
-     * if there is some error output, and if not, return standard output.
-     *
-     * @param Process $process
-     * @return string
-     */
-    public static function getOutput($process) {
-
-        $output = $process->getErrorOutput();
-        if (!$output) {
-            $output = $process->getOutput();
-        }
-
-        return $output;
-    }
-
-    /**
      * Linux shell escaping from Drush:
      * http://drupalcontrib.org/api/drupal/contributions!drush!includes!exec.inc/function/_drush_escapeshellarg_linux/7
      *
