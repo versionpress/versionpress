@@ -1,5 +1,5 @@
 require:
-  - ../vendor/x-team/wp-cli-ssh/wp-cli-ssh.php
+  - ../vendor/janvoracek/wp-cli-ssh/wp-cli-ssh.php
 
 ssh:
 
