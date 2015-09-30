@@ -25,6 +25,8 @@ use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\VersionPressOptions;
+use VersionPress\Synchronizers\SynchronizationProcess;
+use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\BugReporter;
 
 class VersionPressApi {
@@ -35,11 +37,14 @@ class VersionPressApi {
     private $reverter;
     /** @var VersionPressConfig */
     private $vpConfig;
+    /** @var SynchronizationProcess */
+    private $synchronizationProcess;
 
-    public function __construct(GitRepository $gitRepository, Reverter $reverter, VersionPressConfig $vpConfig) {
+    public function __construct(GitRepository $gitRepository, Reverter $reverter, VersionPressConfig $vpConfig, SynchronizationProcess $synchronizationProcess) {
         $this->gitRepository = $gitRepository;
         $this->reverter = $reverter;
         $this->vpConfig = $vpConfig;
+        $this->synchronizationProcess = $synchronizationProcess;
     }
 
     /**
@@ -366,8 +371,48 @@ class VersionPressApi {
         $authorEmail = $currentUser->user_email;
 
         $this->gitRepository->stageAll();
+
+        $status = $this->gitRepository->getStatus(true);
+        if (ArrayUtils::any($status, function ($fileStatus) {
+            return Strings::contains($fileStatus[1], 'vpdb');
+        })) {
+            $this->updateDatabase($status);
+        }
+
         $this->gitRepository->commit($request['commit-message'], $authorName, $authorEmail);
         return new WP_REST_Response(true);
+    }
+
+    private function updateDatabase($status) {
+        $diff = $this->gitRepository->getDiff();
+        $vpidRegex = "/([\\da-f]{32})/i";
+        $optionRegex = "/.*vpdb[\\/\\\\]options[\\/\\\\].+[\\/\\\\](.+)\\.ini/i";
+
+        preg_match_all($vpidRegex, $diff, $vpidMatches);
+        preg_match_all($optionRegex, $diff, $optionNameMatches); // for options after WP-473
+
+        $entitiesToSynchronize = array(
+            'entities' => array_unique(array_merge($vpidMatches[1], $optionNameMatches[1])),
+            'storages' => array(),
+        );
+
+        if (ArrayUtils::any($status, function ($fileStatus) {
+            return Strings::contains($fileStatus[1], 'terms.ini');
+        })
+        ) {
+            $entitiesToSynchronize['storages'][] = 'term';
+            $entitiesToSynchronize['storages'][] = 'term_taxonomy';
+        }
+
+        // for options before WP-473
+        if (ArrayUtils::any($status, function ($fileStatus) {
+            return Strings::contains($fileStatus[1], 'options.ini');
+        })
+        ) {
+            $entitiesToSynchronize['storages'][] = 'option';
+        }
+
+        $this->synchronizationProcess->synchronize($entitiesToSynchronize);
     }
 
     /**
