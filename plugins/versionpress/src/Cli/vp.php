@@ -582,7 +582,11 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::error("Changes couldn't be pushed. Details:\n\n" . $process->getConsoleOutput());
         }
 
-        VPCommandUtils::exec("git config --local push.default $currentPushType");
+        if ($currentPushType === '') { // implicit value
+            VPCommandUtils::exec("git config --local --unset push.default");
+        } else {
+            VPCommandUtils::exec("git config --local push.default $currentPushType");
+        }
 
         $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-push', array('require' => self::VP_INTERNAL_COMMAND_PATH), $remotePath);
         if ($process->isSuccessful()) {
