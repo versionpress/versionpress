@@ -8,6 +8,7 @@ use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\WpdbReplacer;
@@ -618,32 +619,41 @@ class VPCommand extends WP_CLI_Command {
         global $versionPressContainer;
         /** @var Reverter $reverter */
         $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
+        /** @var GitRepository $repository */
+        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
 
-        $status = $reverter->undo($args[0]);
+        $hash = $args[0];
+        $log = $repository->log($hash);
+        if (count($log) === 0) {
+            WP_CLI::error("Commit '$hash' does not exist.");
+        }
+
+        $this->switchMaintenance('on');
+
+        $status = $reverter->undo($hash);
 
         if ($status === RevertStatus::VIOLATED_REFERENTIAL_INTEGRITY) {
-            WP_CLI::error("Violated referential integrity. Objects with missing references cannot be restored. For example we cannot restore comment where the related post was deleted.");
-            return;
+            WP_CLI::error("Violated referential integrity. Objects with missing references cannot be restored. For example we cannot restore comment where the related post was deleted.", false);
         }
 
         if ($status === RevertStatus::MERGE_CONFLICT) {
-            WP_CLI::error("Merge conflict. Overwritten changes can not be reverted.");
-            return;
+            WP_CLI::error("Merge conflict. Overwritten changes can not be reverted.", false);
         }
 
         if ($status === RevertStatus::NOT_CLEAN_WORKING_DIRECTORY) {
-            WP_CLI::error("The working directory is not clean. Please commit your changes.");
-            return;
+            WP_CLI::error("The working directory is not clean. Please commit your changes.", false);
         }
 
         if ($status === RevertStatus::REVERTING_MERGE_COMMIT) {
-            WP_CLI::error("Cannot undo a merge commit.");
-            return;
+            WP_CLI::error("Cannot undo a merge commit.", false);
         }
 
-        WP_CLI::success("Done.");
-    }
+        if ($status === RevertStatus::OK) {
+            WP_CLI::success("Undo was successful.");
+        }
 
+        $this->switchMaintenance('off');
+    }
 
     /**
      * Rollbacks site to the same state as it was in the specified commit.
@@ -666,20 +676,32 @@ class VPCommand extends WP_CLI_Command {
         global $versionPressContainer;
         /** @var Reverter $reverter */
         $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
+        /** @var GitRepository $repository */
+        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
 
-        $status = $reverter->rollback($args[0]);
+        $hash = $args[0];
+        $log = $repository->log($hash);
+        if (count($log) === 0) {
+            WP_CLI::error("Commit '$hash' does not exist.");
+        }
+
+        $this->switchMaintenance('on');
+
+        $status = $reverter->rollback($hash);
 
         if ($status === RevertStatus::NOTHING_TO_COMMIT) {
-            WP_CLI::error("Nothing to commit. Current state is the same as the one you want rollback to.");
-            return;
+            WP_CLI::error("Nothing to commit. Current state is the same as the one you want rollback to.", false);
         }
 
         if ($status === RevertStatus::NOT_CLEAN_WORKING_DIRECTORY) {
-            WP_CLI::error("The working directory is not clean. Please commit your changes.");
-            return;
+            WP_CLI::error("The working directory is not clean. Please commit your changes.", false);
         }
 
-        WP_CLI::success("Done.");
+        if ($status === RevertStatus::OK) {
+            WP_CLI::success("Rollback was successful.");
+        }
+
+        $this->switchMaintenance('off');
     }
     private function dropTables() {
         global $versionPressContainer;
