@@ -88,6 +88,8 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
           lines = this.getLinesForPostmeta(changesByTypeAndAction[type][action], countOfDuplicates, action);
         } else if (type === 'versionpress' && (action === 'undo' || action === 'rollback')) {
           lines = this.getLinesForRevert(changesByTypeAndAction[type][action], action);
+        } else if (type === 'versionpress' && (action === 'activate' || action === 'deactivate')) {
+          lines = this.getLinesForVersionPress(changesByTypeAndAction[type][action], action);
         } else if (type === 'wordpress' && action === 'update') {
           lines = this.getLinesForWordPressUpdate(changesByTypeAndAction[type][action]);
         } else if (type === 'comment') {
@@ -203,6 +205,16 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
     }
   }
 
+  private getLinesForVersionPress(changes: Change[], action) {
+    let change = changes[0];
+    let line = DOM.span(null,
+      StringUtils.capitalize(StringUtils.verbToPastTense(action)),
+      ' ',
+      DOM.span({className: 'identifier'}, 'VersionPress')
+    );
+    return [line];
+  }
+  
   private getLinesForWordPressUpdate(changes: Change[]) {
     let change = changes[0];
     let line = DOM.span(null,
@@ -213,6 +225,7 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
     );
     return [line];
   }
+
 
   private getLinesForOtherChanges(changes, countOfDuplicates, type, action) {
     let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changes, countOfDuplicates);
