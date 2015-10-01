@@ -93,7 +93,7 @@ class PluginChangeInfo extends TrackedChangeInfo {
         }
         $pluginChange = array("type" => "path", "path" => $path);
 
-        $optionChange = array("type" => "storage-file", "entity" => "option", "id" => "", "parent-id" => "");
+        $optionChange = array("type" => "path", "path" => VERSIONPRESS_MIRRORING_DIR);
 
         return array($pluginChange, $optionChange);
     }

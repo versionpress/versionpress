@@ -4,9 +4,7 @@ namespace VersionPress\Synchronizers;
 /**
  * Synchronizers synchronize entities from {@link EntityStorage storages} back to the database.
  *
- * Most storages have their complementary synchronizers so the typical relationship is 1:1 but in some
- * cases, there may be more synchronizers for a single storage. For example, both VersionPress\Synchronizers\PostsSynchronizer
- * and VersionPress\Synchronizers\TermRelationshipsSynchronizer exist for VersionPress\Storages\PostStorage.
+ * Every storage has its complementary synchronizer.
  *
  * Synchronizers do work that is kind of opposite to the ones of storages but with one major
  * difference: while storages usually add or delete entities one by one or by small amounts,

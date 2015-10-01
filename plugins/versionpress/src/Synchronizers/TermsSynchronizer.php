@@ -20,7 +20,7 @@ class TermsSynchronizer extends SynchronizerBase {
         $transformedEntities = array();
         foreach ($entities as $id => $entity) {
             $entityCopy = $entity;
-            unset($entityCopy['taxonomies']); // taxonomies are synchronized by VersionPress\Synchronizers\TermTaxonomySynchronizer
+            unset($entityCopy['taxonomies']); // taxonomies are synchronized by VersionPress\Synchronizers\TermTaxonomiesSynchronizer
             $entityCopy[$this->dbSchema->getEntityInfo('term')->idColumnName] = $id;
 
             $transformedEntities[] = $entityCopy;

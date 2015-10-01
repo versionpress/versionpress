@@ -32,7 +32,7 @@ class SynchronizerFactory {
         'user' => 'VersionPress\Synchronizers\UsersSynchronizer',
         'usermeta' => 'VersionPress\Synchronizers\UserMetaSynchronizer',
         'term' => 'VersionPress\Synchronizers\TermsSynchronizer',
-        'term_taxonomy' => 'VersionPress\Synchronizers\TermTaxonomySynchronizer',
+        'term_taxonomy' => 'VersionPress\Synchronizers\TermTaxonomiesSynchronizer',
     );
 
     function __construct(StorageFactory $storageFactory, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer) {

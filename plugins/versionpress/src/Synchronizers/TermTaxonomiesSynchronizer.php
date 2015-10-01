@@ -7,7 +7,7 @@ use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use wpdb;
 
-class TermTaxonomySynchronizer extends SynchronizerBase {
+class TermTaxonomiesSynchronizer extends SynchronizerBase {
 
     /** @var wpdb */
     private $database;

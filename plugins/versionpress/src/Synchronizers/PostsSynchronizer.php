@@ -25,7 +25,7 @@ class PostsSynchronizer extends SynchronizerBase {
 
         foreach ($entities as $entity) {
             $entityClone = $entity;
-            unset($entityClone['category'], $entityClone['post_tag']); // categories and tags are synchronized by TermRelationshipsSynchronizer
+            unset($entityClone['category'], $entityClone['post_tag']); // categories and tags are synchronized as an M:N relationship / todo: maybe we can remove this line?
             $entityClone = $this->removePostMeta($entityClone);
             $filteredEntities[] = $entityClone;
         }

@@ -195,6 +195,10 @@ abstract class SingleFileStorage extends Storage {
         return $this->file;
     }
 
+    public function getPathCommonToAllEntities() {
+        return $this->file;
+    }
+
     protected function deserializeEntities($fileContent) {
         return IniSerializer::deserialize($fileContent);
     }

@@ -2,7 +2,7 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
-use VersionPress\Storages\OptionsStorage;
+use VersionPress\Storages\OptionStorage;
 use VersionPress\Synchronizers\OptionsSynchronizer;
 use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
@@ -12,7 +12,7 @@ use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class OptionsSynchronizerTest extends SynchronizerTestCase {
 
-    /** @var OptionsStorage */
+    /** @var OptionStorage */
     private $storage;
     /** @var OptionsSynchronizer */
     private $synchronizer;

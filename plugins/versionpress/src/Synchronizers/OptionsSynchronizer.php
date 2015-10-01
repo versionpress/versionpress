@@ -2,9 +2,10 @@
 namespace VersionPress\Synchronizers;
 
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Storages\OptionsStorage;
+use VersionPress\Storages\OptionStorage;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
+use VersionPress\Utils\ArrayUtils;
 use wpdb;
 
 /**
@@ -13,8 +14,8 @@ use wpdb;
  */
 class OptionsSynchronizer implements Synchronizer {
 
-    /** @var OptionsStorage */
-    private $optionsStorage;
+    /** @var Storage */
+    private $optionStorage;
 
     /** @var wpdb */
     private $database;
@@ -23,15 +24,15 @@ class OptionsSynchronizer implements Synchronizer {
 
     private $tableName;
 
-    function __construct(Storage $optionsStorage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer) {
-        $this->optionsStorage = $optionsStorage;
+    function __construct(Storage $optionStorage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer) {
+        $this->optionStorage = $optionStorage;
         $this->database = $wpdb;
         $this->urlReplacer = $urlReplacer;
         $this->tableName = $dbSchema->getPrefixedTableName('option');
     }
 
     function synchronize($task, $entitiesToSynchronize = null) {
-        $options = $this->optionsStorage->loadAll();
+        $options = $this->optionStorage->loadAll();
         if (count($options) == 0) return array();
 
         $syncQuery = "INSERT INTO {$this->tableName} (option_name, option_value, autoload) VALUES ";
@@ -46,15 +47,12 @@ class OptionsSynchronizer implements Synchronizer {
 
         $this->database->query($syncQuery);
 
-        $ignoredOptionNames = array_map(function ($option) {
-            return "\"" . $option['option_name'] . "\"";
-        }, $options);
+        $ignoredOptionNames = ArrayUtils::column($options, 'option_name');
+        $ignoredOptionNames = array_merge($ignoredOptionNames, OptionStorage::$optionsBlacklist);
 
-        $ignoredOptionNames[] = '"cron"';
-        $ignoredOptionNames[] = '"siteurl"';
-        $ignoredOptionNames[] = '"home"';
-        $ignoredOptionNames[] = '"db_upgraded"';
-        $ignoredOptionNames[] = '"auto_updater.lock"';
+        $ignoredOptionNames = array_map(function ($optionName) {
+            return "\"$optionName\"";
+        }, $ignoredOptionNames);
 
         $deleteSql = "DELETE FROM {$this->tableName} WHERE option_name NOT IN(" . join(", ", $ignoredOptionNames) . ") OR option_name NOT LIKE '_%'";
         $this->database->query($deleteSql);

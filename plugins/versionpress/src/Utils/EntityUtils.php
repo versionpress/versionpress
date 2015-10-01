@@ -30,7 +30,7 @@ class EntityUtils {
     public static function getDiff($oldEntityData, $newEntityData) {
         $diff = array();
         foreach ($newEntityData as $key => $value) {
-            if (!isset($oldEntityData[$key]) || $oldEntityData[$key] != $value) { // Intensional loose comparison, old entity items are always string.
+            if (!isset($oldEntityData[$key]) || $oldEntityData[$key] !== $value) {
                 $diff[$key] = $value;
             }
         }

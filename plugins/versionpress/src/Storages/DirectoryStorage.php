@@ -7,7 +7,6 @@ use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use RegexIterator;
 use VersionPress\Database\EntityInfo;
-use VersionPress\Filters\EntityFilter;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\EntityUtils;
 use VersionPress\Utils\FileSystem;
@@ -83,9 +82,9 @@ abstract class DirectoryStorage extends Storage {
     }
 
     public function delete($restriction) {
-        $fileName = $this->getEntityFilename($restriction['vp_id']);
+        $fileName = $this->getEntityFilename($restriction[$this->entityInfo->idColumnName]);
         if (is_file($fileName)) {
-            $entity = $this->loadEntity($restriction['vp_id']);
+            $entity = $this->loadEntity($restriction[$this->entityInfo->idColumnName]);
             FileSystem::remove($fileName);
             return $this->createChangeInfo($entity, $entity, 'delete');
         } else {
@@ -132,17 +131,13 @@ abstract class DirectoryStorage extends Storage {
         return $this->directory . '/' . $vpidPath . '.ini';
     }
 
+    public function getPathCommonToAllEntities() {
+        return $this->directory;
+    }
+
     protected function deserializeEntity($serializedEntity) {
         $entity = IniSerializer::deserialize($serializedEntity);
-        if (count($entity) == 0) {
-            return $entity;
-        }
-
-        $vpid = key($entity);
-        $flattenEntity = $entity[$vpid];
-        $flattenEntity[$this->entityInfo->vpidColumnName] = $vpid;
-
-        return $flattenEntity;
+        return $this->flattenEntity($entity);
     }
 
     protected function serializeEntity($vpid, $entity) {
@@ -178,5 +173,18 @@ abstract class DirectoryStorage extends Storage {
     public function loadEntity($id, $parentId = null) {
         $entities = $this->loadAllFromFiles(array($this->getEntityFilename($id)));
         return $entities[$id];
+    }
+
+    protected function flattenEntity($entity) {
+        if (count($entity) === 0) {
+            return $entity;
+        }
+
+        reset($entity);
+        $vpid = key($entity);
+        $flatEntity = $entity[$vpid];
+        $flatEntity[$this->entityInfo->vpidColumnName] = $vpid;
+
+        return $flatEntity;
     }
 }

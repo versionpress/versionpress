@@ -234,6 +234,9 @@ class Committer {
                 $entityId = $change["id"];
                 $parentId = $change["parent-id"];
                 $path = $this->storageFactory->getStorage($entityName)->getEntityFilename($entityId, $parentId);
+            } elseif ($change["type"] === "all-storage-files") {
+                $entityName = $change["entity"];
+                $path = $this->storageFactory->getStorage($entityName)->getPathCommonToAllEntities();
             } elseif ($change["type"] === "path") {
                 $path = $change["path"];
             } else {
