@@ -8,6 +8,7 @@ use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\WpdbReplacer;
@@ -599,10 +600,18 @@ class VPCommand extends WP_CLI_Command {
         global $versionPressContainer;
         /** @var Reverter $reverter */
         $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
+        /** @var GitRepository $repository */
+        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+
+        $hash = $args[0];
+        $log = $repository->log($hash);
+        if (count($log) === 0) {
+            WP_CLI::error("Commit '$hash' does not exist.");
+        }
 
         $this->switchMaintenance('on');
 
-        $status = $reverter->undo($args[0]);
+        $status = $reverter->undo($hash);
 
         if ($status === RevertStatus::VIOLATED_REFERENTIAL_INTEGRITY) {
             WP_CLI::error("Violated referential integrity. Objects with missing references cannot be restored. For example we cannot restore comment where the related post was deleted.", false);
@@ -648,10 +657,18 @@ class VPCommand extends WP_CLI_Command {
         global $versionPressContainer;
         /** @var Reverter $reverter */
         $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
+        /** @var GitRepository $repository */
+        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+
+        $hash = $args[0];
+        $log = $repository->log($hash);
+        if (count($log) === 0) {
+            WP_CLI::error("Commit '$hash' does not exist.");
+        }
 
         $this->switchMaintenance('on');
 
-        $status = $reverter->rollback($args[0]);
+        $status = $reverter->rollback($hash);
 
         if ($status === RevertStatus::NOTHING_TO_COMMIT) {
             WP_CLI::error("Nothing to commit. Current state is the same as the one you want rollback to.", false);
