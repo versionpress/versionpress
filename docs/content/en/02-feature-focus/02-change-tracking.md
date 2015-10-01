@@ -31,6 +31,7 @@ Most tracked changes involve database entities which are described below but som
  - **Plugin** installations, uninstallations and updates
  - **WordPress core** updates
  - **Media** uploads
+ - **Translations**
 
 When any such action happens, VersionPress commits both the database change and a related file(s) change. For example, when installing a plugin, VersionPress will take not that the list of installed plugins has been changed in the database and commit the corresponding plugin files as well.
 
