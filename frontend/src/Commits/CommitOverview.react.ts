@@ -90,6 +90,8 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
           lines = this.getLinesForRevert(changesByTypeAndAction[type][action], action);
         } else if (type === 'versionpress' && (action === 'activate' || action === 'deactivate')) {
           lines = this.getLinesForVersionPress(changesByTypeAndAction[type][action], action);
+        } else if (type === 'wordpress' && action === 'update') {
+          lines = this.getLinesForWordPressUpdate(changesByTypeAndAction[type][action]);
         } else if (type === 'comment') {
           lines = this.getLinesForComments(changesByTypeAndAction[type][action], action);
         } else if (type === 'post') {
@@ -212,6 +214,18 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
     );
     return [line];
   }
+  
+  private getLinesForWordPressUpdate(changes: Change[]) {
+    let change = changes[0];
+    let line = DOM.span(null,
+      'Updated ',
+      DOM.span({className: 'identifier'}, 'WordPress'),
+      ' to version ',
+      DOM.span({className: 'identifier'}, change.name)
+    );
+    return [line];
+  }
+
 
   private getLinesForOtherChanges(changes, countOfDuplicates, type, action) {
     let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changes, countOfDuplicates);
