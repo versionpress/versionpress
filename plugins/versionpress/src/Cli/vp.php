@@ -390,7 +390,7 @@ class VPCommand extends WP_CLI_Command {
         }
 
 
-        // Enable pushing
+        // Enable pushing to origin
         $configCommand = "git config receive.denyCurrentBranch ignore";
         $process = VPCommandUtils::exec($configCommand);
 
@@ -398,6 +398,16 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::success("Enabled pushing to the original repository");
         } else {
             WP_CLI::error("Cannot enable pushing to the original repository");
+        }
+
+        // Enable pushing to clone
+        $configCommand = "git config receive.denyCurrentBranch ignore";
+        $process = VPCommandUtils::exec($configCommand, $clonePath);
+
+        if ($process->isSuccessful()) {
+            WP_CLI::success("Enabled pushing to the clone");
+        } else {
+            WP_CLI::error("Cannot enable pushing to the clone");
         }
 
         // Copy & Update wp-config
@@ -560,13 +570,22 @@ class VPCommand extends WP_CLI_Command {
 
         $this->switchMaintenance('on', $remoteName);
 
-        $pushCommand = "git push $remoteName";
+        $currentPushType = trim(VPCommandUtils::exec('git config --local push.default')->getOutput());
+        VPCommandUtils::exec('git config --local push.default simple');
+
+        $pushCommand = "git push --set-upstream $remoteName master"; // hardcoded branch name until we support custom branches
         $process = VPCommandUtils::exec($pushCommand);
         if ($process->isSuccessful()) {
             WP_CLI::success("Changes successfully pushed");
         } else {
             $this->switchMaintenance('off', $remoteName);
             WP_CLI::error("Changes couldn't be pushed. Details:\n\n" . $process->getConsoleOutput());
+        }
+
+        if ($currentPushType === '') { // implicit value
+            VPCommandUtils::exec("git config --local --unset push.default");
+        } else {
+            VPCommandUtils::exec("git config --local push.default $currentPushType");
         }
 
         $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-push', array('require' => self::VP_INTERNAL_COMMAND_PATH), $remotePath);
