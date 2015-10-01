@@ -470,7 +470,13 @@ class VersionPressApi {
      * @return \WP_Error|bool
      */
     public function checkPermissions(WP_REST_Request $request) {
-        return !$this->vpConfig->mergedConfig['requireApiAuth'] || current_user_can('manage_options');
+        return !$this->vpConfig->mergedConfig['requireApiAuth'] || current_user_can('manage_options')
+            ? true
+            : new \WP_Error(
+                'error',
+                'You don\'t have permission to do this.',
+                array('status' => 403)
+            );
     }
 
     private function convertChangeInfoList($getChangeInfoList) {

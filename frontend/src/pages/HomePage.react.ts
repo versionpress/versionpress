@@ -45,6 +45,8 @@ interface HomePageState {
 
 class HomePage extends React.Component<HomePageProps, HomePageState> {
 
+  private refreshInterval;
+
   constructor() {
     super();
     this.state = {
@@ -61,13 +63,15 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     this.onUndo = this.onUndo.bind(this);
     this.onRollback = this.onRollback.bind(this);
     this.checkUpdate = this.checkUpdate.bind(this);
-
-    setInterval(this.checkUpdate, 10000);
   }
 
   componentDidMount() {
     this.fetchWelcomePanel();
     this.fetchCommits();
+    this.refreshInterval = setInterval(() => this.checkUpdate(), 10 * 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this.refreshInterval);
   }
 
   componentWillReceiveProps(nextProps: HomePageProps) {
@@ -127,10 +131,18 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
       .get('should-update')
       .query({latestCommit: this.state.commits[0].hash})
       .end((err: any, res: request.Response) => {
-        this.setState({
-          displayUpdateNotice: !this.props.params.page && res.body.update === true,
-          displayCommitPanel: res.body.cleanWorkingDirectory !== true
-        });
+        if (err) {
+          this.setState({
+            displayUpdateNotice: false,
+            displayCommitPanel: false
+          });
+          clearInterval(this.refreshInterval);
+        } else {
+          this.setState({
+            displayUpdateNotice: !this.props.params.page && res.body.update === true,
+            displayCommitPanel: res.body.cleanWorkingDirectory !== true
+          });
+        }
       });
   }
 
