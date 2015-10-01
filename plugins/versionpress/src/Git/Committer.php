@@ -104,7 +104,7 @@ class Committer {
             $this->repository->commit($changeInfoEnvelope->getCommitMessage(), $authorName, $authorEmail);
         }
 
-        if (count($this->forcedChangeInfos) === 1 && $this->forcedChangeInfos[0] instanceof \VersionPress\ChangeInfos\WordPressUpdateChangeInfo) {
+        if (count($this->forcedChangeInfos) > 0 && $this->forcedChangeInfos[0] instanceof \VersionPress\ChangeInfos\WordPressUpdateChangeInfo) {
             FileSystem::remove(ABSPATH . 'versionpress.maintenance');
         }
 
