@@ -9,19 +9,6 @@ namespace VersionPress\Utils;
  */
 class Process extends \Symfony\Component\Process\Process {
 
-    public function start($callback = null) {
-
-        $this->consoleOutput = '';
-        $consoleOutput = &$this->consoleOutput;
-
-        return parent::start(function($type, $buffer) use (&$consoleOutput, $callback) {
-            $consoleOutput .= $buffer;
-            if ($callback) {
-                call_user_func($callback, $type, $buffer);
-            }
-        });
-    }
-
     private $consoleOutput;
 
     /**
@@ -35,6 +22,22 @@ class Process extends \Symfony\Component\Process\Process {
      */
     public function getConsoleOutput() {
         return $this->consoleOutput;
+    }
+
+
+    public function start($callback = null) {
+        $this->consoleOutput = '';
+        parent::start($callback);
+    }
+
+    public function addOutput($line) {
+        parent::addOutput($line);
+        $this->consoleOutput .= $line;
+    }
+
+    public function addErrorOutput($line) {
+        parent::addErrorOutput($line);
+        $this->consoleOutput .= $line;
     }
 
 
