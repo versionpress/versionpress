@@ -31,7 +31,6 @@ Minimum system requirements are (as a general rule, **we recommend using the lat
  - Safe mode turned off
  - `proc_open()` enabled
  - Write permissions in the site root and everywhere under it
- - No `wp-content/db.php` on the disk
  - No path customizations (e.g., custom location for `wp-content`)
 
 On top of that, if you want to use the [multi-instance / sync features](../sync) of VersionPress 2.0, probably even more control over the requirement will be required. In practice, this means that you need to have a lot of control over your server environment and custom server / VPS is your best bet. See also the section on [hosting providers](../integrations/hosts).
@@ -50,13 +49,6 @@ Git **1.9** and newer are supported. Do not attempt to make VersionPress run wit
 WordPress can run on an old and [long unsupported](http://php.net/eol.php) PHP 5.2. We also started with this version but eventually dropped it so that we could use the newer language features and some 3<sup>rd</sup> party libraries that are 5.3+ only. We recommend using one of the [actively supported](http://php.net/supported-versions.php) PHP versions.
 
 Note: VersionPress is currently not being tested on HHVM.
-
-
-### The db.php drop-in
-
-VersionPress currently uses the `wp-content/db.php` file to hook into some WordPress actions for the lack of better extensibility points (see [WP issue #29710](https://core.trac.wordpress.org/ticket/29710) and [this suggestion](https://wordpress.org/ideas/topic/multiple-dbphp-files-for-plugins)). This means that VersionPress will conflict with other plugins that want to use db.php which are usually some debug or caching plugins.
-
-There is no easy way around this. We hope that WordPress will provide suitable hooks for us – you can go vote on the aforementioned ticket if this issue is important to you. 
 
 
 ### Path customizations
