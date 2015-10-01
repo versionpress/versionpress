@@ -152,22 +152,17 @@ VersionPress tracks everything that goes into the standard WordPress tables, whi
 
 ## Manual change tracking
 
-VersionPress uses the [Git version control system](./git) under the hood and **treats manual commits exactly the same as auto-generated commits**. This means that you can create Git commits however you want – on the command line, using some GUI tool etc. and those commits will show up in the main VersionPress table as any other changes, with the same options to [undo or rollback](./undo-and-rollback) those changes etc.
+Some changes cannot be auto-tracked by VersionPress, e.g., manual file edits on the disk or FTP uploads. In such cases, you need to commit the changes manually.
 
-We will have a user interface for creating commits manually in some future release but at the moment, you need to use the Git command-line interface or one of the GUI Git clients.
+You can use any Git client for it or, since VersionPress 2.0, there is a GUI for it:
 
-An example of how to utilize manual change tracking is editing a WordPress theme:
+<figure style="width: 90%;">
+  <img src="../../media/manual-commit.png" alt="Manual commit" /> 
+</figure>
+ 
 
- 1. You open a theme file (e.g., `wp-content/themes/awesometheme/style.css`) in an editor of your choice
- 2. You do some edits to the file and preview the changes in the browser
- 3. When happy with the result, you commit the changes using this command:
+VersionPress treats manual commits exactly the same as auto-generated commits – they will be visible in the table, [undo or rollback](./undo-and-rollback) them, etc.
 
-<!-- end of list, http://meta.stackexchange.com/a/34325/136297 -->
-
-    git add style.css
-    git commit -m "Updated awesometheme"
-
-This commit will be available in the main VersionPress table as any other change.
 
 
 ## What's not tracked
