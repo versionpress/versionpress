@@ -82,9 +82,9 @@ abstract class DirectoryStorage extends Storage {
     }
 
     public function delete($restriction) {
-        $fileName = $this->getEntityFilename($restriction[$this->entityInfo->idColumnName]);
+        $fileName = $this->getEntityFilename($restriction[$this->entityInfo->vpidColumnName]);
         if (is_file($fileName)) {
-            $entity = $this->loadEntity($restriction[$this->entityInfo->idColumnName]);
+            $entity = $this->loadEntity($restriction[$this->entityInfo->vpidColumnName]);
             FileSystem::remove($fileName);
             return $this->createChangeInfo($entity, $entity, 'delete');
         } else {
