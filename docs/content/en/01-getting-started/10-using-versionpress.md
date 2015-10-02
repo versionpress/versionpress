@@ -1,11 +1,51 @@
 # Using VersionPress #
 
-Lucky you, there isn't much to talk about here! Once VersionPress is installed and activated it will do its thing silently behind the scenes and you can basically forget about it.
+VersionPress is used in three main ways:
 
-When there is some kind of issue with the website, or when you just want to inspect what has happened in the past, using VersionPress is fairly simple:
 
-1. Go to the VersionPress admin screen
-2. Review the table with all the recent changes
-3. Undo or Roll back to a previous state of the site
+## Auto-tracking (unattended mode)
 
-That's about it. You can find more details about various aspects of VersionPress in the *Feature Focus* section of these docs but for the basic scenarios, using VersionPress is really simple.
+You can activate VersionPress and forget it. It will work behind the scenes, automatically tracking changes on the site. Learn more in the [change tracking](../feature-focus/change-tracking) topic. 
+
+
+## Inspecting history of changes
+
+On the VersionPress admin screen, you can inspect the history of changes:
+
+<figure style="width: 90%;">
+  <img src="../../media/history-overview.png" alt="History overview" /> 
+</figure>
+
+Each row is clickable and will reveal more details about the change:
+
+<figure style="width: 90%;">
+  <img src="../../media/expand-row-to-show-detail.png" alt="Change detail" /> 
+</figure>
+
+You can also switch to the *Full diff* mode which displays complete contents of the change:
+
+<figure style="width: 90%;">
+  <img src="../../media/full-diff-view.png" alt="Full diff view" /> 
+</figure>
+
+Related:
+
+ - Blog post [VersionPress 2.0: New User Interface](http://blog.versionpress.net/2015/09/versionpress-2-0-new-user-interface/)
+
+
+## Undoing changes
+
+When something goes wrong, you can use the [Undo and Rollback feature](../feature-focus/undo-and-rollback) to return to a previous state of a site or to revert a specific change.
+
+Related:
+
+ - Blog post [VersionPress 1.0 Walkthrough](http://blog.versionpress.net/2015/05/versionpress-1-0-walkthrough/)
+
+
+## Sync / staging workflows
+
+Since VersionPress 2.0, [sync / staging workflows](../sync) are supported. See the dedicated section for that.
+
+Related:
+
+ - Blog post [VersionPress 2.0: Simple Staging](http://blog.versionpress.net/2015/09/versionpress-2-0-staging/)
