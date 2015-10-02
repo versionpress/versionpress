@@ -34,8 +34,12 @@ If VersionPress is not active or cannot be active, for example, in case of a bro
 
 Generally, **use `wp help` as the primary source of information** as that will always be 100% up to date. Below is a descriptive overview of the commands available.
 
+### vp config
 
-### vp undo &lt;commit>
+Configures VersionPress. See [configuration](../getting-started/configuration).
+
+
+### vp undo
 
 Undoes a commit.
 
@@ -49,7 +53,7 @@ Takes a commit SHA-1 as an argument and which can either be a full SHA1 like `4d
 
 
 
-### vp rollback &lt;commit></dt>
+### vp rollback
 
 Reverts site to a previous state.
 
@@ -61,11 +65,6 @@ Takes a commit SHA-1 as an argument and which can either be a full SHA1 like `4d
 *Examples:*
 
     $ wp vp rollback a34bc28 
-
-
-### vp clone
-
-Clones site to a new folder, database and Git branch. See [Cloning a site](../sync/cloning).
 
 
 ### vp restore-site
@@ -95,3 +94,23 @@ The second point means that you can't immediately run `wp vp restore-site` becau
  2. Run `wp vp restore-site` from the site root, possibly with command-line arguments specifying the database name, its user etc. (There are defaults for all the options but you will probably want to change them as, for example, the default connection uses the `root` user without any password, etc.)
 
 For the full list of command-line arguments of this command, run `wp help vp restore-site`.
+
+
+### vp clone
+
+Clones site to a new folder, database and Git branch. See [Cloning a site](../sync/cloning).
+
+
+### vp pull
+
+Pulls changes from another site instance and creates a merge if necessary. See [merging](../sync/merging).
+
+
+### vp push
+
+Pushes changes to another site instance. Does not create a merge; see [merging](../sync/merging).
+
+
+### vp apply-changes
+
+Applies changes found on the disk to the database. Useful e.g. after resolving merge conflicts. See [merging](../sync/merging).
