@@ -300,10 +300,20 @@ class Reverter {
     private function getAllVpIdsFromModifiedFiles($modifiedFiles) {
         $vpIds = array();
         $vpIdRegex = "/([\\da-f]{32})/i";
+        // https://regex101.com/r/yT6mF5/1
+        $optionFileRegex = "/.*vpdb[\\/\\\\]options[\\/\\\\].+[\\/\\\\](.+)\\.ini/i";
+        // https://regex101.com/r/zC6dA2/2
+        $optionNameRegex = "/^\\[(.*)\\]\\r?$/m";
 
         foreach ($modifiedFiles as $file) {
             if (!is_file(ABSPATH . $file)) {
                 continue;
+            }
+
+            if (preg_match($optionFileRegex, $file)) {
+                $firstLine = fgets(fopen(ABSPATH . $file, 'r'));
+                preg_match($optionNameRegex, $firstLine, $optionNameMatch);
+                $vpIds[] = $optionNameMatch[1];
             }
 
             preg_match($vpIdRegex, $file, $matches);
