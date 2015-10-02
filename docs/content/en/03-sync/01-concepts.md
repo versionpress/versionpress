@@ -31,6 +31,15 @@ That's where VersionPress comes in.
 
 Let's discuss a workflow that seems basic but actually covers almost any real-world scenario – you can use it for staging, team work, hosting the repository on GitHub, almost anything.
 
+<div class="note">
+ 
+  **See also**
+ 
+  The workflow has been showcased in the blog post [VersionPress 2.0: Easy Staging](http://blog.versionpress.net/2015/09/versionpress-2-0-staging/).
+ 
+</div>
+
+
 **(1)** You start by **[cloning a site](./cloning)**. That creates a new site instance that looks exactly like the original one but with its own files and database tables. Technically, it is a separate WordPress installation.
 
 **(2)** Then you **do the work** there. You can experiment with new stuff, you can break things, it doesn't matter as the environment is completely separate and safe. If things go too crazy, you can always start over and clone from the origin again.
