@@ -2,6 +2,8 @@
 
 The current release is **[1.0.1](./release-notes/1.0.1)**, released on 13-May-2015, and it is an [EAP release](getting-started/about-eap). VersionPress can be obtained via the main **[versionpress.net](http://versionpress.net/)** site.
 
+[TODO v2.0 is really close, will be released in the next few weeks]
+
  * [1.0.1 release notes](./release-notes/1.0.1)
  * [Roadmap](./release-notes/roadmap)
 
