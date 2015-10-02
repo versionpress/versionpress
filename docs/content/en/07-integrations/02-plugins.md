@@ -25,11 +25,7 @@ Plugins that are known to work fine, or very close to that, are:
 
 ## Unsupported plugins 
 
-This (incomplete!) section lists plugins that are known to cause issues.
-
-### Caching plugins (W3 Total Cache and others)
-
-VersionPress currently uses the `wp-content/db.php` file to hook into some WordPress actions for the lack of better extensibility points (see [WP issue #29710](https://core.trac.wordpress.org/ticket/29710) and [this suggestion](https://wordpress.org/ideas/topic/multiple-dbphp-files-for-plugins)). This means that VersionPress will conflict with other plugins that want to use db.php which is the case of W3 Total Cache and some other caching plugins. We will work with the WordPress community to resolve this.
+Those that have custom database tables. No specific list at the moment.
 
 
 ## Partially supported plugins
