@@ -71,13 +71,17 @@
   .chunk-separator {
     .chunk;
 
-    .line:first-of-type td {
-      border-top: 0;
-      overflow: visible;
+    .line:first-of-type {
+      .line-left, .line-right, .line-separator {
+        border-top: 0;
+        overflow: visible;
+      }
     }
 
-    .line:last-of-type td {
-      border-bottom: 0;
+    .line:last-of-type {
+      .line-left, .line-right, .line-separator {
+        border-bottom: 0;
+      }
     }
 
     .hellip {
