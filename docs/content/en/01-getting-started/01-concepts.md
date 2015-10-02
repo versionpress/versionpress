@@ -1,11 +1,11 @@
 # Basic Concepts #
 
-VersionPress brings true version control to the world of WordPress. It is a fairly simple concept but if you never worked with it, this page will walk you through the basic ideas, commonly used terms etc. 
+VersionPress brings true version control to WordPress. Version control is a fairly simple concept but if you never worked with it, this page will walk you through the basic ideas, commonly used terms, etc. 
 
 
 ## Version control ##
 
-Version control simply means that **historic revisions of some content are stored**. It has many forms, from simple Undo buttons in text editors to advanced systems for managing documents but the basic principle is really simple.
+Version control simply means that **historic revisions of some content are stored**. It has many forms, from simple Undo buttons in text editors to advanced systems for managing documents but the basic principle is really that simple.
 
 <figure>
   <img src="../../media/version-control.png" alt="Version Control" /> 

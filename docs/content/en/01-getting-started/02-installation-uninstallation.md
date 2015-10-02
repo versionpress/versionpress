@@ -31,9 +31,9 @@ Minimum system requirements are (as a general rule, **we recommend using the lat
  - Safe mode turned off
  - `proc_open()` enabled
  - Write permissions in the site root and everywhere under it
- - No path customizations (e.g., custom location for `wp-content`)
+ - No path customizations at the moment (e.g., custom location for `wp-content`)
 
-On top of that, if you want to use the [multi-instance / sync features](../sync) of VersionPress 2.0, probably even more control over the requirement will be required. In practice, this means that you need to have a lot of control over your server environment and custom server / VPS is your best bet. See also the section on [hosting providers](../integrations/hosts).
+On top of that, if you want to use the [multi-instance / sync features](../sync) of VersionPress 2.0, probably even more control over the requirement will be required. In practice, this means that a custom server / VPS is your best bet. See also the section on [hosting providers](../integrations/hosts).
 
 Here are notes on some of the requirements:
 
@@ -53,7 +53,7 @@ Note: VersionPress is currently not being tested on HHVM.
 
 ### Path customizations
 
-Some advanced users like having their plugins directory and other folders outside of the document root. This is currently not supported by VersionPress.
+Some advanced users like having their plugins directory and other folders outside of the document root. This is currently not supported by VersionPress (it will be one day).
 
 
 ### Supported web servers

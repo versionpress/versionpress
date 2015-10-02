@@ -69,8 +69,8 @@ Important notes about paths:
         git-binary: C:\My Git\git.exe                         # spaces are not a problem
     
         # Will not work:
-        git-binary: C:\Program Files (x86)\Git\bin\git.exe
-        git-binary: "C:\Program Files (x86)\Git\bin\git.exe"
+        git-binary: C:\Program Files (x86)\Git\bin\git.exe    # because of (x86)
+        git-binary: "C:\Program Files (x86)\Git\bin\git.exe"  # unescaped backslashes
 
 
     You can test whether the path will be parsed correctly in [NEON playground](http://ne-on.org/).

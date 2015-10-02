@@ -1,8 +1,8 @@
 # Getting Started
 
-VersionPress is a version control plugin for WordPress sites. It aims to be "the Undo button for WordPress" by automatically tracking all the actions and allowing going back to any point in its history.
+VersionPress is a version control plugin for WordPress. It maintains a Git repository for a site, allowing similar workflows that devs are used to for standard software projects.
 
-It does so by utilizing the Git version control system which happens to be very powerful and used by millions of professional developers around the world. As a result, many more things are possible, including database merges, seamless push into the production etc.
+VersionPress is currently an [Early Access](./getting-started/about-eap) version.
 
 * [Understand the basic concepts](./getting-started/concepts) (optional but useful)
 * [Install VersionPress](./getting-started/installation-uninstallation)
