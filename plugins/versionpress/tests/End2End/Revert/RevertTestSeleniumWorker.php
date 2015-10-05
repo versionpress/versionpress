@@ -22,7 +22,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         $this->createTestPost();
         self::$wpAutomation->runWpCliCommand('vp', 'config', array('gui', 'html'));
         $this->url('wp-admin/admin.php?page=versionpress/');
-        return array(array('M', '%vpdb%/options/%VPID%.ini'));
+        return array(array('M', '%vpdb%/options/*'));
     }
 
     public function undoSecondCommit() {
@@ -59,7 +59,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         return array(
             array('D', '%vpdb%/posts/*'),
             array('D', '%vpdb%/comments/*'),
-            array('M', '%vpdb%/options/%VPID%.ini'),
+            array('M', '%vpdb%/options/*'),
         );
     }
 
