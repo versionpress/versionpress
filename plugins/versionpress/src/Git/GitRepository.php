@@ -192,7 +192,9 @@ class GitRepository {
      * @param $commitHash
      */
     public function revertAll($commitHash) {
-        $this->runShellCommand("git checkout %s .", $commitHash);
+        $this->runShellCommand("git reset --hard %s", $commitHash);
+        $this->runShellCommand("git reset --soft HEAD@{1}");
+        $this->runShellCommand("git clean -f -d");
     }
 
     /**
