@@ -389,7 +389,7 @@ class VersionPressApi {
         $optionRegex = "/.*vpdb[\\/\\\\]options[\\/\\\\].+[\\/\\\\](.+)\\.ini/i";
 
         preg_match_all($vpidRegex, $diff, $vpidMatches);
-        preg_match_all($optionRegex, $diff, $optionNameMatches); // for options after WP-473
+        preg_match_all($optionRegex, $diff, $optionNameMatches);
 
         $entitiesToSynchronize = array(
             'entities' => array_unique(array_merge($vpidMatches[1], $optionNameMatches[1])),
@@ -402,14 +402,6 @@ class VersionPressApi {
         ) {
             $entitiesToSynchronize['storages'][] = 'term';
             $entitiesToSynchronize['storages'][] = 'term_taxonomy';
-        }
-
-        // for options before WP-473
-        if (ArrayUtils::any($status, function ($fileStatus) {
-            return Strings::contains($fileStatus[1], 'options.ini');
-        })
-        ) {
-            $entitiesToSynchronize['storages'][] = 'option';
         }
 
         $this->synchronizationProcess->synchronize($entitiesToSynchronize);
