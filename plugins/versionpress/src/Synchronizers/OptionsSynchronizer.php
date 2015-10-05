@@ -6,6 +6,7 @@ use VersionPress\Storages\OptionStorage;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\ArrayUtils;
+use VersionPress\Utils\ReferenceUtils;
 use wpdb;
 
 /**
@@ -25,11 +26,15 @@ class OptionsSynchronizer implements Synchronizer {
     private $tableName;
     private $options;
 
+    /** @var DbSchemaInfo */
+    private $dbSchema;
+
     function __construct(Storage $optionStorage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer) {
         $this->optionStorage = $optionStorage;
         $this->database = $wpdb;
         $this->urlReplacer = $urlReplacer;
         $this->tableName = $dbSchema->getPrefixedTableName('option');
+        $this->dbSchema = $dbSchema;
     }
 
     function synchronize($task, $entitiesToSynchronize = null) {
@@ -38,10 +43,12 @@ class OptionsSynchronizer implements Synchronizer {
 
         if (count($options) > 0) {
             $syncQuery = "INSERT INTO {$this->tableName} (option_name, option_value, autoload) VALUES ";
-            foreach ($options as $optionName => $values) {
-                $values = $this->urlReplacer->restore($values);
-                if (!isset($values['autoload'])) $values['autoload'] = 'yes'; // default value
-                $syncQuery .= "(\"$optionName\", \"" . $this->database->_real_escape($values['option_value']) . "\", \"$values[autoload]\"),";
+            foreach ($options as $optionName => $option) {
+                $option = $this->urlReplacer->restore($option);
+                $option = $this->maybeRestoreReference($option);
+                if (!isset($option['autoload'])) $option['autoload'] = 'yes'; // default value
+                if (!isset($option['option_value'])) $option['option_value'] = '';
+                $syncQuery .= "(\"$optionName\", \"" . $this->database->_real_escape($option['option_value']) . "\", \"$option[autoload]\"),";
             }
 
             $syncQuery[mb_strlen($syncQuery) - 1] = " "; // strip last comma
@@ -84,5 +91,21 @@ class OptionsSynchronizer implements Synchronizer {
         }
 
         return $options;
+    }
+
+    private function maybeRestoreReference($option) {
+        $entityInfo = $this->dbSchema->getEntityInfo('option');
+        foreach ($entityInfo->valueReferences as $reference => $targetEntity) {
+            $referenceDetails = ReferenceUtils::getValueReferenceDetails($reference);
+            if ($option[$referenceDetails['source-column']] === $referenceDetails['source-value']) {
+                $vpid = $option[$referenceDetails['value-column']];
+                $vpidTable = $this->dbSchema->getPrefixedTableName('vp_id');
+                $targetTable = $this->dbSchema->getTableName($targetEntity);
+                $dbId = $this->database->get_var("SELECT id FROM $vpidTable WHERE `table`='$targetTable' AND vp_id=UNHEX('$vpid')");
+                $option[$referenceDetails['value-column']] = $dbId;
+            }
+        }
+
+        return $option;
     }
 }

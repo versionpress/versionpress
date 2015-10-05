@@ -198,6 +198,8 @@ class DBAsserter {
 
                     if (self::isInIdMap($idMap, $targetEntity, $entity[$valueColumn])) {
                         $entity[$valueColumn] = $idMap[self::$schemaInfo->getTableName($targetEntity)][$entity[$valueColumn]];
+                    } else {
+                        $entity[$valueColumn] = '';
                     }
                 }
             }
