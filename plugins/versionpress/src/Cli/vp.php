@@ -520,7 +520,7 @@ class VPCommand extends WP_CLI_Command {
         $process = VPCommandUtils::exec($pullCommand);
 
         if ($process->isSuccessful()) {
-            WP_CLI::success("Pulled changes from $remote");
+            WP_CLI::success("Pulled changes from '$remote'");
         } else {
 
             if (stripos($process->getConsoleOutput(), 'automatic merge failed') !== false) {
@@ -544,6 +544,7 @@ class VPCommand extends WP_CLI_Command {
                     WP_CLI::success(" 3. Return here and run `wp vp apply-changes`");
                     WP_CLI::success("");
                     WP_CLI::success("That last step will turn the maintenance mode off.");
+                    WP_CLI::success("You can also abort the merge manually by running `git merge --abort`");
                     exit();
 
                 } else {
@@ -668,12 +669,13 @@ class VPCommand extends WP_CLI_Command {
 
         $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-push', array('require' => self::VP_INTERNAL_COMMAND_PATH), $remotePath);
         if ($process->isSuccessful()) {
-            WP_CLI::success("Remote repository synchronized");
-            // maintenance mode was already disabled in the 'finish-push' command
+            WP_CLI::success("Remote database synchronized");
         } else {
-            $this->switchMaintenance('off', $remoteName);
-            WP_CLI::error("Remote repository couldn't be synchronized. Details:\n\n" . $process->getConsoleOutput());
+            WP_CLI::error("Push couldn't be finished. Details:\n\n" . $process->getConsoleOutput());
         }
+        $this->switchMaintenance('off', $remoteName);
+        WP_CLI::success("All done");
+
     }
 
     /**
@@ -898,9 +900,9 @@ class VPCommand extends WP_CLI_Command {
         $preposition = $onOrOff == 'on' ? 'to' : 'from';
 
         if ($process->isSuccessful()) {
-            WP_CLI::success("Remote site switched $preposition the maintenance mode");
+            WP_CLI::success("Maintenance mode turned $onOrOff" . ($remoteName ? " for '$remoteName'" : ""));
         } else {
-            WP_CLI::error("Remote site couldn't be switched $preposition the maintenance mode. Details:\n\n" . $process->getConsoleOutput());
+            WP_CLI::error("Maintenance mode couldn't be switched" . ($remoteName ? " for '$remoteName'" : "") . ". Details:\n\n" . $process->getConsoleOutput());
         }
     }
 }

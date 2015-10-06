@@ -101,9 +101,7 @@ class VPInternalCommand extends WP_CLI_Command {
         // Update working copy
         $resetCommand = "git reset --hard";
         $process = VPCommandUtils::exec($resetCommand);
-        if ($process->isSuccessful()) {
-            WP_CLI::success("Reset working directory");
-        } else {
+        if (!$process->isSuccessful()) {
             WP_CLI::error("Working directory couldn't be reset");
         }
 
@@ -111,9 +109,7 @@ class VPInternalCommand extends WP_CLI_Command {
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
         $syncProcess->synchronize();
-        WP_CLI::success("The database has been synchronized with filesystem");
 
-        vp_disable_maintenance();
     }
 }
 
