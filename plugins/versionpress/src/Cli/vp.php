@@ -144,7 +144,6 @@ class VPCommand extends WP_CLI_Command {
     public function restoreSite($args, $assoc_args) {
         if (!defined('WP_CONTENT_DIR')) {
             define('WP_CONTENT_DIR', ABSPATH . 'wp-content');
-            define('WPINC', 'wp-includes');
         }
         require_once(__DIR__ . '/../../bootstrap.php');
 
@@ -229,24 +228,39 @@ class VPCommand extends WP_CLI_Command {
         return count(array_intersect($specifiedOptions, $configOptions)) > 0;
     }
 
+    /**
+     * Prepares an empty database - creates it if it doesn't exist or drops its WP tables if it does.
+     * Prompt will be displayed if the tables are going to be dropped, unless 'yes' is provided
+     * as part of $assoc_args.
+     *
+     * @param array $assoc_args
+     */
     private function prepareDatabase($assoc_args) {
+
         $process = VPCommandUtils::runWpCliCommand('db', 'create');
-        if (!$process->isSuccessful()) {
+
+        if ($process->isSuccessful()) {
+            WP_CLI::success("Database created");
+        } else {
+
             $msg = $process->getConsoleOutput();
-            if (Strings::contains($msg, '1007')) { // It's OK. The database already exists.
-                if (!isset($assoc_args['yes'])) {
-                    defined('SHORTINIT') or define('SHORTINIT', true);
-                    require_once ABSPATH . 'wp-config.php';
-                    global $table_prefix;
-                    $this->checkTables(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $table_prefix);
+            $dbExists = Strings::contains($msg, '1007');
+
+            if ($dbExists) {
+
+                defined('SHORTINIT') or define('SHORTINIT', true);
+                require_once ABSPATH . 'wp-config.php';
+                global $table_prefix;
+                if ($this->someWpTablesExist(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $table_prefix)) {
+                    WP_CLI::confirm('Database tables already exist, they will be droped and re-created. Proceed?', $assoc_args);
                 }
+
                 $this->dropTables();
             } else {
-                WP_CLI::error("Failed creating DB");
+                WP_CLI::error("Failed creating database. Details:\n\n" . $msg);
             }
         }
 
-        WP_CLI::success("DB created");
     }
 
     private function configSite($assoc_args) {
