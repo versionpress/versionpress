@@ -1,6 +1,10 @@
 <?php
 // NOTE: VersionPress must be fully activated for these commands to be available
 
+// WORD-WRAPPING of the doc comments: 75 chars for option description, 90 chars for everything else,
+// see https://github.com/wp-cli/wp-cli/wiki/Commands-Cookbook#longdesc.
+// In this source file, wrap long desc at col 97 and option desc at col 84.
+
 namespace VersionPress\Cli;
 
 use Nette\Neon\Neon;
@@ -88,7 +92,7 @@ class VPCommand extends WP_CLI_Command {
      * ## OPTIONS
      *
      * --siteurl=<url>
-     * : The address of the restored site. Default: http://localhost/<cwd>
+     * : The address of the restored site. Default: 'http://localhost/<cwd>'
      *
      * --dbname=<dbname>
      * : Set the database name.
@@ -275,47 +279,51 @@ class VPCommand extends WP_CLI_Command {
      * ## OPTIONS
      *
      * --name=<name>
-     * : Name of the clone. Used as a suffix for new folder and a suffix of db prefix. See example below.
+     * : Name of the clone. Used as a directory name, part of the DB prefix
+     * and an argument to the pull & push commands later.
      *
      * --siteurl=<url>
-     * : URL of new website. By default the command tries to search in URL the name of directory
-     * where the website is located and replace it with new directory name.
-     * E.g. if you have website in directory called "wordpress" and it runs at http://wordpress.local,
-     * the new URL will be http://wordpress-<name>.local.
+     * : URL of the clone. By default, the original URL is searched for <cwd>
+     * and replaced with the clone name.
      *
      * --dbname=<dbname>
-     * : Set the database name for the clone.
+     * : Database name for the clone.
      *
      * --dbuser=<dbuser>
-     * : Set the database user for the clone.
+     * : Database user for the clone.
      *
      * --dbpass=<dbpass>
-     * : Set the database user password for the clone.
+     * : Database user password for the clone.
      *
      * --dbhost=<dbhost>
-     * : Set the database host for the clone.
+     * : Database host for the clone.
      *
      * --dbprefix=<dbprefix>
-     * : Set the database table prefix for the clone.
+     * : Database table prefix for the clone.
      *
      * --dbcharset=<dbcharset>
-     * : Set the database charset for the clone.
+     * : Database charset for the clone.
      *
      * --dbcollate=<dbcollate>
-     * : Set the database collation for the clone.
+     * : Database collation for the clone.
      *
      * --yes
-     * : Answer yes to the confirmation message.
+     * : Answer yes to all confirmation messages.
      *
      * ## EXAMPLES
      *
-     * Let's say we have a site in folder `wordpress` that uses database called `wordpress`
-     * with tables prefixed with `wp_`. The command
+     * The main site lives in a directory 'wpsite', uses the 'wp_' database table prefix and is
+     * accessible via 'http://localhost/wpsite'. The command
      *
-     *     wp vp clone --name=test
+     *     wp vp clone --name=myclone
      *
-     * creates a copy of the site in `test` and the tables in database `wordpress`
-     * will be prefixed with `wp_test_`.
+     * does the following:
+     *
+     *    - Creates new directory 'myclone' next to the current one
+     *    - Clones the files there
+     *    - Creates new database tables prefixed with 'wp_myclone_'
+     *    - Populates database tables with data
+     *    - Makes the site accessible as 'http://localhost/myclone'
      *
      * @synopsis --name=<name> [--siteurl=<url>] [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--yes]
      *
@@ -447,10 +455,26 @@ class VPCommand extends WP_CLI_Command {
      *
      * ## OPTIONS
      *
-     * [--from=<nameOrPathOrURL>]
-     * : Name, path or an URL of the remote, just like in `git pull`. Defaults to "origin".
+     * --from=<name|path|url>
+     * : Where to pull from. Can be a clone name (specified previously during the
+     * 'clone' command), a path or a URL. Defaults to 'origin' which is
+     * automatically set in every clone by the 'clone' command.
      *
-     * @synopsis [--from=<nameOrPathOrURL>]
+     * ## EXAMPLES
+     *
+     * Let's have a site 'wpsite' and a clone 'myclone' created from it. To pull the changes
+     * from the clone back into the main site, use:
+     *
+     *     wp vp pull --from=myclone
+     *
+     * When in the clone, the pull can be run without any parameter:
+     *
+     *     wp vp pull
+     *
+     * This will pull the changes from 'origin' which was set to the parent site during the
+     * 'clone' command.
+     *
+     * @synopsis [--from=<name|path|url>]
      */
     public function pull($args = array(), $assoc_args = array()) {
 
@@ -524,9 +548,17 @@ class VPCommand extends WP_CLI_Command {
     }
 
     /**
-     * Applies changes from the disk to the database.
+     * Applies changes from the disk to the database
      *
-     * It happens under the maintenance mode.
+     * ## EXAMPLES
+     *
+     * This command is mainly used in a merge conflict situation, after a 'pull'. When
+     * the conflict is manually resolved and committed, run this command to make sure that
+     * the database in sync with the Git repository / filesystem:
+     *
+     *     wp vp apply-changes
+     *
+     * Note that this command temporarily turns on the maintenance mode.
      *
      * @subcommand apply-changes
      */
@@ -554,10 +586,23 @@ class VPCommand extends WP_CLI_Command {
      *
      * ## OPTIONS
      *
-     * [--to=<nameOrPath>]
-     * : Name or path of the remote. Defaults to "origin".
+     * --to=<name|path>
+     * : Name of the clone or a path to it. Defaults to 'origin' which, in a clone,
+     * points to its original site.
      *
-     * @synopsis [--to=<nameOrPath>]
+     * ## EXAMPLES
+     *
+     * Push is a similar command to 'pull' but does not create a merge. To push from clone
+     * to the original site, run:
+     *
+     *     wp vp push
+     *
+     * To push from the original site to the clone, use the '--to' parameter:
+     *
+     *     wp vp push --to=clonename
+     *
+     *
+     * @synopsis [--to=<name|path>]
      */
     public function push($args = array(), $assoc_args = array()) {
         $remoteName = isset($assoc_args['to']) ? $assoc_args['to'] : 'origin';
