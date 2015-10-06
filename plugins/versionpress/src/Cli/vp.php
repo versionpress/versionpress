@@ -146,9 +146,6 @@ class VPCommand extends WP_CLI_Command {
             define('WP_CONTENT_DIR', ABSPATH . 'wp-content');
             define('WPINC', 'wp-includes');
         }
-
-        $this->defineGlobalTablePrefix();
-
         require_once(__DIR__ . '/../../bootstrap.php');
 
         $process = VPCommandUtils::runWpCliCommand('core', 'is-installed');
@@ -774,15 +771,6 @@ class VPCommand extends WP_CLI_Command {
     }
 
 
-    private function defineGlobalTablePrefix() {
-        global $table_prefix;
-
-        $wpConfigPath = ABSPATH . 'wp-config.php';
-        $wpConfigLines = file_get_contents($wpConfigPath);
-        // https://regex101.com/r/oO7gX7/2
-        preg_match("/^\\\$table_prefix\\s*=\\s*['\"](.*)['\"];/m", $wpConfigLines, $matches);
-        $table_prefix = $matches[1];
-    }
 
     private function checkTables($dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $assoc_args) {
         $wpdb = new \wpdb($dbUser, $dbPassword, $dbName, $dbHost);
