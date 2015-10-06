@@ -48,4 +48,36 @@ class VPCommandUtils {
         $process->run();
         return $process;
     }
+
+    /**
+     * Asks user a question, offers an array of values and returns what he/she entered. The first value
+     * in the `$values` array is the default one, used if the user just ENTERs the question or types
+     * in some random value. The $assoc_args array may be given as the third parameter, in which case
+	 * it behaves like in WP_CLI::confirm() and will return 'y' is such value is in $values,
+     * or the default value.
+     *
+     * Inspired by WP_CLI::confirm() that can only do "yes" / "no" and cannot really return "no"
+     * (it just exits in such case).
+     *
+     * @param string $question
+     * @param array $values e.g. ["y", "n"] or ["1", "2", "3"]
+     * @param array $assoc_args If $assoc_args contain 'yes' and $values contain 'y', it will be automatically answered.
+     *   (Similar behavior to WP_CLI::confirm().)
+     * @return string The answer
+     */
+    public static function cliQuestion($question, $values, $assoc_args = array()) {
+
+        if (isset($assoc_args['yes'])) {
+            return in_array('y', $values) ? 'y' : $values[0];
+        }
+
+        fwrite(STDOUT, $question . " [" . implode('/', $values) . "] ");
+        $answer = trim(fgets(STDIN));
+
+        if (!in_array($answer, $values)) {
+            $answer = $values[0];
+        }
+
+        return $answer;
+    }
 }

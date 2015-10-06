@@ -18,7 +18,6 @@ use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\FileSystem;
-use VersionPress\Utils\ProcessUtils;
 use WP_CLI;
 use WP_CLI_Command;
 
@@ -142,11 +141,14 @@ class VPCommand extends WP_CLI_Command {
      * @when before_wp_load
      */
     public function restoreSite($args, $assoc_args) {
+
+        // Load VersionPress' bootstrap (WP_CONTENT_DIR needs to be defined)
         if (!defined('WP_CONTENT_DIR')) {
             define('WP_CONTENT_DIR', ABSPATH . 'wp-content');
         }
         require_once(__DIR__ . '/../../bootstrap.php');
 
+        // Check if the site is installed
         $process = VPCommandUtils::runWpCliCommand('core', 'is-installed');
         if ($process->isSuccessful()) {
             WP_CLI::confirm("It looks like the site is OK. Do you really want to run the 'restore-site' command?", $assoc_args);
@@ -157,10 +159,12 @@ class VPCommand extends WP_CLI_Command {
 
         $url = @$assoc_args['siteurl'] ?: $defaultUrl;
 
+        // Confirm automatically chosen site URL
         if (!isset($assoc_args['siteurl'])) {
             WP_CLI::confirm("The site URL will be set to '$url'. Proceed?", $assoc_args);
         }
 
+        // Updating wp-config.php
         if (file_exists(ABSPATH . 'wp-config.php')) {
             if ($this->issetConfigOption($assoc_args)) {
                 WP_CLI::error("Site settings was loaded from wp-config.php. If you want to reconfigure the site, please delete the wp-config.php file");
@@ -169,6 +173,7 @@ class VPCommand extends WP_CLI_Command {
             $this->configSite($assoc_args);
         }
 
+        // Create or empty database
         $this->prepareDatabase($assoc_args);
 
 
@@ -188,10 +193,10 @@ class VPCommand extends WP_CLI_Command {
 
         $process = VPCommandUtils::runWpCliCommand('core', 'install', $installArgs);
         if (!$process->isSuccessful()) {
-            WP_CLI::log("Failed creating WP tables.");
+            WP_CLI::log("Failed creating database tables");
             WP_CLI::error($process->getConsoleOutput());
         } else {
-            WP_CLI::success("WP tables created");
+            WP_CLI::success("Database tables created");
         }
 
 
@@ -202,8 +207,6 @@ class VPCommand extends WP_CLI_Command {
         if (!$process->isSuccessful()) {
             WP_CLI::log("Could not clean working directory");
             WP_CLI::error($process->getConsoleOutput());
-        } else {
-            WP_CLI::success("Working directory reset");
         }
 
 
@@ -373,10 +376,12 @@ class VPCommand extends WP_CLI_Command {
         $cloneUrl = isset($assoc_args['siteurl']) ? $assoc_args['siteurl'] : $this->getCloneUrl(get_site_url(), basename($currentWpPath), $cloneDirName);
 
         if (is_dir($clonePath)) {
-            WP_CLI::confirm("Directory '" . basename($clonePath) . "' already exists. It will be deleted before cloning. Proceed?", $assoc_args);
+            WP_CLI::confirm("Directory '" . basename($clonePath) . "' already exists, it will be deleted before cloning. Proceed?", $assoc_args);
         }
 
-        $this->checkTables($cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $assoc_args);
+        if ($this->someWpTablesExist($cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix)) {
+            WP_CLI::confirm("Database tables for the clone already exist, they will be dropped and re-created. Proceed?", $assoc_args);
+        }
 
         if (is_dir($clonePath)) {
             try {
@@ -398,21 +403,25 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::success("Site files cloned");
         }
 
-        // Adding the clone as a remote for the convenience of the `vp pull` command - its `--remote`
+        // Adding the clone as a remote for the convenience of the `vp pull` command - its `--from`
         // parameter can then be just the name of the clone, not a path to it
         $addRemoteCommand = sprintf("git remote add %s %s", escapeshellarg($name), escapeshellarg($clonePath));
         $process = VPCommandUtils::exec($addRemoteCommand, $currentWpPath);
 
         if (!$process->isSuccessful()) {
-            WP_CLI::confirm("Remote '$name' already exists, will be re-used. Proceed?", $assoc_args);
 
-            $addRemoteCommand = str_replace(" add ", " set-url ", $addRemoteCommand);
-            $process = VPCommandUtils::exec($addRemoteCommand, $currentWpPath);
-            if (!$process->isSuccessful()) {
-                WP_CLI::error("Could not update remote's URL");
-            } else {
-                WP_CLI::success("Updated remote configuration");
+            $overwriteRemote = VPCommandUtils::cliQuestion("The Git repo of this site already defines remote '$name', overwrite it?", array("y", "n"), $assoc_args);
+
+            if ($overwriteRemote == "y") {
+                $addRemoteCommand = str_replace(" add ", " set-url ", $addRemoteCommand);
+                $process = VPCommandUtils::exec($addRemoteCommand, $currentWpPath);
+                if (!$process->isSuccessful()) {
+                    WP_CLI::error("Could not update remote's URL");
+                } else {
+                    WP_CLI::success("Updated remote configuration");
+                }
             }
+
         } else {
             WP_CLI::success("Clone added as a remote");
         }
@@ -450,7 +459,11 @@ class VPCommand extends WP_CLI_Command {
 
         // Finish the process by doing the standard restore-site
         $process = VPCommandUtils::runWpCliCommand('vp', 'restore-site', array('siteurl' => $cloneUrl, 'yes' => null, 'require' => __FILE__), $clonePath);
-        WP_CLI::log($process->getConsoleOutput());
+        WP_CLI::log(trim($process->getConsoleOutput()));
+
+        if ($process->isSuccessful()) {
+            WP_CLI::success("All done");
+        }
     }
 
     /**
@@ -767,6 +780,7 @@ class VPCommand extends WP_CLI_Command {
 
         $this->switchMaintenance('off');
     }
+
     private function dropTables() {
         global $versionPressContainer;
         $tables = array(
@@ -793,16 +807,22 @@ class VPCommand extends WP_CLI_Command {
     }
 
 
-
-    private function checkTables($dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $assoc_args) {
+    /**
+     * Checks if some tables with the given prefix exist in the database
+     *
+     * @param string $dbUser
+     * @param string $dbPassword
+     * @param string $dbName
+     * @param string $dbHost
+     * @param string $dbPrefix
+     * @return bool
+     */
+    private function someWpTablesExist($dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix) {
         $wpdb = new \wpdb($dbUser, $dbPassword, $dbName, $dbHost);
         $wpdb->set_prefix($dbPrefix);
         $tables = $wpdb->get_col("SHOW TABLES LIKE '{$dbPrefix}_%'");
         $wpTables = array_intersect($tables, $wpdb->tables());
-        $wpTablesExists = count($wpTables) > 0;
-        if ($wpTablesExists) {
-            WP_CLI::confirm("Tables for this site already exist. They will be dropped. Proceed?", $assoc_args);
-        }
+        return count($wpTables) > 0;
     }
 
     private function updateConfig($wpConfigFile, $dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $dbCharset, $dbCollate) {

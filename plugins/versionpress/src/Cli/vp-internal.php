@@ -53,7 +53,6 @@ class VPInternalCommand extends WP_CLI_Command {
             $truncateCmd = "TRUNCATE TABLE `$table`";
             $wpdb->query($truncateCmd);
         }
-        WP_CLI::success("Truncated DB tables");
 
 
         // Create VersionPress tables
@@ -70,7 +69,7 @@ class VPInternalCommand extends WP_CLI_Command {
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
         $syncProcess->synchronize();
-        WP_CLI::success("Git -> db synchronization run");
+        WP_CLI::success("Database synchronized");
 
     }
 
