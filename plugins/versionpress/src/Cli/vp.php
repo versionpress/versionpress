@@ -318,8 +318,12 @@ class VPCommand extends WP_CLI_Command {
      * --dbcollate=<dbcollate>
      * : Database collation for the clone.
      *
+     * --force
+     * : Forces cloning even if the target directory or DB tables exists.
+     * Basically provides --yes to all warnings / confirmations.
+     *
      * --yes
-     * : Answer yes to all confirmation messages.
+     * : Another way to force the clone
      *
      * ## EXAMPLES
      *
@@ -336,12 +340,16 @@ class VPCommand extends WP_CLI_Command {
      *    - Populates database tables with data
      *    - Makes the site accessible as 'http://localhost/myclone'
      *
-     * @synopsis --name=<name> [--siteurl=<url>] [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--yes]
+     * @synopsis --name=<name> [--siteurl=<url>] [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--force] [--yes]
      *
      * @subcommand clone
      */
     public function clone_($args = array(), $assoc_args = array()) {
         global $table_prefix;
+
+        if (isset($assoc_args['force'])) {
+            $assoc_args['yes'] = 1;
+        }
 
         $name = $assoc_args['name'];
 
