@@ -128,6 +128,11 @@ class VpidRepository {
             return 'post';
         }
 
+        // Special case - reference to homepage (WP sets it as 'custom', but actually it is 'post_type')
+        if ($menuItemType === 'custom' && is_numeric($postmeta['meta_value'])) {
+            return 'post';
+        }
+
         return null; // custom url or unknown target
     }
 }
