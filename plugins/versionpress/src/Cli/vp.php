@@ -1,6 +1,10 @@
 <?php
 // NOTE: VersionPress must be fully activated for these commands to be available
 
+// WORD-WRAPPING of the doc comments: 75 chars for option description, 90 chars for everything else,
+// see https://github.com/wp-cli/wp-cli/wiki/Commands-Cookbook#longdesc.
+// In this source file, wrap long desc at col 97 and option desc at col 84.
+
 namespace VersionPress\Cli;
 
 use Nette\Neon\Neon;
@@ -14,7 +18,6 @@ use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\FileSystem;
-use VersionPress\Utils\ProcessUtils;
 use WP_CLI;
 use WP_CLI_Command;
 
@@ -88,7 +91,7 @@ class VPCommand extends WP_CLI_Command {
      * ## OPTIONS
      *
      * --siteurl=<url>
-     * : The address of the restored site. Default: http://localhost/<cwd>
+     * : The address of the restored site. Default: 'http://localhost/<cwd>'
      *
      * --dbname=<dbname>
      * : Set the database name.
@@ -138,15 +141,14 @@ class VPCommand extends WP_CLI_Command {
      * @when before_wp_load
      */
     public function restoreSite($args, $assoc_args) {
+
+        // Load VersionPress' bootstrap (WP_CONTENT_DIR needs to be defined)
         if (!defined('WP_CONTENT_DIR')) {
             define('WP_CONTENT_DIR', ABSPATH . 'wp-content');
-            define('WPINC', 'wp-includes');
         }
-
-        $this->defineGlobalTablePrefix();
-
         require_once(__DIR__ . '/../../bootstrap.php');
 
+        // Check if the site is installed
         $process = VPCommandUtils::runWpCliCommand('core', 'is-installed');
         if ($process->isSuccessful()) {
             WP_CLI::confirm("It looks like the site is OK. Do you really want to run the 'restore-site' command?", $assoc_args);
@@ -157,10 +159,12 @@ class VPCommand extends WP_CLI_Command {
 
         $url = @$assoc_args['siteurl'] ?: $defaultUrl;
 
+        // Confirm automatically chosen site URL
         if (!isset($assoc_args['siteurl'])) {
             WP_CLI::confirm("The site URL will be set to '$url'. Proceed?", $assoc_args);
         }
 
+        // Updating wp-config.php
         if (file_exists(ABSPATH . 'wp-config.php')) {
             if ($this->issetConfigOption($assoc_args)) {
                 WP_CLI::error("Site settings was loaded from wp-config.php. If you want to reconfigure the site, please delete the wp-config.php file");
@@ -169,6 +173,7 @@ class VPCommand extends WP_CLI_Command {
             $this->configSite($assoc_args);
         }
 
+        // Create or empty database
         $this->prepareDatabase($assoc_args);
 
 
@@ -188,10 +193,10 @@ class VPCommand extends WP_CLI_Command {
 
         $process = VPCommandUtils::runWpCliCommand('core', 'install', $installArgs);
         if (!$process->isSuccessful()) {
-            WP_CLI::log("Failed creating WP tables.");
+            WP_CLI::log("Failed creating database tables");
             WP_CLI::error($process->getConsoleOutput());
         } else {
-            WP_CLI::success("WP tables created");
+            WP_CLI::success("Database tables created");
         }
 
 
@@ -202,8 +207,6 @@ class VPCommand extends WP_CLI_Command {
         if (!$process->isSuccessful()) {
             WP_CLI::log("Could not clean working directory");
             WP_CLI::error($process->getConsoleOutput());
-        } else {
-            WP_CLI::success("Working directory reset");
         }
 
 
@@ -228,24 +231,39 @@ class VPCommand extends WP_CLI_Command {
         return count(array_intersect($specifiedOptions, $configOptions)) > 0;
     }
 
+    /**
+     * Prepares an empty database - creates it if it doesn't exist or drops its WP tables if it does.
+     * Prompt will be displayed if the tables are going to be dropped, unless 'yes' is provided
+     * as part of $assoc_args.
+     *
+     * @param array $assoc_args
+     */
     private function prepareDatabase($assoc_args) {
+
         $process = VPCommandUtils::runWpCliCommand('db', 'create');
-        if (!$process->isSuccessful()) {
+
+        if ($process->isSuccessful()) {
+            WP_CLI::success("Database created");
+        } else {
+
             $msg = $process->getConsoleOutput();
-            if (Strings::contains($msg, '1007')) { // It's OK. The database already exists.
-                if (!isset($assoc_args['yes'])) {
-                    defined('SHORTINIT') or define('SHORTINIT', true);
-                    require_once ABSPATH . 'wp-config.php';
-                    global $table_prefix;
-                    $this->checkTables(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $table_prefix);
+            $dbExists = Strings::contains($msg, '1007');
+
+            if ($dbExists) {
+
+                defined('SHORTINIT') or define('SHORTINIT', true);
+                require_once ABSPATH . 'wp-config.php';
+                global $table_prefix;
+                if ($this->someWpTablesExist(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $table_prefix)) {
+                    WP_CLI::confirm('Database tables already exist, they will be droped and re-created. Proceed?', $assoc_args);
                 }
+
                 $this->dropTables();
             } else {
-                WP_CLI::error("Failed creating DB");
+                WP_CLI::error("Failed creating database. Details:\n\n" . $msg);
             }
         }
 
-        WP_CLI::success("DB created");
     }
 
     private function configSite($assoc_args) {
@@ -275,54 +293,66 @@ class VPCommand extends WP_CLI_Command {
      * ## OPTIONS
      *
      * --name=<name>
-     * : Name of the clone. Used as a suffix for new folder and a suffix of db prefix. See example below.
+     * : Name of the clone. Used as a directory name, part of the DB prefix
+     * and an argument to the pull & push commands later.
      *
      * --siteurl=<url>
-     * : URL of new website. By default the command tries to search in URL the name of directory
-     * where the website is located and replace it with new directory name.
-     * E.g. if you have website in directory called "wordpress" and it runs at http://wordpress.local,
-     * the new URL will be http://wordpress-<name>.local.
+     * : URL of the clone. By default, the original URL is searched for <cwd>
+     * and replaced with the clone name.
      *
      * --dbname=<dbname>
-     * : Set the database name for the clone.
+     * : Database name for the clone.
      *
      * --dbuser=<dbuser>
-     * : Set the database user for the clone.
+     * : Database user for the clone.
      *
      * --dbpass=<dbpass>
-     * : Set the database user password for the clone.
+     * : Database user password for the clone.
      *
      * --dbhost=<dbhost>
-     * : Set the database host for the clone.
+     * : Database host for the clone.
      *
      * --dbprefix=<dbprefix>
-     * : Set the database table prefix for the clone.
+     * : Database table prefix for the clone.
      *
      * --dbcharset=<dbcharset>
-     * : Set the database charset for the clone.
+     * : Database charset for the clone.
      *
      * --dbcollate=<dbcollate>
-     * : Set the database collation for the clone.
+     * : Database collation for the clone.
+     *
+     * --force
+     * : Forces cloning even if the target directory or DB tables exists.
+     * Basically provides --yes to all warnings / confirmations.
      *
      * --yes
-     * : Answer yes to the confirmation message.
+     * : Another way to force the clone
      *
      * ## EXAMPLES
      *
-     * Let's say we have a site in folder `wordpress` that uses database called `wordpress`
-     * with tables prefixed with `wp_`. The command
+     * The main site lives in a directory 'wpsite', uses the 'wp_' database table prefix and is
+     * accessible via 'http://localhost/wpsite'. The command
      *
-     *     wp vp clone --name=test
+     *     wp vp clone --name=myclone
      *
-     * creates a copy of the site in `test` and the tables in database `wordpress`
-     * will be prefixed with `wp_test_`.
+     * does the following:
      *
-     * @synopsis --name=<name> [--siteurl=<url>] [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--yes]
+     *    - Creates new directory 'myclone' next to the current one
+     *    - Clones the files there
+     *    - Creates new database tables prefixed with 'wp_myclone_'
+     *    - Populates database tables with data
+     *    - Makes the site accessible as 'http://localhost/myclone'
+     *
+     * @synopsis --name=<name> [--siteurl=<url>] [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--force] [--yes]
      *
      * @subcommand clone
      */
     public function clone_($args = array(), $assoc_args = array()) {
         global $table_prefix;
+
+        if (isset($assoc_args['force'])) {
+            $assoc_args['yes'] = 1;
+        }
 
         $name = $assoc_args['name'];
 
@@ -346,10 +376,12 @@ class VPCommand extends WP_CLI_Command {
         $cloneUrl = isset($assoc_args['siteurl']) ? $assoc_args['siteurl'] : $this->getCloneUrl(get_site_url(), basename($currentWpPath), $cloneDirName);
 
         if (is_dir($clonePath)) {
-            WP_CLI::confirm("Directory '" . basename($clonePath) . "' already exists. It will be deleted before cloning. Proceed?", $assoc_args);
+            WP_CLI::confirm("Directory '" . basename($clonePath) . "' already exists, it will be deleted before cloning. Proceed?", $assoc_args);
         }
 
-        $this->checkTables($cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $assoc_args);
+        if ($this->someWpTablesExist($cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix)) {
+            WP_CLI::confirm("Database tables for the clone already exist, they will be dropped and re-created. Proceed?", $assoc_args);
+        }
 
         if (is_dir($clonePath)) {
             try {
@@ -371,21 +403,25 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::success("Site files cloned");
         }
 
-        // Adding the clone as a remote for the convenience of the `vp pull` command - its `--remote`
+        // Adding the clone as a remote for the convenience of the `vp pull` command - its `--from`
         // parameter can then be just the name of the clone, not a path to it
         $addRemoteCommand = sprintf("git remote add %s %s", escapeshellarg($name), escapeshellarg($clonePath));
         $process = VPCommandUtils::exec($addRemoteCommand, $currentWpPath);
 
         if (!$process->isSuccessful()) {
-            WP_CLI::confirm("Remote '$name' already exists, will be re-used. Proceed?", $assoc_args);
 
-            $addRemoteCommand = str_replace(" add ", " set-url ", $addRemoteCommand);
-            $process = VPCommandUtils::exec($addRemoteCommand, $currentWpPath);
-            if (!$process->isSuccessful()) {
-                WP_CLI::error("Could not update remote's URL");
-            } else {
-                WP_CLI::success("Updated remote configuration");
+            $overwriteRemote = VPCommandUtils::cliQuestion("The Git repo of this site already defines remote '$name', overwrite it?", array("y", "n"), $assoc_args);
+
+            if ($overwriteRemote == "y") {
+                $addRemoteCommand = str_replace(" add ", " set-url ", $addRemoteCommand);
+                $process = VPCommandUtils::exec($addRemoteCommand, $currentWpPath);
+                if (!$process->isSuccessful()) {
+                    WP_CLI::error("Could not update remote's URL");
+                } else {
+                    WP_CLI::success("Updated remote configuration");
+                }
             }
+
         } else {
             WP_CLI::success("Clone added as a remote");
         }
@@ -423,7 +459,14 @@ class VPCommand extends WP_CLI_Command {
 
         // Finish the process by doing the standard restore-site
         $process = VPCommandUtils::runWpCliCommand('vp', 'restore-site', array('siteurl' => $cloneUrl, 'yes' => null, 'require' => __FILE__), $clonePath);
-        WP_CLI::log($process->getConsoleOutput());
+        WP_CLI::log(trim($process->getConsoleOutput()));
+
+        if ($process->isSuccessful()) {
+            WP_CLI::success("All done. Clone created here:");
+            WP_CLI::log("");
+            WP_CLI::log("Path:   $clonePath");
+            WP_CLI::log("URL:    $cloneUrl");
+        }
     }
 
     /**
@@ -447,10 +490,26 @@ class VPCommand extends WP_CLI_Command {
      *
      * ## OPTIONS
      *
-     * [--from=<nameOrPathOrURL>]
-     * : Name, path or an URL of the remote, just like in `git pull`. Defaults to "origin".
+     * --from=<name|path|url>
+     * : Where to pull from. Can be a clone name (specified previously during the
+     * 'clone' command), a path or a URL. Defaults to 'origin' which is
+     * automatically set in every clone by the 'clone' command.
      *
-     * @synopsis [--from=<nameOrPathOrURL>]
+     * ## EXAMPLES
+     *
+     * Let's have a site 'wpsite' and a clone 'myclone' created from it. To pull the changes
+     * from the clone back into the main site, use:
+     *
+     *     wp vp pull --from=myclone
+     *
+     * When in the clone, the pull can be run without any parameter:
+     *
+     *     wp vp pull
+     *
+     * This will pull the changes from 'origin' which was set to the parent site during the
+     * 'clone' command.
+     *
+     * @synopsis [--from=<name|path|url>]
      */
     public function pull($args = array(), $assoc_args = array()) {
 
@@ -464,7 +523,7 @@ class VPCommand extends WP_CLI_Command {
         $process = VPCommandUtils::exec($pullCommand);
 
         if ($process->isSuccessful()) {
-            WP_CLI::success("Pulled changes from $remote");
+            WP_CLI::success("Pulled changes from '$remote'");
         } else {
 
             if (stripos($process->getConsoleOutput(), 'automatic merge failed') !== false) {
@@ -488,6 +547,7 @@ class VPCommand extends WP_CLI_Command {
                     WP_CLI::success(" 3. Return here and run `wp vp apply-changes`");
                     WP_CLI::success("");
                     WP_CLI::success("That last step will turn the maintenance mode off.");
+                    WP_CLI::success("You can also abort the merge manually by running `git merge --abort`");
                     exit();
 
                 } else {
@@ -524,9 +584,17 @@ class VPCommand extends WP_CLI_Command {
     }
 
     /**
-     * Applies changes from the disk to the database.
+     * Applies changes from the disk to the database
      *
-     * It happens under the maintenance mode.
+     * ## EXAMPLES
+     *
+     * This command is mainly used in a merge conflict situation, after a 'pull'. When
+     * the conflict is manually resolved and committed, run this command to make sure that
+     * the database in sync with the Git repository / filesystem:
+     *
+     *     wp vp apply-changes
+     *
+     * Note that this command temporarily turns on the maintenance mode.
      *
      * @subcommand apply-changes
      */
@@ -554,10 +622,23 @@ class VPCommand extends WP_CLI_Command {
      *
      * ## OPTIONS
      *
-     * [--to=<nameOrPath>]
-     * : Name or path of the remote. Defaults to "origin".
+     * --to=<name|path>
+     * : Name of the clone or a path to it. Defaults to 'origin' which, in a clone,
+     * points to its original site.
      *
-     * @synopsis [--to=<nameOrPath>]
+     * ## EXAMPLES
+     *
+     * Push is a similar command to 'pull' but does not create a merge. To push from clone
+     * to the original site, run:
+     *
+     *     wp vp push
+     *
+     * To push from the original site to the clone, use the '--to' parameter:
+     *
+     *     wp vp push --to=clonename
+     *
+     *
+     * @synopsis [--to=<name|path>]
      */
     public function push($args = array(), $assoc_args = array()) {
         $remoteName = isset($assoc_args['to']) ? $assoc_args['to'] : 'origin';
@@ -591,12 +672,13 @@ class VPCommand extends WP_CLI_Command {
 
         $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-push', array('require' => self::VP_INTERNAL_COMMAND_PATH), $remotePath);
         if ($process->isSuccessful()) {
-            WP_CLI::success("Remote repository synchronized");
-            // maintenance mode was already disabled in the 'finish-push' command
+            WP_CLI::success("Remote database synchronized");
         } else {
-            $this->switchMaintenance('off', $remoteName);
-            WP_CLI::error("Remote repository couldn't be synchronized. Details:\n\n" . $process->getConsoleOutput());
+            WP_CLI::error("Push couldn't be finished. Details:\n\n" . $process->getConsoleOutput());
         }
+        $this->switchMaintenance('off', $remoteName);
+        WP_CLI::success("All done");
+
     }
 
     /**
@@ -703,6 +785,7 @@ class VPCommand extends WP_CLI_Command {
 
         $this->switchMaintenance('off');
     }
+
     private function dropTables() {
         global $versionPressContainer;
         $tables = array(
@@ -729,25 +812,22 @@ class VPCommand extends WP_CLI_Command {
     }
 
 
-    private function defineGlobalTablePrefix() {
-        global $table_prefix;
-
-        $wpConfigPath = ABSPATH . 'wp-config.php';
-        $wpConfigLines = file_get_contents($wpConfigPath);
-        // https://regex101.com/r/oO7gX7/2
-        preg_match("/^\\\$table_prefix\\s*=\\s*['\"](.*)['\"];/m", $wpConfigLines, $matches);
-        $table_prefix = $matches[1];
-    }
-
-    private function checkTables($dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $assoc_args) {
+    /**
+     * Checks if some tables with the given prefix exist in the database
+     *
+     * @param string $dbUser
+     * @param string $dbPassword
+     * @param string $dbName
+     * @param string $dbHost
+     * @param string $dbPrefix
+     * @return bool
+     */
+    private function someWpTablesExist($dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix) {
         $wpdb = new \wpdb($dbUser, $dbPassword, $dbName, $dbHost);
         $wpdb->set_prefix($dbPrefix);
         $tables = $wpdb->get_col("SHOW TABLES LIKE '{$dbPrefix}_%'");
         $wpTables = array_intersect($tables, $wpdb->tables());
-        $wpTablesExists = count($wpTables) > 0;
-        if ($wpTablesExists) {
-            WP_CLI::confirm("Tables for this site already exist. They will be dropped. Proceed?", $assoc_args);
-        }
+        return count($wpTables) > 0;
     }
 
     private function updateConfig($wpConfigFile, $dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $dbCharset, $dbCollate) {
@@ -823,9 +903,9 @@ class VPCommand extends WP_CLI_Command {
         $preposition = $onOrOff == 'on' ? 'to' : 'from';
 
         if ($process->isSuccessful()) {
-            WP_CLI::success("Remote site switched $preposition the maintenance mode");
+            WP_CLI::success("Maintenance mode turned $onOrOff" . ($remoteName ? " for '$remoteName'" : ""));
         } else {
-            WP_CLI::error("Remote site couldn't be switched $preposition the maintenance mode. Details:\n\n" . $process->getConsoleOutput());
+            WP_CLI::error("Maintenance mode couldn't be switched" . ($remoteName ? " for '$remoteName'" : "") . ". Details:\n\n" . $process->getConsoleOutput());
         }
     }
 }
