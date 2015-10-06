@@ -462,7 +462,10 @@ class VPCommand extends WP_CLI_Command {
         WP_CLI::log(trim($process->getConsoleOutput()));
 
         if ($process->isSuccessful()) {
-            WP_CLI::success("All done");
+            WP_CLI::success("All done. Clone created here:");
+            WP_CLI::log("");
+            WP_CLI::log("Path:   $clonePath");
+            WP_CLI::log("URL:    $cloneUrl");
         }
     }
 
