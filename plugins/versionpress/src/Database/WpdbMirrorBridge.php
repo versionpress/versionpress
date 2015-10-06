@@ -185,7 +185,7 @@ class WpdbMirrorBridge {
         foreach ($postmeta as $meta) {
             $meta['vp_post_id'] = $data['vp_id'];
 
-            $this->vpidRepository->replaceForeignKeysWithReferences('postmeta', $meta);
+            $meta = $this->vpidRepository->replaceForeignKeysWithReferences('postmeta', $meta);
             if (!$this->mirror->shouldBeSaved('postmeta', $meta)) {
                 continue;
             }
