@@ -26,8 +26,6 @@ use WP_CLI_Command;
  */
 class VPCommand extends WP_CLI_Command {
 
-    const VP_INTERNAL_COMMAND_PATH = 'wp-content/plugins/versionpress/src/Cli/vp-internal.php';
-
     /**
      * Configures VersionPress
      *
@@ -215,7 +213,7 @@ class VPCommand extends WP_CLI_Command {
 
         // The next couple of the steps need to be done after the WP is fully loaded; we use `finish-init-clone` for that
         // The main reason for this is that we need properly set WP_CONTENT_DIR constant for reading from storages
-        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-init-clone', array('require' => self::VP_INTERNAL_COMMAND_PATH));
+        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-init-clone', array('require' => $this->getVPInternalCommandPath()));
         WP_CLI::log($process->getConsoleOutput());
         if (!$process->isSuccessful()) {
             WP_CLI::error("Could not finish site restore");
@@ -673,7 +671,7 @@ class VPCommand extends WP_CLI_Command {
             VPCommandUtils::exec("git config --local push.default $currentPushType");
         }
 
-        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-push', array('require' => self::VP_INTERNAL_COMMAND_PATH), $remotePath);
+        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-push', array('require' => $this->getVPInternalCommandPath()), $remotePath);
         if ($process->isSuccessful()) {
             WP_CLI::success("Remote database synchronized");
         } else {
@@ -902,7 +900,7 @@ class VPCommand extends WP_CLI_Command {
      */
     private function switchMaintenance($onOrOff, $remoteName = null) {
         $remotePath = $remoteName ? $this->getRemoteUrl($remoteName) : null;
-        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'maintenance', array($onOrOff, 'require' => self::VP_INTERNAL_COMMAND_PATH), $remotePath);
+        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'maintenance', array($onOrOff, 'require' => $this->getVPInternalCommandPath()), $remotePath);
         $preposition = $onOrOff == 'on' ? 'to' : 'from';
 
         if ($process->isSuccessful()) {
@@ -910,6 +908,10 @@ class VPCommand extends WP_CLI_Command {
         } else {
             WP_CLI::error("Maintenance mode couldn't be switched" . ($remoteName ? " for '$remoteName'" : "") . ". Details:\n\n" . $process->getConsoleOutput());
         }
+    }
+
+    private function getVPInternalCommandPath() {
+        return __DIR__ . '/vp-internal.php';
     }
 }
 
