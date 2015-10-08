@@ -111,7 +111,7 @@ gulp.task('prepare-src-definition', function () {
     srcDef.push('!' + vpDir + '/.gitattributes');
     srcDef.push('!' + vpDir + '/tests{,/**}'); // tests might be useful for `test-deploy` but we don't currently need them
     srcDef.push('!' + vpDir + '/log/**/!(.gitignore)'); // keep just the .gitignore inside `log` folder
-    srcDef.push('!' + vpDir + '/**.md'); // all Markdown files are considered documentation
+    srcDef.push('!' + vpDir + '/**/*.md'); // all Markdown files are considered documentation
 
     // and now some build-specific patterns:
     if (buildType == 'test-deploy') {
