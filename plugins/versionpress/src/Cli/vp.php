@@ -178,6 +178,9 @@ class VPCommand extends WP_CLI_Command {
 
 
         // Disable VersionPress tracking
+        if (!defined('WPINC')) {
+            define('WPINC', 'wp-includes');
+        }
         WpdbReplacer::restoreOriginal();
         unlink(VERSIONPRESS_ACTIVATION_FILE);
 
