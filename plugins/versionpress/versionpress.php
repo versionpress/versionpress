@@ -796,12 +796,15 @@ if (VersionPress::isActive()) {
 }
 
 add_action('admin_enqueue_scripts', 'vp_enqueue_styles_and_scripts');
+add_action('wp_enqueue_scripts', 'vp_enqueue_styles_and_scripts');
 function vp_enqueue_styles_and_scripts() {
-    wp_enqueue_style('versionpress_popover_style', plugins_url('admin/public/css/jquery.webui-popover.min.css', __FILE__));
-    wp_enqueue_style('versionpress_popover_custom_style', plugins_url('admin/public/css/popover-custom.css', __FILE__));
+    if (is_admin_bar_showing()) {
+        wp_enqueue_style('versionpress_popover_style', plugins_url('admin/public/css/jquery.webui-popover.min.css', __FILE__));
+        wp_enqueue_style('versionpress_popover_custom_style', plugins_url('admin/public/css/popover-custom.css', __FILE__));
 
-    wp_enqueue_script('jquery');
-    wp_enqueue_script('versionpress_popover_script', plugins_url('admin/public/js/jquery.webui-popover.min.js', __FILE__), 'jquery');
+        wp_enqueue_script('jquery');
+        wp_enqueue_script('versionpress_popover_script', plugins_url('admin/public/js/jquery.webui-popover.min.js', __FILE__), 'jquery');
+    }
 }
 
 function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
