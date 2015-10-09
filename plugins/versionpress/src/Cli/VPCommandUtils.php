@@ -12,6 +12,9 @@ class VPCommandUtils {
         if ($subcommand) {
             $cliCommand .= " $subcommand";
         }
+        
+        // Colorize the output
+        $args['color'] = null;
 
         foreach ($args as $name => $value) {
             if (is_int($name)) { // positional argument
