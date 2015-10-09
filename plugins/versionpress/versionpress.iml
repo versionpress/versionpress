@@ -41,8 +41,6 @@
           <root url="file://$MODULE_DIR$/vendor/janvoracek/comment-stripper" />
           <root url="file://$MODULE_DIR$/vendor/janvoracek/wp-cli-ssh" />
           <root url="file://$MODULE_DIR$/vendor/michelf/php-markdown" />
-          <root url="file://$MODULE_DIR$/vendor/mustache/mustache" />
-          <root url="file://$MODULE_DIR$/vendor/nb/oxymel" />
           <root url="file://$MODULE_DIR$/vendor/nette/caching" />
           <root url="file://$MODULE_DIR$/vendor/nette/database" />
           <root url="file://$MODULE_DIR$/vendor/nette/finder" />
@@ -57,19 +55,14 @@
           <root url="file://$MODULE_DIR$/vendor/phpunit/phpunit" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/phpunit-mock-objects" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/phpunit-selenium" />
-          <root url="file://$MODULE_DIR$/vendor/ramsey/array_column" />
-          <root url="file://$MODULE_DIR$/vendor/rmccue/requests" />
           <root url="file://$MODULE_DIR$/vendor/sebastian/comparator" />
           <root url="file://$MODULE_DIR$/vendor/sebastian/diff" />
           <root url="file://$MODULE_DIR$/vendor/sebastian/exporter" />
           <root url="file://$MODULE_DIR$/vendor/sebastian/recursion-context" />
           <root url="file://$MODULE_DIR$/vendor/symfony/filesystem" />
-          <root url="file://$MODULE_DIR$/vendor/symfony/finder" />
           <root url="file://$MODULE_DIR$/vendor/symfony/process" />
           <root url="file://$MODULE_DIR$/vendor/symfony/yaml" />
           <root url="file://$MODULE_DIR$/vendor/tracy/tracy" />
-          <root url="file://$MODULE_DIR$/vendor/wp-cli/php-cli-tools" />
-          <root url="file://$MODULE_DIR$/vendor/wp-cli/wp-cli" />
         </CLASSES>
         <SOURCES>
           <root url="file://$MODULE_DIR$/../../ext-libs/vendor/wp-cli" />
@@ -83,8 +76,6 @@
           <root url="file://$MODULE_DIR$/vendor/janvoracek/comment-stripper" />
           <root url="file://$MODULE_DIR$/vendor/janvoracek/wp-cli-ssh" />
           <root url="file://$MODULE_DIR$/vendor/michelf/php-markdown" />
-          <root url="file://$MODULE_DIR$/vendor/mustache/mustache" />
-          <root url="file://$MODULE_DIR$/vendor/nb/oxymel" />
           <root url="file://$MODULE_DIR$/vendor/nette/caching" />
           <root url="file://$MODULE_DIR$/vendor/nette/database" />
           <root url="file://$MODULE_DIR$/vendor/nette/finder" />
@@ -99,19 +90,14 @@
           <root url="file://$MODULE_DIR$/vendor/phpunit/phpunit" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/phpunit-mock-objects" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/phpunit-selenium" />
-          <root url="file://$MODULE_DIR$/vendor/ramsey/array_column" />
-          <root url="file://$MODULE_DIR$/vendor/rmccue/requests" />
           <root url="file://$MODULE_DIR$/vendor/sebastian/comparator" />
           <root url="file://$MODULE_DIR$/vendor/sebastian/diff" />
           <root url="file://$MODULE_DIR$/vendor/sebastian/exporter" />
           <root url="file://$MODULE_DIR$/vendor/sebastian/recursion-context" />
           <root url="file://$MODULE_DIR$/vendor/symfony/filesystem" />
-          <root url="file://$MODULE_DIR$/vendor/symfony/finder" />
           <root url="file://$MODULE_DIR$/vendor/symfony/process" />
           <root url="file://$MODULE_DIR$/vendor/symfony/yaml" />
           <root url="file://$MODULE_DIR$/vendor/tracy/tracy" />
-          <root url="file://$MODULE_DIR$/vendor/wp-cli/php-cli-tools" />
-          <root url="file://$MODULE_DIR$/vendor/wp-cli/wp-cli" />
         </SOURCES>
       </library>
     </orderEntry>
