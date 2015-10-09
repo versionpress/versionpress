@@ -6,7 +6,7 @@ use VersionPress\Git\CommitMessage;
 use VersionPress\Git\GitRepository;
 use VersionPress\Utils\FileSystem;
 
-class GitLogTest extends \PHPUnit_Framework_TestCase {
+class LogTest extends \PHPUnit_Framework_TestCase {
 
     private static $repositoryPath;
     private static $tempPath;
