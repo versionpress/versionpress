@@ -1,7 +1,6 @@
 # Roadmap #
 
-This page should give you an idea of where we are and what is planned for the future. The order roughly represents our priorities but no commitments are made here.
-
+This page should give you an idea of where we are and what is planned for the future. The order roughly represents our priorities.
 
 * ✓ <del>Core versioning functionality</del> *(shipped in 1.0)*
 * ✓ <del>Automatic change tracking</del> *(shipped in 1.0)*
@@ -16,6 +15,6 @@ This page should give you an idea of where we are and what is planned for the fu
 * Multisite support
 * Better hosting support – remove dependency on external Git process
 * Update mechanism
-* Support for large sites (many improvements in this area done already, more to come) 
-* Improved support for complex 3<sup>rd</sup> party plugins
+* Support for large sites *(many improvements in this area done in 2.0, more to come)* 
+* Improved support for complex 3<sup>rd</sup> party plugins *(ongoing effort)*
 * Localization

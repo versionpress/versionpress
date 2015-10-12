@@ -26,7 +26,7 @@ If you're going to use EAP versions of VersionPress (we do and some of our users
 
  - **If you're going to run VersionPress on a live site, <span style="color:red;">keep backup at all times</span>**. We really mean this. VersionPress manipulates the database during revert operations and for EAP releases, backups are mandatory.
 
- - **Controlled hosting** is recommended. VersionPress requires Git on the server and `proc_open()` enabled which only some hosts allow (see [hosting](../integrations/hosts)).
+ - **Controlled hosting** is recommended. VersionPress requires Git on the server and `proc_open()` enabled which only some hosts allow (see [hosting](../integrations/hosts) and [system requirements](./installation-uninstallation)).
 
  - **Be familiar with WordPress and Git**. While the big promise of VersionPress is that it will be usable versioning solution for everyone, both technical and nontechnical people, at this stage familiarity with Git and WordPress will help.
 
