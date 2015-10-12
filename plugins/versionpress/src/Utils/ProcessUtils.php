@@ -2,9 +2,6 @@
 
 namespace VersionPress\Utils;
 
-
-use Symfony\Component\Process\Process;
-
 class ProcessUtils {
 
     /**

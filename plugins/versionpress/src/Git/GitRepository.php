@@ -12,8 +12,6 @@ use VersionPress\Utils\FileSystem;
 class GitRepository {
 
     private $workingDirectoryRoot;
-    private $authorName = "";
-    private $authorEmail = "";
     private $tempDirectory;
     private $commitMessagePrefix;
     private $gitBinary;
@@ -54,8 +52,6 @@ class GitRepository {
      * @param string $authorEmail
      */
     public function commit($message, $authorName, $authorEmail) {
-        $this->authorName = $authorName;
-        $this->authorEmail = $authorEmail;
 
         if (is_string($message)) {
             $commitMessage = $message;
@@ -72,9 +68,8 @@ class GitRepository {
         $tempCommitMessagePath = $this->tempDirectory . '/' . $tempCommitMessageFilename;
         file_put_contents($tempCommitMessagePath, $commitMessage);
 
-        $this->runShellCommand("git config user.name %s", $this->authorName);
-        $this->runShellCommand("git config user.email %s", $this->authorEmail);
-        $this->runShellCommand("git commit -F %s", $tempCommitMessagePath);
+        $author = sprintf("%s <%s>", $authorName, $authorEmail);
+        $this->runShellCommand("git commit --file=%s --author=%s", $tempCommitMessagePath, $author);
         FileSystem::remove($tempCommitMessagePath);
     }
 

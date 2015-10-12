@@ -2,6 +2,7 @@
 
 namespace VersionPress\Tests\End2End\Revert;
 
+use VersionPress\Cli\VPCommandUtils;
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
@@ -132,6 +133,33 @@ class RevertTest extends End2EndTestCase {
         $commitAsserter->assertNumCommits(0);
         unlink(self::$testConfig->testSite->path . '/revert-test-file');
         $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     */
+    public function rollbackWorksWithMergeCommits() {
+        $commitHash = $this->gitRepository->getLastCommitHash();
+        $sitePath = self::$testConfig->testSite->path;
+
+        VPCommandUtils::exec('git branch test', $sitePath);
+        self::$wpAutomation->createOption('vp_option_master', 'foo');
+        VPCommandUtils::exec('git checkout test', $sitePath);
+        self::$wpAutomation->createOption('vp_option_test', 'foo');
+        VPCommandUtils::exec('git checkout master', $sitePath);
+        VPCommandUtils::exec('git merge test', $sitePath);
+        VPCommandUtils::exec('git branch -d test', $sitePath);
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$wpAutomation->runWpCliCommand('vp', 'rollback', array($commitHash));
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertCountOfAffectedFiles(2);
+        $commitAsserter->assertCommitPath('D', '%vpdb%/options/vp/vp_option_master.ini');
+        $commitAsserter->assertCommitPath('D', '%vpdb%/options/vp/vp_option_test.ini');
         DBAsserter::assertFilesEqualDatabase();
     }
 }

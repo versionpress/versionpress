@@ -304,7 +304,8 @@ class CommitAsserter {
             $unfilteredCommits = $this->gitRepository->log("{$this->startCommit->getHash()}..HEAD");
             $that = $this;
             $filteredCommits = array_filter($unfilteredCommits, function ($commit) use ($that) {
-                return !in_array(ChangeInfoUtils::getFullAction($that->getChangeInfo($commit)), $that->ignoreCommitsWithActions);
+                $changeInfo = $that->getChangeInfo($commit);
+                return $changeInfo instanceof UntrackedChangeInfo || !in_array(ChangeInfoUtils::getFullAction($changeInfo), $that->ignoreCommitsWithActions);
             });
             $this->commitCache = array_values($filteredCommits); // array_values reindexes the array from zero
         }
