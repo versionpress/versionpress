@@ -68,9 +68,28 @@ class GitRepository {
         $tempCommitMessagePath = $this->tempDirectory . '/' . $tempCommitMessageFilename;
         file_put_contents($tempCommitMessagePath, $commitMessage);
 
-        $author = sprintf("%s <%s>", $authorName, $authorEmail);
-        $this->runShellCommand("git commit --file=%s --author=%s", $tempCommitMessagePath, $author);
+        // Unfortunatelly, `git commit --author=...` is not enough.
+        // It doesn't work with empty both local and global config.
+        $localConfigUserName = $this->runShellCommandWithStandardOutput('git config --local user.name');
+        $localConfigUserEmail = $this->runShellCommandWithStandardOutput('git config --local user.email');
+
+        $this->runShellCommand('git config --local user.name %s', $authorName);
+        $this->runShellCommand('git config --local user.email %s', $authorEmail);
+
+        $this->runShellCommand("git commit --file=%s", $tempCommitMessagePath);
         FileSystem::remove($tempCommitMessagePath);
+
+        if ($localConfigUserName === null) {
+            $this->runShellCommand('git config --local --unset user.name');
+        } else {
+            $this->runShellCommand('git config --local user.name %s', $localConfigUserName);
+        }
+
+        if ($localConfigUserEmail === null) {
+            $this->runShellCommand('git config --local --unset user.email');
+        } else {
+            $this->runShellCommand('git config --local user.email %s', $localConfigUserEmail);
+        }
     }
 
     /**
