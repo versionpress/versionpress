@@ -3,7 +3,7 @@
 Plugin Name: VersionPress
 Plugin URI: http://versionpress.net/
 Description: Git-versioning plugin for WordPress
-Version: 2.0
+Version: 3.0-dev
 Author: VersionPress
 Author URI: http://versionpress.net/
 License: GPLv2 or later
