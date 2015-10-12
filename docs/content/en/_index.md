@@ -7,11 +7,6 @@ Welcome to [VersionPress](http://versionpress.net/) documentation. VersionPress 
   <figcaption>Hello VersionPress!</figcaption>
 </figure>
 
-<div class="note">
-  <strong>BETA!</strong>
-  <p>We are currently updating these docs to version 2.0 which is expected to ship at the end of September / start of October 2015. Please bear with us.</p>
-</div>
-
 These docs are divided into a couple of sections:
 
 * [Getting Started](./en/getting-started) – brief introduction to VersionPress
