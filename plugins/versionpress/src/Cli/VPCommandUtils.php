@@ -12,9 +12,11 @@ class VPCommandUtils {
         if ($subcommand) {
             $cliCommand .= " $subcommand";
         }
-        
+
         // Colorize the output
-        $args['color'] = null;
+        if (defined('WP_CLI') && WP_CLI && \WP_CLI::get_runner()->in_color()) {
+            $args['color'] = null;
+        }
 
         foreach ($args as $name => $value) {
             if (is_int($name)) { // positional argument
