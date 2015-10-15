@@ -127,6 +127,9 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   }
 
   checkUpdate() {
+    if (!this.state.commits.length) {
+      return;
+    }
     WpApi
       .get('should-update')
       .query({latestCommit: this.state.commits[0].hash})
