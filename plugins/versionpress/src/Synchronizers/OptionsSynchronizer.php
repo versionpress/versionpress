@@ -51,7 +51,7 @@ class OptionsSynchronizer implements Synchronizer {
                 $syncQuery .= "(\"$optionName\", \"" . $this->database->_real_escape($option['option_value']) . "\", \"$option[autoload]\"),";
             }
 
-            $syncQuery[mb_strlen($syncQuery) - 1] = " "; // strip last comma
+            $syncQuery[strlen($syncQuery) - 1] = " "; // strip last comma
             $syncQuery .= " ON DUPLICATE KEY UPDATE option_value = VALUES(option_value), autoload = VALUES(autoload);";
 
             $this->database->query($syncQuery);
