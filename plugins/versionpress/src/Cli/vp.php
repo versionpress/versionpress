@@ -834,8 +834,8 @@ class VPCommand extends WP_CLI_Command {
     private function updateConfig($wpConfigFile, $dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $dbCharset, $dbCollate) {
         $config = file_get_contents($wpConfigFile);
 
-        // https://regex101.com/r/oO7gX7/3 - just remove the "g" modifier which is there for testing only
-        $re = "/^(\\\$table_prefix\\s*=\\s*['\"]).*(['\"];)$/m";
+        // https://regex101.com/r/oO7gX7/4 - just remove the "g" modifier which is there for testing only
+        $re = "/^(\\\$table_prefix\\s*=\\s*['\"]).*(['\"];)/m";
         $config = preg_replace($re, "\${1}{$dbPrefix}\${2}", $config, 1);
 
         https://regex101.com/r/zD3mJ4/1 - just remove the "g" modifier which is there for testing only
