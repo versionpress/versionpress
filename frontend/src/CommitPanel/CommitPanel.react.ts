@@ -46,7 +46,7 @@ class CommitPanel extends React.Component<CommitPanelProps, CommitPanelState> {
           ? React.createElement(CommitPanelCommit, <CommitPanelCommit.Props>{
             onCommit: this.props.onCommit,
             onDiscard: this.props.onDiscard
-          }): null
+          }) : null
       ),
       this.renderDetails()
     );
@@ -73,7 +73,7 @@ class CommitPanel extends React.Component<CommitPanelProps, CommitPanelState> {
       this.state.error
         ? this.renderError()
         : content
-    )
+    );
   }
 
   private renderToggle() {
@@ -103,7 +103,7 @@ class CommitPanel extends React.Component<CommitPanelProps, CommitPanelState> {
           })
         ).catch(err => {
           this.setState({detailsLevel: detailsLevel, error: err.message, loading: false});
-        })
+        });
     } else if (detailsLevel === 'full-diff' && !this.state.diff) {
       this.setState({loading: true});
       this.props.diffProvider.getDiff('')

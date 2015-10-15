@@ -3,8 +3,6 @@
 import React = require('react');
 import DiffPanel = require('../Commits/DiffPanel.react');
 
-const DOM = React.DOM;
-
 interface CommitPanelDetailsProps {
   diff: string;
 }

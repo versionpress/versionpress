@@ -29,6 +29,24 @@ class CommitPanelCommit extends React.Component<CommitPanelCommitProps, CommitPa
       : this.renderButtons();
   }
 
+  onSubmit(e: React.SyntheticEvent) {
+    e.preventDefault();
+
+    const message = e.target['message'].value;
+
+    if (this.props.onCommit(message)) {
+      e.target['message'].value = '';
+    }
+  }
+
+  onDiscard(e: React.MouseEvent) {
+    e.preventDefault();
+    const body = DOM.div(null, 'This action cannot be undone, are you sure?');
+    const options = { okButtonText: 'Proceed' };
+
+    portal.confirmDialog('Warning', body, this.props.onDiscard, () => {}, options);
+  }
+
   private renderButtons() {
     return DOM.div({className: 'CommitPanel-commit'},
       DOM.a({
@@ -64,24 +82,6 @@ class CommitPanelCommit extends React.Component<CommitPanelCommitProps, CommitPa
         })
       )
     );
-  }
-
-  onSubmit(e: React.SyntheticEvent) {
-    e.preventDefault();
-
-    const message = e.target['message'].value;
-
-    if (this.props.onCommit(message)) {
-      e.target['message'].value = '';
-    }
-  }
-
-  onDiscard(e: React.MouseEvent) {
-    e.preventDefault();
-    const body = DOM.div(null, 'This action cannot be undone, are you sure?');
-    const options = { okButtonText: 'Proceed' };
-
-    portal.confirmDialog('Warning', body, this.props.onDiscard, () => {}, options);
   }
 
   private displayForm() {
