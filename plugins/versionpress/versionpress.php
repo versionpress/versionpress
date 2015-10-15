@@ -255,12 +255,13 @@ function vp_register_hooks() {
         $committer->postponeCommit('permalinks');
     });
 
-    add_action('update_option', function ($option, $_, $value) use ($committer) {
-       if ($option === 'rewrite_rules') {
-           $committer->usePostponedChangeInfos('permalinks');
-       }
-    }, 10, 3);
+    add_action('update_option_rewrite_rules', function () use ($committer) {
+        $committer->usePostponedChangeInfos('permalinks');
+    });
 
+    add_action('add_option_rewrite_rules', function() use ($committer) {
+        $committer->usePostponedChangeInfos('permalinks');
+    });
 
     function _vp_get_language_name_by_code($code) {
         $translations = wp_get_available_translations();
