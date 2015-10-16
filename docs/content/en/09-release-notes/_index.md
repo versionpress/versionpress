@@ -1,9 +1,6 @@
 # Release Notes
 
-The current release is **[2.0](./release-notes/2.0)**, released on 12-Oct-2015, and it is an [EAP release](getting-started/about-eap). VersionPress can be obtained via the main **[versionpress.net](http://versionpress.net/)** site.
-
- * [2.0 release notes](./release-notes/2.0)
- * [Roadmap](./release-notes/roadmap)
+The current release is **[2.0.1](./release-notes/2.0.1)**, released on 16-Oct-2015, and it is an [EAP release](getting-started/about-eap). VersionPress can be obtained via the main **[versionpress.net](http://versionpress.net/)** site.
 
 
 ## Release versioning
@@ -19,3 +16,7 @@ VersionPress releases are marked so that it's easy to understand what to expect 
      - **RC (Release Candidate)** is close to the final / stable version.
 
 Versions are compared and ordered by the same rules that [semver](http://semver.org/) uses – versions with two segments assume the ".0" at the end so 1.0 is effectively the same as 1.0.0.
+
+## Roadmap
+
+See [roadmap here](./release-notes/roadmap).
