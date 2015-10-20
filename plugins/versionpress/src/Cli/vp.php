@@ -371,7 +371,7 @@ class VPCommand extends WP_CLI_Command {
 
         $currentUrl = get_site_url();
         if (!Strings::contains($currentUrl, basename($currentWpPath))) {
-            WP_CLI::error("The command cannot derive default clone URL. Please specify the --url parameter.");
+            WP_CLI::error("The command cannot derive default clone URL. Please specify the --siteurl parameter.");
         }
 
         $cloneUrl = isset($assoc_args['siteurl']) ? $assoc_args['siteurl'] : $this->getCloneUrl(get_site_url(), basename($currentWpPath), $cloneDirName);
