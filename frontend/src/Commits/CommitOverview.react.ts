@@ -206,7 +206,6 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
   }
 
   private getLinesForVersionPress(changes: Change[], action) {
-    let change = changes[0];
     let line = DOM.span(null,
       StringUtils.capitalize(StringUtils.verbToPastTense(action)),
       ' ',
@@ -214,7 +213,7 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
     );
     return [line];
   }
-  
+
   private getLinesForWordPressUpdate(changes: Change[]) {
     let change = changes[0];
     let line = DOM.span(null,
@@ -225,7 +224,6 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
     );
     return [line];
   }
-
 
   private getLinesForOtherChanges(changes, countOfDuplicates, type, action) {
     let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changes, countOfDuplicates);

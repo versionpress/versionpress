@@ -371,7 +371,7 @@ class VPCommand extends WP_CLI_Command {
 
         $currentUrl = get_site_url();
         if (!Strings::contains($currentUrl, basename($currentWpPath))) {
-            WP_CLI::error("The command cannot derive default clone URL. Please specify the --url parameter.");
+            WP_CLI::error("The command cannot derive default clone URL. Please specify the --siteurl parameter.");
         }
 
         $cloneUrl = isset($assoc_args['siteurl']) ? $assoc_args['siteurl'] : $this->getCloneUrl(get_site_url(), basename($currentWpPath), $cloneDirName);
@@ -834,8 +834,8 @@ class VPCommand extends WP_CLI_Command {
     private function updateConfig($wpConfigFile, $dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $dbCharset, $dbCollate) {
         $config = file_get_contents($wpConfigFile);
 
-        // https://regex101.com/r/oO7gX7/3 - just remove the "g" modifier which is there for testing only
-        $re = "/^(\\\$table_prefix\\s*=\\s*['\"]).*(['\"];)$/m";
+        // https://regex101.com/r/oO7gX7/4 - just remove the "g" modifier which is there for testing only
+        $re = "/^(\\\$table_prefix\\s*=\\s*['\"]).*(['\"];)/m";
         $config = preg_replace($re, "\${1}{$dbPrefix}\${2}", $config, 1);
 
         https://regex101.com/r/zD3mJ4/1 - just remove the "g" modifier which is there for testing only
