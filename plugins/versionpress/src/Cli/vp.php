@@ -578,6 +578,7 @@ class VPCommand extends WP_CLI_Command {
         $syncProcess->synchronize();
         WP_CLI::success("Synchronized database");
 
+        $this->flushRewriteRules();
         $this->switchMaintenance('off');
 
         WP_CLI::success("All done");
@@ -609,7 +610,7 @@ class VPCommand extends WP_CLI_Command {
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
         $syncProcess->synchronize();
         WP_CLI::success("Database updated");
-
+        $this->flushRewriteRules();
         $this->switchMaintenance('off');
 
         WP_CLI::success("All done");
@@ -735,6 +736,7 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::success("Undo was successful.");
         }
 
+        $this->flushRewriteRules();
         $this->switchMaintenance('off');
     }
 
@@ -784,6 +786,7 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::success("Rollback was successful.");
         }
 
+        $this->flushRewriteRules();
         $this->switchMaintenance('off');
     }
 
@@ -901,7 +904,6 @@ class VPCommand extends WP_CLI_Command {
     private function switchMaintenance($onOrOff, $remoteName = null) {
         $remotePath = $remoteName ? $this->getRemoteUrl($remoteName) : null;
         $process = VPCommandUtils::runWpCliCommand('vp-internal', 'maintenance', array($onOrOff, 'require' => $this->getVPInternalCommandPath()), $remotePath);
-        $preposition = $onOrOff == 'on' ? 'to' : 'from';
 
         if ($process->isSuccessful()) {
             WP_CLI::success("Maintenance mode turned $onOrOff" . ($remoteName ? " for '$remoteName'" : ""));
@@ -912,6 +914,11 @@ class VPCommand extends WP_CLI_Command {
 
     private function getVPInternalCommandPath() {
         return __DIR__ . '/vp-internal.php';
+    }
+
+    private function flushRewriteRules() {
+        set_transient('vp_flush_rewrite_rules', 1);
+        file_get_contents(get_home_url());
     }
 }
 

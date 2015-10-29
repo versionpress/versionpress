@@ -62,6 +62,14 @@ if (VersionPress::isActive()) {
             WpdbReplacer::replaceMethods();
         }
     });
+
+//----------------------------------
+// Flushing rewrite rules after clone / pull / push
+//----------------------------------
+   if (get_transient('vp_flush_rewrite_rules') && !defined('WP_CLI')) {
+       flush_rewrite_rules();
+       delete_transient('vp_flush_rewrite_rules');
+   }
 }
 
 //----------------------------------
