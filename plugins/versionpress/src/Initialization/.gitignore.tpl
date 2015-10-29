@@ -4,6 +4,7 @@
 
 /wp-config.php
 .maintenance
+/.htaccess
 
 /wp-content/*
 !/wp-content/db.php
