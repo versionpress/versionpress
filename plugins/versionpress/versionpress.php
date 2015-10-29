@@ -367,6 +367,10 @@ function vp_register_hooks() {
         return $actions;
     }, 10, 2);
 
+    add_action('vp_revert', function () {
+        flush_rewrite_rules();
+    });
+
     //----------------------------------------
     // URL and WP-CLI "hooks"
     //----------------------------------------

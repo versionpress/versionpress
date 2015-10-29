@@ -56,7 +56,7 @@ class Reverter {
     }
 
     public function canRevert() {
-        if(!$this->repository->isCleanWorkingDirectory()) {
+        if (!$this->repository->isCleanWorkingDirectory()) {
             $this->clearOrphanedPosts();
         }
         return $this->repository->isCleanWorkingDirectory();
@@ -96,6 +96,7 @@ class Reverter {
         $affectedPosts = $this->getAffectedPosts($modifiedFiles);
         $this->updateChangeDateForPosts($affectedPosts);
 
+        do_action('vp_revert');
         return RevertStatus::OK;
     }
 
