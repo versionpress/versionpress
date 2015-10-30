@@ -578,8 +578,8 @@ class VPCommand extends WP_CLI_Command {
         $syncProcess->synchronize();
         WP_CLI::success("Synchronized database");
 
-        $this->flushRewriteRules();
         $this->switchMaintenance('off');
+        $this->flushRewriteRules();
 
         WP_CLI::success("All done");
 
@@ -610,8 +610,8 @@ class VPCommand extends WP_CLI_Command {
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
         $syncProcess->synchronize();
         WP_CLI::success("Database updated");
-        $this->flushRewriteRules();
         $this->switchMaintenance('off');
+        $this->flushRewriteRules();
 
         WP_CLI::success("All done");
 
@@ -736,8 +736,8 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::success("Undo was successful.");
         }
 
-        $this->flushRewriteRules();
         $this->switchMaintenance('off');
+        $this->flushRewriteRules();
     }
 
     /**
@@ -786,8 +786,8 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::success("Rollback was successful.");
         }
 
-        $this->flushRewriteRules();
         $this->switchMaintenance('off');
+        $this->flushRewriteRules();
     }
 
     private function dropTables() {
@@ -918,7 +918,15 @@ class VPCommand extends WP_CLI_Command {
 
     private function flushRewriteRules() {
         set_transient('vp_flush_rewrite_rules', 1);
-        file_get_contents(get_home_url());
+        /**
+         * If it fails, we just flush the rewrite rules on the next request.
+         * The disadvantage is that until the next (valid) request all rewritten
+         * URLs may be broken.
+         * Valid request is such a request, which does not require URL rewrite
+         * (e.g. homepage / administration) and finishes successfully.
+         * @noinspection PhpUsageOfSilenceOperatorInspection
+         */
+        @file_get_contents(get_home_url());
     }
 }
 
