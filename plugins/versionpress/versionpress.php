@@ -66,10 +66,14 @@ if (VersionPress::isActive()) {
 //----------------------------------
 // Flushing rewrite rules after clone / pull / push
 //----------------------------------
-   if (get_transient('vp_flush_rewrite_rules') && !defined('WP_CLI')) {
-       flush_rewrite_rules();
-       delete_transient('vp_flush_rewrite_rules');
-   }
+    add_action('wp_loaded', function () {
+        if (get_transient('vp_flush_rewrite_rules') && !defined('WP_CLI')) {
+            require_once(ABSPATH . 'wp-admin/includes/misc.php');
+            require_once(ABSPATH . 'wp-admin/includes/file.php');
+            flush_rewrite_rules();
+            delete_transient('vp_flush_rewrite_rules');
+        }
+    });
 }
 
 //----------------------------------
