@@ -1,54 +1,48 @@
 {
   "version": "v4",
-  "repo": "vasek17/DefinitelyTyped",
+  "repo": "borisyankov/DefinitelyTyped",
   "ref": "master",
   "path": "typings",
   "bundle": "typings/tsd.d.ts",
   "installed": {
-    "superagent/superagent.d.ts": {
-      "commit": "8c9ede30fca2a095018e70940806cc9c8aa122f6"
+    "assertion-error/assertion-error.d.ts": {
+      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
     },
     "chai/chai.d.ts": {
-      "commit": "8c9ede30fca2a095018e70940806cc9c8aa122f6"
-    },
-    "react/react-addons.d.ts": {
-      "commit": "0b3c1591f9266ef507dc5e8cfcbd2ce4ca957227"
-    },
-    "react/react.d.ts": {
-      "commit": "0b3c1591f9266ef507dc5e8cfcbd2ce4ca957227"
-    },
-    "mocha/mocha.d.ts": {
-      "commit": "172964b865679c553bb7d82bc5ff62e5f891d381"
-    },
-    "node/node.d.ts": {
-      "commit": "ad0dfb0b43a60345486e07a2e8f36b240e36fcd3"
-    },
-    "moment/moment-node.d.ts": {
-      "commit": "ad0dfb0b43a60345486e07a2e8f36b240e36fcd3"
-    },
-    "moment/moment.d.ts": {
-      "commit": "ad0dfb0b43a60345486e07a2e8f36b240e36fcd3"
-    },
-    "react-router/react-router.d.ts": {
-      "commit": "dd44d185ca70fbda51df26d31b51d09408c21412"
-    },
-    "sinon-chai/sinon-chai.d.ts": {
-      "commit": "dd44d185ca70fbda51df26d31b51d09408c21412"
-    },
-    "sinon/sinon.d.ts": {
-      "commit": "dd44d185ca70fbda51df26d31b51d09408c21412"
-    },
-    "karma-chai-sinon/karma-chai-sinon.d.ts": {
-      "commit": "bf5ead10d2e309458d0bd07eff57779462171b6d"
+      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
     },
     "core-js/core-js.d.ts": {
-      "commit": "b6f89b5f6deaf556843d554709c694156f8c6ccc"
-    },
-    "lodash/lodash.d.ts": {
-      "commit": "b6f89b5f6deaf556843d554709c694156f8c6ccc"
+      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
     },
     "diff/diff.d.ts": {
-      "commit": "b6f89b5f6deaf556843d554709c694156f8c6ccc"
+      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+    },
+    "sinon/sinon.d.ts": {
+      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+    },
+    "lodash/lodash.d.ts": {
+      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+    },
+    "mocha/mocha.d.ts": {
+      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+    },
+    "moment/moment.d.ts": {
+      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+    },
+    "moment/moment-node.d.ts": {
+      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+    },
+    "react-router/react-router.d.ts": {
+      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+    },
+    "react/react.d.ts": {
+      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+    },
+    "superagent/superagent.d.ts": {
+      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+    },
+    "node/node.d.ts": {
+      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
     }
   }
 }

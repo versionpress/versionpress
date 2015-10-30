@@ -1,4 +1,4 @@
-/// <reference path='../../../typings/tsd.d.ts' />
+/// <reference path='../../../typings/typings.d.ts' />
 
 /* tslint:disable:variable-name */
 
