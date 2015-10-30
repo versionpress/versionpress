@@ -368,7 +368,9 @@ function vp_register_hooks() {
     }, 10, 2);
 
     add_action('vp_revert', function () {
-        flush_rewrite_rules();
+        // We have to flush the rewrite rules in the next request, because
+        // in the current one the changed rewrite rules are not yet effective.
+        set_transient('vp_flush_rewrite_rules', 1);
     });
 
     //----------------------------------------
