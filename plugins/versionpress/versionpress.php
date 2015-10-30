@@ -593,6 +593,7 @@ function vp_admin_post_confirm_deactivation() {
     }
 
 
+    delete_option('vp_rest_api_plugin_version');
     deactivate_plugins("versionpress/versionpress.php", true);
 
     if (defined('WP_ADMIN')) {
