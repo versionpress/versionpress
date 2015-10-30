@@ -263,18 +263,6 @@ function vp_register_hooks() {
         }
     }, 0); // zero because the default WP action with priority 1 calls wp_die()
 
-    add_action('permalink_structure_changed', function () use ($committer) {
-        $committer->postponeCommit('permalinks');
-    });
-
-    add_action('update_option_rewrite_rules', function () use ($committer) {
-        $committer->usePostponedChangeInfos('permalinks');
-    });
-
-    add_action('add_option_rewrite_rules', function() use ($committer) {
-        $committer->usePostponedChangeInfos('permalinks');
-    });
-
     function _vp_get_language_name_by_code($code) {
         $translations = wp_get_available_translations();
         return isset($translations[$code])
