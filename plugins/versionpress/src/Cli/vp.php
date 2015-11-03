@@ -369,6 +369,17 @@ class VPCommand extends WP_CLI_Command {
         $cloneDbCharset = isset($assoc_args['dbcharset']) ? $assoc_args['dbcharset'] : DB_CHARSET;
         $cloneDbCollate = isset($assoc_args['dbcollate']) ? $assoc_args['dbcollate'] : DB_COLLATE;
 
+        // Checking the DB prefix, regex from wp-admin/setup-config.php
+        if (preg_match('|[^a-z0-9_]|i', $cloneDbPrefix)) {
+            if (isset($assoc_args['dbprefix'])) {
+                $hint = 'Please choose different one.';
+            } else {
+                $hint = 'Please choose different clone name or specify the --dbprefix parameter.';
+            }
+
+            WP_CLI::error(sprintf('Table prefix %s is not valid. It can only contain numbers, letters and underscores. %s', var_export($cloneDbPrefix, true), $hint));
+        }
+
         $currentUrl = get_site_url();
         if (!Strings::contains($currentUrl, basename($currentWpPath))) {
             WP_CLI::error("The command cannot derive default clone URL. Please specify the --siteurl parameter.");
