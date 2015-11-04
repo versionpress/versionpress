@@ -1,4 +1,4 @@
-/// <reference path='../../../typings/tsd.d.ts' />
+/// <reference path='../../../typings/typings.d.ts' />
 
 import React = require('react/addons');
 import ServicePanel = require('../ServicePanel.react');

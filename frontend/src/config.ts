@@ -1,4 +1,4 @@
-/// <reference path='../typings/tsd.d.ts' />
+/// <reference path='../typings/typings.d.ts' />
 /// <reference path='./VersionPressConfig.d.ts' />
 
 import _ = require('lodash');

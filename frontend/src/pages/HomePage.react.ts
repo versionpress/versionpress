@@ -1,4 +1,4 @@
-/// <reference path='../../typings/tsd.d.ts' />
+/// <reference path='../../typings/typings.d.ts' />
 /// <reference path='../Commits/Commits.d.ts' />
 
 import React = require('react');
@@ -274,7 +274,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
 
     WpApi
       .post('discard-changes')
-      .on('progress', (e) => progressBar.progress(e.percent))
+      .on('progress', (e: {percent: number}) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({message: res.body[0]});
