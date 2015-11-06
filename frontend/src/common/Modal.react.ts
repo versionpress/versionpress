@@ -1,4 +1,4 @@
-/// <reference path='../../typings/tsd.d.ts' />
+/// <reference path='../../typings/typings.d.ts' />
 
 import React = require('react');
 import portal = require('./portal');
@@ -47,7 +47,7 @@ class Modal extends React.Component<ModalProps, any> {
   }
 
   render() {
-    return DOM.div({onClick: this.backgroundClickHandler, className: 'Modal-container', 'data-clickcatcher': true},
+    return DOM.div({onClick: this.backgroundClickHandler, className: 'Modal-container', 'data-clickcatcher': true },
       DOM.div({ref: 'content', className: 'Modal-content', tabIndex: -1, onKeyDown: this.keyDownHandler},
         DOM.div({className: 'Modal-header'},
           DOM.h3({className: 'Modal-title'}, this.props.title),
