@@ -44,6 +44,25 @@ VersionPress takes a strategic dependency on [Git](http://git-scm.com/) which pr
 
 Git **1.9** and newer are supported. Do not attempt to make VersionPress run with older releases (1.7 and 1.8 are still quite popular), there are known issues with them.
 
+
+### Supported web servers
+
+We recommend Apache or nginx (as [WordPress itself](https://wordpress.org/about/requirements/)) but almost any web server should work. Just pay attention to two things:
+
+ 1. **Write permissions**. The user that runs PHP and the eventual Git process needs to have write access into the locations listed below and the `sys_get_temp_dir()`. Initialization page checks this automatically and the [system info page](../troubleshooting/system-info-page) has a dedicated section on permissions if you need more info.
+     - IIS users, please [read this page](../troubleshooting/iis).
+ 2. **Access rules**. The locations listed below should be protected against direct requests.
+
+The sensitive locations are:
+
+ - `/wp-content/vpdb`
+ - `/wp-content/vpbackups`
+ - `/wp-content/plugins/versionpress`
+ - `/.git`
+
+We ship `.htaccess` rules for Apache, `web.config` rules for IIS and `wp-content/plugins/versionpress/versionpress-nginx.conf` template for nginx but please confirm manually that direct access to e.g. `yoursite/.git/config` is prevented.
+
+
 ### PHP 5.3
 
 WordPress can run on an old and [long unsupported](http://php.net/eol.php) PHP 5.2. We also started with this version but eventually dropped it so that we could use the newer language features and some 3<sup>rd</sup> party libraries that are 5.3+ only. We recommend using one of the [actively supported](http://php.net/supported-versions.php) PHP versions.
@@ -54,20 +73,6 @@ Note: VersionPress is currently not being tested on HHVM.
 ### Path customizations
 
 Some advanced users like having their plugins directory and other folders outside of the document root. This is currently not supported by VersionPress (it will be one day).
-
-
-### Supported web servers
-
-Apache 2.2+, IIS 7+ and nginx are supported. 
-
-For Apache and IIS we automatically install access rules to protect direct access to certain locations. For nginx, please include `wp-content/plugins/versionpress/versionpress-nginx.conf` to your virtual host config.
-
-If the locations cannot be protected automatically (e.g., due to global configuration), make sure direct access is denied for the following locations:
-
- - `/wp-content/vpdb`
- - `/wp-content/vpbackups`
- - `/wp-content/plugins/versionpress`
- - `/.git` 
 
 
 ### External libraries
