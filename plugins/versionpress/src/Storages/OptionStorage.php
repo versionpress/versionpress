@@ -21,6 +21,10 @@ class OptionStorage extends DirectoryStorage {
         'auto_core_update_notified',
     );
 
+    public static $regenerableOptions = array(
+        '.*_children',
+    );
+
     /** @var EntityInfo */
     private $entityInfo;
     /** @var string */
@@ -57,11 +61,19 @@ class OptionStorage extends DirectoryStorage {
 
     public function shouldBeSaved($data) {
         $id = $data[$this->entityInfo->idColumnName];
-        return !($this->isTransientOption($id) || in_array($id, self::$optionsBlacklist));
+        return !($this->isTransientOption($id) || $this->isRegenerableOption($id) || in_array($id, self::$optionsBlacklist));
     }
 
     private function isTransientOption($id) {
         return substr($id, 0, 1) === '_'; // All transient options begin with underscore - there's no need to save them
+    }
+
+    private function isRegenerableOption($id) {
+        foreach (self::$regenerableOptions as $pattern) {
+            if (preg_match('/^' . $pattern . '$/', $id))
+                return true;
+        }
+        return false;
     }
 
     private function maybeReplacePrefixWithPlaceholder($key) {
