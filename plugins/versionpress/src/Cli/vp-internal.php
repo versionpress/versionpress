@@ -69,6 +69,7 @@ class VPInternalCommand extends WP_CLI_Command {
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
         $syncProcess->synchronize();
+        $this->flushRegenerableOptions();
         WP_CLI::success("Database synchronized");
 
     }
@@ -110,6 +111,11 @@ class VPInternalCommand extends WP_CLI_Command {
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
         $syncProcess->synchronize();
 
+        $this->flushRegenerableOptions();
+    }
+
+    private function flushRegenerableOptions() {
+        do_action('vp_flush_regenerable_options');
     }
 }
 

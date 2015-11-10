@@ -367,6 +367,16 @@ function vp_register_hooks() {
         return $actions;
     }, 10, 2);
 
+    add_action('vp_flush_regenerable_options', function () {
+        wp_cache_flush();
+        $taxonomies = get_taxonomies();
+        foreach($taxonomies as $taxonomy) {
+            delete_option("{$taxonomy}_children");
+            // Regenerate {$taxonomy}_children
+            _get_term_hierarchy($taxonomy);
+        }
+    });
+
     //----------------------------------------
     // URL and WP-CLI "hooks"
     //----------------------------------------

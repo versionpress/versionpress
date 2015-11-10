@@ -96,6 +96,7 @@ class Reverter {
         $affectedPosts = $this->getAffectedPosts($modifiedFiles);
         $this->updateChangeDateForPosts($affectedPosts);
 
+        do_action('vp_flush_regenerable_options');
         return RevertStatus::OK;
     }
 
