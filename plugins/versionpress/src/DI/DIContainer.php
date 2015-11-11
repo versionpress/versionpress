@@ -60,7 +60,8 @@ class DIContainer {
             return new StorageFactory(
                 VERSIONPRESS_MIRRORING_DIR,
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
-                $dic->resolve(VersionPressServices::WPDB)
+                $dic->resolve(VersionPressServices::WPDB),
+                get_taxonomies()
             );
         });
 
