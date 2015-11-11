@@ -21,10 +21,6 @@ class OptionStorage extends DirectoryStorage {
         'auto_core_update_notified',
     );
 
-    public static $regenerableOptions = array(
-        '.*_children',
-    );
-
     /** @var EntityInfo */
     private $entityInfo;
     /** @var string */
@@ -69,9 +65,9 @@ class OptionStorage extends DirectoryStorage {
     }
 
     private function isRegenerableOption($id) {
-        foreach (self::$regenerableOptions as $pattern) {
-            if (preg_match('/^' . $pattern . '$/', $id))
-                return true;
+        // <taxonomy>_children
+        if (preg_match('/^.*_children$/', $id) && taxonomy_exists(substr($id, 0, -9))) {
+            return true;
         }
         return false;
     }
