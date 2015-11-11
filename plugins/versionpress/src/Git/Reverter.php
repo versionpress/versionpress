@@ -275,11 +275,7 @@ class Reverter {
 
         if ($this->wasModified($modifiedFiles, 'terms.ini')) {
             $entitiesToSynchronize['storages'][] = 'term';
-            $entitiesToSynchronize[] = 'term_taxonomy';
-        }
-
-        if ($this->wasModified($modifiedFiles, 'options')) {
-            $entitiesToSynchronize['storages'][] = 'option';
+            $entitiesToSynchronize['storages'][] = 'term_taxonomy';
         }
 
         return $entitiesToSynchronize;
@@ -314,7 +310,7 @@ class Reverter {
             if (preg_match($optionFileRegex, $file)) {
                 $firstLine = fgets(fopen(ABSPATH . $file, 'r'));
                 preg_match($optionNameRegex, $firstLine, $optionNameMatch);
-                $vpIds[] = $optionNameMatch[1];
+                $vpIds[] = array('vp_id' => $optionNameMatch[1], 'parent' => null);
             }
 
             preg_match($vpIdRegex, $file, $matches);
