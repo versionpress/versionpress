@@ -69,6 +69,7 @@ class VPInternalCommand extends WP_CLI_Command {
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
         $syncProcess->synchronize();
+        $this->flushRewriteRules();
         WP_CLI::success("Database synchronized");
 
     }
@@ -110,6 +111,18 @@ class VPInternalCommand extends WP_CLI_Command {
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
         $syncProcess->synchronize();
 
+        vp_disable_maintenance();
+        $this->flushRewriteRules();
+        vp_enable_maintenance();
+    }
+
+    private function flushRewriteRules() {
+        set_transient('vp_flush_rewrite_rules', 1);
+        /**
+         * @see VPCommand::flushRewriteRules
+         * @noinspection PhpUsageOfSilenceOperatorInspection
+         */
+        @file_get_contents(get_home_url());
     }
 }
 

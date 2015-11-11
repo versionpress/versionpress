@@ -579,6 +579,7 @@ class VPCommand extends WP_CLI_Command {
         WP_CLI::success("Synchronized database");
 
         $this->switchMaintenance('off');
+        $this->flushRewriteRules();
 
         WP_CLI::success("All done");
 
@@ -609,8 +610,8 @@ class VPCommand extends WP_CLI_Command {
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
         $syncProcess->synchronize();
         WP_CLI::success("Database updated");
-
         $this->switchMaintenance('off');
+        $this->flushRewriteRules();
 
         WP_CLI::success("All done");
 
@@ -736,6 +737,7 @@ class VPCommand extends WP_CLI_Command {
         }
 
         $this->switchMaintenance('off');
+        $this->flushRewriteRules();
     }
 
     /**
@@ -785,6 +787,7 @@ class VPCommand extends WP_CLI_Command {
         }
 
         $this->switchMaintenance('off');
+        $this->flushRewriteRules();
     }
 
     private function dropTables() {
@@ -901,7 +904,6 @@ class VPCommand extends WP_CLI_Command {
     private function switchMaintenance($onOrOff, $remoteName = null) {
         $remotePath = $remoteName ? $this->getRemoteUrl($remoteName) : null;
         $process = VPCommandUtils::runWpCliCommand('vp-internal', 'maintenance', array($onOrOff, 'require' => $this->getVPInternalCommandPath()), $remotePath);
-        $preposition = $onOrOff == 'on' ? 'to' : 'from';
 
         if ($process->isSuccessful()) {
             WP_CLI::success("Maintenance mode turned $onOrOff" . ($remoteName ? " for '$remoteName'" : ""));
@@ -912,6 +914,19 @@ class VPCommand extends WP_CLI_Command {
 
     private function getVPInternalCommandPath() {
         return __DIR__ . '/vp-internal.php';
+    }
+
+    private function flushRewriteRules() {
+        set_transient('vp_flush_rewrite_rules', 1);
+        /**
+         * If it fails, we just flush the rewrite rules on the next request.
+         * The disadvantage is that until the next (valid) request all rewritten
+         * URLs may be broken.
+         * Valid request is such a request, which does not require URL rewrite
+         * (e.g. homepage / administration) and finishes successfully.
+         * @noinspection PhpUsageOfSilenceOperatorInspection
+         */
+        @file_get_contents(get_home_url());
     }
 }
 
