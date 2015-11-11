@@ -195,24 +195,38 @@ class WpdbMirrorBridge {
         }
     }
 
+    /**
+     * Returns all database IDs matching the restriction.
+     * In most cases it returns ID from $where array.
+     * For meta-entities it can find the ID by key and parent entity ID, if
+     * the ID is missing in the $where array.
+     * For all other cases see {@link WpdbMirrorBridge::getIdsForRestriction}.
+     *
+     * @param $entityName
+     * @param $data
+     * @param $where
+     * @return array List of ids
+     */
     private function detectAllAffectedIds($entityName, $data, $where) {
         $idColumnName = $this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName;
-        $ids = array();
 
-        if ($entityName === 'usermeta') {
+        if ($entityName === 'usermeta' && !isset($where[$idColumnName])) {
             return array($this->getUsermetaId($data['user_id'], $data['meta_key']));
-        } elseif ($entityName === 'postmeta') {
-            if (isset($data['meta_id'])) {
-                return array($ids[] = $data['meta_id']);
-            }
-            return array($this->getPostMetaId($data['post_id'], $data['meta_key']));
-        } elseif (isset($where[$idColumnName])) {
-            $ids[] = $where[$idColumnName];
-            return $ids;
-        } else {
-            $ids = $this->getIdsForRestriction($entityName, $where);
-            return $ids;
         }
+
+        if ($entityName === 'postmeta' && !isset($where[$idColumnName])) {
+            return array($this->getPostMetaId($data['post_id'], $data['meta_key']));
+        }
+
+        if ($entityName === 'postmeta' && isset($data['meta_id'])) {
+            return array($data['meta_id']);
+        }
+
+        if (isset($where[$idColumnName])) {
+            return array($where[$idColumnName]);
+        }
+
+        return $this->getIdsForRestriction($entityName, $where);
     }
 
     private function fillParentId($metaEntityName, $where, $id) {
