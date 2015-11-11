@@ -377,7 +377,7 @@ class GitRepository {
      * @return boolean
      */
     public function clearWorkingDirectory() {
-        $this->runShellCommand("git clean -f");
+        $this->runShellCommand("git clean -fd");
         $this->runShellCommand("git reset --hard");
         return $this->isCleanWorkingDirectory();
     }
