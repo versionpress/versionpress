@@ -1,6 +1,6 @@
 # Release Notes
 
-The current release is **[2.0.1](./release-notes/2.0.1)**, released on 16-Oct-2015, and it is an [EAP release](getting-started/about-eap). VersionPress can be obtained via the main **[versionpress.net](http://versionpress.net/)** site.
+The current release is **[2.1](./release-notes/2.1)**, released on 12-Nov-2015, and it is an [EAP release](getting-started/about-eap). VersionPress can be obtained via the main **[versionpress.net](http://versionpress.net/)** site.
 
 
 ## Release versioning
