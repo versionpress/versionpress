@@ -15,6 +15,7 @@ class OptionStorage extends DirectoryStorage {
         'home',
         'siteurl',
         'db_upgraded',
+        'rewrite_rules',
         'recently_edited',
         'auto_updater.lock',
         'can_compress_scripts',

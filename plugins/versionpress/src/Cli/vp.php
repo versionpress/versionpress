@@ -369,6 +369,17 @@ class VPCommand extends WP_CLI_Command {
         $cloneDbCharset = isset($assoc_args['dbcharset']) ? $assoc_args['dbcharset'] : DB_CHARSET;
         $cloneDbCollate = isset($assoc_args['dbcollate']) ? $assoc_args['dbcollate'] : DB_COLLATE;
 
+        // Checking the DB prefix, regex from wp-admin/setup-config.php
+        if (preg_match('|[^a-z0-9_]|i', $cloneDbPrefix)) {
+            if (isset($assoc_args['dbprefix'])) {
+                $hint = 'Please choose different one.';
+            } else {
+                $hint = 'Please choose different clone name or specify the --dbprefix parameter.';
+            }
+
+            WP_CLI::error(sprintf('Table prefix %s is not valid. It can only contain numbers, letters and underscores. %s', var_export($cloneDbPrefix, true), $hint));
+        }
+
         $currentUrl = get_site_url();
         if (!Strings::contains($currentUrl, basename($currentWpPath))) {
             WP_CLI::error("The command cannot derive default clone URL. Please specify the --siteurl parameter.");
@@ -580,6 +591,7 @@ class VPCommand extends WP_CLI_Command {
 
         $this->switchMaintenance('off');
         $this->flushRegenerableOptions();
+        $this->flushRewriteRules();
 
         WP_CLI::success("All done");
 
@@ -610,9 +622,9 @@ class VPCommand extends WP_CLI_Command {
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
         $syncProcess->synchronize();
         WP_CLI::success("Database updated");
-
         $this->switchMaintenance('off');
         $this->flushRegenerableOptions();
+        $this->flushRewriteRules();
 
         WP_CLI::success("All done");
 
@@ -739,6 +751,7 @@ class VPCommand extends WP_CLI_Command {
 
         $this->switchMaintenance('off');
         $this->flushRegenerableOptions();
+        $this->flushRewriteRules();
     }
 
     /**
@@ -789,6 +802,7 @@ class VPCommand extends WP_CLI_Command {
 
         $this->switchMaintenance('off');
         $this->flushRegenerableOptions();
+        $this->flushRewriteRules();
     }
 
     private function dropTables() {
@@ -905,7 +919,6 @@ class VPCommand extends WP_CLI_Command {
     private function switchMaintenance($onOrOff, $remoteName = null) {
         $remotePath = $remoteName ? $this->getRemoteUrl($remoteName) : null;
         $process = VPCommandUtils::runWpCliCommand('vp-internal', 'maintenance', array($onOrOff, 'require' => $this->getVPInternalCommandPath()), $remotePath);
-        $preposition = $onOrOff == 'on' ? 'to' : 'from';
 
         if ($process->isSuccessful()) {
             WP_CLI::success("Maintenance mode turned $onOrOff" . ($remoteName ? " for '$remoteName'" : ""));
@@ -920,6 +933,19 @@ class VPCommand extends WP_CLI_Command {
 
     private function flushRegenerableOptions() {
         do_action('vp_flush_regenerable_options');
+    }
+
+    private function flushRewriteRules() {
+        set_transient('vp_flush_rewrite_rules', 1);
+        /**
+         * If it fails, we just flush the rewrite rules on the next request.
+         * The disadvantage is that until the next (valid) request all rewritten
+         * URLs may be broken.
+         * Valid request is such a request, which does not require URL rewrite
+         * (e.g. homepage / administration) and finishes successfully.
+         * @noinspection PhpUsageOfSilenceOperatorInspection
+         */
+        @file_get_contents(get_home_url());
     }
 }
 

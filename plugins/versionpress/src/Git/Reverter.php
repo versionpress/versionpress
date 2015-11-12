@@ -56,7 +56,7 @@ class Reverter {
     }
 
     public function canRevert() {
-        if(!$this->repository->isCleanWorkingDirectory()) {
+        if (!$this->repository->isCleanWorkingDirectory()) {
             $this->clearOrphanedPosts();
         }
         return $this->repository->isCleanWorkingDirectory();
@@ -97,6 +97,7 @@ class Reverter {
         $this->updateChangeDateForPosts($affectedPosts);
 
         do_action('vp_flush_regenerable_options');
+        do_action('vp_revert');
         return RevertStatus::OK;
     }
 
@@ -275,11 +276,7 @@ class Reverter {
 
         if ($this->wasModified($modifiedFiles, 'terms.ini')) {
             $entitiesToSynchronize['storages'][] = 'term';
-            $entitiesToSynchronize[] = 'term_taxonomy';
-        }
-
-        if ($this->wasModified($modifiedFiles, 'options')) {
-            $entitiesToSynchronize['storages'][] = 'option';
+            $entitiesToSynchronize['storages'][] = 'term_taxonomy';
         }
 
         return $entitiesToSynchronize;
@@ -314,7 +311,7 @@ class Reverter {
             if (preg_match($optionFileRegex, $file)) {
                 $firstLine = fgets(fopen(ABSPATH . $file, 'r'));
                 preg_match($optionNameRegex, $firstLine, $optionNameMatch);
-                $vpIds[] = $optionNameMatch[1];
+                $vpIds[] = array('vp_id' => $optionNameMatch[1], 'parent' => null);
             }
 
             preg_match($vpIdRegex, $file, $matches);

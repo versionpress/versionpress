@@ -62,6 +62,18 @@ if (VersionPress::isActive()) {
             WpdbReplacer::replaceMethods();
         }
     });
+
+//----------------------------------
+// Flushing rewrite rules after clone / pull / push
+//----------------------------------
+    add_action('wp_loaded', function () {
+        if (get_transient('vp_flush_rewrite_rules') && !defined('WP_CLI')) {
+            require_once(ABSPATH . 'wp-admin/includes/misc.php');
+            require_once(ABSPATH . 'wp-admin/includes/file.php');
+            flush_rewrite_rules();
+            delete_transient('vp_flush_rewrite_rules');
+        }
+    });
 }
 
 //----------------------------------
@@ -251,18 +263,6 @@ function vp_register_hooks() {
         }
     }, 0); // zero because the default WP action with priority 1 calls wp_die()
 
-    add_action('permalink_structure_changed', function () use ($committer) {
-        $committer->postponeCommit('permalinks');
-    });
-
-    add_action('update_option_rewrite_rules', function () use ($committer) {
-        $committer->usePostponedChangeInfos('permalinks');
-    });
-
-    add_action('add_option_rewrite_rules', function() use ($committer) {
-        $committer->usePostponedChangeInfos('permalinks');
-    });
-
     function _vp_get_language_name_by_code($code) {
         $translations = wp_get_available_translations();
         return isset($translations[$code])
@@ -375,6 +375,12 @@ function vp_register_hooks() {
             // Regenerate {$taxonomy}_children
             _get_term_hierarchy($taxonomy);
         }
+    });
+
+    add_action('vp_revert', function () {
+        // We have to flush the rewrite rules in the next request, because
+        // in the current one the changed rewrite rules are not yet effective.
+        set_transient('vp_flush_rewrite_rules', 1);
     });
 
     //----------------------------------------
