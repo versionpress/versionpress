@@ -1,13 +1,13 @@
 # Release Notes
 
-The current release is **[2.0.1](./release-notes/2.0.1)**, released on 16-Oct-2015, and it is an [EAP release](getting-started/about-eap). VersionPress can be obtained via the main **[versionpress.net](http://versionpress.net/)** site.
+The current release is **[2.1](./release-notes/2.1)**, released on 12-Nov-2015, and it is an [EAP release](getting-started/about-eap). VersionPress can be obtained via the main **[versionpress.net](http://versionpress.net/)** site.
 
 
 ## Release versioning
 
 VersionPress releases are marked so that it's easy to understand what to expect of them. Here is a couple of rules we follow:
 
- - VersionPress generally **bumps a major version with every release**, so while WordPress uses a sequence like `4.1` → `4.2` → `4.3` etc., we will generally use `4.0` → `5.0` → `6.0` etc., similarly to modern web browsers.
+ - VersionPress generally **bumps a major version with every release**, so while WordPress uses a sequence like `4.1` → `4.2` → `4.3` etc., we generally use `4.0` → `5.0` → `6.0` etc., similarly to modern web browsers.
  - **Minor releases**, e.g., `4.1`, with minor feature changes can happen but we generally aim to avoid them.
  - **Patch releases** use the third segment of version identifier, e.g., `4.0.1`. We aim to avoid them too :-)
  - **Preview versions** are marked with labels like `4.0-alpha1`, `4.0-beta1`, `4.0-rc2` and similar. Pre-release names have their well-defined meaning:
