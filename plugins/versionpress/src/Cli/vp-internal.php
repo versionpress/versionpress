@@ -2,9 +2,7 @@
 
 namespace VersionPress\Cli;
 
-use Symfony\Component\Process\Process;
 use VersionPress\DI\VersionPressServices;
-use VersionPress\Git\GitRepository;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use WP_CLI;
 use WP_CLI_Command;
@@ -69,6 +67,7 @@ class VPInternalCommand extends WP_CLI_Command {
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
         $syncProcess->synchronize();
+        vp_flush_regenerable_options();
         $this->flushRewriteRules();
         WP_CLI::success("Database synchronized");
 
@@ -111,6 +110,7 @@ class VPInternalCommand extends WP_CLI_Command {
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
         $syncProcess->synchronize();
 
+        vp_flush_regenerable_options();
         vp_disable_maintenance();
         $this->flushRewriteRules();
         vp_enable_maintenance();

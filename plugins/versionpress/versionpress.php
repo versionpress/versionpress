@@ -371,6 +371,7 @@ function vp_register_hooks() {
         // We have to flush the rewrite rules in the next request, because
         // in the current one the changed rewrite rules are not yet effective.
         set_transient('vp_flush_rewrite_rules', 1);
+        vp_flush_regenerable_options();
     });
 
     //----------------------------------------
@@ -852,6 +853,16 @@ function vp_enable_maintenance() {
 
 function vp_disable_maintenance() {
     FileSystem::remove(ABSPATH . '/.maintenance');
+}
+
+function vp_flush_regenerable_options() {
+    wp_cache_flush();
+    $taxonomies = get_taxonomies();
+    foreach($taxonomies as $taxonomy) {
+        delete_option("{$taxonomy}_children");
+        // Regenerate {$taxonomy}_children
+        _get_term_hierarchy($taxonomy);
+    }
 }
 
 //----------------------------------

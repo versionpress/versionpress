@@ -590,6 +590,7 @@ class VPCommand extends WP_CLI_Command {
         WP_CLI::success("Synchronized database");
 
         $this->switchMaintenance('off');
+        vp_flush_regenerable_options();
         $this->flushRewriteRules();
 
         WP_CLI::success("All done");
@@ -622,6 +623,7 @@ class VPCommand extends WP_CLI_Command {
         $syncProcess->synchronize();
         WP_CLI::success("Database updated");
         $this->switchMaintenance('off');
+        vp_flush_regenerable_options();
         $this->flushRewriteRules();
 
         WP_CLI::success("All done");

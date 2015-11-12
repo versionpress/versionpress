@@ -44,7 +44,7 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
         self::$wpdb->set_prefix(self::$testConfig->testSite->dbTablePrefix);
 
         $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
-        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$wpdb);
+        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$wpdb, array());
         self::$urlReplacer = new AbsoluteUrlReplacer(self::$testConfig->testSite->url);
     }
 
