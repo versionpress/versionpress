@@ -357,6 +357,10 @@ class VPCommand extends WP_CLI_Command {
 
         $name = $assoc_args['name'];
 
+        if (preg_match('/[^a-zA-Z0-9-_]/', $name)) {
+            WP_CLI::error("Clone name '$name' is not valid. It can only contain letters, numbers, hyphens and underscores.");
+        }
+
         $currentWpPath = get_home_path();
         $cloneDirName = $name;
         $clonePath = dirname($currentWpPath) . '/' . $cloneDirName;
@@ -370,14 +374,14 @@ class VPCommand extends WP_CLI_Command {
         $cloneDbCollate = isset($assoc_args['dbcollate']) ? $assoc_args['dbcollate'] : DB_COLLATE;
 
         // Checking the DB prefix, regex from wp-admin/setup-config.php
-        if (preg_match('|[^a-z0-9_]|i', $cloneDbPrefix)) {
-            if (isset($assoc_args['dbprefix'])) {
-                $hint = 'Please choose different one.';
-            } else {
-                $hint = 'Please choose different clone name or specify the --dbprefix parameter.';
-            }
+        if (isset($assoc_args['dbprefix']) && preg_match('|[^a-z0-9_]|i', $cloneDbPrefix)) {
+            WP_CLI::error("Table prefix '$cloneDbPrefix' is not valid. It can only contain letters, numbers and underscores. Please choose different one.");
+        }
 
-            WP_CLI::error(sprintf('Table prefix %s is not valid. It can only contain numbers, letters and underscores. %s', var_export($cloneDbPrefix, true), $hint));
+        $prefixChanged = false;
+        if (Strings::contains($cloneDbPrefix, '-')) {
+            $cloneDbPrefix = str_replace('-', '_', $cloneDbPrefix);
+            $prefixChanged = true;
         }
 
         $currentUrl = get_site_url();
@@ -386,6 +390,7 @@ class VPCommand extends WP_CLI_Command {
         }
 
         $cloneUrl = isset($assoc_args['siteurl']) ? $assoc_args['siteurl'] : $this->getCloneUrl(get_site_url(), basename($currentWpPath), $cloneDirName);
+        $urlChanged = !isset($assoc_args['siteurl']) && !Strings::contains($cloneUrl, $cloneDirName);
 
         if (is_dir($clonePath)) {
             WP_CLI::confirm("Directory '" . basename($clonePath) . "' already exists, it will be deleted before cloning. Proceed?", $assoc_args);
@@ -478,6 +483,14 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::log("");
             WP_CLI::log("Path:   $clonePath");
             WP_CLI::log("URL:    $cloneUrl");
+
+            if ($urlChanged) {
+                WP_CLI::log("Note: Underscores changed to hyphens for URL.");
+            }
+
+            if ($prefixChanged) {
+                WP_CLI::log("Note: Hyphens changed to underscores for DB prefix.");
+            }
         }
     }
 
@@ -494,6 +507,13 @@ class VPCommand extends WP_CLI_Command {
      * @return string
      */
     private function getCloneUrl($originUrl, $originDirName, $cloneDirName) {
+        // https://regex101.com/r/wO1zJ7/1
+        $isNameInPath = preg_match("/https?:\\/\\/.*\\/$originDirName/", $originUrl);
+
+        if (!$isNameInPath) {
+            $cloneDirName = str_replace('_', '-', $cloneDirName);
+        }
+
         return str_replace($originDirName, $cloneDirName, $originUrl);
     }
 
