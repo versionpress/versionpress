@@ -276,14 +276,14 @@ gulp.task('composer-install-versionpress-libs', function() {
  * Inits projects settings files from templates.
  */
 gulp.task('init-project-settings-files', function() {
-    return gulp.src('./.idea/*.tpl.xml')
+    return gulp.src(vpDir + '/.idea/*.tpl.xml')
             .pipe(rename(function(path) {
                 var targetName = path.basename.substr(0, path.basename.length - 4) // cut '.tpl' from the filename
                 if (!fs.existsSync(targetName)) {
                     path.basename = targetName; 
                 }
             }))
-            .pipe(gulp.dest('./.idea'));
+            .pipe(gulp.dest(vpDir + '/.idea'));
 });
 
 /**
