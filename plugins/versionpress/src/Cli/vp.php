@@ -357,6 +357,10 @@ class VPCommand extends WP_CLI_Command {
 
         $name = $assoc_args['name'];
 
+        if (preg_match('/[^a-zA-Z0-9-_]/', $name)) {
+            WP_CLI::error("Clone name '$name' is not valid. It can only contain letters, numbers, hyphens and underscores.");
+        }
+
         $currentWpPath = get_home_path();
         $cloneDirName = $name;
         $clonePath = dirname($currentWpPath) . '/' . $cloneDirName;
@@ -369,12 +373,24 @@ class VPCommand extends WP_CLI_Command {
         $cloneDbCharset = isset($assoc_args['dbcharset']) ? $assoc_args['dbcharset'] : DB_CHARSET;
         $cloneDbCollate = isset($assoc_args['dbcollate']) ? $assoc_args['dbcollate'] : DB_COLLATE;
 
+        // Checking the DB prefix, regex from wp-admin/setup-config.php
+        if (isset($assoc_args['dbprefix']) && preg_match('|[^a-z0-9_]|i', $cloneDbPrefix)) {
+            WP_CLI::error("Table prefix '$cloneDbPrefix' is not valid. It can only contain letters, numbers and underscores. Please choose different one.");
+        }
+
+        $prefixChanged = false;
+        if (Strings::contains($cloneDbPrefix, '-')) {
+            $cloneDbPrefix = str_replace('-', '_', $cloneDbPrefix);
+            $prefixChanged = true;
+        }
+
         $currentUrl = get_site_url();
         if (!Strings::contains($currentUrl, basename($currentWpPath))) {
             WP_CLI::error("The command cannot derive default clone URL. Please specify the --siteurl parameter.");
         }
 
         $cloneUrl = isset($assoc_args['siteurl']) ? $assoc_args['siteurl'] : $this->getCloneUrl(get_site_url(), basename($currentWpPath), $cloneDirName);
+        $urlChanged = !isset($assoc_args['siteurl']) && !Strings::contains($cloneUrl, $cloneDirName);
 
         if (is_dir($clonePath)) {
             WP_CLI::confirm("Directory '" . basename($clonePath) . "' already exists, it will be deleted before cloning. Proceed?", $assoc_args);
@@ -467,6 +483,14 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::log("");
             WP_CLI::log("Path:   $clonePath");
             WP_CLI::log("URL:    $cloneUrl");
+
+            if ($urlChanged) {
+                WP_CLI::log("Note: Underscores changed to hyphens for URL.");
+            }
+
+            if ($prefixChanged) {
+                WP_CLI::log("Note: Hyphens changed to underscores for DB prefix.");
+            }
         }
     }
 
@@ -483,6 +507,13 @@ class VPCommand extends WP_CLI_Command {
      * @return string
      */
     private function getCloneUrl($originUrl, $originDirName, $cloneDirName) {
+        // https://regex101.com/r/wO1zJ7/1
+        $isNameInPath = preg_match("/https?:\\/\\/.*\\/$originDirName/", $originUrl);
+
+        if (!$isNameInPath) {
+            $cloneDirName = str_replace('_', '-', $cloneDirName);
+        }
+
         return str_replace($originDirName, $cloneDirName, $originUrl);
     }
 
@@ -579,6 +610,8 @@ class VPCommand extends WP_CLI_Command {
         WP_CLI::success("Synchronized database");
 
         $this->switchMaintenance('off');
+        vp_flush_regenerable_options();
+        $this->flushRewriteRules();
 
         WP_CLI::success("All done");
 
@@ -609,8 +642,9 @@ class VPCommand extends WP_CLI_Command {
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
         $syncProcess->synchronize();
         WP_CLI::success("Database updated");
-
         $this->switchMaintenance('off');
+        vp_flush_regenerable_options();
+        $this->flushRewriteRules();
 
         WP_CLI::success("All done");
 
@@ -736,6 +770,7 @@ class VPCommand extends WP_CLI_Command {
         }
 
         $this->switchMaintenance('off');
+        $this->flushRewriteRules();
     }
 
     /**
@@ -785,6 +820,7 @@ class VPCommand extends WP_CLI_Command {
         }
 
         $this->switchMaintenance('off');
+        $this->flushRewriteRules();
     }
 
     private function dropTables() {
@@ -901,7 +937,6 @@ class VPCommand extends WP_CLI_Command {
     private function switchMaintenance($onOrOff, $remoteName = null) {
         $remotePath = $remoteName ? $this->getRemoteUrl($remoteName) : null;
         $process = VPCommandUtils::runWpCliCommand('vp-internal', 'maintenance', array($onOrOff, 'require' => $this->getVPInternalCommandPath()), $remotePath);
-        $preposition = $onOrOff == 'on' ? 'to' : 'from';
 
         if ($process->isSuccessful()) {
             WP_CLI::success("Maintenance mode turned $onOrOff" . ($remoteName ? " for '$remoteName'" : ""));
@@ -912,6 +947,19 @@ class VPCommand extends WP_CLI_Command {
 
     private function getVPInternalCommandPath() {
         return __DIR__ . '/vp-internal.php';
+    }
+
+    private function flushRewriteRules() {
+        set_transient('vp_flush_rewrite_rules', 1);
+        /**
+         * If it fails, we just flush the rewrite rules on the next request.
+         * The disadvantage is that until the next (valid) request all rewritten
+         * URLs may be broken.
+         * Valid request is such a request, which does not require URL rewrite
+         * (e.g. homepage / administration) and finishes successfully.
+         * @noinspection PhpUsageOfSilenceOperatorInspection
+         */
+        @file_get_contents(get_home_url());
     }
 }
 

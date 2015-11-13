@@ -4,6 +4,7 @@ namespace VersionPress\Tests\Utils;
 
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\DIContainer;
+use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\ArrayUtils;
@@ -39,6 +40,10 @@ class DBAsserter {
         $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.neon';
         self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix);
 
+        $wpAutomation = new WpAutomation(self::$testConfig->testSite, '0.21.0');
+        $rawTaxonomies = $wpAutomation->runWpCliCommand('taxonomy', 'list', array('format'=>'json', 'fields'=>'name'));
+        $taxonomies = ArrayUtils::column(json_decode($rawTaxonomies, true), 'name');
+
         $dbHost = self::$testConfig->testSite->dbHost;
         $dbUser = self::$testConfig->testSite->dbUser;
         $dbPassword = self::$testConfig->testSite->dbPassword;
@@ -48,7 +53,7 @@ class DBAsserter {
         self::$wpdb = new \wpdb($dbHost, $dbUser, $dbPassword, $dbName);
         self::$wpdb->set_prefix($dbPrefix);
 
-        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$wpdb);
+        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$wpdb, $taxonomies);
 
         self::defineGlobalVariables();
     }

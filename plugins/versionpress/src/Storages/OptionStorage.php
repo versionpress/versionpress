@@ -15,6 +15,7 @@ class OptionStorage extends DirectoryStorage {
         'home',
         'siteurl',
         'db_upgraded',
+        'rewrite_rules',
         'recently_edited',
         'auto_updater.lock',
         'can_compress_scripts',
@@ -25,11 +26,14 @@ class OptionStorage extends DirectoryStorage {
     private $entityInfo;
     /** @var string */
     private $tablePrefix;
+    /** @var string[] */
+    private $taxonomies;
 
-    public function __construct($directory, $entityInfo, $tablePrefix) {
+    public function __construct($directory, $entityInfo, $tablePrefix, $taxonomies) {
         parent::__construct($directory, $entityInfo);
         $this->entityInfo = $entityInfo;
         $this->tablePrefix = $tablePrefix;
+        $this->taxonomies = $taxonomies;
     }
 
     public function save($data) {
@@ -57,11 +61,21 @@ class OptionStorage extends DirectoryStorage {
 
     public function shouldBeSaved($data) {
         $id = $data[$this->entityInfo->idColumnName];
-        return !($this->isTransientOption($id) || in_array($id, self::$optionsBlacklist));
+        return !($this->isTransientOption($id) || $this->isTaxonomyChildren($id) || in_array($id, self::$optionsBlacklist));
     }
 
     private function isTransientOption($id) {
         return substr($id, 0, 1) === '_'; // All transient options begin with underscore - there's no need to save them
+    }
+
+    private function isTaxonomyChildren($id) {
+        $childrenSuffix = '_children';
+        if (!Strings::endsWith($id, $childrenSuffix)) {
+            return false;
+        }
+
+        $maybeTaxonomyName = Strings::substring($id, 0, Strings::length($id) - Strings::length($childrenSuffix));
+        return in_array($maybeTaxonomyName, $this->taxonomies);
     }
 
     private function maybeReplacePrefixWithPlaceholder($key) {

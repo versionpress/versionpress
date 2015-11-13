@@ -4,9 +4,11 @@ namespace Utils;
 
 
 use Nette\Utils\Strings;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Process\Process;
 use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\RequirementsChecker;
 use VersionPress\VersionPress;
 
@@ -23,6 +25,7 @@ class SystemInfo {
         $output['git-info'] = self::getGitInfo();
         $output['wordpress-info'] = self::getWordPressInfo();
         $output['php-info'] = self::getPhpInfo();
+        $output['permission-info'] = self::getPermissionInfo();
 
         $output['summary']['wordpress-version'] = $output['wordpress-info']['wp-version'];
         $output['summary']['versionpress-version'] = VersionPress::getVersion();
@@ -207,5 +210,49 @@ class SystemInfo {
         $pi['Extensions'] = get_loaded_extensions();
 
         return $pi;
+    }
+
+    private static function getPermissionInfo() {
+        $proc = proc_open('whoami',
+            array(
+                array('pipe', 'r'),
+                array('pipe', 'w'),
+                array('pipe', 'w')
+            ),
+            $pipes);
+        $procOpenUser = trim(stream_get_contents($pipes[1]));
+
+        $processInfo = array(
+            'exec-user' => exec('whoami'),
+            'proc_open-user' => $procOpenUser,
+        );
+
+        $writeTargets = array(
+            'ABSPATH' => ABSPATH,
+            'WP_CONTENT_DIR' => WP_CONTENT_DIR,
+            'sys_temp_dir' => sys_get_temp_dir()
+        );
+
+        foreach ($writeTargets as $target => $directory) {
+            $filePath = $directory . '/' . '.vp-try-write-php';
+            /** @noinspection PhpUsageOfSilenceOperatorInspection */
+            @file_put_contents($filePath, "");
+            $processInfo['php-can-write'][$target] = is_file($filePath);
+            FileSystem::remove($filePath);
+            $processInfo['php-can-delete'][$target] = !is_file($filePath);
+
+            $filePath = $directory . '/' . '.vp-try-write-process';
+            $process = new Process(sprintf("echo test > %s", escapeshellarg($filePath)));
+            $process->run();
+            $processInfo['process-can-write'][$target] = is_file($filePath);
+            try {
+                FileSystem::remove($filePath);
+                $processInfo['php-can-delete-file-created-by-process'][$target] = !is_file($filePath);
+            } catch (IOException $ex) {
+                $processInfo['php-can-delete-file-created-by-process'][$target] = false;
+            }
+        }
+
+        return $processInfo;
     }
 }

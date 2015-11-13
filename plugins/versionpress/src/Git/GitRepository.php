@@ -379,6 +379,14 @@ class GitRepository {
     public function clearWorkingDirectory() {
         $this->runShellCommand("git clean -f");
         $this->runShellCommand("git reset --hard");
+
+        $status = $this->getStatus(true);
+        foreach ($status as $file) {
+            if ($file[0] === '??') {
+                unlink($this->workingDirectoryRoot . '/' . $file[1]);
+            }
+        }
+
         return $this->isCleanWorkingDirectory();
     }
 

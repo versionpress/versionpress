@@ -17,6 +17,8 @@ class OptionStorageTest extends \PHPUnit_Framework_TestCase {
         "autoload" => "yes",
     );
 
+    private $sampleTaxonomy = 'some_taxonomy';
+
     /**
      * @test
      */
@@ -70,6 +72,21 @@ class OptionStorageTest extends \PHPUnit_Framework_TestCase {
         $this->storage->save($testingOption);
         $loadedOption = $this->storage->loadEntity($testingOption['option_name']);
         ArrayAsserter::assertSimilar($testingOption, $loadedOption);
+    }
+
+    /**
+     * @test
+     */
+    public function taxonomyChildrenAreNotSaved() {
+        $option = array(
+            "option_name" => $this->sampleTaxonomy . "_children",
+            "option_value" => "some value",
+            "autoload" => "yes",
+        );
+
+        $this->storage->save($option);
+        $loadedOptions = $this->storage->loadAll();
+        $this->assertEquals(0, count($loadedOptions));
     }
 
     /**
@@ -142,7 +159,7 @@ class OptionStorageTest extends \PHPUnit_Framework_TestCase {
             )
         ));
 
-        $this->storage = new OptionStorage(__DIR__ . '/options', $entityInfo, 'prefix_');
+        $this->storage = new OptionStorage(__DIR__ . '/options', $entityInfo, 'prefix_', array($this->sampleTaxonomy));
     }
 
     protected function tearDown() {

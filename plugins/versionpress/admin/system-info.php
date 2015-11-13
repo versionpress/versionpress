@@ -76,6 +76,7 @@ function displaySystemInfoArray($array) {
 
     Jump to:
     <a href="#git-info">Git info</a> |
+    <a href="#persmission-info">Permission info</a> |
     <a href="#wordpress-info">WordPress info</a> |
     <a href="#php-info">System / PHP info</a>
 
@@ -89,6 +90,8 @@ function displaySystemInfoArray($array) {
 <h2 id="git-info">Git</h2>
 <?php displaySystemInfoArray($systemInfo['git-info']); ?>
 
+<h2 id="persmission-info">Permissions</h2>
+<?php displaySystemInfoArray($systemInfo['permission-info']); ?>
 
 <h2 id="wordpress-info">WordPress</h2>
 <?php displaySystemInfoArray($systemInfo['wordpress-info']); ?>

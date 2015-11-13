@@ -4,6 +4,7 @@ namespace VersionPress\Utils;
 
 use Exception;
 use Nette\Utils\Strings;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Process\Process;
 use Utils\SystemInfo;
 use VersionPress\Database\DbSchemaInfo;
@@ -205,6 +206,17 @@ class RequirementsChecker {
             @file_put_contents($filePath, "");
             $writable &= is_file($filePath);
             FileSystem::remove($filePath);
+
+            // Trying to create file from process (issue #522)
+            $process = new Process(sprintf("echo test > %s", escapeshellarg($filePath)));
+            $process->run();
+            $writable &= is_file($filePath);
+
+            try {
+                FileSystem::remove($filePath);
+            } catch (IOException $ex) {
+                $writable = false; // the file could not be deleted - the permissions are wrong
+            }
         }
 
         return $writable;
