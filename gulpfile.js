@@ -195,7 +195,7 @@ gulp.task('remove-phpstrip-files', ['rename-phpstrip-back'], function (cb) {
 /**
  * Installs Composer packages, ignores dev packages prefers dist ones
  */
-gulp.task('composer-install', ['remove-phpstrip-files'], shell.task(['composer install -d ' + buildDir + ' --no-dev --prefer-dist --ignore-platform-reqs']));
+gulp.task('composer-install', ['remove-phpstrip-files'], shell.task(['composer install -d ' + buildDir + ' --no-dev --prefer-dist --ignore-platform-reqs --optimize-autoloader']));
 
 /**
  * Removes composer.json|lock after the `composer-install` task is done
