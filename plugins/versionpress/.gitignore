@@ -1,10 +1,4 @@
 # IDEA project files
-/.idea/workspace.xml
-/.idea/tasks.xml
-/.idea/deployment.xml
-/.idea/jsLibraryMappings.xml
-/.idea/watcherTasks.xml
-/.idea/misc.xml
-/.idea/webServers.xml
+/.idea
 
 vendor
