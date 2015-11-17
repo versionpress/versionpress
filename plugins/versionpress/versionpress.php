@@ -855,16 +855,6 @@ function vp_disable_maintenance() {
     FileSystem::remove(ABSPATH . '/.maintenance');
 }
 
-function vp_flush_regenerable_options() {
-    wp_cache_flush();
-    $taxonomies = get_taxonomies();
-    foreach($taxonomies as $taxonomy) {
-        delete_option("{$taxonomy}_children");
-        // Regenerate {$taxonomy}_children
-        _get_term_hierarchy($taxonomy);
-    }
-}
-
 //----------------------------------
 // CSS & JS
 //----------------------------------
