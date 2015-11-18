@@ -90,7 +90,7 @@ class Reverter {
         $vpIdsInModifiedFiles = array_merge($vpIdsInModifiedFiles, $this->getAllVpIdsFromModifiedFiles($modifiedFiles));
         $vpIdsInModifiedFiles = array_unique($vpIdsInModifiedFiles, SORT_REGULAR);
 
-        $entitiesToSynchronize = $this->detectEntitiesToSynchronize($modifiedFiles, $vpIdsInModifiedFiles);
+        $entitiesToSynchronize = array('storages' => array(), 'entities' => $vpIdsInModifiedFiles);
 
         $this->synchronizationProcess->synchronize($entitiesToSynchronize);
         $affectedPosts = $this->getAffectedPosts($modifiedFiles);
@@ -262,36 +262,6 @@ class Reverter {
         }
 
         return false;
-    }
-
-    /**
-     * @param string[] $modifiedFiles List of modified files
-     * @param string[][] $vpIdsInModifiedFiles List of VPIDs with their possible parents
-     * @return array List of storages which will be fully synchronized and list of VPIDs with their possible parents
-     *          which will be synchronized as well.
-     */
-    private function detectEntitiesToSynchronize($modifiedFiles, $vpIdsInModifiedFiles) {
-        $entitiesToSynchronize = array('storages' => array(), 'entities' => $vpIdsInModifiedFiles);
-
-        if ($this->wasModified($modifiedFiles, 'terms.ini')) {
-            $entitiesToSynchronize['storages'][] = 'term';
-            $entitiesToSynchronize['storages'][] = 'term_taxonomy';
-        }
-
-        return $entitiesToSynchronize;
-    }
-
-    /**
-     * Returns true if any item of array $modifiedFiles contains a substring $pathPart.
-     *
-     * @param string[] $modifiedFiles
-     * @param string $pathPart
-     * @return bool
-     */
-    private function wasModified($modifiedFiles, $pathPart) {
-        return ArrayUtils::any($modifiedFiles, function ($file) use ($pathPart) {
-            return Strings::contains($file, $pathPart);
-        });
     }
 
     private function getAllVpIdsFromModifiedFiles($modifiedFiles) {

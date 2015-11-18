@@ -118,7 +118,7 @@ abstract class SynchronizerBase implements Synchronizer {
     private function loadEntitiesFromStorage($entitiesToSynchronize) {
         if ($this->selectiveSynchronization) {
             $entities = array();
-            if (!($this->storage instanceof MetaEntityStorage)) {
+            if (!$this->dbSchema->isChildEntity($this->entityName)) {
                 $entitiesToSynchronize = array_map(function ($entity) { $entity['parent'] = null; return $entity; }, $entitiesToSynchronize);
                 $entitiesToSynchronize = array_unique($entitiesToSynchronize, SORT_REGULAR);
             }

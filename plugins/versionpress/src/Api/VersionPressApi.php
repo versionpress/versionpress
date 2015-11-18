@@ -396,14 +396,6 @@ class VersionPressApi {
             'storages' => array(),
         );
 
-        if (ArrayUtils::any($status, function ($fileStatus) {
-            return Strings::contains($fileStatus[1], 'terms.ini');
-        })
-        ) {
-            $entitiesToSynchronize['storages'][] = 'term';
-            $entitiesToSynchronize['storages'][] = 'term_taxonomy';
-        }
-
         $this->synchronizationProcess->synchronize($entitiesToSynchronize);
     }
 

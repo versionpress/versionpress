@@ -232,16 +232,11 @@ class Initializer {
 
         if ($storage instanceof DirectoryStorage) {
             $this->saveDirectoryStorageEntities($storage, $entities);
-        }
-
-        if ($storage instanceof SingleFileStorage) {
+        } else if ($storage instanceof SingleFileStorage) {
             $this->saveSingleFileStorageEntities($storage, $entities);
-        }
-
-        if ($storage instanceof MetaEntityStorage) {
+        } else if ($this->dbSchema->isChildEntity($entityName)) { // meta and term_taxonomy
             $entityInfo = $this->dbSchema->getEntityInfo($entityName);
-            reset($entityInfo->references);
-            $parentReference = "vp_" . key($entityInfo->references);
+            $parentReference = "vp_" . $entityInfo->parentReference;
 
             $this->saveMetaEntities($storage, $entities, $parentReference);
         }
@@ -262,7 +257,7 @@ class Initializer {
         $this->checkTimeout();
     }
 
-    private function saveMetaEntities(MetaEntityStorage $storage, $entities, $parentReference) {
+    private function saveMetaEntities(Storage $storage, $entities, $parentReference) {
         if (count($entities) == 0) {
             return;
         }
@@ -505,9 +500,9 @@ class Initializer {
      * @return mixed
      */
     private function getEntitiesFromDatabase($entityName) {
-        if ($this->storageFactory->getStorage($entityName) instanceof MetaEntityStorage) {
+        if ($this->dbSchema->isChildEntity($entityName)) {
             $entityInfo = $this->dbSchema->getEntityInfo($entityName);
-            $parentReference = key($entityInfo->references);
+            $parentReference = $entityInfo->parentReference;
 
             return $this->database->get_results("SELECT * FROM {$this->getTableName($entityName)} ORDER BY {$parentReference}", ARRAY_A);
         }

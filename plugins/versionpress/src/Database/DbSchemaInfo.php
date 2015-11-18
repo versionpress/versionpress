@@ -114,6 +114,16 @@ class DbSchemaInfo {
     }
 
     /**
+     * Returns true if entity has a parent reference.
+     *
+     * @param $entityName
+     * @return bool
+     */
+    public function isChildEntity($entityName) {
+        return $this->getEntityInfo($entityName)->parentReference !== null;
+    }
+
+    /**
      * Returns true if given name is an entity (is defined in schema).
      * Useful for prefixing VP tables.
      *

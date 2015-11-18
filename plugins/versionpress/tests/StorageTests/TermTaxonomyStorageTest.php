@@ -37,7 +37,7 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
     public function savedTermTaxonomyEqualsLoadedTermTaxonomy() {
         $this->termStorage->save($this->testingTerm);
         $this->storage->save($this->testingTermTaxonomy);
-        $loadedTermTaxonomy = $this->storage->loadEntity($this->testingTermTaxonomy['vp_id']);
+        $loadedTermTaxonomy = $this->storage->loadEntity($this->testingTermTaxonomy['vp_id'], $this->testingTerm['vp_id']);
         $this->assertEquals($this->testingTermTaxonomy, $loadedTermTaxonomy);
     }
 
@@ -55,10 +55,32 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
+    public function storageDoesNotContainDeletedEntities() {
+        $anotherTestingTermTaxonomy = $this->testingTermTaxonomy;
+        $anotherTestingTermTaxonomy['taxonomy'] = 'tag';
+        $anotherTestingTermTaxonomy['vp_id'] = 'CB6EBE2FD5D54BD9A5E1B54565A6E862';
+
+        $this->termStorage->save($this->testingTerm);
+        $this->storage->save($this->testingTermTaxonomy);
+        $this->storage->save($anotherTestingTermTaxonomy);
+
+        $loadedTermTaxonomies = $this->storage->loadAll();
+        $this->assertTrue(count($loadedTermTaxonomies) === 2);
+
+        $this->storage->delete($this->testingTermTaxonomy);
+
+        $loadedTermTaxonomies = $this->storage->loadAll();
+        $this->assertTrue(count($loadedTermTaxonomies) === 1);
+        $this->assertEquals($anotherTestingTermTaxonomy, reset($loadedTermTaxonomies));
+    }
+
+    /**
+     * @test
+     */
     public function savedTaxonomyDoesNotContainVpIdKey() {
         $this->termStorage->save($this->testingTerm);
         $this->storage->save($this->testingTermTaxonomy);
-        $fileName = $this->termStorage->getEntityFilename($this->testingTerm['vp_id']);
+        $fileName = $this->storage->getEntityFilename($this->testingTermTaxonomy['vp_id'], $this->testingTerm['vp_id']);
         $content = file_get_contents($fileName);
         $this->assertFalse(strpos($content, 'vp_id'), 'Entity contains a vp_id key');
     }
@@ -82,8 +104,8 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
             )
         ));
 
-        $this->termStorage = new TermStorage(__DIR__ . '/terms.ini', $termInfo);
-        $this->storage = new TermTaxonomyStorage(__DIR__ . '/terms.ini', $termTaxonomyInfo);
+        $this->termStorage = new TermStorage(__DIR__ . '/terms', $termInfo);
+        $this->storage = new TermTaxonomyStorage($this->termStorage, $termTaxonomyInfo);
     }
 
     protected function tearDown() {
