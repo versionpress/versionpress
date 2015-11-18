@@ -385,11 +385,13 @@ class VPCommand extends WP_CLI_Command {
         }
 
         $currentUrl = get_site_url();
-        if (!Strings::contains($currentUrl, basename($currentWpPath))) {
+        $suggestedUrl = $this->suggestCloneUrl($currentUrl, basename($currentWpPath), $cloneDirName);
+
+        if (!$suggestedUrl && !isset($assoc_args['siteurl'])) {
             WP_CLI::error("The command cannot derive default clone URL. Please specify the --siteurl parameter.");
         }
 
-        $cloneUrl = isset($assoc_args['siteurl']) ? $assoc_args['siteurl'] : $this->getCloneUrl(get_site_url(), basename($currentWpPath), $cloneDirName);
+        $cloneUrl = isset($assoc_args['siteurl']) ? $assoc_args['siteurl'] : $suggestedUrl;
         $urlChanged = !isset($assoc_args['siteurl']) && !Strings::contains($cloneUrl, $cloneDirName);
 
         if (is_dir($clonePath)) {
@@ -495,23 +497,24 @@ class VPCommand extends WP_CLI_Command {
     }
 
     /**
-     * Examples (clone name "test"):
+     * Suggests clone URL by replacing directory names. If no suggestion can be made, returns null.
      *
-     *   http://localhost/vp01  ->  http://localhost/test
-     *   http://vp01            ->  http://test
-     *   http://www.vp01.dev    ->  http://www.test.dev
+     * Examples (original dir "original", clone name "clone"):
+     *
+     *   http://localhost/original  ->  http://localhost/clone
+     *   http://original            ->  http://clone
+     *   http://www.original.dev    ->  http://www.clone.dev
+     *   http://example.com         ->  null
      *
      * @param string $originUrl
      * @param string $originDirName
      * @param string $cloneDirName
      * @return string
      */
-    private function getCloneUrl($originUrl, $originDirName, $cloneDirName) {
-        // https://regex101.com/r/wO1zJ7/1
-        $isNameInPath = preg_match("/https?:\\/\\/.*\\/$originDirName/", $originUrl);
+    private function suggestCloneUrl($originUrl, $originDirName, $cloneDirName) {
 
-        if (!$isNameInPath) {
-            $cloneDirName = str_replace('_', '-', $cloneDirName);
+        if (!Strings::contains($originUrl, $originDirName)) {
+            return null;
         }
 
         return str_replace($originDirName, $cloneDirName, $originUrl);
