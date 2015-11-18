@@ -275,7 +275,7 @@ class VPCommand extends WP_CLI_Command {
         $configArgs['dbhost'] = @$assoc_args['dbhost'] ?: '127.0.0.1';
         $configArgs['dbprefix'] = @$assoc_args['dbprefix'] ?: 'wp_';
         $configArgs['dbcharset'] = @$assoc_args['dbcharset'] ?: 'utf8';
-        $configArgs['dbcollate'] = @$assoc_args['dbcollate'] ?: '';
+        if (isset($assoc_args['dbcollate'])) $configArgs['dbcollate'] = $assoc_args['dbcollate'];
 
 
         // Create wp-config.php
