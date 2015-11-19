@@ -106,7 +106,7 @@ gulp.task('prepare-src-definition', function () {
 
     srcDef.push(vpDir + '/**'); // add all, except:
 
-    srcDef.push('!' + vpDir + '/versionpress.iml');
+    srcDef.push('!' + vpDir + '/.idea{,/**}');
     srcDef.push('!' + vpDir + '/.gitignore'); // this .gitignore is valid for a project, not for deployed VP
     srcDef.push('!' + vpDir + '/.editorconfig');
     srcDef.push('!' + vpDir + '/.gitattributes');
