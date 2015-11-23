@@ -34,6 +34,8 @@ class TermTaxonomyStorage extends Storage {
     private $termStorage;
     /** @var EntityInfo */
     private $entityInfo;
+    /** @var array[] */
+    private $cachedEntities;
 
     public function __construct(TermStorage $termStorage, EntityInfo $entityInfo) {
         $this->termStorage = $termStorage;
@@ -60,6 +62,7 @@ class TermTaxonomyStorage extends Storage {
 
         if ($newTaxonomy !== $originalTaxonomy) {
             $term['taxonomies'][$vpid] = $newTaxonomy;
+            $this->cachedEntities[$vpid] = $newTaxonomy;
             $this->termStorage->save($term);
             return new TermChangeInfo('edit', $termVpid, $term['name'], $newTaxonomy['taxonomy']);
         }
@@ -85,6 +88,13 @@ class TermTaxonomyStorage extends Storage {
     }
 
     public function loadEntity($id, $parentId = null) {
+        if ($parentId === null) {
+            if ($this->cachedEntities === null) {
+                $this->cachedEntities = $this->loadAll();
+            }
+            return isset($this->cachedEntities[$id]) ? $this->cachedEntities[$id] : null;
+        }
+
         $term = $this->termStorage->loadEntity($parentId);
         if (!$term) {
             return null;
@@ -126,6 +136,13 @@ class TermTaxonomyStorage extends Storage {
     }
 
     public function exists($id, $parentId = null) {
+        if ($parentId === null) {
+            if ($this->cachedEntities === null) {
+                $this->cachedEntities = $this->loadAll();
+            }
+            return isset($this->cachedEntities[$id]);
+        }
+
         if (!$this->termStorage->exists($parentId)) {
             return false;
         }
