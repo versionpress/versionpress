@@ -66,7 +66,7 @@ class VPInternalCommand extends WP_CLI_Command {
 
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
-        $syncProcess->synchronize();
+        $syncProcess->synchronizeAll();
         vp_flush_regenerable_options();
         $this->flushRewriteRules();
         WP_CLI::success("Database synchronized");
@@ -108,7 +108,7 @@ class VPInternalCommand extends WP_CLI_Command {
         // Run synchronization
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
-        $syncProcess->synchronize();
+        $syncProcess->synchronizeAll();
 
         vp_flush_regenerable_options();
         vp_disable_maintenance();

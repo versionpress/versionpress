@@ -35,6 +35,8 @@ class SynchronizerFactory {
         'term_taxonomy' => 'VersionPress\Synchronizers\TermTaxonomiesSynchronizer',
     );
 
+    private $synchronizationSequence = array('option', 'user', 'usermeta', 'term', 'term_taxonomy', 'post', 'postmeta', 'comment');
+
     function __construct(StorageFactory $storageFactory, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer) {
         $this->storageFactory = $storageFactory;
         $this->database = $wpdb;
@@ -51,8 +53,8 @@ class SynchronizerFactory {
         return new $synchronizerClass($this->getStorage($synchronizerName), $this->database, $this->dbSchema, $this->urlReplacer);
     }
 
-    public function getAllSupportedSynchronizers() {
-        return array_keys($this->synchronizerClasses);
+    public function getSynchronizationSequence() {
+        return $this->synchronizationSequence;
     }
 
     private function getStorage($synchronizerName) {

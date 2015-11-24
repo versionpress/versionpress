@@ -90,9 +90,7 @@ class Reverter {
         $vpIdsInModifiedFiles = array_merge($vpIdsInModifiedFiles, $this->getAllVpIdsFromModifiedFiles($modifiedFiles));
         $vpIdsInModifiedFiles = array_unique($vpIdsInModifiedFiles, SORT_REGULAR);
 
-        $entitiesToSynchronize = array('storages' => array(), 'entities' => $vpIdsInModifiedFiles);
-
-        $this->synchronizationProcess->synchronize($entitiesToSynchronize);
+        $this->synchronizationProcess->synchronize($vpIdsInModifiedFiles);
         $affectedPosts = $this->getAffectedPosts($modifiedFiles);
         $this->updateChangeDateForPosts($affectedPosts);
 

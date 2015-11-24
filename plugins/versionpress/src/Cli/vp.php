@@ -606,7 +606,7 @@ class VPCommand extends WP_CLI_Command {
         // Run synchronization
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
-        $syncProcess->synchronize();
+        $syncProcess->synchronizeAll();
         WP_CLI::success("Synchronized database");
 
         $this->switchMaintenance('off');
@@ -640,7 +640,7 @@ class VPCommand extends WP_CLI_Command {
 
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
-        $syncProcess->synchronize();
+        $syncProcess->synchronizeAll();
         WP_CLI::success("Database updated");
         $this->switchMaintenance('off');
         vp_flush_regenerable_options();
