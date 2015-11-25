@@ -2,10 +2,8 @@
 
 namespace VersionPress\Tests\StorageTests;
 
-
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\StorageFactory;
-
 
 class StorageFactoryTest extends \PHPUnit_Framework_TestCase {
 
@@ -19,6 +17,7 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase {
             'comment' => 'VersionPress\Storages\CommentStorage',
             'option' => 'VersionPress\Storages\OptionStorage',
             'term' => 'VersionPress\Storages\TermStorage',
+            'termmeta' => 'VersionPress\Storages\TermMetaStorage',
             'term_taxonomy' => 'VersionPress\Storages\TermTaxonomyStorage',
             'user' => 'VersionPress\Storages\UserStorage',
             'usermeta' => 'VersionPress\Storages\UserMetaStorage',

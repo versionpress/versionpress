@@ -92,23 +92,23 @@ class EntityUtils {
             $vpId = IdUtil::newId();
         }
 
-        $usermeta = array(
+        $postmeta = array(
             'vp_id' => $vpId
         );
 
         if ($postVpId !== null) {
-            $usermeta['vp_post_id'] = $postVpId;
+            $postmeta['vp_post_id'] = $postVpId;
         }
 
         if ($key !== null) {
-            $usermeta['meta_key'] = $key;
+            $postmeta['meta_key'] = $key;
         }
 
         if ($value !== null) {
-            $usermeta['meta_value'] = $value;
+            $postmeta['meta_value'] = $value;
         }
 
-        return $usermeta;
+        return $postmeta;
     }
 
     public static function prepareComment($vpId = null, $postVpId = null, $authorVpId = null, $commentValues = array()) {
@@ -137,13 +137,15 @@ class EntityUtils {
         return $comment;
     }
 
-    public static function prepareTerm($vpId, $name = null, $slug = null) {
+    public static function prepareTerm($vpId = null, $name = null, $slug = null) {
         if ($vpId === null) {
             $vpId = IdUtil::newId();
         }
 
         $term = array(
             'vp_id' => $vpId,
+            'name' => 'Some term',
+            'slug' => 'some-term',
             'term_group' => 0
         );
 
@@ -181,5 +183,29 @@ class EntityUtils {
 
         return $termTaxonomy;
 
+    }
+
+    public static function prepareTermMeta($vpId = null, $termVpId = null, $key = null, $value = null) {
+        if ($vpId === null) {
+            $vpId = IdUtil::newId();
+        }
+
+        $termmeta = array(
+            'vp_id' => $vpId
+        );
+
+        if ($termVpId !== null) {
+            $termmeta['vp_term_id'] = $termVpId;
+        }
+
+        if ($key !== null) {
+            $termmeta['meta_key'] = $key;
+        }
+
+        if ($value !== null) {
+            $termmeta['meta_value'] = $value;
+        }
+
+        return $termmeta;
     }
 }

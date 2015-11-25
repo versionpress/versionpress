@@ -32,10 +32,11 @@ class SynchronizerFactory {
         'user' => 'VersionPress\Synchronizers\UsersSynchronizer',
         'usermeta' => 'VersionPress\Synchronizers\UserMetaSynchronizer',
         'term' => 'VersionPress\Synchronizers\TermsSynchronizer',
+        'termmeta' => 'VersionPress\Synchronizers\TermMetaSynchronizer',
         'term_taxonomy' => 'VersionPress\Synchronizers\TermTaxonomiesSynchronizer',
     );
 
-    private $synchronizationSequence = array('option', 'user', 'usermeta', 'term', 'term_taxonomy', 'post', 'postmeta', 'comment');
+    private $synchronizationSequence = array('option', 'user', 'usermeta', 'term', 'termmeta', 'term_taxonomy', 'post', 'postmeta', 'comment');
 
     function __construct(StorageFactory $storageFactory, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer) {
         $this->storageFactory = $storageFactory;
