@@ -59,9 +59,19 @@ class TermMetaStorageTest extends \PHPUnit_Framework_TestCase {
             )
         ));
 
+        $termMetaInfo = new EntityInfo(array(
+            'termmeta' => array(
+                'id' => 'meta_id',
+                'parent-reference' => 'term_id',
+                'references' => array (
+                    'term_id' => 'term',
+                )
+            )
+        ));
+
         mkdir(__DIR__ . '/terms');
         $this->termStorage = new TermStorage(__DIR__ . '/terms', $userInfo);
-        $this->storage = new TermMetaStorage($this->termStorage);
+        $this->storage = new TermMetaStorage($this->termStorage, $termMetaInfo);
     }
 
     protected function tearDown() {

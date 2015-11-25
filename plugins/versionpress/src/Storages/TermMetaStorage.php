@@ -6,8 +6,8 @@ use VersionPress\ChangeInfos\TermMetaChangeInfo;
 use VersionPress\Database\EntityInfo;
 
 class TermMetaStorage extends MetaEntityStorage {
-    function __construct(TermStorage $termStorage) {
-        parent::__construct($termStorage, 'meta_key', 'meta_value', 'vp_term_id');
+    function __construct(TermStorage $termStorage, EntityInfo $entityInfo) {
+        parent::__construct($termStorage, $entityInfo, 'meta_key', 'meta_value');
     }
 
     protected function createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action) {

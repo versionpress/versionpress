@@ -38,7 +38,7 @@ class UserMetaStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function savedUserMetaEqualsLoadedPostMeta() {
+    public function savedUserMetaEqualsLoadedUserMeta() {
         $this->userStorage->save($this->testingUser);
         $this->storage->save($this->testingUserMeta);
         $loadedUserMeta = $this->storage->loadEntity($this->testingUserMeta['vp_id'], $this->testingUser['vp_id']);
@@ -65,9 +65,19 @@ class UserMetaStorageTest extends \PHPUnit_Framework_TestCase {
             )
         ));
 
+        $userMetaInfo = new EntityInfo(array(
+            'usermeta' => array(
+                'id' => 'umeta_id',
+                'parent-reference' => 'user_id',
+                'references' => array (
+                    'user_id' => 'user',
+                )
+            )
+        ));
+
         mkdir(__DIR__ . '/users');
         $this->userStorage = new UserStorage(__DIR__ . '/users', $userInfo);
-        $this->storage = new UserMetaStorage($this->userStorage, 'prefix_');
+        $this->storage = new UserMetaStorage($this->userStorage, $userMetaInfo, 'prefix_');
     }
 
     protected function tearDown() {
