@@ -1,7 +1,7 @@
 /// <reference path='../../typings/typings.d.ts' />
 
-import config = require('../config');
-import request = require('superagent');
+import * as request from 'superagent';
+import config from '../config';
 
 export function getApiLink(endpoint: string) {
   if (/^\/index.php\/.*/.test(<string> config.api.permalinkStructure)) {

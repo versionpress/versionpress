@@ -1,13 +1,11 @@
 /// <reference path='../../typings/typings.d.ts' />
 
-import React = require('react');
-import portal = require('./portal');
+import * as React from 'react';
+import * as portal from './portal';
 
-require('./Modal.less');
+import './Modal.less';
 
-const DOM = React.DOM;
-
-interface ModalProps {
+interface ModalProps extends React.Props<JSX.Element> {
   closeModalCallback?: Function;
   backgroundClickToClose?: boolean;
   showCloseIcon?: boolean;
@@ -15,7 +13,7 @@ interface ModalProps {
   children?: React.ReactElement<any>;
 }
 
-class Modal extends React.Component<ModalProps, any> {
+export default class Modal extends React.Component<ModalProps, any> {
 
   constructor(props) {
     super(props);
@@ -31,32 +29,34 @@ class Modal extends React.Component<ModalProps, any> {
   };
 
   componentDidMount() {
-    const content = <any> this.refs['content'];
-    content.getDOMNode().focus();
+    const content = this.refs['content'] as HTMLElement;
+    content.focus();
   }
 
   componentDidUpdate() {
-    const content = <any> this.refs['content'];
-    content.getDOMNode().focus();
+    const content = this.refs['content'] as HTMLElement;
+    content.focus();
   }
 
   getCloseIconMarkup() {
     return this.props.showCloseIcon
-      ? DOM.a({href: '#', className: 'Modal-close', onClick: this.closeModalHandler}, '×')
+      ? <a href='#' className='Modal-close' onClick={this.closeModalHandler}>&times;</a>
       : null;
   }
 
   render() {
-    return DOM.div({onClick: this.backgroundClickHandler, className: 'Modal-container', 'data-clickcatcher': true },
-      DOM.div({ref: 'content', className: 'Modal-content', tabIndex: -1, onKeyDown: this.keyDownHandler},
-        DOM.div({className: 'Modal-header'},
-          DOM.h3({className: 'Modal-title'}, this.props.title),
-          this.getCloseIconMarkup()
-        ),
-        DOM.div({className: 'Modal-body'},
-          this.props.children
-        )
-      )
+    return (
+      <div className='Modal-container' onClick={this.backgroundClickHandler} data-clickcatcher={true}>
+        <div ref='content' className='Modal-content' tabIndex={-1} onKeyDown={this.keyDownHandler}>
+          <div className='Modal-header'>
+            <h3 className='Modal-title'>{this.props.title}</h3>
+            {this.getCloseIconMarkup()}
+          </div>
+          <div className='Modal-body'>
+            {this.props.children}
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -82,9 +82,3 @@ class Modal extends React.Component<ModalProps, any> {
   }
 
 }
-
-module Modal {
-  export interface Props extends ModalProps {}
-}
-
-export = Modal;

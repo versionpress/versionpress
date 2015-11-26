@@ -1,6 +1,6 @@
 /// <reference path='Diff.d.ts' />
 
-class DiffParser {
+export default class DiffParser {
 
   public static parse(rawDiff: string): Diff[] {
     let lines = rawDiff.split(/\r\n|\r|\n/);
@@ -70,5 +70,3 @@ class DiffParser {
     return chunks;
   }
 }
-
-export = DiffParser;

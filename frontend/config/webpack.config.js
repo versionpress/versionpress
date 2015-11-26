@@ -10,9 +10,9 @@ module.exports = function (isDevelopment) {
     app: isDevelopment ? [
       'webpack-dev-server/client?http://localhost:8888',
       'webpack/hot/only-dev-server',
-      './src/main.ts'
+      './src/main.tsx'
     ] : [
-      './src/main.ts'
+      './src/main.tsx'
     ]
   };
 
@@ -20,7 +20,7 @@ module.exports = function (isDevelopment) {
     {
       exclude: /node_modules/,
       loaders: ['react-hot','ts-loader'],
-      test: /\.ts$/
+      test: /\.tsx?$/
     },
     {
       loader: 'url-loader?limit=32768',
@@ -97,7 +97,7 @@ module.exports = function (isDevelopment) {
     output: output,
     plugins: plugins,
     resolve: {
-      extensions: ['', '.js', '.json', '.ts']
+      extensions: ['', '.js', '.json', '.ts', '.tsx']
     }
   }
 

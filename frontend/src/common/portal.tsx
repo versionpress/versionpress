@@ -1,17 +1,18 @@
 /// <reference path='../../typings/typings.d.ts' />
 
-import React = require('react');
-import Modal = require('./Modal.react');
-import ConfirmDialog = require('./ConfirmDialog.react');
+import * as React from 'react';
+import * as DOM from 'react-dom';
+import ConfirmDialog from './ConfirmDialog.react';
+import Modal from './Modal.react';
 
 var portalNode;
 
 export function alertDialog(title: React.ReactNode, body: React.ReactNode) {
   closePortal();
   openPortal(
-    React.createElement(Modal, <Modal.Props> {title: title},
-      body
-    )
+    <Modal title={title}>
+      {body}
+    </Modal>
   );
 }
 
@@ -25,21 +26,21 @@ export function confirmDialog(title: React.ReactNode, body: React.ReactNode, okH
   }
   closePortal();
   openPortal(
-    React.createElement(Modal, <Modal.Props> {title: title},
-      React.createElement(ConfirmDialog, <ConfirmDialog.Props> Object.assign({}, {message: body}, options))
-    )
+    <Modal title={title}>
+      <ConfirmDialog message={body} {...options} />
+    </Modal>
   );
 }
 
 export function openPortal(children) {
   portalNode = document.createElement('div');
   document.body.appendChild(portalNode);
-  React.render(children, portalNode);
+  DOM.render(children, portalNode);
 }
 
 export function closePortal() {
   if (portalNode && portalNode.parentNode && close) {
-    React.unmountComponentAtNode(portalNode.parentNode);
+    DOM.unmountComponentAtNode(portalNode.parentNode);
     portalNode.parentNode.removeChild(portalNode);
     portalNode = null;
   }

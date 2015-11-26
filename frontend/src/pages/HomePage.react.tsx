@@ -1,29 +1,27 @@
 /// <reference path='../../typings/typings.d.ts' />
 /// <reference path='../Commits/Commits.d.ts' />
 
-import React = require('react');
-import ReactRouter = require('react-router');
-import request = require('superagent');
-import CommitsTable = require('../Commits/CommitsTable.react');
-import FlashMessage = require('../common/FlashMessage.react');
-import ProgressBar = require('../common/ProgressBar.react');
-import ServicePanel = require('../ServicePanel/ServicePanel.react');
-import ServicePanelButton = require('../ServicePanel/ServicePanelButton.react');
-import WelcomePanel = require('../WelcomePanel/WelcomePanel.react');
-import CommitPanel = require('../CommitPanel/CommitPanel.react');
-import revertDialog = require('../Commits/revertDialog');
-import moment = require('moment');
-import config = require('../config');
-import WpApi = require('../services/WpApi');
-import Promise = require('core-js/es6/promise');
+import * as React from 'react';
+import * as ReactRouter from 'react-router';
+import * as request from 'superagent';
+import * as moment from 'moment';
+import * as Promise from 'core-js/es6/promise';
+import CommitPanel from '../CommitPanel/CommitPanel.react';
+import CommitsTable from '../Commits/CommitsTable.react';
+import FlashMessage from '../common/FlashMessage.react';
+import ProgressBar from '../common/ProgressBar.react';
+import ServicePanel from '../ServicePanel/ServicePanel.react';
+import ServicePanelButton from '../ServicePanel/ServicePanelButton.react';
+import WelcomePanel from '../WelcomePanel/WelcomePanel.react';
+import * as revertDialog from '../Commits/revertDialog';
+import * as WpApi from '../services/WpApi';
+import config from '../config';
 
-require('./HomePage.less');
+import './HomePage.less';
 
-const DOM = React.DOM;
 const routes = config.routes;
 
-interface HomePageProps {
-  router: ReactRouter.Context;
+interface HomePageProps extends React.Props<JSX.Element> {
   params: {
     page?: string
   };
@@ -43,7 +41,7 @@ interface HomePageState {
   displayCommitPanel?: boolean;
 }
 
-class HomePage extends React.Component<HomePageProps, HomePageState> {
+export default class HomePage extends React.Component<HomePageProps, HomePageState> {
 
   private refreshInterval;
 
@@ -65,6 +63,10 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     this.checkUpdate = this.checkUpdate.bind(this);
   }
 
+  static contextTypes: React.ValidationMap<any> = {
+    router: React.PropTypes.func.isRequired
+  };
+
   componentDidMount() {
     this.fetchWelcomePanel();
     this.fetchCommits();
@@ -79,14 +81,15 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   }
 
   fetchCommits(params = this.props.params) {
+    const router: ReactRouter.Context = (this.context as any).router;
     this.setState({ loading: true });
-    const progressBar = <ProgressBar> this.refs['progress'];
+    const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
 
     const page = (parseInt(params.page, 10) - 1) || 0;
 
     if (page === 0) {
-      this.props.router.transitionTo(routes.home);
+      router.transitionTo(routes.home);
     }
 
     WpApi
@@ -104,7 +107,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
         } else {
           this.setState({
             pages: res.body.pages.map(c => c + 1),
-            commits: <Commit[]>res.body.commits,
+            commits: res.body.commits as Commit[],
             message: null,
             loading: false,
             displayUpdateNotice: false
@@ -150,7 +153,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   }
 
   undoCommit(hash: string) {
-    const progressBar = <ProgressBar> this.refs['progress'];
+    const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
     this.setState({ loading: true });
     WpApi
@@ -167,7 +170,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   }
 
   rollbackToCommit(hash: string) {
-    const progressBar = <ProgressBar> this.refs['progress'];
+    const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
     this.setState({ loading: true });
     WpApi
@@ -218,7 +221,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   }
 
   sendBugReport(values: Object) {
-    const progressBar = <ProgressBar> this.refs['progress'];
+    const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
 
     WpApi
@@ -242,7 +245,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   }
 
   onCommit(message: string) {
-    const progressBar = <ProgressBar> this.refs['progress'];
+    const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
 
     const values = { 'commit-message': message };
@@ -269,7 +272,7 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   }
 
   onDiscard() {
-    const progressBar = <ProgressBar> this.refs['progress'];
+    const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
 
     WpApi
@@ -295,7 +298,9 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     e.preventDefault();
     const hash = e.target.getAttribute('data-hash');
     const message = e.target.getAttribute('data-message');
-    const title = DOM.span(null, 'Undo ', DOM.em(null, message), ' ?');
+    const title = (
+      <span>Undo <em>{message}</em>?</span>
+    );
 
     revertDialog.revertDialog.call(this, title, () => this.undoCommit(hash));
   }
@@ -304,7 +309,9 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
     e.preventDefault();
     const hash = e.target.getAttribute('data-hash');
     const date = moment(e.target.getAttribute('data-date')).format('LLL');
-    const title = DOM.span(null, 'Roll back to ', DOM.em(null, date), ' ?');
+    const title = (
+      <span>Roll back to <em>{date}</em>?</span>
+    );
 
     revertDialog.revertDialog.call(this, title, () => this.rollbackToCommit(hash));
   }
@@ -322,50 +329,54 @@ class HomePage extends React.Component<HomePageProps, HomePageState> {
   }
 
   render() {
-    return DOM.div({className: this.state.loading ? 'loading' : ''},
-      React.createElement(ProgressBar, {ref: 'progress'}),
-      React.createElement(ServicePanelButton, <ServicePanelButton.Props>{
-        onClick: this.toggleServicePanel.bind(this)
-      }),
-      DOM.h1({className: 'vp-header'}, 'VersionPress'),
-      this.state.message
-        ? React.createElement(FlashMessage, <FlashMessage.Props>this.state.message)
-        : null,
-      React.createElement(ServicePanel, <ServicePanel.Props>{
-        display: this.state.displayServicePanel,
-        onSubmit: this.sendBugReport.bind(this)
-      }),
-      this.state.displayCommitPanel
-        ? React.createElement(CommitPanel, <CommitPanel.Props>{
-          diffProvider: { getDiff: this.getDiff },
-          gitStatusProvider: { getGitStatus: this.getGitStatus },
-          onCommit: this.onCommit.bind(this),
-          onDiscard: this.onDiscard.bind(this)
-        })
-        : null,
-      this.state.displayWelcomePanel
-        ? React.createElement(WelcomePanel, <WelcomePanel.Props>{ onHide: this.onWelcomePanelHide.bind(this) })
-        : null,
-      this.state.displayUpdateNotice
-        ? DOM.div({className: 'updateNotice'},
-          DOM.span(null, 'There are newer changes available.'),
-          DOM.a({ href: '#', onClick: (e) => { e.preventDefault(); this.fetchCommits(); } }, 'Refresh now.')
-        ) : null,
-      React.createElement(CommitsTable, <CommitsTable.Props>{
-        currentPage: parseInt(this.props.params.page, 10) || 1,
-        pages: this.state.pages,
-        commits: this.state.commits,
-        onUndo: this.onUndo,
-        onRollback: this.onRollback,
-        diffProvider: { getDiff: this.getDiff }
-      })
+    return (
+      <div className={this.state.loading ? 'loading' : ''}>
+        <ProgressBar ref='progress' />
+        <ServicePanelButton
+          onClick={this.toggleServicePanel.bind(this)}
+        />
+        <h1 className='vp-header'>VersionPress</h1>
+        {this.state.message
+          ? <FlashMessage {...this.state.message} />
+          : null
+        }
+        <ServicePanel
+          display={this.state.displayServicePanel}
+          onSubmit={this.sendBugReport.bind(this)}
+        />
+        {this.state.displayCommitPanel
+          ? <CommitPanel
+              diffProvider={{ getDiff: this.getDiff }}
+              gitStatusProvider={{ getGitStatus: this.getGitStatus }}
+              onCommit={this.onCommit.bind(this)}
+              onDiscard={this.onDiscard.bind(this)}
+            />
+          : null
+        }
+        {this.state.displayWelcomePanel
+          ? <WelcomePanel onHide={this.onWelcomePanelHide.bind(this)} />
+          : null
+        }
+        {this.state.displayUpdateNotice
+          ? <div className='updateNotice'>
+              <span>There are newer changes available.</span>
+              <a
+                href='#'
+                onClick={(e) => { e.preventDefault(); this.fetchCommits(); }}
+              >Refresh now.</a>
+            </div>
+          : null
+        }
+        <CommitsTable
+          currentPage={parseInt(this.props.params.page, 10) || 1}
+          pages={this.state.pages}
+          commits={this.state.commits}
+          onUndo={this.onUndo}
+          onRollback={this.onRollback}
+          diffProvider={{ getDiff: this.getDiff }}
+        />
+      </div>
     );
   }
 
 }
-
-module HomePage {
-  export interface Props extends HomePageProps {}
-}
-
-export = HomePage;

@@ -1,13 +1,11 @@
 /// <reference path='../../typings/typings.d.ts' />
 
-import React = require('react');
-import portal = require('./portal');
+import * as React from 'react';
+import * as portal from './portal';
 
-require('./ConfirmDialog.less');
+import './ConfirmDialog.less';
 
-const DOM = React.DOM;
-
-interface ConfirmDialogProps {
+interface ConfirmDialogProps extends React.Props<JSX.Element> {
   message?: React.ReactNode;
   okButtonText?: string;
   cancelButtonText?: string;
@@ -18,7 +16,7 @@ interface ConfirmDialogProps {
   loading?: boolean;
 }
 
-class ConfirmDialog extends React.Component<ConfirmDialogProps, {}> {
+export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {}> {
 
   constructor(props) {
     super(props);
@@ -52,23 +50,17 @@ class ConfirmDialog extends React.Component<ConfirmDialogProps, {}> {
     const cancelButtonClasses = 'ConfirmDialog-button button ' + this.props.cancelButtonClasses;
 
     return !this.props.loading
-      ? DOM.div({className: 'ConfirmDialog'},
-        DOM.div({className: 'ConfirmDialog-message'}, this.props.message),
-          DOM.div({className: 'ConfirmDialog-buttons'},
-            DOM.button({className: okButtonClasses, onClick: this.handleOkClick},
-              this.props.okButtonText
-            ),
-            DOM.button({className: cancelButtonClasses, onClick: this.handleCancelClick},
-              this.props.cancelButtonText
-            )
-          )
-        )
-      : DOM.div({className: 'ConfirmDialog-spinner'});
+      ? <div className='ConfirmDialog'>
+          <div className='ConfirmDialog-message'>{this.props.message}</div>
+          <div className='ConfirmDialog-buttons'>
+            <button className={okButtonClasses} onClick={this.handleOkClick}>
+              {this.props.okButtonText}
+            </button>
+            <button className={cancelButtonClasses} onClick={this.handleCancelClick}>
+              {this.props.cancelButtonText}
+            </button>
+          </div>
+        </div>
+      : <div className='ConfirmDialog-spinner' />;
   }
 }
-
-module ConfirmDialog {
-  export interface Props extends ConfirmDialogProps {}
-}
-
-export = ConfirmDialog;

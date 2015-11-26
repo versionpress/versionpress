@@ -1,17 +1,15 @@
 /// <reference path='../../typings/typings.d.ts' />
 
-import React = require('react');
+import * as React from 'react';
 
-require('./ProgressBar.less');
-
-const DOM = React.DOM;
+import './ProgressBar.less';
 
 interface ProgressBarState {
   display?: boolean;
   progress?: number;
 }
 
-class ProgressBar extends React.Component<{}, ProgressBarState> {
+export default class ProgressBar extends React.Component<React.Props<JSX.Element>, ProgressBarState> {
 
   constructor() {
     super();
@@ -34,14 +32,14 @@ class ProgressBar extends React.Component<{}, ProgressBarState> {
       display: (this.state.display ? 'inline-block' : 'none')
     };
     const className = 'ProgressBar';
-    return DOM.div({className: className},
-      DOM.div({className: 'ProgressBar-bar', style: styles}),
-      DOM.div({className: 'ProgressBar-spinner' + (this.state.display ? '' : ' hide')},
-        DOM.div({className: 'ProgressBar-spinner-icon'})
-      )
+    return (
+      <div className={className}>
+        <div className='ProgressBar-bar' style={styles}>
+          <div className={'ProgressBar-spinner' + (this.state.display ? '' : ' hide')}></div>
+          <div className='ProgressBar-spinner-icon'></div>
+        </div>
+      </div>
     );
   }
 
 }
-
-export = ProgressBar;

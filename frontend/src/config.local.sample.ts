@@ -1,6 +1,6 @@
 // Copy and update values from config.ts
 
-var config = {
+const config = {
 
   api: {
     root: 'http://localhost/wordpress'
@@ -8,4 +8,4 @@ var config = {
 
 };
 
-export = config;
+export default config;
