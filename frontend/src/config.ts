@@ -1,8 +1,8 @@
 /// <reference path='../typings/typings.d.ts' />
 /// <reference path='./VersionPressConfig.d.ts' />
 
-import _ = require('lodash');
-import localConfig = require('./config.local');
+import * as _ from 'lodash';
+import localConfig from './config.local';
 
 const defaultConfig: VersionPressConfig = {
 
@@ -28,4 +28,4 @@ const vpApiConfig = {
 
 var config = <VersionPressConfig> _.merge(defaultConfig, localConfig, vpApiConfig);
 
-export = config;
+export default config;

@@ -2,47 +2,50 @@
   "version": "v4",
   "repo": "borisyankov/DefinitelyTyped",
   "ref": "master",
-  "path": "typings",
-  "bundle": "typings/tsd.d.ts",
+  "path": "typings/tsd",
+  "bundle": "typings/tsd/tsd.d.ts",
   "installed": {
     "assertion-error/assertion-error.d.ts": {
-      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+      "commit": "4f7b7e01d3a9622bfab0bef469e169529e60c66b"
     },
     "chai/chai.d.ts": {
-      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+      "commit": "4f7b7e01d3a9622bfab0bef469e169529e60c66b"
     },
     "core-js/core-js.d.ts": {
-      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+      "commit": "4f7b7e01d3a9622bfab0bef469e169529e60c66b"
     },
     "diff/diff.d.ts": {
-      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+      "commit": "4f7b7e01d3a9622bfab0bef469e169529e60c66b"
     },
     "sinon/sinon.d.ts": {
-      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+      "commit": "4f7b7e01d3a9622bfab0bef469e169529e60c66b"
     },
     "lodash/lodash.d.ts": {
-      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+      "commit": "4f7b7e01d3a9622bfab0bef469e169529e60c66b"
     },
     "mocha/mocha.d.ts": {
-      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+      "commit": "4f7b7e01d3a9622bfab0bef469e169529e60c66b"
     },
     "moment/moment.d.ts": {
-      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+      "commit": "4f7b7e01d3a9622bfab0bef469e169529e60c66b"
     },
     "moment/moment-node.d.ts": {
-      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+      "commit": "4f7b7e01d3a9622bfab0bef469e169529e60c66b"
     },
     "react-router/react-router.d.ts": {
-      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+      "commit": "4f7b7e01d3a9622bfab0bef469e169529e60c66b"
     },
     "react/react.d.ts": {
-      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+      "commit": "4f7b7e01d3a9622bfab0bef469e169529e60c66b"
     },
     "superagent/superagent.d.ts": {
-      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+      "commit": "4f7b7e01d3a9622bfab0bef469e169529e60c66b"
     },
     "node/node.d.ts": {
-      "commit": "2319d7a678b044b3a31c00acbd87f23c233cfd73"
+      "commit": "4f7b7e01d3a9622bfab0bef469e169529e60c66b"
+    },
+    "react/react-dom.d.ts": {
+      "commit": "4f7b7e01d3a9622bfab0bef469e169529e60c66b"
     }
   }
 }

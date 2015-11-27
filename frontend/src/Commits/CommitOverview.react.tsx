@@ -1,14 +1,12 @@
 /// <reference path='../../typings/typings.d.ts' />
 /// <reference path='./Commits.d.ts' />
 
-import React = require('react');
-import moment = require('moment');
-import ArrayUtils = require('../common/ArrayUtils');
-import StringUtils = require('../common/StringUtils');
+import * as React from 'react';
+import * as moment from 'moment';
+import * as ArrayUtils from '../common/ArrayUtils';
+import * as StringUtils from '../common/StringUtils';
 
-const DOM = React.DOM;
-
-interface CommitOverviewProps {
+interface CommitOverviewProps extends React.Props<JSX.Element> {
   commit: Commit;
 }
 
@@ -16,20 +14,22 @@ interface CommitOverviewState {
   expandedLists: string[];
 }
 
-class CommitOverview extends React.Component<CommitOverviewProps, CommitOverviewState> {
+export default class CommitOverview extends React.Component<CommitOverviewProps, CommitOverviewState> {
 
   constructor(props: CommitOverviewProps, context: any) {
     super(props, context);
     this.state = {expandedLists: []};
   }
 
-  private static renderEntityNamesWithDuplicates(changes: Change[], countOfDuplicates): React.DOMElement<React.HTMLAttributes>[] {
+  private static renderEntityNamesWithDuplicates(changes: Change[], countOfDuplicates): JSX.Element[] {
     return changes.map((change: Change) => {
       let duplicatesOfChange = countOfDuplicates[change.type][change.action][change.name];
       let duplicatesSuffix = duplicatesOfChange > 1 ? (' (' + duplicatesOfChange + '×)') : '';
-      return DOM.span(null,
-        DOM.span({className: 'identifier'}, CommitOverview.getUserFriendlyName(change)),
-        duplicatesSuffix
+      return (
+        <span>
+          <span className='identifier'>{CommitOverview.getUserFriendlyName(change)}</span>
+          {duplicatesSuffix}
+        </span>
       );
     });
   }
@@ -59,15 +59,19 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
   }
 
   render() {
-    return DOM.ul({className: 'overview-list'}, this.formatChanges(this.props.commit.changes).map(line => DOM.li(null, line)));
+    return (
+      <ul className='overview-list'>
+        {this.formatChanges(this.props.commit.changes).map((line, i) => <li key={i}>{line}</li>)}
+      </ul>
+    );
   }
 
   private formatChanges(changes: Change[]) {
     if (changes.length === 0) {
       if (this.props.commit.isMerge) {
-        return [DOM.em(null, 'This is a merge commit. No files were changed in this commit.')];
+        return [<em>This is a merge commit. No files were changed in this commit.</em>];
       }
-      return [DOM.em(null, 'No files were changed in this commit.')];
+      return [<em>No files were changed in this commit.</em>];
     }
 
     let displayedLines = [];
@@ -140,20 +144,16 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
         capitalizedVerb = 'Created';
       }
 
-      let line = DOM.span(null,
-        capitalizedVerb,
-        ' ',
-        numberOfComments === 1 ? '' : (numberOfComments + ' '),
-        DOM.span({className: 'type'}, numberOfComments === 1 ? 'comment' : 'comments'),
-        ' by ',
-        DOM.span({className: 'type'}, 'user'),
-        ' ',
-        DOM.span({className: 'identifier'}, authorsString),
-        ' for ',
-        DOM.span({className: 'type'}, 'post'),
-        ' ',
-        DOM.span({className: 'identifier'}, postTitle),
-        suffix
+      let line = (
+        <span>
+          {capitalizedVerb}
+          {' '}
+          {numberOfComments === 1 ? '' : (numberOfComments + ' ')}
+          <span className='type'>{numberOfComments === 1 ? 'comment' : 'comments'}</span>
+          {' '} by <span className='type'>user</span> <span className='identifier'>{authorsString}</span>
+          {' '} for <span className='type'>post</span> <span className='identifier'>{postTitle}</span>
+          {suffix}
+        </span>
       );
       lines.push(line);
     }
@@ -183,9 +183,9 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
 
       let lineSuffix = [
         ' for ',
-        DOM.span({className: 'type'}, parentEntity),
+        <span className='type'>{parentEntity}</span>,
         ' ',
-        DOM.span({className: 'identifier'}, tagValue)
+        <span className='identifier'>{tagValue}</span>
       ];
       let line = this.renderOverviewLine(entityName, action, changedEntities, lineSuffix);
       lines.push(line);
@@ -206,21 +206,23 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
   }
 
   private getLinesForVersionPress(changes: Change[], action) {
-    let line = DOM.span(null,
-      StringUtils.capitalize(StringUtils.verbToPastTense(action)),
-      ' ',
-      DOM.span({className: 'identifier'}, 'VersionPress')
+    let line = (
+      <span>
+        {StringUtils.capitalize(StringUtils.verbToPastTense(action))}
+        {' '}
+        <span className='identifier'>VersionPress</span>
+      </span>
     );
     return [line];
   }
 
   private getLinesForWordPressUpdate(changes: Change[]) {
     let change = changes[0];
-    let line = DOM.span(null,
-      'Updated ',
-      DOM.span({className: 'identifier'}, 'WordPress'),
-      ' to version ',
-      DOM.span({className: 'identifier'}, change.name)
+    let line = (
+      <span>
+        Updated <span className='identifier'>WordPress</span>
+        {' '} to version <span className='identifier'>{change.name}</span>
+      </span>
     );
     return [line];
   }
@@ -235,37 +237,45 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
     let capitalizedVerb = StringUtils.capitalize(StringUtils.verbToPastTense(action));
 
     if (entities.length < 5) {
-      return DOM.span(null,
-        capitalizedVerb,
-        ' ',
-        DOM.span({className: 'type'}, entities.length === 1 ? type : StringUtils.pluralize(type)),
-        ' ',
-        ArrayUtils.interspace(entities, ', ', ' and '),
-        suffix
+      return (
+        <span>
+          {capitalizedVerb}
+          {' '} <span className='type'>{entities.length === 1 ? type : StringUtils.pluralize(type)}</span>
+          {' '} {ArrayUtils.interspace(entities, ', ', ' and ')}
+          {suffix}
+        </span>
       );
     }
 
     let listKey = `${type}|||${action}|||${suffix}`;
     let entityList;
     if (this.state.expandedLists.indexOf(listKey) > -1) {
-      entityList = DOM.ul(null,
-        entities.map(entity => DOM.li(null, entity))
+      entityList = (
+        <ul>
+          {entities.map(entity => <li>{entity}</li>)}
+        </ul>
       );
     } else {
       let displayedListLength = 3;
-      entityList = DOM.ul(null,
-        entities.slice(0, displayedListLength).map(entity => DOM.li(null, entity)),
-        DOM.li(null, DOM.a({onClick: () => this.expandList(listKey)}, 'show ', entities.length - displayedListLength, ' more...'))
+      entityList = (
+        <ul>
+          {entities.slice(0, displayedListLength).map(entity => <li>{entity}</li>)}
+          <li>
+            <a onClick={() => this.expandList(listKey)}>
+              show {entities.length - displayedListLength} more...
+            </a>
+          </li>
+        </ul>
       );
     }
 
-    return DOM.span(null,
-      capitalizedVerb,
-      ' ',
-      DOM.span({className: 'type'}, StringUtils.pluralize(type)),
-      ' ',
-      suffix,
-      entityList
+    return (
+      <span>
+        {capitalizedVerb}
+        {' '} <span className='type'>{StringUtils.pluralize(type)}</span>
+        {suffix}
+        {entityList}
+      </span>
     );
   }
 
@@ -276,9 +286,3 @@ class CommitOverview extends React.Component<CommitOverviewProps, CommitOverview
   }
 
 }
-
-module CommitOverview {
-  export interface Props extends CommitOverviewProps {}
-}
-
-export = CommitOverview;

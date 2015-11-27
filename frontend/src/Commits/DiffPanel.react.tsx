@@ -1,34 +1,33 @@
 /// <reference path='../../typings/typings.d.ts' />
 /// <reference path='../common/Diff.d.ts' />
 
-import React = require('react');
-import DiffParser = require('../common/DiffParser');
-import JsDiff = require('diff');
+import * as React from 'react';
+import * as JsDiff from 'diff';
+import DiffParser from '../common/DiffParser';
 
-require('./DiffPanel.less');
+import './DiffPanel.less';
 
-const DOM = React.DOM;
-
-interface DiffPanelProps {
+interface DiffPanelProps extends React.Props<JSX.Element> {
   diff: string;
 }
 
-class DiffPanel extends React.Component<DiffPanelProps, any> {
+export default class DiffPanel extends React.Component<DiffPanelProps, any> {
 
-  private static createTableFromChunk(chunk: Chunk) {
+  private static createTableFromChunk(chunk: Chunk, i: number) {
     let [left, right] = DiffPanel.divideToLeftAndRightColumn(chunk);
 
-    let mapTwoArrays = <T, U>(a1: T[], a2: U[], fn: (a: T, b: U) => any) => {
+    let mapTwoArrays = function<T, U>(a1: T[], a2: U[], fn: (a: T, b: U, i: number) => any) {
       let result = [];
       for (let i = 0; i < a1.length; i++) {
-        result.push(fn(a1[i], a2[i]));
+        result.push(fn(a1[i], a2[i], i));
       }
       return result;
     };
 
-    return DOM.table({className: 'chunk'},
-      DOM.tbody(null,
-        mapTwoArrays(left, right, (l, r) => {
+    return (
+      <table className='chunk' key={i}>
+        <tbody>
+          {mapTwoArrays(left, right, (l, r, i) => {
             let leftContent: any = DiffPanel.replaceLeadingSpacesWithHardSpaces(l.content);
             let rightContent: any = DiffPanel.replaceLeadingSpacesWithHardSpaces(r.content);
 
@@ -36,27 +35,28 @@ class DiffPanel extends React.Component<DiffPanelProps, any> {
               [leftContent, rightContent] = this.highlightInlineDiff(leftContent, rightContent);
             }
 
-            return DOM.tr({className: 'line'},
-              DOM.td({className: 'line-left ' + l.type}, leftContent),
-              DOM.td({className: 'line-separator'}),
-              DOM.td({className: 'line-right ' + r.type}, rightContent)
+            return (
+              <tr className='line' key={i}>
+                <td className={'line-left ' + l.type}>{leftContent}</td>
+                <td className='line-separator' />
+                <td className={'line-right ' + r.type}>{rightContent}</td>
+              </tr>
             );
-          }
-        )
-      )
+          })}
+        </tbody>
+      </table>
     );
   }
 
   private static highlightInlineDiff(leftContent, rightContent) {
-
     let highlightLine = (diffPart: JsDiff.IDiffResult, shouldBeHighlighted: () => boolean, color: string) => {
       if (shouldBeHighlighted()) {
-        return DOM.span({style: {backgroundColor: color}}, diffPart.value);
+        return <span style={{backgroundColor: color}}>{diffPart.value}</span>;
       } else if (!diffPart.added && !diffPart.removed) {
-        return DOM.span(null, diffPart.value);
+        return <span>{diffPart.value}</span>;
       }
 
-      return DOM.span(null);
+      return <span />;
     };
 
     let lineDiff = JsDiff.diffWords(leftContent, rightContent);
@@ -107,28 +107,28 @@ class DiffPanel extends React.Component<DiffPanelProps, any> {
 
   private static formatChunks(chunks: any[]) {
     let result = [];
-    let chunkTables = chunks.map(chunk =>
-        DiffPanel.createTableFromChunk(chunk)
+    let chunkTables = chunks.map((chunk, i) =>
+        DiffPanel.createTableFromChunk(chunk, i)
     );
 
     for (let i = 0; i < chunkTables.length; i++) {
       result.push(chunkTables[i]);
       if (chunkTables[i + 1]) {
         result.push(
-          DOM.table({className: 'chunk-separator'},
-            DOM.tbody(null,
-              DOM.tr({className: 'line'},
-                DOM.td({className: 'line-left'}, DOM.span({className: 'hellip'}, '\u00B7\u00B7\u00B7')),
-                DOM.td({className: 'line-separator'}),
-                DOM.td({className: 'line-right'}, DOM.span({className: 'hellip'}, '\u00B7\u00B7\u00B7'))
-              ),
-              DOM.tr({className: 'line'},
-                DOM.td({className: 'line-left'}),
-                DOM.td({className: 'line-separator'}),
-                DOM.td({className: 'line-right'})
-              )
-            )
-          )
+          <table className='chunk-separator' key={'sep' + i}>
+            <tbody>
+              <tr className='line'>
+                <td className='line-left'><span className='hellip'>\u00B7\u00B7\u00B7</span></td>
+                <td className='line-separator' />
+                <td className='line-right'><span className='hellip'>\u00B7\u00B7\u00B7</span></td>
+              </tr>
+              <tr className='line'>
+                <td className='line-left' />
+                <td className='line-separator' />
+                <td className='line-right' />
+              </tr>
+            </tbody>
+          </table>
         );
       }
     }
@@ -157,28 +157,27 @@ class DiffPanel extends React.Component<DiffPanelProps, any> {
       message = 'Changed binary file';
     }
 
-    return DOM.div({className: 'binary-file-info'}, message);
+    return <div className='binary-file-info'>{message}</div>;
   }
 
   render() {
     if (this.props.diff === null) {
-      return DOM.div(null);
+      return <div />;
     }
     let diffs = DiffParser.parse(this.props.diff);
 
-    return DOM.div(null,
-      diffs.map(diff =>
-          DOM.div({className: 'DiffPanel'},
-            DOM.h4({className: 'heading'}, (diff.from === '/dev/null' ? diff.to : diff.from).substr(2)),
-            diff.type === 'plain' ? DiffPanel.formatChunks(diff.chunks) : DiffPanel.formatInfoForBinaryFileDiff(diff)
-          )
-      )
+    return (
+      <div>
+        {diffs.map((diff, i) =>
+          <div className='DiffPanel' key={i}>
+            <h4 className='heading'>{(diff.from === '/dev/null' ? diff.to : diff.from).substr(2)}</h4>
+            {diff.type === 'plain'
+              ? DiffPanel.formatChunks(diff.chunks)
+              : DiffPanel.formatInfoForBinaryFileDiff(diff)
+            }
+          </div>
+        )}
+      </div>
     );
   }
 }
-
-module DiffPanel {
-  export interface Props extends DiffPanelProps {}
-}
-
-export = DiffPanel;

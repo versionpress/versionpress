@@ -1,12 +1,16 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "sourceMap": true
+    "sourceMap": true,
+    "target": "es5",
+    "jsx": "react"
   },
   "filesGlob": [
     "src/**/*.ts",
+    "src/**/*.tsx",
     "typings/typings.d.ts",
-    "!./node_modules/**/*.ts"
+    "!./node_modules/**/*.ts",
+    "!./node_modules/**/*.tsx"
   ],
   "files": [
     "typings/typings.d.ts"
