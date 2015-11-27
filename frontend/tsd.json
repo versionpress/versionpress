@@ -3,7 +3,7 @@
   "repo": "borisyankov/DefinitelyTyped",
   "ref": "master",
   "path": "typings/tsd",
-  "bundle": "typings/tsd.d.ts",
+  "bundle": "typings/tsd/tsd.d.ts",
   "installed": {
     "assertion-error/assertion-error.d.ts": {
       "commit": "4f7b7e01d3a9622bfab0bef469e169529e60c66b"

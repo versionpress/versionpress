@@ -43,6 +43,10 @@ interface HomePageState {
 
 export default class HomePage extends React.Component<HomePageProps, HomePageState> {
 
+  static contextTypes: React.ValidationMap<any> = {
+    router: React.PropTypes.func.isRequired
+  };
+
   private refreshInterval;
 
   constructor() {
@@ -62,10 +66,6 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     this.onRollback = this.onRollback.bind(this);
     this.checkUpdate = this.checkUpdate.bind(this);
   }
-
-  static contextTypes: React.ValidationMap<any> = {
-    router: React.PropTypes.func.isRequired
-  };
 
   componentDidMount() {
     this.fetchWelcomePanel();
