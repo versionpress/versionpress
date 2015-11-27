@@ -9,9 +9,8 @@
 /node_modules
 
 # TypeScript definition files
-/typings/*
-!/typings/versionpress-custom
-!/typings/typings.d.ts
+/typings/tsd
+/typings/tsd.d.ts
 
 # Local config files
 /src/config.local.ts
