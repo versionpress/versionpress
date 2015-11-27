@@ -1,4 +1,4 @@
-import ArrayUtils = require('./ArrayUtils');
+import * as ArrayUtils from './ArrayUtils';
 
 export function verbToPastTense(verb: string) {
   if (verb.match(/.*[aeiouy]y$/)) {
