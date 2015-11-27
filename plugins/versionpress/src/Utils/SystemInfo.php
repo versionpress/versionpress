@@ -126,6 +126,10 @@ class SystemInfo {
         $info = array();
 
         $info['wp-version'] = get_bloginfo('version');
+
+        if (!function_exists('get_plugins')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
         $installedPlugins = get_plugins();
         array_walk($installedPlugins, function(&$pluginInfo, $pluginFile) {
 
