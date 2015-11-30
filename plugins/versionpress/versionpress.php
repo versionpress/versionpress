@@ -374,6 +374,32 @@ function vp_register_hooks() {
         vp_flush_regenerable_options();
     });
 
+    add_action('pre_delete_term', function ($term, $taxonomy) use ($wpdb, $wpdbMirrorBridge) {
+        if (!is_taxonomy_hierarchical($taxonomy)) {
+            return;
+        }
+
+        $term = get_term($term, $taxonomy);
+        if (is_wp_error($term)) {
+            return;
+        }
+
+        $wpdbMirrorBridge->update($wpdb->term_taxonomy, array('parent' => $term->parent), array('parent' => $term->term_id));
+    }, 10, 2);
+
+    add_action('before_delete_post', function ($postId) use ($wpdb) {
+            // Fixing bug in WP (#34803) and WP-CLI (#2246)
+        $post = get_post($postId);
+        if ( !is_wp_error($post) && $post->post_type === 'nav_menu_item' ) {
+            \Tracy\Debugger::log('Deleting menu item ' . $post->ID);
+            $newParent = get_post_meta($post->ID, '_menu_item_menu_item_parent', true);
+            $wpdb->update($wpdb->postmeta,
+                array('meta_value' => $newParent),
+                array('meta_key' => '_menu_item_menu_item_parent', 'meta_value' => $post->ID)
+            );
+        }
+    });
+
     //----------------------------------------
     // URL and WP-CLI "hooks"
     //----------------------------------------

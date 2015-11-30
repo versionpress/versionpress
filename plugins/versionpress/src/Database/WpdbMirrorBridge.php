@@ -74,7 +74,7 @@ class WpdbMirrorBridge {
         }
 
         $entityName = $entityInfo->entityName;
-        $data = array_merge($data, $where);
+        $data = array_merge($where, $data);
 
         if (!$entityInfo->usesGeneratedVpids) { // options etc.
             $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityName, $data);
@@ -123,21 +123,6 @@ class WpdbMirrorBridge {
         }
     }
 
-    private function getUsermetaId($user_id, $meta_key) {
-        $getMetaIdSql = "SELECT umeta_id FROM {$this->database->prefix}usermeta WHERE meta_key = \"$meta_key\" AND user_id = $user_id";
-        return $this->database->get_var($getMetaIdSql);
-    }
-
-    private function getPostMetaId($post_id, $meta_key) {
-        $getMetaIdSql = "SELECT meta_id FROM {$this->database->prefix}postmeta WHERE meta_key = \"$meta_key\" AND post_id = $post_id";
-        return $this->database->get_var($getMetaIdSql);
-    }
-
-    private function getTermMetaId($term_id, $meta_key) {
-        $getMetaIdSql = "SELECT meta_id FROM {$this->database->prefix}termmeta WHERE meta_key = \"$meta_key\" AND term_id = $term_id";
-        return $this->database->get_var($getMetaIdSql);
-    }
-
     /**
      * Returns all ids from DB suitable for given restriction.
      * E.g. all comment_id values where comment_post_id = 1
@@ -167,6 +152,19 @@ class WpdbMirrorBridge {
         $vpId = $this->vpidRepository->getVpidForEntity($entityName, $id);
 
         $data['vp_id'] = $vpId;
+
+        if ($this->dbSchemaInfo->isChildEntity($entityName)) {
+            $entityInfo = $this->dbSchemaInfo->getEntityInfo($entityName);
+            $parentVpReference = "vp_" . $entityInfo->parentReference;
+            if (!isset($data[$parentVpReference])) {
+                $table = $this->dbSchemaInfo->getPrefixedTableName($entityName);
+                $parentTable = $this->dbSchemaInfo->getTableName($entityInfo->references[$entityInfo->parentReference]);
+                $vpidTable = $this->dbSchemaInfo->getPrefixedTableName('vp_id');
+                $parentVpidSql = "SELECT HEX(vpid.vp_id) FROM {$table} t JOIN {$vpidTable} vpid ON t.{$entityInfo->parentReference} = vpid.id AND `table` = '{$parentTable}' WHERE {$entityInfo->idColumnName} = $id";
+                $parentVpid = $this->database->get_var($parentVpidSql);
+                $data[$parentVpReference] = $parentVpid;
+            }
+        }
 
         $shouldBeSaved = $this->mirror->shouldBeSaved($entityName, $data);
         if (!$shouldBeSaved) {
@@ -213,22 +211,6 @@ class WpdbMirrorBridge {
      */
     private function detectAllAffectedIds($entityName, $data, $where) {
         $idColumnName = $this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName;
-
-        if ($entityName === 'usermeta' && !isset($where[$idColumnName])) {
-            return array($this->getUsermetaId($data['user_id'], $data['meta_key']));
-        }
-
-        if ($entityName === 'postmeta' && !isset($where[$idColumnName])) {
-            return array($this->getPostMetaId($data['post_id'], $data['meta_key']));
-        }
-
-        if ($entityName === 'postmeta' && isset($data['meta_id'])) {
-            return array($data['meta_id']);
-        }
-
-        if ($entityName === 'termmeta' && !isset($where[$idColumnName])) {
-            return array($this->getTermMetaId($data['term_id'], $data['meta_key']));
-        }
 
         if (isset($where[$idColumnName])) {
             return array($where[$idColumnName]);

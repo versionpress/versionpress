@@ -35,12 +35,7 @@ class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker
     }
     public function addMenuItem() {
         $this->url('wp-admin/nav-menus.php');
-        $this->byCssSelector('a[data-type=page-all]')->click();
-        $this->byCssSelector('#page-all .menu-item-checkbox:first-of-type')->click();
-        $this->byCssSelector('.submit-add-to-menu')->click();
-        $this->waitForAjax();
-        $this->byCssSelector('#save_menu_header')->click();
-        $this->waitAfterRedirect();
+        $this->addNewMenuItem();
     }
 
     public function prepare_editMenuItem() {
@@ -96,6 +91,31 @@ class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker
         $this->waitAfterRedirect();
     }
 
+
+    public function prepare_removeMenuItemWithChildren() {
+        $this->url('wp-admin/nav-menus.php');
+        $menuId = intval($this->byId('menu')->value());
+
+        $item = array(1, 'title' => 'Parent');
+        $parentId = self::$wpAutomation->addMenuItem($menuId, "post", $item);
+
+        $item = array(1, 'title' => 'Child 1', 'parent-id' => $parentId);
+        $parentId = self::$wpAutomation->addMenuItem($menuId, "post", $item);
+
+        $item = array(1, 'title' => 'Child 2', 'parent-id' => $parentId);
+        self::$wpAutomation->addMenuItem($menuId, "post", $item);
+    }
+
+    public function removeMenuItemWithChildren() {
+        $this->url('wp-admin/nav-menus.php');
+        $this->byCssSelector('.menu-item:nth-of-type(2) .item-edit')->click();
+        usleep(200 * 1000); // Wait for the UI animation
+        $this->byCssSelector('.menu-item:nth-of-type(2) .item-delete')->click();
+        usleep(1000 * 1000); // Wait for the UI animation
+        $this->byCssSelector('#save_menu_header')->click();
+        $this->waitAfterRedirect();
+    }
+
     public function prepare_deleteMenu() {
     }
 
@@ -103,6 +123,15 @@ class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker
         $this->url('wp-admin/nav-menus.php');
         $this->byCssSelector('.menu-delete')->click();
         $this->acceptAlert();
+        $this->waitAfterRedirect();
+    }
+
+    private function addNewMenuItem() {
+        $this->byCssSelector('a[data-type=page-all]')->click();
+        $this->byCssSelector('#page-all .menu-item-checkbox:first-of-type')->click();
+        $this->byCssSelector('.submit-add-to-menu')->click();
+        $this->waitForAjax();
+        $this->byCssSelector('#save_menu_header')->click();
         $this->waitAfterRedirect();
     }
 }

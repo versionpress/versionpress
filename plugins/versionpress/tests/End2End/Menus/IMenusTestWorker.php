@@ -27,6 +27,9 @@ interface IMenusTestWorker extends ITestWorker {
     public function prepare_removeMenuItem();
     public function removeMenuItem();
 
+    public function prepare_removeMenuItemWithChildren();
+    public function removeMenuItemWithChildren();
+
     public function prepare_deleteMenu();
     public function deleteMenu();
 }
