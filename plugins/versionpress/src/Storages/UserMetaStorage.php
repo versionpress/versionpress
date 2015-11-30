@@ -13,7 +13,7 @@ class UserMetaStorage extends MetaEntityStorage {
     private $dbPrefix;
     const PREFIX_PLACEHOLDER = "<<table-prefix>>";
 
-    function __construct(UserStorage $userStorage, EntityInfo$entityInfo, $dbPrefix) {
+    function __construct(UserStorage $userStorage, EntityInfo $entityInfo, $dbPrefix) {
         parent::__construct($userStorage, $entityInfo, 'meta_key', 'meta_value');
         $this->dbPrefix = $dbPrefix;
     }
