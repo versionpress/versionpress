@@ -2,6 +2,8 @@
 namespace VersionPress\Storages;
 
 use VersionPress\ChangeInfos\TermChangeInfo;
+use VersionPress\Database\EntityInfo;
+use VersionPress\Utils\EntityUtils;
 use VersionPress\Utils\IniSerializer;
 
 /**
@@ -25,85 +27,103 @@ use VersionPress\Utils\IniSerializer;
  *     description = ""
  *     vp_id = "B915DEDDA9634BE38367AD6A65D8CA8B"
  */
-class TermTaxonomyStorage extends SingleFileStorage {
+class TermTaxonomyStorage extends Storage {
 
-    protected $notSavedFields = array('vp_term_id', 'count', 'term_id', 'term_taxonomy_id');
+    protected $notSavedFields = array('vp_term_id', 'count', 'term_id', 'term_taxonomy_id', 'vp_id');
+    /** @var TermStorage */
+    private $termStorage;
+    /** @var EntityInfo */
+    private $entityInfo;
+    /** @var array[] */
+    private $cachedEntities;
 
-    private $currentlySavedTaxonomy;
+    public function __construct(TermStorage $termStorage, EntityInfo $entityInfo) {
+        $this->termStorage = $termStorage;
+        $this->entityInfo = $entityInfo;
+    }
 
     public function save($data) {
-        $this->currentlySavedTaxonomy = $data['taxonomy'];
+        $vpid = $data['vp_id'];
+        $termVpid = $data['vp_term_id'];
+        $term = $this->termStorage->loadEntity($termVpid);
 
-        $this->loadEntities();
-        $termId = $this->findTermId($data);
-
-        if (!$termId) {
-            return null;
-        }
-
-        $taxonomyVpid = $data['vp_id'];
-
-        if (!isset($this->entities[$termId]['taxonomies'])) {
-            $this->entities[$termId]['taxonomies'] = array();
-        }
-
-        $originalTaxonomies = $this->entities[$termId]['taxonomies'];
-
-        $isNew = !isset($originalTaxonomies[$taxonomyVpid]);
-
-        $this->updateTaxonomy($termId, $taxonomyVpid, $data);
-
-        if ($this->entities[$termId]['taxonomies'] != $originalTaxonomies) {
-            $changeInfo = $this->createChangeInfo(null, $this->entities[$termId], $isNew ? 'create' : 'edit');
-            $this->saveEntities();
-            return $changeInfo;
+        if (!isset($term['taxonomies']) || !isset($term['taxonomies'][$vpid])) {
+            $originalTaxonomy = array();
         } else {
-            return null;
-        }
-    }
-
-    public function delete($restriction) {
-        $taxonomyId = $restriction['vp_id'];
-
-        $this->loadEntities();
-        $termId = $this->findTermId($restriction);
-
-        if ($termId === null)
-            return null;
-        $originalTerm = $this->entities[$termId];
-        $originalTaxonomies = $originalTerm['taxonomies'];
-        unset($this->entities[$termId]['taxonomies'][$taxonomyId]);
-        if ($this->entities[$termId]['taxonomies'] != $originalTaxonomies) {
-            $this->saveEntities();
-            return $this->createChangeInfo(null, $originalTerm, 'delete');
-        } else {
-            return null;
+            $originalTaxonomy = $term['taxonomies'][$vpid];
         }
 
-    }
-
-    public function loadEntity($id, $parentId = null) {
-        $this->loadEntities();
-        foreach ($this->entities as $term) {
-            if (isset($term['taxonomies']) && isset($term['taxonomies'][$id])){
-                $taxonomy = $term['taxonomies'][$id];
-                $taxonomy['vp_term_id'] = $term['vp_id'];
-                return $taxonomy;
-            }
+        $newTaxonomy = array_merge($originalTaxonomy, $data);
+        foreach ($this->notSavedFields as $field) {
+            unset($newTaxonomy[$field]);
         }
+
+        $newTaxonomy = array_filter($newTaxonomy, function ($value) { return $value !== false; });
+
+        if ($newTaxonomy !== $originalTaxonomy) {
+            $term['taxonomies'][$vpid] = $newTaxonomy;
+            $this->cachedEntities[$vpid] = $newTaxonomy;
+            $this->termStorage->save($term);
+            return new TermChangeInfo('edit', $termVpid, $term['name'], $newTaxonomy['taxonomy']);
+        }
+
         return null;
     }
 
+    public function delete($restriction) {
+        $vpid = $restriction['vp_id'];
+        $termVpid = $restriction['vp_term_id'];
+
+        $term = $this->termStorage->loadEntity($termVpid);
+
+        if (!isset($term['taxonomies']) || !isset($term['taxonomies'][$vpid])) {
+            return null;
+        }
+
+        $originalTaxonomy = $term['taxonomies'][$vpid];
+        unset($term['taxonomies'][$vpid]);
+        $this->termStorage->save($term);
+
+        return new TermChangeInfo('edit', $termVpid, $term['name'], $originalTaxonomy['taxonomy']);
+    }
+
+    public function loadEntity($id, $parentId = null) {
+        if ($parentId === null) {
+            if ($this->cachedEntities === null) {
+                $this->cachedEntities = $this->loadAll();
+            }
+            return isset($this->cachedEntities[$id]) ? $this->cachedEntities[$id] : null;
+        }
+
+        $term = $this->termStorage->loadEntity($parentId);
+        if (!$term) {
+            return null;
+        }
+
+        if (!isset($term['taxonomies']) || !isset($term['taxonomies'][$id])) {
+            return null;
+        }
+
+        $taxonomy = $term['taxonomies'][$id];
+        $taxonomy['vp_id'] = $id;
+        $taxonomy['vp_term_id'] = $parentId;
+
+        return $taxonomy;
+    }
+
     public function loadAll() {
-        $this->loadEntities();
+        $terms = $this->termStorage->loadAll();
         $taxonomies = array();
 
-        foreach ($this->entities as $term) {
-            if (isset($term['taxonomies'])) {
-                foreach ($term['taxonomies'] as $taxonomy) {
-                    $taxonomy['vp_term_id'] = $term['vp_id'];
-                    $taxonomies[$taxonomy['vp_id']] = $taxonomy;
-                }
+        foreach ($terms as $term) {
+            if (!isset($term['taxonomies'])) {
+                continue;
+            }
+
+            foreach ($term['taxonomies'] as $taxonomyVpid => $taxonomy) {
+                $taxonomy['vp_id'] = $taxonomyVpid;
+                $taxonomy['vp_term_id'] = $term['vp_id'];
+                $taxonomies[$taxonomyVpid] = $taxonomy;
             }
         }
 
@@ -116,79 +136,41 @@ class TermTaxonomyStorage extends SingleFileStorage {
     }
 
     public function exists($id, $parentId = null) {
-        $this->loadAll();
-        foreach ($this->entities as $term) {
-            if (isset($term['taxonomies']) && isset($term['taxonomies'][$id])) {
-                return true;
+        if ($parentId === null) {
+            if ($this->cachedEntities === null) {
+                $this->cachedEntities = $this->loadAll();
             }
-        }
-        return false;
-    }
-
-    protected function loadEntities() {
-        parent::loadEntities();
-        $entities = $this->entities;
-
-        foreach ($entities as $id => &$entity) {
-            if (isset ($entity['taxonomies'])) {
-                foreach ($entity['taxonomies'] as $taxonomyId => &$taxonomy) {
-                    $taxonomy['vp_id'] = $taxonomyId;
-                }
-            }
+            return isset($this->cachedEntities[$id]);
         }
 
-        $this->entities = $entities;
-    }
-
-    protected function saveEntities() {
-        $entities = $this->entities;
-        foreach ($entities as &$entity) {
-            if (isset ($entity['taxonomies'])) {
-                foreach ($entity['taxonomies'] as &$taxonomy) {
-                    unset ($taxonomy['vp_id']);
-                }
-            }
+        if (!$this->termStorage->exists($parentId)) {
+            return false;
         }
 
-        $this->entities = $entities;
-        parent::saveEntities();
-    }
-
-    /**
-     * Finds term ID related to the taxonomy, or null if no such term exists
-     *
-     * @param $data
-     * @return string|null
-     */
-    private function findTermId($data) {
-        $taxonomyVpid = $data['vp_id'];
-
-        foreach ($this->entities as $termId => $term) {
-            if (isset($term['taxonomies'][$taxonomyVpid])
-                || (isset($data['vp_term_id']) && strval($term['vp_id']) == strval($data['vp_term_id']))
-            ) {
-                return $termId;
-            }
-        }
-
-        return null;
-    }
-
-    private function updateTaxonomy($termId, $taxonomyId, $data) {
-        $taxonomies = &$this->entities[$termId]['taxonomies'];
-
-        if (!isset($taxonomies[$taxonomyId]))
-            $taxonomies[$taxonomyId] = array();
-
-        foreach ($this->notSavedFields as $field)
-            unset($data[$field]);
-
-        foreach ($data as $field => $value)
-            $taxonomies[$taxonomyId][$field] = $value;
+        $term = $this->termStorage->loadEntity($parentId);
+        return isset($term['taxonomies']) && isset($term['taxonomies'][$id]);
     }
 
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
-        // Whatever operation on term-taxonomy, it is always an 'edit' action on the related term
-        return new TermChangeInfo('edit', $newEntity['vp_id'], $newEntity['name'], $this->currentlySavedTaxonomy);
+        // change info is returned directly from save / delete methods
+    }
+
+    public function prepareStorage() {
+        $this->termStorage->prepareStorage();
+    }
+
+    public function getEntityFilename($id, $parentId) {
+        return $this->termStorage->getEntityFilename($parentId);
+    }
+
+    public function getPathCommonToAllEntities() {
+        return $this->termStorage->getPathCommonToAllEntities();
+    }
+
+    public function saveLater($data) {
+        $this->save($data); // todo
+    }
+
+    public function commit() {
     }
 }

@@ -114,8 +114,7 @@ class WpdbMirrorBridge {
                 continue; // already deleted - deleting postmeta is sometimes called twice
             }
 
-            if (($entityName === 'postmeta' && !isset($where['vp_post_id'])) ||
-                ($entityName === 'usermeta' && !isset($where['vp_user_id']))) {
+            if ($this->dbSchemaInfo->isChildEntity($entityName) && !isset($where["vp_{$entityInfo->parentReference}"])) {
                 $where = $this->fillParentId($entityName, $where, $id);
             }
 
@@ -230,13 +229,16 @@ class WpdbMirrorBridge {
     }
 
     private function fillParentId($metaEntityName, $where, $id) {
-        $parent = $metaEntityName === 'postmeta' ? 'post' : 'user';
+        $entityInfo = $this->dbSchemaInfo->getEntityInfo($metaEntityName);
+        $parentReference = $entityInfo->parentReference;
+
+        $parent = $entityInfo->references[$parentReference];
         $vpIdTable = $this->dbSchemaInfo->getPrefixedTableName('vp_id');
-        $postMetaTable = $this->dbSchemaInfo->getPrefixedTableName($metaEntityName);
+        $entityTable = $this->dbSchemaInfo->getPrefixedTableName($metaEntityName);
         $parentTable = $this->dbSchemaInfo->getTableName($parent);
         $idColumnName = $this->dbSchemaInfo->getEntityInfo($metaEntityName)->idColumnName;
 
-        $where["vp_{$parent}_id"] = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '{$parentTable}' AND ID = (SELECT {$parent}_id FROM $postMetaTable WHERE {$idColumnName} = $id)");
+        $where["vp_{$parentReference}"] = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '{$parentTable}' AND ID = (SELECT {$parentReference} FROM $entityTable WHERE {$idColumnName} = $id)");
         return $where;
     }
 

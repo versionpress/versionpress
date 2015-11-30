@@ -100,6 +100,7 @@ class DIContainer {
                 $dic->resolve(VersionPressServices::WPDB),
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::STORAGE_FACTORY),
+                $dic->resolve(VersionPressServices::SYNCHRONIZER_FACTORY),
                 $dic->resolve(VersionPressServices::REPOSITORY),
                 $dic->resolve(VersionPressServices::URL_REPLACER),
                 $dic->resolve(VersionPressServices::VPID_REPOSITORY)

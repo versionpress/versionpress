@@ -119,6 +119,14 @@ class EntityInfo {
      */
     public $hasReferences = false;
 
+    /**
+     * If entity is child entity (meta, term_taxonomy etc.), this contains name of reference
+     * to its parent.
+     *
+     * @var string
+     */
+    public $parentReference;
+
     private $virtualReferences = array();
 
     /**
@@ -156,6 +164,10 @@ class EntityInfo {
             $this->vpidColumnName = $schemaInfo['vpid'];
             $this->usesGeneratedVpids = false;
             $this->hasNaturalVpid = true;
+        }
+
+        if (isset($schemaInfo['parent-reference'])) {
+            $this->parentReference = $schemaInfo['parent-reference'];
         }
 
         if (isset($schemaInfo['references'])) {

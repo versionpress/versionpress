@@ -13,6 +13,7 @@ Some essential information about database entities and their relationships is de
 
     postmeta:
         id: meta_id
+        parent-reference: post_id
         references:
             post_id: post
         value-references:
@@ -70,3 +71,12 @@ an M:N relationship (junction table in the SQL). To do that we can use this form
 As you can see, the reference can be prefixed with shut-up operator. It means that the reference is virtual - the entity does not contain 
 the data but is's checked in Reverter. The reference is usually saved within the foreign entity (e.g. the `post` contains a list of `term_taxonomy` VPIDs
 but the `term_taxonomy` does NOT contain a list of `post` VPIDs).
+
+Some entities are saved within other entities (e.g. the `postmeta` are saved in the same .ini file with `post` they belong to). As part of this we introduced
+concept of “parent entities”.
+
+    postmeta:
+        id: meta_id
+        parent-reference: post_id
+ 
+ The field `parent-reference` contains the name of one of the simple references. This specifies within which entity will be the child entity saved.

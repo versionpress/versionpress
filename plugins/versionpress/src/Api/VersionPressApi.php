@@ -391,19 +391,7 @@ class VersionPressApi {
         preg_match_all($vpidRegex, $diff, $vpidMatches);
         preg_match_all($optionRegex, $diff, $optionNameMatches);
 
-        $entitiesToSynchronize = array(
-            'entities' => array_unique(array_merge($vpidMatches[1], $optionNameMatches[1])),
-            'storages' => array(),
-        );
-
-        if (ArrayUtils::any($status, function ($fileStatus) {
-            return Strings::contains($fileStatus[1], 'terms.ini');
-        })
-        ) {
-            $entitiesToSynchronize['storages'][] = 'term';
-            $entitiesToSynchronize['storages'][] = 'term_taxonomy';
-        }
-
+        $entitiesToSynchronize = array_unique(array_merge($vpidMatches[1], $optionNameMatches[1]));
         $this->synchronizationProcess->synchronize($entitiesToSynchronize);
     }
 

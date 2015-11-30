@@ -9,6 +9,7 @@ post:
 
 postmeta:
     id: meta_id
+    parent-reference: post_id
     references:
         post_id: post
     value-references:
@@ -35,6 +36,7 @@ term:
 
 term_taxonomy:
     id: term_taxonomy_id
+    parent-reference: term_id
     references:
         parent: term_taxonomy
         term_id: term
@@ -43,6 +45,7 @@ term_taxonomy:
 
 usermeta:
     id: umeta_id
+    parent-reference: user_id
     references:
         user_id: user
 

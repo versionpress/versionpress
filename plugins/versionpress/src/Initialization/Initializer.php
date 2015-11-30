@@ -8,11 +8,10 @@ use VersionPress\Database\VpidRepository;
 use VersionPress\Git\GitConfig;
 use VersionPress\Git\GitRepository;
 use VersionPress\Storages\DirectoryStorage;
-use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Storages\SingleFileStorage;
 use VersionPress\Storages\Storage;
 use VersionPress\Storages\StorageFactory;
-use VersionPress\Synchronizers\SynchronizationProcess;
+use VersionPress\Synchronizers\SynchronizerFactory;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\FileSystem;
@@ -54,6 +53,11 @@ class Initializer {
     private $storageFactory;
 
     /**
+     * @var SynchronizerFactory
+     */
+    private $synchronizerFactory;
+
+    /**
      * @var bool
      */
     private $isDatabaseLocked;
@@ -67,7 +71,6 @@ class Initializer {
      * @var AbsoluteUrlReplacer
      */
     private $urlReplacer;
-
     /**
      * @var VpidRepository
      */
@@ -75,10 +78,11 @@ class Initializer {
     private $idCache;
     private $executionStartTime;
 
-    function __construct($wpdb, DbSchemaInfo $dbSchema, StorageFactory $storageFactory, GitRepository $repository, AbsoluteUrlReplacer $urlReplacer, VpidRepository $vpidRepository) {
+    function __construct($wpdb, DbSchemaInfo $dbSchema, StorageFactory $storageFactory, SynchronizerFactory $synchronizerFactory, GitRepository $repository, AbsoluteUrlReplacer $urlReplacer, VpidRepository $vpidRepository) {
         $this->database = $wpdb;
         $this->dbSchema = $dbSchema;
         $this->storageFactory = $storageFactory;
+        $this->synchronizerFactory = $synchronizerFactory;
         $this->repository = $repository;
         $this->urlReplacer = $urlReplacer;
         $this->vpidRepository = $vpidRepository;
@@ -200,7 +204,7 @@ class Initializer {
 
         FileSystem::mkdir(VERSIONPRESS_MIRRORING_DIR);
 
-        $entityNames = SynchronizationProcess::sortStoragesToSynchronize($this->storageFactory->getAllSupportedStorages());
+        $entityNames = $this->synchronizerFactory->getSynchronizationSequence();
         foreach ($entityNames as $entityName) {
             $this->createVpidsForEntitiesOfType($entityName);
             $this->saveEntitiesOfTypeToStorage($entityName);
@@ -232,16 +236,11 @@ class Initializer {
 
         if ($storage instanceof DirectoryStorage) {
             $this->saveDirectoryStorageEntities($storage, $entities);
-        }
-
-        if ($storage instanceof SingleFileStorage) {
+        } else if ($storage instanceof SingleFileStorage) {
             $this->saveSingleFileStorageEntities($storage, $entities);
-        }
-
-        if ($storage instanceof MetaEntityStorage) {
+        } else if ($this->dbSchema->isChildEntity($entityName)) { // meta and term_taxonomy
             $entityInfo = $this->dbSchema->getEntityInfo($entityName);
-            reset($entityInfo->references);
-            $parentReference = "vp_" . key($entityInfo->references);
+            $parentReference = "vp_" . $entityInfo->parentReference;
 
             $this->saveMetaEntities($storage, $entities, $parentReference);
         }
@@ -262,7 +261,7 @@ class Initializer {
         $this->checkTimeout();
     }
 
-    private function saveMetaEntities(MetaEntityStorage $storage, $entities, $parentReference) {
+    private function saveMetaEntities(Storage $storage, $entities, $parentReference) {
         if (count($entities) == 0) {
             return;
         }
@@ -505,9 +504,9 @@ class Initializer {
      * @return mixed
      */
     private function getEntitiesFromDatabase($entityName) {
-        if ($this->storageFactory->getStorage($entityName) instanceof MetaEntityStorage) {
+        if ($this->dbSchema->isChildEntity($entityName)) {
             $entityInfo = $this->dbSchema->getEntityInfo($entityName);
-            $parentReference = key($entityInfo->references);
+            $parentReference = $entityInfo->parentReference;
 
             return $this->database->get_results("SELECT * FROM {$this->getTableName($entityName)} ORDER BY {$parentReference}", ARRAY_A);
         }

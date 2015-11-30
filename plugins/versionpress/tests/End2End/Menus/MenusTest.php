@@ -29,7 +29,7 @@ class MenusTest extends End2EndTestCase {
         $commitAsserter->ignoreCommits("usermeta/create");
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("term/create");
-        $commitAsserter->assertCommitPath('M', "%vpdb%/terms.ini");
+        $commitAsserter->assertCommitPath('A', "%vpdb%/terms/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -48,7 +48,7 @@ class MenusTest extends End2EndTestCase {
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("term/rename");
-        $commitAsserter->assertCommitPath('M', "%vpdb%/terms.ini");
+        $commitAsserter->assertCommitPath('M', "%vpdb%/terms/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -158,7 +158,7 @@ class MenusTest extends End2EndTestCase {
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("term/delete");
-        $commitAsserter->assertCommitPath('M', "%vpdb%/terms.ini");
+        $commitAsserter->assertCommitPath('D', "%vpdb%/terms/%VPID%.ini");
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
