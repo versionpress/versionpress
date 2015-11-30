@@ -110,6 +110,6 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
 
     protected function tearDown() {
         parent::tearDown();
-        FileSystem::remove(__DIR__ . '/terms.ini');
+        FileSystem::remove(__DIR__ . '/terms');
     }
 }

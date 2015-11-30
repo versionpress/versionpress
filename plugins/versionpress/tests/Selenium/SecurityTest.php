@@ -26,7 +26,7 @@ class SecurityTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function vpdbDoesntAllowDirectAccess() {
-        $url = self::$testConfig->testSite->url . "/wp-content/vpdb/terms.ini";
+        $url = self::$testConfig->testSite->url . "/wp-content/vpdb/web.config";
         $statusCode = HttpStatusCodeUtil::getStatusCode($url);
         $this->assertEquals(403, $statusCode, "Wrong HTTP status codes");
     }
