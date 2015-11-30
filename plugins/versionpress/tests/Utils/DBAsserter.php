@@ -195,7 +195,7 @@ class DBAsserter {
 
             foreach (self::$schemaInfo->getEntityInfo($entityName)->valueReferences as $reference => $targetEntity) {
                 list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
-                if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn]) && $entity[$valueColumn] != "0") {
+                if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn])) {
                     if ($targetEntity[0] === '@') {
                         $entityNameProvider = substr($targetEntity, 1);
                         $targetEntity = call_user_func($entityNameProvider, $entity);

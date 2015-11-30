@@ -11,10 +11,6 @@ class MenusTest extends End2EndTestCase {
     /** @var IMenusTestWorker */
     private static $worker;
 
-    public static function setUpBeforeClass() {
-        parent::setUpBeforeClass();
-    }
-
     /**
      * @test
      * @testdox New menu creates 'term/create' action
@@ -144,6 +140,24 @@ class MenusTest extends End2EndTestCase {
         DBAsserter::assertFilesEqualDatabase();
     }
 
+    /**
+     * @test
+     * @testdox Removing menu item withChildrenUpdatesChildrensParent
+     */
+    public function removingMenuItemWithChildrenUpdatesChildrensParent() {
+        self::$worker->prepare_removeMenuItemWithChildren();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->removeMenuItemWithChildren();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/delete");
+        $commitAsserter->assertCommitTag("VP-Post-Type", "nav_menu_item");
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+    
     /**
      * @test
      * @testdox Deleting menu creates 'term/delete' action
