@@ -56,7 +56,11 @@ class VpidRepository {
         foreach ($entityInfo->valueReferences as $referenceName => $targetEntity) {
             list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
 
-            if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn]) && $entity[$valueColumn] > 0) {
+            if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn])) {
+
+                if ($entity[$valueColumn] == 0) {
+                    $entity[$valueColumn] = false;
+                }
 
                 if ($targetEntity[0] === '@') {
                     $entityNameProvider = substr($targetEntity, 1);
