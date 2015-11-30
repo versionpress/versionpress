@@ -32,6 +32,7 @@ class ChangeInfoMatcher {
         "comment/.*" => 'VersionPress\ChangeInfos\CommentChangeInfo',
         "option/.*" => 'VersionPress\ChangeInfos\OptionChangeInfo',
         "term/.*" => 'VersionPress\ChangeInfos\TermChangeInfo',
+        "termmeta/.*" => 'VersionPress\ChangeInfos\TermMetaChangeInfo',
         "usermeta/.*" => 'VersionPress\ChangeInfos\UserMetaChangeInfo',
         "user/.*" => 'VersionPress\ChangeInfos\UserChangeInfo',
 

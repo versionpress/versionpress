@@ -133,6 +133,11 @@ class WpdbMirrorBridge {
         return $this->database->get_var($getMetaIdSql);
     }
 
+    private function getTermMetaId($term_id, $meta_key) {
+        $getMetaIdSql = "SELECT meta_id FROM {$this->database->prefix}termmeta WHERE meta_key = \"$meta_key\" AND term_id = $term_id";
+        return $this->database->get_var($getMetaIdSql);
+    }
+
     /**
      * Returns all ids from DB suitable for given restriction.
      * E.g. all comment_id values where comment_post_id = 1
@@ -219,6 +224,10 @@ class WpdbMirrorBridge {
 
         if ($entityName === 'postmeta' && isset($data['meta_id'])) {
             return array($data['meta_id']);
+        }
+
+        if ($entityName === 'termmeta' && !isset($where[$idColumnName])) {
+            return array($this->getTermMetaId($data['term_id'], $data['meta_key']));
         }
 
         if (isset($where[$idColumnName])) {

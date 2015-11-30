@@ -17,14 +17,10 @@ class TermsSynchronizer extends SynchronizerBase {
     }
 
     protected function transformEntities($entities) {
-        $transformedEntities = array();
-        foreach ($entities as $id => $entity) {
-            $entityCopy = $entity;
-            unset($entityCopy['taxonomies']); // taxonomies are synchronized by VersionPress\Synchronizers\TermTaxonomiesSynchronizer
-            $entityCopy[$this->dbSchema->getEntityInfo('term')->idColumnName] = $id;
-
-            $transformedEntities[] = $entityCopy;
+        $entities = parent::transformEntities($entities);
+        foreach ($entities as $id => &$entity) {
+            unset($entity['taxonomies']); // taxonomies are synchronized by VersionPress\Synchronizers\TermTaxonomiesSynchronizer
         }
-        return $transformedEntities;
+        return $entities;
     }
 }

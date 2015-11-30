@@ -76,9 +76,19 @@ class PostMetaStorageTest extends \PHPUnit_Framework_TestCase {
             )
         ));
 
+        $postMetaInfo = new EntityInfo(array(
+            'postmeta' => array(
+                'id' => 'meta_id',
+                'parent-reference' => 'post_id',
+                'references' => array (
+                    'post_id' => 'post',
+                )
+            )
+        ));
+
         mkdir(__DIR__ . '/posts');
         $this->postStorage = new PostStorage(__DIR__ . '/posts', $postInfo);
-        $this->storage = new PostMetaStorage($this->postStorage);
+        $this->storage = new PostMetaStorage($this->postStorage, $postMetaInfo);
     }
 
     protected function tearDown() {

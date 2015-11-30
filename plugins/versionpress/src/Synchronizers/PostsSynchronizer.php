@@ -20,19 +20,6 @@ class PostsSynchronizer extends SynchronizerBase {
         $this->database = $wpdb;
     }
 
-    protected function filterEntities($entities) {
-        $filteredEntities = array();
-
-        foreach ($entities as $entity) {
-            $entityClone = $entity;
-            unset($entityClone['category'], $entityClone['post_tag']); // categories and tags are synchronized as an M:N relationship / todo: maybe we can remove this line?
-            $entityClone = $this->removePostMeta($entityClone);
-            $filteredEntities[] = $entityClone;
-        }
-
-        return parent::filterEntities($filteredEntities);
-    }
-
     protected function doEntitySpecificActions() {
         if ($this->passNumber == 1) {
             return false;
@@ -46,16 +33,5 @@ class PostsSynchronizer extends SynchronizerBase {
         $sql = "update {$this->database->prefix}posts set comment_count =
      (select count(*) from {$this->database->prefix}comments where comment_post_ID = {$this->database->prefix}posts.ID and comment_approved = 1);";
         $this->database->query($sql);
-    }
-
-    private function removePostMeta($entity) {
-        $postWithoutMeta = array();
-
-        foreach ($entity as $key => $value) {
-            if (Strings::contains($key, '#')) continue;
-            $postWithoutMeta[$key] = $value;
-        }
-
-        return $postWithoutMeta;
     }
 }

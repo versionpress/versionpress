@@ -135,12 +135,20 @@ abstract class SynchronizerBase implements Synchronizer {
 
     /**
      * Called after entities have been loaded from storage to give the subclasses
-     * a chance to modify the array.
+     * a chance to modify the array. By default removes meta-entities.
      *
      * @param array $entities Entities as loaded from the storage
      * @return array Entities as transformed (if at all) by this synchronizer
      */
     protected function transformEntities($entities) {
+        foreach ($entities as &$entity) {
+            foreach ($entity as $field => $value) {
+                if (Strings::match($field, "/.*#[0-9a-f]+/i")) {
+                    unset($entity[$field]);
+                }
+            }
+        }
+
         return $entities;
     }
 

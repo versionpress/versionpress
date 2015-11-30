@@ -4,6 +4,7 @@ namespace VersionPress\Storages;
 
 use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\UserMetaChangeInfo;
+use VersionPress\Database\EntityInfo;
 use VersionPress\Utils\ArrayUtils;
 
 class UserMetaStorage extends MetaEntityStorage {
@@ -12,8 +13,8 @@ class UserMetaStorage extends MetaEntityStorage {
     private $dbPrefix;
     const PREFIX_PLACEHOLDER = "<<table-prefix>>";
 
-    function __construct(UserStorage $userStorage, $dbPrefix) {
-        parent::__construct($userStorage, 'meta_key', 'meta_value', 'vp_user_id');
+    function __construct(UserStorage $userStorage, EntityInfo $entityInfo, $dbPrefix) {
+        parent::__construct($userStorage, $entityInfo, 'meta_key', 'meta_value');
         $this->dbPrefix = $dbPrefix;
     }
 

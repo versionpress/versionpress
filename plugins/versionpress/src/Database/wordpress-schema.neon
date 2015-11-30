@@ -34,6 +34,12 @@ term:
     table: terms
     id: term_id
 
+termmeta:
+    id: meta_id
+    parent-reference: term_id
+    references:
+        term_id: term
+
 term_taxonomy:
     id: term_taxonomy_id
     parent-reference: term_id

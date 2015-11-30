@@ -4,11 +4,12 @@ namespace VersionPress\Storages;
 
 use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\PostMetaChangeInfo;
+use VersionPress\Database\EntityInfo;
 use VersionPress\Utils\ArrayUtils;
 
 class PostMetaStorage extends MetaEntityStorage {
-    function __construct(PostStorage $storage) {
-        parent::__construct($storage, 'meta_key', 'meta_value', 'vp_post_id');
+    function __construct(PostStorage $storage, EntityInfo $entityInfo) {
+        parent::__construct($storage, $entityInfo, 'meta_key', 'meta_value');
     }
 
     protected function createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action) {
