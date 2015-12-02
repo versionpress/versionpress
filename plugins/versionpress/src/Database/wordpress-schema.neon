@@ -42,7 +42,6 @@ termmeta:
 
 term_taxonomy:
     id: term_taxonomy_id
-    parent-reference: term_id
     references:
         parent: term
         term_id: term

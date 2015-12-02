@@ -33,10 +33,12 @@ class SortingStrategy {
         'VersionPress\ChangeInfos\PluginChangeInfo',
         'VersionPress\ChangeInfos\ThemeChangeInfo',
         'VersionPress\ChangeInfos\TermChangeInfo',
+        'VersionPress\ChangeInfos\TermTaxonomyChangeInfo',
         'VersionPress\ChangeInfos\TranslationChangeInfo',
         'VersionPress\ChangeInfos\OptionChangeInfo',
         'VersionPress\ChangeInfos\PostMetaChangeInfo',
         'VersionPress\ChangeInfos\UserMetaChangeInfo',
+        'VersionPress\ChangeInfos\TermMetaChangeInfo',
     );
 
     function sort($changeInfoList) {
