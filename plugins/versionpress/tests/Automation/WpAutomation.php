@@ -4,7 +4,7 @@ namespace VersionPress\Tests\Automation;
 
 use Exception;
 use Nette\Utils\Strings;
-use Symfony\Component\Process\Process;
+use VersionPress\Utils\Process;
 use VersionPress\Tests\Utils\SiteConfig;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\ProcessUtils;

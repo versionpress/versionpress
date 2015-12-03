@@ -3,7 +3,7 @@
 namespace VersionPress\Git;
 
 use Nette\Utils\Strings;
-use Symfony\Component\Process\Process;
+use VersionPress\Utils\Process;
 use VersionPress\Utils\FileSystem;
 
 /**

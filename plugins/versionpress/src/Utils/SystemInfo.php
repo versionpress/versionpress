@@ -5,7 +5,7 @@ namespace Utils;
 
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Process\Process;
+use VersionPress\Utils\Process;
 use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Utils\FileSystem;

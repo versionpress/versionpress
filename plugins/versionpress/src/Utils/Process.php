@@ -3,13 +3,17 @@
 namespace VersionPress\Utils;
 
 /**
- * Symfony\Process implementation that adds the `getConsoleOutput()` method.
+ * Symfony\Process implementation that adds the `getConsoleOutput()` method and increases the time limit.
  *
  * @package VersionPress\Utils
  */
 class Process extends \Symfony\Component\Process\Process {
 
     private $consoleOutput;
+
+    public function __construct($commandline, $cwd = null, array $env = null, $input = null, $timeout = 3600, array $options = array()) {
+        parent::__construct($commandline, $cwd, $env, $input, $timeout, $options);
+    }
 
     /**
      * Returns output as it would appear in the console and doesn't care whether it comes from STDOUT or STDERR (or both).

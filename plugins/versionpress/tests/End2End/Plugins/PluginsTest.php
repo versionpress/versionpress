@@ -2,7 +2,7 @@
 
 namespace VersionPress\Tests\End2End\Plugins;
 
-use Symfony\Component\Process\Process;
+use VersionPress\Utils\Process;
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
