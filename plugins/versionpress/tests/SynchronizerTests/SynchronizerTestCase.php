@@ -4,12 +4,11 @@ namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ExtendedWpdb;
-use VersionPress\Git\GitRepository;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Tests\Utils\TestConfig;
-use Symfony\Component\Process\Process;
+use VersionPress\Utils\Process;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
