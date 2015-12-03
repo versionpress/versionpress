@@ -238,7 +238,7 @@ class Initializer {
             $this->saveDirectoryStorageEntities($storage, $entities);
         } else if ($storage instanceof SingleFileStorage) {
             $this->saveSingleFileStorageEntities($storage, $entities);
-        } else if ($this->dbSchema->isChildEntity($entityName)) { // meta and term_taxonomy
+        } else if ($this->dbSchema->isChildEntity($entityName)) { // meta entities
             $entityInfo = $this->dbSchema->getEntityInfo($entityName);
             $parentReference = "vp_" . $entityInfo->parentReference;
 
