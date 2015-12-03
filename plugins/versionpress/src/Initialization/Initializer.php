@@ -30,6 +30,8 @@ use wpdb;
  */
 class Initializer {
 
+    const TIME_FOR_ABORTION = 3;
+
     /**
      * Array of functions to call when the progress changes. Implements part of the Observer pattern.
      *
@@ -95,8 +97,6 @@ class Initializer {
     public function initializeVersionPress() {
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
         @set_time_limit(0); // intentionally @ - if it's disabled we can't do anything but try the initialization
-        $this->adjustGitProcessTimeout();
-
         $this->reportProgressChange(InitializerStates::START);
         vp_enable_maintenance();
         try {
@@ -413,7 +413,9 @@ class Initializer {
         }
 
         try {
+            $this->adjustGitProcessTimeout();
             $this->repository->stageAll();
+            $this->adjustGitProcessTimeout();
             $this->repository->commit($installationChangeInfo->getCommitMessage(), $authorName, $authorEmail);
         } catch (ProcessTimedOutException $ex) {
             $this->abortInitialization();
@@ -466,8 +468,18 @@ class Initializer {
     }
 
     private function adjustGitProcessTimeout() {
-        $maxExecutionTime = ini_get('max_execution_time');
-        $processTimeout = $maxExecutionTime > 0 ? $maxExecutionTime / 2 : 5 * 60;
+        $maxExecutionTime = intval(ini_get('max_execution_time'));
+
+        if ($maxExecutionTime === 0) {
+            $this->repository->setGitProcessTimeout(0);
+            return;
+        }
+
+        $currentTime = microtime(true);
+        $alreadyConsumedTime = $currentTime - $this->executionStartTime;
+        $remainingTime = $maxExecutionTime - $alreadyConsumedTime;
+        $this->checkTimeout();
+        $processTimeout = $remainingTime - self::TIME_FOR_ABORTION;
         $this->repository->setGitProcessTimeout($processTimeout);
     }
 
@@ -487,7 +499,7 @@ class Initializer {
         $executionTime = microtime(true) - $this->executionStartTime;
         $remainingTime = $maxExecutionTime - $executionTime;
 
-        return $remainingTime < 3; // in seconds
+        return $remainingTime <= self::TIME_FOR_ABORTION; // in seconds
     }
 
     private function abortInitialization() {
