@@ -838,6 +838,7 @@ class VPCommand extends WP_CLI_Command {
             'postmeta',
             'terms',
             'term_taxonomy',
+            'termmeta',
             'term_relationships',
             'commentmeta',
             'vp_id',

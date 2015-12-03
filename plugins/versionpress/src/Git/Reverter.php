@@ -340,7 +340,7 @@ class Reverter {
 
     /**
      * For standard entities just checks the storage.
-     * For child entities (like term_taxonomy) loads all entities and checks them.
+     * For child entities (like postmeta) loads all entities and checks them.
      *
      * @param $referencedEntityName
      * @param $referencedEntityId

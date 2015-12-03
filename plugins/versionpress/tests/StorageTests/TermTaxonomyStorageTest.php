@@ -92,7 +92,7 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
             'term_taxonomy' => array(
                 'id' => 'term_taxonomy_id',
                 'references' => array(
-                    'parent' => 'term_taxonomy',
+                    'parent' => 'term',
                     'term_id' => 'term'
                 )
             )

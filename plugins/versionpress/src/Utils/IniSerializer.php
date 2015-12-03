@@ -170,18 +170,12 @@ class IniSerializer {
 
 
     /**
-     * Deserializes nested INI format into an array structure
+     * Deserializes INI format into an array structure
      *
-     * @param string $string Nested INI string
-     * @return array Array structure corresponding to the nested INI format
+     * @param string $string INI string
+     * @return array Array structure corresponding to the INI format
      */
     public static function deserialize($string) {
-        $deserialized = self::deserializeFlat($string);
-        $deserialized = self::recursive_parse($deserialized);
-        return $deserialized;
-    }
-
-    public static function deserializeFlat($string) {
         $string = self::eolWorkaround_addPlaceholders($string);
         $string = self::sanitizeSectionsAndKeys_addPlaceholders($string);
         $deserialized = parse_ini_string($string, true, INI_SCANNER_RAW);
@@ -288,68 +282,6 @@ class IniSerializer {
         }
 
         return array_merge($keyValues, $subsections);
-    }
-
-
-    /**
-     * From http://stackoverflow.com/questions/3242175/parsing-an-advanced-ini-file-with-php
-     * Creates hierarchical array from flat array with hierarchical keys.
-     * E.g.:
-     * Input:
-     * [
-     * "foo" => [
-     *   "bar" => 1
-     *   ],
-     * "foo.something" => [
-     *   "bar" => 2
-     *   ]
-     * ]
-     *
-     * Output:
-     * [
-     * "foo" => [
-     *   "bar" => 1,
-     *   "something" => [
-     *     "bar => 2"
-     *     ]
-     *   ]
-     * ]
-     *
-     * @param $array
-     * @return array
-     */
-    private static function recursive_parse($array) {
-        $returnArray = array();
-        if (is_array($array)) {
-            foreach ($array as $key => $value) {
-                if (is_array($value)) {
-                    $array[$key] = self::recursive_parse($value);
-                }
-                $x = explode('.', $key);
-                if (!empty($x[1])) {
-                    $x = array_reverse($x, true);
-                    if (isset($returnArray[$key])) {
-                        unset($returnArray[$key]);
-                    }
-                    if (!isset($returnArray[$x[0]])) {
-                        $returnArray[$x[0]] = array();
-                    }
-                    $first = true;
-                    $b = null;
-                    foreach ($x as $k => $v) {
-                        if ($first === true) {
-                            $b = $array[$key];
-                            $first = false;
-                        }
-                        $b = array($v => $b);
-                    }
-                    $returnArray[$x[0]] = array_merge_recursive($returnArray[$x[0]], $b[$x[0]]);
-                } else {
-                    $returnArray[$key] = $array[$key];
-                }
-            }
-        }
-        return $returnArray;
     }
 
     private static function sanitizeSectionsAndKeys_addPlaceholders($string) {
