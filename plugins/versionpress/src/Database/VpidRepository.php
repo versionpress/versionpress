@@ -60,6 +60,7 @@ class VpidRepository {
 
                 if ($entity[$valueColumn] == 0) {
                     $entity[$valueColumn] = false;
+                    continue;
                 }
 
                 if ($targetEntity[0] === '@') {
