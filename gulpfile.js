@@ -144,14 +144,14 @@ gulp.task('copy', ['clean', 'prepare-src-definition'], function (cb) {
 /**
  * Builds the frontend.
  */
-gulp.task('frontend-build', ['copy'], shell.task([
+gulp.task('frontend-build', ['init-frontend'], shell.task([
     'npm run build'
 ], {cwd: frontendDir}));
 
 /**
  * Deploys the frontend.
  */
-gulp.task('frontend-deploy', ['copy', 'frontend-build'], function(cb) {
+gulp.task('frontend-deploy', ['copy'], function(cb) {
     var src = frontendDir + '/build/**';
     var dist = buildDir + '/admin/public/gui';
     var srcOptions = {dot: true};
@@ -346,7 +346,7 @@ gulp.task('test-deploy', ['prepare-test-deploy', 'copy', 'frontend-deploy']);
  * Inits dev environment.
  * Install vendors, set env variables.
  */
-gulp.task('init-dev', ['git-config', 'composer-install-ext-libs', 'composer-install-versionpress-libs', 'init-project-settings-files', 'init-frontend']);
+gulp.task('init-dev', ['git-config', 'composer-install-ext-libs', 'composer-install-versionpress-libs', 'init-project-settings-files', 'frontend-build']);
 
 //--------------------------------------
 // Helper functions
