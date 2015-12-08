@@ -7,8 +7,6 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Git\GitConfig;
 use VersionPress\Git\GitRepository;
-use VersionPress\Storages\DirectoryStorage;
-use VersionPress\Storages\SingleFileStorage;
 use VersionPress\Storages\Storage;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Synchronizers\SynchronizerFactory;
@@ -234,11 +232,9 @@ class Initializer {
         $entities = $this->doEntitySpecificActions($entityName, $entities);
         $storage->prepareStorage();
 
-        if ($storage instanceof DirectoryStorage) {
-            $this->saveDirectoryStorageEntities($storage, $entities);
-        } else if ($storage instanceof SingleFileStorage) {
-            $this->saveSingleFileStorageEntities($storage, $entities);
-        } else if ($this->dbSchema->isChildEntity($entityName)) { // meta entities
+        if (!$this->dbSchema->isChildEntity($entityName)) {
+            $this->saveStandardEntities($storage, $entities);
+        } else { // meta entities
             $entityInfo = $this->dbSchema->getEntityInfo($entityName);
             $parentReference = "vp_" . $entityInfo->parentReference;
 
@@ -246,19 +242,11 @@ class Initializer {
         }
     }
 
-    private function saveDirectoryStorageEntities(DirectoryStorage $storage, $entities) {
+    private function saveStandardEntities(Storage $storage, $entities) {
         foreach ($entities as $entity) {
             $storage->save($entity);
             $this->checkTimeout();
         }
-    }
-
-    private function saveSingleFileStorageEntities(SingleFileStorage $storage, $entities) {
-        foreach ($entities as $entity) {
-            $storage->saveLater($entity);
-        }
-        $storage->commit();
-        $this->checkTimeout();
     }
 
     private function saveMetaEntities(Storage $storage, $entities, $parentReference) {
