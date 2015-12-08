@@ -30,7 +30,7 @@ use wpdb;
  */
 class Initializer {
 
-    const TIME_FOR_ABORTION = 3;
+    const TIME_FOR_ABORTION = 5;
 
     /**
      * Array of functions to call when the progress changes. Implements part of the Observer pattern.
@@ -503,11 +503,13 @@ class Initializer {
     }
 
     private function abortInitialization() {
-        vp_disable_maintenance();
+        touch(VERSIONPRESS_PLUGIN_DIR . '/.abort-initialization');
+
         if (VersionPress::isActive()) {
-            @unlink(WP_CONTENT_DIR . '/db.php');
             @unlink(VERSIONPRESS_ACTIVATION_FILE);
         }
+
+        vp_disable_maintenance();
         throw new InitializationAbortedException();
     }
 
