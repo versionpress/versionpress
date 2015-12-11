@@ -55,7 +55,7 @@ use VersionPress\Utils\RequirementsChecker;
                     ?>
                 </ul>
 
-                <div><a href="<?php echo admin_url('admin.php?page=versionpress/admin/system-info.php') ?>">(view full system info)</a></div>
+                <div><a href="<?php echo admin_url('admin.php?page=versionpress/admin/system-info.php') ?>">View full system info</a><?php if (!$requirementsChecker->isEverythingFulfilled()) { ?>, <a href="https://github.com/versionpress/support">get support on GitHub</a><?php } ?></div>
 
             </div>
 
@@ -65,7 +65,7 @@ use VersionPress\Utils\RequirementsChecker;
                 <ul>
                     <li>
                         <span class="icon icon-notification"></span>
-                        You are activating an <strong>Early Access version</strong>. If you encounter any issues please let us know at info@versionpress.net. <a href="http://docs.versionpress.net/en/getting-started/about-eap">Learn more about EAP</a>.
+                        You are activating an <strong>Early Access version</strong>. If you encounter any issues please let us know <a href="https://github.com/versionpress/support">on GitHub</a>. <a href="http://docs.versionpress.net/en/getting-started/about-eap">Learn more about EAP</a>.
                     </li>
                     <li>
                         <span class="icon icon-notification"></span>
