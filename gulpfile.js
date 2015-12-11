@@ -87,7 +87,7 @@ gulp.task('set-nightly-build', function() {
 gulp.task('prepare-test-deploy', function() {
     var testConfigStr = fs.readFileSync(vpDir + '/tests/test-config.neon', 'utf-8');
     var testConfig = neon.decode(testConfigStr).toObject(true);
-    var sitePath = testConfig["sites"][testConfig["test-site"]]["wp-site"]["path"];
+    var sitePath = process.env.VP_DEPLOY_TARGET || testConfig["sites"][testConfig["test-site"]]["wp-site"]["path"];
     if (isRelative(sitePath)) {
         sitePath = vpDir + '/tests/' + sitePath;
     }

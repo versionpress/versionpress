@@ -25,5 +25,9 @@
             <directory>Selenium</directory>
         </testsuite>
 
+        <testsuite name="Workflow Tests">
+            <directory>Workflow</directory>
+        </testsuite>
+
     </testsuites>
 </phpunit>
