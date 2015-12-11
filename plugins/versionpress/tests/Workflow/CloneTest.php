@@ -9,18 +9,101 @@ use VersionPress\Tests\Utils\TestConfig;
 
 class CloneTest extends PHPUnit_Framework_TestCase {
 
+    private static $cloneSiteName;
+
+    /** @var TestConfig */
+    private static $testConfig;
+    /** @var SiteConfig */
+    private static $siteConfig;
+    /** @var SiteConfig */
+    private static $cloneSiteConfig;
+
+    public static function setUpBeforeClass() {
+        parent::setUpBeforeClass();
+        self::$testConfig = TestConfig::createDefaultConfig();
+        self::$siteConfig = self::$testConfig->testSite;
+
+        self::$cloneSiteName = self::$siteConfig->name . 'clone';
+        self::$cloneSiteConfig = self::changeSite(self::$siteConfig, self::$cloneSiteName);
+
+    }
+
     /**
      * @test
      */
     public function cloneLooksExactlySameAsOriginal() {
-        $origSiteName = 'vp01orig';
-        $cloneSiteName = 'vp01clone';
-        $testConfig = TestConfig::createDefaultConfig();
+        $this->prepareSiteWithClone();
+        $this->assertCloneLooksExactlySameAsOriginal();
+    }
 
-        $siteConfig = $this->changeSite($testConfig->testSite, $origSiteName);
-        $cloneSiteConfig = $this->changeSite($siteConfig, $cloneSiteName);
+    /**
+     * @test
+     * @depends cloneLooksExactlySameAsOriginal
+     */
+    public function updatedCloneCanBeMergedBack() {
+        $cloneWpAutomation = new WpAutomation(self::$cloneSiteConfig, self::$testConfig->wpCliVersion);
+        $cloneWpAutomation->editOption('blogname', 'Blogname from clone');
 
-        $wpAutomation = new WpAutomation($siteConfig, $testConfig->wpCliVersion);
+        $wpAutomation = new WpAutomation(self::$siteConfig, self::$testConfig->wpCliVersion);
+        $wpAutomation->runWpCliCommand('vp', 'pull', array('from' => self::$cloneSiteName));
+
+        $this->assertCloneLooksExactlySameAsOriginal();
+    }
+
+    /**
+     * @test
+     * @depends cloneLooksExactlySameAsOriginal
+     */
+    public function updatedSiteCanBePushedToClone() {
+        $wpAutomation = new WpAutomation(self::$siteConfig, self::$testConfig->wpCliVersion);
+        $wpAutomation->editOption('blogname', 'Blogname from original');
+
+        $wpAutomation->runWpCliCommand('vp', 'push', array('to' => self::$cloneSiteName));
+
+        $this->assertCloneLooksExactlySameAsOriginal();
+    }
+
+    /**
+     * @test
+     *
+     */
+    public function sitesAreNotMergedIfThereIsConflict() {
+        $cloneWpAutomation = new WpAutomation(self::$cloneSiteConfig, self::$testConfig->wpCliVersion);
+        $cloneWpAutomation->editOption('blogname', 'Blogname from clone - conflict');
+
+        $wpAutomation = new WpAutomation(self::$siteConfig, self::$testConfig->wpCliVersion);
+        $wpAutomation->editOption('blogname', 'Blogname from original - conflict');
+
+        $output = $wpAutomation->runWpCliCommand('vp', 'pull', array('from' => self::$cloneSiteName));
+
+        $this->assertContains("Pull aborted", $output);
+    }
+
+    /**
+     * Creates SiteConfig for new site based on another SiteConfig.
+     *
+     * @param SiteConfig $testSite
+     * @param $siteName
+     * @return SiteConfig
+     */
+    private static function changeSite(SiteConfig $testSite, $siteName) {
+        $testSite = clone $testSite;
+        $testSite->name = $siteName;
+        $testSite->path = dirname($testSite->path) . "/$siteName";
+        $testSite->url = dirname($testSite->url) . "/$siteName";
+        $testSite->dbTablePrefix = "wp_{$siteName}_";
+
+        return $testSite;
+    }
+
+    /**
+     * Creates site and its clone.
+     */
+    private function prepareSiteWithClone() {
+        $siteConfig = self::$siteConfig;
+        $cloneSiteConfig = self::$cloneSiteConfig;
+
+        $wpAutomation = new WpAutomation($siteConfig, self::$testConfig->wpCliVersion);
         $wpAutomation->setUpSite();
         $wpAutomation->copyVersionPressFiles();
         $wpAutomation->disableDebugger();
@@ -37,33 +120,19 @@ UPDATE {$cloneSiteConfig->dbTablePrefix}posts c_posts
   JOIN {$siteConfig->dbTablePrefix}vp_id o_vp_id ON o_vp_id.vp_id = c_vp_id.vp_id
   JOIN {$siteConfig->dbTablePrefix}posts o_posts ON o_posts.ID = o_vp_id.id
   SET c_posts.post_modified = o_posts.post_modified, c_posts.post_modified_gmt = o_posts.post_modified_gmt;");
-
-        $domOrig = new \DOMDocument();
-        @$domOrig->loadHTML(file_get_contents($siteConfig->url));
-        $domClone = new \DOMDocument();
-        @$domClone->loadHTML(file_get_contents($cloneSiteConfig->url));
-
-        $t1 = $domOrig->textContent;
-        // todo: remove replacing of line endings in #589
-        $t2 = str_replace("\r\n", "\n", str_replace($cloneSiteName, $origSiteName, $domClone->textContent));
-
-        $this->assertEquals($t1, $t2);
     }
 
-    /**
-     * Creates SiteConfig for new site based on another SiteConfig.
-     *
-     * @param SiteConfig $testSite
-     * @param $siteName
-     * @return SiteConfig
-     */
-    private function changeSite(SiteConfig $testSite, $siteName) {
-        $testSite = clone $testSite;
-        $testSite->name = $siteName;
-        $testSite->path = dirname($testSite->path) . "/$siteName";
-        $testSite->url = dirname($testSite->url) . "/$siteName";
-        $testSite->dbTablePrefix = "wp_{$siteName}_";
+    private function getTextContentAtUrl($url) {
+        $dom = new \DOMDocument();
+        @$dom->loadHTML(file_get_contents($url));
+        return $dom->textContent;
+    }
 
-        return $testSite;
+    private function assertCloneLooksExactlySameAsOriginal() {
+        $origContent = $this->getTextContentAtUrl(self::$siteConfig->url);
+        // todo: remove replacing of line endings in #589
+        $cloneContent = str_replace("\r\n", "\n", str_replace(self::$cloneSiteName, self::$siteConfig->name, $this->getTextContentAtUrl(self::$cloneSiteConfig->url)));
+
+        $this->assertEquals($origContent, $cloneContent);
     }
 }
