@@ -60,7 +60,7 @@ class IniSerializer {
             } else if (empty($section)) {
                 throw new \Exception("Empty sections are not supported");
             }
-            $output = array_merge($output, self::serializeSection($sectionName, $section, ""));
+            $output = array_merge($output, self::serializeSection($sectionName, $section));
         }
         return self::outputToString($output);
     }
@@ -70,20 +70,12 @@ class IniSerializer {
      *
      * @param string $sectionName Something like "Section"
      * @param array $data
-     * @param string $parentFullName Empty string or something ending with a dot, e.g. "ParentSection."
      * @return array Array of strings that will be lines in the output INI string
      */
-    private static function serializeSection($sectionName, $data, $parentFullName = "") {
-
-        $data = self::ensureCorrectOrder($data);
-
+    private static function serializeSection($sectionName, $data) {
         $output = array();
-
-        if (!self::containsOnlySubsections($data)) {
-            $output[] = "[$parentFullName$sectionName]";
-        }
-
-        $output = array_merge($output, self::serializeData($data, $parentFullName . $sectionName . "."));
+        $output[] = "[$sectionName]";
+        $output = array_merge($output, self::serializeData($data));
 
         // Add empty line after section. There could have been empty lines already generated from recursive
         // calls so just add it if it's necessary.
@@ -94,47 +86,13 @@ class IniSerializer {
         return $output;
     }
 
-    /**
-     * Returns true of the section data contains only subsections.
-     *
-     * @param $data
-     * @return bool
-     */
-    private static function containsOnlySubsections($data) {
-
-        // Let's keep the full-fledged algo here but there could also be a simpler one:
-        // should there be a normal key-value pair in the data, it would be the first one
-        // because if it followed after some subsection, it would belong to the subsection in the INI
-        // format. So it must be first.
-
-        foreach ($data as $key => $value) {
-            if (!ArrayUtils::isAssociative($value)) {
-                return false;
-            }
-        }
-
-        return true;
-
-    }
-
-    private static function serializeData($data, $parentFullName) {
+    private static function serializeData($data) {
         $output = array();
         foreach ($data as $key => $value) {
             if ($key == '') continue;
             if (is_array($value)) {
-
-                if (!ArrayUtils::isAssociative($value)) {
-
-                    // Plain arrays are serialized as key[0] = val1, key[1] = val2
-
-                    foreach ($value as $arrayKey => $arrayValue)
-                        $output[] = self::serializeKeyValuePair($key . "[$arrayKey]", $arrayValue);
-
-                } else {
-
-                    // Associative arrays create subsections
-
-                    $output = array_merge($output, self::serializeSection($key, $value, $parentFullName));
+                foreach ($value as $arrayKey => $arrayValue) {
+                    $output[] = self::serializeKeyValuePair($key . "[$arrayKey]", $arrayValue);
                 }
 
             } else {
@@ -261,27 +219,6 @@ class IniSerializer {
      */
     private static function serializeKeyValuePair($key, $value) {
         return $key . " = " . (is_numeric($value) ? $value : '"' . self::escapeString($value) . '"');
-    }
-
-    /**
-     * Simple key-values must appear before subsections for serialization to work correctly,
-     * which this method ensures.
-     *
-     * @param array $data
-     * @return array
-     */
-    private static function ensureCorrectOrder($data) {
-        $keyValues = array();
-        $subsections = array();
-        foreach ($data as $key => $value) {
-            if (ArrayUtils::isAssociative($value)) {
-                $subsections[$key] = $value;
-            } else {
-                $keyValues[$key] = $value;
-            }
-        }
-
-        return array_merge($keyValues, $subsections);
     }
 
     private static function sanitizeSectionsAndKeys_addPlaceholders($string) {
