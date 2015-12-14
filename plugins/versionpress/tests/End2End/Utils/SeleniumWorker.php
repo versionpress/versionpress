@@ -273,7 +273,7 @@ class SeleniumWorker implements ITestWorker {
      *
      * @param int $timeout Milliseconds
      */
-    protected function waitAfterRedirect($timeout = 5000) {
+    protected function waitAfterRedirect($timeout = 15000) {
         $this->waitUntilTrue(function (SeleniumWorkerBasedFakeTestCase $testCase) {
             return $testCase->executeScript("return document.readyState;") == "complete";
         }, $timeout);
@@ -300,7 +300,7 @@ class SeleniumWorker implements ITestWorker {
     protected function waitForAjax() {
         $this->waitUntilTrue(function (SeleniumWorkerBasedFakeTestCase $testCase) {
             return $testCase->executeScript("return jQuery.active;") === 0;
-        }, 5000);
+        }, 15000);
     }
 
     /**

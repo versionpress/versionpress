@@ -5,6 +5,7 @@ namespace VersionPress\Tests\End2End\Users;
 use Nette\Utils\Random;
 use Nette\Utils\Strings;
 use VersionPress\Tests\End2End\Utils\SeleniumWorker;
+use VersionPress\Tests\Utils\WpVersionComparer;
 
 class UsersTestSeleniumWorker extends SeleniumWorker implements IUsersTestWorker {
 
@@ -68,7 +69,10 @@ class UsersTestSeleniumWorker extends SeleniumWorker implements IUsersTestWorker
     }
 
     public function deleteUser() {
-        $this->byCssSelector('#delete_option0')->click();
+        if ($this->isWpVersionLowerThan("4.4-beta1")) {
+            $this->byCssSelector('#delete_option0')->click();
+        }
+
         $this->byCssSelector('#updateusers')->submit();
         $this->waitAfterRedirect();
     }
@@ -96,7 +100,11 @@ class UsersTestSeleniumWorker extends SeleniumWorker implements IUsersTestWorker
 
         $this->select($this->byId('bulk-action-selector-top'))->selectOptionByValue('delete');
         $this->jsClickAndWait('#doaction');
-        $this->byCssSelector('#delete_option0')->click();
+
+        if ($this->isWpVersionLowerThan("4.4-beta1")) {
+            $this->byCssSelector('#delete_option0')->click();
+        }
+
         $this->byCssSelector('#updateusers')->submit();
         $this->waitAfterRedirect();
     }

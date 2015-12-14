@@ -603,16 +603,11 @@ class WpAutomation {
 
         $childEnv = array_merge($childEnv, (array)$env);
 
-        $process = new Process($command, $executionPath, $childEnv, null, 180);
+        $process = new Process($command, $executionPath, $childEnv);
         $process->run();
 
         if (!$process->isSuccessful()) {
-            $msg = $process->getErrorOutput();
-            if (!$msg) {
-                // e.g. WP-CLI outputs to STDOUT instead of STDERR
-                $msg = $process->getOutput();
-            }
-            throw new Exception("Error executing cmd '$command' from working directory '$executionPath':\n$msg");
+            throw new Exception("Error executing cmd '$command' from working directory '$executionPath':\n{$process->getConsoleOutput()}");
         }
 
         return $process->getOutput();
