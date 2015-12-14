@@ -45,6 +45,15 @@ if (defined('VP_MAINTENANCE')) {
     vp_disable_maintenance();
 }
 
+if (!VersionPress::isActive() && is_file(VERSIONPRESS_PLUGIN_DIR . '/.abort-initialization')) {
+    if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
+        FileSystem::remove(ABSPATH . '.git');
+    }
+
+    FileSystem::remove(VERSIONPRESS_MIRRORING_DIR);
+    unlink(VERSIONPRESS_PLUGIN_DIR . '/.abort-initialization');
+}
+
 //----------------------------------------
 // Hooks for VersionPress functionality
 //----------------------------------------
