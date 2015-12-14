@@ -123,7 +123,11 @@ class OptionsSynchronizerTest extends SynchronizerTestCase {
 
         // cleanup
         if ($previousSiteIcon) {
-            $this->storage->save(EntityUtils::prepareOption('site_icon', $previousSiteIcon));
+            if (!isset($previousSiteIcon['option_value'])) {
+                $previousSiteIcon['option_value'] = false;
+            }
+
+            $this->storage->save($previousSiteIcon);
         } else {
             $this->storage->delete($option);
         }

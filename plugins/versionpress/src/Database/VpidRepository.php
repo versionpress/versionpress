@@ -44,7 +44,7 @@ class VpidRepository {
                 if ($entity[$referenceName] > 0) {
                     $referenceVpId = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=$entity[$referenceName]");
                 } else {
-                    $referenceVpId = false;
+                    $referenceVpId = 0;
                 }
 
                 $entity['vp_' . $referenceName] = $referenceVpId;
@@ -59,7 +59,6 @@ class VpidRepository {
             if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn])) {
 
                 if ($entity[$valueColumn] == 0) {
-                    $entity[$valueColumn] = false;
                     continue;
                 }
 
