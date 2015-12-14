@@ -20,7 +20,8 @@ class UserMetaStorage extends MetaEntityStorage {
 
     public function shouldBeSaved($data) {
         if ($this->keyEquals($data, 'session_tokens') ||
-            $this->keyEquals($data, 'nav_menu_recently_edited')) {
+            $this->keyEquals($data, 'nav_menu_recently_edited') ||
+            $this->keyEquals($data, 'wporg_favorites')) {
             return false;
         }
 
