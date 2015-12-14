@@ -33,7 +33,10 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
 
         $schemaReflection = new \ReflectionClass('VersionPress\Database\DbSchemaInfo');
         $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.neon';
-        self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix);
+        /** @var $wp_db_version */
+        require(self::$testConfig->testSite->path . '/wp-includes/version.php');
+
+        self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
 
         $dbHost = self::$testConfig->testSite->dbHost;
         $dbUser = self::$testConfig->testSite->dbUser;

@@ -35,6 +35,7 @@ term:
     id: term_id
 
 termmeta:
+    since: 35329
     id: meta_id
     parent-reference: term_id
     references:

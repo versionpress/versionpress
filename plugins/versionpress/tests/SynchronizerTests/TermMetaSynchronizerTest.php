@@ -24,6 +24,10 @@ class TermMetaSynchronizerTest extends SynchronizerTestCase {
     private static $termVpId;
 
     protected function setUp() {
+        if (!in_array('termmeta', self::$schemaInfo->getAllEntityNames())) {
+            throw new \PHPUnit_Framework_SkippedTestError("Termmeta are not supported in this version of WP");
+        }
+
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('termmeta');
         $this->termStorage = self::$storageFactory->getStorage('term');

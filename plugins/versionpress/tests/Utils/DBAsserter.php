@@ -38,9 +38,13 @@ class DBAsserter {
         $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
         $schemaReflection = new \ReflectionClass('VersionPress\Database\DbSchemaInfo');
         $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.neon';
-        self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix);
 
-        $wpAutomation = new WpAutomation(self::$testConfig->testSite, '0.21.0');
+        /** @var $wp_db_version */
+        require(self::$testConfig->testSite->path . '/wp-includes/version.php');
+
+        self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
+
+        $wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
         $rawTaxonomies = $wpAutomation->runWpCliCommand('taxonomy', 'list', array('format'=>'json', 'fields'=>'name'));
         $taxonomies = ArrayUtils::column(json_decode($rawTaxonomies, true), 'name');
 

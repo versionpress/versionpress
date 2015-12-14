@@ -43,6 +43,7 @@ class SynchronizerFactory {
         $this->database = $wpdb;
         $this->dbSchema = $dbSchema;
         $this->urlReplacer = $urlReplacer;
+        $this->adjustSynchronizationSequenceToDbVersion();
     }
 
     /**
@@ -60,5 +61,10 @@ class SynchronizerFactory {
 
     private function getStorage($synchronizerName) {
         return $this->storageFactory->getStorage($synchronizerName);
+    }
+
+    private function adjustSynchronizationSequenceToDbVersion() {
+        $allSupportedEntities = $this->dbSchema->getAllEntityNames();
+        $this->synchronizationSequence = array_intersect($this->synchronizationSequence, $allSupportedEntities);
     }
 }
