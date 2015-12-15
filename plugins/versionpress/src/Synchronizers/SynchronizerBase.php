@@ -118,14 +118,11 @@ abstract class SynchronizerBase implements Synchronizer {
     private function loadEntitiesFromStorage($entitiesToSynchronize) {
         if ($this->selectiveSynchronization) {
             $entities = array();
-            if (!($this->storage instanceof MetaEntityStorage)) {
-                $entitiesToSynchronize = array_map(function ($entity) { $entity['parent'] = null; return $entity; }, $entitiesToSynchronize);
-                $entitiesToSynchronize = array_unique($entitiesToSynchronize, SORT_REGULAR);
-            }
-
             foreach ($entitiesToSynchronize as $entityToSynchronize) {
                 if ($this->storage->exists($entityToSynchronize['vp_id'], $entityToSynchronize['parent'])) {
                     $entities[] = $this->storage->loadEntity($entityToSynchronize['vp_id'], $entityToSynchronize['parent']);
+                } else if ($this->storage->exists($entityToSynchronize['vp_id'], null)) {
+                    $entities[] = $this->storage->loadEntity($entityToSynchronize['vp_id'], null);
                 }
             }
 
@@ -138,12 +135,20 @@ abstract class SynchronizerBase implements Synchronizer {
 
     /**
      * Called after entities have been loaded from storage to give the subclasses
-     * a chance to modify the array.
+     * a chance to modify the array. By default removes meta-entities.
      *
      * @param array $entities Entities as loaded from the storage
      * @return array Entities as transformed (if at all) by this synchronizer
      */
     protected function transformEntities($entities) {
+        foreach ($entities as &$entity) {
+            foreach ($entity as $field => $value) {
+                if (Strings::match($field, "/.*#[0-9a-f]+/i")) {
+                    unset($entity[$field]);
+                }
+            }
+        }
+
         return $entities;
     }
 
@@ -443,7 +448,7 @@ abstract class SynchronizerBase implements Synchronizer {
 
     private function getIdsForVpIds($referencesToUpdate) {
         if (count($referencesToUpdate) === 0) {
-            return array();
+            return array(array(0, 0));
         }
 
         $vpIdTable = $this->dbSchema->getPrefixedTableName('vp_id');
@@ -454,6 +459,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $vpIdsRestriction = join(', ', $vpIds);
 
         $result = $this->database->get_results("SELECT HEX(vp_id), id FROM $vpIdTable WHERE vp_id IN ($vpIdsRestriction)", ARRAY_N);
+        $result[] = array(0, 0);
         return array_combine(ArrayUtils::column($result, 0), ArrayUtils::column($result, 1));
     }
 

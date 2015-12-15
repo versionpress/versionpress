@@ -55,11 +55,11 @@ class TermStorageTest extends \PHPUnit_Framework_TestCase {
             )
         ));
 
-        $this->storage = new TermStorage(__DIR__ . '/terms.ini', $entityInfo);
+        $this->storage = new TermStorage(__DIR__ . '/terms', $entityInfo);
     }
 
     protected function tearDown() {
         parent::tearDown();
-        FileSystem::remove(__DIR__ . '/terms.ini');
+        FileSystem::remove(__DIR__ . '/terms');
     }
 }

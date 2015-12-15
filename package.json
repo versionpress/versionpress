@@ -19,6 +19,7 @@
     "gulp-replace": "~0.5.4",
     "gulp-shell": "~0.4.3",
     "gulp-zip": "~3.0.2",
+    "merge-stream": "^1.0.0",
     "neon-js": "^1.0.0",
     "shelljs": "^0.5.3"
   },

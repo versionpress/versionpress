@@ -6,6 +6,7 @@ use Exception;
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
+use VersionPress\Tests\Utils\WpVersionComparer;
 
 class WidgetsTest extends End2EndTestCase {
 
@@ -34,9 +35,17 @@ class WidgetsTest extends End2EndTestCase {
         self::$worker->createWidget();
 
         $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction('option/create');
+
+        if (self::$testConfig->end2endTestType === 'selenium' &&
+            WpVersionComparer::compare(self::$testConfig->testSite->wpVersion, '4.4-beta1') >= 0) {
+            $commitAsserter->assertCommitAction('option/edit');
+            $commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
+        } else {
+            $commitAsserter->assertCommitAction('option/create');
+            $commitAsserter->assertCommitPath('A', '%vpdb%/options/%VPID%.ini');
+        }
+
         $commitAsserter->assertCountOfAffectedFiles(2);
-        $commitAsserter->assertCommitPath('A', '%vpdb%/options/%VPID%.ini');
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }

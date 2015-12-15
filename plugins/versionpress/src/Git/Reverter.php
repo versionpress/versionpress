@@ -90,9 +90,7 @@ class Reverter {
         $vpIdsInModifiedFiles = array_merge($vpIdsInModifiedFiles, $this->getAllVpIdsFromModifiedFiles($modifiedFiles));
         $vpIdsInModifiedFiles = array_unique($vpIdsInModifiedFiles, SORT_REGULAR);
 
-        $entitiesToSynchronize = $this->detectEntitiesToSynchronize($modifiedFiles, $vpIdsInModifiedFiles);
-
-        $this->synchronizationProcess->synchronize($entitiesToSynchronize);
+        $this->synchronizationProcess->synchronize($vpIdsInModifiedFiles);
         $affectedPosts = $this->getAffectedPosts($modifiedFiles);
         $this->updateChangeDateForPosts($affectedPosts);
 
@@ -163,11 +161,11 @@ class Reverter {
                 continue;
             }
 
-            $entityExists = $this->storageFactory->getStorage($referencedEntityName)->exists($entity[$vpReference], $parentId);
+            $referencedEntityId = $entity[$vpReference];
+            $entityExists = $this->entityExists($referencedEntityName, $referencedEntityId, $parentId);
             if (!$entityExists) {
                 return false;
             }
-
         }
 
         foreach ($entityInfo->mnReferences as $reference => $referencedEntityName) {
@@ -177,7 +175,7 @@ class Reverter {
             }
 
             foreach ($entity[$vpReference] as $referencedEntityId) {
-                $entityExists = $this->storageFactory->getStorage($referencedEntityName)->exists($referencedEntityId, $parentId);
+                $entityExists = $this->entityExists($referencedEntityName, $referencedEntityId, $parentId);
                 if (!$entityExists) {
                     return false;
                 }
@@ -190,6 +188,8 @@ class Reverter {
                 continue;
             }
 
+            $referencedEntityId = $entity[$valueColumn];
+
             if ($referencedEntityName[0] === '@') {
                 $entityNameProvider = substr($referencedEntityName, 1); // strip the '@'
                 $referencedEntityName = call_user_func($entityNameProvider, $entity);
@@ -198,7 +198,7 @@ class Reverter {
                 }
             }
 
-            $entityExists = $this->storageFactory->getStorage($referencedEntityName)->exists($entity[$valueColumn], $parentId);
+            $entityExists = $this->entityExists($referencedEntityName, $referencedEntityId, $parentId);
             if (!$entityExists) {
                 return false;
             }
@@ -262,36 +262,6 @@ class Reverter {
         }
 
         return false;
-    }
-
-    /**
-     * @param string[] $modifiedFiles List of modified files
-     * @param string[][] $vpIdsInModifiedFiles List of VPIDs with their possible parents
-     * @return array List of storages which will be fully synchronized and list of VPIDs with their possible parents
-     *          which will be synchronized as well.
-     */
-    private function detectEntitiesToSynchronize($modifiedFiles, $vpIdsInModifiedFiles) {
-        $entitiesToSynchronize = array('storages' => array(), 'entities' => $vpIdsInModifiedFiles);
-
-        if ($this->wasModified($modifiedFiles, 'terms.ini')) {
-            $entitiesToSynchronize['storages'][] = 'term';
-            $entitiesToSynchronize['storages'][] = 'term_taxonomy';
-        }
-
-        return $entitiesToSynchronize;
-    }
-
-    /**
-     * Returns true if any item of array $modifiedFiles contains a substring $pathPart.
-     *
-     * @param string[] $modifiedFiles
-     * @param string $pathPart
-     * @return bool
-     */
-    private function wasModified($modifiedFiles, $pathPart) {
-        return ArrayUtils::any($modifiedFiles, function ($file) use ($pathPart) {
-            return Strings::contains($file, $pathPart);
-        });
     }
 
     private function getAllVpIdsFromModifiedFiles($modifiedFiles) {
@@ -366,5 +336,29 @@ class Reverter {
             wp_delete_post($menuItemId, true);
             $this->committer->discardPostponedCommit('menu-item-' . $menuItemId);
         }
+    }
+
+    /**
+     * For standard entities just checks the storage.
+     * For child entities (like postmeta) loads all entities and checks them.
+     *
+     * @param $referencedEntityName
+     * @param $referencedEntityId
+     * @param $maybeParentId
+     * @return bool
+     */
+    private function entityExists($referencedEntityName, $referencedEntityId, $maybeParentId) {
+
+        if (!$this->dbSchemaInfo->isChildEntity($referencedEntityName)) {
+            return $this->storageFactory->getStorage($referencedEntityName)->exists($referencedEntityId, null);
+        }
+
+        // Optimalization for child entities saved within their parents
+        if ($this->storageFactory->getStorage($referencedEntityName)->exists($referencedEntityId, $maybeParentId)) {
+            return true;
+        }
+
+        $allEntities = $this->storageFactory->getStorage($referencedEntityName)->loadAll();
+        return isset($allEntities[$referencedEntityId]);
     }
 }

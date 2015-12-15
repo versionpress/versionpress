@@ -4,6 +4,7 @@ namespace VersionPress\Storages;
 
 use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\UserMetaChangeInfo;
+use VersionPress\Database\EntityInfo;
 use VersionPress\Utils\ArrayUtils;
 
 class UserMetaStorage extends MetaEntityStorage {
@@ -12,14 +13,15 @@ class UserMetaStorage extends MetaEntityStorage {
     private $dbPrefix;
     const PREFIX_PLACEHOLDER = "<<table-prefix>>";
 
-    function __construct(UserStorage $userStorage, $dbPrefix) {
-        parent::__construct($userStorage, 'meta_key', 'meta_value', 'vp_user_id');
+    function __construct(UserStorage $userStorage, EntityInfo $entityInfo, $dbPrefix) {
+        parent::__construct($userStorage, $entityInfo, 'meta_key', 'meta_value');
         $this->dbPrefix = $dbPrefix;
     }
 
     public function shouldBeSaved($data) {
         if ($this->keyEquals($data, 'session_tokens') ||
-            $this->keyEquals($data, 'nav_menu_recently_edited')) {
+            $this->keyEquals($data, 'nav_menu_recently_edited') ||
+            $this->keyEquals($data, 'wporg_favorites')) {
             return false;
         }
 

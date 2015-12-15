@@ -33,6 +33,7 @@ class ChangeInfoEnvelope implements ChangeInfo {
         "post" => 'VersionPress\ChangeInfos\BulkPostChangeInfo',
         "postmeta" => 'VersionPress\ChangeInfos\BulkPostMetaChangeInfo',
         "term" => 'VersionPress\ChangeInfos\BulkTermChangeInfo',
+        "termmeta" => 'VersionPress\ChangeInfos\BulkTermMetaChangeInfo',
         "theme" => 'VersionPress\ChangeInfos\BulkThemeChangeInfo',
         "translation" => 'VersionPress\ChangeInfos\BulkTranslationChangeInfo',
         "user" => 'VersionPress\ChangeInfos\BulkUserChangeInfo',

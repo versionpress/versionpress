@@ -45,6 +45,15 @@ if (defined('VP_MAINTENANCE')) {
     vp_disable_maintenance();
 }
 
+if (!VersionPress::isActive() && is_file(VERSIONPRESS_PLUGIN_DIR . '/.abort-initialization')) {
+    if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
+        FileSystem::remove(ABSPATH . '.git');
+    }
+
+    FileSystem::remove(VERSIONPRESS_MIRRORING_DIR);
+    unlink(VERSIONPRESS_PLUGIN_DIR . '/.abort-initialization');
+}
+
 //----------------------------------------
 // Hooks for VersionPress functionality
 //----------------------------------------
@@ -372,6 +381,32 @@ function vp_register_hooks() {
         // in the current one the changed rewrite rules are not yet effective.
         set_transient('vp_flush_rewrite_rules', 1);
         vp_flush_regenerable_options();
+    });
+
+    add_action('pre_delete_term', function ($term, $taxonomy) use ($wpdb, $wpdbMirrorBridge) {
+        if (!is_taxonomy_hierarchical($taxonomy)) {
+            return;
+        }
+
+        $term = get_term($term, $taxonomy);
+        if (is_wp_error($term)) {
+            return;
+        }
+
+        $wpdbMirrorBridge->update($wpdb->term_taxonomy, array('parent' => $term->parent), array('parent' => $term->term_id));
+    }, 10, 2);
+
+    add_action('before_delete_post', function ($postId) use ($wpdb) {
+            // Fixing bug in WP (#34803) and WP-CLI (#2246)
+        $post = get_post($postId);
+        if ( !is_wp_error($post) && $post->post_type === 'nav_menu_item' ) {
+            \Tracy\Debugger::log('Deleting menu item ' . $post->ID);
+            $newParent = get_post_meta($post->ID, '_menu_item_menu_item_parent', true);
+            $wpdb->update($wpdb->postmeta,
+                array('meta_value' => $newParent),
+                array('meta_key' => '_menu_item_menu_item_parent', 'meta_value' => $post->ID)
+            );
+        }
     });
 
     //----------------------------------------
@@ -841,29 +876,6 @@ function vp_ajax_hide_vp_welcome_panel() {
 }
 
 add_action('wp_ajax_vp_show_undo_confirm', 'vp_show_undo_confirm');
-
-//----------------------------------
-// Private functions
-//----------------------------------
-
-function vp_enable_maintenance() {
-    $maintenance_string = '<?php define("VP_MAINTENANCE", true); $upgrading = ' . time() . '; ?>';
-    file_put_contents(ABSPATH . '/.maintenance', $maintenance_string);
-}
-
-function vp_disable_maintenance() {
-    FileSystem::remove(ABSPATH . '/.maintenance');
-}
-
-function vp_flush_regenerable_options() {
-    wp_cache_flush();
-    $taxonomies = get_taxonomies();
-    foreach($taxonomies as $taxonomy) {
-        delete_option("{$taxonomy}_children");
-        // Regenerate {$taxonomy}_children
-        _get_term_hierarchy($taxonomy);
-    }
-}
 
 //----------------------------------
 // CSS & JS

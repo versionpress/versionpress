@@ -16,6 +16,7 @@ var removeLines = require('gulp-remove-lines');
 var neon = require('neon-js');
 var composer = require('gulp-composer');
 var git = require('gulp-git');
+var merge = require('merge-stream');
 
 /**
  * Version to be displayed both in WordPress administration and used as a suffix of the generated ZIP file
@@ -86,7 +87,7 @@ gulp.task('set-nightly-build', function() {
 gulp.task('prepare-test-deploy', function() {
     var testConfigStr = fs.readFileSync(vpDir + '/tests/test-config.neon', 'utf-8');
     var testConfig = neon.decode(testConfigStr).toObject(true);
-    var sitePath = testConfig["sites"][testConfig["test-site"]]["wp-site"]["path"];
+    var sitePath = process.env.VP_DEPLOY_TARGET || testConfig["sites"][testConfig["test-site"]]["wp-site"]["path"];
     if (isRelative(sitePath)) {
         sitePath = vpDir + '/tests/' + sitePath;
     }
@@ -105,7 +106,7 @@ gulp.task('prepare-src-definition', function () {
 
     srcDef.push(vpDir + '/**'); // add all, except:
 
-    srcDef.push('!' + vpDir + '/versionpress.iml');
+    srcDef.push('!' + vpDir + '/.idea{,/**}');
     srcDef.push('!' + vpDir + '/.gitignore'); // this .gitignore is valid for a project, not for deployed VP
     srcDef.push('!' + vpDir + '/.editorconfig');
     srcDef.push('!' + vpDir + '/.gitattributes');
@@ -273,20 +274,6 @@ gulp.task('composer-install-versionpress-libs', function() {
 });
 
 /**
- * Inits projects settings files from templates.
- */
-gulp.task('init-project-settings-files', function() {
-    return gulp.src('./.idea/*.tpl.xml')
-            .pipe(rename(function(path) {
-                var targetName = path.basename.substr(0, path.basename.length - 4) // cut '.tpl' from the filename
-                if (!fs.existsSync(targetName)) {
-                    path.basename = targetName; 
-                }
-            }))
-            .pipe(gulp.dest('./.idea'));
-});
-
-/**
  * Inits the frontend project.
  */
 gulp.task('init-frontend', function() {
@@ -346,7 +333,28 @@ gulp.task('test-deploy', ['prepare-test-deploy', 'copy', 'frontend-deploy']);
  * Inits dev environment.
  * Install vendors, set env variables.
  */
-gulp.task('init-dev', ['git-config', 'composer-install-ext-libs', 'composer-install-versionpress-libs', 'init-project-settings-files', 'frontend-build']);
+gulp.task('init-dev', ['git-config', 'composer-install-ext-libs', 'composer-install-versionpress-libs', 'frontend-build']);
+
+
+//--------------------------------------
+// IDE tasks
+//--------------------------------------
+
+/**
+ * Setup project files for IDEA / PhpStorm
+ */
+gulp.task('idea', function() {
+    var ideaProjects = [
+        {src: './.ide-tpl/.idea-versionpress/**', dest: vpDir + '/.idea'},
+        {src: './.ide-tpl/.idea-frontend/**', dest: frontendDir + '/.idea'}
+    ];
+
+    var streams = ideaProjects.map(function (project) {
+        return gulp.src(project.src, {dot: true}).pipe(gulp.dest(project.dest));
+    });
+
+    return merge.apply(null, streams);
+});
 
 //--------------------------------------
 // Helper functions

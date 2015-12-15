@@ -47,7 +47,7 @@ class UsersSynchronizerTest extends SynchronizerTestCase {
      * @testdox Synchronizer replaces absolute URLs
      */
     public function synchronizerReplacesAbsoluteUrls() {
-        $this->editUser('some_property', AbsoluteUrlReplacer::PLACEHOLDER);
+        $this->editUser('user_url', AbsoluteUrlReplacer::PLACEHOLDER);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
     }

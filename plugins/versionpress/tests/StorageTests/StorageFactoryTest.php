@@ -2,10 +2,8 @@
 
 namespace VersionPress\Tests\StorageTests;
 
-
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\StorageFactory;
-
 
 class StorageFactoryTest extends \PHPUnit_Framework_TestCase {
 
@@ -19,6 +17,7 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase {
             'comment' => 'VersionPress\Storages\CommentStorage',
             'option' => 'VersionPress\Storages\OptionStorage',
             'term' => 'VersionPress\Storages\TermStorage',
+            'termmeta' => 'VersionPress\Storages\TermMetaStorage',
             'term_taxonomy' => 'VersionPress\Storages\TermTaxonomyStorage',
             'user' => 'VersionPress\Storages\UserStorage',
             'usermeta' => 'VersionPress\Storages\UserMetaStorage',
@@ -28,7 +27,7 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase {
         /** @var \wpdb $wpdbStub */
         $wpdbStub = $this->getMockBuilder('\wpdb')->disableOriginalConstructor()->getMock();
 
-        $factory = new StorageFactory(__DIR__ . '/vpdb', new DbSchemaInfo(__DIR__ . '/../../src/Database/wordpress-schema.neon', 'wp_'), $wpdbStub, array());
+        $factory = new StorageFactory(__DIR__ . '/vpdb', new DbSchemaInfo(__DIR__ . '/../../src/Database/wordpress-schema.neon', 'wp_', PHP_INT_MAX), $wpdbStub, array());
         foreach ($storages as $entityName => $expectedClass) {
             $this->assertInstanceOf($expectedClass, $factory->getStorage($entityName));
         }

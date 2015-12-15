@@ -5,7 +5,7 @@ namespace Utils;
 
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Process\Process;
+use VersionPress\Utils\Process;
 use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Utils\FileSystem;
@@ -126,6 +126,10 @@ class SystemInfo {
         $info = array();
 
         $info['wp-version'] = get_bloginfo('version');
+
+        if (!function_exists('get_plugins')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
         $installedPlugins = get_plugins();
         array_walk($installedPlugins, function(&$pluginInfo, $pluginFile) {
 

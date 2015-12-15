@@ -97,7 +97,7 @@ class OptionsSynchronizer implements Synchronizer {
         $entityInfo = $this->dbSchema->getEntityInfo('option');
         foreach ($entityInfo->valueReferences as $reference => $targetEntity) {
             $referenceDetails = ReferenceUtils::getValueReferenceDetails($reference);
-            if ($option[$referenceDetails['source-column']] === $referenceDetails['source-value']) {
+            if ($option[$referenceDetails['source-column']] === $referenceDetails['source-value'] && isset($option[$referenceDetails['value-column']])) {
                 $vpid = $option[$referenceDetails['value-column']];
                 $vpidTable = $this->dbSchema->getPrefixedTableName('vp_id');
                 $targetTable = $this->dbSchema->getTableName($targetEntity);

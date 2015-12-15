@@ -4,6 +4,7 @@ namespace VersionPress\Storages;
 
 
 use Nette\Utils\Strings;
+use VersionPress\Database\EntityInfo;
 
 /**
  * Stores meta entities like postmeta and usermeta. It means that the meta entities are stored together
@@ -25,11 +26,11 @@ abstract class MetaEntityStorage extends Storage {
     /** @var Storage */
     private $parentStorage;
 
-    function __construct(Storage $parentStorage, $keyName, $valueName, $parentReferenceName) {
+    function __construct(Storage $parentStorage, EntityInfo $entityInfo, $keyName, $valueName) {
         $this->parentStorage = $parentStorage;
         $this->keyName = $keyName;
         $this->valueName = $valueName;
-        $this->parentReferenceName = $parentReferenceName;
+        $this->parentReferenceName = "vp_$entityInfo->parentReference";
     }
 
     public function save($data) {

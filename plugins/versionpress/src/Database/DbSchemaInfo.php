@@ -31,14 +31,18 @@ class DbSchemaInfo {
      */
     private $entityInfoRegistry;
 
+    /** @var int */
+    private $dbVersion;
+
     /**
      * @param string $schemaFile Path to a *.neon file to read from disk
      * @param string $prefix
      */
-    function __construct($schemaFile, $prefix) {
+    function __construct($schemaFile, $prefix, $dbVersion) {
         $neonSchema = file_get_contents($schemaFile);
-        $this->schema = Neon::decode($neonSchema);
+        $this->dbVersion = $dbVersion;
         $this->prefix = $prefix;
+        $this->schema = $this->useSchemaForCurrentVersion(Neon::decode($neonSchema));
     }
 
     /**
@@ -114,6 +118,16 @@ class DbSchemaInfo {
     }
 
     /**
+     * Returns true if entity has a parent reference.
+     *
+     * @param $entityName
+     * @return bool
+     */
+    public function isChildEntity($entityName) {
+        return $this->getEntityInfo($entityName)->parentReference !== null;
+    }
+
+    /**
      * Returns true if given name is an entity (is defined in schema).
      * Useful for prefixing VP tables.
      *
@@ -122,5 +136,23 @@ class DbSchemaInfo {
      */
     private function isEntity($entityOrTableName) {
         return in_array($entityOrTableName, $this->getAllEntityNames());
+    }
+
+    /**
+     * Returns valid schema for current version of WP.
+     * For example in WP < 4.4-beta1 removes the `termmeta` entity.
+     *
+     * @param $schema
+     * @return array
+     */
+    private function useSchemaForCurrentVersion($schema) {
+        $currentDbVersion = $this->dbVersion;
+        return array_filter($schema, function ($entitySchema) use ($currentDbVersion) {
+            if (!isset($entitySchema['since'])) {
+                return true;
+            }
+
+            return $entitySchema['since'] <= $currentDbVersion;
+        });
     }
 }

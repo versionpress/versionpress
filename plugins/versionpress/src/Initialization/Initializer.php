@@ -7,12 +7,9 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Git\GitConfig;
 use VersionPress\Git\GitRepository;
-use VersionPress\Storages\DirectoryStorage;
-use VersionPress\Storages\MetaEntityStorage;
-use VersionPress\Storages\SingleFileStorage;
 use VersionPress\Storages\Storage;
 use VersionPress\Storages\StorageFactory;
-use VersionPress\Synchronizers\SynchronizationProcess;
+use VersionPress\Synchronizers\SynchronizerFactory;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\FileSystem;
@@ -30,6 +27,8 @@ use wpdb;
  * @see VpAutomateCommand::startOver
  */
 class Initializer {
+
+    const TIME_FOR_ABORTION = 5;
 
     /**
      * Array of functions to call when the progress changes. Implements part of the Observer pattern.
@@ -54,6 +53,11 @@ class Initializer {
     private $storageFactory;
 
     /**
+     * @var SynchronizerFactory
+     */
+    private $synchronizerFactory;
+
+    /**
      * @var bool
      */
     private $isDatabaseLocked;
@@ -67,7 +71,6 @@ class Initializer {
      * @var AbsoluteUrlReplacer
      */
     private $urlReplacer;
-
     /**
      * @var VpidRepository
      */
@@ -75,10 +78,11 @@ class Initializer {
     private $idCache;
     private $executionStartTime;
 
-    function __construct($wpdb, DbSchemaInfo $dbSchema, StorageFactory $storageFactory, GitRepository $repository, AbsoluteUrlReplacer $urlReplacer, VpidRepository $vpidRepository) {
+    function __construct($wpdb, DbSchemaInfo $dbSchema, StorageFactory $storageFactory, SynchronizerFactory $synchronizerFactory, GitRepository $repository, AbsoluteUrlReplacer $urlReplacer, VpidRepository $vpidRepository) {
         $this->database = $wpdb;
         $this->dbSchema = $dbSchema;
         $this->storageFactory = $storageFactory;
+        $this->synchronizerFactory = $synchronizerFactory;
         $this->repository = $repository;
         $this->urlReplacer = $urlReplacer;
         $this->vpidRepository = $vpidRepository;
@@ -91,8 +95,6 @@ class Initializer {
     public function initializeVersionPress() {
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
         @set_time_limit(0); // intentionally @ - if it's disabled we can't do anything but try the initialization
-        $this->adjustGitProcessTimeout();
-
         $this->reportProgressChange(InitializerStates::START);
         vp_enable_maintenance();
         try {
@@ -200,7 +202,7 @@ class Initializer {
 
         FileSystem::mkdir(VERSIONPRESS_MIRRORING_DIR);
 
-        $entityNames = SynchronizationProcess::sortStoragesToSynchronize($this->storageFactory->getAllSupportedStorages());
+        $entityNames = $this->synchronizerFactory->getSynchronizationSequence();
         foreach ($entityNames as $entityName) {
             $this->createVpidsForEntitiesOfType($entityName);
             $this->saveEntitiesOfTypeToStorage($entityName);
@@ -230,39 +232,24 @@ class Initializer {
         $entities = $this->doEntitySpecificActions($entityName, $entities);
         $storage->prepareStorage();
 
-        if ($storage instanceof DirectoryStorage) {
-            $this->saveDirectoryStorageEntities($storage, $entities);
-        }
-
-        if ($storage instanceof SingleFileStorage) {
-            $this->saveSingleFileStorageEntities($storage, $entities);
-        }
-
-        if ($storage instanceof MetaEntityStorage) {
+        if (!$this->dbSchema->isChildEntity($entityName)) {
+            $this->saveStandardEntities($storage, $entities);
+        } else { // meta entities
             $entityInfo = $this->dbSchema->getEntityInfo($entityName);
-            reset($entityInfo->references);
-            $parentReference = "vp_" . key($entityInfo->references);
+            $parentReference = "vp_" . $entityInfo->parentReference;
 
             $this->saveMetaEntities($storage, $entities, $parentReference);
         }
     }
 
-    private function saveDirectoryStorageEntities(DirectoryStorage $storage, $entities) {
+    private function saveStandardEntities(Storage $storage, $entities) {
         foreach ($entities as $entity) {
             $storage->save($entity);
             $this->checkTimeout();
         }
     }
 
-    private function saveSingleFileStorageEntities(SingleFileStorage $storage, $entities) {
-        foreach ($entities as $entity) {
-            $storage->saveLater($entity);
-        }
-        $storage->commit();
-        $this->checkTimeout();
-    }
-
-    private function saveMetaEntities(MetaEntityStorage $storage, $entities, $parentReference) {
+    private function saveMetaEntities(Storage $storage, $entities, $parentReference) {
         if (count($entities) == 0) {
             return;
         }
@@ -414,7 +401,9 @@ class Initializer {
         }
 
         try {
+            $this->adjustGitProcessTimeout();
             $this->repository->stageAll();
+            $this->adjustGitProcessTimeout();
             $this->repository->commit($installationChangeInfo->getCommitMessage(), $authorName, $authorEmail);
         } catch (ProcessTimedOutException $ex) {
             $this->abortInitialization();
@@ -467,8 +456,18 @@ class Initializer {
     }
 
     private function adjustGitProcessTimeout() {
-        $maxExecutionTime = ini_get('max_execution_time');
-        $processTimeout = $maxExecutionTime > 0 ? $maxExecutionTime / 2 : 5 * 60;
+        $maxExecutionTime = intval(ini_get('max_execution_time'));
+
+        if ($maxExecutionTime === 0) {
+            $this->repository->setGitProcessTimeout(0);
+            return;
+        }
+
+        $currentTime = microtime(true);
+        $alreadyConsumedTime = $currentTime - $this->executionStartTime;
+        $remainingTime = $maxExecutionTime - $alreadyConsumedTime;
+        $this->checkTimeout();
+        $processTimeout = $remainingTime - self::TIME_FOR_ABORTION;
         $this->repository->setGitProcessTimeout($processTimeout);
     }
 
@@ -488,15 +487,17 @@ class Initializer {
         $executionTime = microtime(true) - $this->executionStartTime;
         $remainingTime = $maxExecutionTime - $executionTime;
 
-        return $remainingTime < 3; // in seconds
+        return $remainingTime <= self::TIME_FOR_ABORTION; // in seconds
     }
 
     private function abortInitialization() {
-        vp_disable_maintenance();
+        touch(VERSIONPRESS_PLUGIN_DIR . '/.abort-initialization');
+
         if (VersionPress::isActive()) {
-            @unlink(WP_CONTENT_DIR . '/db.php');
             @unlink(VERSIONPRESS_ACTIVATION_FILE);
         }
+
+        vp_disable_maintenance();
         throw new InitializationAbortedException();
     }
 
@@ -505,9 +506,9 @@ class Initializer {
      * @return mixed
      */
     private function getEntitiesFromDatabase($entityName) {
-        if ($this->storageFactory->getStorage($entityName) instanceof MetaEntityStorage) {
+        if ($this->dbSchema->isChildEntity($entityName)) {
             $entityInfo = $this->dbSchema->getEntityInfo($entityName);
-            $parentReference = key($entityInfo->references);
+            $parentReference = $entityInfo->parentReference;
 
             return $this->database->get_results("SELECT * FROM {$this->getTableName($entityName)} ORDER BY {$parentReference}", ARRAY_A);
         }

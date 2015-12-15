@@ -74,8 +74,8 @@ class DIContainer {
         });
 
         $dic->register(VersionPressServices::DB_SCHEMA, function () {
-            global $table_prefix;
-            return new DbSchemaInfo(VERSIONPRESS_PLUGIN_DIR . '/src/Database/wordpress-schema.neon', $table_prefix);
+            global $table_prefix, $wp_db_version;
+            return new DbSchemaInfo(VERSIONPRESS_PLUGIN_DIR . '/src/Database/wordpress-schema.neon', $table_prefix, $wp_db_version);
         });
 
         $dic->register(VersionPressServices::WPDB_MIRROR_BRIDGE, function () use ($dic) {
@@ -100,6 +100,7 @@ class DIContainer {
                 $dic->resolve(VersionPressServices::WPDB),
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::STORAGE_FACTORY),
+                $dic->resolve(VersionPressServices::SYNCHRONIZER_FACTORY),
                 $dic->resolve(VersionPressServices::REPOSITORY),
                 $dic->resolve(VersionPressServices::URL_REPLACER),
                 $dic->resolve(VersionPressServices::VPID_REPOSITORY)

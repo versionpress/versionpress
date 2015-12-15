@@ -4,7 +4,7 @@ namespace VersionPress\Tests\Automation;
 
 use Exception;
 use Nette\Utils\Strings;
-use Symfony\Component\Process\Process;
+use VersionPress\Utils\Process;
 use VersionPress\Tests\Utils\SiteConfig;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\ProcessUtils;
@@ -103,7 +103,7 @@ class WpAutomation {
     public function copyVersionPressFiles($createConfigFile = true) {
         $versionPressDir = __DIR__ . '/../..';
         $gulpBaseDir = $versionPressDir . '/../..'; // project root as checked out from our repository
-        $this->exec('gulp test-deploy', $gulpBaseDir); // this also cleans the destination directory, see gulpfile.js "clean" task
+        $this->exec('gulp test-deploy', $gulpBaseDir, true, false, array('VP_DEPLOY_TARGET' => $this->siteConfig->path)); // this also cleans the destination directory, see gulpfile.js "clean" task
         if ($createConfigFile) {
             $this->createVpconfigFile();
         }
@@ -576,10 +576,11 @@ class WpAutomation {
      *   though the site is "remote" and setting this parameter to false enables that.
      *
      * @param bool $debug
+     * @param null|array $env
      * @return string When process execution is not successful
      * @throws Exception
      */
-    private function exec($command, $executionPath = null, $autoSshTunnelling = true, $debug = false) {
+    private function exec($command, $executionPath = null, $autoSshTunnelling = true, $debug = false, $env = null) {
 
         $command = $this->rewriteWpCliCommand($command, $autoSshTunnelling);
 
@@ -591,26 +592,22 @@ class WpAutomation {
         // We don't need the xdebug enabled in the subprocesses,
         // but sometimes on the other hand we need it enabled only in the subprocess.
         $isDebug = isset($_SERVER["XDEBUG_CONFIG"]);
+        $childEnv = $_SERVER;
         if ($isDebug == $debug) {
-            $env = null; // same as this process
+            // same as this process
         } elseif ($debug) {
-            $env = $_SERVER;
-            $env["XDEBUG_CONFIG"] = "idekey=xdebug"; // turn debug on
-        } else {
-            $env = $_SERVER;
-            unset($env["XDEBUG_CONFIG"]); // turn debug off
+            $childEnv["XDEBUG_CONFIG"] = "idekey=xdebug"; // turn debug on
+        } else {;
+            unset($childEnv["XDEBUG_CONFIG"]); // turn debug off
         }
 
-        $process = new Process($command, $executionPath, $env, null, 180);
+        $childEnv = array_merge($childEnv, (array)$env);
+
+        $process = new Process($command, $executionPath, $childEnv);
         $process->run();
 
         if (!$process->isSuccessful()) {
-            $msg = $process->getErrorOutput();
-            if (!$msg) {
-                // e.g. WP-CLI outputs to STDOUT instead of STDERR
-                $msg = $process->getOutput();
-            }
-            throw new Exception("Error executing cmd '$command' from working directory '$executionPath':\n$msg");
+            throw new Exception("Error executing cmd '$command' from working directory '$executionPath':\n{$process->getConsoleOutput()}");
         }
 
         return $process->getOutput();
@@ -734,5 +731,15 @@ class WpAutomation {
 
     private function disableAutoUpdate() {
         file_put_contents($this->siteConfig->path . '/wp-config.php', "\ndefine( 'AUTOMATIC_UPDATER_DISABLED', true );\n", FILE_APPEND);
+    }
+
+    public function disableDebugger() {
+        $bootstrapFile = $this->siteConfig->path . '/wp-content/plugins/versionpress/bootstrap.php';
+        $lines = file($bootstrapFile);
+        $lines = array_filter($lines, function ($line) {
+            return !Strings::contains($line, "Debugger::enable(");
+        });
+
+        file_put_contents($bootstrapFile, join("\n", $lines));
     }
 }

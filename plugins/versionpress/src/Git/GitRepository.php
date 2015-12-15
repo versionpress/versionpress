@@ -3,7 +3,7 @@
 namespace VersionPress\Git;
 
 use Nette\Utils\Strings;
-use Symfony\Component\Process\Process;
+use VersionPress\Utils\Process;
 use VersionPress\Utils\FileSystem;
 
 /**
@@ -15,7 +15,7 @@ class GitRepository {
     private $tempDirectory;
     private $commitMessagePrefix;
     private $gitBinary;
-    private $gitProcessTimeout = 60;
+    private $gitProcessTimeout = null;
 
     /**
      * @param string $workingDirectoryRoot Filesystem path to working directory root (where the .git folder resides)
@@ -458,8 +458,7 @@ class GitRepository {
      */
     private function runProcess($cmd) {
         /*
-         * MAMP / XAMPP issue on Mac OS X,
-         * see http://jira.agilio.cz/browse/WP-106.
+         * MAMP / XAMPP issue on Mac OS X, see #106.
          *
          * http://stackoverflow.com/a/16903162/1243495
          */
@@ -469,7 +468,9 @@ class GitRepository {
         }
 
         $process = new Process($cmd, $this->workingDirectoryRoot);
-        $process->setTimeout($this->gitProcessTimeout);
+        if ($this->gitProcessTimeout !== null) {
+            $process->setTimeout($this->gitProcessTimeout);
+        }
         $process->run();
 
         $result = array(

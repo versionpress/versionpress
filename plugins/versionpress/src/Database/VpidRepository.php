@@ -40,18 +40,27 @@ class VpidRepository {
         foreach ($entityInfo->references as $referenceName => $targetEntity) {
             $targetTable = $this->schemaInfo->getEntityInfo($targetEntity)->tableName;
 
-            if (isset($entity[$referenceName]) && $entity[$referenceName] > 0) {
-                $referenceVpId = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=$entity[$referenceName]");
+            if (isset($entity[$referenceName])) {
+                if ($entity[$referenceName] > 0) {
+                    $referenceVpId = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=$entity[$referenceName]");
+                } else {
+                    $referenceVpId = 0;
+                }
+
                 $entity['vp_' . $referenceName] = $referenceVpId;
+                unset($entity[$referenceName]);
             }
 
-            unset($entity[$referenceName]);
         }
 
         foreach ($entityInfo->valueReferences as $referenceName => $targetEntity) {
             list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
 
-            if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn]) && $entity[$valueColumn] > 0) {
+            if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn])) {
+
+                if ($entity[$valueColumn] == 0) {
+                    continue;
+                }
 
                 if ($targetEntity[0] === '@') {
                     $entityNameProvider = substr($targetEntity, 1);

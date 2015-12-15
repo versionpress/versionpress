@@ -4,12 +4,11 @@ namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ExtendedWpdb;
-use VersionPress\Git\GitRepository;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Tests\Utils\TestConfig;
-use Symfony\Component\Process\Process;
+use VersionPress\Utils\Process;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
@@ -34,7 +33,10 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
 
         $schemaReflection = new \ReflectionClass('VersionPress\Database\DbSchemaInfo');
         $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.neon';
-        self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix);
+        /** @var $wp_db_version */
+        require(self::$testConfig->testSite->path . '/wp-includes/version.php');
+
+        self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
 
         $dbHost = self::$testConfig->testSite->dbHost;
         $dbUser = self::$testConfig->testSite->dbUser;

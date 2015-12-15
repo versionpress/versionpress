@@ -51,12 +51,12 @@ class OptionStorage extends DirectoryStorage {
     }
 
     protected function deserializeEntity($serializedEntity) {
-        $entity = IniSerializer::deserializeFlat($serializedEntity);
-        $flatEntity = $this->flattenEntity($entity);
-        if (isset($flatEntity[$this->entityInfo->idColumnName])) {
-            $flatEntity[$this->entityInfo->idColumnName] = $this->maybeReplacePlaceholderWithPrefix($flatEntity[$this->entityInfo->idColumnName]);
+        $entity = parent::deserializeEntity($serializedEntity);
+
+        if (isset($entity[$this->entityInfo->idColumnName])) {
+            $entity[$this->entityInfo->idColumnName] = $this->maybeReplacePlaceholderWithPrefix($entity[$this->entityInfo->idColumnName]);
         }
-        return $flatEntity;
+        return $entity;
     }
 
     public function shouldBeSaved($data) {

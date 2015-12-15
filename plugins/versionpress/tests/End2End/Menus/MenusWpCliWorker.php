@@ -57,6 +57,21 @@ class MenusTestWpCliWorker extends WpCliWorker implements IMenusTestWorker {
         $this->wpAutomation->removeMenuItem($this->lastInsertedItem);
     }
 
+    public function prepare_removeMenuItemWithChildren() {
+        $item = array($this->testPagesId, 'title' => 'Parent');
+        $this->lastInsertedItem = $parentId = $this->wpAutomation->addMenuItem($this->testMenuId, "post", $item);
+
+        $item = array($this->testPagesId, 'title' => 'Child 1', 'parent-id' => $parentId);
+        $this->wpAutomation->addMenuItem($this->testMenuId, "post", $item);
+
+        $item = array($this->testPagesId, 'title' => 'Child 2', 'parent-id' => $parentId);
+        $this->wpAutomation->addMenuItem($this->testMenuId, "post", $item);
+    }
+
+    public function removeMenuItemWithChildren() {
+        $this->wpAutomation->removeMenuItem($this->lastInsertedItem);
+    }
+
     public function prepare_deleteMenu() {
     }
     public function deleteMenu() {

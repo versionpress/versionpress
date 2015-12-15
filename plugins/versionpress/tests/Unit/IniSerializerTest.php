@@ -490,26 +490,6 @@ INI
 
     /**
      * @test
-     */
-    public function squareBracketsInArrayKey() {
-
-        $data = array("Section" => array("some[]key" => array(0 => "some value", 1 => "other value")));
-        $ini = StringUtils::crlfize(<<<'INI'
-[Section]
-some[]key[0] = "some value"
-some[]key[1] = "other value"
-
-INI
-        );
-
-        $this->assertSame($ini, IniSerializer::serialize($data));
-        $this->assertSame($data, IniSerializer::deserialize($ini));
-
-    }
-
-
-    /**
-     * @test
      * @dataProvider specialCharactersProvider
      */
     public function specialCharacterInKey($specialCharacter) {
@@ -550,7 +530,7 @@ INI
     public function specialCharactersProvider() {
         return array_map(function ($specialChar) { return array($specialChar);},
             array(
-                "\\", "\"", "[]", "$", "%","'", ";", "+", "-", "/", "#", "&", "!",
+                "\\", "\"", "[]", "$", "%","'", ";", "+", "-", "/", "#", "&", "!", ".",
                 "~", "^", "`", "?", ":", ",", "*", "<", ">", "(", ")", "@", "{", "}",
                 "|", "_", " ", "\t", "ěščřžýáíéúůóďťňôâĺ", "茶", "русский", "حصان", "="));
     }
@@ -559,172 +539,6 @@ INI
         // Double quotes are escaped see WP-458
         return array_filter($this->specialCharactersProvider(), function($val) { return $val[0] !== "\""; });
     }
-
-    //--------------------------------
-    // Subsections
-    //--------------------------------
-
-    /**
-     * @test
-     */
-    public function singleSubsection() {
-
-        $data = array("Section" => array("Subsection" => array("key" => "value")));
-        $ini = StringUtils::crlfize(<<<'INI'
-[Section.Subsection]
-key = "value"
-
-INI
-        );
-
-        $this->assertSame($ini, IniSerializer::serialize($data));
-        $this->assertSame($data, IniSerializer::deserialize($ini));
-
-    }
-
-    /**
-     * @test
-     */
-    public function deepSubsections() {
-
-        $data = array(
-            "Section" => array(
-                "Subsection" => array(
-                    "SubSubsection" => array(
-                        "SubSubSubsection" => array("key" => "value")
-                    )
-                )
-            )
-        );
-        $ini = StringUtils::crlfize(<<<'INI'
-[Section.Subsection.SubSubsection.SubSubSubsection]
-key = "value"
-
-INI
-        );
-
-        $this->assertSame($ini, IniSerializer::serialize($data));
-        $this->assertSame($data, IniSerializer::deserialize($ini));
-
-    }
-
-    /**
-     * @test
-     */
-    public function deepSubsectionsMixedWithData() {
-
-        $data = array(
-            "Section" => array(
-                "key" => "value",
-                "Subsection" => array(
-                    "SubSubsection" => array(
-                        "key" => "value",
-                        "SubSubSubsection" => array("key" => "value")
-                    )
-                )
-            )
-        );
-        $ini = StringUtils::crlfize(<<<'INI'
-[Section]
-key = "value"
-[Section.Subsection.SubSubsection]
-key = "value"
-[Section.Subsection.SubSubsection.SubSubSubsection]
-key = "value"
-
-INI
-        );
-
-        $this->assertSame($ini, IniSerializer::serialize($data));
-        $this->assertSame($data, IniSerializer::deserialize($ini));
-
-    }
-
-    /**
-     * @test
-     */
-    public function twoSubsections() {
-
-        $data = array("Section" => array(
-            "Subsection1" => array("key" => "value"),
-            "Subsection2" => array("key" => "value")
-        ));
-
-        $ini = StringUtils::crlfize(<<<'INI'
-[Section.Subsection1]
-key = "value"
-
-[Section.Subsection2]
-key = "value"
-
-INI
-        );
-
-        $this->assertSame($ini, IniSerializer::serialize($data));
-        $this->assertSame($data, IniSerializer::deserialize($ini));
-
-    }
-
-    /**
-     * @test
-     */
-    public function subsectionMixedWithData() {
-
-        $data = array("Section" => array(
-            "key" => "value",
-            "Subsection" => array("key" => "value")
-        ));
-
-        $ini = StringUtils::crlfize(<<<'INI'
-[Section]
-key = "value"
-[Section.Subsection]
-key = "value"
-
-INI
-        );
-
-        $this->assertSame($ini, IniSerializer::serialize($data));
-        $this->assertSame($data, IniSerializer::deserialize($ini));
-
-    }
-
-    /**
-     * @test
-     */
-    public function subsectionMixedWithDataInWrongOrder() {
-
-        // "Wrong" order - key-value must appear before Subsection so that it doesn't belong
-        // to the subsection in the INI format
-        $data = array("Section" =>
-            array(
-                "Subsection" => array("key" => "value"),
-                "key" => "value"
-            )
-        );
-
-        // "Right" order
-        $expectedData = array("Section" =>
-            array(
-                "key" => "value",
-                "Subsection" => array("key" => "value")
-            )
-        );
-
-        $ini = StringUtils::crlfize(<<<'INI'
-[Section]
-key = "value"
-[Section.Subsection]
-key = "value"
-
-INI
-        );
-
-        $this->assertSame($ini, IniSerializer::serialize($data));
-        $this->assertSame($expectedData, IniSerializer::deserialize($ini));
-
-    }
-
 
     /**
      * @test
@@ -747,10 +561,6 @@ INI
 
     }
 
-    //--------------------------------
-    // Flat data (options)
-    //--------------------------------
-
     /**
      * @test
      */
@@ -764,6 +574,6 @@ INI
         );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
-        $this->assertSame($data, IniSerializer::deserializeFlat($ini));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
     }
 }
