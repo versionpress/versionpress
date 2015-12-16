@@ -2,7 +2,7 @@
 
 namespace VersionPress\DI;
 
-use Committer;
+use VersionPress\Git\Committer;
 use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\WpdbMirrorBridge;

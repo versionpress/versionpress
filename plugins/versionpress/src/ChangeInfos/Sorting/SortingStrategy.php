@@ -1,6 +1,6 @@
 <?php
 
-namespace ChangeInfos\Sorting;
+namespace VersionPress\ChangeInfos\Sorting;
 
 
 use Nette\Utils\Strings;

@@ -2,7 +2,6 @@
 
 namespace VersionPress\Git;
 
-use Committer;
 use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\ChangeInfoMatcher;
 use VersionPress\ChangeInfos\EntityChangeInfo;

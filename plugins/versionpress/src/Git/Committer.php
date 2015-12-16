@@ -1,4 +1,6 @@
 <?php
+namespace VersionPress\Git;
+
 use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
