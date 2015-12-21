@@ -2,7 +2,9 @@
 
 namespace VersionPress\Cli;
 
+use cli\Colors;
 use VersionPress\Utils\Process;
+use WP_CLI;
 
 class VPCommandUtils {
     public static function runWpCliCommand($command, $subcommand, $args = array(), $cwd = null) {
@@ -84,5 +86,9 @@ class VPCommandUtils {
         }
 
         return $answer;
+    }
+
+    public static function warning($message) {
+        WP_CLI::log(Colors::colorize('%YWarning: %n' . $message));
     }
 }

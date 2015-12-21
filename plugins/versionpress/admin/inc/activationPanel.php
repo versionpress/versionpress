@@ -44,7 +44,7 @@ use VersionPress\Utils\RequirementsChecker;
                         <?php
                     }
 
-                    if ($requirementsChecker->isEverythingFulfilled() && $repository->isVersioned()) {
+                    if ($requirementsChecker->isWithoutCriticalErrors() && $repository->isVersioned()) {
                         ?>
                         <li>
                             <span class="icon icon-warning"></span>
@@ -55,7 +55,7 @@ use VersionPress\Utils\RequirementsChecker;
                     ?>
                 </ul>
 
-                <div><a href="<?php echo admin_url('admin.php?page=versionpress/admin/system-info.php') ?>">View full system info</a><?php if (!$requirementsChecker->isEverythingFulfilled()) { ?>, <a href="https://github.com/versionpress/support">get support on GitHub</a><?php } ?></div>
+                <div><a href="<?php echo admin_url('admin.php?page=versionpress/admin/system-info.php') ?>">View full system info</a><?php if (!$requirementsChecker->isWithoutCriticalErrors()) { ?>, <a href="https://github.com/versionpress/support">get support on GitHub</a><?php } ?></div>
 
             </div>
 
@@ -84,7 +84,7 @@ use VersionPress\Utils\RequirementsChecker;
 
         <div style="text-align: center;">
             <?php
-            if ($requirementsChecker->isEverythingFulfilled()) {
+            if ($requirementsChecker->isWithoutCriticalErrors()) {
                 $activationUrl = admin_url('admin.php?page=versionpress/admin/index.php&init_versionpress');
                 $buttonClass = "button-primary";
             } else {

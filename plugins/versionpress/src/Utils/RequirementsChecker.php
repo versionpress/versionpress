@@ -33,6 +33,11 @@ class RequirementsChecker {
         'wp-super-cache' => 'wp-super-cache/wp-cache.php'
     );
 
+    /** @var bool */
+    private $isWithoutCriticalErrors;
+    /** @var bool */
+    private $isEverythingFulfilled;
+
     function __construct($wpdb, DbSchemaInfo $schema) {
 
         $this->database = $wpdb;
@@ -148,8 +153,12 @@ class RequirementsChecker {
             'help' => $externalPluginsHelp
         );
 
-        $this->everythingFulfilled = array_reduce($this->requirements, function ($carry, $requirement) {
+        $this->isWithoutCriticalErrors = array_reduce($this->requirements, function ($carry, $requirement) {
             return $carry && ($requirement['fulfilled'] || $requirement['level'] === 'warning');
+        }, true);
+
+        $this->isEverythingFulfilled = array_reduce($this->requirements, function ($carry, $requirement) {
+            return $carry && $requirement['fulfilled'];
         }, true);
 
     }
@@ -163,8 +172,12 @@ class RequirementsChecker {
         return $this->requirements;
     }
 
+    public function isWithoutCriticalErrors() {
+        return $this->isWithoutCriticalErrors;
+    }
+
     public function isEverythingFulfilled() {
-        return $this->everythingFulfilled;
+        return $this->isEverythingFulfilled;
     }
 
     private function tryRunProcess() {
