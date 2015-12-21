@@ -18,6 +18,7 @@ use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\FileSystem;
+use VersionPress\VersionPress;
 use WP_CLI;
 use WP_CLI_Command;
 
@@ -145,6 +146,10 @@ class VPCommand extends WP_CLI_Command {
             define('WP_CONTENT_DIR', ABSPATH . 'wp-content');
         }
         require_once(__DIR__ . '/../../bootstrap.php');
+
+        if (!VersionPress::isActive()) {
+            WP_CLI::error('Unfortunately, this site was not tracked by VersionPress. Therefore it can not be restored.');
+        }
 
         // Check if the site is installed
         $process = VPCommandUtils::runWpCliCommand('core', 'is-installed');
@@ -355,6 +360,10 @@ class VPCommand extends WP_CLI_Command {
             $assoc_args['yes'] = 1;
         }
 
+        if (!VersionPress::isActive()) {
+            WP_CLI::error('This site is not tracked by VersionPress. Please run "wp vp activate" before cloning.');
+        }
+
         $name = $assoc_args['name'];
 
         if (preg_match('/[^a-zA-Z0-9-_]/', $name)) {
@@ -550,6 +559,10 @@ class VPCommand extends WP_CLI_Command {
 
         global $versionPressContainer;
 
+        if (!VersionPress::isActive()) {
+            WP_CLI::error('This site is not tracked by VersionPress. Please run "wp vp activate" before cloning / merging.');
+        }
+
         $remote = isset($assoc_args['from']) ? $assoc_args['from'] : 'origin';
         $this->switchMaintenance('on');
 
@@ -679,6 +692,11 @@ class VPCommand extends WP_CLI_Command {
      * @synopsis [--to=<name|path>]
      */
     public function push($args = array(), $assoc_args = array()) {
+
+        if (!VersionPress::isActive()) {
+            WP_CLI::error('This site is not tracked by VersionPress. Please run "wp vp activate" before cloning / merging.');
+        }
+
         $remoteName = isset($assoc_args['to']) ? $assoc_args['to'] : 'origin';
         $remotePath = $this->getRemoteUrl($remoteName);
         if ($remotePath === null) {
@@ -737,6 +755,11 @@ class VPCommand extends WP_CLI_Command {
      */
     public function undo($args = array(), $assoc_args = array()) {
         global $versionPressContainer;
+
+        if (!VersionPress::isActive()) {
+            WP_CLI::error('This site is not tracked by VersionPress. Please run "wp vp activate" first.');
+        }
+
         /** @var Reverter $reverter */
         $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
         /** @var GitRepository $repository */
@@ -795,6 +818,11 @@ class VPCommand extends WP_CLI_Command {
      */
     public function rollback($args = array(), $assoc_args = array()) {
         global $versionPressContainer;
+
+        if (!VersionPress::isActive()) {
+            WP_CLI::error('This site is not tracked by VersionPress. Please run "wp vp activate" first.');
+        }
+
         /** @var Reverter $reverter */
         $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
         /** @var GitRepository $repository */
