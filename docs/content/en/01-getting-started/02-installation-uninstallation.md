@@ -136,6 +136,7 @@ Uninstallation is a standard two-step process:
 
 1. You first **deactivate** the plugin on the *Plugins* admin screen
 2. You then **delete** the plugin to get rid of all its files
+    - :warning: If you didn't deactivate the plugin via admin screens and manually removed the `wp-content/plugins/versionpress` folder (which is NOT recommended), you have to manually restore the `wp-db.php` file from `wp-db.php.original`.
 3. *Optional:* Manually download or delete a repository backup which was created under `wp-content/backup`. 
 
 There are two important things to note:
