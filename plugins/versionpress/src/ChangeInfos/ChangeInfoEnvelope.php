@@ -18,6 +18,12 @@ class ChangeInfoEnvelope implements ChangeInfo {
      */
     const VP_VERSION_TAG = "X-VP-Version";
 
+    /**
+     * VP meta tag that says the name of current environment. For clone it's the name of clone,
+     * for original site it's master. It's based on constant {@link VP_ENVIRONMENT}.
+     */
+    const VP_ENVIRONMENT_TAG = "X-VP-Environment";
+
     /** @var TrackedChangeInfo[] */
     private $changeInfoList;
 
@@ -41,13 +47,20 @@ class ChangeInfoEnvelope implements ChangeInfo {
     );
 
     /**
+     * @var null|string
+     */
+    private $environment;
+
+    /**
      * @param TrackedChangeInfo[] $changeInfoList
      * @param string|null $version
+     * @param string|null $environment
      * @param SortingStrategy $sortingStrategy
      */
-    public function __construct($changeInfoList, $version = null, $sortingStrategy = null) {
+    public function __construct($changeInfoList, $version = null, $environment = null, $sortingStrategy = null) {
         $this->changeInfoList = $changeInfoList;
         $this->version = $version === null ? VersionPress::getVersion() : $version;
+        $this->environment = $environment ?: VersionPress::getEnvironment();
         $this->sortingStrategy = $sortingStrategy === null ? new SortingStrategy() : $sortingStrategy;
     }
 
@@ -67,6 +80,7 @@ class ChangeInfoEnvelope implements ChangeInfo {
 
         $body = join("\n\n", $bodies);
         $body .= sprintf("\n\n%s: %s", self::VP_VERSION_TAG, $this->version);
+        $body .= sprintf("\n%s: %s", self::VP_ENVIRONMENT_TAG, $this->environment);
 
         return new CommitMessage($subject, $body);
     }
@@ -97,9 +111,11 @@ class ChangeInfoEnvelope implements ChangeInfo {
         $lastBody = $splittedBodies[count($splittedBodies) - 1];
         $changeInfoList = array();
         $version = null;
+        $environment = null;
 
         if (self::containsVersion($lastBody)) {
-            $version = self::extractVersion($lastBody);
+            $version = self::extractTag(self::VP_VERSION_TAG, $lastBody);
+            $environment = self::extractTag(self::VP_ENVIRONMENT_TAG, $lastBody);
             array_pop($splittedBodies);
         }
 
@@ -110,7 +126,7 @@ class ChangeInfoEnvelope implements ChangeInfo {
             $changeInfoList[] = $matchingChangeInfoType::buildFromCommitMessage($partialCommitMessage);
         }
 
-        return new self($changeInfoList, $version);
+        return new self($changeInfoList, $version, $environment);
     }
 
     /**
@@ -142,10 +158,9 @@ class ChangeInfoEnvelope implements ChangeInfo {
         return Strings::startsWith($lastBody, self::VP_VERSION_TAG);
     }
 
-    private static function extractVersion($lastBody) {
+    private static function extractTag($tag, $lastBody) {
         $tmpMessage = new CommitMessage("", $lastBody);
-        $version = $tmpMessage->getVersionPressTag(self::VP_VERSION_TAG);
-        return $version;
+        return $tmpMessage->getVersionPressTag($tag);
     }
 
     private function groupBulkActions($changeInfoList) {

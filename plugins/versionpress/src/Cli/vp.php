@@ -470,7 +470,7 @@ class VPCommand extends WP_CLI_Command {
         $wpConfigFile = $clonePath . '/wp-config.php';
         copy($currentWpPath . '/wp-config.php', $wpConfigFile);
 
-        $this->updateConfig($wpConfigFile, $cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $cloneDbCharset, $cloneDbCollate);
+        $this->updateConfig($wpConfigFile, $name, $cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $cloneDbCharset, $cloneDbCollate);
 
         // Copy VersionPress
         FileSystem::copyDir(VERSIONPRESS_PLUGIN_DIR, $clonePath . '/wp-content/plugins/versionpress');
@@ -871,14 +871,21 @@ class VPCommand extends WP_CLI_Command {
         return count($wpTables) > 0;
     }
 
-    private function updateConfig($wpConfigFile, $dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $dbCharset, $dbCollate) {
+    private function updateConfig($wpConfigFile, $environment, $dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $dbCharset, $dbCollate) {
         $config = file_get_contents($wpConfigFile);
+
+        $environmentConstant = 'VP_ENVIRONMENT';
+
+        if (strpos($config, $environmentConstant) === false) {
+            // https://regex101.com/r/yJ8tY8/1
+            $config = preg_replace('/^(\\$table_prefix\\s*=.*)$/m', "define('$environmentConstant', '$environment');\n\n\${1}", $config, 1);
+        }
 
         // https://regex101.com/r/oO7gX7/4 - just remove the "g" modifier which is there for testing only
         $re = "/^(\\\$table_prefix\\s*=\\s*['\"]).*(['\"];)/m";
         $config = preg_replace($re, "\${1}{$dbPrefix}\${2}", $config, 1);
 
-        https://regex101.com/r/zD3mJ4/1 - just remove the "g" modifier which is there for testing only
+        // https://regex101.com/r/zD3mJ4/1 - just remove the "g" modifier which is there for testing only
         $defineRegexPattern = "/^(define\\s*\\(\\s*['\"]%s['\"]\\s*,\\s*['\"]).*(['\"]\\s*\\)\\s*;)$/m";
 
         $replacements = array(
@@ -888,6 +895,7 @@ class VPCommand extends WP_CLI_Command {
             "DB_HOST" => $dbHost,
             "DB_CHARSET" => $dbCharset,
             "DB_COLLATE" => $dbCollate,
+            $environmentConstant => $environment,
         );
 
         foreach ($replacements as $constant => $value) {
