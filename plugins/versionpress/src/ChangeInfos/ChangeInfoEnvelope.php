@@ -148,6 +148,13 @@ class ChangeInfoEnvelope implements ChangeInfo {
     }
 
     /**
+     * @return null|string
+     */
+    public function getEnvironment() {
+        return $this->environment;
+    }
+
+    /**
      * @return TrackedChangeInfo[]
      */
     private function getSortedChangeInfoList() {

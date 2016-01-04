@@ -7,6 +7,7 @@ interface Commit {
   isEnabled: boolean;
   isInitial: boolean;
   isMerge: boolean;
+  environment: string;
   changes: Change[];
 }
 
