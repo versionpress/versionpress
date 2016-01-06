@@ -148,7 +148,7 @@ class VPCommand extends WP_CLI_Command {
         require_once(__DIR__ . '/../../bootstrap.php');
 
         if (!VersionPress::isActive()) {
-            WP_CLI::error('Unfortunately, this site was not tracked by VersionPress. Therefore it can not be restored.');
+            WP_CLI::error('Unfortunately, this site was not tracked by VersionPress. Therefore, it cannot be restored.');
         }
 
         // Check if the site is installed
