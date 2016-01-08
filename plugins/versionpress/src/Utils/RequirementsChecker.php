@@ -44,7 +44,7 @@ class RequirementsChecker {
             'name' => 'PHP 5.3',
             'level' => 'critical',
             'fulfilled' => version_compare(PHP_VERSION, '5.3.0', '>='),
-            'help' => 'PHP 5.3 is currently required. We might support PHP 5.2 (the minimum WordPress-required PHP version) in some future update.'
+            'help' => 'PHP 5.3 is currently required.'
         );
 
         $this->requirements[] = array(
@@ -126,9 +126,9 @@ class RequirementsChecker {
         $countOfEntities = $this->countEntities();
 
         if ($setTimeLimitEnabled) {
-            $help = "The initialization will take a little longer. This website contains $countOfEntities entities, which is a lot.";
+            $help = "The initialization will take a little longer. This website contains $countOfEntities entities.";
         } else {
-            $help = "The initialization may not finish. This website contains $countOfEntities entities, which is a lot.";
+            $help = "The initialization may not finish. This website contains $countOfEntities entities.";
         }
 
         $this->requirements[] = array(
