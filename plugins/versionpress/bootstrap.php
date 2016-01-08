@@ -3,7 +3,6 @@ use Nette\Caching\Storages\FileStorage;
 use Nette\Loaders\RobotLoader;
 use Tracy\Debugger;
 use VersionPress\DI\DIContainer;
-use VersionPress\DI\VersionPressServices;
 
 define('VERSIONPRESS_PLUGIN_DIR', __DIR__);
 define('VERSIONPRESS_MIRRORING_DIR', WP_CONTENT_DIR . '/vpdb');
@@ -14,7 +13,7 @@ require_once(VERSIONPRESS_PLUGIN_DIR . '/vendor/autoload.php');
 require_once(VERSIONPRESS_PLUGIN_DIR . '/versionpress-functions.php');
 
 if (defined('DOING_AJAX')) {
-    header("Content-Type: application/json");
+    $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
 }
 
 Debugger::enable(Debugger::DEVELOPMENT, VERSIONPRESS_PLUGIN_DIR . '/log');
