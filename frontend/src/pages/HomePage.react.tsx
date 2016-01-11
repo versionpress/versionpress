@@ -8,6 +8,7 @@ import * as moment from 'moment';
 import * as Promise from 'core-js/es6/promise';
 import CommitPanel from '../CommitPanel/CommitPanel.react';
 import CommitsTable from '../Commits/CommitsTable.react';
+import Filter from '../Filter/Filter.react';
 import FlashMessage from '../common/FlashMessage.react';
 import ProgressBar from '../common/ProgressBar.react';
 import ServicePanel from '../ServicePanel/ServicePanel.react';
@@ -29,6 +30,7 @@ interface HomePageProps extends React.Props<JSX.Element> {
 
 interface HomePageState {
   pages?: number[];
+  query?: Object;
   commits?: Commit[];
   message?: {
     code: string,
@@ -53,6 +55,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     super();
     this.state = {
       pages: [],
+      query: [],
       commits: [],
       message: null,
       loading: true,
@@ -62,6 +65,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       dirtyWorkingDirectory: false
     };
 
+    this.onFilter = this.onFilter.bind(this);
     this.onUndo = this.onUndo.bind(this);
     this.onRollback = this.onRollback.bind(this);
     this.checkUpdate = this.checkUpdate.bind(this);
@@ -103,7 +107,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
     WpApi
       .get('commits')
-      .query({page: page})
+      .query({page: page, query: encodeURIComponent(JSON.stringify(this.state.query))})
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
@@ -303,6 +307,12 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       });
   }
 
+  onFilter(query: Object) {
+    this.setState({
+      query: query
+    }, this.fetchCommits);
+  }
+
   onUndo(e) {
     e.preventDefault();
     const hash = e.target.getAttribute('data-hash');
@@ -376,6 +386,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             </div>
           : null
         }
+        <Filter
+          onSubmit={this.onFilter}
+        />
         <CommitsTable
           currentPage={parseInt(this.props.params.page, 10) || 1}
           pages={this.state.pages}
