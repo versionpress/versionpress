@@ -138,13 +138,17 @@ class GitRepository {
      * @param string $gitrevisions Empty by default, i.e., calling full 'git log'
      * @return Commit[]
      */
-    public function log($gitrevisions = "") {
+    public function log($gitrevisions = "", $filter = "") {
 
         $commitDelimiter = chr(29);
         $dataDelimiter = chr(30);
         $statusDelimiter = chr(31);
 
         $logCommand = "git log --pretty=format:\"|begin|%%H|delimiter|%%aD|delimiter|%%ar|delimiter|%%an|delimiter|%%ae|delimiter|%%P|delimiter|%%s|delimiter|%%b|end|\" --name-status";
+
+        if (!empty($filter)) {
+            $logCommand .= " " . $filter;
+        }
         if (!empty($gitrevisions)) {
             $logCommand .= " " . escapeshellarg($gitrevisions);
         }

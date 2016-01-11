@@ -59,6 +59,9 @@ class VersionPressApi {
             'args' => array(
                 'page' => array(
                     'default' => '0'
+                ),
+                'query' => array(
+                    'default' => array()
                 )
             ),
             'permission_callback' => array($this, 'checkPermissions')
@@ -168,7 +171,9 @@ class VersionPressApi {
         $gitLogPaginator->setCommitsPerPage(25);
 
         $page = intval($request['page']);
-        $commits = $gitLogPaginator->getPage($page);
+        $query = json_decode(urldecode($request['query']), true);
+
+        $commits = $gitLogPaginator->getPage($page, $this->getQueryString($query));
 
         if (empty($commits)) {
             return new WP_Error('notice', 'No more commits to show.', array('status' => 404));
@@ -215,6 +220,61 @@ class VersionPressApi {
             'pages' => $gitLogPaginator->getPrettySteps($page),
             'commits' => $result
         ));
+    }
+
+    /**
+     * @param array $query
+     * @return string
+     */
+    private function getQueryString($queryObject = array()) {
+        $query = '-i --all-match';
+        $entity = $action = $vpid = array();
+
+        foreach ($queryObject as $key => $values) {
+            switch ($key) {
+                case 'author':
+                    foreach ($values as $value) {
+                        if (!$value['n']) {
+                            $query .= ' --author="' . $value['s'] . '"';
+                        }
+                    }
+                    break;
+                case 'date':
+                    foreach ($values as $value) {
+                        if (!$value['n']) {
+                            $query .= ' --author="' . $value['s'] . '"';
+                        }
+                    }
+                    break;
+                case 'text':
+                    break;
+                case 'entity':
+                case 'action':
+                case 'vpid':
+                    foreach ($values as $value) {
+                        if (!$value['n']) {
+                            ${$key}[] = $value['s'];
+                        }
+                    }
+                    break;
+                default:
+                    $patterns = array();
+                    foreach ($values as $value) {
+                        if (!$value['n']) {
+                            $patterns[] = $value['s'];
+                        }
+                    }
+                    $query .= ' --grep="^vp-' . $key . ': \(' . implode('\|', $patterns) . '\)"';
+            }
+        }
+
+        $query .= ' --grep="^VP-Action: ' .
+                    (empty($entity) ? '.*' : '\(' . implode('\|', $entity) . '\)') . '/' .
+                    (empty($action) ? '.*' : '\(' . implode('\|', $action) . '\)') . '/' .
+                    (empty($vpid)   ? '.*' : '\(' . implode('\|', $vpid)   . '\)') .
+                    '"';
+
+        return $query;
     }
 
     /**
