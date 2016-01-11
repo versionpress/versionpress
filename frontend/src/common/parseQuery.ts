@@ -7,8 +7,8 @@ export default function parseQuery(query: string) {
   // Make in-between white spaces a unique space
   query = query.trim().replace(/\s+/g, ' ');
 
-  // https://regex101.com/r/wT6zG3/2
-  const regex = /(-)?(?:(\S+):)?(?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"|(\S+))/g;
+  // https://regex101.com/r/wT6zG3/5
+  const regex = /(-)?(?:(\S+):\s*)?(?:'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"|(\S+))/g;
   let term;
   let terms = {};
 
