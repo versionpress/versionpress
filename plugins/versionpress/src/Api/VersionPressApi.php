@@ -240,11 +240,53 @@ class VersionPressApi {
                     }
                     break;
                 case 'date':
+                    $after = $before = array();
                     foreach ($values as $value) {
-                        if (!$value['n']) {
-                            $query .= ' --author="' . $value['s'] . '"';
+                        $val = preg_replace('/\s+/', '', $value['s']);
+                        $neg = $value['n'];
+                        $bounds = explode('..', $val);
+                        if (count($bounds) > 1) {
+
+                            if ($bounds[0] !== '*') {
+                                if (!$neg)
+                                    $after[] = date('Y-m-d', strtotime($bounds[0] . ' -1 day'));
+                                else
+                                    $before[] = date('Y-m-d', strtotime($bounds[0]));
+                            }
+                            if ($bounds[1] !== '*') {
+                                if (!$neg)
+                                    $before[] = date('Y-m-d', strtotime($bounds[1] . ' +1 day'));
+                                else
+                                    $after[] = date('Y-m-d', strtotime($bounds[1]));
+                            }
+                            continue;
+                        }
+
+                        if (in_array(($op = substr($val, 0, 2)), array('<=', '>='))) $date = substr($val, 2);
+                        else if (in_array(($op = substr($val, 0, 1)), array('<', '>'))) $date = substr($val, 1);
+                        else { $op = ''; $date = $val; };
+
+                        if ((!$neg && $op === '>=') || ($neg && $op === '<'))
+                            $after[] = date('Y-m-d', strtotime($date . ' -1 day'));
+                        else if ((!$neg && $op === '>') || ($neg && $op === '<='))
+                            $after[] = date('Y-m-d', strtotime($date));
+                        else if ((!$neg && $op === '<=') || ($neg && $op === '>'))
+                            $before[] = date('Y-m-d', strtotime($date));
+                        else if ((!$neg && $op === '<') || ($neg && $op === '>='))
+                            $before[] = date('Y-m-d', strtotime($date . '-1 day'));
+                        else if (!$neg) {
+                            $after[] = date('Y-m-d', strtotime($date . ' -1 day'));
+                            $before[] = date('Y-m-d', strtotime($date));
+                        } else {
+                            $after[] = date('Y-m-d', strtotime($date));
+                            $before[] = date('Y-m-d', strtotime($date));
                         }
                     }
+
+                    foreach ($after as $v)
+                        $query .= ' --after=' . $v;
+                    foreach ($before as $v)
+                        $query .= ' --before=' . $v;
                     break;
                 case 'text':
                     break;
