@@ -129,6 +129,8 @@ class EntityInfo {
 
     private $virtualReferences = array();
 
+    private $frequentlyWritten = array();
+
     /**
      * Does the parsing and sets all properties
      *
@@ -196,9 +198,70 @@ class EntityInfo {
             }
             $this->hasReferences = true;
         }
+
+        if (isset($schemaInfo['frequently-written'])) {
+            $this->frequentlyWritten = $schemaInfo['frequently-written'];
+        }
     }
 
     public function isVirtualReference($reference) {
         return isset($this->virtualReferences[$reference]);
+    }
+
+    public function isFrequentlyWrittenEntity($entity) {
+        $rules = $this->getRulesForFrequentlyWrittenEntities();
+
+        foreach ($rules as $rule) {
+            foreach ($rule as $field => $value) { // check all parts of rule
+                if (!isset($entity[$field]) || $entity[$field] != $value) {
+                    continue;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function getRulesForFrequentlyWrittenEntities() {
+        // https://regex101.com/r/wT6zG3/4 (query language)
+        $re = "/(-)?(?:(\\S+):\\s*)?(?:'((?:[^'\\\\]|\\\\.)*)'|\"((?:[^\"\\\\]|\\\\.)*)\"|(\\S+))/";
+        $rules = array();
+
+        foreach ($this->frequentlyWritten as $rule) {
+            preg_match_all($re, $rule, $matches);
+            $isValidRule = count($matches[0]) > 0;
+            if (!$isValidRule) {
+                continue;
+            }
+
+            $keys = $matches[2];
+
+            /* value can be in 3rd, 4th or 5th group
+             *
+             * 3rd group => value is in single quotes
+             * 4th group => value is in double quotes
+             * 5th group => value is without quotes
+             *
+             */
+            $possibleValues[] = $matches[3];
+            $possibleValues[] = $matches[4];
+            $possibleValues[] = $matches[5];
+
+            // we need to join all groups together
+            $values = array();
+            foreach ($possibleValues as $possibleValue) {
+                foreach ($possibleValue as $index => $value) {
+                    if ($value !== '') {
+                        $values[$index] = $value;
+                    }
+                }
+            }
+
+            ksort($values);
+            $rules[] = array_combine($keys, $values);
+
+        }
+
+        return $rules;
     }
 }

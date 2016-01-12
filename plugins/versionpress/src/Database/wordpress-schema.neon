@@ -61,3 +61,5 @@ option:
     value-references:
         option_name@option_value:
             site_icon: post
+    frequently-written:
+        - 'option_name: akismet_spam_count'
