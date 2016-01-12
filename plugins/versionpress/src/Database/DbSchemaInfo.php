@@ -128,6 +128,26 @@ class DbSchemaInfo {
     }
 
     /**
+     * Returns all rules for frequently written entities grouped by entity name.
+     *
+     * @return array
+     */
+    public function getRulesForFrequentlyWrittenEntities() {
+        $frequentlyWrittenEntities = array();
+        foreach ($this->getAllEntityNames() as $entityName) {
+            $entityInfo = $this->getEntityInfo($entityName);
+            $frequentlyWrittenEntities[$entityName] = $entityInfo->getRulesForFrequentlyWrittenEntities();
+        }
+
+        return $frequentlyWrittenEntities;
+    }
+
+
+    public function getIntervalsForFrequentlyWrittenEntities() {
+
+    }
+
+    /**
      * Returns true if given name is an entity (is defined in schema).
      * Useful for prefixing VP tables.
      *

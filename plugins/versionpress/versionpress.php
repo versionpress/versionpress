@@ -24,6 +24,7 @@ use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Storages\Mirror;
+use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\BugReporter;
 use VersionPress\Utils\CompatibilityChecker;
 use VersionPress\Utils\CompatibilityResult;
@@ -104,10 +105,10 @@ function vp_register_hooks() {
     $dbSchemaInfo = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
     /** @var VpidRepository $vpidRepository */
     $vpidRepository = $versionPressContainer->resolve(VersionPressServices::VPID_REPOSITORY);
-
     /** @var WpdbMirrorBridge $wpdbMirrorBridge */
     $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
-
+    /** @var StorageFactory $storageFactory */
+    $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
 
     /**
      *  Hook for saving taxonomies into files
@@ -483,6 +484,42 @@ function vp_register_hooks() {
 
         $committer->forceChangeInfo(new PluginChangeInfo($bestMatch, 'edit'));
     }
+
+    add_action('vp_commit_frequently_written_entities', 'vp_commit_frequently_written_entities', 10, 0);
+
+    if (!wp_next_scheduled('vp_commit_frequently_written_entities')) {
+        wp_schedule_event(time(), 'hourly', 'vp_commit_frequently_written_entities');
+    }
+
+    function vp_commit_frequently_written_entities() {
+        global $versionPressContainer;
+        $dbSchemaInfo = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
+        $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
+        $wpdb = $versionPressContainer->resolve(VersionPressServices::WPDB);
+        $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
+
+        $allRules = $dbSchemaInfo->getRulesForFrequentlyWrittenEntities();
+
+        foreach ($allRules as $entityName => $rules) {
+            $storageFactory->getStorage($entityName)->ignoreFrequentlyWrittenEntities = false;
+
+            $table = $dbSchemaInfo->getPrefixedTableName($entityName);
+            foreach ($rules as $rule) {
+                $restrictionParts = array();
+                foreach ($rule as $field => $value) {
+                    $restrictionParts[] = sprintf('`%s` = "%s"', $field, $wpdb->_escape($value));
+                }
+                $restriction = join(' AND ', $restrictionParts);
+                $sql = "SELECT * FROM $table WHERE $restriction";
+
+                $results = $wpdb->get_results($sql, ARRAY_A);
+                foreach ($results as $data) {
+                    $wpdbMirrorBridge->update($table, $data, $data);
+                }
+            }
+        }
+    }
+
 
     register_shutdown_function(array($committer, 'commit'));
 }
