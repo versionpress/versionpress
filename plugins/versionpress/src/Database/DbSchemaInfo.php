@@ -144,7 +144,16 @@ class DbSchemaInfo {
 
 
     public function getIntervalsForFrequentlyWrittenEntities() {
+        $rulesByEntity = $this->getRulesForFrequentlyWrittenEntities();
+        $intervals = array();
 
+        foreach ($rulesByEntity as $rules) {
+            foreach ($rules as $rule) {
+                $intervals[] = $rule['interval'];
+            }
+        }
+
+        return array_unique($intervals);
     }
 
     /**
