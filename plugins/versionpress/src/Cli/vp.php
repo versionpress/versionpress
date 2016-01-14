@@ -197,6 +197,10 @@ class VPCommand extends WP_CLI_Command {
             'admin_email' => 'x@example.com',
         );
 
+        if (version_compare(WP_CLI_VERSION, '0.22.0', '>=')) {
+            $installArgs['skip-email'] = null;
+        }
+
         $process = VPCommandUtils::runWpCliCommand('core', 'install', $installArgs);
         if (!$process->isSuccessful()) {
             WP_CLI::log("Failed creating database tables");
