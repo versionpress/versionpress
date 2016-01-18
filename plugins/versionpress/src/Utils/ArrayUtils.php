@@ -7,7 +7,10 @@ class ArrayUtils {
     public static function parametrize($array) {
         $out = array();
         foreach ($array as $key => $value)
-            $out[] = "$key=$value";
+            if(empty($value))
+                $out[] = "$key=''";
+            else
+                $out[] = "$key=$value";
         return $out;
     }
 
