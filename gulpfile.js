@@ -181,7 +181,7 @@ gulp.task('strip-comments', ['copy'], function (cb) {
 /**
  * Copies content of *.php-strip files back to the original files
  */
-gulp.task('rename-phpstrip-back', ['strip-comments'], function (cb) {
+gulp.task('rename-phpstrip-back', ['copy'], function (cb) {
     return gulp.src(buildDir + '/**/*.php-strip').pipe(rename({extname: '.php'})).
         pipe(gulp.dest(buildDir));
 });
