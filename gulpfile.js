@@ -37,7 +37,7 @@ var buildType = ''; // empty (default, means production),
 
 /**
  * Directory where the VP files are copied to and some actions
- * like `composer install`, comment stripping etc. are run on them.
+ * like `composer install` etc. are run on them.
  *
  * One exception is the `test-deploy` task that basically just runs the `copy`
  * and sets buildDir directly to some WP test site, see `prepare-test-deploy`.
@@ -159,44 +159,11 @@ gulp.task('frontend-deploy', ['copy'], function(cb) {
     return gulp.src(src, srcOptions).pipe(gulp.dest(dist));
 });
 
-/**
- * Removes all comments from the source code and stores the new files to .php-strip files.
- * Next tasks are `rename-phpstrip-back` and `remove-phpstrip-files` and also `persist-plugin-comment`
- * needs to be run in order to restore plugin metadata which are also technically comments but need
- * to be there.
- */
-gulp.task('strip-comments', ['copy'], function (cb) {
-	var stripCmd = (vpDir + '/vendor/bin/strip').replace(/\//g, path.sep);
-
-    var phpFilesToStrip = [
-        buildDir + '/**/*.php',
-        '!' + buildDir + '/src/Cli/vp.php',
-        '!' + buildDir + '/src/Cli/vp-internal.php'
-    ];
-
-    return gulp.src(phpFilesToStrip, {read: false}).
-        pipe(shell([stripCmd + ' <%= file.path %> > <%= file.path %>-strip']));
-});
-
-/**
- * Copies content of *.php-strip files back to the original files
- */
-gulp.task('rename-phpstrip-back', ['strip-comments'], function (cb) {
-    return gulp.src(buildDir + '/**/*.php-strip').pipe(rename({extname: '.php'})).
-        pipe(gulp.dest(buildDir));
-});
-
-/**
- * Removes *.php-strip files
- */
-gulp.task('remove-phpstrip-files', ['rename-phpstrip-back'], function (cb) {
-    return del(buildDir + '/**/*.php-strip');
-});
 
 /**
  * Installs Composer packages, ignores dev packages prefers dist ones
  */
-gulp.task('composer-install', ['remove-phpstrip-files'], shell.task(['composer install -d ' + buildDir + ' --no-dev --prefer-dist --ignore-platform-reqs --optimize-autoloader']));
+gulp.task('composer-install', ['copy'], shell.task(['composer install -d ' + buildDir + ' --no-dev --prefer-dist --ignore-platform-reqs --optimize-autoloader']));
 
 /**
  * Removes composer.json|lock after the `composer-install` task is done
@@ -206,35 +173,9 @@ gulp.task('remove-composer-files', ['composer-install'], function (cb) {
 });
 
 /**
- * Copies plugin metadata from source versionpress.php to the `buildDir` version.
- */
-gulp.task('persist-plugin-comment', ['rename-phpstrip-back'], function (cb) {
-    var fileOptions = {encoding: 'UTF-8'};
-    fs.readFile(vpDir + '/versionpress.php', fileOptions, function (err, content) {
-        var definePosition = content.indexOf("define");
-        var originalHead = content.substr(0, definePosition);
-        var versionMatch = content.match(/^Version: (.*)$/m);
-        packageVersion = versionMatch[1];
-        if (buildType == 'nightly') {
-            var gitCommit = exec('git rev-parse --short HEAD', {silent: true}).output.trim(); // trims the "\n" from the end
-            packageVersion += '+' + gitCommit;
-        }
-
-        fs.readFile(buildDir + '/versionpress.php', fileOptions, function (err, content) {
-            var definePosition = content.indexOf("define");
-            var newContent = originalHead + content.substr(definePosition);
-            newContent = newContent.replace(/^Version: .*$/m, 'Version: ' + packageVersion);
-            fs.writeFile(buildDir + '/versionpress.php', newContent, fileOptions, function (err) {
-                cb();
-            });
-        });
-    });
-});
-
-/**
  * Disables the debugger because we don't want to handle all exceptions and errors caused by all plugins. See WP-268.
  */
-gulp.task('disable-debugger', ['rename-phpstrip-back'], function (cb) {
+gulp.task('disable-debugger', ['copy'], function (cb) {
     return gulp.src(buildDir + '/bootstrap.php').pipe(removeLines(
         {filters: [/^Debugger::enable/]}
     )).pipe(gulp.dest(buildDir));
@@ -243,7 +184,7 @@ gulp.task('disable-debugger', ['rename-phpstrip-back'], function (cb) {
 /**
  * Builds the final ZIP in the `distDir` folder.
  */
-gulp.task('zip', ['persist-plugin-comment', 'disable-debugger', 'remove-composer-files', 'frontend-deploy'], function (cb) {
+gulp.task('zip', ['copy', 'disable-debugger', 'remove-composer-files', 'frontend-deploy'], function (cb) {
     return gulp.src(buildDir + '/**', {dot: true}).
         pipe(rename(function (path) {
             path.dirname = 'versionpress/' + path.dirname;
