@@ -17,6 +17,8 @@ var neon = require('neon-js');
 var composer = require('gulp-composer');
 var git = require('gulp-git');
 var merge = require('merge-stream');
+var runSequence = require('run-sequence');
+
 
 /**
  * Version to be displayed both in WordPress administration and used as a suffix of the generated ZIP file
@@ -67,6 +69,13 @@ var vpDir = './plugins/versionpress';
  * @type {string}
  */
 var frontendDir = './frontend';
+
+/**
+ * Frontend destination directory
+ *
+ * @type {string}
+ */
+var adminGuiDir = vpDir + '/admin/public/gui';
 
 /**
  * Array of globs that will be used in gulp.src() to copy files from source to destination.
@@ -137,7 +146,7 @@ gulp.task('clean', function (cb) {
 /**
  * Copies files defined by `srcDef` to `buildDir`
  */
-gulp.task('copy', ['clean', 'prepare-src-definition'], function (cb) {
+gulp.task('copy', ['clean', 'prepare-src-definition', 'frontend-deploy'], function (cb) {
     var srcOptions = {dot: true, base: vpDir};
     return gulp.src(srcDef, srcOptions).pipe(gulp.dest(buildDir));
 });
@@ -152,13 +161,18 @@ gulp.task('frontend-build', ['init-frontend'], shell.task([
 /**
  * Deploys the frontend.
  */
-gulp.task('frontend-deploy', ['copy'], function(cb) {
+gulp.task('frontend-deploy', function(cb) {
     var src = frontendDir + '/build/**';
-    var dist = buildDir + '/admin/public/gui';
     var srcOptions = {dot: true};
-    return gulp.src(src, srcOptions).pipe(gulp.dest(dist));
+    return gulp.src(src, srcOptions).pipe(gulp.dest(adminGuiDir));
 });
 
+/**
+ * Builds and deploys the frontend.
+ */
+gulp.task('frontend-build-and-deploy', function (cb) {
+    runSequence('frontend-build', 'frontend-deploy', cb);
+});
 
 /**
  * Installs Composer packages, ignores dev packages prefers dist ones
@@ -184,7 +198,7 @@ gulp.task('disable-debugger', ['copy'], function (cb) {
 /**
  * Builds the final ZIP in the `distDir` folder.
  */
-gulp.task('zip', ['copy', 'disable-debugger', 'remove-composer-files', 'frontend-deploy'], function (cb) {
+gulp.task('zip', ['copy', 'disable-debugger', 'remove-composer-files'], function (cb) {
     return gulp.src(buildDir + '/**', {dot: true}).
         pipe(rename(function (path) {
             path.dirname = 'versionpress/' + path.dirname;
@@ -268,13 +282,13 @@ gulp.task('nightly', ['set-nightly-build', 'clean-build']);
  * Task called from WpAutomation to copy the plugin files to the test directory
  * specified in `test-config.neon`. Basically does only the `copy` task.
  */
-gulp.task('test-deploy', ['prepare-test-deploy', 'copy', 'frontend-deploy']);
+gulp.task('test-deploy', ['prepare-test-deploy', 'copy']);
 
 /**
  * Inits dev environment.
  * Install vendors, set env variables.
  */
-gulp.task('init-dev', ['git-config', 'composer-install-ext-libs', 'composer-install-versionpress-libs', 'frontend-build']);
+gulp.task('init-dev', ['git-config', 'composer-install-ext-libs', 'composer-install-versionpress-libs', 'frontend-build-and-deploy']);
 
 
 //--------------------------------------

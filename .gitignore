@@ -1,7 +1,9 @@
 # Build dirs
 /build
 /dist
+
 node_modules
+/plugins/versionpress/admin/public/gui
 
 # Other
 Thumbs.db
