@@ -792,7 +792,7 @@ function vp_admin_menu() {
 }
 
 function versionpress_page() {
-    require_once(WP_CONTENT_DIR . '/plugins/versionpress/admin/index.php');
+    require_once(VERSIONPRESS_PLUGIN_DIR . '/admin/index.php');
 }
 
 add_action('admin_action_vp_show_undo_confirm', 'vp_show_undo_confirm');
