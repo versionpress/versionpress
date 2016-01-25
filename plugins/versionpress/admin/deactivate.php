@@ -26,7 +26,7 @@ function _vp_button($label, $action, $type = "delete", $cssClass = "") {
 ?>
 
 <div class="wrap vp-deactivation">
-    <h2 class="vp-deactivation-header">VersionPress deactivation</h2>
+    <h2 class="vp-deactivation-header"><?php esc_html_e( 'VersionPress deactivation', 'versionpress' ); ?></h2>
 
 
 
