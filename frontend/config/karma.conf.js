@@ -12,11 +12,11 @@ module.exports = function(config) {
 		singleRun: false,
 
 		files: [
-      './webpack-test.js'
+			'./webpack-test.js'
 		],
 
 		preprocessors: {
-      './webpack-test.js': ['webpack', 'sourcemap']
+			'./webpack-test.js': ['webpack', 'sourcemap']
 		},
 
 		reporters: ['dots'],
@@ -24,7 +24,7 @@ module.exports = function(config) {
 		webpack: {
 			devtool: 'inline-source-map',
 			module: webpackConfig.module,
-      resolve: webpackConfig.resolve
+			resolve: webpackConfig.resolve
 		},
 
 		webpackServer: {
@@ -32,7 +32,7 @@ module.exports = function(config) {
 		},
 
 		plugins: [
-      require('karma-webpack'),
+			require('karma-webpack'),
 			'karma-mocha',
 			'karma-chai-sinon',
 			'karma-chrome-launcher',
