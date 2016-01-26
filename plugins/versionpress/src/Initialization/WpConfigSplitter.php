@@ -38,17 +38,12 @@ DOC;
         }
 
         $configLines = file($wpConfigPath);
-
-        $constants = join('|', self::$constantsForExtraction);
-
-        if (is_file($commonConfigPath)) {
-            $commonConfigLines = file($commonConfigPath);
-        } else {
-            $commonConfigLines = array("<?php\n");
-        }
+        $commonConfigLines = is_file($commonConfigPath) ? file($commonConfigPath) : array("<?php\n");
 
         // https://regex101.com/r/zD3mJ4/2
-        $defineRegexPattern = "/(define\\s*\\(\\s*['\"]($constants)['\"]\\s*,.*\\)\\s*;)/m";
+        $constantsForRegex = join('|', self::$constantsForExtraction);
+        $defineRegexPattern = "/(define\\s*\\(\\s*['\"]($constantsForRegex)['\"]\\s*,.*\\)\\s*;)/m";
+
         foreach ($configLines as $lineNumber => $line) {
             if (preg_match($defineRegexPattern, $line)) {
                 $commonConfigLines[] = $line;
