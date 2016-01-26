@@ -1,7 +1,6 @@
 <?php
 namespace VersionPress\Initialization;
 
-use Nette\Utils\Strings;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use VersionPress\ChangeInfos\VersionPressChangeInfo;
 use VersionPress\Database\DbSchemaInfo;
@@ -463,50 +462,9 @@ class Initializer {
         $elevatedConfigPath = realpath(ABSPATH . '../wp-config.php');
 
         $configPath = is_file($defaultConfigPath) ? $defaultConfigPath : $elevatedConfigPath;
-
         $commonConfigName = 'wp-config.common.php';
-        $commonConfigPath = dirname($configPath) . '/' . $commonConfigName;
 
-        $include = <<<DOC
-// Configuration common to all environments
-include_once __DIR__ . '/$commonConfigName';
-DOC;
-
-        $configContent = file_get_contents($configPath);
-
-        if (!Strings::contains($configContent, $include)) {
-            $configContent = str_replace('<?php', "<?php\n\n$include\n", $configContent);
-            file_put_contents($configPath, $configContent);
-        }
-
-        $configLines = file($configPath);
-
-        $constants = join('|',
-            array(
-                'WP_CONTENT_DIR',
-                'WP_CONTENT_URL',
-                'WP_PLUGIN_DIR',
-                'WP_PLUGIN_URL',
-                'UPLOADS',
-                ));
-
-        if (is_file($commonConfigPath)) {
-            $commonConfigLines = file($commonConfigPath);
-        } else {
-            $commonConfigLines = array("<?php\n");
-        }
-
-        // https://regex101.com/r/zD3mJ4/2
-        $defineRegexPattern = "/(define\\s*\\(\\s*['\"]($constants)['\"]\\s*,.*\\)\\s*;)/m";
-        foreach ($configLines as $lineNumber => $line) {
-            if (preg_match($defineRegexPattern, $line)) {
-                $commonConfigLines[] = $line;
-                unset($configLines[$lineNumber]);
-            }
-        }
-
-        file_put_contents($commonConfigPath, join("", $commonConfigLines));
-        file_put_contents($configPath, join("", $configLines));
+        WpConfigSplitter::split($configPath, $commonConfigName);
     }
 
     private function adjustGitProcessTimeout() {
