@@ -3,6 +3,7 @@
 namespace VersionPress\Tests\End2End\Utils;
 
 use VersionPress\Tests\Utils\WpVersionComparer;
+use VersionPress\Utils\PathUtils;
 
 abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPostTypeTestWorker {
 

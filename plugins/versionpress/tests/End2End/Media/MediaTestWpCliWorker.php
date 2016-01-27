@@ -2,7 +2,7 @@
 
 namespace VersionPress\Tests\End2End\Media;
 
-use VersionPress\Tests\End2End\Utils\PathUtils;
+use VersionPress\Utils\PathUtils;
 use VersionPress\Tests\End2End\Utils\WpCliWorker;
 
 class MediaTestWpCliWorker extends WpCliWorker implements IMediaTestWorker {

@@ -228,7 +228,7 @@ class RequirementsChecker {
     }
 
     private function testGitignore() {
-        $gitignorePath = ABSPATH . '.gitignore';
+        $gitignorePath = VP_PROJECT_ROOT . '/.gitignore';
         $gitignoreExists = is_file($gitignorePath);
         if (!$gitignoreExists) {
             return true;

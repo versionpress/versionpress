@@ -29,9 +29,9 @@ if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
 
     $backupPath = $backupsDir . '/git-backup-' . date("YmdHis");
 
-    FileSystem::rename(ABSPATH . '.git', $backupPath, true);
+    FileSystem::rename(VP_PROJECT_ROOT . '/.git', $backupPath, true);
 
-    $productionGitignore = ABSPATH . '.gitignore';
+    $productionGitignore = VP_PROJECT_ROOT . '.gitignore';
     $templateGitignore = __DIR__ . '/src/Initialization/.gitignore.tpl';
 
     if (FileSystem::filesHaveSameContents($productionGitignore, $templateGitignore)) {

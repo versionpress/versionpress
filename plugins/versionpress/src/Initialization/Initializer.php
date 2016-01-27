@@ -14,6 +14,7 @@ use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\IdUtil;
+use VersionPress\Utils\PathUtils;
 use VersionPress\Utils\SecurityUtils;
 use VersionPress\VersionPress;
 use wpdb;
@@ -445,7 +446,7 @@ class Initializer {
      * Copies the .htaccess and web.config files into the vpdb directory.
      */
     private function copyAccessRulesFiles() {
-        SecurityUtils::protectDirectory(ABSPATH . "/.git");
+        SecurityUtils::protectDirectory(VP_PROJECT_ROOT . "/.git");
         SecurityUtils::protectDirectory(VERSIONPRESS_MIRRORING_DIR);
     }
 
