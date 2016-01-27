@@ -239,6 +239,10 @@ class RequirementsChecker {
     }
 
     private function testDirectoryLayout() {
+        if (defined('VP_PROJECT_ROOT')) {
+            return true;
+        }
+
         $uploadDirInfo = wp_upload_dir();
 
         $isStandardLayout = true;
@@ -246,6 +250,7 @@ class RequirementsChecker {
         $isStandardLayout &= WP_CONTENT_DIR . '/plugins' === WP_PLUGIN_DIR;
         $isStandardLayout &= WP_CONTENT_DIR . '/themes' === get_theme_root();
         $isStandardLayout &= WP_CONTENT_DIR . '/uploads' === $uploadDirInfo['basedir'];
+        $isStandardLayout &= is_file(ABSPATH . 'wp-config.php');
 
         return $isStandardLayout;
     }

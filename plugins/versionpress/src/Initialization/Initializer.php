@@ -454,7 +454,25 @@ class Initializer {
      * Installs Gitignore to the repository root, or does nothing if the file already exists.
      */
     private function installGitignore() {
-        FileSystem::copy(__DIR__ . '/.gitignore.tpl', ABSPATH . '.gitignore', false);
+
+        $gitignorePath = VP_PROJECT_ROOT . '/.gitignore';
+
+        if (is_file($gitignorePath)) {
+            return;
+        }
+
+        $gitignore = file_get_contents(__DIR__ . '/.gitignore.tpl');
+
+        $gitIgnoreVariables = array(
+            'wp-content' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_CONTENT_DIR), '.'), '/\\'),
+            'wp-plugins' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_PLUGIN_DIR), '.'), '/\\'),
+        );
+
+        $search = array_map(function ($var) { return sprintf('{{%s}}', $var); }, array_keys($gitIgnoreVariables));
+        $replace = array_values($gitIgnoreVariables);
+
+        $gitignore = str_replace($search, $replace, $gitignore);
+        file_put_contents($gitignorePath, $gitignore);
     }
 
 
