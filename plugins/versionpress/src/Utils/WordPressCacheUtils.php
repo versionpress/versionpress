@@ -8,11 +8,7 @@ class WordPressCacheUtils {
             return;
         }
 
-        $vpidsForRestriction = join(', ', array_map(function ($vpid) {
-            return "UNHEX('$vpid')";
-        }, $vpids));
-
-        $postIds = $wpdb->get_col("SELECT id FROM {$wpdb->prefix}vp_id WHERE vp_id IN ($vpidsForRestriction)");
+        $postIds = self::getIdsForVpids($vpids, $wpdb);
 
         foreach ($postIds as $id) {
             clean_post_cache($id);
@@ -24,11 +20,7 @@ class WordPressCacheUtils {
             return;
         }
 
-        $vpidsForRestriction = join(', ', array_map(function ($vpid) {
-            return "UNHEX('$vpid')";
-        }, $vpids));
-
-        $termIds = $wpdb->get_col("SELECT id FROM {$wpdb->prefix}vp_id WHERE vp_id IN ($vpidsForRestriction)");
+        $termIds = self::getIdsForVpids($vpids, $wpdb);
         clean_term_cache($termIds);
     }
 
@@ -37,11 +29,7 @@ class WordPressCacheUtils {
             return;
         }
 
-        $vpidsForRestriction = join(', ', array_map(function ($vpid) {
-            return "UNHEX('$vpid')";
-        }, $vpids));
-
-        $userIds = $wpdb->get_col("SELECT id FROM {$wpdb->prefix}vp_id WHERE vp_id IN ($vpidsForRestriction)");
+        $userIds = self::getIdsForVpids($vpids, $wpdb);
 
         foreach ($userIds as $id) {
             clean_user_cache($id);
@@ -53,11 +41,19 @@ class WordPressCacheUtils {
             return;
         }
 
+        $commentsIds = self::getIdsForVpids($vpids, $wpdb);
+        clean_comment_cache($commentsIds);
+    }
+
+    private static function getIdsForVpids($vpids, $wpdb) {
+        $vpidsForRestriction = self::joinVpidsForRestriction($vpids);
+        return $wpdb->get_col("SELECT id FROM {$wpdb->prefix}vp_id WHERE vp_id IN ($vpidsForRestriction)");
+    }
+
+    private static function joinVpidsForRestriction($vpids) {
         $vpidsForRestriction = join(', ', array_map(function ($vpid) {
             return "UNHEX('$vpid')";
         }, $vpids));
-
-        $commentsIds = $wpdb->get_col("SELECT id FROM {$wpdb->prefix}vp_id WHERE vp_id IN ($vpidsForRestriction)");
-        clean_comment_cache($commentsIds);
+        return $vpidsForRestriction;
     }
 }
