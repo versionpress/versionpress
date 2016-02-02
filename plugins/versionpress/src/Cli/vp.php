@@ -141,6 +141,8 @@ class VPCommand extends WP_CLI_Command {
      */
     public function restoreSite($args, $assoc_args) {
 
+        include_once ABSPATH . 'wp-config.common.php';
+
         // Load VersionPress' bootstrap (WP_CONTENT_DIR needs to be defined)
         if (!defined('WP_CONTENT_DIR')) {
             define('WP_CONTENT_DIR', ABSPATH . 'wp-content');
@@ -175,6 +177,10 @@ class VPCommand extends WP_CLI_Command {
         } else {
             $this->configSite($assoc_args);
         }
+
+        // Update URLs in wp-config.php
+        $this->setConfigUrl('WP_CONTENT_URL', 'WP_CONTENT_DIR', ABSPATH . 'wp-content', $url);
+        $this->setConfigUrl('WP_PLUGIN_URL', 'WP_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins', $url);
 
         // Create or empty database
         $this->prepareDatabase($assoc_args);
@@ -377,6 +383,7 @@ class VPCommand extends WP_CLI_Command {
         $currentWpPath = get_home_path();
         $cloneDirName = $name;
         $clonePath = dirname($currentWpPath) . '/' . $cloneDirName;
+        $cloneVpPluginPath = $clonePath . '/' . str_replace(realpath(ABSPATH), '', realpath(VERSIONPRESS_PLUGIN_DIR));
 
         $cloneDbUser = isset($assoc_args['dbuser']) ? $assoc_args['dbuser'] : DB_USER;
         $cloneDbPassword = isset($assoc_args['dbpass']) ? $assoc_args['dbpass'] : DB_PASSWORD;
@@ -486,7 +493,7 @@ class VPCommand extends WP_CLI_Command {
         $this->updateConfig($wpConfigFile, $cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $cloneDbCharset, $cloneDbCollate);
 
         // Copy VersionPress
-        FileSystem::copyDir(VERSIONPRESS_PLUGIN_DIR, $clonePath . '/wp-content/plugins/versionpress');
+        FileSystem::copyDir(VERSIONPRESS_PLUGIN_DIR, $cloneVpPluginPath);
         WP_CLI::success("Copied VersionPress");
 
         // Finish the process by doing the standard restore-site
@@ -910,9 +917,6 @@ class VPCommand extends WP_CLI_Command {
         $re = "/^(\\\$table_prefix\\s*=\\s*['\"]).*(['\"];)/m";
         $config = preg_replace($re, "\${1}{$dbPrefix}\${2}", $config, 1);
 
-        https://regex101.com/r/zD3mJ4/1 - just remove the "g" modifier which is there for testing only
-        $defineRegexPattern = "/^(define\\s*\\(\\s*['\"]%s['\"]\\s*,\\s*['\"]).*(['\"]\\s*\\)\\s*;)$/m";
-
         $replacements = array(
             "DB_NAME" => $dbName,
             "DB_USER" => $dbUser,
@@ -923,13 +927,26 @@ class VPCommand extends WP_CLI_Command {
         );
 
         foreach ($replacements as $constant => $value) {
-            $re = sprintf($defineRegexPattern, $constant);
-            $config = preg_replace($re, "\${1}{$value}\${2}", $config, 1);
+            self::updateConfigConstant($config, $constant, $value);
         }
-
 
         file_put_contents($wpConfigFile, $config);
         WP_CLI::success("wp-config.php updated");
+    }
+
+    private static function updateConfigConstant($config, $constant, $value) {
+        // https://regex101.com/r/zD3mJ4/3 - just remove the "g" modifier which is there for testing only
+        $re = "/(define\\s*\\(\\s*['\"]{$constant}['\"]\\s*,\\s*['\"]).*(['\"]\\s*\\)\\s*;)/m";
+        return preg_replace($re, "\${1}{$value}\${2}", $config, 1);
+    }
+
+    private static function createConfigConstant($config, $constant, $value) {
+        $tablePrefixPos = strpos($config, 'table_prefix');
+        $lineAfterTablePrefixPos = strpos($config, "\n", $tablePrefixPos) + 1;
+
+        $constantDefinition = "define('$constant', '$value');\n";
+
+        return substr($config, 0, $lineAfterTablePrefixPos) . $constantDefinition . substr($config, $lineAfterTablePrefixPos);
     }
 
     /**
@@ -996,6 +1013,23 @@ class VPCommand extends WP_CLI_Command {
          * @noinspection PhpUsageOfSilenceOperatorInspection
          */
         @file_get_contents(get_home_url());
+    }
+
+    private function setConfigUrl($urlConstant, $pathConstant, $defaultPath, $baseUrl) {
+        if (defined($pathConstant) && constant($pathConstant) !== $defaultPath) {
+            $relativePathToWpContent = str_replace(getcwd(), '', realpath(constant($pathConstant)));
+
+            $wpContentUrl = $baseUrl . str_replace('//', '/', '/' . $relativePathToWpContent);
+            $config = file_get_contents(ABSPATH . 'wp-config.php');
+
+            if (Strings::contains($config, $urlConstant)) {
+                $config = self::updateConfigConstant($config, $urlConstant, $wpContentUrl);
+            } else {
+                $config = self::createConfigConstant($config, $urlConstant, $wpContentUrl);
+            }
+
+            file_put_contents(ABSPATH . 'wp-config.php', $config);
+        }
     }
 }
 

@@ -15,9 +15,7 @@ class WpConfigSplitter {
 
     private static $constantsForExtraction = array(
         'WP_CONTENT_DIR',
-        'WP_CONTENT_URL',
         'WP_PLUGIN_DIR',
-        'WP_PLUGIN_URL',
         'UPLOADS',
     );
 
