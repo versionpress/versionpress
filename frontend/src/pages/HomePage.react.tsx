@@ -38,7 +38,7 @@ interface HomePageState {
   displayServicePanel?: boolean;
   displayWelcomePanel?: boolean;
   displayUpdateNotice?: boolean;
-  displayCommitPanel?: boolean;
+  dirtyWorkingDirectory?: boolean;
 }
 
 export default class HomePage extends React.Component<HomePageProps, HomePageState> {
@@ -59,7 +59,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       displayServicePanel: false,
       displayWelcomePanel: false,
       displayUpdateNotice: false,
-      displayCommitPanel: false
+      dirtyWorkingDirectory: false
     };
 
     this.onUndo = this.onUndo.bind(this);
@@ -140,13 +140,13 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         if (err) {
           this.setState({
             displayUpdateNotice: false,
-            displayCommitPanel: false
+            dirtyWorkingDirectory: false
           });
           clearInterval(this.refreshInterval);
         } else {
           this.setState({
             displayUpdateNotice: !this.props.params.page && res.body.update === true,
-            displayCommitPanel: res.body.cleanWorkingDirectory !== true
+            dirtyWorkingDirectory: res.body.cleanWorkingDirectory !== true
           });
         }
       });
@@ -259,7 +259,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           this.setState({message: res.body[0]});
         } else {
           this.setState({
-            displayCommitPanel: false,
+            dirtyWorkingDirectory: false,
             message: {
               code: 'updated',
               message: 'Changes have been committed.'
@@ -283,7 +283,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           this.setState({message: res.body[0]});
         } else {
           this.setState({
-            displayCommitPanel: false,
+            dirtyWorkingDirectory: false,
             message: {
               code: 'updated',
               message: 'Changes have been discarded.'
@@ -344,7 +344,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           display={this.state.displayServicePanel}
           onSubmit={this.sendBugReport.bind(this)}
         />
-        {this.state.displayCommitPanel
+        {this.state.dirtyWorkingDirectory
           ? <CommitPanel
               diffProvider={{ getDiff: this.getDiff }}
               gitStatusProvider={{ getGitStatus: this.getGitStatus }}
@@ -371,6 +371,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           currentPage={parseInt(this.props.params.page, 10) || 1}
           pages={this.state.pages}
           commits={this.state.commits}
+          enableActions={!this.state.dirtyWorkingDirectory}
           onUndo={this.onUndo}
           onRollback={this.onRollback}
           diffProvider={{ getDiff: this.getDiff }}
