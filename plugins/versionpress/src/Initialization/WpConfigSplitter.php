@@ -20,8 +20,8 @@ class WpConfigSplitter {
     );
 
     public static function split($wpConfigPath, $commonConfigName) {
-
-        $commonConfigPath = dirname($wpConfigPath) . '/' . $commonConfigName;
+        $wpConfigDir = dirname($wpConfigPath);
+        $commonConfigPath = $wpConfigDir . '/' . $commonConfigName;
 
         $include = <<<DOC
 // Configuration common to all environments
@@ -44,6 +44,12 @@ DOC;
 
         foreach ($configLines as $lineNumber => $line) {
             if (preg_match($defineRegexPattern, $line)) {
+                if (Strings::contains($line, $wpConfigDir)) {
+                    $positionOfPath = strpos($line, $wpConfigDir) - 1;
+                    $line = str_replace($wpConfigDir, '', $line);
+                    $line = substr($line, 0, $positionOfPath) . '__DIR__ . ' . substr($line, $positionOfPath);
+                }
+
                 $commonConfigLines[] = $line;
                 unset($configLines[$lineNumber]);
             }
