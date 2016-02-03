@@ -3,6 +3,7 @@
 #------------------------
 
 /wp-config.php
+{{abspath}}/wp-config.php
 .maintenance
 /.htaccess
 /web.config

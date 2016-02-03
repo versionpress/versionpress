@@ -16,6 +16,7 @@ use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\IdUtil;
 use VersionPress\Utils\PathUtils;
 use VersionPress\Utils\SecurityUtils;
+use VersionPress\Utils\WordPressMissingFunctions;
 use VersionPress\VersionPress;
 use wpdb;
 
@@ -466,6 +467,7 @@ class Initializer {
         $gitIgnoreVariables = array(
             'wp-content' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_CONTENT_DIR), '.'), '/\\'),
             'wp-plugins' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_PLUGIN_DIR), '.'), '/\\'),
+            'abspath' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, ABSPATH), '.'), '/\\'),
         );
 
         $search = array_map(function ($var) { return sprintf('{{%s}}', $var); }, array_keys($gitIgnoreVariables));
@@ -477,10 +479,7 @@ class Initializer {
 
 
     private function createCommonConfig() {
-        $defaultConfigPath = ABSPATH . 'wp-config.php';
-        $elevatedConfigPath = realpath(ABSPATH . '../wp-config.php');
-
-        $configPath = is_file($defaultConfigPath) ? $defaultConfigPath : $elevatedConfigPath;
+        $configPath = WordPressMissingFunctions::getWpConfigPath();
         $commonConfigName = 'wp-config.common.php';
 
         WpConfigSplitter::split($configPath, $commonConfigName);

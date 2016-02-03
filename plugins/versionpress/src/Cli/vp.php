@@ -18,6 +18,7 @@ use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\FileSystem;
+use VersionPress\Utils\WordPressMissingFunctions;
 use VersionPress\VersionPress;
 use WP_CLI;
 use WP_CLI_Command;
@@ -141,7 +142,8 @@ class VPCommand extends WP_CLI_Command {
      */
     public function restoreSite($args, $assoc_args) {
 
-        include_once ABSPATH . 'wp-config.common.php';
+        include_once __DIR__ . '/../Utils/WordPressMissingFunctions.php';
+        include_once dirname(WordPressMissingFunctions::getWpConfigPath()) . '/wp-config.common.php';
 
         // Load VersionPress' bootstrap (WP_CONTENT_DIR needs to be defined)
         if (!defined('WP_CONTENT_DIR')) {
@@ -170,7 +172,7 @@ class VPCommand extends WP_CLI_Command {
         }
 
         // Updating wp-config.php
-        if (file_exists(ABSPATH . 'wp-config.php')) {
+        if (file_exists(WordPressMissingFunctions::getWpConfigPath())) {
             if ($this->issetConfigOption($assoc_args)) {
                 WP_CLI::error("Site settings was loaded from wp-config.php. If you want to reconfigure the site, please delete the wp-config.php file");
             }
@@ -268,7 +270,7 @@ class VPCommand extends WP_CLI_Command {
             if ($dbExists) {
 
                 defined('SHORTINIT') or define('SHORTINIT', true);
-                require_once ABSPATH . 'wp-config.php';
+                require_once WordPressMissingFunctions::getWpConfigPath();
                 global $table_prefix;
                 if ($this->someWpTablesExist(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $table_prefix)) {
                     WP_CLI::confirm('Database tables already exist, they will be droped and re-created. Proceed?', $assoc_args);
@@ -488,7 +490,7 @@ class VPCommand extends WP_CLI_Command {
 
         // Copy & Update wp-config
         $wpConfigFile = $clonePath . '/wp-config.php';
-        copy($currentWpPath . '/wp-config.php', $wpConfigFile);
+        copy(WordPressMissingFunctions::getWpConfigPath(), $wpConfigFile);
 
         $this->updateConfig($wpConfigFile, $cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $cloneDbCharset, $cloneDbCollate);
 
@@ -1020,7 +1022,7 @@ class VPCommand extends WP_CLI_Command {
             $relativePathToWpContent = str_replace(getcwd(), '', realpath(constant($pathConstant)));
 
             $wpContentUrl = $baseUrl . str_replace('//', '/', '/' . $relativePathToWpContent);
-            $config = file_get_contents(ABSPATH . 'wp-config.php');
+            $config = file_get_contents(WordPressMissingFunctions::getWpConfigPath());
 
             if (Strings::contains($config, $urlConstant)) {
                 $config = self::updateConfigConstant($config, $urlConstant, $wpContentUrl);
