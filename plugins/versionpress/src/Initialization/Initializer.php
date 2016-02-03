@@ -105,6 +105,7 @@ class Initializer {
             $this->createGitRepository();
             $this->activateVersionPress();
             $this->copyAccessRulesFiles();
+            $this->createCommonConfig();
             $this->doInitializationCommit();
             vp_disable_maintenance();
             $this->reportProgressChange(InitializerStates::FINISHED);
@@ -298,7 +299,7 @@ class Initializer {
         return $entities;
     }
 
-    private function extendPostWithTaxonomies($post) {
+    public function extendPostWithTaxonomies($post) {
         $idColumnName = $this->dbSchema->getEntityInfo('post')->idColumnName;
         $id = $post[$idColumnName];
 
@@ -453,6 +454,17 @@ class Initializer {
      */
     private function installGitignore() {
         FileSystem::copy(__DIR__ . '/.gitignore.tpl', ABSPATH . '.gitignore', false);
+    }
+
+
+    private function createCommonConfig() {
+        $defaultConfigPath = ABSPATH . 'wp-config.php';
+        $elevatedConfigPath = realpath(ABSPATH . '../wp-config.php');
+
+        $configPath = is_file($defaultConfigPath) ? $defaultConfigPath : $elevatedConfigPath;
+        $commonConfigName = 'wp-config.common.php';
+
+        WpConfigSplitter::split($configPath, $commonConfigName);
     }
 
     private function adjustGitProcessTimeout() {
