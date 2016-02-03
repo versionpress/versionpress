@@ -14,7 +14,9 @@ use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\IdUtil;
+use VersionPress\Utils\PathUtils;
 use VersionPress\Utils\SecurityUtils;
+use VersionPress\Utils\WordPressMissingFunctions;
 use VersionPress\VersionPress;
 use wpdb;
 
@@ -445,7 +447,7 @@ class Initializer {
      * Copies the .htaccess and web.config files into the vpdb directory.
      */
     private function copyAccessRulesFiles() {
-        SecurityUtils::protectDirectory(ABSPATH . "/.git");
+        SecurityUtils::protectDirectory(VP_PROJECT_ROOT . "/.git");
         SecurityUtils::protectDirectory(VERSIONPRESS_MIRRORING_DIR);
     }
 
@@ -453,15 +455,31 @@ class Initializer {
      * Installs Gitignore to the repository root, or does nothing if the file already exists.
      */
     private function installGitignore() {
-        FileSystem::copy(__DIR__ . '/.gitignore.tpl', ABSPATH . '.gitignore', false);
+
+        $gitignorePath = VP_PROJECT_ROOT . '/.gitignore';
+
+        if (is_file($gitignorePath)) {
+            return;
+        }
+
+        $gitignore = file_get_contents(__DIR__ . '/.gitignore.tpl');
+
+        $gitIgnoreVariables = array(
+            'wp-content' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_CONTENT_DIR), '.'), '/\\'),
+            'wp-plugins' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_PLUGIN_DIR), '.'), '/\\'),
+            'abspath' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, ABSPATH), '.'), '/\\'),
+        );
+
+        $search = array_map(function ($var) { return sprintf('{{%s}}', $var); }, array_keys($gitIgnoreVariables));
+        $replace = array_values($gitIgnoreVariables);
+
+        $gitignore = str_replace($search, $replace, $gitignore);
+        file_put_contents($gitignorePath, $gitignore);
     }
 
 
     private function createCommonConfig() {
-        $defaultConfigPath = ABSPATH . 'wp-config.php';
-        $elevatedConfigPath = realpath(ABSPATH . '../wp-config.php');
-
-        $configPath = is_file($defaultConfigPath) ? $defaultConfigPath : $elevatedConfigPath;
+        $configPath = WordPressMissingFunctions::getWpConfigPath();
         $commonConfigName = 'wp-config.common.php';
 
         WpConfigSplitter::split($configPath, $commonConfigName);
