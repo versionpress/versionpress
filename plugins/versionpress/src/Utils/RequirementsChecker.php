@@ -101,9 +101,9 @@ class RequirementsChecker {
 
         $this->requirements[] = array(
             'name' => 'Standard directory layout',
-            'level' => 'critical',
+            'level' => 'warning',
             'fulfilled' => $this->testDirectoryLayout(),
-            'help' => 'It\'s necessary to use standard WordPress directory layout with the current version of VersionPress.'
+            'help' => 'It seems like you use customized project structure. VersionPress supports only some scenarios. [Learn more](http://docs.versionpress.net/en/feature-focus/custom-project-structure).'
         );
 
 
@@ -239,10 +239,6 @@ class RequirementsChecker {
     }
 
     private function testDirectoryLayout() {
-        if (defined('VP_PROJECT_ROOT')) {
-            return true;
-        }
-
         $uploadDirInfo = wp_upload_dir();
 
         $isStandardLayout = true;
