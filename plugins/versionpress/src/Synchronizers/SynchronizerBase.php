@@ -27,7 +27,7 @@ abstract class SynchronizerBase implements Synchronizer {
     private $storage;
 
     /** @var wpdb */
-    private $database;
+    protected $database;
 
     /** @var DbSchemaInfo */
     private $dbSchema;
@@ -36,7 +36,7 @@ abstract class SynchronizerBase implements Synchronizer {
     private $urlReplacer;
 
     /** @var array|null */
-    private $entities = null;
+    protected $entities = null;
 
     protected $passNumber = 0;
 

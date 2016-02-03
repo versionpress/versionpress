@@ -171,7 +171,7 @@ class VersionPressApi {
         $commits = $gitLogPaginator->getPage($page);
 
         if (empty($commits)) {
-            return new \WP_Error('notice', 'No more commits to show.', array('status' => 403));
+            return new \WP_Error('notice', 'No more commits to show.', array('status' => 404));
         }
 
         $preActivationHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));

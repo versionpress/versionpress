@@ -44,7 +44,7 @@ class RequirementsChecker {
             'name' => 'PHP 5.3',
             'level' => 'critical',
             'fulfilled' => version_compare(PHP_VERSION, '5.3.0', '>='),
-            'help' => 'PHP 5.3 is currently required. We might support PHP 5.2 (the minimum WordPress-required PHP version) in some future update.'
+            'help' => 'PHP 5.3 is currently required.'
         );
 
         $this->requirements[] = array(
@@ -101,9 +101,9 @@ class RequirementsChecker {
 
         $this->requirements[] = array(
             'name' => 'Standard directory layout',
-            'level' => 'critical',
+            'level' => 'warning',
             'fulfilled' => $this->testDirectoryLayout(),
-            'help' => 'It\'s necessary to use standard WordPress directory layout with the current version of VersionPress.'
+            'help' => 'It seems like you use customized project structure. VersionPress supports only some scenarios. [Learn more](http://docs.versionpress.net/en/feature-focus/custom-project-structure).'
         );
 
 
@@ -126,9 +126,9 @@ class RequirementsChecker {
         $countOfEntities = $this->countEntities();
 
         if ($setTimeLimitEnabled) {
-            $help = "The initialization will take a little longer. This website contains $countOfEntities entities, which is a lot.";
+            $help = "The initialization will take a little longer. This website contains $countOfEntities entities.";
         } else {
-            $help = "The initialization may not finish. This website contains $countOfEntities entities, which is a lot.";
+            $help = "The initialization may not finish. This website contains $countOfEntities entities.";
         }
 
         $this->requirements[] = array(
@@ -228,7 +228,7 @@ class RequirementsChecker {
     }
 
     private function testGitignore() {
-        $gitignorePath = ABSPATH . '.gitignore';
+        $gitignorePath = VP_PROJECT_ROOT . '/.gitignore';
         $gitignoreExists = is_file($gitignorePath);
         if (!$gitignoreExists) {
             return true;
@@ -246,6 +246,7 @@ class RequirementsChecker {
         $isStandardLayout &= WP_CONTENT_DIR . '/plugins' === WP_PLUGIN_DIR;
         $isStandardLayout &= WP_CONTENT_DIR . '/themes' === get_theme_root();
         $isStandardLayout &= WP_CONTENT_DIR . '/uploads' === $uploadDirInfo['basedir'];
+        $isStandardLayout &= is_file(ABSPATH . 'wp-config.php');
 
         return $isStandardLayout;
     }

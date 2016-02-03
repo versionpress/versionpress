@@ -5,6 +5,7 @@ namespace VersionPress\Synchronizers;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
+use VersionPress\Utils\WordPressCacheUtils;
 use wpdb;
 
 class TermsSynchronizer extends SynchronizerBase {
@@ -22,5 +23,10 @@ class TermsSynchronizer extends SynchronizerBase {
             unset($entity['taxonomies']); // taxonomies are synchronized by VersionPress\Synchronizers\TermTaxonomiesSynchronizer
         }
         return $entities;
+    }
+
+    protected function doEntitySpecificActions() {
+        parent::doEntitySpecificActions();
+        WordPressCacheUtils::clearTermCache(array_column($this->entities, 'vp_id'), $this->database);
     }
 }

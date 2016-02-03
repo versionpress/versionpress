@@ -47,7 +47,7 @@ if (defined('VP_MAINTENANCE')) {
 
 if (!VersionPress::isActive() && is_file(VERSIONPRESS_PLUGIN_DIR . '/.abort-initialization')) {
     if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
-        FileSystem::remove(ABSPATH . '.git');
+        FileSystem::remove(VP_PROJECT_ROOT . '/.git');
     }
 
     FileSystem::remove(VERSIONPRESS_MIRRORING_DIR);
@@ -120,7 +120,7 @@ function vp_register_hooks() {
         touch(ABSPATH . 'versionpress.maintenance');
     });
     add_action('_core_updated_successfully', function () use ($committer, $mirror) {
-        require(ABSPATH . 'wp-includes/version.php'); // load constants (like $wp_version)
+        require(ABSPATH . WPINC . '/version.php'); // load constants (like $wp_version)
         /** @var string $wp_version */
         $changeInfo = new WordPressUpdateChangeInfo($wp_version);
         $committer->forceChangeInfo($changeInfo);
@@ -792,14 +792,14 @@ function vp_admin_menu() {
 }
 
 function versionpress_page() {
-    require_once(WP_CONTENT_DIR . '/plugins/versionpress/admin/index.php');
+    require_once(VERSIONPRESS_PLUGIN_DIR . '/admin/index.php');
 }
 
 add_action('admin_action_vp_show_undo_confirm', 'vp_show_undo_confirm');
 
 function vp_show_undo_confirm() {
     if(isAjax()) {
-        require_once(WP_CONTENT_DIR . '/plugins/versionpress/admin/undo.php');
+        require_once(VERSIONPRESS_PLUGIN_DIR . '/admin/undo.php');
     } else {
         wp_redirect(admin_url('admin.php?page=versionpress/admin/undo.php&method=' . $_GET['method'] . '&commit=' . $_GET['commit']));
     }

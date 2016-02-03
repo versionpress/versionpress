@@ -2,7 +2,7 @@
 
 namespace VersionPress\Tests\End2End\Plugins;
 
-use VersionPress\Tests\End2End\Utils\PathUtils;
+use VersionPress\Utils\PathUtils;
 use VersionPress\Tests\End2End\Utils\SeleniumWorker;
 
 class PluginsTestSeleniumWorker extends SeleniumWorker implements IPluginsTestWorker {

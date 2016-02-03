@@ -69,8 +69,7 @@ abstract class DirectoryStorage extends Storage {
             $newEntity = array_merge($oldEntity, $diff);
             $newEntity = array_filter($newEntity, function ($value) { return $value !== false; });
 
-            /** @noinspection PhpUsageOfSilenceOperatorInspection */
-            @mkdir(dirname($this->getEntityFilename($vpid)), 0777, true); // intentionally @ - it's OK that the directory already exists
+            FileSystem::mkdir(dirname($this->getEntityFilename($vpid)));
             file_put_contents($filename, $this->serializeEntity($vpid, $newEntity));
 
             return $this->createChangeInfo($oldEntity, $newEntity, !$isExistingEntity ? 'create' : 'edit');

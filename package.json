@@ -21,6 +21,7 @@
     "gulp-zip": "~3.0.2",
     "merge-stream": "^1.0.0",
     "neon-js": "^1.0.0",
+    "run-sequence": "^1.1.5",
     "shelljs": "^0.5.3"
   },
   "scripts": {
