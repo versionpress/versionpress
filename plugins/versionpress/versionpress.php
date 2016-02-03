@@ -799,7 +799,7 @@ add_action('admin_action_vp_show_undo_confirm', 'vp_show_undo_confirm');
 
 function vp_show_undo_confirm() {
     if(isAjax()) {
-        require_once(WP_CONTENT_DIR . '/plugins/versionpress/admin/undo.php');
+        require_once(VERSIONPRESS_PLUGIN_DIR . '/admin/undo.php');
     } else {
         wp_redirect(admin_url('admin.php?page=versionpress/admin/undo.php&method=' . $_GET['method'] . '&commit=' . $_GET['commit']));
     }
