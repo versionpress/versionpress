@@ -1,23 +1,8 @@
-This bundled library is used when the [WP-API](https://github.com/WP-API/WP-API) plugin is not installed.
-Technically, it is the minimal REST API needed for VersionPress extracted from WP-API. 
+This bundled library is used when the the WP-API is not in WordPress core (until WP 4.4)
 
-The minimal code is extracted manually, when updating to newer WP-API, don't forget to:
+The code is updated manually, when updating to newer version, don't forget to:
 
-- Remove unnecessary files:
-    - non-source files
-    - endpoints
-    - `compatibility-v1.php`
-    - `wp-api.js`
-- Remove unnecessary functions and actions:
-    - `register_api_field`
-    - `_add_extra_api_post_type_arguments`
-    - `_add_extra_api_taxonomy_arguments`
-    - `create_initial_rest_routes`
-    - `rest_register_scripts`
-- Rename REST_API_VERSION constant to VP_REST_API_VERSION
-- Change all occurences of 'rest_' to 'vp_rest_'
-- Change `vp_rest_url_prefix` value to 'vp-json'
-- Change <api name='WP-API'> argument in `rest_output_rsd` to 'VP-API'
-- Put all classes to namespace `VersionPress\Api\BundledWpApi`
-- Add use statements for all used classes beside `VersionPress\Api`
-- Change `$wp_vp_rest_server_class` value to 'VersionPress\\Api\\BundledWpApi\\WP_REST_Server'
+- Put all global functions and classes into conditions to avoid redeclaration
+- Copy function `wp_json_encode` that has been redeclared in WP 4.4 and rename it to `wp_vp_json_encode`
+- Change all uses of `wp_json_encode` in BundledWpApi to `wp_vp_json_encode`
+- Add function `vp_rest_api_maybe_flush_rewrites` hooked to 'init' after `rest_api_init`
