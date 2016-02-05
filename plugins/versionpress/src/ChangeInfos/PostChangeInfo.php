@@ -102,7 +102,7 @@ class PostChangeInfo extends EntityChangeInfo {
         $changes = parent::getChangedFiles();
         if ($this->postType !== "attachment") return $changes;
 
-        $changes[] = array("type" => "path", "path" => WP_CONTENT_DIR . "/uploads/*");
+        $changes[] = array("type" => "path", "path" => path_join(wp_upload_dir(), '/*'));
         return $changes;
     }
 

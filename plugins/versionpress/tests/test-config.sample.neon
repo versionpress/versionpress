@@ -1,7 +1,7 @@
 # Test configuration, see TestConfig
 
 selenium:
-    firefox-binary: C:/Path/To/FirefoxPortable/App/Firefox/firefox.exe
+    firefox-binary: /Users/johndoe/Path/To/Firefox.app/Contents/MacOS/firefox
     post-commit-wait-time: 500
 
 # Default values for all sites, may be overwritten by a specific site
@@ -40,7 +40,7 @@ sites:
             user: vp01
             password: vp01
         wp-site:
-            path: C:/wamp/www/vp01
+            path: /Users/johdoe/Sites/vp01
             url: http://localhost/vp01
             title: "VP Test @ WampServer"
 

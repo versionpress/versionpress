@@ -27,6 +27,7 @@ abstract class MetaEntityStorage extends Storage {
     private $parentStorage;
 
     function __construct(Storage $parentStorage, EntityInfo $entityInfo, $keyName, $valueName) {
+        parent::__construct($entityInfo);
         $this->parentStorage = $parentStorage;
         $this->keyName = $keyName;
         $this->valueName = $valueName;
@@ -258,7 +259,7 @@ abstract class MetaEntityStorage extends Storage {
     }
 
     function shouldBeSaved($data) {
-        return isset($data[$this->parentReferenceName]) && $this->parentStorage->exists($data[$this->parentReferenceName], null);
+        return parent::shouldBeSaved($data) && isset($data[$this->parentReferenceName]) && $this->parentStorage->exists($data[$this->parentReferenceName], null);
     }
 
     function prepareStorage() {

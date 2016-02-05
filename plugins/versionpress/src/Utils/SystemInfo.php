@@ -2,7 +2,6 @@
 
 namespace Utils;
 
-
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
 use VersionPress\Utils\Process;

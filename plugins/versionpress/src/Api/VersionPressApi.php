@@ -171,7 +171,7 @@ class VersionPressApi {
         $commits = $gitLogPaginator->getPage($page);
 
         if (empty($commits)) {
-            return new \WP_Error('notice', 'No more commits to show.', array('status' => 403));
+            return new \WP_Error('notice', 'No more commits to show.', array('status' => 404));
         }
 
         $preActivationHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
@@ -193,6 +193,8 @@ class VersionPressApi {
             $isEnabled = $isChildOfInitialCommit || $canRollbackToThisCommit || $commit->getHash() === $initialCommitHash;
 
             $fileChanges = $this->getFileChanges($commit);
+
+            $environment = $changeInfo instanceof ChangeInfoEnvelope ? $changeInfo->getEnvironment() : '?';
             $changeInfoList = $changeInfo instanceof ChangeInfoEnvelope ? $changeInfo->getChangeInfoList() : array();
 
             $result[] = array(
@@ -204,6 +206,7 @@ class VersionPressApi {
                 "isEnabled" => $isEnabled,
                 "isInitial" => $commit->getHash() === $initialCommitHash,
                 "isMerge" => $commit->isMerge(),
+                "environment" => $environment,
                 "changes" => array_merge($this->convertChangeInfoList($changeInfoList), $fileChanges),
             );
             $isFirstCommit = false;

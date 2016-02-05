@@ -25,6 +25,10 @@ class ReplacerMethods {
 
         $r = $this->__wp_insert($table, $data, $format);
 
+        if ($r === false) {
+            return $r;
+        }
+
         $this->vp_backup_fields();
         $wpdbMirrorBridge->insert($table, $data);
         $this->vp_restore_fields();
@@ -39,6 +43,10 @@ class ReplacerMethods {
 
         $r = $this->__wp_update($table, $data, $where, $format, $where_format);
 
+        if ($r === false) {
+            return $r;
+        }
+
         $this->vp_backup_fields();
         $wpdbMirrorBridge->update($table, $data, $where);
         $this->vp_restore_fields();
@@ -52,6 +60,10 @@ class ReplacerMethods {
         $wpdbMirrorBridge = $versionPressContainer->resolve(\VersionPress\DI\VersionPressServices::WPDB_MIRROR_BRIDGE);
 
         $r = $this->__wp_delete($table, $where, $where_format);
+
+        if ($r === false) {
+            return $r;
+        }
 
         $this->vp_backup_fields();
         $wpdbMirrorBridge->delete($table, $where);

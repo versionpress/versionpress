@@ -83,7 +83,7 @@ class PluginChangeInfo extends TrackedChangeInfo {
     }
 
     public function getChangedFiles() {
-        $path = WP_CONTENT_DIR . "/plugins/";
+        $path = WP_PLUGIN_DIR . "/";
         if (dirname($this->pluginFile) == ".") {
             // single-file plugin like hello.php
             $path .= $this->pluginFile;

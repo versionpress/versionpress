@@ -20,6 +20,7 @@ use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\RequirementsChecker;
+use VersionPress\Utils\WordPressMissingFunctions;
 use VersionPress\VersionPress;
 use WP_CLI;
 use WP_CLI_Command;
@@ -203,11 +204,18 @@ class VPCommand extends WP_CLI_Command {
      */
     public function restoreSite($args, $assoc_args) {
 
+        include_once __DIR__ . '/../Utils/WordPressMissingFunctions.php';
+        include_once dirname(WordPressMissingFunctions::getWpConfigPath()) . '/wp-config.common.php';
+
         // Load VersionPress' bootstrap (WP_CONTENT_DIR needs to be defined)
         if (!defined('WP_CONTENT_DIR')) {
             define('WP_CONTENT_DIR', ABSPATH . 'wp-content');
         }
         require_once(__DIR__ . '/../../bootstrap.php');
+
+        if (!VersionPress::isActive()) {
+            WP_CLI::error('Unfortunately, this site was not tracked by VersionPress. Therefore, it cannot be restored.');
+        }
 
         // Check if the site is installed
         $process = VPCommandUtils::runWpCliCommand('core', 'is-installed');
@@ -226,13 +234,17 @@ class VPCommand extends WP_CLI_Command {
         }
 
         // Updating wp-config.php
-        if (file_exists(ABSPATH . 'wp-config.php')) {
+        if (file_exists(WordPressMissingFunctions::getWpConfigPath())) {
             if ($this->issetConfigOption($assoc_args)) {
                 WP_CLI::error("Site settings was loaded from wp-config.php. If you want to reconfigure the site, please delete the wp-config.php file");
             }
         } else {
             $this->configSite($assoc_args);
         }
+
+        // Update URLs in wp-config.php
+        $this->setConfigUrl('WP_CONTENT_URL', 'WP_CONTENT_DIR', ABSPATH . 'wp-content', $url);
+        $this->setConfigUrl('WP_PLUGIN_URL', 'WP_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins', $url);
 
         // Create or empty database
         $this->prepareDatabase($assoc_args);
@@ -254,6 +266,10 @@ class VPCommand extends WP_CLI_Command {
             'admin_password' => 'x',
             'admin_email' => 'x@example.com',
         );
+
+        if (version_compare(WP_CLI_VERSION, '0.22.0', '>=')) {
+            $installArgs['skip-email'] = null;
+        }
 
         $process = VPCommandUtils::runWpCliCommand('core', 'install', $installArgs);
         if (!$process->isSuccessful()) {
@@ -316,7 +332,7 @@ class VPCommand extends WP_CLI_Command {
             if ($dbExists) {
 
                 defined('SHORTINIT') or define('SHORTINIT', true);
-                require_once ABSPATH . 'wp-config.php';
+                require_once WordPressMissingFunctions::getWpConfigPath();
                 global $table_prefix;
                 if ($this->someWpTablesExist(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $table_prefix)) {
                     WP_CLI::confirm('Database tables already exist, they will be droped and re-created. Proceed?', $assoc_args);
@@ -418,6 +434,10 @@ class VPCommand extends WP_CLI_Command {
             $assoc_args['yes'] = 1;
         }
 
+        if (!VersionPress::isActive()) {
+            WP_CLI::error('This site is not tracked by VersionPress. Please run "wp vp activate" before cloning.');
+        }
+
         $name = $assoc_args['name'];
 
         if (preg_match('/[^a-zA-Z0-9-_]/', $name)) {
@@ -427,6 +447,7 @@ class VPCommand extends WP_CLI_Command {
         $currentWpPath = get_home_path();
         $cloneDirName = $name;
         $clonePath = dirname($currentWpPath) . '/' . $cloneDirName;
+        $cloneVpPluginPath = $clonePath . '/' . str_replace(realpath(ABSPATH), '', realpath(VERSIONPRESS_PLUGIN_DIR));
 
         $cloneDbUser = isset($assoc_args['dbuser']) ? $assoc_args['dbuser'] : DB_USER;
         $cloneDbPassword = isset($assoc_args['dbpass']) ? $assoc_args['dbpass'] : DB_PASSWORD;
@@ -531,12 +552,12 @@ class VPCommand extends WP_CLI_Command {
 
         // Copy & Update wp-config
         $wpConfigFile = $clonePath . '/wp-config.php';
-        copy($currentWpPath . '/wp-config.php', $wpConfigFile);
+        copy(WordPressMissingFunctions::getWpConfigPath(), $wpConfigFile);
 
-        $this->updateConfig($wpConfigFile, $cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $cloneDbCharset, $cloneDbCollate);
+        $this->updateConfig($wpConfigFile, $name, $cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $cloneDbCharset, $cloneDbCollate);
 
         // Copy VersionPress
-        FileSystem::copyDir(VERSIONPRESS_PLUGIN_DIR, $clonePath . '/wp-content/plugins/versionpress');
+        FileSystem::copyDir(VERSIONPRESS_PLUGIN_DIR, $cloneVpPluginPath);
         WP_CLI::success("Copied VersionPress");
 
         // Finish the process by doing the standard restore-site
@@ -612,6 +633,10 @@ class VPCommand extends WP_CLI_Command {
     public function pull($args = array(), $assoc_args = array()) {
 
         global $versionPressContainer;
+
+        if (!VersionPress::isActive()) {
+            WP_CLI::error('This site is not tracked by VersionPress. Please run "wp vp activate" before cloning / merging.');
+        }
 
         $remote = isset($assoc_args['from']) ? $assoc_args['from'] : 'origin';
         $this->switchMaintenance('on');
@@ -741,6 +766,11 @@ class VPCommand extends WP_CLI_Command {
      * @synopsis [--to=<name|path>]
      */
     public function push($args = array(), $assoc_args = array()) {
+
+        if (!VersionPress::isActive()) {
+            WP_CLI::error('This site is not tracked by VersionPress. Please run "wp vp activate" before cloning / merging.');
+        }
+
         $remoteName = isset($assoc_args['to']) ? $assoc_args['to'] : 'origin';
         $remotePath = $this->getRemoteUrl($remoteName);
         if ($remotePath === null) {
@@ -799,6 +829,11 @@ class VPCommand extends WP_CLI_Command {
      */
     public function undo($args = array(), $assoc_args = array()) {
         global $versionPressContainer;
+
+        if (!VersionPress::isActive()) {
+            WP_CLI::error('This site is not tracked by VersionPress. Please run "wp vp activate" first.');
+        }
+
         /** @var Reverter $reverter */
         $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
         /** @var GitRepository $repository */
@@ -857,6 +892,11 @@ class VPCommand extends WP_CLI_Command {
      */
     public function rollback($args = array(), $assoc_args = array()) {
         global $versionPressContainer;
+
+        if (!VersionPress::isActive()) {
+            WP_CLI::error('This site is not tracked by VersionPress. Please run "wp vp activate" first.');
+        }
+
         /** @var Reverter $reverter */
         $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
         /** @var GitRepository $repository */
@@ -933,15 +973,19 @@ class VPCommand extends WP_CLI_Command {
         return count($wpTables) > 0;
     }
 
-    private function updateConfig($wpConfigFile, $dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $dbCharset, $dbCollate) {
+    private function updateConfig($wpConfigFile, $environment, $dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $dbCharset, $dbCollate) {
         $config = file_get_contents($wpConfigFile);
+
+        $environmentConstant = 'VP_ENVIRONMENT';
+
+        if (strpos($config, $environmentConstant) === false) {
+            // https://regex101.com/r/yJ8tY8/1
+            $config = preg_replace('/^(\\$table_prefix\\s*=.*)$/m', "define('$environmentConstant', '$environment');\n\n\${1}", $config, 1);
+        }
 
         // https://regex101.com/r/oO7gX7/4 - just remove the "g" modifier which is there for testing only
         $re = "/^(\\\$table_prefix\\s*=\\s*['\"]).*(['\"];)/m";
         $config = preg_replace($re, "\${1}{$dbPrefix}\${2}", $config, 1);
-
-        https://regex101.com/r/zD3mJ4/1 - just remove the "g" modifier which is there for testing only
-        $defineRegexPattern = "/^(define\\s*\\(\\s*['\"]%s['\"]\\s*,\\s*['\"]).*(['\"]\\s*\\)\\s*;)$/m";
 
         $replacements = array(
             "DB_NAME" => $dbName,
@@ -950,16 +994,30 @@ class VPCommand extends WP_CLI_Command {
             "DB_HOST" => $dbHost,
             "DB_CHARSET" => $dbCharset,
             "DB_COLLATE" => $dbCollate,
+            $environmentConstant => $environment,
         );
 
         foreach ($replacements as $constant => $value) {
-            $re = sprintf($defineRegexPattern, $constant);
-            $config = preg_replace($re, "\${1}{$value}\${2}", $config, 1);
+            self::updateConfigConstant($config, $constant, $value);
         }
-
 
         file_put_contents($wpConfigFile, $config);
         WP_CLI::success("wp-config.php updated");
+    }
+
+    private static function updateConfigConstant($config, $constant, $value) {
+        // https://regex101.com/r/zD3mJ4/3 - just remove the "g" modifier which is there for testing only
+        $re = "/(define\\s*\\(\\s*['\"]{$constant}['\"]\\s*,\\s*['\"]).*(['\"]\\s*\\)\\s*;)/m";
+        return preg_replace($re, "\${1}{$value}\${2}", $config, 1);
+    }
+
+    private static function createConfigConstant($config, $constant, $value) {
+        $tablePrefixPos = strpos($config, 'table_prefix');
+        $lineAfterTablePrefixPos = strpos($config, "\n", $tablePrefixPos) + 1;
+
+        $constantDefinition = "define('$constant', '$value');\n";
+
+        return substr($config, 0, $lineAfterTablePrefixPos) . $constantDefinition . substr($config, $lineAfterTablePrefixPos);
     }
 
     /**
@@ -1026,6 +1084,23 @@ class VPCommand extends WP_CLI_Command {
          * @noinspection PhpUsageOfSilenceOperatorInspection
          */
         @file_get_contents(get_home_url());
+    }
+
+    private function setConfigUrl($urlConstant, $pathConstant, $defaultPath, $baseUrl) {
+        if (defined($pathConstant) && constant($pathConstant) !== $defaultPath) {
+            $relativePathToWpContent = str_replace(getcwd(), '', realpath(constant($pathConstant)));
+
+            $wpContentUrl = $baseUrl . str_replace('//', '/', '/' . $relativePathToWpContent);
+            $config = file_get_contents(WordPressMissingFunctions::getWpConfigPath());
+
+            if (Strings::contains($config, $urlConstant)) {
+                $config = self::updateConfigConstant($config, $urlConstant, $wpContentUrl);
+            } else {
+                $config = self::createConfigConstant($config, $urlConstant, $wpContentUrl);
+            }
+
+            file_put_contents(ABSPATH . 'wp-config.php', $config);
+        }
     }
 }
 

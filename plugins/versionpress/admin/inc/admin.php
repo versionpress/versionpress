@@ -26,7 +26,7 @@ if (isset($_GET['error'])) {
         ),
     );
 
-    $error = $errors[$_GET['error']];
+    $error = isset( $errors[ $_GET['error'] ] ) ? $errors[ $_GET['error'] ] : null;
 }
 
 if (isset($_GET['bug-report'])) {
@@ -43,7 +43,7 @@ if (isset($_GET['bug-report'])) {
     }
 }
 
-if (isset($error)) {
+if ( ! empty( $error ) ) {
     echo "<div class='$error[class]'><p>$error[message]</p></div>";
 }
 

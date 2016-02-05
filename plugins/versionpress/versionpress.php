@@ -24,6 +24,7 @@ use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Storages\Mirror;
+use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\BugReporter;
 use VersionPress\Utils\CompatibilityChecker;
 use VersionPress\Utils\CompatibilityResult;
@@ -47,7 +48,7 @@ if (defined('VP_MAINTENANCE')) {
 
 if (!VersionPress::isActive() && is_file(VERSIONPRESS_PLUGIN_DIR . '/.abort-initialization')) {
     if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
-        FileSystem::remove(ABSPATH . '.git');
+        FileSystem::remove(VP_PROJECT_ROOT . '/.git');
     }
 
     FileSystem::remove(VERSIONPRESS_MIRRORING_DIR);
@@ -104,10 +105,10 @@ function vp_register_hooks() {
     $dbSchemaInfo = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
     /** @var VpidRepository $vpidRepository */
     $vpidRepository = $versionPressContainer->resolve(VersionPressServices::VPID_REPOSITORY);
-
     /** @var WpdbMirrorBridge $wpdbMirrorBridge */
     $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
-
+    /** @var StorageFactory $storageFactory */
+    $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
 
     /**
      *  Hook for saving taxonomies into files
@@ -120,7 +121,7 @@ function vp_register_hooks() {
         touch(ABSPATH . 'versionpress.maintenance');
     });
     add_action('_core_updated_successfully', function () use ($committer, $mirror) {
-        require(ABSPATH . 'wp-includes/version.php'); // load constants (like $wp_version)
+        require(ABSPATH . WPINC . '/version.php'); // load constants (like $wp_version)
         /** @var string $wp_version */
         $changeInfo = new WordPressUpdateChangeInfo($wp_version);
         $committer->forceChangeInfo($changeInfo);
@@ -484,6 +485,66 @@ function vp_register_hooks() {
         $committer->forceChangeInfo(new PluginChangeInfo($bestMatch, 'edit'));
     }
 
+    add_filter('cron_schedules', function ($schedules) use ($dbSchemaInfo) {
+        $intervals = $dbSchemaInfo->getIntervalsForFrequentlyWrittenEntities();
+
+        foreach ($intervals as $interval) {
+            if (isset($schedules[$interval])) {
+                continue;
+            }
+
+            $seconds = strtotime($interval, 0);
+            $schedules[$interval] = array(
+                'interval' => $seconds,
+                'display' => $interval
+            );
+        }
+
+        return $schedules;
+    });
+
+    $r = $dbSchemaInfo->getRulesForFrequentlyWrittenEntities();
+    $groupedByInterval = array();
+    foreach ($r as $entityName => $rules) {
+        foreach ($rules as $rule) {
+            $groupedByInterval[$rule['interval']][$entityName][] = $rule;
+        }
+    }
+
+    foreach ($groupedByInterval as $interval => $allRulesInInterval) {
+        $actionName = "vp_commit_frequently_written_entities_$interval";
+        if (!wp_next_scheduled($actionName)) {
+            wp_schedule_event(time(), $interval, $actionName);
+        }
+
+        add_action($actionName, function () use ($allRulesInInterval) {
+            global $versionPressContainer;
+            $dbSchemaInfo = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
+            $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
+            $wpdb = $versionPressContainer->resolve(VersionPressServices::WPDB);
+            $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
+
+            foreach ($allRulesInInterval as $entityName => $rules) {
+                $storageFactory->getStorage($entityName)->ignoreFrequentlyWrittenEntities = false;
+
+                $table = $dbSchemaInfo->getPrefixedTableName($entityName);
+                foreach ($rules as $rule) {
+                    $restrictionParts = array();
+                    foreach ($rule['rule-parts'] as $field => $value) {
+                        $restrictionParts[] = sprintf('`%s` = "%s"', $field, $wpdb->_escape($value));
+                    }
+                    $restriction = join(' AND ', $restrictionParts);
+                    $sql = "SELECT * FROM $table WHERE $restriction";
+
+                    $results = $wpdb->get_results($sql, ARRAY_A);
+                    foreach ($results as $data) {
+                        $wpdbMirrorBridge->update($table, $data, $data);
+                    }
+                }
+            }
+        });
+    }
+
     register_shutdown_function(array($committer, 'commit'));
 }
 
@@ -792,14 +853,14 @@ function vp_admin_menu() {
 }
 
 function versionpress_page() {
-    require_once(WP_CONTENT_DIR . '/plugins/versionpress/admin/index.php');
+    require_once(VERSIONPRESS_PLUGIN_DIR . '/admin/index.php');
 }
 
 add_action('admin_action_vp_show_undo_confirm', 'vp_show_undo_confirm');
 
 function vp_show_undo_confirm() {
     if(isAjax()) {
-        require_once(WP_CONTENT_DIR . '/plugins/versionpress/admin/undo.php');
+        require_once(VERSIONPRESS_PLUGIN_DIR . '/admin/undo.php');
     } else {
         wp_redirect(admin_url('admin.php?page=versionpress/admin/undo.php&method=' . $_GET['method'] . '&commit=' . $_GET['commit']));
     }

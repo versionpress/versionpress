@@ -17,6 +17,15 @@ class VersionPress {
     }
 
     /**
+     * Returns name of current environment (master for original site, clone name for clone).
+     *
+     * @return string
+     */
+    public static function getEnvironment() {
+        return defined('VP_ENVIRONMENT') ? VP_ENVIRONMENT : 'master';
+    }
+
+    /**
      * Returns true if VersionPress is active. Note that active != activated and being
      * active means that VersionPress is tracking changes.
      *

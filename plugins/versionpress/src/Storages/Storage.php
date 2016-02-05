@@ -14,6 +14,16 @@ abstract class Storage {
     /** @var bool */
     protected $isTransaction;
 
+    /** @var bool */
+    public $ignoreFrequentlyWrittenEntities = true;
+
+    /** @var EntityInfo */
+    protected $entityInfo;
+
+    public function __construct(EntityInfo $entityInfo) {
+        $this->entityInfo = $entityInfo;
+    }
+
     /**
      * Saves data to a storage
      *
@@ -58,7 +68,13 @@ abstract class Storage {
      * @param array $data
      * @return bool
      */
-    public abstract function shouldBeSaved($data);
+    public function shouldBeSaved($data) {
+        if (!$this->ignoreFrequentlyWrittenEntities) {
+            return true;
+        }
+
+        return !$this->entityInfo->isFrequentlyWrittenEntity($data);
+    }
 
     /**
      * Called from {@link VersionPress\Initialization\Initializer} to give storage a chance to prepare itself.

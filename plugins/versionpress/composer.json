@@ -9,8 +9,12 @@
     "symfony/process": "2.5.*",
     "michelf/php-markdown": "1.4.*",
     "symfony/filesystem": "~2.5",
-    "imnotjames/curlfile-compat": "0.0.1",
-    "php": "5.3.*"
+    "imnotjames/curlfile-compat": "0.0.1"
+  },
+  "config": {
+    "platform": {
+      "php": "5.3.3"
+    }
   },
   "require-dev": {
     "phpunit/phpunit": "3.7.*",
