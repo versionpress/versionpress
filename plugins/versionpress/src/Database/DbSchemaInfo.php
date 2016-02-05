@@ -136,7 +136,7 @@ class DbSchemaInfo {
         $frequentlyWrittenEntities = array();
         foreach ($this->getAllEntityNames() as $entityName) {
             $entityInfo = $this->getEntityInfo($entityName);
-            $frequentlyWrittenEntities[$entityName] = $entityInfo->getRulesForFrequentlyWrittenEntities();
+            $frequentlyWrittenEntities[$entityName] = $entityInfo->getRulesAndIntervalsForFrequentlyWrittenEntities();
         }
 
         return $frequentlyWrittenEntities;

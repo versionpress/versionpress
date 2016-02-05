@@ -133,6 +133,8 @@ class EntityInfo {
 
     private $frequentlyWritten = array();
 
+    private $ignoredEntities = array();
+
     /**
      * Does the parsing and sets all properties
      *
@@ -193,7 +195,7 @@ class EntityInfo {
         if (isset($schemaInfo['value-references'])) {
             foreach ($schemaInfo['value-references'] as $key => $references) {
                 list($keyCol, $valueCol) = explode('@', $key);
-                foreach($references as $reference => $targetEntity) {
+                foreach ($references as $reference => $targetEntity) {
                     $key = $keyCol . '=' . $reference . '@' . $valueCol;
                     $this->valueReferences[$key] = $targetEntity;
                 }
@@ -204,6 +206,10 @@ class EntityInfo {
         if (isset($schemaInfo['frequently-written'])) {
             $this->frequentlyWritten = $schemaInfo['frequently-written'];
         }
+
+        if (isset($schemaInfo['ignored-entities'])) {
+            $this->ignoredEntities = $schemaInfo['ignored-entities'];
+        }
     }
 
     public function isVirtualReference($reference) {
@@ -211,32 +217,55 @@ class EntityInfo {
     }
 
     public function isFrequentlyWrittenEntity($entity) {
-        $rules = $this->getRulesForFrequentlyWrittenEntities();
+        $rulesAndIntervals = $this->getRulesAndIntervalsForFrequentlyWrittenEntities();
+        $rules = array_column($rulesAndIntervals, 'rule');
+        return $this->matchesRules($entity, $rules);
+    }
 
+    public function isIgnoredEntity($entity) {
+        $rules = $this->getRulesForIgnoredEntities();
+        return $this->matchesRules($entity, $rules);
+    }
+
+    public function getRulesAndIntervalsForFrequentlyWrittenEntities() {
+        $queries = array_map(function ($banan) {
+            return is_string($banan) ? $banan : $banan['query'];
+        }, $this->frequentlyWritten);
+
+        $rules = $this->createRulesFromQueries($queries);
+
+        $rulesAndIntervals = array();
+        foreach ($rules as $key => $rule) {
+            $interval = isset($this->frequentlyWritten[$key]['interval']) ? $this->frequentlyWritten[$key]['interval'] : self::FREQUENTLY_WRITTEN_DEFAULT_INTERVAL;
+            $rulesAndIntervals[] = array('rule' => $rule, 'interval' => $interval);
+        }
+
+
+        return $rulesAndIntervals;
+    }
+
+    public function getRulesForIgnoredEntities() {
+        return $this->createRulesFromQueries($this->ignoredEntities);
+    }
+
+    private function matchesRules($entity, $rules) {
         foreach ($rules as $rule) {
-            foreach ($rule['rule-parts'] as $field => $value) { // check all parts of rule
+            foreach ($rule as $field => $value) { // check all parts of rule
                 if (!isset($entity[$field]) || $entity[$field] != $value) {
-                    continue;
+                    continue 2;
                 }
-                return true;
             }
+            return true;
         }
         return false;
     }
 
-    public function getRulesForFrequentlyWrittenEntities() {
+    private function createRulesFromQueries($queries) {
         // https://regex101.com/r/wT6zG3/4 (query language)
         $re = "/(-)?(?:(\\S+):\\s*)?(?:'((?:[^'\\\\]|\\\\.)*)'|\"((?:[^\"\\\\]|\\\\.)*)\"|(\\S+))/";
         $rules = array();
-
-        foreach ($this->frequentlyWritten as $rule) {
-            if (is_string($rule)) {
-                $query = $rule;
-                $interval = self::FREQUENTLY_WRITTEN_DEFAULT_INTERVAL;
-            } else {
-                $query = $rule['query'];
-                $interval = isset($rule['interval']) ? $rule['interval'] : self::FREQUENTLY_WRITTEN_DEFAULT_INTERVAL;
-            }
+        foreach ($queries as $query) {
+            $possibleValues = array();
 
             preg_match_all($re, $query, $matches);
             $isValidRule = count($matches[0]) > 0;
@@ -268,10 +297,8 @@ class EntityInfo {
             }
 
             ksort($ruleParts);
-            $rules[] = array('rule-parts' => array_combine($keys, $ruleParts), 'interval' => $interval);
-
+            $rules[] = array_combine($keys, $ruleParts);
         }
-
         return $rules;
     }
 }
