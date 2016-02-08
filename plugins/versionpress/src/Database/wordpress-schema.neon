@@ -65,3 +65,13 @@ option:
             page_for_posts: post
     frequently-written:
         - 'option_name: akismet_spam_count'
+    ignored-entities:
+        - 'option_name: cron'
+        - 'option_name: home'
+        - 'option_name: siteurl'
+        - 'option_name: db_upgraded'
+        - 'option_name: rewrite_rules'
+        - 'option_name: recently_edited'
+        - 'option_name: auto_updater.lock'
+        - 'option_name: can_compress_scripts'
+        - 'option_name: auto_core_update_notified'
