@@ -20,6 +20,11 @@ class OptionStorage extends DirectoryStorage {
         'auto_updater.lock',
         'can_compress_scripts',
         'auto_core_update_notified',
+        'auth_key',
+        'auth_salt',
+        'logged_in_key',
+        'logged_in_salt',
+
     );
 
     /** @var string */
