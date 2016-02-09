@@ -196,9 +196,27 @@ gulp.task('disable-debugger', false, ['copy'], function (cb) {
 });
 
 /**
+ * Fills VersionPress version
+ */
+
+gulp.task('fill-vp-version', false, function(cb){
+    var fileOptions = {encoding: 'UTF-8'};
+    fs.readFile(vpDir + '/versionpress.php', fileOptions, function (err, content) {
+        var versionMatch = content.match(/^Version: (.*)$/m);
+        packageVersion = versionMatch[1];
+        if (buildType == 'nightly') {
+            var gitCommit = exec('git rev-parse --short HEAD', {silent: true}).output.trim(); // trims the "\n" from the end
+            packageVersion += '+' + gitCommit;
+        }
+        cb();
+    })
+
+})
+
+/**
  * Builds the final ZIP in the `distDir` folder.
  */
-gulp.task('zip', false, ['copy', 'disable-debugger', 'remove-composer-files'], function (cb) {
+gulp.task('zip', false, ['copy', 'disable-debugger', 'remove-composer-files', 'fill-vp-version'], function (cb) {
     return gulp.src(buildDir + '/**', {dot: true}).
         pipe(rename(function (path) {
             path.dirname = 'versionpress/' + path.dirname;
