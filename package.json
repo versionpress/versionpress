@@ -14,6 +14,7 @@
     "gulp": "~3.9.0",
     "gulp-composer": "^0.1.0",
     "gulp-git": "^1.0.1",
+    "gulp-help": "^1.6.1",
     "gulp-remove-lines": "^0.1.0",
     "gulp-rename": "~1.2.0",
     "gulp-replace": "~0.5.4",
