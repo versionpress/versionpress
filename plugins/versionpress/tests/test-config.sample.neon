@@ -34,7 +34,6 @@ sites:
     # Local sites
     vp01:
         host: localhost
-
         db:
             # Database should be created. VersionPress does not create it
             host: localhost
