@@ -86,14 +86,14 @@ var adminGuiDir = vpDir + '/admin/public/gui';
 var srcDef = [];
 
 
-gulp.task('set-nightly-build', 'Sets build type to \'nightly\'', function() {
+gulp.task('set-nightly-build', false, function () {
     buildType = 'nightly';
 });
 
 /**
  * Sets `buildDir` and `buildType` so that the copy methods copies to the WP test site.
  */
-gulp.task('prepare-test-deploy','Sets `buildDir` and `buildType` so that the copy methods copies to the WP test site.', function() {
+gulp.task('prepare-test-deploy', false, function () {
     var testConfigStr = fs.readFileSync(vpDir + '/tests/test-config.neon', 'utf-8');
     var testConfig = neon.decode(testConfigStr).toObject(true);
     var sitePath = process.env.VP_DEPLOY_TARGET || testConfig["sites"][testConfig["test-site"]]["wp-site"]["path"];
@@ -109,7 +109,7 @@ gulp.task('prepare-test-deploy','Sets `buildDir` and `buildType` so that the cop
  * Prepares `srcDef` that is later used in the `copy` task. The src definition
  * is slightly different for various buildTypes.
  */
-gulp.task('prepare-src-definition','Prepares `srcDef` that is later used in the `copy` task.', function () {
+gulp.task('prepare-src-definition', false, function () {
 
     srcDef = [];
 
@@ -138,7 +138,7 @@ gulp.task('prepare-src-definition','Prepares `srcDef` that is later used in the 
 /**
  * Cleans buildDir and distDir
  */
-gulp.task('clean','Cleans buildDir and distDir', function (cb) {
+gulp.task('clean', false, function (cb) {
     return del([buildDir, distDir], {force: true});
 });
 
@@ -146,7 +146,7 @@ gulp.task('clean','Cleans buildDir and distDir', function (cb) {
 /**
  * Copies files defined by `srcDef` to `buildDir`
  */
-gulp.task('copy','Copies files defined by `srcDef` to `buildDir`', ['clean', 'prepare-src-definition', 'frontend-deploy'], function (cb) {
+gulp.task('copy', false, ['clean', 'prepare-src-definition', 'frontend-deploy'], function (cb) {
     var srcOptions = {dot: true, base: vpDir};
     return gulp.src(srcDef, srcOptions).pipe(gulp.dest(buildDir));
 });
@@ -154,14 +154,14 @@ gulp.task('copy','Copies files defined by `srcDef` to `buildDir`', ['clean', 'pr
 /**
  * Builds the frontend.
  */
-gulp.task('frontend-build','Builds the frontend.', ['init-frontend'], shell.task([
+gulp.task('frontend-build', false, ['init-frontend'], shell.task([
     'npm run build'
 ], {cwd: frontendDir}));
 
 /**
  * Deploys the frontend.
  */
-gulp.task('frontend-deploy','Deploys the frontend.', function(cb) {
+gulp.task('frontend-deploy', false, function (cb) {
     var src = frontendDir + '/build/**';
     var srcOptions = {dot: true};
     return gulp.src(src, srcOptions).pipe(gulp.dest(adminGuiDir));
@@ -170,26 +170,26 @@ gulp.task('frontend-deploy','Deploys the frontend.', function(cb) {
 /**
  * Builds and deploys the frontend.
  */
-gulp.task('frontend-build-and-deploy','Builds and deploys the frontend.', function (cb) {
+gulp.task('frontend-build-and-deploy', false, function (cb) {
     runSequence('frontend-build', 'frontend-deploy', cb);
 });
 
 /**
  * Installs Composer packages, ignores dev packages prefers dist ones
  */
-gulp.task('composer-install', 'Installs Composer packages, ignores dev packages prefers dist ones', ['copy'], shell.task(['composer install -d ' + buildDir + ' --no-dev --prefer-dist --ignore-platform-reqs --optimize-autoloader']));
+gulp.task('composer-install', false, ['copy'], shell.task(['composer install -d ' + buildDir + ' --no-dev --prefer-dist --ignore-platform-reqs --optimize-autoloader']));
 
 /**
  * Removes composer.json|lock after the `composer-install` task is done
  */
-gulp.task('remove-composer-files','Removes composer.json|lock after the `composer-install` task is done', ['composer-install'], function (cb) {
+gulp.task('remove-composer-files', false, ['composer-install'], function (cb) {
     return del([buildDir + '/composer.json', buildDir + '/composer.lock']);
 });
 
 /**
  * Disables the debugger because we don't want to handle all exceptions and errors caused by all plugins. See WP-268.
  */
-gulp.task('disable-debugger', 'Disables the debugger because we don\'t want to handle all exceptions and errors caused by all plugins.', ['copy'], function (cb) {
+gulp.task('disable-debugger', false, ['copy'], function (cb) {
     return gulp.src(buildDir + '/bootstrap.php').pipe(removeLines(
         {filters: [/^Debugger::enable/]}
     )).pipe(gulp.dest(buildDir));
@@ -198,7 +198,7 @@ gulp.task('disable-debugger', 'Disables the debugger because we don\'t want to h
 /**
  * Builds the final ZIP in the `distDir` folder.
  */
-gulp.task('zip', 'Builds the final ZIP in the `distDir` folder.', ['copy', 'disable-debugger', 'remove-composer-files'], function (cb) {
+gulp.task('zip', false, ['copy', 'disable-debugger', 'remove-composer-files'], function (cb) {
     return gulp.src(buildDir + '/**', {dot: true}).
         pipe(rename(function (path) {
             path.dirname = 'versionpress/' + path.dirname;
@@ -210,28 +210,28 @@ gulp.task('zip', 'Builds the final ZIP in the `distDir` folder.', ['copy', 'disa
 /**
  * After the ZIP has been built, cleans the build directory
  */
-gulp.task('clean-build', 'After the ZIP has been built, cleans the build directory', ['zip'], function (cb) {
-	return del(['build']);
+gulp.task('clean-build', false, ['zip'], function (cb) {
+    return del(['build']);
 });
 
 /**
  * Installs Composer external libs.
  */
-gulp.task('composer-install-ext-libs', 'Installs Composer external libs.', function() {
-    return composer('update', { cwd: './ext-libs', bin: 'composer', 'ignore-platform-reqs': true});
+gulp.task('composer-install-ext-libs', false, function () {
+    return composer('update', {cwd: './ext-libs', bin: 'composer', 'ignore-platform-reqs': true});
 });
 
 /**
  * Installs Composer libs.
  */
-gulp.task('composer-install-versionpress-libs','Installs Composer libs.', function() {
-    return composer({ cwd: './plugins/versionpress', bin: 'composer', 'ignore-platform-reqs': true});
+gulp.task('composer-install-versionpress-libs', false, function () {
+    return composer({cwd: './plugins/versionpress', bin: 'composer', 'ignore-platform-reqs': true});
 });
 
 /**
  * Inits the frontend project.
  */
-gulp.task('init-frontend','Inits the frontend project.', function() {
+gulp.task('init-frontend', false, function () {
     var configPath = frontendDir + '/src/config.local.sample.ts';
     var targetName = configPath.replace('.sample', '');
     if (fs.existsSync(targetName)) {
@@ -249,9 +249,11 @@ gulp.task('init-frontend','Inits the frontend project.', function() {
 /**
  * Sets git to be case sensitive.
  */
-gulp.task('git-config','Sets git to be case sensitive.', function(cb) {
+gulp.task('git-config', false, function (cb) {
     return git.exec({args: 'config core.ignorecase false'}, function (err, stdout) {
-        if(err) { console.log(err); }
+        if (err) {
+            console.log(err);
+        }
         cb();
     });
 });
@@ -261,13 +263,14 @@ gulp.task('git-config','Sets git to be case sensitive.', function(cb) {
 // Main callable tasks
 //--------------------------------------
 
-gulp.task('default', 'Default task that prints all tasks available (same as `help` task)', ['help'], function () {});
+gulp.task('default', false, ['help'], function () {
+});
 
 
 /**
  * Task that exports production build
  */
-gulp.task('Build','task that exports production build', ['clean-build'], function() {
+gulp.task('build', 'Task that exports production build', ['clean-build'], function () {
     console.log(" ");
     console.log("Build ready: " + chalk.white.bold.bgGreen("versionpress-" + packageVersion + ".zip"));
     console.log(" ");
@@ -278,19 +281,19 @@ gulp.task('Build','task that exports production build', ['clean-build'], functio
  * but the version number in both plugin metadata and file name contains short Git hash,
  * e.g., "versionpress-1.0+58a96f2.zip" or "Version: 1.0+58a96f2".
  */
-gulp.task('nightly-build','Nightly build from current Git revision. Short hash is added to ZIP name.', ['set-nightly-build', 'clean-build']);
+gulp.task('nightly-build', 'Nightly build from current Git revision. Short hash is added to ZIP name.', ['set-nightly-build', 'clean-build']);
 
 /**
  * Task called from WpAutomation to copy the plugin files to the test directory
  * specified in `test-config.neon`. Basically does only the `copy` task.
  */
-gulp.task('test-deploy','Task called from WpAutomation to copy the plugin files to the test directory.', ['prepare-test-deploy', 'copy']);
+gulp.task('test-deploy', 'Task called from WpAutomation to copy the plugin files to the test directory.', ['prepare-test-deploy', 'copy']);
 
 /**
  * Inits dev environment.
  * Install vendors, set env variables.
  */
-gulp.task('init-dev','Inits user development environment.', ['git-config', 'composer-install-ext-libs', 'composer-install-versionpress-libs', 'frontend-build-and-deploy']);
+gulp.task('init-dev', 'Inits user development environment.', ['git-config', 'composer-install-ext-libs', 'composer-install-versionpress-libs', 'frontend-build-and-deploy']);
 
 
 //--------------------------------------
@@ -300,7 +303,7 @@ gulp.task('init-dev','Inits user development environment.', ['git-config', 'comp
 /**
  * Setup project files for IDEA / PhpStorm
  */
-gulp.task('idea','Setup project files for IDEA / PhpStorm', function() {
+gulp.task('idea', 'Setup project files for IDEA / PhpStorm', function () {
     var ideaProjects = [
         {src: './.ide-tpl/.idea-versionpress/**', dest: vpDir + '/.idea'},
         {src: './.ide-tpl/.idea-frontend/**', dest: frontendDir + '/.idea'}
