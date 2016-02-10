@@ -8,8 +8,8 @@ const defaultConfig: VersionPressConfig = {
 
   api: {
     root: '',
-    urlPrefix: 'vp-json',
-    queryParam: 'vp_rest_route',
+    urlPrefix: 'wp-json',
+    queryParam: 'rest_route',
     permalinkStructure: false,
     nonce: null
   },

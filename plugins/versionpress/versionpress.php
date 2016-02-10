@@ -965,9 +965,9 @@ function vp_enqueue_admin_styles_and_scripts() {
 //---------------------------------
 // API
 //---------------------------------
-require("src/Api/BundledWpApi/plugin.php");
+require("src/Api/BundledWpApi/rest-api.php");
 
-add_action('vp_rest_api_init', 'versionpress_api_init');
+add_action('rest_api_init', 'versionpress_api_init');
 function versionpress_api_init() {
     global $versionPressContainer;
     $gitRepository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
