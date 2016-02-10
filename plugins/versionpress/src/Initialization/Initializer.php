@@ -209,7 +209,6 @@ class Initializer {
         foreach ($entityNames as $entityName) {
             $this->createVpidsForEntitiesOfType($entityName);
             $this->saveEntitiesOfTypeToStorage($entityName);
-            $this->reportProgressChange("All " . $entityName . " saved into files");
         }
     }
 

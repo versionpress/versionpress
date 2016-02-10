@@ -193,6 +193,8 @@ class VersionPressApi {
             $isEnabled = $isChildOfInitialCommit || $canRollbackToThisCommit || $commit->getHash() === $initialCommitHash;
 
             $fileChanges = $this->getFileChanges($commit);
+
+            $environment = $changeInfo instanceof ChangeInfoEnvelope ? $changeInfo->getEnvironment() : '?';
             $changeInfoList = $changeInfo instanceof ChangeInfoEnvelope ? $changeInfo->getChangeInfoList() : array();
 
             $result[] = array(
@@ -204,6 +206,7 @@ class VersionPressApi {
                 "isEnabled" => $isEnabled,
                 "isInitial" => $commit->getHash() === $initialCommitHash,
                 "isMerge" => $commit->isMerge(),
+                "environment" => $environment,
                 "changes" => array_merge($this->convertChangeInfoList($changeInfoList), $fileChanges),
             );
             $isFirstCommit = false;

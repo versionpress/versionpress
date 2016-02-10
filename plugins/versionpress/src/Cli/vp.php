@@ -15,9 +15,11 @@ use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
+use VersionPress\Initialization\Initializer;
 use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\FileSystem;
+use VersionPress\Utils\RequirementsChecker;
 use VersionPress\Utils\WordPressMissingFunctions;
 use VersionPress\VersionPress;
 use WP_CLI;
@@ -83,6 +85,66 @@ class VPCommand extends WP_CLI_Command {
 
         return $result;
 
+    }
+
+    /**
+     * Starts tracking the site
+     *
+     * --yes
+     * : Answer yes to the confirmation message.
+     *
+     * @synopsis [--yes]
+     */
+    public function activate($args, $assoc_args) {
+        global $versionPressContainer;
+
+        /** @var GitRepository $repository */
+        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+        $database = $versionPressContainer->resolve(VersionPressServices::WPDB);
+        $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
+
+        $requirementsChecker = new RequirementsChecker($database, $schema);
+        $report = $requirementsChecker->getRequirements();
+
+        foreach ($report as $requirement) {
+            if ($requirement['fulfilled']) {
+                WP_CLI::success($requirement['name']);
+            } else {
+                if ($requirement['level'] === 'critical') {
+                    WP_CLI::error($requirement['name'], false);
+                } else {
+                    VPCommandUtils::warning($requirement['name']);
+                }
+                WP_CLI::log('  ' . $requirement['help']);
+            }
+        }
+
+        WP_CLI::line('');
+
+        if (!$requirementsChecker->isWithoutCriticalErrors()) {
+            WP_CLI::error('VersionPress cannot be fully activated.');
+        }
+
+        if (!$requirementsChecker->isEverythingFulfilled()) {
+            WP_CLI::confirm('There are some warnings. Continue?', $assoc_args);
+        }
+
+        /**
+         * @var Initializer $initializer
+         */
+        $initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);
+        $initializer->onProgressChanged[] = 'WP_CLI::log';
+        $initializer->initializeVersionPress();
+
+        WP_CLI::line('');
+
+        $successfullyInitialized = VersionPress::isActive();
+
+        if ($successfullyInitialized) {
+            WP_CLI::success('VersionPress is fully activated.');
+        } else {
+            WP_CLI::error('Something went wrong. Please try the activation again.');
+        }
     }
 
     /**
@@ -492,7 +554,7 @@ class VPCommand extends WP_CLI_Command {
         $wpConfigFile = $clonePath . '/wp-config.php';
         copy(WordPressMissingFunctions::getWpConfigPath(), $wpConfigFile);
 
-        $this->updateConfig($wpConfigFile, $cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $cloneDbCharset, $cloneDbCollate);
+        $this->updateConfig($wpConfigFile, $name, $cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $cloneDbCharset, $cloneDbCollate);
 
         // Copy VersionPress
         FileSystem::copyDir(VERSIONPRESS_PLUGIN_DIR, $cloneVpPluginPath);
@@ -595,7 +657,7 @@ class VPCommand extends WP_CLI_Command {
                 WP_CLI::warning(" 2) Abort the process. The site will look like you never ran the pull.");
                 WP_CLI::warning("");
 
-                fwrite(STDOUT, "Choose 1 or 2: " );
+                fwrite(STDOUT, "Choose 1 or 2: ");
                 $answer = trim(fgets(STDIN));
 
                 if ($answer == "1") {
@@ -676,7 +738,6 @@ class VPCommand extends WP_CLI_Command {
         $this->flushRewriteRules();
 
         WP_CLI::success("All done");
-
 
 
     }
@@ -912,8 +973,15 @@ class VPCommand extends WP_CLI_Command {
         return count($wpTables) > 0;
     }
 
-    private function updateConfig($wpConfigFile, $dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $dbCharset, $dbCollate) {
+    private function updateConfig($wpConfigFile, $environment, $dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $dbCharset, $dbCollate) {
         $config = file_get_contents($wpConfigFile);
+
+        $environmentConstant = 'VP_ENVIRONMENT';
+
+        if (strpos($config, $environmentConstant) === false) {
+            // https://regex101.com/r/yJ8tY8/1
+            $config = preg_replace('/^(\\$table_prefix\\s*=.*)$/m', "define('$environmentConstant', '$environment');\n\n\${1}", $config, 1);
+        }
 
         // https://regex101.com/r/oO7gX7/4 - just remove the "g" modifier which is there for testing only
         $re = "/^(\\\$table_prefix\\s*=\\s*['\"]).*(['\"];)/m";
@@ -926,6 +994,7 @@ class VPCommand extends WP_CLI_Command {
             "DB_HOST" => $dbHost,
             "DB_CHARSET" => $dbCharset,
             "DB_COLLATE" => $dbCollate,
+            $environmentConstant => $environment,
         );
 
         foreach ($replacements as $constant => $value) {

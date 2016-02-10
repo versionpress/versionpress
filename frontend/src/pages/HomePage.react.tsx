@@ -67,6 +67,15 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     this.checkUpdate = this.checkUpdate.bind(this);
   }
 
+  static getErrorMessage(res: request.Response) {
+    return res
+      ? res.body[0]
+      : {
+      code: 'error',
+      message: 'Connection Error: VersionPress is not able to connect to WordPress site. Please try refreshing the page.'
+    };
+  }
+
   componentDidMount() {
     this.fetchWelcomePanel();
     this.fetchCommits();
@@ -100,7 +109,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         if (err) {
           this.setState({
             commits: [],
-            message: res.body[0],
+            message: HomePage.getErrorMessage(res),
             loading: false,
             displayUpdateNotice: false
           });
@@ -162,7 +171,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: res.body[0], loading: false});
+          this.setState({message: HomePage.getErrorMessage(res), loading: false});
         } else {
           document.location.reload();
         }
@@ -179,7 +188,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: res.body[0], loading: false});
+          this.setState({message: HomePage.getErrorMessage(res), loading: false});
         } else {
           document.location.reload();
         }
@@ -192,7 +201,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         .get('git-status')
         .end((err, res: request.Response) => {
           if (err) {
-            reject(res.body[0]);
+            reject(HomePage.getErrorMessage(res));
           } else {
             resolve(res.body);
           }
@@ -208,7 +217,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         .query(query)
         .end((err, res: request.Response) => {
           if (err) {
-            reject(res.body[0]);
+            reject(HomePage.getErrorMessage(res));
           } else {
             resolve(res.body.diff);
           }
@@ -230,7 +239,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: res.body[0]});
+          this.setState({message: HomePage.getErrorMessage(res)});
         } else {
           this.setState({
             displayServicePanel: false,
@@ -256,7 +265,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: res.body[0]});
+          this.setState({message: HomePage.getErrorMessage(res)});
         } else {
           this.setState({
             displayCommitPanel: false,
@@ -280,7 +289,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .on('progress', (e: {percent: number}) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: res.body[0]});
+          this.setState({message: HomePage.getErrorMessage(res)});
         } else {
           this.setState({
             displayCommitPanel: false,

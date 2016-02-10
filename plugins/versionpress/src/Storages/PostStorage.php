@@ -36,7 +36,7 @@ class PostStorage extends DirectoryStorage {
         if (!$isExistingEntity && isset($data['post_type']) && $data['post_type'] === 'attachment' && !isset($data['post_title']))
             return false;
 
-        return true;
+        return parent::shouldBeSaved($data);
     }
 
     protected function removeUnwantedColumns($entity) {

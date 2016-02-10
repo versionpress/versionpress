@@ -20,10 +20,13 @@ class OptionStorage extends DirectoryStorage {
         'auto_updater.lock',
         'can_compress_scripts',
         'auto_core_update_notified',
+        'auth_key',
+        'auth_salt',
+        'logged_in_key',
+        'logged_in_salt',
+
     );
 
-    /** @var EntityInfo */
-    private $entityInfo;
     /** @var string */
     private $tablePrefix;
     /** @var string[] */
@@ -31,7 +34,6 @@ class OptionStorage extends DirectoryStorage {
 
     public function __construct($directory, $entityInfo, $tablePrefix, $taxonomies) {
         parent::__construct($directory, $entityInfo);
-        $this->entityInfo = $entityInfo;
         $this->tablePrefix = $tablePrefix;
         $this->taxonomies = $taxonomies;
     }
@@ -61,7 +63,7 @@ class OptionStorage extends DirectoryStorage {
 
     public function shouldBeSaved($data) {
         $id = $data[$this->entityInfo->idColumnName];
-        return !($this->isTransientOption($id) || $this->isTaxonomyChildren($id) || in_array($id, self::$optionsBlacklist));
+        return parent::shouldBeSaved($data) && !($this->isTransientOption($id) || $this->isTaxonomyChildren($id) || in_array($id, self::$optionsBlacklist));
     }
 
     private function isTransientOption($id) {
