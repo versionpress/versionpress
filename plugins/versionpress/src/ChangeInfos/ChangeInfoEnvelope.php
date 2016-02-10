@@ -1,7 +1,7 @@
 <?php
 namespace VersionPress\ChangeInfos;
 
-use ChangeInfos\Sorting\SortingStrategy;
+use VersionPress\ChangeInfos\Sorting\SortingStrategy;
 use Nette\Utils\Strings;
 use VersionPress\Git\CommitMessage;
 use VersionPress\Utils\ArrayUtils;

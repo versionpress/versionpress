@@ -19,6 +19,7 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\WpdbMirrorBridge;
 use VersionPress\Database\VpidRepository;
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\Committer;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\VersionPressOptions;

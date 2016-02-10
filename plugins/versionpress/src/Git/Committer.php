@@ -1,4 +1,6 @@
 <?php
+namespace VersionPress\Git;
+
 use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
@@ -8,6 +10,7 @@ use VersionPress\Git\GitRepository;
 use VersionPress\Storages\Mirror;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\FileSystem;
+use VersionPress\Utils\Mutex;
 
 /**
  * Creates commits using the `GitStatic` class. By default, it detects the change from the `$mirror` object
@@ -91,6 +94,9 @@ class Committer {
 
         $changeInfoLists = $this->preprocessChangeInfoList($changeInfoList);
 
+        $mutex = new Mutex('committer-stage-commit');
+        $mutex->lock();
+
         if (count($this->forcedChangeInfos) === 1) {
             // If there is one forced change info, we can commit all changes made by change info objects emitted from
             // storages. If there will be more forced change info objects in the future, we have to come up with
@@ -103,6 +109,8 @@ class Committer {
             $this->stageRelatedFiles($changeInfoEnvelope);
             $this->repository->commit($changeInfoEnvelope->getCommitMessage(), $authorName, $authorEmail);
         }
+
+        $mutex->release();
 
         if (count($this->forcedChangeInfos) > 0 && $this->forcedChangeInfos[0] instanceof \VersionPress\ChangeInfos\WordPressUpdateChangeInfo) {
             FileSystem::remove(ABSPATH . 'versionpress.maintenance');
