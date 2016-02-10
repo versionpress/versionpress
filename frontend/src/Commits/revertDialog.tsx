@@ -6,9 +6,7 @@ import * as portal from '../common/portal';
 import * as WpApi from '../services/WpApi';
 
 export function revertDialog(title: React.ReactNode, okHandler: Function) {
-  portal.confirmDialog(title, '', () => {}, () => {}, {loading: true});
-
-  WpApi
+  const req = WpApi
     .get('can-revert')
     .end((err: any, res: request.Response) => {
       if (res.body) {
@@ -43,4 +41,7 @@ export function revertDialog(title: React.ReactNode, okHandler: Function) {
         portal.confirmDialog(title, body, () => {}, () => {}, {okButtonClasses: 'disabled'});
       }
     });
+
+  const cancelHandler = () => { req.abort(); };
+  portal.confirmDialog(title, '', () => {}, cancelHandler, {loading: true});
 }
