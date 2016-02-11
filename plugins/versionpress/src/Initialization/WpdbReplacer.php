@@ -8,7 +8,12 @@ class WpdbReplacer {
 
     private static $methodPrefix = '__wp_';
     private static $vpFirstLineComment = '// Enhanced by VersionPress';
-    private static $bootstrapRequire = "require_once(WP_CONTENT_DIR . '/plugins/versionpress/bootstrap.php');";
+    private static $bootstrapRequire = "\$vp_bootstrap = WP_PLUGIN_DIR.'/versionpress/bootstrap.php';
+    if(file_exists(\$vp_bootstrap)) {
+        require_once(\$vp_bootstrap);
+    } else {
+        register_shutdown_function(array('wpdb','restoreOriginal'));
+    }";
 
     public static function replaceMethods() {
         $wpdbClassPath = ABSPATH . WPINC . '/wp-db.php';

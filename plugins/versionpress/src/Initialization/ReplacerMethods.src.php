@@ -18,8 +18,11 @@ namespace VersionPress\Initialization;
  */
 class ReplacerMethods {
 
-    public function insert( $table, $data, $format = null ) {
+    public function insert($table, $data, $format = null) {
         global $versionPressContainer;
+        if ($versionPressContainer == null) {
+            return $this->__wp_insert($table, $data, $format);
+        }
         /** @var \VersionPress\Database\WpdbMirrorBridge $wpdbMirrorBridge */
         $wpdbMirrorBridge = $versionPressContainer->resolve(\VersionPress\DI\VersionPressServices::WPDB_MIRROR_BRIDGE);
 
@@ -34,10 +37,14 @@ class ReplacerMethods {
         $this->vp_restore_fields();
 
         return $r;
+
     }
 
-    public function update( $table, $data, $where, $format = null, $where_format = null ) {
+    public function update($table, $data, $where, $format = null, $where_format = null) {
         global $versionPressContainer;
+        if ($versionPressContainer == null) {
+            return $this->__wp_update($table, $data, $where, $format, $where_format);
+        }
         /** @var \VersionPress\Database\WpdbMirrorBridge $wpdbMirrorBridge */
         $wpdbMirrorBridge = $versionPressContainer->resolve(\VersionPress\DI\VersionPressServices::WPDB_MIRROR_BRIDGE);
 
@@ -54,9 +61,12 @@ class ReplacerMethods {
         return $r;
     }
 
-    public function delete( $table, $where, $where_format = null ) {
+    public function delete($table, $where, $where_format = null) {
         global $versionPressContainer;
         /** @var \VersionPress\Database\WpdbMirrorBridge $wpdbMirrorBridge */
+        if ($versionPressContainer == null) {
+            return $this->__wp_delete($table, $where, $where_format);
+        }
         $wpdbMirrorBridge = $versionPressContainer->resolve(\VersionPress\DI\VersionPressServices::WPDB_MIRROR_BRIDGE);
 
         $r = $this->__wp_delete($table, $where, $where_format);
@@ -105,4 +115,18 @@ class ReplacerMethods {
         $this->num_rows = $this->vp_field_backup["num_rows"];
         $this->insert_id = $this->vp_field_backup["insert_id"];
     }
+
+    /**
+     * @since VersionPress
+     */
+    public static function restoreOriginal(){
+        $wpdbClassPath = ABSPATH . WPINC . '/wp-db.php';
+        $wpdbOriginalPath = $wpdbClassPath. '.original';
+        if(file_exists($wpdbOriginalPath)) {
+            copy($wpdbOriginalPath, $wpdbClassPath);
+            unlink($wpdbOriginalPath);
+        }
+    }
+
+
 }
