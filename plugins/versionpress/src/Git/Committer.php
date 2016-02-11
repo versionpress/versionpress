@@ -94,7 +94,7 @@ class Committer {
 
         $changeInfoLists = $this->preprocessChangeInfoList($changeInfoList);
 
-        $mutex = new Mutex('committer-stage-commit');
+        $mutex = new Mutex(VERSIONPRESS_MIRRORING_DIR,'committer-stage-commit');
         $mutex->lock();
 
         if (count($this->forcedChangeInfos) === 1) {

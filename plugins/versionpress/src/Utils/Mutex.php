@@ -14,9 +14,13 @@ class Mutex {
     /** @var bool */
     private $isLockedByThisThread;
 
-    public function __construct($name, $timeout = 60) {
+    /** @var string directory for creating mutex */
+    private $lockDir;
+
+    public function __construct($dir, $name, $timeout = 60) {
         $this->name = $name;
         $this->timeout = $timeout;
+        $this->lockDir=$dir;
     }
 
     public function __destruct() {
@@ -58,6 +62,6 @@ class Mutex {
     }
 
     private function getLockName() {
-        return $this->name . '.lock';
+        return $this->lockDir.'/'.$this->name . '.lock';
     }
 }

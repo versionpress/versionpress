@@ -59,6 +59,7 @@ class FooChangeInfo extends \VersionPress\ChangeInfos\TrackedChangeInfo {
 
 define('ABSPATH', __DIR__); // fake
 define('VERSIONPRESS_PLUGIN_DIR', __DIR__); // fake
+define('VERSIONPRESS_MIRRORING_DIR',__DIR__); // fake
 $repositoryDir = __DIR__ . '/repository';
 
 $changeList = createFiles($repositoryDir, $args['from'], $args['to']);
@@ -79,7 +80,6 @@ $gitRepository = new \VersionPress\Git\GitRepository($repositoryDir, __DIR__);
 
 $committer = new \VersionPress\Git\Committer($mirror, $gitRepository, $storageFactory);
 $committer->commit();
-
 function createFiles($dir, $from, $to) {
     return array_map(function ($n) use ($dir) {
         $file = $dir . "/$n.txt";
