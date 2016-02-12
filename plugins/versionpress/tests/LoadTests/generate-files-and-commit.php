@@ -59,7 +59,7 @@ class FooChangeInfo extends \VersionPress\ChangeInfos\TrackedChangeInfo {
 
 define('ABSPATH', __DIR__); // fake
 define('VERSIONPRESS_PLUGIN_DIR', __DIR__); // fake
-define('VERSIONPRESS_MIRRORING_DIR',__DIR__); // fake
+define('VERSIONPRESS_MIRRORING_DIR', __DIR__); // fake
 $repositoryDir = __DIR__ . '/repository';
 
 $changeList = createFiles($repositoryDir, $args['from'], $args['to']);
@@ -85,7 +85,7 @@ function createFiles($dir, $from, $to) {
         $file = $dir . "/$n.txt";
         touch($file);
         return createChangeInfo(array($file));
-    }, range($from, $to-1));
+    }, range($from, $to - 1));
 }
 
 /**
@@ -114,10 +114,8 @@ function createChangeInfo($files) {
     $fooChangeInfo = new FooChangeInfo($files);
 
 
-
     return $fooChangeInfo;
 }
-
 
 
 function is_user_logged_in() {

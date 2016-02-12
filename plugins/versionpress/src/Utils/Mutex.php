@@ -20,7 +20,7 @@ class Mutex {
     public function __construct($dir, $name, $timeout = 60) {
         $this->name = $name;
         $this->timeout = $timeout;
-        $this->lockDir=$dir;
+        $this->lockDir = $dir;
     }
 
     public function __destruct() {
@@ -62,6 +62,6 @@ class Mutex {
     }
 
     private function getLockName() {
-        return $this->lockDir.'/'.$this->name . '.lock';
+        return $this->lockDir . '/' . $this->name . '.lock';
     }
 }

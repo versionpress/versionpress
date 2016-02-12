@@ -94,7 +94,7 @@ class Committer {
 
         $changeInfoLists = $this->preprocessChangeInfoList($changeInfoList);
 
-        $mutex = new Mutex(VERSIONPRESS_MIRRORING_DIR,'committer-stage-commit');
+        $mutex = new Mutex(VERSIONPRESS_MIRRORING_DIR, 'committer-stage-commit');
         $mutex->lock();
 
         if (count($this->forcedChangeInfos) === 1) {
@@ -282,7 +282,7 @@ class Committer {
     }
 
     /**
-     * @param TrackedChangeInfo[key][] $postponedChangeInfos
+     * @param TrackedChangeInfo [key][] $postponedChangeInfos
      */
     private function savePostponedChangeInfos($postponedChangeInfos) {
         $file = VERSIONPRESS_TEMP_DIR . '/' . $this->fileForPostpone;
