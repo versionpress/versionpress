@@ -119,10 +119,10 @@ class ReplacerMethods {
     /**
      * @since VersionPress
      */
-    public static function restoreOriginal(){
+    public static function restoreOriginal() {
         $wpdbClassPath = ABSPATH . WPINC . '/wp-db.php';
-        $wpdbOriginalPath = $wpdbClassPath. '.original';
-        if(file_exists($wpdbOriginalPath)) {
+        $wpdbOriginalPath = $wpdbClassPath . '.original';
+        if (file_exists($wpdbOriginalPath)) {
             copy($wpdbOriginalPath, $wpdbClassPath);
             unlink($wpdbOriginalPath);
         }
