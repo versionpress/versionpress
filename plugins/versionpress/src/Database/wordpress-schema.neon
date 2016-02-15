@@ -6,6 +6,9 @@ post:
         post_parent: post
     mn-references:
         term_relationships.term_taxonomy_id: term_taxonomy
+    ignored-entities:
+            - 'post_type: revision'
+            - 'post_status: auto-draft'
 
 postmeta:
     id: meta_id
@@ -17,6 +20,11 @@ postmeta:
             _thumbnail_id: post
             _menu_item_object_id: @\VersionPress\Database\VpidRepository::getMenuReference
             _menu_item_menu_item_parent: post
+    ignored-entities:
+        - 'meta_key: _edit_lock'
+        - 'meta_key: _edit_last'
+        - 'meta_key: _pingme'
+        - 'meta_key: _encloseme'
 
 comment:
     table: comments
@@ -54,6 +62,11 @@ usermeta:
     parent-reference: user_id
     references:
         user_id: user
+    ignored-entities:
+        - 'meta_key: session_tokens'
+        - 'meta_key: nav_menu_recently_edited'
+        - 'meta_key: wporg_favorites'
+        - 'meta_key: *dashboard_quick_press_last_post_id'
 
 option:
     table: options
