@@ -70,29 +70,24 @@ class QueryLanguageUtils {
      * @return bool
      */
     public static function entityMatchesSomeRule($entity, $rules) {
-        foreach ($rules as $rule) {
-            foreach ($rule as $field => $value) { // check all parts of rule
+        return ArrayUtils::any($rules, function ($rule) use ($entity) {
+            return ArrayUtils::all($rule, function ($value, $field) use ($entity) { // check all parts of rule
                 if (!isset($entity[$field])) {
-                    goto nextRule;
+                    return false;
                 }
 
-                $valueTokens = self::tokenizeValue($value);
-                $isWildcard = self::tokensContainWildcard($valueTokens);
+                $valueTokens = QueryLanguageUtils::tokenizeValue($value);
+                $isWildcard = QueryLanguageUtils::tokensContainWildcard($valueTokens);
 
-                if ($isWildcard) {
-                    $valueRegex = self::tokensToRegex($valueTokens);
-                    if (!preg_match($valueRegex, $entity[$field])) {
-                        goto nextRule;
-                    }
-                } elseif ($entity[$field] != $value) {
-                    goto nextRule;
+                if ($isWildcard && preg_match(QueryLanguageUtils::tokensToRegex($valueTokens), $entity[$field])) {
+                    return true;
+                } elseif ($entity[$field] == $value) {
+                    return true;
                 }
-            }
-            return true;
 
-            nextRule:
-        }
-        return false;
+                return false;
+            });
+        });
     }
 
     /**
