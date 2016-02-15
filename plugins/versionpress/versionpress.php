@@ -529,11 +529,7 @@ function vp_register_hooks() {
 
                 $table = $dbSchemaInfo->getPrefixedTableName($entityName);
                 foreach ($rulesWithInterval as $ruleAndInterval) {
-                    $restrictionParts = array();
-                    foreach ($ruleAndInterval['rule'] as $field => $value) {
-                        $restrictionParts[] = sprintf('`%s` = "%s"', $field, $wpdb->_escape($value));
-                    }
-                    $restriction = join(' AND ', $restrictionParts);
+                    $restriction = \VersionPress\Utils\QueryLanguageUtils::createSqlRestrictionFromRule($ruleAndInterval['rule']);
                     $sql = "SELECT * FROM $table WHERE $restriction";
 
                     $results = $wpdb->get_results($sql, ARRAY_A);

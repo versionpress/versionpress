@@ -85,7 +85,6 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function commonEntityIsNotFalselyIdentifiedAsFrequentlyWritten() {
-        xdebug_break();
         $entity = array(
             'some_field' => 'value'
         );
@@ -111,6 +110,13 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase {
     public function commonEntityIsNotFalselyIdentifiedAsIgnored() {
         $entity = array(
             'some_field' => 'value'
+        );
+
+        $this->assertFalse($this->entityInfo->isIgnoredEntity($entity));
+
+        $entity = array(
+            'some_field' => 'value',
+            'other_field' => 'b',
         );
 
         $this->assertFalse($this->entityInfo->isIgnoredEntity($entity));

@@ -3,6 +3,7 @@
 namespace VersionPress\Database;
 use Nette\Utils\Arrays;
 use Nette\Utils\Strings;
+use VersionPress\Utils\QueryLanguageUtils;
 
 /**
  * Info about an entity. Basically represents a section of the NEON schema file -  find
@@ -219,12 +220,12 @@ class EntityInfo {
     public function isFrequentlyWrittenEntity($entity) {
         $rulesAndIntervals = $this->getRulesAndIntervalsForFrequentlyWrittenEntities();
         $rules = array_column($rulesAndIntervals, 'rule');
-        return $this->matchesRules($entity, $rules);
+        return QueryLanguageUtils::entityMatchesSomeRule($entity, $rules);
     }
 
     public function isIgnoredEntity($entity) {
         $rules = $this->getRulesForIgnoredEntities();
-        return $this->matchesRules($entity, $rules);
+        return QueryLanguageUtils::entityMatchesSomeRule($entity, $rules);
     }
 
     public function getRulesAndIntervalsForFrequentlyWrittenEntities() {
@@ -232,7 +233,7 @@ class EntityInfo {
             return is_string($banan) ? $banan : $banan['query'];
         }, $this->frequentlyWritten);
 
-        $rules = $this->createRulesFromQueries($queries);
+        $rules = QueryLanguageUtils::createRulesFromQueries($queries);
 
         $rulesAndIntervals = array();
         foreach ($rules as $key => $rule) {
@@ -245,7 +246,7 @@ class EntityInfo {
     }
 
     public function getRulesForIgnoredEntities() {
-        return $this->createRulesFromQueries($this->ignoredEntities);
+        return QueryLanguageUtils::createRulesFromQueries($this->ignoredEntities);
     }
 
     private function matchesRules($entity, $rules) {
@@ -260,45 +261,5 @@ class EntityInfo {
         return false;
     }
 
-    private function createRulesFromQueries($queries) {
-        // https://regex101.com/r/wT6zG3/4 (query language)
-        $re = "/(-)?(?:(\\S+):\\s*)?(?:'((?:[^'\\\\]|\\\\.)*)'|\"((?:[^\"\\\\]|\\\\.)*)\"|(\\S+))/";
-        $rules = array();
-        foreach ($queries as $query) {
-            $possibleValues = array();
 
-            preg_match_all($re, $query, $matches);
-            $isValidRule = count($matches[0]) > 0;
-            if (!$isValidRule) {
-                continue;
-            }
-
-            $keys = $matches[2];
-
-            /* value can be in 3rd, 4th or 5th group
-             *
-             * 3rd group => value is in single quotes
-             * 4th group => value is in double quotes
-             * 5th group => value is without quotes
-             *
-             */
-            $possibleValues[] = $matches[3];
-            $possibleValues[] = $matches[4];
-            $possibleValues[] = $matches[5];
-
-            // we need to join all groups together
-            $ruleParts = array();
-            foreach ($possibleValues as $possibleValue) {
-                foreach ($possibleValue as $index => $value) {
-                    if ($value !== '') {
-                        $ruleParts[$index] = $value;
-                    }
-                }
-            }
-
-            ksort($ruleParts);
-            $rules[] = array_combine($keys, $ruleParts);
-        }
-        return $rules;
-    }
 }
