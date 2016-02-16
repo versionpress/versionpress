@@ -110,4 +110,15 @@ class StringUtils {
 
         return $string;
     }
+
+    /**
+     * @param $variables
+     * @param $templateString
+     * @return mixed
+     */
+    public static function fillTemplateString($variables, $templateString) {
+        $search = array_map(function ($var) { return sprintf('{{%s}}', $var); }, array_keys($variables));
+        $replace = array_values($variables);
+        return str_replace($search, $replace, $templateString);
+    }
 }
