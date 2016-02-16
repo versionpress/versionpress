@@ -28,6 +28,10 @@ Some essential information about database entities and their relationships is de
     option:
         table: options
         vpid: option_name
+        frequently-written:
+            - 'option_name: akismet_spam_count'
+            - query: 'option_name: request_counter'
+              interval: 5min
 
 
 ## Defining entities
@@ -80,3 +84,15 @@ concept of “parent entities”.
         parent-reference: post_id
  
  The field `parent-reference` contains the name of one of the simple references. This specifies within which entity will be the child entity saved.
+
+## Frequently written entities
+
+Some entities are changed very often (view counter, akismet spam count, etc.). It is possible to save them once in a while.
+They are specified in section `frequently-written`. It's a list of selectors or combination of selector and custom interval.
+
+    frequently-written:
+        - 'column_name: value'
+        - query: 'column1_name: value1 column2_name: value2'
+          interval: 5min
+
+The interval is parsed by PHP function `strtotime`, so it can be whatever the function takes.

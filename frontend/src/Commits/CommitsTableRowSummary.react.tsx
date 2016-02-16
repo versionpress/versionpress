@@ -4,9 +4,11 @@
 import * as React from 'react';
 import * as moment from 'moment';
 import * as portal from '../common/portal';
+import {UndoDisabledDialog} from '../Commits/revertDialog';
 
 interface CommitsTableRowSummaryProps extends React.Props<JSX.Element> {
   commit: Commit;
+  enableActions: boolean;
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
   onDetailsLevelChanged: (detailsLevel) => any;
@@ -50,13 +52,20 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
         <td className='column-actions'>
           {(commit.canUndo || commit.isMerge) && commit.isEnabled
             ? <a
-                className={'vp-table-undo ' + (commit.isMerge ? 'disabled' : '')}
+                className={'vp-table-undo ' + (commit.isMerge || !this.props.enableActions ? 'disabled' : '')}
                 href='#'
                 onClick={commit.isMerge
                           ? (e) => { this.renderUndoMergeDialog(); e.stopPropagation(); }
-                          : (e) => { this.props.onUndo(e); e.stopPropagation(); }
+                          : this.props.enableActions
+                            ? (e) => { this.props.onUndo(e); e.stopPropagation(); }
+                            : (e) => { this.renderDisabledDialog(); e.stopPropagation(); }
                         }
-                title={commit.isMerge ? 'Merge commit cannot be undone.' : null}
+                title={commit.isMerge
+                        ? 'Merge commit cannot be undone.'
+                        : !this.props.enableActions
+                          ? 'You have uncommitted changes in your WordPress directory.'
+                          : null
+                      }
                 data-hash={commit.hash}
                 data-message={commit.message}
               >Undo this</a>
@@ -64,9 +73,16 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
           }
           {commit.canRollback && commit.isEnabled
             ? <a
-                className='vp-table-rollback'
+                className={'vp-table-rollback ' + (!this.props.enableActions ? 'disabled' : '')}
                 href='#'
-                onClick={(e) => { this.props.onRollback(e); e.stopPropagation(); }}
+                onClick={this.props.enableActions
+                          ? (e) => { this.props.onRollback(e); e.stopPropagation(); }
+                          : (e) => { this.renderDisabledDialog(); e.stopPropagation(); }
+                        }
+                title={!this.props.enableActions
+                        ? 'You have uncommitted changes in your WordPress directory.'
+                        : null
+                      }
                 data-hash={commit.hash}
                 data-date={commit.date}
               >Roll back to this</a>
@@ -88,6 +104,12 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
       </p>
     );
     portal.alertDialog('This is a merge commit', body);
+  }
+
+  private renderDisabledDialog() {
+    const title = <span>Undo <em>{this.props.commit.message}</em>?</span>;
+    const body = <UndoDisabledDialog />;
+    portal.alertDialog(title, body);
   }
 
   private toggleDetails() {
