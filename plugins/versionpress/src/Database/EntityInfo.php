@@ -248,18 +248,4 @@ class EntityInfo {
     public function getRulesForIgnoredEntities() {
         return QueryLanguageUtils::createRulesFromQueries($this->ignoredEntities);
     }
-
-    private function matchesRules($entity, $rules) {
-        foreach ($rules as $rule) {
-            foreach ($rule as $field => $value) { // check all parts of rule
-                if (!isset($entity[$field]) || $entity[$field] != $value) {
-                    continue 2;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-
 }
