@@ -4,6 +4,7 @@ namespace VersionPress\Tests\End2End\Utils;
 
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\TestConfig;
+use VersionPress\Utils\PathUtils;
 
 class WpCliWorker implements ITestWorker {
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace VersionPress\Tests\End2End\Utils;
+namespace VersionPress\Utils;
 
 class PathUtils {
     public static function getRelativePath($from, $to) {

@@ -5,9 +5,6 @@ namespace VersionPress\Api;
 require_once ABSPATH . 'wp-admin/includes/file.php';
 
 use Nette\Utils\Strings;
-use VersionPress\Api\BundledWpApi\WP_REST_Request;
-use VersionPress\Api\BundledWpApi\WP_REST_Response;
-use VersionPress\Api\BundledWpApi\WP_REST_Server;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\ChangeInfoMatcher;
 use VersionPress\ChangeInfos\EntityChangeInfo;
@@ -19,7 +16,6 @@ use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
 use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Commit;
-use VersionPress\Git\CommitMessage;
 use VersionPress\Git\GitLogPaginator;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
@@ -28,6 +24,10 @@ use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\BugReporter;
+use WP_REST_Request;
+use WP_REST_Response;
+use WP_REST_Server;
+use WP_Error;
 
 class VersionPressApi {
 
@@ -53,7 +53,7 @@ class VersionPressApi {
     public function register_routes() {
         $namespace = 'versionpress';
 
-        register_vp_rest_route($namespace, '/commits', array(
+        register_rest_route($namespace, '/commits', array(
             'methods' => WP_REST_Server::READABLE,
             'callback' => array($this, 'getCommits'),
             'args' => array(
@@ -64,7 +64,7 @@ class VersionPressApi {
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
-        register_vp_rest_route($namespace, '/undo', array(
+        register_rest_route($namespace, '/undo', array(
             'methods' => WP_REST_Server::READABLE,
             'callback' => array($this, 'undoCommit'),
             'args' => array(
@@ -75,7 +75,7 @@ class VersionPressApi {
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
-        register_vp_rest_route($namespace, '/rollback', array(
+        register_rest_route($namespace, '/rollback', array(
             'methods' => WP_REST_Server::READABLE,
             'callback' => array($this, 'rollbackToCommit'),
             'args' => array(
@@ -86,13 +86,13 @@ class VersionPressApi {
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
-        register_vp_rest_route($namespace, '/can-revert', array(
+        register_rest_route($namespace, '/can-revert', array(
             'methods' => WP_REST_Server::READABLE,
             'callback' => array($this, 'canRevert'),
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
-        register_vp_rest_route($namespace, '/diff', array(
+        register_rest_route($namespace, '/diff', array(
             'methods' => WP_REST_Server::READABLE,
             'callback' => array($this, 'getDiff'),
             'args' => array(
@@ -103,7 +103,7 @@ class VersionPressApi {
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
-        register_vp_rest_route($namespace, '/submit-bug', array(
+        register_rest_route($namespace, '/submit-bug', array(
             'methods' => WP_REST_Server::CREATABLE,
             'callback' => array($this, 'submitBug'),
             'args' => array(
@@ -117,31 +117,31 @@ class VersionPressApi {
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
-        register_vp_rest_route($namespace, '/display-welcome-panel', array(
+        register_rest_route($namespace, '/display-welcome-panel', array(
             'methods' => WP_REST_Server::READABLE,
             'callback' => array($this, 'displayWelcomePanel'),
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
-        register_vp_rest_route($namespace, '/hide-welcome-panel', array(
+        register_rest_route($namespace, '/hide-welcome-panel', array(
             'methods' => WP_REST_Server::CREATABLE,
             'callback' => array($this, 'hideWelcomePanel'),
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
-        register_vp_rest_route($namespace, '/should-update', array(
+        register_rest_route($namespace, '/should-update', array(
             'methods' => WP_REST_Server::READABLE,
             'callback' => array($this, 'shouldUpdate'),
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
-        register_vp_rest_route($namespace, '/git-status', array(
+        register_rest_route($namespace, '/git-status', array(
             'methods' => WP_REST_Server::READABLE,
             'callback' => array($this, 'getGitStatus'),
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
-        register_vp_rest_route($namespace, '/commit', array(
+        register_rest_route($namespace, '/commit', array(
             'methods' => WP_REST_Server::CREATABLE,
             'callback' => array($this, 'commit'),
             'args' => array(
@@ -152,7 +152,7 @@ class VersionPressApi {
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
-        register_vp_rest_route($namespace, '/discard-changes', array(
+        register_rest_route($namespace, '/discard-changes', array(
             'methods' => WP_REST_Server::CREATABLE,
             'callback' => array($this, 'discardChanges'),
             'permission_callback' => array($this, 'checkPermissions')
@@ -161,7 +161,7 @@ class VersionPressApi {
 
     /**
      * @param WP_REST_Request $request
-     * @return WP_REST_Response|\WP_Error
+     * @return WP_REST_Response|WP_Error
      */
     public function getCommits(WP_REST_Request $request) {
         $gitLogPaginator = new GitLogPaginator($this->gitRepository);
@@ -171,7 +171,7 @@ class VersionPressApi {
         $commits = $gitLogPaginator->getPage($page);
 
         if (empty($commits)) {
-            return new \WP_Error('notice', 'No more commits to show.', array('status' => 404));
+            return new WP_Error('notice', 'No more commits to show.', array('status' => 404));
         }
 
         $preActivationHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
@@ -193,6 +193,8 @@ class VersionPressApi {
             $isEnabled = $isChildOfInitialCommit || $canRollbackToThisCommit || $commit->getHash() === $initialCommitHash;
 
             $fileChanges = $this->getFileChanges($commit);
+
+            $environment = $changeInfo instanceof ChangeInfoEnvelope ? $changeInfo->getEnvironment() : '?';
             $changeInfoList = $changeInfo instanceof ChangeInfoEnvelope ? $changeInfo->getChangeInfoList() : array();
 
             $result[] = array(
@@ -204,6 +206,7 @@ class VersionPressApi {
                 "isEnabled" => $isEnabled,
                 "isInitial" => $commit->getHash() === $initialCommitHash,
                 "isMerge" => $commit->isMerge(),
+                "environment" => $environment,
                 "changes" => array_merge($this->convertChangeInfoList($changeInfoList), $fileChanges),
             );
             $isFirstCommit = false;
@@ -216,7 +219,7 @@ class VersionPressApi {
 
     /**
      * @param WP_REST_Request $request
-     * @return WP_REST_Response|\WP_Error
+     * @return WP_REST_Response|WP_Error
      */
     public function undoCommit(WP_REST_Request $request) {
         return $this->revertCommit('undo', $request['commit']);
@@ -224,14 +227,14 @@ class VersionPressApi {
 
     /**
      * @param WP_REST_Request $request
-     * @return WP_REST_Response|\WP_Error
+     * @return WP_REST_Response|WP_Error
      */
     public function rollbackToCommit(WP_REST_Request $request) {
         return $this->revertCommit('rollback', $request['commit']);
     }
 
     /**
-     * @return WP_REST_Response|\WP_Error
+     * @return WP_REST_Response|WP_Error
      */
     public function canRevert() {
         return new WP_REST_Response($this->reverter->canRevert());
@@ -240,7 +243,7 @@ class VersionPressApi {
     /**
      * @param string $reverterMethod
      * @param string $commit
-     * @return WP_REST_Response|\WP_Error
+     * @return WP_REST_Response|WP_Error
      */
     public function revertCommit($reverterMethod, $commit) {
         vp_enable_maintenance();
@@ -258,14 +261,14 @@ class VersionPressApi {
      * If there's provided no commit hash, returns diff of working directory and HEAD.
      *
      * @param WP_REST_Request $request
-     * @return WP_REST_Response|\WP_Error
+     * @return WP_REST_Response|WP_Error
      */
     public function getDiff(WP_REST_Request $request) {
         $hash = $request['commit'];
         $diff = $this->gitRepository->getDiff($hash);
 
         if (strlen($diff) > 50 * 1024) { // 50 kB is maximum size for diff (see WP-49)
-            return new \WP_Error(
+            return new WP_Error(
                 'error',
                 'The diff is too large to show here. Please use some Git client. Thank you.',
                 array('status' => 403));
@@ -276,7 +279,7 @@ class VersionPressApi {
 
     /**
      * @param WP_REST_Request $request
-     * @return WP_REST_Response|\WP_Error
+     * @return WP_REST_Response|WP_Error
      */
     public function submitBug(WP_REST_Request $request) {
         $email = $request['email'];
@@ -288,7 +291,7 @@ class VersionPressApi {
         if ($reportedSuccessfully) {
             return new WP_REST_Response(true);
         } else {
-            return new \WP_Error(
+            return new WP_Error(
                 'error',
                 'There was a problem with sending bug report. Please try it again. Thank you.',
                 array('status' => 403)
@@ -354,12 +357,12 @@ class VersionPressApi {
      * Creates manual commit. Adds everything to stage.
      *
      * @param WP_REST_Request $request
-     * @return WP_REST_Response|\WP_Error
+     * @return WP_REST_Response|WP_Error
      */
     public function commit(WP_REST_Request $request) {
         $currentUser = wp_get_current_user();
         if ($currentUser->ID === 0) {
-            return new \WP_Error(
+            return new WP_Error(
                 'error',
                 'You don\'t have permission to do this.',
                 array('status' => 403));
@@ -411,7 +414,7 @@ class VersionPressApi {
 
     /**
      * @param string $status
-     * @return \WP_Error
+     * @return WP_Error
      */
     public function getError($status) {
         $errors = array(
@@ -438,7 +441,7 @@ class VersionPressApi {
         );
 
         $error = $errors[$status];
-        return new \WP_Error(
+        return new WP_Error(
             $error['class'],
             $error['message'],
             array('status' => $error['status'])
@@ -447,12 +450,12 @@ class VersionPressApi {
 
     /**
      * @param WP_REST_Request $request
-     * @return \WP_Error|bool
+     * @return WP_Error|bool
      */
     public function checkPermissions(WP_REST_Request $request) {
         return !$this->vpConfig->mergedConfig['requireApiAuth'] || current_user_can('manage_options')
             ? true
-            : new \WP_Error(
+            : new WP_Error(
                 'error',
                 'You don\'t have permission to do this.',
                 array('status' => 403)

@@ -7,6 +7,7 @@ import CommitsTableRowDetails from './CommitsTableRowDetails.react';
 
 interface CommitsTableRowProps extends React.Props<JSX.Element> {
   commit: Commit;
+  enableActions: boolean;
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
   diffProvider: {getDiff: (hash: string) => Promise<string>};
@@ -31,6 +32,7 @@ export default class CommitsTableRow extends React.Component<CommitsTableRowProp
       <tbody>
         <CommitsTableRowSummary
           commit={this.props.commit}
+          enableActions={this.props.enableActions}
           onUndo={this.props.onUndo}
           onRollback={this.props.onRollback}
           onDetailsLevelChanged={detailsLevel => this.changeDetailsLevel(detailsLevel)}

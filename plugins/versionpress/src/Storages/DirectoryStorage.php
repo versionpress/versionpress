@@ -27,12 +27,10 @@ abstract class DirectoryStorage extends Storage {
     /** @var string */
     private $directory;
 
-    /** @var EntityInfo */
-    private $entityInfo;
-
     private $uncommittedEntities = array();
 
     public function __construct($directory, $entityInfo) {
+        parent::__construct($entityInfo);
         $this->directory = $directory;
         $this->entityInfo = $entityInfo;
     }
@@ -69,8 +67,7 @@ abstract class DirectoryStorage extends Storage {
             $newEntity = array_merge($oldEntity, $diff);
             $newEntity = array_filter($newEntity, function ($value) { return $value !== false; });
 
-            /** @noinspection PhpUsageOfSilenceOperatorInspection */
-            @mkdir(dirname($this->getEntityFilename($vpid)), 0777, true); // intentionally @ - it's OK that the directory already exists
+            FileSystem::mkdir(dirname($this->getEntityFilename($vpid)));
             file_put_contents($filename, $this->serializeEntity($vpid, $newEntity));
 
             return $this->createChangeInfo($oldEntity, $newEntity, !$isExistingEntity ? 'create' : 'edit');
@@ -116,10 +113,6 @@ abstract class DirectoryStorage extends Storage {
         $entityFiles = $this->getEntityFiles();
         $entities = $this->loadAllFromFiles($entityFiles);
         return $entities;
-    }
-
-    public function shouldBeSaved($data) {
-        return true;
     }
 
     public function prepareStorage() {

@@ -5,16 +5,13 @@ namespace VersionPress\Synchronizers;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
+use VersionPress\Utils\WordPressCacheUtils;
 use wpdb;
 
 class TermTaxonomiesSynchronizer extends SynchronizerBase {
 
-    /** @var wpdb */
-    private $database;
-
     function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer) {
         parent::__construct($storage, $wpdb, $dbSchema, $urlReplacer, 'term_taxonomy');
-        $this->database = $wpdb;
     }
 
     function synchronize($task, $entitiesToSynchronize = null) {
@@ -30,6 +27,7 @@ class TermTaxonomiesSynchronizer extends SynchronizerBase {
         }
 
         $this->fixPostsCount();
+        $this->clearCache();
         return true;
     }
 
@@ -39,5 +37,7 @@ class TermTaxonomiesSynchronizer extends SynchronizerBase {
         $this->database->query($sql);
     }
 
-
+    private function clearCache() {
+        WordPressCacheUtils::clearTermCache(array_column($this->entities, 'vp_term_id'), $this->database);
+    }
 }

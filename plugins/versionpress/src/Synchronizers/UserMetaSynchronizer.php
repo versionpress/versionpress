@@ -5,6 +5,7 @@ namespace VersionPress\Synchronizers;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
+use VersionPress\Utils\WordPressCacheUtils;
 use wpdb;
 
 class UserMetaSynchronizer extends SynchronizerBase {
@@ -13,4 +14,8 @@ class UserMetaSynchronizer extends SynchronizerBase {
         parent::__construct($storage, $wpdb, $dbSchema, $urlReplacer, 'usermeta');
     }
 
+    protected function doEntitySpecificActions() {
+        parent::doEntitySpecificActions();
+        WordPressCacheUtils::clearUserCache(array_column($this->entities, 'vp_user_id'), $this->database);
+    }
 }

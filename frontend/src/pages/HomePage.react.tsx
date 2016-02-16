@@ -38,7 +38,7 @@ interface HomePageState {
   displayServicePanel?: boolean;
   displayWelcomePanel?: boolean;
   displayUpdateNotice?: boolean;
-  displayCommitPanel?: boolean;
+  dirtyWorkingDirectory?: boolean;
 }
 
 export default class HomePage extends React.Component<HomePageProps, HomePageState> {
@@ -59,12 +59,21 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       displayServicePanel: false,
       displayWelcomePanel: false,
       displayUpdateNotice: false,
-      displayCommitPanel: false
+      dirtyWorkingDirectory: false
     };
 
     this.onUndo = this.onUndo.bind(this);
     this.onRollback = this.onRollback.bind(this);
     this.checkUpdate = this.checkUpdate.bind(this);
+  }
+
+  static getErrorMessage(res: request.Response) {
+    return res
+      ? res.body[0]
+      : {
+      code: 'error',
+      message: 'Connection Error: VersionPress is not able to connect to WordPress site. Please try refreshing the page.'
+    };
   }
 
   componentDidMount() {
@@ -100,7 +109,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         if (err) {
           this.setState({
             commits: [],
-            message: res.body[0],
+            message: HomePage.getErrorMessage(res),
             loading: false,
             displayUpdateNotice: false
           });
@@ -140,13 +149,13 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         if (err) {
           this.setState({
             displayUpdateNotice: false,
-            displayCommitPanel: false
+            dirtyWorkingDirectory: false
           });
           clearInterval(this.refreshInterval);
         } else {
           this.setState({
             displayUpdateNotice: !this.props.params.page && res.body.update === true,
-            displayCommitPanel: res.body.cleanWorkingDirectory !== true
+            dirtyWorkingDirectory: res.body.cleanWorkingDirectory !== true
           });
         }
       });
@@ -162,7 +171,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: res.body[0], loading: false});
+          this.setState({message: HomePage.getErrorMessage(res), loading: false});
         } else {
           document.location.reload();
         }
@@ -179,7 +188,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: res.body[0], loading: false});
+          this.setState({message: HomePage.getErrorMessage(res), loading: false});
         } else {
           document.location.reload();
         }
@@ -192,7 +201,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         .get('git-status')
         .end((err, res: request.Response) => {
           if (err) {
-            reject(res.body[0]);
+            reject(HomePage.getErrorMessage(res));
           } else {
             resolve(res.body);
           }
@@ -208,7 +217,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         .query(query)
         .end((err, res: request.Response) => {
           if (err) {
-            reject(res.body[0]);
+            reject(HomePage.getErrorMessage(res));
           } else {
             resolve(res.body.diff);
           }
@@ -230,7 +239,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: res.body[0]});
+          this.setState({message: HomePage.getErrorMessage(res)});
         } else {
           this.setState({
             displayServicePanel: false,
@@ -256,10 +265,10 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: res.body[0]});
+          this.setState({message: HomePage.getErrorMessage(res)});
         } else {
           this.setState({
-            displayCommitPanel: false,
+            dirtyWorkingDirectory: false,
             message: {
               code: 'updated',
               message: 'Changes have been committed.'
@@ -280,10 +289,10 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .on('progress', (e: {percent: number}) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: res.body[0]});
+          this.setState({message: HomePage.getErrorMessage(res)});
         } else {
           this.setState({
-            displayCommitPanel: false,
+            dirtyWorkingDirectory: false,
             message: {
               code: 'updated',
               message: 'Changes have been discarded.'
@@ -344,7 +353,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           display={this.state.displayServicePanel}
           onSubmit={this.sendBugReport.bind(this)}
         />
-        {this.state.displayCommitPanel
+        {this.state.dirtyWorkingDirectory
           ? <CommitPanel
               diffProvider={{ getDiff: this.getDiff }}
               gitStatusProvider={{ getGitStatus: this.getGitStatus }}
@@ -371,6 +380,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           currentPage={parseInt(this.props.params.page, 10) || 1}
           pages={this.state.pages}
           commits={this.state.commits}
+          enableActions={!this.state.dirtyWorkingDirectory}
           onUndo={this.onUndo}
           onRollback={this.onRollback}
           diffProvider={{ getDiff: this.getDiff }}
