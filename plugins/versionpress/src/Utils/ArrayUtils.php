@@ -75,13 +75,30 @@ class ArrayUtils {
      * @return bool
      */
     public static function any($array, $predicate) {
-        foreach ($array as $item) {
-            if ($predicate($item)) {
+        foreach ($array as $key => $item) {
+            if ($predicate($item, $key)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Determines whether all elements of an array satisfy a condition.
+     *
+     * @param array $array
+     * @param callable $predicate
+     * @return bool
+     */
+    public static function all($array, $predicate) {
+        foreach ($array as $key => $item) {
+            if (!$predicate($item, $key)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

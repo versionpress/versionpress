@@ -2,10 +2,8 @@
 
 namespace VersionPress\Storages;
 
-use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\PostMetaChangeInfo;
 use VersionPress\Database\EntityInfo;
-use VersionPress\Utils\ArrayUtils;
 
 class PostMetaStorage extends MetaEntityStorage {
     function __construct(PostStorage $storage, EntityInfo $entityInfo) {
@@ -21,16 +19,5 @@ class PostMetaStorage extends MetaEntityStorage {
         $metaKey = $newEntity['meta_key'];
 
         return new PostMetaChangeInfo($action, $vpId, $postType, $postTitle, $postVpId, $metaKey);
-    }
-
-    public function shouldBeSaved($data) {
-        $ignoredMeta = array(
-            '_edit_lock',
-            '_edit_last',
-            '_pingme',
-            '_encloseme'
-        );
-
-        return parent::shouldBeSaved($data) && !in_array($data['meta_key'], $ignoredMeta);
     }
 }

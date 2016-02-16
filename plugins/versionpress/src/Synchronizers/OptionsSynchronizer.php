@@ -6,6 +6,7 @@ use VersionPress\Storages\OptionStorage;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\ArrayUtils;
+use VersionPress\Utils\QueryLanguageUtils;
 use VersionPress\Utils\ReferenceUtils;
 use wpdb;
 
@@ -57,13 +58,26 @@ class OptionsSynchronizer implements Synchronizer {
             $this->database->query($syncQuery);
         }
 
-        $ignoredOptionNames = ArrayUtils::column($options, 'option_name');
-        $ignoredOptionNames = array_merge($ignoredOptionNames, OptionStorage::$optionsBlacklist);
+        $entityInfo = $this->dbSchema->getEntityInfo('option');
+        $rules = $entityInfo->getRulesForIgnoredEntities();
+        $restriction = join(' OR ', array_map(function ($rule) {
+            $restrictionPart = QueryLanguageUtils::createSqlRestrictionFromRule($rule);
+            return "($restrictionPart)";
+        }, $rules));
 
-        $deleteSql = "DELETE FROM {$this->tableName} WHERE option_name NOT IN (\"" . join('", "', $ignoredOptionNames) . "\") OR option_name NOT LIKE '_%'";
+        $deleteSql = "DELETE FROM {$this->tableName} WHERE NOT ($restriction)";
+
+        if (count($options) > 0) {
+            $updatedOptionNames = ArrayUtils::column($options, 'option_name');
+            $restrictionForUpdatedOptions = "\"" . join('", "', $updatedOptionNames) . "\"";
+
+            $deleteSql .= " AND option_name NOT IN ($restrictionForUpdatedOptions)";
+        }
+
         if ($entitiesToSynchronize) {
             $synchronizedOptions = ArrayUtils::column($entitiesToSynchronize, 'vp_id');
-            $deleteSql = "DELETE FROM {$this->tableName} WHERE option_name NOT IN (\"" . join('", "', $ignoredOptionNames) . "\") AND option_name IN (\"" . join('", "', $synchronizedOptions) . "\")";
+            $restrictionForBasicSet = "\"" . join('", "', $synchronizedOptions) . "\"";
+            $deleteSql .= " AND option_name IN ($restrictionForBasicSet)";
         }
 
         $this->database->query($deleteSql);

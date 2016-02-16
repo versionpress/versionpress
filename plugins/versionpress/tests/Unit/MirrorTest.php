@@ -14,8 +14,9 @@ class MirrorTest extends \PHPUnit_Framework_TestCase {
     public function mirrorCallsTheReplacerOnSavingEntity() {
         $fakeStorageFactory = $this->getMockBuilder('VersionPress\Storages\StorageFactory')->disableOriginalConstructor()->getMock();
         $fakeReplacer = $this->getMockBuilder('VersionPress\Utils\AbsoluteUrlReplacer')->disableOriginalConstructor()->getMock();
+        $fakeStorage = $this->getMockBuilder('VersionPress\Storages\Storage')->disableOriginalConstructor()->getMockForAbstractClass();
 
-        $fakeStorageFactory->expects($this->any())->method('getStorage')->will($this->returnValue($this->getMockForAbstractClass('VersionPress\Storages\Storage')));
+        $fakeStorageFactory->expects($this->any())->method('getStorage')->will($this->returnValue($fakeStorage));
         $fakeReplacer->expects($this->once())->method('replace');
 
         /**
@@ -35,7 +36,7 @@ class MirrorTest extends \PHPUnit_Framework_TestCase {
 
         $fakeStorageFactory = $this->getMockBuilder('VersionPress\Storages\StorageFactory')->disableOriginalConstructor()->getMock();
         $fakeReplacer = $this->getMockBuilder('VersionPress\Utils\AbsoluteUrlReplacer')->disableOriginalConstructor()->getMock();
-        $fakeStorage = $this->getMockForAbstractClass('VersionPress\Storages\Storage');
+        $fakeStorage = $this->getMockBuilder('VersionPress\Storages\Storage')->disableOriginalConstructor()->getMockForAbstractClass();
 
         $fakeReplacer->expects($this->once())->method('replace')->will($this->returnArgument(0));
         $fakeStorageFactory->expects($this->once())->method('getStorage')->with($entityName)->will($this->returnValue($fakeStorage));

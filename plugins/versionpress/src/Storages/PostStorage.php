@@ -17,16 +17,8 @@ class PostStorage extends DirectoryStorage {
 
 
     public function shouldBeSaved($data) {
-
-        if (isset($data['post_type']) && ($data['post_type'] === 'revision'))
-            return false;
-
-        if (isset($data['post_status']) && ($data['post_status'] === 'auto-draft'))
-            return false;
-
         $isExistingEntity = $this->entityExistedBeforeThisRequest($data);
 
-        // Don't save revisions and drafts
         if ($isExistingEntity && isset($_POST['wp-preview']) && $_POST['wp-preview'] === 'dopreview') // ignore saving draft on preview
             return false;
 

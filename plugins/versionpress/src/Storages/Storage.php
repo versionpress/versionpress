@@ -69,6 +69,10 @@ abstract class Storage {
      * @return bool
      */
     public function shouldBeSaved($data) {
+        if ($this->entityInfo->isIgnoredEntity($data)) {
+            return false;
+        }
+
         if (!$this->ignoreFrequentlyWrittenEntities) {
             return true;
         }

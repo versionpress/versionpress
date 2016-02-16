@@ -32,7 +32,9 @@ Some essential information about database entities and their relationships is de
             - 'option_name: akismet_spam_count'
             - query: 'option_name: request_counter'
               interval: 5min
-
+        ignored-entities:
+            - 'option_name: _*'
+            - 'option_name: siteurl'
 
 ## Defining entities
 
@@ -96,3 +98,11 @@ They are specified in section `frequently-written`. It's a list of selectors or 
           interval: 5min
 
 The interval is parsed by PHP function `strtotime`, so it can be whatever the function takes.
+
+## Ignoring entities
+
+It is possible to ignore some entities (don't save them into INI files). You can just write some queries identifying those entities.
+
+    ignored-entities:
+        - 'option_name: _*'
+        - 'option_name: siteurl'
