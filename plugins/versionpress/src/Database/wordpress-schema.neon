@@ -89,3 +89,7 @@ option:
         - 'option_name: auto_updater.lock'
         - 'option_name: can_compress_scripts'
         - 'option_name: auto_core_update_notified'
+        - 'option_name: auth_key'
+        - 'option_name: auth_salt'
+        - 'option_name: logged_in_key'
+        - 'option_name: logged_in_salt'

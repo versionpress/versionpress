@@ -19,6 +19,7 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\WpdbMirrorBridge;
 use VersionPress\Database\VpidRepository;
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\Committer;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\VersionPressOptions;
@@ -961,31 +962,9 @@ function vp_enqueue_admin_styles_and_scripts() {
 //---------------------------------
 // API
 //---------------------------------
-require("src/Api/BundledWpApi/plugin.php");
+require("src/Api/BundledWpApi/rest-api.php");
 
-header('Access-Control-Allow-Headers: origin, content-type, accept, X-WP-Nonce');
-header('Access-Control-Allow-Origin: *');
-
-add_filter('allowed_http_origin', '__return_true');
-
-add_filter('wp_headers', 'vp_send_cors_headers', 11, 1);
-function vp_send_cors_headers($headers) {
-    $headers['Access-Control-Allow-Origin'] = get_http_origin();
-    $headers['Access-Control-Allow-Credentials'] = 'true';
-
-    if ('OPTIONS' == $_SERVER['REQUEST_METHOD']) {
-        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
-            $headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
-        }
-
-        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
-            $headers['Access-Control-Allow-Headers'] = $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'];
-        }
-    }
-    return $headers;
-}
-
-add_action('vp_rest_api_init', 'versionpress_api_init');
+add_action('rest_api_init', 'versionpress_api_init');
 function versionpress_api_init() {
     global $versionPressContainer;
     $gitRepository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);

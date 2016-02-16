@@ -15,6 +15,7 @@ interface CommitsTableProps extends React.Props<JSX.Element> {
   currentPage: number;
   pages: number[];
   commits: Commit[];
+  enableActions: boolean;
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
   diffProvider: {getDiff: (hash: string) => Promise<string>};
@@ -53,6 +54,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
           const row = <CommitsTableRow
                         key={commit.hash}
                         commit={commit}
+                        enableActions={this.props.enableActions}
                         onUndo={this.props.onUndo}
                         onRollback={this.props.onRollback}
                         diffProvider={this.props.diffProvider}

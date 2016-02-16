@@ -1,4 +1,4 @@
 [bugtraq]
-	url = http://jira.agilio.cz/browse/%BUGID%
+	url = https://github.com/versionpress/versionpress/issues/%BUGID%
 	warnifnoissue = true
-	logregex = \\[?(WP-\\d+)\\]?
+	logregex = "\\[?#(\\d+)\\]?"
