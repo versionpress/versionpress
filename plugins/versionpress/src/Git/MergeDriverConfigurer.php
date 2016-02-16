@@ -14,7 +14,7 @@ class MergeDriverConfigurer {
         $gitattributesVariables = array(
             'wp-content' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_CONTENT_DIR), '.'), '/\\')
         );
-        $gitattributes = StringUtils::fillTemplateString($gitattributesVariables,$gitattributes);
+        $gitattributes = StringUtils::fillTemplateString($gitattributesVariables, $gitattributes);
 
         $flag = null;
         if (is_file($gitattributesPath)) {
@@ -38,7 +38,7 @@ class MergeDriverConfigurer {
             'bin-dir' => PHP_BINDIR . '/php'
         );
 
-        $gitconfig = StringUtils::fillTemplateString($gitconfigVariables,$gitconfig);
+        $gitconfig = StringUtils::fillTemplateString($gitconfigVariables, $gitconfig);
         file_put_contents($gitconfigPath, $gitconfig, FILE_APPEND);
         chmod($mergeDriverScript, 0774);
 

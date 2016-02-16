@@ -30,15 +30,15 @@ foreach ($dates as $date) {
     $aDate = new DateTime($aDateString);
     $bDate = new DateTime($bDateString);
     if ($aDate->getTimestamp() > $bDate->getTimestamp()) {
-        $bFile = preg_replace($dateReplacePattern, '${1}'.$aDateString.'${3}', $bFile);
+        $bFile = preg_replace($dateReplacePattern, '${1}' . $aDateString . '${3}', $bFile);
     } else {
 
-        $aFile = preg_replace($dateReplacePattern, '${1}'.$bDateString.'${3}', $aFile);
+        $aFile = preg_replace($dateReplacePattern, '${1}' . $bDateString . '${3}', $aFile);
     }
 
 }
-file_put_contents($B,$bFile);
-file_put_contents($A,$aFile);
+file_put_contents($B, $bFile);
+file_put_contents($A, $aFile);
 
 
 shell_exec($mergeCommand);
