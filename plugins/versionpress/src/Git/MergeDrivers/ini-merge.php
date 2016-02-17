@@ -40,4 +40,6 @@ foreach ($dates as $date) {
 file_put_contents($B, $bFile);
 file_put_contents($A, $aFile);
 
-shell_exec($mergeCommand);
+exec($mergeCommand, $dummy, $mergeExitCode);
+
+exit ($mergeExitCode);
