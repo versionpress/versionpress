@@ -6,7 +6,7 @@ $B = $argv[3];
 
 $dates = array("post_modified", "post_modified_gmt");
 
-$mergeCommand = 'git merge-file ' . $A . ' ' . $O . ' ' . $B;
+$mergeCommand = 'git merge-file -L mine -L base -L theirs ' . $A . ' ' . $O . ' ' . $B;
 
 $oFile = file_get_contents($O);
 $aFile = file_get_contents($A);
