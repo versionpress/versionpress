@@ -36,8 +36,8 @@ class MergeDriverInstaller {
         $mergeDriverScript = VERSIONPRESS_PLUGIN_DIR . '/src/Git/MergeDrivers/ini-merge.php';
 
         $gitconfigVariables = array(
-            'merge-driver-script' => $mergeDriverScript,
-            'php-binary-path' => PHP_BINDIR . '/php'
+            'merge-driver-script' => '"' . str_replace('\\', '/', $mergeDriverScript) . '"',
+            'php-binary-path' => '"' . str_replace('\\', '/', PHP_BINARY) . '"'
         );
 
         $gitconfig = StringUtils::fillTemplateString($gitconfigVariables, $gitconfig);
