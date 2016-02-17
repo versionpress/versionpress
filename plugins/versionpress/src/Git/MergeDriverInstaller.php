@@ -14,12 +14,12 @@ class MergeDriverInstaller {
         $gitattributesVariables = array(
             'vp-mirroring-dir' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, VERSIONPRESS_MIRRORING_DIR), '.'), '/\\')
         );
-        $gitattributes = '\n' . StringUtils::fillTemplateString($gitattributesVariables, $gitattributes);
+        $gitattributes = "\n" . StringUtils::fillTemplateString($gitattributesVariables, $gitattributes);
 
         $flag = null;
         if (is_file($gitattributesPath)) {
             $flag = FILE_APPEND;
-            if (strpos(file_get_contents($gitattributesPath), "merge=vp-ini") !== false) {
+            if (strpos(file_get_contents($gitattributesPath), 'merge=vp-ini') !== false) {
                 return;
             }
         }
@@ -29,8 +29,11 @@ class MergeDriverInstaller {
 
     public static function installGitMergeDriver($directory) {
         $gitconfigFilePath = VP_PROJECT_ROOT . '/.git/config';
+        if (strpos(file_get_contents($gitconfigFilePath), '[merge "vp-ini"]') !== false) {
+            return;
+        }
         $gitconfig = file_get_contents($directory . '/gitconfig.tpl');
-        $mergeDriverScript = VERSIONPRESS_PLUGIN_DIR . "/src/Git/MergeDrivers/ini-merge.php";
+        $mergeDriverScript = VERSIONPRESS_PLUGIN_DIR . '/src/Git/MergeDrivers/ini-merge.php';
 
         $gitconfigVariables = array(
             'merge-driver-script' => $mergeDriverScript,
@@ -42,4 +45,6 @@ class MergeDriverInstaller {
         chmod($mergeDriverScript, 0774);
 
     }
+
+
 }
