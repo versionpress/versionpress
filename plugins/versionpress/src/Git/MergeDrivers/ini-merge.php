@@ -19,7 +19,6 @@ foreach ($dates as $date) {
     $matches = array();
     preg_match($dateMatchPattern, $aFile, $matches);
     if (count($matches) == 0) {
-        echo "not found";
         break;
     }
     $aDateString = $matches[1];
@@ -37,8 +36,8 @@ foreach ($dates as $date) {
     }
 
 }
+
 file_put_contents($B, $bFile);
 file_put_contents($A, $aFile);
-
 
 shell_exec($mergeCommand);

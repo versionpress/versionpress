@@ -112,9 +112,11 @@ class StringUtils {
     }
 
     /**
-     * @param $variables
-     * @param $templateString
-     * @return mixed
+     * Fills template string placeholders with variables provided in $variables array. Placeholders pattern: {{variable-name}}
+     *
+     * @param array $variables  associative array with keys as variable names.
+     * @param string $templateString template string which contains placeholders for variables to be expanded.
+     * @return string templateString with expanded variable placeholders
      */
     public static function fillTemplateString($variables, $templateString) {
         $search = array_map(function ($var) { return sprintf('{{%s}}', $var); }, array_keys($variables));

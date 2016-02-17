@@ -3,7 +3,7 @@
 namespace VersionPress\Cli;
 
 use VersionPress\DI\VersionPressServices;
-use VersionPress\Git\MergeDriverConfigurer;
+use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use WP_CLI;
 use WP_CLI_Command;
@@ -64,9 +64,9 @@ class VPInternalCommand extends WP_CLI_Command {
 
         // Install Custom merge driver
         $initializationDir = VERSIONPRESS_PLUGIN_DIR . '/src/Initialization';
-        MergeDriverConfigurer::installGitattributes($initializationDir);
-        MergeDriverConfigurer::installGitMergeDriver($initializationDir);
-        WP_CLI::success("Git merge driver for VersionPress files added.");
+        MergeDriverInstaller::installGitattributes($initializationDir);
+        MergeDriverInstaller::installGitMergeDriver($initializationDir);
+        WP_CLI::success("Git merge driver added.");
         // Run synchronization
 
         /** @var SynchronizationProcess $syncProcess */

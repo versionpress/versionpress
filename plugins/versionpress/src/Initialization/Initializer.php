@@ -7,7 +7,7 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Git\GitConfig;
 use VersionPress\Git\GitRepository;
-use VersionPress\Git\MergeDriverConfigurer;
+use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Storages\Storage;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Synchronizers\SynchronizerFactory;
@@ -369,8 +369,8 @@ class Initializer {
             $this->reportProgressChange(InitializerStates::CREATING_GIT_REPOSITORY);
             $this->repository->init();
             $this->installGitignore();
-            MergeDriverConfigurer::installGitattributes(__DIR__);
-            MergeDriverConfigurer::installGitMergeDriver(__DIR__);
+            MergeDriverInstaller::installGitattributes(__DIR__);
+            MergeDriverInstaller::installGitMergeDriver(__DIR__);
         }
     }
 

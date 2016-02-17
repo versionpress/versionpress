@@ -1,1 +1,1 @@
-{{wp-content}}/vpdb/**/*.ini merge=vp-ini
+{{vp-mirroring-dir}}/vpdb/**/*.ini merge=vp-ini
