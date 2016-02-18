@@ -268,13 +268,17 @@ class GitRepository {
     /**
      * Counts number of commits
      *
-     * @param string $startRevision Where to start. NULL means the initial commit (repo start)
-     * @param string $endRevision Where to end. This will typically be HEAD.
+     * @param string $options Options passed to git log
+     * @param string $gitrevisions Empty by default, i.e., calling full 'git log'
      * @return int
      */
-    public function getNumberOfCommits($startRevision = null, $endRevision = "HEAD") {
-        $revRange = empty($startRevision) ? $endRevision : "$startRevision..$endRevision";
-        return intval($this->runShellCommandWithStandardOutput("git rev-list %s --count", $revRange));
+    public function getNumberOfCommits($options = "", $gitrevisions = "") {
+        $logCommand = 'git log --pretty=format:"%%h"';
+
+        $logCommand .= " " . $options;
+        $result = $this->runShellCommandWithStandardOutput($logCommand);
+        $count = substr_count($result, "\n") + 1;
+        return $count;
     }
 
     /**

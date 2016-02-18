@@ -26,8 +26,8 @@ class GitLogPaginator {
      * @param $pageNumber
      * @return Commit[]
      */
-        $this->numberOfCommits = $this->repository->getNumberOfCommits();
     public function getPage($pageNumber) {
+        $this->numberOfCommits = $this->repository->getNumberOfCommits($this->query);
 
         $firstCommitIndex = $pageNumber * $this->commitsPerPage;
         $lastCommitIndex = ($pageNumber + 1) * $this->commitsPerPage;
