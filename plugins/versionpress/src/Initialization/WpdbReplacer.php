@@ -8,11 +8,16 @@ class WpdbReplacer {
 
     private static $methodPrefix = '__wp_';
     private static $vpFirstLineComment = '// Enhanced by VersionPress';
-    private static $bootstrapRequire = "\$vp_bootstrap = WP_PLUGIN_DIR.'/versionpress/bootstrap.php';
-    if(file_exists(\$vp_bootstrap)) {
+    private static $bootstrapRequire = "
+    if (!defined('WP_PLUGIN_DIR')) {
+        \$vp_bootstrap = WP_CONTENT_DIR . '/plugins/versionpress/bootstrap.php';
+    } else {
+        \$vp_bootstrap = WP_PLUGIN_DIR . '/versionpress/bootstrap.php';
+    }
+    if (file_exists(\$vp_bootstrap)) {
         require_once(\$vp_bootstrap);
     } else {
-        register_shutdown_function(array('wpdb','restoreOriginal'));
+        register_shutdown_function(array('wpdb', 'restoreOriginal'));
     }";
 
     public static function replaceMethods() {
@@ -45,7 +50,10 @@ class WpdbReplacer {
     }
 
     public static function restoreOriginal() {
-        rename(ABSPATH . WPINC . '/wp-db.php.original', ABSPATH . WPINC . '/wp-db.php');
+        $original = ABSPATH . WPINC . '/wp-db.php.original';
+        if (file_exists($original)) {
+            rename($original, ABSPATH . WPINC . '/wp-db.php');
+        }
     }
 
     private static function replaceMethod($source, $method) {
