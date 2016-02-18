@@ -33,11 +33,14 @@ class MergeDriverInstaller {
             return;
         }
         $gitconfig = file_get_contents($directory . '/gitconfig.tpl');
-        $mergeDriverScript = VERSIONPRESS_PLUGIN_DIR . '/src/Git/MergeDrivers/ini-merge.php';
 
+        if (DIRECTORY_SEPARATOR == '/') {
+            $mergeDriverScript = VERSIONPRESS_PLUGIN_DIR . '/src/Git/MergeDrivers/ini-merge.sh';
+        } else {
+            $mergeDriverScript = '"' . PHP_BINARY . '" "' . VERSIONPRESS_PLUGIN_DIR . '/src/Git/MergeDrivers/ini-merge.php"';
+        }
         $gitconfigVariables = array(
-            'merge-driver-script' => '"' . str_replace('\\', '/', $mergeDriverScript) . '"',
-            'php-binary-path' => '"' . str_replace('\\', '/', PHP_BINARY) . '"'
+            'merge-driver-script' => str_replace('\\', '/', $mergeDriverScript)
         );
 
         $gitconfig = StringUtils::fillTemplateString($gitconfigVariables, $gitconfig);

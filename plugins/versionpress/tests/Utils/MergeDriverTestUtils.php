@@ -81,5 +81,20 @@ class MergeDriverTestUtils {
 
     }
 
+    public static function switchDriverToPhp() {
+        $driverScriptName = 'ini-merge.php';
+        $driverScript = '../../src/Git/MergeDrivers/' . $driverScriptName;
+        $driverScriptFakeDir = self::$repositoryDir . '/src/Git/MergeDrivers';
+        copy($driverScript, $driverScriptFakeDir . '/' . $driverScriptName);
+        chmod($driverScriptFakeDir . '/' . $driverScriptName, 0774);
+
+        $mergeDriverScript = '"' . PHP_BINARY . '" "' . $driverScriptFakeDir . '/' . $driverScriptName;
+
+        $gitconfig = file_get_contents(self::$repositoryDir . '/.git/config');
+        $gitconfig = preg_replace('/\n?.*driver = .*$/m', "\n" . 'driver = ' . $mergeDriverScript . '" %O %A %B' . "\n", $gitconfig);
+        file_put_contents(self::$repositoryDir . '/.git/config', $gitconfig);
+
+    }
+
 
 }

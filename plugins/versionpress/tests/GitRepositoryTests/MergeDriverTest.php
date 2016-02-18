@@ -69,17 +69,12 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function isMergedWithoutConflictTest() {
+    public function isBashMergedWithoutConflictTest() {
 
         MergeDriverTestUtils::installMergeDriver(self::$initializationDir);
+        MergeDriverTestUtils::switchDriverToBash();
 
-        MergeDriverTestUtils::fillFakeFileAndCommit(ORIGIN_DATE, 'file.ini', 'Initial commit to Ancestor');
-
-        MergeDriverTestUtils::runProcess(CHECKOUT_BRANCH_CMD);
-        MergeDriverTestUtils::fillFakeFileAndCommit(BRANCH_DATE, 'file.ini', 'Commit to branch');
-
-        MergeDriverTestUtils::runProcess(CHECKOUT_MASTER_CMD);
-        MergeDriverTestUtils::fillFakeFileAndCommit(MASTER_DATE, 'file.ini', 'Commit to master');
+        $this->prepareNonConflictingData();
 
         $this->assertEquals(0, MergeDriverTestUtils::runProcess(MERGE_CMD));
 
@@ -88,17 +83,12 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function isMergedWithoutConflictInDateTest() {
+    public function isBashMergedWithoutConflictInDateTest() {
 
         MergeDriverTestUtils::installMergeDriver(self::$initializationDir);
+        MergeDriverTestUtils::switchDriverToBash();
 
-        MergeDriverTestUtils::fillFakeFileAndCommit(ORIGIN_DATE, 'file.ini', 'Initial commit to Ancestor');
-
-        MergeDriverTestUtils::runProcess(CHECKOUT_BRANCH_CMD);
-        MergeDriverTestUtils::fillFakeFileAndCommit(BRANCH_DATE, 'file.ini', 'Commit to branch', 'Custom branch message');
-
-        MergeDriverTestUtils::runProcess(CHECKOUT_MASTER_CMD);
-        MergeDriverTestUtils::fillFakeFileAndCommit(MASTER_DATE, 'file.ini', 'Commit to master');
+        $this->prepareConflictingData();
 
         $this->assertEquals(1, MergeDriverTestUtils::runProcess(MERGE_CMD));
 
@@ -107,6 +97,60 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
         $file = file_get_contents(self::$repositoryDir . '/file.ini');
         $this->assertEquals($expected, $file);
 
+    }
+
+    /**
+     * @test
+     */
+    public function isPhpMergedWithoutConflictTest() {
+        MergeDriverTestUtils::installMergeDriver(self::$initializationDir);
+        MergeDriverTestUtils::switchDriverToPhp();
+
+        $this->prepareNonConflictingData();
+
+        $this->assertEquals(0, MergeDriverTestUtils::runProcess(MERGE_CMD));
+
+    }
+
+    /**
+     * @test
+     */
+    public function isPhpMergedWithoutConflictInDateTest() {
+
+        MergeDriverTestUtils::installMergeDriver(self::$initializationDir);
+        MergeDriverTestUtils::switchDriverToPhp();
+
+        $this->prepareConflictingData();
+
+        $this->assertEquals(1, MergeDriverTestUtils::runProcess(MERGE_CMD));
+
+        copy(self::$repositoryDir . '/file.ini', '/Users/Ivan/expected-merge-conflict.ini');
+        $expected = file_get_contents(__DIR__ . '/expected-merge-conflict.ini');
+        $file = file_get_contents(self::$repositoryDir . '/file.ini');
+        $this->assertEquals($expected, $file);
+
+    }
+
+    private function prepareNonConflictingData() {
+        $this->prepareTestData();
+    }
+
+    private function prepareConflictingData() {
+        $this->prepareTestData('Custom branch message');
+    }
+
+    private function prepareTestData($customMessage = null) {
+        MergeDriverTestUtils::fillFakeFileAndCommit(ORIGIN_DATE, 'file.ini', 'Initial commit to Ancestor');
+
+        MergeDriverTestUtils::runProcess(CHECKOUT_BRANCH_CMD);
+        if($customMessage==null) {
+            MergeDriverTestUtils::fillFakeFileAndCommit(BRANCH_DATE, 'file.ini', 'Commit to branch');
+        } else {
+            MergeDriverTestUtils::fillFakeFileAndCommit(BRANCH_DATE, 'file.ini', 'Commit to branch', $customMessage);
+        }
+
+        MergeDriverTestUtils::runProcess(CHECKOUT_MASTER_CMD);
+        MergeDriverTestUtils::fillFakeFileAndCommit(MASTER_DATE, 'file.ini', 'Commit to master');
     }
 
 

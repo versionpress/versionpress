@@ -54,9 +54,15 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
     public function phpDriverLoadTest() {
 
         MergeDriverTestUtils::installMergeDriver(self::$initializationDir);
+        MergeDriverTestUtils::switchDriverToPhp();
         $this->runLoadTest();
+        $time_start = microtime(true);
+        $mergeEC = MergeDriverTestUtils::runProcess(MERGE_CMD);
+        $time_end = microtime(true);
+        $execution_time = ($time_end - $time_start);
+        echo 'Php Execution Time: '.$execution_time.' Sec';
+        $this->assertEquals(0, $mergeEC);
 
-        $this->assertEquals(0, MergeDriverTestUtils::runProcess(MERGE_CMD));
     }
 
     /**
@@ -67,8 +73,12 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
         MergeDriverTestUtils::installMergeDriver(self::$initializationDir);
         MergeDriverTestUtils::switchDriverToBash();
         $this->runLoadTest();
-
-        $this->assertEquals(0, MergeDriverTestUtils::runProcess(MERGE_CMD));
+        $time_start = microtime(true);
+        $mergeEC = MergeDriverTestUtils::runProcess(MERGE_CMD);
+        $time_end = microtime(true);
+        $execution_time = ($time_end - $time_start);
+        echo 'Bash Execution Time: '.$execution_time.' Sec';
+        $this->assertEquals(0, $mergeEC);
     }
 
     private function runLoadTest() {
@@ -87,5 +97,6 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
             MergeDriverTestUtils::fillFakeFile(MASTER_DATE, 'file' . $i . '.ini');
         }
         MergeDriverTestUtils::commit('Commit to master');
+        echo "Done";
     }
 }
