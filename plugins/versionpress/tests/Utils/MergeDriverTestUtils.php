@@ -37,11 +37,20 @@ class MergeDriverTestUtils {
         FileSystem::remove(self::$repositoryDir);
     }
 
-    public static function fillFakeFileAndCommit($originDate, $message = 'Fake commit message', $content = 'Fake content') {
+
+    public static function fillFakeFile($originDate, $fileName, $content = 'Fake content') {
         $originData = array("GUID" => array('post_modified' => $originDate, 'post_modified_gmt' => $originDate, 'content' => $content));
-        file_put_contents(self::$repositoryDir . '/file.ini', IniSerializer::serialize($originData));
+        file_put_contents(self::$repositoryDir . '/' . $fileName, IniSerializer::serialize($originData));
+    }
+
+    public static function commit($message = 'Fake commit message') {
         self::$gitRepository->stageAll();
         self::$gitRepository->commit($message, GitConfig::$wpcliUserName, GitConfig::$wpcliUserEmail);
+    }
+
+    public static function fillFakeFileAndCommit($originDate, $fileName, $message = 'Fake commit message', $content = 'Fake content') {
+        self::fillFakeFile($originDate, $fileName, $content);
+        self::commit($message);
     }
 
     /**
@@ -57,6 +66,19 @@ class MergeDriverTestUtils {
     public static function installMergeDriver($initializationDir) {
         MergeDriverInstaller::installGitattributes($initializationDir);
         MergeDriverInstaller::installGitMergeDriver($initializationDir);
+    }
+
+    public static function switchDriverToBash() {
+        $driverScriptName = 'ini-merge.sh';
+        $driverScript = '../../src/Git/MergeDrivers/' . $driverScriptName;
+        $driverScriptFakeDir = self::$repositoryDir . '/src/Git/MergeDrivers';
+        copy($driverScript, $driverScriptFakeDir . '/' . $driverScriptName);
+        chmod($driverScriptFakeDir . '/' . $driverScriptName, 0774);
+
+        $gitconfig = file_get_contents(self::$repositoryDir . '/.git/config');
+        $gitconfig = preg_replace('/\n?.*driver = .*$/m', "\n" . 'driver = ' . $driverScriptFakeDir . '/' . $driverScriptName . ' %O %A %B' . "\n", $gitconfig);
+        file_put_contents(self::$repositoryDir . '/.git/config', $gitconfig);
+
     }
 
 

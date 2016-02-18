@@ -1,5 +1,5 @@
 <?php
-namespace VersionPress\Tests\GitRepositoryTests;
+namespace VersionPress\Tests\LoadTests;
 
 use DateTime;
 use VersionPress\Git\GitConfig;
@@ -11,8 +11,7 @@ use VersionPress\Utils\IniSerializer;
 use VersionPress\Utils\Process;
 use VersionPress\Utils\StringUtils;
 
-class MergeDriverTest extends \PHPUnit_Framework_TestCase {
-
+class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
 
     private static $repositoryDir;
 
@@ -45,7 +44,6 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
         MergeDriverTestUtils::destroyRepository();
     }
 
-
     public static function tearDownAfterClass() {
         MergeDriverTestUtils::destroyRepository();
     }
@@ -53,61 +51,41 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function isGitAttributesSetTest() {
-        MergeDriverInstaller::installGitattributes(self::$initializationDir);
-        $this->assertContains('merge=vp-ini', file_get_contents(self::$repositoryDir . "/.gitattributes"));
-    }
-
-    /**
-     * @test
-     */
-    public function isMergeDriverInstalledTest() {
-        MergeDriverInstaller::installGitMergeDriver(self::$initializationDir);
-        $this->assertContains('vp-ini', file_get_contents(self::$repositoryDir . "/.git/config"));
-    }
-
-    /**
-     * @test
-     */
-    public function isMergedWithoutConflictTest() {
+    public function phpDriverLoadTest() {
 
         MergeDriverTestUtils::installMergeDriver(self::$initializationDir);
-
-        MergeDriverTestUtils::fillFakeFileAndCommit(ORIGIN_DATE, 'file.ini', 'Initial commit to Ancestor');
-
-        MergeDriverTestUtils::runProcess(CHECKOUT_BRANCH_CMD);
-        MergeDriverTestUtils::fillFakeFileAndCommit(BRANCH_DATE, 'file.ini', 'Commit to branch');
-
-        MergeDriverTestUtils::runProcess(CHECKOUT_MASTER_CMD);
-        MergeDriverTestUtils::fillFakeFileAndCommit(MASTER_DATE, 'file.ini', 'Commit to master');
+        $this->runLoadTest();
 
         $this->assertEquals(0, MergeDriverTestUtils::runProcess(MERGE_CMD));
-
     }
 
     /**
      * @test
      */
-    public function isMergedWithoutConflictInDateTest() {
+    public function bashDriverLoadTest() {
 
         MergeDriverTestUtils::installMergeDriver(self::$initializationDir);
+        MergeDriverTestUtils::switchDriverToBash();
+        $this->runLoadTest();
 
-        MergeDriverTestUtils::fillFakeFileAndCommit(ORIGIN_DATE, 'file.ini', 'Initial commit to Ancestor');
-
-        MergeDriverTestUtils::runProcess(CHECKOUT_BRANCH_CMD);
-        MergeDriverTestUtils::fillFakeFileAndCommit(BRANCH_DATE, 'file.ini', 'Commit to branch', 'Custom branch message');
-
-        MergeDriverTestUtils::runProcess(CHECKOUT_MASTER_CMD);
-        MergeDriverTestUtils::fillFakeFileAndCommit(MASTER_DATE, 'file.ini', 'Commit to master');
-
-        $this->assertEquals(1, MergeDriverTestUtils::runProcess(MERGE_CMD));
-
-        copy(self::$repositoryDir . '/file.ini', '/Users/Ivan/expected-merge-conflict.ini');
-        $expected = file_get_contents(__DIR__ . '/expected-merge-conflict.ini');
-        $file = file_get_contents(self::$repositoryDir . '/file.ini');
-        $this->assertEquals($expected, $file);
-
+        $this->assertEquals(0, MergeDriverTestUtils::runProcess(MERGE_CMD));
     }
 
-
+    private function runLoadTest() {
+        $limit = 1000;
+        for ($i = 0; $i < $limit; $i++) {
+            MergeDriverTestUtils::fillFakeFile(ORIGIN_DATE, 'file' . $i . '.ini');
+        }
+        MergeDriverTestUtils::commit('Initial commit to Ancestor');
+        MergeDriverTestUtils::runProcess(CHECKOUT_BRANCH_CMD);
+        for ($i = 0; $i < $limit; $i++) {
+            MergeDriverTestUtils::fillFakeFile(BRANCH_DATE, 'file' . $i . '.ini');
+        }
+        MergeDriverTestUtils::commit('Commit to branch');
+        MergeDriverTestUtils::runProcess(CHECKOUT_MASTER_CMD);
+        for ($i = 0; $i < $limit; $i++) {
+            MergeDriverTestUtils::fillFakeFile(MASTER_DATE, 'file' . $i . '.ini');
+        }
+        MergeDriverTestUtils::commit('Commit to master');
+    }
 }
