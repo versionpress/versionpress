@@ -34,10 +34,15 @@ class MergeDriverInstaller {
         }
         $gitconfig = file_get_contents($directory . '/gitconfig.tpl');
 
+
+
         if (DIRECTORY_SEPARATOR == '/') {
-            $mergeDriverScript = VERSIONPRESS_PLUGIN_DIR . '/src/Git/MergeDrivers/ini-merge.sh';
+            $mergeDriverFile = 'ini-merge.sh';
+            $mergeDriverScript = VERSIONPRESS_PLUGIN_DIR . '/src/Git/MergeDrivers/' . $mergeDriverFile;
+            chmod(str_replace('\\', '/', $mergeDriverScript), 0774);
         } else {
-            $mergeDriverScript = '"' . PHP_BINARY . '" "' . VERSIONPRESS_PLUGIN_DIR . '/src/Git/MergeDrivers/ini-merge.php"';
+            $mergeDriverFile = 'ini-merge.php';
+            $mergeDriverScript = '"' . PHP_BINARY . '" "' . VERSIONPRESS_PLUGIN_DIR . '/src/Git/MergeDrivers/' . $mergeDriverFile . '"';
         }
         $gitconfigVariables = array(
             'merge-driver-script' => str_replace('\\', '/', $mergeDriverScript)
@@ -45,7 +50,6 @@ class MergeDriverInstaller {
 
         $gitconfig = StringUtils::fillTemplateString($gitconfigVariables, $gitconfig);
         file_put_contents($gitconfigFilePath, $gitconfig, FILE_APPEND);
-        chmod($mergeDriverScript, 0774);
 
     }
 

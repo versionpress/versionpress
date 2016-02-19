@@ -29,6 +29,9 @@ class MergeDriverTestUtils {
         self::$gitRepository = new GitRepository(self::$repositoryDir, __DIR__);
         self::$gitRepository->init();
         copy($driverScript, $driverScriptFakeDir . '/' . $driverScriptName);
+        $driverScriptName = 'ini-merge.sh';
+        $driverScript = '../../src/Git/MergeDrivers/' . $driverScriptName;
+        copy($driverScript, $driverScriptFakeDir . '/' . $driverScriptName);
 
     }
 
