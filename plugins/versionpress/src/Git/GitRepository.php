@@ -111,10 +111,19 @@ class GitRepository {
     /**
      * Gets last (most recent) commit hash in the repository, or an empty string is there are no commits.
      *
+     * @param string $options Options passed to git log
      * @return string Empty string or SHA1
      */
-    public function getLastCommitHash() {
-        $result = $this->runShellCommand("git rev-parse HEAD");
+    public function getLastCommitHash($options = "") {
+        if (!empty($options)) {
+            $command = 'git log --pretty=format:"%%H" --max-count=1';
+            $command .= " " . $options;
+        } else {
+            $command = 'git rev-parse HEAD';
+        }
+
+        $result = $this->runShellCommand($command);
+
         if ($result["stderr"]) {
             return "";
         } else {

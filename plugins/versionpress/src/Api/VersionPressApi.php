@@ -329,8 +329,11 @@ class VersionPressApi {
 
         $latestCommit = $request['latestCommit'];
 
+        $queryBuilder = new QueryBuilder(urldecode(stripslashes($request['query'])));
+        $repoLatestCommit = $repository->getLastCommitHash($queryBuilder->getGitLogQuery());
+
         return new WP_REST_Response(array(
-            "update" => $repository->wasCreatedAfter("HEAD", $latestCommit),
+            "update" => $repository->wasCreatedAfter($repoLatestCommit, $latestCommit),
             "cleanWorkingDirectory" => $repository->isCleanWorkingDirectory()
         ));
     }

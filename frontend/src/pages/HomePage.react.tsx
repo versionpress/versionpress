@@ -148,7 +148,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     }
     WpApi
       .get('should-update')
-      .query({latestCommit: this.state.commits[0].hash})
+      .query({query: encodeURIComponent(this.state.query), latestCommit: this.state.commits[0].hash})
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
