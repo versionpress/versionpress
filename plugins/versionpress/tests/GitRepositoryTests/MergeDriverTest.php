@@ -74,28 +74,9 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
         MergeDriverTestUtils::installMergeDriver(self::$initializationDir);
         MergeDriverTestUtils::switchDriverToBash();
 
-        $this->prepareNonConflictingData();
-
-        $this->assertEquals(0, MergeDriverTestUtils::runProcess(MERGE_CMD));
-
-    }
-
-    /**
-     * @test
-     */
-    public function isBashMergedWithoutConflictInDateTest() {
-
-        MergeDriverTestUtils::installMergeDriver(self::$initializationDir);
-        MergeDriverTestUtils::switchDriverToBash();
-
         $this->prepareConflictingData();
 
-        $this->assertEquals(1, MergeDriverTestUtils::runProcess(MERGE_CMD));
-
-        copy(self::$repositoryDir . '/file.ini', '/Users/Ivan/expected-merge-conflict.ini');
-        $expected = file_get_contents(__DIR__ . '/expected-merge-conflict.ini');
-        $file = file_get_contents(self::$repositoryDir . '/file.ini');
-        $this->assertEquals($expected, $file);
+        $this->assertEquals(0, MergeDriverTestUtils::runProcess(MERGE_CMD));
 
     }
 
@@ -106,47 +87,24 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
         MergeDriverTestUtils::installMergeDriver(self::$initializationDir);
         MergeDriverTestUtils::switchDriverToPhp();
 
-        $this->prepareNonConflictingData();
+        $this->prepareConflictingData();
 
         $this->assertEquals(0, MergeDriverTestUtils::runProcess(MERGE_CMD));
 
     }
 
-    /**
-     * @test
-     */
-    public function isPhpMergedWithoutConflictInDateTest() {
-
-        MergeDriverTestUtils::installMergeDriver(self::$initializationDir);
-        MergeDriverTestUtils::switchDriverToPhp();
-
-        $this->prepareConflictingData();
-
-        $this->assertEquals(1, MergeDriverTestUtils::runProcess(MERGE_CMD));
-
-        copy(self::$repositoryDir . '/file.ini', '/Users/Ivan/expected-merge-conflict.ini');
-        $expected = file_get_contents(__DIR__ . '/expected-merge-conflict.ini');
-        $file = file_get_contents(self::$repositoryDir . '/file.ini');
-        $this->assertEquals($expected, $file);
-
-    }
-
-    private function prepareNonConflictingData() {
-        $this->prepareTestData();
-    }
-
     private function prepareConflictingData() {
-        $this->prepareTestData('Custom branch message');
+        $this->prepareTestData('Custom branch content');
     }
 
-    private function prepareTestData($customMessage = null) {
+    private function prepareTestData($customContent = null) {
         MergeDriverTestUtils::fillFakeFileAndCommit(ORIGIN_DATE, 'file.ini', 'Initial commit to Ancestor');
 
         MergeDriverTestUtils::runProcess(CHECKOUT_BRANCH_CMD);
-        if($customMessage==null) {
+        if($customContent==null) {
             MergeDriverTestUtils::fillFakeFileAndCommit(BRANCH_DATE, 'file.ini', 'Commit to branch');
         } else {
-            MergeDriverTestUtils::fillFakeFileAndCommit(BRANCH_DATE, 'file.ini', 'Commit to branch', $customMessage);
+            MergeDriverTestUtils::fillFakeFileAndCommit(BRANCH_DATE, 'file.ini', 'Commit to branch', $customContent);
         }
 
         MergeDriverTestUtils::runProcess(CHECKOUT_MASTER_CMD);
