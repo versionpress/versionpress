@@ -30,7 +30,7 @@ interface HomePageProps extends React.Props<JSX.Element> {
 
 interface HomePageState {
   pages?: number[];
-  query?: Object;
+  query?: string;
   commits?: Commit[];
   message?: {
     code: string,
@@ -55,7 +55,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     super();
     this.state = {
       pages: [],
-      query: [],
+      query: '',
       commits: [],
       message: null,
       loading: true,
@@ -107,7 +107,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
     WpApi
       .get('commits')
-      .query({page: page, query: encodeURIComponent(JSON.stringify(this.state.query))})
+      .query({page: page, query: encodeURIComponent(this.state.query)})
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
@@ -307,7 +307,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       });
   }
 
-  onFilter(query: Object) {
+  onFilter(query: string) {
     this.setState({
       query: query
     }, this.fetchCommits);

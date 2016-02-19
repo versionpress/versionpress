@@ -135,10 +135,11 @@ class GitRepository {
     /**
      * Returns an array of Commits based on {@link http://git-scm.com/docs/gitrevisions gitrevisions}
      *
+     * @param string $options Options passed to git log
      * @param string $gitrevisions Empty by default, i.e., calling full 'git log'
      * @return Commit[]
      */
-    public function log($gitrevisions = "", $filter = "") {
+    public function log($options = "", $gitrevisions = "") {
 
         $commitDelimiter = chr(29);
         $dataDelimiter = chr(30);
@@ -146,9 +147,7 @@ class GitRepository {
 
         $logCommand = "git log --pretty=format:\"|begin|%%H|delimiter|%%aD|delimiter|%%ar|delimiter|%%an|delimiter|%%ae|delimiter|%%P|delimiter|%%s|delimiter|%%b|end|\" --name-status";
 
-        if (!empty($filter)) {
-            $logCommand .= " " . $filter;
-        }
+        $logCommand .= " " . $options;
         if (!empty($gitrevisions)) {
             $logCommand .= " " . escapeshellarg($gitrevisions);
         }

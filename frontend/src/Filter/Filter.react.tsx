@@ -6,7 +6,7 @@ import parseQuery from '../common/parseQuery';
 import './Filter.less';
 
 interface FilterProps extends React.Props<JSX.Element> {
-  onSubmit: (values: Object) => void;
+  onSubmit: (values: string) => void;
 }
 
 export default class Filter extends React.Component<FilterProps,{}> {
@@ -16,9 +16,7 @@ export default class Filter extends React.Component<FilterProps,{}> {
 
     const query = e.target['s'].value;
 
-    const values = parseQuery(query);
-
-    this.props.onSubmit(values);
+    this.props.onSubmit(query);
   }
 
   render() {
