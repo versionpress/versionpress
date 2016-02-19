@@ -37,9 +37,14 @@ foreach ($dates as $date) {
 
 }
 
-file_put_contents($B, $bFile);
-file_put_contents($A, $aFile);
+file_put_contents($B, preg_replace('/(\r\n|\r|\n)/', "$1#######\n", $bFile));
+file_put_contents($A, preg_replace('/(\r\n|\r|\n)/', "$1#######\n", $aFile));
+file_put_contents($O, preg_replace('/(\r\n|\r|\n)/', "$1#######\n", $oFile));
 
 exec($mergeCommand, $dummy, $mergeExitCode);
+
+file_put_contents($B, str_replace("#######\n", '', file_get_contents($B)));
+file_put_contents($A, str_replace("#######\n", '', file_get_contents($A)));
+file_put_contents($O, str_replace("#######\n", '', file_get_contents($O)));
 
 exit ($mergeExitCode);

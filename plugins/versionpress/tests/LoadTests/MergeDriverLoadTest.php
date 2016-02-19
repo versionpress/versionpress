@@ -89,7 +89,7 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
         MergeDriverTestUtils::commit('Initial commit to Ancestor');
         MergeDriverTestUtils::runProcess(CHECKOUT_BRANCH_CMD);
         for ($i = 0; $i < $limit; $i++) {
-            MergeDriverTestUtils::fillFakeFile(BRANCH_DATE, 'file' . $i . '.ini');
+            MergeDriverTestUtils::fillFakeFile(BRANCH_DATE, 'file' . $i . '.ini', 'Custom branch test');
         }
         MergeDriverTestUtils::commit('Commit to branch');
         MergeDriverTestUtils::runProcess(CHECKOUT_MASTER_CMD);
