@@ -17,6 +17,20 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
 
     private static $initializationDir;
 
+    private static $branchName;
+
+    private static $checkoutBranchCmd;
+
+    private static $checkoutMasterCmd;
+
+    private static $mergeCmd;
+
+    private static $originDate;
+
+    private static $masterDate;
+
+    private static $branchDate;
+
     public static function setUpBeforeClass() {
         self::$initializationDir = '../../src/Initialization';
         self::$repositoryDir = __DIR__ . '/repository';
@@ -24,15 +38,15 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
         define('VERSIONPRESS_PLUGIN_DIR', self::$repositoryDir); // fake
         define('VERSIONPRESS_MIRRORING_DIR', self::$repositoryDir); // fake
         define('VP_PROJECT_ROOT', self::$repositoryDir); // fake
-        define('BRANCH_NAME', 'test-branch');
+        self::$branchName = 'test-branch';
 
-        define('CHECKOUT_BRANCH_CMD', 'git checkout -b ' . BRANCH_NAME);
-        define('CHECKOUT_MASTER_CMD', 'git checkout master');
-        define('MERGE_CMD', 'git merge ' . BRANCH_NAME);
+        self::$checkoutBranchCmd = 'git checkout -b ' . self::$branchName;
+        self::$checkoutMasterCmd = 'git checkout master';
+        self::$mergeCmd = 'git merge ' . self::$branchName;
 
-        define('ORIGIN_DATE', '10-02-16 08:00:00');
-        define('MASTER_DATE', '15-02-16 12:00:11');
-        define('BRANCH_DATE', '17-02-16 19:19:23');
+        self::$originDate = '10-02-16 08:00:00';
+        self::$masterDate = '15-02-16 12:00:11';
+        self::$branchDate = '17-02-16 19:19:23';
 
     }
 
@@ -53,15 +67,15 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
      */
     public function phpDriverLoadTest() {
 
-        MergeDriverTestUtils::installMergeDriver(self::$initializationDir);
+        MergeDriverInstaller::installMergeDriver(self::$initializationDir);
         MergeDriverTestUtils::switchDriverToPhp();
-        $this->runLoadTest();
+        $this->prepareTestData();
         $time_start = microtime(true);
-        $mergeEC = MergeDriverTestUtils::runProcess(MERGE_CMD);
+        $mergeCommandExitCode = MergeDriverTestUtils::runProcess(self::$mergeCmd);
         $time_end = microtime(true);
         $execution_time = ($time_end - $time_start);
-        echo 'Php Execution Time: '.$execution_time.' Sec';
-        $this->assertEquals(0, $mergeEC);
+        echo 'Php Execution Time: ' . $execution_time . " Sec\n";
+        $this->assertEquals(0, $mergeCommandExitCode);
 
     }
 
@@ -70,33 +84,32 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
      */
     public function bashDriverLoadTest() {
 
-        MergeDriverTestUtils::installMergeDriver(self::$initializationDir);
+        MergeDriverInstaller::installMergeDriver(self::$initializationDir);
         MergeDriverTestUtils::switchDriverToBash();
-        $this->runLoadTest();
+        $this->prepareTestData();
         $time_start = microtime(true);
-        $mergeEC = MergeDriverTestUtils::runProcess(MERGE_CMD);
+        $mergeCommandExitCode = MergeDriverTestUtils::runProcess(self::$mergeCmd);
         $time_end = microtime(true);
         $execution_time = ($time_end - $time_start);
-        echo 'Bash Execution Time: '.$execution_time.' Sec';
-        $this->assertEquals(0, $mergeEC);
+        echo 'Bash Execution Time: ' . $execution_time . " Sec\n";
+        $this->assertEquals(0, $mergeCommandExitCode);
     }
 
-    private function runLoadTest() {
+    private function prepareTestData() {
         $limit = 1000;
         for ($i = 0; $i < $limit; $i++) {
-            MergeDriverTestUtils::fillFakeFile(ORIGIN_DATE, 'file' . $i . '.ini');
+            MergeDriverTestUtils::fillFakeFile(self::$originDate, 'file' . $i . '.ini');
         }
         MergeDriverTestUtils::commit('Initial commit to Ancestor');
-        MergeDriverTestUtils::runProcess(CHECKOUT_BRANCH_CMD);
+        MergeDriverTestUtils::runProcess(self::$checkoutBranchCmd);
         for ($i = 0; $i < $limit; $i++) {
-            MergeDriverTestUtils::fillFakeFile(BRANCH_DATE, 'file' . $i . '.ini');
+            MergeDriverTestUtils::fillFakeFile(self::$branchDate, 'file' . $i . '.ini');
         }
         MergeDriverTestUtils::commit('Commit to branch');
-        MergeDriverTestUtils::runProcess(CHECKOUT_MASTER_CMD);
+        MergeDriverTestUtils::runProcess(self::$checkoutMasterCmd);
         for ($i = 0; $i < $limit; $i++) {
-            MergeDriverTestUtils::fillFakeFile(MASTER_DATE, 'file' . $i . '.ini');
+            MergeDriverTestUtils::fillFakeFile(self::$masterDate, 'file' . $i . '.ini');
         }
         MergeDriverTestUtils::commit('Commit to master');
-        echo "Done";
     }
 }

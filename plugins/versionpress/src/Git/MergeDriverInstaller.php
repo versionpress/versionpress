@@ -6,7 +6,7 @@ use VersionPress\Utils\StringUtils;
 
 
 class MergeDriverInstaller {
-    public static function installGitattributes($directory) {
+    private static function installGitattributes($directory) {
 
         $gitattributesPath = VP_PROJECT_ROOT . '/.gitattributes';
         $gitattributes = file_get_contents($directory . '/.gitattributes.tpl');
@@ -27,13 +27,17 @@ class MergeDriverInstaller {
         file_put_contents($gitattributesPath, $gitattributes, $flag);
     }
 
-    public static function installGitMergeDriver($directory) {
+    public static function installMergeDriver($directory) {
+        self::installGitattributes($directory);
+        self::installGitConfig($directory);
+    }
+
+    private static function installGitConfig($directory) {
         $gitconfigFilePath = VP_PROJECT_ROOT . '/.git/config';
         if (strpos(file_get_contents($gitconfigFilePath), '[merge "vp-ini"]') !== false) {
             return;
         }
         $gitconfig = file_get_contents($directory . '/gitconfig.tpl');
-
 
 
         if (DIRECTORY_SEPARATOR == '/') {
@@ -51,6 +55,22 @@ class MergeDriverInstaller {
         $gitconfig = StringUtils::fillTemplateString($gitconfigVariables, $gitconfig);
         file_put_contents($gitconfigFilePath, $gitconfig, FILE_APPEND);
 
+    }
+
+    public static function uninstallMergeDriver() {
+        $gitconfigFilePath = VP_PROJECT_ROOT . '/.git/config';
+        $gitattributesPath = VP_PROJECT_ROOT . '/.gitattributes';
+        if (file_exists($gitattributesPath)) {
+            $gitAttributes = file_get_contents($gitattributesPath);
+            $gitAttributes = preg_replace('/(.*)merge=vp-ini/', '', $gitAttributes);
+            file_put_contents($gitattributesPath, $gitAttributes);
+        }
+
+        $gitConfig = file_get_contents($gitconfigFilePath);
+        //https://regex101.com/r/wG0uT0/1
+        $mergeDriverRegex = "/\\[merge \"vp-ini\"\\]\\n(.*)\\n(.*)\\n(.*)/";
+        $gitConfig = preg_replace($mergeDriverRegex, '', $gitConfig, 1);
+        file_put_contents($gitconfigFilePath, $gitConfig);
     }
 
 

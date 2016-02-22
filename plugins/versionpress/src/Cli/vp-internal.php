@@ -64,8 +64,7 @@ class VPInternalCommand extends WP_CLI_Command {
 
         // Install Custom merge driver
         $initializationDir = VERSIONPRESS_PLUGIN_DIR . '/src/Initialization';
-        MergeDriverInstaller::installGitattributes($initializationDir);
-        MergeDriverInstaller::installGitMergeDriver($initializationDir);
+        MergeDriverInstaller::installMergeDriver($initializationDir);
         WP_CLI::success("Git merge driver added.");
         // Run synchronization
 

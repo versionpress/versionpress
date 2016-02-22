@@ -66,11 +66,6 @@ class MergeDriverTestUtils {
         return $process->getExitCode();
     }
 
-    public static function installMergeDriver($initializationDir) {
-        MergeDriverInstaller::installGitattributes($initializationDir);
-        MergeDriverInstaller::installGitMergeDriver($initializationDir);
-    }
-
     public static function switchDriverToBash() {
         $driverScriptName = 'ini-merge.sh';
         $driverScript = '../../src/Git/MergeDrivers/' . $driverScriptName;
@@ -94,7 +89,7 @@ class MergeDriverTestUtils {
         $mergeDriverScript = '"' . PHP_BINARY . '" "' . $driverScriptFakeDir . '/' . $driverScriptName;
 
         $gitconfig = file_get_contents(self::$repositoryDir . '/.git/config');
-        $gitconfig = preg_replace('/\n?.*driver = .*$/m', "\n" . 'driver = ' . $mergeDriverScript . '" %O %A %B' . "\n", $gitconfig);
+        $gitconfig = preg_replace('/\n?.*driver = .*$/m', "\n" . 'driver = ' . str_replace('\\', '/', $mergeDriverScript) . '" %O %A %B' . "\n", $gitconfig);
         file_put_contents(self::$repositoryDir . '/.git/config', $gitconfig);
 
     }
