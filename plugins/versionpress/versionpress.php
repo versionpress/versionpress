@@ -526,16 +526,12 @@ function vp_register_hooks() {
             $wpdb = $versionPressContainer->resolve(VersionPressServices::WPDB);
             $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
 
-            foreach ($allRulesInInterval as $entityName => $rules) {
+            foreach ($allRulesInInterval as $entityName => $rulesWithInterval) {
                 $storageFactory->getStorage($entityName)->ignoreFrequentlyWrittenEntities = false;
 
                 $table = $dbSchemaInfo->getPrefixedTableName($entityName);
-                foreach ($rules as $rule) {
-                    $restrictionParts = array();
-                    foreach ($rule['rule-parts'] as $field => $value) {
-                        $restrictionParts[] = sprintf('`%s` = "%s"', $field, $wpdb->_escape($value));
-                    }
-                    $restriction = join(' AND ', $restrictionParts);
+                foreach ($rulesWithInterval as $ruleAndInterval) {
+                    $restriction = \VersionPress\Utils\QueryLanguageUtils::createSqlRestrictionFromRule($ruleAndInterval['rule']);
                     $sql = "SELECT * FROM $table WHERE $restriction";
 
                     $results = $wpdb->get_results($sql, ARRAY_A);

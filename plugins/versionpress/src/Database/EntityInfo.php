@@ -3,6 +3,7 @@
 namespace VersionPress\Database;
 use Nette\Utils\Arrays;
 use Nette\Utils\Strings;
+use VersionPress\Utils\QueryLanguageUtils;
 
 /**
  * Info about an entity. Basically represents a section of the NEON schema file -  find
@@ -133,6 +134,8 @@ class EntityInfo {
 
     private $frequentlyWritten = array();
 
+    private $ignoredEntities = array();
+
     /**
      * Does the parsing and sets all properties
      *
@@ -193,7 +196,7 @@ class EntityInfo {
         if (isset($schemaInfo['value-references'])) {
             foreach ($schemaInfo['value-references'] as $key => $references) {
                 list($keyCol, $valueCol) = explode('@', $key);
-                foreach($references as $reference => $targetEntity) {
+                foreach ($references as $reference => $targetEntity) {
                     $key = $keyCol . '=' . $reference . '@' . $valueCol;
                     $this->valueReferences[$key] = $targetEntity;
                 }
@@ -204,6 +207,10 @@ class EntityInfo {
         if (isset($schemaInfo['frequently-written'])) {
             $this->frequentlyWritten = $schemaInfo['frequently-written'];
         }
+
+        if (isset($schemaInfo['ignored-entities'])) {
+            $this->ignoredEntities = $schemaInfo['ignored-entities'];
+        }
     }
 
     public function isVirtualReference($reference) {
@@ -211,67 +218,34 @@ class EntityInfo {
     }
 
     public function isFrequentlyWrittenEntity($entity) {
-        $rules = $this->getRulesForFrequentlyWrittenEntities();
-
-        foreach ($rules as $rule) {
-            foreach ($rule['rule-parts'] as $field => $value) { // check all parts of rule
-                if (!isset($entity[$field]) || $entity[$field] != $value) {
-                    continue;
-                }
-                return true;
-            }
-        }
-        return false;
+        $rulesAndIntervals = $this->getRulesAndIntervalsForFrequentlyWrittenEntities();
+        $rules = array_column($rulesAndIntervals, 'rule');
+        return QueryLanguageUtils::entityMatchesSomeRule($entity, $rules);
     }
 
-    public function getRulesForFrequentlyWrittenEntities() {
-        // https://regex101.com/r/wT6zG3/4 (query language)
-        $re = "/(-)?(?:(\\S+):\\s*)?(?:'((?:[^'\\\\]|\\\\.)*)'|\"((?:[^\"\\\\]|\\\\.)*)\"|(\\S+))/";
-        $rules = array();
+    public function isIgnoredEntity($entity) {
+        $rules = $this->getRulesForIgnoredEntities();
+        return QueryLanguageUtils::entityMatchesSomeRule($entity, $rules);
+    }
 
-        foreach ($this->frequentlyWritten as $rule) {
-            if (is_string($rule)) {
-                $query = $rule;
-                $interval = self::FREQUENTLY_WRITTEN_DEFAULT_INTERVAL;
-            } else {
-                $query = $rule['query'];
-                $interval = isset($rule['interval']) ? $rule['interval'] : self::FREQUENTLY_WRITTEN_DEFAULT_INTERVAL;
-            }
+    public function getRulesAndIntervalsForFrequentlyWrittenEntities() {
+        $queries = array_map(function ($banan) {
+            return is_string($banan) ? $banan : $banan['query'];
+        }, $this->frequentlyWritten);
 
-            preg_match_all($re, $query, $matches);
-            $isValidRule = count($matches[0]) > 0;
-            if (!$isValidRule) {
-                continue;
-            }
+        $rules = QueryLanguageUtils::createRulesFromQueries($queries);
 
-            $keys = $matches[2];
-
-            /* value can be in 3rd, 4th or 5th group
-             *
-             * 3rd group => value is in single quotes
-             * 4th group => value is in double quotes
-             * 5th group => value is without quotes
-             *
-             */
-            $possibleValues[] = $matches[3];
-            $possibleValues[] = $matches[4];
-            $possibleValues[] = $matches[5];
-
-            // we need to join all groups together
-            $ruleParts = array();
-            foreach ($possibleValues as $possibleValue) {
-                foreach ($possibleValue as $index => $value) {
-                    if ($value !== '') {
-                        $ruleParts[$index] = $value;
-                    }
-                }
-            }
-
-            ksort($ruleParts);
-            $rules[] = array('rule-parts' => array_combine($keys, $ruleParts), 'interval' => $interval);
-
+        $rulesAndIntervals = array();
+        foreach ($rules as $key => $rule) {
+            $interval = isset($this->frequentlyWritten[$key]['interval']) ? $this->frequentlyWritten[$key]['interval'] : self::FREQUENTLY_WRITTEN_DEFAULT_INTERVAL;
+            $rulesAndIntervals[] = array('rule' => $rule, 'interval' => $interval);
         }
 
-        return $rules;
+
+        return $rulesAndIntervals;
+    }
+
+    public function getRulesForIgnoredEntities() {
+        return QueryLanguageUtils::createRulesFromQueries($this->ignoredEntities);
     }
 }

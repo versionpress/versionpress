@@ -18,28 +18,6 @@ class UserMetaStorage extends MetaEntityStorage {
         $this->dbPrefix = $dbPrefix;
     }
 
-    public function shouldBeSaved($data) {
-        if ($this->keyEquals($data, 'session_tokens') ||
-            $this->keyEquals($data, 'nav_menu_recently_edited') ||
-            $this->keyEquals($data, 'wporg_favorites')) {
-            return false;
-        }
-
-        if ($this->keyEndsWith($data, 'dashboard_quick_press_last_post_id')) {
-            return false;
-        }
-
-        return parent::shouldBeSaved($data);
-    }
-
-    private function keyEquals($data, $key) {
-        return (isset($data['meta_key']) && $data['meta_key'] === $key);
-    }
-
-    private function keyEndsWith($data, $suffix) {
-        return (isset($data['meta_key']) && Strings::endsWith($data['meta_key'], $suffix));
-    }
-
     protected function createJoinedKey($key, $vpId) {
         $key = $this->maybeReplacePrefixWithPlaceholder($key);
         return parent::createJoinedKey($key, $vpId);

@@ -10,23 +10,6 @@ class OptionStorage extends DirectoryStorage {
 
     const PREFIX_PLACEHOLDER = "<<table-prefix>>";
 
-    public static $optionsBlacklist = array(
-        'cron',          // Cron, siteurl and home are specific for environment, so they're not saved, too.
-        'home',
-        'siteurl',
-        'db_upgraded',
-        'rewrite_rules',
-        'recently_edited',
-        'auto_updater.lock',
-        'can_compress_scripts',
-        'auto_core_update_notified',
-        'auth_key',
-        'auth_salt',
-        'logged_in_key',
-        'logged_in_salt',
-
-    );
-
     /** @var string */
     private $tablePrefix;
     /** @var string[] */
@@ -63,11 +46,7 @@ class OptionStorage extends DirectoryStorage {
 
     public function shouldBeSaved($data) {
         $id = $data[$this->entityInfo->idColumnName];
-        return parent::shouldBeSaved($data) && !($this->isTransientOption($id) || $this->isTaxonomyChildren($id) || in_array($id, self::$optionsBlacklist));
-    }
-
-    private function isTransientOption($id) {
-        return substr($id, 0, 1) === '_'; // All transient options begin with underscore - there's no need to save them
+        return parent::shouldBeSaved($data) && !($this->isTaxonomyChildren($id));
     }
 
     private function isTaxonomyChildren($id) {

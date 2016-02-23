@@ -15,12 +15,12 @@ class TestConfigTest extends PHPUnit_Framework_TestCase {
         $config = new TestConfig(__DIR__ . "/../test-config.sample.neon");
 
         // 'selenium' section
-        $this->assertEquals("C:/Path/To/FirefoxPortable/App/Firefox/firefox.exe", $config->seleniumConfig->firefoxBinary);
+        $this->assertEquals("/Users/johndoe/Path/To/Firefox.app/Contents/MacOS/firefox", $config->seleniumConfig->firefoxBinary);
         $this->assertEquals(500, $config->seleniumConfig->postCommitWaitTime);
 
         // 'sites' section
-        $this->assertEquals(4, count($config->sites));
-        $this->assertEquals("VP Test @ WampServer", $config->sites["vp01"]->title);
+        $this->assertArrayHasKey('vp01', $config->sites);
+        $this->assertEquals("VP Test @ localhost", $config->sites["vp01"]->title);
         $this->assertFalse($config->sites["vp01"]->isVagrant);
 
         // 'vp-config' section

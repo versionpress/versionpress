@@ -125,6 +125,29 @@ class OptionStorageTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @test
+     * @dataProvider ignoredOptionNamesProvider
+     */
+    public function ignoredOptionAreNotSaved($optionName) {
+        $option = array(
+            'option_name' => $optionName,
+            'option_value' => 'foo',
+            'autoload' => 'yes',
+        );
+
+        $this->assertFalse($this->storage->shouldBeSaved($option));
+    }
+
+    /**
+     * See $entityInfo in $this->setUp for rules for ignored options
+     */
+    public function ignoredOptionNamesProvider() {
+        return array(
+            array('ignored_option'),
+        );
+    }
+
+    /**
      * Test covers part of for WP-428
      *
      * @test
@@ -156,6 +179,9 @@ class OptionStorageTest extends \PHPUnit_Framework_TestCase {
             'option' => array(
                 'table' => 'options',
                 'vpid' => 'option_name',
+                'ignored-entities' => array(
+                    'option_name: ignored_option',
+                ),
             )
         ));
 
