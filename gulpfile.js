@@ -27,17 +27,6 @@ var runSequence = require('run-sequence');
 var packageVersion = "";
 
 /**
- * Type of build. Possible values:
- *
- *  - '' (default - means production)
- *  - 'nightly' - set by the `nightly` task
- *  - 'test-deploy' - set by the `test-deploy` task
- *
- * @type {string}
- */
-var buildType = ''; // empty (default, means production),
-
-/**
  * Directory where the VP files are copied to and some actions
  * like `composer install` etc. are run on them.
  *
@@ -85,10 +74,6 @@ var adminGuiDir = vpDir + '/admin/public/gui';
  */
 var srcDef = [];
 
-
-gulp.task('set-nightly-build', false, function () {
-    buildType = 'nightly';
-});
 
 /**
  * Sets `buildDir` and `buildType` so that the copy methods copies to the WP test site.
@@ -313,12 +298,6 @@ gulp.task('build', 'Task that exports production build', ['clean-build'], functi
     console.log(" ");
 });
 
-/**
- * Exports "nightly" build which contains the same files as production (`build`) build
- * but the version number in both plugin metadata and file name contains short Git hash,
- * e.g., "versionpress-1.0+58a96f2.zip" or "Version: 1.0+58a96f2".
- */
-gulp.task('nightly-build', 'Nightly build from current Git revision. Short hash is added to ZIP name.', ['set-nightly-build', 'clean-build']);
 
 /**
  * Task called from WpAutomation to copy the plugin files to the test directory
