@@ -1,5 +1,5 @@
 /**
- * VersionPress build script. See the end of the file for main callable tasks.
+ * VersionPress build script. Run `gulp` or `gulp help` to see the main tasks.
  */
 
 var gulp = require('gulp-help')(require('gulp'));
@@ -196,27 +196,46 @@ gulp.task('disable-debugger', false, ['copy'], function (cb) {
 });
 
 /**
- * Fills VersionPress version
+ * Fills the packageVersion variable
  */
+gulp.task('fill-vp-version', false, function(cb) {
 
-gulp.task('fill-vp-version', false, function(cb){
-    var fileOptions = {encoding: 'UTF-8'};
-    fs.readFile(vpDir + '/versionpress.php', fileOptions, function (err, content) {
-        var versionMatch = content.match(/^Version: (.*)$/m);
-        packageVersion = versionMatch[1];
-        if (buildType == 'nightly') {
-            var gitCommit = exec('git rev-parse --short HEAD', {silent: true}).output.trim(); // trims the "\n" from the end
-            packageVersion += '+' + gitCommit;
+    // E.g., 2.1.1-50-g5cab646. See https://git-scm.com/docs/git-describe#_examples
+    packageVersion = exec('git describe --tags', {silent: true}).output.trim();
+    cb();
+
+});
+
+
+/**
+ * Updated versionpress.php to contain the current package version
+ */
+gulp.task('update-plugin-version', false, ['fill-vp-version', 'copy'], function(cb) {
+
+    var pluginFile = buildDir + '/versionpress.php';
+    fs.readFile(pluginFile, {encoding: 'UTF-8'}, function (err, content) {
+
+        if (err) {
+            return console.log(err);
         }
-        cb();
-    })
 
-})
+        var result = content.replace(/^Version: (.*)$/m, 'Version: ' + packageVersion);
+        fs.writeFile(pluginFile, result, 'utf8', function(err) {
+            if (err) {
+                return console.log(err);
+            }
+            cb();
+        });
+
+    });
+
+});
+
 
 /**
  * Builds the final ZIP in the `distDir` folder.
  */
-gulp.task('zip', false, ['copy', 'disable-debugger', 'remove-composer-files', 'fill-vp-version'], function (cb) {
+gulp.task('zip', false, ['copy', 'disable-debugger', 'remove-composer-files', 'fill-vp-version', 'update-plugin-version'], function (cb) {
     return gulp.src(buildDir + '/**', {dot: true}).
         pipe(rename(function (path) {
             path.dirname = 'versionpress/' + path.dirname;
