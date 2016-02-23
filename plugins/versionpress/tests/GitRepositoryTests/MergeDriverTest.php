@@ -109,9 +109,8 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEquals(1, MergeDriverTestUtils::runProcess(self::$mergeCmd));
 
-        copy(self::$repositoryDir . '/file.ini', '/Users/Ivan/expected-merge-conflict.ini');
-        $expected = file_get_contents(__DIR__ . '/expected-merge-conflict.ini');
-        $file = file_get_contents(self::$repositoryDir . '/file.ini');
+        $expected = StringUtils::crlfize(file_get_contents(__DIR__ . '/expected-merge-conflict.ini'));
+        $file = StringUtils::crlfize(file_get_contents(self::$repositoryDir . '/file.ini'));
         $this->assertEquals($expected, $file, 'Merge returned unexpected exit code.');
 
     }
@@ -141,9 +140,8 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEquals(1, MergeDriverTestUtils::runProcess(self::$mergeCmd));
 
-        copy(self::$repositoryDir . '/file.ini', '/Users/Ivan/expected-merge-conflict.ini');
-        $expected = file_get_contents(__DIR__ . '/expected-merge-conflict.ini');
-        $file = file_get_contents(self::$repositoryDir . '/file.ini');
+        $expected = StringUtils::crlfize(file_get_contents(__DIR__ . '/expected-merge-conflict.ini'));
+        $file = StringUtils::crlfize(file_get_contents(self::$repositoryDir . '/file.ini'));
         $this->assertEquals($expected, $file, 'Merge returned unexpected exit code.');
 
     }
