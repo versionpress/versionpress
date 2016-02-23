@@ -43,6 +43,20 @@ class ShortcodesReplacer {
         return $entity;
     }
 
+    public function restoreShortcodesInEntity($entityName, $entity) {
+        if (!$this->entityCanContainShortcodes($entityName)) {
+            return $entity;
+        }
+
+        foreach ($entity as $field => $value) {
+            if ($this->fieldCanContainShortcodes($entityName, $field)) {
+                $entity[$field] = $this->restoreShortcodes($value);
+            }
+        }
+
+        return $entity;
+    }
+
     public function entityCanContainShortcodes($entityName) {
         $shortcodeLocations = $this->shortcodesInfo->getShortcodeLocations();
         return isset($shortcodeLocations[$entityName]);

@@ -37,9 +37,9 @@ class CommentsSynchronizerTest extends SynchronizerTestCase {
         $this->storage = self::$storageFactory->getStorage('comment');
         $this->postStorage = self::$storageFactory->getStorage('post');
         $this->userStorage = self::$storageFactory->getStorage('user');
-        $this->synchronizer = new CommentsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
-        $this->postsSynchronizer = new PostsSynchronizer($this->postStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
-        $this->usersSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->synchronizer = new CommentsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->postsSynchronizer = new PostsSynchronizer($this->postStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->usersSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
     }
 
     /**
