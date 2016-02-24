@@ -90,7 +90,7 @@ class CloneTest extends PHPUnit_Framework_TestCase {
             array('require' => $internalCommandPath, 'id' => $postId, 'name' => 'posts')
         );
 
-        $wpAutomation->runWpCliCommand('vp', 'clone', array('name' => self::$cloneSiteConfig->name, 'dbprefix' => $cloneSiteConfig->dbTablePrefix, 'yes' => null));
+        $wpAutomation->runWpCliCommand('vp', 'clone', array('name' => self::$cloneSiteConfig->name, 'yes' => null));
 
         $wpAutomation->editPost($postId, array('post_title' => 'Some new title'));
 
