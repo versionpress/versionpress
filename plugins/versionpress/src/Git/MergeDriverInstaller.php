@@ -42,11 +42,11 @@ class MergeDriverInstaller {
 
         if (DIRECTORY_SEPARATOR == '/') {
             $mergeDriverFile = 'ini-merge.sh';
-            $mergeDriverScript = VERSIONPRESS_PLUGIN_DIR . '/src/Git/MergeDrivers/' . $mergeDriverFile;
+            $mergeDriverScript = VERSIONPRESS_PLUGIN_DIR . '/src/Git/merge-drivers/' . $mergeDriverFile;
             chmod(str_replace('\\', '/', $mergeDriverScript), 0774);
         } else {
             $mergeDriverFile = 'ini-merge.php';
-            $mergeDriverScript = '"' . PHP_BINARY . '" "' . VERSIONPRESS_PLUGIN_DIR . '/src/Git/MergeDrivers/' . $mergeDriverFile . '"';
+            $mergeDriverScript = '"' . PHP_BINARY . '" "' . VERSIONPRESS_PLUGIN_DIR . '/src/Git/merge-drivers/' . $mergeDriverFile . '"';
         }
         $gitconfigVariables = array(
             'merge-driver-script' => str_replace('\\', '/', $mergeDriverScript)

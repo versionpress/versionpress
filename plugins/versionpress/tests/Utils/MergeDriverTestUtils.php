@@ -21,8 +21,8 @@ class MergeDriverTestUtils {
     public static function initRepository($repositoryDir) {
         self::$repositoryDir = $repositoryDir;
         $driverScriptName = 'ini-merge.php';
-        $driverScript = '../../src/Git/MergeDrivers/' . $driverScriptName;
-        $driverScriptFakeDir = self::$repositoryDir . '/src/Git/MergeDrivers';
+        $driverScript = '../../src/Git/merge-drivers/' . $driverScriptName;
+        $driverScriptFakeDir = self::$repositoryDir . '/src/Git/merge-drivers';
         FileSystem::remove(self::$repositoryDir);
         mkdir(self::$repositoryDir);
         FileSystem::mkdir($driverScriptFakeDir);
@@ -30,7 +30,7 @@ class MergeDriverTestUtils {
         self::$gitRepository->init();
         copy($driverScript, $driverScriptFakeDir . '/' . $driverScriptName);
         $driverScriptName = 'ini-merge.sh';
-        $driverScript = '../../src/Git/MergeDrivers/' . $driverScriptName;
+        $driverScript = '../../src/Git/merge-drivers/' . $driverScriptName;
         copy($driverScript, $driverScriptFakeDir . '/' . $driverScriptName);
 
     }
@@ -68,8 +68,8 @@ class MergeDriverTestUtils {
 
     public static function switchDriverToBash() {
         $driverScriptName = 'ini-merge.sh';
-        $driverScript = '../../src/Git/MergeDrivers/' . $driverScriptName;
-        $driverScriptFakeDir = self::$repositoryDir . '/src/Git/MergeDrivers';
+        $driverScript = '../../src/Git/merge-drivers/' . $driverScriptName;
+        $driverScriptFakeDir = self::$repositoryDir . '/src/Git/merge-drivers';
         copy($driverScript, $driverScriptFakeDir . '/' . $driverScriptName);
         chmod($driverScriptFakeDir . '/' . $driverScriptName, 0774);
 
@@ -81,8 +81,8 @@ class MergeDriverTestUtils {
 
     public static function switchDriverToPhp() {
         $driverScriptName = 'ini-merge.php';
-        $driverScript = '../../src/Git/MergeDrivers/' . $driverScriptName;
-        $driverScriptFakeDir = self::$repositoryDir . '/src/Git/MergeDrivers';
+        $driverScript = '../../src/Git/merge-drivers/' . $driverScriptName;
+        $driverScriptFakeDir = self::$repositoryDir . '/src/Git/merge-drivers';
         copy($driverScript, $driverScriptFakeDir . '/' . $driverScriptName);
         chmod($driverScriptFakeDir . '/' . $driverScriptName, 0774);
 
