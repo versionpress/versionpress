@@ -3,6 +3,8 @@
 namespace VersionPress\Tests\Workflow;
 
 use PHPUnit_Framework_TestCase;
+use VersionPress\Cli\VPCommandUtils;
+use VersionPress\Database\VpidRepository;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\SiteConfig;
 use VersionPress\Tests\Utils\TestConfig;
@@ -25,6 +27,7 @@ class CloneTest extends PHPUnit_Framework_TestCase {
 
         self::$cloneSiteName = self::$siteConfig->name . 'clone';
         self::$cloneSiteConfig = self::changeSite(self::$siteConfig, self::$cloneSiteName);
+
 
     }
 
@@ -61,6 +64,49 @@ class CloneTest extends PHPUnit_Framework_TestCase {
         $wpAutomation->runWpCliCommand('vp', 'push', array('to' => self::$cloneSiteName));
 
         $this->assertCloneLooksExactlySameAsOriginal();
+    }
+
+    /**
+     * @test
+     */
+    public function updatedArticleCanBeMergedFromClone() {
+        $cloneSiteConfig = self::$cloneSiteConfig;
+
+        $wpAutomation = new WpAutomation(self::$siteConfig, self::$testConfig->wpCliVersion);
+
+        $this->prepareSite($wpAutomation);
+        $post = array(
+            "post_type" => "page",
+            "post_status" => "publish",
+            "post_title" => "Test page for menu",
+            "post_date" => "2011-11-11 11:11:11",
+            "post_content" => "Test page",
+            "post_author" => 1
+        );
+        $postId = $wpAutomation->createPost($post);
+        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'get-entity-vpid', array('require' => $this->getVPInternalCommandPath(), 'id' => $postId, 'name' => 'posts'), self::$testConfig->testSite->path);
+        $postVpId = $process->getConsoleOutput();
+        $wpAutomation->runWpCliCommand('vp', 'clone', array('name' => 'vp01clone', 'dbprefix' => $cloneSiteConfig->dbTablePrefix, 'yes' => null));
+        $wpAutomation->editPost($postId, array('post_title' => 'Some new title'));
+
+        $cloneWpAutomation = new WpAutomation(self::$cloneSiteConfig, self::$testConfig->wpCliVersion);
+        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'get-entity-id', array('require' => $this->getVPInternalCommandPath(), 'vpid' => $postVpId), self::$cloneSiteConfig->path);
+        $clonedPostId = $process->getConsoleOutput();
+        $cloneWpAutomation->editPost($clonedPostId, array('post_content' => 'Some new content'));
+
+        $wpAutomation->runWpCliCommand('vp', 'pull', array('from' => self::$cloneSiteName));
+
+        $process = VPCommandUtils::runWpCliCommand('post get', $postId, array('field' => 'post_modified') , self::$testConfig->testSite->path);
+        $modifiedDate = $process->getConsoleOutput();
+
+        $process = VPCommandUtils::runWpCliCommand('post get', $clonedPostId, array('field' => 'post_modified') , self::$cloneSiteConfig->path);
+        $clonedModifiedDate = $process->getConsoleOutput();
+
+        $this->assertEquals($clonedModifiedDate,$modifiedDate);
+    }
+
+    private function getVPInternalCommandPath() {
+        return __DIR__ . '/../../src/Cli/vp-internal.php';
     }
 
     /**
@@ -102,14 +148,8 @@ class CloneTest extends PHPUnit_Framework_TestCase {
     private function prepareSiteWithClone() {
         $siteConfig = self::$siteConfig;
         $cloneSiteConfig = self::$cloneSiteConfig;
-
         $wpAutomation = new WpAutomation($siteConfig, self::$testConfig->wpCliVersion);
-        $wpAutomation->setUpSite();
-        $wpAutomation->copyVersionPressFiles();
-        $wpAutomation->disableDebugger();
-
-        $wpAutomation->activateVersionPress();
-        $wpAutomation->initializeVersionPress();
+        $this->prepareSite($wpAutomation);
         $wpAutomation->runWpCliCommand('vp', 'clone', array('name' => 'vp01clone', 'dbprefix' => $cloneSiteConfig->dbTablePrefix, 'yes' => null));
 
         // todo: remove this SQL in #588
@@ -134,5 +174,17 @@ UPDATE {$cloneSiteConfig->dbTablePrefix}posts c_posts
         $cloneContent = str_replace("\r\n", "\n", str_replace(self::$cloneSiteName, self::$siteConfig->name, $this->getTextContentAtUrl(self::$cloneSiteConfig->url)));
 
         $this->assertEquals($origContent, $cloneContent);
+    }
+
+    /**
+     * @param WpAutomation $wpAutomation
+     */
+    private function prepareSite($wpAutomation) {
+        $wpAutomation->setUpSite();
+        $wpAutomation->copyVersionPressFiles();
+        $wpAutomation->disableDebugger();
+
+        $wpAutomation->activateVersionPress();
+        $wpAutomation->initializeVersionPress();
     }
 }
