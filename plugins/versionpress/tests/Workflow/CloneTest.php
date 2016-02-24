@@ -96,13 +96,13 @@ class CloneTest extends PHPUnit_Framework_TestCase {
 
         $wpAutomation->runWpCliCommand('vp', 'pull', array('from' => self::$cloneSiteName));
 
-        $process = VPCommandUtils::runWpCliCommand('post get', $postId, array('field' => 'post_modified') , self::$testConfig->testSite->path);
+        $process = VPCommandUtils::runWpCliCommand('post get', $postId, array('field' => 'post_modified'), self::$testConfig->testSite->path);
         $modifiedDate = $process->getConsoleOutput();
 
-        $process = VPCommandUtils::runWpCliCommand('post get', $clonedPostId, array('field' => 'post_modified') , self::$cloneSiteConfig->path);
+        $process = VPCommandUtils::runWpCliCommand('post get', $clonedPostId, array('field' => 'post_modified'), self::$cloneSiteConfig->path);
         $clonedModifiedDate = $process->getConsoleOutput();
 
-        $this->assertEquals($clonedModifiedDate,$modifiedDate);
+        $this->assertEquals($clonedModifiedDate, $modifiedDate);
     }
 
     private function getVPInternalCommandPath() {
@@ -151,15 +151,6 @@ class CloneTest extends PHPUnit_Framework_TestCase {
         $wpAutomation = new WpAutomation($siteConfig, self::$testConfig->wpCliVersion);
         $this->prepareSite($wpAutomation);
         $wpAutomation->runWpCliCommand('vp', 'clone', array('name' => 'vp01clone', 'dbprefix' => $cloneSiteConfig->dbTablePrefix, 'yes' => null));
-
-        // todo: remove this SQL in #588
-        $db = new \mysqli($siteConfig->dbHost, $siteConfig->dbUser, $siteConfig->dbPassword, $siteConfig->dbName);
-        $db->query("
-UPDATE {$cloneSiteConfig->dbTablePrefix}posts c_posts
-  JOIN {$cloneSiteConfig->dbTablePrefix}vp_id c_vp_id ON c_posts.ID = c_vp_id.id AND c_vp_id.`table` = 'posts'
-  JOIN {$siteConfig->dbTablePrefix}vp_id o_vp_id ON o_vp_id.vp_id = c_vp_id.vp_id
-  JOIN {$siteConfig->dbTablePrefix}posts o_posts ON o_posts.ID = o_vp_id.id
-  SET c_posts.post_modified = o_posts.post_modified, c_posts.post_modified_gmt = o_posts.post_modified_gmt;");
     }
 
     private function getTextContentAtUrl($url) {
