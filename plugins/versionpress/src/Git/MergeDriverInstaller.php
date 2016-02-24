@@ -67,8 +67,8 @@ class MergeDriverInstaller {
         }
 
         $gitConfig = file_get_contents($gitconfigFilePath);
-        //https://regex101.com/r/wG0uT0/1
-        $mergeDriverRegex = "/\\[merge \"vp-ini\"\\]\\n(.*)\\n(.*)\\n(.*)/";
+        //https://regex101.com/r/eJ4rJ5/3
+        $mergeDriverRegex = "/(\\[merge \\\"vp\\-ini\\\"\\]\\n)([^\\[]*)/";
         $gitConfig = preg_replace($mergeDriverRegex, '', $gitConfig, 1);
         file_put_contents($gitconfigFilePath, $gitConfig);
     }

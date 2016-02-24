@@ -7,7 +7,7 @@ use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\SiteConfig;
 use VersionPress\Tests\Utils\TestConfig;
 
-class CloneTest extends PHPUnit_Framework_TestCase {
+class CloneMergeTest extends PHPUnit_Framework_TestCase {
 
     /** @var TestConfig */
     private static $testConfig;
