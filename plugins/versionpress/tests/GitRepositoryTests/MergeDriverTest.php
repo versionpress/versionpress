@@ -13,24 +13,9 @@ use VersionPress\Utils\StringUtils;
 
 class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
-
     private static $repositoryDir;
 
     private static $initializationDir;
-
-    private static $branchName;
-
-    private static $checkoutBranchCmd;
-
-    private static $checkoutMasterCmd;
-
-    private static $mergeCmd;
-
-    private static $originDate;
-
-    private static $masterDate;
-
-    private static $branchDate;
 
     public static function setUpBeforeClass() {
         self::$initializationDir = '../../src/Initialization';
@@ -39,15 +24,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
         define('VERSIONPRESS_PLUGIN_DIR', self::$repositoryDir); // fake
         define('VERSIONPRESS_MIRRORING_DIR', self::$repositoryDir); // fake
         define('VP_PROJECT_ROOT', self::$repositoryDir); // fake
-        self::$branchName = 'test-branch';
-
-        self::$checkoutBranchCmd = 'git checkout -b ' . self::$branchName;
-        self::$checkoutMasterCmd = 'git checkout master';
-        self::$mergeCmd = 'git merge ' . self::$branchName;
-
-        self::$originDate = '10-02-16 08:00:00';
-        self::$masterDate = '15-02-16 12:00:11';
-        self::$branchDate = '17-02-16 19:19:23';
+  
 
     }
 
@@ -67,7 +44,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function isMergeDriverInstalledTest() {
+    public function mergeDriverInstalledCorrectly() {
         MergeDriverInstaller::installMergeDriver(self::$initializationDir);
         $this->assertContains('vp-ini', file_get_contents(self::$repositoryDir . "/.git/config"));
         $this->assertContains('merge=vp-ini', file_get_contents(self::$repositoryDir . "/.gitattributes"));
@@ -76,7 +53,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function uninstallMergeDriverTest() {
+    public function mergeDriverUninstalledCorrectly() {
         MergeDriverInstaller::installMergeDriver(self::$initializationDir);
         MergeDriverInstaller::uninstallMergeDriver();
         $this->assertNotContains('vp-ini', file_get_contents(self::$repositoryDir . "/.git/config"));
@@ -86,28 +63,28 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function isBashMergedWithoutConflictTest() {
+    public function mergedWithoutConflictUsingBash() {
 
         MergeDriverInstaller::installMergeDriver(self::$initializationDir);
         MergeDriverTestUtils::switchDriverToBash();
 
         $this->prepareNonConflictingData();
 
-        $this->assertEquals(0, MergeDriverTestUtils::runProcess(self::$mergeCmd), 'Merge returned unexpected exit code.');
+        $this->assertEquals(0, MergeDriverTestUtils::runProcess('git merge test-branch'), 'Merge returned unexpected exit code.');
 
     }
 
     /**
      * @test
      */
-    public function isBashMergedWithoutConflictInDateTest() {
+    public function mergedWithoutConflictInDateUsingBash() {
 
         MergeDriverInstaller::installMergeDriver(self::$initializationDir);
         MergeDriverTestUtils::switchDriverToBash();
 
         $this->prepareConflictingData();
 
-        $this->assertEquals(1, MergeDriverTestUtils::runProcess(self::$mergeCmd));
+        $this->assertEquals(1, MergeDriverTestUtils::runProcess('git merge test-branch'));
 
         $expected = StringUtils::crlfize(file_get_contents(__DIR__ . '/expected-merge-conflict.ini'));
         $file = StringUtils::crlfize(file_get_contents(self::$repositoryDir . '/file.ini'));
@@ -118,27 +95,27 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function isPhpMergedWithoutConflictTest() {
+    public function mergedWithoutConflictUsingPhp() {
         MergeDriverInstaller::installMergeDriver(self::$initializationDir);
         MergeDriverTestUtils::switchDriverToPhp();
 
         $this->prepareNonConflictingData();
 
-        $this->assertEquals(0, MergeDriverTestUtils::runProcess(self::$mergeCmd), 'Merge returned unexpected exit code.');
+        $this->assertEquals(0, MergeDriverTestUtils::runProcess('git merge test-branch'), 'Merge returned unexpected exit code.');
 
     }
 
     /**
      * @test
      */
-    public function isPhpMergedWithoutConflictInDateTest() {
+    public function mergedWithoutConflictInDateUsingPhp() {
 
         MergeDriverInstaller::installMergeDriver(self::$initializationDir);
         MergeDriverTestUtils::switchDriverToPhp();
 
         $this->prepareConflictingData();
 
-        $this->assertEquals(1, MergeDriverTestUtils::runProcess(self::$mergeCmd));
+        $this->assertEquals(1, MergeDriverTestUtils::runProcess('git merge test-branch'));
 
         $expected = StringUtils::crlfize(file_get_contents(__DIR__ . '/expected-merge-conflict.ini'));
         $file = StringUtils::crlfize(file_get_contents(self::$repositoryDir . '/file.ini'));
@@ -155,17 +132,21 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     }
 
     private function prepareTestData($customMessage = null) {
-        MergeDriverTestUtils::fillFakeFileAndCommit(self::$originDate, 'file.ini', 'Initial commit to Ancestor');
+        $originDate = '10-02-16 08:00:00';
+        $masterDate = '15-02-16 12:00:11';
+        $branchDate = '17-02-16 19:19:23';
 
-        MergeDriverTestUtils::runProcess(self::$checkoutBranchCmd);
+        MergeDriverTestUtils::fillFakeFileAndCommit($originDate, 'file.ini', 'Initial commit to Ancestor');
+
+        MergeDriverTestUtils::runProcess('git checkout -b test-branch');
         if ($customMessage == null) {
-            MergeDriverTestUtils::fillFakeFileAndCommit(self::$branchDate, 'file.ini', 'Commit to branch');
+            MergeDriverTestUtils::fillFakeFileAndCommit($branchDate, 'file.ini', 'Commit to branch');
         } else {
-            MergeDriverTestUtils::fillFakeFileAndCommit(self::$branchDate, 'file.ini', 'Commit to branch', $customMessage);
+            MergeDriverTestUtils::fillFakeFileAndCommit($branchDate, 'file.ini', 'Commit to branch', $customMessage);
         }
 
-        MergeDriverTestUtils::runProcess(self::$checkoutMasterCmd);
-        MergeDriverTestUtils::fillFakeFileAndCommit(self::$masterDate, 'file.ini', 'Commit to master');
+        MergeDriverTestUtils::runProcess('git checkout master');
+        MergeDriverTestUtils::fillFakeFileAndCommit($masterDate, 'file.ini', 'Commit to master');
     }
 
 

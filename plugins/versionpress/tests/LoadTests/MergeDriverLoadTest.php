@@ -17,19 +17,7 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
 
     private static $initializationDir;
 
-    private static $branchName;
 
-    private static $checkoutBranchCmd;
-
-    private static $checkoutMasterCmd;
-
-    private static $mergeCmd;
-
-    private static $originDate;
-
-    private static $masterDate;
-
-    private static $branchDate;
 
     public static function setUpBeforeClass() {
         self::$initializationDir = '../../src/Initialization';
@@ -38,15 +26,7 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
         define('VERSIONPRESS_PLUGIN_DIR', self::$repositoryDir); // fake
         define('VERSIONPRESS_MIRRORING_DIR', self::$repositoryDir); // fake
         define('VP_PROJECT_ROOT', self::$repositoryDir); // fake
-        self::$branchName = 'test-branch';
 
-        self::$checkoutBranchCmd = 'git checkout -b ' . self::$branchName;
-        self::$checkoutMasterCmd = 'git checkout master';
-        self::$mergeCmd = 'git merge ' . self::$branchName;
-
-        self::$originDate = '10-02-16 08:00:00';
-        self::$masterDate = '15-02-16 12:00:11';
-        self::$branchDate = '17-02-16 19:19:23';
 
     }
 
@@ -65,13 +45,13 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function phpDriverLoadTest() {
+    public function phpDriverLoadTested() {
 
         MergeDriverInstaller::installMergeDriver(self::$initializationDir);
         MergeDriverTestUtils::switchDriverToPhp();
         $this->prepareTestData();
         $time_start = microtime(true);
-        $mergeCommandExitCode = MergeDriverTestUtils::runProcess(self::$mergeCmd);
+        $mergeCommandExitCode = MergeDriverTestUtils::runProcess('git merge test-branch');
         $time_end = microtime(true);
         $execution_time = ($time_end - $time_start);
         echo 'Php Execution Time: ' . $execution_time . " Sec\n";
@@ -82,13 +62,13 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function bashDriverLoadTest() {
+    public function bashDriverLoadTested() {
 
         MergeDriverInstaller::installMergeDriver(self::$initializationDir);
         MergeDriverTestUtils::switchDriverToBash();
         $this->prepareTestData();
         $time_start = microtime(true);
-        $mergeCommandExitCode = MergeDriverTestUtils::runProcess(self::$mergeCmd);
+        $mergeCommandExitCode = MergeDriverTestUtils::runProcess('git merge test-branch');
         $time_end = microtime(true);
         $execution_time = ($time_end - $time_start);
         echo 'Bash Execution Time: ' . $execution_time . " Sec\n";
@@ -97,18 +77,22 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
 
     private function prepareTestData() {
         $limit = 1000;
+        $originDate = '10-02-16 08:00:00';
+        $masterDate = '15-02-16 12:00:11';
+        $branchDate = '17-02-16 19:19:23';
+
         for ($i = 0; $i < $limit; $i++) {
-            MergeDriverTestUtils::fillFakeFile(self::$originDate, 'file' . $i . '.ini');
+            MergeDriverTestUtils::fillFakeFile($originDate, 'file' . $i . '.ini');
         }
         MergeDriverTestUtils::commit('Initial commit to Ancestor');
-        MergeDriverTestUtils::runProcess(self::$checkoutBranchCmd);
+        MergeDriverTestUtils::runProcess('git checkout -b test-branch');
         for ($i = 0; $i < $limit; $i++) {
-            MergeDriverTestUtils::fillFakeFile(self::$branchDate, 'file' . $i . '.ini');
+            MergeDriverTestUtils::fillFakeFile($branchDate, 'file' . $i . '.ini');
         }
         MergeDriverTestUtils::commit('Commit to branch');
-        MergeDriverTestUtils::runProcess(self::$checkoutMasterCmd);
+        MergeDriverTestUtils::runProcess('git checkout master');
         for ($i = 0; $i < $limit; $i++) {
-            MergeDriverTestUtils::fillFakeFile(self::$masterDate, 'file' . $i . '.ini');
+            MergeDriverTestUtils::fillFakeFile($masterDate, 'file' . $i . '.ini');
         }
         MergeDriverTestUtils::commit('Commit to master');
     }
