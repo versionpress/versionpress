@@ -108,10 +108,10 @@ class CloneTest extends PHPUnit_Framework_TestCase {
         $wpAutomation->runWpCliCommand('vp', 'pull', array('from' => self::$cloneSiteConfig->name));
 
         $modifiedDate = $wpAutomation->runWpCliCommand('post get', $postId, array('field' => 'post_modified'));
-        $clonedModifiedDate = $cloneWpAutomation->runWpCliCommand('post get', $postId, array('field' => 'post_modified'));
+        $clonedModifiedDate = $cloneWpAutomation->runWpCliCommand('post get', $clonedPostId, array('field' => 'post_modified'));
 
         $modifiedDateGmt = $wpAutomation->runWpCliCommand('post get', $postId, array('field' => 'post_modified_gmt'));
-        $clonedModifiedDateGmt = $cloneWpAutomation->runWpCliCommand('post get', $postId, array('field' => 'post_modified_gmt'));
+        $clonedModifiedDateGmt = $cloneWpAutomation->runWpCliCommand('post get', $clonedPostId, array('field' => 'post_modified_gmt'));
 
         $this->assertEquals($clonedModifiedDate, $modifiedDate);
         $this->assertEquals($clonedModifiedDateGmt, $modifiedDateGmt);
