@@ -20,6 +20,7 @@ function _vp_button($label, $action, $type = "delete", $cssClass = "") {
     echo "<form action='" . admin_url('admin-post.php') . "' method='post' class='$cssClass'>";
     echo "<input type='hidden' name='action' value='$action' />";
     submit_button($label, $type, $action, false, $other_attributes = array("id" => $action) );
+    wp_nonce_field('vp_deactivation');
     echo "</form>";
 }
 

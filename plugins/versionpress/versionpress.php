@@ -653,6 +653,8 @@ function vp_admin_post_cancel_deactivation() {
  */
 function vp_admin_post_confirm_deactivation() {
 
+    vp_verify_nonce('vp_deactivation');
+
     define('VP_DEACTIVATING', true);
 
     if (WpdbReplacer::isReplaced()) {
@@ -856,7 +858,7 @@ function versionpress_page() {
 add_action('admin_action_vp_show_undo_confirm', 'vp_show_undo_confirm');
 
 function vp_show_undo_confirm() {
-    if(isAjax()) {
+    if (isAjax()) {
         require_once(VERSIONPRESS_PLUGIN_DIR . '/admin/undo.php');
     } else {
         wp_redirect(admin_url('admin.php?page=versionpress/admin/undo.php&method=' . $_GET['method'] . '&commit=' . $_GET['commit']));
@@ -877,7 +879,10 @@ function vp_rollback() {
 
 function _vp_revert($reverterMethod) {
     global $versionPressContainer;
-    /** @var Reverter $reverter */
+
+    vp_verify_nonce('vp_revert');
+
+        /** @var Reverter $reverter */
     $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
 
     $commitHash = $_GET['commit'];
