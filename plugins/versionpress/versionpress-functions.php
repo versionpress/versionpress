@@ -32,3 +32,13 @@ function vp_verify_nonce($name) {
         );
     }
 }
+
+function vp_check_permissions() {
+    if (!current_user_can('manage_options')) {
+        wp_die(
+            '<h1>' . __('Cheatin&#8217; uh?') . '</h1>' .
+            '<p>' . __('You are not allowed to access VersionPress.') . '</p>',
+            403
+        );
+    }
+}

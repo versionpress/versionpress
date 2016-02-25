@@ -654,6 +654,7 @@ function vp_admin_post_cancel_deactivation() {
 function vp_admin_post_confirm_deactivation() {
 
     vp_verify_nonce('vp_deactivation');
+    vp_check_permissions();
 
     define('VP_DEACTIVATING', true);
 
@@ -881,6 +882,7 @@ function _vp_revert($reverterMethod) {
     global $versionPressContainer;
 
     vp_verify_nonce('vp_revert');
+    vp_check_permissions();
 
         /** @var Reverter $reverter */
     $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
@@ -903,7 +905,9 @@ if (VersionPress::isActive()) {
 }
 
 function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
-    if (!current_user_can('activate_plugins')) return;
+    if (!current_user_can('manage_options')) {
+        return;
+    }
 
     $adminBarText = "<span style=\"color:#FF8800;font-weight:bold\">VersionPress EAP running</span>";
     $popoverTitle = "Note";
