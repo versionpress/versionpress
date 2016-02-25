@@ -369,8 +369,7 @@ class Initializer {
             $this->reportProgressChange(InitializerStates::CREATING_GIT_REPOSITORY);
             $this->repository->init();
             $this->installGitignore();
-            MergeDriverInstaller::installGitattributes(__DIR__);
-            MergeDriverInstaller::installGitMergeDriver(__DIR__);
+            MergeDriverInstaller::installMergeDriver(__DIR__);
         }
     }
 

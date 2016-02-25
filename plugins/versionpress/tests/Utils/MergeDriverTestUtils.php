@@ -21,8 +21,8 @@ class MergeDriverTestUtils {
     public static function initRepository($repositoryDir) {
         self::$repositoryDir = $repositoryDir;
         $driverScriptName = 'ini-merge.php';
-        $driverScript = '../../src/Git/MergeDrivers/' . $driverScriptName;
-        $driverScriptFakeDir = self::$repositoryDir . '/src/Git/MergeDrivers';
+        $driverScript = '../../src/Git/merge-drivers/' . $driverScriptName;
+        $driverScriptFakeDir = self::$repositoryDir . '/src/Git/merge-drivers';
         FileSystem::remove(self::$repositoryDir);
         mkdir(self::$repositoryDir);
         FileSystem::mkdir($driverScriptFakeDir);
@@ -30,7 +30,7 @@ class MergeDriverTestUtils {
         self::$gitRepository->init();
         copy($driverScript, $driverScriptFakeDir . '/' . $driverScriptName);
         $driverScriptName = 'ini-merge.sh';
-        $driverScript = '../../src/Git/MergeDrivers/' . $driverScriptName;
+        $driverScript = '../../src/Git/merge-drivers/' . $driverScriptName;
         copy($driverScript, $driverScriptFakeDir . '/' . $driverScriptName);
 
     }
@@ -66,15 +66,10 @@ class MergeDriverTestUtils {
         return $process->getExitCode();
     }
 
-    public static function installMergeDriver($initializationDir) {
-        MergeDriverInstaller::installGitattributes($initializationDir);
-        MergeDriverInstaller::installGitMergeDriver($initializationDir);
-    }
-
     public static function switchDriverToBash() {
         $driverScriptName = 'ini-merge.sh';
-        $driverScript = '../../src/Git/MergeDrivers/' . $driverScriptName;
-        $driverScriptFakeDir = self::$repositoryDir . '/src/Git/MergeDrivers';
+        $driverScript = '../../src/Git/merge-drivers/' . $driverScriptName;
+        $driverScriptFakeDir = self::$repositoryDir . '/src/Git/merge-drivers';
         copy($driverScript, $driverScriptFakeDir . '/' . $driverScriptName);
         chmod($driverScriptFakeDir . '/' . $driverScriptName, 0774);
 
@@ -86,15 +81,15 @@ class MergeDriverTestUtils {
 
     public static function switchDriverToPhp() {
         $driverScriptName = 'ini-merge.php';
-        $driverScript = '../../src/Git/MergeDrivers/' . $driverScriptName;
-        $driverScriptFakeDir = self::$repositoryDir . '/src/Git/MergeDrivers';
+        $driverScript = '../../src/Git/merge-drivers/' . $driverScriptName;
+        $driverScriptFakeDir = self::$repositoryDir . '/src/Git/merge-drivers';
         copy($driverScript, $driverScriptFakeDir . '/' . $driverScriptName);
         chmod($driverScriptFakeDir . '/' . $driverScriptName, 0774);
 
         $mergeDriverScript = '"' . PHP_BINARY . '" "' . $driverScriptFakeDir . '/' . $driverScriptName;
 
         $gitconfig = file_get_contents(self::$repositoryDir . '/.git/config');
-        $gitconfig = preg_replace('/\n?.*driver = .*$/m', "\n" . 'driver = ' . $mergeDriverScript . '" %O %A %B' . "\n", $gitconfig);
+        $gitconfig = preg_replace('/\n?.*driver = .*$/m', "\n" . 'driver = ' . str_replace('\\', '/', $mergeDriverScript) . '" %O %A %B' . "\n", $gitconfig);
         file_put_contents(self::$repositoryDir . '/.git/config', $gitconfig);
 
     }
