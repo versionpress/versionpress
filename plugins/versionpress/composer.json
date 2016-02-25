@@ -23,7 +23,8 @@
     "nette/database": "2.2.*",
     "janvoracek/wp-cli-ssh": "dev-master",
     "fzaninotto/faker": "1.4.*",
-    "icecave/semver": "3.0.3"
+    "icecave/semver": "3.0.3",
+    "udan11/sql-parser": "^3.0"
   },
   "license": "GPL",
   "authors": [
