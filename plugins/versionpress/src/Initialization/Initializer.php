@@ -7,6 +7,7 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Git\GitConfig;
 use VersionPress\Git\GitRepository;
+use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Storages\Storage;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Synchronizers\SynchronizerFactory;
@@ -16,6 +17,7 @@ use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\IdUtil;
 use VersionPress\Utils\PathUtils;
 use VersionPress\Utils\SecurityUtils;
+use VersionPress\Utils\StringUtils;
 use VersionPress\Utils\WordPressMissingFunctions;
 use VersionPress\VersionPress;
 use wpdb;
@@ -367,6 +369,7 @@ class Initializer {
             $this->reportProgressChange(InitializerStates::CREATING_GIT_REPOSITORY);
             $this->repository->init();
             $this->installGitignore();
+            MergeDriverInstaller::installMergeDriver(__DIR__);
         }
     }
 
@@ -411,9 +414,6 @@ class Initializer {
             $this->abortInitialization();
         }
     }
-
-
-
 
     //----------------------------------------
     // Helper functions
@@ -469,12 +469,12 @@ class Initializer {
             'abspath' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, ABSPATH), '.'), '/\\'),
         );
 
-        $search = array_map(function ($var) { return sprintf('{{%s}}', $var); }, array_keys($gitIgnoreVariables));
-        $replace = array_values($gitIgnoreVariables);
-
-        $gitignore = str_replace($search, $replace, $gitignore);
+        $gitignore = StringUtils::fillTemplateString($gitIgnoreVariables, $gitignore);
         file_put_contents($gitignorePath, $gitignore);
     }
+
+
+
 
 
     private function createCommonConfig() {
@@ -544,4 +544,5 @@ class Initializer {
 
         return $this->database->get_results("SELECT * FROM {$this->getTableName($entityName)}", ARRAY_A);
     }
+
 }
