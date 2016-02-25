@@ -4,6 +4,12 @@ namespace VersionPress\Database;
 
 use VersionPress\Utils\WordPressMissingFunctions;
 
+/**
+ * Class for replacing IDs in shortcodes with VPIDs.
+ *
+ * !!! This class depends on wp-includes/shortcodes.php !!!
+ *
+ */
 class ShortcodesReplacer {
     /** @var ShortcodesInfo */
     private $shortcodesInfo;
@@ -77,7 +83,7 @@ class ShortcodesReplacer {
         $shortcodesInfo = $this->shortcodesInfo;
 
         return function ($m) use ($shortcodesInfo, $idProvider) {
-            // allow [[foo]] syntax for escaping a tag
+            // allow [[foo]] syntax for escaping a tag - code adopted from WP function `do_shortcode_tag`
             if ($m[1] == '[' && $m[6] == ']') {
                 return substr($m[0], 1, -1);
             }
