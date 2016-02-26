@@ -17,9 +17,9 @@ defined('ABSPATH') or die("Direct access not allowed");
  * @param string $cssClass Optional CSS class to be used for the button
  */
 function _vp_button($label, $action, $type = "delete", $cssClass = "") {
-    echo "<form action='" . admin_url('admin-post.php') . "' method='post' class='$cssClass'>";
+    echo "<form action='" . esc_url(admin_url('admin-post.php')) . "' method='post' class='" . esc_attr($cssClass) . "'>";
     echo "<input type='hidden' name='action' value='$action' />";
-    submit_button($label, $type, $action, false, $other_attributes = array("id" => $action) );
+    submit_button($label, $type, $action, false, $other_attributes = array("id" => $action));
     echo "</form>";
 }
 

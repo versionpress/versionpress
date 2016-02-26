@@ -35,8 +35,8 @@ use VersionPress\Utils\RequirementsChecker;
                         $iconClass = $requirement["fulfilled"] ? "icon-checkmark" : "icon-warning";
                         ?>
                         <li>
-                            <span class="icon <?php echo $iconClass; ?>"></span>
-                            <?php echo $requirement["name"]; ?>
+                            <span class="icon <?php echo esc_attr($iconClass); ?>"></span>
+                            <?php echo esc_html($requirement["name"]); ?>
                             <p class="<?php echo $requirement["fulfilled"] ? 'closed' : 'open'; ?>">
                                 <?php echo Markdown::transform($requirement["help"]); ?>
                             </p>
@@ -55,7 +55,7 @@ use VersionPress\Utils\RequirementsChecker;
                     ?>
                 </ul>
 
-                <div><a href="<?php echo admin_url('admin.php?page=versionpress/admin/system-info.php') ?>">View full system info</a><?php if (!$requirementsChecker->isWithoutCriticalErrors()) { ?>, <a href="https://github.com/versionpress/support">get support on GitHub</a><?php } ?></div>
+                <div><a href="<?php echo esc_url(admin_url('admin.php?page=versionpress/admin/system-info.php')) ?>">View full system info</a><?php if (!$requirementsChecker->isWithoutCriticalErrors()) { ?>, <a href="https://github.com/versionpress/support">get support on GitHub</a><?php } ?></div>
 
             </div>
 
@@ -92,8 +92,8 @@ use VersionPress\Utils\RequirementsChecker;
                 $buttonClass = "button-primary-disabled";
             }
             ?>
-            <a href="<?php echo $activationUrl; ?>"
-               class="button <?php echo $buttonClass; ?> button-hero" id="activate-versionpress-btn">Activate
+            <a href="<?php echo esc_url($activationUrl); ?>"
+               class="button <?php echo esc_attr($buttonClass); ?> button-hero" id="activate-versionpress-btn">Activate
                 VersionPress</a>
         </div>
 
