@@ -103,7 +103,7 @@ class FileSystem {
      * @param string $dir
      * @param int $mode
      */
-    public static function mkdir($dir, $mode = 0777) {
+    public static function mkdir($dir, $mode = 0750) {
         $fs = new \Symfony\Component\Filesystem\Filesystem();
         $fs->mkdir($dir, $mode);
     }
