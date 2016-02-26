@@ -83,17 +83,17 @@ class PluginChangeInfo extends TrackedChangeInfo {
     }
 
     public function getChangedFiles() {
-        $path = WP_PLUGIN_DIR . "/";
+        $pluginPath = WP_PLUGIN_DIR . "/";
         if (dirname($this->pluginFile) == ".") {
             // single-file plugin like hello.php
-            $path .= $this->pluginFile;
+            $pluginPath .= $this->pluginFile;
         } else {
             // multi-file plugin like akismet/...
-            $path .= dirname($this->pluginFile) . "/*";
+            $pluginPath .= dirname($this->pluginFile) . "/*";
         }
-        $pluginChange = array("type" => "path", "path" => $path);
 
-        $optionChange = array("type" => "path", "path" => VERSIONPRESS_MIRRORING_DIR);
+        $pluginChange = array("type" => "path", "path" => $pluginPath);
+        $optionChange = array("type" => "path", "path" => VP_VPDB_DIR);
 
         return array($pluginChange, $optionChange);
     }

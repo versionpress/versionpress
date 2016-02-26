@@ -53,7 +53,7 @@ if (!VersionPress::isActive() && is_file(VERSIONPRESS_PLUGIN_DIR . '/.abort-init
         FileSystem::remove(VP_PROJECT_ROOT . '/.git');
     }
 
-    FileSystem::remove(VERSIONPRESS_MIRRORING_DIR);
+    FileSystem::remove(VP_VPDB_DIR);
     unlink(VERSIONPRESS_PLUGIN_DIR . '/.abort-initialization');
 }
 
@@ -664,7 +664,7 @@ function vp_admin_post_confirm_deactivation() {
         FileSystem::remove(VERSIONPRESS_ACTIVATION_FILE);
     }
 
-    FileSystem::remove(VERSIONPRESS_MIRRORING_DIR);
+    FileSystem::remove(VP_VPDB_DIR);
 
 
     global $versionPressContainer;

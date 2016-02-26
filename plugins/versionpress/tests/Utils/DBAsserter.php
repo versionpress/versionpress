@@ -286,7 +286,7 @@ class DBAsserter {
         global $versionPressContainer, $wpdb;
 
         defined('VERSIONPRESS_PLUGIN_DIR') || define('VERSIONPRESS_PLUGIN_DIR', self::$testConfig->testSite->path . '/wp-content/plugins/versionpress');
-        defined('VERSIONPRESS_MIRRORING_DIR') || define('VERSIONPRESS_MIRRORING_DIR', self::$testConfig->testSite->path . '/wp-content/vpdb');
+        defined('VP_VPDB_DIR') || define('VP_VPDB_DIR', self::$testConfig->testSite->path . '/wp-content/vpdb');
         $versionPressContainer = DIContainer::getConfiguredInstance();
         $wpdb = self::$wpdb;
     }

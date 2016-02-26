@@ -59,7 +59,7 @@ class DIContainer {
         $dic->register(VersionPressServices::STORAGE_FACTORY, function () use ($dic) {
             global $wp_taxonomies;
             return new StorageFactory(
-                VERSIONPRESS_MIRRORING_DIR,
+                VP_VPDB_DIR,
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::WPDB),
                 array_keys((array)$wp_taxonomies)

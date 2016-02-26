@@ -24,7 +24,7 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
         self::$repositoryDir = __DIR__ . '/repository';
 
         define('VERSIONPRESS_PLUGIN_DIR', self::$repositoryDir); // fake
-        define('VERSIONPRESS_MIRRORING_DIR', self::$repositoryDir); // fake
+        define('VP_VPDB_DIR', self::$repositoryDir); // fake
         define('VP_PROJECT_ROOT', self::$repositoryDir); // fake
 
 
