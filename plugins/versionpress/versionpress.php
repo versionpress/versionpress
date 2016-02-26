@@ -41,6 +41,7 @@ require_once(__DIR__ . '/bootstrap.php');
 require_once( ABSPATH . 'wp-admin/includes/translation-install.php' );
 
 if (defined('WP_CLI') && WP_CLI) {
+    require_once(__DIR__ . '/src/Cli/vp.php');
     WP_CLI::add_command('vp', 'VersionPress\Cli\VPCommand');
 }
 
