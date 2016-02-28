@@ -1081,9 +1081,8 @@ class VPCommand extends WP_CLI_Command {
          * URLs may be broken.
          * Valid request is such a request, which does not require URL rewrite
          * (e.g. homepage / administration) and finishes successfully.
-         * @noinspection PhpUsageOfSilenceOperatorInspection
          */
-        @file_get_contents(get_home_url());
+        wp_remote_get(get_home_url());
     }
 
     private function setConfigUrl($urlConstant, $pathConstant, $defaultPath, $baseUrl) {

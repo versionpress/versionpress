@@ -125,9 +125,8 @@ class VPInternalCommand extends WP_CLI_Command {
         set_transient('vp_flush_rewrite_rules', 1);
         /**
          * @see VPCommand::flushRewriteRules
-         * @noinspection PhpUsageOfSilenceOperatorInspection
          */
-        @file_get_contents(get_home_url());
+        wp_remote_get(get_home_url());
     }
 
     /**
