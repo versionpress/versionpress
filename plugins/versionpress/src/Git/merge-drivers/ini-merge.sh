@@ -37,9 +37,9 @@ do
 done
 
 # Place placeholder between lines
-awk '{printf("%s\n#######\n",$0)}' $A > $A.tmp && mv $A.tmp $A
-awk '{printf("%s\n#######\n",$0)}' $B > $B.tmp && mv $B.tmp $B
-awk '{printf("%s\n#######\n",$0)}' $O > $O.tmp && mv $O.tmp $O
+sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/\n/&#######&/g' $O
+sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/\n/&#######&/g' $A
+sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/\n/&#######&/g' $B
 
 # Process everything else through standard
 git merge-file -L mine -L base -L theirs $A $O $B
