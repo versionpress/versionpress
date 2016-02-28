@@ -81,17 +81,17 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
         $branchDate = '17-02-16 19:19:23';
 
         for ($i = 0; $i < $limit; $i++) {
-            MergeDriverTestUtils::fillFakeFile($originDate, 'file' . $i . '.ini');
+            MergeDriverTestUtils::createIniFile($originDate, 'file' . $i . '.ini');
         }
         MergeDriverTestUtils::commit('Initial commit to Ancestor');
         MergeDriverTestUtils::runProcess('git checkout -b test-branch');
         for ($i = 0; $i < $limit; $i++) {
-            MergeDriverTestUtils::fillFakeFile($branchDate, 'file' . $i . '.ini', 'Custom content');
+            MergeDriverTestUtils::createIniFile($branchDate, 'file' . $i . '.ini', 'Custom content');
         }
         MergeDriverTestUtils::commit('Commit to branch');
         MergeDriverTestUtils::runProcess('git checkout master');
         for ($i = 0; $i < $limit; $i++) {
-            MergeDriverTestUtils::fillFakeFile($masterDate, 'file' . $i . '.ini');
+            MergeDriverTestUtils::createIniFile($masterDate, 'file' . $i . '.ini');
         }
         MergeDriverTestUtils::commit('Commit to master');
     }

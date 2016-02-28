@@ -134,18 +134,18 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
     private function prepareTestData($customMessage = null) {
 
-        MergeDriverTestUtils::fillFakeFileAndCommit('10-02-16 08:00:00', 'file.ini', 'Initial commit to Ancestor');
+        MergeDriverTestUtils::createIniFileAndCommit('10-02-16 08:00:00', 'file.ini', 'Initial commit to Ancestor');
 
         MergeDriverTestUtils::runProcess('git checkout -b test-branch');
         $branchDate = '17-02-16 19:19:23';
         if ($customMessage == null) {
-            MergeDriverTestUtils::fillFakeFileAndCommit($branchDate, 'file.ini', 'Commit to branch');
+            MergeDriverTestUtils::createIniFileAndCommit($branchDate, 'file.ini', 'Commit to branch');
         } else {
-            MergeDriverTestUtils::fillFakeFileAndCommit($branchDate, 'file.ini', 'Commit to branch', $customMessage);
+            MergeDriverTestUtils::createIniFileAndCommit($branchDate, 'file.ini', 'Commit to branch', $customMessage);
         }
 
         MergeDriverTestUtils::runProcess('git checkout master');
-        MergeDriverTestUtils::fillFakeFileAndCommit('15-02-16 12:00:11', 'file.ini', 'Commit to master', 'Custom content in master');
+        MergeDriverTestUtils::createIniFileAndCommit('15-02-16 12:00:11', 'file.ini', 'Commit to master', 'Custom content in master');
     }
 
 
