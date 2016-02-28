@@ -23,9 +23,5 @@ class TestConfigTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals("VP Test @ localhost", $config->sites["vp01"]->title);
         $this->assertFalse($config->sites["vp01"]->isVagrant);
 
-        // 'vp-config' section
-        $this->assertEquals(null, $config->sites["vp01"]->vpConfig["git-binary"]);
-        $this->assertEquals("/usr/bin/git", $config->sites["vagrant-php53"]->vpConfig["git-binary"]);
-
     }
 }
