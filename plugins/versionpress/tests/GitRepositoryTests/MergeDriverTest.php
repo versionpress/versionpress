@@ -161,19 +161,47 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
     }
 
+    /**
+     * @test
+     */
+    public function mergedFileWithoutDateFieldsUsingPhp() {
+        MergeDriverInstaller::installMergeDriver(self::$initializationDir);
+        MergeDriverTestUtils::switchDriverToPhp();
+
+        $this->prepareRepositoryhistoryForTestingMergeWithoutDateFields();
+
+        $this->assertEquals(0, MergeDriverTestUtils::runProcess('git merge test-branch'), 'Merge returned unexpected exit code.');
+    }
+
+    /**
+     * @test
+     */
+    public function mergedFileWithoutDateFieldsUsingBash() {
+        if(DIRECTORY_SEPARATOR == '\\') {
+            $this->markTestSkipped('mergedFileWithoutDateFieldsUsingBash is skipped (no Bash on Windows).');
+        }
+        MergeDriverInstaller::installMergeDriver(self::$initializationDir);
+        MergeDriverTestUtils::switchDriverToBash();
+
+        $this->prepareRepositoryhistoryForTestingMergeWithoutDateFields();
+
+        $this->assertEquals(0, MergeDriverTestUtils::runProcess('git merge test-branch'), 'Merge returned unexpected exit code.');
+    }
+
+
     private function prepareNonConflictingData() {
-        $this->prepareTestRepositoryHistory();
+        $this->prepareRepositoryHistoryForTestingDateFieldMerge();
     }
 
     private function prepareDataWithChangedAdjacentLines() {
-        $this->prepareTestRepositoryHistory(false, true);
+        $this->prepareRepositoryHistoryForTestingDateFieldMerge(false, true);
     }
 
     private function prepareConflictingData() {
-        $this->prepareTestRepositoryHistory(true, false);
+        $this->prepareRepositoryHistoryForTestingDateFieldMerge(true, false);
     }
 
-    private function prepareTestRepositoryHistory($createConflict = false, $changeTitle = false) {
+    private function prepareRepositoryHistoryForTestingDateFieldMerge($createConflict = false, $changeTitle = false) {
 
         $originDate = '10-02-16 08:00:00';
         $masterDate = '15-02-16 12:00:11';
@@ -194,6 +222,14 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
         } else {
             MergeDriverTestUtils::createIniFileAndCommit($masterDate, 'file.ini', 'Commit to master', 'Custom content in master', 'Custom title in master');
         }
+    }
+
+    private function prepareRepositoryhistoryForTestingMergeWithoutDateFields() {
+        MergeDriverTestUtils::createIniFileWithoutDateFieldsAndCommit('file.ini', 'Initial commit to Ancestor');
+        MergeDriverTestUtils::runProcess('git checkout -b test-branch');
+        MergeDriverTestUtils::createIniFileWithoutDateFieldsAndCommit('file.ini', 'Commit to branch');
+        MergeDriverTestUtils::runProcess('git checkout master');
+        MergeDriverTestUtils::createIniFileWithoutDateFieldsAndCommit('file.ini', 'Commit to master', 'Custom content in master', 'Custom title in master');
     }
 
 

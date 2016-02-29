@@ -45,6 +45,11 @@ class MergeDriverTestUtils {
         $data = array("GUID" => array('post_modified' => $date, 'post_modified_gmt' => $date, 'title' => $title, 'content' => $content));
         file_put_contents(self::$repositoryDir . '/' . $fileName, IniSerializer::serialize($data));
     }
+    
+    public static function createIniFileWithoutDateFields($fileName, $content = 'Default content', $title = 'Default title') {
+        $data = array("GUID" => array('title' => $title, 'content' => $content));
+        file_put_contents(self::$repositoryDir . '/' . $fileName, IniSerializer::serialize($data));
+    }
 
     public static function commit($message = 'Default commit message') {
         self::$gitRepository->stageAll();
@@ -53,6 +58,11 @@ class MergeDriverTestUtils {
 
     public static function createIniFileAndCommit($originDate, $fileName, $message, $content = 'Default content', $title = 'Default title') {
         self::createIniFile($originDate, $fileName, $content, $title);
+        self::commit($message);
+    }
+
+    public static function createIniFileWithoutDateFieldsAndCommit($fileName, $message, $content = 'Default content', $title = 'Default title') {
+        self::createIniFileWithoutDateFields($fileName, $content, $title);
         self::commit($message);
     }
 
