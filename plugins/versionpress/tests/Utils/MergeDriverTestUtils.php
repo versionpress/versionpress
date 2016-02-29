@@ -68,9 +68,9 @@ class MergeDriverTestUtils {
 
     /**
      * @param $checkoutBranchCmd
-     * @return Process
+     * @return int
      */
-    public static function runProcess($checkoutBranchCmd) {
+    public static function getProcessExitCode($checkoutBranchCmd) {
         $process = new Process($checkoutBranchCmd, self::$repositoryDir);
         $process->run();
         return $process->getExitCode();

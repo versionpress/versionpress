@@ -75,7 +75,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
         $this->prepareNonConflictingData();
 
-        $this->assertEquals(0, MergeDriverTestUtils::runProcess('git merge test-branch'), 'Merge returned unexpected exit code.');
+        $this->assertEquals(0, MergeDriverTestUtils::getProcessExitCode('git merge test-branch'), 'Merge returned unexpected exit code.');
 
     }
 
@@ -93,7 +93,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
         $this->prepareConflictingData();
 
-        $this->assertEquals(1, MergeDriverTestUtils::runProcess('git merge test-branch'), 'Merge returned unexpected exit code.');
+        $this->assertEquals(1, MergeDriverTestUtils::getProcessExitCode('git merge test-branch'), 'Merge returned unexpected exit code.');
 
         $expected = StringUtils::crlfize(file_get_contents(__DIR__ . '/expected-merge-conflict.ini'));
         $file = StringUtils::crlfize(file_get_contents(self::$repositoryDir . '/file.ini'));
@@ -110,7 +110,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
         $this->prepareNonConflictingData();
 
-        $this->assertEquals(0, MergeDriverTestUtils::runProcess('git merge test-branch'), 'Merge returned unexpected exit code.');
+        $this->assertEquals(0, MergeDriverTestUtils::getProcessExitCode('git merge test-branch'), 'Merge returned unexpected exit code.');
 
     }
 
@@ -123,7 +123,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
         $this->prepareDataWithChangedAdjacentLines();
 
-        $this->assertEquals(0, MergeDriverTestUtils::runProcess('git merge test-branch'), 'Merge returned unexpected exit code.');
+        $this->assertEquals(0, MergeDriverTestUtils::getProcessExitCode('git merge test-branch'), 'Merge returned unexpected exit code.');
 
     }
 
@@ -139,7 +139,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
         $this->prepareDataWithChangedAdjacentLines();
 
-        $this->assertEquals(0, MergeDriverTestUtils::runProcess('git merge test-branch'), 'Merge returned unexpected exit code.');
+        $this->assertEquals(0, MergeDriverTestUtils::getProcessExitCode('git merge test-branch'), 'Merge returned unexpected exit code.');
 
     }
 
@@ -153,7 +153,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
         $this->prepareConflictingData();
 
-        $this->assertEquals(1, MergeDriverTestUtils::runProcess('git merge test-branch'), 'Merge returned unexpected exit code.');
+        $this->assertEquals(1, MergeDriverTestUtils::getProcessExitCode('git merge test-branch'), 'Merge returned unexpected exit code.');
 
         $expected = StringUtils::crlfize(file_get_contents(__DIR__ . '/expected-merge-conflict.ini'));
         $file = StringUtils::crlfize(file_get_contents(self::$repositoryDir . '/file.ini'));
@@ -170,7 +170,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
         $this->prepareRepositoryhistoryForTestingMergeWithoutDateFields();
 
-        $this->assertEquals(0, MergeDriverTestUtils::runProcess('git merge test-branch'), 'Merge returned unexpected exit code.');
+        $this->assertEquals(0, MergeDriverTestUtils::getProcessExitCode('git merge test-branch'), 'Merge returned unexpected exit code.');
     }
 
     /**
@@ -185,7 +185,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
         $this->prepareRepositoryhistoryForTestingMergeWithoutDateFields();
 
-        $this->assertEquals(0, MergeDriverTestUtils::runProcess('git merge test-branch'), 'Merge returned unexpected exit code.');
+        $this->assertEquals(0, MergeDriverTestUtils::getProcessExitCode('git merge test-branch'), 'Merge returned unexpected exit code.');
     }
 
 
@@ -208,7 +208,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
         $branchDate = '17-02-16 19:19:23';
 
         MergeDriverTestUtils::createIniFileAndCommit($originDate, 'file.ini', 'Initial commit to Ancestor');
-        MergeDriverTestUtils::runProcess('git checkout -b test-branch');
+        MergeDriverTestUtils::getProcessExitCode('git checkout -b test-branch');
 
         if ($createConflict == false) {
             MergeDriverTestUtils::createIniFileAndCommit($branchDate, 'file.ini', 'Commit to branch');
@@ -216,7 +216,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
             MergeDriverTestUtils::createIniFileAndCommit($branchDate, 'file.ini', 'Commit to branch', 'Custom branch message');
         }
 
-        MergeDriverTestUtils::runProcess('git checkout master');
+        MergeDriverTestUtils::getProcessExitCode('git checkout master');
         if($changeTitle == false) {
             MergeDriverTestUtils::createIniFileAndCommit($masterDate, 'file.ini', 'Commit to master', 'Custom content in master');
         } else {
@@ -226,9 +226,9 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
     private function prepareRepositoryhistoryForTestingMergeWithoutDateFields() {
         MergeDriverTestUtils::createIniFileWithoutDateFieldsAndCommit('file.ini', 'Initial commit to Ancestor');
-        MergeDriverTestUtils::runProcess('git checkout -b test-branch');
+        MergeDriverTestUtils::getProcessExitCode('git checkout -b test-branch');
         MergeDriverTestUtils::createIniFileWithoutDateFieldsAndCommit('file.ini', 'Commit to branch');
-        MergeDriverTestUtils::runProcess('git checkout master');
+        MergeDriverTestUtils::getProcessExitCode('git checkout master');
         MergeDriverTestUtils::createIniFileWithoutDateFieldsAndCommit('file.ini', 'Commit to master', 'Custom content in master', 'Custom title in master');
     }
 
