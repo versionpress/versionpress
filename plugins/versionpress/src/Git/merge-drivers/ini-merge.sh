@@ -9,7 +9,7 @@ B=$3
 declare -a datesArray=("post_modified" "post_modified_gmt")
 
 
-#Iterate through array of date fields
+# Iterate through array of date fields
 for i in "${datesArray[@]}"
 do
 	# Find Values

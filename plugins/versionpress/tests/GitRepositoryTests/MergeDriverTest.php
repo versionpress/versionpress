@@ -66,7 +66,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
      */
     public function mergedWithoutConflictUsingBash() {
 
-        if(DIRECTORY_SEPARATOR == '\\') {
+        if (DIRECTORY_SEPARATOR == '\\') {
             $this->markTestSkipped('mergedWithoutConflictUsingBash is skipped (no Bash on Windows).');
         }
 
@@ -84,7 +84,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
      */
     public function mergedWithExpectedConflictUsingBash() {
 
-        if(DIRECTORY_SEPARATOR == '\\') {
+        if (DIRECTORY_SEPARATOR == '\\') {
             $this->markTestSkipped('mergedWithoutConflictInDateUsingBash is skipped (no Bash on Windows).');
         }
 
@@ -131,7 +131,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function changesOnAdjacentLinesMergeWithoutConflictBash() {
-        if(DIRECTORY_SEPARATOR == '\\') {
+        if (DIRECTORY_SEPARATOR == '\\') {
             $this->markTestSkipped('changesOnAdjacentLinesMergeWithoutConflictUsingBash is skipped (no Bash on Windows).');
         }
         MergeDriverInstaller::installMergeDriver(self::$initializationDir);
@@ -177,7 +177,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function mergedFileWithoutDateFieldsUsingBash() {
-        if(DIRECTORY_SEPARATOR == '\\') {
+        if (DIRECTORY_SEPARATOR == '\\') {
             $this->markTestSkipped('mergedFileWithoutDateFieldsUsingBash is skipped (no Bash on Windows).');
         }
         MergeDriverInstaller::installMergeDriver(self::$initializationDir);
@@ -217,7 +217,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
         }
 
         MergeDriverTestUtils::getProcessExitCode('git checkout master');
-        if($changeTitle == false) {
+        if ($changeTitle == false) {
             MergeDriverTestUtils::createIniFileAndCommit($masterDate, 'file.ini', 'Commit to master', 'Custom content in master');
         } else {
             MergeDriverTestUtils::createIniFileAndCommit($masterDate, 'file.ini', 'Commit to master', 'Custom content in master', 'Custom title in master');

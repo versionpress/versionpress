@@ -45,7 +45,7 @@ class MergeDriverTestUtils {
         $data = array("GUID" => array('post_modified' => $date, 'post_modified_gmt' => $date, 'title' => $title, 'content' => $content));
         file_put_contents(self::$repositoryDir . '/' . $fileName, IniSerializer::serialize($data));
     }
-    
+
     public static function createIniFileWithoutDateFields($fileName, $content = 'Default content', $title = 'Default title') {
         $data = array("GUID" => array('title' => $title, 'content' => $content));
         file_put_contents(self::$repositoryDir . '/' . $fileName, IniSerializer::serialize($data));

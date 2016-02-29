@@ -34,7 +34,7 @@ foreach ($dates as $date) {
 
     $aDate = new DateTime($aDateString);
     $bDate = new DateTime($bDateString);
-    //Replace date value in both files to be more recent
+    // Replace date value in both files to be more recent
     if ($aDate->getTimestamp() > $bDate->getTimestamp()) {
         $bFile = preg_replace($dateReplacePattern, '${1}' . $aDateString . '${3}', $bFile);
     } else {

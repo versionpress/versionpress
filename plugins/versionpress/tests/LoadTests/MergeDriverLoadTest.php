@@ -63,7 +63,7 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
      */
     public function bashDriverLoadTested() {
 
-        if(DIRECTORY_SEPARATOR == '\\') {
+        if (DIRECTORY_SEPARATOR == '\\') {
             $this->markTestSkipped('bashDriverLoadTested is skipped (no Bash on Windows).');
         }
 
