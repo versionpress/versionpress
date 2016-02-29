@@ -82,7 +82,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function mergedWithoutConflictInDateUsingBash() {
+    public function mergedWithExpectedConflictUsingBash() {
 
         if(DIRECTORY_SEPARATOR == '\\') {
             $this->markTestSkipped('mergedWithoutConflictInDateUsingBash is skipped (no Bash on Windows).');
@@ -117,7 +117,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function mergedWithoutConflictInDateUsingPhp() {
+    public function mergedWithExpectedConflictUsingPhp() {
 
         MergeDriverInstaller::installMergeDriver(self::$initializationDir);
         MergeDriverTestUtils::switchDriverToPhp();
