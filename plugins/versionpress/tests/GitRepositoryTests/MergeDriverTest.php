@@ -117,6 +117,35 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
+    public function changesOnAdjacentLinesMergeWithoutConflictUsingPhp() {
+        MergeDriverInstaller::installMergeDriver(self::$initializationDir);
+        MergeDriverTestUtils::switchDriverToPhp();
+
+        $this->prepareDataWithChangedAdjacentLines();
+
+        $this->assertEquals(0, MergeDriverTestUtils::runProcess('git merge test-branch'), 'Merge returned unexpected exit code.');
+
+    }
+
+    /**
+     * @test
+     */
+    public function changesOnAdjacentLinesMergeWithoutConflictBash() {
+        if(DIRECTORY_SEPARATOR == '\\') {
+            $this->markTestSkipped('changesOnAdjacentLinesMergeWithoutConflictUsingBash is skipped (no Bash on Windows).');
+        }
+        MergeDriverInstaller::installMergeDriver(self::$initializationDir);
+        MergeDriverTestUtils::switchDriverToBash();
+
+        $this->prepareDataWithChangedAdjacentLines();
+
+        $this->assertEquals(0, MergeDriverTestUtils::runProcess('git merge test-branch'), 'Merge returned unexpected exit code.');
+
+    }
+
+    /**
+     * @test
+     */
     public function mergedWithExpectedConflictUsingPhp() {
 
         MergeDriverInstaller::installMergeDriver(self::$initializationDir);
@@ -136,11 +165,15 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
         $this->prepareTestRepositoryHistory();
     }
 
-    private function prepareConflictingData() {
-        $this->prepareTestRepositoryHistory(false);
+    private function prepareDataWithChangedAdjacentLines() {
+        $this->prepareTestRepositoryHistory(false, true);
     }
 
-    private function prepareTestRepositoryHistory($createConflict = false) {
+    private function prepareConflictingData() {
+        $this->prepareTestRepositoryHistory(true, false);
+    }
+
+    private function prepareTestRepositoryHistory($createConflict = false, $changeTitle = false) {
 
         $originDate = '10-02-16 08:00:00';
         $masterDate = '15-02-16 12:00:11';
@@ -156,7 +189,11 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
         }
 
         MergeDriverTestUtils::runProcess('git checkout master');
-        MergeDriverTestUtils::createIniFileAndCommit($masterDate, 'file.ini', 'Commit to master', 'Custom content in master');
+        if($changeTitle == false) {
+            MergeDriverTestUtils::createIniFileAndCommit($masterDate, 'file.ini', 'Commit to master', 'Custom content in master');
+        } else {
+            MergeDriverTestUtils::createIniFileAndCommit($masterDate, 'file.ini', 'Commit to master', 'Custom content in master', 'Custom title in master');
+        }
     }
 
 

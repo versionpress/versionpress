@@ -41,18 +41,18 @@ class MergeDriverTestUtils {
     }
 
 
-    public static function createIniFile($originDate, $fileName, $content = 'Fake content') {
-        $originData = array("GUID" => array('post_modified' => $originDate, 'post_modified_gmt' => $originDate, 'content' => $content));
-        file_put_contents(self::$repositoryDir . '/' . $fileName, IniSerializer::serialize($originData));
+    public static function createIniFile($date, $fileName, $content = 'Default content', $title = 'Default title') {
+        $data = array("GUID" => array('post_modified' => $date, 'post_modified_gmt' => $date, 'title' => $title, 'content' => $content));
+        file_put_contents(self::$repositoryDir . '/' . $fileName, IniSerializer::serialize($data));
     }
 
-    public static function commit($message = 'Fake commit message') {
+    public static function commit($message = 'Default commit message') {
         self::$gitRepository->stageAll();
         self::$gitRepository->commit($message, GitConfig::$wpcliUserName, GitConfig::$wpcliUserEmail);
     }
 
-    public static function createIniFileAndCommit($originDate, $fileName, $message = 'Fake commit message', $content = 'Fake content') {
-        self::createIniFile($originDate, $fileName, $content);
+    public static function createIniFileAndCommit($originDate, $fileName, $message, $content = 'Default content', $title = 'Default title') {
+        self::createIniFile($originDate, $fileName, $content, $title);
         self::commit($message);
     }
 
