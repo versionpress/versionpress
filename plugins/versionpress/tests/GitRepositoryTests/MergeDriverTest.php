@@ -97,7 +97,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
         $expected = StringUtils::crlfize(file_get_contents(__DIR__ . '/expected-merge-conflict.ini'));
         $file = StringUtils::crlfize(file_get_contents(self::$repositoryDir . '/file.ini'));
-        $this->assertEquals($expected, $file, 'Merge returned unexpected exit code.');
+        $this->assertEquals($expected, $file);
 
     }
 
@@ -128,7 +128,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
         $expected = StringUtils::crlfize(file_get_contents(__DIR__ . '/expected-merge-conflict.ini'));
         $file = StringUtils::crlfize(file_get_contents(self::$repositoryDir . '/file.ini'));
-        $this->assertEquals($expected, $file, 'Merge returned unexpected exit code.');
+        $this->assertEquals($expected, $file);
 
     }
 
@@ -137,10 +137,10 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     }
 
     private function prepareConflictingData() {
-        $this->prepareTestData('Custom branch message');
+        $this->prepareTestData(false);
     }
 
-    private function prepareTestData($customMessage = null) {
+    private function prepareTestData($createConflict = false) {
 
         $originDate = '10-02-16 08:00:00';
         $masterDate = '15-02-16 12:00:11';
@@ -149,10 +149,10 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
         MergeDriverTestUtils::createIniFileAndCommit($originDate, 'file.ini', 'Initial commit to Ancestor');
         MergeDriverTestUtils::runProcess('git checkout -b test-branch');
 
-        if ($customMessage == null) {
+        if ($createConflict == false) {
             MergeDriverTestUtils::createIniFileAndCommit($branchDate, 'file.ini', 'Commit to branch');
         } else {
-            MergeDriverTestUtils::createIniFileAndCommit($branchDate, 'file.ini', 'Commit to branch', $customMessage);
+            MergeDriverTestUtils::createIniFileAndCommit($branchDate, 'file.ini', 'Commit to branch', 'Custom branch message');
         }
 
         MergeDriverTestUtils::runProcess('git checkout master');
