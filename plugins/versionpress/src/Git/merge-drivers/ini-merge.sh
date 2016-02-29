@@ -8,6 +8,8 @@ B=$3
 # Date fields to merge
 declare -a datesArray=("post_modified" "post_modified_gmt")
 
+
+#Iterate through array of date fields
 for i in "${datesArray[@]}"
 do
 	# Find Values
@@ -36,7 +38,7 @@ do
 
 done
 
-# Place placeholder between lines
+# Place temporary placeholder between lines to avoid merge conflicts on adjacent lines
 sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/\n/&#######&/g' $O
 sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/\n/&#######&/g' $A
 sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/\n/&#######&/g' $B
@@ -44,15 +46,15 @@ sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/\n/&#######&/g' $B
 # Process everything else through standard
 git merge-file -L mine -L base -L theirs $A $O $B
 
-# Save Git merge status
-GIT_MERGE_STATUS=$?
+# Save Git merge status exit code
+GIT_MERGE_EXIT_CODE=$?
 
-# Remove placeholders
+# Remove temporary placeholders
 sed -e ':a' -e 'N' -e '$!ba' -e 's/\n#######//g' -i '' $A
 sed -e ':a' -e 'N' -e '$!ba' -e 's/\n#######//g' -i '' $B
 sed -e ':a' -e 'N' -e '$!ba' -e 's/\n#######//g' -i '' $O
 
 # If Git merge fails, we should also 'fail'
-if [ $GIT_MERGE_STATUS -ne 0 ]; then
+if [ $GIT_MERGE_EXIT_CODE -ne 0 ]; then
 	exit 1
 fi
