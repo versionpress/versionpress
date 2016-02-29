@@ -48,7 +48,7 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
 
         MergeDriverInstaller::installMergeDriver(self::$initializationDir);
         MergeDriverTestUtils::switchDriverToPhp();
-        $this->prepareTestData();
+        $this->prepareTestRepositoryHistory();
         $time_start = microtime(true);
         $mergeCommandExitCode = MergeDriverTestUtils::runProcess('git merge test-branch');
         $time_end = microtime(true);
@@ -69,7 +69,7 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
 
         MergeDriverInstaller::installMergeDriver(self::$initializationDir);
         MergeDriverTestUtils::switchDriverToBash();
-        $this->prepareTestData();
+        $this->prepareTestRepositoryHistory();
         $time_start = microtime(true);
         $mergeCommandExitCode = MergeDriverTestUtils::runProcess('git merge test-branch');
         $time_end = microtime(true);
@@ -78,7 +78,7 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(0, $mergeCommandExitCode);
     }
 
-    private function prepareTestData() {
+    private function prepareTestRepositoryHistory() {
         $limit = 1000;
         $originDate = '10-02-16 08:00:00';
         $masterDate = '15-02-16 12:00:11';

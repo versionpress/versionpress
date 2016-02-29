@@ -133,14 +133,14 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     }
 
     private function prepareNonConflictingData() {
-        $this->prepareTestData();
+        $this->prepareTestRepositoryHistory();
     }
 
     private function prepareConflictingData() {
-        $this->prepareTestData(false);
+        $this->prepareTestRepositoryHistory(false);
     }
 
-    private function prepareTestData($createConflict = false) {
+    private function prepareTestRepositoryHistory($createConflict = false) {
 
         $originDate = '10-02-16 08:00:00';
         $masterDate = '15-02-16 12:00:11';
