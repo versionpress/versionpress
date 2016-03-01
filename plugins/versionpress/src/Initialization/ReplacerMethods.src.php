@@ -1,6 +1,7 @@
 <?php
 
 namespace VersionPress\Initialization;
+use VersionPress\Database\SqlQueryParser;
 
 /**
  * Methods in this class are used by WpdbReplacer. It pastes them into the wpdb class.
@@ -15,6 +16,7 @@ namespace VersionPress\Initialization;
  * @method __wp_insert($table, $data, $format)
  * @method __wp_update($table, $data, $where, $format, $where_format)
  * @method __wp_delete($table, $where, $where_format)
+ * @method __wp_query($query)
  */
 class ReplacerMethods {
 
@@ -63,10 +65,10 @@ class ReplacerMethods {
 
     public function delete($table, $where, $where_format = null) {
         global $versionPressContainer;
-        /** @var \VersionPress\Database\WpdbMirrorBridge $wpdbMirrorBridge */
         if ($versionPressContainer == null) {
             return $this->__wp_delete($table, $where, $where_format);
         }
+        /** @var \VersionPress\Database\WpdbMirrorBridge $wpdbMirrorBridge */
         $wpdbMirrorBridge = $versionPressContainer->resolve(\VersionPress\DI\VersionPressServices::WPDB_MIRROR_BRIDGE);
 
         $r = $this->__wp_delete($table, $where, $where_format);
@@ -80,6 +82,37 @@ class ReplacerMethods {
         $this->vp_restore_fields();
 
         return $r;
+    }
+
+    public function query($query) {
+        global $versionPressContainer;
+        if ($versionPressContainer == null) {
+            return $this->__wp_query($query);
+        }
+
+
+        /** @var SqlQueryParser $sqlQueryParser */
+        $sqlQueryParser = $versionPressContainer->resolve(\VersionPress\DI\VersionPressServices::SQL_QUERY_PARSER);
+
+
+
+        $parsedQuery = $sqlQueryParser->parseQuery($query);
+
+        $r = $this->__wp_query($query);
+
+        if ($r === false || $parsedQuery == null) {
+            return $r;
+        }
+
+       // return r;
+
+        /** @var \VersionPress\Database\WpdbMirrorBridge $wpdbMirrorBridge */
+        $wpdbMirrorBridge = $versionPressContainer->resolve(\VersionPress\DI\VersionPressServices::WPDB_MIRROR_BRIDGE);
+
+        $this->vp_backup_fields();
+        $wpdbMirrorBridge->query($parsedQuery);
+        $this->vp_restore_fields();
+
     }
 
     /**

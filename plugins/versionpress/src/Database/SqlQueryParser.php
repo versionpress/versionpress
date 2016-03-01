@@ -12,6 +12,20 @@ use VersionPress\Database\DbSchemaInfo;
 
 class SqlQueryParser {
 
+    private $schema;
+
+    private $wpdb;
+
+    /**
+     * SqlQueryParser constructor.
+     * @param $schema DbSchemaInfo
+     * @param \wpdb $wpdb
+     */
+    public function __construct($schema, $wpdb) {
+        $this->schema = $schema;
+        $this->wpdb = $wpdb;
+    }
+
     /**
      * Parses Sql query called. If not parseable, returns null
      * @param $query string
@@ -19,15 +33,15 @@ class SqlQueryParser {
      * @param \wpdb $wpdb
      * @return ParsedQueryData
      */
-    public static function parseQuery($query, $schema, $wpdb) {
+    public function parseQuery($query) {
         $parser = self::getParser($query);
         $primaryStatement = $parser->statements[0];
         if ($primaryStatement instanceof UpdateStatement) {
-            return self::parseUpdateQuery($parser, $query, $schema, $wpdb);
+            return self::parseUpdateQuery($parser, $query, $this->schema, $this->wpdb);
         } elseif ($primaryStatement instanceof InsertStatement) {
             return self::parseInsertQuery($parser, $query);
         } elseif ($primaryStatement instanceof DeleteStatement) {
-            return self::parseDeleteQuery($parser, $query, $schema, $wpdb);
+            return self::parseDeleteQuery($parser, $query, $this->schema, $this->wpdb);
         }
         return null;
 
@@ -45,19 +59,22 @@ class SqlQueryParser {
         $statement = $parser->statements[0];
         $table = $statement->tables[0]->table;
         $idColumn = self::getIdColumn($schema, $table);
-        $result = new ParsedQueryData('UPDATE');
+        if ($idColumn == null) {
+            return null;
+        }
+        $result = new ParsedQueryData(ParsedQueryData::UPDATE_QUERY);
         $result->originalQuery = $query;
         $result->table = $table;
-
+        $result->idColumn = $idColumn;
         $selectSql = self::getSelect($parser, $idColumn);
-        $where = self::getSelectWhereClause($parser, $query, $statement);
+        $where = self::getWhereFragments($parser, $query, $statement);
         if (isset($where)) {
             $selectSql .= " WHERE " . join(' ', $where);
         }
         $result->query = $selectSql;
         $result->ids = $wpdb->get_col($selectSql);
         $result->data = self::getData($statement);
-        $result->dirty = self::isQueryDirty($parser);
+        $result->usesSqlFunctions = self::isUsingSqlFunctions($parser);
         $result->where = self::getWhere($where);
         return $result;
     }
@@ -71,7 +88,7 @@ class SqlQueryParser {
      */
     private static function parseInsertQuery($parser, $query) {
         $primaryStatement = $parser->statements[0];
-        $queryType = 'INSERT';
+        $queryType = ParsedQueryData::INSERT_QUERY;
         $table = $primaryStatement->into->dest->table;
         if (count($primaryStatement->options->options) > 0) {
             foreach (array_keys($primaryStatement->options->options) as $key) {
@@ -82,7 +99,7 @@ class SqlQueryParser {
         $result->data = self::getData($primaryStatement);
         $result->table = $table;
         $result->originalQuery = $query;
-        $result->dirty = self::isQueryDirty($parser);
+        $result->usesSqlFunctions = self::isUsingSqlFunctions($parser);
         return $result;
     }
 
@@ -100,17 +117,21 @@ class SqlQueryParser {
         $statement = $parser->statements[0];
         $table = $statement->from[0]->table;
         $idColumn = self::getIdColumn($schema, $table);
-        $result = new ParsedQueryData('DELETE');
+        if ($idColumn == null) {
+            return null;
+        }
+        $result = new ParsedQueryData(ParsedQueryData::DELETE_QUERY);
         $result->originalQuery = $query;
+        $result->idColumn = $idColumn;
         $result->table = $table;
         $selectSql = self::getSelect($parser, $idColumn);
-        $where = self::getSelectWhereClause($parser, $query, $statement);
+        $where = self::getWhereFragments($parser, $query, $statement);
         if (isset($where)) {
             $selectSql .= " WHERE " . join(' ', $where);
         }
         $result->query = $selectSql;
         $result->ids = $wpdb->get_col($selectSql);
-        $result->dirty = self::isQueryDirty($parser);
+        $result->usesSqlFunctions = self::isUsingSqlFunctions($parser);
         $result->where = self::getWhere($where);
         return $result;
     }
@@ -123,7 +144,7 @@ class SqlQueryParser {
      * @param $primaryStatement
      * @return array
      */
-    private static function getSelectWhereClause($parser, $sql, $primaryStatement) {
+    private static function getWhereFragments($parser, $sql, $primaryStatement) {
         if ($primaryStatement->where != null) {
             $where = $primaryStatement->where;
             return $where;
@@ -161,9 +182,11 @@ class SqlQueryParser {
     private static function getData($statement) {
 
         if ($statement instanceof UpdateStatement) {
-            return array_map(function ($set) {
-                return array('column' => $set->column, 'value' => $set->value);
-            }, $statement->set);
+            $dataSet = [];
+            foreach ($statement->set as $set) {
+                $dataSet[str_replace('`','',$set->column)] = $set->value;
+            };
+            return $dataSet;
         } elseif ($statement instanceof InsertStatement) {
             $columns = $statement->into->columns;
             $result = [];
@@ -171,7 +194,7 @@ class SqlQueryParser {
                 $sets = $statement->values[$i];
                 $data = [];
                 for ($j = 0; $j < count($sets->values); $j++) {
-                    array_push($data, array('column' => $columns[$j], 'value' => $sets->values[$j]));
+                    $data[$columns[$j]] = $sets->values[$j];
                 }
                 array_push($result, $data);
             }
@@ -185,7 +208,7 @@ class SqlQueryParser {
      * @param $parser
      * @return bool
      */
-    private static function isQueryDirty($parser) {
+    private static function isUsingSqlFunctions($parser) {
         if (count($parser->statements) > 1) {
             return true;
         } else {
@@ -337,12 +360,14 @@ class SqlQueryParser {
     /**
      * Returns ID column for a table
      *
-     * @param $schema
+     * @param $schema DbSchemaInfo
      * @param $table
      * @return mixed
      */
     private static function getIdColumn($schema, $table) {
-        return $schema->getEntityInfoByPrefixedTableName($table)->idColumnName;
+
+        $entity = $schema->getEntityInfoByPrefixedTableName($table);
+        return $entity == null ? null : $entity->idColumnName;
     }
 
 

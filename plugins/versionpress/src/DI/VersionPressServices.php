@@ -17,6 +17,7 @@ final class VersionPressServices {
     const WPDB = 'wpdb';
     const VPID_REPOSITORY = 'vpid-repository';
     const URL_REPLACER = 'url-replacer';
+    const SQL_QUERY_PARSER = 'sql-query-parser';
 
     private function __construct() {
     }

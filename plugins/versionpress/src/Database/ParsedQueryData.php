@@ -39,13 +39,20 @@ class ParsedQueryData {
     /**
      * @var boolean
      */
-    public $dirty;
+    public $usesSqlFunctions;
     
+    
+    public $idColumn;
     
     /**
     * @var string
     */
     public $queryType;
+
+    const UPDATE_QUERY = 'UPDATE';
+    const INSERT_QUERY = 'INSERT';
+    const DELETE_QUERY = 'DELETE';
+    const INSERT_IGNORE_QUERY = 'INSERT_IGNORE';
     
     
     public function __construct($queryType) {

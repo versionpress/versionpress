@@ -2,6 +2,7 @@
 
 namespace VersionPress\DI;
 
+use VersionPress\Database\SqlQueryParser;
 use VersionPress\Git\Committer;
 use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\Database\DbSchemaInfo;
@@ -146,6 +147,13 @@ class DIContainer {
 
         $dic->register(VersionPressServices::URL_REPLACER, function () {
             return new AbsoluteUrlReplacer(get_site_url());
+        });
+
+        $dic->register(VersionPressServices::SQL_QUERY_PARSER, function () use ($dic) {
+            return new SqlQueryParser(
+                $dic->resolve(VersionPressServices::DB_SCHEMA),
+                $dic->resolve(VersionPressServices::WPDB)
+            );
         });
 
         return self::$instance;
