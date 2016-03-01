@@ -234,15 +234,6 @@ function vp_register_hooks() {
         $committer->forceChangeInfo(new ThemeChangeInfo($stylesheet, 'switch', $themeName));
     });
 
-    add_action('customize_save_after', function ($customizeManager) use ($committer) {
-        /** @var WP_Customize_Manager $customizeManager */
-        $stylesheet = $customizeManager->theme()->get_stylesheet();
-        $committer->forceChangeInfo(new ThemeChangeInfo($stylesheet, 'customize'));
-        register_shutdown_function(function () {
-            wp_remote_get(admin_url("admin.php"));
-        });
-    });
-
     add_action('untrashed_post_comments', function ($postId) use ($wpdb, $dbSchemaInfo, $wpdbMirrorBridge) {
         $commentsTable = $dbSchemaInfo->getPrefixedTableName("comment");
         $commentStatusSql = "select comment_ID, comment_approved from {$commentsTable} where comment_post_ID = {$postId}";
@@ -400,10 +391,9 @@ function vp_register_hooks() {
     }, 10, 2);
 
     add_action('before_delete_post', function ($postId) use ($wpdb) {
-            // Fixing bug in WP (#34803) and WP-CLI (#2246)
+        // Fixing bug in WP (#34803) and WP-CLI (#2246)
         $post = get_post($postId);
         if ( !is_wp_error($post) && $post->post_type === 'nav_menu_item' ) {
-            \Tracy\Debugger::log('Deleting menu item ' . $post->ID);
             $newParent = get_post_meta($post->ID, '_menu_item_menu_item_parent', true);
             $wpdb->update($wpdb->postmeta,
                 array('meta_value' => $newParent),
