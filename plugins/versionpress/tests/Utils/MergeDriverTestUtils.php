@@ -78,33 +78,5 @@ class MergeDriverTestUtils {
         return $process->getExitCode();
     }
 
-    public static function switchDriverToBash() {
-        $driverScriptName = 'ini-merge.sh';
-        $driverScript = '../../src/Git/merge-drivers/' . $driverScriptName;
-        $driverScriptFakeDir = self::$repositoryDir . '/src/Git/merge-drivers';
-        copy($driverScript, $driverScriptFakeDir . '/' . $driverScriptName);
-        chmod($driverScriptFakeDir . '/' . $driverScriptName, 0774);
-
-        $gitconfig = file_get_contents(self::$repositoryDir . '/.git/config');
-        $gitconfig = preg_replace('/\n?.*driver = .*$/m', "\n" . 'driver = ' . $driverScriptFakeDir . '/' . $driverScriptName . ' %O %A %B' . "\n", $gitconfig);
-        file_put_contents(self::$repositoryDir . '/.git/config', $gitconfig);
-
-    }
-
-    public static function switchDriverToPhp() {
-        $driverScriptName = 'ini-merge.php';
-        $driverScript = '../../src/Git/merge-drivers/' . $driverScriptName;
-        $driverScriptFakeDir = self::$repositoryDir . '/src/Git/merge-drivers';
-        copy($driverScript, $driverScriptFakeDir . '/' . $driverScriptName);
-        chmod($driverScriptFakeDir . '/' . $driverScriptName, 0774);
-
-        $mergeDriverScript = '"' . PHP_BINARY . '" "' . $driverScriptFakeDir . '/' . $driverScriptName;
-
-        $gitconfig = file_get_contents(self::$repositoryDir . '/.git/config');
-        $gitconfig = preg_replace('/\n?.*driver = .*$/m', "\n" . 'driver = ' . str_replace('\\', '/', $mergeDriverScript) . '" %O %A %B' . "\n", $gitconfig);
-        file_put_contents(self::$repositoryDir . '/.git/config', $gitconfig);
-
-    }
-
 
 }
