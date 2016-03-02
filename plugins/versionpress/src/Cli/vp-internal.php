@@ -6,6 +6,7 @@ use VersionPress\Database\VpidRepository;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Synchronizers\SynchronizationProcess;
+use VersionPress\Utils\WordPressMissingFunctions;
 use WP_CLI;
 use WP_CLI_Command;
 use wpdb;
@@ -196,44 +197,23 @@ class VPInternalCommand extends WP_CLI_Command {
             WP_CLI::error('wp-config.php does not exist. Please run `wp core config` first.');
         }
 
-        $wpConfigContent = file_get_contents($wpConfigPath);
+        require_once __DIR__ . '/VPCommandUtils.php';
+        require_once __DIR__ . '/../Utils/WordPressMissingFunctions.php';
 
         $constantOrVariableName = $args[0];
-        $value = $args[1];
         $isVariable = isset($assoc_args['variable']);
+        $usePlainValue = isset($assoc_args['plain']);
+        $value = $usePlainValue ? $args[1] : VPCommandUtils::fixTypeOfValue($args[1]);
 
-        $phpizedValue = isset($assoc_args['plain']) ? $value : var_export($this->fixTypeOfValue($value), true);
-
-        // https://regex101.com/r/jE0eJ6/2
-        $constantRegex = "/^(\\s*define\\s*\\(\\s*['\"]" . preg_quote($constantOrVariableName, '/') . "['\"]\\s*,\\s*).*(\\s*\\)\\s*;\\s*)$/m";
-        // https://regex101.com/r/oO7gX7/5
-        $variableRegex = "/^(\\\${$constantOrVariableName}\\s*=\\s*).*(;\\s*)$/m";
-
-        $definitionRegex = $isVariable ? $variableRegex : $constantRegex;
-
-        $configContainsDefinition = preg_match($definitionRegex, $wpConfigContent);
-
-        if ($configContainsDefinition) {
-            $wpConfigContent = preg_replace($definitionRegex, "\${1}$phpizedValue\${2}", $wpConfigContent);
-        } else {
-            $originalContent = $wpConfigContent;
-            $endOfEditableSection = strpos($wpConfigContent, '/* That\'s all, stop editing! Happy blogging. */');
-
-            if ($endOfEditableSection === false) {
-                WP_CLI::error('Cannot find place for defining the ' . ($isVariable ? 'variable' : 'constant')  . '. Config was probably edited manually.');
+        try {
+            if ($isVariable) {
+                WordPressMissingFunctions::updateConfigVariable($wpConfigPath, $constantOrVariableName, $value, $usePlainValue);
+            } else {
+                WordPressMissingFunctions::updateConfigConstant($wpConfigPath, $constantOrVariableName, $value, $usePlainValue);
             }
-
-            $constantTemplate = "define('%s', %s);\n";
-            $variableTemplate = "\$%s = %s;\n";
-
-            $definitionTemplate = $isVariable ? $variableTemplate : $constantTemplate;
-
-            $wpConfigContent = substr($originalContent, 0, $endOfEditableSection);
-            $wpConfigContent .= sprintf($definitionTemplate, $constantOrVariableName, $phpizedValue);
-            $wpConfigContent .= substr($originalContent, $endOfEditableSection);
+        } catch (\Exception $e) {
+            WP_CLI::error('Cannot find place for defining the ' . ($isVariable ? 'variable' : 'constant')  . '. Config was probably edited manually.');
         }
-
-        file_put_contents($wpConfigPath, $wpConfigContent);
     }
 
     /**
