@@ -12,7 +12,7 @@ class MergeDriverInstaller {
         $gitattributes = file_get_contents($directory . '/.gitattributes.tpl');
 
         $gitattributesVariables = array(
-            'vpdb-dir' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, VP_VPDB_DIR), '.'), '/\\')
+            'vpdb-dir' => '/' . PathUtils::getRelativePath(VP_PROJECT_ROOT, VP_VPDB_DIR),
         );
         $gitattributes = "\n" . StringUtils::fillTemplateString($gitattributesVariables, $gitattributes);
 

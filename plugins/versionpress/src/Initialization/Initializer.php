@@ -464,9 +464,9 @@ class Initializer {
         $gitignore = file_get_contents(__DIR__ . '/.gitignore.tpl');
 
         $gitIgnoreVariables = array(
-            'wp-content' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_CONTENT_DIR), '.'), '/\\'),
-            'wp-plugins' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_PLUGIN_DIR), '.'), '/\\'),
-            'abspath' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, ABSPATH), '.'), '/\\'),
+            'wp-content' => '/' . PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_CONTENT_DIR),
+            'wp-plugins' => '/' . PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_PLUGIN_DIR),
+            'abspath' => '/' . PathUtils::getRelativePath(VP_PROJECT_ROOT, ABSPATH),
         );
 
         $gitignore = StringUtils::fillTemplateString($gitIgnoreVariables, $gitignore);
