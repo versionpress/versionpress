@@ -3,7 +3,6 @@
 namespace VersionPress\DI;
 
 use VersionPress\Git\Committer;
-use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\WpdbMirrorBridge;
 use VersionPress\Database\VpidRepository;
@@ -46,10 +45,6 @@ class DIContainer {
             return self::$instance;
 
         self::$instance = $dic = new DIContainer();
-
-        $dic->register(VersionPressServices::VP_CONFIGURATION, function () {
-            return new VersionPressConfig();
-        });
 
         $dic->register(VersionPressServices::WPDB, function () {
             global $wpdb;
@@ -131,10 +126,8 @@ class DIContainer {
             );
         });
 
-        $dic->register(VersionPressServices::REPOSITORY, function () use ($dic) {
-            /** @var VersionPressConfig $vpConfig */
-            $vpConfig = $dic->resolve(VersionPressServices::VP_CONFIGURATION);
-            return new GitRepository(VP_PROJECT_ROOT, VERSIONPRESS_TEMP_DIR, "[VP] ", $vpConfig->gitBinary);
+        $dic->register(VersionPressServices::REPOSITORY, function () {
+            return new GitRepository(VP_PROJECT_ROOT, VERSIONPRESS_TEMP_DIR, "[VP] ", VP_GIT_BINARY);
         });
 
         $dic->register(VersionPressServices::VPID_REPOSITORY, function () use ($dic) {

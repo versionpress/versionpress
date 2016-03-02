@@ -13,7 +13,6 @@ final class VersionPressServices {
     const SYNCHRONIZER_FACTORY = 'synchronizer-factory';
     const REVERTER = 'reverter';
     const REPOSITORY = 'repository';
-    const VP_CONFIGURATION = 'vp-configuration';
     const WPDB = 'wpdb';
     const VPID_REPOSITORY = 'vpid-repository';
     const URL_REPLACER = 'url-replacer';

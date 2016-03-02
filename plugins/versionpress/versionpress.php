@@ -971,9 +971,8 @@ function versionpress_api_init() {
     global $versionPressContainer;
     $gitRepository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
     $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
-    $vpConfig = $versionPressContainer->resolve(VersionPressServices::VP_CONFIGURATION);
     $synchronizationProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
 
-    $vpApi = new VersionPressApi($gitRepository, $reverter, $vpConfig, $synchronizationProcess);
+    $vpApi = new VersionPressApi($gitRepository, $reverter, $synchronizationProcess);
     $vpApi->register_routes();
 }
