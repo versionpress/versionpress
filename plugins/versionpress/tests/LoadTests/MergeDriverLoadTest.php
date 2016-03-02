@@ -50,7 +50,7 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
         MergeDriverTestUtils::switchDriverToPhp();
         $this->prepareTestRepositoryHistory();
         $time_start = microtime(true);
-        $mergeCommandExitCode = MergeDriverTestUtils::getProcessExitCode('git merge test-branch');
+        $mergeCommandExitCode = MergeDriverTestUtils::runGitCommand('git merge test-branch');
         $time_end = microtime(true);
         $execution_time = ($time_end - $time_start);
         echo 'Php Execution Time: ' . $execution_time . " Sec\n";
@@ -71,7 +71,7 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
         MergeDriverTestUtils::switchDriverToBash();
         $this->prepareTestRepositoryHistory();
         $time_start = microtime(true);
-        $mergeCommandExitCode = MergeDriverTestUtils::getProcessExitCode('git merge test-branch');
+        $mergeCommandExitCode = MergeDriverTestUtils::runGitCommand('git merge test-branch');
         $time_end = microtime(true);
         $execution_time = ($time_end - $time_start);
         echo 'Bash Execution Time: ' . $execution_time . " Sec\n";
@@ -85,17 +85,17 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
         $branchDate = '17-02-16 19:19:23';
 
         for ($i = 0; $i < $limit; $i++) {
-            MergeDriverTestUtils::createIniFile($originDate, 'file' . $i . '.ini');
+            MergeDriverTestUtils::writeIniFile('file' . $i . '.ini', $originDate);
         }
         MergeDriverTestUtils::commit('Initial commit to Ancestor');
-        MergeDriverTestUtils::getProcessExitCode('git checkout -b test-branch');
+        MergeDriverTestUtils::runGitCommand('git checkout -b test-branch');
         for ($i = 0; $i < $limit; $i++) {
-            MergeDriverTestUtils::createIniFile($branchDate, 'file' . $i . '.ini', 'Custom content');
+            MergeDriverTestUtils::writeIniFile('file' . $i . '.ini', $branchDate, 'Custom content');
         }
         MergeDriverTestUtils::commit('Commit to branch');
-        MergeDriverTestUtils::getProcessExitCode('git checkout master');
+        MergeDriverTestUtils::runGitCommand('git checkout master');
         for ($i = 0; $i < $limit; $i++) {
-            MergeDriverTestUtils::createIniFile($masterDate, 'file' . $i . '.ini');
+            MergeDriverTestUtils::writeIniFile('file' . $i . '.ini', $masterDate);
         }
         MergeDriverTestUtils::commit('Commit to master');
     }

@@ -41,7 +41,7 @@ class MergeDriverTestUtils {
     }
 
 
-    public static function createIniFile($date, $fileName, $content = 'Default content', $title = 'Default title') {
+    public static function writeIniFile($fileName, $date, $content = 'Default content', $title = 'Default title') {
         $data = array("GUID" => array('post_modified' => $date, 'post_modified_gmt' => $date, 'title' => $title, 'content' => $content));
         file_put_contents(self::$repositoryDir . '/' . $fileName, IniSerializer::serialize($data));
     }
@@ -57,7 +57,7 @@ class MergeDriverTestUtils {
     }
 
     public static function createIniFileAndCommit($originDate, $fileName, $message, $content = 'Default content', $title = 'Default title') {
-        self::createIniFile($originDate, $fileName, $content, $title);
+        self::writeIniFile($fileName, $originDate, $content, $title);
         self::commit($message);
     }
 
@@ -67,11 +67,13 @@ class MergeDriverTestUtils {
     }
 
     /**
-     * @param $checkoutBranchCmd
-     * @return int
+     * Runs Git command in the test repo and returns the exit code.
+     * 
+     * @param string $cmd
+     * @return int Exit code
      */
-    public static function getProcessExitCode($checkoutBranchCmd) {
-        $process = new Process($checkoutBranchCmd, self::$repositoryDir);
+    public static function runGitCommand($cmd) {
+        $process = new Process($cmd, self::$repositoryDir);
         $process->run();
         return $process->getExitCode();
     }
