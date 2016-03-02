@@ -1,6 +1,7 @@
 <?php
 
 namespace VersionPress\Initialization;
+use VersionPress\Database\ParsedQueryData;
 use VersionPress\Database\SqlQueryParser;
 
 /**
@@ -25,6 +26,7 @@ class ReplacerMethods {
         if ($versionPressContainer == null) {
             return $this->__wp_insert($table, $data, $format);
         }
+        $this->vp_use_original_query_method = true;
         /** @var \VersionPress\Database\WpdbMirrorBridge $wpdbMirrorBridge */
         $wpdbMirrorBridge = $versionPressContainer->resolve(\VersionPress\DI\VersionPressServices::WPDB_MIRROR_BRIDGE);
 
@@ -37,7 +39,7 @@ class ReplacerMethods {
         $this->vp_backup_fields();
         $wpdbMirrorBridge->insert($table, $data);
         $this->vp_restore_fields();
-
+        $this->vp_use_original_query_method = false;
         return $r;
 
     }
@@ -47,6 +49,7 @@ class ReplacerMethods {
         if ($versionPressContainer == null) {
             return $this->__wp_update($table, $data, $where, $format, $where_format);
         }
+        $this->vp_use_original_query_method = true;
         /** @var \VersionPress\Database\WpdbMirrorBridge $wpdbMirrorBridge */
         $wpdbMirrorBridge = $versionPressContainer->resolve(\VersionPress\DI\VersionPressServices::WPDB_MIRROR_BRIDGE);
 
@@ -59,7 +62,7 @@ class ReplacerMethods {
         $this->vp_backup_fields();
         $wpdbMirrorBridge->update($table, $data, $where);
         $this->vp_restore_fields();
-
+        $this->vp_use_original_query_method = false;
         return $r;
     }
 
@@ -68,6 +71,7 @@ class ReplacerMethods {
         if ($versionPressContainer == null) {
             return $this->__wp_delete($table, $where, $where_format);
         }
+        $this->vp_use_original_query_method = true;
         /** @var \VersionPress\Database\WpdbMirrorBridge $wpdbMirrorBridge */
         $wpdbMirrorBridge = $versionPressContainer->resolve(\VersionPress\DI\VersionPressServices::WPDB_MIRROR_BRIDGE);
 
@@ -80,13 +84,13 @@ class ReplacerMethods {
         $this->vp_backup_fields();
         $wpdbMirrorBridge->delete($table, $where);
         $this->vp_restore_fields();
-
+        $this->vp_use_original_query_method = false;
         return $r;
     }
 
     public function query($query) {
         global $versionPressContainer;
-        if ($versionPressContainer == null) {
+        if ($versionPressContainer == null || $this->vp_use_original_query_method) {
             return $this->__wp_query($query);
         }
 
@@ -96,11 +100,16 @@ class ReplacerMethods {
 
 
 
-        $parsedQuery = $sqlQueryParser->parseQuery($query);
+        $parsedQueryData = $sqlQueryParser->parseQuery($query);
 
         $r = $this->__wp_query($query);
 
-        if ($r === false || $parsedQuery == null) {
+        if($parsedQueryData != null && $parsedQueryData->queryType == \VersionPress\Database\ParsedQueryData::INSERT_UPDATE_QUERY) {
+                $parsedQueryData->ids = $this->insert_id;
+        }
+
+
+        if ($r === false || $parsedQueryData == null) {
             return $r;
         }
 
@@ -110,7 +119,7 @@ class ReplacerMethods {
         $wpdbMirrorBridge = $versionPressContainer->resolve(\VersionPress\DI\VersionPressServices::WPDB_MIRROR_BRIDGE);
 
         $this->vp_backup_fields();
-        $wpdbMirrorBridge->query($parsedQuery);
+        $wpdbMirrorBridge->query($parsedQueryData);
         $this->vp_restore_fields();
 
     }
@@ -122,6 +131,14 @@ class ReplacerMethods {
      * @var array
      */
     private $vp_field_backup = array();
+
+    /**
+     * Used by VersionPress to avoid 'patched' query() method call when update,insert,delete methods are called
+     *
+     * @since VersionPress
+     * @var boolean
+     */
+    private $vp_use_original_query_method;
 
     /**
      * @since VersionPress

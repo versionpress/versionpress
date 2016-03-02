@@ -71,7 +71,7 @@ class VpidRepository {
                 }
                 $targetTable = $this->schemaInfo->getEntityInfo($targetEntity)->tableName;
 
-                $referenceVpId = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=".$entity[$valueColumn]);
+                $referenceVpId = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=" . $entity[$valueColumn]);
                 $entity[$valueColumn] = $referenceVpId;
             }
         }
@@ -83,11 +83,12 @@ class VpidRepository {
         if ($this->schemaInfo->getEntityInfo($entityName)->usesGeneratedVpids) {
             $data['vp_id'] = IdUtil::newId();
             $this->saveId($entityName, $id, $data['vp_id']);
+
+
+            $data[$this->schemaInfo->getEntityInfo($entityName)->idColumnName] = $id;
         }
-
-        $data[$this->schemaInfo->getEntityInfo($entityName)->idColumnName] = $id;
-
         $data = $this->fillId($entityName, $data, $id);
+
         return $data;
     }
 

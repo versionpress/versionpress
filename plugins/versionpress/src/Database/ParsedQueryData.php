@@ -53,6 +53,7 @@ class ParsedQueryData {
     const INSERT_QUERY = 'INSERT';
     const DELETE_QUERY = 'DELETE';
     const INSERT_IGNORE_QUERY = 'INSERT_IGNORE';
+    const INSERT_UPDATE_QUERY = 'INSERT_UPDATE';
     
     
     public function __construct($queryType) {

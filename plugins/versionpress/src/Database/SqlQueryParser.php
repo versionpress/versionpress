@@ -39,7 +39,7 @@ class SqlQueryParser {
         if ($primaryStatement instanceof UpdateStatement) {
             return self::parseUpdateQuery($parser, $query, $this->schema, $this->wpdb);
         } elseif ($primaryStatement instanceof InsertStatement) {
-            return self::parseInsertQuery($parser, $query);
+            return self::parseInsertQuery($parser, $query, $this->schema);
         } elseif ($primaryStatement instanceof DeleteStatement) {
             return self::parseDeleteQuery($parser, $query, $this->schema, $this->wpdb);
         }
@@ -86,20 +86,29 @@ class SqlQueryParser {
      * @param $query
      * @return ParsedQueryData
      */
-    private static function parseInsertQuery($parser, $query) {
-        $primaryStatement = $parser->statements[0];
+    private static function parseInsertQuery($parser, $query, $schema) {
+        $statement = $parser->statements[0];
         $queryType = ParsedQueryData::INSERT_QUERY;
-        $table = $primaryStatement->into->dest->table;
-        if (count($primaryStatement->options->options) > 0) {
-            foreach (array_keys($primaryStatement->options->options) as $key) {
-                $queryType .= "_" . $primaryStatement->options->options[$key];
+        $table = $statement->into->dest->table;
+        $idColumn = self::getIdColumn($schema, $table);
+        if ($idColumn == null) {
+            return null;
+        }
+        if (count($statement->options->options) > 0) {
+            foreach (array_keys($statement->options->options) as $key) {
+                $queryType .= "_" . $statement->options->options[$key];
             }
         }
+        if(strpos($query, 'ON DUPLICATE KEY UPDATE') !== false) {
+            $queryType .= "_UPDATE";
+        }
         $result = new ParsedQueryData($queryType);
-        $result->data = self::getData($primaryStatement);
+        $result->data = self::getData($statement);
         $result->table = $table;
         $result->originalQuery = $query;
         $result->usesSqlFunctions = self::isUsingSqlFunctions($parser);
+        $selectSql = self::getSelect($parser, $idColumn);
+        $result->query = $selectSql;
         return $result;
     }
 
@@ -184,7 +193,7 @@ class SqlQueryParser {
         if ($statement instanceof UpdateStatement) {
             $dataSet = [];
             foreach ($statement->set as $set) {
-                $dataSet[str_replace('`','',$set->column)] = $set->value;
+                $dataSet[str_replace('`', '', $set->column)] = $set->value;
             };
             return $dataSet;
         } elseif ($statement instanceof InsertStatement) {
@@ -294,11 +303,22 @@ class SqlQueryParser {
     private static function getSelect($parser, $idColumn) {
         $query = "SELECT $idColumn FROM ";
         $statement = $parser->statements[0];
+        if ($statement instanceof InsertStatement) {
+            $query = "SELECT * FROM " . $statement->into->dest . " WHERE ";
+            $dataSet = self::getData($statement);
+            $whereConditions = [];
+            foreach ($dataSet[0] as $key => $value) {
+                array_push($whereConditions, $key . '=\'' . $value . '\'');
+            }
+            $query .= join(" AND ", $whereConditions);
+            return $query;
+        }
         if (isset($statement->from)) {
             $from = $statement->from[0];
         } else {
             $from = $statement->tables[0];
         }
+
         $query .= $from->expr;
         if ($from->alias != null) {
             $query .= ' AS ' . $from->alias;
@@ -322,7 +342,8 @@ class SqlQueryParser {
      * @param $query
      * @return Parser
      */
-    private static function getParser($query) {
+    private
+    static function getParser($query) {
         $containsUsingPattern = "/(.*)(USING ?\\(([^\\)]+)\\))(.*)/"; //https://regex101.com/r/vF6dI5/1
         $isTransformed = false;
         $parser = new Parser($query);
@@ -364,7 +385,8 @@ class SqlQueryParser {
      * @param $table
      * @return mixed
      */
-    private static function getIdColumn($schema, $table) {
+    private
+    static function getIdColumn($schema, $table) {
 
         $entity = $schema->getEntityInfoByPrefixedTableName($table);
         return $entity == null ? null : $entity->idColumnName;

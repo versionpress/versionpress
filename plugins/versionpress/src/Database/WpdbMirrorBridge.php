@@ -125,29 +125,32 @@ class WpdbMirrorBridge {
     }
 
     /**
-     * @param $parsedQuery ParsedQueryData
+     * @param $parsedQueryData ParsedQueryData
      */
-    function query($parsedQuery) {
+    function query($parsedQueryData) {
         if ($this->disabled) {
             return;
         }
-        $table = $parsedQuery->table;
+        $table = $parsedQueryData->table;
         $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($table);
 
         if (!$entityInfo)
             return;
 
-        $usesSqlFunctions = $parsedQuery->usesSqlFunctions;
+        $usesSqlFunctions = $parsedQueryData->usesSqlFunctions;
 
 
-        if ($parsedQuery->queryType == ParsedQueryData::UPDATE_QUERY && !$usesSqlFunctions) {
-            $this->processUpdateQueryWithoutSqlFunctions($parsedQuery, $entityInfo);
+        if ($parsedQueryData->queryType == ParsedQueryData::UPDATE_QUERY && !$usesSqlFunctions) {
+            $this->processUpdateQueryWithoutSqlFunctions($parsedQueryData, $entityInfo);
         }
-        if ($parsedQuery->queryType == ParsedQueryData::DELETE_QUERY && !$usesSqlFunctions) {
-            $this->processDeleteQueryWithoutSqlFunctions($parsedQuery, $entityInfo);
+        if ($parsedQueryData->queryType == ParsedQueryData::DELETE_QUERY && !$usesSqlFunctions) {
+            $this->processDeleteQueryWithoutSqlFunctions($parsedQueryData, $entityInfo);
         }
-        if ($parsedQuery->queryType == ParsedQueryData::INSERT_QUERY && !$usesSqlFunctions) {
-            $this->processInsertQueryWithoutSqlFunctions($parsedQuery, $entityInfo);
+        if ($parsedQueryData->queryType == ParsedQueryData::INSERT_QUERY && !$usesSqlFunctions) {
+            $this->processInsertQueryWithoutSqlFunctions($parsedQueryData, $entityInfo);
+        }
+        if($parsedQueryData->queryType == ParsedQueryData::INSERT_UPDATE_QUERY) {
+            $this->processInsertUpdateQuery($parsedQueryData, $entityInfo);
         }
 
 
@@ -309,21 +312,43 @@ class WpdbMirrorBridge {
         }
     }
 
-    private function processInsertQueryWithoutSqlFunctions($parsedQuery, $entityInfo) {
-        $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityInfo->entityName, $parsedQuery->data);
-        $shouldBeSaved = $this->mirror->shouldBeSaved($entityInfo->entityName, $data);
+    private function processInsertQueryWithoutSqlFunctions($parsedQueryData, $entityInfo) {
 
-        if (!$shouldBeSaved) {
-            return;
-        }
         
         $id = $this->database->insert_id;
-        $entitiesCount = count($parsedQuery->data);
+        $entitiesCount = count($parsedQueryData->data);
 
         for($i=0;$i<$entitiesCount;$i++) {
+            $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityInfo->entityName, $parsedQueryData->data[$i]);
+            $shouldBeSaved = $this->mirror->shouldBeSaved($entityInfo->entityName, $data[$i]);
+
+            if (!$shouldBeSaved) {
+                continue;
+            }
             $data = $this->vpidRepository->identifyEntity($entityInfo->entityName, $data[$i], ($id-$i));
             $this->mirror->save($entityInfo->entityName, $data);
         }
+    }
+
+    private function processInsertUpdateQuery($parsedQueryData, $entityInfo) {
+        
+        if($parsedQueryData->ids != 0) {
+            $id = $parsedQueryData->ids;
+            $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityInfo->entityName, $parsedQueryData->data[0]);
+            $shouldBeSaved = $this->mirror->shouldBeSaved($entityInfo->entityName, $data);
+
+            if (!$shouldBeSaved) {
+                return;
+            }
+            $data = $this->vpidRepository->identifyEntity($entityInfo->entityName, $data, $id);
+            $this->mirror->save($entityInfo->entityName, $data);
+        }else {
+            $data = $this->database->get_results($parsedQueryData->query, ARRAY_A)[0];
+            $stringifiedId = "'" . $data[$parsedQueryData->idColumn] . "'";
+            $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityInfo->entityName, $data);
+            $this->updateEntity($data, $entityInfo->entityName, $stringifiedId);
+        }
+
     }
 
 }
