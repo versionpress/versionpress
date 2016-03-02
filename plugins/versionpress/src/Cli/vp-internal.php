@@ -165,6 +165,98 @@ class VPInternalCommand extends WP_CLI_Command {
         $vpIdRepository = $versionPressContainer->resolve(VersionPressServices::VPID_REPOSITORY);
         echo $vpIdRepository->getVpidForEntity($assoc_args["name"], $assoc_args["id"]);
     }
+
+    /**
+     * Sets or updates constant or variable in wp-config.php
+     *
+     * ## OPTIONS
+     *
+     * <constant>
+     * : Name of constant or variable that will be changed.
+     *
+     * <value>
+     * : Desired value. Supported types are: string, int, float and bool.
+     *
+     * --plain
+     * : The value will be used as is - without type detection, quoting etc.
+     *
+     * --variable
+     * : Will set a variable instead of constant. Useful for $table_prefix.
+     *
+     * @subcommand update-config
+     *
+     * @synopsis <constant> <value> [--plain] [--variable]
+     *
+     * @when before_wp_load
+     */
+    public function updateConfig($args = array(), $assoc_args = array()) {
+        $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
+
+        if ($wpConfigPath === false) {
+            WP_CLI::error('wp-config.php does not exist. Please run `wp core config` first.');
+        }
+
+        $wpConfigContent = file_get_contents($wpConfigPath);
+
+        $constantOrVariableName = $args[0];
+        $value = $args[1];
+        $isVariable = isset($assoc_args['variable']);
+
+        $phpizedValue = isset($assoc_args['plain']) ? $value : var_export($this->fixTypeOfValue($value), true);
+
+        // https://regex101.com/r/jE0eJ6/2
+        $constantRegex = "/^(\\s*define\\s*\\(\\s*['\"]" . preg_quote($constantOrVariableName, '/') . "['\"]\\s*,\\s*).*(\\s*\\)\\s*;\\s*)$/m";
+        // https://regex101.com/r/oO7gX7/5
+        $variableRegex = "/^(\\\${$constantOrVariableName}\\s*=\\s*).*(;\\s*)$/m";
+
+        $definitionRegex = $isVariable ? $variableRegex : $constantRegex;
+
+        $configContainsDefinition = preg_match($definitionRegex, $wpConfigContent);
+
+        if ($configContainsDefinition) {
+            $wpConfigContent = preg_replace($definitionRegex, "\${1}$phpizedValue\${2}", $wpConfigContent);
+        } else {
+            $originalContent = $wpConfigContent;
+            $endOfEditableSection = strpos($wpConfigContent, '/* That\'s all, stop editing! Happy blogging. */');
+
+            if ($endOfEditableSection === false) {
+                WP_CLI::error('Cannot find place for defining the ' . ($isVariable ? 'variable' : 'constant')  . '. Config was probably edited manually.');
+            }
+
+            $constantTemplate = "define('%s', %s);\n";
+            $variableTemplate = "\$%s = %s;\n";
+
+            $definitionTemplate = $isVariable ? $variableTemplate : $constantTemplate;
+
+            $wpConfigContent = substr($originalContent, 0, $endOfEditableSection);
+            $wpConfigContent .= sprintf($definitionTemplate, $constantOrVariableName, $phpizedValue);
+            $wpConfigContent .= substr($originalContent, $endOfEditableSection);
+        }
+
+        file_put_contents($wpConfigPath, $wpConfigContent);
+    }
+
+    /**
+     * WP-CLI args are always strings. This method restores the original type.
+     * 
+     * @param string $value
+     * @return bool|int|float|string
+     */
+    private function fixTypeOfValue($value) {
+        if (is_numeric($value)) {
+            return $value + 0;
+        }
+
+        if (strtolower($value) === 'true') {
+            return true;
+        }
+
+        if (strtolower($value) === 'false') {
+            return false;
+        }
+
+        return $value;
+    }
 }
 
 if (defined('WP_CLI') && WP_CLI) {
