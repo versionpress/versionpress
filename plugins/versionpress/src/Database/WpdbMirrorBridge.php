@@ -277,21 +277,24 @@ class WpdbMirrorBridge {
 
 
         foreach ($parsedQuery->ids as $id) {
-            $data = $this->database->get_results("SELECT * FROM {$parsedQuery->table} WHERE {$parsedQuery->idColumn} = '{$id}'", ARRAY_A)[0];
+            $stringifiedId = "'" . $id . "'";
+            $data = $this->database->get_results("SELECT * FROM {$parsedQuery->table} WHERE {$parsedQuery->idColumn} = {$stringifiedId}", ARRAY_A)[0];
             $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityInfo->entityName, $data);
-            $this->updateEntity($data, $entityInfo->entityName, $id);
+            $this->updateEntity($data, $entityInfo->entityName, $stringifiedId);
         }
     }
     private function processDeleteQueryWithoutSqlFunctions($parsedQuery, $entityInfo) {
         if (!$entityInfo->usesGeneratedVpids) {
             foreach ($parsedQuery->ids as $id) {
-                $where[$parsedQuery->idColumn] = $id;
-                $this->vpidRepository->deleteId($entityInfo->entityName, $id);
+                $stringifiedId = "'" . $id . "'";
+                $where[$parsedQuery->idColumn] = $stringifiedId;
+                $this->vpidRepository->deleteId($entityInfo->entityName, $stringifiedId);
                 $this->mirror->delete($entityInfo->entityName, $where);
             }
             return;
         }
         foreach ($parsedQuery->ids as $id) {
+            $stringifiedId = "'" . $id . "'";
             $where['vp_id'] = $this->vpidRepository->getVpidForEntity($entityInfo->entityName, $id);
             if (!$where['vp_id']) {
                 continue; // already deleted - deleting postmeta is sometimes called twice
@@ -301,7 +304,7 @@ class WpdbMirrorBridge {
                 $where = $this->fillParentId($entityInfo->entityName, $where, $id);
             }
 
-            $this->vpidRepository->deleteId($entityInfo->entityName, $id);
+            $this->vpidRepository->deleteId($entityInfo->entityName, $stringifiedId);
             $this->mirror->delete($entityInfo->entityName, $where);
         }
     }
