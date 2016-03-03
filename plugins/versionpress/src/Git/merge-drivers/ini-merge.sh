@@ -39,9 +39,9 @@ do
 done
 
 # Place temporary placeholder between lines to avoid merge conflicts on adjacent lines
-sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/\n/&#######&/g' $O
-sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/\n/&#######&/g' $A
-sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/\n/&#######&/g' $B
+sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/\n/&###VP###&/g' $O
+sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/\n/&###VP###&/g' $A
+sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/\n/&###VP###&/g' $B
 
 # Process everything else through standard
 git merge-file -L mine -L base -L theirs $A $O $B
@@ -50,9 +50,9 @@ git merge-file -L mine -L base -L theirs $A $O $B
 GIT_MERGE_EXIT_CODE=$?
 
 # Remove temporary placeholders
-sed -e ':a' -e 'N' -e '$!ba' -e 's/\n#######//g' -i '' $A
-sed -e ':a' -e 'N' -e '$!ba' -e 's/\n#######//g' -i '' $B
-sed -e ':a' -e 'N' -e '$!ba' -e 's/\n#######//g' -i '' $O
+sed -e ':a' -e 'N' -e '$!ba' -e 's/\n###VP###//g' -i '' $A
+sed -e ':a' -e 'N' -e '$!ba' -e 's/\n###VP###//g' -i '' $B
+sed -e ':a' -e 'N' -e '$!ba' -e 's/\n###VP###//g' -i '' $O
 
 # If Git merge fails, we should also 'fail'
 if [ $GIT_MERGE_EXIT_CODE -ne 0 ]; then

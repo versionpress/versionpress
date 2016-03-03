@@ -44,16 +44,16 @@ foreach ($dates as $date) {
 
 }
 // Add temporary placeholder between adjacent lines to prevent merge conflicts
-file_put_contents($B, preg_replace('/(\r\n|\r|\n)/', "$1#######\n", $bFile));
-file_put_contents($A, preg_replace('/(\r\n|\r|\n)/', "$1#######\n", $aFile));
-file_put_contents($O, preg_replace('/(\r\n|\r|\n)/', "$1#######\n", $oFile));
+file_put_contents($B, preg_replace('/(\r\n|\r|\n)/', "$1###VP###\n", $bFile));
+file_put_contents($A, preg_replace('/(\r\n|\r|\n)/', "$1###VP###\n", $aFile));
+file_put_contents($O, preg_replace('/(\r\n|\r|\n)/', "$1###VP###\n", $oFile));
 
 // Call git merge command and receive the exitcode
 exec($mergeCommand, $dummy, $mergeExitCode);
 
 // Remove temporary placeholders
-file_put_contents($B, str_replace("#######\n", '', file_get_contents($B)));
-file_put_contents($A, str_replace("#######\n", '', file_get_contents($A)));
-file_put_contents($O, str_replace("#######\n", '', file_get_contents($O)));
+file_put_contents($B, str_replace("###VP###\n", '', file_get_contents($B)));
+file_put_contents($A, str_replace("###VP###\n", '', file_get_contents($A)));
+file_put_contents($O, str_replace("###VP###\n", '', file_get_contents($O)));
 
 exit ($mergeExitCode);
