@@ -36,56 +36,77 @@ class VPCommand extends WP_CLI_Command {
      *
      * ## OPTIONS
      *
-     * <key>
-     * : The name of the option to set.
+     * <constant>
+     * : The name of the constant to set.
      *
      * [<value>]
-     * : The new value. If missing, just prints out the option.
+     * : The new value. If missing, just prints out current value.
      *
-     * @when before_wp_load
      */
     public function config($args, $assoc_args) {
+        /**
+         * common: will be saved into wp-config.common.php
+         * type: type of constant
+         *   absolute-path: will be saved as-is
+         *   dynamic-path: part of the path (to wp-config.php) will be replaced with __DIR__ constant
+         */
+        $allowedConstants = array(
+            'VP_GIT_BINARY' => array(
+                'common' => false,
+                'type' => 'absolute-path',
+            ),
+            'VP_PROJECT_ROOT' => array(
+                'common' => true,
+                'type' => 'dynamic-path',
+                'root' => dirname(\WP_CLI\Utils\locate_wp_config()),
+            ),
+            'VP_VPDB_DIR' => array(
+                'common' => true,
+                'type' => 'dynamic-path',
+                'root' => dirname(\WP_CLI\Utils\locate_wp_config()),
+            ),
+        );
 
-        $configFile = __DIR__ . '/../../vpconfig.neon';
-        $configContents = "";
-        if (file_exists($configFile)) {
-            $configContents = file_get_contents($configFile);
+        $constant = $args[0];
+
+        if (!isset($allowedConstants[$constant])) {
+            WP_CLI::log($constant);
+            WP_CLI::error("Cannot configure constant '{$constant}'");
         }
 
         if (count($args) === 1) {
-            $config = Neon::decode($configContents);
-            WP_CLI::out(@$config[$args[0]]);
-            return;
+            if (defined($constant)) {
+                WP_CLI::print_value(constant($constant));
+                return;
+            }
+
+            WP_CLI::error("Constant '{$constant}' is not defined.");
         }
 
-        $configContents = $this->updateConfigValue($configContents, $args[0], $args[1]);
+        $value = $args[1];
+        $isCommon = $allowedConstants[$constant]['common'];
+        $valueType = $allowedConstants[$constant]['type'];
 
-        file_put_contents($configFile, $configContents);
+        $updateConfigArgs = $args;
 
-    }
+        if ($valueType === 'dynamic-path') {
+            $root = $allowedConstants[$constant]['root'];
 
-    private function updateConfigValue($config, $key, $value) {
-
-        // We don't use NEON decoding and encoding again as that removes comments etc.
-
-        require_once(__DIR__ . '/../../vendor/nette/utils/src/Utils/Strings.php');
-
-        // General matching: https://regex101.com/r/sE2iB1/1
-        // Concrete example: https://regex101.com/r/sE2iB1/2
-
-        $re = "/^($key)(:\\s*)(\\S[^#\\r\\n]+)(\\h+#?.*)?$/m";
-        $subst = "$1$2$value$4";
-
-        if (preg_match_all($re, $config, $matches)) {
-            $result = preg_replace($re, $subst, $config);
-        } else {
-            // value was not there, add it to the end
-            $result = $config . (Strings::endsWith($config, "\n") ? "" : "\n");
-            $result .= "$key: $value\n";
+            $relativePath = PathUtils::getRelativePath($value, $root);
+            $updateConfigArgs[1] = '__DIR__' . ($relativePath === '' ? '' : " . '/$relativePath'");
+            $updateConfigArgs['plain'] = null;
         }
 
-        return $result;
+        if ($valueType === 'absolute-path') {
+            $updateConfigArgs['plain'] = null;
+        }
 
+        if ($isCommon) {
+            $updateConfigArgs['common'] = null;
+        }
+
+        $process = $this->runVPInternalCommand('update-config', $updateConfigArgs);
+        WP_CLI::log($process->getConsoleOutput());
     }
 
     /**
