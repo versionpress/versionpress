@@ -121,14 +121,4 @@ class SiteConfig {
      */
     public $wpAutoupdate;
 
-    //----------------------
-    // VersionPress config
-    //----------------------
-
-    /**
-     * Array of 'config-option' (string) => 'config-value' (string)
-     *
-     * @var array
-     */
-    public $vpConfig;
 }
