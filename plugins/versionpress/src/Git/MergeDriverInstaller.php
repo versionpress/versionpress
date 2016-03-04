@@ -7,6 +7,10 @@ use VersionPress\Utils\StringUtils;
 
 class MergeDriverInstaller {
 
+    const DRIVER_BASH = 'bash';
+    const DRIVER_PHP = 'php';
+    const DRIVER_AUTO = 'auto';
+
     /**
      * Installs a merge driver.
      *
@@ -28,9 +32,9 @@ class MergeDriverInstaller {
      * @param string $rootDir Where to install the driver
      * @param string $pluginDir Path to VersionPress (plugin) - used to look up templates and merge drivers
      * @param string $vpdbDir Location of the VPDB dir (where the INI files are)
-     * @param string $driver 'bash' | 'php' | 'auto' (will use 'php' for Windows, 'bash' otherwise)
+     * @param string $driver DRIVER_BASH | DRIVER_PHP | DRIVER_AUTO (default; will use PHP driver for Windows, Bash otherwise)
      */
-    public static function installMergeDriver($rootDir, $pluginDir, $vpdbDir, $driver = 'auto') {
+    public static function installMergeDriver($rootDir, $pluginDir, $vpdbDir, $driver = self::DRIVER_AUTO) {
         self::installGitattributes($rootDir, $pluginDir, $vpdbDir);
         self::installGitConfig($rootDir, $pluginDir, $driver);
     }
@@ -82,12 +86,12 @@ class MergeDriverInstaller {
         $gitconfigContents = file_get_contents($pluginDir . '/src/Initialization/gitconfig.tpl');
 
         $mergeDriverScript = '';
-        if ($driver == 'bash' || ($driver == 'auto' && DIRECTORY_SEPARATOR == '/')) {
+        if ($driver == MergeDriverInstaller::DRIVER_BASH || ($driver == MergeDriverInstaller::DRIVER_AUTO && DIRECTORY_SEPARATOR == '/')) {
             $mergeDriverScript = $pluginDir . '/src/Git/merge-drivers/ini-merge.sh';
             chmod($mergeDriverScript, 0750);
         }
 
-        if ($driver == 'php' || ($driver == 'auto' && DIRECTORY_SEPARATOR == '\\')) {
+        if ($driver == MergeDriverInstaller::DRIVER_PHP || ($driver == MergeDriverInstaller::DRIVER_AUTO && DIRECTORY_SEPARATOR == '\\')) {
             $mergeDriverScript = '"' . PHP_BINARY . '" "' . $pluginDir . '/src/Git/merge-drivers/ini-merge.php' . '"';
         }
 

@@ -11,15 +11,10 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
     private static $repositoryDir;
 
-    /**
-     * Most tests are run with two drivers, 'bash' and 'php'. This is the data provider for PHPUnit.
-     *
-     * @return array 'bash' or 'php'
-     */
     public function driverProvider() {
         return [
-            ['bash'],
-            ['php']
+            [MergeDriverInstaller::DRIVER_BASH],
+            [MergeDriverInstaller::DRIVER_PHP]
         ];
     }
 
@@ -72,7 +67,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
      */
     public function mergedDatesWithoutConflict($driver) {
 
-        if (DIRECTORY_SEPARATOR == '\\' && $driver == 'bash') {
+        if (DIRECTORY_SEPARATOR == '\\' && $driver == MergeDriverInstaller::DRIVER_BASH) {
             $this->markTestSkipped('No Bash on Windows.');
             return;
         }
@@ -107,7 +102,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
      */
     public function conflictingContentsCreatedConflict($driver) {
 
-        if (DIRECTORY_SEPARATOR == '\\' && $driver == 'bash') {
+        if (DIRECTORY_SEPARATOR == '\\' && $driver == MergeDriverInstaller::DRIVER_BASH) {
             $this->markTestSkipped('No Bash on Windows.');
             return;
         }
@@ -144,7 +139,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
      */
     public function changesOnAdjacentLinesMergeWithoutConflict($driver) {
 
-        if (DIRECTORY_SEPARATOR == '\\' && $driver == 'bash') {
+        if (DIRECTORY_SEPARATOR == '\\' && $driver == MergeDriverInstaller::DRIVER_BASH) {
             $this->markTestSkipped('No Bash on Windows.');
             return;
         }

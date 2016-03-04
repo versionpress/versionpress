@@ -35,7 +35,7 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
      */
     public function phpDriverLoadTested() {
 
-        $this->installMergeDriver('php');
+        $this->installMergeDriver(MergeDriverInstaller::DRIVER_PHP);
         $this->prepareTestRepositoryHistory();
 
         $time_start = microtime(true);
@@ -59,7 +59,7 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {
             return;
         }
 
-        $this->installMergeDriver('bash');
+        $this->installMergeDriver(MergeDriverInstaller::DRIVER_BASH);
         $this->prepareTestRepositoryHistory();
 
         $time_start = microtime(true);
