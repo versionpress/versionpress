@@ -7,6 +7,7 @@ use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\WordPressMissingFunctions;
+use VersionPress\Utils\WpConfigEditor;
 use WP_CLI;
 use WP_CLI_Command;
 use wpdb;
@@ -184,32 +185,42 @@ class VPInternalCommand extends WP_CLI_Command {
      * --variable
      * : Will set a variable instead of constant. Useful for $table_prefix.
      *
+     * --common
+     * : The constant / variable will be set in wp-config.common.php.
+     *
      * @subcommand update-config
      *
-     * @synopsis <constant> <value> [--plain] [--variable]
+     * @synopsis <constant> <value> [--plain] [--variable] [--common]
      *
      * @when before_wp_load
      */
     public function updateConfig($args = array(), $assoc_args = array()) {
         $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
+        $updateCommonConfig = isset($assoc_args['common']);
+
+        if ($updateCommonConfig) {
+            $wpConfigPath = dirname($wpConfigPath) . '/wp-config.common.php';
+        }
 
         if ($wpConfigPath === false) {
-            WP_CLI::error('wp-config.php does not exist. Please run `wp core config` first.');
+            WP_CLI::error('Config file does not exist. Please run `wp core config` first.');
         }
 
         require_once __DIR__ . '/VPCommandUtils.php';
-        require_once __DIR__ . '/../Utils/WordPressMissingFunctions.php';
+        require_once __DIR__ . '/../Utils/WpConfigEditor.php';
 
         $constantOrVariableName = $args[0];
         $isVariable = isset($assoc_args['variable']);
         $usePlainValue = isset($assoc_args['plain']);
         $value = $usePlainValue ? $args[1] : VPCommandUtils::fixTypeOfValue($args[1]);
 
+        $wpConfigEditor = new WpConfigEditor($wpConfigPath, $updateCommonConfig);
+
         try {
             if ($isVariable) {
-                WordPressMissingFunctions::updateConfigVariable($wpConfigPath, $constantOrVariableName, $value, $usePlainValue);
+                $wpConfigEditor->updateConfigVariable($constantOrVariableName, $value, $usePlainValue);
             } else {
-                WordPressMissingFunctions::updateConfigConstant($wpConfigPath, $constantOrVariableName, $value, $usePlainValue);
+                $wpConfigEditor->updateConfigConstant($constantOrVariableName, $value, $usePlainValue);
             }
         } catch (\Exception $e) {
             WP_CLI::error('Cannot find place for defining the ' . ($isVariable ? 'variable' : 'constant')  . '. Config was probably edited manually.');
