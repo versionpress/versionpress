@@ -79,7 +79,8 @@ option:
     frequently-written:
         - 'option_name: akismet_spam_count'
     ignored-entities:
-        - 'option_name: _*'
+        - 'option_name: _transient_*'
+        - 'option_name: _site_transient_*'
         - 'option_name: cron'
         - 'option_name: home'
         - 'option_name: siteurl'
