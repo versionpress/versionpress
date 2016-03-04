@@ -7,9 +7,9 @@
 
 namespace VersionPress\Cli;
 
-use Nette\Neon\Neon;
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Yaml\Yaml;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitRepository;
@@ -45,14 +45,14 @@ class VPCommand extends WP_CLI_Command {
      */
     public function config($args, $assoc_args) {
 
-        $configFile = __DIR__ . '/../../vpconfig.neon';
+        $configFile = __DIR__ . '/../../vpconfig.yml';
         $configContents = "";
         if (file_exists($configFile)) {
             $configContents = file_get_contents($configFile);
         }
 
         if (count($args) === 1) {
-            $config = Neon::decode($configContents);
+            $config = Yaml::parse($configContents);
             WP_CLI::out(@$config[$args[0]]);
             return;
         }
@@ -65,7 +65,7 @@ class VPCommand extends WP_CLI_Command {
 
     private function updateConfigValue($config, $key, $value) {
 
-        // We don't use NEON decoding and encoding again as that removes comments etc.
+        // We don't use YAML decoding and encoding again as that removes comments etc.
 
         require_once(__DIR__ . '/../../vendor/nette/utils/src/Utils/Strings.php');
 

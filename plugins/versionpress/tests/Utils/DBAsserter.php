@@ -37,7 +37,7 @@ class DBAsserter {
 
         $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
         $schemaReflection = new \ReflectionClass('VersionPress\Database\DbSchemaInfo');
-        $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.neon';
+        $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.yml';
 
         /** @var $wp_db_version */
         require(self::$testConfig->testSite->path . '/wp-includes/version.php');

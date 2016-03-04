@@ -4,7 +4,7 @@ require:
 ssh:
 
   # These keys can be used as a --host option of the 'wp ssh' command
-  # They should match the site config keys in test-config.neon
+  # They should match the site config keys in test-config.yml
 
   vagrant-php53:
     cmd: ssh -i C:\Users\Borek\.vagrant.d\insecure_private_key -q vagrant@wordpress-php53.local %cmd%
