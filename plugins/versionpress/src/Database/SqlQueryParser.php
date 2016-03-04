@@ -58,7 +58,7 @@ class SqlQueryParser {
     private static function parseUpdateQuery($parser, $query, $schema, $wpdb) {
         $statement = $parser->statements[0];
         $table = $statement->tables[0]->table;
-        $idColumn = self::getIdColumn($schema, $table);
+        $idColumn = self::resolveIdColumn($schema, $table);
         if ($idColumn == null) {
             return null;
         }
@@ -66,6 +66,7 @@ class SqlQueryParser {
         $result->originalQuery = $query;
         $result->table = $table;
         $result->idColumn = $idColumn;
+        $result->entityName = self::resolveEntityName($schema, $table);
         $selectSql = self::getSelect($parser, $idColumn);
         $where = self::getWhereFragments($parser, $query, $statement);
         if (isset($where)) {
@@ -90,13 +91,16 @@ class SqlQueryParser {
         $statement = $parser->statements[0];
         $queryType = ParsedQueryData::INSERT_QUERY;
         $table = $statement->into->dest->table;
-        $idColumn = self::getIdColumn($schema, $table);
+        $idColumn = self::resolveIdColumn($schema, $table);
         if ($idColumn == null) {
             return null;
         }
         if (count($statement->options->options) > 0) {
             foreach (array_keys($statement->options->options) as $key) {
                 $queryType .= "_" . $statement->options->options[$key];
+            }
+            if($queryType==ParsedQueryData::INSERT_IGNORE_QUERY) {
+                return null;
             }
         }
         if(strpos($query, 'ON DUPLICATE KEY UPDATE') !== false) {
@@ -106,6 +110,8 @@ class SqlQueryParser {
         $result->data = self::getData($statement);
         $result->table = $table;
         $result->originalQuery = $query;
+        $result->idColumn = $idColumn;
+        $result->entityName = self::resolveEntityName($schema, $table);
         $result->usesSqlFunctions = self::isUsingSqlFunctions($parser);
         $selectSql = self::getSelect($parser, $idColumn);
         $result->query = $selectSql;
@@ -125,13 +131,14 @@ class SqlQueryParser {
     private static function parseDeleteQuery($parser, $query, $schema, $wpdb) {
         $statement = $parser->statements[0];
         $table = $statement->from[0]->table;
-        $idColumn = self::getIdColumn($schema, $table);
+        $idColumn = self::resolveIdColumn($schema, $table);
         if ($idColumn == null) {
             return null;
         }
         $result = new ParsedQueryData(ParsedQueryData::DELETE_QUERY);
         $result->originalQuery = $query;
         $result->idColumn = $idColumn;
+        $result->entityName = self::resolveEntityName($schema, $table);
         $result->table = $table;
         $selectSql = self::getSelect($parser, $idColumn);
         $where = self::getWhereFragments($parser, $query, $statement);
@@ -385,11 +392,23 @@ class SqlQueryParser {
      * @param $table
      * @return mixed
      */
-    private
-    static function getIdColumn($schema, $table) {
+    private static function resolveIdColumn($schema, $table) {
 
         $entity = $schema->getEntityInfoByPrefixedTableName($table);
         return $entity == null ? null : $entity->idColumnName;
+    }
+
+    /**
+     * Returns entity name for a table
+     *
+     * @param $schema DbSchemaInfo
+     * @param $table
+     * @return mixed
+     */
+    private static function resolveEntityName($schema, $table) {
+
+        $entity = $schema->getEntityInfoByPrefixedTableName($table);
+        return $entity == null ? null : $entity->entityName;
     }
 
 

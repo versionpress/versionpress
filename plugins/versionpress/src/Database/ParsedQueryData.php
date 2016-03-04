@@ -10,6 +10,12 @@ class ParsedQueryData {
      */
     public $table;
 
+
+    /**
+     * @var string
+     */
+    public $entityName;
+
     /**
      * @var array
      */

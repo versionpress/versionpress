@@ -1,6 +1,7 @@
 <?php
 
 namespace VersionPress\Initialization;
+
 use VersionPress\Database\ParsedQueryData;
 use VersionPress\Database\SqlQueryParser;
 
@@ -98,22 +99,19 @@ class ReplacerMethods {
         /** @var SqlQueryParser $sqlQueryParser */
         $sqlQueryParser = $versionPressContainer->resolve(\VersionPress\DI\VersionPressServices::SQL_QUERY_PARSER);
 
-
-
         $parsedQueryData = $sqlQueryParser->parseQuery($query);
 
         $r = $this->__wp_query($query);
 
-        if($parsedQueryData != null && $parsedQueryData->queryType == \VersionPress\Database\ParsedQueryData::INSERT_UPDATE_QUERY) {
-                $parsedQueryData->ids = $this->insert_id;
+        if ($parsedQueryData != null && $parsedQueryData->queryType == \VersionPress\Database\ParsedQueryData::INSERT_UPDATE_QUERY) {
+            $parsedQueryData->ids = $this->insert_id;
         }
-
 
         if ($r === false || $parsedQueryData == null) {
             return $r;
         }
 
-       // return r;
+        // return r;
 
         /** @var \VersionPress\Database\WpdbMirrorBridge $wpdbMirrorBridge */
         $wpdbMirrorBridge = $versionPressContainer->resolve(\VersionPress\DI\VersionPressServices::WPDB_MIRROR_BRIDGE);

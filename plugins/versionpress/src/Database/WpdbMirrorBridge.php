@@ -131,26 +131,31 @@ class WpdbMirrorBridge {
         if ($this->disabled) {
             return;
         }
-        $table = $parsedQueryData->table;
-        $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($table);
+
+        $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($parsedQueryData->table);
+        $entityName = $entityInfo->entityName;
 
         if (!$entityInfo)
             return;
-
         $usesSqlFunctions = $parsedQueryData->usesSqlFunctions;
 
-
-        if ($parsedQueryData->queryType == ParsedQueryData::UPDATE_QUERY && !$usesSqlFunctions) {
-            $this->processUpdateQueryWithoutSqlFunctions($parsedQueryData, $entityInfo);
-        }
-        if ($parsedQueryData->queryType == ParsedQueryData::DELETE_QUERY && !$usesSqlFunctions) {
-            $this->processDeleteQueryWithoutSqlFunctions($parsedQueryData, $entityInfo);
-        }
-        if ($parsedQueryData->queryType == ParsedQueryData::INSERT_QUERY && !$usesSqlFunctions) {
-            $this->processInsertQueryWithoutSqlFunctions($parsedQueryData, $entityInfo);
-        }
-        if($parsedQueryData->queryType == ParsedQueryData::INSERT_UPDATE_QUERY) {
-            $this->processInsertUpdateQuery($parsedQueryData, $entityInfo);
+        switch ($parsedQueryData->queryType) {
+            case ParsedQueryData::UPDATE_QUERY:
+                $this->processUpdateQuery($parsedQueryData);
+                break;
+            case  ParsedQueryData::DELETE_QUERY:
+                $this->processDeleteQuery($parsedQueryData, $entityInfo);
+                break;
+            case ParsedQueryData::INSERT_QUERY:
+                if ($usesSqlFunctions) {
+                    $this->processInsertQueryWithSqlFunctions($parsedQueryData, $entityName);
+                } else {
+                    $this->processInsertQueryWithoutSqlFunctions($parsedQueryData);
+                }
+                break;
+            case ParsedQueryData::INSERT_UPDATE_QUERY:
+                $this->processInsertUpdateQuery($parsedQueryData);
+                break;
         }
 
 
@@ -274,82 +279,108 @@ class WpdbMirrorBridge {
     }
 
     /**
-     * @param $parsedQuery ParsedQueryData
+     * Processes ParsedQueryData from UPDATE query and stores updated entity/entities data into Storage.
+     *
+     * @param $parsedQueryData ParsedQueryData
+     * @param $entityName
      */
-    private function processUpdateQueryWithoutSqlFunctions($parsedQuery, $entityInfo) {
+    private function processUpdateQuery($parsedQueryData) {
 
-
-        foreach ($parsedQuery->ids as $id) {
+        foreach ($parsedQueryData->ids as $id) {
             $stringifiedId = "'" . $id . "'";
-            $data = $this->database->get_results("SELECT * FROM {$parsedQuery->table} WHERE {$parsedQuery->idColumn} = {$stringifiedId}", ARRAY_A)[0];
-            $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityInfo->entityName, $data);
-            $this->updateEntity($data, $entityInfo->entityName, $stringifiedId);
+            $data = $this->database->get_results("SELECT * FROM {$parsedQueryData->table} WHERE {$parsedQueryData->idColumn} = {$stringifiedId}", ARRAY_A)[0];
+            $data = $this->vpidRepository->replaceForeignKeysWithReferences($parsedQueryData->entityName, $data);
+            $this->updateEntity($data, $parsedQueryData->entityName, $stringifiedId);
         }
     }
-    private function processDeleteQueryWithoutSqlFunctions($parsedQuery, $entityInfo) {
+
+    /**
+     * Process ParsedQueryData from DELETE query and deletes entity/entities data from Storage.
+     * Source parsed query does not contain any special Sql functions (e.g. NOW)
+     *
+     * @param $parsedQueryData ParsedQueryData
+     * @param $entityInfo
+     */
+    private function processDeleteQuery($parsedQueryData, $entityInfo) {
         if (!$entityInfo->usesGeneratedVpids) {
-            foreach ($parsedQuery->ids as $id) {
+            foreach ($parsedQueryData->ids as $id) {
                 $stringifiedId = "'" . $id . "'";
-                $where[$parsedQuery->idColumn] = $stringifiedId;
-                $this->vpidRepository->deleteId($entityInfo->entityName, $stringifiedId);
-                $this->mirror->delete($entityInfo->entityName, $where);
+                $where[$parsedQueryData->idColumn] = $stringifiedId;
+                $this->vpidRepository->deleteId($parsedQueryData->entityName, $stringifiedId);
+                $this->mirror->delete($parsedQueryData->entityName, $where);
             }
             return;
         }
-        foreach ($parsedQuery->ids as $id) {
+        foreach ($parsedQueryData->ids as $id) {
             $stringifiedId = "'" . $id . "'";
-            $where['vp_id'] = $this->vpidRepository->getVpidForEntity($entityInfo->entityName, $id);
+            $where['vp_id'] = $this->vpidRepository->getVpidForEntity($parsedQueryData->entityName, $id);
             if (!$where['vp_id']) {
                 continue; // already deleted - deleting postmeta is sometimes called twice
             }
 
-            if ($this->dbSchemaInfo->isChildEntity($entityInfo->entityName) && !isset($where["vp_{$entityInfo->parentReference}"])) {
-                $where = $this->fillParentId($entityInfo->entityName, $where, $id);
+            if ($this->dbSchemaInfo->isChildEntity($parsedQueryData->entityName) && !isset($where["vp_{$entityInfo->parentReference}"])) {
+                $where = $this->fillParentId($parsedQueryData->entityName, $where, $id);
             }
 
-            $this->vpidRepository->deleteId($entityInfo->entityName, $stringifiedId);
-            $this->mirror->delete($entityInfo->entityName, $where);
+            $this->vpidRepository->deleteId($parsedQueryData->entityName, $stringifiedId);
+            $this->mirror->delete($parsedQueryData->entityName, $where);
         }
     }
 
-    private function processInsertQueryWithoutSqlFunctions($parsedQueryData, $entityInfo) {
+    /**
+     * Process ParsedQueryData from INSERT query and stores affected entity into Storage.
+     * Source parsed query does not contain any special Sql functions (e.g. NOW)
+     *
+     * @param $parsedQueryData ParsedQueryData
+     */
+    private function processInsertQueryWithoutSqlFunctions($parsedQueryData) {
 
-        
+
         $id = $this->database->insert_id;
         $entitiesCount = count($parsedQueryData->data);
 
-        for($i=0;$i<$entitiesCount;$i++) {
-            $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityInfo->entityName, $parsedQueryData->data[$i]);
-            $shouldBeSaved = $this->mirror->shouldBeSaved($entityInfo->entityName, $data[$i]);
+        for ($i = 0; $i < $entitiesCount; $i++) {
+            $data = $this->vpidRepository->replaceForeignKeysWithReferences($parsedQueryData->entityName, $parsedQueryData->data[$i]);
+            $shouldBeSaved = $this->mirror->shouldBeSaved($parsedQueryData->entityName, $data);
 
             if (!$shouldBeSaved) {
                 continue;
             }
-            $data = $this->vpidRepository->identifyEntity($entityInfo->entityName, $data[$i], ($id-$i));
-            $this->mirror->save($entityInfo->entityName, $data);
+            $data = $this->vpidRepository->identifyEntity($parsedQueryData->entityName, $data, ($id - $i));
+            $this->mirror->save($parsedQueryData->entityName, $data);
         }
     }
 
-    private function processInsertUpdateQuery($parsedQueryData, $entityInfo) {
-        
-        if($parsedQueryData->ids != 0) {
+    private function processInsertQueryWithSqlFunctions($parsedQueryData, $entityName) {
+
+    }
+
+    /**
+     * Processes ParsedQueryData from INSERT ... ON DUPLICATE UPDATE query and stores changes into Storage
+     *
+     * @param $parsedQueryData ParsedQueryData
+     */
+    private function processInsertUpdateQuery($parsedQueryData) {
+
+        if ($parsedQueryData->ids != 0) {
             $id = $parsedQueryData->ids;
-            $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityInfo->entityName, $parsedQueryData->data[0]);
-            $shouldBeSaved = $this->mirror->shouldBeSaved($entityInfo->entityName, $data);
+            $data = $this->vpidRepository->replaceForeignKeysWithReferences($parsedQueryData->entityName, $parsedQueryData->data[0]);
+            $shouldBeSaved = $this->mirror->shouldBeSaved($parsedQueryData->entityName, $data);
 
             if (!$shouldBeSaved) {
                 return;
             }
-            $data = $this->vpidRepository->identifyEntity($entityInfo->entityName, $data, $id);
-            $this->mirror->save($entityInfo->entityName, $data);
-        }else {
+            $data = $this->vpidRepository->identifyEntity($parsedQueryData->entityName, $data, $id);
+            $this->mirror->save($parsedQueryData->entityName, $data);
+        } else {
             $data = $this->database->get_results($parsedQueryData->query, ARRAY_A)[0];
             $stringifiedId = "'" . $data[$parsedQueryData->idColumn] . "'";
-            $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityInfo->entityName, $data);
-            $this->updateEntity($data, $entityInfo->entityName, $stringifiedId);
+            $data = $this->vpidRepository->replaceForeignKeysWithReferences($parsedQueryData->entityName, $data);
+            $this->updateEntity($data, $parsedQueryData->entityName, $stringifiedId);
         }
 
     }
+
 
 }
 

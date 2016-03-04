@@ -37,26 +37,33 @@ class ParserTest extends PHPUnit_Framework_TestCase {
     /**
      * @test
      * @dataProvider updateQueryParseTestDataProvider
+     * @param $query
+     * @param $expectedSelect
+     * @param $expectedData
+     * @param $expectedWhere
      */
-    public function whereClausesFromUpdate($query, $select, $data, $where) {
+    public function whereClausesFromUpdate($query, $expectedSelect, $expectedData, $expectedWhere) {
 
         $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col");
         $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
 
-        $this->assertEquals($where, $parsedQueryData->where);
+        $this->assertEquals($expectedWhere, $parsedQueryData->where);
 
     }
 
     /**
      * @test
      * @dataProvider updateQueryParseTestDataProvider
+     * @param $query
+     * @param $expectedSelect
+     * @param $expectedData
      */
-    public function dataToSetFromUpdate($query, $select, $data) {
+    public function dataToSetFromUpdate($query, $expectedSelect, $expectedData) {
 
         $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col");
         $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
 
-        $this->assertEquals($data, $parsedQueryData->data);
+        $this->assertEquals($expectedData, $parsedQueryData->data);
 
     }
 
@@ -64,69 +71,93 @@ class ParserTest extends PHPUnit_Framework_TestCase {
     /**
      * @test
      * @dataProvider updateQueryParseTestDataProvider
+     * @param $query
+     * @param $expectedSelect
+     * @param $expectedData
+     * @param $expectedWhere
+     * @param $expectedUseOfSqlFunctions
      */
-    public function detectUseOfSqlFunctionsInUpdate($query, $select, $data, $where, $usesSqlFunctions) {
+    public function detectUseOfSqlFunctionsInUpdate($query, $expectedSelect, $expectedData, $expectedWhere, $expectedUseOfSqlFunctions) {
 
         $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col");
         $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
-        $this->assertEquals($usesSqlFunctions, $parsedQueryData->usesSqlFunctions);
+        $this->assertEquals($expectedUseOfSqlFunctions, $parsedQueryData->usesSqlFunctions);
     }
 
 
     /**
      * @test
      * @dataProvider updateQueryParseTestDataProvider
+     * @param $query
+     * @param $expectedSelectQuery
+     * @param $expectedData
+     * @param $expectedWhere
+     * @param $expectedUseOfSqlFunctions
+     * @param $expectedIds
      */
-    public function selectQueryFromUpdate($query, $select, $data, $where, $usesSqlFunctions, $ids) {
+    public function selectQueryFromUpdate($query, $expectedSelectQuery, $expectedData, $expectedWhere, $expectedUseOfSqlFunctions, $expectedIds) {
 
         $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col")
-            ->with($select)->will(new PHPUnit_Framework_MockObject_Stub_Return($ids));
+            ->with($expectedSelectQuery)->will(new PHPUnit_Framework_MockObject_Stub_Return($expectedIds));
         $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
-        $this->assertEquals($select, $parsedQueryData->query);
+        $this->assertEquals($expectedSelectQuery, $parsedQueryData->query);
     }
 
     /**
      * @test
      * @dataProvider insertQueryParseTestDataProvider
+     * @param $query
+     * @param $expectedData
      */
-    public function dataFromInsert($query, $data) {
+    public function dataFromInsert($query, $expectedData) {
 
         $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
-        print_r($parsedQueryData);
-        $this->assertEquals($data, $parsedQueryData->data);
+        $parsedData = $parsedQueryData == null ? null : $parsedQueryData->data;
+        $this->assertEquals($expectedData, $parsedData);
     }
 
     /**
      * @test
      * @dataProvider insertQueryParseTestDataProvider
+     * @param $query
+     * @param $expectedData
+     * @param $expectedUseOfSqlFunctions
      */
-    public function detectUseOfSqlFunctionsInInsert($query, $data, $usesSqlFunctions) {
+    public function detectUseOfSqlFunctionsInInsert($query, $expectedData, $expectedUseOfSqlFunctions) {
 
         /** @var ParsedQueryData $parsedQueryData */
         $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
-        $this->assertEquals($usesSqlFunctions, $parsedQueryData->usesSqlFunctions);
+        $parsedUseOfSqlFunctions = $parsedQueryData == null ? null : $parsedQueryData->usesSqlFunctions;
+        $this->assertEquals($expectedUseOfSqlFunctions, $parsedUseOfSqlFunctions);
     }
 
     /**
      * @test
      * @dataProvider insertQueryParseTestDataProvider
+     * @param $query
+     * @param $expectedData
+     * @param $expectedUseOfSqlFunctions
+     * @param $expectedQueryType
      */
-    public function detectNonStandardInsert($query, $data, $usesSqlFunctions, $queryType) {
+    public function detectNonStandardInsert($query, $expectedData, $expectedUseOfSqlFunctions, $expectedQueryType) {
 
         $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
-
-        $this->assertEquals($queryType, $parsedQueryData->queryType);
+        $parsedQeryType = $parsedQueryData == null ? null : $parsedQueryData->queryType;
+        $this->assertEquals($expectedQueryType, $parsedQeryType);
     }
 
     /**
      * @test
      * @dataProvider deleteQueryParseTestDataProvider
+     * @param $query
+     * @param $expectedSelectQuery
+     * @param $testIds
      */
-    public function selectQueryFromDelete($query, $select, $testIds) {
+    public function selectQueryFromDelete($query, $expectedSelectQuery, $testIds) {
         $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col")
-            ->with($select)->will(new PHPUnit_Framework_MockObject_Stub_Return($testIds));
+            ->with($expectedSelectQuery)->will(new PHPUnit_Framework_MockObject_Stub_Return($testIds));
         $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
-        $this->assertEquals($select, $parsedQueryData->query);
+        $this->assertEquals($expectedSelectQuery, $parsedQueryData->query);
     }
 
 
@@ -155,22 +186,24 @@ class ParserTest extends PHPUnit_Framework_TestCase {
 
     public function insertQueryParseTestDataProvider() {
         return array(
-            array("INSERT INTO `wp_options` (`option_name`, `option_value`, `autoload`) VALUES ('name', 'value', 1) ON DUPLICATE KEY UPDATE `option_name` = VALUES(`option_name`), `option_value` = VALUES(`option_value`), `autoload` = VALUES(`autoload`)"
-            ),
-            array(
-                "INSERT INTO `wp_term_relationships` (object_id, term_taxonomy_id, term_order) VALUES (10, 4, 5) , (20, 10, 15) ON DUPLICATE KEY UPDATE term_order = VALUES(term_order)",
-                array(array("object_id" => "10", "term_taxonomy_id" => "4", "term_order" => "5"),
-                    array("object_id" => "20", "term_taxonomy_id" => "10", "term_order" => "15")),
+            array("INSERT INTO `wp_options` (`option_name`, `option_value`, `autoload`) VALUES ('name', 'value', 1) ON DUPLICATE KEY UPDATE `option_name` = VALUES(`option_name`), `option_value` = VALUES(`option_value`), `autoload` = VALUES(`autoload`)",
+                array(array("option_name" => "name", "option_value" => "value", "autoload" => "1")),
                 1,
-                ParsedQueryData::INSERT_QUERY
+                ParsedQueryData::INSERT_UPDATE_QUERY
             ),
+//            array(
+//                "INSERT INTO `wp_term_relationships` (object_id, term_taxonomy_id, term_order) VALUES (10, 4, 5) , (20, 10, 15) ON DUPLICATE KEY UPDATE term_order = VALUES(term_order)",
+//                array(array("object_id" => "10", "term_taxonomy_id" => "4", "term_order" => "5"),
+//                    array("object_id" => "20", "term_taxonomy_id" => "10", "term_order" => "15")),
+//                1,
+//                ParsedQueryData::INSERT_QUERY
+//            ),
             array(
                 "INSERT IGNORE INTO `wp_terms` (term_id, name, slug, term_group) VALUES (10, 'term name', 'term-name', 5) , (20, 'term another', 'term-another', 15)",
-                array(array("term_id" => "10", "name" => "term name", "slug" => "term-name", "term_group" => "5"),
-                    array("term_id" => "20", "name" => "term another", "slug" => "term-another", "term_group" => "15")),
-            0,
-                ParsedQueryData::INSERT_IGNORE_QUERY
-        ),
+                null,
+                null,
+                null
+            ),
             array(
                 "INSERT INTO `wp_terms` (term_id, name, slug, term_group) VALUES (10, 'term name', 'term-name', 5)",
                 array(array("term_id" => "10", "name" => "term name", "slug" => "term-name", "term_group" => "5")),

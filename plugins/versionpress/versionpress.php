@@ -170,10 +170,10 @@ function vp_register_hooks() {
         }
     }, 10, 2);
 
-    add_action('added_option', function ($name) use ($wpdb, $mirror) {
-        $option = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}options WHERE option_name='$name'", ARRAY_A);
-        $mirror->save("option", $option);
-    });
+//    add_action('added_option', function ($name) use ($wpdb, $mirror) {
+//        $option = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}options WHERE option_name='$name'", ARRAY_A);
+//        $mirror->save("option", $option);
+//    });
 
     add_filter('upgrader_pre_install', function ($_, $hook_extra) use ($committer) {
         if (!(isset($hook_extra['type']) && $hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'install')) return;

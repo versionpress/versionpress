@@ -9,7 +9,8 @@
     "symfony/process": "2.5.*",
     "michelf/php-markdown": "1.4.*",
     "symfony/filesystem": "~2.5",
-    "imnotjames/curlfile-compat": "0.0.1"
+    "imnotjames/curlfile-compat": "0.0.1",
+    "udan11/sql-parser": "^3.0"
   },
   "config": {
     "platform": {
@@ -23,8 +24,7 @@
     "nette/database": "2.2.*",
     "janvoracek/wp-cli-ssh": "dev-master",
     "fzaninotto/faker": "1.4.*",
-    "icecave/semver": "3.0.3",
-    "udan11/sql-parser": "^3.0"
+    "icecave/semver": "3.0.3"
   },
   "license": "GPL",
   "authors": [
