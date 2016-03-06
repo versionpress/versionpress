@@ -638,7 +638,7 @@ function vp_deactivate() {
     if (defined('WP_CLI') || !VersionPress::isActive()) {
         vp_admin_post_confirm_deactivation();
     } else {
-        wp_redirect(admin_url('admin.php?page=versionpress/admin/deactivate.php'));
+        wp_safe_redirect(admin_url('admin.php?page=versionpress/admin/deactivate.php'));
         die();
     }
 }
@@ -647,7 +647,8 @@ function vp_deactivate() {
  * Handles a situation where user canceled the deactivation
  */
 function vp_admin_post_cancel_deactivation() {
-    wp_redirect(admin_url('plugins.php'));
+    wp_safe_redirect(admin_url('plugins.php'));
+    exit();
 }
 
 /**
@@ -702,7 +703,8 @@ function vp_admin_post_confirm_deactivation() {
     deactivate_plugins("versionpress/versionpress.php", true);
 
     if (defined('WP_ADMIN')) {
-        wp_redirect(admin_url("plugins.php"));
+        wp_safe_redirect(admin_url("plugins.php"));
+        exit();
     }
 
 }
@@ -723,7 +725,8 @@ function vp_send_bug_report() {
     $reportedSuccessfully = $bugReporter->reportBug($email, $description);
 
     $result = $reportedSuccessfully ? "ok" : "err";
-    wp_redirect(add_query_arg('bug-report', $result, menu_page_url('versionpress', false)));
+    wp_safe_redirect(add_query_arg('bug-report', $result, menu_page_url('versionpress', false)));
+    exit();
 }
 
 add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are just one step less important :) */);
@@ -836,7 +839,8 @@ function vp_show_undo_confirm() {
     if (vp_is_ajax()) {
         require_once(VERSIONPRESS_PLUGIN_DIR . '/admin/undo.php');
     } else {
-        wp_redirect(admin_url('admin.php?page=versionpress/admin/undo.php&method=' . $_GET['method'] . '&commit=' . $_GET['commit']));
+        wp_safe_redirect(admin_url('admin.php?page=versionpress/admin/undo.php&method=' . $_GET['method'] . '&commit=' . $_GET['commit']));
+        exit();
     }
 }
 
@@ -864,10 +868,11 @@ function _vp_revert($reverterMethod) {
     $adminPage = menu_page_url('versionpress', false);
 
     if ($revertStatus !== RevertStatus::OK) {
-        wp_redirect(add_query_arg('error', $revertStatus, $adminPage));
+        wp_safe_redirect(add_query_arg('error', $revertStatus, $adminPage));
     } else {
-        wp_redirect($adminPage);
+        wp_safe_redirect($adminPage);
     }
+    exit();
 }
 
 if (VersionPress::isActive()) {
