@@ -117,7 +117,7 @@ function vp_register_hooks() {
      *  WordPress creates plain INSERT query and executes it using wpdb::query method instead of wpdb::insert.
      *  It's too difficult to parse every INSERT query, that's why the WordPress hook is used.
      */
-    add_action('save_post', createUpdatePostTermsHook($mirror, $vpidRepository));
+    add_action('save_post', vp_create_update_post_terms_hook($mirror, $vpidRepository));
 
     add_filter('update_feedback', function () {
         touch(ABSPATH . 'versionpress.maintenance');
@@ -310,7 +310,7 @@ function vp_register_hooks() {
             /** @var Mirror $mirror */
             $mirror = $versionPressContainer->resolve(VersionPressServices::MIRROR);
             $vpidRepository = $versionPressContainer->resolve(VersionPressServices::VPID_REPOSITORY);
-            $func = createUpdatePostTermsHook($mirror, $vpidRepository);
+            $func = vp_create_update_post_terms_hook($mirror, $vpidRepository);
             $func($menu_item_db_id);
         }
     }, 10, 2);
@@ -321,7 +321,7 @@ function vp_register_hooks() {
         $committer->forceChangeInfo(new \VersionPress\ChangeInfos\TermChangeInfo('delete', $termVpid, $term->name, $taxonomy));
     }, 10, 2);
 
-    add_action('set_object_terms', createUpdatePostTermsHook($mirror, $vpidRepository));
+    add_action('set_object_terms', vp_create_update_post_terms_hook($mirror, $vpidRepository));
 
     add_filter('plugin_install_action_links', function ($links, $plugin) {
         $compatibility = CompatibilityChecker::testCompatibilityBySlug($plugin['slug']);
@@ -546,7 +546,7 @@ function vp_register_hooks() {
     register_shutdown_function(array($committer, 'commit'));
 }
 
-function createUpdatePostTermsHook(Mirror $mirror, VpidRepository $vpidRepository) {
+function vp_create_update_post_terms_hook(Mirror $mirror, VpidRepository $vpidRepository) {
 
     return function ($postId) use ($mirror, $vpidRepository) {
         /** @var array $post */
@@ -706,36 +706,8 @@ function vp_admin_post_confirm_deactivation() {
 
 function vp_send_headers() {
     if (isset($_GET['init_versionpress']) && !VersionPress::isActive()) {
-        _vp_disable_output_buffering();
+        vp_disable_output_buffering();
     }
-}
-
-/**
- * Multiple methods of disabling output buffering.
- * @see http://www.binarytides.com/php-output-content-browser-realtime-buffering/
- */
-function _vp_disable_output_buffering() {
-    // Turn off output buffering
-    ini_set('output_buffering', 'off');
-    // Turn off PHP output compression
-    ini_set('zlib.output_compression', false);
-
-    // Flush (send) the output buffer and turn off output buffering
-    /** @noinspection PhpUsageOfSilenceOperatorInspection */
-    while (@ob_end_flush()) ;
-
-    // Implicitly flush the buffer(s)
-    ini_set('implicit_flush', true);
-    ob_implicit_flush(true);
-
-    //prevent apache from buffering it for deflate/gzip
-    header("Content-type: text/plain");
-    header('Cache-Control: no-cache'); // recommended to prevent caching of event data.
-
-    for ($i = 0; $i < 1000; $i++) echo ' ';
-
-    ob_flush();
-    flush();
 }
 
 add_action('admin_post_vp_send_bug_report', 'vp_send_bug_report');
@@ -858,7 +830,7 @@ function versionpress_page() {
 add_action('admin_action_vp_show_undo_confirm', 'vp_show_undo_confirm');
 
 function vp_show_undo_confirm() {
-    if(isAjax()) {
+    if (vp_is_ajax()) {
         require_once(VERSIONPRESS_PLUGIN_DIR . '/admin/undo.php');
     } else {
         wp_redirect(admin_url('admin.php?page=versionpress/admin/undo.php&method=' . $_GET['method'] . '&commit=' . $_GET['commit']));
@@ -923,10 +895,6 @@ function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
 //----------------------------------
 // AJAX handling
 //----------------------------------
-
-function isAjax() {
-    return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
-}
 
 add_action('wp_ajax_hide_vp_welcome_panel', 'vp_ajax_hide_vp_welcome_panel');
 

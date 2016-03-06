@@ -16,7 +16,7 @@ if (!in_array($outputFormat, $supportedOutputFormats)) {
 
 $systemInfo = SystemInfo::getAllInfo();
 
-function displaySystemInfoArray($array, $outputFormat) {
+function vp_display_system_info_array($array, $outputFormat) {
 
     switch ($outputFormat) {
         case 've': // var_export
@@ -82,19 +82,19 @@ function displaySystemInfoArray($array, $outputFormat) {
 
 
 <h2 id="summary">Quick summary</h2>
-<?php displaySystemInfoArray($systemInfo['summary'], $outputFormat); ?>
+<?php vp_display_system_info_array($systemInfo['summary'], $outputFormat); ?>
 
 
 <h2 id="git-info">Git</h2>
-<?php displaySystemInfoArray($systemInfo['git-info'], $outputFormat); ?>
+<?php vp_display_system_info_array($systemInfo['git-info'], $outputFormat); ?>
 
 <h2 id="persmission-info">Permissions</h2>
-<?php displaySystemInfoArray($systemInfo['permission-info'], $outputFormat); ?>
+<?php vp_display_system_info_array($systemInfo['permission-info'], $outputFormat); ?>
 
 <h2 id="wordpress-info">WordPress</h2>
-<?php displaySystemInfoArray($systemInfo['wordpress-info'], $outputFormat); ?>
+<?php vp_display_system_info_array($systemInfo['wordpress-info'], $outputFormat); ?>
 
 
 <h2 id="php-info">Server environment / PHP info</h2>
-<?php displaySystemInfoArray($systemInfo['php-info'], $outputFormat); ?>
+<?php vp_display_system_info_array($systemInfo['php-info'], $outputFormat); ?>
 
