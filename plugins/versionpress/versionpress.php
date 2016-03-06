@@ -38,7 +38,6 @@ use VersionPress\VersionPress;
 defined('ABSPATH') or die("Direct access not allowed");
 
 require_once(__DIR__ . '/bootstrap.php');
-require_once( ABSPATH . 'wp-admin/includes/translation-install.php' );
 
 if (defined('WP_CLI') && WP_CLI) {
     WP_CLI::add_command('vp', 'VersionPress\Cli\VPCommand');
@@ -198,6 +197,8 @@ function vp_register_hooks() {
         $languages = get_available_languages();
 
         $postInstallHook = function ($_, $hook_extra) use ($committer, $languages, &$postInstallHook) {
+            require_once(ABSPATH . 'wp-admin/includes/translation-install.php');
+
             if (!isset($hook_extra['language_update_type'])) return;
             $translations = wp_get_available_translations();
 
@@ -276,6 +277,8 @@ function vp_register_hooks() {
     }, 0); // zero because the default WP action with priority 1 calls wp_die()
 
     function _vp_get_language_name_by_code($code) {
+        require_once(ABSPATH . 'wp-admin/includes/translation-install.php');
+
         $translations = wp_get_available_translations();
         return isset($translations[$code])
             ? $translations[$code]['native_name']
