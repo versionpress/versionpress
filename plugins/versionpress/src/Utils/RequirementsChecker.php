@@ -53,7 +53,7 @@ class RequirementsChecker {
         );
 
         $this->requirements[] = array(
-            'name' => 'PHP extensions',
+            'name' => "'mbstring' extension",
             'level' => 'critical',
             'fulfilled' => extension_loaded('mbstring'),
             'help' => 'Extension `mbstring` is required.'
