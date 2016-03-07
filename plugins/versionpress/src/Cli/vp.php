@@ -192,6 +192,8 @@ class VPCommand extends WP_CLI_Command {
      *    * Drops all tables tracked by VersionPress.
      *    * Recreates and fill them with data from repository.
      *
+     * If you just cloned the site from another repository, run `wp core config` first.
+     *
      * @synopsis --siteurl=<url> [--yes]
      *
      * @subcommand restore-site
