@@ -13,7 +13,7 @@ Here is a full example:
         gallery:
             id: post
             ids: post
-            include:
+            include: post
             exclude: post
         playlist:
             id: post

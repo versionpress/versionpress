@@ -5,7 +5,7 @@ shortcodes:
     gallery:
         id: post
         ids: post
-        include:
+        include: post
         exclude: post
     playlist:
         id: post
