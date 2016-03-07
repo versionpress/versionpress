@@ -8,8 +8,7 @@ Here is a full example:
 
     shortcode-locations:
         post:
-            fields:
-                - post_content
+            - post_content
     shortcodes:
         gallery:
             id: post
@@ -36,7 +35,6 @@ Following code:
 
     shortcode-locations:
         post:
-            fields:
-                - post_content
+            - post_content
 
 says that shortcodes can appear in field (DB column) `post_content` of posts.

@@ -74,7 +74,7 @@ class ShortcodesReplacer {
         }
 
         $shortcodeLocations = $this->shortcodesInfo->getShortcodeLocations();
-        $allowedFields = $shortcodeLocations[$entityName]['fields'];
+        $allowedFields = $shortcodeLocations[$entityName];
 
         return array_search($field, $allowedFields) !== false;
     }

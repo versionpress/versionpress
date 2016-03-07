@@ -1,7 +1,6 @@
 shortcode-locations:
     post:
-        fields:
-            - post_content
+        - post_content
 shortcodes:
     gallery:
         id: post
