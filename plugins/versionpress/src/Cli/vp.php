@@ -32,12 +32,17 @@ use WP_CLI_Command;
 class VPCommand extends WP_CLI_Command {
 
     /**
-     * Configures VersionPress
+     * Configures VersionPress. See options for details.
      *
      * ## OPTIONS
      *
      * <constant>
      * : The name of the constant to set.
+     *   VP_GIT_BINARY:   Absolute path to the git binary.
+     *   VP_PROJECT_ROOT: Absolute path to the root of your project (typically
+     *                    where is the .git directory)
+     *   VP_VPDB_DIR:     Absolute path to directory where VersionPress saves
+     *                    versioned database data.
      *
      * [<value>]
      * : The new value. If missing, just prints out current value.
