@@ -13,7 +13,7 @@ var fs = require('fs');
 var path = require('path');
 var chalk = require('chalk');
 var removeLines = require('gulp-remove-lines');
-var neon = require('neon-js');
+var yaml = require('yamljs');
 var composer = require('gulp-composer');
 var git = require('gulp-git');
 var merge = require('merge-stream');
@@ -79,8 +79,8 @@ var srcDef = [];
  * Sets `buildDir` and `buildType` so that the copy methods copies to the WP test site.
  */
 gulp.task('prepare-test-deploy', false, function () {
-    var testConfigStr = fs.readFileSync(vpDir + '/tests/test-config.neon', 'utf-8');
-    var testConfig = neon.decode(testConfigStr).toObject(true);
+    var testConfigStr = fs.readFileSync(vpDir + '/tests/test-config.yml', 'utf-8');
+    var testConfig = yaml.parse(testConfigStr);
     var sitePath = process.env.VP_DEPLOY_TARGET || testConfig["sites"][testConfig["test-site"]]["wp-site"]["path"];
     if (isRelative(sitePath)) {
         sitePath = vpDir + '/tests/' + sitePath;
@@ -301,7 +301,7 @@ gulp.task('build', 'Task that exports production build', ['clean-build'], functi
 
 /**
  * Task called from WpAutomation to copy the plugin files to the test directory
- * specified in `test-config.neon`. Basically does only the `copy` task.
+ * specified in `test-config.yml`. Basically does only the `copy` task.
  */
 gulp.task('test-deploy', 'Task called from WpAutomation to copy the plugin files to the test directory.', ['prepare-test-deploy', 'copy']);
 

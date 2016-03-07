@@ -1,5 +1,5 @@
 # TestConfig
-test-config.neon
+test-config.yml
 
 # Various PHPUnit reporting formats
 phpunit-log.*

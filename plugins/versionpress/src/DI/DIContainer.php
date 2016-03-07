@@ -75,7 +75,7 @@ class DIContainer {
 
         $dic->register(VersionPressServices::DB_SCHEMA, function () {
             global $table_prefix, $wp_db_version;
-            return new DbSchemaInfo(VERSIONPRESS_PLUGIN_DIR . '/src/Database/wordpress-schema.neon', $table_prefix, $wp_db_version);
+            return new DbSchemaInfo(VERSIONPRESS_PLUGIN_DIR . '/src/Database/wordpress-schema.yml', $table_prefix, $wp_db_version);
         });
 
         $dic->register(VersionPressServices::WPDB_MIRROR_BRIDGE, function () use ($dic) {
