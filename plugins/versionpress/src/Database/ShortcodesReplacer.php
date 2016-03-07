@@ -5,9 +5,10 @@ namespace VersionPress\Database;
 use VersionPress\Utils\WordPressMissingFunctions;
 
 /**
- * Class for replacing IDs in shortcodes with VPIDs.
+ * Class for replacing IDs in shortcodes with VPIDs (and vice versa).
  *
- * !!! This class depends on wp-includes/shortcodes.php !!!
+ * !!! This class uses many functions of wp-includes/shortcodes.php, there is no easy
+ * way around it.
  *
  */
 class ShortcodesReplacer {
@@ -25,16 +26,35 @@ class ShortcodesReplacer {
         $this->vpidRepository = $vpidRepository;
     }
 
+    /**
+     * Translates IDs to VPIDs in shortcodes.
+     *
+     * @param string $string
+     * @return string
+     */
     public function replaceShortcodes($string) {
         $pattern = get_shortcode_regex($this->shortcodesInfo->getAllShortcodeNames());
         return preg_replace_callback("/$pattern/", $this->createReplaceCallback(array($this, 'getVpidByEntityNameAndId')), $string);
     }
 
+    /**
+     * Translates VPIDs to IDs in shortcodes.
+     *
+     * @param string $string
+     * @return string
+     */
     public function restoreShortcodes($string) {
         $pattern = get_shortcode_regex($this->shortcodesInfo->getAllShortcodeNames());
         return preg_replace_callback("/$pattern/", $this->createReplaceCallback(array($this, 'getIdByVpid')), $string);
     }
 
+    /**
+     * Translates IDs to VPIDs in shortcodes for an entity
+     *
+     * @param string $entityName
+     * @param array $entity Entity data, see {@link WpdbMirrorBridge}
+     * @return array Entity data
+     */
     public function replaceShortcodesInEntity($entityName, $entity) {
         if (!$this->entityCanContainShortcodes($entityName)) {
             return $entity;
@@ -49,6 +69,13 @@ class ShortcodesReplacer {
         return $entity;
     }
 
+    /**
+     * Translates VPIDs to IDs in shortcodes for an entity
+     *
+     * @param string $entityName
+     * @param array $entity Entity data, see {@link WpdbMirrorBridge}
+     * @return array Entity data
+     */
     public function restoreShortcodesInEntity($entityName, $entity) {
         if (!$this->entityCanContainShortcodes($entityName)) {
             return $entity;
@@ -63,11 +90,24 @@ class ShortcodesReplacer {
         return $entity;
     }
 
+    /**
+     * Return true if entity can contain shortcodes
+     *
+     * @param string $entityName
+     * @return bool
+     */
     public function entityCanContainShortcodes($entityName) {
         $shortcodeLocations = $this->shortcodesInfo->getShortcodeLocations();
         return isset($shortcodeLocations[$entityName]);
     }
 
+    /**
+     * Return true if a field on an entity can contain shortcodes
+     *
+     * @param string $entityName E.g., 'post'
+     * @param string $field E.g., 'post_content'
+     * @return bool
+     */
     public function fieldCanContainShortcodes($entityName, $field) {
         if (!$this->entityCanContainShortcodes($entityName)) {
             return false;
