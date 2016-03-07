@@ -32,7 +32,7 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
         DBAsserter::assertFilesEqualDatabase();
 
         $schemaReflection = new \ReflectionClass('VersionPress\Database\DbSchemaInfo');
-        $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.neon';
+        $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.yml';
         /** @var $wp_db_version */
         require(self::$testConfig->testSite->path . '/wp-includes/version.php');
 

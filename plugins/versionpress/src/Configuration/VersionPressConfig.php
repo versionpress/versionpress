@@ -2,15 +2,15 @@
 
 namespace VersionPress\Configuration;
 
-use Nette\Neon\Neon;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Parses and makes accessible VersionPress configuration.
  *
  * The configuration comes from two files:
  *
- *  - vpconfig.defaults.neon - here all the options with their defaults are defined
- *  - vpconfig.neon - empty by default but the user can override some or all of the options here
+ *  - vpconfig.defaults.yml - here all the options with their defaults are defined
+ *  - vpconfig.yml - empty by default but the user can override some or all of the options here
  */
 class VersionPressConfig {
 
@@ -26,13 +26,13 @@ class VersionPressConfig {
 
     function __construct() {
 
-        $defaultsFile = VERSIONPRESS_PLUGIN_DIR . '/vpconfig.defaults.neon';
-        $customConfigFile = VERSIONPRESS_PLUGIN_DIR . '/vpconfig.neon';
+        $defaultsFile = VERSIONPRESS_PLUGIN_DIR . '/vpconfig.defaults.yml';
+        $customConfigFile = VERSIONPRESS_PLUGIN_DIR . '/vpconfig.yml';
 
-        $this->defaults = array_merge($this->defaults, Neon::decode(file_get_contents($defaultsFile)));
+        $this->defaults = array_merge($this->defaults, Yaml::parse(file_get_contents($defaultsFile)));
 
         if (file_exists($customConfigFile)) {
-            $this->customConfig = Neon::decode(file_get_contents($customConfigFile));
+            $this->customConfig = Yaml::parse(file_get_contents($customConfigFile));
             if ($this->customConfig === null) {
                 $this->customConfig = array();
             }

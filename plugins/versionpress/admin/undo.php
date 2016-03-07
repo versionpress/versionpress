@@ -44,7 +44,7 @@
     $buttonCancel = "<a " .
         "class='button cancel' ".
         "id='popover-cancel-button' ".
-        "href='" . (isAjax() ? "javascript:;" : menu_page_url('versionpress', false)) . "'>Cancel</a>";
+        "href='" . (vp_is_ajax() ? "javascript:;" : menu_page_url('versionpress', false)) . "'>Cancel</a>";
 
     $body = "
         <div>
@@ -57,7 +57,7 @@
         </div>
     ";
 
-    if(isAjax()) {
+    if (vp_is_ajax()) {
         $response = new stdClass();
         $response->body = $body;
         echo json_encode($response);
