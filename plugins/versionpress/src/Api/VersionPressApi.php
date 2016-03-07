@@ -228,7 +228,7 @@ class VersionPressApi {
             return new WP_Error(
                 'error',
                 'Invalid commit hash',
-                array('status' => 403));
+                array('status' => 404));
         }
 
         return $this->revertCommit('undo', $commitHash);
@@ -245,7 +245,7 @@ class VersionPressApi {
             return new WP_Error(
                 'error',
                 'Invalid commit hash',
-                array('status' => 403));
+                array('status' => 404));
         }
 
         return $this->revertCommit('rollback', $commitHash);
@@ -288,7 +288,7 @@ class VersionPressApi {
             return new WP_Error(
                 'error',
                 'Invalid commit hash',
-                array('status' => 403));
+                array('status' => 404));
         }
 
         $diff = $this->gitRepository->getDiff($commitHash);
