@@ -296,7 +296,8 @@ class VPCommand extends WP_CLI_Command {
         }
 
         $msg = $process->getConsoleOutput();
-        $dbExists = Strings::contains($msg, '1007');
+        $dbExistsMysqlErrorCode = '1007';
+        $dbExists = Strings::contains($msg, $dbExistsMysqlErrorCode);
 
         if (!$dbExists) {
             WP_CLI::error("Failed creating database. Details:\n\n" . $msg);
