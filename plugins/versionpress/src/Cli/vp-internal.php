@@ -6,6 +6,8 @@ use VersionPress\Database\VpidRepository;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Synchronizers\SynchronizationProcess;
+use VersionPress\Utils\WordPressMissingFunctions;
+use VersionPress\Utils\WpConfigEditor;
 use WP_CLI;
 use WP_CLI_Command;
 use wpdb;
@@ -183,79 +185,46 @@ class VPInternalCommand extends WP_CLI_Command {
      * --variable
      * : Will set a variable instead of constant. Useful for $table_prefix.
      *
+     * --common
+     * : The constant / variable will be set in wp-config.common.php.
+     *
      * @subcommand update-config
      *
-     * @synopsis <constant> <value> [--plain] [--variable]
+     * @synopsis <constant> <value> [--plain] [--variable] [--common]
      *
      * @when before_wp_load
      */
     public function updateConfig($args = array(), $assoc_args = array()) {
         $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
+        $updateCommonConfig = isset($assoc_args['common']);
+
+        if ($updateCommonConfig) {
+            $wpConfigPath = dirname($wpConfigPath) . '/wp-config.common.php';
+        }
 
         if ($wpConfigPath === false) {
-            WP_CLI::error('wp-config.php does not exist. Please run `wp core config` first.');
+            WP_CLI::error('Config file does not exist. Please run `wp core config` first.');
         }
 
-        $wpConfigContent = file_get_contents($wpConfigPath);
+        require_once __DIR__ . '/VPCommandUtils.php';
+        require_once __DIR__ . '/../Utils/WpConfigEditor.php';
 
         $constantOrVariableName = $args[0];
-        $value = $args[1];
         $isVariable = isset($assoc_args['variable']);
+        $usePlainValue = isset($assoc_args['plain']);
+        $value = $usePlainValue ? $args[1] : VPCommandUtils::fixTypeOfValue($args[1]);
 
-        $phpizedValue = isset($assoc_args['plain']) ? $value : var_export($this->fixTypeOfValue($value), true);
+        $wpConfigEditor = new WpConfigEditor($wpConfigPath, $updateCommonConfig);
 
-        // https://regex101.com/r/jE0eJ6/2
-        $constantRegex = "/^(\\s*define\\s*\\(\\s*['\"]" . preg_quote($constantOrVariableName, '/') . "['\"]\\s*,\\s*).*(\\s*\\)\\s*;\\s*)$/m";
-        // https://regex101.com/r/oO7gX7/5
-        $variableRegex = "/^(\\\${$constantOrVariableName}\\s*=\\s*).*(;\\s*)$/m";
-
-        $definitionRegex = $isVariable ? $variableRegex : $constantRegex;
-
-        $configContainsDefinition = preg_match($definitionRegex, $wpConfigContent);
-
-        if ($configContainsDefinition) {
-            $wpConfigContent = preg_replace($definitionRegex, "\${1}$phpizedValue\${2}", $wpConfigContent);
-        } else {
-            $originalContent = $wpConfigContent;
-            $endOfEditableSection = strpos($wpConfigContent, '/* That\'s all, stop editing! Happy blogging. */');
-
-            if ($endOfEditableSection === false) {
-                WP_CLI::error('Cannot find place for defining the ' . ($isVariable ? 'variable' : 'constant')  . '. Config was probably edited manually.');
+        try {
+            if ($isVariable) {
+                $wpConfigEditor->updateConfigVariable($constantOrVariableName, $value, $usePlainValue);
+            } else {
+                $wpConfigEditor->updateConfigConstant($constantOrVariableName, $value, $usePlainValue);
             }
-
-            $constantTemplate = "define('%s', %s);\n";
-            $variableTemplate = "\$%s = %s;\n";
-
-            $definitionTemplate = $isVariable ? $variableTemplate : $constantTemplate;
-
-            $wpConfigContent = substr($originalContent, 0, $endOfEditableSection);
-            $wpConfigContent .= sprintf($definitionTemplate, $constantOrVariableName, $phpizedValue);
-            $wpConfigContent .= substr($originalContent, $endOfEditableSection);
+        } catch (\Exception $e) {
+            WP_CLI::error('Cannot find place for defining the ' . ($isVariable ? 'variable' : 'constant')  . '. Config was probably edited manually.');
         }
-
-        file_put_contents($wpConfigPath, $wpConfigContent);
-    }
-
-    /**
-     * WP-CLI args are always strings. This method restores the original type.
-     * 
-     * @param string $value
-     * @return bool|int|float|string
-     */
-    private function fixTypeOfValue($value) {
-        if (is_numeric($value)) {
-            return $value + 0;
-        }
-
-        if (strtolower($value) === 'true') {
-            return true;
-        }
-
-        if (strtolower($value) === 'false') {
-            return false;
-        }
-
-        return $value;
     }
 }
 

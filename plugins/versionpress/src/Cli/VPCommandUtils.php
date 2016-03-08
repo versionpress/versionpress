@@ -60,7 +60,7 @@ class VPCommandUtils {
      * Asks user a question, offers an array of values and returns what he/she entered. The first value
      * in the `$values` array is the default one, used if the user just ENTERs the question or types
      * in some random value. The $assoc_args array may be given as the third parameter, in which case
-	 * it behaves like in WP_CLI::confirm() and will return 'y' is such value is in $values,
+     * it behaves like in WP_CLI::confirm() and will return 'y' is such value is in $values,
      * or the default value.
      *
      * Inspired by WP_CLI::confirm() that can only do "yes" / "no" and cannot really return "no"
@@ -90,5 +90,27 @@ class VPCommandUtils {
 
     public static function warning($message) {
         WP_CLI::log(Colors::colorize('%YWarning: %n' . $message));
+    }
+
+    /**
+     * WP-CLI args are always strings. This method restores the original type.
+     *
+     * @param string $value
+     * @return bool|int|float|string
+     */
+    public static function fixTypeOfValue($value) {
+        if (is_numeric($value)) {
+            return $value + 0;
+        }
+
+        if (strtolower($value) === 'true') {
+            return true;
+        }
+
+        if (strtolower($value) === 'false') {
+            return false;
+        }
+
+        return $value;
     }
 }

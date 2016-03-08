@@ -13,7 +13,6 @@ use VersionPress\ChangeInfos\RevertChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
-use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Commit;
 use VersionPress\Git\GitLogPaginator;
@@ -35,15 +34,12 @@ class VersionPressApi {
     private $gitRepository;
     /** @var Reverter */
     private $reverter;
-    /** @var VersionPressConfig */
-    private $vpConfig;
     /** @var SynchronizationProcess */
     private $synchronizationProcess;
 
-    public function __construct(GitRepository $gitRepository, Reverter $reverter, VersionPressConfig $vpConfig, SynchronizationProcess $synchronizationProcess) {
+    public function __construct(GitRepository $gitRepository, Reverter $reverter, SynchronizationProcess $synchronizationProcess) {
         $this->gitRepository = $gitRepository;
         $this->reverter = $reverter;
-        $this->vpConfig = $vpConfig;
         $this->synchronizationProcess = $synchronizationProcess;
     }
 
@@ -481,7 +477,7 @@ class VersionPressApi {
      * @return WP_Error|bool
      */
     public function checkPermissions(WP_REST_Request $request) {
-        return !$this->vpConfig->mergedConfig['requireApiAuth'] || current_user_can('manage_options')
+        return !VERSIONPRESS_REQUIRE_API_AUTH || current_user_can('manage_options')
             ? true
             : new WP_Error(
                 'error',

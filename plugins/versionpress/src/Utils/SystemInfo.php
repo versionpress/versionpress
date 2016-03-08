@@ -5,8 +5,6 @@ namespace VersionPress\Utils;
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
 use VersionPress\Utils\Process;
-use VersionPress\Configuration\VersionPressConfig;
-use VersionPress\DI\VersionPressServices;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\RequirementsChecker;
 use VersionPress\VersionPress;
@@ -14,11 +12,6 @@ use VersionPress\VersionPress;
 class SystemInfo {
 
     public static function getAllInfo() {
-
-        global $versionPressContainer;
-        /** @var VersionPressConfig $vpConfig */
-        $vpConfig = $versionPressContainer->resolve(VersionPressServices::VP_CONFIGURATION);
-
         $output = array();
         $output['summary'] = array();
         $output['git-info'] = self::getGitInfo();
@@ -31,7 +24,6 @@ class SystemInfo {
         $output['summary']['operating-system'] = php_uname();
         $output['summary']['php-version'] = phpversion();
         $output['summary']['php-sapi'] = php_sapi_name();
-        $output['summary']['custom-vp-config'] = $vpConfig->customConfig;
         $output['summary']['git-version'] = isset($output['git-info']['git-version']) ? $output['git-info']['git-version'] : '';
         $output['summary']['git-full-path'] = isset($output['git-info']['git-full-path']) ? $output['git-info']['git-full-path'] : '';
 
@@ -46,12 +38,7 @@ class SystemInfo {
      * @return array
      */
     public static function getGitInfo() {
-
-        global $versionPressContainer;
-        /** @var VersionPressConfig $vpConfig */
-        $vpConfig = $versionPressContainer->resolve(VersionPressServices::VP_CONFIGURATION);
-        $gitBinary = $vpConfig->gitBinary;
-
+        $gitBinary = VP_GIT_BINARY;
 
         $info = array();
 
