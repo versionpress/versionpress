@@ -4,6 +4,8 @@ namespace VersionPress\Initialization;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use VersionPress\ChangeInfos\VersionPressChangeInfo;
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Database\ShortcodesReplacer;
+use VersionPress\Database\ShortcodesInfo;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Git\GitConfig;
 use VersionPress\Git\GitRepository;
@@ -79,10 +81,23 @@ class Initializer {
      * @var VpidRepository
      */
     private $vpidRepository;
+    /**
+     * @var ShortcodesReplacer
+     */
+    private $shortcodesReplacer;
     private $idCache;
     private $executionStartTime;
 
-    function __construct($wpdb, DbSchemaInfo $dbSchema, StorageFactory $storageFactory, SynchronizerFactory $synchronizerFactory, GitRepository $repository, AbsoluteUrlReplacer $urlReplacer, VpidRepository $vpidRepository) {
+    function __construct(
+        $wpdb,
+        DbSchemaInfo $dbSchema,
+        StorageFactory $storageFactory,
+        SynchronizerFactory $synchronizerFactory,
+        GitRepository $repository,
+        AbsoluteUrlReplacer $urlReplacer,
+        VpidRepository $vpidRepository,
+        ShortcodesReplacer $shortcodesReplacer) {
+
         $this->database = $wpdb;
         $this->dbSchema = $dbSchema;
         $this->storageFactory = $storageFactory;
@@ -90,6 +105,7 @@ class Initializer {
         $this->repository = $repository;
         $this->urlReplacer = $urlReplacer;
         $this->vpidRepository = $vpidRepository;
+        $this->shortcodesReplacer = $shortcodesReplacer;
         $this->executionStartTime = microtime(true);
     }
 
@@ -225,6 +241,7 @@ class Initializer {
 
         $entities = $this->getEntitiesFromDatabase($entityName);
         $entities = $this->replaceForeignKeysWithReferencesInAllEntities($entityName, $entities);
+        $entities = $this->replaceShortcodesInAllEntities($entityName, $entities);
 
         $entities = array_values(array_filter($entities, function ($entity) use ($storage) {
             return $storage->shouldBeSaved($entity);
@@ -273,6 +290,14 @@ class Initializer {
         $vpidRepository = $this->vpidRepository;
         return array_map(function ($entity) use ($vpidRepository, $entityName) {
             return $vpidRepository->replaceForeignKeysWithReferences($entityName, $entity);
+        }, $entities);
+    }
+
+    private function replaceShortcodesInAllEntities($entityName, $entities) {
+        $shortcodesReplacer = $this->shortcodesReplacer;
+
+        return array_map(function ($entity) use ($entityName, $shortcodesReplacer) {
+            return $shortcodesReplacer->replaceShortcodesInEntity($entityName, $entity);
         }, $entities);
     }
 
@@ -450,6 +475,7 @@ class Initializer {
         SecurityUtils::protectDirectory(VP_VPDB_DIR);
     }
 
+
     /**
      * Installs Gitignore to the repository root, or does nothing if the file already exists.
      */
@@ -464,15 +490,14 @@ class Initializer {
         $gitignore = file_get_contents(__DIR__ . '/.gitignore.tpl');
 
         $gitIgnoreVariables = array(
-            'wp-content' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_CONTENT_DIR), '.'), '/\\'),
-            'wp-plugins' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_PLUGIN_DIR), '.'), '/\\'),
-            'abspath' => rtrim(ltrim(PathUtils::getRelativePath(VP_PROJECT_ROOT, ABSPATH), '.'), '/\\'),
+            'wp-content' => '/' . PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_CONTENT_DIR),
+            'wp-plugins' => '/' . PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_PLUGIN_DIR),
+            'abspath' => '/' . PathUtils::getRelativePath(VP_PROJECT_ROOT, ABSPATH),
         );
 
         $gitignore = StringUtils::fillTemplateString($gitIgnoreVariables, $gitignore);
         file_put_contents($gitignorePath, $gitignore);
     }
-
 
 
 

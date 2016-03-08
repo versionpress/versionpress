@@ -3,6 +3,7 @@ namespace VersionPress\Synchronizers;
 
 use Nette\Utils\Strings;
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\WordPressCacheUtils;
@@ -13,8 +14,8 @@ use wpdb;
  */
 class PostsSynchronizer extends SynchronizerBase {
 
-    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer) {
-        parent::__construct($storage, $wpdb, $dbSchema, $urlReplacer, 'post');
+    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
+        parent::__construct($storage, $wpdb, $dbSchema, $urlReplacer, $shortcodesReplacer, 'post');
     }
 
     protected function doEntitySpecificActions() {

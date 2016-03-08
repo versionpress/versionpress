@@ -46,7 +46,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/edit");
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
-        $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_content,post_title");
+        $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_content,post_title,post_modified,post_modified_gmt");
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -61,12 +61,12 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertCommitsAreEquivalent();
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
         try {
-            $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_title");
+            $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_title,post_modified,post_modified_gmt");
         } catch (PHPUnit_Framework_AssertionFailedError $e) {
             // Since WP 4.2 there is a bug in WP.
             // The ping_status might be changed by the quick edit form.
             // Reported here: https://core.trac.wordpress.org/ticket/31977
-            $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_title,ping_status");
+            $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_title,ping_status,post_modified,post_modified_gmt");
         }
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
@@ -81,7 +81,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/trash");
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
-        $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_status");
+        $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_status,post_modified,post_modified_gmt");
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -95,7 +95,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/untrash");
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
-        $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_status");
+        $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_status,post_modified,post_modified_gmt");
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -169,7 +169,7 @@ abstract class PostTypeTestCase extends End2EndTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/publish");
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
-        $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_date,post_date_gmt,post_content,post_status,post_name");
+        $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "post_date,post_date_gmt,post_content,post_status,post_name,post_modified,post_modified_gmt");
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }

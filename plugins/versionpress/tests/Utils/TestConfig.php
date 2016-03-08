@@ -82,18 +82,6 @@ class TestConfig {
             $this->sites[$siteId]->wpLocale = isset($rawSiteConfig['wp-site']['wp-locale']) ? $rawSiteConfig['wp-site']['wp-locale'] : null;
             $this->sites[$siteId]->wpAutoupdate = $rawSiteConfig['wp-site']['wp-autoupdate'];
 
-            // VP config
-            $this->sites[$siteId]->vpConfig = $rawSiteConfig['vp-config'];
-
-            // If the site overrode a common config vp-config value, array_merge_recursive() caused that the key now
-            // contains array with two items, first being the empty value from common-site-config
-            // and the other one being the real one. We want just the real one.
-            foreach ($this->sites[$siteId]->vpConfig as $key => $value) {
-                if (is_array($value)) {
-                    $this->sites[$siteId]->vpConfig[$key] = $value[1];
-                }
-            }
-
         }
 
         $this->testSite = $this->sites[$rawConfig['test-site']];

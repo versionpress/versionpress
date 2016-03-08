@@ -23,17 +23,7 @@ class WpConfigSplitter {
         $wpConfigDir = dirname($wpConfigPath);
         $commonConfigPath = $wpConfigDir . '/' . $commonConfigName;
 
-        $include = <<<DOC
-// Configuration common to all environments
-include_once __DIR__ . '/$commonConfigName';
-DOC;
-
-        $configContent = file_get_contents($wpConfigPath);
-
-        if (!Strings::contains($configContent, $include)) {
-            $configContent = str_replace('<?php', "<?php\n\n$include\n", $configContent);
-            file_put_contents($wpConfigPath, $configContent);
-        }
+        self::ensureCommonConfigInclude($wpConfigPath, $commonConfigName);
 
         $configLines = file($wpConfigPath);
         $commonConfigLines = is_file($commonConfigPath) ? file($commonConfigPath) : array("<?php\n");
@@ -57,5 +47,25 @@ DOC;
 
         file_put_contents($commonConfigPath, join("", $commonConfigLines));
         file_put_contents($wpConfigPath, join("", $configLines));
+    }
+
+    /**
+     * Adds include of common config if it's missing.
+     *
+     * @param $wpConfigPath
+     * @param $commonConfigName
+     */
+    public static function ensureCommonConfigInclude($wpConfigPath, $commonConfigName) {
+        $include = <<<DOC
+// Configuration common to all environments
+include_once __DIR__ . '/$commonConfigName';
+DOC;
+
+        $configContent = file_get_contents($wpConfigPath);
+
+        if (!Strings::contains($configContent, $include)) {
+            $configContent = str_replace('<?php', "<?php\n\n$include\n", $configContent);
+            file_put_contents($wpConfigPath, $configContent);
+        }
     }
 }
