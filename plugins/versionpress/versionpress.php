@@ -849,10 +849,16 @@ function vp_rollback() {
 
 function _vp_revert($reverterMethod) {
     global $versionPressContainer;
+
+    $commitHash = $_GET['commit'];
+
+    if (!preg_match('/^[0-9a-f]+$/', $commitHash)) {
+        exit();
+    }
+
     /** @var Reverter $reverter */
     $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
 
-    $commitHash = $_GET['commit'];
     vp_enable_maintenance();
     $revertStatus = call_user_func(array($reverter, $reverterMethod), $commitHash);
     vp_disable_maintenance();

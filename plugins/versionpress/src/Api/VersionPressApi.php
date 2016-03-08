@@ -222,7 +222,16 @@ class VersionPressApi {
      * @return WP_REST_Response|WP_Error
      */
     public function undoCommit(WP_REST_Request $request) {
-        return $this->revertCommit('undo', $request['commit']);
+        $commitHash = $request['commit'];
+
+        if (!preg_match('/^[0-9a-f]+$/', $commitHash)) {
+            return new WP_Error(
+                'error',
+                'Invalid commit hash',
+                array('status' => 404));
+        }
+
+        return $this->revertCommit('undo', $commitHash);
     }
 
     /**
@@ -230,7 +239,16 @@ class VersionPressApi {
      * @return WP_REST_Response|WP_Error
      */
     public function rollbackToCommit(WP_REST_Request $request) {
-        return $this->revertCommit('rollback', $request['commit']);
+        $commitHash = $request['commit'];
+
+        if (!preg_match('/^[0-9a-f]+$/', $commitHash)) {
+            return new WP_Error(
+                'error',
+                'Invalid commit hash',
+                array('status' => 404));
+        }
+
+        return $this->revertCommit('rollback', $commitHash);
     }
 
     /**
@@ -264,8 +282,16 @@ class VersionPressApi {
      * @return WP_REST_Response|WP_Error
      */
     public function getDiff(WP_REST_Request $request) {
-        $hash = $request['commit'];
-        $diff = $this->gitRepository->getDiff($hash);
+        $commitHash = $request['commit'];
+
+        if (!preg_match('/^[0-9a-f]*$/', $commitHash)) {
+            return new WP_Error(
+                'error',
+                'Invalid commit hash',
+                array('status' => 404));
+        }
+
+        $diff = $this->gitRepository->getDiff($commitHash);
 
         if (strlen($diff) > 50 * 1024) { // 50 kB is maximum size for diff (see WP-49)
             return new WP_Error(
