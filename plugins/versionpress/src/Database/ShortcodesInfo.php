@@ -2,21 +2,21 @@
 
 namespace VersionPress\Database;
 
-use Nette\Neon\Neon;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Describes shortcodes and their references to DB entities.
  * 
- * The information is loaded from a *-shortcodes.neon file.
+ * The information is loaded from a *-shortcodes.yml file.
  */
 class ShortcodesInfo {
 
     public function __construct($shortcodeFile) {
-        $this->shortcodeSchema = Neon::decode(file_get_contents($shortcodeFile));
+        $this->shortcodeSchema = Yaml::parse(file_get_contents($shortcodeFile));
     }
 
     /**
-     * Returns all supported shortcode names - keys from the `shortcodes` array in the NEON file.
+     * Returns all supported shortcode names - keys from the `shortcodes` array in the YAML file.
      *
      * @return string[]
      */

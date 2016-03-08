@@ -18,7 +18,7 @@ use VersionPress\Utils\ProcessUtils;
  *  - WP-CLI (`wp --info` works in console)
  *  - NPM packages installed in <project_root>
  *  - Gulp (`gulp -v` works in console)
- *  - `test-config.neon` file created in `versionpress/tests`
+ *  - `test-config.yml` file created in `versionpress/tests`
  *  - Vagrant configuration as described on the wiki
  *
  * Currently, WpAutomation is a set of static functions as of v1; other options will be considered for v2, see WP-56.

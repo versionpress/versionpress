@@ -35,7 +35,7 @@ class SecurityTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function vpconfigDoesntAllowDirectAccess() {
-        $url = self::$testConfig->testSite->url . "/wp-content/plugins/versionpress/vpconfig.neon";
+        $url = self::$testConfig->testSite->url . "/wp-content/plugins/versionpress/vpconfig.yml";
         $statusCode = HttpStatusCodeUtil::getStatusCode($url);
         $this->assertEquals(403, $statusCode, "Wrong HTTP status codes");
     }

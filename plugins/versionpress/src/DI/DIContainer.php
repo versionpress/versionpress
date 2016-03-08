@@ -61,7 +61,7 @@ class DIContainer {
         $dic->register(VersionPressServices::STORAGE_FACTORY, function () use ($dic) {
             global $wp_taxonomies;
             return new StorageFactory(
-                VERSIONPRESS_MIRRORING_DIR,
+                VP_VPDB_DIR,
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::WPDB),
                 array_keys((array)$wp_taxonomies)
@@ -77,7 +77,7 @@ class DIContainer {
 
         $dic->register(VersionPressServices::DB_SCHEMA, function () {
             global $table_prefix, $wp_db_version;
-            return new DbSchemaInfo(VERSIONPRESS_PLUGIN_DIR . '/src/Database/wordpress-schema.neon', $table_prefix, $wp_db_version);
+            return new DbSchemaInfo(VERSIONPRESS_PLUGIN_DIR . '/src/Database/wordpress-schema.yml', $table_prefix, $wp_db_version);
         });
 
         $dic->register(VersionPressServices::WPDB_MIRROR_BRIDGE, function () use ($dic) {
@@ -161,7 +161,7 @@ class DIContainer {
         });
 
         $dic->register(VersionPressServices::SHORTCODES_INFO, function () {
-            return new ShortcodesInfo(VERSIONPRESS_PLUGIN_DIR . '/src/Database/wordpress-shortcodes.neon');
+            return new ShortcodesInfo(VERSIONPRESS_PLUGIN_DIR . '/src/Database/wordpress-shortcodes.yml');
         });
 
         return self::$instance;

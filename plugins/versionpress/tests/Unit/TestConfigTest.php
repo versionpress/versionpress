@@ -10,9 +10,9 @@ class TestConfigTest extends PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function neonParsingWorks() {
+    public function yamlParsingWorks() {
 
-        $config = new TestConfig(__DIR__ . "/../test-config.sample.neon");
+        $config = new TestConfig(__DIR__ . "/../test-config.sample.yml");
 
         // 'selenium' section
         $this->assertEquals("/Users/johndoe/Path/To/Firefox.app/Contents/MacOS/firefox", $config->seleniumConfig->firefoxBinary);
@@ -22,10 +22,6 @@ class TestConfigTest extends PHPUnit_Framework_TestCase {
         $this->assertArrayHasKey('vp01', $config->sites);
         $this->assertEquals("VP Test @ localhost", $config->sites["vp01"]->title);
         $this->assertFalse($config->sites["vp01"]->isVagrant);
-
-        // 'vp-config' section
-        $this->assertEquals(null, $config->sites["vp01"]->vpConfig["git-binary"]);
-        $this->assertEquals("/usr/bin/git", $config->sites["vagrant-php53"]->vpConfig["git-binary"]);
 
     }
 }

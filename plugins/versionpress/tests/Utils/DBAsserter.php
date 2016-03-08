@@ -42,8 +42,8 @@ class DBAsserter {
 
         $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
         $schemaReflection = new \ReflectionClass('VersionPress\Database\DbSchemaInfo');
-        $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.neon';
-        $shortcodeFile = dirname($schemaReflection->getFileName()) . '/wordpress-shortcodes.neon';
+        $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.yml';
+        $shortcodeFile = dirname($schemaReflection->getFileName()) . '/wordpress-shortcodes.yml';
 
         /** @var $wp_db_version */
         require(self::$testConfig->testSite->path . '/wp-includes/version.php');
@@ -299,7 +299,7 @@ class DBAsserter {
         global $versionPressContainer, $wpdb;
 
         defined('VERSIONPRESS_PLUGIN_DIR') || define('VERSIONPRESS_PLUGIN_DIR', self::$testConfig->testSite->path . '/wp-content/plugins/versionpress');
-        defined('VERSIONPRESS_MIRRORING_DIR') || define('VERSIONPRESS_MIRRORING_DIR', self::$testConfig->testSite->path . '/wp-content/vpdb');
+        defined('VP_VPDB_DIR') || define('VP_VPDB_DIR', self::$testConfig->testSite->path . '/wp-content/vpdb');
         $versionPressContainer = DIContainer::getConfiguredInstance();
         $wpdb = self::$wpdb;
     }

@@ -1,6 +1,6 @@
 # Shortcodes Description Format
 
-Similarly to DB schema, VersionPress needs to understand shortcodes – what DB entities they reference, in which attributes and what contexts are valid for them. We use the `*-shortcodes.neon` file to capture this information.
+Similarly to DB schema, VersionPress needs to understand shortcodes – what DB entities they reference, in which attributes and what contexts are valid for them. We use the `*-shortcodes.yml` file to capture this information.
 
 Here is a full example:
 
