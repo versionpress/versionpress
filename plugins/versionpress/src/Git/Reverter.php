@@ -84,25 +84,30 @@ class Reverter {
         }
 
         $this->committer->forceChangeInfo($changeInfo);
+        $affectedPosts = $this->getAffectedPosts($modifiedFiles);
+        $this->updateChangeDateForPosts($affectedPosts);
         $this->committer->commit();
 
         $vpIdsInModifiedFiles = array_merge($vpIdsInModifiedFiles, $this->getAllVpIdsFromModifiedFiles($modifiedFiles));
         $vpIdsInModifiedFiles = array_unique($vpIdsInModifiedFiles, SORT_REGULAR);
 
         $this->synchronizationProcess->synchronize($vpIdsInModifiedFiles);
-        $affectedPosts = $this->getAffectedPosts($modifiedFiles);
-        $this->updateChangeDateForPosts($affectedPosts);
 
         do_action('vp_revert');
         return RevertStatus::OK;
     }
 
     private function updateChangeDateForPosts($vpIds) {
+        $storage = $this->storageFactory->getStorage('post');
         $date = current_time('mysql');
         $dateGmt = current_time('mysql', true);
         foreach ($vpIds as $vpId) {
             $sql = "update {$this->database->prefix}posts set post_modified = '{$date}', post_modified_gmt = '{$dateGmt}' where ID = (select id from {$this->database->prefix}vp_id where vp_id = unhex('{$vpId}'))";
             $this->database->query($sql);
+            $post = $storage->loadEntity($vpId, null);
+            $post['post_modified'] = $date;
+            $post['post_modified_gmt'] = $dateGmt;
+            $storage->save($post);
         }
     }
 
