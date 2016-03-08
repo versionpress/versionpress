@@ -649,6 +649,9 @@ function vp_admin_post_cancel_deactivation() {
  */
 function vp_admin_post_confirm_deactivation() {
 
+    vp_verify_nonce('vp_deactivation');
+    vp_check_permissions();
+
     define('VP_DEACTIVATING', true);
 
     if (WpdbReplacer::isReplaced()) {
@@ -850,13 +853,16 @@ function vp_rollback() {
 function _vp_revert($reverterMethod) {
     global $versionPressContainer;
 
+    vp_verify_nonce('vp_revert');
+    vp_check_permissions();
+    
     $commitHash = $_GET['commit'];
-
+    
     if (!preg_match('/^[0-9a-f]+$/', $commitHash)) {
         exit();
     }
 
-    /** @var Reverter $reverter */
+        /** @var Reverter $reverter */
     $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
 
     vp_enable_maintenance();
@@ -877,7 +883,9 @@ if (VersionPress::isActive()) {
 }
 
 function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
-    if (!current_user_can('activate_plugins')) return;
+    if (!current_user_can('manage_options')) {
+        return;
+    }
 
     $adminBarText = "<span style=\"color:#FF8800;font-weight:bold\">VersionPress EAP running</span>";
     $popoverTitle = "Note";

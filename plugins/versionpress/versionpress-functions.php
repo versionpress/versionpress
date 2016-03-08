@@ -27,6 +27,26 @@ function vp_is_ajax() {
     return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
 }
 
+function vp_verify_nonce($name) {
+    if (!wp_verify_nonce(@$_REQUEST['_wpnonce'], $name)) {
+        wp_die(
+            '<h1>' . __('Cheatin&#8217; uh?') . '</h1>' .
+            '<p>' . __('Or maybe it\'s just a long time since you opened previous page. In this case please try it again.') . '</p>',
+            403
+        );
+    }
+}
+
+function vp_check_permissions() {
+    if (!current_user_can('manage_options')) {
+        wp_die(
+            '<h1>' . __('Cheatin&#8217; uh?') . '</h1>' .
+            '<p>' . __('You are not allowed to access VersionPress.') . '</p>',
+            403
+        );
+    }
+}
+
 /**
  * Multiple methods of disabling output buffering.
  * @see http://www.binarytides.com/php-output-content-browser-realtime-buffering/
