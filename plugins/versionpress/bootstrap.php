@@ -1,6 +1,4 @@
 <?php
-use Nette\Caching\Storages\FileStorage;
-use Nette\Loaders\RobotLoader;
 use Tracy\Debugger;
 use VersionPress\DI\DIContainer;
 
@@ -64,11 +62,6 @@ if (defined('DOING_AJAX')) {
 }
 
 Debugger::enable(Debugger::DEVELOPMENT, VERSIONPRESS_PLUGIN_DIR . '/log');
-
-$robotLoader = new RobotLoader();
-$robotLoader->addDirectory(VERSIONPRESS_PLUGIN_DIR . '/src');
-$robotLoader->setCacheStorage(new FileStorage(VERSIONPRESS_PLUGIN_DIR . '/temp'));
-$robotLoader->register();
 
 global $versionPressContainer;
 $versionPressContainer = DIContainer::getConfiguredInstance();

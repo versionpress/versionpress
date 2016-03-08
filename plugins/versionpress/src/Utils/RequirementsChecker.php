@@ -53,6 +53,13 @@ class RequirementsChecker {
         );
 
         $this->requirements[] = array(
+            'name' => "'mbstring' extension",
+            'level' => 'critical',
+            'fulfilled' => extension_loaded('mbstring'),
+            'help' => 'Extension `mbstring` is required.'
+        );
+
+        $this->requirements[] = array(
             'name' => 'Execute external commands',
             'level' => 'critical',
             'fulfilled' => $this->tryRunProcess(),

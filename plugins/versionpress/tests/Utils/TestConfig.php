@@ -2,10 +2,10 @@
 
 namespace VersionPress\Tests\Utils;
 
-use Nette\Neon\Neon;
+use Symfony\Component\Yaml\Yaml;
 
 /**
- * Test config, loaded from test-config.neon
+ * Test config, loaded from test-config.yml
  */
 class TestConfig {
 
@@ -45,7 +45,7 @@ class TestConfig {
     public static $defaultConfigFile;
 
     function __construct($configFile) {
-        $rawConfig = Neon::decode(file_get_contents($configFile));
+        $rawConfig = Yaml::parse(file_get_contents($configFile));
 
         $this->seleniumConfig = new SeleniumConfig();
         $this->seleniumConfig->firefoxBinary = $rawConfig['selenium']['firefox-binary'];

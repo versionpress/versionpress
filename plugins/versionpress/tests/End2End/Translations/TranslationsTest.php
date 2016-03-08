@@ -24,7 +24,7 @@ class TranslationsTest extends End2EndTestCase {
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction('translation/activate');
-        $commitAsserter->assertCommitPath('M', '%vpdb%/options/*');
+        $commitAsserter->assertCommitPath(array('A', 'M'), '%vpdb%/options/*');
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }

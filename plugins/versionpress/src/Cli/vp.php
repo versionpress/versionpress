@@ -7,9 +7,9 @@
 
 namespace VersionPress\Cli;
 
-use Nette\Neon\Neon;
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Yaml\Yaml;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitRepository;
