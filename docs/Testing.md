@@ -30,7 +30,7 @@ To be able to run the tests you have to create a **test config file**. You can c
  - `common-site-config`,
  - `sites` — here you can specify a list of your test sites (or just simple alter the `vp01`). 
 
-The test config file is generally very important as our WpAutomation [depends on it](https://github.com/versionpress/versionpress/wiki/Dev-Setup#wpautomation-setup) and the tests use it to couldn't automate WordPress installation to run tests in it.
+The test config file is generally very important as our WpAutomation [depends on it](./Dev-Setup.md#wpautomation-setup) and the tests use it to couldn't automate WordPress installation to run tests in it.
 
 > <small>More detailed setup instructions follow, if you just want to run the tests skip to [Running tests](#running-tests).</small>
 
@@ -110,7 +110,7 @@ Sometimes, the web server cannot see the WordPress installation - it just shows 
 
 ## Running tests
 
-Tests are run by PHPUnit which is automatically downloaded via Composer if you follow the [Dev-Setup steps](./Dev-Setup) (there's no need to have PHPUnit installed globally).
+Tests are run by PHPUnit which is automatically downloaded via Composer if you follow the [Dev-Setup steps](./Dev-Setup.md) (there's no need to have PHPUnit installed globally).
 
 To run **all tests**:
 

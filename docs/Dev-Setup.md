@@ -96,7 +96,7 @@ We use the [`WpAutomation`](https://github.com/versionpress/versionpress/blob/ma
 3. In the `tests` directory (`PROJECT_DIR/plugins/versionpress/tests`), copy `test-config.sample.yml` into `test-config.yml` and update the values to match your local environment.
     - WpAutomation doesn't create a database, it should already exist. For example, the sample file uses dbname, user and password `vp01` so you should create this beforehand (or configure any values that fit your local environment).
     - The web and DB server must both be up and running.
-    - Windows users, here's a [sample configuration](https://github.com/versionpress/versionpress/wiki/Testing#windows-users) for you.
+    - Windows users, here's a [sample configuration](./Testing.md#windows-users) for you.
 3. Use `WpAutomation` methods to do stuff you need. For example, this will set up a WordPress site and initialize VersionPress in it:
 
 ```
@@ -190,4 +190,4 @@ It is also recommended to install [React Developer Tools](https://chrome.google.
 
 ## Testing
 
-Testing is covered by separate page, see [Testing](./Testing).
+Testing is covered by separate page, see [Testing](./Testing.md).
