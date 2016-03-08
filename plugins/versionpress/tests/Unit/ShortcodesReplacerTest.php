@@ -16,7 +16,7 @@ class ShortcodesReplacerTest extends \PHPUnit_Framework_TestCase {
         array('another-entity', '1', '1234567890'),
         array('another-entity', '7', 'BOND007'),
     );
-
+    
     private $shortcodesInfo;
 
     private $vpidRepository;
@@ -29,21 +29,37 @@ class ShortcodesReplacerTest extends \PHPUnit_Framework_TestCase {
 
         $this->shortcodesInfo->expects($this->any())->method('getShortcodeInfo')->will($this->returnValueMap($this->shortcodeSchemaValueMap));
 
+        $this->shortcodesInfo->expects($this->any())->method('getShortcodeLocations')->will($this->returnValue(array("post" => array("post_content"))));
+
         $this->vpidRepository = $this->getMockBuilder('VersionPress\Database\VpidRepository')->disableOriginalConstructor()->getMock();
         $this->vpidRepository->expects($this->any())->method('getVpidForEntity')->will($this->returnValueMap($this->idValueMap));
 
-        $vpidValueMap = array_map(function ($idValueMapItem) { return array($idValueMapItem[2], $idValueMapItem[1]); }, $this->idValueMap);
+        $vpidValueMap = array_map(function ($idValueMapItem) {
+            return array($idValueMapItem[2], $idValueMapItem[1]);
+        }, $this->idValueMap);
         $this->vpidRepository->expects($this->any())->method('getIdForVpid')->will($this->returnValueMap($vpidValueMap));
+
+
     }
 
     /**
      * @test
      * @dataProvider shortcodeProvider
+     * @param $input
+     * @param $expectedReplacedOutput
      */
-    public function replacerReplacesIdsInKnownShortcodesWithVpids($input, $expectedOutput) {
+    public function replacerReplacesIdForVpidsInEntity($input, $expectedReplacedOutput) {
         $shortcodesReplacer = new ShortcodesReplacer($this->shortcodesInfo, $this->vpidRepository);
-        $replacedString = $shortcodesReplacer->replaceShortcodes($input);
-        $this->assertEquals($expectedOutput, $replacedString);
+        $testingPost = array(
+            'post_title' => $input,
+            'post_content' => $input
+        );
+        $expectedPost = array(
+            'post_title' => $input,
+            'post_content' => $expectedReplacedOutput
+        );
+        $entityWithReplacedShortCodes = $shortcodesReplacer->replaceShortcodesInEntity('post', $testingPost);
+        $this->assertEquals($expectedPost, $entityWithReplacedShortCodes);
     }
 
     /**

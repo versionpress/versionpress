@@ -29,10 +29,11 @@ class ShortcodesReplacer {
     /**
      * Translates IDs to VPIDs in shortcodes.
      *
+     *
      * @param string $string
      * @return string
      */
-    public function replaceShortcodes($string) {
+    private function replaceShortcodes($string) {
         $pattern = get_shortcode_regex($this->shortcodesInfo->getAllShortcodeNames());
         return preg_replace_callback("/$pattern/", $this->createReplaceCallback(array($this, 'getVpidByEntityNameAndId')), $string);
     }
@@ -136,7 +137,9 @@ class ShortcodesReplacer {
                 if (isset($shortcodeInfo[$attribute])) {
                     $ids = explode(',', $value);
                     $entityName = $shortcodeInfo[$attribute];
-                    $attributes[$attribute] = join(',', array_map(function ($id) use ($entityName, $idProvider) { return $idProvider($entityName, $id); }, $ids));
+                    $attributes[$attribute] = join(',', array_map(function ($id) use ($entityName, $idProvider) {
+                        return $idProvider($entityName, $id);
+                    }, $ids));
                 }
             }
 
