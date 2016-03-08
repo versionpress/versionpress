@@ -3,7 +3,7 @@
 Plugin Name: VersionPress
 Plugin URI: http://versionpress.net/
 Description: Git-versioning plugin for WordPress
-Version: 3.0-dev
+Version: DEV
 Author: VersionPress
 Author URI: http://versionpress.net/
 License: GPLv2 or later
@@ -38,9 +38,9 @@ use VersionPress\VersionPress;
 defined('ABSPATH') or die("Direct access not allowed");
 
 require_once(__DIR__ . '/bootstrap.php');
-require_once( ABSPATH . 'wp-admin/includes/translation-install.php' );
 
 if (defined('WP_CLI') && WP_CLI) {
+    require_once(__DIR__ . '/src/Cli/vp.php');
     WP_CLI::add_command('vp', 'VersionPress\Cli\VPCommand');
 }
 
@@ -53,7 +53,7 @@ if (!VersionPress::isActive() && is_file(VERSIONPRESS_PLUGIN_DIR . '/.abort-init
         FileSystem::remove(VP_PROJECT_ROOT . '/.git');
     }
 
-    FileSystem::remove(VERSIONPRESS_MIRRORING_DIR);
+    FileSystem::remove(VP_VPDB_DIR);
     unlink(VERSIONPRESS_PLUGIN_DIR . '/.abort-initialization');
 }
 
@@ -117,7 +117,7 @@ function vp_register_hooks() {
      *  WordPress creates plain INSERT query and executes it using wpdb::query method instead of wpdb::insert.
      *  It's too difficult to parse every INSERT query, that's why the WordPress hook is used.
      */
-    add_action('save_post', createUpdatePostTermsHook($mirror, $vpidRepository));
+    add_action('save_post', vp_create_update_post_terms_hook($mirror, $vpidRepository));
 
     add_filter('update_feedback', function () {
         touch(ABSPATH . 'versionpress.maintenance');
@@ -198,6 +198,8 @@ function vp_register_hooks() {
         $languages = get_available_languages();
 
         $postInstallHook = function ($_, $hook_extra) use ($committer, $languages, &$postInstallHook) {
+            require_once(ABSPATH . 'wp-admin/includes/translation-install.php');
+
             if (!isset($hook_extra['language_update_type'])) return;
             $translations = wp_get_available_translations();
 
@@ -220,7 +222,7 @@ function vp_register_hooks() {
 
     add_action('switch_theme', function () use ($committer) {
         if (defined('WP_CLI') && WP_CLI) {
-            file_get_contents(admin_url()); //
+            wp_remote_get(admin_url()); //
         } else {
             $committer->disableCommit(); // the change will be committed on next load
         }
@@ -232,15 +234,6 @@ function vp_register_hooks() {
         $themeName = $theme->get('Name');
 
         $committer->forceChangeInfo(new ThemeChangeInfo($stylesheet, 'switch', $themeName));
-    });
-
-    add_action('customize_save_after', function ($customizeManager) use ($committer) {
-        /** @var WP_Customize_Manager $customizeManager */
-        $stylesheet = $customizeManager->theme()->get_stylesheet();
-        $committer->forceChangeInfo(new ThemeChangeInfo($stylesheet, 'customize'));
-        register_shutdown_function(function () {
-            wp_remote_get(admin_url("admin.php"));
-        });
     });
 
     add_action('untrashed_post_comments', function ($postId) use ($wpdb, $dbSchemaInfo, $wpdbMirrorBridge) {
@@ -276,6 +269,8 @@ function vp_register_hooks() {
     }, 0); // zero because the default WP action with priority 1 calls wp_die()
 
     function _vp_get_language_name_by_code($code) {
+        require_once(ABSPATH . 'wp-admin/includes/translation-install.php');
+
         $translations = wp_get_available_translations();
         return isset($translations[$code])
             ? $translations[$code]['native_name']
@@ -310,7 +305,7 @@ function vp_register_hooks() {
             /** @var Mirror $mirror */
             $mirror = $versionPressContainer->resolve(VersionPressServices::MIRROR);
             $vpidRepository = $versionPressContainer->resolve(VersionPressServices::VPID_REPOSITORY);
-            $func = createUpdatePostTermsHook($mirror, $vpidRepository);
+            $func = vp_create_update_post_terms_hook($mirror, $vpidRepository);
             $func($menu_item_db_id);
         }
     }, 10, 2);
@@ -321,7 +316,7 @@ function vp_register_hooks() {
         $committer->forceChangeInfo(new \VersionPress\ChangeInfos\TermChangeInfo('delete', $termVpid, $term->name, $taxonomy));
     }, 10, 2);
 
-    add_action('set_object_terms', createUpdatePostTermsHook($mirror, $vpidRepository));
+    add_action('set_object_terms', vp_create_update_post_terms_hook($mirror, $vpidRepository));
 
     add_filter('plugin_install_action_links', function ($links, $plugin) {
         $compatibility = CompatibilityChecker::testCompatibilityBySlug($plugin['slug']);
@@ -400,10 +395,9 @@ function vp_register_hooks() {
     }, 10, 2);
 
     add_action('before_delete_post', function ($postId) use ($wpdb) {
-            // Fixing bug in WP (#34803) and WP-CLI (#2246)
+        // Fixing bug in WP (#34803) and WP-CLI (#2246)
         $post = get_post($postId);
         if ( !is_wp_error($post) && $post->post_type === 'nav_menu_item' ) {
-            \Tracy\Debugger::log('Deleting menu item ' . $post->ID);
             $newParent = get_post_meta($post->ID, '_menu_item_menu_item_parent', true);
             $wpdb->update($wpdb->postmeta,
                 array('meta_value' => $newParent),
@@ -546,7 +540,7 @@ function vp_register_hooks() {
     register_shutdown_function(array($committer, 'commit'));
 }
 
-function createUpdatePostTermsHook(Mirror $mirror, VpidRepository $vpidRepository) {
+function vp_create_update_post_terms_hook(Mirror $mirror, VpidRepository $vpidRepository) {
 
     return function ($postId) use ($mirror, $vpidRepository) {
         /** @var array $post */
@@ -635,7 +629,7 @@ function vp_deactivate() {
     if (defined('WP_CLI') || !VersionPress::isActive()) {
         vp_admin_post_confirm_deactivation();
     } else {
-        wp_redirect(admin_url('admin.php?page=versionpress/admin/deactivate.php'));
+        wp_safe_redirect(admin_url('admin.php?page=versionpress/admin/deactivate.php'));
         die();
     }
 }
@@ -644,7 +638,8 @@ function vp_deactivate() {
  * Handles a situation where user canceled the deactivation
  */
 function vp_admin_post_cancel_deactivation() {
-    wp_redirect(admin_url('plugins.php'));
+    wp_safe_redirect(admin_url('plugins.php'));
+    exit();
 }
 
 /**
@@ -653,6 +648,9 @@ function vp_admin_post_cancel_deactivation() {
  * or is called directly from vp_deactivate() if the confirmation screen was not necessary.
  */
 function vp_admin_post_confirm_deactivation() {
+
+    vp_verify_nonce('vp_deactivation');
+    vp_check_permissions();
 
     define('VP_DEACTIVATING', true);
 
@@ -664,7 +662,7 @@ function vp_admin_post_confirm_deactivation() {
         FileSystem::remove(VERSIONPRESS_ACTIVATION_FILE);
     }
 
-    FileSystem::remove(VERSIONPRESS_MIRRORING_DIR);
+    FileSystem::remove(VP_VPDB_DIR);
 
 
     global $versionPressContainer;
@@ -699,43 +697,16 @@ function vp_admin_post_confirm_deactivation() {
     deactivate_plugins("versionpress/versionpress.php", true);
 
     if (defined('WP_ADMIN')) {
-        wp_redirect(admin_url("plugins.php"));
+        wp_safe_redirect(admin_url("plugins.php"));
+        exit();
     }
 
 }
 
 function vp_send_headers() {
     if (isset($_GET['init_versionpress']) && !VersionPress::isActive()) {
-        _vp_disable_output_buffering();
+        vp_disable_output_buffering();
     }
-}
-
-/**
- * Multiple methods of disabling output buffering.
- * @see http://www.binarytides.com/php-output-content-browser-realtime-buffering/
- */
-function _vp_disable_output_buffering() {
-    // Turn off output buffering
-    ini_set('output_buffering', 'off');
-    // Turn off PHP output compression
-    ini_set('zlib.output_compression', false);
-
-    // Flush (send) the output buffer and turn off output buffering
-    /** @noinspection PhpUsageOfSilenceOperatorInspection */
-    while (@ob_end_flush()) ;
-
-    // Implicitly flush the buffer(s)
-    ini_set('implicit_flush', true);
-    ob_implicit_flush(true);
-
-    //prevent apache from buffering it for deflate/gzip
-    header("Content-type: text/plain");
-    header('Cache-Control: no-cache'); // recommended to prevent caching of event data.
-
-    for ($i = 0; $i < 1000; $i++) echo ' ';
-
-    ob_flush();
-    flush();
 }
 
 add_action('admin_post_vp_send_bug_report', 'vp_send_bug_report');
@@ -748,7 +719,8 @@ function vp_send_bug_report() {
     $reportedSuccessfully = $bugReporter->reportBug($email, $description);
 
     $result = $reportedSuccessfully ? "ok" : "err";
-    wp_redirect(add_query_arg('bug-report', $result, menu_page_url('versionpress', false)));
+    wp_safe_redirect(add_query_arg('bug-report', $result, menu_page_url('versionpress', false)));
+    exit();
 }
 
 add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are just one step less important :) */);
@@ -858,10 +830,11 @@ function versionpress_page() {
 add_action('admin_action_vp_show_undo_confirm', 'vp_show_undo_confirm');
 
 function vp_show_undo_confirm() {
-    if(isAjax()) {
+    if (vp_is_ajax()) {
         require_once(VERSIONPRESS_PLUGIN_DIR . '/admin/undo.php');
     } else {
-        wp_redirect(admin_url('admin.php?page=versionpress/admin/undo.php&method=' . $_GET['method'] . '&commit=' . $_GET['commit']));
+        wp_safe_redirect(admin_url('admin.php?page=versionpress/admin/undo.php&method=' . $_GET['method'] . '&commit=' . $_GET['commit']));
+        exit();
     }
 }
 
@@ -879,20 +852,30 @@ function vp_rollback() {
 
 function _vp_revert($reverterMethod) {
     global $versionPressContainer;
-    /** @var Reverter $reverter */
+
+    vp_verify_nonce('vp_revert');
+    vp_check_permissions();
+    
+    $commitHash = $_GET['commit'];
+    
+    if (!preg_match('/^[0-9a-f]+$/', $commitHash)) {
+        exit();
+    }
+
+        /** @var Reverter $reverter */
     $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
 
-    $commitHash = $_GET['commit'];
     vp_enable_maintenance();
     $revertStatus = call_user_func(array($reverter, $reverterMethod), $commitHash);
     vp_disable_maintenance();
     $adminPage = menu_page_url('versionpress', false);
 
     if ($revertStatus !== RevertStatus::OK) {
-        wp_redirect(add_query_arg('error', $revertStatus, $adminPage));
+        wp_safe_redirect(add_query_arg('error', $revertStatus, $adminPage));
     } else {
-        wp_redirect($adminPage);
+        wp_safe_redirect($adminPage);
     }
+    exit();
 }
 
 if (VersionPress::isActive()) {
@@ -900,7 +883,9 @@ if (VersionPress::isActive()) {
 }
 
 function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
-    if (!current_user_can('activate_plugins')) return;
+    if (!current_user_can('manage_options')) {
+        return;
+    }
 
     $adminBarText = "<span style=\"color:#FF8800;font-weight:bold\">VersionPress EAP running</span>";
     $popoverTitle = "Note";
@@ -923,10 +908,6 @@ function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
 //----------------------------------
 // AJAX handling
 //----------------------------------
-
-function isAjax() {
-    return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
-}
 
 add_action('wp_ajax_hide_vp_welcome_panel', 'vp_ajax_hide_vp_welcome_panel');
 

@@ -81,7 +81,9 @@ define('DB_COLLATE', '');
 
 $table_prefix = 'wp_';
 
+define( 'WP_CONTENT_URL', 'http://localhost/wp/app' ); // Do not remove. Removing this line could break your site. Added by Security > Settings > Change Content Directory.
 
+define('WP_PLUGIN_URL', 'http://localhost/wp/app/addons');
 
 
 /* That's all, stop editing! Happy blogging. */
@@ -100,9 +102,7 @@ DOC;
     private $commonConfig = <<<'DOC'
 <?php
 define( 'WP_CONTENT_DIR', '/Users/johndoe/Sites/wp/app' ); // Do not remove. Removing this line could break your site. Added by Security > Settings > Change Content Directory.
-define( 'WP_CONTENT_URL', 'http://localhost/wp/app' ); // Do not remove. Removing this line could break your site. Added by Security > Settings > Change Content Directory.
 define('WP_PLUGIN_DIR', WP_CONTENT_DIR . '/addons');
-define('WP_PLUGIN_URL', 'http://localhost/wp/app/addons');
 define('UPLOADS', 'uploads');
 
 DOC;
