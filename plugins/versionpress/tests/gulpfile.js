@@ -28,12 +28,12 @@ gulp.task('default', function() {
         console.log('');
         console.log(chalk.cyan('Notes:'));
         console.log('');
-        console.log(' - Make sure that ' + chalk.yellow('test-config.neon') + ' is configured properly');
+        console.log(' - Make sure that ' + chalk.yellow('test-config.yml') + ' is configured properly');
         console.log(' - Tests defined in ' + chalk.yellow('phpunit.xml') + ' will be run');
         console.log(' - Port ' + chalk.yellow('4444') + ' must be available' + portStatus);
         console.log(' - ' + chalk.yellow('Java') + ' has to be installed and in the PATH');
         console.log(' - Selenium Server will be downloaded and run automatically');
-        console.log(' - Firefox defined in test-config.neon will be used');
+        console.log(' - Firefox defined in test-config.yml will be used');
         console.log('');
 
     })

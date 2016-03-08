@@ -23,6 +23,10 @@ function vp_disable_maintenance() {
     FileSystem::remove(ABSPATH . '.maintenance');
 }
 
+function vp_is_ajax() {
+    return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
+}
+
 function vp_verify_nonce($name) {
     if (!wp_verify_nonce(@$_REQUEST['_wpnonce'], $name)) {
         wp_die(
@@ -41,4 +45,32 @@ function vp_check_permissions() {
             403
         );
     }
+}
+
+/**
+ * Multiple methods of disabling output buffering.
+ * @see http://www.binarytides.com/php-output-content-browser-realtime-buffering/
+ */
+function vp_disable_output_buffering() {
+    // Turn off output buffering
+    ini_set('output_buffering', 'off');
+    // Turn off PHP output compression
+    ini_set('zlib.output_compression', false);
+
+    // Flush (send) the output buffer and turn off output buffering
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
+    while (@ob_end_flush()) ;
+
+    // Implicitly flush the buffer(s)
+    ini_set('implicit_flush', true);
+    ob_implicit_flush(true);
+
+    //prevent apache from buffering it for deflate/gzip
+    header("Content-type: text/plain");
+    header('Cache-Control: no-cache'); // recommended to prevent caching of event data.
+
+    for ($i = 0; $i < 1000; $i++) echo ' ';
+
+    ob_flush();
+    flush();
 }

@@ -59,7 +59,7 @@ class FooChangeInfo extends \VersionPress\ChangeInfos\TrackedChangeInfo {
 
 define('ABSPATH', __DIR__); // fake
 define('VERSIONPRESS_PLUGIN_DIR', __DIR__); // fake
-define('VERSIONPRESS_MIRRORING_DIR', __DIR__); // fake
+define('VERSIONPRESS_TEMP_DIR', __DIR__); // fake
 $repositoryDir = __DIR__ . '/repository';
 
 $changeList = createFiles($repositoryDir, $args['from'], $args['to']);

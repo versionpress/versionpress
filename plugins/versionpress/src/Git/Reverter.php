@@ -266,8 +266,9 @@ class Reverter {
     private function getAllVpIdsFromModifiedFiles($modifiedFiles) {
         $vpIds = array();
         $vpIdRegex = "/([\\da-f]{32})/i";
+        $vpdbName = basename(VP_VPDB_DIR);
         // https://regex101.com/r/yT6mF5/1
-        $optionFileRegex = "/.*vpdb[\\/\\\\]options[\\/\\\\].+[\\/\\\\](.+)\\.ini/i";
+        $optionFileRegex = "/.*{$vpdbName}[\\/\\\\]options[\\/\\\\].+[\\/\\\\](.+)\\.ini/i";
         // https://regex101.com/r/zC6dA2/2
         $optionNameRegex = "/^\\[(.*)\\]\\r?$/m";
 
