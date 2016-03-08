@@ -377,7 +377,8 @@ class VersionPressApi {
 
         $status = $this->gitRepository->getStatus(true);
         if (ArrayUtils::any($status, function ($fileStatus) {
-            return Strings::contains($fileStatus[1], 'vpdb');
+            $vpdbName = basename(VP_VPDB_DIR);
+            return Strings::contains($fileStatus[1], $vpdbName);
         })) {
             $this->updateDatabase($status);
         }
@@ -389,7 +390,8 @@ class VersionPressApi {
     private function updateDatabase($status) {
         $diff = $this->gitRepository->getDiff();
         $vpidRegex = "/([\\da-f]{32})/i";
-        $optionRegex = "/.*vpdb[\\/\\\\]options[\\/\\\\].+[\\/\\\\](.+)\\.ini/i";
+        $vpdbName = basename(VP_VPDB_DIR);
+        $optionRegex = "/.*{$vpdbName}[\\/\\\\]options[\\/\\\\].+[\\/\\\\](.+)\\.ini/i";
 
         preg_match_all($vpidRegex, $diff, $vpidMatches);
         preg_match_all($optionRegex, $diff, $optionNameMatches);
@@ -515,7 +517,7 @@ class VersionPressApi {
 
         $changedFiles = array_filter($changedFiles, function ($changedFile) {
             $path = str_replace('\\', '/', ABSPATH . $changedFile['path']);
-            $vpdbPath = str_replace('\\', '/', VERSIONPRESS_MIRRORING_DIR);
+            $vpdbPath = str_replace('\\', '/', VP_VPDB_DIR);
 
             return !Strings::startsWith($path, $vpdbPath);
         });

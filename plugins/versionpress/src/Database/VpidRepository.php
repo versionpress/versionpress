@@ -114,7 +114,7 @@ class VpidRepository {
     }
 
     /**
-     * Function used in wordpress-schema.neon.
+     * Function used in wordpress-schema.yml.
      * Maps menu item with given postmeta (_menu_item_object_id) to target entity (post/category/custom url).
      *
      * @param $postmeta

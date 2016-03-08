@@ -1,6 +1,6 @@
 root = true
 
-[*.{php,js,json,neon,yml}]
+[*.{php,js,json,yml}]
 end_of_line = lf
 charset = utf-8
 insert_final_newline = true

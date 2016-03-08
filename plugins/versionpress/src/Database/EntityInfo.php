@@ -6,7 +6,7 @@ use Nette\Utils\Strings;
 use VersionPress\Utils\QueryLanguageUtils;
 
 /**
- * Info about an entity. Basically represents a section of the NEON schema file -  find
+ * Info about an entity. Basically represents a section of the YAML schema file -  find
  * the parsing logic in the constructor.
  */
 class EntityInfo {
@@ -184,7 +184,7 @@ class EntityInfo {
 
         if (isset($schemaInfo['mn-references'])) {
             foreach ($schemaInfo['mn-references'] as $reference => $targetEntity) {
-                if (Strings::startsWith($reference, '@')) {
+                if (Strings::startsWith($reference, '~')) {
                     $reference = Strings::substring($reference, 1);
                     $this->virtualReferences[$reference] = true;
                 }

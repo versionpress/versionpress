@@ -15,7 +15,7 @@ TestRunnerOptions::getInstance()->configureInstance(array(
 
 ));
 
-TestConfig::$defaultConfigFile = __DIR__ . '/test-config.neon';
+TestConfig::$defaultConfigFile = __DIR__ . '/test-config.yml';
 PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
 
 if (TestRunnerOptions::getInstance()->forceSetup == "before-suite") {

@@ -201,11 +201,11 @@ class Initializer {
      */
     private function saveDatabaseToStorages() {
 
-        if (is_dir(VERSIONPRESS_MIRRORING_DIR)) {
-            FileSystem::remove(VERSIONPRESS_MIRRORING_DIR);
+        if (is_dir(VP_VPDB_DIR)) {
+            FileSystem::remove(VP_VPDB_DIR);
         }
 
-        FileSystem::mkdir(VERSIONPRESS_MIRRORING_DIR);
+        FileSystem::mkdir(VP_VPDB_DIR);
 
         $entityNames = $this->synchronizerFactory->getSynchronizationSequence();
         foreach ($entityNames as $entityName) {
@@ -447,7 +447,7 @@ class Initializer {
      */
     private function copyAccessRulesFiles() {
         SecurityUtils::protectDirectory(VP_PROJECT_ROOT . "/.git");
-        SecurityUtils::protectDirectory(VERSIONPRESS_MIRRORING_DIR);
+        SecurityUtils::protectDirectory(VP_VPDB_DIR);
     }
 
     /**
