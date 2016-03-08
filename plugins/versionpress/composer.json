@@ -4,7 +4,6 @@
   "require": {
     "tracy/tracy": "2.2.*",
     "nette/utils": "2.2.*",
-    "nette/neon": "2.2.*",
     "symfony/yaml": "^2.6",
     "symfony/process": "2.5.*",
     "michelf/php-markdown": "1.4.*",
