@@ -29,7 +29,6 @@ class ShortcodesReplacer {
     /**
      * Translates IDs to VPIDs in shortcodes.
      *
-     *
      * @param string $string
      * @return string
      */
@@ -44,7 +43,7 @@ class ShortcodesReplacer {
      * @param string $string
      * @return string
      */
-    public function restoreShortcodes($string) {
+    private function restoreShortcodes($string) {
         $pattern = get_shortcode_regex($this->shortcodesInfo->getAllShortcodeNames());
         return preg_replace_callback("/$pattern/", $this->createReplaceCallback(array($this, 'getIdByVpid')), $string);
     }
