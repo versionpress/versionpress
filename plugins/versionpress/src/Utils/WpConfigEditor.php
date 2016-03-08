@@ -12,7 +12,7 @@ class WpConfigEditor {
         $this->isCommonConfig = $isCommonConfig;
     }
 
-    public function updateConfigConstant($constantName, $value, $usePlainValue) {
+    public function updateConfigConstant($constantName, $value, $usePlainValue = false) {
         // https://regex101.com/r/jE0eJ6/2
         $constantRegex = "/^(\\s*define\\s*\\(\\s*['\"]" . preg_quote($constantName, '/') . "['\"]\\s*,\\s*).*(\\s*\\)\\s*;\\s*)$/m";
         $constantTemplate = "define('{$constantName}', %s);\n";
@@ -20,10 +20,10 @@ class WpConfigEditor {
         self::updateConfig($value, $constantRegex, $constantTemplate, $usePlainValue);
     }
 
-    public function updateConfigVariable($variableName, $value, $usePlainValue) {
+    public function updateConfigVariable($variableName, $value, $usePlainValue = false) {
         // https://regex101.com/r/oO7gX7/5
         $variableRegex = "/^(\\\${$variableName}\\s*=\\s*).*(;\\s*)$/m";
-        $variableTemplate = "\$%s = %s;\n";
+        $variableTemplate = "\${$variableName} = %s;\n";
 
         self::updateConfig($value, $variableRegex, $variableTemplate, $usePlainValue);
     }
