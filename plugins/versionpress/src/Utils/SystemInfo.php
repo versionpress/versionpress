@@ -1,6 +1,6 @@
 <?php
 
-namespace Utils;
+namespace VersionPress\Utils;
 
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;

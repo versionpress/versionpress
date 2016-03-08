@@ -5,7 +5,7 @@ namespace VersionPress\Utils;
 use Exception;
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Utils\SystemInfo;
+use VersionPress\Utils\SystemInfo;
 use VersionPress\Database\DbSchemaInfo;
 use wpdb;
 
