@@ -9,33 +9,30 @@ use VersionPress\Storages\Mirror;
  */
 class WpdbMirrorBridge {
 
-    /**
-     * @var Mirror
-     */
+    /** @var Mirror */
     private $mirror;
 
-    /**
-     * @var DbSchemaInfo
-     */
+    /** @var DbSchemaInfo */
     private $dbSchemaInfo;
 
-    /**
-     * @var \wpdb
-     */
+    /** @var \wpdb */
     private $database;
-    /**
-     * @var VpidRepository
-     */
+
+    /** @var VpidRepository */
     private $vpidRepository;
+
+    /** @var ShortcodesReplacer */
+    private $shortcodesReplacer;
 
     /** @var bool */
     private $disabled;
 
-    function __construct($wpdb, Mirror $mirror, DbSchemaInfo $dbSchemaInfo, VpidRepository $vpidRepository) {
+    function __construct($wpdb, Mirror $mirror, DbSchemaInfo $dbSchemaInfo, VpidRepository $vpidRepository, ShortcodesReplacer $shortcodesReplacer) {
         $this->database = $wpdb;
         $this->mirror = $mirror;
         $this->dbSchemaInfo = $dbSchemaInfo;
         $this->vpidRepository = $vpidRepository;
+        $this->shortcodesReplacer = $shortcodesReplacer;
     }
 
     function insert($table, $data) {
@@ -59,6 +56,7 @@ class WpdbMirrorBridge {
         }
 
         $data = $this->vpidRepository->identifyEntity($entityName, $data, $id);
+        $data = $this->shortcodesReplacer->replaceShortcodesInEntity($entityName, $data);
         $this->mirror->save($entityName, $data);
     }
 
@@ -177,6 +175,7 @@ class WpdbMirrorBridge {
             $data = $this->vpidRepository->identifyEntity($entityName, $data, $id);
         }
 
+        $data = $this->shortcodesReplacer->replaceShortcodesInEntity($entityName, $data);
         $this->mirror->save($entityName, $data);
 
         if (!$savePostmeta) {
@@ -193,6 +192,8 @@ class WpdbMirrorBridge {
             }
 
             $meta = $this->vpidRepository->identifyEntity('postmeta', $meta, $meta['meta_id']);
+
+            $meta = $this->shortcodesReplacer->replaceShortcodesInEntity('postmeta', $meta);
             $this->mirror->save('postmeta', $meta);
         }
     }

@@ -30,7 +30,11 @@ class VpidRepository {
      */
     public function getVpidForEntity($entityName, $id) {
         $tableName = $this->schemaInfo->getTableName($entityName);
-        return $this->database->get_var("SELECT HEX(vp_id) FROM $this->vpidTableName WHERE id = $id AND `table` = '$tableName'");
+        return $this->database->get_var("SELECT HEX(vp_id) FROM $this->vpidTableName WHERE id = '$id' AND `table` = '$tableName'");
+    }
+
+    public function getIdForVpid($vpid) {
+        return $this->database->get_var("SELECT id FROM $this->vpidTableName WHERE vp_id = UNHEX('$vpid')");
     }
 
     public function replaceForeignKeysWithReferences($entityName, $entity) {
