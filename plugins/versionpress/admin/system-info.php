@@ -22,7 +22,7 @@ function vp_display_system_info_array($array, $outputFormat) {
         case 've': // var_export
 
             echo '<pre><code style="language-php">';
-            echo htmlspecialchars(var_export($array, true));
+            echo esc_html(var_export($array, true));
             echo '</code></pre>';
 
             break;
@@ -66,8 +66,8 @@ function vp_display_system_info_array($array, $outputFormat) {
 
 <div>
     Format:
-    <a href="<?php echo admin_url('admin.php?page=versionpress/admin/system-info.php&f=ve') ?>">var_export</a> |
-    <a href="<?php echo admin_url('admin.php?page=versionpress/admin/system-info.php&f=tc') ?>">tracy</a>
+    <a href="<?php echo esc_url(admin_url('admin.php?page=versionpress/admin/system-info.php&f=ve')) ?>">var_export</a> |
+    <a href="<?php echo esc_url(admin_url('admin.php?page=versionpress/admin/system-info.php&f=tc')) ?>">tracy</a>
 
     <br />
 
