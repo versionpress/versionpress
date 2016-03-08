@@ -226,28 +226,6 @@ class VPInternalCommand extends WP_CLI_Command {
             WP_CLI::error('Cannot find place for defining the ' . ($isVariable ? 'variable' : 'constant')  . '. Config was probably edited manually.');
         }
     }
-
-    /**
-     * WP-CLI args are always strings. This method restores the original type.
-     * 
-     * @param string $value
-     * @return bool|int|float|string
-     */
-    private function fixTypeOfValue($value) {
-        if (is_numeric($value)) {
-            return $value + 0;
-        }
-
-        if (strtolower($value) === 'true') {
-            return true;
-        }
-
-        if (strtolower($value) === 'false') {
-            return false;
-        }
-
-        return $value;
-    }
 }
 
 if (defined('WP_CLI') && WP_CLI) {
