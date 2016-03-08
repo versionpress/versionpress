@@ -251,6 +251,13 @@ gulp.task('composer-install-versionpress-libs', false, function () {
 });
 
 /**
+ * Inits the tests.
+ */
+gulp.task('init-tests', false, shell.task([
+    'npm install'
+], {cwd: vpDir + '/tests'}));
+
+/**
  * Inits the frontend project.
  */
 gulp.task('init-frontend', false, function () {
@@ -309,7 +316,7 @@ gulp.task('test-deploy', 'Task called from WpAutomation to copy the plugin files
  * Inits dev environment.
  * Install vendors, set env variables.
  */
-gulp.task('init-dev', 'Inits user development environment.', ['git-config', 'composer-install-ext-libs', 'composer-install-versionpress-libs', 'frontend-build-and-deploy']);
+gulp.task('init-dev', 'Inits user development environment.', ['git-config', 'composer-install-ext-libs', 'composer-install-versionpress-libs', 'frontend-build-and-deploy', 'init-tests']);
 
 
 //--------------------------------------
