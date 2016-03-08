@@ -28,31 +28,21 @@ class ParsedQueryData {
 
 
     /**
-     * @var array
+     * @var array;
      */
-    public $where;
+    public $parentIds;
 
     /**
      * @var string
      */
-    public $query;
+    public $sqlQuery;
+
+
+    public $idColumnName;
 
     /**
      * @var string
      */
-    public $originalQuery;
-
-    /**
-     * @var boolean
-     */
-    public $usesSqlFunctions;
-    
-    
-    public $idColumn;
-    
-    /**
-    * @var string
-    */
     public $queryType;
 
     const UPDATE_QUERY = 'UPDATE';
@@ -60,10 +50,10 @@ class ParsedQueryData {
     const DELETE_QUERY = 'DELETE';
     const INSERT_IGNORE_QUERY = 'INSERT_IGNORE';
     const INSERT_UPDATE_QUERY = 'INSERT_UPDATE';
-    
-    
+
+
     public function __construct($queryType) {
-       $this->queryType = $queryType; 
+        $this->queryType = $queryType;
     }
 
 

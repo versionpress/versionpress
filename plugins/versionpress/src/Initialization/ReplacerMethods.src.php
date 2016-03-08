@@ -95,23 +95,29 @@ class ReplacerMethods {
             return $this->__wp_query($query);
         }
 
+        $r = null;
 
         /** @var SqlQueryParser $sqlQueryParser */
         $sqlQueryParser = $versionPressContainer->resolve(\VersionPress\DI\VersionPressServices::SQL_QUERY_PARSER);
 
         $parsedQueryData = $sqlQueryParser->parseQuery($query);
 
-        $r = $this->__wp_query($query);
+
+        if ($parsedQueryData != null && $parsedQueryData->queryType !== \VersionPress\Database\ParsedQueryData::DELETE_QUERY) {
+            $r = $this->__wp_query($query);
+        }
 
         if ($parsedQueryData != null && $parsedQueryData->queryType == \VersionPress\Database\ParsedQueryData::INSERT_UPDATE_QUERY) {
             $parsedQueryData->ids = $this->insert_id;
         }
 
+        if ($parsedQueryData == null) {
+            $r = $this->__wp_query($query);
+        }
+
         if ($r === false || $parsedQueryData == null) {
             return $r;
         }
-
-        // return r;
 
         /** @var \VersionPress\Database\WpdbMirrorBridge $wpdbMirrorBridge */
         $wpdbMirrorBridge = $versionPressContainer->resolve(\VersionPress\DI\VersionPressServices::WPDB_MIRROR_BRIDGE);
@@ -120,6 +126,10 @@ class ReplacerMethods {
         $wpdbMirrorBridge->query($parsedQueryData);
         $this->vp_restore_fields();
 
+        if ($parsedQueryData != null && $parsedQueryData->queryType == \VersionPress\Database\ParsedQueryData::DELETE_QUERY) {
+            $r = $this->__wp_query($query);
+        }
+        return $r;
     }
 
     /**

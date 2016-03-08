@@ -137,7 +137,6 @@ class WpdbMirrorBridge {
 
         if (!$entityInfo)
             return;
-        $usesSqlFunctions = $parsedQueryData->usesSqlFunctions;
 
         switch ($parsedQueryData->queryType) {
             case ParsedQueryData::UPDATE_QUERY:
@@ -147,11 +146,7 @@ class WpdbMirrorBridge {
                 $this->processDeleteQuery($parsedQueryData, $entityInfo);
                 break;
             case ParsedQueryData::INSERT_QUERY:
-                if ($usesSqlFunctions) {
-                    $this->processInsertQueryWithSqlFunctions($parsedQueryData, $entityName);
-                } else {
-                    $this->processInsertQueryWithoutSqlFunctions($parsedQueryData);
-                }
+                $this->processInsertQuery($parsedQueryData);
                 break;
             case ParsedQueryData::INSERT_UPDATE_QUERY:
                 $this->processInsertUpdateQuery($parsedQueryData);
@@ -288,7 +283,7 @@ class WpdbMirrorBridge {
 
         foreach ($parsedQueryData->ids as $id) {
             $stringifiedId = "'" . $id . "'";
-            $data = $this->database->get_results("SELECT * FROM {$parsedQueryData->table} WHERE {$parsedQueryData->idColumn} = {$stringifiedId}", ARRAY_A)[0];
+            $data = $this->database->get_results("SELECT * FROM {$parsedQueryData->table} WHERE {$parsedQueryData->idColumnName} = {$stringifiedId}", ARRAY_A)[0];
             $data = $this->vpidRepository->replaceForeignKeysWithReferences($parsedQueryData->entityName, $data);
             $this->updateEntity($data, $parsedQueryData->entityName, $stringifiedId);
         }
@@ -305,7 +300,7 @@ class WpdbMirrorBridge {
         if (!$entityInfo->usesGeneratedVpids) {
             foreach ($parsedQueryData->ids as $id) {
                 $stringifiedId = "'" . $id . "'";
-                $where[$parsedQueryData->idColumn] = $stringifiedId;
+                $where[$parsedQueryData->idColumnName] = $stringifiedId;
                 $this->vpidRepository->deleteId($parsedQueryData->entityName, $stringifiedId);
                 $this->mirror->delete($parsedQueryData->entityName, $where);
             }
@@ -313,13 +308,13 @@ class WpdbMirrorBridge {
         }
         foreach ($parsedQueryData->ids as $id) {
             $stringifiedId = "'" . $id . "'";
-            $where['vp_id'] = $this->vpidRepository->getVpidForEntity($parsedQueryData->entityName, $id);
+            $where['vp_id'] = $this->vpidRepository->getVpidForEntity($parsedQueryData->entityName, $stringifiedId);
             if (!$where['vp_id']) {
                 continue; // already deleted - deleting postmeta is sometimes called twice
             }
 
-            if ($this->dbSchemaInfo->isChildEntity($parsedQueryData->entityName) && !isset($where["vp_{$entityInfo->parentReference}"])) {
-                $where = $this->fillParentId($parsedQueryData->entityName, $where, $id);
+            if ($this->dbSchemaInfo->isChildEntity($parsedQueryData->entityName)) {
+                $where = $this->fillParentId($parsedQueryData->entityName, $where, $stringifiedId);
             }
 
             $this->vpidRepository->deleteId($parsedQueryData->entityName, $stringifiedId);
@@ -333,7 +328,7 @@ class WpdbMirrorBridge {
      *
      * @param $parsedQueryData ParsedQueryData
      */
-    private function processInsertQueryWithoutSqlFunctions($parsedQueryData) {
+    private function processInsertQuery($parsedQueryData) {
 
 
         $id = $this->database->insert_id;
@@ -349,10 +344,6 @@ class WpdbMirrorBridge {
             $data = $this->vpidRepository->identifyEntity($parsedQueryData->entityName, $data, ($id - $i));
             $this->mirror->save($parsedQueryData->entityName, $data);
         }
-    }
-
-    private function processInsertQueryWithSqlFunctions($parsedQueryData, $entityName) {
-
     }
 
     /**
@@ -373,8 +364,8 @@ class WpdbMirrorBridge {
             $data = $this->vpidRepository->identifyEntity($parsedQueryData->entityName, $data, $id);
             $this->mirror->save($parsedQueryData->entityName, $data);
         } else {
-            $data = $this->database->get_results($parsedQueryData->query, ARRAY_A)[0];
-            $stringifiedId = "'" . $data[$parsedQueryData->idColumn] . "'";
+            $data = $this->database->get_results($parsedQueryData->sqlQuery, ARRAY_A)[0];
+            $stringifiedId = "'" . $data[$parsedQueryData->idColumnName] . "'";
             $data = $this->vpidRepository->replaceForeignKeysWithReferences($parsedQueryData->entityName, $data);
             $this->updateEntity($data, $parsedQueryData->entityName, $stringifiedId);
         }

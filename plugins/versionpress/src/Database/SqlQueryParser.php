@@ -62,22 +62,19 @@ class SqlQueryParser {
         if ($idColumn == null) {
             return null;
         }
-        $result = new ParsedQueryData(ParsedQueryData::UPDATE_QUERY);
-        $result->originalQuery = $query;
-        $result->table = $table;
-        $result->idColumn = $idColumn;
-        $result->entityName = self::resolveEntityName($schema, $table);
+        $parsedQueryData = new ParsedQueryData(ParsedQueryData::UPDATE_QUERY);
+        $parsedQueryData->table = $table;
+        $parsedQueryData->idColumnName = $idColumn;
+        $parsedQueryData->entityName = self::resolveEntityName($schema, $table);
         $selectSql = self::getSelect($parser, $idColumn);
         $where = self::getWhereFragments($parser, $query, $statement);
         if (isset($where)) {
             $selectSql .= " WHERE " . join(' ', $where);
         }
-        $result->query = $selectSql;
-        $result->ids = $wpdb->get_col($selectSql);
-        $result->data = self::getData($statement);
-        $result->usesSqlFunctions = self::isUsingSqlFunctions($parser);
-        $result->where = self::getWhere($where);
-        return $result;
+        $parsedQueryData->sqlQuery = $selectSql;
+        $parsedQueryData->ids = $wpdb->get_col($selectSql);
+        $parsedQueryData->data = self::getData($statement);
+        return $parsedQueryData;
     }
 
     /**
@@ -99,33 +96,30 @@ class SqlQueryParser {
             foreach (array_keys($statement->options->options) as $key) {
                 $queryType .= "_" . $statement->options->options[$key];
             }
-            if($queryType==ParsedQueryData::INSERT_IGNORE_QUERY) {
+            if ($queryType == ParsedQueryData::INSERT_IGNORE_QUERY) {
                 return null;
             }
         }
-        if(strpos($query, 'ON DUPLICATE KEY UPDATE') !== false) {
+        if (strpos($query, 'ON DUPLICATE KEY UPDATE') !== false) {
             $queryType .= "_UPDATE";
         }
-        $result = new ParsedQueryData($queryType);
-        $result->data = self::getData($statement);
-        $result->table = $table;
-        $result->originalQuery = $query;
-        $result->idColumn = $idColumn;
-        $result->entityName = self::resolveEntityName($schema, $table);
-        $result->usesSqlFunctions = self::isUsingSqlFunctions($parser);
+        $parsedQueryData = new ParsedQueryData($queryType);
+        $parsedQueryData->data = self::getData($statement);
+        $parsedQueryData->table = $table;
+        $parsedQueryData->idColumnName = $idColumn;
+        $parsedQueryData->entityName = self::resolveEntityName($schema, $table);
         $selectSql = self::getSelect($parser, $idColumn);
-        $result->query = $selectSql;
-        return $result;
+        $parsedQueryData->sqlQuery = $selectSql;
+        return $parsedQueryData;
     }
-
 
     /**
      * Parses DELETE query
      *
      * @param $parser
      * @param $query
-     * @param $schema
-     * @param $wpdb
+     * @param $schema DbSchemaInfo
+     * @param $wpdb \wpdb
      * @return ParsedQueryData
      */
     private static function parseDeleteQuery($parser, $query, $schema, $wpdb) {
@@ -135,22 +129,24 @@ class SqlQueryParser {
         if ($idColumn == null) {
             return null;
         }
-        $result = new ParsedQueryData(ParsedQueryData::DELETE_QUERY);
-        $result->originalQuery = $query;
-        $result->idColumn = $idColumn;
-        $result->entityName = self::resolveEntityName($schema, $table);
-        $result->table = $table;
+        $parsedQueryData = new ParsedQueryData(ParsedQueryData::DELETE_QUERY);
+        $parsedQueryData->idColumnName = $idColumn;
+        $parsedQueryData->entityName = self::resolveEntityName($schema, $table);
+        $parsedQueryData->table = $table;
         $selectSql = self::getSelect($parser, $idColumn);
         $where = self::getWhereFragments($parser, $query, $statement);
         if (isset($where)) {
             $selectSql .= " WHERE " . join(' ', $where);
         }
-        $result->query = $selectSql;
-        $result->ids = $wpdb->get_col($selectSql);
-        $result->usesSqlFunctions = self::isUsingSqlFunctions($parser);
-        $result->where = self::getWhere($where);
-        return $result;
+        $parsedQueryData->sqlQuery = $selectSql;
+        $parsedQueryData->ids = $wpdb->get_col($selectSql);
+        if ($schema->isChildEntity($parsedQueryData->entityName)) {
+            $parsedQueryData->parentIds = self::getParentIds($schema, $wpdb, $parsedQueryData);
+        }
+
+        return $parsedQueryData;
     }
+
 
     /**
      * Returns representation of WHERE SQL clauses found in whole query
@@ -220,82 +216,22 @@ class SqlQueryParser {
     }
 
     /**
-     * If query contains some markers (unknown functions) or more than one statement.
-     * @param $parser
-     * @return bool
+     * @param $schema DbSchemaInfo
+     * @param $wpdb \wpdb
+     * @param $parsedQueryData ParsedQueryData
+     * @return array
      */
-    private static function isUsingSqlFunctions($parser) {
-        if (count($parser->statements) > 1) {
-            return true;
-        } else {
-            $statement = $parser->statements[0];
-            if ($statement instanceof UpdateStatement) {
-                return self::containsDirtyPatterns($parser->statements[0]->set);
-            } elseif ($statement instanceof InsertStatement) {
-                if (isset($statement->tables)) {
-                    return true;
-                }
-                $values = [];
-                foreach ($statement->values as $dataSet) {
-                    $values = array_merge($values, $dataSet->values);
-                }
-                return self::containsDirtyPatterns($values);
-            }
+    private static function getParentIds($schema, $wpdb, $parsedQueryData) {
+        $entityInfo = $schema->getEntityInfo($parsedQueryData->entityName);
+        $parentReference = $entityInfo->parentReference;
+        $parent = $entityInfo->references[$parentReference];
+        $vpIdTable = $schema->getPrefixedTableName('vp_id');
+        $parentTable = $schema->getTableName($parent);
+        $parentIds = [];
+        foreach ($parsedQueryData->ids as $id) {
+            $parentIds[] = $wpdb->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '{$parentTable}' AND ID = (SELECT {$parentReference} FROM $parsedQueryData->table WHERE {$parsedQueryData->idColumnName} = $id)");
         }
-    }
-
-    /**
-     * Returns Sql query WHERE fragments as array
-     *
-     * Example
-     *
-     * [where] => Array
-     *     (
-     *          [0] => option_name LIKE '%_'
-     *          [1] => option_value LIKE '%s'
-     *     )
-     * Filters operators  where fragments
-     * @param $whereConditions
-     * @return mixed
-     */
-    private static function getWhere($whereConditions) {
-        $where = array_filter($whereConditions, function ($w) {
-            if (is_object($w)) {
-                return !$w->isOperator;
-            } else {
-                return true;
-            }
-        });
-
-        $where = array_map(function ($w) {
-            if (is_object($w)) {
-                return $w->expr;
-            } else {
-                return $w;
-            }
-        }, $where);
-
-        return array_values($where);
-    }
-
-    /**
-     * @param array $sets
-     * @return boolean
-     */
-    private static function containsDirtyPatterns($sets) {
-        $dirtyPatterns = array(
-            "/DATE_ADD[ ]?\\(.*/", //https://regex101.com/r/tS2iC6/1
-            "/NOW\\(\\)/",
-            "/NOW/"
-        );
-        foreach ($sets as $set) {
-            foreach ($dirtyPatterns as $pattern) {
-                if (preg_match($pattern, $set)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return $parentIds;
     }
 
     /**

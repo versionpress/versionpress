@@ -34,22 +34,6 @@ class ParserTest extends PHPUnit_Framework_TestCase {
         $this->sqlParser = new SqlQueryParser(self::$DbSchemaInfo, $this->wpdbStub);
     }
 
-    /**
-     * @test
-     * @dataProvider updateQueryParseTestDataProvider
-     * @param $query
-     * @param $expectedSelect
-     * @param $expectedData
-     * @param $expectedWhere
-     */
-    public function whereClausesFromUpdate($query, $expectedSelect, $expectedData, $expectedWhere) {
-
-        $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col");
-        $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
-
-        $this->assertEquals($expectedWhere, $parsedQueryData->where);
-
-    }
 
     /**
      * @test
@@ -72,35 +56,16 @@ class ParserTest extends PHPUnit_Framework_TestCase {
      * @test
      * @dataProvider updateQueryParseTestDataProvider
      * @param $query
-     * @param $expectedSelect
-     * @param $expectedData
-     * @param $expectedWhere
-     * @param $expectedUseOfSqlFunctions
-     */
-    public function detectUseOfSqlFunctionsInUpdate($query, $expectedSelect, $expectedData, $expectedWhere, $expectedUseOfSqlFunctions) {
-
-        $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col");
-        $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
-        $this->assertEquals($expectedUseOfSqlFunctions, $parsedQueryData->usesSqlFunctions);
-    }
-
-
-    /**
-     * @test
-     * @dataProvider updateQueryParseTestDataProvider
-     * @param $query
      * @param $expectedSelectQuery
      * @param $expectedData
-     * @param $expectedWhere
-     * @param $expectedUseOfSqlFunctions
      * @param $expectedIds
      */
-    public function selectQueryFromUpdate($query, $expectedSelectQuery, $expectedData, $expectedWhere, $expectedUseOfSqlFunctions, $expectedIds) {
+    public function selectQueryFromUpdate($query, $expectedSelectQuery, $expectedData, $expectedIds) {
 
         $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col")
             ->with($expectedSelectQuery)->will(new PHPUnit_Framework_MockObject_Stub_Return($expectedIds));
         $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
-        $this->assertEquals($expectedSelectQuery, $parsedQueryData->query);
+        $this->assertEquals($expectedSelectQuery, $parsedQueryData->sqlQuery);
     }
 
     /**
@@ -116,30 +81,15 @@ class ParserTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($expectedData, $parsedData);
     }
 
-    /**
-     * @test
-     * @dataProvider insertQueryParseTestDataProvider
-     * @param $query
-     * @param $expectedData
-     * @param $expectedUseOfSqlFunctions
-     */
-    public function detectUseOfSqlFunctionsInInsert($query, $expectedData, $expectedUseOfSqlFunctions) {
-
-        /** @var ParsedQueryData $parsedQueryData */
-        $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
-        $parsedUseOfSqlFunctions = $parsedQueryData == null ? null : $parsedQueryData->usesSqlFunctions;
-        $this->assertEquals($expectedUseOfSqlFunctions, $parsedUseOfSqlFunctions);
-    }
 
     /**
      * @test
      * @dataProvider insertQueryParseTestDataProvider
      * @param $query
      * @param $expectedData
-     * @param $expectedUseOfSqlFunctions
      * @param $expectedQueryType
      */
-    public function detectNonStandardInsert($query, $expectedData, $expectedUseOfSqlFunctions, $expectedQueryType) {
+    public function detectNonStandardInsert($query, $expectedData, $expectedQueryType) {
 
         $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
         $parsedQeryType = $parsedQueryData == null ? null : $parsedQueryData->queryType;
@@ -157,7 +107,7 @@ class ParserTest extends PHPUnit_Framework_TestCase {
         $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col")
             ->with($expectedSelectQuery)->will(new PHPUnit_Framework_MockObject_Stub_Return($testIds));
         $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
-        $this->assertEquals($expectedSelectQuery, $parsedQueryData->query);
+        $this->assertEquals($expectedSelectQuery, $parsedQueryData->sqlQuery);
     }
 
 
@@ -188,39 +138,27 @@ class ParserTest extends PHPUnit_Framework_TestCase {
         return array(
             array("INSERT INTO `wp_options` (`option_name`, `option_value`, `autoload`) VALUES ('name', 'value', 1) ON DUPLICATE KEY UPDATE `option_name` = VALUES(`option_name`), `option_value` = VALUES(`option_value`), `autoload` = VALUES(`autoload`)",
                 array(array("option_name" => "name", "option_value" => "value", "autoload" => "1")),
-                1,
                 ParsedQueryData::INSERT_UPDATE_QUERY
             ),
-//            array(
-//                "INSERT INTO `wp_term_relationships` (object_id, term_taxonomy_id, term_order) VALUES (10, 4, 5) , (20, 10, 15) ON DUPLICATE KEY UPDATE term_order = VALUES(term_order)",
-//                array(array("object_id" => "10", "term_taxonomy_id" => "4", "term_order" => "5"),
-//                    array("object_id" => "20", "term_taxonomy_id" => "10", "term_order" => "15")),
-//                1,
-//                ParsedQueryData::INSERT_QUERY
-//            ),
             array(
                 "INSERT IGNORE INTO `wp_terms` (term_id, name, slug, term_group) VALUES (10, 'term name', 'term-name', 5) , (20, 'term another', 'term-another', 15)",
-                null,
                 null,
                 null
             ),
             array(
                 "INSERT INTO `wp_terms` (term_id, name, slug, term_group) VALUES (10, 'term name', 'term-name', 5)",
                 array(array("term_id" => "10", "name" => "term name", "slug" => "term-name", "term_group" => "5")),
-                0,
                 ParsedQueryData::INSERT_QUERY
             ),
             array(
                 "INSERT INTO `wp_terms` (term_id, name, slug, term_group) VALUES (10, 'term name', 'term-name', 5) , (20, 'term another', 'term-another', 15)",
                 array(array("term_id" => "10", "name" => "term name", "slug" => "term-name", "term_group" => "5"),
                     array("term_id" => "20", "name" => "term another", "slug" => "term-another", "term_group" => "15")),
-                0,
                 ParsedQueryData::INSERT_QUERY
             ),
             array(
                 "INSERT INTO `wp_terms` (term_id, date) VALUES (10, NOW())",
                 array(array("term_id" => "10", "date" => "NOW")),
-                1,
                 ParsedQueryData::INSERT_QUERY
             )
 
@@ -234,48 +172,41 @@ class ParserTest extends PHPUnit_Framework_TestCase {
                 "UPDATE  `wp_posts` SET post_modified = NOW() WHERE post_author = 'B'",
                 "SELECT ID FROM `wp_posts` WHERE post_author = 'B'",
                 array("post_modified" => "NOW()"),
-                array("post_author = 'B'"),
-                1,
+                $testIds
+            ),
+            array("UPDATE `wp_posts` SET post_date = post_modified WHERE post_date = '0000-00-00 00:00:00'",
+                "SELECT ID FROM `wp_posts` WHERE post_date = '0000-00-00 00:00:00'",
+                array("post_date" => "post_modified"),
                 $testIds
             ),
             array(
                 "UPDATE `wp_options` SET option_value=REPLACE(option_value, 'wp-links/links-images/', 'wp-images/links/') WHERE option_name LIKE '%_' AND option_value LIKE '%s'",
                 "SELECT option_name FROM `wp_options` WHERE option_name LIKE '%_' AND option_value LIKE '%s'",
                 array("option_value" => ""),
-                array("option_name LIKE '%_'", "option_value LIKE '%s'"),
-                1,
                 $testIds
             ),
             array(
                 "UPDATE `wp_options` SET option_value=REPLACE(option_value, 'wp-links/links-images/', 'wp-images/links/'), option_abc = 'def' WHERE option_name LIKE '%A' AND option_value LIKE '%s'",
                 "SELECT option_name FROM `wp_options` WHERE option_name LIKE '%A' AND option_value LIKE '%s'",
                 array("option_value" => ""),
-                array("option_name LIKE '%A'", "option_value LIKE '%s'"),
-                1,
                 $testIds
             ),
             array(
                 "UPDATE `wp_posts` SET post_parent = '10', post_type='page' WHERE post_type = 'attachment' AND ID IN (" . join(',', $testIds) . ")",
                 "SELECT ID FROM `wp_posts` WHERE post_type = 'attachment' AND ID IN (" . join(',', $testIds) . ")",
                 array("post_parent" => "'10'", "post_type" => "'page'"),
-                array("post_type = 'attachment'", "ID IN (" . join(',', $testIds) . ")"),
-                0,
                 $testIds
             ),
             array(
                 "UPDATE `wp_posts` SET post_date_gmt = DATE_ADD(post_date, INTERVAL '01:20' HOUR_MINUTE)",
                 "SELECT ID FROM `wp_posts` WHERE 1=1",
                 array("post_date_gmt" => "DATE_ADD(post_date"),
-                array("1=1"),
-                1,
                 $testIds
             ),
             array(
                 "UPDATE  `wp_posts` SET post_author = 'A' WHERE post_author = 'B'",
                 "SELECT ID FROM `wp_posts` WHERE post_author = 'B'",
                 array("post_author" => "'A'"),
-                array("post_author = 'B'"),
-                0,
                 $testIds
             )
 
