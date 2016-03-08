@@ -40,6 +40,7 @@ defined('ABSPATH') or die("Direct access not allowed");
 require_once(__DIR__ . '/bootstrap.php');
 
 if (defined('WP_CLI') && WP_CLI) {
+    require_once(__DIR__ . '/src/Cli/vp.php');
     WP_CLI::add_command('vp', 'VersionPress\Cli\VPCommand');
 }
 
