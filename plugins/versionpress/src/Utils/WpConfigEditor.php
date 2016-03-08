@@ -2,6 +2,11 @@
 
 namespace VersionPress\Utils;
 
+/**
+ * This class is useful for setting constants and variables in wp-config.php or wp-config.common.php.
+ * It's used mainly from our internal WP-CLI command `update-config`.
+ *
+ */
 class WpConfigEditor {
 
     private $wpConfigPath;
@@ -12,6 +17,14 @@ class WpConfigEditor {
         $this->isCommonConfig = $isCommonConfig;
     }
 
+    /**
+     * Sets value of a constant. It creates new one if it's missing.
+     * By default it saves string in single quotes. See $usePlainValue.
+     *
+     * @param $constantName
+     * @param string|number|bool $value
+     * @param bool $usePlainValue The value is used as-is, without quoting.
+     */
     public function updateConfigConstant($constantName, $value, $usePlainValue = false) {
         // https://regex101.com/r/jE0eJ6/2
         $constantRegex = "/^(\\s*define\\s*\\(\\s*['\"]" . preg_quote($constantName, '/') . "['\"]\\s*,\\s*).*(\\s*\\)\\s*;\\s*)$/m";
@@ -20,6 +33,14 @@ class WpConfigEditor {
         self::updateConfig($value, $constantRegex, $constantTemplate, $usePlainValue);
     }
 
+    /**
+     * Sets value of a variable. It creates new one if it's missing.
+     * By default it saves string in single quotes. See $usePlainValue.
+     *
+     * @param $variableName
+     * @param string|number|bool $value
+     * @param bool $usePlainValue The value is used as-is, without quoting.
+     */
     public function updateConfigVariable($variableName, $value, $usePlainValue = false) {
         // https://regex101.com/r/oO7gX7/5
         $variableRegex = "/^(\\\${$variableName}\\s*=\\s*).*(;\\s*)$/m";
