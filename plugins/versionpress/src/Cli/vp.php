@@ -7,20 +7,21 @@
 
 namespace VersionPress\Cli;
 
-use Nette\Neon\Neon;
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Yaml\Yaml;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\Initializer;
+use VersionPress\Initialization\WpConfigSplitter;
 use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\FileSystem;
+use VersionPress\Utils\PathUtils;
 use VersionPress\Utils\RequirementsChecker;
-use VersionPress\Utils\WordPressMissingFunctions;
 use VersionPress\VersionPress;
 use WP_CLI;
 use WP_CLI_Command;
@@ -31,60 +32,86 @@ use WP_CLI_Command;
 class VPCommand extends WP_CLI_Command {
 
     /**
-     * Configures VersionPress
+     * Configures VersionPress. See options for details.
      *
      * ## OPTIONS
      *
-     * <key>
-     * : The name of the option to set.
+     * <constant>
+     * : The name of the constant to set.
+     *   VP_GIT_BINARY:   Absolute path to the git binary.
+     *   VP_PROJECT_ROOT: Absolute path to the root of your project (typically
+     *                    where is the .git directory)
+     *   VP_VPDB_DIR:     Absolute path to directory where VersionPress saves
+     *                    versioned database data.
      *
      * [<value>]
-     * : The new value. If missing, just prints out the option.
+     * : The new value. If missing, just prints out current value.
      *
-     * @when before_wp_load
      */
     public function config($args, $assoc_args) {
+        /**
+         * common: will be saved into wp-config.common.php
+         * type: type of constant
+         *   absolute-path: will be saved as-is
+         *   dynamic-path: part of the path (to wp-config.php) will be replaced with __DIR__ constant
+         */
+        $allowedConstants = array(
+            'VP_GIT_BINARY' => array(
+                'common' => false,
+                'type' => 'absolute-path',
+            ),
+            'VP_PROJECT_ROOT' => array(
+                'common' => true,
+                'type' => 'dynamic-path',
+                'root' => dirname(\WP_CLI\Utils\locate_wp_config()),
+            ),
+            'VP_VPDB_DIR' => array(
+                'common' => true,
+                'type' => 'dynamic-path',
+                'root' => dirname(\WP_CLI\Utils\locate_wp_config()),
+            ),
+        );
 
-        $configFile = __DIR__ . '/../../vpconfig.neon';
-        $configContents = "";
-        if (file_exists($configFile)) {
-            $configContents = file_get_contents($configFile);
+        $constant = $args[0];
+
+        if (!isset($allowedConstants[$constant])) {
+            WP_CLI::log($constant);
+            WP_CLI::error("Cannot configure constant '{$constant}'");
         }
 
         if (count($args) === 1) {
-            $config = Neon::decode($configContents);
-            WP_CLI::out(@$config[$args[0]]);
-            return;
+            if (defined($constant)) {
+                WP_CLI::print_value(constant($constant));
+                return;
+            }
+
+            WP_CLI::error("Constant '{$constant}' is not defined.");
         }
 
-        $configContents = $this->updateConfigValue($configContents, $args[0], $args[1]);
+        $value = $args[1];
+        $isCommon = $allowedConstants[$constant]['common'];
+        $valueType = $allowedConstants[$constant]['type'];
 
-        file_put_contents($configFile, $configContents);
+        $updateConfigArgs = $args;
 
-    }
+        if ($valueType === 'dynamic-path') {
+            $root = $allowedConstants[$constant]['root'];
 
-    private function updateConfigValue($config, $key, $value) {
-
-        // We don't use NEON decoding and encoding again as that removes comments etc.
-
-        require_once(__DIR__ . '/../../vendor/nette/utils/src/Utils/Strings.php');
-
-        // General matching: https://regex101.com/r/sE2iB1/1
-        // Concrete example: https://regex101.com/r/sE2iB1/2
-
-        $re = "/^($key)(:\\s*)(\\S[^#\\r\\n]+)(\\h+#?.*)?$/m";
-        $subst = "$1$2$value$4";
-
-        if (preg_match_all($re, $config, $matches)) {
-            $result = preg_replace($re, $subst, $config);
-        } else {
-            // value was not there, add it to the end
-            $result = $config . (Strings::endsWith($config, "\n") ? "" : "\n");
-            $result .= "$key: $value\n";
+            $relativePath = PathUtils::getRelativePath($value, $root);
+            $updateConfigArgs[1] = '__DIR__' . ($relativePath === '' ? '' : " . '/$relativePath'");
+            $updateConfigArgs['plain'] = null;
         }
 
-        return $result;
+        if ($valueType === 'absolute-path') {
+            $updateConfigArgs['plain'] = null;
+        }
 
+        if ($isCommon) {
+            $updateConfigArgs['common'] = null;
+        }
+
+        $process = $this->runVPInternalCommand('update-config', $updateConfigArgs);
+        WP_CLI::log($process->getConsoleOutput());
     }
 
     /**
@@ -153,50 +180,21 @@ class VPCommand extends WP_CLI_Command {
      * ## OPTIONS
      *
      * --siteurl=<url>
-     * : The address of the restored site. Default: 'http://localhost/<cwd>'
-     *
-     * --dbname=<dbname>
-     * : Set the database name.
-     *
-     * --dbuser=<dbuser>
-     * : Set the database user.
-     *
-     * --dbpass=<dbpass>
-     * : Set the database user password.
-     *
-     * --dbhost=<dbhost>
-     * : Set the database host. Default: 'localhost'
-     *
-     * --dbprefix=<dbprefix>
-     * : Set the database table prefix. Default: 'wp_'
-     *
-     * --dbcharset=<dbcharset>
-     * : Set the database charset. Default: 'utf8'
-     *
-     * --dbcollate=<dbcollate>
-     * : Set the database collation. Default: ''
+     * : The address of the restored site.
      *
      * --yes
      * : Answer yes to the confirmation message.
      *
      * ## DESCRIPTION
      *
-     * The simplest possible example just executes `site-restore` without any parameters.
-     * The assumptions are:
-     *
-     *    * The current directory must be reachable from the webserver as http://localhost/<cwd>
-     *    * Credentials for the MySQL server are in the wp-config.php
-     *
      * The command will then do the following:
      *
-     *    * Create a db <dirname>, e.g., 'vp01'
-     *    * Optionally configure WordPress to connect to this DB
-     *    * Create WordPress tables in it and preconfigure it with site_url and home options
-     *    * Run VP synchronizers on the database
+     *    * Drops all tables tracked by VersionPress.
+     *    * Recreates and fill them with data from repository.
      *
-     * All DB credentials and site URL are configurable.
+     * If you just cloned the site from another repository, run `wp core config` first.
      *
-     * @synopsis [--siteurl=<url>] [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--yes]
+     * @synopsis --siteurl=<url> [--yes]
      *
      * @subcommand restore-site
      *
@@ -204,14 +202,14 @@ class VPCommand extends WP_CLI_Command {
      */
     public function restoreSite($args, $assoc_args) {
 
-        include_once __DIR__ . '/../Utils/WordPressMissingFunctions.php';
-        include_once dirname(WordPressMissingFunctions::getWpConfigPath()) . '/wp-config.common.php';
+        defined('SHORTINIT') or define('SHORTINIT', true);
 
-        // Load VersionPress' bootstrap (WP_CONTENT_DIR needs to be defined)
-        if (!defined('WP_CONTENT_DIR')) {
-            define('WP_CONTENT_DIR', ABSPATH . 'wp-content');
-        }
-        require_once(__DIR__ . '/../../bootstrap.php');
+        $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
+        $commonConfigName = 'wp-config.common.php';
+
+        require_once dirname($wpConfigPath) . '/' . $commonConfigName;
+        require_once $wpConfigPath;
+        require_once __DIR__ . '/../../bootstrap.php';
 
         if (!VersionPress::isActive()) {
             WP_CLI::error('Unfortunately, this site was not tracked by VersionPress. Therefore, it cannot be restored.');
@@ -221,39 +219,22 @@ class VPCommand extends WP_CLI_Command {
         $process = VPCommandUtils::runWpCliCommand('core', 'is-installed');
         if ($process->isSuccessful()) {
             WP_CLI::confirm("It looks like the site is OK. Do you really want to run the 'restore-site' command?", $assoc_args);
-            $defaultUrl = trim(VPCommandUtils::runWpCliCommand('option', 'get', array('siteurl'))->getConsoleOutput());
-        } else {
-            $defaultUrl = 'http://localhost/' . basename(getcwd());
         }
 
-        $url = @$assoc_args['siteurl'] ?: $defaultUrl;
-
-        // Confirm automatically chosen site URL
-        if (!isset($assoc_args['siteurl'])) {
-            WP_CLI::confirm("The site URL will be set to '$url'. Proceed?", $assoc_args);
-        }
-
-        // Updating wp-config.php
-        if (file_exists(WordPressMissingFunctions::getWpConfigPath())) {
-            if ($this->issetConfigOption($assoc_args)) {
-                WP_CLI::error("Site settings was loaded from wp-config.php. If you want to reconfigure the site, please delete the wp-config.php file");
-            }
-        } else {
-            $this->configSite($assoc_args);
-        }
+        $this->dropTables();
+        $url = $assoc_args['siteurl'];
 
         // Update URLs in wp-config.php
         $this->setConfigUrl('WP_CONTENT_URL', 'WP_CONTENT_DIR', ABSPATH . 'wp-content', $url);
         $this->setConfigUrl('WP_PLUGIN_URL', 'WP_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins', $url);
 
+        WpConfigSplitter::ensureCommonConfigInclude($wpConfigPath, $commonConfigName);
+
         // Create or empty database
         $this->prepareDatabase($assoc_args);
 
 
-        // Disable VersionPress tracking
-        if (!defined('WPINC')) {
-            define('WPINC', 'wp-includes');
-        }
+        // Disable VersionPress tracking for a while
         WpdbReplacer::restoreOriginal();
         unlink(VERSIONPRESS_ACTIVATION_FILE);
 
@@ -279,8 +260,7 @@ class VPCommand extends WP_CLI_Command {
             WP_CLI::success("Database tables created");
         }
 
-
-        // Restores "wp-db.php", "wp-db.php.original" and ".active"
+        // Restores "wp-db.php", "wp-db.php.original" and ".active" - enables VP
         $resetCmd = 'git reset --hard';
 
         $process = VPCommandUtils::exec($resetCmd);
@@ -292,23 +272,11 @@ class VPCommand extends WP_CLI_Command {
 
         // The next couple of the steps need to be done after the WP is fully loaded; we use `finish-init-clone` for that
         // The main reason for this is that we need properly set WP_CONTENT_DIR constant for reading from storages
-        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-init-clone', array('require' => $this->getVPInternalCommandPath()));
+        $process = $this->runVPInternalCommand('finish-init-clone');
         WP_CLI::log($process->getConsoleOutput());
         if (!$process->isSuccessful()) {
             WP_CLI::error("Could not finish site restore");
         }
-    }
-
-    /**
-     * Returns true if there is some config option in the assoc_args.
-     *
-     * @param $assoc_args
-     * @return bool
-     */
-    private function issetConfigOption($assoc_args) {
-        $configOptions = array('dbname', 'dbuser', 'dbpass', 'dbhost', 'dbprefix', 'dbcharset', 'dbcollate');
-        $specifiedOptions = array_keys($assoc_args);
-        return count(array_intersect($specifiedOptions, $configOptions)) > 0;
     }
 
     /**
@@ -324,47 +292,24 @@ class VPCommand extends WP_CLI_Command {
 
         if ($process->isSuccessful()) {
             WP_CLI::success("Database created");
-        } else {
-
-            $msg = $process->getConsoleOutput();
-            $dbExists = Strings::contains($msg, '1007');
-
-            if ($dbExists) {
-
-                defined('SHORTINIT') or define('SHORTINIT', true);
-                require_once WordPressMissingFunctions::getWpConfigPath();
-                global $table_prefix;
-                if ($this->someWpTablesExist(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $table_prefix)) {
-                    WP_CLI::confirm('Database tables already exist, they will be droped and re-created. Proceed?', $assoc_args);
-                }
-
-                $this->dropTables();
-            } else {
-                WP_CLI::error("Failed creating database. Details:\n\n" . $msg);
-            }
+            return;
         }
 
-    }
+        $msg = $process->getConsoleOutput();
+        $dbExistsMysqlErrorCode = '1007';
+        $dbExists = Strings::contains($msg, $dbExistsMysqlErrorCode);
 
-    private function configSite($assoc_args) {
-        $configArgs = array();
-        $configArgs['dbname'] = @$assoc_args['dbname'] ?: basename(getcwd());
-        $configArgs['dbuser'] = @$assoc_args['dbuser'] ?: 'root';
-        $configArgs['dbpass'] = @$assoc_args['dbpass'] ?: '';
-        $configArgs['dbhost'] = @$assoc_args['dbhost'] ?: '127.0.0.1';
-        $configArgs['dbprefix'] = @$assoc_args['dbprefix'] ?: 'wp_';
-        $configArgs['dbcharset'] = @$assoc_args['dbcharset'] ?: 'utf8';
-        if (isset($assoc_args['dbcollate'])) $configArgs['dbcollate'] = $assoc_args['dbcollate'];
-
-
-        // Create wp-config.php
-        $process = VPCommandUtils::runWpCliCommand('core', 'config', $configArgs);
-        if (!$process->isSuccessful()) {
-            WP_CLI::log("Failed creating wp-config.php");
-            WP_CLI::error($process->getConsoleOutput());
-        } else {
-            WP_CLI::success("wp-config.php created");
+        if (!$dbExists) {
+            WP_CLI::error("Failed creating database. Details:\n\n" . $msg);
         }
+
+        global $table_prefix;
+        if ($this->someWpTablesExist(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, $table_prefix)) {
+            WP_CLI::confirm('Database tables already exist, they will be droped and re-created. Proceed?', $assoc_args);
+        }
+
+        $this->dropTables();
+
     }
 
     /**
@@ -552,16 +497,17 @@ class VPCommand extends WP_CLI_Command {
 
         // Copy & Update wp-config
         $wpConfigFile = $clonePath . '/wp-config.php';
-        copy(WordPressMissingFunctions::getWpConfigPath(), $wpConfigFile);
+        copy(\WP_CLI\Utils\locate_wp_config(), $wpConfigFile);
 
-        $this->updateConfig($wpConfigFile, $name, $cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $cloneDbCharset, $cloneDbCollate);
+        $this->updateConfig($clonePath, $name, $cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $cloneDbCharset, $cloneDbCollate);
 
         // Copy VersionPress
         FileSystem::copyDir(VERSIONPRESS_PLUGIN_DIR, $cloneVpPluginPath);
         WP_CLI::success("Copied VersionPress");
 
         // Finish the process by doing the standard restore-site
-        $process = VPCommandUtils::runWpCliCommand('vp', 'restore-site', array('siteurl' => $cloneUrl, 'yes' => null, 'require' => __FILE__), $clonePath);
+        $relativePathToThisFile = PathUtils::getRelativePath($currentWpPath, __FILE__);
+        $process = VPCommandUtils::runWpCliCommand('vp', 'restore-site', array('siteurl' => $cloneUrl, 'yes' => null, 'require' => $relativePathToThisFile), $clonePath);
         WP_CLI::log(trim($process->getConsoleOutput()));
 
         if ($process->isSuccessful()) {
@@ -800,7 +746,7 @@ class VPCommand extends WP_CLI_Command {
             VPCommandUtils::exec("git config --local push.default $currentPushType");
         }
 
-        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'finish-push', array('require' => $this->getVPInternalCommandPath()), $remotePath);
+        $process = $this->runVPInternalCommand('finish-push', array(), $remotePath);
         if ($process->isSuccessful()) {
             WP_CLI::success("Remote database synchronized");
         } else {
@@ -973,19 +919,8 @@ class VPCommand extends WP_CLI_Command {
         return count($wpTables) > 0;
     }
 
-    private function updateConfig($wpConfigFile, $environment, $dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $dbCharset, $dbCollate) {
-        $config = file_get_contents($wpConfigFile);
-
+    private function updateConfig($clonePath, $environment, $dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $dbCharset, $dbCollate) {
         $environmentConstant = 'VP_ENVIRONMENT';
-
-        if (strpos($config, $environmentConstant) === false) {
-            // https://regex101.com/r/yJ8tY8/1
-            $config = preg_replace('/^(\\$table_prefix\\s*=.*)$/m', "define('$environmentConstant', '$environment');\n\n\${1}", $config, 1);
-        }
-
-        // https://regex101.com/r/oO7gX7/4 - just remove the "g" modifier which is there for testing only
-        $re = "/^(\\\$table_prefix\\s*=\\s*['\"]).*(['\"];)/m";
-        $config = preg_replace($re, "\${1}{$dbPrefix}\${2}", $config, 1);
 
         $replacements = array(
             "DB_NAME" => $dbName,
@@ -997,11 +932,12 @@ class VPCommand extends WP_CLI_Command {
             $environmentConstant => $environment,
         );
 
+        $this->runVPInternalCommand('update-config', array('table_prefix', $dbPrefix, 'variable' => null), $clonePath);
+
         foreach ($replacements as $constant => $value) {
-            self::updateConfigConstant($config, $constant, $value);
+            $this->runVPInternalCommand('update-config', array($constant, $value), $clonePath);
         }
 
-        file_put_contents($wpConfigFile, $config);
         WP_CLI::success("wp-config.php updated");
     }
 
@@ -1060,7 +996,7 @@ class VPCommand extends WP_CLI_Command {
      */
     private function switchMaintenance($onOrOff, $remoteName = null) {
         $remotePath = $remoteName ? $this->getRemoteUrl($remoteName) : null;
-        $process = VPCommandUtils::runWpCliCommand('vp-internal', 'maintenance', array($onOrOff, 'require' => $this->getVPInternalCommandPath()), $remotePath);
+        $process = $this->runVPInternalCommand('maintenance', array($onOrOff), $remotePath);
 
         if ($process->isSuccessful()) {
             WP_CLI::success("Maintenance mode turned $onOrOff" . ($remoteName ? " for '$remoteName'" : ""));
@@ -1069,8 +1005,9 @@ class VPCommand extends WP_CLI_Command {
         }
     }
 
-    private function getVPInternalCommandPath() {
-        return __DIR__ . '/vp-internal.php';
+    private function runVPInternalCommand($subcommand, $args = array(), $cwd = null) {
+        $args = $args + array('require' => __DIR__ . '/vp-internal.php');
+        return VPCommandUtils::runWpCliCommand('vp-internal', $subcommand, $args, $cwd);
     }
 
     private function flushRewriteRules() {
@@ -1081,25 +1018,16 @@ class VPCommand extends WP_CLI_Command {
          * URLs may be broken.
          * Valid request is such a request, which does not require URL rewrite
          * (e.g. homepage / administration) and finishes successfully.
-         * @noinspection PhpUsageOfSilenceOperatorInspection
          */
-        @file_get_contents(get_home_url());
+        wp_remote_get(get_home_url());
     }
 
     private function setConfigUrl($urlConstant, $pathConstant, $defaultPath, $baseUrl) {
         if (defined($pathConstant) && constant($pathConstant) !== $defaultPath) {
             $relativePathToWpContent = str_replace(getcwd(), '', realpath(constant($pathConstant)));
+            $url = $baseUrl . str_replace('//', '/', '/' . $relativePathToWpContent);
 
-            $wpContentUrl = $baseUrl . str_replace('//', '/', '/' . $relativePathToWpContent);
-            $config = file_get_contents(WordPressMissingFunctions::getWpConfigPath());
-
-            if (Strings::contains($config, $urlConstant)) {
-                $config = self::updateConfigConstant($config, $urlConstant, $wpContentUrl);
-            } else {
-                $config = self::createConfigConstant($config, $urlConstant, $wpContentUrl);
-            }
-
-            file_put_contents(ABSPATH . 'wp-config.php', $config);
+            $this->runVPInternalCommand('update-config', array($urlConstant, $url));
         }
     }
 }

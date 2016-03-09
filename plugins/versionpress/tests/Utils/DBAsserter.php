@@ -3,6 +3,9 @@
 namespace VersionPress\Tests\Utils;
 
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Database\ShortcodesInfo;
+use VersionPress\Database\ShortcodesReplacer;
+use VersionPress\Database\VpidRepository;
 use VersionPress\DI\DIContainer;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -21,6 +24,8 @@ class DBAsserter {
     private static $database;
     /** @var \wpdb */
     private static $wpdb;
+    /** @var ShortcodesReplacer */
+    private static $shortcodesReplacer;
 
 
     public static function assertFilesEqualDatabase() {
@@ -37,10 +42,12 @@ class DBAsserter {
 
         $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
         $schemaReflection = new \ReflectionClass('VersionPress\Database\DbSchemaInfo');
-        $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.neon';
+        $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.yml';
+        $shortcodeFile = dirname($schemaReflection->getFileName()) . '/wordpress-shortcodes.yml';
 
         /** @var $wp_db_version */
         require(self::$testConfig->testSite->path . '/wp-includes/version.php');
+        require_once(self::$testConfig->testSite->path . '/wp-includes/shortcodes.php');
 
         self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
 
@@ -54,8 +61,12 @@ class DBAsserter {
         $dbName = self::$testConfig->testSite->dbName;
         $dbPrefix = self::$testConfig->testSite->dbTablePrefix;
         self::$database = new \mysqli($dbHost, $dbUser, $dbPassword, $dbName);
-        self::$wpdb = new \wpdb($dbHost, $dbUser, $dbPassword, $dbName);
+        self::$wpdb = new \wpdb($dbUser, $dbPassword, $dbName, $dbHost);
         self::$wpdb->set_prefix($dbPrefix);
+
+        $shortcodesInfo = new ShortcodesInfo($shortcodeFile);
+        $vpidRepository = new VpidRepository(self::$wpdb, self::$schemaInfo);
+        self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo,$vpidRepository);
 
         self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$wpdb, $taxonomies);
 
@@ -93,6 +104,8 @@ class DBAsserter {
         foreach ($dbEntities as $dbEntity) {
             $id = $dbEntity[$entityInfo->vpidColumnName];
             $storageEntity = $storageEntities[$id];
+
+            $dbEntity = self::$shortcodesReplacer->replaceShortcodesInEntity($entityName, $dbEntity);
 
             foreach ($dbEntity as $column => $value) {
                 if (!isset($storageEntity[$column])) {
@@ -286,7 +299,7 @@ class DBAsserter {
         global $versionPressContainer, $wpdb;
 
         defined('VERSIONPRESS_PLUGIN_DIR') || define('VERSIONPRESS_PLUGIN_DIR', self::$testConfig->testSite->path . '/wp-content/plugins/versionpress');
-        defined('VERSIONPRESS_MIRRORING_DIR') || define('VERSIONPRESS_MIRRORING_DIR', self::$testConfig->testSite->path . '/wp-content/vpdb');
+        defined('VP_VPDB_DIR') || define('VP_VPDB_DIR', self::$testConfig->testSite->path . '/wp-content/vpdb');
         $versionPressContainer = DIContainer::getConfiguredInstance();
         $wpdb = self::$wpdb;
     }

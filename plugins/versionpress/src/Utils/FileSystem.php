@@ -103,14 +103,14 @@ class FileSystem {
      * @param string $dir
      * @param int $mode
      */
-    public static function mkdir($dir, $mode = 0777) {
+    public static function mkdir($dir, $mode = 0750) {
         $fs = new \Symfony\Component\Filesystem\Filesystem();
         $fs->mkdir($dir, $mode);
     }
 
     /**
      * If the path is either a `.git` repository itself or a directory that contains it,
-     * this method attempts to set 0777 permissions on the `.git` folder to avoid issues
+     * this method attempts to set correct permissions on the `.git` folder to avoid issues
      * on Windows.
      *
      * @param $path
@@ -131,7 +131,11 @@ class FileSystem {
             $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($gitDir));
 
             foreach ($iterator as $item) {
-                chmod($item, 0777);
+                if (is_dir($item)) {
+                    chmod($item, 0750);
+                } else {
+                    chmod($item, 0640);
+                }
             }
 
         }

@@ -13,7 +13,6 @@ use VersionPress\ChangeInfos\RevertChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
-use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Commit;
 use VersionPress\Git\GitLogPaginator;
@@ -35,15 +34,12 @@ class VersionPressApi {
     private $gitRepository;
     /** @var Reverter */
     private $reverter;
-    /** @var VersionPressConfig */
-    private $vpConfig;
     /** @var SynchronizationProcess */
     private $synchronizationProcess;
 
-    public function __construct(GitRepository $gitRepository, Reverter $reverter, VersionPressConfig $vpConfig, SynchronizationProcess $synchronizationProcess) {
+    public function __construct(GitRepository $gitRepository, Reverter $reverter, SynchronizationProcess $synchronizationProcess) {
         $this->gitRepository = $gitRepository;
         $this->reverter = $reverter;
-        $this->vpConfig = $vpConfig;
         $this->synchronizationProcess = $synchronizationProcess;
     }
 
@@ -222,7 +218,16 @@ class VersionPressApi {
      * @return WP_REST_Response|WP_Error
      */
     public function undoCommit(WP_REST_Request $request) {
-        return $this->revertCommit('undo', $request['commit']);
+        $commitHash = $request['commit'];
+
+        if (!preg_match('/^[0-9a-f]+$/', $commitHash)) {
+            return new WP_Error(
+                'error',
+                'Invalid commit hash',
+                array('status' => 404));
+        }
+
+        return $this->revertCommit('undo', $commitHash);
     }
 
     /**
@@ -230,7 +235,16 @@ class VersionPressApi {
      * @return WP_REST_Response|WP_Error
      */
     public function rollbackToCommit(WP_REST_Request $request) {
-        return $this->revertCommit('rollback', $request['commit']);
+        $commitHash = $request['commit'];
+
+        if (!preg_match('/^[0-9a-f]+$/', $commitHash)) {
+            return new WP_Error(
+                'error',
+                'Invalid commit hash',
+                array('status' => 404));
+        }
+
+        return $this->revertCommit('rollback', $commitHash);
     }
 
     /**
@@ -264,8 +278,16 @@ class VersionPressApi {
      * @return WP_REST_Response|WP_Error
      */
     public function getDiff(WP_REST_Request $request) {
-        $hash = $request['commit'];
-        $diff = $this->gitRepository->getDiff($hash);
+        $commitHash = $request['commit'];
+
+        if (!preg_match('/^[0-9a-f]*$/', $commitHash)) {
+            return new WP_Error(
+                'error',
+                'Invalid commit hash',
+                array('status' => 404));
+        }
+
+        $diff = $this->gitRepository->getDiff($commitHash);
 
         if (strlen($diff) > 50 * 1024) { // 50 kB is maximum size for diff (see WP-49)
             return new WP_Error(
@@ -377,7 +399,8 @@ class VersionPressApi {
 
         $status = $this->gitRepository->getStatus(true);
         if (ArrayUtils::any($status, function ($fileStatus) {
-            return Strings::contains($fileStatus[1], 'vpdb');
+            $vpdbName = basename(VP_VPDB_DIR);
+            return Strings::contains($fileStatus[1], $vpdbName);
         })) {
             $this->updateDatabase($status);
         }
@@ -389,7 +412,8 @@ class VersionPressApi {
     private function updateDatabase($status) {
         $diff = $this->gitRepository->getDiff();
         $vpidRegex = "/([\\da-f]{32})/i";
-        $optionRegex = "/.*vpdb[\\/\\\\]options[\\/\\\\].+[\\/\\\\](.+)\\.ini/i";
+        $vpdbName = basename(VP_VPDB_DIR);
+        $optionRegex = "/.*{$vpdbName}[\\/\\\\]options[\\/\\\\].+[\\/\\\\](.+)\\.ini/i";
 
         preg_match_all($vpidRegex, $diff, $vpidMatches);
         preg_match_all($optionRegex, $diff, $optionNameMatches);
@@ -453,7 +477,7 @@ class VersionPressApi {
      * @return WP_Error|bool
      */
     public function checkPermissions(WP_REST_Request $request) {
-        return !$this->vpConfig->mergedConfig['requireApiAuth'] || current_user_can('manage_options')
+        return !VERSIONPRESS_REQUIRE_API_AUTH || current_user_can('manage_options')
             ? true
             : new WP_Error(
                 'error',
@@ -515,7 +539,7 @@ class VersionPressApi {
 
         $changedFiles = array_filter($changedFiles, function ($changedFile) {
             $path = str_replace('\\', '/', ABSPATH . $changedFile['path']);
-            $vpdbPath = str_replace('\\', '/', VERSIONPRESS_MIRRORING_DIR);
+            $vpdbPath = str_replace('\\', '/', VP_VPDB_DIR);
 
             return !Strings::startsWith($path, $vpdbPath);
         });

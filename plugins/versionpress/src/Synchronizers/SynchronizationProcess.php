@@ -27,7 +27,7 @@ class SynchronizationProcess {
 
         $synchronizationTasks = array_map(function ($synchronizerName) use ($vpidsToSynchronize, $synchronizerFactory) {
             $synchronizer = $synchronizerFactory->createSynchronizer($synchronizerName);
-            return array('synchronizer' => $synchronizer, 'task' => Synchronizer::SYNCHRONIZE_EVERYTHING, 'entities' => $vpidsToSynchronize['entities']);
+            return array('synchronizer' => $synchronizer, 'task' => Synchronizer::SYNCHRONIZE_EVERYTHING, 'entities' => $vpidsToSynchronize);
         }, $allSynchronizers);
 
         $this->runSynchronizationTasks($synchronizationTasks);

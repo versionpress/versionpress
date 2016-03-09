@@ -2,10 +2,10 @@
 
 namespace VersionPress\Tests\Utils;
 
-use Nette\Neon\Neon;
+use Symfony\Component\Yaml\Yaml;
 
 /**
- * Test config, loaded from test-config.neon
+ * Test config, loaded from test-config.yml
  */
 class TestConfig {
 
@@ -45,7 +45,7 @@ class TestConfig {
     public static $defaultConfigFile;
 
     function __construct($configFile) {
-        $rawConfig = Neon::decode(file_get_contents($configFile));
+        $rawConfig = Yaml::parse(file_get_contents($configFile));
 
         $this->seleniumConfig = new SeleniumConfig();
         $this->seleniumConfig->firefoxBinary = $rawConfig['selenium']['firefox-binary'];
@@ -81,18 +81,6 @@ class TestConfig {
             $this->sites[$siteId]->wpVersion = $rawSiteConfig['wp-site']['wp-version'];
             $this->sites[$siteId]->wpLocale = isset($rawSiteConfig['wp-site']['wp-locale']) ? $rawSiteConfig['wp-site']['wp-locale'] : null;
             $this->sites[$siteId]->wpAutoupdate = $rawSiteConfig['wp-site']['wp-autoupdate'];
-
-            // VP config
-            $this->sites[$siteId]->vpConfig = $rawSiteConfig['vp-config'];
-
-            // If the site overrode a common config vp-config value, array_merge_recursive() caused that the key now
-            // contains array with two items, first being the empty value from common-site-config
-            // and the other one being the real one. We want just the real one.
-            foreach ($this->sites[$siteId]->vpConfig as $key => $value) {
-                if (is_array($value)) {
-                    $this->sites[$siteId]->vpConfig[$key] = $value[1];
-                }
-            }
 
         }
 

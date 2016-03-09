@@ -1,6 +1,6 @@
-# NEON Schema Format #
+# YAML Schema Format #
 
-Some essential information about database entities and their relationships is described in a [NEON](http://ne-on.org/) format which is then parsed and made accessible via the `VersionPress\Database\DbSchemaInfo` class. This excerpt from `wordpress-schema.neon` is basically a complete example of all the possible options: 
+Some essential information about database entities and their relationships is described in a [YAML](http://yaml.org/) format which is then parsed and made accessible via the `VersionPress\Database\DbSchemaInfo` class. This excerpt from `wordpress-schema.yml` is basically a complete example of all the possible options:
 
     post:
         table: posts
@@ -19,7 +19,7 @@ Some essential information about database entities and their relationships is de
         value-references:
             meta_key@meta_value:
                 _thumbnail_id: post
-                _menu_item_object_id: @\VersionPress\Database\VpidRepository::getMenuReference
+                _menu_item_object_id: '@\VersionPress\Database\VpidRepository::getMenuReference'
 
     user:
         table: posts
@@ -72,9 +72,9 @@ an M:N relationship (junction table in the SQL). To do that we can use this form
 
     mn-references:
         <junction_table_name>.<column_name>: <foreign_entity_name>
-        @<junction_table_name>.<column_name>: <foreign_entity_name>
+        ~<junction_table_name>.<column_name>: <foreign_entity_name>
 
-As you can see, the reference can be prefixed with shut-up operator. It means that the reference is virtual - the entity does not contain 
+As you can see, the reference can be prefixed with a tilde (~). It means that the reference is virtual - the entity does not contain
 the data but is's checked in Reverter. The reference is usually saved within the foreign entity (e.g. the `post` contains a list of `term_taxonomy` VPIDs
 but the `term_taxonomy` does NOT contain a list of `post` VPIDs).
 

@@ -4,8 +4,7 @@
   "require": {
     "tracy/tracy": "2.2.*",
     "nette/utils": "2.2.*",
-    "nette/robot-loader": "2.2.*",
-    "nette/neon": "2.2.*",
+    "symfony/yaml": "^2.6",
     "symfony/process": "2.5.*",
     "michelf/php-markdown": "1.4.*",
     "symfony/filesystem": "~2.5",
@@ -23,7 +22,19 @@
     "nette/database": "2.2.*",
     "janvoracek/wp-cli-ssh": "dev-master",
     "fzaninotto/faker": "1.4.*",
-    "icecave/semver": "3.0.3"
+    "icecave/semver": "3.0.3",
+    "mikey179/vfsStream": "^1.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "VersionPress\\": "src/"
+    },
+    "files": [
+      "versionpress-functions.php"
+    ]
+  },
+  "autoload-dev": {
+    "classmap":  ["tests/"]
   },
   "license": "GPL",
   "authors": [

@@ -1,21 +1,21 @@
 <?php
 namespace VersionPress\Database;
+
 use DateTime;
-use Nette\Neon\Neon;
-use Nette\Neon\Entity;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Describes parts of the DB schema, specifically telling how to identify entities
- * and what are the relationships between them. The information is loaded from a *.neon file
+ * and what are the relationships between them. The information is loaded from a *.yml file
  * which is described in `schema-readme.md`.
  */
 class DbSchemaInfo {
 
     /**
-     * Parsed NEON schema - to see what it looks like, paste the NEON into {@link http://ne-on.org/ne-on.org}).
+     * Parsed YAML schema - to see what it looks like, paste the YAML into {@link http://yaml-online-parser.appspot.com/}).
      * Parsed in constructor.
      *
-     * @var array|int|mixed|DateTime|Entity|null|string
+     * @var array|int|mixed|DateTime|null|string
      */
     private $schema;
 
@@ -35,14 +35,14 @@ class DbSchemaInfo {
     private $dbVersion;
 
     /**
-     * @param string $schemaFile Path to a *.neon file to read from disk
+     * @param string $schemaFile Path to a *.yml file to read from disk
      * @param string $prefix
      */
     function __construct($schemaFile, $prefix, $dbVersion) {
-        $neonSchema = file_get_contents($schemaFile);
+        $yamlSchema = file_get_contents($schemaFile);
         $this->dbVersion = $dbVersion;
         $this->prefix = $prefix;
-        $this->schema = $this->useSchemaForCurrentVersion(Neon::decode($neonSchema));
+        $this->schema = $this->useSchemaForCurrentVersion(Yaml::parse($yamlSchema));
     }
 
     /**

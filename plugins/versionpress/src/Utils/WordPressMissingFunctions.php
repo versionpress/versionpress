@@ -14,4 +14,14 @@ class WordPressMissingFunctions {
 
         return $elevatedWpConfigPath;
     }
+
+    public static function renderShortcode($shortcodeTag, $attributes) {
+        $renderedAttributes = array();
+
+        foreach ($attributes as $attribute => $value) {
+            $renderedAttributes[] = sprintf('%s="%s"', $attribute, $value);
+        }
+
+        return sprintf('[%s %s]', $shortcodeTag, join(' ', $renderedAttributes));
+    }
 }

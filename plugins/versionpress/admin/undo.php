@@ -4,7 +4,7 @@
     use VersionPress\DI\VersionPressServices;
     use VersionPress\ChangeInfos\ChangeInfoMatcher;
 
-    if(!in_array($_GET['method'], array('undo', 'rollback'))) { exit(); }
+    if (!in_array($_GET['method'], array('undo', 'rollback'))) { exit(); }
 
     global $versionPressContainer;
     /** @var GitRepository $repository */
@@ -37,14 +37,20 @@
             Please commit them before doing a revert.
         </p>" : "");
 
+    $proceedUrl = add_query_arg(array(
+        'action' => 'vp_' . $method,
+        'commit' => $commit->getHash(),
+        'nonce' => wp_create_nonce('vp_revert')
+    ), admin_url('admin.php'));
+
     $buttonProceed = "<a " .
         "class='button " . ( !$canRevert ? "disabled" : "") . "' " .
         "id='popover-ok-button' ".
-        "href='" . ( !$canRevert ? "javascript:;" : admin_url('admin.php?action=vp_' . $method . '&commit=' . $commit->getHash()) ) . "'>Proceed</a>";
+        "href='" . ( !$canRevert ? "javascript:;" : $proceedUrl ) . "'>Proceed</a>";
     $buttonCancel = "<a " .
         "class='button cancel' ".
         "id='popover-cancel-button' ".
-        "href='" . (isAjax() ? "javascript:;" : menu_page_url('versionpress', false)) . "'>Cancel</a>";
+        "href='" . (vp_is_ajax() ? "javascript:;" : menu_page_url('versionpress', false)) . "'>Cancel</a>";
 
     $body = "
         <div>
@@ -57,7 +63,7 @@
         </div>
     ";
 
-    if(isAjax()) {
+    if (vp_is_ajax()) {
         $response = new stdClass();
         $response->body = $body;
         echo json_encode($response);
