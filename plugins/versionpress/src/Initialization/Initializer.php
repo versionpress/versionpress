@@ -394,7 +394,7 @@ class Initializer {
             $this->reportProgressChange(InitializerStates::CREATING_GIT_REPOSITORY);
             $this->repository->init();
             $this->installGitignore();
-            MergeDriverInstaller::installMergeDriver(__DIR__);
+            MergeDriverInstaller::installMergeDriver(VP_PROJECT_ROOT, VERSIONPRESS_PLUGIN_DIR, VP_VPDB_DIR);
         }
     }
 

@@ -65,10 +65,13 @@ class VPInternalCommand extends WP_CLI_Command {
 
         WP_CLI::success("VersionPress tables created");
 
+
         // Install Custom merge driver
-        $initializationDir = VERSIONPRESS_PLUGIN_DIR . '/src/Initialization';
-        MergeDriverInstaller::installMergeDriver($initializationDir);
-        WP_CLI::success("Git merge driver added.");
+
+        MergeDriverInstaller::installMergeDriver(VP_PROJECT_ROOT, VERSIONPRESS_PLUGIN_DIR, VP_VPDB_DIR);
+        WP_CLI::success("Git merge driver added");
+
+        
         // Run synchronization
 
         /** @var SynchronizationProcess $syncProcess */
