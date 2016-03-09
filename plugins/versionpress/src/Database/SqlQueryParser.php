@@ -140,9 +140,6 @@ class SqlQueryParser {
         }
         $parsedQueryData->sqlQuery = $selectSql;
         $parsedQueryData->ids = $wpdb->get_col($selectSql);
-        if ($schema->isChildEntity($parsedQueryData->entityName)) {
-            $parsedQueryData->parentIds = self::getParentIds($schema, $wpdb, $parsedQueryData);
-        }
 
         return $parsedQueryData;
     }
@@ -206,7 +203,7 @@ class SqlQueryParser {
                 $sets = $statement->values[$i];
                 $data = [];
                 for ($j = 0; $j < count($sets->values); $j++) {
-                    $data[$columns[$j]] = $sets->values[$j];
+                    $data[$columns[$j]] = stripslashes_from_strings_only($sets->values[$j]);
                 }
                 array_push($result, $data);
             }
@@ -214,26 +211,7 @@ class SqlQueryParser {
         }
 
     }
-
-    /**
-     * @param $schema DbSchemaInfo
-     * @param $wpdb \wpdb
-     * @param $parsedQueryData ParsedQueryData
-     * @return array
-     */
-    private static function getParentIds($schema, $wpdb, $parsedQueryData) {
-        $entityInfo = $schema->getEntityInfo($parsedQueryData->entityName);
-        $parentReference = $entityInfo->parentReference;
-        $parent = $entityInfo->references[$parentReference];
-        $vpIdTable = $schema->getPrefixedTableName('vp_id');
-        $parentTable = $schema->getTableName($parent);
-        $parentIds = [];
-        foreach ($parsedQueryData->ids as $id) {
-            $parentIds[] = $wpdb->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '{$parentTable}' AND ID = (SELECT {$parentReference} FROM $parsedQueryData->table WHERE {$parsedQueryData->idColumnName} = $id)");
-        }
-        return $parentIds;
-    }
-
+    
     /**
      * Creates Select SQL query from query in Parser
      *

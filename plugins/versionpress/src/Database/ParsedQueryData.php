@@ -26,11 +26,7 @@ class ParsedQueryData {
      */
     public $data;
 
-
-    /**
-     * @var array;
-     */
-    public $parentIds;
+    
 
     /**
      * @var string
