@@ -47,7 +47,10 @@ class DBAsserter {
 
         /** @var $wp_db_version */
         require(self::$testConfig->testSite->path . '/wp-includes/version.php');
-        require_once(self::$testConfig->testSite->path . '/wp-includes/shortcodes.php');
+
+        if (!function_exists('get_shortcode_regex')) {
+            require_once(self::$testConfig->testSite->path . '/wp-includes/shortcodes.php');
+        }
 
         self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
 

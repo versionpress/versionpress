@@ -24,7 +24,9 @@ class ShortcodesReplacerTest extends \PHPUnit_Framework_TestCase {
     private $vpidRepository;
 
     protected function setUp() {
-        include_once '../../../../ext-libs/wordpress/wp-includes/shortcodes.php';
+        if (!function_exists('get_shortcode_regex')) {
+            include_once __DIR__ . '/../../../../ext-libs/wordpress/wp-includes/shortcodes.php';
+        }
 
         $this->shortcodesInfo = $this->getMockBuilder('VersionPress\Database\ShortcodesInfo')->disableOriginalConstructor()->getMock();
         $this->shortcodesInfo->expects($this->any())->method('getAllShortcodeNames')->will($this->returnValue(array_column($this->shortcodeSchemaValueMap, 0)));
