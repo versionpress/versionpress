@@ -68,7 +68,7 @@ class VPInternalCommand extends WP_CLI_Command {
 
         // Install Custom merge driver
 
-        MergeDriverInstaller::installMergeDriver(VP_PROJECT_ROOT, VERSIONPRESS_PLUGIN_DIR, VERSIONPRESS_MIRRORING_DIR);
+        MergeDriverInstaller::installMergeDriver(VP_PROJECT_ROOT, VERSIONPRESS_PLUGIN_DIR, VP_VPDB_DIR);
         WP_CLI::success("Git merge driver added");
 
         
