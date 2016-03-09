@@ -393,9 +393,10 @@ class Initializer {
         if (!$this->repository->isVersioned()) {
             $this->reportProgressChange(InitializerStates::CREATING_GIT_REPOSITORY);
             $this->repository->init();
-            $this->installGitignore();
-            MergeDriverInstaller::installMergeDriver(VP_PROJECT_ROOT, VERSIONPRESS_PLUGIN_DIR, VP_VPDB_DIR);
         }
+
+        $this->installGitignore();
+        MergeDriverInstaller::installMergeDriver(VP_PROJECT_ROOT, VERSIONPRESS_PLUGIN_DIR, VP_VPDB_DIR);
     }
 
 
@@ -483,11 +484,7 @@ class Initializer {
 
         $gitignorePath = VP_PROJECT_ROOT . '/.gitignore';
 
-        if (is_file($gitignorePath)) {
-            return;
-        }
-
-        $gitignore = file_get_contents(__DIR__ . '/.gitignore.tpl');
+        $vpGitignore = file_get_contents(__DIR__ . '/.gitignore.tpl');
 
         $gitIgnoreVariables = array(
             'wp-content' => '/' . PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_CONTENT_DIR),
@@ -495,8 +492,20 @@ class Initializer {
             'abspath' => '/' . PathUtils::getRelativePath(VP_PROJECT_ROOT, ABSPATH),
         );
 
-        $gitignore = StringUtils::fillTemplateString($gitIgnoreVariables, $gitignore);
-        file_put_contents($gitignorePath, $gitignore);
+        $vpGitignore = StringUtils::fillTemplateString($gitIgnoreVariables, $vpGitignore);
+
+        if (is_file($gitignorePath)) {
+            $currentGitignore = file_get_contents($gitignorePath);
+
+            if (strpos($currentGitignore, $vpGitignore) !== false) {
+                return;
+            }
+
+            file_put_contents($gitignorePath, "\n" . $vpGitignore, FILE_APPEND);
+
+        } else {
+            file_put_contents($gitignorePath, $vpGitignore);
+        }
     }
 
 
