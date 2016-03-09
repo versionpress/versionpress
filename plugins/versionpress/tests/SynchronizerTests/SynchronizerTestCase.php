@@ -42,7 +42,10 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
 
         /** @var $wp_db_version */
         require(self::$testConfig->testSite->path . '/wp-includes/version.php');
-        require_once(self::$testConfig->testSite->path . '/wp-includes/shortcodes.php');
+
+        if (!function_exists('get_shortcode_regex')) {
+            require_once(self::$testConfig->testSite->path . '/wp-includes/shortcodes.php');
+        }
 
         self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
 
@@ -55,7 +58,7 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
 
         $shortcodesInfo = new ShortcodesInfo($shortcodeFile);
         $vpidRepository = new VpidRepository(self::$wpdb, self::$schemaInfo);
-        self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo,$vpidRepository);
+        self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, $vpidRepository);
 
         $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
         self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$wpdb, array());
