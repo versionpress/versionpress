@@ -16,6 +16,7 @@ use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\IdUtil;
+use VersionPress\Utils\WordPressMissingFunctions;
 
 class PostsSynchronizerTest extends SynchronizerTestCase {
     /** @var PostStorage */
@@ -48,10 +49,10 @@ class PostsSynchronizerTest extends SynchronizerTestCase {
         $this->termStorage = self::$storageFactory->getStorage('term');
         $this->termTaxonomyStorage = self::$storageFactory->getStorage('term_taxonomy');
 
-        $this->synchronizer = new PostsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
-        $this->usersSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
-        $this->termsSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
-        $this->termTaxonomiesSynchronizer = new TermTaxonomiesSynchronizer($this->termTaxonomyStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->synchronizer = new PostsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->usersSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->termsSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->termTaxonomiesSynchronizer = new TermTaxonomiesSynchronizer($this->termTaxonomyStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
     }
 
     /**
@@ -185,6 +186,25 @@ class PostsSynchronizerTest extends SynchronizerTestCase {
         DBAsserter::assertFilesEqualDatabase();
     }
 
+    /**
+     * @test
+     * @testdox Synchronizer restores shortcodes
+     */
+    public function synchronizerRestoresShortcodes() {
+        $this->createPostWithShortcode();
+        $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        DBAsserter::assertFilesEqualDatabase();
+
+        $this->deletePost();
+        
+        $this->synchronizer = new PostsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->usersSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
     private function createPost() {
         $author = EntityUtils::prepareUser();
         self::$authorVpId = $author['vp_id'];
@@ -245,6 +265,22 @@ class PostsSynchronizerTest extends SynchronizerTestCase {
             array('vp_id' => self::$categoryTaxonomyVpId, 'parent' => self::$categoryVpId),
             array('vp_id' => self::$categoryVpId, 'parent' => self::$categoryVpId),
             array('vp_id' => self::$authorVpId, 'parent' => self::$authorVpId),
+        );
+    }
+
+    private function createPostWithShortcode() {
+        $author = EntityUtils::prepareUser();
+        self::$authorVpId = $author['vp_id'];
+        $this->userStorage->save($author);
+
+        $post = EntityUtils::preparePost(null, self::$authorVpId);
+        self::$vpId = $post['vp_id'];
+        $post['post_content'] = WordPressMissingFunctions::renderShortcode('gallery', array('id' => self::$vpId));
+        $this->storage->save($post);
+
+        return array(
+            array('vp_id' => self::$authorVpId, 'parent' => self::$authorVpId),
+            array('vp_id' => self::$vpId, 'parent' => self::$vpId),
         );
     }
 }

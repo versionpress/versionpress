@@ -10,10 +10,10 @@ use VersionPress\Utils\StringUtils;
  *
  * VP tags:
  *
- *     VP-Action: theme/(install|update|customize|edit|switch|delete)/twentyfourteen
+ *     VP-Action: theme/(install|update|edit|switch|delete)/twentyfourteen
  *     VP-Theme-Name: Twenty Fourteen
  *
- * Note: theme is `customize`d via the WP customizer, `edit`ed via the built in text editor.
+ * Note: theme is `edit`ed via the built in text editor.
  *
  */
 class ThemeChangeInfo extends TrackedChangeInfo {

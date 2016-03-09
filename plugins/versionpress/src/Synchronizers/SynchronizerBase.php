@@ -3,7 +3,7 @@ namespace VersionPress\Synchronizers;
 
 use Nette\Utils\Strings;
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Storages\MetaEntityStorage;
+use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\ArrayUtils;
@@ -19,6 +19,7 @@ abstract class SynchronizerBase implements Synchronizer {
 
     const SYNCHRONIZE_MN_REFERENCES = 'mn-references';
     const DO_ENTITY_SPECIFIC_ACTIONS = 'entity-specific-actions';
+    const REPLACE_SHORTCODES = 'replace-shortcodes';
 
     private $entityName;
     private $idColumnName;
@@ -34,6 +35,9 @@ abstract class SynchronizerBase implements Synchronizer {
 
     /** @var AbsoluteUrlReplacer */
     private $urlReplacer;
+
+    /** @var ShortcodesReplacer */
+    private $shortcodesReplacer;
 
     /** @var array|null */
     protected $entities = null;
@@ -51,13 +55,15 @@ abstract class SynchronizerBase implements Synchronizer {
      * @param DbSchemaInfo $dbSchema
      * @param AbsoluteUrlReplacer $urlReplacer
      * @param string $entityName Constructors in subclasses provide this
+     * @param ShortcodesReplacer $shortcodesReplacer
      */
-    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, $entityName) {
+    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer, $entityName) {
         $this->storage = $storage;
         $this->database = $wpdb;
         $this->dbSchema = $dbSchema;
         $this->urlReplacer = $urlReplacer;
         $this->entityName = $entityName;
+        $this->shortcodesReplacer = $shortcodesReplacer;
         $this->idColumnName = $dbSchema->getEntityInfo($this->entityName)->idColumnName;
     }
 
@@ -83,6 +89,10 @@ abstract class SynchronizerBase implements Synchronizer {
             if (!$fixedMnReferences) {
                 $remainingTasks[] = self::SYNCHRONIZE_MN_REFERENCES;
             }
+
+            if ($this->shortcodesReplacer->entityCanContainShortcodes($this->entityName)) {
+                $remainingTasks[] = self::REPLACE_SHORTCODES;
+            }
         }
 
         if ($task === self::SYNCHRONIZE_MN_REFERENCES) {
@@ -91,6 +101,10 @@ abstract class SynchronizerBase implements Synchronizer {
 
         if ($task === self::DO_ENTITY_SPECIFIC_ACTIONS) {
             $this->doEntitySpecificActions();
+        }
+
+        if ($task === self::REPLACE_SHORTCODES) {
+            $this->restoreShortcodesInAllEntities();
         }
 
         return $remainingTasks;
@@ -549,5 +563,14 @@ abstract class SynchronizerBase implements Synchronizer {
             }
         }
         return true;
+    }
+
+    private function restoreShortcodesInAllEntities() {
+        foreach ($this->entities as $entity) {
+            $replacedEntity = $this->shortcodesReplacer->restoreShortcodesInEntity($this->entityName, $entity);
+            if ($entity != $replacedEntity) {
+                $this->updateEntityInDatabase($replacedEntity);
+            }
+        }
     }
 }

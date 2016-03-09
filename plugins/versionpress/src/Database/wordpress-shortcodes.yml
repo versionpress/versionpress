@@ -1,0 +1,14 @@
+shortcode-locations:
+    post:
+        - post_content
+shortcodes:
+    gallery:
+        id: post
+        ids: post
+        include: post
+        exclude: post
+    playlist:
+        id: post
+        ids: post
+        include: post
+        exclude: post

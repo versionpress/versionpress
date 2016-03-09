@@ -3,35 +3,47 @@
 namespace VersionPress\Utils;
 
 class PathUtils {
+    /**
+     * Calculates relative path from two absolute paths.
+     *
+     * @param string $from It has to be a directory!
+     * @param string $to Directory or file the relativa path will lead to.
+     * @return string
+     */
     public static function getRelativePath($from, $to) {
-        // some compatibility fixes for Windows paths
-        $from = is_dir($from) ? rtrim($from, '\/') . '/' : $from;
-        $to   = is_dir($to)   ? rtrim($to, '\/') . '/'   : $to;
+        // Windows FTW!
         $from = str_replace('\\', '/', $from);
-        $to   = str_replace('\\', '/', $to);
+        $to = str_replace('\\', '/', $to);
 
-        $from     = explode('/', $from);
-        $to       = explode('/', $to);
-        $relPath  = $to;
+        $from = preg_replace('~([^/]*)/+([^/]*)~', '$1/$2',$from);
+        $to = preg_replace('~([^/]*)/+([^/]*)~', '$1/$2', $to);
 
-        foreach($from as $depth => $dir) {
-            // find first non-matching dir
-            if($dir === $to[$depth]) {
-                // ignore this directory
-                array_shift($relPath);
-            } else {
-                // get number of remaining dirs to $from
-                $remaining = count($from) - $depth;
-                if($remaining > 1) {
-                    // add traversals up to first matching dir
-                    $padLength = (count($relPath) + $remaining - 1) * -1;
-                    $relPath = array_pad($relPath, $padLength, '..');
-                    break;
-                } else {
-                    $relPath[0] = './' . $relPath[0];
-                }
-            }
-        }
+        $from = rtrim($from, '/');
+        $to = rtrim($to, '/');
+
+        $from = explode('/', $from);
+        $to = explode('/', $to);
+
+        $depthOfCommonPath = self::countCommonDepth($from, $to);
+        $relPath = array_slice($to, $depthOfCommonPath);
+
+        // get number of remaining dirs up to $from
+        $remaining = count($from) - $depthOfCommonPath;
+
+        // add .. up to first matching dir
+        $totalLengthOfRelativePath = count($relPath) + $remaining;
+        $relPath = array_pad($relPath, $totalLengthOfRelativePath * -1, '..');
+
         return implode('/', $relPath);
+    }
+
+    private static function countCommonDepth($from, $to) {
+        $depth = 0;
+
+        while (isset($from[$depth], $to[$depth]) && $from[$depth] === $to[$depth]) {
+            $depth += 1;
+        }
+
+        return $depth;
     }
 }

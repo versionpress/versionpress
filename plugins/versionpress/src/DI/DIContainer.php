@@ -3,8 +3,9 @@
 namespace VersionPress\DI;
 
 use VersionPress\Database\SqlQueryParser;
+use VersionPress\Database\ShortcodesReplacer;
+use VersionPress\Database\ShortcodesInfo;
 use VersionPress\Git\Committer;
-use VersionPress\Configuration\VersionPressConfig;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\WpdbMirrorBridge;
 use VersionPress\Database\VpidRepository;
@@ -48,10 +49,6 @@ class DIContainer {
 
         self::$instance = $dic = new DIContainer();
 
-        $dic->register(VersionPressServices::VP_CONFIGURATION, function () {
-            return new VersionPressConfig();
-        });
-
         $dic->register(VersionPressServices::WPDB, function () {
             global $wpdb;
             return $wpdb;
@@ -60,7 +57,7 @@ class DIContainer {
         $dic->register(VersionPressServices::STORAGE_FACTORY, function () use ($dic) {
             global $wp_taxonomies;
             return new StorageFactory(
-                VERSIONPRESS_MIRRORING_DIR,
+                VP_VPDB_DIR,
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::WPDB),
                 array_keys((array)$wp_taxonomies)
@@ -76,7 +73,7 @@ class DIContainer {
 
         $dic->register(VersionPressServices::DB_SCHEMA, function () {
             global $table_prefix, $wp_db_version;
-            return new DbSchemaInfo(VERSIONPRESS_PLUGIN_DIR . '/src/Database/wordpress-schema.neon', $table_prefix, $wp_db_version);
+            return new DbSchemaInfo(VERSIONPRESS_PLUGIN_DIR . '/src/Database/wordpress-schema.yml', $table_prefix, $wp_db_version);
         });
 
         $dic->register(VersionPressServices::WPDB_MIRROR_BRIDGE, function () use ($dic) {
@@ -84,7 +81,8 @@ class DIContainer {
                 $dic->resolve(VersionPressServices::WPDB),
                 $dic->resolve(VersionPressServices::MIRROR),
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
-                $dic->resolve(VersionPressServices::VPID_REPOSITORY)
+                $dic->resolve(VersionPressServices::VPID_REPOSITORY),
+                $dic->resolve(VersionPressServices::SHORTCODES_REPLACER)
             );
         });
 
@@ -104,7 +102,8 @@ class DIContainer {
                 $dic->resolve(VersionPressServices::SYNCHRONIZER_FACTORY),
                 $dic->resolve(VersionPressServices::REPOSITORY),
                 $dic->resolve(VersionPressServices::URL_REPLACER),
-                $dic->resolve(VersionPressServices::VPID_REPOSITORY)
+                $dic->resolve(VersionPressServices::VPID_REPOSITORY),
+                $dic->resolve(VersionPressServices::SHORTCODES_REPLACER)
             );
         });
 
@@ -113,7 +112,8 @@ class DIContainer {
                 $dic->resolve(VersionPressServices::STORAGE_FACTORY),
                 $dic->resolve(VersionPressServices::WPDB),
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
-                $dic->resolve(VersionPressServices::URL_REPLACER)
+                $dic->resolve(VersionPressServices::URL_REPLACER),
+                $dic->resolve(VersionPressServices::SHORTCODES_REPLACER)
             );
         });
 
@@ -132,10 +132,8 @@ class DIContainer {
             );
         });
 
-        $dic->register(VersionPressServices::REPOSITORY, function () use ($dic) {
-            /** @var VersionPressConfig $vpConfig */
-            $vpConfig = $dic->resolve(VersionPressServices::VP_CONFIGURATION);
-            return new GitRepository(VP_PROJECT_ROOT, VERSIONPRESS_TEMP_DIR, "[VP] ", $vpConfig->gitBinary);
+        $dic->register(VersionPressServices::REPOSITORY, function () {
+            return new GitRepository(VP_PROJECT_ROOT, VERSIONPRESS_TEMP_DIR, "[VP] ", VP_GIT_BINARY);
         });
 
         $dic->register(VersionPressServices::VPID_REPOSITORY, function () use ($dic) {
@@ -147,6 +145,17 @@ class DIContainer {
 
         $dic->register(VersionPressServices::URL_REPLACER, function () {
             return new AbsoluteUrlReplacer(get_site_url());
+        });
+
+        $dic->register(VersionPressServices::SHORTCODES_REPLACER, function () use ($dic) {
+            return new ShortcodesReplacer(
+                $dic->resolve(VersionPressServices::SHORTCODES_INFO),
+                $dic->resolve(VersionPressServices::VPID_REPOSITORY)
+                );
+        });
+
+        $dic->register(VersionPressServices::SHORTCODES_INFO, function () {
+            return new ShortcodesInfo(VERSIONPRESS_PLUGIN_DIR . '/src/Database/wordpress-shortcodes.yml');
         });
 
         $dic->register(VersionPressServices::SQL_QUERY_PARSER, function () use ($dic) {

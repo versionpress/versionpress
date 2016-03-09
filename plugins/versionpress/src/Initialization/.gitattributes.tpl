@@ -1,1 +1,1 @@
-{{vp-mirroring-dir}}/**/*.ini merge=vp-ini
+{{vpdb-dir}}/**/*.ini merge=vp-ini
