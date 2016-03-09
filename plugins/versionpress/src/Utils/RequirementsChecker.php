@@ -46,10 +46,10 @@ class RequirementsChecker {
         // Markdown can be used in the 'help' field
 
         $this->requirements[] = array(
-            'name' => 'PHP 5.3',
+            'name' => 'PHP 5.6',
             'level' => 'critical',
-            'fulfilled' => version_compare(PHP_VERSION, '5.3.0', '>='),
-            'help' => 'PHP 5.3 is currently required.'
+            'fulfilled' => version_compare(PHP_VERSION, '5.6.0', '>='),
+            'help' => 'PHP 5.6 is currently required.'
         );
 
         $this->requirements[] = array(
