@@ -73,7 +73,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
   static getErrorMessage(res: request.Response) {
     return res
-      ? res.body[0]
+      ? (Array.isArray(res.body)
+        ? res.body[0]
+        : res.body)
       : {
       code: 'error',
       message: 'Connection Error: VersionPress is not able to connect to WordPress site. Please try refreshing the page.'
