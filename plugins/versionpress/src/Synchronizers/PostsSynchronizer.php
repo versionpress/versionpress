@@ -31,7 +31,7 @@ class PostsSynchronizer extends SynchronizerBase {
     private function fixCommentCounts() {
         $sql = "update {$this->database->prefix}posts set comment_count =
      (select count(*) from {$this->database->prefix}comments where comment_post_ID = {$this->database->prefix}posts.ID and comment_approved = 1);";
-        $this->database->query($sql);
+        $this->database->vp_query($sql);
     }
 
     private function clearCache() {

@@ -286,7 +286,7 @@ class WpdbMirrorBridge {
             $stringifiedId = "'" . $id . "'";
             $data = $this->database->get_results("SELECT * FROM {$parsedQueryData->table} WHERE {$parsedQueryData->idColumnName} = {$stringifiedId}", ARRAY_A)[0];
             $data = $this->vpidRepository->replaceForeignKeysWithReferences($parsedQueryData->entityName, $data);
-            $this->updateEntity($data, $parsedQueryData->entityName, $stringifiedId);
+            $this->updateEntity($data, $parsedQueryData->entityName, $id);
         }
     }
 
@@ -318,7 +318,7 @@ class WpdbMirrorBridge {
                 $where = $this->fillParentId($parsedQueryData->entityName, $where, $stringifiedId);
             }
 
-            $this->vpidRepository->deleteId($parsedQueryData->entityName, $stringifiedId);
+            $this->vpidRepository->deleteId($parsedQueryData->entityName, $id);
             $this->mirror->delete($parsedQueryData->entityName, $where);
         }
     }
@@ -368,7 +368,7 @@ class WpdbMirrorBridge {
             $data = $this->database->get_results($parsedQueryData->sqlQuery, ARRAY_A)[0];
             $stringifiedId = "'" . $data[$parsedQueryData->idColumnName] . "'";
             $data = $this->vpidRepository->replaceForeignKeysWithReferences($parsedQueryData->entityName, $data);
-            $this->updateEntity($data, $parsedQueryData->entityName, $stringifiedId);
+            $this->updateEntity($data, $parsedQueryData->entityName, $data[$parsedQueryData->idColumnName]);
         }
 
     }

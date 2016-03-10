@@ -164,6 +164,17 @@ class ReplacerMethods {
 
     /**
      * @since VersionPress
+     * @param $query
+     */
+    public function vp_query($query) {
+        $this->vp_use_original_query_method = true;
+        $r = $this->query($query);
+        $this->vp_use_original_query_method = false;
+        return $r;
+    }
+
+    /**
+     * @since VersionPress
      */
     private function vp_restore_fields() {
         $this->last_error = $this->vp_field_backup["last_error"];
