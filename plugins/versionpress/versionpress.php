@@ -230,18 +230,7 @@ function vp_register_hooks() {
 
         $committer->forceChangeInfo(new ThemeChangeInfo($stylesheet, 'switch', $themeName));
     });
-
-    add_action('untrashed_post_comments', function ($postId) use ($wpdb, $dbSchemaInfo, $wpdbMirrorBridge) {
-        $commentsTable = $dbSchemaInfo->getPrefixedTableName("comment");
-        $commentStatusSql = "select comment_ID, comment_approved from {$commentsTable} where comment_post_ID = {$postId}";
-        $comments = $wpdb->get_results($commentStatusSql, ARRAY_A);
-
-        foreach ($comments as $comment) {
-            $wpdbMirrorBridge->update($commentsTable,
-                array("comment_approved" => $comment["comment_approved"]),
-                array("comment_ID" => $comment["comment_ID"]));
-        }
-    });
+    
 
     add_action('delete_user_meta', function ($metaIds) use ($wpdbMirrorBridge, $dbSchemaInfo) {
         $idColumnName = $dbSchemaInfo->getEntityInfo("usermeta")->idColumnName;
