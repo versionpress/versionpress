@@ -2,6 +2,7 @@
 namespace VersionPress\Synchronizers;
 
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Storages\OptionStorage;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -23,6 +24,8 @@ class OptionsSynchronizer implements Synchronizer {
     private $database;
     /** @var AbsoluteUrlReplacer */
     private $urlReplacer;
+    /** @var ShortcodesReplacer */
+    private $shortcodesReplacer;
 
     private $tableName;
     private $options;
@@ -30,12 +33,13 @@ class OptionsSynchronizer implements Synchronizer {
     /** @var DbSchemaInfo */
     private $dbSchema;
 
-    function __construct(Storage $optionStorage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer) {
+    function __construct(Storage $optionStorage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
         $this->optionStorage = $optionStorage;
         $this->database = $wpdb;
         $this->urlReplacer = $urlReplacer;
         $this->tableName = $dbSchema->getPrefixedTableName('option');
         $this->dbSchema = $dbSchema;
+        $this->shortcodesReplacer = $shortcodesReplacer;
     }
 
     function synchronize($task, $entitiesToSynchronize = null) {
@@ -45,6 +49,8 @@ class OptionsSynchronizer implements Synchronizer {
         if (count($options) > 0) {
             $syncQuery = "INSERT INTO {$this->tableName} (option_name, option_value, autoload) VALUES ";
             foreach ($options as $optionName => $option) {
+                $option = $this->shortcodesReplacer->restoreShortcodesInEntity('option', $option);
+
                 $option = $this->urlReplacer->restore($option);
                 $option = $this->maybeRestoreReference($option);
                 if (!isset($option['autoload'])) $option['autoload'] = 'yes'; // default value

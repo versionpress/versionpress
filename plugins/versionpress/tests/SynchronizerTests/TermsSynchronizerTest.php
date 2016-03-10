@@ -19,7 +19,7 @@ class TermsSynchronizerTest extends SynchronizerTestCase {
     protected function setUp() {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('term');
-        $this->synchronizer = new TermsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer);
+        $this->synchronizer = new TermsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
     }
 
     /**

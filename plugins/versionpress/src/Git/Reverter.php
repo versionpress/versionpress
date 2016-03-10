@@ -84,25 +84,30 @@ class Reverter {
         }
 
         $this->committer->forceChangeInfo($changeInfo);
+        $affectedPosts = $this->getAffectedPosts($modifiedFiles);
+        $this->updateChangeDateForPosts($affectedPosts);
         $this->committer->commit();
 
         $vpIdsInModifiedFiles = array_merge($vpIdsInModifiedFiles, $this->getAllVpIdsFromModifiedFiles($modifiedFiles));
         $vpIdsInModifiedFiles = array_unique($vpIdsInModifiedFiles, SORT_REGULAR);
 
         $this->synchronizationProcess->synchronize($vpIdsInModifiedFiles);
-        $affectedPosts = $this->getAffectedPosts($modifiedFiles);
-        $this->updateChangeDateForPosts($affectedPosts);
 
         do_action('vp_revert');
         return RevertStatus::OK;
     }
 
     private function updateChangeDateForPosts($vpIds) {
+        $storage = $this->storageFactory->getStorage('post');
         $date = current_time('mysql');
         $dateGmt = current_time('mysql', true);
         foreach ($vpIds as $vpId) {
             $sql = "update {$this->database->prefix}posts set post_modified = '{$date}', post_modified_gmt = '{$dateGmt}' where ID = (select id from {$this->database->prefix}vp_id where vp_id = unhex('{$vpId}'))";
             $this->database->query($sql);
+            $post = $storage->loadEntity($vpId, null);
+            $post['post_modified'] = $date;
+            $post['post_modified_gmt'] = $dateGmt;
+            $storage->save($post);
         }
     }
 
@@ -266,8 +271,9 @@ class Reverter {
     private function getAllVpIdsFromModifiedFiles($modifiedFiles) {
         $vpIds = array();
         $vpIdRegex = "/([\\da-f]{32})/i";
+        $vpdbName = basename(VP_VPDB_DIR);
         // https://regex101.com/r/yT6mF5/1
-        $optionFileRegex = "/.*vpdb[\\/\\\\]options[\\/\\\\].+[\\/\\\\](.+)\\.ini/i";
+        $optionFileRegex = "/.*{$vpdbName}[\\/\\\\]options[\\/\\\\].+[\\/\\\\](.+)\\.ini/i";
         // https://regex101.com/r/zC6dA2/2
         $optionNameRegex = "/^\\[(.*)\\]\\r?$/m";
 

@@ -4,6 +4,9 @@ namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ExtendedWpdb;
+use VersionPress\Database\ShortcodesInfo;
+use VersionPress\Database\ShortcodesReplacer;
+use VersionPress\Database\VpidRepository;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\DBAsserter;
@@ -23,6 +26,8 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
     protected static $wpdb;
     /** @var AbsoluteUrlReplacer */
     protected static $urlReplacer;
+    /** @var ShortcodesReplacer */
+    protected static $shortcodesReplacer;
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
@@ -32,9 +37,15 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
         DBAsserter::assertFilesEqualDatabase();
 
         $schemaReflection = new \ReflectionClass('VersionPress\Database\DbSchemaInfo');
-        $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.neon';
+        $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.yml';
+        $shortcodeFile = dirname($schemaReflection->getFileName()) . '/wordpress-shortcodes.yml';
+
         /** @var $wp_db_version */
         require(self::$testConfig->testSite->path . '/wp-includes/version.php');
+
+        if (!function_exists('get_shortcode_regex')) {
+            require_once(self::$testConfig->testSite->path . '/wp-includes/shortcodes.php');
+        }
 
         self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
 
@@ -44,6 +55,10 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
         $dbName = self::$testConfig->testSite->dbName;
         self::$wpdb = new ExtendedWpdb($dbUser, $dbPassword, $dbName, $dbHost);
         self::$wpdb->set_prefix(self::$testConfig->testSite->dbTablePrefix);
+
+        $shortcodesInfo = new ShortcodesInfo($shortcodeFile);
+        $vpidRepository = new VpidRepository(self::$wpdb, self::$schemaInfo);
+        self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, $vpidRepository);
 
         $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
         self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$wpdb, array());

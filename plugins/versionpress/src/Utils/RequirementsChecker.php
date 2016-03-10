@@ -5,7 +5,7 @@ namespace VersionPress\Utils;
 use Exception;
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Utils\SystemInfo;
+use VersionPress\Utils\SystemInfo;
 use VersionPress\Database\DbSchemaInfo;
 use wpdb;
 
@@ -50,6 +50,13 @@ class RequirementsChecker {
             'level' => 'critical',
             'fulfilled' => version_compare(PHP_VERSION, '5.3.0', '>='),
             'help' => 'PHP 5.3 is currently required.'
+        );
+
+        $this->requirements[] = array(
+            'name' => "'mbstring' extension",
+            'level' => 'critical',
+            'fulfilled' => extension_loaded('mbstring'),
+            'help' => 'Extension `mbstring` is required.'
         );
 
         $this->requirements[] = array(

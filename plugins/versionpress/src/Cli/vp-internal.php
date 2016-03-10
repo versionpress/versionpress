@@ -2,8 +2,12 @@
 
 namespace VersionPress\Cli;
 
+use VersionPress\Database\VpidRepository;
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Synchronizers\SynchronizationProcess;
+use VersionPress\Utils\WordPressMissingFunctions;
+use VersionPress\Utils\WpConfigEditor;
 use WP_CLI;
 use WP_CLI_Command;
 use wpdb;
@@ -62,6 +66,12 @@ class VPInternalCommand extends WP_CLI_Command {
         WP_CLI::success("VersionPress tables created");
 
 
+        // Install Custom merge driver
+
+        MergeDriverInstaller::installMergeDriver(VP_PROJECT_ROOT, VERSIONPRESS_PLUGIN_DIR, VP_VPDB_DIR);
+        WP_CLI::success("Git merge driver added");
+
+        
         // Run synchronization
 
         /** @var SynchronizationProcess $syncProcess */
@@ -120,9 +130,104 @@ class VPInternalCommand extends WP_CLI_Command {
         set_transient('vp_flush_rewrite_rules', 1);
         /**
          * @see VPCommand::flushRewriteRules
-         * @noinspection PhpUsageOfSilenceOperatorInspection
          */
-        @file_get_contents(get_home_url());
+        wp_remote_get(get_home_url());
+    }
+
+    /**
+     * Gets `id` of an entity from `vp_id` table
+     *
+     * @subcommand get-entity-id
+     *
+     * @synopsis --vpid=<vpid>
+     *
+     */
+    public function getEntityId($args = array(), $assoc_args = array()) {
+        global $versionPressContainer;
+        /** @var wpdb $wpdb */
+        $wpdb = $versionPressContainer->resolve(VersionPressServices::WPDB);
+        $sql = "SELECT ID FROM " . $wpdb->prefix . "vp_id WHERE vp_id=UNHEX('" . $assoc_args["vpid"] . "')";
+        $newId = $wpdb->get_col($sql);
+        if (isset($newId[0])) {
+            echo $newId[0];
+
+        }
+    }
+
+    /**
+     * Gets `vp_id` Guid of an entity from id and entity name
+     *
+     * @subcommand get-entity-vpid
+     *
+     * @synopsis --id=<id> --name=<name>
+     *
+     */
+    public function getEntityVpid($args = array(), $assoc_args = array()) {
+        global $versionPressContainer;
+        /** @var wpdb $wpdb */
+        $wpdb = $versionPressContainer->resolve(VersionPressServices::WPDB);
+        /** @var VpidRepository $vpIdRepository */
+        $vpIdRepository = $versionPressContainer->resolve(VersionPressServices::VPID_REPOSITORY);
+        echo $vpIdRepository->getVpidForEntity($assoc_args["name"], $assoc_args["id"]);
+    }
+
+    /**
+     * Sets or updates constant or variable in wp-config.php
+     *
+     * ## OPTIONS
+     *
+     * <constant>
+     * : Name of constant or variable that will be changed.
+     *
+     * <value>
+     * : Desired value. Supported types are: string, int, float and bool.
+     *
+     * --plain
+     * : The value will be used as is - without type detection, quoting etc.
+     *
+     * --variable
+     * : Will set a variable instead of constant. Useful for $table_prefix.
+     *
+     * --common
+     * : The constant / variable will be set in wp-config.common.php.
+     *
+     * @subcommand update-config
+     *
+     * @synopsis <constant> <value> [--plain] [--variable] [--common]
+     *
+     * @when before_wp_load
+     */
+    public function updateConfig($args = array(), $assoc_args = array()) {
+        $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
+        $updateCommonConfig = isset($assoc_args['common']);
+
+        if ($updateCommonConfig) {
+            $wpConfigPath = dirname($wpConfigPath) . '/wp-config.common.php';
+        }
+
+        if ($wpConfigPath === false) {
+            WP_CLI::error('Config file does not exist. Please run `wp core config` first.');
+        }
+
+        require_once __DIR__ . '/VPCommandUtils.php';
+        require_once __DIR__ . '/../Utils/WpConfigEditor.php';
+
+        $constantOrVariableName = $args[0];
+        $isVariable = isset($assoc_args['variable']);
+        $usePlainValue = isset($assoc_args['plain']);
+        $value = $usePlainValue ? $args[1] : VPCommandUtils::fixTypeOfValue($args[1]);
+
+        $wpConfigEditor = new WpConfigEditor($wpConfigPath, $updateCommonConfig);
+
+        try {
+            if ($isVariable) {
+                $wpConfigEditor->updateConfigVariable($constantOrVariableName, $value, $usePlainValue);
+            } else {
+                $wpConfigEditor->updateConfigConstant($constantOrVariableName, $value, $usePlainValue);
+            }
+        } catch (\Exception $e) {
+            WP_CLI::error('Cannot find place for defining the ' . ($isVariable ? 'variable' : 'constant')  . '. Config was probably edited manually.');
+        }
     }
 }
 
