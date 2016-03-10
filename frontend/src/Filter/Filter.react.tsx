@@ -1,7 +1,6 @@
 /// <reference path='../../typings/typings.d.ts' />
 
 import * as React from 'react';
-import parseQuery from '../common/parseQuery';
 
 import './Filter.less';
 
