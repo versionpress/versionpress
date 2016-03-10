@@ -301,7 +301,7 @@ class WpdbMirrorBridge {
         if (!$entityInfo->usesGeneratedVpids) {
             foreach ($parsedQueryData->ids as $id) {
                 $stringifiedId = "'" . $id . "'";
-                $where[$parsedQueryData->idColumnName] = $stringifiedId;
+                $where[$parsedQueryData->idColumnName] = $id;
                 $this->vpidRepository->deleteId($parsedQueryData->entityName, $stringifiedId);
                 $this->mirror->delete($parsedQueryData->entityName, $where);
             }
@@ -309,7 +309,7 @@ class WpdbMirrorBridge {
         }
         foreach ($parsedQueryData->ids as $id) {
             $stringifiedId = "'" . $id . "'";
-            $where['vp_id'] = $this->vpidRepository->getVpidForEntity($parsedQueryData->entityName, $stringifiedId);
+            $where['vp_id'] = $this->vpidRepository->getVpidForEntity($parsedQueryData->entityName, $id);
             if (!$where['vp_id']) {
                 continue; // already deleted - deleting postmeta is sometimes called twice
             }

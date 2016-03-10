@@ -155,6 +155,25 @@ class UsersTest extends End2EndTestCase {
         DBAsserter::assertFilesEqualDatabase();
     }
 
+    /**
+     * @test
+     * @testdox Deleting usermeta creates multiple usermeta creates 'usermeta/delete' action
+     */
+    public function deletingUsermetaCreatesUsermetaDeleteAction() {
+        self::$worker->prepare_deleteUsermeta();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->deleteUsermeta();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("usermeta/delete");
+        $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
+        $commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID(VP-User-Id)%.ini");
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
     public static function tearDownAfterClass() {
         parent::tearDownAfterClass();
         self::$worker->tearDownAfterClass();

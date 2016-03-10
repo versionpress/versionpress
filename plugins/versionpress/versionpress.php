@@ -232,13 +232,6 @@ function vp_register_hooks() {
     });
     
 
-    add_action('delete_user_meta', function ($metaIds) use ($wpdbMirrorBridge, $dbSchemaInfo) {
-        $idColumnName = $dbSchemaInfo->getEntityInfo("usermeta")->idColumnName;
-        foreach ($metaIds as $metaId) {
-            $wpdbMirrorBridge->delete($dbSchemaInfo->getPrefixedTableName("usermeta"), array($idColumnName => $metaId));
-        }
-    });
-
     add_action('wp_ajax_save-widget', function () use ($committer) {
         if (defined('DOING_AJAX') && DOING_AJAX && isset($_POST['delete_widget']) && $_POST['delete_widget']) {
             $committer->postponeCommit('widgets');
