@@ -94,7 +94,7 @@ class QueryLanguageUtils {
      * @param $rule array
      * @return string
      */
-    public static function createGitLogQueryFromRules($rule) {
+    public static function createGitLogQueryFromRule($rule) {
         $query = '-i --all-match';
 
         if (isset($rule['author'])) {

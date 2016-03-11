@@ -166,8 +166,11 @@ class VersionPressApi {
     public function getCommits(WP_REST_Request $request) {
         $gitLogPaginator = new GitLogPaginator($this->gitRepository);
 
-        $rules = QueryLanguageUtils::createRulesFromQueries(urldecode(stripslashes($request['query'])));
-        $gitLogQuery = QueryLanguageUtils::createGitLogQueryFromRules($rules);
+        $query = urldecode(stripslashes($request['query']));
+        $rules = QueryLanguageUtils::createRulesFromQueries(array($query));
+        $gitLogQuery = !empty($rules)
+            ? QueryLanguageUtils::createGitLogQueryFromRule($rules[0])
+            : '';
         $gitLogPaginator->setQuery($gitLogQuery);
         $gitLogPaginator->setCommitsPerPage(25);
 
@@ -352,8 +355,12 @@ class VersionPressApi {
 
         $latestCommit = $request['latestCommit'];
 
-        $queryBuilder = new QueryBuilder(urldecode(stripslashes($request['query'])));
-        $repoLatestCommit = $repository->getLastCommitHash($queryBuilder->getGitLogQuery());
+        $query = urldecode(stripslashes($request['query']));
+        $rules = QueryLanguageUtils::createRulesFromQueries(array($query));
+        $gitLogQuery = !empty($rules)
+            ? QueryLanguageUtils::createGitLogQueryFromRule($rules[0])
+            : '';
+        $repoLatestCommit = $repository->getLastCommitHash($gitLogQuery);
 
         return new WP_REST_Response(array(
             "update" => $repository->wasCreatedAfter($repoLatestCommit, $latestCommit),

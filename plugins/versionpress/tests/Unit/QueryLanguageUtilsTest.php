@@ -121,7 +121,7 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider rulesAndGitLogQueryProvider
      */
     public function queryLanguageUtilsGeneratesCorrectGitLogQuery($rules, $expectedQuery) {
-        $query = QueryLanguageUtils::createGitLogQueryFromRules($rules);
+        $query = QueryLanguageUtils::createGitLogQueryFromRule($rules);
         $this->assertEquals($expectedQuery, $query);
     }
 
