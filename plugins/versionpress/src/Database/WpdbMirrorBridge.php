@@ -88,7 +88,7 @@ class WpdbMirrorBridge {
         }
     }
 
-    function delete($table, $where) {
+    function delete($table, $where, $parentIds) {
         if ($this->disabled) {
             return;
         }
@@ -114,13 +114,43 @@ class WpdbMirrorBridge {
             }
 
             if ($this->dbSchemaInfo->isChildEntity($entityName) && !isset($where["vp_{$entityInfo->parentReference}"])) {
-                $where = $this->fillParentId($entityName, $where, $id);
+                //$where = $this->fillParentId($entityName, $where, $id);
+                $where["vp_{$entityInfo->parentReference}"] = $parentIds[$id];
             }
 
             $this->vpidRepository->deleteId($entityName, $id);
             $this->mirror->delete($entityName, $where);
         }
     }
+
+    /**
+     * Fill parentIds of child entities and returns them as associative array in `$id => $parentId` format.
+     * Returns FALSE when table contains entity which is not an childEntity.
+     *
+     * @param $table
+     * @param $where
+     * @return array|bool
+     */
+    public function getParentIdsBeforeDelete($table, $where) {
+        $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($table);
+        if (!$this->dbSchemaInfo->isChildEntity($entityInfo->entityName)) {
+            return false;
+        }
+
+        $ids = $this->detectAllAffectedIds($entityInfo->entityName, $where, $where);
+        $parentIds = [];
+        foreach ($ids as $id) {
+            $table = $this->dbSchemaInfo->getPrefixedTableName($entityInfo->entityName);
+            $parentTable = $this->dbSchemaInfo->getTableName($entityInfo->references[$entityInfo->parentReference]);
+            $vpidTable = $this->dbSchemaInfo->getPrefixedTableName('vp_id');
+            $parentVpidSql = "SELECT HEX(vpid.vp_id) FROM {$table} t JOIN {$vpidTable} vpid ON t.{$entityInfo->parentReference} = vpid.id AND `table` = '{$parentTable}' WHERE {$entityInfo->idColumnName} = $id";
+            $parentVpid = $this->database->get_var($parentVpidSql);
+            $parentIds[$id] = $parentVpid;
+        }
+        return $parentIds;
+
+    }
+
 
     /**
      * @param $parsedQueryData ParsedQueryData
@@ -131,10 +161,10 @@ class WpdbMirrorBridge {
         }
 
         $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($parsedQueryData->table);
-        $entityName = $entityInfo->entityName;
 
         if (!$entityInfo)
             return;
+
 
         switch ($parsedQueryData->queryType) {
             case ParsedQueryData::UPDATE_QUERY:

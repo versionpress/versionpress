@@ -23,4 +23,12 @@ class PagesTestSeleniumWorker extends PostTypeTestSeleniumWorker {
 
     public function changePostFormat() {
     }
+
+    public function prepare_deletePostmeta() {
+    }
+
+    public function deletePostmeta() {
+    }
+
+
 }

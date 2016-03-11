@@ -76,6 +76,8 @@ class ReplacerMethods {
         /** @var \VersionPress\Database\WpdbMirrorBridge $wpdbMirrorBridge */
         $wpdbMirrorBridge = $versionPressContainer->resolve(\VersionPress\DI\VersionPressServices::WPDB_MIRROR_BRIDGE);
 
+        $parentIds = $wpdbMirrorBridge->getParentIdsBeforeDelete($table, $where);
+
         $r = $this->__wp_delete($table, $where, $where_format);
 
         if ($r === false) {
@@ -83,7 +85,7 @@ class ReplacerMethods {
         }
 
         $this->vp_backup_fields();
-        $wpdbMirrorBridge->delete($table, $where);
+        $wpdbMirrorBridge->delete($table, $where, $parentIds);
         $this->vp_restore_fields();
         $this->vp_use_original_query_method = false;
         return $r;

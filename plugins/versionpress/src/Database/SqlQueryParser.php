@@ -203,7 +203,7 @@ class SqlQueryParser {
                 $sets = $statement->values[$i];
                 $data = [];
                 for ($j = 0; $j < count($sets->values); $j++) {
-                    $data[$columns[$j]] = stripslashes_from_strings_only($sets->values[$j]);
+                    $data[$columns[$j]] = stripslashes($sets->values[$j]);
                 }
                 array_push($result, $data);
             }

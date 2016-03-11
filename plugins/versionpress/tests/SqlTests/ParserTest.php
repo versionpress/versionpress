@@ -26,7 +26,7 @@ class ParserTest extends PHPUnit_Framework_TestCase {
     private $sqlParser;
 
     public static function setUpBeforeClass() {
-        self::$DbSchemaInfo = new DbSchemaInfo(__DIR__ . '/../../src/Database/wordpress-schema.neon', 'wp_', PHP_INT_MAX);
+        self::$DbSchemaInfo = new DbSchemaInfo(__DIR__ . '/../../src/Database/wordpress-schema.yml', 'wp_', PHP_INT_MAX);
     }
 
     public function setup() {
