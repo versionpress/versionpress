@@ -38,13 +38,13 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase {
             array(
                 'rule' =>
                     array(
-                        'some_field' => 'value',
-                        'other_field' => 'a',
+                        'some_field' => array('value'),
+                        'other_field' => array('a'),
                     ),
                 'interval' => 'hourly',
             ),
             array(
-                'rule' => array('other_field' => 'value'),
+                'rule' => array('other_field' => array('value')),
                 'interval' => '5 min',
             )
         );
@@ -58,11 +58,11 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase {
     public function rulesOfIgnoredEntitiesEqualEntitySchema() {
         $expectedRules = array(
             array(
-                'some_field' => 'value',
-                'other_field' => 'a',
+                'some_field' => array('value'),
+                'other_field' => array('a'),
             ),
             array(
-                'other_field' => 'value'
+                'other_field' => array('value')
             ),
         );
 

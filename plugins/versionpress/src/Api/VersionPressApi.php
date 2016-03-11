@@ -23,7 +23,7 @@ use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\BugReporter;
-use VersionPress\Utils\QueryBuilder;
+use VersionPress\Utils\QueryLanguageUtils;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -166,8 +166,9 @@ class VersionPressApi {
     public function getCommits(WP_REST_Request $request) {
         $gitLogPaginator = new GitLogPaginator($this->gitRepository);
 
-        $queryBuilder = new QueryBuilder(urldecode(stripslashes($request['query'])));
-        $gitLogPaginator->setQuery($queryBuilder->getGitLogQuery());
+        $rules = QueryLanguageUtils::createRulesFromQueries(urldecode(stripslashes($request['query'])));
+        $gitLogQuery = QueryLanguageUtils::createGitLogQueryFromRules($rules);
+        $gitLogPaginator->setQuery($gitLogQuery);
         $gitLogPaginator->setCommitsPerPage(25);
 
         $page = intval($request['page']);

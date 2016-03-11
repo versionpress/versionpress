@@ -61,18 +61,18 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase {
 
     public function ruleAndQueryProvider() {
         return array(
-            array(array('field' => 'value'), '(`field` = "value")'),
-            array(array('field' => 'value', 'other_field' => 'other_value'), '(`field` = "value" AND `other_field` = "other_value")'),
+            array(array('field' => array('value')), '(`field` = "value")'),
+            array(array('field' => array('value'), 'other_field' => array('other_value')), '(`field` = "value" AND `other_field` = "other_value")'),
 
-            array(array('field' => 'val*'), '(`field` LIKE "val%")'),
-            array(array('field' => '*ue'), '(`field` LIKE "%ue")'),
-            array(array('field' => 'v*ue'), '(`field` LIKE "v%ue")'),
-            array(array('field' => '*al*'), '(`field` LIKE "%al%")'),
+            array(array('field' => array('val*')), '(`field` LIKE "val%")'),
+            array(array('field' => array('*ue')), '(`field` LIKE "%ue")'),
+            array(array('field' => array('v*ue')), '(`field` LIKE "v%ue")'),
+            array(array('field' => array('*al*')), '(`field` LIKE "%al%")'),
 
-            array(array('field' => '*al*', 'other_field' => 'other_value'), '(`field` LIKE "%al%" AND `other_field` = "other_value")'),
-            array(array('field' => '*al*', 'other_field' => 'other_*'), '(`field` LIKE "%al%" AND `other_field` LIKE "other\_%")'),
+            array(array('field' => array('*al*'), 'other_field' => array('other_value')), '(`field` LIKE "%al%" AND `other_field` = "other_value")'),
+            array(array('field' => array('*al*'), 'other_field' => array('other_*')), '(`field` LIKE "%al%" AND `other_field` LIKE "other\_%")'),
 
-            array(array('field' => '_*'), '(`field` LIKE "\_%")'),
+            array(array('field' => array('_*')), '(`field` LIKE "\_%")'),
         );
     }
 }

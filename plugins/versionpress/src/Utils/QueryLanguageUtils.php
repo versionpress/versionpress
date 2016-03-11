@@ -17,47 +17,44 @@ class QueryLanguageUtils {
      * Transforms queries into arrays for easier manipulation.
      * Example of transformation of one query (method works with list):
      *  query = some_field: value other_field: other_value
-     *  array = ['some_field' => 'value', 'other_field' => 'other_value']
+     *  array = ['some_field' => ['value'], 'other_field' => ['other_value']]
      *
      * @param $queries
+     * @param $allowEmpty boolean Allow empty values
      * @return array
      */
-    public static function createRulesFromQueries($queries) {
+    public static function createRulesFromQueries($queries, $allowEmpty = false) {
         $rules = array();
         foreach ($queries as $query) {
-            $possibleValues = array();
-
-            preg_match_all(self::$queryRegex, $query, $matches);
-            $isValidRule = count($matches[0]) > 0;
+            preg_match_all(self::$queryRegex, $query, $matches, PREG_SET_ORDER);
+            $isValidRule = count($matches) > 0;
             if (!$isValidRule) {
                 continue;
             }
 
-            $keys = $matches[2];
-
-            /* value can be in 3rd, 4th or 5th group
-             *
-             * 3rd group => value is in single quotes
-             * 4th group => value is in double quotes
-             * 5th group => value is without quotes
-             *
-             */
-            $possibleValues[] = $matches[3];
-            $possibleValues[] = $matches[4];
-            $possibleValues[] = $matches[5];
-
-            // we need to join all groups together
             $ruleParts = array();
-            foreach ($possibleValues as $possibleValue) {
-                foreach ($possibleValue as $index => $value) {
-                    if ($value !== '') {
-                        $ruleParts[$index] = $value;
+            foreach($matches as $match) {
+                $key = empty($match[2]) ? 'text' : $match[2];
+
+                /* value can be in 3rd, 4th or 5th index
+                 *
+                 * 3rd index => value is in single quotes
+                 * 4th index => value is in double quotes
+                 * 5th index => value is without quotes
+                 */
+                $value = isset($match[5]) ? $match[5] : (
+                            isset($match[4]) ? $match[4] : (
+                                isset($match[3]) ? $match[3] : ''));
+
+                if ($value !== '' || $allowEmpty) {
+                    if (!isset($ruleParts[$key])) {
+                        $ruleParts[$key] = array();
                     }
+                    $ruleParts[$key][] = $value;
                 }
             }
 
-            ksort($ruleParts);
-            $rules[] = array_combine($keys, $ruleParts);
+            $rules[] = $ruleParts;
         }
         return $rules;
     }
@@ -71,11 +68,12 @@ class QueryLanguageUtils {
      */
     public static function entityMatchesSomeRule($entity, $rules) {
         return ArrayUtils::any($rules, function ($rule) use ($entity) {
-            return ArrayUtils::all($rule, function ($value, $field) use ($entity) { // check all parts of rule
+            return ArrayUtils::all($rule, function ($values, $field) use ($entity) { // check all parts of rule
                 if (!isset($entity[$field])) {
                     return false;
                 }
 
+                $value = $values[0]; // Use single value per field
                 $valueTokens = QueryLanguageUtils::tokenizeValue($value);
                 $isWildcard = QueryLanguageUtils::tokensContainWildcard($valueTokens);
 
@@ -91,10 +89,92 @@ class QueryLanguageUtils {
     }
 
     /**
+     * Converts rule (array) to query string to be used as an argument for `git log`.
+     *
+     * @param $rule array
+     * @return string
+     */
+    public static function createGitLogQueryFromRules($rule) {
+        $query = '-i --all-match';
+
+        if (isset($rule['author'])) {
+            foreach ($rule['author'] as $value) {
+                $query .= ' --author="' . $value . '"';
+            }
+        }
+
+        if (isset($rule['date'])) {
+            foreach ($rule['date'] as $value) {
+                $val = preg_replace('/\s+/', '', $value);
+
+                $bounds = explode('..', $val);
+                if (count($bounds) > 1) {
+                    if ($bounds[0] !== '*') {
+                        $query .= ' --after=' . date('Y-m-d', strtotime($bounds[0] . ' -1 day'));
+                        if ($bounds[1] !== '*') {
+                            $query .= ' --before=' . date('Y-m-d', strtotime($bounds[1] . ' +1 day'));
+                        }
+                        continue;
+                    }
+                }
+
+                if (in_array(($op = substr($val, 0, 2)), array('<=', '>='))) {
+                    $date = substr($val, 2);
+                } else if (in_array(($op = substr($val, 0, 1)), array('<', '>'))) {
+                    $date = substr($val, 1);
+                } else {
+                    $op = '';
+                    $date = $val;
+                };
+
+                if ($op === '>=') {
+                    $query .= ' --after=' . date('Y-m-d', strtotime($date . ' -1 day'));
+                } else if ($op === '>') {
+                    $query .= ' --after=' . date('Y-m-d', strtotime($date));
+                } else if ($op === '<=') {
+                    $query .= ' --before=' . date('Y-m-d', strtotime($date));
+                } else if ($op === '<') {
+                    $query .= ' --before=' . date('Y-m-d', strtotime($date . '-1 day'));
+                } else {
+                    $query .= ' --after=' . date('Y-m-d', strtotime($date . ' -1 day'));
+                    $query .= ' --before=' . date('Y-m-d', strtotime($date));
+                }
+            }
+        }
+
+        if (isset($rule['entity']) || isset($rule['action']) || isset($rule['vpid'])) {
+            if (!empty($rule['entity']) || !empty($rule['action']) || !empty($rule['vpid'])) {
+                $query .= ' --grep="^VP-Action: ' .
+                    (empty($rule['entity']) ? '.*' : '\(' . implode('\|', $rule['entity']) . '\)') . '/' .
+                    (empty($rule['action']) ? '.*' : '\(' . implode('\|', $rule['action']) . '\)') . '/' .
+                    (empty($rule['vpid'])   ? '.*' : '\(' . implode('\|', $rule['item'])   . '\)') . '"';
+            }
+        }
+
+        if (isset($rule['text'])) {
+            if (!empty($rule['text'])) {
+                $query .= ' --grep="\(' . implode('\|', $rule['text']) . '\)"';
+            }
+        }
+
+        foreach ($rule as $key => $values) {
+            if (in_array($key, array('author', 'date', 'entity', 'action', 'vpid', 'text'))) {
+                continue;
+            }
+
+            if (!empty($values)) {
+                $query .= ' --grep="^vp-' . $key . ': \(' . implode('\|', $values) . '\)"';
+            }
+        }
+
+        return $query;
+    }
+
+    /**
      * Converts rule (array) to isolated (enclosed in brackets) part of SQL restriction.
      *
      * Example:
-     *  rule = ['field' => 'value', 'other_field' => 'with_prefix*']
+     *  rule = ['field' => ['value'], 'other_field' => ['with_prefix*']]
      *  output = (`field` = "value" AND `other_field` LIKE "with_prefix%")
      *
      * @param $rule array
@@ -103,7 +183,8 @@ class QueryLanguageUtils {
     public static function createSqlRestrictionFromRule($rule) {
         $restrictionParts = array();
 
-        foreach ($rule as $field => $value) {
+        foreach ($rule as $field => $values) {
+            $value = $values[0]; // Use single value per field
             $valueTokens = self::tokenizeValue($value);
             $isWildcard = self::tokensContainWildcard($valueTokens);
             $searchedValue = self::tokensToSqlString($valueTokens);
