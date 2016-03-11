@@ -21,7 +21,7 @@ class MergeDriverTestUtils {
     public static function initRepository($repositoryDir) {
         self::$repositoryDir = $repositoryDir;
         $driverScriptName = 'ini-merge.php';
-        $driverScript = '../../src/Git/merge-drivers/' . $driverScriptName;
+        $driverScript = __DIR__ . '/../../src/Git/merge-drivers/' . $driverScriptName;
         $driverScriptFakeDir = self::$repositoryDir . '/src/Git/merge-drivers';
         FileSystem::remove(self::$repositoryDir);
         mkdir(self::$repositoryDir);
@@ -30,7 +30,7 @@ class MergeDriverTestUtils {
         self::$gitRepository->init();
         copy($driverScript, $driverScriptFakeDir . '/' . $driverScriptName);
         $driverScriptName = 'ini-merge.sh';
-        $driverScript = '../../src/Git/merge-drivers/' . $driverScriptName;
+        $driverScript = __DIR__ . '/../../src/Git/merge-drivers/' . $driverScriptName;
         copy($driverScript, $driverScriptFakeDir . '/' . $driverScriptName);
 
     }
