@@ -111,11 +111,11 @@ class QueryLanguageUtils {
                 if (count($bounds) > 1) {
                     if ($bounds[0] !== '*') {
                         $query .= ' --after=' . date('Y-m-d', strtotime($bounds[0] . ' -1 day'));
-                        if ($bounds[1] !== '*') {
-                            $query .= ' --before=' . date('Y-m-d', strtotime($bounds[1] . ' +1 day'));
-                        }
-                        continue;
                     }
+                    if ($bounds[1] !== '*') {
+                        $query .= ' --before=' . date('Y-m-d', strtotime($bounds[1] . ' +1 day'));
+                    }
+                    continue;
                 }
 
                 if (in_array(($op = substr($val, 0, 2)), array('<=', '>='))) {
@@ -147,7 +147,7 @@ class QueryLanguageUtils {
                 $query .= ' --grep="^VP-Action: ' .
                     (empty($rule['entity']) ? '.*' : '\(' . implode('\|', $rule['entity']) . '\)') . '/' .
                     (empty($rule['action']) ? '.*' : '\(' . implode('\|', $rule['action']) . '\)') . '/' .
-                    (empty($rule['vpid'])   ? '.*' : '\(' . implode('\|', $rule['item'])   . '\)') . '"';
+                    (empty($rule['vpid'])   ? '.*' : '\(' . implode('\|', $rule['vpid'])   . '\)') . '"';
             }
         }
 
