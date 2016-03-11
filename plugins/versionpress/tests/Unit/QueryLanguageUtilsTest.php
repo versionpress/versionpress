@@ -75,4 +75,93 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase {
             array(array('field' => array('_*')), '(`field` LIKE "\_%")'),
         );
     }
+
+    /**
+     * @test
+     * @dataProvider queryAndRulesProvider
+     */
+    public function queryLanguageUtilsCreatesCorrectRules($query, $expectedRules) {
+        $rules = QueryLanguageUtils::createRulesFromQueries($query);
+        $this->assertEquals($expectedRules, $rules);
+    }
+
+    public function queryAndRulesProvider() {
+        return array(
+            array(
+                array('Text', ' "Longer text" ', '\'Longer text\''),
+                array(
+                    array('text' => array('Text')),
+                    array('text' => array('Longer text')),
+                    array('text' => array('Longer text'))
+                )
+            ),
+            array(
+                array('author:doe', ' author: "John Doe" ', 'author:\'John Doe\''),
+                array(
+                    array('author' => array('doe')),
+                    array('author' => array('John Doe')),
+                    array('author' => array('John Doe'))
+                )
+            ),
+            array(
+                array('text author:doe "Another text" author: "John Doe" date:>2012-01-02 date: \'2012-01-02 .. 2012-02-13\''),
+                array(
+                    array(
+                        'author' => array('doe', 'John Doe'),
+                        'date' => array('>2012-01-02', '2012-01-02 .. 2012-02-13'),
+                        'text' => array('text', 'Another text')
+                    )
+                )
+            )
+        );
+    }
+    
+    /**
+     * @test
+     * @dataProvider rulesAndGitLogQueryProvider
+     */
+    public function queryLanguageUtilsGeneratesCorrectGitLogQuery($rules, $expectedQuery) {
+        $query = QueryLanguageUtils::createGitLogQueryFromRules($rules);
+        $this->assertEquals($expectedQuery, $query);
+    }
+
+    public function rulesAndGitLogQueryProvider() {
+        return array(
+            array(
+                array('author' => array('doe', 'John Doe')),
+                '-i --all-match --author="doe" --author="John Doe"'
+            ),
+            array(array('date' => array('>2012-01-02')), '-i --all-match --after=2012-01-02'),
+            array(array('date' => array('>=2012-01-02')), '-i --all-match --after=2012-01-01'),
+            array(array('date' => array('<2012-01-02')), '-i --all-match --before=2012-01-01'),
+            array(array('date' => array('<=2012-01-02')), '-i --all-match --before=2012-01-02'),
+            array(
+                array('date' => array('2012-01-02 .. 2012-02-13')),
+                '-i --all-match --after=2012-01-01 --before=2012-02-14'
+            ),
+            array(
+                array('date' => array('2012-01-02 .. *')), '-i --all-match --after=2012-01-01'
+            ),
+            array(
+                array('date' => array('* .. 2012-02-13')), '-i --all-match --before=2012-02-14'
+            ),
+            array(array('entity' => array('entity')), '-i --all-match --grep="^VP-Action: \(entity\)/.*/.*"'),
+            array(array('action' => array('action')), '-i --all-match --grep="^VP-Action: .*/\(action\)/.*"'),
+            array(array('vpid' => array('vpid')), '-i --all-match --grep="^VP-Action: .*/.*/\(vpid\)"'),
+            array(
+                array(
+                    'entity' => array('entity', 'entity2'),
+                    'action' => array('action', 'long action'),
+                    'vpid' => array('vpid', 'vpid2')
+                ),
+                '-i --all-match --grep="^VP-Action: \(entity\|entity2\)/\(action\|long action\)/\(vpid\|vpid2\)"'
+            ),
+            array(
+                array('text' => array('text1', 'Test text')), '-i --all-match --grep="\(text1\|Test text\)"'
+            ),
+            array(
+                array('key' => array('Test value')), '-i --all-match --grep="^vp-key: \(Test value\)"'
+            )
+        );
+    }
 }
