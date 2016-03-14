@@ -118,14 +118,6 @@ class RequirementsChecker {
             'help' => 'It seems like you use customized project structure. VersionPress supports only some scenarios. [Learn more](http://docs.versionpress.net/en/feature-focus/custom-project-structure).'
         );
 
-
-        $this->requirements[] = array(
-            'name' => '.gitignore',
-            'level' => 'critical',
-            'fulfilled' => $this->testGitignore(),
-            'help' => 'It seems you have already created .gitignore file in the site root. It\'s necessary to add some rules for VersionPress. Please add those from `wp-content/plugins/versionpress/src/Initialization/.gitignore.tpl`.'
-        );
-
         $this->requirements[] = array(
             'name' => 'Access rules can be installed',
             'level' => 'warning',

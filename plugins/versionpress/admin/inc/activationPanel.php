@@ -48,7 +48,9 @@ use VersionPress\Utils\RequirementsChecker;
                         ?>
                         <li>
                             <span class="icon icon-warning"></span>
-                            Note: This website is already versioned in Git (the repository is either your custom or has been created by a previous installation of VersionPress). It is not a problem for VersionPress, just be sure that you know what you are doing.
+                            Note: This website is already versioned in Git (the repository is either your custom or has been created by a previous installation of VersionPress).
+                            VersionPress will add some rules into `.gitignore` and install a custom merge driver for its own files.
+                            It is not a problem for VersionPress, just be sure that you know what you are doing.
                         </li>
                         <?php
                     }
