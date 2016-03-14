@@ -12,7 +12,7 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ParsedQueryData;
 use VersionPress\Database\SqlQueryParser;
 
-class ParserTest extends PHPUnit_Framework_TestCase {
+class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
 
     /**
      * @var DbSchemaInfo
@@ -34,7 +34,6 @@ class ParserTest extends PHPUnit_Framework_TestCase {
         $this->sqlParser = new SqlQueryParser(self::$DbSchemaInfo, $this->wpdbStub);
     }
 
-
     /**
      * @test
      * @dataProvider updateQueryParseTestDataProvider
@@ -51,7 +50,6 @@ class ParserTest extends PHPUnit_Framework_TestCase {
 
     }
 
-
     /**
      * @test
      * @dataProvider updateQueryParseTestDataProvider
@@ -61,10 +59,10 @@ class ParserTest extends PHPUnit_Framework_TestCase {
      * @param $expectedIds
      */
     public function selectQueryFromUpdate($query, $expectedSelectQuery, $expectedData, $expectedIds) {
-
         $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col")
             ->with($expectedSelectQuery)->will(new PHPUnit_Framework_MockObject_Stub_Return($expectedIds));
         $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
+
         $this->assertEquals($expectedSelectQuery, $parsedQueryData->sqlQuery);
     }
 
@@ -75,12 +73,11 @@ class ParserTest extends PHPUnit_Framework_TestCase {
      * @param $expectedData
      */
     public function dataFromInsert($query, $expectedData) {
-
         $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
         $parsedData = $parsedQueryData == null ? null : $parsedQueryData->data;
+
         $this->assertEquals($expectedData, $parsedData);
     }
-
 
     /**
      * @test
@@ -90,9 +87,9 @@ class ParserTest extends PHPUnit_Framework_TestCase {
      * @param $expectedQueryType
      */
     public function detectNonStandardInsert($query, $expectedData, $expectedQueryType) {
-
         $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
         $parsedQeryType = $parsedQueryData == null ? null : $parsedQueryData->queryType;
+
         $this->assertEquals($expectedQueryType, $parsedQeryType);
     }
 
@@ -107,9 +104,9 @@ class ParserTest extends PHPUnit_Framework_TestCase {
         $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col")
             ->with($expectedSelectQuery)->will(new PHPUnit_Framework_MockObject_Stub_Return($testIds));
         $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
+
         $this->assertEquals($expectedSelectQuery, $parsedQueryData->sqlQuery);
     }
-
 
     public function deleteQueryParseTestDataProvider() {
         $testIds = [1, 3, 15];
@@ -132,7 +129,6 @@ class ParserTest extends PHPUnit_Framework_TestCase {
             )
         );
     }
-
 
     public function insertQueryParseTestDataProvider() {
         return array(
@@ -209,7 +205,6 @@ class ParserTest extends PHPUnit_Framework_TestCase {
                 array("post_author" => "'A'"),
                 $testIds
             )
-
 
         );
     }
