@@ -114,7 +114,6 @@ class WpdbMirrorBridge {
             }
 
             if ($this->dbSchemaInfo->isChildEntity($entityName) && !isset($where["vp_{$entityInfo->parentReference}"])) {
-                //$where = $this->fillParentId($entityName, $where, $id);
                 $where["vp_{$entityInfo->parentReference}"] = $parentIds[$id];
             }
 
