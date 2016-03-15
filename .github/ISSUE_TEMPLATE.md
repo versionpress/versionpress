@@ -1,0 +1,1 @@
+Having trouble using VersionPress? Please go to https://github.com/versionpress/support. 
