@@ -335,7 +335,7 @@ class Reverter {
      */
     private function clearOrphanedPosts() {
         $deleteTimestamp = time() - self::DELETE_ORPHANED_POSTS_SECONDS; // Older than 1 minute
-        $orphanedMenuItems = $this->database->getColumn($this->database->prepareStatement("SELECT ID FROM $this->database->getPosts() AS p LEFT JOIN $this->database->getPostmeta() AS m ON p.ID = m.post_id WHERE post_type = 'nav_menu_item' AND post_status = 'draft' AND meta_key = '_menu_item_orphaned' AND meta_value < '%d'", $deleteTimestamp ) );
+        $orphanedMenuItems = $this->database->getColumn($this->database->prepareStatement("SELECT ID FROM {$this->database->getPosts()} AS p LEFT JOIN {$this->database->getPostmeta()} AS m ON p.ID = m.post_id WHERE post_type = 'nav_menu_item' AND post_status = 'draft' AND meta_key = '_menu_item_orphaned' AND meta_value < '%d'", $deleteTimestamp ) );
 
         foreach( (array) $orphanedMenuItems as $menuItemId ) {
             wp_delete_post($menuItemId, true);

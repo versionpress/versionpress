@@ -2,6 +2,8 @@
 
 namespace VersionPress\Utils;
 
+use VersionPress\Database\Database;
+
 class WordPressCacheUtils {
     public static function clearPostCache($vpids, $database) {
         if (count($vpids) === 0 || !function_exists('clean_post_cache')) {
@@ -44,10 +46,15 @@ class WordPressCacheUtils {
         $commentsIds = self::getIdsForVpids($vpids, $database);
         clean_comment_cache($commentsIds);
     }
-    
+
+    /**
+     * @param $vpids
+     * @param Database $database
+     * @return mixed
+     */
     private static function getIdsForVpids($vpids, $database) {
         $vpidsForRestriction = self::joinVpidsForRestriction($vpids);
-        return $database->getColumn("SELECT id FROM {$database->prefix}vp_id WHERE vp_id IN ($vpidsForRestriction)");
+        return $database->getColumn("SELECT id FROM {$database->getTablePrefix()}vp_id WHERE vp_id IN ($vpidsForRestriction)");
     }
 
     private static function joinVpidsForRestriction($vpids) {
