@@ -10,7 +10,7 @@ use VersionPress\Database\EntityInfo;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\EntityUtils;
 use VersionPress\Utils\FileSystem;
-use VersionPress\Utils\IniSerializer;
+use VersionPress\Utils\Serialization\IniSerializer;
 
 /**
  * Saves entities to files in a common directory. Useful for entities that either

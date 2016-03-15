@@ -3,7 +3,7 @@ namespace VersionPress\Tests\LoadTests;
 
 use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Tests\Utils\MergeDriverTestUtils;
-use VersionPress\Utils\IniSerializer;
+use VersionPress\Utils\Serialization\IniSerializer;
 
 
 class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase {

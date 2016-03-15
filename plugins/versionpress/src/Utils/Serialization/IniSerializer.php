@@ -1,7 +1,8 @@
 <?php
 
-namespace VersionPress\Utils;
+namespace VersionPress\Utils\Serialization;
 use Nette\Utils\Strings;
+use VersionPress\Utils\StringUtils;
 
 /**
  * Serializes and deserializes data arrays into INI strings.
@@ -169,7 +170,7 @@ class IniSerializer {
         // https://regex101.com/r/cJ6eN0/4
         $stringValueRegEx = "/[ =]\"(.*)(?<!\\\\)\"/sU";
 
-        $iniString = preg_replace_callback($stringValueRegEx, array('self', 'replace_eol_callback'), $iniString);
+        $iniString = preg_replace_callback($stringValueRegEx, array('VersionPress\Utils\Serialization\IniSerializer', 'replace_eol_callback'), $iniString);
 
         return $iniString;
     }
