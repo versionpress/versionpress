@@ -880,6 +880,27 @@ INI
     /**
      * @test
      */
+    public function serializedCustomClassWithSleepMethod() {
+        $object = new IniSerializer_FooWithCleanup('value');
+
+        $serializedString = serialize($object);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <VersionPress\Tests\Unit\IniSerializer_FooWithCleanup>
+data["attribute"] = "value"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
     public function serializedNull() {
         $serializedString = serialize(null);
 

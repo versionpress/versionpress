@@ -250,7 +250,15 @@ class IniSerializer {
             $line .= '<' . get_class($value) . '>';
             $reflection = new \ReflectionObject($value);
             $properties = $reflection->getProperties();
-            foreach ($properties as $property) {
+
+            if (method_exists($value, '__sleep')) {
+                $propertyNames = $value->__sleep();
+            } else {
+                $propertyNames = array_map(function (\ReflectionProperty $property) { return $property->getName(); }, $properties);
+            }
+
+            foreach ($propertyNames as $propertyName) {
+                $property = $reflection->getProperty($propertyName);
                 $property->setAccessible(true);
                 $accesibilityFlag = $property->isPrivate() ? '-' : ($property->isProtected() ? '*' : '');
 
