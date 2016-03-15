@@ -123,4 +123,16 @@ class StringUtils {
         $replace = array_values($variables);
         return str_replace($search, $replace, $templateString);
     }
+
+    /**
+     * Returns true if string is a serialized value (object, array, primitive types, ...).
+     *
+     * @param $value
+     * @return bool
+     */
+    public static function isSerializedValue($value) {
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
+        $test = @unserialize(($value)); // it throws an error and returns false if $value is not a serialized object
+        return $test !== false || $value === 'b:0;';
+    }
 }

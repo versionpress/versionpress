@@ -1,6 +1,7 @@
 <?php
 
 namespace VersionPress\Utils;
+use Nette\Utils\Strings;
 
 /**
  * Serializes and deserializes data arrays into INI strings.
@@ -44,6 +45,7 @@ class IniSerializer {
         "\t" => "<<<tab>>>",
         "=" => "<<<eq>>>",
     );
+    const SERIALIZED_MARKER = '<<<serialized>>>';
 
     /**
      * Serializes sectioned data array into an INI string
@@ -94,7 +96,9 @@ class IniSerializer {
                 foreach ($value as $arrayKey => $arrayValue) {
                     $output[] = self::serializeKeyValuePair($key . "[$arrayKey]", $arrayValue);
                 }
-
+            } elseif (StringUtils::isSerializedValue($value)) {
+                $unserializedValue = unserialize($value);
+                $output[] = self::serializePhpSerializedValue($key, $unserializedValue);
             } else {
                 $output[] = self::serializeKeyValuePair($key, $value);
             }
@@ -139,6 +143,8 @@ class IniSerializer {
         $deserialized = parse_ini_string($string, true, INI_SCANNER_RAW);
         $deserialized = self::restoreTypesOfValues($deserialized);
         $deserialized = self::sanitizeSectionsAndKeys_removePlaceholders($deserialized);
+        $deserialized = self::restorePhpSerializedData($deserialized);
+        $deserialized = self::expandArrays($deserialized);
         $deserialized = self::eolWorkaround_removePlaceholders($deserialized);
         return $deserialized;
     }
@@ -218,7 +224,45 @@ class IniSerializer {
      * @return string
      */
     private static function serializeKeyValuePair($key, $value) {
-        return $key . " = " . (is_numeric($value) ? $value : '"' . self::escapeString($value) . '"');
+        return $key . " = " . self::serializePlainValue($value);
+    }
+
+    private static function serializePhpSerializedValue($key, $value, $isRoot = true) {
+        $line = $key . " = ";
+
+        if ($isRoot) {
+            $line .= self::SERIALIZED_MARKER . ' ';
+        }
+
+        $subitems = [];
+
+        if (is_numeric($value) || is_string($value)) {
+            $line .= self::serializePlainValue($value);
+        } else if (is_bool($value)) {
+            $line .= '<boolean> ' . ($value ? 'true' : 'false');
+        } else if (is_array($value)) {
+            $line .= '<array>';
+            foreach ($value as $arrayKey => $arrayValue) {
+                $subkey = $key . '[' . self::serializePlainValue($arrayKey) . ']';
+                $subitems[] = self::serializePhpSerializedValue($subkey, $arrayValue, false);
+            }
+        } else if (is_object($value)) {
+            $line .= '<' . get_class($value) . '>';
+            $reflection = new \ReflectionObject($value);
+            $properties = $reflection->getProperties();
+            foreach ($properties as $property) {
+                $property->setAccessible(true);
+                $accesibilityFlag = $property->isPrivate() ? '-' : ($property->isProtected() ? '*' : '');
+
+                $propertyValue = $property->getValue($value);
+                $subkey = $key . '["' . $accesibilityFlag . $property->getName() . '"]';
+                $subitems[] = self::serializePhpSerializedValue($subkey, $propertyValue, false);
+            }
+        }
+
+        $output = array_merge([$line], $subitems);
+
+        return self::outputToString($output);
     }
 
     private static function sanitizeSectionsAndKeys_addPlaceholders($string) {
@@ -231,8 +275,8 @@ class IniSerializer {
         }, $string);
 
         // Replace brackets and quotes in keys
-        // https://regex101.com/r/iD5oO0/2
-        $string = preg_replace_callback("/^(.*?)(\\[[^\\]]*\\])? = /m", function ($match) use ($sanitizedChars) {
+        // https://regex101.com/r/iD5oO0/3
+        $string = preg_replace_callback("/^(.*?) = /m", function ($match) use ($sanitizedChars) {
             $keyWithPlaceholders = strtr($match[1], $sanitizedChars);
             return $keyWithPlaceholders . (isset($match[2]) ? $match[2] : "") . " = ";
         }, $string);
@@ -253,6 +297,27 @@ class IniSerializer {
         return $result;
     }
 
+    private static function expandArrays($deserialized) {
+        $dataWithExpandedArrays = [];
+
+        foreach ($deserialized as $key => $value) {
+            if (is_array($value)) {
+                $value = self::expandArrays($value);
+            }
+
+            // https://regex101.com/r/bA6uD2/3
+            if (preg_match("/(.*)\\[([^]]+)\\]$/", $key, $matches)) {
+                $originalKey = $matches[1];
+                $subkey = $matches[2];
+                $dataWithExpandedArrays[$originalKey][$subkey] = $value;
+            } else {
+                $dataWithExpandedArrays[$key] = $value;
+            }
+        }
+
+        return $dataWithExpandedArrays;
+    }
+
     private static function restoreTypesOfValues($deserialized) {
         $result = array();
         foreach ($deserialized as $key => $value) {
@@ -260,10 +325,122 @@ class IniSerializer {
                 $result[$key] = self::restoreTypesOfValues($value);
             } else if (is_numeric($value)) {
                 $result[$key] = $value + 0;
+            } else if ($value === 'true' || $value === 'false') {
+                $result[$key] = $value === 'true';
             } else {
                 $result[$key] = self::unescapeString($value);
             }
         }
         return $result;
+    }
+
+    private static function restorePhpSerializedData($deserialized) {
+        $keysToRestore = [];
+
+        foreach ($deserialized as $key => $value) {
+            if (is_array($value)) {
+                $deserialized[$key] = self::restorePhpSerializedData($value);
+            } else if (Strings::startsWith($value, self::SERIALIZED_MARKER)) {
+                $keysToRestore[] = $key;
+            }
+        }
+
+        foreach ($keysToRestore as $key) {
+            $value = substr($deserialized[$key], strlen(self::SERIALIZED_MARKER) + 1); // + space
+
+            $relatedKeys = self::findRelatedKeys($deserialized, $key);
+
+            foreach ($relatedKeys as $relatedKey => $_) {
+                unset($deserialized[$key . $relatedKey]);
+            }
+
+            $deserialized[$key] = self::convertValueToSerializedString($value, $relatedKeys);
+        }
+
+        return $deserialized;
+    }
+
+    /**
+     * @param $value
+     * @return int|string
+     */
+    private static function serializePlainValue($value) {
+        if (is_numeric($value)) {
+            return $value;
+        }
+
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        return '"' . self::escapeString($value) . '"';
+    }
+
+    private static function convertValueToSerializedString($value, $relatedKeys = []) {
+        if (is_numeric($value)) {
+            return (Strings::contains($value, '.') ? 'd' : 'i') . ':' . $value . ';';
+        } else if (preg_match('/^<([\w\d\\\\]+)> ?(.*)/', $value, $matches)) {
+            $type = $matches[1];
+            $value = $matches[2];
+            if ($type === 'boolean') {
+                return 'b:' . ($value === 'false' ? 0 : 1) . ';';
+            }
+
+            if ($type === 'array' || class_exists($type)) {
+                $items = [];
+                foreach ($relatedKeys as $relatedKey => $valueOfRelatedKey) {
+
+                    $indexAfterFirstOpeningBracket = strpos($relatedKey, '[') + 1;
+                    $indexOfFirstClosingBracket = strpos($relatedKey, ']');
+                    $keyLength = $indexOfFirstClosingBracket - $indexAfterFirstOpeningBracket;
+
+                    $subkey = substr($relatedKey, $indexAfterFirstOpeningBracket, $keyLength);
+
+                    if (class_exists($type)) {
+                        if (strpos($subkey, '*') === 1) {
+                            $subkey = "\"\0*\0" . substr($subkey, 2);
+                        }
+
+                        if (strpos($subkey, '-') === 1) {
+                            $subkey = "\"\0{$type}\0" . substr($subkey, 2);
+                        }
+                    }
+
+                    if (strpos($relatedKey, '[', $indexOfFirstClosingBracket) === false) {
+                        $rel = self::findRelatedKeys($relatedKeys, $relatedKey);
+
+                        $items[] = self::convertValueToSerializedString($subkey) . self::convertValueToSerializedString($valueOfRelatedKey, $rel);
+                    }
+                }
+
+                if ($type === 'array') {
+                    return 'a:' . count($items) . ':{' . join('', $items) . '}';
+                }
+
+                return 'O:' . strlen($type) . ':"' . $type . '":' . count($items) . ':{' . join('', $items) . '}';
+            }
+        }
+
+        if (Strings::startsWith($value, '"')) {
+            $value = preg_replace('/^"(.*)"$/', '$1', $value);
+        }
+        return 's:' . strlen($value) . ':' . self::serializePlainValue($value) . ';';
+    }
+
+    /**
+     * @param $maybeRelatedKeys
+     * @param $commonKey
+     * @return array
+     */
+    private static function findRelatedKeys($maybeRelatedKeys, $commonKey) {
+        $rel = [];
+        $lengthOfCommonPart = strlen($commonKey);
+
+        foreach ($maybeRelatedKeys as $key => $value) {
+            if (Strings::startsWith($key, $commonKey) && $key !== $commonKey) {
+                $rel[substr($key, $lengthOfCommonPart)] = $value;
+            }
+        }
+        return $rel;
     }
 }

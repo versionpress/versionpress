@@ -528,16 +528,20 @@ INI
     }
 
     public function specialCharactersProvider() {
-        return array_map(function ($specialChar) { return array($specialChar);},
+        return array_map(function ($specialChar) {
+            return array($specialChar);
+        },
             array(
-                "\\", "\"", "[]", "$", "%","'", ";", "+", "-", "/", "#", "&", "!", ".",
+                "\\", "\"", "[]", "$", "%", "'", ";", "+", "-", "/", "#", "&", "!", ".",
                 "~", "^", "`", "?", ":", ",", "*", "<", ">", "(", ")", "@", "{", "}",
                 "|", "_", " ", "\t", "ěščřžýáíéúůóďťňôâĺ", "茶", "русский", "حصان", "="));
     }
 
     public function specialCharactersInValueProvider() {
         // Double quotes are escaped see WP-458
-        return array_filter($this->specialCharactersProvider(), function($val) { return $val[0] !== "\""; });
+        return array_filter($this->specialCharactersProvider(), function ($val) {
+            return $val[0] !== "\"";
+        });
     }
 
     /**
@@ -569,6 +573,302 @@ INI
         $ini = StringUtils::crlfize(<<<'INI'
 [Section.Name]
 key = "value"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedString() {
+        $serializedString = serialize('some string');
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> "some string"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedNumber() {
+        $serializedString = serialize(777);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> 777
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedBoolean() {
+        $serializedString = serialize(false);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <boolean> false
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedEmptyArray() {
+        $serializedString = serialize([]);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedArrayWithString() {
+        $serializedString = serialize(['some string']);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = "some string"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedOption() {
+        $sidebarWidgets = [
+            'wp_inactive_widgets' => [],
+            'sidebar-1' => ['search-2', 'recent-posts-2', 'recent-comments-2'],
+            'array_version' => 3,
+        ];
+
+
+        $serializedString = serialize($sidebarWidgets);
+
+        $data = ["sidebar_widgets" => ["option_value" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[sidebar_widgets]
+option_value = <<<serialized>>> <array>
+option_value["wp_inactive_widgets"] = <array>
+option_value["sidebar-1"] = <array>
+option_value["sidebar-1"][0] = "search-2"
+option_value["sidebar-1"][1] = "recent-posts-2"
+option_value["sidebar-1"][2] = "recent-comments-2"
+option_value["array_version"] = 3
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedComplexArray() {
+        $array = [
+            'numeric index',
+            'string index' => 1234,
+            'nested array' => [0 => 'some', 345 => 'sparse', 1234 => 'array'],
+            'even more nested arrays' => [['array', ['in array', ['in array', 'with mixed' => 'keys']]]],
+            'and bool' => true
+        ];
+
+
+        $serializedString = serialize($array);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = "numeric index"
+data["string index"] = 1234
+data["nested array"] = <array>
+data["nested array"][0] = "some"
+data["nested array"][345] = "sparse"
+data["nested array"][1234] = "array"
+data["even more nested arrays"] = <array>
+data["even more nested arrays"][0] = <array>
+data["even more nested arrays"][0][0] = "array"
+data["even more nested arrays"][0][1] = <array>
+data["even more nested arrays"][0][1][0] = "in array"
+data["even more nested arrays"][0][1][1] = <array>
+data["even more nested arrays"][0][1][1][0] = "in array"
+data["even more nested arrays"][0][1][1]["with mixed"] = "keys"
+data["and bool"] = <boolean> true
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedEmptyStdClass() {
+        $serializedString = serialize(new \stdClass());
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <stdClass>
+
+INI
+        );
+
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+        $this->assertSame($ini, IniSerializer::serialize($data));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedStdClassWithAttribute() {
+        $object = new \stdClass();
+        $object->attribute = 'value';
+
+        $serializedString = serialize($object);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <stdClass>
+data["attribute"] = "value"
+
+INI
+        );
+
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+        $this->assertSame($ini, IniSerializer::serialize($data));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedStdClassWithMultipleAttributes() {
+        $object = new \stdClass();
+        $object->stringAttribute = 'value';
+        $object->numericAttribute = 1.004;
+        $object->boolAttribute = false;
+        $object->arrayAttribute = ['array'];
+
+        $serializedString = serialize($object);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <stdClass>
+data["stringAttribute"] = "value"
+data["numericAttribute"] = 1.004
+data["boolAttribute"] = <boolean> false
+data["arrayAttribute"] = <array>
+data["arrayAttribute"][0] = "array"
+
+INI
+        );
+
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+        $this->assertSame($ini, IniSerializer::serialize($data));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedCustomClassWithPublicAttribute() {
+        $object = new IniSerializer_FooPublic('value');
+
+        $serializedString = serialize($object);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <VersionPress\Tests\Unit\IniSerializer_FooPublic>
+data["attribute"] = "value"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedCustomClassWithProtectedAttribute() {
+        $object = new IniSerializer_FooProtected('value');
+
+        $serializedString = serialize($object);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <VersionPress\Tests\Unit\IniSerializer_FooProtected>
+data["*attribute"] = "value"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedCustomClassWithPrivateAttribute() {
+        $object = new IniSerializer_FooPrivate('value');
+
+        $serializedString = serialize($object);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <VersionPress\Tests\Unit\IniSerializer_FooPrivate>
+data["-attribute"] = "value"
 
 INI
         );
