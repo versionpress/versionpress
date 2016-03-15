@@ -368,7 +368,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $updateSql .= join(", ", ArrayUtils::parametrize($newReferences));
 
         $updateSql .= " WHERE $idColumnName=(SELECT id FROM $vpIdTable WHERE vp_id=UNHEX(\"$entity[vp_id]\"))";
-        $this->database->vp_query($updateSql);
+        $this->database->vp_direct_query($updateSql);
     }
 
     /**
@@ -407,7 +407,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $updateSql .= join(", ", ArrayUtils::parametrize($newReferences));
 
         $updateSql .= " WHERE $idColumnName=(SELECT id FROM $vpIdTable WHERE vp_id=UNHEX(\"$entity[vp_id]\"))";
-        $this->database->vp_query($updateSql);
+        $this->database->vp_direct_query($updateSql);
     }
 
     private function fixMnReferences($entities) {
@@ -446,15 +446,15 @@ abstract class SynchronizerBase implements Synchronizer {
 
             if ($this->selectiveSynchronization) {
                 if (count($processedIds) > 0) {
-                    $this->database->vp_query("DELETE FROM $prefixedTable WHERE $sourceColumn IN (" . join(", ", $processedIds) . ")");
+                    $this->database->vp_direct_query("DELETE FROM $prefixedTable WHERE $sourceColumn IN (" . join(", ", $processedIds) . ")");
                 }
             } else {
-                $this->database->vp_query("TRUNCATE TABLE $prefixedTable");
+                $this->database->vp_direct_query("TRUNCATE TABLE $prefixedTable");
             }
 
             $valuesString = join(", ", $valuesForInsert);
             $insertSql = "INSERT IGNORE INTO $prefixedTable ($sourceColumn, $targetColumn) VALUES $valuesString";
-            $this->database->vp_query($insertSql);
+            $this->database->vp_direct_query($insertSql);
         }
 
         return true;
@@ -509,7 +509,7 @@ abstract class SynchronizerBase implements Synchronizer {
      * @return false|int
      */
     private function executeQuery($query) {
-        $result = $this->database->vp_query($query);
+        $result = $this->database->vp_direct_query($query);
         return $result;
     }
 

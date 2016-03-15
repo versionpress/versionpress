@@ -165,10 +165,13 @@ class ReplacerMethods {
     }
 
     /**
+     * Calls original wpdb.query() method without VersionPress mirroring functionality.
+     * Used in cases when VersionPress calls database for its internal needs
      * @since VersionPress
      * @param $query
+     * @return mixed
      */
-    public function vp_query($query) {
+    public function vp_direct_query($query) {
         $this->vp_use_original_query_method = true;
         $r = $this->query($query);
         $this->vp_use_original_query_method = false;

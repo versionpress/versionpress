@@ -99,15 +99,15 @@ class VpidRepository {
     public function deleteId($entityName, $id) {
         $vpIdTableName = $this->schemaInfo->getPrefixedTableName('vp_id');
         $tableName = $this->schemaInfo->getTableName($entityName);
-        $deleteQuery = "DELETE FROM $vpIdTableName WHERE `table` = \"$tableName\" AND id = $id";
-        $this->database->vp_query($deleteQuery);
+        $deleteQuery = "DELETE FROM $vpIdTableName WHERE `table` = \"$tableName\" AND id = '$id'";
+        $this->database->vp_direct_query($deleteQuery);
     }
 
     private function saveId($entityName, $id, $vpId) {
         $vpIdTableName = $this->schemaInfo->getPrefixedTableName('vp_id');
         $tableName = $this->schemaInfo->getTableName($entityName);
         $query = "INSERT INTO $vpIdTableName (`vp_id`, `table`, `id`) VALUES (UNHEX('$vpId'), \"$tableName\", $id)";
-        $this->database->vp_query($query);
+        $this->database->vp_direct_query($query);
     }
 
     private function fillId($entityName, $data, $id) {

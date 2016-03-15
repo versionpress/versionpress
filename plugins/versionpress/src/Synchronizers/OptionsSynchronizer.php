@@ -61,7 +61,7 @@ class OptionsSynchronizer implements Synchronizer {
             $syncQuery[strlen($syncQuery) - 1] = " "; // strip last comma
             $syncQuery .= " ON DUPLICATE KEY UPDATE option_value = VALUES(option_value), autoload = VALUES(autoload);";
 
-            $this->database->vp_query($syncQuery);
+            $this->database->vp_direct_query($syncQuery);
         }
 
         $entityInfo = $this->dbSchema->getEntityInfo('option');
@@ -86,7 +86,7 @@ class OptionsSynchronizer implements Synchronizer {
             $deleteSql .= " AND option_name IN ($restrictionForBasicSet)";
         }
 
-        $this->database->vp_query($deleteSql);
+        $this->database->vp_direct_query($deleteSql);
         return array();
     }
 

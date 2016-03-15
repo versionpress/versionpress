@@ -6,22 +6,37 @@ namespace VersionPress\Database;
 class ParsedQueryData {
 
     /**
+     * Table name parsed from the source sql query. Usually prefixed e.g. `wp_posts`
+     *
      * @var string
      */
     public $table;
 
 
     /**
+     * VersionPress entity name resolved from `wordpress-schema.neon` and $table
+     *
      * @var string
      */
     public $entityName;
 
     /**
+     * List of record Ids which are/will be affected by parsed query
+     *
      * @var array
      */
     public $ids;
 
     /**
+     * Data statements which will be applied to database when UPDATE or INSERT is performed.
+     *
+     * Example structure:
+     *
+     *  [data] => 
+     * [
+     *      [ column => post_modified, value => NOW() ],
+     *      [ column => another_column, value => 123 ]
+     * ]
      * @var array;
      */
     public $data;
@@ -29,15 +44,20 @@ class ParsedQueryData {
     
 
     /**
+     * SELECT query created from provided source query (INSERT, UPDATE, DELETE)
+     *
      * @var string
      */
     public $sqlQuery;
 
-
+    /**
+     * Id column name resolved from `wordpress-schema.neon` and $table
+     * @var string
+     */
     public $idColumnName;
 
     /**
-     * @var string
+     * @var string Internal enumeration of queries which are currently supoorted by SqlQueryParser
      */
     public $queryType;
 

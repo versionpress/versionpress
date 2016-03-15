@@ -24,7 +24,7 @@ class ExtendedWpdb extends wpdb {
         return parent::get_row($query, $output, $y);
     }
 
-    public function vp_query($query) {
+    public function vp_direct_query($query) {
         return parent::query($query);
     }
 

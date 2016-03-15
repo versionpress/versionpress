@@ -8,12 +8,11 @@ use SqlParser\Statement;
 use SqlParser\Statements\DeleteStatement;
 use SqlParser\Statements\InsertStatement;
 use SqlParser\Statements\UpdateStatement;
-use VersionPress\Database\DbSchemaInfo;
 
 class SqlQueryParser {
 
     /**
-     * @var \VersionPress\Database\DbSchemaInfo
+     * @var DbSchemaInfo
      */
     private $schema;
 
@@ -24,7 +23,7 @@ class SqlQueryParser {
 
     /**
      * SqlQueryParser constructor.
-     * @param \VersionPress\Database\DbSchemaInfo $schema
+     * @param DbSchemaInfo $schema
      * @param \wpdb $wpdb
      */
     public function __construct($schema, $wpdb) {
@@ -55,7 +54,7 @@ class SqlQueryParser {
      * Parses UPDATE query
      *
      * @param SqlParser\Parser $parser
-     * @param \VersionPress\Database\DbSchemaInfo $schema
+     * @param DbSchemaInfo $schema
      * @param string $query
      * @param \wpdb $wpdb
      * @return ParsedQueryData
@@ -123,7 +122,7 @@ class SqlQueryParser {
      *
      * @param SqlParser\Parser $parser
      * @param string $query
-     * @param \VersionPress\Database\DbSchemaInfo $schema
+     * @param DbSchemaInfo $schema
      * @param $wpdb \wpdb
      * @return ParsedQueryData
      */
@@ -180,15 +179,11 @@ class SqlQueryParser {
      * Gets data which needs to be set by UPDATE statement
      *
      * Example
-     *
-     * [data] => Array
-     *     (
-     *         [0] => Array
-     *               (
-     *                   [column] => post_modified
-     *                   [value] => NOW()
-     *               )
-     *     )
+     * [data] =>
+     *  [
+     *          [ column => post_modified, value => NOW() ],
+     *          [ column => another_column, value => 123 ]
+     *  ]
      * @param SqlParser\Statements\Statement $sqlStatement
      * @return array
      */
@@ -197,17 +192,25 @@ class SqlQueryParser {
         if ($sqlStatement instanceof UpdateStatement) {
             $dataSet = [];
             foreach ($sqlStatement->set as $set) {
-                $dataSet[str_replace('`', '', $set->column)] = $set->value;
+                if(is_string($set->value)) {
+                    $dataSet[str_replace('`', '', $set->column)] = stripslashes($set->value);
+                } else {
+                    $data[$columns[$i]] = $set->value;
+                }
+                
             };
             return $dataSet;
         } elseif ($sqlStatement instanceof InsertStatement) {
             $columns = $sqlStatement->into->columns;
             $dataToSet = [];
-            for ($i = 0; $i < count($sqlStatement->values); $i++) {
-                $sets = $sqlStatement->values[$i];
+            foreach($sqlStatement->values as $sets) {
                 $data = [];
-                for ($j = 0; $j < count($sets->values); $j++) {
-                    $data[$columns[$j]] = stripslashes($sets->values[$j]);
+                foreach ($sets->values as $i => $value) {
+                    if(is_string($value)) {
+                        $data[$columns[$i]] = stripslashes($value);
+                    } else {
+                        $data[$columns[$i]] = $value;
+                    }
                 }
                 array_push($dataToSet, $data);
             }
