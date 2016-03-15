@@ -103,7 +103,7 @@ class Reverter {
         $dateGmt = current_time('mysql', true);
         foreach ($vpIds as $vpId) {
             $sql = "update {$this->database->prefix}posts set post_modified = '{$date}', post_modified_gmt = '{$dateGmt}' where ID = (select id from {$this->database->prefix}vp_id where vp_id = unhex('{$vpId}'))";
-            $this->database->query($sql);
+            $this->database->vp_direct_query($sql);
             $post = $storage->loadEntity($vpId, null);
             $post['post_modified'] = $date;
             $post['post_modified_gmt'] = $dateGmt;

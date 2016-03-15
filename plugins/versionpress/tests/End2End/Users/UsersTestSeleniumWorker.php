@@ -135,6 +135,14 @@ class UsersTestSeleniumWorker extends SeleniumWorker implements IUsersTestWorker
         $this->waitAfterRedirect();
     }
 
+    public function prepare_deleteUsermeta() {
+            throw new \PHPUnit_Framework_SkippedTestError("There is no way to delete one usermeta directly in the GUI");
+    }
+
+    public function deleteUsermeta() {
+    }
+
+
     public function tearDownAfterClass() {
         $users = json_decode(self::$wpAutomation->runWpCliCommand('user', 'list', array('format' => 'json')));
         $userLogins = array_map(function ($user) { return $user->user_login; }, $users);

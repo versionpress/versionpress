@@ -88,14 +88,15 @@ class WpdbMirrorBridge {
         }
     }
 
-    function delete($table, $where) {
+    function delete($table, $where, $parentIds) {
         if ($this->disabled) {
             return;
         }
 
         $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($table);
 
-        if (!$entityInfo) return;
+        if (!$entityInfo)
+            return;
 
         $entityName = $entityInfo->entityName;
 
@@ -113,12 +114,68 @@ class WpdbMirrorBridge {
             }
 
             if ($this->dbSchemaInfo->isChildEntity($entityName) && !isset($where["vp_{$entityInfo->parentReference}"])) {
-                $where = $this->fillParentId($entityName, $where, $id);
+                $where["vp_{$entityInfo->parentReference}"] = $parentIds[$id];
             }
 
             $this->vpidRepository->deleteId($entityName, $id);
             $this->mirror->delete($entityName, $where);
         }
+    }
+
+    /**
+     * Fill parentIds of child entities and returns them as associative array in `$id => $parentId` format.
+     * Returns FALSE when table contains entity which is not an childEntity.
+     *
+     * @param $table
+     * @param $where
+     * @return array|bool
+     */
+    public function getParentIdsBeforeDelete($table, $where) {
+        $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($table);
+        if (!$this->dbSchemaInfo->isChildEntity($entityInfo->entityName)) {
+            return false;
+        }
+
+        $ids = $this->detectAllAffectedIds($entityInfo->entityName, $where, $where);
+        $parentIds = [];
+        foreach ($ids as $id) {
+            $parentIds[$id] = $this->fillParentId($entityInfo->entityName,$entityInfo,$id);
+        }
+        return $parentIds;
+
+    }
+
+
+    /**
+     * @param ParsedQueryData $parsedQueryData
+     */
+    function query($parsedQueryData) {
+        if ($this->disabled) {
+            return;
+        }
+
+        $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($parsedQueryData->table);
+
+        if (!$entityInfo)
+            return;
+
+
+        switch ($parsedQueryData->queryType) {
+            case ParsedQueryData::UPDATE_QUERY:
+                $this->processUpdateQuery($parsedQueryData);
+                break;
+            case  ParsedQueryData::DELETE_QUERY:
+                $this->processDeleteQuery($parsedQueryData, $entityInfo);
+                break;
+            case ParsedQueryData::INSERT_QUERY:
+                $this->processInsertQuery($parsedQueryData);
+                break;
+            case ParsedQueryData::INSERT_UPDATE_QUERY:
+                $this->processInsertUpdateQuery($parsedQueryData);
+                break;
+        }
+
+
     }
 
     /**
@@ -155,12 +212,7 @@ class WpdbMirrorBridge {
             $entityInfo = $this->dbSchemaInfo->getEntityInfo($entityName);
             $parentVpReference = "vp_" . $entityInfo->parentReference;
             if (!isset($data[$parentVpReference])) {
-                $table = $this->dbSchemaInfo->getPrefixedTableName($entityName);
-                $parentTable = $this->dbSchemaInfo->getTableName($entityInfo->references[$entityInfo->parentReference]);
-                $vpidTable = $this->dbSchemaInfo->getPrefixedTableName('vp_id');
-                $parentVpidSql = "SELECT HEX(vpid.vp_id) FROM {$table} t JOIN {$vpidTable} vpid ON t.{$entityInfo->parentReference} = vpid.id AND `table` = '{$parentTable}' WHERE {$entityInfo->idColumnName} = $id";
-                $parentVpid = $this->database->get_var($parentVpidSql);
-                $data[$parentVpReference] = $parentVpid;
+               $data[$parentVpReference] = $this->fillParentId($entityName, $entityInfo, $id);
             }
         }
 
@@ -220,18 +272,17 @@ class WpdbMirrorBridge {
         return $this->getIdsForRestriction($entityName, $where);
     }
 
-    private function fillParentId($metaEntityName, $where, $id) {
-        $entityInfo = $this->dbSchemaInfo->getEntityInfo($metaEntityName);
-        $parentReference = $entityInfo->parentReference;
+    private function fillParentId($metaEntityName, $entityInfo, $id) {
 
+        $parentReference = $entityInfo->parentReference;
         $parent = $entityInfo->references[$parentReference];
         $vpIdTable = $this->dbSchemaInfo->getPrefixedTableName('vp_id');
         $entityTable = $this->dbSchemaInfo->getPrefixedTableName($metaEntityName);
         $parentTable = $this->dbSchemaInfo->getTableName($parent);
         $idColumnName = $this->dbSchemaInfo->getEntityInfo($metaEntityName)->idColumnName;
 
-        $where["vp_{$parentReference}"] = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '{$parentTable}' AND ID = (SELECT {$parentReference} FROM $entityTable WHERE {$idColumnName} = $id)");
-        return $where;
+        return $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '{$parentTable}' AND ID = (SELECT {$parentReference} FROM $entityTable WHERE {$idColumnName} = '$id')");
+
     }
 
     /**
@@ -241,4 +292,102 @@ class WpdbMirrorBridge {
         $this->disabled = true;
     }
 
+    /**
+     * Processes ParsedQueryData from UPDATE query and stores updated entity/entities data into Storage.
+     *
+     * @param ParsedQueryData $parsedQueryData
+     */
+    private function processUpdateQuery($parsedQueryData) {
+
+        foreach ($parsedQueryData->ids as $id) {
+            $data = $this->database->get_results("SELECT * FROM {$parsedQueryData->table} WHERE {$parsedQueryData->idColumnName} = '{$id}'", ARRAY_A)[0];
+            $data = $this->vpidRepository->replaceForeignKeysWithReferences($parsedQueryData->entityName, $data);
+            $this->updateEntity($data, $parsedQueryData->entityName, $id);
+        }
+    }
+
+    /**
+     * Process ParsedQueryData from DELETE query and deletes entity/entities data from Storage.
+     * Source parsed query does not contain any special Sql functions (e.g. NOW)
+     *
+     * @param ParsedQueryData $parsedQueryData
+     * @param $entityInfo
+     */
+    private function processDeleteQuery($parsedQueryData, $entityInfo) {
+        if (!$entityInfo->usesGeneratedVpids) {
+            foreach ($parsedQueryData->ids as $id) {
+                $where[$parsedQueryData->idColumnName] = $id;
+                $this->vpidRepository->deleteId($parsedQueryData->entityName, $id);
+                $this->mirror->delete($parsedQueryData->entityName, $where);
+            }
+            return;
+        }
+        foreach ($parsedQueryData->ids as $id) {
+            $where['vp_id'] = $this->vpidRepository->getVpidForEntity($parsedQueryData->entityName, $id);
+            if (!$where['vp_id']) {
+                continue; // already deleted - deleting postmeta is sometimes called twice
+            }
+
+            if ($this->dbSchemaInfo->isChildEntity($parsedQueryData->entityName)) {
+                $parentVpReference = "vp_" . $entityInfo->parentReference;
+                $where[$parentVpReference] = $this->fillParentId($parsedQueryData->entityName, $entityInfo, $id);
+            }
+
+            $this->vpidRepository->deleteId($parsedQueryData->entityName, $id);
+            $this->mirror->delete($parsedQueryData->entityName, $where);
+        }
+    }
+
+    /**
+     * Process ParsedQueryData from INSERT query and stores affected entity into Storage.
+     * Source parsed query does not contain any special Sql functions (e.g. NOW)
+     *
+     * @param ParsedQueryData $parsedQueryData
+     */
+    private function processInsertQuery($parsedQueryData) {
+
+
+        $id = $this->database->insert_id;
+        $entitiesCount = count($parsedQueryData->data);
+
+        for ($i = 0; $i < $entitiesCount; $i++) {
+            $data = $this->vpidRepository->replaceForeignKeysWithReferences($parsedQueryData->entityName, $parsedQueryData->data[$i]);
+            $shouldBeSaved = $this->mirror->shouldBeSaved($parsedQueryData->entityName, $data);
+
+            if (!$shouldBeSaved) {
+                continue;
+            }
+            $data = $this->vpidRepository->identifyEntity($parsedQueryData->entityName, $data, ($id - $i));
+            $this->mirror->save($parsedQueryData->entityName, $data);
+        }
+    }
+
+    /**
+     * Processes ParsedQueryData from INSERT ... ON DUPLICATE UPDATE query and stores changes into Storage
+     *
+     * @param ParsedQueryData $parsedQueryData
+     */
+    private function processInsertUpdateQuery($parsedQueryData) {
+
+        if ($parsedQueryData->ids != 0) {
+            $id = $parsedQueryData->ids;
+            $data = $this->vpidRepository->replaceForeignKeysWithReferences($parsedQueryData->entityName, $parsedQueryData->data[0]);
+            $shouldBeSaved = $this->mirror->shouldBeSaved($parsedQueryData->entityName, $data);
+
+            if (!$shouldBeSaved) {
+                return;
+            }
+            $data = $this->vpidRepository->identifyEntity($parsedQueryData->entityName, $data, $id);
+            $this->mirror->save($parsedQueryData->entityName, $data);
+        } else {
+            $data = $this->database->get_results($parsedQueryData->sqlQuery, ARRAY_A)[0];
+            $data = $this->vpidRepository->replaceForeignKeysWithReferences($parsedQueryData->entityName, $data);
+            $this->updateEntity($data, $parsedQueryData->entityName, $data[$parsedQueryData->idColumnName]);
+        }
+
+    }
+
+
 }
+
+

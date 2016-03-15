@@ -49,6 +49,14 @@ class UsersTestWpCliWorker extends WpCliWorker implements IUsersTestWorker {
         $this->wpAutomation->runWpCliCommand('user', 'meta', array('update', $this->userId, 'first_name', $this->originalFirstName));
     }
 
+    function prepare_deleteUsermeta() {
+        $this->createUser();
+    }
+
+    public function deleteUsermeta() {
+        $this->wpAutomation->runWpCliCommand('user', 'meta', array('delete', $this->userId, 'last_name'));
+    }
+
     public function prepare_deleteUser() {
     }
 

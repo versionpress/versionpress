@@ -28,6 +28,9 @@ interface IUsersTestWorker extends ITestWorker {
 
     public function prepare_editTwoUsermeta();
     public function editTwoUsermeta();
+    
+    public function prepare_deleteUsermeta();
+    public function deleteUsermeta();
 
     public function tearDownAfterClass();
 }
