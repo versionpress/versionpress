@@ -32,7 +32,6 @@ class ParsedQueryData {
      *
      * Example structure:
      *
-     *  [data] => 
      * [
      *      [ column => post_modified, value => NOW() ],
      *      [ column => another_column, value => 123 ]

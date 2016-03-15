@@ -179,7 +179,6 @@ class SqlQueryParser {
      * Gets data which needs to be set by UPDATE statement
      *
      * Example
-     * [data] =>
      *  [
      *          [ column => post_modified, value => NOW() ],
      *          [ column => another_column, value => 123 ]
@@ -192,21 +191,21 @@ class SqlQueryParser {
         if ($sqlStatement instanceof UpdateStatement) {
             $dataSet = [];
             foreach ($sqlStatement->set as $set) {
-                if(is_string($set->value)) {
+                if (is_string($set->value)) {
                     $dataSet[str_replace('`', '', $set->column)] = stripslashes($set->value);
                 } else {
                     $data[$columns[$i]] = $set->value;
                 }
-                
+
             };
             return $dataSet;
         } elseif ($sqlStatement instanceof InsertStatement) {
             $columns = $sqlStatement->into->columns;
             $dataToSet = [];
-            foreach($sqlStatement->values as $sets) {
+            foreach ($sqlStatement->values as $sets) {
                 $data = [];
                 foreach ($sets->values as $i => $value) {
-                    if(is_string($value)) {
+                    if (is_string($value)) {
                         $data[$columns[$i]] = stripslashes($value);
                     } else {
                         $data[$columns[$i]] = $value;
