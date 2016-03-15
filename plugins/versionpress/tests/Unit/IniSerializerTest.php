@@ -876,4 +876,22 @@ INI
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
     }
+
+    /**
+     * @test
+     */
+    public function serializedNull() {
+        $serializedString = serialize(null);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <null>
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
 }

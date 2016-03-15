@@ -258,6 +258,8 @@ class IniSerializer {
                 $subkey = $key . '["' . $accesibilityFlag . $property->getName() . '"]';
                 $subitems[] = self::serializePhpSerializedValue($subkey, $propertyValue, false);
             }
+        } else if (is_null($value)) {
+            $line .= '<null>';
         }
 
         $output = array_merge([$line], $subitems);
@@ -418,6 +420,10 @@ class IniSerializer {
                 }
 
                 return 'O:' . strlen($type) . ':"' . $type . '":' . count($items) . ':{' . join('', $items) . '}';
+            }
+
+            if ($type === 'null') {
+                return 'N;';
             }
         }
 
