@@ -15,7 +15,7 @@ class WpdbMirrorBridge {
     /** @var DbSchemaInfo */
     private $dbSchemaInfo;
 
-    /** @var \wpdb */
+    /** @var Database */
     private $database;
 
     /** @var VpidRepository */
@@ -27,8 +27,8 @@ class WpdbMirrorBridge {
     /** @var bool */
     private $disabled;
 
-    function __construct($wpdb, Mirror $mirror, DbSchemaInfo $dbSchemaInfo, VpidRepository $vpidRepository, ShortcodesReplacer $shortcodesReplacer) {
-        $this->database = $wpdb;
+    function __construct($database, Mirror $mirror, DbSchemaInfo $dbSchemaInfo, VpidRepository $vpidRepository, ShortcodesReplacer $shortcodesReplacer) {
+        $this->database = $database;
         $this->mirror = $mirror;
         $this->dbSchemaInfo = $dbSchemaInfo;
         $this->vpidRepository = $vpidRepository;
@@ -40,7 +40,7 @@ class WpdbMirrorBridge {
             return;
         }
 
-        $id = $this->database->insert_id;
+        $id = $this->database->getLastInsertedId();
         $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($table);
 
         if (!$entityInfo) {
@@ -199,7 +199,7 @@ class WpdbMirrorBridge {
                 array_keys($where)
             )
         );
-        $ids = $this->database->get_col($this->database->prepare($sql, $where));
+        $ids = $this->database->getColumn($this->database->prepareStatement($sql, $where));
         return $ids;
     }
 
@@ -234,7 +234,7 @@ class WpdbMirrorBridge {
             return;
         }
 
-        $postmeta = $this->database->get_results("SELECT meta_id, meta_key, meta_value FROM {$this->database->postmeta} WHERE post_id = {$id}", ARRAY_A);
+        $postmeta = $this->database->getResults("SELECT meta_id, meta_key, meta_value FROM {$this->database->getPostmeta()} WHERE post_id = {$id}", ARRAY_A);
         foreach ($postmeta as $meta) {
             $meta['vp_post_id'] = $data['vp_id'];
 
@@ -281,7 +281,7 @@ class WpdbMirrorBridge {
         $parentTable = $this->dbSchemaInfo->getTableName($parent);
         $idColumnName = $this->dbSchemaInfo->getEntityInfo($metaEntityName)->idColumnName;
 
-        return $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '{$parentTable}' AND ID = (SELECT {$parentReference} FROM $entityTable WHERE {$idColumnName} = '$id')");
+        return $this->database->getVariable("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '{$parentTable}' AND ID = (SELECT {$parentReference} FROM $entityTable WHERE {$idColumnName} = '$id')");
 
     }
 
@@ -300,7 +300,7 @@ class WpdbMirrorBridge {
     private function processUpdateQuery($parsedQueryData) {
 
         foreach ($parsedQueryData->ids as $id) {
-            $data = $this->database->get_results("SELECT * FROM {$parsedQueryData->table} WHERE {$parsedQueryData->idColumnName} = '{$id}'", ARRAY_A)[0];
+            $data = $this->database->getResults("SELECT * FROM {$parsedQueryData->table} WHERE {$parsedQueryData->idColumnName} = '{$id}'", ARRAY_A)[0];
             $data = $this->vpidRepository->replaceForeignKeysWithReferences($parsedQueryData->entityName, $data);
             $this->updateEntity($data, $parsedQueryData->entityName, $id);
         }
@@ -347,7 +347,7 @@ class WpdbMirrorBridge {
     private function processInsertQuery($parsedQueryData) {
 
 
-        $id = $this->database->insert_id;
+        $id = $this->database->getLastInsertedId();
         $entitiesCount = count($parsedQueryData->data);
 
         for ($i = 0; $i < $entitiesCount; $i++) {
@@ -380,7 +380,7 @@ class WpdbMirrorBridge {
             $data = $this->vpidRepository->identifyEntity($parsedQueryData->entityName, $data, $id);
             $this->mirror->save($parsedQueryData->entityName, $data);
         } else {
-            $data = $this->database->get_results($parsedQueryData->sqlQuery, ARRAY_A)[0];
+            $data = $this->database->getResults($parsedQueryData->sqlQuery, ARRAY_A)[0];
             $data = $this->vpidRepository->replaceForeignKeysWithReferences($parsedQueryData->entityName, $data);
             $this->updateEntity($data, $parsedQueryData->entityName, $data[$parsedQueryData->idColumnName]);
         }

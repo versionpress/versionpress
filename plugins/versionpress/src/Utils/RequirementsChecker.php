@@ -5,6 +5,7 @@ namespace VersionPress\Utils;
 use Exception;
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
+use VersionPress\Database\Database;
 use VersionPress\Utils\SystemInfo;
 use VersionPress\Database\DbSchemaInfo;
 use wpdb;
@@ -12,7 +13,7 @@ use wpdb;
 class RequirementsChecker {
     private $requirements = array();
     /**
-     * @var wpdb
+     * @var Database
      */
     private $database;
     /**
@@ -38,9 +39,9 @@ class RequirementsChecker {
     /** @var bool */
     private $isEverythingFulfilled;
 
-    function __construct($wpdb, DbSchemaInfo $schema) {
+    function __construct($database, DbSchemaInfo $schema) {
 
-        $this->database = $wpdb;
+        $this->database = $database;
         $this->schema = $schema;
 
         // Markdown can be used in the 'help' field
@@ -295,7 +296,7 @@ class RequirementsChecker {
 
         foreach ($entities as $entity) {
             $table = $this->schema->getPrefixedTableName($entity);
-            $totalEntitiesCount += $this->database->get_var("SELECT COUNT(*) FROM $table");
+            $totalEntitiesCount += $this->database->getVariable("SELECT COUNT(*) FROM $table");
         }
 
         return $totalEntitiesCount;

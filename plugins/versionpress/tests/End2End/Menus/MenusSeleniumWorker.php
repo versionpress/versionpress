@@ -2,6 +2,7 @@
 
 namespace VersionPress\Tests\End2End\Menus;
 
+use VersionPress\Database\Database;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Reverter;
 use VersionPress\Tests\End2End\Utils\SeleniumWorker;
@@ -68,7 +69,8 @@ class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker
         $wpdb = new \wpdb($dbUser, $dbPassword, $dbName, $dbHost);
         $wpdb->set_prefix(self::$testConfig->testSite->dbTablePrefix);
         $deleteOrphanedFilesSeconds = Reverter::DELETE_ORPHANED_POSTS_SECONDS;
-        $wpdb->query($wpdb->prepare("UPDATE $wpdb->postmeta SET meta_value = meta_value - $deleteOrphanedFilesSeconds WHERE meta_key='_menu_item_orphaned' ORDER BY meta_id DESC LIMIT 1", array()));
+        $database = new Database($wpdb);
+        $database->query($wpdb->prepare("UPDATE $database->getPostmeta() SET meta_value = meta_value - $deleteOrphanedFilesSeconds WHERE meta_key='_menu_item_orphaned' ORDER BY meta_id DESC LIMIT 1", array()));
 
         $updateConfigArgs = array('VERSIONPRESS_GUI', 'html', 'require' => 'wp-content/plugins/versionpress/src/Cli/vp-internal.php');
         self::$wpAutomation->runWpCliCommand('vp-internal', 'update-config', $updateConfigArgs);

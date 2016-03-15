@@ -2,6 +2,7 @@
 
 namespace VersionPress\Tests\Utils;
 
+use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesInfo;
 use VersionPress\Database\ShortcodesReplacer;
@@ -22,7 +23,12 @@ class DBAsserter {
     private static $testConfig;
     /** @var \mysqli */
     private static $database;
-    /** @var \wpdb */
+    /** @var Database */
+    private static $vp_database;
+
+    /**
+     * @var \wpdb
+     */
     private static $wpdb;
     /** @var ShortcodesReplacer */
     private static $shortcodesReplacer;
@@ -66,12 +72,12 @@ class DBAsserter {
         self::$database = new \mysqli($dbHost, $dbUser, $dbPassword, $dbName);
         self::$wpdb = new \wpdb($dbUser, $dbPassword, $dbName, $dbHost);
         self::$wpdb->set_prefix($dbPrefix);
-
+        self::$vp_database = new Database(self::$wpdb);
         $shortcodesInfo = new ShortcodesInfo($shortcodeFile);
-        $vpidRepository = new VpidRepository(self::$wpdb, self::$schemaInfo);
+        $vpidRepository = new VpidRepository(self::$vp_database, self::$schemaInfo);
         self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo,$vpidRepository);
 
-        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$wpdb, $taxonomies);
+        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$vp_database, $taxonomies);
 
         self::defineGlobalVariables();
     }

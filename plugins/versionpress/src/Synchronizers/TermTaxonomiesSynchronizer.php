@@ -16,9 +16,9 @@ class TermTaxonomiesSynchronizer extends SynchronizerBase {
     }
 
     function synchronize($task, $entitiesToSynchronize = null) {
-        $this->database->vp_direct_query("drop index term_id_taxonomy on {$this->database->term_taxonomy}");
+        $this->database->query("drop index term_id_taxonomy on {$this->database->getTermTaxonomy()}");
         $result = parent::synchronize($task, $entitiesToSynchronize);
-        $this->database->vp_direct_query("create unique index term_id_taxonomy on {$this->database->term_taxonomy}(term_id, taxonomy)");
+        $this->database->query("create unique index term_id_taxonomy on {$this->database->getTermTaxonomy()}(term_id, taxonomy)");
         return $result;
     }
 
@@ -33,9 +33,9 @@ class TermTaxonomiesSynchronizer extends SynchronizerBase {
     }
 
     private function fixPostsCount() {
-        $sql = "update {$this->database->term_taxonomy} tt set tt.count =
-          (select count(*) from {$this->database->term_relationships} tr where tr.term_taxonomy_id = tt.term_taxonomy_id);";
-        $this->database->vp_direct_query($sql);
+        $sql = "update {$this->database->getTermTaxonomy()} tt set tt.count =
+          (select count(*) from {$this->database->getTermRelationships()} tr where tr.term_taxonomy_id = tt.term_taxonomy_id);";
+        $this->database->query($sql);
     }
 
     private function clearCache() {

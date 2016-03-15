@@ -4,6 +4,7 @@ namespace VersionPress\Storages;
 
 use Nette\Utils\Strings;
 use Tracy\Debugger;
+use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 
 class StorageFactory {
@@ -15,20 +16,20 @@ class StorageFactory {
 
     private $storages = array();
     const ENTITY_INFO = '%entityInfo%';
-    /** @var \wpdb */
+    /** @var Database */
     private $database;
     private $taxonomies;
 
     /**
      * @param string $vpdbDir Path to the `wp-content/vpdb` directory
      * @param DbSchemaInfo $dbSchemaInfo Passed to storages
-     * @param \wpdb $wpdb
+     * @param Database $database
      * @param string[] $taxonomies List of taxonomies used on current site
      */
-    function __construct($vpdbDir, DbSchemaInfo $dbSchemaInfo, $wpdb, $taxonomies) {
+    function __construct($vpdbDir, DbSchemaInfo $dbSchemaInfo, $database, $taxonomies) {
         $this->vpdbDir = $vpdbDir;
         $this->dbSchemaInfo = $dbSchemaInfo;
-        $this->database = $wpdb;
+        $this->database = $database;
         $this->taxonomies = $taxonomies;
         $this->initStorageClasses();
     }
@@ -61,11 +62,11 @@ class StorageFactory {
     private function initStorageClasses() {
         $this->addStorageClassInfo('post', 'VersionPress\Storages\PostStorage', '%vpdb%/posts', self::ENTITY_INFO);
         $this->addStorageClassInfo('comment', 'VersionPress\Storages\CommentStorage', '%vpdb%/comments', self::ENTITY_INFO, '%database%');
-        $this->addStorageClassInfo('option', 'VersionPress\Storages\OptionStorage', '%vpdb%/options', self::ENTITY_INFO, $this->database->prefix, $this->taxonomies);
+        $this->addStorageClassInfo('option', 'VersionPress\Storages\OptionStorage', '%vpdb%/options', self::ENTITY_INFO, $this->database->getTablePrefix(), $this->taxonomies);
         $this->addStorageClassInfo('term', 'VersionPress\Storages\TermStorage', '%vpdb%/terms', self::ENTITY_INFO);
         $this->addStorageClassInfo('term_taxonomy', 'VersionPress\Storages\TermTaxonomyStorage', '%vpdb%/term_taxonomies', self::ENTITY_INFO, '%storage(term)%');
         $this->addStorageClassInfo('user', 'VersionPress\Storages\UserStorage', '%vpdb%/users', self::ENTITY_INFO);
-        $this->addStorageClassInfo('usermeta', 'VersionPress\Storages\UserMetaStorage', '%storage(user)%', self::ENTITY_INFO, $this->database->prefix);
+        $this->addStorageClassInfo('usermeta', 'VersionPress\Storages\UserMetaStorage', '%storage(user)%', self::ENTITY_INFO, $this->database->getTablePrefix());
         $this->addStorageClassInfo('postmeta', 'VersionPress\Storages\PostMetaStorage', '%storage(post)%', self::ENTITY_INFO);
         $this->addStorageClassInfo('termmeta', 'VersionPress\Storages\TermMetaStorage', '%storage(term)%', self::ENTITY_INFO);
     }

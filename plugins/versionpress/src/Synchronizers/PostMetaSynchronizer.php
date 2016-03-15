@@ -10,8 +10,8 @@ use VersionPress\Utils\WordPressCacheUtils;
 use wpdb;
 
 class PostMetaSynchronizer extends SynchronizerBase {
-    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
-        parent::__construct($storage, $wpdb, $dbSchema, $urlReplacer, $shortcodesReplacer, 'postmeta');
+    function __construct(Storage $storage, $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
+        parent::__construct($storage, $database, $dbSchema, $urlReplacer, $shortcodesReplacer, 'postmeta');
     }
 
     protected function doEntitySpecificActions() {

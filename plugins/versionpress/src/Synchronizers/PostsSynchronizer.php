@@ -14,8 +14,8 @@ use wpdb;
  */
 class PostsSynchronizer extends SynchronizerBase {
 
-    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
-        parent::__construct($storage, $wpdb, $dbSchema, $urlReplacer, $shortcodesReplacer, 'post');
+    function __construct(Storage $storage, $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
+        parent::__construct($storage, $database, $dbSchema, $urlReplacer, $shortcodesReplacer, 'post');
     }
 
     protected function doEntitySpecificActions() {
@@ -29,9 +29,9 @@ class PostsSynchronizer extends SynchronizerBase {
     }
 
     private function fixCommentCounts() {
-        $sql = "update {$this->database->prefix}posts set comment_count =
-     (select count(*) from {$this->database->prefix}comments where comment_post_ID = {$this->database->prefix}posts.ID and comment_approved = 1);";
-        $this->database->vp_direct_query($sql);
+        $sql = "update {$this->database->getTablePrefix()}posts set comment_count =
+     (select count(*) from {$this->database->getTablePrefix()}comments where comment_post_ID = {$this->database->getTablePrefix()}posts.ID and comment_approved = 1);";
+        $this->database->query($sql);
     }
 
     private function clearCache() {

@@ -8,6 +8,7 @@ use PHPUnit_Framework_MockObject_Stub_Return;
 use PHPUnit_Framework_TestCase;
 use SqlParser\Parser;
 use SqlParser\Statements\DeleteStatement;
+use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ParsedQueryData;
 use VersionPress\Database\SqlQueryParser;
@@ -19,8 +20,8 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
      */
     private static $DbSchemaInfo;
 
-    /** @var \wpdb $wpdbStub */
-    private $wpdbStub;
+    /** @var Database */
+    private $database;
 
     /** @var  SqlQueryParser */
     private $sqlParser;
@@ -30,8 +31,9 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
     }
 
     public function setup() {
-        $this->wpdbStub = $this->getMockBuilder('\wpdb')->disableOriginalConstructor()->getMock();
-        $this->sqlParser = new SqlQueryParser(self::$DbSchemaInfo, $this->wpdbStub);
+        $wpdbStub = $this->getMockBuilder('\wpdb')->disableOriginalConstructor()->getMock();
+        $this->database = new Database($wpdbStub);
+        $this->sqlParser = new SqlQueryParser(self::$DbSchemaInfo, $this->database);
     }
 
     /**
@@ -61,7 +63,7 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
     public function selectQueryFromUpdate($query, $expectedSelectQuery, $expectedData, $expectedIds) {
         $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col")
             ->with($expectedSelectQuery)->will(new PHPUnit_Framework_MockObject_Stub_Return($expectedIds));
-        $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
+        $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->database);
 
         $this->assertEquals($expectedSelectQuery, $parsedQueryData->sqlQuery);
     }
@@ -73,7 +75,7 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
      * @param $expectedData
      */
     public function dataFromInsert($query, $expectedData) {
-        $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
+        $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->database);
         $parsedData = $parsedQueryData == null ? null : $parsedQueryData->data;
 
         $this->assertEquals($expectedData, $parsedData);
@@ -87,7 +89,7 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
      * @param $expectedQueryType
      */
     public function detectNonStandardInsert($query, $expectedData, $expectedQueryType) {
-        $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
+        $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->database);
         $parsedQeryType = $parsedQueryData == null ? null : $parsedQueryData->queryType;
 
         $this->assertEquals($expectedQueryType, $parsedQeryType);
@@ -103,7 +105,7 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
     public function selectQueryFromDelete($query, $expectedSelectQuery, $testIds) {
         $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col")
             ->with($expectedSelectQuery)->will(new PHPUnit_Framework_MockObject_Stub_Return($testIds));
-        $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
+        $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->database);
 
         $this->assertEquals($expectedSelectQuery, $parsedQueryData->sqlQuery);
     }

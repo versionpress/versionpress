@@ -2,6 +2,7 @@
 namespace VersionPress\Synchronizers;
 
 use Nette\Utils\Strings;
+use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Storages\Storage;
@@ -27,7 +28,7 @@ abstract class SynchronizerBase implements Synchronizer {
     /** @var Storage */
     private $storage;
 
-    /** @var wpdb */
+    /** @var Database */
     protected $database;
 
     /** @var DbSchemaInfo */
@@ -51,15 +52,15 @@ abstract class SynchronizerBase implements Synchronizer {
 
     /**
      * @param Storage $storage Specific Synchronizers will use specific storage types, see VersionPress\Synchronizers\SynchronizerFactory
-     * @param wpdb $wpdb
+     * @param Database $database
      * @param DbSchemaInfo $dbSchema
      * @param AbsoluteUrlReplacer $urlReplacer
      * @param string $entityName Constructors in subclasses provide this
      * @param ShortcodesReplacer $shortcodesReplacer
      */
-    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer, $entityName) {
+    function __construct(Storage $storage, $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer, $entityName) {
         $this->storage = $storage;
-        $this->database = $wpdb;
+        $this->database = $database;
         $this->dbSchema = $dbSchema;
         $this->urlReplacer = $urlReplacer;
         $this->entityName = $entityName;
@@ -218,7 +219,7 @@ abstract class SynchronizerBase implements Synchronizer {
     private function createEntityInDatabase($entity) {
         $createQuery = $this->buildCreateQuery($entity);
         $this->executeQuery($createQuery);
-        $id = $this->database->insert_id;
+        $id = $this->database->getLastInsertedId();
         $this->createIdentifierRecord($entity['vp_id'], $id);
         return $id;
     }
@@ -241,17 +242,17 @@ abstract class SynchronizerBase implements Synchronizer {
      */
     private function getId($vpid) {
         $vpIdTableName = $this->getPrefixedTableName('vp_id');
-        return $this->database->get_var("SELECT id FROM $vpIdTableName WHERE `table` = \"{$this->dbSchema->getTableName($this->entityName)}\" AND vp_id = UNHEX('$vpid')");
+        return $this->database->getVariable("SELECT id FROM $vpIdTableName WHERE `table` = \"{$this->dbSchema->getTableName($this->entityName)}\" AND vp_id = UNHEX('$vpid')");
     }
 
     private function buildUpdateQuery($updateData) {
         $id = $updateData['vp_id'];
         $tableName = $this->getPrefixedTableName($this->entityName);
-        $query = "UPDATE {$tableName} JOIN (SELECT * FROM {$this->database->prefix}vp_id WHERE `table` = '{$this->dbSchema->getTableName($this->entityName)}') filtered_vp_id ON {$tableName}.{$this->idColumnName} = filtered_vp_id.id SET";
+        $query = "UPDATE {$tableName} JOIN (SELECT * FROM {$this->database->getTablePrefix()}vp_id WHERE `table` = '{$this->dbSchema->getTableName($this->entityName)}') filtered_vp_id ON {$tableName}.{$this->idColumnName} = filtered_vp_id.id SET";
         foreach ($updateData as $key => $value) {
             if ($key == $this->idColumnName) continue;
             if (Strings::startsWith($key, 'vp_')) continue;
-            $query .= " `$key` = " . (is_numeric($value) ? $value : '"' . $this->database->_escape($value) . '"') . ',';
+            $query .= " `$key` = " . (is_numeric($value) ? $value : '"' . $this->database->escape($value) . '"') . ',';
         }
         $query[strlen($query) - 1] = ' '; // strip the last comma
         $query .= " WHERE filtered_vp_id.vp_id = UNHEX('$id')";
@@ -271,7 +272,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $query = "INSERT INTO {$this->getPrefixedTableName($this->entityName)} ({$columnsString}) VALUES (";
 
         foreach ($columns as $column) {
-            $query .= (is_numeric($entity[$column]) ? $entity[$column] : '"' . $this->database->_escape($entity[$column]) . '"') . ", ";
+            $query .= (is_numeric($entity[$column]) ? $entity[$column] : '"' . $this->database->escape($entity[$column]) . '"') . ", ";
         }
 
         $query[strlen($query) - 2] = ' '; // strip the last comma
@@ -294,14 +295,14 @@ abstract class SynchronizerBase implements Synchronizer {
             $sql .= sprintf('AND HEX(vp_id) IN ("%s") ', join('", "', $vpIdsToSynchronize));
             $sql .= sprintf('AND HEX(vp_id) NOT IN ("%s")', join('", "', $savedVpIds));
 
-            $ids = $this->database->get_col($sql);
+            $ids = $this->database->getColumn($sql);
 
         } else {
             $vpIdsUnhexed = array_map(function ($entity) {
                 return 'UNHEX("' . $entity['vp_id'] . '")';
             }, $entities);
 
-            $ids = $this->database->get_col("SELECT id FROM {$this->getPrefixedTableName('vp_id')} " .
+            $ids = $this->database->getColumn("SELECT id FROM {$this->getPrefixedTableName('vp_id')} " .
                 "WHERE `table` = \"{$this->dbSchema->getTableName($this->entityName)}\"" . (count($vpIdsUnhexed) > 0 ? "AND vp_id NOT IN (" . join(",", $vpIdsUnhexed) . ")" : ""));
         }
 
@@ -368,7 +369,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $updateSql .= join(", ", ArrayUtils::parametrize($newReferences));
 
         $updateSql .= " WHERE $idColumnName=(SELECT id FROM $vpIdTable WHERE vp_id=UNHEX(\"$entity[vp_id]\"))";
-        $this->database->vp_direct_query($updateSql);
+        $this->database->query($updateSql);
     }
 
     /**
@@ -407,7 +408,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $updateSql .= join(", ", ArrayUtils::parametrize($newReferences));
 
         $updateSql .= " WHERE $idColumnName=(SELECT id FROM $vpIdTable WHERE vp_id=UNHEX(\"$entity[vp_id]\"))";
-        $this->database->vp_direct_query($updateSql);
+        $this->database->query($updateSql);
     }
 
     private function fixMnReferences($entities) {
@@ -442,19 +443,19 @@ abstract class SynchronizerBase implements Synchronizer {
             $sql = sprintf("SELECT id FROM %s WHERE HEX(vp_id) IN ('%s')",
                 $this->dbSchema->getPrefixedTableName('vp_id'),
                 join("', '", array_map(function ($entity) { return $entity['vp_id']; }, $entities)));
-            $processedIds = array_merge($this->database->get_col($sql), $this->deletedIds);
+            $processedIds = array_merge($this->database->getColumn($sql), $this->deletedIds);
 
             if ($this->selectiveSynchronization) {
                 if (count($processedIds) > 0) {
-                    $this->database->vp_direct_query("DELETE FROM $prefixedTable WHERE $sourceColumn IN (" . join(", ", $processedIds) . ")");
+                    $this->database->query("DELETE FROM $prefixedTable WHERE $sourceColumn IN (" . join(", ", $processedIds) . ")");
                 }
             } else {
-                $this->database->vp_direct_query("TRUNCATE TABLE $prefixedTable");
+                $this->database->query("TRUNCATE TABLE $prefixedTable");
             }
 
             $valuesString = join(", ", $valuesForInsert);
             $insertSql = "INSERT IGNORE INTO $prefixedTable ($sourceColumn, $targetColumn) VALUES $valuesString";
-            $this->database->vp_direct_query($insertSql);
+            $this->database->query($insertSql);
         }
 
         return true;
@@ -472,7 +473,7 @@ abstract class SynchronizerBase implements Synchronizer {
 
         $vpIdsRestriction = join(', ', $vpIds);
 
-        $result = $this->database->get_results("SELECT HEX(vp_id), id FROM $vpIdTable WHERE vp_id IN ($vpIdsRestriction)", ARRAY_N);
+        $result = $this->database->getResults("SELECT HEX(vp_id), id FROM $vpIdTable WHERE vp_id IN ($vpIdsRestriction)", ARRAY_N);
         $result[] = array(0, 0);
         return array_combine(ArrayUtils::column($result, 0), ArrayUtils::column($result, 1));
     }
@@ -509,7 +510,7 @@ abstract class SynchronizerBase implements Synchronizer {
      * @return false|int
      */
     private function executeQuery($query) {
-        $result = $this->database->vp_direct_query($query);
+        $result = $this->database->query($query);
         return $result;
     }
 

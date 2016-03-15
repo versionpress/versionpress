@@ -29,8 +29,8 @@ class OptionsSynchronizerTest extends SynchronizerTestCase {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('option');
         $this->postStorage = self::$storageFactory->getStorage('post');
-        $this->synchronizer = new OptionsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
-        $this->postsSynchronizer = new PostsSynchronizer($this->postStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->synchronizer = new OptionsSynchronizer($this->storage, self::$database, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->postsSynchronizer = new PostsSynchronizer($this->postStorage, self::$database, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
     }
 
     /**
@@ -135,8 +135,8 @@ class OptionsSynchronizerTest extends SynchronizerTestCase {
         $this->postStorage->delete($post);
 
         // We need new instances because of caching in SynchronizerBase::maybeInit
-        $this->synchronizer = new OptionsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
-        $this->postsSynchronizer = new PostsSynchronizer($this->postStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->synchronizer = new OptionsSynchronizer($this->storage, self::$database, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->postsSynchronizer = new PostsSynchronizer($this->postStorage, self::$database, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $optionToSynchronize);
         $this->postsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $postToSynchronize);
     }

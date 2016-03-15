@@ -2,6 +2,7 @@
 
 namespace VersionPress\Cli;
 
+use VersionPress\Database\Database;
 use VersionPress\Database\VpidRepository;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\MergeDriverInstaller;
@@ -43,17 +44,17 @@ class VPInternalCommand extends WP_CLI_Command {
 
         // Truncate tables
 
-        /** @var wpdb $wpdb */
-        $wpdb = $versionPressContainer->resolve(VersionPressServices::WPDB);
-        $tables = $wpdb->tables();
+        /** @var Database */
+        $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
+        $tables = $database->tables();
 
         if (!isset($assoc_args["truncate-options"])) {
-            $tables = array_filter($tables, function ($table) use ($wpdb) { return $table !== $wpdb->options; });
+            $tables = array_filter($tables, function ($table) use ($database) { return $table !== $database->getOptions(); });
         }
 
         foreach ($tables as $table) {
             $truncateCmd = "TRUNCATE TABLE `$table`";
-            $wpdb->query($truncateCmd);
+            $database->query($truncateCmd);
         }
 
 

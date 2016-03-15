@@ -10,8 +10,8 @@ use VersionPress\Utils\WordPressCacheUtils;
 use wpdb;
 
 class TermMetaSynchronizer extends SynchronizerBase {
-    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
-        parent::__construct($storage, $wpdb, $dbSchema, $urlReplacer, $shortcodesReplacer, 'termmeta');
+    function __construct(Storage $storage, $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
+        parent::__construct($storage, $database, $dbSchema, $urlReplacer, $shortcodesReplacer, 'termmeta');
     }
 
     protected function doEntitySpecificActions() {
