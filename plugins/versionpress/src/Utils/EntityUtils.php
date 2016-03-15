@@ -49,10 +49,10 @@ class EntityUtils {
      * @return bool
      */
     private static function isChanged($oldData, $newValue) {
-        if(is_numeric($oldData)) {
+        if (is_numeric($oldData) && is_numeric($newValue)) {
             return $oldData != $newValue;
         }
-        return $oldData!==$newValue;
+        return $oldData !== $newValue;
     }
 
 }
