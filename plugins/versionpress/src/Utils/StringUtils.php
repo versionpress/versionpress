@@ -135,4 +135,21 @@ class StringUtils {
         $test = @unserialize(($value)); // it throws an error and returns false if $value is not a serialized object
         return $test !== false || $value === 'b:0;';
     }
+
+    /**
+     * Replaces the first occurence.
+     *
+     * @param string $needle
+     * @param string $replace
+     * @param string $haystack
+     * @return string
+     */
+    public static function replaceFirst($needle, $replace, $haystack) {
+        $needlePosition = strpos($haystack, $needle);
+        if ($needlePosition === false) {
+            return $haystack;
+        }
+
+        return substr_replace($haystack, $replace, $needlePosition, strlen($needle));
+    }
 }
