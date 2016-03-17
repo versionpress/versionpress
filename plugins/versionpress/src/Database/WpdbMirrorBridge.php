@@ -133,10 +133,10 @@ class WpdbMirrorBridge {
     public function getParentIdsBeforeDelete($table, $where) {
         $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($table);
         if (!$entityInfo) {
-            return;
+            return [];
         }
         if (!$this->dbSchemaInfo->isChildEntity($entityInfo->entityName)) {
-            return;
+            return [];
         }
 
         $ids = $this->detectAllAffectedIds($entityInfo->entityName, $where, $where);
