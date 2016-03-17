@@ -40,7 +40,7 @@
     $proceedUrl = add_query_arg(array(
         'action' => 'vp_' . $method,
         'commit' => $commit->getHash(),
-        'nonce' => wp_create_nonce('vp_revert')
+        '_wpnonce' => wp_create_nonce('vp_revert')
     ), admin_url('admin.php'));
 
     $buttonProceed = "<a " .
