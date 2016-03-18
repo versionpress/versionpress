@@ -12,6 +12,7 @@ class TranslationsTestWpCliWorker extends WpCliWorker implements ITranslationsTe
 
     public function prepare_switchLanguage() {
         try {
+            $this->wpAutomation->runWpCliCommand('core language', 'install', array('en_GB'));
             $this->originalLanguage = trim($this->wpAutomation->runWpCliCommand('option', 'get', array('WPLANG')));
         } catch (\Exception $e) {
             $this->originalLanguage = ''; // the language wasn't changed yet
