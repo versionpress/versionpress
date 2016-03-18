@@ -7,8 +7,8 @@ class Database {
      * @var \wpdb
      */
     private $wpdb;
-    
-    
+
+
     public function __construct($wpdb) {
         $this->wpdb = $wpdb;
     }
@@ -62,7 +62,7 @@ class Database {
      * @see \wpdb::get_results()
      * @param $query
      * @param $outputFormat
-     * @return array|object|null 
+     * @return array|object|null
      */
     public function getResults($query, $outputFormat) {
         return $this->wpdb->get_results($query, $outputFormat);
@@ -80,7 +80,7 @@ class Database {
      * @see \wpdb::posts
      * @return string
      */
-    public function getPosts(){
+    public function getPosts() {
         return $this->wpdb->posts;
     }
 
@@ -88,7 +88,7 @@ class Database {
      * @see \wpdb::options
      * @return string
      */
-    public function getOptions(){
+    public function getOptions() {
         return $this->wpdb->options;
     }
 
@@ -96,7 +96,7 @@ class Database {
      * @see \wpdb::term_taxonomy
      * @return string
      */
-    public function getTermTaxonomy(){
+    public function getTermTaxonomy() {
         return $this->wpdb->term_taxonomy;
     }
 
@@ -104,7 +104,7 @@ class Database {
      * @see \wpdb::term_relationships
      * @return string
      */
-    public function getTermRelationships(){
+    public function getTermRelationships() {
         return $this->wpdb->term_relationships;
     }
 
@@ -123,7 +123,7 @@ class Database {
      * @return false|int
      */
     public function query($query) {
-        if(method_exists("wpdb", "vp_direct_query")) {
+        if (method_exists("wpdb", "vp_direct_query")) {
             return $this->wpdb->vp_direct_query($query);
         } else {
             return $this->wpdb->query($query);
@@ -135,7 +135,7 @@ class Database {
      * @param $data
      * @return array|string
      */
-    public function escape($data){
+    public function escape($data) {
         return $this->wpdb->_escape($data);
     }
 
@@ -144,7 +144,7 @@ class Database {
      * @param $data
      * @return array|string
      */
-    public function realEscape($data){
+    public function realEscape($data) {
         return $this->wpdb->_real_escape($data);
     }
 
@@ -166,5 +166,5 @@ class Database {
     public function update($table, $data, $where) {
         return $this->wpdb->update($table, $data, $where);
     }
-    
+
 }
