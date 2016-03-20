@@ -46,12 +46,12 @@ class Reverter {
         $this->storageFactory = $storageFactory;
     }
 
-    public function undo($commitHash) {
-        return $this->_revert($commitHash, "undo");
+    public function undo($commits) {
+        return $this->_revert($commits, "undo");
     }
 
-    public function rollback($commitHash) {
-        return $this->_revert($commitHash, "rollback");
+    public function rollback($commits) {
+        return $this->_revert($commits, "rollback");
     }
 
     public function canRevert() {
@@ -61,29 +61,42 @@ class Reverter {
         return $this->repository->isCleanWorkingDirectory();
     }
 
-    private function _revert($commitHash, $method) {
+    private function _revert($commits, $method) {
         if (!$this->canRevert()) {
             return RevertStatus::NOT_CLEAN_WORKING_DIRECTORY;
         }
 
-        $commitHashForDiff = $method === "undo" ? sprintf("%s~1..%s", $commitHash, $commitHash) : $commitHash;
-        $modifiedFiles = $this->repository->getModifiedFiles($commitHashForDiff);
-        $vpIdsInModifiedFiles = $this->getAllVpIdsFromModifiedFiles($modifiedFiles);
+        uasort($commits, function ($a, $b) { return $this->repository->wasCreatedAfter($b, $a); });
 
-        if ($method === "undo") {
-            $status = $this->revertOneCommit($commitHash);
-            $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_UNDO, $commitHash);
+        $modifiedFiles = array();
+        $vpIdsInModifiedFiles = array();
 
-        } else {
-            $status = $this->revertToCommit($commitHash);
-            $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_ROLLBACK, $commitHash);
+        foreach ($commits as $commitHash) {
+            $commitHashForDiff = $method === "undo" ? sprintf("%s~1..%s", $commitHash, $commitHash) : $commitHash;
+            $modifiedFiles = array_merge($modifiedFiles, $this->repository->getModifiedFiles($commitHashForDiff));
+            $modifiedFiles = array_unique($modifiedFiles, SORT_REGULAR);
+            $vpIdsInModifiedFiles = array_merge($vpIdsInModifiedFiles, $this->getAllVpIdsFromModifiedFiles($modifiedFiles));
+            $vpIdsInModifiedFiles = array_unique($vpIdsInModifiedFiles, SORT_REGULAR);
+
+            if ($method === "undo") {
+                $status = $this->revertOneCommit($commitHash);
+                $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_UNDO, $commitHash);
+            } else {
+                $status = $this->revertToCommit($commitHash);
+                $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_ROLLBACK, $commitHash);
+            }
+
+            if ($status !== RevertStatus::OK) {
+                return $status;
+            }
+
+            $this->committer->forceChangeInfo($changeInfo);
         }
 
-        if ($status !== RevertStatus::OK) {
-            return $status;
+        if (!$this->repository->willCommit()) {
+            return RevertStatus::NOTHING_TO_COMMIT;
         }
 
-        $this->committer->forceChangeInfo($changeInfo);
         $affectedPosts = $this->getAffectedPosts($modifiedFiles);
         $this->updateChangeDateForPosts($affectedPosts);
         $this->committer->commit();
