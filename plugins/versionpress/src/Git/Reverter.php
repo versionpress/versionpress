@@ -115,12 +115,14 @@ class Reverter {
         $date = current_time('mysql');
         $dateGmt = current_time('mysql', true);
         foreach ($vpIds as $vpId) {
-            $sql = "update {$this->database->prefix}posts set post_modified = '{$date}', post_modified_gmt = '{$dateGmt}' where ID = (select id from {$this->database->prefix}vp_id where vp_id = unhex('{$vpId}'))";
-            $this->database->query($sql);
             $post = $storage->loadEntity($vpId, null);
-            $post['post_modified'] = $date;
-            $post['post_modified_gmt'] = $dateGmt;
-            $storage->save($post);
+            if ($post) {
+                $sql = "update {$this->database->prefix}posts set post_modified = '{$date}', post_modified_gmt = '{$dateGmt}' where ID = (select id from {$this->database->prefix}vp_id where vp_id = unhex('{$vpId}'))";
+                $this->database->query($sql);
+                $post['post_modified'] = $date;
+                $post['post_modified_gmt'] = $dateGmt;
+                $storage->save($post);
+            }
         }
     }
 
@@ -291,7 +293,7 @@ class Reverter {
         $optionNameRegex = "/^\\[(.*)\\]\\r?$/m";
 
         foreach ($modifiedFiles as $file) {
-            if (!is_file(ABSPATH . $file)) {
+            if (!file_exists(ABSPATH . $file) || !is_file(ABSPATH . $file)) {
                 continue;
             }
 
