@@ -32,6 +32,7 @@
     "moment": "2.10.6",
     "node-notifier": "4.3.1",
     "react": "^0.14.2",
+    "react-addons-update": "0.14.7",
     "react-dom": "^0.14.2",
     "react-router": "0.13.5",
     "rimraf": "2.4.3",
