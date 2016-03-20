@@ -758,16 +758,16 @@ class VPCommand extends WP_CLI_Command {
     }
 
     /**
-     * Reverts one commit
+     * Reverts commits
      *
      * ## OPTIONS
      *
      * <commit>
-     * : Hash of commit that will be reverted.
+     * : Hashes of commit that will be reverted (separated by comma).
      *
      * ## EXAMPLES
      *
-     *     wp vp undo a34bc28
+     *     wp vp undo a34bc28,d12ef22
      *
      * @synopsis <commit>
      *
@@ -785,15 +785,17 @@ class VPCommand extends WP_CLI_Command {
         /** @var GitRepository $repository */
         $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
 
-        $hash = $args[0];
-        $log = $repository->log($hash);
-        if (count($log) === 0) {
-            WP_CLI::error("Commit '$hash' does not exist.");
+        $commits = explode(',', $args[0]);
+        foreach ($commits as $hash) {
+            $log = $repository->log($hash);
+            if (count($log) === 0) {
+                WP_CLI::error("Commit '$hash' does not exist.");
+            }
         }
 
         $this->switchMaintenance('on');
 
-        $status = $reverter->undo($hash);
+        $status = $reverter->undo($commits);
 
         if ($status === RevertStatus::VIOLATED_REFERENTIAL_INTEGRITY) {
             WP_CLI::error("Violated referential integrity. Objects with missing references cannot be restored. For example we cannot restore comment where the related post was deleted.", false);
@@ -856,7 +858,7 @@ class VPCommand extends WP_CLI_Command {
 
         $this->switchMaintenance('on');
 
-        $status = $reverter->rollback($hash);
+        $status = $reverter->rollback(array($hash));
 
         if ($status === RevertStatus::NOTHING_TO_COMMIT) {
             WP_CLI::error("Nothing to commit. Current state is the same as the one you want rollback to.", false);

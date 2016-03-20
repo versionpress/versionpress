@@ -866,7 +866,7 @@ function _vp_revert($reverterMethod) {
     $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
 
     vp_enable_maintenance();
-    $revertStatus = call_user_func(array($reverter, $reverterMethod), $commitHash);
+    $revertStatus = call_user_func(array($reverter, $reverterMethod), array($commitHash));
     vp_disable_maintenance();
     $adminPage = menu_page_url('versionpress', false);
 

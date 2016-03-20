@@ -62,9 +62,9 @@ class VersionPressApi {
 
         register_rest_route($namespace, '/undo', array(
             'methods' => WP_REST_Server::READABLE,
-            'callback' => array($this, 'undoCommit'),
+            'callback' => array($this, 'undoCommits'),
             'args' => array(
-                'commit' => array(
+                'commits' => array(
                     'required' => true
                 )
             ),
@@ -217,17 +217,19 @@ class VersionPressApi {
      * @param WP_REST_Request $request
      * @return WP_REST_Response|WP_Error
      */
-    public function undoCommit(WP_REST_Request $request) {
-        $commitHash = $request['commit'];
+    public function undoCommits(WP_REST_Request $request) {
+        $commitHashes = explode(',', $request['commits']);
 
-        if (!preg_match('/^[0-9a-f]+$/', $commitHash)) {
-            return new WP_Error(
-                'error',
-                'Invalid commit hash',
-                array('status' => 404));
+        foreach ($commitHashes as $commitHash) {
+            if (!preg_match('/^[0-9a-f]+$/', $commitHash)) {
+                return new WP_Error(
+                    'error',
+                    'Invalid commit hash',
+                    array('status' => 404));
+            }
         }
 
-        return $this->revertCommit('undo', $commitHash);
+        return $this->revertCommits('undo', $commitHashes);
     }
 
     /**
@@ -244,7 +246,7 @@ class VersionPressApi {
                 array('status' => 404));
         }
 
-        return $this->revertCommit('rollback', $commitHash);
+        return $this->revertCommits('rollback', array($commitHash));
     }
 
     /**
@@ -256,12 +258,12 @@ class VersionPressApi {
 
     /**
      * @param string $reverterMethod
-     * @param string $commit
+     * @param array $commit
      * @return WP_REST_Response|WP_Error
      */
-    public function revertCommit($reverterMethod, $commit) {
+    public function revertCommits($reverterMethod, $commits) {
         vp_enable_maintenance();
-        $revertStatus = call_user_func(array($this->reverter, $reverterMethod), $commit);
+        $revertStatus = call_user_func(array($this->reverter, $reverterMethod), $commits);
         vp_disable_maintenance();
 
         if ($revertStatus !== RevertStatus::OK) {
