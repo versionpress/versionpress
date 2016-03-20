@@ -162,4 +162,37 @@ class RevertTest extends End2EndTestCase {
         $commitAsserter->assertCommitPath('D', '%vpdb%/options/vp/vp_option_test.ini');
         DBAsserter::assertFilesEqualDatabase();
     }
+    
+    /**
+     * @test
+     * @testdox Undo multiple commits should create one commit
+     */
+    public function undoMultipleCommitsCreatesOneCommit() {
+        $changes = self::$worker->prepare_undoMultipleCommits();
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->undoMultipleCommits();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('versionpress/undo');
+        $commitAsserter->assertCountOfAffectedFiles(count($changes));
+        $commitAsserter->assertCommitPaths($changes);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Undo multiple commits should do nothing id one change cannot be reverted
+     */
+    public function undoMultipleCommitsDoesNothingIfOneChangeCannotBeReverted() {
+        self::$worker->prepare_undoMultipleCommitsThatCannotBeReverted();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->undoMultipleCommitsThatCannotBeReverted();
+        $commitAsserter->assertNumCommits(0);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
 }
