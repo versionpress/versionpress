@@ -149,7 +149,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   }
 
   checkUpdate() {
-    if (!this.state.commits.length) {
+    if (!this.state.commits.length || this.state.loading) {
       return;
     }
     WpApi
