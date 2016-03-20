@@ -2,9 +2,11 @@
 /// <reference path='./Commits.d.ts' />
 
 import * as React from 'react';
+import * as _ from 'lodash';
 import {Link} from 'react-router';
 import CommitsTableRow from './CommitsTableRow.react';
 import CommitsTableNote from './CommitsTableNote.react';
+import {indexOf} from '../Commits/CommitUtils';
 import config from '../config';
 
 import './CommitsTable.less';
@@ -15,9 +17,11 @@ interface CommitsTableProps extends React.Props<JSX.Element> {
   currentPage: number;
   pages: number[];
   commits: Commit[];
+  selected: Commit[];
   enableActions: boolean;
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
+  onCommitSelect: (commits: Commit[], check: boolean, shiftKey: boolean) => void;
   diffProvider: {getDiff: (hash: string) => Promise<string>};
 }
 
@@ -36,11 +40,21 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
   render() {
     const firstCommit = this.props.commits[0];
     const displayTopNote = firstCommit && !firstCommit.isEnabled;
+    const allSelected = !_.differenceBy(this.props.commits, this.props.selected, ((value: Commit) => value.hash)).length;
 
     return (
       <table className='vp-table widefat fixed'>
         <thead>
           <tr>
+            <td className='column-cb manage-column check-column'>
+              <label className='screen-reader-text' htmlFor='CommitsTable-selectAll'>Select All</label>
+              <input
+                type='checkbox'
+                id='CommitsTable-selectAll'
+                checked={this.props.commits.length > 0 && allSelected}
+                onChange={this.onSelectAll.bind(this)}
+              />
+            </td>
             <th className='column-date'>Date</th>
             <th className='column-message'>Message</th>
             <th className='column-actions' />
@@ -55,8 +69,10 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
                         key={commit.hash}
                         commit={commit}
                         enableActions={this.props.enableActions}
+                        isSelected={indexOf(this.props.selected, commit) !== -1}
                         onUndo={this.props.onUndo}
                         onRollback={this.props.onRollback}
+                        onCommitSelect={this.props.onCommitSelect}
                         diffProvider={this.props.diffProvider}
                       />;
 
@@ -70,7 +86,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
         })}
         <tfoot>
           <tr>
-            <td className='vp-table-pagination' colSpan={3}>
+            <td className='vp-table-pagination' colSpan={4}>
               {this.props.pages.map((page: number) => {
                 return <Link
                           activeClassName='active'
@@ -91,6 +107,11 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
              key='note'
              message='VersionPress is not able to undo changes made before it has been activated.'
            />;
+  }
+
+  onSelectAll(e: React.MouseEvent) {
+    const check = (e.target as HTMLInputElement).checked;
+    this.props.onCommitSelect(this.props.commits, check, false);
   }
 
 }

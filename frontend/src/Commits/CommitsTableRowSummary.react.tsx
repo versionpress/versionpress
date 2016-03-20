@@ -9,8 +9,10 @@ import {UndoDisabledDialog} from '../Commits/revertDialog';
 interface CommitsTableRowSummaryProps extends React.Props<JSX.Element> {
   commit: Commit;
   enableActions: boolean;
+  isSelected: boolean;
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
+  onCommitSelect: (commits: Commit[], check: boolean, shiftKey: boolean) => void;
   onDetailsLevelChanged: (detailsLevel) => any;
   detailsLevel: string;
 }
@@ -26,6 +28,7 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
 
     return (
       <tr className={className} onClick={() => this.toggleDetails()}>
+        <td className='column-cb'><input type='checkbox' onClick={this.onCheckboxClick.bind(this)} checked={this.props.isSelected} readOnly={true} /></td>
         <td className='column-date' title={moment(commit.date).format('LLL')}>{moment(commit.date).fromNow()}</td>
         <td className='column-message'>
           {commit.isMerge
@@ -116,6 +119,12 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
     if (this.props.commit.isEnabled) {
       this.props.onDetailsLevelChanged(this.props.detailsLevel === 'none' ? 'overview' : 'none');
     }
+  }
+
+  private onCheckboxClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    const check = (e.target as HTMLInputElement).checked;
+    this.props.onCommitSelect([this.props.commit], check, e.shiftKey);
   }
 
   private changeDetailsLevel(detailsLevel) {

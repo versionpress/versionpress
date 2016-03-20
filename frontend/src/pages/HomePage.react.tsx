@@ -6,6 +6,8 @@ import * as ReactRouter from 'react-router';
 import * as request from 'superagent';
 import * as moment from 'moment';
 import * as Promise from 'core-js/es6/promise';
+import update = require('react-addons-update');
+import BulkActionPanel from '../BulkActionPanel/BulkActionPanel.react';
 import CommitPanel from '../CommitPanel/CommitPanel.react';
 import CommitsTable from '../Commits/CommitsTable.react';
 import FlashMessage from '../common/FlashMessage.react';
@@ -15,6 +17,7 @@ import ServicePanelButton from '../ServicePanel/ServicePanelButton.react';
 import WelcomePanel from '../WelcomePanel/WelcomePanel.react';
 import * as revertDialog from '../Commits/revertDialog';
 import * as WpApi from '../services/WpApi';
+import {indexOf} from '../Commits/CommitUtils';
 import config from '../config';
 
 import './HomePage.less';
@@ -30,6 +33,8 @@ interface HomePageProps extends React.Props<JSX.Element> {
 interface HomePageState {
   pages?: number[];
   commits?: Commit[];
+  selected?: Commit[];
+  lastSelected?: Commit;
   message?: {
     code: string,
     message: string
@@ -54,6 +59,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     this.state = {
       pages: [],
       commits: [],
+      selected: [],
+      lastSelected: null,
       message: null,
       loading: true,
       displayServicePanel: false,
@@ -64,12 +71,15 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
     this.onUndo = this.onUndo.bind(this);
     this.onRollback = this.onRollback.bind(this);
+    this.onCommitSelect = this.onCommitSelect.bind(this);
     this.checkUpdate = this.checkUpdate.bind(this);
   }
 
   static getErrorMessage(res: request.Response) {
     return res
-      ? res.body[0]
+      ? (Array.isArray(res.body)
+        ? res.body[0]
+        : res.body)
       : {
       code: 'error',
       message: 'Connection Error: VersionPress is not able to connect to WordPress site. Please try refreshing the page.'
@@ -161,13 +171,13 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       });
   }
 
-  undoCommit(hash: string) {
+  undoCommits(commits: string[]) {
     const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
     this.setState({ loading: true });
     WpApi
       .get('undo')
-      .query({commit: hash})
+      .query({commits: commits})
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
@@ -253,6 +263,55 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       });
   }
 
+  onCommitSelect(commits: Commit[], check: boolean, shiftKey: boolean) {
+    let selected = this.state.selected,
+        lastSelected = this.state.lastSelected;
+    const bulk = commits.length > 1;
+
+    commits.forEach((commit: Commit) => {
+      let lastIndex = -1;
+      const index = indexOf(this.state.commits, commit);
+
+      if (!bulk && shiftKey) {
+        const last = this.state.lastSelected;
+        lastIndex = indexOf(this.state.commits, last);
+      }
+
+      if (lastIndex === -1) {
+        lastIndex = index;
+      }
+
+      const step = (index < lastIndex ? -1 : 1);
+      const cond = index + step;
+      for (let i = lastIndex; i != cond; i += step) {
+        const current = this.state.commits[i];
+        const index = indexOf(selected, current);
+        if (check && index === -1) {
+          selected = update(selected, {$push: [current]});
+        } else if (!check && index !== -1) {
+          selected = update(selected, {$splice: [[index, 1]]});
+        }
+        lastSelected = current;
+      }
+    });
+
+    this.setState({
+      selected: selected,
+      lastSelected: (bulk ? null : lastSelected)
+    });
+  }
+
+  onBulkAction(action: string) {
+    if (action === 'undo') {
+      const title = (
+        <span>Undo <em>{this.state.selected.length} {this.state.selected.length === 1 ? 'change' : 'changes'}</em>?</span>
+      );
+      const hashes = this.state.selected.map((commit: Commit) => commit.hash);
+
+      revertDialog.revertDialog.call(this, title, () => this.undoCommits(hashes));
+    }
+  }
+
   onCommit(message: string) {
     const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
@@ -311,7 +370,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       <span>Undo <em>{message}</em>?</span>
     );
 
-    revertDialog.revertDialog.call(this, title, () => this.undoCommit(hash));
+    revertDialog.revertDialog.call(this, title, () => this.undoCommits([hash]));
   }
 
   onRollback(e) {
@@ -376,11 +435,19 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             </div>
           : null
         }
+        <div className='tablenav top'>
+          <BulkActionPanel
+            onBulkAction={this.onBulkAction.bind(this)}
+            selected={this.state.selected}
+          />
+        </div>
         <CommitsTable
           currentPage={parseInt(this.props.params.page, 10) || 1}
           pages={this.state.pages}
           commits={this.state.commits}
+          selected={this.state.selected}
           enableActions={!this.state.dirtyWorkingDirectory}
+          onCommitSelect={this.onCommitSelect}
           onUndo={this.onUndo}
           onRollback={this.onRollback}
           diffProvider={{ getDiff: this.getDiff }}
