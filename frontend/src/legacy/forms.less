@@ -1,4 +1,57 @@
 .no-wp {
+  input,
+  select {
+    margin: 1px;
+    padding: 3px 5px;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 14px;
+    border-radius: 0;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+  }
+
+  input,
+  textarea {
+    box-sizing: border-box;
+  }
+
+  input[type=text],
+  input[type=password],
+  input[type=checkbox],
+  input[type=color],
+  input[type=date],
+  input[type=datetime],
+  input[type=datetime-local],
+  input[type=email],
+  input[type=month],
+  input[type=number],
+  input[type=radio],
+  input[type=tel],
+  input[type=time],
+  input[type=url],
+  input[type=week],
+  input[type=search],
+  select,
+  textarea {
+    border: 1px solid #ddd;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.07);
+    background-color: #fff;
+    color: #32373c;
+    outline: 0;
+    transition: 50ms border-color ease-in-out;
+  }
+
   input[type=text],
   input[type=email],
   textarea {
@@ -19,10 +72,73 @@
     }
   }
 
-  input,
+  input[type=checkbox],
+  input[type=radio] {
+    border: 1px solid #b4b9be;
+    background: #fff;
+    color: #555;
+    clear: none;
+    cursor: pointer;
+    display: inline-block;
+    line-height: 0;
+    height: 16px;
+    margin: -4px 4px 0 0;
+    outline: 0;
+    padding: 0!important;
+    text-align: center;
+    vertical-align: middle;
+    width: 16px;
+    min-width: 16px;
+    -webkit-appearance: none;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+    transition: .05s border-color ease-in-out;
+
+    &:checked:before {
+      float: left;
+      display: inline-block;
+      vertical-align: middle;
+      width: 16px;
+      font: 400 21px/1 dashicons;
+      speak: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  }
+
+  input[type=checkbox]:checked:before {
+    content: "\f147";
+    margin: -3px 0 0 -4px;
+    color: #1e8cbe;
+  }
+
+  input[type=radio]:checked:before {
+    content: "\2022";
+    text-indent: -9999px;
+    border-radius: 50px;
+    font-size: 24px;
+    width: 6px;
+    height: 6px;
+    margin: 4px;
+    line-height: 16px;
+    background-color: #1e8cbe;
+  }
+
+  label {
+    cursor: pointer;
+    vertical-align: middle;
+  }
+
   select {
-    margin: 1px;
-    padding: 3px 5px;
+    padding: 2px;
+    line-height: 28px;
+    height: 28px;
+    vertical-align: middle;
+  }
+
+  #doaction,
+  #doaction2,
+  #post-query-submit {
+    margin: 1px 8px 0 0;
   }
 
   .button,
