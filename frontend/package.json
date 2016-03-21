@@ -6,7 +6,7 @@
     "loglevel": "warn"
   },
   "scripts": {
-    "postinstall": "./node_modules/.bin/tsd reinstall --save",
+    "postinstall": "./node_modules/.bin/tsd reinstall --clean --overwrite --save",
     "clean": "./node_modules/.bin/rimraf build/*",
     "prebuild": "npm run clean",
     "build": "node ./config/webpack-build.js",
