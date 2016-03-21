@@ -118,7 +118,7 @@ class Reverter {
             $post = $storage->loadEntity($vpId, null);
             if ($post) {
                 $sql = "update {$this->database->prefix}posts set post_modified = '{$date}', post_modified_gmt = '{$dateGmt}' where ID = (select id from {$this->database->prefix}vp_id where vp_id = unhex('{$vpId}'))";
-                $this->database->query($sql);
+                $this->database->vp_direct_query($sql);
                 $post['post_modified'] = $date;
                 $post['post_modified_gmt'] = $dateGmt;
                 $storage->save($post);

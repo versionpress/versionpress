@@ -64,4 +64,7 @@ interface IPostTypeTestWorker extends ITestWorker {
 
     public function prepare_publishTwoPosts();
     public function publishTwoPosts();
+
+    public function prepare_deletePostmeta();
+    public function deletePostmeta(); 
 }

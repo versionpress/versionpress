@@ -22,7 +22,7 @@ class ThemeCustomizerTest extends SeleniumTestCase {
         $this->waitForAjax();
 
         $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction('theme/customize');
+        $commitAsserter->assertCommitAction('option/edit');
         $commitAsserter->assertCleanWorkingDirectory();
     }
 }

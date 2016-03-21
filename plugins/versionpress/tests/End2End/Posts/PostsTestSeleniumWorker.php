@@ -37,4 +37,27 @@ class PostsTestSeleniumWorker extends PostTypeTestSeleniumWorker {
         $this->byCssSelector('form#post #publish')->click();
         $this->waitAfterRedirect();
     }
+
+    public function prepare_deletePostmeta() {
+        $this->url($this->getPostTypeScreenUrl());
+        $this->prepareTestPost();
+        $this->byCssSelector('form#post #publish')->click();
+        $this->waitForElement('#message.updated');
+        $this->byCssSelector('#show-settings-link')->click();
+        $this->byCssSelector('form#adv-settings #postcustom-hide')->click();
+        $this->waitForElement('#metavalue');
+        if($this->elementExists("#enternew")) {
+            $this->jsClickAndWait('#newmetaleft #enternew');
+        }
+        $this->waitForElement('#metakeyinput');
+        $this->byCssSelector('#metakeyinput')->value('post_meta');
+        $this->byCssSelector('#metavalue')->value(Random::generate());
+        $this->byCssSelector('#newmeta-submit')->click();
+        $this->waitForElement("input[id^='deletemeta']");
+    }
+
+    public function deletePostmeta() {
+        $this->jsClickAndWait("input[id^='deletemeta']");
+        $this->waitAfterRedirect();
+    }
 }

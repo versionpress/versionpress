@@ -50,7 +50,8 @@ module.exports = function (isDevelopment) {
         NODE_ENV: JSON.stringify(isDevelopment ? 'development' : 'production'),
         IS_BROWSER: true
       }
-    })
+    }),
+    new webpack.IgnorePlugin(/^\.\/locale$/, [/moment$/]) // http://stackoverflow.com/a/25426019/1243495
   ];
   if (isDevelopment) {
     plugins.push(

@@ -30,13 +30,29 @@ class EntityUtils {
     public static function getDiff($oldEntityData, $newEntityData) {
         $diff = array();
         foreach ($newEntityData as $key => $value) {
-            if (!isset($oldEntityData[$key]) || $oldEntityData[$key] !== $value) {
+
+            if (!isset($oldEntityData[$key]) || self::isChanged($oldEntityData[$key], $value)) {
                 $diff[$key] = $value;
             }
         }
 
         return $diff;
 
+    }
+
+    /**
+     * Evaluates if there is difference between old and new value.
+     * Threads string numbers as equals to their numeric equivalents so e.g. "0" = 0
+     *
+     * @param $oldData
+     * @param $newValue
+     * @return bool
+     */
+    private static function isChanged($oldData, $newValue) {
+        if (is_numeric($oldData) && is_numeric($newValue)) {
+            return $oldData != $newValue;
+        }
+        return $oldData !== $newValue;
     }
 
 }

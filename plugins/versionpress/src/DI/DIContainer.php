@@ -2,6 +2,7 @@
 
 namespace VersionPress\DI;
 
+use VersionPress\Database\SqlQueryParser;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Database\ShortcodesInfo;
 use VersionPress\Git\Committer;
@@ -155,6 +156,13 @@ class DIContainer {
 
         $dic->register(VersionPressServices::SHORTCODES_INFO, function () {
             return new ShortcodesInfo(VERSIONPRESS_PLUGIN_DIR . '/src/Database/wordpress-shortcodes.yml');
+        });
+
+        $dic->register(VersionPressServices::SQL_QUERY_PARSER, function () use ($dic) {
+            return new SqlQueryParser(
+                $dic->resolve(VersionPressServices::DB_SCHEMA),
+                $dic->resolve(VersionPressServices::WPDB)
+            );
         });
 
         return self::$instance;

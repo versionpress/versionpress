@@ -46,10 +46,10 @@ class RequirementsChecker {
         // Markdown can be used in the 'help' field
 
         $this->requirements[] = array(
-            'name' => 'PHP 5.3',
+            'name' => 'PHP 5.6+',
             'level' => 'critical',
-            'fulfilled' => version_compare(PHP_VERSION, '5.3.0', '>='),
-            'help' => 'PHP 5.3 is currently required.'
+            'fulfilled' => version_compare(PHP_VERSION, '5.6.0', '>='),
+            'help' => 'PHP 5.6+ is required.'
         );
 
         $this->requirements[] = array(
@@ -116,14 +116,6 @@ class RequirementsChecker {
             'level' => 'warning',
             'fulfilled' => $this->testDirectoryLayout(),
             'help' => 'It seems like you use customized project structure. VersionPress supports only some scenarios. [Learn more](http://docs.versionpress.net/en/feature-focus/custom-project-structure).'
-        );
-
-
-        $this->requirements[] = array(
-            'name' => '.gitignore',
-            'level' => 'critical',
-            'fulfilled' => $this->testGitignore(),
-            'help' => 'It seems you have already created .gitignore file in the site root. It\'s necessary to add some rules for VersionPress. Please add those from `wp-content/plugins/versionpress/src/Initialization/.gitignore.tpl`.'
         );
 
         $this->requirements[] = array(

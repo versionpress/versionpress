@@ -75,7 +75,7 @@ class VpidRepository {
                 }
                 $targetTable = $this->schemaInfo->getEntityInfo($targetEntity)->tableName;
 
-                $referenceVpId = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=".$entity[$valueColumn]);
+                $referenceVpId = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=" . $entity[$valueColumn]);
                 $entity[$valueColumn] = $referenceVpId;
             }
         }
@@ -87,26 +87,27 @@ class VpidRepository {
         if ($this->schemaInfo->getEntityInfo($entityName)->usesGeneratedVpids) {
             $data['vp_id'] = IdUtil::newId();
             $this->saveId($entityName, $id, $data['vp_id']);
+
+
+            $data[$this->schemaInfo->getEntityInfo($entityName)->idColumnName] = $id;
         }
-
-        $data[$this->schemaInfo->getEntityInfo($entityName)->idColumnName] = $id;
-
         $data = $this->fillId($entityName, $data, $id);
+
         return $data;
     }
 
     public function deleteId($entityName, $id) {
         $vpIdTableName = $this->schemaInfo->getPrefixedTableName('vp_id');
         $tableName = $this->schemaInfo->getTableName($entityName);
-        $deleteQuery = "DELETE FROM $vpIdTableName WHERE `table` = \"$tableName\" AND id = $id";
-        $this->database->query($deleteQuery);
+        $deleteQuery = "DELETE FROM $vpIdTableName WHERE `table` = \"$tableName\" AND id = '$id'";
+        $this->database->vp_direct_query($deleteQuery);
     }
 
     private function saveId($entityName, $id, $vpId) {
         $vpIdTableName = $this->schemaInfo->getPrefixedTableName('vp_id');
         $tableName = $this->schemaInfo->getTableName($entityName);
         $query = "INSERT INTO $vpIdTableName (`vp_id`, `table`, `id`) VALUES (UNHEX('$vpId'), \"$tableName\", $id)";
-        $this->database->query($query);
+        $this->database->vp_direct_query($query);
     }
 
     private function fillId($entityName, $data, $id) {

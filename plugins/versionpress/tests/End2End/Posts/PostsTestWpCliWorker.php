@@ -21,6 +21,15 @@ class PostsTestWpCliWorker extends PostTypeTestWpCliWorker {
         $this->wpAutomation->runWpCliCommand('post', 'term', array('add', $this->postId, 'post_tag', Random::generate()));
     }
 
+    public function prepare_deletePostmeta() {
+        $this->postId = $this->wpAutomation->createPost($this->testPost);
+        $this->wpAutomation->runWpCliCommand('post', 'meta', array('add', $this->postId, 'random_meta', Random::generate()));
+    }
+
+    public function deletePostmeta() {
+        $this->wpAutomation->runWpCliCommand('post', 'meta', array('delete', $this->postId, 'random_meta'));
+    }
+
     public function prepare_changePostFormat() {
         throw new \PHPUnit_Framework_SkippedTestError("Post format cannot be changed using WP-CLI.");
     }

@@ -199,4 +199,18 @@ class PostsTest extends PostTypeTestCase {
     public function publishingOfMultiplePostsCreatesBulkAction() {
         $this->runPublishingMultiplePostsCreatesBulkAction();
     }
+
+    /**
+     * @test
+     * @testdox Deleting post meta creates 'postmeta/delete' action
+     */
+    public function deletingOfPostmetaCreatesPostmetaDeleteAction() {
+        self::$worker->prepare_deletePostmeta();
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+        self::$worker->deletePostmeta();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('postmeta/delete');
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
 }

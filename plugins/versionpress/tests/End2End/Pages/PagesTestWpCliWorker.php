@@ -24,4 +24,12 @@ class PagesTestWpCliWorker extends PostTypeTestWpCliWorker {
 
     public function changePostFormat() {
     }
+
+    public function prepare_deletePostmeta() {
+    }
+
+    public function deletePostmeta() {
+    }
+
+
 }

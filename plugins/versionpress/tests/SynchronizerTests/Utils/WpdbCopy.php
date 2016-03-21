@@ -23,9 +23,10 @@ function wp_load_translations_early() {
 function _doing_it_wrong() {
 
 }
-
-function __($s) {
-    return $s;
+if (!function_exists('__')) {
+    function __($s) {
+        return $s;
+    }
 }
 
 function wp_die($s) {

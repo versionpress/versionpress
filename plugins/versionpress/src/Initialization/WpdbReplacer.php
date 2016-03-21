@@ -39,6 +39,7 @@ class WpdbReplacer {
         $wpdbSource = self::replaceMethod($wpdbSource, 'insert');
         $wpdbSource = self::replaceMethod($wpdbSource, 'update');
         $wpdbSource = self::replaceMethod($wpdbSource, 'delete');
+        $wpdbSource = self::replaceMethod($wpdbSource, 'query');
         $wpdbSource = self::injectVersionPressMethods($wpdbSource);
 
         file_put_contents($wpdbClassPath, $wpdbSource);

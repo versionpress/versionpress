@@ -18,6 +18,7 @@ final class VersionPressServices {
     const URL_REPLACER = 'url-replacer';
     const SHORTCODES_REPLACER = 'shortcode-replacer';
     const SHORTCODES_INFO = 'shortcodes-info';
+    const SQL_QUERY_PARSER = 'sql-query-parser';
 
     private function __construct() {
     }

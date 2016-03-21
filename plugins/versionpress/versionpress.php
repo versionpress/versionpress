@@ -149,7 +149,7 @@ function vp_register_hooks() {
             foreach ($themes as $theme) {
                 $themeName = wp_get_theme($theme)->get('Name');
                 if ($themeName === $theme && isset($upgrader->skin->api, $upgrader->skin->api->name)) {
-                    $themeName =  $upgrader->skin->api->name;
+                    $themeName = $upgrader->skin->api->name;
                 }
 
                 $action = $hook_extra['action']; // can be "install" or "update", see WP_Upgrader and search for `'hook_extra' =>`
@@ -170,11 +170,6 @@ function vp_register_hooks() {
         }
     }, 10, 2);
 
-    add_action('added_option', function ($name) use ($wpdb, $mirror) {
-        $option = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}options WHERE option_name='$name'", ARRAY_A);
-        $mirror->save("option", $option);
-    });
-
     add_filter('upgrader_pre_install', function ($_, $hook_extra) use ($committer) {
         if (!(isset($hook_extra['type']) && $hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'install')) return;
 
@@ -193,7 +188,7 @@ function vp_register_hooks() {
         add_filter('upgrader_post_install', $postInstallHook, 10, 2);
     }, 10, 2);
 
-    add_filter('upgrader_pre_download', function($reply, $_, $upgrader) use ($committer) {
+    add_filter('upgrader_pre_download', function ($reply, $_, $upgrader) use ($committer) {
         if (!isset($upgrader->skin->language_update)) return $reply;
         $languages = get_available_languages();
 
@@ -235,32 +230,7 @@ function vp_register_hooks() {
 
         $committer->forceChangeInfo(new ThemeChangeInfo($stylesheet, 'switch', $themeName));
     });
-
-    add_action('untrashed_post_comments', function ($postId) use ($wpdb, $dbSchemaInfo, $wpdbMirrorBridge) {
-        $commentsTable = $dbSchemaInfo->getPrefixedTableName("comment");
-        $commentStatusSql = "select comment_ID, comment_approved from {$commentsTable} where comment_post_ID = {$postId}";
-        $comments = $wpdb->get_results($commentStatusSql, ARRAY_A);
-
-        foreach ($comments as $comment) {
-            $wpdbMirrorBridge->update($commentsTable,
-                array("comment_approved" => $comment["comment_approved"]),
-                array("comment_ID" => $comment["comment_ID"]));
-        }
-    });
-
-    add_action('delete_post_meta', function ($metaIds) use ($wpdbMirrorBridge, $dbSchemaInfo) {
-        $idColumnName = $dbSchemaInfo->getEntityInfo("postmeta")->idColumnName;
-        foreach ($metaIds as $metaId) {
-            $wpdbMirrorBridge->delete($dbSchemaInfo->getPrefixedTableName("postmeta"), array($idColumnName => $metaId));
-        }
-    });
-
-    add_action('delete_user_meta', function ($metaIds) use ($wpdbMirrorBridge, $dbSchemaInfo) {
-        $idColumnName = $dbSchemaInfo->getEntityInfo("usermeta")->idColumnName;
-        foreach ($metaIds as $metaId) {
-            $wpdbMirrorBridge->delete($dbSchemaInfo->getPrefixedTableName("usermeta"), array($idColumnName => $metaId));
-        }
-    });
+    
 
     add_action('wp_ajax_save-widget', function () use ($committer) {
         if (defined('DOING_AJAX') && DOING_AJAX && isset($_POST['delete_widget']) && $_POST['delete_widget']) {
@@ -292,7 +262,7 @@ function vp_register_hooks() {
         $committer->forceChangeInfo(new TranslationChangeInfo("activate", $newValue, $languageName));
     }, 10, 2);
 
-    add_action('wp_update_nav_menu_item', function($menu_id, $menu_item_db_id) use ($committer) {
+    add_action('wp_update_nav_menu_item', function ($menu_id, $menu_item_db_id) use ($committer) {
         $key = 'menu-item-' . $menu_item_db_id;
         if (defined('DOING_AJAX') && DOING_AJAX && isset($_POST['action']) && $_POST['action'] === 'add-menu-item') {
             $committer->postponeCommit($key);
@@ -397,7 +367,7 @@ function vp_register_hooks() {
     add_action('before_delete_post', function ($postId) use ($wpdb) {
         // Fixing bug in WP (#34803) and WP-CLI (#2246)
         $post = get_post($postId);
-        if ( !is_wp_error($post) && $post->post_type === 'nav_menu_item' ) {
+        if ( !is_wp_error($post) && $post->post_type === 'nav_menu_item') {
             $newParent = get_post_meta($post->ID, '_menu_item_menu_item_parent', true);
             $wpdb->update($wpdb->postmeta,
                 array('meta_value' => $newParent),
@@ -648,8 +618,9 @@ function vp_admin_post_cancel_deactivation() {
  * or is called directly from vp_deactivate() if the confirmation screen was not necessary.
  */
 function vp_admin_post_confirm_deactivation() {
-
-    vp_verify_nonce('vp_deactivation');
+    //nonce verification is performed according to 'deactivate-plugin_versionpress/versionpress.php'
+    // as a standard deactivation token for which nonce is generated
+    vp_verify_nonce('deactivate-plugin_versionpress/versionpress.php');
     vp_check_permissions();
 
     define('VP_DEACTIVATING', true);
@@ -756,7 +727,7 @@ function vp_display_activation_notice($file, $plugin_data) {
 
     $wp_list_table = _get_list_table('WP_Plugins_List_Table');
     $activationUrl = menu_page_url('versionpress', false);
-    echo '<tr class="plugin-update-tr vp-plugin-update-tr updated"><td colspan="' . esc_attr( $wp_list_table->get_column_count() ) . '" class="vp-plugin-update plugin-update colspanchange"><div class="update-message vp-update-message">';
+    echo '<tr class="plugin-update-tr vp-plugin-update-tr updated"><td colspan="' . esc_attr($wp_list_table->get_column_count()) . '" class="vp-plugin-update plugin-update colspanchange"><div class="update-message vp-update-message">';
     echo 'VersionPress is installed but not yet tracking this site. <a href="' . $activationUrl . '">Please finish the activation.</a>';
     echo '</div></td></tr>';
 }
