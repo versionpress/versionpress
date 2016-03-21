@@ -1,6 +1,6 @@
 # Contributing
 
-You're awesome! :heart:
+You're awesome!
 
 - [Reporting bugs](#reporting-bugs)
 - [Feature ideas](#feature-ideas)
@@ -10,31 +10,23 @@ You're awesome! :heart:
 
 ## Reporting bugs
 
-Generally, there can be two kinds of issues with VersionPress:
+1. Support issues (white screen of death, unsupported host etc.) should go to the [**support repo**](https://github.com/versionpress/support). Make sure you're reporting a true VersionPress issue here.
+2. [**Search** the issues](https://github.com/versionpress/versionpress/issues) first.
+3. [Open a new issue](https://github.com/versionpress/versionpress/issues/new).
+    - You can also **discuss** it first [on Gitter](https://gitter.im/versionpress/versionpress). 
 
-1. You cannot get it working on a *specific site* (on your host, with a certain combination of plugins etc.). In that case please open a ticket in our [**support repo**](https://github.com/versionpress/support).
-2. You indeed found a bug *in VersionPress*, or at least you're pretty sure you did.
 
-Then, do this:
+What makes the issue really helpful:
 
-1. Search [the issues](https://github.com/versionpress/versionpress/issues) to see if it hasn't been reported before. Here's a [quick wiki page](https://github.com/versionpress/versionpress/wiki/Issues) on how we use the issues.
-2. Open a new issue for the bug. Someone from the team will respond to you soon and label the issue appropriately.
-
-What makes the bug report *amazing* for us:
-
-- You articulate the problem clearly and provide **steps to reproduce** the problem. Reproducibility is a very important thing in every issue.
--  Screenshots or GIFs are appreciated!
+- You articulate the problem clearly and provide **steps to reproduce** the problem.
+- **Screenshots or GIFs** are appreciated.
 
 
 ## Feature ideas
 
-Ideas are great. VersionPress needs them. There are so many difficult problems still to solve, and so many opportunities to make the project better.
+Ideas are great. VersionPress needs them. There are so many difficult problems still to solve, and so many opportunities to make the project better. :bulb: :bulb: :bulb:
 
-:bulb: :bulb: :bulb:
-
-The best place to start is [our Gitter room](https://gitter.im/versionpress/versionpress). You'll get some initial feedback and if the idea is worth pursuing, feel free to open an [issue](https://github.com/versionpress/versionpress/issues) for it.
-
-:bulb: :bulb: :bulb:
+The best place to start is [our Gitter room](https://gitter.im/versionpress/versionpress). You'll get some initial feedback and eventually, it will turn into an issue (ticket) here.
 
 
 ## Contributing code
@@ -59,7 +51,7 @@ The following discusses some of the important details if you want to contribute.
 
 - **We care about user / dev experience**. Everything that is outward-facing, be it a user interface, developer API or a file format, must be carefully designed for usability and usefulness. We invest our energy to save it for the others.
 - **We care about code quality**. Hacked-together code without tests is a liability as soon as it reaches the repo. We try to write good, clean code.
-- **We try to be pragmatic**. While we care about quality, the main thing for VersionPress and its users is to move forward. You won't see us fighting over things like where the long lines wrap, etc.
+- **We try to be pragmatic**. While we care about quality, the main thing for VersionPress and its users is to move forward. We're always looking for the right balance.
 
 
 ### Our development process
@@ -70,7 +62,6 @@ The following discusses some of the important details if you want to contribute.
 
 - We create them for new features, bugs, improvements or even larger things like planning documents. **We strongly prefer issues over wiki** or other documents as they are actionable and time-framed.
 - [This set of labels](https://github.com/versionpress/versionpress/wiki/Issues#labels) is used to categorize issues.
-- Issues are **not a discussion forum**. Users can use [Gitter](https://gitter.im/versionpress/versionpress) (chat) or the [support repo](https://github.com/versionpress/support) for that.
 
 **Branches**: The current release being worked on is `master`. It is hence inherently unsafe, even though we do our best to keep it in a good shape.
 
@@ -158,9 +149,9 @@ Feel free to reach the devs in the [Gitter room](https://gitter.im/versionpress/
 
 ## Improving docs
 
-Public docs (docs.versionpress.net) are managed via the [versionpress/docs](https://github.com/versionpress/docs) repo. We'll be happy to accept Pull Requests with improvements, spelling errors etc. – thank you!
+Public docs (docs.versionpress.net) are managed via [versionpress/docs](https://github.com/versionpress/docs). We're happy to accept pull requests with improvements, fixes for spelling errors etc. Thank you!
 
 
 ---
 
-Other ideas of how to contribute? Join us in the [Gitter room](https://gitter.im/versionpress/versionpress). 
+Other ideas of how to contribute? Tell us [on Gitter](https://gitter.im/versionpress/versionpress). 
