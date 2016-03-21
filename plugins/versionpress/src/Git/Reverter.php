@@ -174,7 +174,7 @@ class Reverter {
 
         foreach ($entityInfo->references as $reference => $referencedEntityName) {
             $vpReference = "vp_$reference";
-            if (!isset($entity[$vpReference]) || $entity[$vpReference] == 0) {
+            if (!isset($entity[$vpReference]) || $entity[$vpReference] === 0 || $entity[$vpReference] === '0') {
                 continue;
             }
 
