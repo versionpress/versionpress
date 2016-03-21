@@ -8,14 +8,20 @@ use VersionPress\Utils\StringUtils;
 class SerializedDataToIniConverter {
 
     private $serializedMarker;
+    private $index = 0;
+    private $value;
+
 
     public function __construct($serializedMarker) {
         $this->serializedMarker = $serializedMarker;
     }
 
     public function toIniLines($key, $serializedData) {
-        $unserializedData = unserialize($serializedData);
-        $iniLines = self::serializeDataToIni($key, $unserializedData);
+        $this->value = $serializedData;
+        $parsingResult = self::parseSerializedString();
+        $iniLines = self::convertParsingResultToIni($key, $parsingResult);
+        $this->index = 0;
+        $this->value = null;
 
         // Add marker
         $iniLines[0] = StringUtils::replaceFirst(' = ', " = {$this->serializedMarker} ", $iniLines[0]);
@@ -46,59 +52,128 @@ class SerializedDataToIniConverter {
      * @param mixed $value Value to serialize
      * @return array
      */
-    private function serializeDataToIni($key, $value) {
-        if (is_numeric($value) || is_string($value)) {
-            return [$key . ' = ' . self::primitiveToEscapedString($value)];
+    private function parseSerializedString() {
+        $type = $this->value[$this->index];
+        $this->index += 2; // <type>:
 
-        } else if (is_bool($value)) {
-            return [$key . ' = <boolean> ' . ($value ? 'true' : 'false')];
+        switch ($type) {
+            case 's':
+                $length = intval(self::substr($this->value, $this->index, strpos($this->value, ':', $this->index)));
+                $this->index += strlen($length) + 2; // :"
+                $str = substr($this->value, $this->index, $length);
+                $this->index += strlen($str) + 2; // ";
 
-        } else if (is_array($value)) {
-            return $this->serializeArrayToIni($key, $value);
+                return ['type' => 'string', 'value' => $str];
+            case 'i':
+            case 'd':
+                $number = self::substr($this->value, $this->index, strpos($this->value, ';', $this->index));
+                $this->index += strlen($number) + 1; // ;
+                return ['type' => $type === 'i' ? 'int' : 'double', 'value' => $number];
 
-        } else if (is_object($value)) {
-            return $this->serializeObjectToIni($key, $value);
+            case 'b':
+                $strVal = self::substr($this->value, $this->index, strpos($this->value, ';', $this->index));
+                $this->index += 2; // <0|1>;
+                return ['type' => 'boolean', 'value' => $strVal === '1'];
+            case 'a':
+                $length = intval(self::substr($this->value, $this->index, strpos($this->value, ':', $this->index)));
+                $this->index += strlen($length) + 2; // :{
 
-        } else if (is_null($value)) {
-            return [$key . ' = <null>'];
+                $subItems = [];
+                for ($i = 0; $i < $length; $i++) {
+                    $key = $this->parseSerializedString()['value'];
+                    $value = $this->parseSerializedString();
+
+                    $subItems[$key] = $value;
+                }
+
+                $this->index += 1; // }
+
+                return ['type' => 'array', 'value' => $subItems];
+            case 'O':
+                $classNameLength = intval(self::substr($this->value, $this->index, strpos($this->value, ':', $this->index)));
+                $this->index += strlen($classNameLength) + 2; // :"
+                $className = substr($this->value, $this->index, $classNameLength);
+                $this->index += $classNameLength + 2; // ":
+                $attributeCount = intval(self::substr($this->value, $this->index, strpos($this->value, ':', $this->index)));
+                $this->index += strlen($attributeCount) + 2; // :{
+
+                $attribute = [];
+                for ($i = 0; $i < $attributeCount; $i++) {
+                    $attributeName = $this->parseSerializedString()['value'];
+
+                    $attributeName = str_replace("\0*\0", '*', $attributeName);
+                    $attributeName = str_replace("\0{$className}\0", '-', $attributeName);
+
+                    $attributeValue = $this->parseSerializedString();
+
+                    $attribute[$attributeName] = $attributeValue;
+                }
+
+                $this->index += 1; // }
+
+                return ['type' => 'object', 'class' => $className, 'value' => $attribute];
+            case 'N':
+                return ['type' => 'null'];
+            case 'r':
+            case 'R':
+                $number = self::substr($this->value, $this->index, strpos($this->value, ';', $this->index));
+                $this->index += strlen($number) + 1; // ;
+
+                return ['type' => $type === 'r' ? 'pointer' : 'reference', 'value' => $number];
+            default:
+                return [];
         }
-
-        return [];
     }
 
-    private function serializeArrayToIni($key, $value) {
-        $lines = [$key . ' = <array>'];
-        foreach ($value as $arrayKey => $arrayValue) {
-            $subkey = $key . '[' . self::primitiveToEscapedString($arrayKey) . ']';
-            $lines = array_merge($lines, self::serializeDataToIni($subkey, $arrayValue));
+    public static function convertParsingResultToIni($key, $parsingResult) {
+        $type = $parsingResult['type'];
+
+        switch ($type) {
+            case 'string':
+            case 'int':
+            case 'double':
+                return [self::banan($key, null, $parsingResult['value'])];
+            case 'boolean':
+                return [self::banan($key, $type, $parsingResult['value'])];
+            case 'array':
+                $lines = [self::banan($key, $type)];
+                foreach ($parsingResult['value'] as $subKey => $subItem) {
+                    $subKey = self::primitiveToEscapedString($subKey);
+                    $lines = array_merge($lines, self::convertParsingResultToIni("{$key}[$subKey]", $subItem));
+                }
+                return $lines;
+            case 'object':
+                $lines = [self::banan($key, $parsingResult['class'])];
+                foreach ($parsingResult['value'] as $subKey => $subItem) {
+                    $subKey = self::primitiveToEscapedString($subKey);
+                    $lines = array_merge($lines, self::convertParsingResultToIni("{$key}[$subKey]", $subItem));
+                }
+                return $lines;
+            case 'null':
+                return [self::banan($key, $type)];
+            case 'pointer':
+                return [self::banan($key, $type, $parsingResult['value'])];
+            case 'reference':
+                return [self::banan($key, $type, $parsingResult['value'])];
         }
-        return $lines;
     }
 
-    private function serializeObjectToIni($key, $value) {
-        $lines = [$key . ' = <' . get_class($value) . '>'];
-        $reflection = new \ReflectionObject($value);
-        $properties = $reflection->getProperties();
+    public static function banan($key, $type = null, $value = null) {
+        $parts = [$key, '='];
 
-        if (method_exists($value, '__sleep')) {
-            $propertyNames = $value->__sleep();
-        } else {
-            $propertyNames = array_map(function (\ReflectionProperty $property) {
-                return $property->getName();
-            }, $properties);
+        if ($type !== null) {
+            $parts[] = "<$type>";
         }
 
-        foreach ($propertyNames as $propertyName) {
-            $property = $reflection->getProperty($propertyName);
-            $property->setAccessible(true);
-            $accesibilityFlag = $property->isPrivate() ? '-' : ($property->isProtected() ? '*' : '');
-
-            $propertyValue = $property->getValue($value);
-            $subkey = $key . '["' . $accesibilityFlag . $property->getName() . '"]';
-            $lines = array_merge($lines, self::serializeDataToIni($subkey, $propertyValue));
+        if ($value !== null) {
+            $parts[] = self::primitiveToEscapedString($value);
         }
 
-        return $lines;
+        return join(' ', $parts);
+    }
+
+    public static function substr($str, $from, $to) {
+        return substr($str, $from, $to - $from);
     }
 
     private static function primitiveToEscapedString($value) {
@@ -131,7 +206,7 @@ class SerializedDataToIniConverter {
             $value = $matches[2];
         }
 
-        if (is_numeric($value)) {
+        if ($type === null && is_numeric($value)) {
             return (Strings::contains($value, '.') ? 'd' : 'i') . ':' . $value . ';';
         }
 
@@ -149,6 +224,14 @@ class SerializedDataToIniConverter {
 
         if ($type === 'null') {
             return 'N;';
+        }
+
+        if ($type === 'reference') {
+            return 'R:' . $value . ';';
+        }
+
+        if ($type === 'pointer') {
+            return 'r:' . $value . ';';
         }
 
         if (Strings::startsWith($value, '"')) { // plain serialized strings are in quotes because of `<<<serialized>>> "string"`

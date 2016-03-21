@@ -602,13 +602,31 @@ INI
     /**
      * @test
      */
-    public function serializedNumber() {
+    public function serializedInteger() {
         $serializedString = serialize(777);
 
         $data = ["Section" => ["data" => $serializedString]];
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
 data = <<<serialized>>> 777
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedDouble() {
+        $serializedString = serialize(1.2);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> 1.2
 
 INI
         );
@@ -914,5 +932,178 @@ INI
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedMultipleSameObjects() {
+        $object = new \stdClass();
+
+        $serializedString = serialize([$object, $object, $object]);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = <stdClass>
+data[1] = <pointer> 2
+data[2] = <pointer> 2
+
+INI
+        );
+
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+        $this->assertSame($ini, IniSerializer::serialize($data));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedReferenceToArray() {
+        $array = [];
+        $array['inception'] = &$array;
+
+        $serializedString = serialize($array);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data["inception"] = <array>
+data["inception"]["inception"] = <reference> 2
+
+INI
+        );
+
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+        $this->assertSame($ini, IniSerializer::serialize($data));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedMoreComplexArrayReferences() {
+        $parent = [];
+        $a = ['parent' => &$parent];
+        $b = ['parent' => &$parent];
+
+        $serializedString = serialize([$a, $b]);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = <array>
+data[0]["parent"] = <array>
+data[1] = <array>
+data[1]["parent"] = <reference> 3
+
+INI
+        );
+
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+        $this->assertSame($ini, IniSerializer::serialize($data));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedEvenMoreComplexArrayReferences() {
+        $parent = [];
+        $a = ['parent' => &$parent];
+        $b = ['parent' => &$parent];
+
+        $a['a'] = &$a;
+        $a['b'] = &$b;
+        $b['a'] = &$a;
+        $b['b'] = &$b;
+
+        $serializedString = serialize([$a, $b]);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = <array>
+data[0]["parent"] = <array>
+data[0]["a"] = <array>
+data[0]["a"]["parent"] = <reference> 3
+data[0]["a"]["a"] = <reference> 4
+data[0]["a"]["b"] = <array>
+data[0]["a"]["b"]["parent"] = <reference> 3
+data[0]["a"]["b"]["a"] = <reference> 4
+data[0]["a"]["b"]["b"] = <reference> 5
+data[0]["b"] = <reference> 5
+data[1] = <array>
+data[1]["parent"] = <reference> 3
+data[1]["a"] = <reference> 4
+data[1]["b"] = <reference> 5
+
+INI
+        );
+
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+        $this->assertSame($ini, IniSerializer::serialize($data));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedReferenceToClass() {
+        $class = new \stdClass();
+        $class->inception = &$class;
+
+        $serializedString = serialize($class);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <stdClass>
+data["inception"] = <reference> 1
+
+INI
+        );
+
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+        $this->assertSame($ini, IniSerializer::serialize($data));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedMoreComplexClassReferences() {
+        $parent = new \stdClass();
+        $a = new \stdClass();
+        $b = new \stdClass();
+
+        $a->parent = &$parent;
+        $a->a = &$a;
+        $a->b = &$b;
+
+        $b->parent = &$parent;
+        $b->a = &$a;
+        $b->b = &$b;
+
+        $serializedString = serialize([$a, $b]);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = <stdClass>
+data[0]["parent"] = <stdClass>
+data[0]["a"] = <reference> 2
+data[0]["b"] = <stdClass>
+data[0]["b"]["parent"] = <reference> 3
+data[0]["b"]["a"] = <reference> 2
+data[0]["b"]["b"] = <reference> 4
+data[1] = <pointer> 4
+
+INI
+        );
+
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+        $this->assertSame($ini, IniSerializer::serialize($data));
     }
 }
