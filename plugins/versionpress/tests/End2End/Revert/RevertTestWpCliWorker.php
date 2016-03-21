@@ -87,6 +87,22 @@ class RevertTestWpCliWorker extends WpCliWorker implements IRevertTestWorker {
         $this->createTestPost();
     }
 
+    public function prepare_undoToTheSameState() {
+        $this->createTestPost();
+        $this->undoLastCommit();
+    }
+
+    public function prepare_rollbackToTheSameState() {
+        $postId = $this->createTestPost();
+        $this->wpAutomation->deletePost($postId);
+    }
+
+    public function rollbackToTheSameState() {
+        $log = $this->repository->log("HEAD~3..HEAD~2");
+        $commitForRollback = $log[0]->getHash();
+        $this->wpAutomation->runWpCliCommand('vp', 'rollback', array($commitForRollback));
+    }
+
     public function prepare_undoMultipleCommits() {
         $this->wpAutomation->editOption('blogname', 'Random blogname for undo test ' . Random::generate());
         $this->createTestPost();
@@ -97,10 +113,28 @@ class RevertTestWpCliWorker extends WpCliWorker implements IRevertTestWorker {
     }
 
     public function undoMultipleCommits() {
-        $firstCommit = $this->repository->getLastCommitHash();
-        $log = $this->repository->log("HEAD~2..HEAD~1");
-        $secondCommit = $log[0]->getHash();
+        $log = $this->repository->log("HEAD~2..HEAD");
+        $firstCommit = $log[0]->getHash();
+        $secondCommit = $log[1]->getHash();
 
+        $commits = array($firstCommit, $secondCommit);
+        $this->wpAutomation->runWpCliCommand('vp', 'undo', array(implode(',', $commits)));
+    }
+
+    public function prepare_undoMultipleDependentCommits() {
+        $postId = $this->createTestPost();
+        $this->createCommentForPost($postId);
+        return array(
+            array('D', '%vpdb%/posts/*'),
+            array('D', '%vpdb%/comments/*')
+        );
+    }
+
+    public function undoMultipleDependentCommits() {
+        $log = $this->repository->log("HEAD~2..HEAD");
+        $firstCommit = $log[0]->getHash();
+        $secondCommit = $log[1]->getHash();
+        
         $commits = array($firstCommit, $secondCommit);
         $this->wpAutomation->runWpCliCommand('vp', 'undo', array(implode(',', $commits)));
     }
@@ -110,19 +144,18 @@ class RevertTestWpCliWorker extends WpCliWorker implements IRevertTestWorker {
         $commentId = $this->createCommentForPost($postId);
         $this->wpAutomation->deleteComment($commentId);
         $this->wpAutomation->deletePost($postId);
+        $this->createTestPost();
     }
 
     public function undoMultipleCommitsThatCannotBeReverted() {
         try {
-            $log = $this->repository->log("HEAD~4..HEAD~1");
-            $firstCommit = $log[2]->getHash();
-            $secondCommit = $log[0]->getHash();
+            $log = $this->repository->log("HEAD~3..HEAD");
+            $firstCommit = $log[0]->getHash();
+            $secondCommit = $log[2]->getHash();
 
             $commits = array($firstCommit, $secondCommit);
             $this->wpAutomation->runWpCliCommand('vp', 'undo', array(implode(',', $commits)));
-        } catch (\Exception $e) {
-            
-        } // Intentionally empty catch. Violated referetial integrity throws an exception.
+        } catch (\Exception $e) {} // Intentionally empty catch. Violated referetial integrity throws an exception.
     }
 
     //---------------------
