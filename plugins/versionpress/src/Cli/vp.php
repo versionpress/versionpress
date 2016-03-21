@@ -869,7 +869,7 @@ class VPCommand extends WP_CLI_Command {
         if (!preg_match('/^[0-9a-f]+$/', $hash) || count($log) === 0) {
             WP_CLI::error("Commit '$hash' does not exist.");
         }
-        if (!$repository->wasCreatedAfter($hash, $initialCommitHash) && $hash !== $initialCommitHash) {
+        if (!$repository->wasCreatedAfter($hash, $initialCommitHash) && $log[0]->getHash() !== $initialCommitHash) {
             WP_CLI::error('Cannot roll back before initial commit');
         }
 

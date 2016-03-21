@@ -246,7 +246,7 @@ class VersionPressApi {
         if (!preg_match('/^[0-9a-f]+$/', $commitHash) || count($log) === 0) {
             return new WP_Error( 'error', 'Invalid commit hash', array('status' => 404));
         }
-        if (!$this->gitRepository->wasCreatedAfter($commitHash, $initialCommitHash) && $commitHash !== $initialCommitHash) {
+        if (!$this->gitRepository->wasCreatedAfter($commitHash, $initialCommitHash) && $log[0]->getHash() !== $initialCommitHash) {
             return new WP_Error( 'error', 'Cannot roll back before initial commit', array('status' => 403));
         }
 
