@@ -862,11 +862,17 @@ class VPCommand extends WP_CLI_Command {
         /** @var GitRepository $repository */
         $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
 
+        $initialCommitHash = $this->getInitialCommitHash($repository);
+
         $hash = $args[0];
         $log = $repository->log($hash);
-        if (count($log) === 0) {
+        if (!preg_match('/^[0-9a-f]+$/', $hash) || count($log) === 0) {
             WP_CLI::error("Commit '$hash' does not exist.");
         }
+        if (!$repository->wasCreatedAfter($hash, $initialCommitHash) && $hash !== $initialCommitHash) {
+            WP_CLI::error('Cannot roll back before initial commit');
+        }
+
 
         $this->switchMaintenance('on');
 

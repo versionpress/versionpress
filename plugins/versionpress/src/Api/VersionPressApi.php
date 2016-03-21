@@ -240,11 +240,14 @@ class VersionPressApi {
     public function rollbackToCommit(WP_REST_Request $request) {
         $commitHash = $request['commit'];
 
-        if (!preg_match('/^[0-9a-f]+$/', $commitHash)) {
-            return new WP_Error(
-                'error',
-                'Invalid commit hash',
-                array('status' => 404));
+        $initialCommitHash = $this->getInitialCommitHash();
+
+        $log = $this->gitRepository->log($commitHash);
+        if (!preg_match('/^[0-9a-f]+$/', $commitHash) || count($log) === 0) {
+            return new WP_Error( 'error', 'Invalid commit hash', array('status' => 404));
+        }
+        if (!$this->gitRepository->wasCreatedAfter($commitHash, $initialCommitHash) && $commitHash !== $initialCommitHash) {
+            return new WP_Error( 'error', 'Cannot roll back before initial commit', array('status' => 403));
         }
 
         return $this->revertCommits('rollback', array($commitHash));
