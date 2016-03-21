@@ -785,11 +785,19 @@ class VPCommand extends WP_CLI_Command {
         /** @var GitRepository $repository */
         $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
 
+        $initialCommitHash = $this->getInitialCommitHash($repository);
+
         $commits = explode(',', $args[0]);
         foreach ($commits as $hash) {
             $log = $repository->log($hash);
-            if (count($log) === 0) {
+            if (!preg_match('/^[0-9a-f]+$/', $hash) || count($log) === 0) {
                 WP_CLI::error("Commit '$hash' does not exist.");
+            }
+            if ($log[0]->isMerge()) {
+                WP_CLI::error('Cannot undo merge commit.');
+            }
+            if (!$repository->wasCreatedAfter($hash, $initialCommitHash)) {
+                WP_CLI::error('Cannot undo changes before initial commit');
             }
         }
 
@@ -1035,6 +1043,18 @@ class VPCommand extends WP_CLI_Command {
 
             $this->runVPInternalCommand('update-config', array($urlConstant, $url));
         }
+    }
+
+    /**
+     * @param GitRepository $repository
+     * @return string
+     */
+    private function getInitialCommitHash(GitRepository $repository) {
+        $preActivationHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
+        if (empty($preActivationHash)) {
+            return $repository->getInitialCommit()->getHash();
+        }
+        return $repository->getChildCommit($preActivationHash);
     }
 }
 

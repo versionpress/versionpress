@@ -170,12 +170,7 @@ class VersionPressApi {
             return new WP_Error('notice', 'No more commits to show.', array('status' => 404));
         }
 
-        $preActivationHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
-        if (empty($preActivationHash)) {
-            $initialCommitHash = $this->gitRepository->getInitialCommit()->getHash();
-        } else {
-            $initialCommitHash = $this->gitRepository->getChildCommit($preActivationHash);
-        }
+        $initialCommitHash = $this->getInitialCommitHash();
 
         $isChildOfInitialCommit = $this->gitRepository->wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
         $isFirstCommit = $page === 0;
@@ -220,12 +215,18 @@ class VersionPressApi {
     public function undoCommits(WP_REST_Request $request) {
         $commitHashes = explode(',', $request['commits']);
 
+        $initialCommitHash = $this->getInitialCommitHash();
+
         foreach ($commitHashes as $commitHash) {
-            if (!preg_match('/^[0-9a-f]+$/', $commitHash)) {
-                return new WP_Error(
-                    'error',
-                    'Invalid commit hash',
-                    array('status' => 404));
+            $log = $this->gitRepository->log($commitHash);
+            if (!preg_match('/^[0-9a-f]+$/', $commitHash) || count($log) === 0) {
+                return new WP_Error( 'error', 'Invalid commit hash', array('status' => 404));
+            }
+            if ($log[0]->isMerge()) {
+                return new WP_Error( 'error', 'Cannot undo merge commit', array('status' => 403));
+            }
+            if (!$this->gitRepository->wasCreatedAfter($commitHash, $initialCommitHash)) {
+                return new WP_Error( 'error', 'Cannot undo changes before initial commit', array('status' => 403));
             }
         }
 
@@ -558,5 +559,16 @@ class VersionPressApi {
         }, $changedFiles);
 
         return $fileChanges;
+    }
+
+    /**
+     * @return string
+     */
+    private function getInitialCommitHash() {
+        $preActivationHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
+        if (empty($preActivationHash)) {
+            return $this->gitRepository->getInitialCommit()->getHash();
+        }
+        return $this->gitRepository->getChildCommit($preActivationHash);
     }
 }
