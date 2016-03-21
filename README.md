@@ -1,50 +1,49 @@
 # VersionPress
 
-WordPress with full power of Git. Undo any change, branch & merge like crazy, migrate databases between environments and much more. <http://versionpress.net/>
+Git-based version control plugin for WordPress. Undo any change, branch & merge easily, migrate database content between environments and more. <http://versionpress.net/>
 
-**WordPress + Git = ♡**
+**WordPress + Git = :heart:**
 
+
+## Early Access
+
+VersionPress is a challenging project and not generally recommended for production use yet. [Learn more](http://docs.versionpress.net/en/getting-started/about-eap). :hatching_chick: 
 
 ## Get started
 
 To **use** VersionPress:
 
-1. Download the ZIP from <http://versionpress.net/>.
-2. Install to your WordPress site.
-3. Read the [quick start tutorial](http://blog.versionpress.net/2015/05/versionpress-1-0-walkthrough/) (and [part 2](http://blog.versionpress.net/2015/09/versionpress-2-0-staging/) on staging).
-4. Enjoy!
+1. Make sure you read the [Early Access notes](http://docs.versionpress.net/en/getting-started/about-eap).
+2. Download the latest version from <http://versionpress.net/>.
+3. Install to your WordPress site.
+4. Read the [quick start tutorial](http://blog.versionpress.net/2015/05/versionpress-1-0-walkthrough/) and [part 2 on staging](http://blog.versionpress.net/2015/09/versionpress-2-0-staging/).
+5. Enjoy!
 
-To **develop** VersionPress / build locally:
 
-1. Make sure you have Modern WP Developer's Toolbelt™ installed (Git, Node.js, Composer, WP-CLI etc., see [Dev Setup wiki](https://github.com/versionpress/versionpress/wiki/Dev-Setup)).
+To **develop** VersionPress:
+
+1. Make sure you have tools like Git, NPM, Composer, WP-CLI etc. installed, see [Dev-Setup.md](./docs/Dev-Setup.md).
 2. Clone this repo.
 3. Run `npm install`.
 
-The main plugin is now available at `PROJ_DIR/plugins/versionpress` and the GUI (React.js app) at `PROJ_DIR/frontend`.
-
-[Learn more about the dev process.](https://github.com/versionpress/versionpress/wiki/Dev-Setup) 
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for more.
 
 
 ## Useful resources
 
 - <http://versionpress.net/> 
 - [User documentation](http://docs.versionpress.net/)
-- [Support repo](https://github.com/versionpress/support)
-- [Developer wiki](https://github.com/versionpress/versionpress/wiki)
 - [Blog](http://blog.versionpress.net/)
+- [Support repo](https://github.com/versionpress/support)
 
 
 ## Contributing
 
 There are many ways to contribute:
 
-- Developers, we love PRs.
+- Developers, we'd love [your help](./CONTRIBUTING.md).
 - Good at writing? Help maintain [the docs](https://github.com/versionpress/docs).
 - Found a bug? [File an issue](https://github.com/versionpress/versionpress/issues).
 
-See [CONTRIBUTING.md](https://github.com/versionpress/versionpress/blob/master/CONTRIBUTING.md) for the details.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for more. Thank you!
 
-
----
-
-Let's change WordPress forever!
