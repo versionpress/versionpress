@@ -872,6 +872,9 @@ class VPCommand extends WP_CLI_Command {
         if (!$repository->wasCreatedAfter($hash, $initialCommitHash) && $log[0]->getHash() !== $initialCommitHash) {
             WP_CLI::error('Cannot roll back before initial commit');
         }
+        if ($log[0]->getHash() === $repository->getLastCommitHash()) {
+            WP_CLI::error('Nothing to commit. Current state is the same as the one you want rollback to.');
+        }
 
 
         $this->switchMaintenance('on');

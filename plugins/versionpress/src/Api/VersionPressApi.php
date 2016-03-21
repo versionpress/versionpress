@@ -249,6 +249,9 @@ class VersionPressApi {
         if (!$this->gitRepository->wasCreatedAfter($commitHash, $initialCommitHash) && $log[0]->getHash() !== $initialCommitHash) {
             return new WP_Error( 'error', 'Cannot roll back before initial commit', array('status' => 403));
         }
+        if ($log[0]->getHash() === $this->gitRepository->getLastCommitHash()) {
+            return new WP_Error( 'error', 'Nothing to commit. Current state is the same as the one you want rollback to.', array('status' => 403));
+        }
 
         return $this->revertCommits('rollback', array($commitHash));
     }
