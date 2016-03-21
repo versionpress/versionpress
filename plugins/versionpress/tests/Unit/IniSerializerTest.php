@@ -170,7 +170,7 @@ INI
         );
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
-key1 = "My \ site"
+key1 = "My \\ site"
 
 INI
         );
@@ -192,7 +192,7 @@ INI
         );
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
-key1 = "My \\ site"
+key1 = "My \\\\ site"
 
 INI
         );
@@ -214,7 +214,7 @@ INI
         );
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
-key1 = "My \\\ site"
+key1 = "My \\\\\\ site"
 
 INI
         );
@@ -231,12 +231,14 @@ INI
 
         $data = array(
             "Section" => array(
-                "key1" => "Value \\"
+                "key1" => "Value \\",
+                "key2" => "Value \\",
             )
         );
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
-key1 = "Value \"
+key1 = "Value \\"
+key2 = "Value \\"
 
 INI
         );
@@ -459,7 +461,7 @@ INI
         $data = array("Section" => array("key1" => '\n'));
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
-key1 = "\n"
+key1 = "\\n"
 
 INI
         );
@@ -538,9 +540,9 @@ INI
     }
 
     public function specialCharactersInValueProvider() {
-        // Double quotes are escaped see WP-458
+        // Double quotes and backslashes are escaped see WP-458 and WP-619
         return array_filter($this->specialCharactersProvider(), function ($val) {
-            return $val[0] !== "\"";
+            return $val[0] !== "\"" && $val[0] !== "\\";
         });
     }
 
@@ -682,6 +684,29 @@ INI
 [Section]
 data = <<<serialized>>> <array>
 data[0] = "some string"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     * @dataProvider specialCharactersInValueProvider
+     */
+    public function serializedArrayWithSpecialStrings($str) {
+        $serializedString = serialize([$str, $str, $str]);
+
+        $data = ["Section" => ["data" => $serializedString]];
+
+        $ini = StringUtils::crlfize(<<<INI
+[Section]
+data = <<<serialized>>> <array>
+data[0] = "$str"
+data[1] = "$str"
+data[2] = "$str"
 
 INI
         );

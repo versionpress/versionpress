@@ -117,7 +117,8 @@ class IniSerializer {
      * @return mixed
      */
     private static function escapeString($str) {
-        $str = str_replace('"', '\"', $str);
+        $str = str_replace('\\', '\\\\', $str);
+        $str = str_replace('"', '\\"', $str);
         return $str;
     }
 
@@ -129,7 +130,8 @@ class IniSerializer {
      * @return mixed
      */
     private static function unescapeString($str) {
-        $str = str_replace('\"', '"', $str);
+        $str = str_replace('\\\\', '\\', $str);
+        $str = str_replace('\\"', '"', $str);
         return $str;
     }
 
@@ -169,8 +171,8 @@ class IniSerializer {
      */
     private static function eolWorkaround_addPlaceholders($iniString) {
 
-        // https://regex101.com/r/cJ6eN0/4
-        $stringValueRegEx = "/[ =]\"(.*)(?<!\\\\)\"/sU";
+        // https://regex101.com/r/cJ6eN0/6
+        $stringValueRegEx = "/ = \"((?:[^\"\\\\]|\\\\.)*)\"/sU";
 
         $iniString = preg_replace_callback($stringValueRegEx, array('VersionPress\Utils\Serialization\IniSerializer', 'replace_eol_callback'), $iniString);
 
