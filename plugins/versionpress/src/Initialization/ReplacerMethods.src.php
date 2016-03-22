@@ -163,21 +163,7 @@ class ReplacerMethods {
             "insert_id" => $this->insert_id,
         );
     }
-
-    /**
-     * Calls original wpdb.query() method without VersionPress mirroring functionality.
-     * Used in cases when VersionPress calls database for its internal needs
-     * @since VersionPress
-     * @param $query
-     * @return mixed
-     */
-    public function vp_direct_query($query) {
-        $this->vp_use_original_query_method = true;
-        $r = $this->query($query);
-        $this->vp_use_original_query_method = false;
-        return $r;
-    }
-
+    
     /**
      * @since VersionPress
      */
