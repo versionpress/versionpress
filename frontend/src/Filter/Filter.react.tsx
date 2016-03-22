@@ -46,7 +46,7 @@ export default class Filter extends React.Component<FilterProps,{}> {
         <form action='' method='post' onSubmit={this.onSubmit.bind(this)}>
           <p className='search-box'>
             <input type='search' className='Filter-query' name='s' ref='search' />
-            <input type='submit' className='button' value='Search commits' />
+            <input type='submit' className='button' value='Search' />
           </p>
         </form>
       </div>
