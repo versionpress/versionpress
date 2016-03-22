@@ -23,6 +23,7 @@ class SqlQueryParser {
 
     /**
      * SqlQueryParser constructor.
+     * 
      * @param DbSchemaInfo $schema
      * @param \wpdb $wpdb
      */
@@ -60,7 +61,7 @@ class SqlQueryParser {
      * @return ParsedQueryData
      */
     private function parseUpdateQuery($parser, $query, $schema, $wpdb) {
-        /**@var UpdateStatement $sqlStatement */
+        /** @var UpdateStatement $sqlStatement */
         $sqlStatement = $parser->statements[0];
         $table = $sqlStatement->tables[0]->table;
         $idColumn = $this->resolveIdColumn($schema, $table);
@@ -90,7 +91,7 @@ class SqlQueryParser {
      * @return ParsedQueryData
      */
     private function parseInsertQuery($parser, $query, $schema) {
-        /**@var InsertStatement $sqlStatement */
+        /** @var InsertStatement $sqlStatement */
         $sqlStatement = $parser->statements[0];
         $queryType = ParsedQueryData::INSERT_QUERY;
         $table = $sqlStatement->into->dest->table;
@@ -129,7 +130,7 @@ class SqlQueryParser {
      * @return ParsedQueryData
      */
     private function parseDeleteQuery($parser, $query, $schema, $wpdb) {
-        /**@var DeleteStatement $sqlStatement */
+        /** @var DeleteStatement $sqlStatement */
         $sqlStatement = $parser->statements[0];
         $table = $sqlStatement->from[0]->table;
         $idColumn = $this->resolveIdColumn($schema, $table);
@@ -165,7 +166,7 @@ class SqlQueryParser {
             return $whereFragments;
         } elseif ($primarySqlStatement->where == null && strpos($sqlQuery, 'WHERE') !== false) {
             if (isset($parser->statements[1])) {
-                /**@var UpdateStatement|DeleteStatement|ReplaceStatement $secondarySqlSatement */
+                /** @var UpdateStatement|DeleteStatement|ReplaceStatement $secondarySqlSatement */
                 $secondarySqlSatement = $parser->statements[1];
                 if ($secondarySqlSatement->where != null) {
                     $whereFragments = $secondarySqlSatement->where;
@@ -310,7 +311,7 @@ class SqlQueryParser {
      * @return Parser
      */
     private function getParserFromQueryWithUsingClause($query, $parser, $matches, $containsUsingPattern) {
-        /**@var DeleteStatement|InsertStatement $sqlStatement */
+        /** @var DeleteStatement|InsertStatement $sqlStatement */
         $sqlStatement = $parser->statements[0];
         $transformedPart = 'ON ';
         $usingColumn = str_replace('`', '', $matches[3][0]);
