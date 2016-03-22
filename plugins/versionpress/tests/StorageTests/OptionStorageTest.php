@@ -31,6 +31,20 @@ class OptionStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
+    public function nullValueOptionMatchWithEmptyStringValueOption() {
+        $testingOption = array(
+            "option_name" => "some option",
+            "option_value" => null,
+            "autoload" => "yes",
+        );
+        $this->storage->save($testingOption);
+        $changeInfo = $this->storage->save($testingOption);
+        $this->assertNull($changeInfo);
+    }
+
+    /**
+     * @test
+     */
     public function loadAllReturnsOnlyOriginalEntities() {
         $this->storage->save($this->testingOption);
         $loadedOptions = $this->storage->loadAll();
