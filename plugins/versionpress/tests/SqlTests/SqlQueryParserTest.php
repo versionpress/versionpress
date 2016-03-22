@@ -2,12 +2,9 @@
 
 namespace VersionPress\Tests\SqlTests;
 
-use PHPUnit_Framework_MockObject_Generator;
 use PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount;
 use PHPUnit_Framework_MockObject_Stub_Return;
 use PHPUnit_Framework_TestCase;
-use SqlParser\Parser;
-use SqlParser\Statements\DeleteStatement;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ParsedQueryData;
 use VersionPress\Database\SqlQueryParser;
@@ -19,7 +16,7 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
      */
     private static $DbSchemaInfo;
 
-    /** @var \wpdb $wpdbStub */
+    /** @var \wpdb|\PHPUnit_Framework_MockObject_MockObject $wpdbStub */
     private $wpdbStub;
 
     /** @var  SqlQueryParser */
@@ -44,7 +41,7 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
     public function dataToSetFromUpdate($query, $expectedSelect, $expectedData) {
 
         $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col");
-        $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
+        $parsedQueryData = $this->sqlParser->parseQuery($query);
 
         $this->assertEquals($expectedData, $parsedQueryData->data);
 
@@ -61,7 +58,7 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
     public function selectQueryFromUpdate($query, $expectedSelectQuery, $expectedData, $expectedIds) {
         $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col")
             ->with($expectedSelectQuery)->will(new PHPUnit_Framework_MockObject_Stub_Return($expectedIds));
-        $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
+        $parsedQueryData = $this->sqlParser->parseQuery($query);
 
         $this->assertEquals($expectedSelectQuery, $parsedQueryData->sqlQuery);
     }
@@ -73,7 +70,7 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
      * @param $expectedData
      */
     public function dataFromInsert($query, $expectedData) {
-        $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
+        $parsedQueryData = $this->sqlParser->parseQuery($query);
         $parsedData = $parsedQueryData == null ? null : $parsedQueryData->data;
 
         $this->assertEquals($expectedData, $parsedData);
@@ -87,7 +84,7 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
      * @param $expectedQueryType
      */
     public function detectNonStandardInsert($query, $expectedData, $expectedQueryType) {
-        $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
+        $parsedQueryData = $this->sqlParser->parseQuery($query);
         $parsedQeryType = $parsedQueryData == null ? null : $parsedQueryData->queryType;
 
         $this->assertEquals($expectedQueryType, $parsedQeryType);
@@ -103,7 +100,7 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
     public function selectQueryFromDelete($query, $expectedSelectQuery, $testIds) {
         $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col")
             ->with($expectedSelectQuery)->will(new PHPUnit_Framework_MockObject_Stub_Return($testIds));
-        $parsedQueryData = $this->sqlParser->parseQuery($query, self::$DbSchemaInfo, $this->wpdbStub);
+        $parsedQueryData = $this->sqlParser->parseQuery($query);
 
         $this->assertEquals($expectedSelectQuery, $parsedQueryData->sqlQuery);
     }
@@ -156,6 +153,11 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
                 "INSERT INTO `wp_terms` (term_id, date) VALUES (10, NOW())",
                 array(array("term_id" => "10", "date" => "NOW")),
                 ParsedQueryData::INSERT_QUERY
+            ),
+            array(
+                "INSERT INTO `wp_terms` (term_id, name) VALUES (10, 'term')",
+                array(array("term_id" => 10, "name" => "term")),
+                ParsedQueryData::INSERT_QUERY
             )
 
         );
@@ -203,6 +205,12 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
                 "UPDATE  `wp_posts` SET post_author = 'A' WHERE post_author = 'B'",
                 "SELECT ID FROM `wp_posts` WHERE post_author = 'B'",
                 array("post_author" => "'A'"),
+                $testIds
+            ),
+            array(
+                "UPDATE  `wp_posts` SET post_author=4 WHERE post_author = 5",
+                "SELECT ID FROM `wp_posts` WHERE post_author = 5",
+                array("post_author" => 4),
                 $testIds
             )
 
