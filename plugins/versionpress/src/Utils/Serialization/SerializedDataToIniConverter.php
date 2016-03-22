@@ -5,6 +5,10 @@ namespace VersionPress\Utils\Serialization;
 use Nette\Utils\Strings;
 use VersionPress\Utils\StringUtils;
 
+/**
+ * This class converts PHP-serialized data to INI and vice versa.
+ * Serialized data are prefixed with the $serializedMarker.
+ */
 class SerializedDataToIniConverter {
 
     private $serializedMarker;
@@ -16,6 +20,21 @@ class SerializedDataToIniConverter {
         $this->serializedMarker = $serializedMarker;
     }
 
+    /**
+     * Converts PHP-serialized string to mutiple INI lines.
+     *
+     * For example string 'a:1:{i:0;s:3:"foo";}' with key 'data' is converted to
+     * [
+     *  'data = <<<serialized>>> <array>',
+     *  'data[0] = "foo"'
+     * ]
+     *
+     * See IniSerializerTest for more examples.
+     *
+     * @param string $key
+     * @param string $serializedData
+     * @return string[]
+     */
     public function toIniLines($key, $serializedData) {
         $this->value = $serializedData;
         $parsingResult = self::parseSerializedString();
@@ -48,8 +67,6 @@ class SerializedDataToIniConverter {
      * Transforms PHP primitives, arrays, objects etc. to INI. Complex structures like arrays and objects
      * can take multiple lines (every scalar value takes one line).
      *
-     * @param string $key Key used in INI.
-     * @param mixed $value Value to serialize
      * @return array
      */
     private function parseSerializedString() {
@@ -58,7 +75,7 @@ class SerializedDataToIniConverter {
 
         switch ($type) {
             case 's':
-                $length = intval(self::substr($this->value, $this->index, strpos($this->value, ':', $this->index)));
+                $length = intval(self::substringFromTo($this->value, $this->index, strpos($this->value, ':', $this->index)));
                 $this->index += strlen($length) + 2; // :"
                 $str = substr($this->value, $this->index, $length);
                 $this->index += strlen($str) + 2; // ";
@@ -66,16 +83,16 @@ class SerializedDataToIniConverter {
                 return ['type' => 'string', 'value' => $str];
             case 'i':
             case 'd':
-                $number = self::substr($this->value, $this->index, strpos($this->value, ';', $this->index));
+                $number = self::substringFromTo($this->value, $this->index, strpos($this->value, ';', $this->index));
                 $this->index += strlen($number) + 1; // ;
                 return ['type' => $type === 'i' ? 'int' : 'double', 'value' => $number];
 
             case 'b':
-                $strVal = self::substr($this->value, $this->index, strpos($this->value, ';', $this->index));
+                $strVal = self::substringFromTo($this->value, $this->index, strpos($this->value, ';', $this->index));
                 $this->index += 2; // <0|1>;
                 return ['type' => 'boolean', 'value' => $strVal === '1'];
             case 'a':
-                $length = intval(self::substr($this->value, $this->index, strpos($this->value, ':', $this->index)));
+                $length = intval(self::substringFromTo($this->value, $this->index, strpos($this->value, ':', $this->index)));
                 $this->index += strlen($length) + 2; // :{
 
                 $subItems = [];
@@ -90,11 +107,11 @@ class SerializedDataToIniConverter {
 
                 return ['type' => 'array', 'value' => $subItems];
             case 'O':
-                $classNameLength = intval(self::substr($this->value, $this->index, strpos($this->value, ':', $this->index)));
+                $classNameLength = intval(self::substringFromTo($this->value, $this->index, strpos($this->value, ':', $this->index)));
                 $this->index += strlen($classNameLength) + 2; // :"
                 $className = substr($this->value, $this->index, $classNameLength);
                 $this->index += $classNameLength + 2; // ":
-                $attributeCount = intval(self::substr($this->value, $this->index, strpos($this->value, ':', $this->index)));
+                $attributeCount = intval(self::substringFromTo($this->value, $this->index, strpos($this->value, ':', $this->index)));
                 $this->index += strlen($attributeCount) + 2; // :{
 
                 $attribute = [];
@@ -116,7 +133,7 @@ class SerializedDataToIniConverter {
                 return ['type' => 'null'];
             case 'r':
             case 'R':
-                $number = self::substr($this->value, $this->index, strpos($this->value, ';', $this->index));
+                $number = self::substringFromTo($this->value, $this->index, strpos($this->value, ';', $this->index));
                 $this->index += strlen($number) + 1; // ;
 
                 return ['type' => $type === 'r' ? 'pointer' : 'reference', 'value' => $number];
@@ -132,33 +149,41 @@ class SerializedDataToIniConverter {
             case 'string':
             case 'int':
             case 'double':
-                return [self::banan($key, null, $parsingResult['value'])];
+                return self::createFirstLine($key, null, $parsingResult['value']);
             case 'boolean':
-                return [self::banan($key, $type, $parsingResult['value'])];
+                return self::createFirstLine($key, $type, $parsingResult['value']);
             case 'array':
-                $lines = [self::banan($key, $type)];
+                $lines = self::createFirstLine($key, $type);
                 foreach ($parsingResult['value'] as $subKey => $subItem) {
                     $subKey = self::primitiveToEscapedString($subKey);
                     $lines = array_merge($lines, self::convertParsingResultToIni("{$key}[$subKey]", $subItem));
                 }
                 return $lines;
             case 'object':
-                $lines = [self::banan($key, $parsingResult['class'])];
+                $lines = self::createFirstLine($key, $parsingResult['class']);
                 foreach ($parsingResult['value'] as $subKey => $subItem) {
                     $subKey = self::primitiveToEscapedString($subKey);
                     $lines = array_merge($lines, self::convertParsingResultToIni("{$key}[$subKey]", $subItem));
                 }
                 return $lines;
             case 'null':
-                return [self::banan($key, $type)];
+                return self::createFirstLine($key, $type);
             case 'pointer':
-                return [self::banan($key, $type, $parsingResult['value'])];
+                return self::createFirstLine($key, $type, $parsingResult['value']);
             case 'reference':
-                return [self::banan($key, $type, $parsingResult['value'])];
+                return self::createFirstLine($key, $type, $parsingResult['value']);
         }
     }
 
-    public static function banan($key, $type = null, $value = null) {
+    /**
+     * Returns array with first line of INI.
+     *
+     * @param string $key
+     * @param string|null $type
+     * @param string|null $value
+     * @return string[]
+     */
+    public static function createFirstLine($key, $type = null, $value = null) {
         $parts = [$key, '='];
 
         if ($type !== null) {
@@ -169,10 +194,19 @@ class SerializedDataToIniConverter {
             $parts[] = self::primitiveToEscapedString($value);
         }
 
-        return join(' ', $parts);
+        return [join(' ', $parts)];
     }
 
-    public static function substr($str, $from, $to) {
+    /**
+     * An alternative to the built-in PHP function `substr`.
+     * The `substr` function needs the length of substring. This method takes bounds from-to.
+     *
+     * @param string $str
+     * @param int $from
+     * @param int $to
+     * @return string
+     */
+    private static function substringFromTo($str, $from, $to) {
         return substr($str, $from, $to - $from);
     }
 
@@ -196,11 +230,11 @@ class SerializedDataToIniConverter {
      * Takes the top-level value + lines related to it.
      * It's called recursively for hierarchical structures (array, object).
      *
-     * @param $value
-     * @param array $relatedKeys
+     * @param mixed $value
+     * @param array $relatedLines
      * @return string
      */
-    private static function convertValueToSerializedString($value, $relatedKeys = []) {
+    private static function convertValueToSerializedString($value, $relatedLines = []) {
         $type = null; // string or number
 
         // https://regex101.com/r/gJ1oF2/1
@@ -218,11 +252,11 @@ class SerializedDataToIniConverter {
         }
 
         if ($type === 'array') {
-            return self::convertArrayToSerializedString($relatedKeys);
+            return self::convertArrayToSerializedString($relatedLines);
         }
 
         if (class_exists($type)) {
-            return self::convertObjectToSerializedString($type, $relatedKeys);
+            return self::convertObjectToSerializedString($type, $relatedLines);
         }
 
         if ($type === 'null') {
@@ -241,17 +275,17 @@ class SerializedDataToIniConverter {
             $value = preg_replace('/^"(.*)"$/', '$1', $value);
         }
 
-        return 's:' . strlen($value) . ':' . self::primitiveToEscapedString($value) . ';';
+        return 's:' . strlen($value) . ':"' . $value . '";';
     }
 
     /**
      * Converts array items saved in INI to PHP-like serialized string.
      *
-     * @param $relatedKeys
+     * @param $relatedLines
      * @return string
      */
-    private static function convertArrayToSerializedString($relatedKeys) {
-        $subItems = self::getSubItems($relatedKeys);
+    private static function convertArrayToSerializedString($relatedLines) {
+        $subItems = self::getSubItems($relatedLines);
         return 'a:' . count($subItems) . ':{' . join('', $subItems) . '}';
     }
 
@@ -286,13 +320,13 @@ class SerializedDataToIniConverter {
      * Finds original key and value at every line  (eg. line `[ 'some_data[0]' => 'some value' ]` contains key `0`
      * and value `some value`) and converts them to the PHP-like serialized string (in this case `i:0;s:10:"some value";`.
      *
-     * @param $relatedKeys
+     * @param $relatedLines
      * @param callable|null $subkeyTransformFn
      * @return array
      */
-    private static function getSubItems($relatedKeys, $subkeyTransformFn = null) {
+    private static function getSubItems($relatedLines, $subkeyTransformFn = null) {
         $items = [];
-        foreach ($relatedKeys as $relatedKey => $valueOfRelatedKey) {
+        foreach ($relatedLines as $relatedKey => $value) {
 
             $indexAfterFirstOpeningBracket = strpos($relatedKey, '[') + 1;
             $indexOfFirstClosingBracket = strpos($relatedKey, ']');
@@ -305,8 +339,8 @@ class SerializedDataToIniConverter {
             }
 
             if (strpos($relatedKey, '[', $indexOfFirstClosingBracket) === false) {
-                $relatedKeysOfSubItem = self::findRelatedKeys($relatedKeys, $relatedKey);
-                $items[] = self::convertValueToSerializedString($subkey) . self::convertValueToSerializedString($valueOfRelatedKey, $relatedKeysOfSubItem);
+                $relatedKeysOfSubItem = self::findRelatedKeys($relatedLines, $relatedKey);
+                $items[] = self::convertValueToSerializedString($subkey) . self::convertValueToSerializedString($value, $relatedKeysOfSubItem);
             }
         }
         return $items;
