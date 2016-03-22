@@ -40,7 +40,8 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
   render() {
     const firstCommit = this.props.commits[0];
     const displayTopNote = firstCommit && !firstCommit.isEnabled;
-    const allSelected = !_.differenceBy(this.props.commits, this.props.selected, ((value: Commit) => value.hash)).length;
+    const selectableCommits = this.props.commits.filter((commit: Commit) => commit.canUndo);
+    const allSelected = !_.differenceBy(selectableCommits, this.props.selected, ((value: Commit) => value.hash)).length;
 
     return (
       <table className='vp-table widefat fixed'>

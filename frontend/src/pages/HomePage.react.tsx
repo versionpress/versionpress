@@ -268,32 +268,34 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         lastSelected = this.state.lastSelected;
     const bulk = commits.length > 1;
 
-    commits.forEach((commit: Commit) => {
-      let lastIndex = -1;
-      const index = indexOf(this.state.commits, commit);
+    commits
+      .filter((commit: Commit) => commit.canUndo)
+      .forEach((commit: Commit) => {
+        let lastIndex = -1;
+        const index = indexOf(this.state.commits, commit);
 
-      if (!bulk && shiftKey) {
-        const last = this.state.lastSelected;
-        lastIndex = indexOf(this.state.commits, last);
-      }
-
-      if (lastIndex === -1) {
-        lastIndex = index;
-      }
-
-      const step = (index < lastIndex ? -1 : 1);
-      const cond = index + step;
-      for (let i = lastIndex; i != cond; i += step) {
-        const current = this.state.commits[i];
-        const index = indexOf(selected, current);
-        if (check && index === -1) {
-          selected = update(selected, {$push: [current]});
-        } else if (!check && index !== -1) {
-          selected = update(selected, {$splice: [[index, 1]]});
+        if (!bulk && shiftKey) {
+          const last = this.state.lastSelected;
+          lastIndex = indexOf(this.state.commits, last);
         }
-        lastSelected = current;
-      }
-    });
+
+        if (lastIndex === -1) {
+          lastIndex = index;
+        }
+
+        const step = (index < lastIndex ? -1 : 1);
+        const cond = index + step;
+        for (let i = lastIndex; i != cond; i += step) {
+          const current = this.state.commits[i];
+          const index = indexOf(selected, current);
+          if (check && index === -1) {
+            selected = update(selected, {$push: [current]});
+          } else if (!check && index !== -1) {
+            selected = update(selected, {$splice: [[index, 1]]});
+          }
+          lastSelected = current;
+        }
+      });
 
     this.setState({
       selected: selected,
