@@ -142,19 +142,15 @@ class QueryLanguageUtils {
             }
         }
 
-        if (isset($rule['entity']) || isset($rule['action']) || isset($rule['vpid'])) {
-            if (!empty($rule['entity']) || !empty($rule['action']) || !empty($rule['vpid'])) {
-                $query .= ' --grep="^VP-Action: ' .
-                    (empty($rule['entity']) ? '.*' : '\(' . implode('\|', $rule['entity']) . '\)') . '/' .
-                    (empty($rule['action']) ? '.*' : '\(' . implode('\|', $rule['action']) . '\)') . '/' .
-                    (empty($rule['vpid'])   ? '.*' : '\(' . implode('\|', $rule['vpid'])   . '\)') . '"';
-            }
+        if (!empty($rule['entity']) || !empty($rule['action']) || !empty($rule['vpid'])) {
+            $query .= ' --grep="^VP-Action: ' .
+                (empty($rule['entity']) ? '.*' : '\(' . implode('\|', $rule['entity']) . '\)') . '/' .
+                (empty($rule['action']) ? '.*' : '\(' . implode('\|', $rule['action']) . '\)') . '/' .
+                (empty($rule['vpid'])   ? '.*' : '\(' . implode('\|', $rule['vpid'])   . '\)') . '"';
         }
 
-        if (isset($rule['text'])) {
-            if (!empty($rule['text'])) {
-                $query .= ' --grep="\(' . implode('\|', $rule['text']) . '\)"';
-            }
+        if (!empty($rule['text'])) {
+            $query .= ' --grep="\(' . implode('\|', $rule['text']) . '\)"';
         }
 
         foreach ($rule as $key => $values) {
