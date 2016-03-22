@@ -51,9 +51,9 @@ class CommentStorage extends DirectoryStorage {
 
         $author = $newEntity["comment_author"];
 
-        $postTable = $this->database->getTablePrefix() . 'posts';
-        $vpIdTable = $this->database->getTablePrefix() . 'vp_id';
-        $result = $this->database->getRow("SELECT post_title FROM {$postTable} JOIN {$vpIdTable} ON {$postTable}.ID = {$vpIdTable}.id WHERE vp_id = UNHEX('$newEntity[vp_comment_post_ID]')");
+        $postTable = $this->database->prefix . 'posts';
+        $vpIdTable = $this->database->prefix . 'vp_id';
+        $result = $this->database->get_row("SELECT post_title FROM {$postTable} JOIN {$vpIdTable} ON {$postTable}.ID = {$vpIdTable}.id WHERE vp_id = UNHEX('$newEntity[vp_comment_post_ID]')");
 
         $postTitle = $result->post_title;
 

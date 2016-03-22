@@ -42,7 +42,7 @@ class SynchronizerFactory {
     );
     private $synchronizationSequence = array('user', 'usermeta', 'term', 'termmeta', 'term_taxonomy', 'post', 'postmeta', 'comment', 'option');
 
-    function __construct(StorageFactory $storageFactory, $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
+    function __construct(StorageFactory $storageFactory, Database $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
         $this->storageFactory = $storageFactory;
         $this->database = $database;
         $this->dbSchema = $dbSchema;

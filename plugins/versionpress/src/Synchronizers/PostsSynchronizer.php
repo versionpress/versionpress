@@ -2,6 +2,7 @@
 namespace VersionPress\Synchronizers;
 
 use Nette\Utils\Strings;
+use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -14,7 +15,7 @@ use wpdb;
  */
 class PostsSynchronizer extends SynchronizerBase {
 
-    function __construct(Storage $storage, $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
+    function __construct(Storage $storage, Database $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
         parent::__construct($storage, $database, $dbSchema, $urlReplacer, $shortcodesReplacer, 'post');
     }
 
@@ -29,8 +30,8 @@ class PostsSynchronizer extends SynchronizerBase {
     }
 
     private function fixCommentCounts() {
-        $sql = "update {$this->database->getTablePrefix()}posts set comment_count =
-     (select count(*) from {$this->database->getTablePrefix()}comments where comment_post_ID = {$this->database->getTablePrefix()}posts.ID and comment_approved = 1);";
+        $sql = "update {$this->database->prefix}posts set comment_count =
+     (select count(*) from {$this->database->prefix}comments where comment_post_ID = {$this->database->prefix}posts.ID and comment_approved = 1);";
         $this->database->query($sql);
     }
 

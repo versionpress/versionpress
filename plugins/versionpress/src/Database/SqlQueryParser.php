@@ -76,7 +76,7 @@ class SqlQueryParser {
             $selectSql .= " WHERE " . join(' ', $where);
         }
         $parsedQueryData->sqlQuery = $selectSql;
-        $parsedQueryData->ids = $database->getColumn($selectSql);
+        $parsedQueryData->ids = $database->get_col($selectSql);
         $parsedQueryData->data = $this->getColumnDataToSet($sqlStatement);
         return $parsedQueryData;
     }
@@ -144,7 +144,7 @@ class SqlQueryParser {
             $selectSql .= " WHERE " . join(' ', $where);
         }
         $parsedQueryData->sqlQuery = $selectSql;
-        $parsedQueryData->ids = $database->getColumn($selectSql);
+        $parsedQueryData->ids = $database->get_col($selectSql);
 
         return $parsedQueryData;
     }

@@ -70,7 +70,7 @@ class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker
         $wpdb->set_prefix(self::$testConfig->testSite->dbTablePrefix);
         $deleteOrphanedFilesSeconds = Reverter::DELETE_ORPHANED_POSTS_SECONDS;
         $database = new Database($wpdb);
-        $database->query($wpdb->prepare("UPDATE {$database->getPostmeta()} SET meta_value = meta_value - $deleteOrphanedFilesSeconds WHERE meta_key='_menu_item_orphaned' ORDER BY meta_id DESC LIMIT 1", array()));
+        $database->query($wpdb->prepare("UPDATE {$database->postmeta} SET meta_value = meta_value - $deleteOrphanedFilesSeconds WHERE meta_key='_menu_item_orphaned' ORDER BY meta_id DESC LIMIT 1", array()));
 
         $updateConfigArgs = array('VERSIONPRESS_GUI', 'html', 'require' => 'wp-content/plugins/versionpress/src/Cli/vp-internal.php');
         self::$wpAutomation->runWpCliCommand('vp-internal', 'update-config', $updateConfigArgs);

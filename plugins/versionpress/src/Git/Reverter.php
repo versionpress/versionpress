@@ -38,7 +38,7 @@ class Reverter {
     /** @var int */
     const DELETE_ORPHANED_POSTS_SECONDS = 60;
 
-    public function __construct(SynchronizationProcess $synchronizationProcess, $database, Committer $committer, GitRepository $repository, DbSchemaInfo $dbSchemaInfo, StorageFactory $storageFactory) {
+    public function __construct(SynchronizationProcess $synchronizationProcess, Database $database, Committer $committer, GitRepository $repository, DbSchemaInfo $dbSchemaInfo, StorageFactory $storageFactory) {
         $this->synchronizationProcess = $synchronizationProcess;
         $this->database = $database;
         $this->committer = $committer;
@@ -103,7 +103,7 @@ class Reverter {
         $date = current_time('mysql');
         $dateGmt = current_time('mysql', true);
         foreach ($vpIds as $vpId) {
-            $sql = "update {$this->database->getTablePrefix()}posts set post_modified = '{$date}', post_modified_gmt = '{$dateGmt}' where ID = (select id from {$this->database->getTablePrefix()}vp_id where vp_id = unhex('{$vpId}'))";
+            $sql = "update {$this->database->prefix}posts set post_modified = '{$date}', post_modified_gmt = '{$dateGmt}' where ID = (select id from {$this->database->prefix}vp_id where vp_id = unhex('{$vpId}'))";
             $this->database->query($sql);
             $post = $storage->loadEntity($vpId, null);
             $post['post_modified'] = $date;
@@ -335,7 +335,7 @@ class Reverter {
      */
     private function clearOrphanedPosts() {
         $deleteTimestamp = time() - self::DELETE_ORPHANED_POSTS_SECONDS; // Older than 1 minute
-        $orphanedMenuItems = $this->database->getColumn($this->database->prepareStatement("SELECT ID FROM {$this->database->getPosts()} AS p LEFT JOIN {$this->database->getPostmeta()} AS m ON p.ID = m.post_id WHERE post_type = 'nav_menu_item' AND post_status = 'draft' AND meta_key = '_menu_item_orphaned' AND meta_value < '%d'", $deleteTimestamp ) );
+        $orphanedMenuItems = $this->database->get_col($this->database->prepare("SELECT ID FROM {$this->database->posts} AS p LEFT JOIN {$this->database->postmeta} AS m ON p.ID = m.post_id WHERE post_type = 'nav_menu_item' AND post_status = 'draft' AND meta_key = '_menu_item_orphaned' AND meta_value < '%d'", $deleteTimestamp ) );
 
         foreach( (array) $orphanedMenuItems as $menuItemId ) {
             wp_delete_post($menuItemId, true);

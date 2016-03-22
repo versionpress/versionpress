@@ -4,7 +4,6 @@ namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Database\ExtendedWpdb;
 use VersionPress\Database\ShortcodesInfo;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Database\VpidRepository;

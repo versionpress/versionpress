@@ -9,8 +9,6 @@ namespace VersionPress\Cli;
 
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Yaml\Yaml;
-use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitRepository;
@@ -915,9 +913,8 @@ class VPCommand extends WP_CLI_Command {
     private function someWpTablesExist($dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix) {
         $wpdb = new \wpdb($dbUser, $dbPassword, $dbName, $dbHost);
         $wpdb->set_prefix($dbPrefix);
-        $database = new Database($wpdb);
-        $tables = $database->getColumn("SHOW TABLES LIKE '{$dbPrefix}_%'");
-        $wpTables = array_intersect($tables, $database->tables());
+        $tables = $wpdb->get_col("SHOW TABLES LIKE '{$dbPrefix}_%'");
+        $wpTables = array_intersect($tables, $wpdb->tables());
         return count($wpTables) > 0;
     }
 

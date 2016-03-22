@@ -30,11 +30,11 @@ class VpidRepository {
      */
     public function getVpidForEntity($entityName, $id) {
         $tableName = $this->schemaInfo->getTableName($entityName);
-        return $this->database->getVariable("SELECT HEX(vp_id) FROM $this->vpidTableName WHERE id = '$id' AND `table` = '$tableName'");
+        return $this->database->get_var("SELECT HEX(vp_id) FROM $this->vpidTableName WHERE id = '$id' AND `table` = '$tableName'");
     }
 
     public function getIdForVpid($vpid) {
-        return $this->database->getVariable("SELECT id FROM $this->vpidTableName WHERE vp_id = UNHEX('$vpid')");
+        return $this->database->get_var("SELECT id FROM $this->vpidTableName WHERE vp_id = UNHEX('$vpid')");
     }
 
     public function replaceForeignKeysWithReferences($entityName, $entity) {
@@ -46,7 +46,7 @@ class VpidRepository {
 
             if (isset($entity[$referenceName])) {
                 if ($entity[$referenceName] > 0) {
-                    $referenceVpId = $this->database->getVariable("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=$entity[$referenceName]");
+                    $referenceVpId = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=$entity[$referenceName]");
                 } else {
                     $referenceVpId = 0;
                 }
@@ -75,7 +75,7 @@ class VpidRepository {
                 }
                 $targetTable = $this->schemaInfo->getEntityInfo($targetEntity)->tableName;
 
-                $referenceVpId = $this->database->getVariable("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=" . $entity[$valueColumn]);
+                $referenceVpId = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=" . $entity[$valueColumn]);
                 $entity[$valueColumn] = $referenceVpId;
             }
         }

@@ -106,7 +106,7 @@ class VpAutomateCommand extends \WP_CLI_Command {
         }
 
         WP_CLI::success("Generating ($entity): " . Debugger::timer());
-        $insertQueries = $this->buildInsertQueries($this->database->getTablePrefix() . $entity, $entities);
+        $insertQueries = $this->buildInsertQueries($this->database->prefix . $entity, $entities);
         WP_CLI::success("Building queries ($entity): " . Debugger::timer());
 
         $connection = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);

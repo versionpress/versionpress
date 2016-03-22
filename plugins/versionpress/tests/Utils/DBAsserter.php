@@ -25,10 +25,7 @@ class DBAsserter {
     private static $database;
     /** @var Database */
     private static $vp_database;
-
-    /**
-     * @var \wpdb
-     */
+    /** @var \wpdb */
     private static $wpdb;
     /** @var ShortcodesReplacer */
     private static $shortcodesReplacer;

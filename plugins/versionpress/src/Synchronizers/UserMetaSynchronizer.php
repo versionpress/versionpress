@@ -2,16 +2,16 @@
 
 namespace VersionPress\Synchronizers;
 
+use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\WordPressCacheUtils;
-use wpdb;
 
 class UserMetaSynchronizer extends SynchronizerBase {
 
-    function __construct(Storage $storage, $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
+    function __construct(Storage $storage, Database $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
         parent::__construct($storage, $database, $dbSchema, $urlReplacer, $shortcodesReplacer, 'usermeta');
     }
 

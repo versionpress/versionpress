@@ -296,7 +296,7 @@ class RequirementsChecker {
 
         foreach ($entities as $entity) {
             $table = $this->schema->getPrefixedTableName($entity);
-            $totalEntitiesCount += $this->database->getVariable("SELECT COUNT(*) FROM $table");
+            $totalEntitiesCount += $this->database->get_var("SELECT COUNT(*) FROM $table");
         }
 
         return $totalEntitiesCount;

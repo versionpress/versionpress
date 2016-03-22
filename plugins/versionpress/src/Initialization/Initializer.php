@@ -136,7 +136,7 @@ class Initializer {
     }
 
     public function createVersionPressTables() {
-        $table_prefix = $this->database->getTablePrefix();
+        $table_prefix = $this->database->prefix;
         $process = array();
 
         $process[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_id`";
@@ -193,7 +193,7 @@ class Initializer {
         $idColumnName = $this->dbSchema->getEntityInfo($entityName)->idColumnName;
         $tableName = $this->dbSchema->getTableName($entityName);
         $prefixedTableName = $this->dbSchema->getPrefixedTableName($entityName);
-        $entities = $this->database->getResults("SELECT * FROM $prefixedTableName", ARRAY_A);
+        $entities = $this->database->get_results("SELECT * FROM $prefixedTableName", ARRAY_A);
         $entities = $this->replaceForeignKeysWithReferencesInAllEntities($entityName, $entities);
 
         $storage = $this->storageFactory->getStorage($entityName);
@@ -574,10 +574,10 @@ class Initializer {
             $entityInfo = $this->dbSchema->getEntityInfo($entityName);
             $parentReference = $entityInfo->parentReference;
 
-            return $this->database->getResults("SELECT * FROM {$this->getTableName($entityName)} ORDER BY {$parentReference}", ARRAY_A);
+            return $this->database->get_results("SELECT * FROM {$this->getTableName($entityName)} ORDER BY {$parentReference}", ARRAY_A);
         }
 
-        return $this->database->getResults("SELECT * FROM {$this->getTableName($entityName)}", ARRAY_A);
+        return $this->database->get_results("SELECT * FROM {$this->getTableName($entityName)}", ARRAY_A);
     }
 
 }

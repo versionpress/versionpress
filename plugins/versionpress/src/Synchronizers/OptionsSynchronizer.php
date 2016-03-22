@@ -34,7 +34,7 @@ class OptionsSynchronizer implements Synchronizer {
     /** @var DbSchemaInfo */
     private $dbSchema;
 
-    function __construct(Storage $optionStorage, $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
+    function __construct(Storage $optionStorage, Database $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
         $this->optionStorage = $optionStorage;
         $this->database = $database;
         $this->urlReplacer = $urlReplacer;
@@ -56,7 +56,7 @@ class OptionsSynchronizer implements Synchronizer {
                 $option = $this->maybeRestoreReference($option);
                 if (!isset($option['autoload'])) $option['autoload'] = 'yes'; // default value
                 if (!isset($option['option_value'])) $option['option_value'] = '';
-                $syncQuery .= "(\"$optionName\", \"" . $this->database->realEscape($option['option_value']) . "\", \"$option[autoload]\"),";
+                $syncQuery .= "(\"$optionName\", \"" . $this->database->_real_escape($option['option_value']) . "\", \"$option[autoload]\"),";
             }
 
             $syncQuery[strlen($syncQuery) - 1] = " "; // strip last comma
@@ -122,7 +122,7 @@ class OptionsSynchronizer implements Synchronizer {
                 $vpid = $option[$referenceDetails['value-column']];
                 $vpidTable = $this->dbSchema->getPrefixedTableName('vp_id');
                 $targetTable = $this->dbSchema->getTableName($targetEntity);
-                $dbId = $this->database->getVariable("SELECT id FROM $vpidTable WHERE `table`='$targetTable' AND vp_id=UNHEX('$vpid')");
+                $dbId = $this->database->get_var("SELECT id FROM $vpidTable WHERE `table`='$targetTable' AND vp_id=UNHEX('$vpid')");
                 $option[$referenceDetails['value-column']] = $dbId;
             }
         }
