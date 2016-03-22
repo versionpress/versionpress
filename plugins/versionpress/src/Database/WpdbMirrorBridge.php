@@ -128,18 +128,21 @@ class WpdbMirrorBridge {
      *
      * @param $table
      * @param $where
-     * @return array|bool
+     * @return array
      */
     public function getParentIdsBeforeDelete($table, $where) {
         $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($table);
+        if (!$entityInfo) {
+            return [];
+        }
         if (!$this->dbSchemaInfo->isChildEntity($entityInfo->entityName)) {
-            return false;
+            return [];
         }
 
         $ids = $this->detectAllAffectedIds($entityInfo->entityName, $where, $where);
         $parentIds = [];
         foreach ($ids as $id) {
-            $parentIds[$id] = $this->fillParentId($entityInfo->entityName,$entityInfo,$id);
+            $parentIds[$id] = $this->fillParentId($entityInfo->entityName, $entityInfo, $id);
         }
         return $parentIds;
 
@@ -156,9 +159,9 @@ class WpdbMirrorBridge {
 
         $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($parsedQueryData->table);
 
-        if (!$entityInfo)
+        if (!$entityInfo) {
             return;
-
+        }
 
         switch ($parsedQueryData->queryType) {
             case ParsedQueryData::UPDATE_QUERY:
@@ -212,7 +215,7 @@ class WpdbMirrorBridge {
             $entityInfo = $this->dbSchemaInfo->getEntityInfo($entityName);
             $parentVpReference = "vp_" . $entityInfo->parentReference;
             if (!isset($data[$parentVpReference])) {
-               $data[$parentVpReference] = $this->fillParentId($entityName, $entityInfo, $id);
+                $data[$parentVpReference] = $this->fillParentId($entityName, $entityInfo, $id);
             }
         }
 

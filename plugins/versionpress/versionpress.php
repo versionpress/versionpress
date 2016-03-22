@@ -623,8 +623,9 @@ function vp_admin_post_cancel_deactivation() {
  * or is called directly from vp_deactivate() if the confirmation screen was not necessary.
  */
 function vp_admin_post_confirm_deactivation() {
-
-    vp_verify_nonce('vp_deactivation');
+    //nonce verification is performed according to 'deactivate-plugin_versionpress/versionpress.php'
+    // as a standard deactivation token for which nonce is generated
+    vp_verify_nonce('deactivate-plugin_versionpress/versionpress.php');
     vp_check_permissions();
 
     define('VP_DEACTIVATING', true);
