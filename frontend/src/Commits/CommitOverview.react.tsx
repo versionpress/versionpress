@@ -162,16 +162,23 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
   }
 
   private getLinesForPosts(changedPosts: Change[], countOfDuplicates, action: string) {
-    let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changedPosts, countOfDuplicates);
-    let suffix = null;
+    let lines = [];
+    let changedPostsByType = ArrayUtils.groupBy(changedPosts, post => post.tags['VP-Post-Type']);
 
-    if (action === 'trash' || action === 'untrash') {
-      suffix = action === 'trash' ? ' to trash' : ' from trash';
-      action = 'move';
+    for (let postType in changedPostsByType) {
+      let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changedPostsByType[postType], countOfDuplicates);
+      let suffix = null;
+
+      if (action === 'trash' || action === 'untrash') {
+        suffix = action === 'trash' ? ' to trash' : ' from trash';
+        action = 'move';
+      }
+
+      let line = this.renderOverviewLine(postType, action, changedEntities, suffix);
+      lines.push(line);
     }
 
-    let line = this.renderOverviewLine('post', action, changedEntities, suffix);
-    return [line];
+    return lines;
   }
 
   private getLinesForMeta(entityName, parentEntity, groupByTag, changedMeta: Change[], countOfDuplicates, action: string) {
