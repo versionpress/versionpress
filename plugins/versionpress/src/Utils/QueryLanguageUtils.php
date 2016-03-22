@@ -142,10 +142,18 @@ class QueryLanguageUtils {
             }
         }
 
-        if (!empty($rule['entity']) || !empty($rule['action']) || !empty($rule['vpid'])) {
+        if (!empty($rule['action'])) {
+            $action = array_filter($rule['action'], function ($val) { return strpos($val, '/') === false; });
+            $vpAction = array_filter($rule['action'], function ($val) { return strpos($val, '/') !== false; });
+            if (!empty($vpAction)) {
+                $query .= ' --grep="^VP-Action: \(' . implode('\|', $vpAction) . '\)"';
+            }
+        }
+
+        if (!empty($rule['entity']) || !empty($action) || !empty($rule['vpid'])) {
             $query .= ' --grep="^VP-Action: ' .
                 (empty($rule['entity']) ? '.*' : '\(' . implode('\|', $rule['entity']) . '\)') . '/' .
-                (empty($rule['action']) ? '.*' : '\(' . implode('\|', $rule['action']) . '\)') . '/' .
+                (empty($action)         ? '.*' : '\(' . implode('\|', $action)         . '\)') . '/' .
                 (empty($rule['vpid'])   ? '.*' : '\(' . implode('\|', $rule['vpid'])   . '\)') . '"';
         }
 
