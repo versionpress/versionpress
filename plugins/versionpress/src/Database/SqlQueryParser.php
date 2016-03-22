@@ -166,10 +166,10 @@ class SqlQueryParser {
             return $whereFragments;
         } elseif ($primarySqlStatement->where == null && strpos($sqlQuery, 'WHERE') !== false) {
             if (isset($parser->statements[1])) {
-                /** @var UpdateStatement|DeleteStatement|ReplaceStatement $secondarySqlSatement */
-                $secondarySqlSatement = $parser->statements[1];
-                if ($secondarySqlSatement->where != null) {
-                    $whereFragments = $secondarySqlSatement->where;
+                /** @var UpdateStatement|DeleteStatement|ReplaceStatement $secondarySqlStatement */
+                $secondarySqlStatement = $parser->statements[1];
+                if ($secondarySqlStatement->where != null) {
+                    $whereFragments = $secondarySqlStatement->where;
                     return $whereFragments;
                 }
 
