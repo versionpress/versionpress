@@ -185,7 +185,10 @@ class SerializedDataToIniConverter {
             return $value ? 'true' : 'false';
         }
 
-        return '"' . str_replace('"', '\"', $value) . '"';
+        $value = str_replace('\\', '\\\\', $value);
+        $value = str_replace('"', '\"', $value);
+
+        return '"' . $value . '"';
     }
 
     /**

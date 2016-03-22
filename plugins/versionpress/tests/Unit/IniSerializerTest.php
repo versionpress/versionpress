@@ -718,6 +718,28 @@ INI
     /**
      * @test
      */
+    public function serializedArrayWithEscapedSpecialStrings() {
+        $serializedString = serialize(["\\", "\"", "\\\""]);
+
+        $data = ["Section" => ["data" => $serializedString]];
+
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = "\\"
+data[1] = "\""
+data[2] = "\\\""
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
     public function serializedOption() {
         $sidebarWidgets = [
             'wp_inactive_widgets' => [],
