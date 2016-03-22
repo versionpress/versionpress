@@ -985,6 +985,27 @@ INI
     /**
      * @test
      */
+    public function serializedMultipleDifferentObjects() {
+        $serializedString = serialize([new \stdClass(), new \stdClass(), new \stdClass()]);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = <stdClass>
+data[1] = <stdClass>
+data[2] = <stdClass>
+
+INI
+        );
+
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+        $this->assertSame($ini, IniSerializer::serialize($data));
+    }
+
+    /**
+     * @test
+     */
     public function serializedReferenceToArray() {
         $array = [];
         $array['inception'] = &$array;
@@ -1124,6 +1145,48 @@ data[0]["b"]["parent"] = <reference> 3
 data[0]["b"]["a"] = <reference> 2
 data[0]["b"]["b"] = <reference> 4
 data[1] = <pointer> 4
+
+INI
+        );
+
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+        $this->assertSame($ini, IniSerializer::serialize($data));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedMultipleDifferentData() {
+
+        $data = [
+            123,
+            4.5,
+            true,
+            "VP",
+            null,
+            new \stdClass(),
+            [123, 4.5, true, "VP", null, new \stdClass()],
+        ];
+
+        $serializedString = serialize($data);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = 123
+data[1] = 4.5
+data[2] = <boolean> true
+data[3] = "VP"
+data[4] = <null>
+data[5] = <stdClass>
+data[6] = <array>
+data[6][0] = 123
+data[6][1] = 4.5
+data[6][2] = <boolean> true
+data[6][3] = "VP"
+data[6][4] = <null>
+data[6][5] = <stdClass>
 
 INI
         );
