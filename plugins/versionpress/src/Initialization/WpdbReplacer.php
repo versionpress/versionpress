@@ -17,7 +17,7 @@ class WpdbReplacer {
     if (file_exists(\$vp_bootstrap)) {
         require_once(\$vp_bootstrap);
     } else {
-        register_shutdown_function(array('wpdb', 'restoreOriginal'));
+        register_shutdown_function(array('wpdb', 'vp_restore_original'));
     }";
 
     public static function replaceMethods() {
