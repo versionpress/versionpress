@@ -31,7 +31,7 @@ class OptionStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function nullValueOptionMatchWithEmptyStringValueOption() {
+    public function nullValueOptionMatchesWithEmptyStringValueOption() {
         $testingOption = array(
             "option_name" => "some option",
             "option_value" => null,
