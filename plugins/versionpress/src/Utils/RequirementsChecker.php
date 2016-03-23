@@ -38,7 +38,7 @@ class RequirementsChecker {
     /** @var bool */
     private $isEverythingFulfilled;
 
-    function __construct($wpdb, DbSchemaInfo $schema, $scope = 'site') {
+    function __construct($wpdb, DbSchemaInfo $schema, $checkScope = 'site') {
 
         $this->database = $wpdb;
         $this->schema = $schema;
@@ -102,7 +102,7 @@ class RequirementsChecker {
             'fulfilled' => $this->tryAccessControlFiles(),
             'help' => 'VersionPress automatically tries to secure certain locations, like `wp-content/vpdb`. You either don\'t have a supported web server or rules cannot be enforced. [Learn more](http://docs.versionpress.net/en/getting-started/installation-uninstallation#supported-web-servers).'
         );
-        if ($scope === 'site') {
+        if ($checkScope === 'site') {
             $this->requirements[] = array(
                 'name' => 'wpdb hook',
                 'level' => 'critical',
