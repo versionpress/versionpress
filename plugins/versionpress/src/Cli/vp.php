@@ -125,36 +125,7 @@ class VPCommand extends WP_CLI_Command {
     public function activate($args, $assoc_args) {
         global $versionPressContainer;
 
-        /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
-        $database = $versionPressContainer->resolve(VersionPressServices::WPDB);
-        $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
-
-        $requirementsChecker = new RequirementsChecker($database, $schema);
-        $report = $requirementsChecker->getRequirements();
-
-        foreach ($report as $requirement) {
-            if ($requirement['fulfilled']) {
-                WP_CLI::success($requirement['name']);
-            } else {
-                if ($requirement['level'] === 'critical') {
-                    WP_CLI::error($requirement['name'], false);
-                } else {
-                    VPCommandUtils::warning($requirement['name']);
-                }
-                WP_CLI::log('  ' . $requirement['help']);
-            }
-        }
-
-        WP_CLI::line('');
-
-        if (!$requirementsChecker->isWithoutCriticalErrors()) {
-            WP_CLI::error('VersionPress cannot be fully activated.');
-        }
-
-        if (!$requirementsChecker->isEverythingFulfilled()) {
-            WP_CLI::confirm('There are some warnings. Continue?', $assoc_args);
-        }
+        $this->checkVpRequirements($assoc_args);
 
         /**
          * @var Initializer $initializer
@@ -210,6 +181,9 @@ class VPCommand extends WP_CLI_Command {
         require_once dirname($wpConfigPath) . '/' . $commonConfigName;
         require_once $wpConfigPath;
         require_once __DIR__ . '/../../bootstrap.php';
+        require_once __DIR__ . '/../../../../../wp-includes/formatting.php';
+        require_once __DIR__ . '/../../../../../wp-includes/theme.php';
+        require_once __DIR__ . '/../../../../../wp-includes/link-template.php';
 
         if (!VersionPress::isActive()) {
             WP_CLI::error('Unfortunately, this site was not tracked by VersionPress. Therefore, it cannot be restored.');
@@ -218,6 +192,7 @@ class VPCommand extends WP_CLI_Command {
         // Check if the site is installed
         $process = VPCommandUtils::runWpCliCommand('core', 'is-installed');
         if ($process->isSuccessful()) {
+            $this->checkVpRequirements($assoc_args);
             WP_CLI::confirm("It looks like the site is OK. Do you really want to run the 'restore-site' command?", $assoc_args);
         }
 
@@ -1028,6 +1003,47 @@ class VPCommand extends WP_CLI_Command {
             $url = $baseUrl . str_replace('//', '/', '/' . $relativePathToWpContent);
 
             $this->runVPInternalCommand('update-config', array($urlConstant, $url));
+        }
+    }
+
+    /**
+     * @param $assoc_args
+     */
+    private function checkVpRequirements($assoc_args) {
+        global $versionPressContainer;
+
+        $database = $versionPressContainer->resolve(VersionPressServices::WPDB);
+        $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
+
+        if (count($assoc_args) > 0) {
+            $requirementsChecker = new RequirementsChecker($database, $schema, 'environment');
+        } else {
+            $requirementsChecker = new RequirementsChecker($database, $schema);
+        }
+
+        $report = $requirementsChecker->getRequirements();
+
+        foreach ($report as $requirement) {
+            if ($requirement['fulfilled']) {
+                WP_CLI::success($requirement['name']);
+            } else {
+                if ($requirement['level'] === 'critical') {
+                    WP_CLI::error($requirement['name'], false);
+                } else {
+                    VPCommandUtils::warning($requirement['name']);
+                }
+                WP_CLI::log('  ' . $requirement['help']);
+            }
+        }
+
+        WP_CLI::line('');
+
+        if (!$requirementsChecker->isWithoutCriticalErrors()) {
+            WP_CLI::error('VersionPress cannot be fully activated.');
+        }
+
+        if (!$requirementsChecker->isEverythingFulfilled()) {
+            WP_CLI::confirm('There are some warnings. Continue?', $assoc_args);
         }
     }
 }
