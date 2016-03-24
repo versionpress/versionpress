@@ -181,9 +181,9 @@ class VPCommand extends WP_CLI_Command {
         require_once dirname($wpConfigPath) . '/' . $commonConfigName;
         require_once $wpConfigPath;
         require_once __DIR__ . '/../../bootstrap.php';
-        require_once __DIR__ . '/../../../../../wp-includes/formatting.php';
-        require_once __DIR__ . '/../../../../../wp-includes/theme.php';
-        require_once __DIR__ . '/../../../../../wp-includes/link-template.php';
+        require_once ABSPATH . WPINC . '/formatting.php';
+        require_once ABSPATH . WPINC . '/theme.php';
+        require_once ABSPATH . WPINC . '/link-template.php';
 
         if (!VersionPress::isActive()) {
             WP_CLI::error('Unfortunately, this site was not tracked by VersionPress. Therefore, it cannot be restored.');
