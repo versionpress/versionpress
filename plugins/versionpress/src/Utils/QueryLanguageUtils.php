@@ -24,7 +24,7 @@ class QueryLanguageUtils {
      * @return array
      */
     public static function createRulesFromQueries($queries, $allowEmpty = false) {
-        $rules = array();
+        $rules = [];
         foreach ($queries as $query) {
             preg_match_all(self::$queryRegex, $query, $matches, PREG_SET_ORDER);
             $isValidRule = count($matches) > 0;
@@ -32,7 +32,7 @@ class QueryLanguageUtils {
                 continue;
             }
 
-            $ruleParts = array();
+            $ruleParts = [];
             foreach($matches as $match) {
                 $key = empty($match[2]) ? 'text' : strtolower($match[2]);
 
@@ -48,7 +48,7 @@ class QueryLanguageUtils {
 
                 if ($value !== '' || $allowEmpty) {
                     if (!isset($ruleParts[$key])) {
-                        $ruleParts[$key] = array();
+                        $ruleParts[$key] = [];
                     }
                     $ruleParts[$key][] = $value;
                 }
@@ -97,7 +97,7 @@ class QueryLanguageUtils {
     public static function createGitLogQueryFromRule($rawRule) {
         $query = '-i --all-match';
 
-        $rule = array();
+        $rule = [];
         foreach ($rawRule as $key => $array) {
             $escapedKey = self::escapeGitLogArgument($key);
             $rule[$escapedKey] = ($key === 'date')
@@ -137,9 +137,9 @@ class QueryLanguageUtils {
                     continue;
                 }
 
-                if (in_array(($op = substr($val, 0, 2)), array('<=', '>='))) {
+                if (in_array(($op = substr($val, 0, 2)), ['<=', '>='])) {
                     $date = substr($val, 2);
-                } else if (in_array(($op = substr($val, 0, 1)), array('<', '>'))) {
+                } else if (in_array(($op = substr($val, 0, 1)), ['<', '>'])) {
                     $date = substr($val, 1);
                 } else {
                     $op = '';
@@ -162,7 +162,7 @@ class QueryLanguageUtils {
         }
 
         if (!empty($rule['action']) || !empty($rule['vp-action'])) {
-            $vpAction = array();
+            $vpAction = [];
             if (!empty($rule['action'])) {
                 $action = array_filter($rule['action'], function ($val) { return strpos($val, '/') === false; });
                 $vpAction = array_diff($rule['action'], $action);
@@ -189,7 +189,7 @@ class QueryLanguageUtils {
         }
 
         foreach ($rule as $key => $values) {
-            if (in_array($key, array('author', 'date', 'entity', 'vp-action', 'action', 'vpid', 'text'))) {
+            if (in_array($key, ['author', 'date', 'entity', 'vp-action', 'action', 'vpid', 'text'])) {
                 continue;
             }
 
@@ -214,7 +214,7 @@ class QueryLanguageUtils {
      * @return string
      */
     public static function createSqlRestrictionFromRule($rule) {
-        $restrictionParts = array();
+        $restrictionParts = [];
 
         foreach ($rule as $field => $values) {
             $value = $values[0]; // Use single value per field
@@ -245,8 +245,8 @@ class QueryLanguageUtils {
         // https://regex101.com/r/yP4yN9/3
         // https://regex101.com/r/yM9wA2/3
         // https://regex101.com/r/fM7uL3/1
-        $regex = array('/(\\\\|\$)/', '/(\.|\[)/', '/(\*)/');
-        $replacements = array('\\\\\\\\\\\\$1', '\\\\$1', '.$1');
+        $regex = ['/(\\\\|\$)/', '/(\.|\[)/', '/(\*)/'];
+        $replacements = ['\\\\\\\\\\\\$1', '\\\\$1', '.$1'];
         return preg_replace($regex, $replacements, $value);
     }
 
@@ -261,28 +261,28 @@ class QueryLanguageUtils {
      */
     private static function tokenizeValue($value) {
         preg_match_all(self::$valueWildcardRegex, $value, $matches);
-        $tokens = array();
+        $tokens = [];
 
         foreach ($matches[0] as $valuePart) {
             if ($valuePart === '*') {
-                $tokens[] = array(
+                $tokens[] = [
                     'type' => self::VALUE_WILDCARD
-                );
+                ];
             } else if ($valuePart === '\*') {
-                $tokens[] = array(
+                $tokens[] = [
                     'type' => self::VALUE_STRING,
                     'value' => '*',
-                );
+                ];
             } else if ($valuePart === '\\\\') {
-                $tokens[] = array(
+                $tokens[] = [
                     'type' => self::VALUE_STRING,
                     'value' => '\\',
-                );
+                ];
             } else {
-                $tokens[] = array(
+                $tokens[] = [
                     'type' => self::VALUE_STRING,
                     'value' => $valuePart,
-                );
+                ];
             }
         }
 
@@ -312,7 +312,7 @@ class QueryLanguageUtils {
     }
 
     private static function tokensToSqlString($valueTokens) {
-        return join('', array_map(array('VersionPress\Utils\QueryLanguageUtils', 'tokenToSqlString'), $valueTokens));
+        return join('', array_map(['VersionPress\Utils\QueryLanguageUtils', 'tokenToSqlString'], $valueTokens));
     }
 
     private static function tokenToSqlString($token) {

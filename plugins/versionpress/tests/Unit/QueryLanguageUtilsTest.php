@@ -16,16 +16,16 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function validQueryAndEntityProvider() {
-        return array(
-            array(array('field: value'), array('field' => 'value')),
-            array(array('field: value'), array('field' => 'value', 'other_field' => 'other_value')),
-            array(array('field: value other_field: other_value'), array('field' => 'value', 'other_field' => 'other_value')),
+        return [
+            [['field: value'], ['field' => 'value']],
+            [['field: value'], ['field' => 'value', 'other_field' => 'other_value']],
+            [['field: value other_field: other_value'], ['field' => 'value', 'other_field' => 'other_value']],
 
-            array(array('field: val*'), array('field' => 'value')),
-            array(array('field: *ue'), array('field' => 'value')),
-            array(array('field: v*ue'), array('field' => 'value')),
-            array(array('field: *al*'), array('field' => 'value')),
-        );
+            [['field: val*'], ['field' => 'value']],
+            [['field: *ue'], ['field' => 'value']],
+            [['field: v*ue'], ['field' => 'value']],
+            [['field: *al*'], ['field' => 'value']],
+        ];
     }
 
     /**
@@ -38,16 +38,16 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function wrongQueryAndEntityProvider() {
-        return array(
-            array(array('field: value'), array('field' => 'another_value')),
-            array(array('field: value'), array('other_field' => 'value')),
-            array(array('field: value other_field: other_value'), array('field' => 'value')),
+        return [
+            [['field: value'], ['field' => 'another_value']],
+            [['field: value'], ['other_field' => 'value']],
+            [['field: value other_field: other_value'], ['field' => 'value']],
 
-            array(array('field: val*'), array('field' => 'other_value')),
-            array(array('field: *ue'), array('field' => 'value_with_other_suffix')),
-            array(array('field: v*ue'), array('field' => 'other_value')),
-            array(array('field: *al*'), array('field' => 'foo')),
-        );
+            [['field: val*'], ['field' => 'other_value']],
+            [['field: *ue'], ['field' => 'value_with_other_suffix']],
+            [['field: v*ue'], ['field' => 'other_value']],
+            [['field: *al*'], ['field' => 'foo']],
+        ];
     }
 
     /**
@@ -60,20 +60,20 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function ruleAndQueryProvider() {
-        return array(
-            array(array('field' => array('value')), '(`field` = "value")'),
-            array(array('field' => array('value'), 'other_field' => array('other_value')), '(`field` = "value" AND `other_field` = "other_value")'),
+        return [
+            [['field' => ['value']], '(`field` = "value")'],
+            [['field' => ['value'], 'other_field' => ['other_value']], '(`field` = "value" AND `other_field` = "other_value")'],
 
-            array(array('field' => array('val*')), '(`field` LIKE "val%")'),
-            array(array('field' => array('*ue')), '(`field` LIKE "%ue")'),
-            array(array('field' => array('v*ue')), '(`field` LIKE "v%ue")'),
-            array(array('field' => array('*al*')), '(`field` LIKE "%al%")'),
+            [['field' => ['val*']], '(`field` LIKE "val%")'],
+            [['field' => ['*ue']], '(`field` LIKE "%ue")'],
+            [['field' => ['v*ue']], '(`field` LIKE "v%ue")'],
+            [['field' => ['*al*']], '(`field` LIKE "%al%")'],
 
-            array(array('field' => array('*al*'), 'other_field' => array('other_value')), '(`field` LIKE "%al%" AND `other_field` = "other_value")'),
-            array(array('field' => array('*al*'), 'other_field' => array('other_*')), '(`field` LIKE "%al%" AND `other_field` LIKE "other\_%")'),
+            [['field' => ['*al*'], 'other_field' => ['other_value']], '(`field` LIKE "%al%" AND `other_field` = "other_value")'],
+            [['field' => ['*al*'], 'other_field' => ['other_*']], '(`field` LIKE "%al%" AND `other_field` LIKE "other\_%")'],
 
-            array(array('field' => array('_*')), '(`field` LIKE "\_%")'),
-        );
+            [['field' => ['_*']], '(`field` LIKE "\_%")'],
+        ];
     }
 
     /**
@@ -87,34 +87,20 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function queryAndRulesProvider() {
-        return array(
-            array(
-                array('Text', ' "Longer text" ', '\'Longer text\''),
-                array(
-                    array('text' => array('Text')),
-                    array('text' => array('Longer text')),
-                    array('text' => array('Longer text'))
-                )
-            ),
-            array(
-                array('author:doe', ' author: "John Doe" ', 'author:\'John Doe\''),
-                array(
-                    array('author' => array('doe')),
-                    array('author' => array('John Doe')),
-                    array('author' => array('John Doe'))
-                )
-            ),
-            array(
-                array('text author:doe "Another text" author: "John Doe" date:>2012-01-02 date: \'2012-01-02 .. 2012-02-13\''),
-                array(
-                    array(
-                        'author' => array('doe', 'John Doe'),
-                        'date' => array('>2012-01-02', '2012-01-02 .. 2012-02-13'),
-                        'text' => array('text', 'Another text')
-                    )
-                )
-            )
-        );
+        return [
+            [
+                ['Text', ' "Longer text" ', '\'Longer text\''],
+                [['text' => ['Text']], ['text' => ['Longer text']], ['text' => ['Longer text']]]
+            ],
+            [
+                ['author:doe', ' author: "John Doe" ', 'author:\'John Doe\''],
+                [['author' => ['doe']], ['author' => ['John Doe']], ['author' => ['John Doe']]]
+            ],
+            [
+                ['text author:doe "Another text" author: "John Doe" date:>2012-01-02 date: \'2012-01-02 .. 2012-02-13\''],
+                [['author' => ['doe', 'John Doe'], 'date' => ['>2012-01-02', '2012-01-02 .. 2012-02-13'], 'text' => ['text', 'Another text']]]
+            ]
+        ];
     }
     
     /**
