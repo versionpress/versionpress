@@ -82,7 +82,8 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase {
      */
     public function queryLanguageUtilsCreatesCorrectRules($query, $expectedRules) {
         $rules = QueryLanguageUtils::createRulesFromQueries($query);
-        $this->assertEquals($expectedRules, $rules);
+        // Perform case insensitive match
+        $this->assertEquals($expectedRules, $rules, '', 0, 10, FALSE, TRUE);
     }
 
     public function queryAndRulesProvider() {
@@ -122,46 +123,42 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase {
      */
     public function queryLanguageUtilsGeneratesCorrectGitLogQuery($rules, $expectedQuery) {
         $query = QueryLanguageUtils::createGitLogQueryFromRule($rules);
-        $this->assertEquals($expectedQuery, $query);
+        // Perform case insensitive match
+        $this->assertEquals($expectedQuery, $query, '', 0, 10, FALSE, TRUE);
     }
 
     public function rulesAndGitLogQueryProvider() {
-        return array(
-            array(
-                array('author' => array('doe', 'John Doe')),
-                '-i --all-match --author="doe" --author="John Doe"'
-            ),
-            array(array('date' => array('>2012-01-02')), '-i --all-match --after=2012-01-02'),
-            array(array('date' => array('>=2012-01-02')), '-i --all-match --after=2012-01-01'),
-            array(array('date' => array('<2012-01-02')), '-i --all-match --before=2012-01-01'),
-            array(array('date' => array('<=2012-01-02')), '-i --all-match --before=2012-01-02'),
-            array(
-                array('date' => array('2012-01-02 .. 2012-02-13')),
-                '-i --all-match --after=2012-01-01 --before=2012-02-14'
-            ),
-            array(
-                array('date' => array('2012-01-02 .. *')), '-i --all-match --after=2012-01-01'
-            ),
-            array(
-                array('date' => array('* .. 2012-02-13')), '-i --all-match --before=2012-02-14'
-            ),
-            array(array('entity' => array('entity')), '-i --all-match --grep="^VP-Action: \(entity\)/.*/.*"'),
-            array(array('action' => array('action')), '-i --all-match --grep="^VP-Action: .*/\(action\)/.*"'),
-            array(array('vpid' => array('vpid')), '-i --all-match --grep="^VP-Action: .*/.*/\(vpid\)"'),
-            array(
-                array(
-                    'entity' => array('entity', 'entity2'),
-                    'action' => array('action', 'long action'),
-                    'vpid' => array('vpid', 'vpid2')
-                ),
-                '-i --all-match --grep="^VP-Action: \(entity\|entity2\)/\(action\|long action\)/\(vpid\|vpid2\)"'
-            ),
-            array(
-                array('text' => array('text1', 'Test text')), '-i --all-match --grep="\(text1\|Test text\)"'
-            ),
-            array(
-                array('key' => array('Test value')), '-i --all-match --grep="^vp-key: \(Test value\)"'
-            )
-        );
+        return [
+            [['author' => ['doe', 'do*', 'John Doe']], '-i --all-match --author="^doe <.*>$" --author="^do.* <.*>$" --author="^John Doe <.*>$"'],
+            [['author' => ['doe@example.com', '*@example.com']], '-i --all-match --author="^.* <doe@example\.com>$" --author="^.* <.*@example\.com>$"'],
+            [['author' => ['John Doe <doe@example.com>', 'John * <*@*.com>']], '-i --all-match --author="^John Doe <doe@example\.com>$" --author="^John .* <.*@.*\.com>$"'],
+            [['date' => ['>2012-01-02']], '-i --all-match --after=2012-01-02'],
+            [['date' => ['>=2012-01-02']], '-i --all-match --after=2012-01-01'],
+            [['date' => ['<2012-01-02']], '-i --all-match --before=2012-01-01'],
+            [['date' => ['<=2012-01-02']], '-i --all-match --before=2012-01-02'],
+            [['date' => ['2012-01-02 .. 2012-02-13']], '-i --all-match --after=2012-01-01 --before=2012-02-14'],
+            [['date' => ['2012-01-02 .. *']], '-i --all-match --after=2012-01-01'],
+            [['date' => ['* .. 2012-02-13']], '-i --all-match --before=2012-02-14'],
+            [['action' => ['entity/action']], '-i --all-match --grep="^VP-Action: \(entity/action\)\(/.*\)\?$"'],
+            [['vp-action' => ['entity/*']], '-i --all-match --grep="^VP-Action: \(entity/.*\)\(/.*\)\?$"'],
+            [['action' => ['*/action/*']], '-i --all-match --grep="^VP-Action: \(.*/action/.*\)\(/.*\)\?$"'],
+            [['vp-action' => ['entity/*/vpid']], '-i --all-match --grep="^VP-Action: \(entity/.*/vpid\)\(/.*\)\?$"'],
+            [['entity' => ['entity']], '-i --all-match --grep="^VP-Action: \(entity\)/.*\(/.*\)\?$"'],
+            [['action' => ['action']], '-i --all-match --grep="^VP-Action: .*/\(action\)\(/.*\)\?$"'],
+            [['vpid' => ['vpid']], '-i --all-match --grep="^VP-Action: .*/.*/\(vpid\)$"'],
+            [
+                ['entity' => ['entity', 'entity2'], 'action' => ['action', 'long action'], 'vpid' => ['vpid', 'vpid2']],
+                '-i --all-match --grep="^VP-Action: \(entity\|entity2\)/\(action\|long action\)/\(vpid\|vpid2\)$"'
+            ],
+            [
+                ['entity' => ['entity', '*'], 'vpid' => ['*vp*', 'vpid']],
+                '-i --all-match --grep="^VP-Action: \(entity\|.*\)/.*/\(.*vp.*\|vpid\)$"'
+            ],
+            [['text' => ['text1', 'Test text', '*']], '-i --all-match --grep="text1" --grep="Test text" --grep=".*"'],
+            [['x-vp-another-key' => ['Test value']], '-i --all-match --grep="^x-vp-another-key: \(Test value\)$"'],
+            [['vp-another-key' => ['Test value']], '-i --all-match --grep="^\(x-\)\?vp-another-key: \(Test value\)$"'],
+            [['another-key' => ['Test value']], '-i --all-match --grep="^\(x-vp-\|vp-\)another-key: \(Test value\)$"'],
+            [['*-key' => ['^+?(){|$*\.[']], '-i --all-match --grep="^\(x-vp-\|vp-\).*-key: \(^+?(){|\\\\\\$.*\\\\\\\\\.\[\)$"']
+        ];
     }
 }
