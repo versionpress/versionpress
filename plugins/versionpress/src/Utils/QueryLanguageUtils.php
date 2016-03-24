@@ -102,7 +102,7 @@ class QueryLanguageUtils {
             $escapedKey = self::escapeGitLogArgument($key);
             $rule[$escapedKey] = ($key === 'date')
                 ? $rule[$escapedKey] = $array
-                : array_map('\VersionPress\Utils\QueryLanguageUtils::escapeGitLogArgument', $array);
+                : array_map(['VersionPress\Utils\QueryLanguageUtils', 'escapeGitLogArgument'], $array);
         }
 
         if (!empty($rule['author'])) {
