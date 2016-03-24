@@ -388,9 +388,11 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             </div>
           : null
         }
-        <Filter
-          onSubmit={this.onFilter}
-        />
+        <div className='tablenav top'>
+          <Filter
+            onSubmit={this.onFilter}
+          />
+        </div>
         <CommitsTable
           currentPage={parseInt(this.props.params.page, 10) || 1}
           pages={this.state.pages}
