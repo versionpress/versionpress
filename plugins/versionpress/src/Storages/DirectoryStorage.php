@@ -29,6 +29,10 @@ abstract class DirectoryStorage extends Storage {
 
     private $uncommittedEntities = array();
 
+    /** @var bool[] */
+    private $existenceCache = array();
+
+
     public function __construct($directory, $entityInfo) {
         parent::__construct($entityInfo);
         $this->directory = $directory;
@@ -179,5 +183,18 @@ abstract class DirectoryStorage extends Storage {
         $flatEntity[$this->entityInfo->vpidColumnName] = $vpid;
 
         return $flatEntity;
+    }
+
+    protected function entityExistedBeforeThisRequest($data) {
+        if (!isset($data['vp_id'])) {
+            return false;
+        }
+
+        $id = $data['vp_id'];
+        if (!isset($this->existenceCache[$id])) {
+            $this->existenceCache[$id] = $this->exists($id);
+        }
+
+        return $this->existenceCache[$id];
     }
 }

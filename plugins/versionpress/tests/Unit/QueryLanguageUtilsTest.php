@@ -19,6 +19,7 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase {
         return array(
             array(array('field: value'), array('field' => 'value')),
             array(array('field: value'), array('field' => 'value', 'other_field' => 'other_value')),
+            array(array('field: 0'), array('field' => 0)),
             array(array('field: value other_field: other_value'), array('field' => 'value', 'other_field' => 'other_value')),
 
             array(array('field: val*'), array('field' => 'value')),
@@ -41,6 +42,7 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase {
         return array(
             array(array('field: value'), array('field' => 'another_value')),
             array(array('field: value'), array('other_field' => 'value')),
+            array(array('field: value'), array('field' => 0)),
             array(array('field: value other_field: other_value'), array('field' => 'value')),
 
             array(array('field: val*'), array('field' => 'other_value')),
