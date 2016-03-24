@@ -1,6 +1,6 @@
 <?php
 
-namespace VersionPress\Utils\Serialization;
+namespace VersionPress\Storages\Serialization;
 
 use Nette\Utils\Strings;
 use VersionPress\Utils\StringUtils;
@@ -174,7 +174,7 @@ class IniSerializer {
         // https://regex101.com/r/cJ6eN0/6
         $stringValueRegEx = "/ = \"((?:[^\"\\\\]|\\\\.)*)\"/sU";
 
-        $iniString = preg_replace_callback($stringValueRegEx, array('VersionPress\Utils\Serialization\IniSerializer', 'replace_eol_callback'), $iniString);
+        $iniString = preg_replace_callback($stringValueRegEx, array('VersionPress\Storages\Serialization\IniSerializer', 'replace_eol_callback'), $iniString);
 
         return $iniString;
     }

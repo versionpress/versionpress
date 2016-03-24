@@ -1,6 +1,6 @@
 <?php
 
-namespace VersionPress\Utils\Serialization;
+namespace VersionPress\Storages\Serialization;
 
 use Nette\Utils\Strings;
 use VersionPress\Utils\StringUtils;

@@ -2,7 +2,7 @@
 
 namespace VersionPress\Tests\Unit;
 
-use VersionPress\Utils\Serialization\IniSerializer;
+use VersionPress\Storages\Serialization\IniSerializer;
 use VersionPress\Utils\StringUtils;
 
 class IniSerializer_IssueWP351Test extends \PHPUnit_Framework_TestCase {

@@ -3,7 +3,7 @@
 namespace VersionPress\Tests\Unit;
 
 use PHPUnit_Framework_TestCase;
-use VersionPress\Utils\Serialization\IniSerializer;
+use VersionPress\Storages\Serialization\IniSerializer;
 use VersionPress\Utils\StringUtils;
 
 /**
