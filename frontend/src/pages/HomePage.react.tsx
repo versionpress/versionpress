@@ -314,6 +314,13 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     }
   }
 
+  onClearSelection() {
+    this.setState({
+      selected: [],
+      lastSelected: null
+    });
+  }
+
   onCommit(message: string) {
     const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
@@ -440,6 +447,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         <div className='tablenav top'>
           <BulkActionPanel
             onBulkAction={this.onBulkAction.bind(this)}
+            onClearSelection={this.onClearSelection.bind(this)}
             selected={this.state.selected}
           />
         </div>

@@ -7,6 +7,7 @@ import './BulkActionPanel.less';
 
 interface BulkActionPanelProps extends React.Props<JSX.Element> {
   onBulkAction: (string) => void;
+  onClearSelection: () => void;
   selected: Commit[];
 }
 
@@ -20,6 +21,11 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
     }
 
     this.props.onBulkAction(value);
+  }
+
+  onClearSelection(e: MouseEvent) {
+    e.preventDefault();
+    this.props.onClearSelection();
   }
 
   render() {
@@ -42,7 +48,9 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
             disabled={selected.length === 0}
           />
           <div className={'BulkActionPanel-note' + (selected.length === 0 ? ' hide' : '')}>
-            ({selected.length} {selected.length === 1 ? 'change' : 'changes'} selected)
+            ({selected.length} {selected.length === 1 ? 'change' : 'changes'} selected;{' '}
+            <a className='BulkActionPanel-clear' href="#" onClick={this.onClearSelection}>clear selection</a>
+            )
           </div>
         </div>
       </div>
