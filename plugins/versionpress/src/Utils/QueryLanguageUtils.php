@@ -97,8 +97,16 @@ class QueryLanguageUtils {
     public static function createGitLogQueryFromRule($rule) {
         $query = '-i --all-match';
 
-        if (!empty($rule['author'])) {
-            foreach ($rule['author'] as $value) {
+        $escapedRule = array();
+        foreach ($rule as $key => $array) {
+            $escapedKey = self::escapeGitLogArgument($key);
+            $escapedRule[$escapedKey] = ($key === 'date')
+                ? $escapedRule[$escapedKey] = $array
+                : array_map('\VersionPress\Utils\QueryLanguageUtils::escapeGitLogArgument', $array);
+        }
+
+        if (!empty($escapedRule['author'])) {
+            foreach ($escapedRule['author'] as $value) {
                 // name and email
                 if (strpos($value, '@') && strpos($value, '<')) {
                     $query .= ' --author="^' . $value . '$"';
@@ -114,8 +122,8 @@ class QueryLanguageUtils {
             }
         }
 
-        if (!empty($rule['date'])) {
-            foreach ($rule['date'] as $value) {
+        if (!empty($escapedRule['date'])) {
+            foreach ($escapedRule['date'] as $value) {
                 $val = preg_replace('/\s+/', '', $value);
 
                 $bounds = explode('..', $val);
@@ -153,34 +161,34 @@ class QueryLanguageUtils {
             }
         }
 
-        if (!empty($rule['action']) || !empty($rule['vp-action'])) {
+        if (!empty($escapedRule['action']) || !empty($escapedRule['vp-action'])) {
             $vpAction = array();
-            if (!empty($rule['action'])) {
-                $action = array_filter($rule['action'], function ($val) { return strpos($val, '/') === false; });
-                $vpAction = array_diff($rule['action'], $action);
+            if (!empty($escapedRule['action'])) {
+                $action = array_filter($escapedRule['action'], function ($val) { return strpos($val, '/') === false; });
+                $vpAction = array_diff($escapedRule['action'], $action);
             }
-            if (!empty($rule['vp-action'])) {
-                $vpAction = array_merge($vpAction, $rule['vp-action']);
+            if (!empty($escapedRule['vp-action'])) {
+                $vpAction = array_merge($vpAction, $escapedRule['vp-action']);
             }
             if (!empty($vpAction)) {
                 $query .= ' --grep="^VP-Action: \(' . implode('\|', $vpAction) . '\)\(/.*\)\?$"';
             }
         }
 
-        if (!empty($rule['entity']) || !empty($action) || !empty($rule['vpid'])) {
+        if (!empty($escapedRule['entity']) || !empty($action) || !empty($escapedRule['vpid'])) {
             $query .= ' --grep="^VP-Action: ' .
-                (empty($rule['entity']) ? '.*'         :  '\(' . implode('\|', $rule['entity']) . '\)') . '/' .
+                (empty($escapedRule['entity']) ? '.*'         :  '\(' . implode('\|', $escapedRule['entity']) . '\)') . '/' .
                 (empty($action)         ? '.*'         :  '\(' . implode('\|', $action)         . '\)') .
-                (empty($rule['vpid'])   ? '\(/.*\)\?'  : '/\(' . implode('\|', $rule['vpid'])   . '\)') . '$"';
+                (empty($escapedRule['vpid'])   ? '\(/.*\)\?'  : '/\(' . implode('\|', $escapedRule['vpid'])   . '\)') . '$"';
         }
 
-        if (!empty($rule['text'])) {
-            foreach ($rule['text'] as $value) {
+        if (!empty($escapedRule['text'])) {
+            foreach ($escapedRule['text'] as $value) {
                 $query .= ' --grep="' . $value . '"';
             }
         }
 
-        foreach ($rule as $key => $values) {
+        foreach ($escapedRule as $key => $values) {
             if (in_array($key, array('author', 'date', 'entity', 'vp-action', 'action', 'vpid', 'text'))) {
                 continue;
             }
@@ -227,6 +235,18 @@ class QueryLanguageUtils {
         }
 
         return sprintf('(%s)', join(' AND ', $restrictionParts));
+    }
+
+    /**
+     * @param string $value The value to be escaped
+     * @return string|NULL
+     */
+    private static function escapeGitLogArgument($value) {
+        // https://regex101.com/r/pZ5nT1/5
+        // https://regex101.com/r/dC8qR0/1
+        $regex = array('/((\\\\|\$))/', '/((\.|\*|\[))/');
+        $replacements = array('\\\\\\\\\\\\$1', '\\\\$1');
+        return preg_replace($regex, $replacements, $value);
     }
 
     /**
