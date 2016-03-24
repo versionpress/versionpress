@@ -4,7 +4,6 @@ namespace VersionPress\Storages;
 use VersionPress\ChangeInfos\TermChangeInfo;
 use VersionPress\ChangeInfos\TermTaxonomyChangeInfo;
 use VersionPress\Database\EntityInfo;
-use VersionPress\Utils\IniSerializer;
 
 class TermTaxonomyStorage extends DirectoryStorage {
 

@@ -6,7 +6,7 @@ use VersionPress\Git\GitConfig;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Utils\FileSystem;
-use VersionPress\Utils\IniSerializer;
+use VersionPress\Storages\Serialization\IniSerializer;
 use VersionPress\Utils\Process;
 
 class MergeDriverTestUtils {

@@ -1,6 +1,9 @@
 <?php
 
-namespace VersionPress\Utils;
+namespace VersionPress\Storages\Serialization;
+
+use Nette\Utils\Strings;
+use VersionPress\Utils\StringUtils;
 
 /**
  * Serializes and deserializes data arrays into INI strings.
@@ -94,7 +97,9 @@ class IniSerializer {
                 foreach ($value as $arrayKey => $arrayValue) {
                     $output[] = self::serializeKeyValuePair($key . "[$arrayKey]", $arrayValue);
                 }
-
+            } elseif (StringUtils::isSerializedValue($value)) {
+                $lines = SerializedDataToIniConverter::toIniLines($key, $value);
+                $output = array_merge($output, $lines);
             } else {
                 $output[] = self::serializeKeyValuePair($key, $value);
             }
@@ -110,7 +115,8 @@ class IniSerializer {
      * @return mixed
      */
     private static function escapeString($str) {
-        $str = str_replace('"', '\"', $str);
+        $str = str_replace('\\', '\\\\', $str);
+        $str = str_replace('"', '\\"', $str);
         return $str;
     }
 
@@ -122,7 +128,8 @@ class IniSerializer {
      * @return mixed
      */
     private static function unescapeString($str) {
-        $str = str_replace('\"', '"', $str);
+        $str = str_replace('\\\\', '\\', $str);
+        $str = str_replace('\\"', '"', $str);
         return $str;
     }
 
@@ -139,6 +146,8 @@ class IniSerializer {
         $deserialized = parse_ini_string($string, true, INI_SCANNER_RAW);
         $deserialized = self::restoreTypesOfValues($deserialized);
         $deserialized = self::sanitizeSectionsAndKeys_removePlaceholders($deserialized);
+        $deserialized = self::restorePhpSerializedData($deserialized);
+        $deserialized = self::expandArrays($deserialized);
         $deserialized = self::eolWorkaround_removePlaceholders($deserialized);
         return $deserialized;
     }
@@ -160,10 +169,10 @@ class IniSerializer {
      */
     private static function eolWorkaround_addPlaceholders($iniString) {
 
-        // https://regex101.com/r/cJ6eN0/4
-        $stringValueRegEx = "/[ =]\"(.*)(?<!\\\\)\"/sU";
+        // https://regex101.com/r/cJ6eN0/6
+        $stringValueRegEx = "/ = \"((?:[^\"\\\\]|\\\\.)*)\"/sU";
 
-        $iniString = preg_replace_callback($stringValueRegEx, array('self', 'replace_eol_callback'), $iniString);
+        $iniString = preg_replace_callback($stringValueRegEx, array('VersionPress\Storages\Serialization\IniSerializer', 'replace_eol_callback'), $iniString);
 
         return $iniString;
     }
@@ -231,8 +240,8 @@ class IniSerializer {
         }, $string);
 
         // Replace brackets and quotes in keys
-        // https://regex101.com/r/iD5oO0/2
-        $string = preg_replace_callback("/^(.*?)(\\[[^\\]]*\\])? = /m", function ($match) use ($sanitizedChars) {
+        // https://regex101.com/r/iD5oO0/3
+        $string = preg_replace_callback("/^(.*?) = /m", function ($match) use ($sanitizedChars) {
             $keyWithPlaceholders = strtr($match[1], $sanitizedChars);
             return $keyWithPlaceholders . (isset($match[2]) ? $match[2] : "") . " = ";
         }, $string);
@@ -253,6 +262,48 @@ class IniSerializer {
         return $result;
     }
 
+    /**
+     * Transforms e.g.
+     * [
+     *  'key' => 'value',
+     *  'another_key[0]' => 'value',
+     *  'another_key[1]' => 'another value',
+     * ]
+     *
+     * to
+     * [
+     *  'key' => 'value',
+     *  'another_key' => [
+     *    0 => 'value',
+     *    1 => 'another value',
+     *  ]
+     * ]
+     *
+     *
+     * @param $deserialized
+     * @return array
+     */
+    private static function expandArrays($deserialized) {
+        $dataWithExpandedArrays = [];
+
+        foreach ($deserialized as $key => $value) {
+            if (is_array($value)) {
+                $value = self::expandArrays($value);
+            }
+
+            // https://regex101.com/r/bA6uD2/3
+            if (preg_match("/(.*)\\[([^]]+)\\]$/", $key, $matches)) {
+                $originalKey = $matches[1];
+                $subkey = $matches[2];
+                $dataWithExpandedArrays[$originalKey][$subkey] = $value;
+            } else {
+                $dataWithExpandedArrays[$key] = $value;
+            }
+        }
+
+        return $dataWithExpandedArrays;
+    }
+
     private static function restoreTypesOfValues($deserialized) {
         $result = array();
         foreach ($deserialized as $key => $value) {
@@ -260,10 +311,63 @@ class IniSerializer {
                 $result[$key] = self::restoreTypesOfValues($value);
             } else if (is_numeric($value)) {
                 $result[$key] = $value + 0;
+            } else if ($value === 'true' || $value === 'false') {
+                $result[$key] = $value === 'true';
             } else {
                 $result[$key] = self::unescapeString($value);
             }
         }
         return $result;
+    }
+
+    /**
+     * Converts all PHP-serialized data in the INI (multiple lines, made for easy merging)
+     * to the original PHP-serialized strings.
+     *
+     * Example:
+     *
+     * [
+     *  'some_option' => [
+     *    'option_value' => '<<<serialized>>> <array>',
+     *    'option_value[0]' = 'some serialized value',
+     *    'autoload' => 1,
+     *  ]
+     * ]
+     *
+     *
+     * is converted to
+     *
+     * [
+     *  'some_option' => [
+     *    'option_value' => 'a:1:{i:0;s:21:"some serialized value";}',
+     *    'autoload' => 1,
+     * ]
+     *
+     *
+     *
+     * @param $deserialized
+     * @return array
+     */
+    private static function restorePhpSerializedData($deserialized) {
+        $keysToRestore = [];
+
+        foreach ($deserialized as $key => $value) {
+            if (is_array($value)) {
+                $deserialized[$key] = self::restorePhpSerializedData($value);
+            } else if (Strings::startsWith($value, SerializedDataToIniConverter::SERIALIZED_MARKER)) {
+                $keysToRestore[] = $key;
+            }
+        }
+
+        foreach ($keysToRestore as $key) {
+            $relatedKeys = array_filter($deserialized, function ($maybeRelatedKey) use ($key) {
+                return Strings::startsWith($maybeRelatedKey, $key);
+            }, ARRAY_FILTER_USE_KEY);
+
+            $deserialized = array_diff_key($deserialized, $relatedKeys);
+            $deserialized[$key] = SerializedDataToIniConverter::fromIniLines($key, $relatedKeys);
+        }
+
+        return $deserialized;
     }
 }

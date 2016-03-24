@@ -4,7 +4,6 @@ namespace VersionPress\Tests\GitRepositoryTests;
 use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Tests\Utils\MergeAsserter;
 use VersionPress\Tests\Utils\MergeDriverTestUtils;
-use VersionPress\Utils\IniSerializer;
 use VersionPress\Utils\StringUtils;
 
 class MergeDriverTest extends \PHPUnit_Framework_TestCase {

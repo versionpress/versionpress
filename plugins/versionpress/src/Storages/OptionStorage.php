@@ -4,7 +4,6 @@ namespace VersionPress\Storages;
 use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\OptionChangeInfo;
 use VersionPress\Database\EntityInfo;
-use VersionPress\Utils\IniSerializer;
 
 class OptionStorage extends DirectoryStorage {
 
