@@ -169,9 +169,9 @@ class QueryLanguageUtils {
 
         if (!empty($rule['entity']) || !empty($action) || !empty($rule['vpid'])) {
             $query .= ' --grep="^VP-Action: ' .
-                (empty($rule['entity']) ? '.*' : '\(' . implode('\|', $rule['entity']) . '\)') . '/' .
-                (empty($action)         ? '.*' : '\(' . implode('\|', $action)         . '\)') . '/' .
-                (empty($rule['vpid'])   ? '.*' : '\(' . implode('\|', $rule['vpid'])   . '\)') . '"';
+                (empty($rule['entity']) ? '.*'         :  '\(' . implode('\|', $rule['entity']) . '\)') . '/' .
+                (empty($action)         ? '.*'         :  '\(' . implode('\|', $action)         . '\)') .
+                (empty($rule['vpid'])   ? '\(/.*\)\?'  : '/\(' . implode('\|', $rule['vpid'])   . '\)') . '$"';
         }
 
         if (!empty($rule['text'])) {
