@@ -242,10 +242,11 @@ class QueryLanguageUtils {
      * @return string|NULL
      */
     private static function escapeGitLogArgument($value) {
-        // https://regex101.com/r/pZ5nT1/5
-        // https://regex101.com/r/dC8qR0/1
-        $regex = array('/((\\\\|\$))/', '/((\.|\*|\[))/');
-        $replacements = array('\\\\\\\\\\\\$1', '\\\\$1');
+        // https://regex101.com/r/yP4yN9/3
+        // https://regex101.com/r/yM9wA2/3
+        // https://regex101.com/r/fM7uL3/1
+        $regex = array('/(\\\\|\$)/', '/(\.|\[)/', '/(\*)/');
+        $replacements = array('\\\\\\\\\\\\$1', '\\\\$1', '.$1');
         return preg_replace($regex, $replacements, $value);
     }
 
