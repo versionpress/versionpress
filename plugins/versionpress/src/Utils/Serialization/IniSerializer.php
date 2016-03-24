@@ -264,6 +264,27 @@ class IniSerializer {
         return $result;
     }
 
+    /**
+     * Transforms e.g.
+     * [
+     *  'key' => 'value',
+     *  'another_key[0]' => 'value',
+     *  'another_key[1]' => 'another value',
+     * ]
+     *
+     * to
+     * [
+     *  'key' => 'value',
+     *  'another_key' => [
+     *    0 => 'value',
+     *    1 => 'another value',
+     *  ]
+     * ]
+     *
+     *
+     * @param $deserialized
+     * @return array
+     */
     private static function expandArrays($deserialized) {
         $dataWithExpandedArrays = [];
 
@@ -301,6 +322,34 @@ class IniSerializer {
         return $result;
     }
 
+    /**
+     * Converts all PHP-serialized data in the INI (multiple lines, made for easy merging)
+     * to the original PHP-serialized strings.
+     *
+     * Example:
+     *
+     * [
+     *  'some_option' => [
+     *    'option_value' => '<<<serialized>>> <array>',
+     *    'option_value[0]' = 'some serialized value',
+     *    'autoload' => 1,
+     *  ]
+     * ]
+     *
+     *
+     * is converted to
+     *
+     * [
+     *  'some_option' => [
+     *    'option_value' => 'a:1:{i:0;s:21:"some serialized value";}',
+     *    'autoload' => 1,
+     * ]
+     *
+     *
+     *
+     * @param $deserialized
+     * @return array
+     */
     private static function restorePhpSerializedData($deserialized) {
         $keysToRestore = [];
 

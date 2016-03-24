@@ -65,7 +65,7 @@ class SerializedDataToIniConverter {
 
     /**
      * Transforms PHP primitives, arrays, objects etc. to INI. Complex structures like arrays and objects
-     * can take multiple lines (every scalar value takes one line).
+     * can take multiple lines (every scalar value is on new line).
      *
      * @return array
      */
