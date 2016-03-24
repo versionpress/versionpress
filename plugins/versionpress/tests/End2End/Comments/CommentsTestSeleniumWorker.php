@@ -24,6 +24,13 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
         $this->waitAfterRedirect();
     }
 
+    public function prepare_createSpamComment() {
+        throw new \PHPUnit_Framework_SkippedTestError('It\'s too difficult to create spam comment via Selenium');
+    }
+
+    public function createSpamComment() {
+    }
+
     public function prepare_createComment() {
         $this->loginIfNecessary();
     }

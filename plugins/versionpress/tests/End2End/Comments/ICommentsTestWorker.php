@@ -56,4 +56,7 @@ interface ICommentsTestWorker {
 
     public function prepare_approveTwoComments();
     public function approveTwoComments();
+
+    public function prepare_createSpamComment();
+    public function createSpamComment();
 }

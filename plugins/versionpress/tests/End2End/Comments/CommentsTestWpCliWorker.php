@@ -25,6 +25,21 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
         $this->wpAutomation->createComment($comment);
     }
 
+    public function prepare_createSpamComment() {
+    }
+
+    public function createSpamComment() {
+        $comment = array(
+            'comment_author' => 'John Tester',
+            'comment_author_email' => 'john.tester@example.com',
+            'comment_content' => 'Public comment',
+            'comment_approved' => "spam",
+            'comment_post_ID' => $this->testPostId
+        );
+
+        $this->wpAutomation->createComment($comment);
+    }
+
     public function prepare_createComment() {
     }
 
