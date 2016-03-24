@@ -152,4 +152,17 @@ class StringUtils {
 
         return substr_replace($haystack, $replace, $needlePosition, strlen($needle));
     }
+
+    /**
+     * An alternative to the built-in PHP function `substr`.
+     * The `substr` function needs the length of substring. This method takes bounds from-to.
+     *
+     * @param string $str
+     * @param int $from
+     * @param int $to
+     * @return string
+     */
+    public static function substringFromTo($str, $from, $to) {
+        return substr($str, $from, $to - $from);
+    }
 }

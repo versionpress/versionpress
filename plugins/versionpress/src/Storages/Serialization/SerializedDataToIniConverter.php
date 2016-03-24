@@ -72,7 +72,7 @@ class SerializedDataToIniConverter {
 
         switch ($type) {
             case 's':
-                $length = intval(self::substringFromTo(self::$value, self::$index, strpos(self::$value, ':', self::$index)));
+                $length = intval(StringUtils::substringFromTo(self::$value, self::$index, strpos(self::$value, ':', self::$index)));
                 self::$index += strlen($length) + 2; // :"
                 $str = substr(self::$value, self::$index, $length);
                 self::$index += strlen($str) + 2; // ";
@@ -80,16 +80,16 @@ class SerializedDataToIniConverter {
                 return ['type' => 'string', 'value' => $str];
             case 'i':
             case 'd':
-                $number = self::substringFromTo(self::$value, self::$index, strpos(self::$value, ';', self::$index));
+                $number = StringUtils::substringFromTo(self::$value, self::$index, strpos(self::$value, ';', self::$index));
                 self::$index += strlen($number) + 1; // ;
                 return ['type' => $type === 'i' ? 'int' : 'double', 'value' => $number];
 
             case 'b':
-                $strVal = self::substringFromTo(self::$value, self::$index, strpos(self::$value, ';', self::$index));
+                $strVal = StringUtils::substringFromTo(self::$value, self::$index, strpos(self::$value, ';', self::$index));
                 self::$index += 2; // <0|1>;
                 return ['type' => 'boolean', 'value' => $strVal === '1'];
             case 'a':
-                $length = intval(self::substringFromTo(self::$value, self::$index, strpos(self::$value, ':', self::$index)));
+                $length = intval(StringUtils::substringFromTo(self::$value, self::$index, strpos(self::$value, ':', self::$index)));
                 self::$index += strlen($length) + 2; // :{
 
                 $subItems = [];
@@ -104,11 +104,11 @@ class SerializedDataToIniConverter {
 
                 return ['type' => 'array', 'value' => $subItems];
             case 'O':
-                $classNameLength = intval(self::substringFromTo(self::$value, self::$index, strpos(self::$value, ':', self::$index)));
+                $classNameLength = intval(StringUtils::substringFromTo(self::$value, self::$index, strpos(self::$value, ':', self::$index)));
                 self::$index += strlen($classNameLength) + 2; // :"
                 $className = substr(self::$value, self::$index, $classNameLength);
                 self::$index += $classNameLength + 2; // ":
-                $attributeCount = intval(self::substringFromTo(self::$value, self::$index, strpos(self::$value, ':', self::$index)));
+                $attributeCount = intval(StringUtils::substringFromTo(self::$value, self::$index, strpos(self::$value, ':', self::$index)));
                 self::$index += strlen($attributeCount) + 2; // :{
 
                 $attribute = [];
@@ -130,7 +130,7 @@ class SerializedDataToIniConverter {
                 return ['type' => 'null'];
             case 'r':
             case 'R':
-                $number = self::substringFromTo(self::$value, self::$index, strpos(self::$value, ';', self::$index));
+                $number = StringUtils::substringFromTo(self::$value, self::$index, strpos(self::$value, ';', self::$index));
                 self::$index += strlen($number) + 1; // ;
 
                 return ['type' => $type === 'r' ? 'pointer' : 'reference', 'value' => $number];
@@ -192,19 +192,6 @@ class SerializedDataToIniConverter {
         }
 
         return [join(' ', $parts)];
-    }
-
-    /**
-     * An alternative to the built-in PHP function `substr`.
-     * The `substr` function needs the length of substring. This method takes bounds from-to.
-     *
-     * @param string $str
-     * @param int $from
-     * @param int $to
-     * @return string
-     */
-    private static function substringFromTo($str, $from, $to) {
-        return substr($str, $from, $to - $from);
     }
 
     private static function primitiveToEscapedString($value) {
