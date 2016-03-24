@@ -4,7 +4,7 @@ since: 3.0
 
 # Searching History
 
-VersionPress has a powerful search that allows finding commits by certain authors, in certain date ranges and so on. The syntax is inspired by GitHub and Gmail and is relatively straightforward to learn.
+VersionPress has powerful search with syntax inspired by GitHub or Gmail. It lets you filter the main table by authors, post types, date ranges etc.
 
 <div class="note">
   <strong>Note</strong>
@@ -16,58 +16,66 @@ VersionPress has a powerful search that allows finding commits by certain author
 
 Let's start with a couple of examples.
 
-<dl>
 
-<dt><code>hello world</code></dt>
-<dl>Finds changes that have the words "hello" and "world" somewhere in the change description (commit message).</dl>
+**`hello world`**<br>
+Finds changes that have the words "hello" and "world" somewhere in the change description (commit message).
 
-<dt><code>author:joe</code></dt>
-<dl>Various operators are supported. This finds changes done by Joe (the search is always case insensitive).</dl>
+**`hello world author:joe`**<br>
+Search operators are supported, e.g., `author:`. The search is always case insensitive so this will find 'Joe', 'JOE' etc.
 
-<dt><code>entity:post action:trash</code></dt>
-<dl>Multiple operators can be used at the same time (they are combined using AND).</dl>
-
-<dt><code>hello world author: joe* date:">= 2016-01-01"</code></dt>
-<dl>Here you can see a couple of syntax rules in play: you can combine as many operators as you like, wildcards are supported, value containing spaces must be quoted, there are optional spaces after the `:`, etc.</dl>
-
-</dl>
+**`hello world author: joe* date:">= 2016-01-01"`**<br>
+Here you can see a couple of syntax rules in play: you can combine as many operators as you like, wildcards are supported, value containing spaces must be quoted, there are optional spaces after the colon, etc.
 
 
 ## Syntax
 
-**`operator: val*ue`**
-Space after colon is optional, value can be quoted using single `' '` or double quotes `" "`. Quoting is required if the value contains spaces. Wildcards are supported.
+**`just text`**, **`"just text"`**, **`w*ldcards`**<br>
+Searches the commit text. Without quotes, it will look for commits containing all the words. With quotes, it does a strict match (still case in-sensitive). Single and double quotes are both supported.
 
-**`operator:value1 operator:value2`**
-Operators can be repeated, their values are then combined using the logical OR. The only exception is the `date` operator with greater than / less than sign which uses logical AND, for example, `date:>2016-01-01 date:<2016-01-15`.
+**`operator: value`**<br>
+Space after colon is optional. Value can be quoted and wildcarded as above.
 
-**`operator1:value operator2:value`**
+**`operator:value1 operator:value2`**<br>
+Operators can be repeated, their values are then combined using logical OR. For example, you can search for changes done by either Adam or Betty by using `author:Adam author:Betty`. The only exception is `date:` which is AND'd, see below.
+
+**`operator1:value operator2:value`**<br>
 Multiple operators are combined using logical AND.
 
-**`just text`**
-Searches the commit text. Without quotes, it will look for commits containing all of the words. With quotes, it does a strict match (still case in-sensitive).
+--
+
+All of the syntaxes above can be freely combined.
 
 
 ## Operators
 
-**`author`**
-Author of the action. You can use either author name or his/her email. Wildcards are supported.
+### `author:`
 
-Some actions are not done by logged-in users, e.g., when someone posts a comment on the website. Those commits are done by a special user who you can search for using `author:nonadmin@example.com`.
+Author of the action. You can use author name or his/her email, wildcards are supported.
+
+Anonymous actions like posting a comment on a blog are tracked under a virtual user `nonadmin@example.com`.
 
 
-**`date`**
-Commit date. Use the `RRRR-MM-DD` format, e.g., `date: 2016-01-01`. You can use **greater than / less than operators** such as `date: >=2016-01-01` or a **range operator** `..`, for example, `date: 2016-01-01..2016-02-01`. Either boundary can be replaced with a wildcard, e.g., `date: 2016-01-01..*`.
+### `date:`
 
-**`entity`, `action`, `vpid`**
-VersionPress identifiers. For example, to show only changed done to users, use `entity:user`. Valid entities are basically WordPress tables without the `wp_` (or custom) prefix and in a singular form.
+Commit date. Recommended format is `YYYY-MM-DD`, e.g., `date: 2016-01-01`, but anything that can be parsed by [`strtotime()`](http://php.net/manual/en/function.strtotime.php) is supported. You can use **greater than / less than operators** such as `date: >=2016-01-01` or a **range operator** `..`, for example, `date: 2016-01-01..2016-02-01`. Either boundary can be replaced with a wildcard, e.g., `date: 2016-01-01..*`.
 
-We currently don't have a good way to generate the definitive list of supported entities and actions so use your intuition. For example, deleting a comment is `entity:comment action:delete`, etc. We'll improve the documentation in the future and possibly also provide auto-complete.
+The `date:` operator has currently some limitations:
 
-**`vp-tag`**
-Looks for an arbitrary VP tag, e.g., `Post-Title` (case insensitive, so `post-title: "hello world"` works as well).
+- Time portion is ignored.
+- Repeating this operator is tricky and we recommend using only a single `date:` at a time. For example, if you searched for `date:2016-01-01 date:2016-01-02` you might expect to see commits from both of the dates, but the result would be empty because `date:` uses logical AND due to technical limitations. You could use the AND logic for something like `date:>2016-01-01 date:<2016-02-01` but we recommend you use the range operator instead.
+- You cannot search for two date periods with a gap between them. The range must be continuous.
 
-VP tags are pieces of metadata that VersionPress stores with every commit. For example, updating the site title creates a commit message like this:
+
+### `entity:`, `action:`, `vpid:`
+
+All actions tracked by VersionPress are done on some entity (`post`, `user`, `option`, `postmeta` etc.), the action is something like `create` or `delete` and every entity has a unique ID, something like `126BBC0541B14B528C623E32EE1B497C`. You can search for these using the operators above, most commonly by `entity` or `action`.
+
+We currently don't have a good way to generate the definitive list of supported entities, you can see them in the commit messages when using a standard Git client but it's not ideal. We'll have a better way to document this in the future.
+
+
+### **`arbitrary-vp-tag:`**
+
+VP tags are pieces of metadata that VersionPress stores with each commit. For example, updating the site title creates a commit message like this:
 
 ```
 [VP] Edited option 'blogname'
@@ -78,18 +86,19 @@ X-VP-Version: 3.0
 X-VP-Environment: master
 ```
 
-You can search for all these pieces of metadata, either in the full form, or without the "VP-" prefix (all the operators are automatically left-wildcarded). Some examples that will work fine against this commit are:
+You can search for VP tags, either in a full form or without the `VP-` / `X-VP-` prefix. Some examples that will work equally fine against the commit above are:
 
+- `environment: master`
+- `X-VP-Environment: master`
+- `VP-environment: MASTER`
 - `action: option/edit/blogname`
 - `VP-Action: option/edit/*`
 - `Action: */edit/*`
 - `vp-version: 3.0`
-- `environment: master`
-- `X-VP-Environment: master`
 
-You might notice that the `VP-Action` tag can clash with the `action:` operator, but it's handled gracefully. For example, if you search for `entity:post action:publish`, VersionPress will understand that you're using an operator at this point. If you do `action:post/publish`, it will understand that it is the lower-case version of the VP tag, it will add the wildcard automatically for you and it will work just if you searched for `VP-Action: post/publish/*`.
+VP-Action actually gets a bit of a treatment because it is also an operator (see above) and quite useful. You can skip the `/*` wildcard as that is added automatically so something like `action: option/edit` will just work.
 
 
 ## Current limitations
 
-Search in 3.0 does not support negative search. You cannot say something like "author is NOT Joe". This will most likely come in VersionPress 4.0.
+Search in 3.0 does not support negative search. You cannot say something like "author is NOT Joe".
