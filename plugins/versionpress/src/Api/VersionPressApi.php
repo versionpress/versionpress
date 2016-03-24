@@ -163,10 +163,10 @@ class VersionPressApi {
      * @return \Closure
      */
     private function handleAsAdminSectionRoute($routeHandler) {
-        if (!defined('WP_ADMIN')) {
-            define('WP_ADMIN', true);
-        }
         return function (WP_REST_Request $request) use ($routeHandler) {
+            if (!defined('WP_ADMIN')) {
+                define('WP_ADMIN', true);
+            }
             return $this->$routeHandler($request);
         };
     }
