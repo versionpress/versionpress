@@ -994,8 +994,8 @@ INI
 [Section]
 data = <<<serialized>>> <array>
 data[0] = <stdClass>
-data[1] = <pointer> 2
-data[2] = <pointer> 2
+data[1] = <*pointer*> 2
+data[2] = <*pointer*> 2
 
 INI
         );
@@ -1039,7 +1039,7 @@ INI
 [Section]
 data = <<<serialized>>> <array>
 data["inception"] = <array>
-data["inception"]["inception"] = <reference> 2
+data["inception"]["inception"] = <*reference*> 2
 
 INI
         );
@@ -1065,7 +1065,7 @@ data = <<<serialized>>> <array>
 data[0] = <array>
 data[0]["parent"] = <array>
 data[1] = <array>
-data[1]["parent"] = <reference> 3
+data[1]["parent"] = <*reference*> 3
 
 INI
         );
@@ -1096,17 +1096,17 @@ data = <<<serialized>>> <array>
 data[0] = <array>
 data[0]["parent"] = <array>
 data[0]["a"] = <array>
-data[0]["a"]["parent"] = <reference> 3
-data[0]["a"]["a"] = <reference> 4
+data[0]["a"]["parent"] = <*reference*> 3
+data[0]["a"]["a"] = <*reference*> 4
 data[0]["a"]["b"] = <array>
-data[0]["a"]["b"]["parent"] = <reference> 3
-data[0]["a"]["b"]["a"] = <reference> 4
-data[0]["a"]["b"]["b"] = <reference> 5
-data[0]["b"] = <reference> 5
+data[0]["a"]["b"]["parent"] = <*reference*> 3
+data[0]["a"]["b"]["a"] = <*reference*> 4
+data[0]["a"]["b"]["b"] = <*reference*> 5
+data[0]["b"] = <*reference*> 5
 data[1] = <array>
-data[1]["parent"] = <reference> 3
-data[1]["a"] = <reference> 4
-data[1]["b"] = <reference> 5
+data[1]["parent"] = <*reference*> 3
+data[1]["a"] = <*reference*> 4
+data[1]["b"] = <*reference*> 5
 
 INI
         );
@@ -1128,7 +1128,7 @@ INI
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
 data = <<<serialized>>> <stdClass>
-data["inception"] = <reference> 1
+data["inception"] = <*reference*> 1
 
 INI
         );
@@ -1161,12 +1161,12 @@ INI
 data = <<<serialized>>> <array>
 data[0] = <stdClass>
 data[0]["parent"] = <stdClass>
-data[0]["a"] = <reference> 2
+data[0]["a"] = <*reference*> 2
 data[0]["b"] = <stdClass>
-data[0]["b"]["parent"] = <reference> 3
-data[0]["b"]["a"] = <reference> 2
-data[0]["b"]["b"] = <reference> 4
-data[1] = <pointer> 4
+data[0]["b"]["parent"] = <*reference*> 3
+data[0]["b"]["a"] = <*reference*> 2
+data[0]["b"]["b"] = <*reference*> 4
+data[1] = <*pointer*> 4
 
 INI
         );

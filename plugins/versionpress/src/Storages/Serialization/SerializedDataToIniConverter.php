@@ -133,7 +133,7 @@ class SerializedDataToIniConverter {
                 $number = StringUtils::substringFromTo(self::$value, self::$index, strpos(self::$value, ';', self::$index));
                 self::$index += strlen($number) + 1; // ;
 
-                return ['type' => $type === 'r' ? 'pointer' : 'reference', 'value' => $number];
+                return ['type' => $type === 'r' ? '*pointer*' : '*reference*', 'value' => $number];
             default:
                 return [];
         }
@@ -165,9 +165,9 @@ class SerializedDataToIniConverter {
                 return $lines;
             case 'null':
                 return self::createFirstLine($key, $type);
-            case 'pointer':
+            case '*pointer*':
                 return self::createFirstLine($key, $type, $parsingResult['value']);
-            case 'reference':
+            case '*reference*':
                 return self::createFirstLine($key, $type, $parsingResult['value']);
         }
     }
@@ -222,7 +222,7 @@ class SerializedDataToIniConverter {
         $type = null; // string or number
 
         // https://regex101.com/r/gJ1oF2/1
-        if (preg_match('/^<([\w\d\\\\]+)> ?(.*)/', $value, $matches)) {
+        if (preg_match('/^<(\*?[\w\d\\\\]+\*?)> ?(.*)/', $value, $matches)) {
             $type = $matches[1]; // detect type and value from eg. `<boolean> false`
             $value = $matches[2];
         }
@@ -247,11 +247,11 @@ class SerializedDataToIniConverter {
             return 'N;';
         }
 
-        if ($type === 'reference') {
+        if ($type === '*reference*') {
             return 'R:' . $value . ';';
         }
 
-        if ($type === 'pointer') {
+        if ($type === '*pointer*') {
             return 'r:' . $value . ';';
         }
 
