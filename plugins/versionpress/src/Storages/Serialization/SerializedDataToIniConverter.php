@@ -13,8 +13,9 @@ class SerializedDataToIniConverter {
 
     const SERIALIZED_MARKER = '<<<serialized>>>';
 
-    private $index = 0;
-    private $value;
+    // Static variables used for parsing PHP-serialized string
+    private static $index = 0;
+    private static $value;
 
     /**
      * Converts PHP-serialized string to mutiple INI lines.
@@ -31,12 +32,12 @@ class SerializedDataToIniConverter {
      * @param string $serializedData
      * @return string[]
      */
-    public function toIniLines($key, $serializedData) {
-        $this->value = $serializedData;
+    public static function toIniLines($key, $serializedData) {
+        self::$value = $serializedData;
         $parsingResult = self::parseSerializedString();
         $iniLines = self::convertParsingResultToIni($key, $parsingResult);
-        $this->index = 0;
-        $this->value = null;
+        self::$index = 0;
+        self::$value = null;
 
         // Add marker
         $iniLines[0] = StringUtils::replaceFirst(' = ', " = " . self::SERIALIZED_MARKER . " ", $iniLines[0]);
@@ -52,7 +53,7 @@ class SerializedDataToIniConverter {
      * @param string[] $lines Lines related to the $key. Hierarchical structures are saved as multiple lines.
      * @return string Original result of PHP serialization.
      */
-    public function fromIniLines($key, $lines) {
+    public static function fromIniLines($key, $lines) {
         $value = substr($lines[$key], strlen(self::SERIALIZED_MARKER) + 1); // + space
         unset($lines[$key]);
 
@@ -65,72 +66,72 @@ class SerializedDataToIniConverter {
      *
      * @return array
      */
-    private function parseSerializedString() {
-        $type = $this->value[$this->index];
-        $this->index += 2; // <type>:
+    private static function parseSerializedString() {
+        $type = self::$value[self::$index];
+        self::$index += 2; // <type>:
 
         switch ($type) {
             case 's':
-                $length = intval(self::substringFromTo($this->value, $this->index, strpos($this->value, ':', $this->index)));
-                $this->index += strlen($length) + 2; // :"
-                $str = substr($this->value, $this->index, $length);
-                $this->index += strlen($str) + 2; // ";
+                $length = intval(self::substringFromTo(self::$value, self::$index, strpos(self::$value, ':', self::$index)));
+                self::$index += strlen($length) + 2; // :"
+                $str = substr(self::$value, self::$index, $length);
+                self::$index += strlen($str) + 2; // ";
 
                 return ['type' => 'string', 'value' => $str];
             case 'i':
             case 'd':
-                $number = self::substringFromTo($this->value, $this->index, strpos($this->value, ';', $this->index));
-                $this->index += strlen($number) + 1; // ;
+                $number = self::substringFromTo(self::$value, self::$index, strpos(self::$value, ';', self::$index));
+                self::$index += strlen($number) + 1; // ;
                 return ['type' => $type === 'i' ? 'int' : 'double', 'value' => $number];
 
             case 'b':
-                $strVal = self::substringFromTo($this->value, $this->index, strpos($this->value, ';', $this->index));
-                $this->index += 2; // <0|1>;
+                $strVal = self::substringFromTo(self::$value, self::$index, strpos(self::$value, ';', self::$index));
+                self::$index += 2; // <0|1>;
                 return ['type' => 'boolean', 'value' => $strVal === '1'];
             case 'a':
-                $length = intval(self::substringFromTo($this->value, $this->index, strpos($this->value, ':', $this->index)));
-                $this->index += strlen($length) + 2; // :{
+                $length = intval(self::substringFromTo(self::$value, self::$index, strpos(self::$value, ':', self::$index)));
+                self::$index += strlen($length) + 2; // :{
 
                 $subItems = [];
                 for ($i = 0; $i < $length; $i++) {
-                    $key = $this->parseSerializedString()['value'];
-                    $value = $this->parseSerializedString();
+                    $key = self::parseSerializedString()['value'];
+                    $value = self::parseSerializedString();
 
                     $subItems[$key] = $value;
                 }
 
-                $this->index += 1; // }
+                self::$index += 1; // }
 
                 return ['type' => 'array', 'value' => $subItems];
             case 'O':
-                $classNameLength = intval(self::substringFromTo($this->value, $this->index, strpos($this->value, ':', $this->index)));
-                $this->index += strlen($classNameLength) + 2; // :"
-                $className = substr($this->value, $this->index, $classNameLength);
-                $this->index += $classNameLength + 2; // ":
-                $attributeCount = intval(self::substringFromTo($this->value, $this->index, strpos($this->value, ':', $this->index)));
-                $this->index += strlen($attributeCount) + 2; // :{
+                $classNameLength = intval(self::substringFromTo(self::$value, self::$index, strpos(self::$value, ':', self::$index)));
+                self::$index += strlen($classNameLength) + 2; // :"
+                $className = substr(self::$value, self::$index, $classNameLength);
+                self::$index += $classNameLength + 2; // ":
+                $attributeCount = intval(self::substringFromTo(self::$value, self::$index, strpos(self::$value, ':', self::$index)));
+                self::$index += strlen($attributeCount) + 2; // :{
 
                 $attribute = [];
                 for ($i = 0; $i < $attributeCount; $i++) {
-                    $attributeName = $this->parseSerializedString()['value'];
+                    $attributeName = self::parseSerializedString()['value'];
 
                     $attributeName = str_replace("\0*\0", '*', $attributeName);
                     $attributeName = str_replace("\0{$className}\0", '-', $attributeName);
 
-                    $attributeValue = $this->parseSerializedString();
+                    $attributeValue = self::parseSerializedString();
 
                     $attribute[$attributeName] = $attributeValue;
                 }
 
-                $this->index += 1; // }
+                self::$index += 1; // }
 
                 return ['type' => 'object', 'class' => $className, 'value' => $attribute];
             case 'N':
                 return ['type' => 'null'];
             case 'r':
             case 'R':
-                $number = self::substringFromTo($this->value, $this->index, strpos($this->value, ';', $this->index));
-                $this->index += strlen($number) + 1; // ;
+                $number = self::substringFromTo(self::$value, self::$index, strpos(self::$value, ';', self::$index));
+                self::$index += strlen($number) + 1; // ;
 
                 return ['type' => $type === 'r' ? 'pointer' : 'reference', 'value' => $number];
             default:

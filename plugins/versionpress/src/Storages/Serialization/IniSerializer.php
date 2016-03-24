@@ -98,8 +98,7 @@ class IniSerializer {
                     $output[] = self::serializeKeyValuePair($key . "[$arrayKey]", $arrayValue);
                 }
             } elseif (StringUtils::isSerializedValue($value)) {
-                $serializedDataToIniConverter = new SerializedDataToIniConverter();
-                $lines = $serializedDataToIniConverter->toIniLines($key, $value);
+                $lines = SerializedDataToIniConverter::toIniLines($key, $value);
                 $output = array_merge($output, $lines);
             } else {
                 $output[] = self::serializeKeyValuePair($key, $value);
@@ -360,14 +359,13 @@ class IniSerializer {
             }
         }
 
-        $serializedDataToIniConverter = new SerializedDataToIniConverter(SerializedDataToIniConverter::SERIALIZED_MARKER);
         foreach ($keysToRestore as $key) {
             $relatedKeys = array_filter($deserialized, function ($maybeRelatedKey) use ($key) {
                 return Strings::startsWith($maybeRelatedKey, $key);
             }, ARRAY_FILTER_USE_KEY);
 
             $deserialized = array_diff_key($deserialized, $relatedKeys);
-            $deserialized[$key] = $serializedDataToIniConverter->fromIniLines($key, $relatedKeys);
+            $deserialized[$key] = SerializedDataToIniConverter::fromIniLines($key, $relatedKeys);
         }
 
         return $deserialized;
