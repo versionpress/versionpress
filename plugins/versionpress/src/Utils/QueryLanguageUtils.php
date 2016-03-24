@@ -153,11 +153,17 @@ class QueryLanguageUtils {
             }
         }
 
-        if (!empty($rule['action'])) {
-            $action = array_filter($rule['action'], function ($val) { return strpos($val, '/') === false; });
-            $vpAction = array_filter($rule['action'], function ($val) { return strpos($val, '/') !== false; });
+        if (!empty($rule['action']) || !empty($rule['vp-action'])) {
+            $vpAction = array();
+            if (!empty($rule['action'])) {
+                $action = array_filter($rule['action'], function ($val) { return strpos($val, '/') === false; });
+                $vpAction = array_diff($rule['action'], $action);
+            }
+            if (!empty($rule['vp-action'])) {
+                $vpAction = array_merge($vpAction, $rule['vp-action']);
+            }
             if (!empty($vpAction)) {
-                $query .= ' --grep="^VP-Action: \(' . implode('\|', $vpAction) . '\)"';
+                $query .= ' --grep="^VP-Action: \(' . implode('\|', $vpAction) . '\)\(/.*\)\?$"';
             }
         }
 
@@ -173,13 +179,15 @@ class QueryLanguageUtils {
         }
 
         foreach ($rule as $key => $values) {
-            if (in_array($key, array('author', 'date', 'entity', 'action', 'vpid', 'text'))) {
+            if (in_array($key, array('author', 'date', 'entity', 'vp-action', 'action', 'vpid', 'text'))) {
                 continue;
             }
 
-            if (!empty($values)) {
-                $query .= ' --grep="^vp-' . $key . ': \(' . implode('\|', $values) . '\)"';
-            }
+            if (substr($key, 0, 5) === 'x-vp-') { $prefix = ''; }
+            else if (substr($key, 0, 3) === 'vp-') { $prefix = '\(X-\)\?'; }
+            else { $prefix = '\(X-VP-\|VP-\)'; }
+
+            $query .= ' --grep="^' . $prefix . $key . ': \(' . implode('\|', $values) . '\)$"';
         }
 
         return $query;
