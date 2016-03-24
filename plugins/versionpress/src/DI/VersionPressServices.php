@@ -6,7 +6,7 @@ final class VersionPressServices {
     const STORAGE_FACTORY = 'storage-factory';
     const MIRROR = 'mirror';
     const DB_SCHEMA = 'db-schema';
-    const WPDB_MIRROR_BRIDGE = 'database';
+    const WPDB_MIRROR_BRIDGE = 'mirror-bridge';
     const COMMITTER = 'committer';
     const INITIALIZER = 'initializer';
     const SYNCHRONIZATION_PROCESS = 'synchronization-process';
@@ -14,6 +14,7 @@ final class VersionPressServices {
     const REVERTER = 'reverter';
     const REPOSITORY = 'repository';
     const WPDB = 'wpdb';
+    const DATABASE = 'database';
     const VPID_REPOSITORY = 'vpid-repository';
     const URL_REPLACER = 'url-replacer';
     const SHORTCODES_REPLACER = 'shortcode-replacer';

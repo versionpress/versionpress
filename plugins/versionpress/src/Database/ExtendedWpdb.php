@@ -24,10 +24,6 @@ class ExtendedWpdb extends wpdb {
         return parent::get_row($query, $output, $y);
     }
 
-    public function vp_direct_query($query) {
-        return parent::query($query);
-    }
-
     function get_results($query = null, $output = OBJECT) {
         if ($output === ARRAY_MAP) {
             $result = parent::get_results($query, $output = ARRAY_N);

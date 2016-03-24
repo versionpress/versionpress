@@ -16,6 +16,7 @@ use Faker;
 use mysqli;
 use Nette\Utils\Random;
 use Tracy\Debugger;
+use VersionPress\Database\Database;
 use VersionPress\Utils\FileSystem;
 use WP_CLI;
 use wpdb;
@@ -28,7 +29,7 @@ class VpAutomateCommand extends \WP_CLI_Command {
     /** @var Faker\Generator */
     private $faker;
 
-    /** @var wpdb */
+    /** @var Database */
     private $database;
 
     /**
@@ -77,7 +78,8 @@ class VpAutomateCommand extends \WP_CLI_Command {
         global $wpdb;
         $this->faker = Faker\Factory::create();
 
-        $this->database = $wpdb;
+        $this->database = new Database($wpdb);
+        
 
         $preferedOrder = array(
             'options',

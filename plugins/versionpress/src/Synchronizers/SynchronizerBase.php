@@ -2,6 +2,7 @@
 namespace VersionPress\Synchronizers;
 
 use Nette\Utils\Strings;
+use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Storages\Storage;
@@ -27,7 +28,7 @@ abstract class SynchronizerBase implements Synchronizer {
     /** @var Storage */
     private $storage;
 
-    /** @var wpdb */
+    /** @var Database */
     protected $database;
 
     /** @var DbSchemaInfo */
@@ -51,15 +52,15 @@ abstract class SynchronizerBase implements Synchronizer {
 
     /**
      * @param Storage $storage Specific Synchronizers will use specific storage types, see VersionPress\Synchronizers\SynchronizerFactory
-     * @param wpdb $wpdb
+     * @param Database $database
      * @param DbSchemaInfo $dbSchema
      * @param AbsoluteUrlReplacer $urlReplacer
      * @param string $entityName Constructors in subclasses provide this
      * @param ShortcodesReplacer $shortcodesReplacer
      */
-    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer, $entityName) {
+    function __construct(Storage $storage, Database $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer, $entityName) {
         $this->storage = $storage;
-        $this->database = $wpdb;
+        $this->database = $database;
         $this->dbSchema = $dbSchema;
         $this->urlReplacer = $urlReplacer;
         $this->entityName = $entityName;
@@ -368,7 +369,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $updateSql .= join(", ", ArrayUtils::parametrize($newReferences));
 
         $updateSql .= " WHERE $idColumnName=(SELECT id FROM $vpIdTable WHERE vp_id=UNHEX(\"$entity[vp_id]\"))";
-        $this->database->vp_direct_query($updateSql);
+        $this->database->query($updateSql);
     }
 
     /**
@@ -407,7 +408,7 @@ abstract class SynchronizerBase implements Synchronizer {
         $updateSql .= join(", ", ArrayUtils::parametrize($newReferences));
 
         $updateSql .= " WHERE $idColumnName=(SELECT id FROM $vpIdTable WHERE vp_id=UNHEX(\"$entity[vp_id]\"))";
-        $this->database->vp_direct_query($updateSql);
+        $this->database->query($updateSql);
     }
 
     private function fixMnReferences($entities) {
@@ -446,15 +447,15 @@ abstract class SynchronizerBase implements Synchronizer {
 
             if ($this->selectiveSynchronization) {
                 if (count($processedIds) > 0) {
-                    $this->database->vp_direct_query("DELETE FROM $prefixedTable WHERE $sourceColumn IN (" . join(", ", $processedIds) . ")");
+                    $this->database->query("DELETE FROM $prefixedTable WHERE $sourceColumn IN (" . join(", ", $processedIds) . ")");
                 }
             } else {
-                $this->database->vp_direct_query("TRUNCATE TABLE $prefixedTable");
+                $this->database->query("TRUNCATE TABLE $prefixedTable");
             }
 
             $valuesString = join(", ", $valuesForInsert);
             $insertSql = "INSERT IGNORE INTO $prefixedTable ($sourceColumn, $targetColumn) VALUES $valuesString";
-            $this->database->vp_direct_query($insertSql);
+            $this->database->query($insertSql);
         }
 
         return true;
@@ -509,7 +510,7 @@ abstract class SynchronizerBase implements Synchronizer {
      * @return false|int
      */
     private function executeQuery($query) {
-        $result = $this->database->vp_direct_query($query);
+        $result = $this->database->query($query);
         return $result;
     }
 

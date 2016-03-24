@@ -5,6 +5,7 @@ namespace VersionPress\Utils;
 use Exception;
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
+use VersionPress\Database\Database;
 use VersionPress\Utils\SystemInfo;
 use VersionPress\Database\DbSchemaInfo;
 use wpdb;
@@ -12,7 +13,7 @@ use wpdb;
 class RequirementsChecker {
     private $requirements = array();
     /**
-     * @var wpdb
+     * @var Database
      */
     private $database;
     /**
@@ -43,16 +44,16 @@ class RequirementsChecker {
 
     /**
      * RequirementsChecker constructor.
-     * @param $wpdb
+     * @param Database $database
      * @param DbSchemaInfo $schema
      * @param string $checkScope determines if all VersionPress requirements need to be fullfilled or just some of them.
      * Possible values are RequirementsChecker::SITE or RequirementsChecker::ENVIRONMENT
      * Default value is RequirementsChecker::SITE which means that all requirements need to be matched.
      * RequirementsChecker::ENVIRONMENT checks only requirements related to "runtime" environment.
      */
-    function __construct($wpdb, DbSchemaInfo $schema, $checkScope = RequirementsChecker::SITE) {
+    function __construct($database, DbSchemaInfo $schema, $checkScope = RequirementsChecker::SITE) {
 
-        $this->database = $wpdb;
+        $this->database = $database;
         $this->schema = $schema;
 
         // Markdown can be used in the 'help' field
