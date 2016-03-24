@@ -91,22 +91,22 @@ class QueryLanguageUtils {
     /**
      * Converts rule (array) to query string to be used as an argument for `git log`.
      *
-     * @param $rule array
+     * @param $rawRule array
      * @return string
      */
-    public static function createGitLogQueryFromRule($rule) {
+    public static function createGitLogQueryFromRule($rawRule) {
         $query = '-i --all-match';
 
-        $escapedRule = array();
-        foreach ($rule as $key => $array) {
+        $rule = array();
+        foreach ($rawRule as $key => $array) {
             $escapedKey = self::escapeGitLogArgument($key);
-            $escapedRule[$escapedKey] = ($key === 'date')
-                ? $escapedRule[$escapedKey] = $array
+            $rule[$escapedKey] = ($key === 'date')
+                ? $rule[$escapedKey] = $array
                 : array_map('\VersionPress\Utils\QueryLanguageUtils::escapeGitLogArgument', $array);
         }
 
-        if (!empty($escapedRule['author'])) {
-            foreach ($escapedRule['author'] as $value) {
+        if (!empty($rule['author'])) {
+            foreach ($rule['author'] as $value) {
                 // name and email
                 if (strpos($value, '@') && strpos($value, '<')) {
                     $query .= ' --author="^' . $value . '$"';
@@ -122,8 +122,8 @@ class QueryLanguageUtils {
             }
         }
 
-        if (!empty($escapedRule['date'])) {
-            foreach ($escapedRule['date'] as $value) {
+        if (!empty($rule['date'])) {
+            foreach ($rule['date'] as $value) {
                 $val = preg_replace('/\s+/', '', $value);
 
                 $bounds = explode('..', $val);
@@ -161,34 +161,34 @@ class QueryLanguageUtils {
             }
         }
 
-        if (!empty($escapedRule['action']) || !empty($escapedRule['vp-action'])) {
+        if (!empty($rule['action']) || !empty($rule['vp-action'])) {
             $vpAction = array();
-            if (!empty($escapedRule['action'])) {
-                $action = array_filter($escapedRule['action'], function ($val) { return strpos($val, '/') === false; });
-                $vpAction = array_diff($escapedRule['action'], $action);
+            if (!empty($rule['action'])) {
+                $action = array_filter($rule['action'], function ($val) { return strpos($val, '/') === false; });
+                $vpAction = array_diff($rule['action'], $action);
             }
-            if (!empty($escapedRule['vp-action'])) {
-                $vpAction = array_merge($vpAction, $escapedRule['vp-action']);
+            if (!empty($rule['vp-action'])) {
+                $vpAction = array_merge($vpAction, $rule['vp-action']);
             }
             if (!empty($vpAction)) {
                 $query .= ' --grep="^VP-Action: \(' . implode('\|', $vpAction) . '\)\(/.*\)\?$"';
             }
         }
 
-        if (!empty($escapedRule['entity']) || !empty($action) || !empty($escapedRule['vpid'])) {
+        if (!empty($rule['entity']) || !empty($action) || !empty($rule['vpid'])) {
             $query .= ' --grep="^VP-Action: ' .
-                (empty($escapedRule['entity']) ? '.*'         :  '\(' . implode('\|', $escapedRule['entity']) . '\)') . '/' .
+                (empty($rule['entity']) ? '.*'         :  '\(' . implode('\|', $rule['entity']) . '\)') . '/' .
                 (empty($action)         ? '.*'         :  '\(' . implode('\|', $action)         . '\)') .
-                (empty($escapedRule['vpid'])   ? '\(/.*\)\?'  : '/\(' . implode('\|', $escapedRule['vpid'])   . '\)') . '$"';
+                (empty($rule['vpid'])   ? '\(/.*\)\?'  : '/\(' . implode('\|', $rule['vpid'])   . '\)') . '$"';
         }
 
-        if (!empty($escapedRule['text'])) {
-            foreach ($escapedRule['text'] as $value) {
+        if (!empty($rule['text'])) {
+            foreach ($rule['text'] as $value) {
                 $query .= ' --grep="' . $value . '"';
             }
         }
 
-        foreach ($escapedRule as $key => $values) {
+        foreach ($rule as $key => $values) {
             if (in_array($key, array('author', 'date', 'entity', 'vp-action', 'action', 'vpid', 'text'))) {
                 continue;
             }
