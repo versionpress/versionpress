@@ -20,6 +20,9 @@ class RequirementsChecker {
      */
     private $schema;
 
+    const SITE = 'site';
+    const ENVIRONMENT = 'environment';
+
     /** @var string[] */
     public static $compatiblePlugins = array(
         'akismet' => 'akismet/akismet.php',
@@ -38,7 +41,16 @@ class RequirementsChecker {
     /** @var bool */
     private $isEverythingFulfilled;
 
-    function __construct($wpdb, DbSchemaInfo $schema, $checkScope = 'site') {
+    /**
+     * RequirementsChecker constructor.
+     * @param $wpdb
+     * @param DbSchemaInfo $schema
+     * @param string $checkScope determines if all VersionPress requirements need to be fullfilled or just some of them.
+     * Possible values are RequirementsChecker::SITE or RequirementsChecker::ENVIRONMENT
+     * Default value is RequirementsChecker::SITE which means that all requirements need to be matched.
+     * RequirementsChecker::ENVIRONMENT checks only requirements related to "runtime" environment.
+     */
+    function __construct($wpdb, DbSchemaInfo $schema, $checkScope = RequirementsChecker::SITE) {
 
         $this->database = $wpdb;
         $this->schema = $schema;
@@ -102,7 +114,7 @@ class RequirementsChecker {
             'fulfilled' => $this->tryAccessControlFiles(),
             'help' => 'VersionPress automatically tries to secure certain locations, like `wp-content/vpdb`. You either don\'t have a supported web server or rules cannot be enforced. [Learn more](http://docs.versionpress.net/en/getting-started/installation-uninstallation#supported-web-servers).'
         );
-        if ($checkScope === 'site') {
+        if ($checkScope === RequirementsChecker::SITE) {
             $this->requirements[] = array(
                 'name' => 'wpdb hook',
                 'level' => 'critical',

@@ -1016,7 +1016,7 @@ class VPCommand extends WP_CLI_Command {
         $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
 
         if (count($assoc_args) > 0) {
-            $requirementsChecker = new RequirementsChecker($database, $schema, 'environment');
+            $requirementsChecker = new RequirementsChecker($database, $schema, RequirementsChecker::ENVIRONMENT);
         } else {
             $requirementsChecker = new RequirementsChecker($database, $schema);
         }
