@@ -2,52 +2,59 @@
 
 namespace VersionPress\Utils;
 
+use VersionPress\Database\Database;
+
 class WordPressCacheUtils {
-    public static function clearPostCache($vpids, $wpdb) {
+    public static function clearPostCache($vpids, $database) {
         if (count($vpids) === 0 || !function_exists('clean_post_cache')) {
             return;
         }
 
-        $postIds = self::getIdsForVpids($vpids, $wpdb);
+        $postIds = self::getIdsForVpids($vpids, $database);
 
         foreach ($postIds as $id) {
             clean_post_cache($id);
         }
     }
 
-    public static function clearTermCache($vpids, $wpdb) {
+    public static function clearTermCache($vpids, $database) {
         if (count($vpids) === 0 || !function_exists('clean_term_cache')) {
             return;
         }
 
-        $termIds = self::getIdsForVpids($vpids, $wpdb);
+        $termIds = self::getIdsForVpids($vpids, $database);
         clean_term_cache($termIds);
     }
 
-    public static function clearUserCache($vpids, $wpdb) {
+    public static function clearUserCache($vpids, $database) {
         if (count($vpids) === 0 || !function_exists('clean_user_cache')) {
             return;
         }
 
-        $userIds = self::getIdsForVpids($vpids, $wpdb);
+        $userIds = self::getIdsForVpids($vpids, $database);
 
         foreach ($userIds as $id) {
             clean_user_cache($id);
         }
     }
 
-    public static function clearCommentCache($vpids, $wpdb) {
+    public static function clearCommentCache($vpids, $database) {
         if (count($vpids) === 0 || !function_exists('clean_comment_cache')) {
             return;
         }
 
-        $commentsIds = self::getIdsForVpids($vpids, $wpdb);
+        $commentsIds = self::getIdsForVpids($vpids, $database);
         clean_comment_cache($commentsIds);
     }
 
-    private static function getIdsForVpids($vpids, $wpdb) {
+    /**
+     * @param $vpids
+     * @param Database $database
+     * @return mixed
+     */
+    private static function getIdsForVpids($vpids, $database) {
         $vpidsForRestriction = self::joinVpidsForRestriction($vpids);
-        return $wpdb->get_col("SELECT id FROM {$wpdb->prefix}vp_id WHERE vp_id IN ($vpidsForRestriction)");
+        return $database->get_col("SELECT id FROM {$database->prefix}vp_id WHERE vp_id IN ($vpidsForRestriction)");
     }
 
     private static function joinVpidsForRestriction($vpids) {

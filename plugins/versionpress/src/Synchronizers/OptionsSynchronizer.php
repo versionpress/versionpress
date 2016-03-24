@@ -1,6 +1,7 @@
 <?php
 namespace VersionPress\Synchronizers;
 
+use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Storages\OptionStorage;
@@ -20,7 +21,7 @@ class OptionsSynchronizer implements Synchronizer {
     /** @var OptionStorage */
     private $optionStorage;
 
-    /** @var wpdb */
+    /** @var Database */
     private $database;
     /** @var AbsoluteUrlReplacer */
     private $urlReplacer;
@@ -33,9 +34,9 @@ class OptionsSynchronizer implements Synchronizer {
     /** @var DbSchemaInfo */
     private $dbSchema;
 
-    function __construct(Storage $optionStorage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
+    function __construct(Storage $optionStorage, Database $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
         $this->optionStorage = $optionStorage;
-        $this->database = $wpdb;
+        $this->database = $database;
         $this->urlReplacer = $urlReplacer;
         $this->tableName = $dbSchema->getPrefixedTableName('option');
         $this->dbSchema = $dbSchema;
@@ -61,7 +62,7 @@ class OptionsSynchronizer implements Synchronizer {
             $syncQuery[strlen($syncQuery) - 1] = " "; // strip last comma
             $syncQuery .= " ON DUPLICATE KEY UPDATE option_value = VALUES(option_value), autoload = VALUES(autoload);";
 
-            $this->database->vp_direct_query($syncQuery);
+            $this->database->query($syncQuery);
         }
 
         $entityInfo = $this->dbSchema->getEntityInfo('option');
@@ -86,7 +87,7 @@ class OptionsSynchronizer implements Synchronizer {
             $deleteSql .= " AND option_name IN ($restrictionForBasicSet)";
         }
 
-        $this->database->vp_direct_query($deleteSql);
+        $this->database->query($deleteSql);
         return array();
     }
 

@@ -3,6 +3,7 @@
 namespace VersionPress\Tests\SqlTests;
 
 use PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount;
+use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_MockObject_Stub_Return;
 use PHPUnit_Framework_TestCase;
 use VersionPress\Database\DbSchemaInfo;
@@ -16,8 +17,8 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
      */
     private static $DbSchemaInfo;
 
-    /** @var \wpdb|\PHPUnit_Framework_MockObject_MockObject $wpdbStub */
-    private $wpdbStub;
+    /** @var \wpdb|PHPUnit_Framework_MockObject_MockObject */
+    private $database;
 
     /** @var  SqlQueryParser */
     private $sqlParser;
@@ -27,8 +28,8 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
     }
 
     public function setup() {
-        $this->wpdbStub = $this->getMockBuilder('\wpdb')->disableOriginalConstructor()->getMock();
-        $this->sqlParser = new SqlQueryParser(self::$DbSchemaInfo, $this->wpdbStub);
+        $this->database =  $this->getMockBuilder('\wpdb')->disableOriginalConstructor()->getMock();
+        $this->sqlParser = new SqlQueryParser(self::$DbSchemaInfo, $this->database);
     }
 
     /**
@@ -40,7 +41,7 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
      */
     public function dataToSetFromUpdate($query, $expectedSelect, $expectedData) {
 
-        $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col");
+        $this->database->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col");
         $parsedQueryData = $this->sqlParser->parseQuery($query);
 
         $this->assertEquals($expectedData, $parsedQueryData->data);
@@ -56,7 +57,7 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
      * @param $expectedIds
      */
     public function selectQueryFromUpdate($query, $expectedSelectQuery, $expectedData, $expectedIds) {
-        $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col")
+        $this->database->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col")
             ->with($expectedSelectQuery)->will(new PHPUnit_Framework_MockObject_Stub_Return($expectedIds));
         $parsedQueryData = $this->sqlParser->parseQuery($query);
 
@@ -98,7 +99,7 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase {
      * @param $testIds
      */
     public function selectQueryFromDelete($query, $expectedSelectQuery, $testIds) {
-        $this->wpdbStub->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col")
+        $this->database->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col")
             ->with($expectedSelectQuery)->will(new PHPUnit_Framework_MockObject_Stub_Return($testIds));
         $parsedQueryData = $this->sqlParser->parseQuery($query);
 

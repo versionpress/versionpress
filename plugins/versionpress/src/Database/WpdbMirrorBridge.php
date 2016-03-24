@@ -15,7 +15,7 @@ class WpdbMirrorBridge {
     /** @var DbSchemaInfo */
     private $dbSchemaInfo;
 
-    /** @var \wpdb */
+    /** @var Database */
     private $database;
 
     /** @var VpidRepository */
@@ -27,8 +27,8 @@ class WpdbMirrorBridge {
     /** @var bool */
     private $disabled;
 
-    function __construct($wpdb, Mirror $mirror, DbSchemaInfo $dbSchemaInfo, VpidRepository $vpidRepository, ShortcodesReplacer $shortcodesReplacer) {
-        $this->database = $wpdb;
+    function __construct($database, Mirror $mirror, DbSchemaInfo $dbSchemaInfo, VpidRepository $vpidRepository, ShortcodesReplacer $shortcodesReplacer) {
+        $this->database = $database;
         $this->mirror = $mirror;
         $this->dbSchemaInfo = $dbSchemaInfo;
         $this->vpidRepository = $vpidRepository;

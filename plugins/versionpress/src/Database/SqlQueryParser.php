@@ -17,19 +17,19 @@ class SqlQueryParser {
     private $schema;
 
     /**
-     * @var \wpdb
+     * @var Database
      */
-    private $wpdb;
+    private $database;
 
     /**
      * SqlQueryParser constructor.
      * 
      * @param DbSchemaInfo $schema
-     * @param \wpdb $wpdb
+     * @param Database $database
      */
-    public function __construct($schema, $wpdb) {
+    public function __construct($schema, $database) {
         $this->schema = $schema;
-        $this->wpdb = $wpdb;
+        $this->database = $database;
     }
 
     /**
@@ -41,11 +41,11 @@ class SqlQueryParser {
         $parser = $this->getParser($query);
         $sqlStatement = $parser->statements[0];
         if ($sqlStatement instanceof UpdateStatement) {
-            return $this->parseUpdateQuery($parser, $query, $this->schema, $this->wpdb);
+            return $this->parseUpdateQuery($parser, $query, $this->schema, $this->database);
         } elseif ($sqlStatement instanceof InsertStatement) {
             return $this->parseInsertQuery($parser, $query, $this->schema);
         } elseif ($sqlStatement instanceof DeleteStatement) {
-            return $this->parseDeleteQuery($parser, $query, $this->schema, $this->wpdb);
+            return $this->parseDeleteQuery($parser, $query, $this->schema, $this->database);
         }
         return null;
 
@@ -57,10 +57,10 @@ class SqlQueryParser {
      * @param Parser $parser
      * @param DbSchemaInfo $schema
      * @param string $query
-     * @param \wpdb $wpdb
+     * @param Database $database
      * @return ParsedQueryData
      */
-    private function parseUpdateQuery($parser, $query, $schema, $wpdb) {
+    private function parseUpdateQuery($parser, $query, $schema, $database) {
         /** @var UpdateStatement $sqlStatement */
         $sqlStatement = $parser->statements[0];
         $table = $sqlStatement->tables[0]->table;
@@ -78,7 +78,7 @@ class SqlQueryParser {
             $selectSql .= " WHERE " . join(' ', $where);
         }
         $parsedQueryData->sqlQuery = $selectSql;
-        $parsedQueryData->ids = $wpdb->get_col($selectSql);
+        $parsedQueryData->ids = $database->get_col($selectSql);
         $parsedQueryData->data = $this->getColumnDataToSet($sqlStatement);
         return $parsedQueryData;
     }
@@ -88,6 +88,7 @@ class SqlQueryParser {
      *
      * @param Parser $parser
      * @param string $query
+     * @param DbSchemaInfo $schema
      * @return ParsedQueryData
      */
     private function parseInsertQuery($parser, $query, $schema) {
@@ -126,10 +127,10 @@ class SqlQueryParser {
      * @param Parser $parser
      * @param string $query
      * @param DbSchemaInfo $schema
-     * @param $wpdb \wpdb
+     * @param $database Database
      * @return ParsedQueryData
      */
-    private function parseDeleteQuery($parser, $query, $schema, $wpdb) {
+    private function parseDeleteQuery($parser, $query, $schema, $database) {
         /** @var DeleteStatement $sqlStatement */
         $sqlStatement = $parser->statements[0];
         $table = $sqlStatement->from[0]->table;
@@ -147,7 +148,7 @@ class SqlQueryParser {
             $selectSql .= " WHERE " . join(' ', $where);
         }
         $parsedQueryData->sqlQuery = $selectSql;
-        $parsedQueryData->ids = $wpdb->get_col($selectSql);
+        $parsedQueryData->ids = $database->get_col($selectSql);
 
         return $parsedQueryData;
     }

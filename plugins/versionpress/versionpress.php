@@ -98,7 +98,7 @@ add_filter('automatic_updates_is_vcs_checkout', function () {
 });
 
 function vp_register_hooks() {
-    global $wpdb, $versionPressContainer;
+    global $versionPressContainer;
     /** @var Committer $committer */
     $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
     /** @var Mirror $mirror */
@@ -111,6 +111,8 @@ function vp_register_hooks() {
     $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
     /** @var StorageFactory $storageFactory */
     $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
+    /** @var \VersionPress\Database\Database $database */
+    $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
 
     /**
      *  Hook for saving taxonomies into files
@@ -351,7 +353,7 @@ function vp_register_hooks() {
         vp_flush_regenerable_options();
     });
 
-    add_action('pre_delete_term', function ($term, $taxonomy) use ($wpdb, $wpdbMirrorBridge) {
+    add_action('pre_delete_term', function ($term, $taxonomy) use ($database, $wpdbMirrorBridge) {
         if (!is_taxonomy_hierarchical($taxonomy)) {
             return;
         }
@@ -361,11 +363,14 @@ function vp_register_hooks() {
             return;
         }
 
-        $wpdbMirrorBridge->update($wpdb->term_taxonomy, array('parent' => $term->parent), array('parent' => $term->term_id));
+        $wpdbMirrorBridge->update($database->term_taxonomy, array('parent' => $term->parent), array('parent' => $term->term_id));
     }, 10, 2);
 
-    add_action('before_delete_post', function ($postId) use ($wpdb) {
-        // Fixing bug in WP (#34803) and WP-CLI (#2246)
+    add_action('before_delete_post', function ($postId) use ($database) {
+        // Fixing bug in WP (#34803) and WP-CLI (#2246);
+        // this is rare case where $wpdb must be used, not $database
+        global $wpdb;
+
         $post = get_post($postId);
         if ( !is_wp_error($post) && $post->post_type === 'nav_menu_item') {
             $newParent = get_post_meta($post->ID, '_menu_item_menu_item_parent', true);

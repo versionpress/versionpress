@@ -25,7 +25,7 @@ use VersionPress\Utils\RequirementsChecker;
                     global $versionPressContainer;
                     /** @var GitRepository $repository */
                     $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
-                    $database = $versionPressContainer->resolve(VersionPressServices::WPDB);
+                    $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
                     $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
 
                     $requirementsChecker = new RequirementsChecker($database, $schema);
