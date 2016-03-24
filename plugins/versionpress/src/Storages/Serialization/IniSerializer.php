@@ -47,7 +47,6 @@ class IniSerializer {
         "\t" => "<<<tab>>>",
         "=" => "<<<eq>>>",
     );
-    const SERIALIZED_MARKER = '<<<serialized>>>';
 
     /**
      * Serializes sectioned data array into an INI string
@@ -99,7 +98,7 @@ class IniSerializer {
                     $output[] = self::serializeKeyValuePair($key . "[$arrayKey]", $arrayValue);
                 }
             } elseif (StringUtils::isSerializedValue($value)) {
-                $serializedDataToIniConverter = new SerializedDataToIniConverter(self::SERIALIZED_MARKER);
+                $serializedDataToIniConverter = new SerializedDataToIniConverter();
                 $lines = $serializedDataToIniConverter->toIniLines($key, $value);
                 $output = array_merge($output, $lines);
             } else {
@@ -356,12 +355,12 @@ class IniSerializer {
         foreach ($deserialized as $key => $value) {
             if (is_array($value)) {
                 $deserialized[$key] = self::restorePhpSerializedData($value);
-            } else if (Strings::startsWith($value, self::SERIALIZED_MARKER)) {
+            } else if (Strings::startsWith($value, SerializedDataToIniConverter::SERIALIZED_MARKER)) {
                 $keysToRestore[] = $key;
             }
         }
 
-        $serializedDataToIniConverter = new SerializedDataToIniConverter(self::SERIALIZED_MARKER);
+        $serializedDataToIniConverter = new SerializedDataToIniConverter(SerializedDataToIniConverter::SERIALIZED_MARKER);
         foreach ($keysToRestore as $key) {
             $relatedKeys = array_filter($deserialized, function ($maybeRelatedKey) use ($key) {
                 return Strings::startsWith($maybeRelatedKey, $key);

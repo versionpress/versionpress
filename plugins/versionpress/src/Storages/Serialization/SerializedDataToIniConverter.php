@@ -11,14 +11,10 @@ use VersionPress\Utils\StringUtils;
  */
 class SerializedDataToIniConverter {
 
-    private $serializedMarker;
+    const SERIALIZED_MARKER = '<<<serialized>>>';
+
     private $index = 0;
     private $value;
-
-
-    public function __construct($serializedMarker) {
-        $this->serializedMarker = $serializedMarker;
-    }
 
     /**
      * Converts PHP-serialized string to mutiple INI lines.
@@ -43,7 +39,7 @@ class SerializedDataToIniConverter {
         $this->value = null;
 
         // Add marker
-        $iniLines[0] = StringUtils::replaceFirst(' = ', " = {$this->serializedMarker} ", $iniLines[0]);
+        $iniLines[0] = StringUtils::replaceFirst(' = ', " = " . self::SERIALIZED_MARKER . " ", $iniLines[0]);
 
         return $iniLines;
     }
@@ -57,7 +53,7 @@ class SerializedDataToIniConverter {
      * @return string Original result of PHP serialization.
      */
     public function fromIniLines($key, $lines) {
-        $value = substr($lines[$key], strlen($this->serializedMarker) + 1); // + space
+        $value = substr($lines[$key], strlen(self::SERIALIZED_MARKER) + 1); // + space
         unset($lines[$key]);
 
         return self::convertValueToSerializedString($value, $lines);
