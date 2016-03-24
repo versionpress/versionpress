@@ -206,11 +206,12 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
 
     public function prepare_markTwoSpamCommentsAsNotSpam() {
         $this->lastCreatedComment = array();
-        $trashedComment = $this->prepareTestComment();
-        $trashedComment['comment_approved'] = 'spam';
+        $comment = $this->prepareTestComment();
 
-        $this->lastCreatedComment[] = $this->wpAutomation->createComment($trashedComment);
-        $this->lastCreatedComment[] = $this->wpAutomation->createComment($trashedComment);
+        $this->lastCreatedComment[] = $lastId = $this->wpAutomation->createComment($comment);
+        $this->wpAutomation->editComment($lastId, ['comment_approved' => 'spam']);
+        $this->lastCreatedComment[] = $lastId = $this->wpAutomation->createComment($comment);
+        $this->wpAutomation->editComment($lastId, ['comment_approved' => 'spam']);
     }
 
     public function markTwoSpamCommentsAsNotSpam() {
