@@ -97,7 +97,7 @@ class QueryLanguageUtils {
     public static function createGitLogQueryFromRule($rule) {
         $query = '-i --all-match';
 
-        if (isset($rule['author'])) {
+        if (!empty($rule['author'])) {
             foreach ($rule['author'] as $value) {
                 // name and email
                 if (strpos($value, '@') && strpos($value, '<')) {
@@ -114,7 +114,7 @@ class QueryLanguageUtils {
             }
         }
 
-        if (isset($rule['date'])) {
+        if (!empty($rule['date'])) {
             foreach ($rule['date'] as $value) {
                 $val = preg_replace('/\s+/', '', $value);
 
