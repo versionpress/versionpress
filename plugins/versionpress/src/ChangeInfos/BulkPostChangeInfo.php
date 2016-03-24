@@ -11,7 +11,7 @@ class BulkPostChangeInfo extends BulkChangeInfo {
         $postChangeInfo = $this->changeInfos[0];
         $postTypePlural = StringUtils::pluralize($postChangeInfo->getPostType());
 
-        if ($postTypePlural === "nav_menu_item") {
+        if ($postTypePlural === "nav_menu_items") {
             return "Updated menu items";
         }
 
