@@ -99,7 +99,18 @@ class QueryLanguageUtils {
 
         if (isset($rule['author'])) {
             foreach ($rule['author'] as $value) {
-                $query .= ' --author="' . $value . '"';
+                // name and email
+                if (strpos($value, '@') && strpos($value, '<')) {
+                    $query .= ' --author="^' . $value . '$"';
+                }
+                // email only
+                else if (strpos($value, '@')) {
+                    $query .= ' --author="^.* <' . $value . '>$"';
+                }
+                // name only
+                else {
+                    $query .= ' --author="^' . $value . ' <.*>$"';
+                }
             }
         }
 
