@@ -175,7 +175,9 @@ class QueryLanguageUtils {
         }
 
         if (!empty($rule['text'])) {
-            $query .= ' --grep="\(' . implode('\|', $rule['text']) . '\)"';
+            foreach ($rule['text'] as $value) {
+                $query .= ' --grep="' . $value . '"';
+            }
         }
 
         foreach ($rule as $key => $values) {
