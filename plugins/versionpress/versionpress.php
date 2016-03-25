@@ -531,19 +531,18 @@ function vp_create_update_post_terms_hook(Mirror $mirror, VpidRepository $vpidRe
         $postVpId = $vpidRepository->getVpidForEntity('post', $postId);
 
         $postUpdateData = array('vp_id' => $postVpId, 'vp_term_taxonomy' => array());
-
+        $taxonomies_terms = [];
         foreach ($taxonomies as $taxonomy) {
             $terms = get_the_terms($postId, $taxonomy);
             if ($terms) {
                 $referencedTaxonomies = array_map(function ($term) use ($vpidRepository) {
                     return $vpidRepository->getVpidForEntity('term_taxonomy', $term->term_taxonomy_id);
                 }, $terms);
-
+                $taxonomies_terms[] = $terms;
                 $postUpdateData['vp_term_taxonomy'] = array_merge($postUpdateData['vp_term_taxonomy'], $referencedTaxonomies);
             }
         }
-
-        if (count($taxonomies) > 0) {
+        if (count($taxonomies) > 0 && count($taxonomies_terms)>0) {
             $mirror->save("post", $postUpdateData);
         }
     };
