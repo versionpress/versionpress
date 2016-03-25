@@ -232,7 +232,7 @@ function vp_register_hooks() {
 
         $committer->forceChangeInfo(new ThemeChangeInfo($stylesheet, 'switch', $themeName));
     });
-    
+
 
     add_action('wp_ajax_save-widget', function () use ($committer) {
         if (defined('DOING_AJAX') && DOING_AJAX && isset($_POST['delete_widget']) && $_POST['delete_widget']) {
@@ -372,7 +372,7 @@ function vp_register_hooks() {
         global $wpdb;
 
         $post = get_post($postId);
-        if ( !is_wp_error($post) && $post->post_type === 'nav_menu_item') {
+        if (!is_wp_error($post) && $post->post_type === 'nav_menu_item') {
             $newParent = get_post_meta($post->ID, '_menu_item_menu_item_parent', true);
             $wpdb->update($wpdb->postmeta,
                 array('meta_value' => $newParent),
@@ -542,7 +542,7 @@ function vp_create_update_post_terms_hook(Mirror $mirror, VpidRepository $vpidRe
                 $postUpdateData['vp_term_taxonomy'] = array_merge($postUpdateData['vp_term_taxonomy'], $referencedTaxonomies);
             }
         }
-        if (count($taxonomies) > 0 && count($taxonomies_terms)>0) {
+        if (count($taxonomies) > 0 && count($taxonomies_terms) > 0) {
             $mirror->save("post", $postUpdateData);
         }
     };
@@ -830,14 +830,14 @@ function _vp_revert($reverterMethod) {
 
     vp_verify_nonce('vp_revert');
     vp_check_permissions();
-    
+
     $commitHash = $_GET['commit'];
-    
+
     if (!preg_match('/^[0-9a-f]+$/', $commitHash)) {
         exit();
     }
 
-        /** @var Reverter $reverter */
+    /** @var Reverter $reverter */
     $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
 
     vp_enable_maintenance();
