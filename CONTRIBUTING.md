@@ -121,6 +121,10 @@ Here are the details:
     
 5. Someone from the core team **merges the pull request**, issue is closed and the branch can be deleted.
 
+A couple of side notes:
+
+- Markdown files (README, docs etc.) can be committed directly into `master` if the changes don't need to be reviewed.
+- We used to use rebasing in the past – you can still see that in commits before April 2015 – but left it in favor of merging which is much more natural on GitHub. Plus, rebases [have their own issues](http://geekblog.oneandoneis2.org/index.php/2013/04/30/please-stay-away-from-rebase). 
 
 ### Style guides
 
