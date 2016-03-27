@@ -126,6 +126,11 @@ A couple of side notes:
 - Markdown files (README, docs etc.) can be committed directly into `master` if the changes don't need to be reviewed.
 - We used to use rebasing in the past – you can still see that in commits before April 2015 – but left it in favor of merging which is much more natural on GitHub. Plus, rebases [have their own issues](http://geekblog.oneandoneis2.org/index.php/2013/04/30/please-stay-away-from-rebase). 
 
+
+### License
+
+VersionPress is licensed under [GNU General Public License v3](http://www.gnu.org/licenses/gpl-3.0.txt).
+
 ### Style guides
 
 #### PHP style guide
