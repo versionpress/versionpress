@@ -40,7 +40,7 @@ Generally:
 5. Someone from the core team will merge the PR
 6. :tada:
 
-It's described in more detail [below](#development-workflow).
+Smaller changes like updating README's etc. don't need to use the full workflow, a direct PR or sometimes even a commit into `master` is fine. However, most code changes undergo the suggested workflow which is described in more detail [below](#development-workflow).
 
 > Note: VersionPress is not the easiest WordPress project to contribute to at the moment. Some things are hard in nature (VersionPress is a lot more complex than most other WP plugins), some we try to continually improve (simplifying [Dev-Setup](./docs/Dev-Setup.md), marking issues as `good-first-bug`'s etc.). Any help on this front is always appreciated! 
 
