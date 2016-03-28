@@ -50,7 +50,7 @@ The following discusses some of the important details if you want to contribute.
 ### Core values
 
 - **We care about user / dev experience**. Everything that is outward-facing, be it a user interface, developer API or a file format, must be carefully designed for usability and usefulness. We invest our energy to save it for the others.
-- **We care about code quality**. Hacked-together code without tests is a liability as soon as it reaches the repo. We try to write good, clean code.
+- **We care about code quality**. Bad code is a liability, not an asset. We value tests, review each other's code and try to make it good and clean.
 - **We try to be pragmatic**. While we care about quality, the main thing for VersionPress and its users is to move forward. We're always looking for the right balance.
 
 
