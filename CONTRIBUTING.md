@@ -97,7 +97,7 @@ Here are the details:
         It means that the commit belongs to issue #123. It makes looking up issues from commits easier.   
 
 
-3. When ready, push the branch and **open a pull request** for it. You can do this early to gather feedback, no worries. Branch can be push-forced if necessary, it is a "sandbox" to make the branch great.
+3. When ready, push the branch and **open a pull request** for it. You can do this early to gather feedback, no worries; you can always add commits to it later. The branch can be push-forced if necessary, it is a "sandbox" to make it great.
 
     This is an example of a good pull request: [versionpress/versionpress#744](https://github.com/versionpress/versionpress/pull/744). As a template, this is what the PR body usually contains:
     
