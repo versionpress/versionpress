@@ -123,8 +123,9 @@ Here are the details:
 
 A couple of side notes:
 
-- Markdown files (README, docs etc.) can be committed directly into `master` if the changes don't need to be reviewed.
-- We used to use rebasing in the past – you can still see that in commits before April 2015 – but left it in favor of merging which is much more natural on GitHub. Plus, rebases [have their own issues](http://geekblog.oneandoneis2.org/index.php/2013/04/30/please-stay-away-from-rebase). 
+- Markdown files (README, docs etc.) can be **committed directly into `master`** if the changes don't need to be reviewed.
+- We used to use **rebasing** in the past – you can still see that in commits before April 2015 – but left it in favor of merging which is much more natural on GitHub. Plus, rebases [have their own issues](http://geekblog.oneandoneis2.org/index.php/2013/04/30/please-stay-away-from-rebase).
+- **Issues vs. pull requests**: most of the new improvements and features start as issues as they are quick to create and don't require a Git branch to begin with. Then there's usually a single PR agains the issue (sometimes more but that's relatively rare). However, issues and pull requests are almost the same thing on GitHub and it's no problem to start something (possibly simpler) directly as a PR. We're not religious about this.
 
 
 ### License
