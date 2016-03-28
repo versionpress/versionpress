@@ -2,7 +2,7 @@
 
 Git-based version control plugin for WordPress. Undo any change, branch & merge easily, migrate database content between environments and more. <http://versionpress.net/>
 
-**WordPress + Git = :heart:**
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/versionpress/versionpress)
 
 
 ## Early Access
