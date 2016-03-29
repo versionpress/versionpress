@@ -1,4 +1,0 @@
-[bugtraq]
-	url = http://jira.agilio.cz/browse/%BUGID%
-	warnifnoissue = false
-	logregex = \\[?(WP-\\d+)\\]?
