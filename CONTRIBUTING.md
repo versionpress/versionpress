@@ -56,48 +56,49 @@ The following discusses some of the important details if you want to contribute.
 
 ### Our development process
 
-**Major versions** (1.0, 2.0 etc.) are released every few months. Each major version has a [corresponding milestone](https://github.com/versionpress/versionpress/milestones/) and issues are assigned to it by the core team.
+**Major versions** (1.0, 2.0 etc.) are released every few months. Each major version has a [corresponding milestone](https://github.com/versionpress/versionpress/milestones/) and issues are assigned to it by the core team. Issues not assigned to any milestone are in a backlog – we want to do them one day but there's no immediate plans yet.
 
 **Issues** are the most important tool to plan and manage almost everything around VersionPress:
 
 - We create them for new features, bugs, improvements or even larger things like planning documents. **We strongly prefer issues over wiki** or other documents as they are actionable and time-framed.
-- [This set of labels](https://github.com/versionpress/versionpress/wiki/Issues#labels) is used to categorize issues.
+- [This set of **labels**](https://github.com/versionpress/versionpress/wiki/Issues#labels) is used to categorize issues.
+- Issues go through **four states**: 'open', 'in progress', 'in review' and 'closed'. There's an [**overv.io board**](https://overv.io/workspace/JanVoracek/cautious-tarsier/) board to visualize that. Also, overv.io helps us set priorities – tickets higher up will be worked on first.
 
-**Branches**: The current release being worked on is `master`. It is hence inherently unsafe, even though we do our best to keep it in a good shape.
+Regarding **branches**, the current release being worked on is **`master`**. It is hence inherently unsafe, even though we do our best to keep it in a good shape.
 
-**For every major release, there's a long-running branch** named `1.x`, `2.x` etc. in case a fix needs to go there. Merging / cherry picking between `master` and these branches is a bit tricky, see e.g. [this blog post](http://blogs.atlassian.com/2013/11/the-essence-of-branch-based-workflows/); generally, merge from older to newer (`1.x` -> `2.x` -> `master`), never the other way around. At the same time, we generally only want to support the latest and greatest and especially during the Early Access period, we don't care that much about the older releases.
+**There's a long-running branch** for every major release named `1.x`, `2.x` etc. in case a fix needs to go there. Merging / cherry picking between `master` and long-running branches is always a bit tricky, see e.g. [this blog post](http://blogs.atlassian.com/2013/11/the-essence-of-branch-based-workflows/); generally, merge from older to newer (`1.x` -> `2.x` -> `master`), never the other way around. At the same time, we generally only want to support the latest and greatest and especially during the Early Access period, we don't care that much about the older releases.
 
 We have quite a large **test suite** and every major feature usually has some tests around it, from small unit tests to large, Selenium-based functional tests. Please see [Testing](./docs/Testing.md) for more info.
 
 
 ### Development workflow
 
-We use the [GitHub flow](https://guides.github.com/introduction/flow/):
+For small / "safe" changes like updating a README or other Markdown files, quick pull request or even commit into `master` is acceptable. However, for most new code, we use the [GitHub flow](https://guides.github.com/introduction/flow/):
 
 ![GitHub Flow](https://guides.github.com/activities/hello-world/branching.png)
 
 Here are the details:
 
 
-1. When you start working on an issue, **create a new feature branch** for it. Name it `<issue number>-<short description>`, e.g., `123-row-filtering`.
+1. When you start working on an issue, **move it to the 'in progress' state** (either visually on the [overv.io board](https://overv.io/workspace/JanVoracek/cautious-tarsier/) or by assigning the `in progress` label to the issue) and **create a new feature branch** for it. Name it `<issue number>-<short description>`, e.g., `123-row-filtering`.
 
-    - **Every feature branch should branch off of master**, not another feature branch, even if it depends on it. **For dependent feature branches, simply merge between them.** This is mainly because when you're goint to open a PR for it, you will need to select the target branch (GitHub doesn't let you to change this later) and `master` is the only sensible choice there.
+    - **Every feature branch should branch off of master**, not another feature branch, even if it depends on it. For dependent feature branches, simply merge between them. This is mainly because when you're going to open a PR for it, you will need to select the target branch (GitHub doesn't let you to change this later) and `master` is the only sensible choice there.
     
 2. **Commit to this branch**. We appreciate good commits, here are some tips:
 
     - **Keep commits small and focused**. There are many articles on version control best practices, e.g., [this one](http://www.git-tower.com/learn/git/ebook/command-line/appendix/best-practices) is good. To sum it up, commit small logical changes, prefer smaller commits over large ones and keep project in a workable state at all times.
     - **Write good commit messages**. We don't have strict rules like [this](http://chris.beams.io/posts/git-commit/), e.g., we don't enforce short subject lines. The main thing for us is that the commit messages are *useful*. Do they make it clear what happened in a commit? Do they reference related commits, if applicable? Good.
         - We most commonly use past tense ("Added tests") or present tense describing the new situation ("IniSerializer now has tests") but we're not religious about it.
-    - **Link to an issue from the commit message**. Most of our commit messages look like this:
+    - **Link to an issue from the commit message**. Most of the commit messages look like this:
     
         ```
         [#123] Implemented xyz
         ```
         
-        It means that the commit belongs to issue #123. It makes looking up issues from commits easier.   
+        It means that the commit belongs to issue `#123`. It makes looking up issues from commits easier.   
 
 
-3. When ready, push the branch and **open a pull request** for it. You can do this early to gather feedback, no worries; you can always add commits to it later. The branch can be push-forced if necessary, it is a "sandbox" to make it great.
+3. When ready, push the branch, **open a pull request** for it and **move the issue to the 'in review' state** (again, either visually in [overv.io](https://overv.io/workspace/JanVoracek/cautious-tarsier/) or by removing the `in progress` label and adding the `in review` one). You can open a PR early to gather feedback, no worries, you can always add commits to it later. The branch can be push-forced if necessary, it is a "sandbox" to make it great.
 
     This is an example of a good pull request: [versionpress/versionpress#744](https://github.com/versionpress/versionpress/pull/744). As a template, this is what the PR body usually contains:
     
@@ -113,7 +114,7 @@ Here are the details:
     
     Actually something like this will be pre-filled automatically for you.
     
-4. **Core team reviews the PR**. Expect feedback – it is uncommon to receive none at all.
+4. **Core team reviews the PR**. Expect feedback – it is uncommon to receive none – and be open to it. The team will happily work with you to make the code contribution great.
 
     All checkboxes checked means that the PR is OK to merge.
     
@@ -121,16 +122,16 @@ Here are the details:
     
 5. Someone from the core team **merges the pull request**, issue is closed and the branch can be deleted.
 
-A couple of side notes:
+A couple of notes:
 
-- Markdown files (README, docs etc.) can be **committed directly into `master`** if the changes don't need to be reviewed.
+- As noted above, small / safe changes don't need to undergo this whole process. For example, Markdown files can be **committed directly into `master`** if the changes don't need to be reviewed.
 - We used to use **rebasing** in the past – you can still see that in commits before April 2015 – but left it in favor of merging which is much more natural on GitHub. Plus, rebases [have their own issues](http://geekblog.oneandoneis2.org/index.php/2013/04/30/please-stay-away-from-rebase).
-- **Issues vs. pull requests**: most of the new improvements and features start as issues as they are quick to create and don't require a Git branch to begin with. Then there's usually a single PR agains the issue (sometimes more but that's relatively rare). However, issues and pull requests are almost the same thing on GitHub and it's no problem to start something (possibly simpler) directly as a PR. We're not religious about this.
+- **Issues vs. pull requests**: most of the new improvements and features start as issues as they are quick to create and don't require a Git branch. Then there's usually a single PR against the issue (sometimes more but that's relatively rare). However, issues and pull requests are almost the same thing on GitHub and it's not a problem to start something (possibly simpler) directly as a PR.
 
 
 ### License
 
-VersionPress is licensed under [GNU General Public License v3](http://www.gnu.org/licenses/gpl-3.0.txt).
+VersionPress is licensed under [GNU General Public License v3](http://www.gnu.org/licenses/gpl-3.0.txt). By contributing, you agree that your contributions will also be licensed under the same license.
 
 ### Style guides
 
@@ -155,6 +156,8 @@ The styleguide is under construction. :construction:
 ### Get help
 
 Feel free to reach the devs in the [Gitter room](https://gitter.im/versionpress/versionpress) if you need help with anything.
+
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/versionpress/versionpress)
 
 
 ## Improving docs
