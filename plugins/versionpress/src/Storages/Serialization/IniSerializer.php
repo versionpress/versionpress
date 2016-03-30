@@ -349,8 +349,6 @@ class IniSerializer {
                 $result[$key] = self::restoreTypesOfValues($value);
             } else if (is_numeric($value)) {
                 $result[$key] = $value + 0;
-            } else if ($value === 'true' || $value === 'false') {
-                $result[$key] = $value === 'true';
             } else {
                 $result[$key] = self::unescapeString($value);
             }
