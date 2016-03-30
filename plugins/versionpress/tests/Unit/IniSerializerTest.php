@@ -2,6 +2,7 @@
 
 namespace VersionPress\Tests\Unit;
 
+use Faker\Provider\Lorem;
 use PHPUnit_Framework_TestCase;
 use VersionPress\Storages\Serialization\IniSerializer;
 use VersionPress\Utils\StringUtils;
@@ -1215,5 +1216,23 @@ INI
 
         $this->assertSame($data, IniSerializer::deserialize($ini));
         $this->assertSame($ini, IniSerializer::serialize($data));
+    }
+
+    /**
+     * @test
+     */
+    public function longString() {
+        $loremIpsum = StringUtils::crlfize(Lorem::text(50000));
+
+        $data = array("Section" => array("key" => $loremIpsum));
+        $ini = StringUtils::crlfize(<<<INI
+[Section]
+key = "$loremIpsum"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
     }
 }

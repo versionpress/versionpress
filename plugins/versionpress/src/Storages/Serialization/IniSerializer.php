@@ -168,17 +168,55 @@ class IniSerializer {
      * @return mixed
      */
     private static function eolWorkaround_addPlaceholders($iniString) {
+        $prefaceString = ' = "'; // sequence of characters before string value
 
-        // https://regex101.com/r/cJ6eN0/6
-        $stringValueRegEx = "/ = \"((?:[^\"\\\\]|\\\\.)*)\"/sU";
+        $position = 0;
+        $length = strlen($iniString);
+        $result = "";
 
-        $iniString = preg_replace_callback($stringValueRegEx, array('VersionPress\Storages\Serialization\IniSerializer', 'replace_eol_callback'), $iniString);
+        // Read the string char by char
+        while ($position < $length) {
+            $nextPrefacePos = strpos($iniString, $prefaceString, $position);
 
-        return $iniString;
-    }
+            if ($nextPrefacePos === false) {
+                // There are no more string values
+                // Just append the rest of the string and we're done
+                $result .= substr($iniString, $position);
+                break;
+            }
 
-    private static function replace_eol_callback($matches) {
-        return self::getReplacedEolString($matches[0], "charsToPlaceholders");
+            // Append everything from the end of last string value to the start of another
+            $result .= StringUtils::substringFromTo($iniString, $position, $nextPrefacePos + strlen($prefaceString));
+
+            // Set position to the start of the string value
+            $position = $nextPrefacePos + strlen($prefaceString);
+            $stringBeginPos = $stringEndPos = $position;
+            $isEndOfString = false;
+
+            while (!$isEndOfString) {
+
+                if ($iniString[$position] === '\\') {
+                    // Found escaped character
+                    // Skip this one and the following one
+                    $position += 2;
+                    continue;
+                } else if ($iniString[$position] === '"') {
+                    // This is it. Unescaped double-quote means that the string value ends here.
+                    $isEndOfString = true;
+                    $stringEndPos = $position;
+                } else {
+                    // Regular character. Boooring - move along.
+                    $position += 1;
+                }
+            }
+
+            // OK. We have the beginning and the end. Let's replace all line-endings with placeholders.
+            $value = StringUtils::substringFromTo($iniString, $stringBeginPos, $stringEndPos);
+            $result .= self::getReplacedEolString($value, 'charsToPlaceholders');
+
+        }
+
+        return $result;
     }
 
     /**
