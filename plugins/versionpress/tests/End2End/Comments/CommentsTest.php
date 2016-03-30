@@ -363,4 +363,23 @@ class CommentsTest extends End2EndTestCase {
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
+
+    /**
+     * @test
+     * @testdox Deleting commentmeta of comment creates 'commentmeta/delete' action
+     * @depends addingCommentmetaCreatesCommentmetaCreateAction
+     */
+    public function deleteCommentmetaCreatesCommentmetaDeleteAction() {
+        self::$worker->prepare_commentmetaDelete();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->commentmetaDelete();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("commentmeta/delete", 0, true);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
 }
+

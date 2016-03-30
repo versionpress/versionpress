@@ -251,4 +251,13 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
     public function approveTwoComments() {
         $this->wpAutomation->runWpCliCommand('comment', 'update', array_merge($this->lastCreatedComment, array('comment_approved' => 1)));
     }
+
+    public function prepare_commentmetaDelete() {
+    }
+
+    public function commentmetaDelete() {
+        $this->wpAutomation->deleteCommentMeta($this->lastCreatedComment, 'dummy_meta');
+    }
+
+
 }

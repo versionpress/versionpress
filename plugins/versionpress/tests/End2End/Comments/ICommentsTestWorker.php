@@ -59,4 +59,7 @@ interface ICommentsTestWorker {
     
     public function prepare_commentmetaCreate();
     public function commentmetaCreate();
+
+    public function prepare_commentmetaDelete();
+    public function commentmetaDelete();
 }

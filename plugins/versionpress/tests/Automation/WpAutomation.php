@@ -170,6 +170,16 @@ class WpAutomation {
     }
 
     /**
+     * Deletes commentmeta using WP-CLI for given comment.
+     *
+     * @param $id
+     * @param $name
+     */
+    public function deleteCommentMeta($id, $name) {
+        $this->runWpCliCommand('comment', 'meta delete', func_get_args());
+    }
+
+    /**
      * Changes the comment using WP-CLI.
      *
      * @param $id
