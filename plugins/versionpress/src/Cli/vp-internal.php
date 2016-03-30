@@ -229,6 +229,15 @@ class VPInternalCommand extends WP_CLI_Command {
             WP_CLI::error('Cannot find place for defining the ' . ($isVariable ? 'variable' : 'constant')  . '. Config was probably edited manually.');
         }
     }
+
+    /**
+     * Used before pull
+     *
+     * @subcommand commit-frequently-written-entities
+     */
+    public function commitFrequentlyWrittenEntities($args = array(), $assoc_args = array()) {
+        vp_commit_all_frequently_written_entities();
+    }
 }
 
 if (defined('WP_CLI') && WP_CLI) {

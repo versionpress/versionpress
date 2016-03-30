@@ -413,6 +413,8 @@ class VPCommand extends WP_CLI_Command {
             }
         }
 
+        vp_commit_all_frequently_written_entities();
+
         // Clone the site
         $cloneCommand = sprintf("git clone %s %s", escapeshellarg($currentWpPath), escapeshellarg($clonePath));
 
@@ -559,6 +561,16 @@ class VPCommand extends WP_CLI_Command {
         }
 
         $remote = isset($assoc_args['from']) ? $assoc_args['from'] : 'origin';
+
+        $process = VPCommandUtils::exec("git config --get remote.". escapeshellarg($remote) . ".url");
+        $remoteUrl = $process->getConsoleOutput();
+
+        if (is_dir($remoteUrl)) {
+            $this->runVPInternalCommand('commit-frequently-written-entities', array(), $remoteUrl);
+        } else {
+            // We currently do not support commiting frequently written entities for repositories on a different server
+        }
+
         $this->switchMaintenance('on');
 
         $branchToPullFrom = 'master'; // hardcoded until we support custom branches
@@ -701,6 +713,8 @@ class VPCommand extends WP_CLI_Command {
         }
 
         $this->switchMaintenance('on', $remoteName);
+
+        vp_commit_all_frequently_written_entities();
 
         $currentPushType = trim(VPCommandUtils::exec('git config --local push.default')->getOutput());
         VPCommandUtils::exec('git config --local push.default simple');
