@@ -34,6 +34,13 @@ comment:
         user_id: user
         comment_parent: comment
 
+commentmeta:
+    table: commentmeta
+    id: meta_id
+    parent-reference: comment_id
+    references:
+          comment_id: comment
+
 user:
     table: users
     id: ID
@@ -75,7 +82,7 @@ option:
         option_name@option_value:
             site_icon: post
             page_on_front: post
-            page_for_posts: post
+            page_for_posts: posta
     frequently-written:
         - 'option_name: akismet_spam_count'
     ignored-entities:

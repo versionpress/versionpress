@@ -46,6 +46,10 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     if (change.type === 'postmeta') {
       return change.tags['VP-PostMeta-Key'];
     }
+    
+    if (change.type === 'commentmeta') {
+      return change.tags['VP-CommentMeta-Key'];
+    }
 
     if (change.type === 'post') {
       return change.tags['VP-Post-Title'];

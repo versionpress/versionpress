@@ -33,6 +33,7 @@ class SynchronizerFactory {
         'post' => 'VersionPress\Synchronizers\PostsSynchronizer',
         'postmeta' => 'VersionPress\Synchronizers\PostMetaSynchronizer',
         'comment' => 'VersionPress\Synchronizers\CommentsSynchronizer',
+        'commentmeta' => 'VersionPress\Synchronizers\CommentMetaSynchronizer',
         'option' => 'VersionPress\Synchronizers\OptionsSynchronizer',
         'user' => 'VersionPress\Synchronizers\UsersSynchronizer',
         'usermeta' => 'VersionPress\Synchronizers\UserMetaSynchronizer',
@@ -40,7 +41,7 @@ class SynchronizerFactory {
         'termmeta' => 'VersionPress\Synchronizers\TermMetaSynchronizer',
         'term_taxonomy' => 'VersionPress\Synchronizers\TermTaxonomiesSynchronizer',
     );
-    private $synchronizationSequence = array('user', 'usermeta', 'term', 'termmeta', 'term_taxonomy', 'post', 'postmeta', 'comment', 'option');
+    private $synchronizationSequence = array('user', 'usermeta', 'term', 'termmeta', 'term_taxonomy', 'post', 'postmeta', 'comment', 'commentmeta', 'option');
 
     function __construct(StorageFactory $storageFactory, Database $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
         $this->storageFactory = $storageFactory;
