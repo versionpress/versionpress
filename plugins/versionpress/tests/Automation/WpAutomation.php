@@ -593,7 +593,6 @@ class WpAutomation {
         } elseif ($debug) {
             $childEnv["XDEBUG_CONFIG"] = "idekey=xdebug"; // turn debug on
         } else {
-            ;
             unset($childEnv["XDEBUG_CONFIG"]); // turn debug off
         }
 
