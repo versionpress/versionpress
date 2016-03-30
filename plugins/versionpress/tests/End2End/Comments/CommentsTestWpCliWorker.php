@@ -155,6 +155,16 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
         );
     }
 
+    public function prepare_commentmetaCreate() {
+        $this->lastCreatedComment = array();
+        $comment = $this->prepareTestComment();
+        $this->lastCreatedComment = $this->wpAutomation->createComment($comment);
+    }
+
+    public function commentmetaCreate() {
+        $this->wpAutomation->createCommentMeta($this->lastCreatedComment, 'dummy_meta', 'dummy_meta_value');
+    }
+
     public function prepare_deleteTwoComments() {
         $this->lastCreatedComment = array();
         $comment = $this->prepareTestComment();

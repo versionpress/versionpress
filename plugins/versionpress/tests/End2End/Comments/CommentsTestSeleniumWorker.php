@@ -238,4 +238,13 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
             'comment_post_ID' => $this->testPostId
         );
     }
+
+    public function prepare_commentmetaCreate() {
+        $this->createNewComment();
+    }
+
+    public function commentmetaCreate() {
+        $this->url('wp-admin/edit-comments.php');
+        $this->jsClickAndWait('#the-comment-list tr:first-child .spam a');
+    }
 }
