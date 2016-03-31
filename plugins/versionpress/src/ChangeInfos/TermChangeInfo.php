@@ -11,6 +11,8 @@ use VersionPress\Git\CommitMessage;
  *
  *     VP-Action: term/(create|edit|rename|delete)/VPID
  *     VP-Term-Name: Uncategorized
+ *     VP-Term-OldName: Old category (used for rename)
+ *     VP-Term-Taxonomy: category
  *
  */
 class TermChangeInfo extends EntityChangeInfo {

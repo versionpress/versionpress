@@ -9,8 +9,10 @@ use VersionPress\Git\CommitMessage;
  * VP tags:
  *
  *     VP-Action: usermeta/(create|edit|delete)/VPID
+ *     VP-User-Login: johndoe
+ *     VP-UserMeta-Key: some_meta
+ *     VP-User-Id: VPID
  *
- * TODO this is work in progress at the time of writing this documentation, see WP-130
  *
  * @see UserChangeInfo
  */

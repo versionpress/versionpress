@@ -11,9 +11,9 @@ use VersionPress\Utils\StringUtils;
  * VP tags:
  *
  *     VP-Action: termmeta/(create|edit|delete)/VPID
- *     VP-Post-Title: Hello world
- *     VP-Post-Type: (post|page)
- *     VP-PostMeta-Key: pagetemplate
+ *     VP-Term-Name: Some category
+ *     VP-TermMeta-Key: some_meta
+ *     VP-Term-Id: VPID
  *
  */
 class TermMetaChangeInfo extends EntityChangeInfo {
