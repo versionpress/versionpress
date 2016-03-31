@@ -59,7 +59,7 @@ export default class DiffPanel extends React.Component<DiffPanelProps, any> {
       return <span />;
     };
 
-    let lineDiff = JsDiff.diffWords(leftContent, rightContent);
+    let lineDiff = JsDiff.diffWordsWithSpace(leftContent, rightContent);
 
     leftContent = lineDiff.map(diffPart => highlightLine(diffPart, () => !!diffPart.removed, '#f8cbcb'));
     rightContent = lineDiff.map(diffPart => highlightLine(diffPart, () => !!diffPart.added, '#a6f3a6'));
