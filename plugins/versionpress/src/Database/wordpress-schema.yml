@@ -76,6 +76,9 @@ option:
             site_icon: post
             page_on_front: post
             page_for_posts: post
+            default_category: term_taxonomy
+            default_link_category: term_taxonomy
+            default_email_category: term_taxonomy
     frequently-written:
         - 'option_name: akismet_spam_count'
     ignored-entities:
