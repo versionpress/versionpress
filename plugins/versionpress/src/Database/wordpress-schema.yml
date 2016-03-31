@@ -9,6 +9,10 @@ post:
   ignored-entities:
     - 'post_type: revision'
     - 'post_status: auto-draft'
+    # Also ignored are:
+    #  - Attachments without post_title
+    #  - Updating draft via AJAX
+    #  - Any changes saved by clicking "Preview"
 
 
 postmeta:
@@ -105,3 +109,4 @@ option:
     - 'option_name: auth_salt'
     - 'option_name: logged_in_key'
     - 'option_name: logged_in_salt'
+    # All {$taxonomy}_children are also ignored - see OptionStorage
