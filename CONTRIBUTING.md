@@ -100,7 +100,7 @@ Here are the details:
 
 3. When ready, push the branch, **open a pull request** for it and **move the issue to the 'in review' state** (again, either visually in [overv.io](https://overv.io/workspace/JanVoracek/cautious-tarsier/) or by removing the `in progress` label and adding the `in review` one). You can open a PR early to gather feedback, no worries, you can always add commits to it later. The branch can be push-forced if necessary, it is a "sandbox" to make it great.
 
-    This is an example of a good pull request: [versionpress/versionpress#744](https://github.com/versionpress/versionpress/pull/744). As a template, this is what the PR body usually contains:
+    This is an example of a good pull request: [versionpress/versionpress#744](https://github.com/versionpress/versionpress/pull/744). The body usually contains something like:
     
         Resolves #123.
         
@@ -112,7 +112,7 @@ Here are the details:
         - [ ] @JanVoracek 
         - [ ] @borekb 
     
-    Actually something like this will be pre-filled automatically for you.
+    It will be pre-filled for you automatically via GitHub templates, just with a different reviewer (`@versionpress/core-devs` will be there by default, someone from the core team will update it to the actual list of people).
     
 4. **Core team reviews the PR**. Expect feedback – it is uncommon to receive none – and be open to it. The team will happily work with you to make the code contribution great.
 
