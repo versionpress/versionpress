@@ -7,7 +7,7 @@ Git-based version control plugin for WordPress. Undo any change, branch & merge 
 
 ## Early Access
 
-VersionPress is a challenging project and not generally recommended for production use yet. [Learn more](http://docs.versionpress.net/en/getting-started/about-eap). :hatching_chick: 
+VersionPress is young :hatching_chick: . It works fine on simpler sites and you're encouraged to try it in your development workflows but there are no guarantees that it will work reliably, especially with complex 3rd party plugins and themes. [Learn more](http://docs.versionpress.net/en/getting-started/about-eap) & see the [roadmap](http://docs.versionpress.net/en/release-notes/roadmap).
 
 ## Get started
 
