@@ -1,6 +1,6 @@
 root = true
 
-[*.{php,js,json,yml}]
+[*.{php,js}]
 end_of_line = lf
 charset = utf-8
 insert_final_newline = true
@@ -8,4 +8,8 @@ indent_style = space
 indent_size = 4
 
 [*.{json,yml}]
+end_of_line = lf
+charset = utf-8
+insert_final_newline = true
+indent_style = space
 indent_size = 2
