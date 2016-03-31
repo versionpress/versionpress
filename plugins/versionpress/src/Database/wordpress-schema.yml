@@ -34,6 +34,13 @@ comment:
         user_id: user
         comment_parent: comment
 
+commentmeta:
+    table: commentmeta
+    id: meta_id
+    parent-reference: comment_id
+    references:
+          comment_id: comment
+
 user:
     table: users
     id: ID

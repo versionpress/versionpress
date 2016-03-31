@@ -35,6 +35,7 @@ class ChangeInfoMatcher {
         "termmeta/.*" => 'VersionPress\ChangeInfos\TermMetaChangeInfo',
         "term_taxonomy/.*" => 'VersionPress\ChangeInfos\TermTaxonomyChangeInfo',
         "usermeta/.*" => 'VersionPress\ChangeInfos\UserMetaChangeInfo',
+        "commentmeta/.*" => 'VersionPress\ChangeInfos\CommentMetaChangeInfo',
         "user/.*" => 'VersionPress\ChangeInfos\UserChangeInfo',
 
         // Unknown action:
