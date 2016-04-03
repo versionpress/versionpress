@@ -2,8 +2,8 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
+use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Database\ExtendedWpdb;
 use VersionPress\Database\ShortcodesInfo;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Database\VpidRepository;
@@ -13,6 +13,7 @@ use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Tests\Utils\TestConfig;
 use VersionPress\Utils\Process;
 use VersionPress\Utils\AbsoluteUrlReplacer;
+use wpdb;
 
 class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
 
@@ -22,8 +23,8 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
     protected static $testConfig;
     /** @var StorageFactory */
     protected static $storageFactory;
-    /** @var \wpdb */
-    protected static $wpdb;
+    /** @var Database */
+    protected static $database;
     /** @var AbsoluteUrlReplacer */
     protected static $urlReplacer;
     /** @var ShortcodesReplacer */
@@ -53,15 +54,16 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
         $dbUser = self::$testConfig->testSite->dbUser;
         $dbPassword = self::$testConfig->testSite->dbPassword;
         $dbName = self::$testConfig->testSite->dbName;
-        self::$wpdb = new ExtendedWpdb($dbUser, $dbPassword, $dbName, $dbHost);
-        self::$wpdb->set_prefix(self::$testConfig->testSite->dbTablePrefix);
+        $wpdb = new wpdb($dbUser, $dbPassword, $dbName, $dbHost);
+        $wpdb->set_prefix(self::$testConfig->testSite->dbTablePrefix);
+        self::$database = new Database($wpdb);
 
         $shortcodesInfo = new ShortcodesInfo($shortcodeFile);
-        $vpidRepository = new VpidRepository(self::$wpdb, self::$schemaInfo);
+        $vpidRepository = new VpidRepository(self::$database, self::$schemaInfo);
         self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, $vpidRepository);
 
         $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
-        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$wpdb, array());
+        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$database, array());
         self::$urlReplacer = new AbsoluteUrlReplacer(self::$testConfig->testSite->url);
     }
 

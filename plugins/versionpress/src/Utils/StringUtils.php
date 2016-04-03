@@ -123,4 +123,46 @@ class StringUtils {
         $replace = array_values($variables);
         return str_replace($search, $replace, $templateString);
     }
+
+    /**
+     * Returns true if string is a serialized value (object, array, primitive types, ...).
+     *
+     * @param $value
+     * @return bool
+     */
+    public static function isSerializedValue($value) {
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
+        $test = @unserialize(($value)); // it throws an error and returns false if $value is not a serialized object
+        return $test !== false || $value === 'b:0;';
+    }
+
+    /**
+     * Replaces the first occurence.
+     *
+     * @param string $needle
+     * @param string $replace
+     * @param string $haystack
+     * @return string
+     */
+    public static function replaceFirst($needle, $replace, $haystack) {
+        $needlePosition = strpos($haystack, $needle);
+        if ($needlePosition === false) {
+            return $haystack;
+        }
+
+        return substr_replace($haystack, $replace, $needlePosition, strlen($needle));
+    }
+
+    /**
+     * An alternative to the built-in PHP function `substr`.
+     * The `substr` function needs the length of substring. This method takes bounds from-to.
+     *
+     * @param string $str
+     * @param int $from
+     * @param int $to
+     * @return string
+     */
+    public static function substringFromTo($str, $from, $to) {
+        return substr($str, $from, $to - $from);
+    }
 }

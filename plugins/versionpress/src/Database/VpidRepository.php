@@ -8,15 +8,15 @@ use VersionPress\Utils\ReferenceUtils;
 use wpdb;
 
 class VpidRepository {
-    /** @var wpdb */
+    /** @var Database */
     private $database;
     /** @var DbSchemaInfo */
     private $schemaInfo;
     /** @var string */
     private $vpidTableName;
 
-    public function __construct($wpdb, DbSchemaInfo $schemaInfo) {
-        $this->database = $wpdb;
+    public function __construct($database, DbSchemaInfo $schemaInfo) {
+        $this->database = $database;
         $this->schemaInfo = $schemaInfo;
         $this->vpidTableName = $schemaInfo->getPrefixedTableName('vp_id');
     }
@@ -100,14 +100,14 @@ class VpidRepository {
         $vpIdTableName = $this->schemaInfo->getPrefixedTableName('vp_id');
         $tableName = $this->schemaInfo->getTableName($entityName);
         $deleteQuery = "DELETE FROM $vpIdTableName WHERE `table` = \"$tableName\" AND id = '$id'";
-        $this->database->vp_direct_query($deleteQuery);
+        $this->database->query($deleteQuery);
     }
 
     private function saveId($entityName, $id, $vpId) {
         $vpIdTableName = $this->schemaInfo->getPrefixedTableName('vp_id');
         $tableName = $this->schemaInfo->getTableName($entityName);
         $query = "INSERT INTO $vpIdTableName (`vp_id`, `table`, `id`) VALUES (UNHEX('$vpId'), \"$tableName\", $id)";
-        $this->database->vp_direct_query($query);
+        $this->database->query($query);
     }
 
     private function fillId($entityName, $data, $id) {

@@ -50,6 +50,10 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
       return change.tags['VP-PostMeta-Key'];
     }
 
+    if (change.type === 'commentmeta') {
+      return change.tags['VP-CommentMeta-Key'];
+    }
+
     if (change.type === 'post') {
       return change.tags['VP-Post-Title'];
     }
@@ -160,16 +164,23 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
   }
 
   private getLinesForPosts(changedPosts: Change[], action: string) {
-    let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changedPosts);
-    let suffix = null;
+    let lines = [];
+    let changedPostsByType = ArrayUtils.groupBy(changedPosts, post => post.tags['VP-Post-Type']);
 
-    if (action === 'trash' || action === 'untrash') {
-      suffix = action === 'trash' ? ' to trash' : ' from trash';
-      action = 'move';
+    for (let postType in changedPostsByType) {
+      let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changedPostsByType[postType]);
+      let suffix = null;
+
+      if (action === 'trash' || action === 'untrash') {
+        suffix = action === 'trash' ? ' to trash' : ' from trash';
+        action = 'move';
+      }
+
+      let line = this.renderOverviewLine(postType, action, changedEntities, suffix);
+      lines.push(line);
     }
 
-    let line = this.renderOverviewLine('post', action, changedEntities, suffix);
-    return [line];
+    return lines;
   }
 
   private getLinesForMeta(entityName, parentEntity, groupByTag, changedMeta: Change[], action: string) {

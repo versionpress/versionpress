@@ -27,8 +27,8 @@ class TermTaxonomiesSynchronizerTest extends SynchronizerTestCase {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('term_taxonomy');
         $this->termStorage = self::$storageFactory->getStorage('term');
-        $this->synchronizer = new TermTaxonomiesSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
-        $this->termsSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->synchronizer = new TermTaxonomiesSynchronizer($this->storage, self::$database, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->termsSynchronizer = new TermsSynchronizer($this->termStorage, self::$database, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
     }
 
     /**
@@ -98,8 +98,8 @@ class TermTaxonomiesSynchronizerTest extends SynchronizerTestCase {
         $this->termStorage->delete($term1);
         $this->termStorage->delete($term2);
         // We need new instances because of caching in SynchronizerBase::maybeInit
-        $termsSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
-        $termTaxonomiesSynchronizer = new TermTaxonomiesSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $termsSynchronizer = new TermsSynchronizer($this->termStorage, self::$database, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $termTaxonomiesSynchronizer = new TermTaxonomiesSynchronizer($this->storage, self::$database, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
         $termTaxonomiesSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $termsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
     }

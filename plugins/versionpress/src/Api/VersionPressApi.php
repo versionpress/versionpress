@@ -62,7 +62,7 @@ class VersionPressApi {
 
         register_rest_route($namespace, '/undo', array(
             'methods' => WP_REST_Server::READABLE,
-            'callback' => array($this, 'undoCommits'),
+            'callback' => $this->handleAsAdminSectionRoute('undoCommits'),
             'args' => array(
                 'commits' => array(
                     'required' => true
@@ -73,7 +73,7 @@ class VersionPressApi {
 
         register_rest_route($namespace, '/rollback', array(
             'methods' => WP_REST_Server::READABLE,
-            'callback' => array($this, 'rollbackToCommit'),
+            'callback' => $this->handleAsAdminSectionRoute('rollbackToCommit'),
             'args' => array(
                 'commit' => array(
                     'required' => true
@@ -121,7 +121,7 @@ class VersionPressApi {
 
         register_rest_route($namespace, '/hide-welcome-panel', array(
             'methods' => WP_REST_Server::CREATABLE,
-            'callback' => array($this, 'hideWelcomePanel'),
+            'callback' => $this->handleAsAdminSectionRoute('hideWelcomePanel'),
             'permission_callback' => array($this, 'checkPermissions')
         ));
 
@@ -139,7 +139,7 @@ class VersionPressApi {
 
         register_rest_route($namespace, '/commit', array(
             'methods' => WP_REST_Server::CREATABLE,
-            'callback' => array($this, 'commit'),
+            'callback' => $this->handleAsAdminSectionRoute('commit'),
             'args' => array(
                 'commit-message' => array(
                     'required' => true
@@ -150,9 +150,25 @@ class VersionPressApi {
 
         register_rest_route($namespace, '/discard-changes', array(
             'methods' => WP_REST_Server::CREATABLE,
-            'callback' => array($this, 'discardChanges'),
+            'callback' => $this->handleAsAdminSectionRoute('discardChanges'),
             'permission_callback' => array($this, 'checkPermissions')
         ));
+    }
+
+    /**
+     * Adds WP_ADMIN constant before route handling function is called. Routes calls are than evaluated as called in admin
+     * section of WordPress even if the routes are called using AJAX (WordPress native function is_admin() evaluates call correctly.
+     *
+     * @param $routeHandler
+     * @return \Closure
+     */
+    private function handleAsAdminSectionRoute($routeHandler) {
+        return function (WP_REST_Request $request) use ($routeHandler) {
+            if (!defined('WP_ADMIN')) {
+                define('WP_ADMIN', true);
+            }
+            return $this->$routeHandler($request);
+        };
     }
 
     /**

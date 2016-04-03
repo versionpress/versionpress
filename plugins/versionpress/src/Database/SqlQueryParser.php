@@ -2,11 +2,11 @@
 
 namespace VersionPress\Database;
 
-use SqlParser\Components\SetOperation;
 use SqlParser\Parser;
 use SqlParser\Statement;
 use SqlParser\Statements\DeleteStatement;
 use SqlParser\Statements\InsertStatement;
+use SqlParser\Statements\ReplaceStatement;
 use SqlParser\Statements\UpdateStatement;
 
 class SqlQueryParser {
@@ -17,18 +17,19 @@ class SqlQueryParser {
     private $schema;
 
     /**
-     * @var \wpdb
+     * @var Database
      */
-    private $wpdb;
+    private $database;
 
     /**
      * SqlQueryParser constructor.
+     * 
      * @param DbSchemaInfo $schema
-     * @param \wpdb $wpdb
+     * @param Database $database
      */
-    public function __construct($schema, $wpdb) {
+    public function __construct($schema, $database) {
         $this->schema = $schema;
-        $this->wpdb = $wpdb;
+        $this->database = $database;
     }
 
     /**
@@ -37,14 +38,14 @@ class SqlQueryParser {
      * @return ParsedQueryData
      */
     public function parseQuery($query) {
-        $parser = self::getParser($query);
+        $parser = $this->getParser($query);
         $sqlStatement = $parser->statements[0];
         if ($sqlStatement instanceof UpdateStatement) {
-            return self::parseUpdateQuery($parser, $query, $this->schema, $this->wpdb);
+            return $this->parseUpdateQuery($parser, $query, $this->schema, $this->database);
         } elseif ($sqlStatement instanceof InsertStatement) {
-            return self::parseInsertQuery($parser, $query, $this->schema);
+            return $this->parseInsertQuery($parser, $query, $this->schema);
         } elseif ($sqlStatement instanceof DeleteStatement) {
-            return $this->parseDeleteQuery($parser, $query, $this->schema, $this->wpdb);
+            return $this->parseDeleteQuery($parser, $query, $this->schema, $this->database);
         }
         return null;
 
@@ -53,13 +54,14 @@ class SqlQueryParser {
     /**
      * Parses UPDATE query
      *
-     * @param SqlParser\Parser $parser
+     * @param Parser $parser
      * @param DbSchemaInfo $schema
      * @param string $query
-     * @param \wpdb $wpdb
+     * @param Database $database
      * @return ParsedQueryData
      */
-    private function parseUpdateQuery($parser, $query, $schema, $wpdb) {
+    private function parseUpdateQuery($parser, $query, $schema, $database) {
+        /** @var UpdateStatement $sqlStatement */
         $sqlStatement = $parser->statements[0];
         $table = $sqlStatement->tables[0]->table;
         $idColumn = $this->resolveIdColumn($schema, $table);
@@ -76,7 +78,7 @@ class SqlQueryParser {
             $selectSql .= " WHERE " . join(' ', $where);
         }
         $parsedQueryData->sqlQuery = $selectSql;
-        $parsedQueryData->ids = $wpdb->get_col($selectSql);
+        $parsedQueryData->ids = $database->get_col($selectSql);
         $parsedQueryData->data = $this->getColumnDataToSet($sqlStatement);
         return $parsedQueryData;
     }
@@ -84,11 +86,13 @@ class SqlQueryParser {
     /**
      * Parses INSERT query
      *
-     * @param SqlParser\Parser $parser
+     * @param Parser $parser
      * @param string $query
+     * @param DbSchemaInfo $schema
      * @return ParsedQueryData
      */
     private function parseInsertQuery($parser, $query, $schema) {
+        /** @var InsertStatement $sqlStatement */
         $sqlStatement = $parser->statements[0];
         $queryType = ParsedQueryData::INSERT_QUERY;
         $table = $sqlStatement->into->dest->table;
@@ -120,13 +124,14 @@ class SqlQueryParser {
     /**
      * Parses DELETE query
      *
-     * @param SqlParser\Parser $parser
+     * @param Parser $parser
      * @param string $query
      * @param DbSchemaInfo $schema
-     * @param $wpdb \wpdb
+     * @param $database Database
      * @return ParsedQueryData
      */
-    private function parseDeleteQuery($parser, $query, $schema, $wpdb) {
+    private function parseDeleteQuery($parser, $query, $schema, $database) {
+        /** @var DeleteStatement $sqlStatement */
         $sqlStatement = $parser->statements[0];
         $table = $sqlStatement->from[0]->table;
         $idColumn = $this->resolveIdColumn($schema, $table);
@@ -143,7 +148,7 @@ class SqlQueryParser {
             $selectSql .= " WHERE " . join(' ', $where);
         }
         $parsedQueryData->sqlQuery = $selectSql;
-        $parsedQueryData->ids = $wpdb->get_col($selectSql);
+        $parsedQueryData->ids = $database->get_col($selectSql);
 
         return $parsedQueryData;
     }
@@ -151,9 +156,9 @@ class SqlQueryParser {
     /**
      * Returns representation of WHERE SQL clauses found in whole query
      *
-     * @param SqlParser\Parser $parser
+     * @param Parser $parser
      * @param string $sqlQuery
-     * @param SqlParser\Statements\Statement $primarySqlStatement
+     * @param DeleteStatement|UpdateStatement $primarySqlStatement
      * @return array
      */
     private function getWhereFragments($parser, $sqlQuery, $primarySqlStatement) {
@@ -162,9 +167,10 @@ class SqlQueryParser {
             return $whereFragments;
         } elseif ($primarySqlStatement->where == null && strpos($sqlQuery, 'WHERE') !== false) {
             if (isset($parser->statements[1])) {
-                $secondarySqlSatement = $parser->statements[1];
-                if ($secondarySqlSatement->where != null) {
-                    $whereFragments = $secondarySqlSatement->where;
+                /** @var UpdateStatement|DeleteStatement|ReplaceStatement $secondarySqlStatement */
+                $secondarySqlStatement = $parser->statements[1];
+                if ($secondarySqlStatement->where != null) {
+                    $whereFragments = $secondarySqlStatement->where;
                     return $whereFragments;
                 }
 
@@ -183,7 +189,7 @@ class SqlQueryParser {
      *          [ column => post_modified, value => NOW() ],
      *          [ column => another_column, value => 123 ]
      *  ]
-     * @param SqlParser\Statements\Statement $sqlStatement
+     * @param Statement $sqlStatement
      * @return array
      */
     private function getColumnDataToSet($sqlStatement) {
@@ -191,12 +197,7 @@ class SqlQueryParser {
         if ($sqlStatement instanceof UpdateStatement) {
             $dataSet = [];
             foreach ($sqlStatement->set as $set) {
-                if (is_string($set->value)) {
-                    $dataSet[str_replace('`', '', $set->column)] = stripslashes($set->value);
-                } else {
-                    $data[$columns[$i]] = $set->value;
-                }
-
+                $dataSet[str_replace('`', '', $set->column)] = stripslashes($set->value);
             };
             return $dataSet;
         } elseif ($sqlStatement instanceof InsertStatement) {
@@ -221,7 +222,7 @@ class SqlQueryParser {
     /**
      * Creates Select SQL query from query in Parser
      *
-     * @param SqlParser\Parser $parser
+     * @param Parser $parser
      * @param string $idColumn
      * @return string
      */
@@ -241,7 +242,7 @@ class SqlQueryParser {
         if (isset($sqlStatement->from)) {
             $from = $sqlStatement->from[0];
         } else {
-            $from = $sqlStatement->tables[0];
+            $from = $sqlStatement->{'tables'}[0];
         }
 
         $selectQuery .= $from->expr;
@@ -265,39 +266,14 @@ class SqlQueryParser {
      * If query contains some suspicious patten, we need to transform it and than create Parser for further use.
      *
      * @param $query
-     * @return SqlParser\Parser
+     * @return Parser
      */
     private function getParser($query) {
         $containsUsingPattern = "/(.*)(USING ?\\(([^\\)]+)\\))(.*)/"; //https://regex101.com/r/vF6dI5/1
-        $isTransformed = false;
         $parser = new Parser($query);
-        $transformedQuery = '';
-        $sqlStatement = $parser->statements[0];
-        if ($sqlStatement instanceof DeleteStatement) {
-            $transformedPart = 'ON ';
-            if (preg_match_all($containsUsingPattern, $query, $matches)) {
-                $usingColumn = str_replace('`', '', $matches[3][0]);
-                $isTransformed = true;
-                $from = $sqlStatement->from[0];
-                if ($from->alias != null) {
-                    $transformedPart .= $from->alias . '.' . $usingColumn;
-                } else {
-                    $transformedPart .= $from->table . '.' . $usingColumn;
-                }
-                $transformedPart .= '=';
-                $join = $sqlStatement->join[0];
+        if (preg_match_all($containsUsingPattern, $query, $matches)) {
+            return $this->getParserFromQueryWithUsingClause($query, $parser, $matches, $containsUsingPattern);
 
-                if ($join->expr->alias != null) {
-                    $transformedPart .= $join->expr->alias . '.' . $usingColumn;
-                } else {
-                    $transformedPart .= $join->expr->table . '.' . $usingColumn;
-                }
-                $transformedQuery = preg_replace($containsUsingPattern, '$1' . $transformedPart . '$4', $query);
-
-            }
-        }
-        if ($isTransformed) {
-            return new Parser($transformedQuery);
         }
         return $parser;
     }
@@ -326,6 +302,36 @@ class SqlQueryParser {
 
         $entity = $schema->getEntityInfoByPrefixedTableName($table);
         return $entity == null ? null : $entity->entityName;
+    }
+
+    /**
+     * @param $query
+     * @param $parser
+     * @param $matches
+     * @param $containsUsingPattern
+     * @return Parser
+     */
+    private function getParserFromQueryWithUsingClause($query, $parser, $matches, $containsUsingPattern) {
+        /** @var DeleteStatement|InsertStatement $sqlStatement */
+        $sqlStatement = $parser->statements[0];
+        $transformedPart = 'ON ';
+        $usingColumn = str_replace('`', '', $matches[3][0]);
+        $from = $sqlStatement->from[0];
+        if ($from->alias != null) {
+            $transformedPart .= $from->alias . '.' . $usingColumn;
+        } else {
+            $transformedPart .= $from->table . '.' . $usingColumn;
+        }
+        $transformedPart .= '=';
+        $join = $sqlStatement->{'join'}[0];
+
+        if ($join->expr->alias != null) {
+            $transformedPart .= $join->expr->alias . '.' . $usingColumn;
+        } else {
+            $transformedPart .= $join->expr->table . '.' . $usingColumn;
+        }
+        $transformedQuery = preg_replace($containsUsingPattern, '$1' . $transformedPart . '$4', $query);
+        return new Parser($transformedQuery);
     }
 
 }

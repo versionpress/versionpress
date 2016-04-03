@@ -1,96 +1,112 @@
 post:
-    table: posts
-    id: ID
-    references:
-        post_author: user
-        post_parent: post
-    mn-references:
-        term_relationships.term_taxonomy_id: term_taxonomy
-    ignored-entities:
-            - 'post_type: revision'
-            - 'post_status: auto-draft'
+  table: posts
+  id: ID
+  references:
+    post_author: user
+    post_parent: post
+  mn-references:
+    term_relationships.term_taxonomy_id: term_taxonomy
+  ignored-entities:
+    - 'post_type: revision'
+    - 'post_status: auto-draft'
+    # Also ignored are:
+    #  - Attachments without post_title
+    #  - Updating draft via AJAX
+    #  - Any changes saved by clicking "Preview"
+
 
 postmeta:
-    id: meta_id
-    parent-reference: post_id
-    references:
-        post_id: post
-    value-references:
-        meta_key@meta_value:
-            _thumbnail_id: post
-            _menu_item_object_id: '@\VersionPress\Database\VpidRepository::getMenuReference'
-            _menu_item_menu_item_parent: post
-    ignored-entities:
-        - 'meta_key: _edit_lock'
-        - 'meta_key: _edit_last'
-        - 'meta_key: _pingme'
-        - 'meta_key: _encloseme'
+  id: meta_id
+  parent-reference: post_id
+  references:
+    post_id: post
+  value-references:
+    meta_key@meta_value:
+      _thumbnail_id: post
+      _menu_item_object_id: '@\VersionPress\Database\VpidRepository::getMenuReference'
+      _menu_item_menu_item_parent: post
+  ignored-entities:
+    - 'meta_key: _edit_lock'
+    - 'meta_key: _edit_last'
+    - 'meta_key: _pingme'
+    - 'meta_key: _encloseme'
 
 comment:
-    table: comments
-    id: comment_ID
-    references:
-        comment_post_ID: post
-        user_id: user
-        comment_parent: comment
+  table: comments
+  id: comment_ID
+  references:
+    comment_post_ID: post
+    user_id: user
+    comment_parent: comment
+
+commentmeta:
+  table: commentmeta
+  id: meta_id
+  parent-reference: comment_id
+  references:
+    comment_id: comment
 
 user:
-    table: users
-    id: ID
+  table: users
+  id: ID
 
 term:
-    table: terms
-    id: term_id
+  table: terms
+  id: term_id
 
 termmeta:
-    since: 35329
-    id: meta_id
-    parent-reference: term_id
-    references:
-        term_id: term
+  since: 35329
+  id: meta_id
+  parent-reference: term_id
+  references:
+    term_id: term
 
 term_taxonomy:
-    id: term_taxonomy_id
-    references:
-        parent: term
-        term_id: term
-    mn-references:
-        ~term_relationships.object_id: post
+  id: term_taxonomy_id
+  references:
+    parent: term
+    term_id: term
+  mn-references:
+    ~term_relationships.object_id: post
 
 usermeta:
-    id: umeta_id
-    parent-reference: user_id
-    references:
-        user_id: user
-    ignored-entities:
-        - 'meta_key: session_tokens'
-        - 'meta_key: nav_menu_recently_edited'
-        - 'meta_key: wporg_favorites'
-        - 'meta_key: *dashboard_quick_press_last_post_id'
+  id: umeta_id
+  parent-reference: user_id
+  references:
+    user_id: user
+  ignored-entities:
+    - 'meta_key: session_tokens'
+    - 'meta_key: nav_menu_recently_edited'
+    - 'meta_key: wporg_favorites'
+    - 'meta_key: *dashboard_quick_press_last_post_id'
 
 option:
-    table: options
-    vpid: option_name
-    value-references:
-        option_name@option_value:
-            site_icon: post
-            page_on_front: post
-            page_for_posts: post
-    frequently-written:
-        - 'option_name: akismet_spam_count'
-    ignored-entities:
-        - 'option_name: _transient_*'
-        - 'option_name: _site_transient_*'
-        - 'option_name: cron'
-        - 'option_name: home'
-        - 'option_name: siteurl'
-        - 'option_name: db_upgraded'
-        - 'option_name: rewrite_rules'
-        - 'option_name: recently_edited'
-        - 'option_name: auto_updater.lock'
-        - 'option_name: can_compress_scripts'
-        - 'option_name: auto_core_update_notified'
-        - 'option_name: auth_key'
-        - 'option_name: auth_salt'
-        - 'option_name: logged_in_key'
-        - 'option_name: logged_in_salt'
+  table: options
+  vpid: option_name
+  value-references:
+    option_name@option_value:
+      site_icon: post
+      page_on_front: post
+      page_for_posts: post
+      default_category: term_taxonomy
+      default_link_category: term_taxonomy
+      default_email_category: term_taxonomy
+  frequently-written:
+    - 'option_name: akismet_spam_count'
+  ignored-entities:
+    - 'option_name: _transient_*'
+    - 'option_name: _site_transient_*'
+    - 'option_name: cron'
+    - 'option_name: home'
+    - 'option_name: siteurl'
+    - 'option_name: db_upgraded'
+    - 'option_name: rewrite_rules'
+    - 'option_name: recently_edited'
+    - 'option_name: auto_updater.lock'
+    - 'option_name: can_compress_scripts'
+    - 'option_name: auto_core_update_notified'
+    - 'option_name: auth_key'
+    - 'option_name: auth_salt'
+    - 'option_name: logged_in_key'
+    - 'option_name: logged_in_salt'
+    # All {$taxonomy}_children are also ignored - see OptionStorage

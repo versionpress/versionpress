@@ -3,6 +3,7 @@ namespace VersionPress\Initialization;
 
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use VersionPress\ChangeInfos\VersionPressChangeInfo;
+use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Database\ShortcodesInfo;
@@ -44,7 +45,7 @@ class Initializer {
     public $onProgressChanged = array();
 
     /**
-     * @var wpdb
+     * @var Database
      */
     private $database;
 
@@ -89,7 +90,7 @@ class Initializer {
     private $executionStartTime;
 
     function __construct(
-        $wpdb,
+        $database,
         DbSchemaInfo $dbSchema,
         StorageFactory $storageFactory,
         SynchronizerFactory $synchronizerFactory,
@@ -98,7 +99,7 @@ class Initializer {
         VpidRepository $vpidRepository,
         ShortcodesReplacer $shortcodesReplacer) {
 
-        $this->database = $wpdb;
+        $this->database = $database;
         $this->dbSchema = $dbSchema;
         $this->storageFactory = $storageFactory;
         $this->synchronizerFactory = $synchronizerFactory;

@@ -4,6 +4,7 @@ namespace VersionPress\Storages;
 
 use Nette\Utils\Strings;
 use Tracy\Debugger;
+use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 
 class StorageFactory {
@@ -15,20 +16,20 @@ class StorageFactory {
 
     private $storages = array();
     const ENTITY_INFO = '%entityInfo%';
-    /** @var \wpdb */
+    /** @var Database */
     private $database;
     private $taxonomies;
 
     /**
      * @param string $vpdbDir Path to the `wp-content/vpdb` directory
      * @param DbSchemaInfo $dbSchemaInfo Passed to storages
-     * @param \wpdb $wpdb
+     * @param Database $database
      * @param string[] $taxonomies List of taxonomies used on current site
      */
-    function __construct($vpdbDir, DbSchemaInfo $dbSchemaInfo, $wpdb, $taxonomies) {
+    function __construct($vpdbDir, DbSchemaInfo $dbSchemaInfo, $database, $taxonomies) {
         $this->vpdbDir = $vpdbDir;
         $this->dbSchemaInfo = $dbSchemaInfo;
-        $this->database = $wpdb;
+        $this->database = $database;
         $this->taxonomies = $taxonomies;
         $this->initStorageClasses();
     }
@@ -68,6 +69,7 @@ class StorageFactory {
         $this->addStorageClassInfo('usermeta', 'VersionPress\Storages\UserMetaStorage', '%storage(user)%', self::ENTITY_INFO, $this->database->prefix);
         $this->addStorageClassInfo('postmeta', 'VersionPress\Storages\PostMetaStorage', '%storage(post)%', self::ENTITY_INFO);
         $this->addStorageClassInfo('termmeta', 'VersionPress\Storages\TermMetaStorage', '%storage(term)%', self::ENTITY_INFO);
+        $this->addStorageClassInfo('commentmeta', 'VersionPress\Storages\CommentMetaStorage', '%storage(comment)%', self::ENTITY_INFO);
     }
 
     private function addStorageClassInfo($entityName, $className, $args) {

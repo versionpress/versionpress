@@ -2,6 +2,7 @@
 
 namespace VersionPress\DI;
 
+use VersionPress\Database\Database;
 use VersionPress\Database\SqlQueryParser;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Database\ShortcodesInfo;
@@ -54,12 +55,16 @@ class DIContainer {
             return $wpdb;
         });
 
+        $dic->register(VersionPressServices::DATABASE, function () use ($dic){
+            return new Database($dic->resolve(VersionPressServices::WPDB));
+        });
+
         $dic->register(VersionPressServices::STORAGE_FACTORY, function () use ($dic) {
             global $wp_taxonomies;
             return new StorageFactory(
                 VP_VPDB_DIR,
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
-                $dic->resolve(VersionPressServices::WPDB),
+                $dic->resolve(VersionPressServices::DATABASE),
                 array_keys((array)$wp_taxonomies)
             );
         });
@@ -78,7 +83,7 @@ class DIContainer {
 
         $dic->register(VersionPressServices::WPDB_MIRROR_BRIDGE, function () use ($dic) {
             return new WpdbMirrorBridge(
-                $dic->resolve(VersionPressServices::WPDB),
+                $dic->resolve(VersionPressServices::DATABASE),
                 $dic->resolve(VersionPressServices::MIRROR),
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::VPID_REPOSITORY),
@@ -96,7 +101,7 @@ class DIContainer {
 
         $dic->register(VersionPressServices::INITIALIZER, function () use ($dic) {
             return new Initializer(
-                $dic->resolve(VersionPressServices::WPDB),
+                $dic->resolve(VersionPressServices::DATABASE),
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::STORAGE_FACTORY),
                 $dic->resolve(VersionPressServices::SYNCHRONIZER_FACTORY),
@@ -110,7 +115,7 @@ class DIContainer {
         $dic->register(VersionPressServices::SYNCHRONIZER_FACTORY, function () use ($dic) {
             return new SynchronizerFactory(
                 $dic->resolve(VersionPressServices::STORAGE_FACTORY),
-                $dic->resolve(VersionPressServices::WPDB),
+                $dic->resolve(VersionPressServices::DATABASE),
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::URL_REPLACER),
                 $dic->resolve(VersionPressServices::SHORTCODES_REPLACER)
@@ -124,7 +129,7 @@ class DIContainer {
         $dic->register(VersionPressServices::REVERTER, function () use ($dic) {
             return new Reverter(
                 $dic->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS),
-                $dic->resolve(VersionPressServices::WPDB),
+                $dic->resolve(VersionPressServices::DATABASE),
                 $dic->resolve(VersionPressServices::COMMITTER),
                 $dic->resolve(VersionPressServices::REPOSITORY),
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
@@ -138,7 +143,7 @@ class DIContainer {
 
         $dic->register(VersionPressServices::VPID_REPOSITORY, function () use ($dic) {
             return new VpidRepository(
-                $dic->resolve(VersionPressServices::WPDB),
+                $dic->resolve(VersionPressServices::DATABASE),
                 $dic->resolve(VersionPressServices::DB_SCHEMA)
             );
         });
@@ -161,7 +166,7 @@ class DIContainer {
         $dic->register(VersionPressServices::SQL_QUERY_PARSER, function () use ($dic) {
             return new SqlQueryParser(
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
-                $dic->resolve(VersionPressServices::WPDB)
+                $dic->resolve(VersionPressServices::DATABASE)
             );
         });
 

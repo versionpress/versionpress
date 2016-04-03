@@ -5,6 +5,7 @@ namespace VersionPress\Utils;
 use Exception;
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
+use VersionPress\Database\Database;
 use VersionPress\Utils\SystemInfo;
 use VersionPress\Database\DbSchemaInfo;
 use wpdb;
@@ -12,13 +13,16 @@ use wpdb;
 class RequirementsChecker {
     private $requirements = array();
     /**
-     * @var wpdb
+     * @var Database
      */
     private $database;
     /**
      * @var DbSchemaInfo
      */
     private $schema;
+
+    const SITE = 'site';
+    const ENVIRONMENT = 'environment';
 
     /** @var string[] */
     public static $compatiblePlugins = array(
@@ -38,9 +42,18 @@ class RequirementsChecker {
     /** @var bool */
     private $isEverythingFulfilled;
 
-    function __construct($wpdb, DbSchemaInfo $schema) {
+    /**
+     * RequirementsChecker constructor.
+     * @param Database $database
+     * @param DbSchemaInfo $schema
+     * @param string $checkScope determines if all VersionPress requirements need to be fullfilled or just some of them.
+     * Possible values are RequirementsChecker::SITE or RequirementsChecker::ENVIRONMENT
+     * Default value is RequirementsChecker::SITE which means that all requirements need to be matched.
+     * RequirementsChecker::ENVIRONMENT checks only requirements related to "runtime" environment.
+     */
+    function __construct($database, DbSchemaInfo $schema, $checkScope = RequirementsChecker::SITE) {
 
-        $this->database = $wpdb;
+        $this->database = $database;
         $this->schema = $schema;
 
         // Markdown can be used in the 'help' field
@@ -97,60 +110,61 @@ class RequirementsChecker {
         );
 
         $this->requirements[] = array(
-            'name' => 'wpdb hook',
-            'level' => 'critical',
-            'fulfilled' => is_writable(ABSPATH . WPINC . '/wp-db.php'),
-            'help' => 'For VersionPress to do its magic, it needs to change the `wpdb` class and put some code there. ' .
-                'To do so it needs write access to the `wp-includes/wp-db.php` file. Please update the permissions.'
-        );
-
-        $this->requirements[] = array(
-            'name' => 'Not multisite',
-            'level' => 'critical',
-            'fulfilled' => !is_multisite(),
-            'help' => 'Currently VersionPress does not support multisites. Stay tuned!'
-        );
-
-        $this->requirements[] = array(
-            'name' => 'Standard directory layout',
-            'level' => 'warning',
-            'fulfilled' => $this->testDirectoryLayout(),
-            'help' => 'It seems like you use customized project structure. VersionPress supports only some scenarios. [Learn more](http://docs.versionpress.net/en/feature-focus/custom-project-structure).'
-        );
-
-        $this->requirements[] = array(
             'name' => 'Access rules can be installed',
             'level' => 'warning',
             'fulfilled' => $this->tryAccessControlFiles(),
             'help' => 'VersionPress automatically tries to secure certain locations, like `wp-content/vpdb`. You either don\'t have a supported web server or rules cannot be enforced. [Learn more](http://docs.versionpress.net/en/getting-started/installation-uninstallation#supported-web-servers).'
         );
+        if ($checkScope === RequirementsChecker::SITE) {
+            $this->requirements[] = array(
+                'name' => 'wpdb hook',
+                'level' => 'critical',
+                'fulfilled' => is_writable(ABSPATH . WPINC . '/wp-db.php'),
+                'help' => 'For VersionPress to do its magic, it needs to change the `wpdb` class and put some code there. ' .
+                    'To do so it needs write access to the `wp-includes/wp-db.php` file. Please update the permissions.'
+            );
+
+            $this->requirements[] = array(
+                'name' => 'Not multisite',
+                'level' => 'critical',
+                'fulfilled' => !is_multisite(),
+                'help' => 'Currently VersionPress does not support multisites. Stay tuned!'
+            );
+
+            $this->requirements[] = array(
+                'name' => 'Standard directory layout',
+                'level' => 'warning',
+                'fulfilled' => $this->testDirectoryLayout(),
+                'help' => 'It seems like you use customized project structure. VersionPress supports only some scenarios. [Learn more](http://docs.versionpress.net/en/feature-focus/custom-project-structure).'
+            );
 
 
-        $setTimeLimitEnabled = (false === strpos(ini_get("disable_functions"), "set_time_limit"));
-        $countOfEntities = $this->countEntities();
+            $setTimeLimitEnabled = (false === strpos(ini_get("disable_functions"), "set_time_limit"));
+            $countOfEntities = $this->countEntities();
 
-        if ($setTimeLimitEnabled) {
-            $help = "The initialization will take a little longer. This website contains $countOfEntities entities.";
-        } else {
-            $help = "The initialization may not finish. This website contains $countOfEntities entities.";
+            if ($setTimeLimitEnabled) {
+                $help = "The initialization will take a little longer. This website contains $countOfEntities entities.";
+            } else {
+                $help = "The initialization may not finish. This website contains $countOfEntities entities.";
+            }
+
+            $this->requirements[] = array(
+                'name' => 'Web size',
+                'level' => 'warning',
+                'fulfilled' => $countOfEntities < 500,
+                'help' => $help
+            );
+
+            $unsupportedPluginsCount = $this->testExternalPlugins();
+            $externalPluginsHelp = "You run $unsupportedPluginsCount external " . ($unsupportedPluginsCount == 1 ? "plugin" : "plugins") . " we have not tested yet. <a href='http://docs.versionpress.net/en/feature-focus/external-plugins'>Read more about 3rd party plugins support.</a>";
+
+            $this->requirements[] = array(
+                'name' => 'External plugins',
+                'level' => 'warning',
+                'fulfilled' => $unsupportedPluginsCount == 0,
+                'help' => $externalPluginsHelp
+            );
         }
-
-        $this->requirements[] = array(
-            'name' => 'Web size',
-            'level' => 'warning',
-            'fulfilled' => $countOfEntities < 500,
-            'help' => $help
-        );
-
-        $unsupportedPluginsCount = $this->testExternalPlugins();
-        $externalPluginsHelp = "You run $unsupportedPluginsCount external ". ($unsupportedPluginsCount == 1 ? "plugin" : "plugins") ." we have not tested yet. <a href='http://docs.versionpress.net/en/feature-focus/external-plugins'>Read more about 3rd party plugins support.</a>";
-
-        $this->requirements[] = array(
-            'name' => 'External plugins',
-            'level' => 'warning',
-            'fulfilled' => $unsupportedPluginsCount == 0,
-            'help' => $externalPluginsHelp
-        );
 
         $this->isWithoutCriticalErrors = array_reduce($this->requirements, function ($carry, $requirement) {
             return $carry && ($requirement['fulfilled'] || $requirement['level'] === 'warning');
@@ -252,7 +266,6 @@ class RequirementsChecker {
 
     private function testDirectoryLayout() {
         $uploadDirInfo = wp_upload_dir();
-
         $isStandardLayout = true;
         $isStandardLayout &= ABSPATH . 'wp-content' === WP_CONTENT_DIR;
         $isStandardLayout &= WP_CONTENT_DIR . '/plugins' === WP_PLUGIN_DIR;
@@ -307,8 +320,8 @@ class RequirementsChecker {
     private function testExternalPlugins() {
         $plugins = get_option('active_plugins');
         $unsupportedPluginsCount = 0;
-        foreach($plugins as $plugin) {
-            if(!in_array($plugin, self::$compatiblePlugins)) {
+        foreach ($plugins as $plugin) {
+            if (!in_array($plugin, self::$compatiblePlugins)) {
                 $unsupportedPluginsCount++;
             }
         }
