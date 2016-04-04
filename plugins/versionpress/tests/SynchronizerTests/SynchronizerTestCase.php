@@ -29,6 +29,8 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
     protected static $urlReplacer;
     /** @var ShortcodesReplacer */
     protected static $shortcodesReplacer;
+    /** @var VpidRepository */
+    protected static $vpidRepository;
 
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
@@ -59,8 +61,8 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
         self::$database = new Database($wpdb);
 
         $shortcodesInfo = new ShortcodesInfo($shortcodeFile);
-        $vpidRepository = new VpidRepository(self::$database, self::$schemaInfo);
-        self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, $vpidRepository);
+        self::$vpidRepository = new VpidRepository(self::$database, self::$schemaInfo);
+        self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, self::$vpidRepository);
 
         $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
         self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$database, array());

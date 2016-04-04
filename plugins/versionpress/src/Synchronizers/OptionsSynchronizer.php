@@ -3,7 +3,9 @@ namespace VersionPress\Synchronizers;
 
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Database\EntityInfo;
 use VersionPress\Database\ShortcodesReplacer;
+use VersionPress\Database\VpidRepository;
 use VersionPress\Storages\OptionStorage;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -31,16 +33,19 @@ class OptionsSynchronizer implements Synchronizer {
     private $tableName;
     private $options;
 
-    /** @var DbSchemaInfo */
-    private $dbSchema;
+    /** @var EntityInfo */
+    private $entityInfo;
+    /** @var VpidRepository */
+    private $vpidRepository;
 
-    function __construct(Storage $optionStorage, Database $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
-        $this->optionStorage = $optionStorage;
+    function __construct(Storage $storage, Database $database, EntityInfo $entityInfo, DbSchemaInfo $dbSchemaInfo, VpidRepository $vpidRepository, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
+        $this->optionStorage = $storage;
         $this->database = $database;
         $this->urlReplacer = $urlReplacer;
-        $this->tableName = $dbSchema->getPrefixedTableName('option');
-        $this->dbSchema = $dbSchema;
+        $this->tableName = $database->prefix . $entityInfo->tableName;
+        $this->entityInfo = $entityInfo;
         $this->shortcodesReplacer = $shortcodesReplacer;
+        $this->vpidRepository = $vpidRepository;
     }
 
     function synchronize($task, $entitiesToSynchronize = null) {
@@ -65,8 +70,7 @@ class OptionsSynchronizer implements Synchronizer {
             $this->database->query($syncQuery);
         }
 
-        $entityInfo = $this->dbSchema->getEntityInfo('option');
-        $rules = $entityInfo->getRulesForIgnoredEntities();
+        $rules = $this->entityInfo->getRulesForIgnoredEntities();
         $restriction = join(' OR ', array_map(function ($rule) {
             $restrictionPart = QueryLanguageUtils::createSqlRestrictionFromRule($rule);
             return "($restrictionPart)";
@@ -115,18 +119,6 @@ class OptionsSynchronizer implements Synchronizer {
     }
 
     private function maybeRestoreReference($option) {
-        $entityInfo = $this->dbSchema->getEntityInfo('option');
-        foreach ($entityInfo->valueReferences as $reference => $targetEntity) {
-            $referenceDetails = ReferenceUtils::getValueReferenceDetails($reference);
-            if ($option[$referenceDetails['source-column']] === $referenceDetails['source-value'] && isset($option[$referenceDetails['value-column']])) {
-                $vpid = $option[$referenceDetails['value-column']];
-                $vpidTable = $this->dbSchema->getPrefixedTableName('vp_id');
-                $targetTable = $this->dbSchema->getTableName($targetEntity);
-                $dbId = $this->database->get_var("SELECT id FROM $vpidTable WHERE `table`='$targetTable' AND vp_id=UNHEX('$vpid')");
-                $option[$referenceDetails['value-column']] = $dbId;
-            }
-        }
-
-        return $option;
+        return $this->vpidRepository->restoreForeignKeys('option', $option);
     }
 }

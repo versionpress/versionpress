@@ -3,7 +3,9 @@
 namespace VersionPress\Utils;
 
 /**
- * Class for manipulation with
+ * Class for manipulation with hierarchic structures.
+ * It enabled to create a "pointer" to some nested value, read it and change it.
+ *
  */
 class Cursor {
 

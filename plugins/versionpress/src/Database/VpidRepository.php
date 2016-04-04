@@ -100,6 +100,23 @@ class VpidRepository {
         return $entity;
     }
 
+    public function restoreForeignKeys($entityName, $entity) {
+        $entityInfo = $this->schemaInfo->getEntityInfo($entityName);
+
+        foreach ($entityInfo->valueReferences as $reference => $targetEntity) {
+            $referenceDetails = ReferenceUtils::getValueReferenceDetails($reference);
+            if ($entity[$referenceDetails['source-column']] === $referenceDetails['source-value'] && isset($entity[$referenceDetails['value-column']])) {
+                $vpid = $entity[$referenceDetails['value-column']];
+                $vpidTable = $this->schemaInfo->getPrefixedTableName('vp_id');
+                $targetTable = $this->schemaInfo->getTableName($targetEntity);
+                $dbId = $this->database->get_var("SELECT id FROM $vpidTable WHERE `table`='$targetTable' AND vp_id=UNHEX('$vpid')");
+                $entity[$referenceDetails['value-column']] = $dbId;
+            }
+        }
+
+        return $entity;
+    }
+
     public function identifyEntity($entityName, $data, $id) {
         if ($this->schemaInfo->getEntityInfo($entityName)->usesGeneratedVpids) {
             $data['vp_id'] = IdUtil::newId();
