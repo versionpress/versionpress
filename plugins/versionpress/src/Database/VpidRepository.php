@@ -35,7 +35,7 @@ class VpidRepository {
     }
 
     public function getIdForVpid($vpid) {
-        return $this->database->get_var("SELECT id FROM $this->vpidTableName WHERE vp_id = UNHEX('$vpid')");
+        return intval($this->database->get_var("SELECT id FROM $this->vpidTableName WHERE vp_id = UNHEX('$vpid')"));
     }
 
     public function replaceForeignKeysWithReferences($entityName, $entity) {
@@ -103,14 +103,34 @@ class VpidRepository {
     public function restoreForeignKeys($entityName, $entity) {
         $entityInfo = $this->schemaInfo->getEntityInfo($entityName);
 
-        foreach ($entityInfo->valueReferences as $reference => $targetEntity) {
-            $referenceDetails = ReferenceUtils::getValueReferenceDetails($reference);
-            if ($entity[$referenceDetails['source-column']] === $referenceDetails['source-value'] && isset($entity[$referenceDetails['value-column']])) {
-                $vpid = $entity[$referenceDetails['value-column']];
-                $vpidTable = $this->schemaInfo->getPrefixedTableName('vp_id');
-                $targetTable = $this->schemaInfo->getTableName($targetEntity);
-                $dbId = $this->database->get_var("SELECT id FROM $vpidTable WHERE `table`='$targetTable' AND vp_id=UNHEX('$vpid')");
-                $entity[$referenceDetails['value-column']] = $dbId;
+        foreach ($entityInfo->valueReferences as $referenceName => $targetEntity) {
+            list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) = array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
+
+            if ($entity[$sourceColumn] === $sourceValue && isset($entity[$valueColumn])) {
+
+                if ((is_numeric($entity[$valueColumn]) && intval($entity[$valueColumn]) === 0) || $entity[$valueColumn] === '') {
+                    continue;
+                }
+
+                if ($pathInStructure) {
+                    $entity[$valueColumn] = unserialize($entity[$valueColumn]);
+                    $paths = ReferenceUtils::getMatchingPaths($entity[$valueColumn], $pathInStructure);
+                } else {
+                    $paths = [[]]; // root = the value itself
+                }
+
+                /** @var Cursor[] $cursors */
+                $cursors = array_map(function ($path) use (&$entity, $valueColumn) { return new Cursor($entity[$valueColumn], $path); }, $paths);
+
+                foreach ($cursors as $cursor) {
+                    $vpid = $cursor->getValue();
+                    $referenceVpId = $this->getIdForVpid($vpid);
+                    $cursor->setValue($referenceVpId);
+                }
+
+                if ($pathInStructure) {
+                    $entity[$valueColumn] = serialize($entity[$valueColumn]);
+                }
             }
         }
 
