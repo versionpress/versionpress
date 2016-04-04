@@ -36,11 +36,17 @@ class ReferenceUtils {
     public static function getValueReferenceDetails($reference) {
         list($keyCol, $valueColumn) = explode("@", $reference);
         list($sourceColumn, $sourceValue) = explode("=", $keyCol);
+        if (strpos($sourceValue, '[') !== false) {
+            list($sourceValue, $pathInStructure) = explode("[", $sourceValue, 2);
+        } else {
+            $pathInStructure = '';
+        }
 
         return array(
             'source-column' => $sourceColumn,
             'source-value'  => $sourceValue,
             'value-column' => $valueColumn,
+            'path-in-structure' => $pathInStructure,
         );
     }
 
@@ -69,5 +75,60 @@ class ReferenceUtils {
         }
 
         return null;
+    }
+
+    /**
+     * Returns list of all paths in hierarchic structure (nested arrays, objects) matching given pattern.
+     * The pattern comes from a schema file. For example line `some_option[/\d+/]["key"]` contains
+     * pattern `[/\d+/]["key"]`. It can contain regular expressions to match multiple / dynamic keys.
+     *
+     * @param array|object $value
+     * @param string $pathInStructure
+     * @return array
+     */
+    public static function getMatchingPaths($value, $pathInStructure) {
+        // https://regex101.com/r/vR8yK3/2
+        $re = "/(?:\\[(?<number>\\d+)|\"(?<string>(?:[^\"\\\\]|\\\\.)*)\"|\\/(?<regex>(?:[^\\/\\\\]|\\\\.)*)\\/)\\]+/";
+        preg_match_all($re, $pathInStructure, $matches, PREG_SET_ORDER);
+        $pathParts = array_map(function ($match) {
+            if (strlen($match['number']) > 0) {
+                return ['type' => 'exact-value', 'value' => intval($match['number'])];
+            } else if (strlen($match['string']) > 0) {
+                return ['type' => 'exact-value', 'value' => $match['string']];
+            } else {
+                $regex = "/^$match[regex]$/";
+                return ['type' => 'regex', 'value' => $regex];
+            }
+        }, $matches);
+
+        $paths = self::getMatchingPathsFromSubtree($value, $pathParts);
+
+        return $paths;
+    }
+
+    private static function getMatchingPathsFromSubtree($value, $pathParts) {
+        if (!is_array($value) && !is_object($value)) {
+            return [];
+        }
+
+        $currentLevelKey = array_shift($pathParts);
+        $paths = [];
+
+        foreach ($value as $key => $subTree) {
+            if (($currentLevelKey['type'] === 'exact-value' && $currentLevelKey['value'] === $key) ||
+                ($currentLevelKey['type'] === 'regex' && preg_match($currentLevelKey['value'], $key))) {
+                if (count($pathParts) > 0) {
+                    $subPaths = self::getMatchingPathsFromSubtree($subTree, $pathParts);
+                    foreach ($subPaths as $subPath) {
+                        array_unshift($subPath, $key);
+                        $paths[] = $subPath;
+                    }
+                } else {
+                    $paths[] = [$key];
+                }
+            }
+        }
+
+        return $paths;
     }
 }

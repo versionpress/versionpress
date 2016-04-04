@@ -3,6 +3,7 @@
 namespace VersionPress\Database;
 
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Utils\Cursor;
 use VersionPress\Utils\IdUtil;
 use VersionPress\Utils\ReferenceUtils;
 use wpdb;
@@ -58,11 +59,11 @@ class VpidRepository {
         }
 
         foreach ($entityInfo->valueReferences as $referenceName => $targetEntity) {
-            list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
+            list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) = array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
 
             if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn])) {
 
-                if ($entity[$valueColumn] == 0) {
+                if ((is_numeric($entity[$valueColumn]) && intval($entity[$valueColumn]) === 0) || $entity[$valueColumn] === '') {
                     continue;
                 }
 
@@ -73,10 +74,26 @@ class VpidRepository {
                         continue;
                     }
                 }
-                $targetTable = $this->schemaInfo->getEntityInfo($targetEntity)->tableName;
 
-                $referenceVpId = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=" . $entity[$valueColumn]);
-                $entity[$valueColumn] = $referenceVpId;
+                if ($pathInStructure) {
+                    $entity[$valueColumn] = unserialize($entity[$valueColumn]);
+                    $paths = ReferenceUtils::getMatchingPaths($entity[$valueColumn], $pathInStructure);
+                } else {
+                    $paths = [[]]; // root = the value itself
+                }
+
+                /** @var Cursor[] $cursors */
+                $cursors = array_map(function ($path) use (&$entity, $valueColumn) { return new Cursor($entity[$valueColumn], $path); }, $paths);
+
+                foreach ($cursors as $cursor) {
+                    $id = $cursor->getValue();
+                    $referenceVpId = $this->getVpidForEntity($targetEntity, $id);
+                    $cursor->setValue($referenceVpId);
+                }
+
+                if ($pathInStructure) {
+                    $entity[$valueColumn] = serialize($entity[$valueColumn]);
+                }
             }
         }
 
