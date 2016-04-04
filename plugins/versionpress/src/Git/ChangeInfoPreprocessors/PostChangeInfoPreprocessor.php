@@ -15,31 +15,14 @@ class PostChangeInfoPreprocessor implements ChangeInfoPreprocessor {
      */
     function process($changeInfoList) {
 
-        // 1) Find combination of post/draft and post/publish
-        $entities = $this->getChangeInfosByIndicies($changeInfoList, array("draft", "publish"));
+        // 1) Find and replace combination of post/draft and post/publish with single post/create action
+        $this->replaceChangeInfosCombination($changeInfoList, array("draft", "publish"), "create");
 
-        // 2) Replace combination of post/draft and post/publish with single post/create action
-        foreach ($entities as $entityId => $changeInfos) {
-            if (count($changeInfos) == 2) {
-                /** @var PostChangeInfo $publish */
-                $publish = $changeInfoList[$changeInfos["publish"][0]];
-                $this->removeChangeInfos($changeInfoList, $changeInfos);
-                $changeInfoList[] = new PostChangeInfo("create", $publish->getEntityId(), $publish->getPostType(), $publish->getPostTitle());
-            }
-        }
+        // 1) Find and replace combination of post/draft and post/edit with single post/create action
+        $this->replaceChangeInfosCombination($changeInfoList, array("draft", "edit"), "draft");
 
-        // 1) Find combination of post/create and post/edit
-        $entities = $this->getChangeInfosByIndicies($changeInfoList, array("create", "edit"));
-
-        // 2) Replace combination of post/create and post/edit with single post/create action
-        foreach ($entities as $entityId => $changeInfos) {
-            if (count($changeInfos) == 2) {
-                /** @var PostChangeInfo $create */
-                $create = $changeInfoList[$changeInfos["create"][0]];
-                $this->removeChangeInfos($changeInfoList, $changeInfos);
-                $changeInfoList[] = new PostChangeInfo("create", $create->getEntityId(), $create->getPostType(), $create->getPostTitle());
-            }
-        }
+        // 1) Find and replace combination of post/create and post/edit with single post/create action
+        $this->replaceChangeInfosCombination($changeInfoList, array("create", "edit"), "create");
 
         return array($changeInfoList);
     }
@@ -69,6 +52,23 @@ class PostChangeInfoPreprocessor implements ChangeInfoPreprocessor {
         foreach ($changeInfos as $indicie => $indexes) {
             foreach ($indexes as $index) {
                 unset($changeInfoList[$index]);
+            }
+        }
+    }
+
+    /**
+     * @param $changeInfoList
+     * @param array $indicies
+     * @param string $resultAction
+     */
+    private function replaceChangeInfosCombination(&$changeInfoList, $indicies, $resultAction) {
+        $entities = $this->getChangeInfosByIndicies($changeInfoList, $indicies);
+        foreach ($entities as $entityId => $changeInfos) {
+            if (count($changeInfos) == 2) {
+                /** @var PostChangeInfo $sourceChangeInfo */
+                $sourceChangeInfo = $changeInfoList[$changeInfos[$indicies[0]][0]];
+                $this->removeChangeInfos($changeInfoList, $changeInfos);
+                $changeInfoList[] = new PostChangeInfo($resultAction, $sourceChangeInfo->getEntityId(), $sourceChangeInfo->getPostType(), $sourceChangeInfo->getPostTitle());
             }
         }
     }
