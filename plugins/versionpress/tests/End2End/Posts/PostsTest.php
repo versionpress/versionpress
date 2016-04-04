@@ -155,7 +155,7 @@ class PostsTest extends PostTypeTestCase {
         $commitAsserter->ignoreCommits('term/create');
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction('post/edit');
-        $commitAsserter->assertCommitTag('VP-Post-UpdatedProperties', 'vp_term_taxonomy');
+        $commitAsserter->assertCommitTag('VP-Post-UpdatedProperties', 'vp_term_taxonomy,post_modified,post_modified_gmt');
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
