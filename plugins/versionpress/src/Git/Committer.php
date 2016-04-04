@@ -127,6 +127,7 @@ class Committer {
      */
     private function preprocessChangeInfoList($changeInfoList) {
         $preprocessors = array(
+            'VersionPress\Git\ChangeInfoPreprocessors\EditActionChangeInfoPreprocessor',
             'VersionPress\Git\ChangeInfoPreprocessors\PostChangeInfoPreprocessor',
             'VersionPress\Git\ChangeInfoPreprocessors\PostTermSplittingPreprocessor',
         );
