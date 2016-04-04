@@ -30,12 +30,12 @@ class EditActionChangeInfoPreprocessor implements ChangeInfoPreprocessor {
                 foreach ($edits as $edit) {
                     /** @var EntityChangeInfo $editChangeInfo */
                     $editChangeInfo = $changeInfoList[$edit];
-                    if (method_exists($editChangeInfo, "getPostUpdatedProperties")) {
+                    if (method_exists($editChangeInfo, "getPostUpdatedProperties")) {  // Only PostChangeInfo has this method, and we need to track updated values in Posts.
                         $updatedProperties = array_unique(array_merge($updatedProperties, $editChangeInfo->getPostUpdatedProperties()));
                     }
                     unset($changeInfoList[$edit]);
                 }
-                if (method_exists($firstEditChangeInfo, "setPostUpdatedProperties")) {
+                if (method_exists($firstEditChangeInfo, "setPostUpdatedProperties")) { // We need to merge values from several PostChangeInfos into one
                     $firstEditChangeInfo->setPostUpdatedProperties($updatedProperties);
                 }
                 $changeInfoList[] = $firstEditChangeInfo;
@@ -54,9 +54,6 @@ class EditActionChangeInfoPreprocessor implements ChangeInfoPreprocessor {
         $entities = array();
         foreach ($changeInfoList as $key => $changeInfo) {
             if ($changeInfo instanceof EntityChangeInfo && in_array($changeInfo->getAction(), $indicies)) {
-                if (!isset($entities[$changeInfo->getEntityId()])) {
-                    $entities[$changeInfo->getEntityId()] = array();
-                }
                 $entities[$changeInfo->getEntityId()][$changeInfo->getAction()][] = $key;
             }
         }
