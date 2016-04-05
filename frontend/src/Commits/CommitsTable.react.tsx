@@ -115,6 +115,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
         <input
           type='checkbox'
           id='CommitsTable-selectAll'
+          disabled={!this.props.enableActions}
           checked={this.props.commits.length > 0 && allSelected}
           onChange={this.onSelectAll.bind(this)}
         />

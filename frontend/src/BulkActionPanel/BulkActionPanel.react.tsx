@@ -6,6 +6,7 @@ import * as React from 'react';
 import './BulkActionPanel.less';
 
 interface BulkActionPanelProps extends React.Props<JSX.Element> {
+  enableActions: boolean;
   onBulkAction: (string) => void;
   onClearSelection: () => void;
   selected: Commit[];
@@ -45,7 +46,7 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
             className='button action'
             value='Apply'
             onClick={this.onBulkAction.bind(this)}
-            disabled={selected.length === 0}
+            disabled={!this.props.enableActions || selected.length === 0}
           />
           <div className={'BulkActionPanel-note' + (selected.length === 0 ? ' hide' : '')}>
             ({selected.length} {selected.length === 1 ? 'change' : 'changes'} selected;{' '}

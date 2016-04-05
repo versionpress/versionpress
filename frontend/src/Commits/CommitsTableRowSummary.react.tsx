@@ -30,8 +30,9 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
       <tr className={className} onClick={() => this.toggleDetails()}>
         {commit.canUndo
           ? <td className='column-cb' onClick={this.onCheckboxClick.bind(this)}><input type='checkbox'
-                                                                                      checked={this.props.isSelected}
-                                                                                      readOnly={true}/></td>
+                                                                                       checked={this.props.isSelected}
+                                                                                       disabled={!this.props.enableActions}
+                                                                                       readOnly={true}/></td>
           : <td className='column-cb' />
         }
         <td className='column-date' title={moment(commit.date).format('LLL')}>{moment(commit.date).fromNow()}</td>

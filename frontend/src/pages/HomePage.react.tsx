@@ -425,6 +425,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   }
 
   render() {
+    const enableActions = !this.state.dirtyWorkingDirectory;
+
     return (
       <div className={this.state.loading ? 'loading' : ''}>
         <ProgressBar ref='progress' />
@@ -468,6 +470,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             onSubmit={this.onFilter}
           />
           <BulkActionPanel
+            enableActions={enableActions}
             onBulkAction={this.onBulkAction.bind(this)}
             onClearSelection={this.onClearSelection.bind(this)}
             selected={this.state.selected}
@@ -478,7 +481,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           pages={this.state.pages}
           commits={this.state.commits}
           selected={this.state.selected}
-          enableActions={!this.state.dirtyWorkingDirectory}
+          enableActions={enableActions}
           onCommitSelect={this.onCommitSelect}
           onUndo={this.onUndo}
           onRollback={this.onRollback}
