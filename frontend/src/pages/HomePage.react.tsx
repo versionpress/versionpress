@@ -8,6 +8,7 @@ import * as moment from 'moment';
 import * as Promise from 'core-js/es6/promise';
 import CommitPanel from '../CommitPanel/CommitPanel.react';
 import CommitsTable from '../Commits/CommitsTable.react';
+import Filter from '../Filter/Filter.react';
 import FlashMessage from '../common/FlashMessage.react';
 import ProgressBar from '../common/ProgressBar.react';
 import ServicePanel from '../ServicePanel/ServicePanel.react';
@@ -29,6 +30,7 @@ interface HomePageProps extends React.Props<JSX.Element> {
 
 interface HomePageState {
   pages?: number[];
+  query?: string;
   commits?: Commit[];
   message?: {
     code: string,
@@ -53,6 +55,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     super();
     this.state = {
       pages: [],
+      query: '',
       commits: [],
       message: null,
       loading: true,
@@ -62,6 +65,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       dirtyWorkingDirectory: false
     };
 
+    this.onFilter = this.onFilter.bind(this);
     this.onUndo = this.onUndo.bind(this);
     this.onRollback = this.onRollback.bind(this);
     this.checkUpdate = this.checkUpdate.bind(this);
@@ -69,7 +73,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
   static getErrorMessage(res: request.Response) {
     return res
-      ? res.body[0]
+      ? (Array.isArray(res.body)
+        ? res.body[0]
+        : res.body)
       : {
       code: 'error',
       message: 'Connection Error: VersionPress is not able to connect to WordPress site. Please try refreshing the page.'
@@ -97,17 +103,18 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
     const page = (parseInt(params.page, 10) - 1) || 0;
 
-    if (page === 0) {
+    if (page < 1) {
       router.transitionTo(routes.home);
     }
 
     WpApi
       .get('commits')
-      .query({page: page})
+      .query({page: page, query: encodeURIComponent(this.state.query)})
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
+            pages: [],
             commits: [],
             message: HomePage.getErrorMessage(res),
             loading: false,
@@ -144,7 +151,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     }
     WpApi
       .get('should-update')
-      .query({latestCommit: this.state.commits[0].hash})
+      .query({query: encodeURIComponent(this.state.query), latestCommit: this.state.commits[0].hash})
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
@@ -303,6 +310,20 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       });
   }
 
+  onFilter(query: string) {
+    this.setState({
+      query: query
+    }, () => {
+      const page = (parseInt(this.props.params.page, 10) - 1) || 0;
+      if (page > 0) {
+        const router:ReactRouter.Context = (this.context as any).router;
+        router.transitionTo(routes.home)
+      } else {
+        this.fetchCommits();
+      }
+    });
+  }
+
   onUndo(e) {
     e.preventDefault();
     const hash = e.target.getAttribute('data-hash');
@@ -376,6 +397,11 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             </div>
           : null
         }
+        <div className='tablenav top'>
+          <Filter
+            onSubmit={this.onFilter}
+          />
+        </div>
         <CommitsTable
           currentPage={parseInt(this.props.params.page, 10) || 1}
           pages={this.state.pages}

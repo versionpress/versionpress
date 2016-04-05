@@ -1,3 +1,14 @@
+.clearfix() {
+  &:before,
+  &:after {
+    content: " ";
+    display: table;
+  }
+  &:after {
+    clear: both;
+  }
+}
+
 .loading() {
   position: relative;
   user-select: none;
