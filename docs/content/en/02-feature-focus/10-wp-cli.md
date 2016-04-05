@@ -120,3 +120,5 @@ Applies changes found on the disk to the database. Useful e.g. after resolving m
 Checks if all requirements for using VersionPress are met on the target environment. 
 
 This command is usefull when you want to check if changes made on server (by you yourself, or hosting provider) does not break some of requirements.
+
+Note that with this command, you will most usually **need to include the `--require=...` parameter**.
