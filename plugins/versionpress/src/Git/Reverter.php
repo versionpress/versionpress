@@ -67,6 +67,8 @@ class Reverter {
             return RevertStatus::NOT_CLEAN_WORKING_DIRECTORY;
         }
 
+        vp_commit_all_frequently_written_entities();
+
         $commitHashForDiff = $method === "undo" ? sprintf("%s~1..%s", $commitHash, $commitHash) : $commitHash;
         $modifiedFiles = $this->repository->getModifiedFiles($commitHashForDiff);
         $vpIdsInModifiedFiles = $this->getAllVpIdsFromModifiedFiles($modifiedFiles);
