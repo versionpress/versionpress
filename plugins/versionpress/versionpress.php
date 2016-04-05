@@ -6,7 +6,8 @@ Description: Git-versioning plugin for WordPress
 Version: DEV
 Author: VersionPress
 Author URI: http://versionpress.net/
-License: GPLv2 or later
+License: GPLv3
+License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 */
 
 use VersionPress\Api\VersionPressApi;
