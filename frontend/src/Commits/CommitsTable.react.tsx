@@ -40,22 +40,12 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
   render() {
     const firstCommit = this.props.commits[0];
     const displayTopNote = firstCommit && !firstCommit.isEnabled;
-    const selectableCommits = this.props.commits.filter((commit: Commit) => commit.canUndo);
-    const allSelected = !_.differenceBy(selectableCommits, this.props.selected, ((value: Commit) => value.hash)).length;
 
     return (
       <table className='vp-table widefat fixed'>
         <thead>
           <tr>
-            <td className='column-cb manage-column check-column'>
-              <label className='screen-reader-text' htmlFor='CommitsTable-selectAll'>Select All</label>
-              <input
-                type='checkbox'
-                id='CommitsTable-selectAll'
-                checked={this.props.commits.length > 0 && allSelected}
-                onChange={this.onSelectAll.bind(this)}
-              />
-            </td>
+            {this.renderSelectAll()}
             <th className='column-date'>Date</th>
             <th className='column-message'>Message</th>
             <th className='column-actions' />
@@ -81,8 +71,8 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
             return [
               row,
               this.renderNote()
-              ];
-            }
+            ];
+          }
           return row;
         })}
         <tfoot>
@@ -108,6 +98,28 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
              key='note'
              message='VersionPress is not able to undo changes made before it has been activated.'
            />;
+  }
+
+  renderSelectAll() {
+    const selectableCommits = this.props.commits.filter((commit: Commit) => commit.canUndo);
+    const displaySelectAll = this.props.commits.some((commit: Commit) => commit.canUndo);
+
+    if (!displaySelectAll) {
+      return <td className='column-cb' />
+    }
+
+    const allSelected = !_.differenceBy(selectableCommits, this.props.selected, ((value: Commit) => value.hash)).length;
+    return (
+      <td className='column-cb manage-column check-column'>
+        <label className='screen-reader-text' htmlFor='CommitsTable-selectAll'>Select All</label>
+        <input
+          type='checkbox'
+          id='CommitsTable-selectAll'
+          checked={this.props.commits.length > 0 && allSelected}
+          onChange={this.onSelectAll.bind(this)}
+        />
+      </td>
+    );
   }
 
   onSelectAll(e: React.MouseEvent) {
