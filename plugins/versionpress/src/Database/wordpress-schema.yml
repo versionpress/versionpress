@@ -92,6 +92,7 @@ option:
       default_link_category: term_taxonomy
       default_email_category: term_taxonomy
       widget_nav_menu[/\d+/]["nav_menu"]: term
+      widget_pages[/\d+/]["exclude"]: post
   frequently-written:
     - 'option_name: akismet_spam_count'
   ignored-entities:

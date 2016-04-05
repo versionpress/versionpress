@@ -40,19 +40,17 @@ class VpidRepository {
 
     public function replaceForeignKeysWithReferences($entityName, $entity) {
         $entityInfo = $this->schemaInfo->getEntityInfo($entityName);
-        $vpIdTable = $this->schemaInfo->getPrefixedTableName('vp_id');
 
         foreach ($entityInfo->references as $referenceName => $targetEntity) {
-            $targetTable = $this->schemaInfo->getEntityInfo($targetEntity)->tableName;
 
             if (isset($entity[$referenceName])) {
-                if ($entity[$referenceName] > 0) {
-                    $referenceVpId = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=$entity[$referenceName]");
+                if ($this->isNullReference($entity[$referenceName])) {
+                    $referenceVpids = 0;
                 } else {
-                    $referenceVpId = 0;
+                    $referenceVpids = $this->replaceIdsInString($targetEntity, $entity[$referenceName]);
                 }
 
-                $entity['vp_' . $referenceName] = $referenceVpId;
+                $entity['vp_' . $referenceName] = $referenceVpids;
                 unset($entity[$referenceName]);
             }
 
@@ -63,7 +61,7 @@ class VpidRepository {
 
             if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn])) {
 
-                if ((is_numeric($entity[$valueColumn]) && intval($entity[$valueColumn]) === 0) || $entity[$valueColumn] === '') {
+                if ($this->isNullReference($entity[$valueColumn])) {
                     continue;
                 }
 
@@ -86,9 +84,9 @@ class VpidRepository {
                 $cursors = array_map(function ($path) use (&$entity, $valueColumn) { return new Cursor($entity[$valueColumn], $path); }, $paths);
 
                 foreach ($cursors as $cursor) {
-                    $id = $cursor->getValue();
-                    $referenceVpId = $this->getVpidForEntity($targetEntity, $id);
-                    $cursor->setValue($referenceVpId);
+                    $ids = $cursor->getValue();
+                    $referenceVpids = $this->replaceIdsInString($targetEntity, $ids);
+                    $cursor->setValue($referenceVpids);
                 }
 
                 if ($pathInStructure) {
@@ -108,7 +106,7 @@ class VpidRepository {
 
             if ($entity[$sourceColumn] === $sourceValue && isset($entity[$valueColumn])) {
 
-                if ((is_numeric($entity[$valueColumn]) && intval($entity[$valueColumn]) === 0) || $entity[$valueColumn] === '') {
+                if ($this->isNullReference($entity[$valueColumn])) {
                     continue;
                 }
 
@@ -123,8 +121,8 @@ class VpidRepository {
                 $cursors = array_map(function ($path) use (&$entity, $valueColumn) { return new Cursor($entity[$valueColumn], $path); }, $paths);
 
                 foreach ($cursors as $cursor) {
-                    $vpid = $cursor->getValue();
-                    $referenceVpId = $this->getIdForVpid($vpid);
+                    $vpids = $cursor->getValue();
+                    $referenceVpId = $this->restoreIdsInString($vpids);
                     $cursor->setValue($referenceVpId);
                 }
 
@@ -170,6 +168,25 @@ class VpidRepository {
             $data[$idColumnName] = $id;
         }
         return $data;
+    }
+
+    private function isNullReference($id) {
+        return (is_numeric($id) && intval($id) === 0) || $id === '';
+    }
+
+    private function replaceIdsInString($targetEntity, $stringWithIds) {
+        return preg_replace_callback('/(\d+)/', function ($match) use ($targetEntity) {
+            return $this->getVpidForEntity($targetEntity, $match[0]) ?: $match[0];
+        }, $stringWithIds);
+    }
+
+    private function restoreIdsInString($stringWithVpids) {
+        $stringWithIds = preg_replace_callback(IdUtil::getRegexMatchingId(), function ($match) {
+            return $this->getIdForVpid($match[0]) ?: $match[0];
+        }, $stringWithVpids);
+
+        return is_numeric($stringWithIds) ? intval($stringWithIds) : $stringWithIds;
+
     }
 
     /**
