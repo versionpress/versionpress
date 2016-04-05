@@ -114,6 +114,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
+            pages: [],
             commits: [],
             message: HomePage.getErrorMessage(res),
             loading: false,
