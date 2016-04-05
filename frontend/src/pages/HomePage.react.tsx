@@ -188,6 +188,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         if (err) {
           this.setState({message: HomePage.getErrorMessage(res), loading: false});
         } else {
+          const router:ReactRouter.Context = (this.context as any).router;
+          router.transitionTo(routes.home);
           document.location.reload();
         }
       });
@@ -205,6 +207,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         if (err) {
           this.setState({message: HomePage.getErrorMessage(res), loading: false});
         } else {
+          const router:ReactRouter.Context = (this.context as any).router;
+          router.transitionTo(routes.home);
           document.location.reload();
         }
       });
@@ -383,7 +387,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       const page = (parseInt(this.props.params.page, 10) - 1) || 0;
       if (page > 0) {
         const router:ReactRouter.Context = (this.context as any).router;
-        router.transitionTo(routes.home)
+        router.transitionTo(routes.home);
       } else {
         this.fetchCommits();
       }
