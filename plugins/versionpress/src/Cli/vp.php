@@ -114,6 +114,19 @@ class VPCommand extends WP_CLI_Command {
     }
 
     /**
+     * Checks if VersionPress requirements are met.
+     *
+     * @subcommand check-requirements
+     */
+    public function checkRequirements($args, $assoc_args) {
+        // Check if the site is installed
+        $process = VPCommandUtils::runWpCliCommand('core', 'is-installed');
+        if ($process->isSuccessful()) {
+            $this->checkVpRequirements($assoc_args);
+        }
+    }
+
+    /**
      * Starts tracking the site
      *
      * --yes
@@ -180,9 +193,6 @@ class VPCommand extends WP_CLI_Command {
         require_once dirname($wpConfigPath) . '/' . $commonConfigName;
         require_once $wpConfigPath;
         require_once __DIR__ . '/../../bootstrap.php';
-        require_once ABSPATH . WPINC . '/formatting.php';
-        require_once ABSPATH . WPINC . '/theme.php';
-        require_once ABSPATH . WPINC . '/link-template.php';
 
         if (!VersionPress::isActive()) {
             WP_CLI::error('Unfortunately, this site was not tracked by VersionPress. Therefore, it cannot be restored.');
@@ -1009,6 +1019,10 @@ class VPCommand extends WP_CLI_Command {
      * @param $assoc_args
      */
     private function checkVpRequirements($assoc_args) {
+        require_once ABSPATH . WPINC . '/formatting.php';
+        require_once ABSPATH . WPINC . '/theme.php';
+        require_once ABSPATH . WPINC . '/link-template.php';
+
         global $versionPressContainer;
 
         $database = $versionPressContainer->resolve(VersionPressServices::WPDB);
