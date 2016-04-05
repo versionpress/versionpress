@@ -2,8 +2,6 @@
 
 import * as React from 'react';
 
-import './FlashMessage.less';
-
 interface FlashMessageProps extends React.Props<JSX.Element> {
   code: string;
   message: string;

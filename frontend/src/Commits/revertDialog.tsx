@@ -5,8 +5,6 @@ import * as request from 'superagent';
 import * as portal from '../common/portal';
 import * as WpApi from '../services/WpApi';
 
-import './revertDialog.less';
-
 const UndoEnabledDialog: React.StatelessComponent<{}> = () => {
   return (
     <div>

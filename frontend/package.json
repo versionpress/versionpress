@@ -6,7 +6,7 @@
     "loglevel": "warn"
   },
   "scripts": {
-    "postinstall": "./node_modules/.bin/tsd reinstall --save",
+    "postinstall": "./node_modules/.bin/tsd reinstall --clean --overwrite --save",
     "clean": "./node_modules/.bin/rimraf build/*",
     "prebuild": "npm run clean",
     "build": "node ./config/webpack-build.js",
@@ -27,11 +27,12 @@
     "file-loader": "0.8.4",
     "gulp-util": "3.0.7",
     "less": "2.5.3",
-    "less-loader": "^2.2.1",
-    "lodash": "3.10.1",
+    "less-loader": "2.2.1",
+    "lodash": "4.6.1",
     "moment": "2.10.6",
     "node-notifier": "4.3.1",
     "react": "^0.14.2",
+    "react-addons-update": "0.14.7",
     "react-dom": "^0.14.2",
     "react-router": "0.13.5",
     "rimraf": "2.4.3",

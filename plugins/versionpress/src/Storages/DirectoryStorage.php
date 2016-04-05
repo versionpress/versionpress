@@ -149,7 +149,8 @@ abstract class DirectoryStorage extends Storage {
     }
 
     private function loadAllFromFiles($entityFiles) {
-        $entities = array_map(array($this, 'deserializeEntity'), array_map('file_get_contents', $entityFiles));
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
+        $entities = array_map(array($this, 'deserializeEntity'), array_filter(@array_map('file_get_contents', $entityFiles), function ($item) { return $item !== FALSE; }));
         $vpIds = ArrayUtils::column($entities, $this->entityInfo->vpidColumnName);
         return array_combine($vpIds, $entities);
     }
@@ -164,7 +165,7 @@ abstract class DirectoryStorage extends Storage {
 
     public function loadEntity($id, $parentId = null) {
         $entities = $this->loadAllFromFiles(array($this->getEntityFilename($id)));
-        return $entities[$id];
+        return isset($entities[$id]) ? $entities[$id] : FALSE;
     }
 
     protected function flattenEntity($entity) {

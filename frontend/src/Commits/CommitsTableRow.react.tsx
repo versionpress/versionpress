@@ -8,8 +8,10 @@ import CommitsTableRowDetails from './CommitsTableRowDetails.react';
 interface CommitsTableRowProps extends React.Props<JSX.Element> {
   commit: Commit;
   enableActions: boolean;
+  isSelected: boolean;
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
+  onCommitSelect: (commits: Commit[], check: boolean, shiftKey: boolean) => void;
   diffProvider: {getDiff: (hash: string) => Promise<string>};
 }
 
@@ -33,8 +35,10 @@ export default class CommitsTableRow extends React.Component<CommitsTableRowProp
         <CommitsTableRowSummary
           commit={this.props.commit}
           enableActions={this.props.enableActions}
+          isSelected={this.props.isSelected}
           onUndo={this.props.onUndo}
           onRollback={this.props.onRollback}
+          onCommitSelect={this.props.onCommitSelect}
           onDetailsLevelChanged={detailsLevel => this.changeDetailsLevel(detailsLevel)}
           detailsLevel={this.state.detailsLevel}
         />
@@ -54,7 +58,7 @@ export default class CommitsTableRow extends React.Component<CommitsTableRowProp
   renderError() {
     return (
       <tr className='details-row error'>
-        <td colSpan={3}>{this.state.error}</td>
+        <td colSpan={4}>{this.state.error}</td>
       </tr>
     );
   }

@@ -746,16 +746,16 @@ class VPCommand extends WP_CLI_Command {
     }
 
     /**
-     * Reverts one commit
+     * Reverts commits
      *
      * ## OPTIONS
      *
      * <commit>
-     * : Hash of commit that will be reverted.
+     * : Hashes of commit that will be reverted (separated by comma).
      *
      * ## EXAMPLES
      *
-     *     wp vp undo a34bc28
+     *     wp vp undo a34bc28,d12ef22
      *
      * @synopsis <commit>
      *
@@ -773,15 +773,25 @@ class VPCommand extends WP_CLI_Command {
         /** @var GitRepository $repository */
         $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
 
-        $hash = $args[0];
-        $log = $repository->log($hash);
-        if (count($log) === 0) {
-            WP_CLI::error("Commit '$hash' does not exist.");
+        $initialCommitHash = $this->getInitialCommitHash($repository);
+
+        $commits = explode(',', $args[0]);
+        foreach ($commits as $hash) {
+            $log = $repository->log($hash);
+            if (!preg_match('/^[0-9a-f]+$/', $hash) || count($log) === 0) {
+                WP_CLI::error("Commit '$hash' does not exist.");
+            }
+            if ($log[0]->isMerge()) {
+                WP_CLI::error('Cannot undo merge commit.');
+            }
+            if (!$repository->wasCreatedAfter($hash, $initialCommitHash)) {
+                WP_CLI::error('Cannot undo changes before initial commit');
+            }
         }
 
         $this->switchMaintenance('on');
 
-        $status = $reverter->undo($hash);
+        $status = $reverter->undo($commits);
 
         if ($status === RevertStatus::VIOLATED_REFERENTIAL_INTEGRITY) {
             WP_CLI::error("Violated referential integrity. Objects with missing references cannot be restored. For example we cannot restore comment where the related post was deleted.", false);
@@ -797,6 +807,10 @@ class VPCommand extends WP_CLI_Command {
 
         if ($status === RevertStatus::REVERTING_MERGE_COMMIT) {
             WP_CLI::error("Cannot undo a merge commit.", false);
+        }
+
+        if ($status === RevertStatus::NOTHING_TO_COMMIT) {
+            WP_CLI::error("Nothing to commit. Current state is the same as the one after the undo.", false);
         }
 
         if ($status === RevertStatus::OK) {
@@ -836,15 +850,24 @@ class VPCommand extends WP_CLI_Command {
         /** @var GitRepository $repository */
         $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
 
+        $initialCommitHash = $this->getInitialCommitHash($repository);
+
         $hash = $args[0];
         $log = $repository->log($hash);
-        if (count($log) === 0) {
+        if (!preg_match('/^[0-9a-f]+$/', $hash) || count($log) === 0) {
             WP_CLI::error("Commit '$hash' does not exist.");
         }
+        if (!$repository->wasCreatedAfter($hash, $initialCommitHash) && $log[0]->getHash() !== $initialCommitHash) {
+            WP_CLI::error('Cannot roll back before initial commit');
+        }
+        if ($log[0]->getHash() === $repository->getLastCommitHash()) {
+            WP_CLI::error('Nothing to commit. Current state is the same as the one you want rollback to.');
+        }
+
 
         $this->switchMaintenance('on');
 
-        $status = $reverter->rollback($hash);
+        $status = $reverter->rollback(array($hash));
 
         if ($status === RevertStatus::NOTHING_TO_COMMIT) {
             WP_CLI::error("Nothing to commit. Current state is the same as the one you want rollback to.", false);
@@ -1058,6 +1081,18 @@ class VPCommand extends WP_CLI_Command {
         if (!$requirementsChecker->isEverythingFulfilled()) {
             WP_CLI::confirm('There are some warnings. Continue?', $assoc_args);
         }
+    }
+
+    /**
+     * @param GitRepository $repository
+     * @return string
+     */
+    private function getInitialCommitHash(GitRepository $repository) {
+        $preActivationHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
+        if (empty($preActivationHash)) {
+            return $repository->getInitialCommit()->getHash();
+        }
+        return $repository->getChildCommit($preActivationHash);
     }
 }
 
