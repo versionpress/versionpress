@@ -114,3 +114,9 @@ Pushes changes to another site instance. Does not create a merge; see [merging](
 ### vp apply-changes
 
 Applies changes found on the disk to the database. Useful e.g. after resolving merge conflicts. See [merging](../sync/merging).
+
+### vp check-requirements
+
+Checks if all requirements for using VersionPress are met on the target environment. 
+
+This command is usefull when you want to check if changes made on server (by you yourself, or hosting provider) does not break some of requirements.
