@@ -38,9 +38,9 @@ class PostChangeInfo extends EntityChangeInfo {
     private $postTitle;
 
     /**
-     * Serialized array of updated post properties.
+     * Array of updated post properties.
      *
-     * @var string
+     * @var array
      */
     private $postUpdatedProperties;
 
@@ -48,7 +48,7 @@ class PostChangeInfo extends EntityChangeInfo {
         parent::__construct("post", $action, $entityId);
         $this->postType = $postType;
         $this->postTitle = $postTitle;
-        $this->postUpdatedProperties = implode(",",$postUpdatedProperties);
+        $this->postUpdatedProperties = $postUpdatedProperties;
     }
 
     public function getPostType() {
@@ -67,13 +67,13 @@ class PostChangeInfo extends EntityChangeInfo {
 
         $titleTag = isset($tags[self::POST_TITLE_TAG]) ? $tags[self::POST_TITLE_TAG] : $entityId;
         $type = isset($tags[self::POST_TYPE_TAG]) ? $tags[self::POST_TYPE_TAG] : "post";
-        $updatedProperties = isset($tags[self::POST_UPDATED_PROPERTIES_TAG]) ? explode(",",$tags[self::POST_UPDATED_PROPERTIES_TAG]) : array();
+        $updatedProperties = isset($tags[self::POST_UPDATED_PROPERTIES_TAG]) ? explode(",", $tags[self::POST_UPDATED_PROPERTIES_TAG]) : array();
 
         return new self($action, $entityId, $type, $titleTag, $updatedProperties);
     }
 
     public function getChangeDescription() {
-        if($this->postType === "nav_menu_item") {
+        if ($this->postType === "nav_menu_item") {
             return "Updated menu items";
         }
         switch ($this->getAction()) {
@@ -91,7 +91,7 @@ class PostChangeInfo extends EntityChangeInfo {
                 return "Published {$this->postType} '{$this->postTitle}'";
         }
 
-        if(count(array_intersect(self::$CONTENT_PROPERTIES, explode(",",$this->postUpdatedProperties))) > 0) {
+        if (count(array_intersect(self::$CONTENT_PROPERTIES, $this->postUpdatedProperties)) > 0) {
             return "Edited {$this->postType} '{$this->postTitle}'";
         } else {
             return "Updated {$this->postType} '{$this->postTitle}'";
@@ -111,8 +111,17 @@ class PostChangeInfo extends EntityChangeInfo {
         return array(
             self::POST_TITLE_TAG => $this->postTitle,
             self::POST_TYPE_TAG => $this->postType,
-            self::POST_UPDATED_PROPERTIES_TAG => $this->postUpdatedProperties,
+            self::POST_UPDATED_PROPERTIES_TAG => implode(",", $this->postUpdatedProperties),
         );
     }
+
+    public function getPostUpdatedProperties() {
+        return $this->postUpdatedProperties;
+    }
+
+    public function setPostUpdatedProperties($postUpdatedProperties) {
+        $this->postUpdatedProperties = $postUpdatedProperties;
+    }
+
 
 }

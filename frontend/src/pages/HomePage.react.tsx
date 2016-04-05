@@ -10,6 +10,7 @@ import update = require('react-addons-update');
 import BulkActionPanel from '../BulkActionPanel/BulkActionPanel.react';
 import CommitPanel from '../CommitPanel/CommitPanel.react';
 import CommitsTable from '../Commits/CommitsTable.react';
+import Filter from '../Filter/Filter.react';
 import FlashMessage from '../common/FlashMessage.react';
 import ProgressBar from '../common/ProgressBar.react';
 import ServicePanel from '../ServicePanel/ServicePanel.react';
@@ -32,6 +33,7 @@ interface HomePageProps extends React.Props<JSX.Element> {
 
 interface HomePageState {
   pages?: number[];
+  query?: string;
   commits?: Commit[];
   selected?: Commit[];
   lastSelected?: Commit;
@@ -58,6 +60,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     super();
     this.state = {
       pages: [],
+      query: '',
       commits: [],
       selected: [],
       lastSelected: null,
@@ -69,6 +72,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       dirtyWorkingDirectory: false
     };
 
+    this.onFilter = this.onFilter.bind(this);
     this.onUndo = this.onUndo.bind(this);
     this.onRollback = this.onRollback.bind(this);
     this.onCommitSelect = this.onCommitSelect.bind(this);
@@ -107,17 +111,18 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
     const page = (parseInt(params.page, 10) - 1) || 0;
 
-    if (page === 0) {
+    if (page < 1) {
       router.transitionTo(routes.home);
     }
 
     WpApi
       .get('commits')
-      .query({page: page})
+      .query({page: page, query: encodeURIComponent(this.state.query)})
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
+            pages: [],
             commits: [],
             message: HomePage.getErrorMessage(res),
             loading: false,
@@ -154,7 +159,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     }
     WpApi
       .get('should-update')
-      .query({latestCommit: this.state.commits[0].hash})
+      .query({query: encodeURIComponent(this.state.query), latestCommit: this.state.commits[0].hash})
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
@@ -371,6 +376,20 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       });
   }
 
+  onFilter(query: string) {
+    this.setState({
+      query: query
+    }, () => {
+      const page = (parseInt(this.props.params.page, 10) - 1) || 0;
+      if (page > 0) {
+        const router:ReactRouter.Context = (this.context as any).router;
+        router.transitionTo(routes.home)
+      } else {
+        this.fetchCommits();
+      }
+    });
+  }
+
   onUndo(e) {
     e.preventDefault();
     const hash = e.target.getAttribute('data-hash');
@@ -445,6 +464,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           : null
         }
         <div className='tablenav top'>
+          <Filter
+            onSubmit={this.onFilter}
+          />
           <BulkActionPanel
             onBulkAction={this.onBulkAction.bind(this)}
             onClearSelection={this.onClearSelection.bind(this)}

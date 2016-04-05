@@ -14,28 +14,63 @@ class PostChangeInfoPreprocessor implements ChangeInfoPreprocessor {
      * @return ChangeInfo[][]
      */
     function process($changeInfoList) {
-        $entities = array();
 
-        // 1) Find all post/draft and post/publish actions and group their indices in $changeInfoList by VPID
-        foreach ($changeInfoList as $key => $changeInfo) {
-            if ($changeInfo instanceof PostChangeInfo && in_array($changeInfo->getAction(), array("draft", "publish"))) {
-                if (!isset($entities[$changeInfo->getEntityId()])) {
-                    $entities[$changeInfo->getEntityId()] = array();
-                }
-                $entities[$changeInfo->getEntityId()][$changeInfo->getAction()] = $key;
-            }
-        }
+        // 1) Find and replace combination of post/draft and post/publish with single post/create action
+        $this->replaceChangeInfosCombination($changeInfoList, array("draft", "publish"), "create");
 
-        // 2) Replace combination of post/draft and post/publish with single post/create action
-        foreach($entities as $entityId => $changeInfos) {
-            if(count($changeInfos) == 2) {
-                /** @var PostChangeInfo $publish */
-                $publish = $changeInfoList[$changeInfos["publish"]];
-                unset($changeInfoList[$changeInfos["draft"]]);
-                unset($changeInfoList[$changeInfos["publish"]]);
-                $changeInfoList[] = new PostChangeInfo("create", $publish->getEntityId(), $publish->getPostType(), $publish->getPostTitle());
-            }
-        }
+        // 1) Find and replace combination of post/draft and post/edit with single post/create action
+        $this->replaceChangeInfosCombination($changeInfoList, array("draft", "edit"), "draft");
+
+        // 1) Find and replace combination of post/create and post/edit with single post/create action
+        $this->replaceChangeInfosCombination($changeInfoList, array("create", "edit"), "create");
+
         return array($changeInfoList);
     }
+
+    /**
+     * Find all changeInfos and group them according to provided indicies in $changeInfoList by VPID
+     * @param ChangeInfo[] $changeInfoList
+     * @param array $indicies
+     * @return array
+     */
+    private function getChangeInfosByIndicies($changeInfoList, $indicies) {
+        $entities = array();
+        foreach ($changeInfoList as $key => $changeInfo) {
+            if ($changeInfo instanceof PostChangeInfo && in_array($changeInfo->getAction(), $indicies)) {
+                $entities[$changeInfo->getEntityId()][$changeInfo->getAction()][] = $key;
+            }
+        }
+        return $entities;
+    }
+
+    /**
+     * Removes all changeInfos from source changeInfoList
+     * @param $changeInfoList
+     * @param $changeInfos
+     */
+    private function removeChangeInfos(&$changeInfoList, $changeInfos) {
+        foreach ($changeInfos as $indicie => $indexes) {
+            foreach ($indexes as $index) {
+                unset($changeInfoList[$index]);
+            }
+        }
+    }
+
+    /**
+     * @param $changeInfoList
+     * @param array $indicies
+     * @param string $resultAction
+     */
+    private function replaceChangeInfosCombination(&$changeInfoList, $indicies, $resultAction) {
+        $entities = $this->getChangeInfosByIndicies($changeInfoList, $indicies);
+        foreach ($entities as $entityId => $changeInfos) {
+            if (count($changeInfos) == 2) {
+                /** @var PostChangeInfo $sourceChangeInfo */
+                $sourceChangeInfo = $changeInfoList[$changeInfos[$indicies[0]][0]];
+                $this->removeChangeInfos($changeInfoList, $changeInfos);
+                $changeInfoList[] = new PostChangeInfo($resultAction, $sourceChangeInfo->getEntityId(), $sourceChangeInfo->getPostType(), $sourceChangeInfo->getPostTitle());
+            }
+        }
+    }
+
 }

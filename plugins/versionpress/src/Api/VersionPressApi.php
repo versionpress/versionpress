@@ -23,6 +23,7 @@ use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\BugReporter;
+use VersionPress\Utils\QueryLanguageUtils;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -55,6 +56,9 @@ class VersionPressApi {
             'args' => array(
                 'page' => array(
                     'default' => '0'
+                ),
+                'query' => array(
+                    'default' => array()
                 )
             ),
             'permission_callback' => array($this, 'checkPermissions')
@@ -177,6 +181,13 @@ class VersionPressApi {
      */
     public function getCommits(WP_REST_Request $request) {
         $gitLogPaginator = new GitLogPaginator($this->gitRepository);
+
+        $query = urldecode(stripslashes($request['query']));
+        $rules = QueryLanguageUtils::createRulesFromQueries(array($query));
+        $gitLogQuery = !empty($rules)
+            ? QueryLanguageUtils::createGitLogQueryFromRule($rules[0])
+            : '';
+        $gitLogPaginator->setQuery($gitLogQuery);
         $gitLogPaginator->setCommitsPerPage(25);
 
         $page = intval($request['page']);
@@ -369,8 +380,15 @@ class VersionPressApi {
 
         $latestCommit = $request['latestCommit'];
 
+        $query = urldecode(stripslashes($request['query']));
+        $rules = QueryLanguageUtils::createRulesFromQueries(array($query));
+        $gitLogQuery = !empty($rules)
+            ? QueryLanguageUtils::createGitLogQueryFromRule($rules[0])
+            : '';
+        $repoLatestCommit = $repository->getLastCommitHash($gitLogQuery);
+
         return new WP_REST_Response(array(
-            "update" => $repository->wasCreatedAfter("HEAD", $latestCommit),
+            "update" => $repository->wasCreatedAfter($repoLatestCommit, $latestCommit),
             "cleanWorkingDirectory" => $repository->isCleanWorkingDirectory()
         ));
     }
