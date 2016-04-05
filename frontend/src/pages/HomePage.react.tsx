@@ -103,7 +103,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
     const page = (parseInt(params.page, 10) - 1) || 0;
 
-    if (page === 0) {
+    if (page < 1) {
       router.transitionTo(routes.home);
     }
 
@@ -312,7 +312,15 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   onFilter(query: string) {
     this.setState({
       query: query
-    }, this.fetchCommits);
+    }, () => {
+      const page = (parseInt(this.props.params.page, 10) - 1) || 0;
+      if (page > 0) {
+        const router:ReactRouter.Context = (this.context as any).router;
+        router.transitionTo(routes.home)
+      } else {
+        this.fetchCommits();
+      }
+    });
   }
 
   onUndo(e) {
