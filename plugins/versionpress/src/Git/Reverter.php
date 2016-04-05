@@ -12,6 +12,7 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\ArrayUtils;
+use VersionPress\Utils\Cursor;
 use VersionPress\Utils\ReferenceUtils;
 use wpdb;
 
@@ -188,12 +189,14 @@ class Reverter {
         }
 
         foreach ($entityInfo->valueReferences as $reference => $referencedEntityName) {
-            list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
+            list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
             if (!isset($entity[$sourceColumn]) || $entity[$sourceColumn] != $sourceValue || !isset($entity[$valueColumn])) {
                 continue;
             }
 
-            $referencedEntityId = $entity[$valueColumn];
+            if ((is_numeric($entity[$valueColumn]) && intval($entity[$valueColumn]) === 0) || $entity[$valueColumn] === '') {
+                continue;
+            }
 
             if ($referencedEntityName[0] === '@') {
                 $entityNameProvider = substr($referencedEntityName, 1); // strip the '@'
@@ -203,10 +206,29 @@ class Reverter {
                 }
             }
 
-            $entityExists = $this->entityExists($referencedEntityName, $referencedEntityId, $parentId);
-            if (!$entityExists) {
-                return false;
+            if ($pathInStructure) {
+                $entity[$valueColumn] = unserialize($entity[$valueColumn]);
+                $paths = ReferenceUtils::getMatchingPaths($entity[$valueColumn], $pathInStructure);
+            } else {
+                $paths = [[]]; // root = the value itself
             }
+
+            /** @var Cursor[] $cursors */
+            $cursors = array_map(function ($path) use (&$entity, $valueColumn) { return new Cursor($entity[$valueColumn], $path); }, $paths);
+
+            foreach ($cursors as $cursor) {
+                $vpid = $cursor->getValue();
+                $entityExists = $this->entityExists($referencedEntityName, $vpid, $parentId);
+                if (!$entityExists) {
+                    return false;
+                }
+            }
+
+            if ($pathInStructure) {
+                $entity[$valueColumn] = serialize($entity[$valueColumn]);
+            }
+
+
         }
 
         return true;
@@ -255,15 +277,33 @@ class Reverter {
                     }
                 }
             } elseif (isset($otherEntityValueReferences[$reference])) { // Value reference
-                list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
+                list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
 
                 foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
-                    if (isset($possiblyReferencingEntity[$sourceColumn]) && $possiblyReferencingEntity[$sourceColumn] == $sourceValue && isset($possiblyReferencingEntity[$valueColumn]) && $possiblyReferencingEntity[$valueColumn] === $entityId) {
-                        return true;
+                    if (isset($possiblyReferencingEntity[$sourceColumn]) && $possiblyReferencingEntity[$sourceColumn] == $sourceValue && isset($possiblyReferencingEntity[$valueColumn])) {
+                        if ((is_numeric($possiblyReferencingEntity[$valueColumn]) && intval($possiblyReferencingEntity[$valueColumn]) === 0) || $possiblyReferencingEntity[$valueColumn] === '') {
+                            continue;
+                        }
+
+                        if ($pathInStructure) {
+                            $possiblyReferencingEntity[$valueColumn] = unserialize($possiblyReferencingEntity[$valueColumn]);
+                            $paths = ReferenceUtils::getMatchingPaths($possiblyReferencingEntity[$valueColumn], $pathInStructure);
+                        } else {
+                            $paths = [[]]; // root = the value itself
+                        }
+
+                        /** @var Cursor[] $cursors */
+                        $cursors = array_map(function ($path) use (&$possiblyReferencingEntity, $valueColumn) { return new Cursor($possiblyReferencingEntity[$valueColumn], $path); }, $paths);
+
+                        foreach ($cursors as $cursor) {
+                            $vpid = $cursor->getValue();
+                            if ($vpid === $entityId) {
+                                return true;
+                            }
+                        }
                     }
                 }
             }
-
         }
 
         return false;
