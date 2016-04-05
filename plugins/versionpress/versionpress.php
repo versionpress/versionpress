@@ -489,26 +489,7 @@ function vp_register_hooks() {
         }
 
         add_action($actionName, function () use ($allRulesInInterval) {
-            global $versionPressContainer;
-            $dbSchemaInfo = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
-            $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
-            $wpdb = $versionPressContainer->resolve(VersionPressServices::WPDB);
-            $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
-
-            foreach ($allRulesInInterval as $entityName => $rulesWithInterval) {
-                $storageFactory->getStorage($entityName)->ignoreFrequentlyWrittenEntities = false;
-
-                $table = $dbSchemaInfo->getPrefixedTableName($entityName);
-                foreach ($rulesWithInterval as $ruleAndInterval) {
-                    $restriction = \VersionPress\Utils\QueryLanguageUtils::createSqlRestrictionFromRule($ruleAndInterval['rule']);
-                    $sql = "SELECT * FROM $table WHERE $restriction";
-
-                    $results = $wpdb->get_results($sql, ARRAY_A);
-                    foreach ($results as $data) {
-                        $wpdbMirrorBridge->update($table, $data, $data);
-                    }
-                }
-            }
+            vp_save_frequently_written_entities($allRulesInInterval);
         });
     }
 
@@ -934,3 +915,7 @@ function versionpress_api_init() {
     $vpApi = new VersionPressApi($gitRepository, $reverter, $synchronizationProcess);
     $vpApi->register_routes();
 }
+
+add_action('init', function () {
+    update_option('akismet_spam_count', ($v = get_option('akismet_spam_count', 0)) + 1);
+});

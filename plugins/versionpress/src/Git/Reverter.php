@@ -67,6 +67,7 @@ class Reverter {
             return RevertStatus::NOT_CLEAN_WORKING_DIRECTORY;
         }
 
+        vp_commit_all_frequently_written_entities();
         uasort($commits, function ($a, $b) { return $this->repository->wasCreatedAfter($b, $a); });
 
         $modifiedFiles = array();
