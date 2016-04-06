@@ -8,7 +8,7 @@ export const getGitBranchColor = (function() {
     'master': '#e74c3c'
   };
 
-  function func(branchName: string) {
+  return function (branchName: string) {
     if (branchName in memo) {
       return memo[branchName];
     } else {
@@ -19,7 +19,5 @@ export const getGitBranchColor = (function() {
       memo[branchName] = color;
       return color;
     }
-  }
-
-  return func;
+  };
 })();
