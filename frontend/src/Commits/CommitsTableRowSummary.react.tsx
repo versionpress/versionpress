@@ -40,7 +40,7 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
           <img
             className='avatar'
             src={commit.author.avatar}
-            title={commit.author.name + ' <' + commit.author.email + '>'}
+            title={this.getAuthorTooltip(commit)}
             width={20}
             height={20}
           />
@@ -128,6 +128,17 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
     const title = <span>Undo <em>{this.props.commit.message}</em>?</span>;
     const body = <UndoDisabledDialog />;
     portal.alertDialog(title, body);
+  }
+
+  private getAuthorTooltip(commit: Commit) {
+    const author = commit.author;
+    if (author.name === 'Non-admin action') {
+      return 'This action is not associated with any user, e.g., it was a public comment';
+    } else if (author.name === 'WP-CLI') {
+      return 'This action was done via WP-CLI';
+    }
+
+    return author.name + ' <' + author.email + '>';
   }
 
   private toggleDetails() {
