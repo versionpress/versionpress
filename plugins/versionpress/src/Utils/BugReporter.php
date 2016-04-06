@@ -2,7 +2,6 @@
 
 namespace VersionPress\Utils;
 use CURLFile;
-use Utils\SystemInfo;
 
 /**
  * Helper class for sending bug reports

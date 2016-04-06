@@ -248,30 +248,6 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     this.setState({displayServicePanel: !this.state.displayServicePanel});
   }
 
-  sendBugReport(values: Object) {
-    const progressBar = this.refs['progress'] as ProgressBar;
-    progressBar.progress(0);
-
-    WpApi
-      .post('submit-bug')
-      .send(values)
-      .on('progress', (e) => progressBar.progress(e.percent))
-      .end((err: any, res: request.Response) => {
-        if (err) {
-          this.setState({message: HomePage.getErrorMessage(res)});
-        } else {
-          this.setState({
-            displayServicePanel: false,
-            message: {
-              code: 'updated',
-              message: 'Bug report was sent. Thank you.'
-            }
-          });
-        }
-        return !err;
-      });
-  }
-
   onCommitSelect(commits: Commit[], check: boolean, shiftKey: boolean) {
     let selected = this.state.selected,
         lastSelected = this.state.lastSelected;
@@ -444,7 +420,6 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         }
         <ServicePanel
           display={this.state.displayServicePanel}
-          onSubmit={this.sendBugReport.bind(this)}
         />
         {this.state.dirtyWorkingDirectory
           ? <CommitPanel

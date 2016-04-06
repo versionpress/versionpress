@@ -3,7 +3,8 @@
 const config = {
 
   api: {
-    root: 'http://localhost/wordpress'
+    root: 'http://localhost/wordpress',
+    adminUrl: 'http://localhost/wordpress/wp-admin'
   }
 
 };
