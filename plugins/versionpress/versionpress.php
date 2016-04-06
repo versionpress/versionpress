@@ -916,7 +916,3 @@ function versionpress_api_init() {
     $vpApi = new VersionPressApi($gitRepository, $reverter, $synchronizationProcess);
     $vpApi->register_routes();
 }
-
-add_action('init', function () {
-    update_option('akismet_spam_count', ($v = get_option('akismet_spam_count', 0)) + 1);
-});
