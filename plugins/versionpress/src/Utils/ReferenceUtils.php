@@ -82,6 +82,15 @@ class ReferenceUtils {
      * The pattern comes from a schema file. For example line `some_option[/\d+/]["key"]` contains
      * pattern `[/\d+/]["key"]`. It can contain regular expressions to match multiple / dynamic keys.
      *
+     * Examples:
+     * For $value = [0 => [key => value], 1 => [key => value]]
+     * And $pathInStructure = [0]["key"]
+     * Returns [[0, key]]
+     *
+     * For the same $value nad $pathInStructure = [/\d+/]["key"]
+     * Returns [[0, key], [1, key]]
+     *
+     *
      * @param array|object $value
      * @param string $pathInStructure
      * @return array
