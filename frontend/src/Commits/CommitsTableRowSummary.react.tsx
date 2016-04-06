@@ -36,6 +36,15 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
           : <td className='column-cb' />
         }
         <td className='column-date' title={moment(commit.date).format('LLL')}>{moment(commit.date).fromNow()}</td>
+        <td className='column-author'>
+          <img
+            className='avatar'
+            src={commit.author.avatar}
+            title={commit.author.name + ' <' + commit.author.email + '>'}
+            width={20}
+            height={20}
+          />
+        </td>
         <td className='column-message'>
           {commit.isMerge
             ? <span className='merge-icon' title='Merge commit'>M</span>

@@ -11,7 +11,7 @@ export default class CommitsTableNote extends React.Component<CommitsTableNotePr
   render() {
     return (
       <tr className='note'>
-        <td colSpan={4}>{this.props.message}</td>
+        <td colSpan={5}>{this.props.message}</td>
       </tr>
     );
   }
