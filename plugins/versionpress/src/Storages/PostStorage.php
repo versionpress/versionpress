@@ -8,14 +8,6 @@ use VersionPress\Utils\EntityUtils;
 
 class PostStorage extends DirectoryStorage {
 
-    /** @var bool[] */
-    private $existenceCache = array();
-
-    function __construct($directory, $entityInfo) {
-        parent::__construct($directory, $entityInfo);
-    }
-
-
     public function shouldBeSaved($data) {
         $isExistingEntity = $this->entityExistedBeforeThisRequest($data);
 
@@ -63,18 +55,5 @@ class PostStorage extends DirectoryStorage {
         $type = $newEntity['post_type'];
 
         return new PostChangeInfo($action, $newEntity['vp_id'], $type, $title, array_keys($diff));
-    }
-
-    private function entityExistedBeforeThisRequest($data) {
-        if (!isset($data['vp_id'])) {
-            return false;
-        }
-
-        $id = $data['vp_id'];
-        if (!isset($this->existenceCache[$id])) {
-            $this->existenceCache[$id] = $this->exists($id);
-        }
-
-        return $this->existenceCache[$id];
     }
 }
