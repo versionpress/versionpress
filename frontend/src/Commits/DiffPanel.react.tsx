@@ -118,9 +118,9 @@ export default class DiffPanel extends React.Component<DiffPanelProps, any> {
           <table className='chunk-separator' key={'sep' + i}>
             <tbody>
               <tr className='line'>
-                <td className='line-left'><span className='hellip'>\u00B7\u00B7\u00B7</span></td>
+                <td className='line-left'><span className='hellip'>&middot;&middot;&middot;</span></td>
                 <td className='line-separator' />
-                <td className='line-right'><span className='hellip'>\u00B7\u00B7\u00B7</span></td>
+                <td className='line-right'><span className='hellip'>&middot;&middot;&middot;</span></td>
               </tr>
               <tr className='line'>
                 <td className='line-left' />
