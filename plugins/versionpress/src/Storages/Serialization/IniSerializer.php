@@ -1,6 +1,9 @@
 <?php
 
-namespace VersionPress\Utils;
+namespace VersionPress\Storages\Serialization;
+
+use Nette\Utils\Strings;
+use VersionPress\Utils\StringUtils;
 
 /**
  * Serializes and deserializes data arrays into INI strings.
@@ -94,7 +97,9 @@ class IniSerializer {
                 foreach ($value as $arrayKey => $arrayValue) {
                     $output[] = self::serializeKeyValuePair($key . "[$arrayKey]", $arrayValue);
                 }
-
+            } elseif (StringUtils::isSerializedValue($value)) {
+                $lines = SerializedDataToIniConverter::toIniLines($key, $value);
+                $output = array_merge($output, $lines);
             } else {
                 $output[] = self::serializeKeyValuePair($key, $value);
             }
@@ -110,7 +115,8 @@ class IniSerializer {
      * @return mixed
      */
     private static function escapeString($str) {
-        $str = str_replace('"', '\"', $str);
+        $str = str_replace('\\', '\\\\', $str);
+        $str = str_replace('"', '\\"', $str);
         return $str;
     }
 
@@ -122,7 +128,8 @@ class IniSerializer {
      * @return mixed
      */
     private static function unescapeString($str) {
-        $str = str_replace('\"', '"', $str);
+        $str = str_replace('\\\\', '\\', $str);
+        $str = str_replace('\\"', '"', $str);
         return $str;
     }
 
@@ -139,6 +146,8 @@ class IniSerializer {
         $deserialized = parse_ini_string($string, true, INI_SCANNER_RAW);
         $deserialized = self::restoreTypesOfValues($deserialized);
         $deserialized = self::sanitizeSectionsAndKeys_removePlaceholders($deserialized);
+        $deserialized = self::restorePhpSerializedData($deserialized);
+        $deserialized = self::expandArrays($deserialized);
         $deserialized = self::eolWorkaround_removePlaceholders($deserialized);
         return $deserialized;
     }
@@ -159,17 +168,55 @@ class IniSerializer {
      * @return mixed
      */
     private static function eolWorkaround_addPlaceholders($iniString) {
+        $prefaceString = ' = "'; // sequence of characters before string value
 
-        // https://regex101.com/r/cJ6eN0/4
-        $stringValueRegEx = "/[ =]\"(.*)(?<!\\\\)\"/sU";
+        $position = 0;
+        $length = strlen($iniString);
+        $result = "";
 
-        $iniString = preg_replace_callback($stringValueRegEx, array('self', 'replace_eol_callback'), $iniString);
+        // Read the string char by char
+        while ($position < $length) {
+            $nextPrefacePos = strpos($iniString, $prefaceString, $position);
 
-        return $iniString;
-    }
+            if ($nextPrefacePos === false) {
+                // There are no more string values
+                // Just append the rest of the string and we're done
+                $result .= substr($iniString, $position);
+                break;
+            }
 
-    private static function replace_eol_callback($matches) {
-        return self::getReplacedEolString($matches[0], "charsToPlaceholders");
+            // Append everything from the end of last string value to the start of another
+            $result .= StringUtils::substringFromTo($iniString, $position, $nextPrefacePos + strlen($prefaceString));
+
+            // Set position to the start of the string value
+            $position = $nextPrefacePos + strlen($prefaceString);
+            $stringBeginPos = $stringEndPos = $position;
+            $isEndOfString = false;
+
+            while (!$isEndOfString) {
+
+                if ($iniString[$position] === '\\') {
+                    // Found escaped character
+                    // Skip this one and the following one
+                    $position += 2;
+                    continue;
+                } else if ($iniString[$position] === '"') {
+                    // This is it. Unescaped double-quote means that the string value ends here.
+                    $isEndOfString = true;
+                    $stringEndPos = $position;
+                } else {
+                    // Regular character. Boooring - move along.
+                    $position += 1;
+                }
+            }
+
+            // OK. We have the beginning and the end. Let's replace all line-endings with placeholders.
+            $value = StringUtils::substringFromTo($iniString, $stringBeginPos, $stringEndPos);
+            $result .= self::getReplacedEolString($value, 'charsToPlaceholders');
+
+        }
+
+        return $result;
     }
 
     /**
@@ -231,8 +278,8 @@ class IniSerializer {
         }, $string);
 
         // Replace brackets and quotes in keys
-        // https://regex101.com/r/iD5oO0/2
-        $string = preg_replace_callback("/^(.*?)(\\[[^\\]]*\\])? = /m", function ($match) use ($sanitizedChars) {
+        // https://regex101.com/r/iD5oO0/3
+        $string = preg_replace_callback("/^(.*?) = /m", function ($match) use ($sanitizedChars) {
             $keyWithPlaceholders = strtr($match[1], $sanitizedChars);
             return $keyWithPlaceholders . (isset($match[2]) ? $match[2] : "") . " = ";
         }, $string);
@@ -253,6 +300,48 @@ class IniSerializer {
         return $result;
     }
 
+    /**
+     * Transforms e.g.
+     * [
+     *  'key' => 'value',
+     *  'another_key[0]' => 'value',
+     *  'another_key[1]' => 'another value',
+     * ]
+     *
+     * to
+     * [
+     *  'key' => 'value',
+     *  'another_key' => [
+     *    0 => 'value',
+     *    1 => 'another value',
+     *  ]
+     * ]
+     *
+     *
+     * @param $deserialized
+     * @return array
+     */
+    private static function expandArrays($deserialized) {
+        $dataWithExpandedArrays = [];
+
+        foreach ($deserialized as $key => $value) {
+            if (is_array($value)) {
+                $value = self::expandArrays($value);
+            }
+
+            // https://regex101.com/r/bA6uD2/3
+            if (preg_match("/(.*)\\[([^]]+)\\]$/", $key, $matches)) {
+                $originalKey = $matches[1];
+                $subkey = $matches[2];
+                $dataWithExpandedArrays[$originalKey][$subkey] = $value;
+            } else {
+                $dataWithExpandedArrays[$key] = $value;
+            }
+        }
+
+        return $dataWithExpandedArrays;
+    }
+
     private static function restoreTypesOfValues($deserialized) {
         $result = array();
         foreach ($deserialized as $key => $value) {
@@ -265,5 +354,56 @@ class IniSerializer {
             }
         }
         return $result;
+    }
+
+    /**
+     * Converts all PHP-serialized data in the INI (multiple lines, made for easy merging)
+     * to the original PHP-serialized strings.
+     *
+     * Example:
+     *
+     * [
+     *  'some_option' => [
+     *    'option_value' => '<<<serialized>>> <array>',
+     *    'option_value[0]' = 'some serialized value',
+     *    'autoload' => 1,
+     *  ]
+     * ]
+     *
+     *
+     * is converted to
+     *
+     * [
+     *  'some_option' => [
+     *    'option_value' => 'a:1:{i:0;s:21:"some serialized value";}',
+     *    'autoload' => 1,
+     * ]
+     *
+     *
+     *
+     * @param $deserialized
+     * @return array
+     */
+    private static function restorePhpSerializedData($deserialized) {
+        $keysToRestore = [];
+
+        foreach ($deserialized as $key => $value) {
+            if (is_array($value)) {
+                $deserialized[$key] = self::restorePhpSerializedData($value);
+            } else if (Strings::startsWith($value, SerializedDataToIniConverter::SERIALIZED_MARKER)) {
+                $keysToRestore[] = $key;
+            }
+        }
+
+        foreach ($keysToRestore as $key) {
+            $relatedKeys = array_filter($deserialized, function ($maybeRelatedKey) use ($key) {
+                return Strings::startsWith($maybeRelatedKey, $key);
+            }, ARRAY_FILTER_USE_KEY);
+
+            $deserialized = array_diff_key($deserialized, $relatedKeys);
+            $deserialized[$key] = SerializedDataToIniConverter::fromIniLines($key, $relatedKeys);
+        }
+
+        return $deserialized;
     }
 }

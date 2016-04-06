@@ -87,6 +87,48 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         $this->url('wp-admin/admin.php?page=versionpress/');
     }
 
+    public function prepare_undoToTheSameState() {
+        $this->createTestPost();
+        $this->switchToHtmlGui();
+        $this->url('wp-admin/admin.php?page=versionpress/');
+        $this->undoLastCommit();
+    }
+
+    public function prepare_rollbackToTheSameState() {
+        $postId = $this->createTestPost();
+        self::$wpAutomation->deletePost($postId);
+        $this->switchToHtmlGui();
+        $this->url('wp-admin/admin.php?page=versionpress/');
+    }
+
+    public function rollbackToTheSameState() {
+        $this->rollbackToNthCommit(3);
+    }
+
+    public function prepare_undoMultipleCommits() {
+        throw new \PHPUnit_Framework_SkippedTestError("There is no way to undo multiple commits in the old GUI");
+    }
+
+    public function undoMultipleCommits() {
+
+    }
+
+    public function prepare_undoMultipleDependentCommits() {
+        throw new \PHPUnit_Framework_SkippedTestError("There is no way to undo multiple commits in the old GUI");
+    }
+
+    public function undoMultipleDependentCommits() {
+
+    }
+
+    public function prepare_undoMultipleCommitsThatCannotBeReverted() {
+        throw new \PHPUnit_Framework_SkippedTestError("There is no way to undo multiple commits in the old GUI");
+    }
+
+    public function undoMultipleCommitsThatCannotBeReverted() {
+        
+    }
+
     //---------------------
     // Helper methods
     //---------------------

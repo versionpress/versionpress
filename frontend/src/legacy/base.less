@@ -1,0 +1,101 @@
+.no-wp {
+  body {
+    color: #444;
+    font-family: "Open Sans", sans-serif;
+    font-size: 13px;
+    line-height: 1.4;
+    min-width: 600px;
+    -webkit-font-smoothing: subpixel-antialiased;
+    padding: 0 30px 65px 20px;
+    background: #f1f1f1;
+  }
+
+  a,
+  div {
+    outline: 0;
+  }
+
+  a {
+    color: #0074a2;
+    transition-property: border, background, color;
+    transition-duration: .05s;
+    transition-timing-function: ease-in-out;
+
+    &:active,
+    &:hover {
+      color: #2ea2cc;
+    }
+
+    &:focus {
+      color: #124964;
+      box-shadow: 0 0 0 1px #5b9dd9,
+      0 0 2px 1px rgba(30,140,190,.8);
+    }
+  }
+
+  p {
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 1em 0;
+  }
+
+  .alignleft {
+    float: left;
+  }
+
+  .screen-reader-text,
+  .screen-reader-text span,
+  .ui-helper-hidden-accessible {
+    position: absolute;
+    margin: -1px;
+    padding: 0;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    border: 0;
+    word-wrap: normal!important;
+  }
+
+  .undo-warning {
+    padding-left: 24px;
+
+    .icon {
+      position: absolute;
+      margin: 3px 0 0 -24px;
+    }
+  }
+
+  .welcome-panel {
+    position: relative;
+    overflow: auto;
+    margin: 16px 0;
+    padding: 23px 10px;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    background: #fff;
+    font-size: 13px;
+    line-height: 2.1;
+
+    h3 {
+      margin: 0;
+      font-size: 21px;
+      font-weight: 400;
+      line-height: 1.2;
+    }
+
+    h4 {
+      margin: 1.33em 0 0;
+      font-size: 16px;
+    }
+  }
+
+  .welcome-panel-content {
+    margin-left: 13px;
+    max-width: 1500px;
+  }
+  .welcome-panel .about-description {
+    font-size: 16px;
+    margin: 23px 0 10px;
+  }
+}

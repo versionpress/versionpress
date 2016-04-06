@@ -191,3 +191,29 @@ It is also recommended to install [React Developer Tools](https://chrome.google.
 ## Testing
 
 Testing is covered by separate page, see [Testing](./Testing.md).
+
+
+## Windows tips
+
+While most VersionPress developers (and WP developers in general) are on Macs, we try to provide similar dev experience on all platforms. Here's a couple of tips for Windows users.
+
+
+### WampServer
+
+There are many WAMP stacks available for Windows but we recommend [**WampServer**](http://www.wampserver.com/en/). The current 3.0 version contains both PHP 5.6 and 7.0 which is good for development.
+
+Most tips below assume WampServer / are tailored to it.
+
+
+### Xdebug
+
+Beware that WampServer comes with **two `php.ini` files**, one for the web server and one command-line PHP.
+
+- For the web server, you can just click the tray icon > *PHP* > *PHP Settings* > *(Xdebug): Remote Debug*.
+- For command-line debugging, e.g., unit tests in PhpStorm, you need to edit `php.ini` file in C:\wamp\bin\php\phpx.y.z. Copy the values from `phpForApache.ini`, e.g.:
+
+```
+[xdebug]
+zend_extension ="C:/wamp/bin/php/php5.6.16/zend_ext/php_xdebug-2.4.0rc2-5.6-vc11-x86_64.dll"
+xdebug.remote_enable = On
+```

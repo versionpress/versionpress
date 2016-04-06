@@ -1,0 +1,101 @@
+.no-wp {
+  table {
+    &.fixed {
+      table-layout: fixed;
+    }
+
+    &.widefat {
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    }
+  }
+
+  .widefat {
+    border-spacing: 0;
+    width: 100%;
+    clear: both;
+    margin: 0;
+
+    * {
+      word-wrap: break-word;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    td,
+    th {
+      overflow: hidden;
+      color: #555;
+      padding: 8px 10px;
+    }
+
+    th {
+      font-weight: 400;
+      text-align: left;
+      line-height: 1.3;
+      font-size: 14px;
+    }
+
+    td {
+      font-size: 13px;
+      line-height: 1.5;
+      vertical-align: top;
+    }
+
+    tfoot td,
+    th,
+    thead td {
+      input {
+        margin: 0 0 0 8px;
+        padding: 0;
+        vertical-align: text-top;
+      }
+      input[type=checkbox] {
+        margin-top: -1px;
+      }
+    }
+
+    tbody th,
+    tfoot td,
+    thead td {
+      &.check-column {
+        padding: 11px 0 0 3px;
+      }
+    }
+
+    thead,
+    tfoot {
+      td.check-column {
+        padding-top: 4px;
+        vertical-align: middle;
+      }
+    }
+
+    .check-column {
+      width: 2.2em;
+      padding: 6px 0 25px;
+      vertical-align: top;
+    }
+  }
+
+  .tablenav {
+    clear: both;
+    height: 30px;
+    margin: 6px 0 4px;
+    vertical-align: middle;
+
+    .actions {
+      padding: 2px 8px 0 0;
+      overflow: hidden;
+
+      select {
+        float: left;
+        margin-right: 6px;
+        max-width: 200px;
+      }
+    }
+  }
+}

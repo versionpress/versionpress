@@ -111,10 +111,19 @@ class GitRepository {
     /**
      * Gets last (most recent) commit hash in the repository, or an empty string is there are no commits.
      *
+     * @param string $options Options passed to git log
      * @return string Empty string or SHA1
      */
-    public function getLastCommitHash() {
-        $result = $this->runShellCommand("git rev-parse HEAD");
+    public function getLastCommitHash($options = "") {
+        if (!empty($options)) {
+            $command = 'git log --pretty=format:"%%H" --max-count=1';
+            $command .= " " . $options;
+        } else {
+            $command = 'git rev-parse HEAD';
+        }
+
+        $result = $this->runShellCommand($command);
+
         if ($result["stderr"]) {
             return "";
         } else {
@@ -135,16 +144,19 @@ class GitRepository {
     /**
      * Returns an array of Commits based on {@link http://git-scm.com/docs/gitrevisions gitrevisions}
      *
+     * @param string $options Options passed to git log
      * @param string $gitrevisions Empty by default, i.e., calling full 'git log'
      * @return Commit[]
      */
-    public function log($gitrevisions = "") {
+    public function log($options = "", $gitrevisions = "") {
 
         $commitDelimiter = chr(29);
         $dataDelimiter = chr(30);
         $statusDelimiter = chr(31);
 
         $logCommand = "git log --pretty=format:\"|begin|%%H|delimiter|%%aD|delimiter|%%ar|delimiter|%%an|delimiter|%%ae|delimiter|%%P|delimiter|%%s|delimiter|%%b|end|\" --name-status";
+
+        $logCommand .= " " . $options;
         if (!empty($gitrevisions)) {
             $logCommand .= " " . escapeshellarg($gitrevisions);
         }
@@ -265,13 +277,17 @@ class GitRepository {
     /**
      * Counts number of commits
      *
-     * @param string $startRevision Where to start. NULL means the initial commit (repo start)
-     * @param string $endRevision Where to end. This will typically be HEAD.
+     * @param string $options Options passed to git log
+     * @param string $gitrevisions Empty by default, i.e., calling full 'git log'
      * @return int
      */
-    public function getNumberOfCommits($startRevision = null, $endRevision = "HEAD") {
-        $revRange = empty($startRevision) ? $endRevision : "$startRevision..$endRevision";
-        return intval($this->runShellCommandWithStandardOutput("git rev-list %s --count", $revRange));
+    public function getNumberOfCommits($options = "", $gitrevisions = "") {
+        $logCommand = 'git log --pretty=format:"%%h"';
+
+        $logCommand .= " " . $options;
+        $result = $this->runShellCommandWithStandardOutput($logCommand);
+        $count = substr_count($result, "\n") + 1;
+        return $count;
     }
 
     /**

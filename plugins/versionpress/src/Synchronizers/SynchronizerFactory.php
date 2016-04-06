@@ -2,6 +2,7 @@
 
 namespace VersionPress\Synchronizers;
 
+use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Storages\StorageFactory;
@@ -14,7 +15,7 @@ class SynchronizerFactory {
      */
     private $storageFactory;
     /**
-     * @var wpdb
+     * @var Database
      */
     private $database;
     /**
@@ -32,6 +33,7 @@ class SynchronizerFactory {
         'post' => 'VersionPress\Synchronizers\PostsSynchronizer',
         'postmeta' => 'VersionPress\Synchronizers\PostMetaSynchronizer',
         'comment' => 'VersionPress\Synchronizers\CommentsSynchronizer',
+        'commentmeta' => 'VersionPress\Synchronizers\CommentMetaSynchronizer',
         'option' => 'VersionPress\Synchronizers\OptionsSynchronizer',
         'user' => 'VersionPress\Synchronizers\UsersSynchronizer',
         'usermeta' => 'VersionPress\Synchronizers\UserMetaSynchronizer',
@@ -39,11 +41,11 @@ class SynchronizerFactory {
         'termmeta' => 'VersionPress\Synchronizers\TermMetaSynchronizer',
         'term_taxonomy' => 'VersionPress\Synchronizers\TermTaxonomiesSynchronizer',
     );
-    private $synchronizationSequence = array('user', 'usermeta', 'term', 'termmeta', 'term_taxonomy', 'post', 'postmeta', 'comment', 'option');
+    private $synchronizationSequence = array('user', 'usermeta', 'term', 'termmeta', 'term_taxonomy', 'post', 'postmeta', 'comment', 'commentmeta', 'option');
 
-    function __construct(StorageFactory $storageFactory, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
+    function __construct(StorageFactory $storageFactory, Database $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
         $this->storageFactory = $storageFactory;
-        $this->database = $wpdb;
+        $this->database = $database;
         $this->dbSchema = $dbSchema;
         $this->urlReplacer = $urlReplacer;
         $this->shortcodesReplacer = $shortcodesReplacer;

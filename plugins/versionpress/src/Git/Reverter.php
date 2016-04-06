@@ -7,6 +7,7 @@ use VersionPress\ChangeInfos\ChangeInfoMatcher;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\RevertChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
+use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Synchronizers\SynchronizationProcess;
@@ -19,7 +20,7 @@ class Reverter {
     /** @var SynchronizationProcess */
     private $synchronizationProcess;
 
-    /** @var wpdb */
+    /** @var Database */
     private $database;
 
     /** @var Committer */
@@ -37,21 +38,21 @@ class Reverter {
     /** @var int */
     const DELETE_ORPHANED_POSTS_SECONDS = 60;
 
-    public function __construct(SynchronizationProcess $synchronizationProcess, $wpdb, Committer $committer, GitRepository $repository, DbSchemaInfo $dbSchemaInfo, StorageFactory $storageFactory) {
+    public function __construct(SynchronizationProcess $synchronizationProcess, Database $database, Committer $committer, GitRepository $repository, DbSchemaInfo $dbSchemaInfo, StorageFactory $storageFactory) {
         $this->synchronizationProcess = $synchronizationProcess;
-        $this->database = $wpdb;
+        $this->database = $database;
         $this->committer = $committer;
         $this->repository = $repository;
         $this->dbSchemaInfo = $dbSchemaInfo;
         $this->storageFactory = $storageFactory;
     }
 
-    public function undo($commitHash) {
-        return $this->_revert($commitHash, "undo");
+    public function undo($commits) {
+        return $this->_revert($commits, "undo");
     }
 
-    public function rollback($commitHash) {
-        return $this->_revert($commitHash, "rollback");
+    public function rollback($commits) {
+        return $this->_revert($commits, "rollback");
     }
 
     public function canRevert() {
@@ -61,29 +62,43 @@ class Reverter {
         return $this->repository->isCleanWorkingDirectory();
     }
 
-    private function _revert($commitHash, $method) {
+    private function _revert($commits, $method) {
         if (!$this->canRevert()) {
             return RevertStatus::NOT_CLEAN_WORKING_DIRECTORY;
         }
 
-        $commitHashForDiff = $method === "undo" ? sprintf("%s~1..%s", $commitHash, $commitHash) : $commitHash;
-        $modifiedFiles = $this->repository->getModifiedFiles($commitHashForDiff);
-        $vpIdsInModifiedFiles = $this->getAllVpIdsFromModifiedFiles($modifiedFiles);
+        vp_commit_all_frequently_written_entities();
+        uasort($commits, function ($a, $b) { return $this->repository->wasCreatedAfter($b, $a); });
 
-        if ($method === "undo") {
-            $status = $this->revertOneCommit($commitHash);
-            $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_UNDO, $commitHash);
+        $modifiedFiles = array();
+        $vpIdsInModifiedFiles = array();
 
-        } else {
-            $status = $this->revertToCommit($commitHash);
-            $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_ROLLBACK, $commitHash);
+        foreach ($commits as $commitHash) {
+            $commitHashForDiff = $method === "undo" ? sprintf("%s~1..%s", $commitHash, $commitHash) : $commitHash;
+            $modifiedFiles = array_merge($modifiedFiles, $this->repository->getModifiedFiles($commitHashForDiff));
+            $modifiedFiles = array_unique($modifiedFiles, SORT_REGULAR);
+            $vpIdsInModifiedFiles = array_merge($vpIdsInModifiedFiles, $this->getAllVpIdsFromModifiedFiles($modifiedFiles));
+            $vpIdsInModifiedFiles = array_unique($vpIdsInModifiedFiles, SORT_REGULAR);
+
+            if ($method === "undo") {
+                $status = $this->revertOneCommit($commitHash);
+                $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_UNDO, $commitHash);
+            } else {
+                $status = $this->revertToCommit($commitHash);
+                $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_ROLLBACK, $commitHash);
+            }
+
+            if ($status !== RevertStatus::OK) {
+                return $status;
+            }
+
+            $this->committer->forceChangeInfo($changeInfo);
         }
 
-        if ($status !== RevertStatus::OK) {
-            return $status;
+        if (!$this->repository->willCommit()) {
+            return RevertStatus::NOTHING_TO_COMMIT;
         }
 
-        $this->committer->forceChangeInfo($changeInfo);
         $affectedPosts = $this->getAffectedPosts($modifiedFiles);
         $this->updateChangeDateForPosts($affectedPosts);
         $this->committer->commit();
@@ -102,12 +117,14 @@ class Reverter {
         $date = current_time('mysql');
         $dateGmt = current_time('mysql', true);
         foreach ($vpIds as $vpId) {
-            $sql = "update {$this->database->prefix}posts set post_modified = '{$date}', post_modified_gmt = '{$dateGmt}' where ID = (select id from {$this->database->prefix}vp_id where vp_id = unhex('{$vpId}'))";
-            $this->database->vp_direct_query($sql);
             $post = $storage->loadEntity($vpId, null);
-            $post['post_modified'] = $date;
-            $post['post_modified_gmt'] = $dateGmt;
-            $storage->save($post);
+            if ($post) {
+                $sql = "update {$this->database->prefix}posts set post_modified = '{$date}', post_modified_gmt = '{$dateGmt}' where ID = (select id from {$this->database->prefix}vp_id where vp_id = unhex('{$vpId}'))";
+                $this->database->query($sql);
+                $post['post_modified'] = $date;
+                $post['post_modified_gmt'] = $dateGmt;
+                $storage->save($post);
+            }
         }
     }
 
@@ -161,7 +178,7 @@ class Reverter {
 
         foreach ($entityInfo->references as $reference => $referencedEntityName) {
             $vpReference = "vp_$reference";
-            if (!isset($entity[$vpReference]) || $entity[$vpReference] == 0) {
+            if (!isset($entity[$vpReference]) || $entity[$vpReference] === 0 || $entity[$vpReference] === '0') {
                 continue;
             }
 
@@ -278,7 +295,7 @@ class Reverter {
         $optionNameRegex = "/^\\[(.*)\\]\\r?$/m";
 
         foreach ($modifiedFiles as $file) {
-            if (!is_file(ABSPATH . $file)) {
+            if (!file_exists(ABSPATH . $file) || !is_file(ABSPATH . $file)) {
                 continue;
             }
 
@@ -334,8 +351,7 @@ class Reverter {
      */
     private function clearOrphanedPosts() {
         $deleteTimestamp = time() - self::DELETE_ORPHANED_POSTS_SECONDS; // Older than 1 minute
-        $wpdb = $this->database;
-        $orphanedMenuItems = $wpdb->get_col($wpdb->prepare("SELECT ID FROM $wpdb->posts AS p LEFT JOIN $wpdb->postmeta AS m ON p.ID = m.post_id WHERE post_type = 'nav_menu_item' AND post_status = 'draft' AND meta_key = '_menu_item_orphaned' AND meta_value < '%d'", $deleteTimestamp ) );
+        $orphanedMenuItems = $this->database->get_col($this->database->prepare("SELECT ID FROM {$this->database->posts} AS p LEFT JOIN {$this->database->postmeta} AS m ON p.ID = m.post_id WHERE post_type = 'nav_menu_item' AND post_status = 'draft' AND meta_key = '_menu_item_orphaned' AND meta_value < '%d'", $deleteTimestamp ) );
 
         foreach( (array) $orphanedMenuItems as $menuItemId ) {
             wp_delete_post($menuItemId, true);

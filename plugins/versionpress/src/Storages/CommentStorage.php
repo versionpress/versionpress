@@ -3,18 +3,19 @@
 namespace VersionPress\Storages;
 
 use VersionPress\ChangeInfos\CommentChangeInfo;
+use VersionPress\Database\Database;
 use VersionPress\Database\ExtendedWpdb;
 use VersionPress\Utils\EntityUtils;
 
 class CommentStorage extends DirectoryStorage {
     /**
-     * @var \wpdb
+     * @var Database
      */
     private $database;
 
-    function __construct($directory, $entityInfo, $wpdb) {
+    function __construct($directory, $entityInfo, $database) {
         parent::__construct($directory, $entityInfo);
-        $this->database = $wpdb;
+        $this->database = $database;
     }
 
     public function shouldBeSaved($data) {

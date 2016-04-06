@@ -39,6 +39,7 @@ class SortingStrategy {
         'VersionPress\ChangeInfos\PostMetaChangeInfo',
         'VersionPress\ChangeInfos\UserMetaChangeInfo',
         'VersionPress\ChangeInfos\TermMetaChangeInfo',
+        'VersionPress\ChangeInfos\CommentMetaChangeInfo'
     );
 
     function sort($changeInfoList) {

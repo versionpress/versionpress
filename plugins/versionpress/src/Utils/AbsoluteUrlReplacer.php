@@ -51,7 +51,7 @@ class AbsoluteUrlReplacer {
     }
 
     private function replaceLocalUrls($value) {
-        if ($this->isSerializedValue($value)) {
+        if (StringUtils::isSerializedValue($value)) {
             $unserializedValue = unserialize($value);
             $replacedValue = $this->replaceRecursively($unserializedValue, array($this, 'replaceLocalUrls'));
             return serialize($replacedValue);
@@ -61,19 +61,13 @@ class AbsoluteUrlReplacer {
     }
 
     private function replacePlaceholders($value) {
-        if ($this->isSerializedValue($value)) {
+        if (StringUtils::isSerializedValue($value)) {
             $unserializedValue = unserialize($value);
             $replacedValue = $this->replaceRecursively($unserializedValue, array($this, 'replacePlaceholders'));
             return serialize($replacedValue);
         } else {
             return is_string($value) ? str_replace(self::PLACEHOLDER, $this->siteUrl, $value) : $value;
         }
-    }
-
-    private function isSerializedValue($value) {
-        /** @noinspection PhpUsageOfSilenceOperatorInspection */
-        $test = @unserialize(($value)); // it throws an error and returns false if $value is not a serialized object
-        return $test !== false || $value === 'b:0;';
     }
 
     /**

@@ -9,8 +9,10 @@ import {UndoDisabledDialog} from '../Commits/revertDialog';
 interface CommitsTableRowSummaryProps extends React.Props<JSX.Element> {
   commit: Commit;
   enableActions: boolean;
+  isSelected: boolean;
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
+  onCommitSelect: (commits: Commit[], check: boolean, shiftKey: boolean) => void;
   onDetailsLevelChanged: (detailsLevel) => any;
   detailsLevel: string;
 }
@@ -26,6 +28,13 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
 
     return (
       <tr className={className} onClick={() => this.toggleDetails()}>
+        {commit.canUndo
+          ? <td className='column-cb' onClick={this.onCheckboxClick.bind(this)}><input type='checkbox'
+                                                                                       checked={this.props.isSelected}
+                                                                                       disabled={!this.props.enableActions}
+                                                                                       readOnly={true}/></td>
+          : <td className='column-cb' />
+        }
         <td className='column-date' title={moment(commit.date).format('LLL')}>{moment(commit.date).fromNow()}</td>
         <td className='column-message'>
           {commit.isMerge
@@ -116,6 +125,20 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
     if (this.props.commit.isEnabled) {
       this.props.onDetailsLevelChanged(this.props.detailsLevel === 'none' ? 'overview' : 'none');
     }
+  }
+
+  private onCheckboxClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    const target = e.target as HTMLInputElement;
+    let checked;
+    
+    if (target.tagName === 'INPUT') {
+      checked = target.checked;
+    } else {
+      const checkbox = target.getElementsByTagName('input')[0] as HTMLInputElement;
+      checked = !checkbox.checked;
+    }
+    this.props.onCommitSelect([this.props.commit], checked, e.shiftKey);
   }
 
   private changeDetailsLevel(detailsLevel) {

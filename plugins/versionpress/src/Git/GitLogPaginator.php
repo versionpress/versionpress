@@ -13,6 +13,7 @@ class GitLogPaginator {
     private $commitsPerPage = 25;
     private $isLastPage = false;
     private $numberOfCommits;
+    private $query = '';
 
     function __construct(GitRepository $repository) {
         $this->repository = $repository;
@@ -26,20 +27,22 @@ class GitLogPaginator {
      * @return Commit[]
      */
     public function getPage($pageNumber) {
-        $this->numberOfCommits = $this->repository->getNumberOfCommits();
+        $this->numberOfCommits = $this->repository->getNumberOfCommits($this->query);
 
         $firstCommitIndex = $pageNumber * $this->commitsPerPage;
         $lastCommitIndex = ($pageNumber + 1) * $this->commitsPerPage;
 
         if ($lastCommitIndex >= $this->numberOfCommits) {
-            $range = sprintf("HEAD~%s", $firstCommitIndex);
             $this->isLastPage = true;
         } else {
-            $range = sprintf("HEAD~%s..HEAD~%s", $lastCommitIndex, $firstCommitIndex);
             $this->isLastPage = false;
         }
 
-        return $this->repository->log($range);
+        $query = $this->query .
+                    ' --skip=' . $firstCommitIndex .
+                    ' --max-count=' . $this->commitsPerPage;
+
+        return $this->repository->log($query);
     }
 
     /**
@@ -56,6 +59,13 @@ class GitLogPaginator {
      */
     public function setCommitsPerPage($commitsPerPage) {
         $this->commitsPerPage = $commitsPerPage;
+    }
+
+    /**
+     * @param string $query
+     */
+    public function setQuery($query) {
+        $this->query = $query;
     }
 
     /**

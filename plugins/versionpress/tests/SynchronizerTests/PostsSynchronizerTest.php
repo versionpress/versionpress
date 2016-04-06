@@ -49,10 +49,10 @@ class PostsSynchronizerTest extends SynchronizerTestCase {
         $this->termStorage = self::$storageFactory->getStorage('term');
         $this->termTaxonomyStorage = self::$storageFactory->getStorage('term_taxonomy');
 
-        $this->synchronizer = new PostsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
-        $this->usersSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
-        $this->termsSynchronizer = new TermsSynchronizer($this->termStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
-        $this->termTaxonomiesSynchronizer = new TermTaxonomiesSynchronizer($this->termTaxonomyStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->synchronizer = new PostsSynchronizer($this->storage, self::$database, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->usersSynchronizer = new UsersSynchronizer($this->userStorage, self::$database, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->termsSynchronizer = new TermsSynchronizer($this->termStorage, self::$database, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->termTaxonomiesSynchronizer = new TermTaxonomiesSynchronizer($this->termTaxonomyStorage, self::$database, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
     }
 
     /**
@@ -198,8 +198,8 @@ class PostsSynchronizerTest extends SynchronizerTestCase {
 
         $this->deletePost();
         
-        $this->synchronizer = new PostsSynchronizer($this->storage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
-        $this->usersSynchronizer = new UsersSynchronizer($this->userStorage, self::$wpdb, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->synchronizer = new PostsSynchronizer($this->storage, self::$database, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->usersSynchronizer = new UsersSynchronizer($this->userStorage, self::$database, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();

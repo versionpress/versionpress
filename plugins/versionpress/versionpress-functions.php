@@ -2,15 +2,70 @@
 // Global VersionPress functions. Stored here and included from bootstrap.php because
 // versionpress.php might not be always loaded (e.g., in WP-CLI commands).
 
+use VersionPress\Database\Database;
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Database\WpdbMirrorBridge;
+use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\Committer;
+use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\FileSystem;
 
 function vp_flush_regenerable_options() {
     wp_cache_flush();
     $taxonomies = get_taxonomies();
-    foreach($taxonomies as $taxonomy) {
+    foreach ($taxonomies as $taxonomy) {
         delete_option("{$taxonomy}_children");
         // Regenerate {$taxonomy}_children
         _get_term_hierarchy($taxonomy);
+    }
+}
+
+function vp_commit_all_frequently_written_entities() {
+    global $versionPressContainer;
+
+    /**
+     * @var DbSchemaInfo $dbSchemaInfo
+     * @var Committer $committer
+     */
+    $dbSchemaInfo = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
+    $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
+
+    $rules = $dbSchemaInfo->getRulesForFrequentlyWrittenEntities();
+
+    vp_save_frequently_written_entities($rules);
+
+    $committer->commit();
+
+}
+
+function vp_save_frequently_written_entities($rules) {
+    global $versionPressContainer;
+
+    /**
+     * @var DbSchemaInfo $dbSchemaInfo
+     * @var Database $database
+     * @var WpdbMirrorBridge $wpdbMirrorBridge
+     * @var StorageFactory $storageFactory
+     */
+    $dbSchemaInfo = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
+    $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
+    $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
+    $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
+
+    foreach ($rules as $entityName => $rulesWithInterval) {
+        $storageFactory->getStorage($entityName)->ignoreFrequentlyWrittenEntities = false;
+
+        $table = $dbSchemaInfo->getPrefixedTableName($entityName);
+
+        foreach ($rulesWithInterval as $ruleAndInterval) {
+            $restriction = \VersionPress\Utils\QueryLanguageUtils::createSqlRestrictionFromRule($ruleAndInterval['rule']);
+            $sql = "SELECT * FROM $table WHERE $restriction";
+
+            $results = $database->get_results($sql, ARRAY_A);
+            foreach ($results as $data) {
+                $wpdbMirrorBridge->update($table, $data, $data);
+            }
+        }
     }
 }
 

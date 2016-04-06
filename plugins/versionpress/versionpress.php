@@ -6,7 +6,8 @@ Description: Git-versioning plugin for WordPress
 Version: DEV
 Author: VersionPress
 Author URI: http://versionpress.net/
-License: GPLv2 or later
+License: GPLv3
+License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 */
 
 use VersionPress\Api\VersionPressApi;
@@ -98,7 +99,7 @@ add_filter('automatic_updates_is_vcs_checkout', function () {
 });
 
 function vp_register_hooks() {
-    global $wpdb, $versionPressContainer;
+    global $versionPressContainer;
     /** @var Committer $committer */
     $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
     /** @var Mirror $mirror */
@@ -111,6 +112,8 @@ function vp_register_hooks() {
     $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
     /** @var StorageFactory $storageFactory */
     $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
+    /** @var \VersionPress\Database\Database $database */
+    $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
 
     /**
      *  Hook for saving taxonomies into files
@@ -230,7 +233,7 @@ function vp_register_hooks() {
 
         $committer->forceChangeInfo(new ThemeChangeInfo($stylesheet, 'switch', $themeName));
     });
-    
+
 
     add_action('wp_ajax_save-widget', function () use ($committer) {
         if (defined('DOING_AJAX') && DOING_AJAX && isset($_POST['delete_widget']) && $_POST['delete_widget']) {
@@ -351,7 +354,7 @@ function vp_register_hooks() {
         vp_flush_regenerable_options();
     });
 
-    add_action('pre_delete_term', function ($term, $taxonomy) use ($wpdb, $wpdbMirrorBridge) {
+    add_action('pre_delete_term', function ($term, $taxonomy) use ($database, $wpdbMirrorBridge) {
         if (!is_taxonomy_hierarchical($taxonomy)) {
             return;
         }
@@ -361,13 +364,16 @@ function vp_register_hooks() {
             return;
         }
 
-        $wpdbMirrorBridge->update($wpdb->term_taxonomy, array('parent' => $term->parent), array('parent' => $term->term_id));
+        $wpdbMirrorBridge->update($database->term_taxonomy, array('parent' => $term->parent), array('parent' => $term->term_id));
     }, 10, 2);
 
-    add_action('before_delete_post', function ($postId) use ($wpdb) {
-        // Fixing bug in WP (#34803) and WP-CLI (#2246)
+    add_action('before_delete_post', function ($postId) use ($database) {
+        // Fixing bug in WP (#34803) and WP-CLI (#2246);
+        // this is rare case where $wpdb must be used, not $database
+        global $wpdb;
+
         $post = get_post($postId);
-        if ( !is_wp_error($post) && $post->post_type === 'nav_menu_item') {
+        if (!is_wp_error($post) && $post->post_type === 'nav_menu_item') {
             $newParent = get_post_meta($post->ID, '_menu_item_menu_item_parent', true);
             $wpdb->update($wpdb->postmeta,
                 array('meta_value' => $newParent),
@@ -484,26 +490,7 @@ function vp_register_hooks() {
         }
 
         add_action($actionName, function () use ($allRulesInInterval) {
-            global $versionPressContainer;
-            $dbSchemaInfo = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
-            $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
-            $wpdb = $versionPressContainer->resolve(VersionPressServices::WPDB);
-            $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
-
-            foreach ($allRulesInInterval as $entityName => $rulesWithInterval) {
-                $storageFactory->getStorage($entityName)->ignoreFrequentlyWrittenEntities = false;
-
-                $table = $dbSchemaInfo->getPrefixedTableName($entityName);
-                foreach ($rulesWithInterval as $ruleAndInterval) {
-                    $restriction = \VersionPress\Utils\QueryLanguageUtils::createSqlRestrictionFromRule($ruleAndInterval['rule']);
-                    $sql = "SELECT * FROM $table WHERE $restriction";
-
-                    $results = $wpdb->get_results($sql, ARRAY_A);
-                    foreach ($results as $data) {
-                        $wpdbMirrorBridge->update($table, $data, $data);
-                    }
-                }
-            }
+            vp_save_frequently_written_entities($allRulesInInterval);
         });
     }
 
@@ -526,19 +513,18 @@ function vp_create_update_post_terms_hook(Mirror $mirror, VpidRepository $vpidRe
         $postVpId = $vpidRepository->getVpidForEntity('post', $postId);
 
         $postUpdateData = array('vp_id' => $postVpId, 'vp_term_taxonomy' => array());
-
+        $postRelatedTerms = [];
         foreach ($taxonomies as $taxonomy) {
             $terms = get_the_terms($postId, $taxonomy);
             if ($terms) {
                 $referencedTaxonomies = array_map(function ($term) use ($vpidRepository) {
                     return $vpidRepository->getVpidForEntity('term_taxonomy', $term->term_taxonomy_id);
                 }, $terms);
-
+                $postRelatedTerms[] = $terms;
                 $postUpdateData['vp_term_taxonomy'] = array_merge($postUpdateData['vp_term_taxonomy'], $referencedTaxonomies);
             }
         }
-
-        if (count($taxonomies) > 0) {
+        if (count($taxonomies) > 0 && count($postRelatedTerms) > 0) {
             $mirror->save("post", $postUpdateData);
         }
     };
@@ -620,8 +606,10 @@ function vp_admin_post_cancel_deactivation() {
 function vp_admin_post_confirm_deactivation() {
     //nonce verification is performed according to 'deactivate-plugin_versionpress/versionpress.php'
     // as a standard deactivation token for which nonce is generated
-    vp_verify_nonce('deactivate-plugin_versionpress/versionpress.php');
-    vp_check_permissions();
+    if (!defined('WP_CLI')) {
+        vp_verify_nonce('deactivate-plugin_versionpress/versionpress.php');
+        vp_check_permissions();
+    }
 
     define('VP_DEACTIVATING', true);
 
@@ -826,18 +814,18 @@ function _vp_revert($reverterMethod) {
 
     vp_verify_nonce('vp_revert');
     vp_check_permissions();
-    
+
     $commitHash = $_GET['commit'];
-    
+
     if (!preg_match('/^[0-9a-f]+$/', $commitHash)) {
         exit();
     }
 
-        /** @var Reverter $reverter */
+    /** @var Reverter $reverter */
     $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
 
     vp_enable_maintenance();
-    $revertStatus = call_user_func(array($reverter, $reverterMethod), $commitHash);
+    $revertStatus = call_user_func(array($reverter, $reverterMethod), array($commitHash));
     vp_disable_maintenance();
     $adminPage = menu_page_url('versionpress', false);
 

@@ -2,6 +2,7 @@
 
 namespace VersionPress\Tests\StorageTests;
 
+use VersionPress\Database\Database;
 use VersionPress\Database\EntityInfo;
 use VersionPress\Storages\CommentStorage;
 use VersionPress\Tests\End2End\Utils\AnonymousObject;
@@ -73,7 +74,8 @@ class CommentStorageTest extends \PHPUnit_Framework_TestCase {
         }
         mkdir(__DIR__ . '/comments');
         $wpdbFake = new AnonymousObject(array('prefix' => '', 'get_row' => function () { return new AnonymousObject(array('post_title' => '')); }));
-        $this->storage = new CommentStorage(__DIR__ . '/comments', $entityInfo, $wpdbFake);
+        $database = new Database($wpdbFake);
+        $this->storage = new CommentStorage(__DIR__ . '/comments', $entityInfo, $database);
     }
 
     protected function tearDown() {

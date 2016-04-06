@@ -9,7 +9,6 @@ namespace VersionPress\Cli;
 
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Yaml\Yaml;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitRepository;
@@ -125,36 +124,7 @@ class VPCommand extends WP_CLI_Command {
     public function activate($args, $assoc_args) {
         global $versionPressContainer;
 
-        /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
-        $database = $versionPressContainer->resolve(VersionPressServices::WPDB);
-        $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
-
-        $requirementsChecker = new RequirementsChecker($database, $schema);
-        $report = $requirementsChecker->getRequirements();
-
-        foreach ($report as $requirement) {
-            if ($requirement['fulfilled']) {
-                WP_CLI::success($requirement['name']);
-            } else {
-                if ($requirement['level'] === 'critical') {
-                    WP_CLI::error($requirement['name'], false);
-                } else {
-                    VPCommandUtils::warning($requirement['name']);
-                }
-                WP_CLI::log('  ' . $requirement['help']);
-            }
-        }
-
-        WP_CLI::line('');
-
-        if (!$requirementsChecker->isWithoutCriticalErrors()) {
-            WP_CLI::error('VersionPress cannot be fully activated.');
-        }
-
-        if (!$requirementsChecker->isEverythingFulfilled()) {
-            WP_CLI::confirm('There are some warnings. Continue?', $assoc_args);
-        }
+        $this->checkVpRequirements($assoc_args);
 
         /**
          * @var Initializer $initializer
@@ -210,6 +180,9 @@ class VPCommand extends WP_CLI_Command {
         require_once dirname($wpConfigPath) . '/' . $commonConfigName;
         require_once $wpConfigPath;
         require_once __DIR__ . '/../../bootstrap.php';
+        require_once ABSPATH . WPINC . '/formatting.php';
+        require_once ABSPATH . WPINC . '/theme.php';
+        require_once ABSPATH . WPINC . '/link-template.php';
 
         if (!VersionPress::isActive()) {
             WP_CLI::error('Unfortunately, this site was not tracked by VersionPress. Therefore, it cannot be restored.');
@@ -218,6 +191,7 @@ class VPCommand extends WP_CLI_Command {
         // Check if the site is installed
         $process = VPCommandUtils::runWpCliCommand('core', 'is-installed');
         if ($process->isSuccessful()) {
+            $this->checkVpRequirements($assoc_args);
             WP_CLI::confirm("It looks like the site is OK. Do you really want to run the 'restore-site' command?", $assoc_args);
         }
 
@@ -439,6 +413,8 @@ class VPCommand extends WP_CLI_Command {
             }
         }
 
+        vp_commit_all_frequently_written_entities();
+
         // Clone the site
         $cloneCommand = sprintf("git clone %s %s", escapeshellarg($currentWpPath), escapeshellarg($clonePath));
 
@@ -585,6 +561,16 @@ class VPCommand extends WP_CLI_Command {
         }
 
         $remote = isset($assoc_args['from']) ? $assoc_args['from'] : 'origin';
+
+        $process = VPCommandUtils::exec("git config --get remote.". escapeshellarg($remote) . ".url");
+        $remoteUrl = $process->getConsoleOutput();
+
+        if (is_dir($remoteUrl)) {
+            $this->runVPInternalCommand('commit-frequently-written-entities', array(), $remoteUrl);
+        } else {
+            // We currently do not support commiting frequently written entities for repositories on a different server
+        }
+
         $this->switchMaintenance('on');
 
         $branchToPullFrom = 'master'; // hardcoded until we support custom branches
@@ -728,6 +714,8 @@ class VPCommand extends WP_CLI_Command {
 
         $this->switchMaintenance('on', $remoteName);
 
+        vp_commit_all_frequently_written_entities();
+
         $currentPushType = trim(VPCommandUtils::exec('git config --local push.default')->getOutput());
         VPCommandUtils::exec('git config --local push.default simple');
 
@@ -758,16 +746,16 @@ class VPCommand extends WP_CLI_Command {
     }
 
     /**
-     * Reverts one commit
+     * Reverts commits
      *
      * ## OPTIONS
      *
      * <commit>
-     * : Hash of commit that will be reverted.
+     * : Hashes of commit that will be reverted (separated by comma).
      *
      * ## EXAMPLES
      *
-     *     wp vp undo a34bc28
+     *     wp vp undo a34bc28,d12ef22
      *
      * @synopsis <commit>
      *
@@ -785,15 +773,25 @@ class VPCommand extends WP_CLI_Command {
         /** @var GitRepository $repository */
         $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
 
-        $hash = $args[0];
-        $log = $repository->log($hash);
-        if (count($log) === 0) {
-            WP_CLI::error("Commit '$hash' does not exist.");
+        $initialCommitHash = $this->getInitialCommitHash($repository);
+
+        $commits = explode(',', $args[0]);
+        foreach ($commits as $hash) {
+            $log = $repository->log($hash);
+            if (!preg_match('/^[0-9a-f]+$/', $hash) || count($log) === 0) {
+                WP_CLI::error("Commit '$hash' does not exist.");
+            }
+            if ($log[0]->isMerge()) {
+                WP_CLI::error('Cannot undo merge commit.');
+            }
+            if (!$repository->wasCreatedAfter($hash, $initialCommitHash)) {
+                WP_CLI::error('Cannot undo changes before initial commit');
+            }
         }
 
         $this->switchMaintenance('on');
 
-        $status = $reverter->undo($hash);
+        $status = $reverter->undo($commits);
 
         if ($status === RevertStatus::VIOLATED_REFERENTIAL_INTEGRITY) {
             WP_CLI::error("Violated referential integrity. Objects with missing references cannot be restored. For example we cannot restore comment where the related post was deleted.", false);
@@ -809,6 +807,10 @@ class VPCommand extends WP_CLI_Command {
 
         if ($status === RevertStatus::REVERTING_MERGE_COMMIT) {
             WP_CLI::error("Cannot undo a merge commit.", false);
+        }
+
+        if ($status === RevertStatus::NOTHING_TO_COMMIT) {
+            WP_CLI::error("Nothing to commit. Current state is the same as the one after the undo.", false);
         }
 
         if ($status === RevertStatus::OK) {
@@ -848,15 +850,24 @@ class VPCommand extends WP_CLI_Command {
         /** @var GitRepository $repository */
         $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
 
+        $initialCommitHash = $this->getInitialCommitHash($repository);
+
         $hash = $args[0];
         $log = $repository->log($hash);
-        if (count($log) === 0) {
+        if (!preg_match('/^[0-9a-f]+$/', $hash) || count($log) === 0) {
             WP_CLI::error("Commit '$hash' does not exist.");
         }
+        if (!$repository->wasCreatedAfter($hash, $initialCommitHash) && $log[0]->getHash() !== $initialCommitHash) {
+            WP_CLI::error('Cannot roll back before initial commit');
+        }
+        if ($log[0]->getHash() === $repository->getLastCommitHash()) {
+            WP_CLI::error('Nothing to commit. Current state is the same as the one you want rollback to.');
+        }
+
 
         $this->switchMaintenance('on');
 
-        $status = $reverter->rollback($hash);
+        $status = $reverter->rollback(array($hash));
 
         if ($status === RevertStatus::NOTHING_TO_COMMIT) {
             WP_CLI::error("Nothing to commit. Current state is the same as the one you want rollback to.", false);
@@ -1029,6 +1040,59 @@ class VPCommand extends WP_CLI_Command {
 
             $this->runVPInternalCommand('update-config', array($urlConstant, $url));
         }
+    }
+
+    /**
+     * @param $assoc_args
+     */
+    private function checkVpRequirements($assoc_args) {
+        global $versionPressContainer;
+
+        $database = $versionPressContainer->resolve(VersionPressServices::WPDB);
+        $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
+
+        if (count($assoc_args) > 0) {
+            $requirementsChecker = new RequirementsChecker($database, $schema, RequirementsChecker::ENVIRONMENT);
+        } else {
+            $requirementsChecker = new RequirementsChecker($database, $schema);
+        }
+
+        $report = $requirementsChecker->getRequirements();
+
+        foreach ($report as $requirement) {
+            if ($requirement['fulfilled']) {
+                WP_CLI::success($requirement['name']);
+            } else {
+                if ($requirement['level'] === 'critical') {
+                    WP_CLI::error($requirement['name'], false);
+                } else {
+                    VPCommandUtils::warning($requirement['name']);
+                }
+                WP_CLI::log('  ' . $requirement['help']);
+            }
+        }
+
+        WP_CLI::line('');
+
+        if (!$requirementsChecker->isWithoutCriticalErrors()) {
+            WP_CLI::error('VersionPress cannot be fully activated.');
+        }
+
+        if (!$requirementsChecker->isEverythingFulfilled()) {
+            WP_CLI::confirm('There are some warnings. Continue?', $assoc_args);
+        }
+    }
+
+    /**
+     * @param GitRepository $repository
+     * @return string
+     */
+    private function getInitialCommitHash(GitRepository $repository) {
+        $preActivationHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
+        if (empty($preActivationHash)) {
+            return $repository->getInitialCommit()->getHash();
+        }
+        return $repository->getChildCommit($preActivationHash);
     }
 }
 

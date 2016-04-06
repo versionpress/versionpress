@@ -74,9 +74,15 @@ var adminGuiDir = vpDir + '/admin/public/gui';
  */
 var srcDef = [];
 
+/**
+ * Set to true for test-deploy build 
+ *
+ * @type {boolean}
+ */
+var isTestDeployBuild = false;
 
 /**
- * Sets `buildDir` and `buildType` so that the copy methods copies to the WP test site.
+ * Sets `buildDir` and `isTestDeployBuild` so that the copy methods copies to the WP test site.
  */
 gulp.task('prepare-test-deploy', false, function () {
     var testConfigStr = fs.readFileSync(vpDir + '/tests/test-config.yml', 'utf-8');
@@ -87,12 +93,12 @@ gulp.task('prepare-test-deploy', false, function () {
     }
     buildDir = sitePath + "/wp-content/plugins/versionpress";
 
-    buildType = 'test-deploy'; // later influences the `prepare-src-definition` task
+    isTestDeployBuild = true;
 });
 
 /**
  * Prepares `srcDef` that is later used in the `copy` task. The src definition
- * is slightly different for various buildTypes.
+ * is slightly different for production build and test-deploy build.
  */
 gulp.task('prepare-src-definition', false, function () {
 
@@ -109,7 +115,7 @@ gulp.task('prepare-src-definition', false, function () {
     srcDef.push('!' + vpDir + '/**/*.md'); // all Markdown files are considered documentation
 
     // and now some build-specific patterns:
-    if (buildType == 'test-deploy') {
+    if (isTestDeployBuild) {
         srcDef.push('!' + vpDir + '/composer.json');
         srcDef.push('!' + vpDir + '/composer.lock');
         srcDef.push('!' + vpDir + '/vendor/**/.git{,/**}'); // keep vendor but ignore all nested Git repositories in it

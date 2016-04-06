@@ -157,6 +157,28 @@ class WpAutomation {
         return intval($this->runWpCliCommand("comment", "create", $comment));
     }
 
+
+    /**
+     * Creates new commentmeta using WP-CLI for given comment.
+     *
+     * @param $id
+     * @param $name
+     * @param $value
+     */
+    public function createCommentMeta($id, $name, $value) {
+        $this->runWpCliCommand('comment', 'meta update', func_get_args());
+    }
+
+    /**
+     * Deletes commentmeta using WP-CLI for given comment.
+     *
+     * @param $id
+     * @param $name
+     */
+    public function deleteCommentMeta($id, $name) {
+        $this->runWpCliCommand('comment', 'meta delete', func_get_args());
+    }
+
     /**
      * Changes the comment using WP-CLI.
      *
@@ -394,7 +416,7 @@ class WpAutomation {
     public function addMenuItem($menu, $type, $item) {
         array_unshift($item, $menu);
         $item["porcelain"] = null;
-        return intval($this->runWpCliCommand("menu", "item add-".$type, $item));
+        return intval($this->runWpCliCommand("menu", "item add-" . $type, $item));
     }
 
     /**
@@ -580,7 +602,7 @@ class WpAutomation {
             // same as this process
         } elseif ($debug) {
             $childEnv["XDEBUG_CONFIG"] = "idekey=xdebug"; // turn debug on
-        } else {;
+        } else {
             unset($childEnv["XDEBUG_CONFIG"]); // turn debug off
         }
 

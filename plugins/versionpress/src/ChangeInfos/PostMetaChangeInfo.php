@@ -12,8 +12,9 @@ use VersionPress\Utils\StringUtils;
  *
  *     VP-Action: postmeta/(create|edit|delete)/VPID
  *     VP-Post-Title: Hello world
- *     VP-Post-Type: (post|page)
+ *     VP-Post-Type: (post|page|nav_menu_item|...)
  *     VP-PostMeta-Key: pagetemplate
+ *     VP-Post-Id: VPID
  *
  */
 class PostMetaChangeInfo extends EntityChangeInfo {
