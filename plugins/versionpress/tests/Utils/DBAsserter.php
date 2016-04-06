@@ -113,9 +113,6 @@ class DBAsserter {
         }
 
         foreach ($dbEntities as $dbEntity) {
-            if (!isset($dbEntity[$entityInfo->vpidColumnName])) {
-                print_r($dbEntity);
-            }
 
             $id = $dbEntity[$entityInfo->vpidColumnName];
             $storageEntity = $storageEntities[$id];
