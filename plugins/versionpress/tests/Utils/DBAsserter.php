@@ -29,6 +29,8 @@ class DBAsserter {
     private static $wpdb;
     /** @var ShortcodesReplacer */
     private static $shortcodesReplacer;
+    /** @var VpidRepository */
+    private static $vpidRepository;
 
 
     public static function assertFilesEqualDatabase() {
@@ -58,7 +60,7 @@ class DBAsserter {
         self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
 
         $wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
-        $rawTaxonomies = $wpAutomation->runWpCliCommand('taxonomy', 'list', array('format'=>'json', 'fields'=>'name'));
+        $rawTaxonomies = $wpAutomation->runWpCliCommand('taxonomy', 'list', array('format' => 'json', 'fields' => 'name'));
         $taxonomies = ArrayUtils::column(json_decode($rawTaxonomies, true), 'name');
 
         $dbHost = self::$testConfig->testSite->dbHost;
@@ -71,8 +73,8 @@ class DBAsserter {
         self::$wpdb->set_prefix($dbPrefix);
         self::$vp_database = new Database(self::$wpdb);
         $shortcodesInfo = new ShortcodesInfo($shortcodeFile);
-        $vpidRepository = new VpidRepository(self::$vp_database, self::$schemaInfo);
-        self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo,$vpidRepository);
+        self::$vpidRepository = new VpidRepository(self::$vp_database, self::$schemaInfo);
+        self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, self::$vpidRepository);
 
         self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$vp_database, $taxonomies);
 
@@ -88,12 +90,15 @@ class DBAsserter {
 
         $allDbEntities = self::selectAll(self::$schemaInfo->getPrefixedTableName($entityName));
         $idMap = self::getVpIdMap();
+        $allDbEntities = self::identifyEntities($entityName, $allDbEntities, $idMap);
         $allDbEntities = self::replaceForeignKeys($entityName, $allDbEntities, $idMap);
         $dbEntities = array_filter($allDbEntities, array($storage, 'shouldBeSaved'));
 
 
         $urlReplacer = new AbsoluteUrlReplacer(self::$testConfig->testSite->url);
-        $storageEntities = array_map(function ($entity) use ($urlReplacer) { return $urlReplacer->restore($entity); }, $storage->loadAll());
+        $storageEntities = array_map(function ($entity) use ($urlReplacer) {
+            return $urlReplacer->restore($entity);
+        }, $storage->loadAll());
         $countOfentitiesInDb = count($dbEntities);
         $countOfentitiesInStorage = count($storageEntities);
 
@@ -108,6 +113,7 @@ class DBAsserter {
         }
 
         foreach ($dbEntities as $dbEntity) {
+
             $id = $dbEntity[$entityInfo->vpidColumnName];
             $storageEntity = $storageEntities[$id];
 
@@ -161,7 +167,8 @@ class DBAsserter {
                 foreach ($storageEntity["vp_$targetEntity"] as $referenceVpId) {
                     if (!ArrayUtils::any($junctionTableContent, function ($junctionRow) use ($storageEntity, $referenceVpId) {
                         return $junctionRow[0] === $storageEntity['vp_id'] && $junctionRow[1] === $referenceVpId;
-                    })) {
+                    })
+                    ) {
                         $missingReferences[$junctionTable][] = array($sourceColumn => $storageEntity['vp_id'], $targetColumn => $referenceVpId);
                     }
                     $checkedReferences[] = array($storageEntity['vp_id'], $referenceVpId);
@@ -205,45 +212,29 @@ class DBAsserter {
         return $idMap;
     }
 
+    private static function identifyEntities($entityName, $entities, $idMap) {
+        $entityInfo = self::$schemaInfo->getEntityInfo($entityName);
+        if (!$entityInfo->usesGeneratedVpids) {
+            return $entities;
+        }
+
+        $table = $entityInfo->tableName;
+        $idColumnName = $entityInfo->idColumnName;
+
+        foreach ($entities as &$entity) {
+            $id = $entity[$idColumnName];
+            if (isset($idMap[$table], $idMap[$table][$id])) {
+                $entity[$entityInfo->vpidColumnName] = $idMap[$table][$id];
+            }
+        }
+
+        return $entities;
+    }
+
     private static function replaceForeignKeys($entityName, $dbEntities, $idMap) {
         $entities = array();
         foreach ($dbEntities as $entity) {
-            foreach (self::$schemaInfo->getEntityInfo($entityName)->references as $column => $targetEntity) {
-                if ($entity[$column] != "0") {
-                    /** @noinspection PhpUsageOfSilenceOperatorInspection The target entity might not be saved by VersionPress */
-                    $entity["vp_$column"] = @$idMap[self::$schemaInfo->getTableName($targetEntity)][$entity[$column]];
-                }
-                unset($entity[$column]);
-            }
-
-            foreach (self::$schemaInfo->getEntityInfo($entityName)->valueReferences as $reference => $targetEntity) {
-                list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
-                if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn])) {
-                    if ($targetEntity[0] === '@') {
-                        $entityNameProvider = substr($targetEntity, 1);
-                        $targetEntity = call_user_func($entityNameProvider, $entity);
-                    }
-
-                    if (self::isInIdMap($idMap, $targetEntity, $entity[$valueColumn])) {
-                        $entity[$valueColumn] = $idMap[self::$schemaInfo->getTableName($targetEntity)][$entity[$valueColumn]];
-                    } else {
-                        $entity[$valueColumn] = '';
-                    }
-                }
-            }
-
-            if (!self::$schemaInfo->getEntityInfo($entityName)->hasNaturalVpid) {
-                $idColumnName = self::$schemaInfo->getEntityInfo($entityName)->idColumnName;
-                /** @noinspection PhpUsageOfSilenceOperatorInspection The entity might not be saved by VersionPress, so it might not have a VPID */
-                $entity['vp_id'] = @$idMap[self::$schemaInfo->getTableName($entityName)][$entity[$idColumnName]];
-                if (!empty($entity['vp_id'])) {
-                    unset($entity[$idColumnName]);
-                }
-            } else {
-                unset($entity['option_id']);
-            }
-
-            $entities[] = $entity;
+            $entities[] = self::$vpidRepository->replaceForeignKeysWithReferences($entityName, $entity);
         }
         return $entities;
     }

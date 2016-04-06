@@ -15,8 +15,12 @@ final class IdUtil {
      *
      * @return string
      */
-    static function newId() {
+    public static function newId() {
         return self::newUuid('%04x%04x%04x%04x%04x%04x%04x%04x');
+    }
+
+    public static function getRegexMatchingId() {
+        return '/([0-9A-F]{32})/';
     }
 
     /**

@@ -117,6 +117,7 @@ class DIContainer {
                 $dic->resolve(VersionPressServices::STORAGE_FACTORY),
                 $dic->resolve(VersionPressServices::DATABASE),
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
+                $dic->resolve(VersionPressServices::VPID_REPOSITORY),
                 $dic->resolve(VersionPressServices::URL_REPLACER),
                 $dic->resolve(VersionPressServices::SHORTCODES_REPLACER)
             );

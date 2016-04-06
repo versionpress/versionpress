@@ -13,9 +13,6 @@ use VersionPress\Utils\WordPressCacheUtils;
  * a couple of properties to be set).
  */
 class UsersSynchronizer extends SynchronizerBase {
-    function __construct(Storage $storage, Database $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
-        parent::__construct($storage, $database, $dbSchema, $urlReplacer, $shortcodesReplacer, 'user');
-    }
 
     protected function doEntitySpecificActions() {
         parent::doEntitySpecificActions();

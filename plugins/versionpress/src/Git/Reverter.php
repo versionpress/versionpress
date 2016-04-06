@@ -12,6 +12,9 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\ArrayUtils;
+use VersionPress\Utils\Comparators;
+use VersionPress\Utils\Cursor;
+use VersionPress\Utils\IdUtil;
 use VersionPress\Utils\ReferenceUtils;
 use wpdb;
 
@@ -182,10 +185,14 @@ class Reverter {
                 continue;
             }
 
-            $referencedEntityId = $entity[$vpReference];
-            $entityExists = $this->entityExists($referencedEntityName, $referencedEntityId, $parentId);
-            if (!$entityExists) {
-                return false;
+            $referencedVpidsString = $entity[$vpReference];
+            preg_match_all(IdUtil::getRegexMatchingId(), $referencedVpidsString, $matches);
+
+            foreach ($matches[0] as $referencedVpid) {
+                $entityExists = $this->entityExists($referencedEntityName, $referencedVpid, $parentId);
+                if (!$entityExists) {
+                    return false;
+                }
             }
         }
 
@@ -204,12 +211,14 @@ class Reverter {
         }
 
         foreach ($entityInfo->valueReferences as $reference => $referencedEntityName) {
-            list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
+            list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
             if (!isset($entity[$sourceColumn]) || $entity[$sourceColumn] != $sourceValue || !isset($entity[$valueColumn])) {
                 continue;
             }
 
-            $referencedEntityId = $entity[$valueColumn];
+            if ((is_numeric($entity[$valueColumn]) && intval($entity[$valueColumn]) === 0) || $entity[$valueColumn] === '') {
+                continue;
+            }
 
             if ($referencedEntityName[0] === '@') {
                 $entityNameProvider = substr($referencedEntityName, 1); // strip the '@'
@@ -219,10 +228,34 @@ class Reverter {
                 }
             }
 
-            $entityExists = $this->entityExists($referencedEntityName, $referencedEntityId, $parentId);
-            if (!$entityExists) {
-                return false;
+            if ($pathInStructure) {
+                $entity[$valueColumn] = unserialize($entity[$valueColumn]);
+                $paths = ReferenceUtils::getMatchingPaths($entity[$valueColumn], $pathInStructure);
+            } else {
+                $paths = [[]]; // root = the value itself
             }
+
+            /** @var Cursor[] $cursors */
+            $cursors = array_map(function ($path) use (&$entity, $valueColumn) { return new Cursor($entity[$valueColumn], $path); }, $paths);
+
+            foreach ($cursors as $cursor) {
+                $vpidsString = $cursor->getValue();
+
+                preg_match_all(IdUtil::getRegexMatchingId(), $vpidsString, $matches);
+
+                foreach ($matches[0] as $referencedVpid) {
+                    $entityExists = $this->entityExists($referencedEntityName, $referencedVpid, $parentId);
+                    if (!$entityExists) {
+                        return false;
+                    }
+                }
+            }
+
+            if ($pathInStructure) {
+                $entity[$valueColumn] = serialize($entity[$valueColumn]);
+            }
+
+
         }
 
         return true;
@@ -246,40 +279,70 @@ class Reverter {
 
             $allReferences = array_merge($otherEntityReferences, $otherEntityMnReferences, $otherEntityValueReferences);
 
-            $reference = array_search($entityName, $allReferences);
 
-            if ($reference === false) { // Other entity is not referencing $entityName
-                continue;
+            foreach ($allReferences as $reference => $referencedEntity) {
+
+                if ($referencedEntity !== $entityName && $referencedEntity[0] !== '@') { // if the target is dynamic, check it anyway - just to be sure
+                    continue;
+                }
+
+                $otherEntityStorage = $this->storageFactory->getStorage($otherEntityName);
+                $possiblyReferencingEntities = $otherEntityStorage->loadAll();
+
+                if (isset($otherEntityReferences[$reference])) { // 1:N reference
+                    $vpReference = "vp_$reference";
+
+                    foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
+                        if (isset($possiblyReferencingEntity[$vpReference])) {
+
+                            $referencedVpidsString = $possiblyReferencingEntity[$vpReference];
+                            preg_match_all(IdUtil::getRegexMatchingId(), $referencedVpidsString, $matches);
+
+                            if (ArrayUtils::any($matches[0], Comparators::equals($entityId))) {
+                                return true;
+                            }
+                        }
+                    }
+                } elseif (isset($otherEntityMnReferences[$reference])) { // M:N reference
+                    $vpReference = "vp_$otherEntityName";
+                    foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
+                        if (isset($possiblyReferencingEntity[$vpReference]) && array_search($entityId, $possiblyReferencingEntity[$vpReference]) !== false) {
+                            return true;
+                        }
+                    }
+                } elseif (isset($otherEntityValueReferences[$reference])) { // Value reference
+                    list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
+
+                    foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
+                        if (isset($possiblyReferencingEntity[$sourceColumn]) && $possiblyReferencingEntity[$sourceColumn] == $sourceValue && isset($possiblyReferencingEntity[$valueColumn])) {
+                            if ((is_numeric($possiblyReferencingEntity[$valueColumn]) && intval($possiblyReferencingEntity[$valueColumn]) === 0) || $possiblyReferencingEntity[$valueColumn] === '') {
+                                continue;
+                            }
+
+                            if ($pathInStructure) {
+                                $possiblyReferencingEntity[$valueColumn] = unserialize($possiblyReferencingEntity[$valueColumn]);
+                                $paths = ReferenceUtils::getMatchingPaths($possiblyReferencingEntity[$valueColumn], $pathInStructure);
+                            } else {
+                                $paths = [[]]; // root = the value itself
+                            }
+
+                            /** @var Cursor[] $cursors */
+                            $cursors = array_map(function ($path) use (&$possiblyReferencingEntity, $valueColumn) {
+                                return new Cursor($possiblyReferencingEntity[$valueColumn], $path);
+                            }, $paths);
+
+                            foreach ($cursors as $cursor) {
+                                $vpidsString = $cursor->getValue();
+                                preg_match_all(IdUtil::getRegexMatchingId(), $vpidsString, $matches);
+
+                                if (ArrayUtils::any($matches[0], Comparators::equals($entityId))) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
             }
-
-            $otherEntityStorage = $this->storageFactory->getStorage($otherEntityName);
-            $possiblyReferencingEntities = $otherEntityStorage->loadAll();
-
-            if (isset($otherEntityReferences[$reference])) { // 1:N reference
-                $vpReference = "vp_$reference";
-
-                foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
-                    if (isset($possiblyReferencingEntity[$vpReference]) && $possiblyReferencingEntity[$vpReference] === $entityId) {
-                        return true;
-                    }
-                }
-            } elseif (isset($otherEntityMnReferences[$reference])) { // M:N reference
-                $vpReference = "vp_$otherEntityName";
-                foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
-                    if (isset($possiblyReferencingEntity[$vpReference]) && array_search($entityId, $possiblyReferencingEntity[$vpReference]) !== false) {
-                        return true;
-                    }
-                }
-            } elseif (isset($otherEntityValueReferences[$reference])) { // Value reference
-                list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
-
-                foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
-                    if (isset($possiblyReferencingEntity[$sourceColumn]) && $possiblyReferencingEntity[$sourceColumn] == $sourceValue && isset($possiblyReferencingEntity[$valueColumn]) && $possiblyReferencingEntity[$valueColumn] === $entityId) {
-                        return true;
-                    }
-                }
-            }
-
         }
 
         return false;

@@ -31,8 +31,8 @@ class TermMetaSynchronizerTest extends SynchronizerTestCase {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('termmeta');
         $this->termStorage = self::$storageFactory->getStorage('term');
-        $this->synchronizer = new TermMetaSynchronizer($this->storage, self::$database, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
-        $this->termsSynchronizer = new TermsSynchronizer($this->termStorage, self::$database, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->synchronizer = new TermMetaSynchronizer($this->storage, self::$database, self::$schemaInfo->getEntityInfo('termmeta') ,self::$schemaInfo, self::$vpidRepository, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->termsSynchronizer = new TermsSynchronizer($this->termStorage, self::$database, self::$schemaInfo->getEntityInfo('term') ,self::$schemaInfo, self::$vpidRepository, self::$urlReplacer, self::$shortcodesReplacer);
     }
 
     /**

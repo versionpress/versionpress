@@ -3,6 +3,7 @@
 namespace VersionPress\Database;
 
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Utils\Cursor;
 use VersionPress\Utils\IdUtil;
 use VersionPress\Utils\ReferenceUtils;
 use wpdb;
@@ -34,35 +35,33 @@ class VpidRepository {
     }
 
     public function getIdForVpid($vpid) {
-        return $this->database->get_var("SELECT id FROM $this->vpidTableName WHERE vp_id = UNHEX('$vpid')");
+        return intval($this->database->get_var("SELECT id FROM $this->vpidTableName WHERE vp_id = UNHEX('$vpid')"));
     }
 
     public function replaceForeignKeysWithReferences($entityName, $entity) {
         $entityInfo = $this->schemaInfo->getEntityInfo($entityName);
-        $vpIdTable = $this->schemaInfo->getPrefixedTableName('vp_id');
 
         foreach ($entityInfo->references as $referenceName => $targetEntity) {
-            $targetTable = $this->schemaInfo->getEntityInfo($targetEntity)->tableName;
 
             if (isset($entity[$referenceName])) {
-                if ($entity[$referenceName] > 0) {
-                    $referenceVpId = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=$entity[$referenceName]");
+                if ($this->isNullReference($entity[$referenceName])) {
+                    $referenceVpids = 0;
                 } else {
-                    $referenceVpId = 0;
+                    $referenceVpids = $this->replaceIdsInString($targetEntity, $entity[$referenceName]);
                 }
 
-                $entity['vp_' . $referenceName] = $referenceVpId;
+                $entity['vp_' . $referenceName] = $referenceVpids;
                 unset($entity[$referenceName]);
             }
 
         }
 
         foreach ($entityInfo->valueReferences as $referenceName => $targetEntity) {
-            list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
+            list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) = array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
 
             if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn])) {
 
-                if ($entity[$valueColumn] == 0) {
+                if ($this->isNullReference($entity[$valueColumn])) {
                     continue;
                 }
 
@@ -73,10 +72,63 @@ class VpidRepository {
                         continue;
                     }
                 }
-                $targetTable = $this->schemaInfo->getEntityInfo($targetEntity)->tableName;
 
-                $referenceVpId = $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '$targetTable' AND id=" . $entity[$valueColumn]);
-                $entity[$valueColumn] = $referenceVpId;
+                if ($pathInStructure) {
+                    $entity[$valueColumn] = unserialize($entity[$valueColumn]);
+                    $paths = ReferenceUtils::getMatchingPaths($entity[$valueColumn], $pathInStructure);
+                } else {
+                    $paths = [[]]; // root = the value itself
+                }
+
+                /** @var Cursor[] $cursors */
+                $cursors = array_map(function ($path) use (&$entity, $valueColumn) { return new Cursor($entity[$valueColumn], $path); }, $paths);
+
+                foreach ($cursors as $cursor) {
+                    $ids = $cursor->getValue();
+                    $referenceVpids = $this->replaceIdsInString($targetEntity, $ids);
+                    $cursor->setValue($referenceVpids);
+                }
+
+                if ($pathInStructure) {
+                    $entity[$valueColumn] = serialize($entity[$valueColumn]);
+                }
+            }
+        }
+
+        return $entity;
+    }
+
+    public function restoreForeignKeys($entityName, $entity) {
+        $entityInfo = $this->schemaInfo->getEntityInfo($entityName);
+
+        foreach ($entityInfo->valueReferences as $referenceName => $targetEntity) {
+            list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) = array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
+
+            if ($entity[$sourceColumn] === $sourceValue && isset($entity[$valueColumn])) {
+
+                if ($this->isNullReference($entity[$valueColumn])) {
+                    continue;
+                }
+
+                if ($pathInStructure) {
+                    $entity[$valueColumn] = unserialize($entity[$valueColumn]);
+                    $paths = ReferenceUtils::getMatchingPaths($entity[$valueColumn], $pathInStructure);
+                } else {
+                    $paths = [[]]; // root = the value itself
+                }
+
+                /** @var Cursor[] $cursors */
+                $cursors = array_map(function ($path) use (&$entity, $valueColumn) { return new Cursor($entity[$valueColumn], $path); }, $paths);
+
+                foreach ($cursors as $cursor) {
+                    $vpids = $cursor->getValue();
+                    $referenceVpId = $this->restoreIdsInString($vpids);
+                    $cursor->setValue($referenceVpId);
+                }
+
+                if ($pathInStructure) {
+                    $entity[$valueColumn] = serialize($entity[$valueColumn]);
+                }
             }
         }
 
@@ -116,6 +168,25 @@ class VpidRepository {
             $data[$idColumnName] = $id;
         }
         return $data;
+    }
+
+    private function isNullReference($id) {
+        return (is_numeric($id) && intval($id) === 0) || $id === '';
+    }
+
+    private function replaceIdsInString($targetEntity, $stringWithIds) {
+        return preg_replace_callback('/(\d+)/', function ($match) use ($targetEntity) {
+            return $this->getVpidForEntity($targetEntity, $match[0]) ?: $match[0];
+        }, $stringWithIds);
+    }
+
+    private function restoreIdsInString($stringWithVpids) {
+        $stringWithIds = preg_replace_callback(IdUtil::getRegexMatchingId(), function ($match) {
+            return $this->getIdForVpid($match[0]) ?: $match[0];
+        }, $stringWithVpids);
+
+        return is_numeric($stringWithIds) ? intval($stringWithIds) : $stringWithIds;
+
     }
 
     /**

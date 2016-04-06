@@ -19,7 +19,7 @@ class TermsSynchronizerTest extends SynchronizerTestCase {
     protected function setUp() {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('term');
-        $this->synchronizer = new TermsSynchronizer($this->storage, self::$database, self::$schemaInfo, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->synchronizer = new TermsSynchronizer($this->storage, self::$database, self::$schemaInfo->getEntityInfo('term') ,self::$schemaInfo, self::$vpidRepository, self::$urlReplacer, self::$shortcodesReplacer);
     }
 
     /**
