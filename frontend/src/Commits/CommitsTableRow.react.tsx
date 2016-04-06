@@ -58,7 +58,7 @@ export default class CommitsTableRow extends React.Component<CommitsTableRowProp
   renderError() {
     return (
       <tr className='details-row error'>
-        <td colSpan={4}>{this.state.error}</td>
+        <td colSpan={5}>{this.state.error}</td>
       </tr>
     );
   }

@@ -5,6 +5,7 @@ import * as React from 'react';
 import * as moment from 'moment';
 import * as portal from '../common/portal';
 import {UndoDisabledDialog} from '../Commits/revertDialog';
+import {getGitBranchColor} from '../services/GitBranchColorProvider';
 
 interface CommitsTableRowSummaryProps extends React.Props<JSX.Element> {
   commit: Commit;
@@ -28,6 +29,12 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
 
     return (
       <tr className={className} onClick={() => this.toggleDetails()}>
+        <td className='column-environment'>
+          {commit.environment === '?'
+            ? null
+            : <div style={{backgroundColor: getGitBranchColor(commit.environment)}}>{commit.environment}</div>
+          }
+        </td>
         {commit.canUndo
           ? <td className='column-cb' onClick={this.onCheckboxClick.bind(this)}><input type='checkbox'
                                                                                        checked={this.props.isSelected}

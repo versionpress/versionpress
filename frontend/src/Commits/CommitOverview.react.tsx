@@ -69,6 +69,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     return (
       <ul className='overview-list'>
         {this.formatChanges(this.props.commit.changes).map((line, i) => <li key={i}>{line}</li>)}
+        {this.renderEnvironment()}
       </ul>
     );
   }
@@ -289,6 +290,14 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
         {entityList}
       </span>
     );
+  }
+
+  private renderEnvironment() {
+    return (
+      <li className='environment'>
+        <em>Environment: {this.props.commit.environment}</em>
+      </li>
+    )
   }
 
   private expandList(listKey) {
