@@ -79,7 +79,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
         })}
         <tfoot>
           <tr>
-            <td className='vp-table-pagination' colSpan={5}>
+            <td className='vp-table-pagination' colSpan={6}>
               {this.props.pages.map((page: number) => {
                 return <Link
                           activeClassName='active'
