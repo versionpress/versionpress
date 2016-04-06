@@ -38,6 +38,8 @@ comment:
     comment_post_ID: post
     user_id: user
     comment_parent: comment
+    ignored-entities:
+      - 'comment_approved: spam'
 
 commentmeta:
   table: commentmeta
@@ -45,6 +47,7 @@ commentmeta:
   parent-reference: comment_id
   references:
     comment_id: comment
+
 
 user:
   table: users
@@ -103,6 +106,7 @@ option:
     - 'option_name: rewrite_rules'
     - 'option_name: recently_edited'
     - 'option_name: auto_updater.lock'
+    - 'option_name: core_updater.lock'
     - 'option_name: can_compress_scripts'
     - 'option_name: auto_core_update_notified'
     - 'option_name: auth_key'

@@ -80,7 +80,44 @@
   }
 
   .column-cb {
-    width: 32px;
+    cursor: pointer;
+    width: 38px !important;
+    padding: 8px 10px 8px 10px !important;
+
+    input[type=checkbox] {
+      vertical-align: middle;
+      margin: -4px 0 0 0 !important;
+    }
+
+    &:hover input[type=checkbox] {
+      border: 1px solid #5b9dd9;
+      box-shadow: 0 0 2px rgba(30, 140, 190, 0.8);
+    }
+  }
+
+  .column-environment {
+    position: relative;
+    padding: 0 !important;
+    overflow: visible !important;
+    width: 12px;
+
+    div {
+      position: absolute;
+      white-space: nowrap;
+      overflow: hidden;
+      height: 100%;
+      max-width: 6px;
+      padding: 8px 0 8px 6px;
+      color: #fff;
+      transition: max-width,padding 0.3s;
+    }
+
+    &:hover {
+      div {
+        max-width: 200px;
+        padding: 8px 10px 8px 20px;
+      }
+    }
   }
 
   .column-date {
@@ -215,6 +252,10 @@
 
       li {
         margin: 0;
+      }
+
+      .environment {
+        margin-top: 8px;
       }
     }
   }

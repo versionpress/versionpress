@@ -45,6 +45,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
       <table className='vp-table widefat fixed'>
         <thead>
           <tr>
+            <th className='column-environment' />
             {this.renderSelectAll()}
             <th className='column-date'>Date</th>
             <th className='column-author' />

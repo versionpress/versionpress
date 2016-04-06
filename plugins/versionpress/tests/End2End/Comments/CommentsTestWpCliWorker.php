@@ -25,6 +25,21 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
         $this->wpAutomation->createComment($comment);
     }
 
+    public function prepare_createSpamComment() {
+    }
+
+    public function createSpamComment() {
+        $comment = array(
+            'comment_author' => 'John Tester',
+            'comment_author_email' => 'john.tester@example.com',
+            'comment_content' => 'Public comment',
+            'comment_approved' => "spam",
+            'comment_post_ID' => $this->testPostId
+        );
+
+        $this->wpAutomation->createComment($comment);
+    }
+
     public function prepare_createComment() {
     }
 
@@ -216,11 +231,12 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
 
     public function prepare_markTwoSpamCommentsAsNotSpam() {
         $this->lastCreatedComment = array();
-        $trashedComment = $this->prepareTestComment();
-        $trashedComment['comment_approved'] = 'spam';
+        $comment = $this->prepareTestComment();
 
-        $this->lastCreatedComment[] = $this->wpAutomation->createComment($trashedComment);
-        $this->lastCreatedComment[] = $this->wpAutomation->createComment($trashedComment);
+        $this->lastCreatedComment[] = $lastId = $this->wpAutomation->createComment($comment);
+        $this->wpAutomation->editComment($lastId, ['comment_approved' => 'spam']);
+        $this->lastCreatedComment[] = $lastId = $this->wpAutomation->createComment($comment);
+        $this->wpAutomation->editComment($lastId, ['comment_approved' => 'spam']);
     }
 
     public function markTwoSpamCommentsAsNotSpam() {

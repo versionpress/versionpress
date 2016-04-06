@@ -846,9 +846,9 @@ function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
         return;
     }
 
-    $adminBarText = "<span style=\"color:#FF8800;font-weight:bold\">VersionPress EAP running</span>";
+    $adminBarText = "<span style=\"color:#FF8800;font-weight:bold\">VersionPress running</span>";
     $popoverTitle = "Note";
-    $popoverText = "<p style='margin-top: 5px;'>You are running <strong>VersionPress " . VersionPress::getVersion() . "</strong> which is an <strong style='font-size: 1.15em;'>EAP release</strong>. Please understand that EAP releases are early versions of the software and as such might not fully support certain workflows, 3<sup>rd</sup> party plugins, hosts etc.<br /><br /><strong>We recommend that you keep a safe backup of the site at all times</strong></p>";
+    $popoverText = "<p style='margin-top: 5px;'>You are running <strong>VersionPress " . VersionPress::getVersion() . "</strong> which is an <strong style='font-size: 1.15em;'>Early Access release</strong>. As such, it might not fully support certain workflows, 3<sup>rd</sup> party plugins, hosts etc.<br /><br /><strong>We recommend that you keep a safe backup of the site at all times</strong></p>";
     $popoverText .= "<p><a href='http://docs.versionpress.net/en/release-notes' target='_blank'>Learn more about VersionPress releases</a></p>";
 
     $adminBar->add_node(array(
@@ -916,7 +916,3 @@ function versionpress_api_init() {
     $vpApi = new VersionPressApi($gitRepository, $reverter, $synchronizationProcess);
     $vpApi->register_routes();
 }
-
-add_action('init', function () {
-    update_option('akismet_spam_count', ($v = get_option('akismet_spam_count', 0)) + 1);
-});

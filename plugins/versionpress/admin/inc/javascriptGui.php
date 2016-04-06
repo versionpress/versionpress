@@ -1,6 +1,7 @@
 <?php
 $apiConfig = array(
     'root' => get_site_url(),
+    'adminUrl' => get_admin_url(),
     'urlPrefix' => rest_get_url_prefix(),
     'queryParam' => 'rest_route',
     'permalinkStructure' => get_option('permalink_structure'),
