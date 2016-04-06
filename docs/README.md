@@ -58,9 +58,9 @@ The `since:` tag can be specified either for a specific page at the top of the M
  - **TODO markers** can be written as `[TODO]` or `[TODO some arbitrary text]`. They will be highlighted in yellow and should be used rarely, possibly in alpha / beta versions of the doc topic.
 
 
-## Previewing and deploying updated docs
+## Deploying docs
 
-The engine running the docs site is an internal project at the moment so the only way to preview the pages is to use some Markdown editor. The updates are currently deployed manually.
+When a PR is merged into `master`, it is automatically deployed to [docs.versionpress.net](http://docs.versionpress.net/en).
 
 
 ## Localization
