@@ -106,6 +106,7 @@ option:
     - 'option_name: rewrite_rules'
     - 'option_name: recently_edited'
     - 'option_name: auto_updater.lock'
+    - 'option_name: core_updater.lock'
     - 'option_name: can_compress_scripts'
     - 'option_name: auto_core_update_notified'
     - 'option_name: auth_key'
