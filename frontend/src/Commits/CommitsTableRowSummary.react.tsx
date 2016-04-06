@@ -156,9 +156,13 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
 
   private onCheckboxClick(e: React.MouseEvent) {
     e.stopPropagation();
+    if (!this.props.enableActions) {
+      return;
+    }
+    
     const target = e.target as HTMLInputElement;
     let checked;
-    
+
     if (target.tagName === 'INPUT') {
       checked = target.checked;
     } else {
