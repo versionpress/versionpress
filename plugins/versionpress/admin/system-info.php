@@ -1,7 +1,6 @@
 <?php
 
-use Utils\SystemInfo;
-use VersionPress\Utils\RequirementsChecker;
+use VersionPress\Utils\SystemInfo;
 
 defined('ABSPATH') or die("Direct access not allowed");
 
