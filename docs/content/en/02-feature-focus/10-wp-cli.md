@@ -119,6 +119,6 @@ Applies changes found on the disk to the database. Useful e.g. after resolving m
 
 Checks if all requirements for using VersionPress are met on the target environment. 
 
-This command is usefull when you want to check if changes made on server (by you yourself, or hosting provider) does not break some of requirements.
+This command is useful when you make changes on the server and want to check whether VersionPress requirements are still met.
 
-Note that with this command, you will most usually **need to include the `--require=...` parameter**.
+Note that you will mostly **need to include the `--require=...` parameter**.
