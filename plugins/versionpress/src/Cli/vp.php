@@ -124,11 +124,8 @@ class VPCommand extends WP_CLI_Command {
 
         defined('SHORTINIT') or define('SHORTINIT', true);
 
-        $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
-        $commonConfigName = 'wp-config.common.php';
+        $this->requireWpConfig();
 
-        require_once dirname($wpConfigPath) . '/' . $commonConfigName;
-        require_once $wpConfigPath;
         require_once __DIR__ . '/../../bootstrap.php';
 
         $this->checkVpRequirements($assoc_args, RequirementsChecker::ENVIRONMENT);
@@ -195,11 +192,7 @@ class VPCommand extends WP_CLI_Command {
 
         defined('SHORTINIT') or define('SHORTINIT', true);
 
-        $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
-        $commonConfigName = 'wp-config.common.php';
-
-        require_once dirname($wpConfigPath) . '/' . $commonConfigName;
-        require_once $wpConfigPath;
+        $this->requireWpConfig();
         require_once __DIR__ . '/../../bootstrap.php';
 
         if (!VersionPress::isActive()) {
@@ -1062,6 +1055,25 @@ class VPCommand extends WP_CLI_Command {
 
         if (!$requirementsChecker->isEverythingFulfilled()) {
             WP_CLI::confirm('There are some warnings. Continue?', $assoc_args);
+        }
+    }
+
+    /**
+     * Tries to require Wordpress config files. Throws WP-CLI error when files not found.
+     */
+    private function requireWpConfig() {
+        $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
+        $commonConfigName = 'wp-config.common.php';
+        $commonConfigPath = dirname($wpConfigPath) . '/' . $commonConfigName;
+        if (file_exists($wpConfigPath)) {
+            require_once $wpConfigPath;
+        } else {
+            WP_CLI::error('wp-config.php file not found');
+        }
+        if (file_exists($commonConfigName)) {
+            require_once $commonConfigPath;
+        } else {
+            WP_CLI::error($commonConfigName . ' file not found.');
         }
     }
 }
