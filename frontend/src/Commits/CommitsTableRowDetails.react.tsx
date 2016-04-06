@@ -34,6 +34,7 @@ export default class CommitsTableRowDetails extends React.Component<CommitsTable
       <tr className={className}>
         <td />
         <td />
+        <td />
         <td>
           {this.props.loading
             ? <div className='details-row-loader'/>
@@ -47,7 +48,7 @@ export default class CommitsTableRowDetails extends React.Component<CommitsTable
 
     const fullDiffRow = (
       <tr className={className}>
-        <td colSpan={4}>
+        <td colSpan={5}>
           <div className={detailsClass}>
             <DiffPanel diff={this.props.diff} />
           </div>

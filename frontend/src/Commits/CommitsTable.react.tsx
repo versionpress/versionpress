@@ -45,6 +45,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
       <table className='vp-table widefat fixed'>
         <thead>
           <tr>
+            <th className='column-environment' />
             {this.renderSelectAll()}
             <th className='column-date'>Date</th>
             <th className='column-message'>Message</th>
@@ -77,7 +78,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
         })}
         <tfoot>
           <tr>
-            <td className='vp-table-pagination' colSpan={4}>
+            <td className='vp-table-pagination' colSpan={5}>
               {this.props.pages.map((page: number) => {
                 return <Link
                           activeClassName='active'
