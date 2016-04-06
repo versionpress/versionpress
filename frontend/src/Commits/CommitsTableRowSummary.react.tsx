@@ -43,6 +43,15 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
           : <td className='column-cb' />
         }
         <td className='column-date' title={moment(commit.date).format('LLL')}>{moment(commit.date).fromNow()}</td>
+        <td className='column-author'>
+          <img
+            className='avatar'
+            src={commit.author.avatar}
+            title={this.getAuthorTooltip(commit)}
+            width={20}
+            height={20}
+          />
+        </td>
         <td className='column-message'>
           {commit.isMerge
             ? <span className='merge-icon' title='Merge commit'>M</span>
@@ -128,6 +137,17 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
     portal.alertDialog(title, body);
   }
 
+  private getAuthorTooltip(commit: Commit) {
+    const author = commit.author;
+    if (author.name === 'Non-admin action') {
+      return 'This action is not associated with any user, e.g., it was a public comment';
+    } else if (author.name === 'WP-CLI') {
+      return 'This action was done via WP-CLI';
+    }
+
+    return author.name + ' <' + author.email + '>';
+  }
+
   private toggleDetails() {
     if (this.props.commit.isEnabled) {
       this.props.onDetailsLevelChanged(this.props.detailsLevel === 'none' ? 'overview' : 'none');
@@ -136,9 +156,13 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
 
   private onCheckboxClick(e: React.MouseEvent) {
     e.stopPropagation();
+    if (!this.props.enableActions) {
+      return;
+    }
+    
     const target = e.target as HTMLInputElement;
     let checked;
-    
+
     if (target.tagName === 'INPUT') {
       checked = target.checked;
     } else {

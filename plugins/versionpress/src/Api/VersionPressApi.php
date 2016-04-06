@@ -226,6 +226,11 @@ class VersionPressApi {
                 "isMerge" => $commit->isMerge(),
                 "environment" => $environment,
                 "changes" => array_merge($this->convertChangeInfoList($changeInfoList), $fileChanges),
+                "author" => array(
+                    "name" => $commit->getAuthorName(),
+                    "email" => $commit->getAuthorEmail(),
+                    "avatar" => get_avatar_url($commit->getAuthorEmail())
+                )
             );
             $isFirstCommit = false;
         }

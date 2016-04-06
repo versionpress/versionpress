@@ -89,7 +89,7 @@
       margin: -4px 0 0 0 !important;
     }
 
-    &:hover input[type=checkbox] {
+    &:hover input[type=checkbox]:not([disabled]) {
       border: 1px solid #5b9dd9;
       box-shadow: 0 0 2px rgba(30, 140, 190, 0.8);
     }
@@ -122,6 +122,17 @@
 
   .column-date {
     width: 135px;
+  }
+
+  .column-author {
+    padding: 7px 0 8px 10px !important;
+    width: 30px;
+    height: 36px;
+
+    .avatar {
+      display: block;
+      border-radius: 4px;
+    }
   }
 
   .column-actions {
