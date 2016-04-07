@@ -23,11 +23,9 @@ class CommentStorage extends DirectoryStorage {
 
         if ($isExistingEntity && $data['comment_approved'] === 'spam') {
             return true;
-        } else if(!$isExistingEntity && $data['comment_approved'] === 'spam') {
-            return false;
-        } else {
-            return parent::shouldBeSaved($data);
         }
+
+        return parent::shouldBeSaved($data);
     }
 
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
