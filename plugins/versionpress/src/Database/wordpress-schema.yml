@@ -38,8 +38,8 @@ comment:
     comment_post_ID: post
     user_id: user
     comment_parent: comment
-    ignored-entities:
-      - 'comment_approved: spam'
+  ignored-entities:
+    - 'comment_approved: spam'
 
 commentmeta:
   table: commentmeta
