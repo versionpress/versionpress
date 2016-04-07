@@ -12,6 +12,9 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\ArrayUtils;
+use VersionPress\Utils\Comparators;
+use VersionPress\Utils\Cursor;
+use VersionPress\Utils\IdUtil;
 use VersionPress\Utils\ReferenceUtils;
 use wpdb;
 
@@ -47,12 +50,12 @@ class Reverter {
         $this->storageFactory = $storageFactory;
     }
 
-    public function undo($commitHash) {
-        return $this->_revert($commitHash, "undo");
+    public function undo($commits) {
+        return $this->_revert($commits, "undo");
     }
 
-    public function rollback($commitHash) {
-        return $this->_revert($commitHash, "rollback");
+    public function rollback($commits) {
+        return $this->_revert($commits, "rollback");
     }
 
     public function canRevert() {
@@ -62,29 +65,43 @@ class Reverter {
         return $this->repository->isCleanWorkingDirectory();
     }
 
-    private function _revert($commitHash, $method) {
+    private function _revert($commits, $method) {
         if (!$this->canRevert()) {
             return RevertStatus::NOT_CLEAN_WORKING_DIRECTORY;
         }
 
-        $commitHashForDiff = $method === "undo" ? sprintf("%s~1..%s", $commitHash, $commitHash) : $commitHash;
-        $modifiedFiles = $this->repository->getModifiedFiles($commitHashForDiff);
-        $vpIdsInModifiedFiles = $this->getAllVpIdsFromModifiedFiles($modifiedFiles);
+        vp_commit_all_frequently_written_entities();
+        uasort($commits, function ($a, $b) { return $this->repository->wasCreatedAfter($b, $a); });
 
-        if ($method === "undo") {
-            $status = $this->revertOneCommit($commitHash);
-            $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_UNDO, $commitHash);
+        $modifiedFiles = array();
+        $vpIdsInModifiedFiles = array();
 
-        } else {
-            $status = $this->revertToCommit($commitHash);
-            $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_ROLLBACK, $commitHash);
+        foreach ($commits as $commitHash) {
+            $commitHashForDiff = $method === "undo" ? sprintf("%s~1..%s", $commitHash, $commitHash) : $commitHash;
+            $modifiedFiles = array_merge($modifiedFiles, $this->repository->getModifiedFiles($commitHashForDiff));
+            $modifiedFiles = array_unique($modifiedFiles, SORT_REGULAR);
+            $vpIdsInModifiedFiles = array_merge($vpIdsInModifiedFiles, $this->getAllVpIdsFromModifiedFiles($modifiedFiles));
+            $vpIdsInModifiedFiles = array_unique($vpIdsInModifiedFiles, SORT_REGULAR);
+
+            if ($method === "undo") {
+                $status = $this->revertOneCommit($commitHash);
+                $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_UNDO, $commitHash);
+            } else {
+                $status = $this->revertToCommit($commitHash);
+                $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_ROLLBACK, $commitHash);
+            }
+
+            if ($status !== RevertStatus::OK) {
+                return $status;
+            }
+
+            $this->committer->forceChangeInfo($changeInfo);
         }
 
-        if ($status !== RevertStatus::OK) {
-            return $status;
+        if (!$this->repository->willCommit()) {
+            return RevertStatus::NOTHING_TO_COMMIT;
         }
 
-        $this->committer->forceChangeInfo($changeInfo);
         $affectedPosts = $this->getAffectedPosts($modifiedFiles);
         $this->updateChangeDateForPosts($affectedPosts);
         $this->committer->commit();
@@ -103,12 +120,14 @@ class Reverter {
         $date = current_time('mysql');
         $dateGmt = current_time('mysql', true);
         foreach ($vpIds as $vpId) {
-            $sql = "update {$this->database->prefix}posts set post_modified = '{$date}', post_modified_gmt = '{$dateGmt}' where ID = (select id from {$this->database->prefix}vp_id where vp_id = unhex('{$vpId}'))";
-            $this->database->query($sql);
             $post = $storage->loadEntity($vpId, null);
-            $post['post_modified'] = $date;
-            $post['post_modified_gmt'] = $dateGmt;
-            $storage->save($post);
+            if ($post) {
+                $sql = "update {$this->database->prefix}posts set post_modified = '{$date}', post_modified_gmt = '{$dateGmt}' where ID = (select id from {$this->database->prefix}vp_id where vp_id = unhex('{$vpId}'))";
+                $this->database->query($sql);
+                $post['post_modified'] = $date;
+                $post['post_modified_gmt'] = $dateGmt;
+                $storage->save($post);
+            }
         }
     }
 
@@ -162,14 +181,18 @@ class Reverter {
 
         foreach ($entityInfo->references as $reference => $referencedEntityName) {
             $vpReference = "vp_$reference";
-            if (!isset($entity[$vpReference]) || $entity[$vpReference] == 0) {
+            if (!isset($entity[$vpReference]) || $entity[$vpReference] === 0 || $entity[$vpReference] === '0') {
                 continue;
             }
 
-            $referencedEntityId = $entity[$vpReference];
-            $entityExists = $this->entityExists($referencedEntityName, $referencedEntityId, $parentId);
-            if (!$entityExists) {
-                return false;
+            $referencedVpidsString = $entity[$vpReference];
+            preg_match_all(IdUtil::getRegexMatchingId(), $referencedVpidsString, $matches);
+
+            foreach ($matches[0] as $referencedVpid) {
+                $entityExists = $this->entityExists($referencedEntityName, $referencedVpid, $parentId);
+                if (!$entityExists) {
+                    return false;
+                }
             }
         }
 
@@ -188,12 +211,14 @@ class Reverter {
         }
 
         foreach ($entityInfo->valueReferences as $reference => $referencedEntityName) {
-            list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
+            list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
             if (!isset($entity[$sourceColumn]) || $entity[$sourceColumn] != $sourceValue || !isset($entity[$valueColumn])) {
                 continue;
             }
 
-            $referencedEntityId = $entity[$valueColumn];
+            if ((is_numeric($entity[$valueColumn]) && intval($entity[$valueColumn]) === 0) || $entity[$valueColumn] === '') {
+                continue;
+            }
 
             if ($referencedEntityName[0] === '@') {
                 $entityNameProvider = substr($referencedEntityName, 1); // strip the '@'
@@ -203,10 +228,34 @@ class Reverter {
                 }
             }
 
-            $entityExists = $this->entityExists($referencedEntityName, $referencedEntityId, $parentId);
-            if (!$entityExists) {
-                return false;
+            if ($pathInStructure) {
+                $entity[$valueColumn] = unserialize($entity[$valueColumn]);
+                $paths = ReferenceUtils::getMatchingPaths($entity[$valueColumn], $pathInStructure);
+            } else {
+                $paths = [[]]; // root = the value itself
             }
+
+            /** @var Cursor[] $cursors */
+            $cursors = array_map(function ($path) use (&$entity, $valueColumn) { return new Cursor($entity[$valueColumn], $path); }, $paths);
+
+            foreach ($cursors as $cursor) {
+                $vpidsString = $cursor->getValue();
+
+                preg_match_all(IdUtil::getRegexMatchingId(), $vpidsString, $matches);
+
+                foreach ($matches[0] as $referencedVpid) {
+                    $entityExists = $this->entityExists($referencedEntityName, $referencedVpid, $parentId);
+                    if (!$entityExists) {
+                        return false;
+                    }
+                }
+            }
+
+            if ($pathInStructure) {
+                $entity[$valueColumn] = serialize($entity[$valueColumn]);
+            }
+
+
         }
 
         return true;
@@ -230,40 +279,70 @@ class Reverter {
 
             $allReferences = array_merge($otherEntityReferences, $otherEntityMnReferences, $otherEntityValueReferences);
 
-            $reference = array_search($entityName, $allReferences);
 
-            if ($reference === false) { // Other entity is not referencing $entityName
-                continue;
+            foreach ($allReferences as $reference => $referencedEntity) {
+
+                if ($referencedEntity !== $entityName && $referencedEntity[0] !== '@') { // if the target is dynamic, check it anyway - just to be sure
+                    continue;
+                }
+
+                $otherEntityStorage = $this->storageFactory->getStorage($otherEntityName);
+                $possiblyReferencingEntities = $otherEntityStorage->loadAll();
+
+                if (isset($otherEntityReferences[$reference])) { // 1:N reference
+                    $vpReference = "vp_$reference";
+
+                    foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
+                        if (isset($possiblyReferencingEntity[$vpReference])) {
+
+                            $referencedVpidsString = $possiblyReferencingEntity[$vpReference];
+                            preg_match_all(IdUtil::getRegexMatchingId(), $referencedVpidsString, $matches);
+
+                            if (ArrayUtils::any($matches[0], Comparators::equals($entityId))) {
+                                return true;
+                            }
+                        }
+                    }
+                } elseif (isset($otherEntityMnReferences[$reference])) { // M:N reference
+                    $vpReference = "vp_$otherEntityName";
+                    foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
+                        if (isset($possiblyReferencingEntity[$vpReference]) && array_search($entityId, $possiblyReferencingEntity[$vpReference]) !== false) {
+                            return true;
+                        }
+                    }
+                } elseif (isset($otherEntityValueReferences[$reference])) { // Value reference
+                    list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
+
+                    foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
+                        if (isset($possiblyReferencingEntity[$sourceColumn]) && $possiblyReferencingEntity[$sourceColumn] == $sourceValue && isset($possiblyReferencingEntity[$valueColumn])) {
+                            if ((is_numeric($possiblyReferencingEntity[$valueColumn]) && intval($possiblyReferencingEntity[$valueColumn]) === 0) || $possiblyReferencingEntity[$valueColumn] === '') {
+                                continue;
+                            }
+
+                            if ($pathInStructure) {
+                                $possiblyReferencingEntity[$valueColumn] = unserialize($possiblyReferencingEntity[$valueColumn]);
+                                $paths = ReferenceUtils::getMatchingPaths($possiblyReferencingEntity[$valueColumn], $pathInStructure);
+                            } else {
+                                $paths = [[]]; // root = the value itself
+                            }
+
+                            /** @var Cursor[] $cursors */
+                            $cursors = array_map(function ($path) use (&$possiblyReferencingEntity, $valueColumn) {
+                                return new Cursor($possiblyReferencingEntity[$valueColumn], $path);
+                            }, $paths);
+
+                            foreach ($cursors as $cursor) {
+                                $vpidsString = $cursor->getValue();
+                                preg_match_all(IdUtil::getRegexMatchingId(), $vpidsString, $matches);
+
+                                if (ArrayUtils::any($matches[0], Comparators::equals($entityId))) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
             }
-
-            $otherEntityStorage = $this->storageFactory->getStorage($otherEntityName);
-            $possiblyReferencingEntities = $otherEntityStorage->loadAll();
-
-            if (isset($otherEntityReferences[$reference])) { // 1:N reference
-                $vpReference = "vp_$reference";
-
-                foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
-                    if (isset($possiblyReferencingEntity[$vpReference]) && $possiblyReferencingEntity[$vpReference] === $entityId) {
-                        return true;
-                    }
-                }
-            } elseif (isset($otherEntityMnReferences[$reference])) { // M:N reference
-                $vpReference = "vp_$otherEntityName";
-                foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
-                    if (isset($possiblyReferencingEntity[$vpReference]) && array_search($entityId, $possiblyReferencingEntity[$vpReference]) !== false) {
-                        return true;
-                    }
-                }
-            } elseif (isset($otherEntityValueReferences[$reference])) { // Value reference
-                list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
-
-                foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
-                    if (isset($possiblyReferencingEntity[$sourceColumn]) && $possiblyReferencingEntity[$sourceColumn] == $sourceValue && isset($possiblyReferencingEntity[$valueColumn]) && $possiblyReferencingEntity[$valueColumn] === $entityId) {
-                        return true;
-                    }
-                }
-            }
-
         }
 
         return false;
@@ -279,7 +358,7 @@ class Reverter {
         $optionNameRegex = "/^\\[(.*)\\]\\r?$/m";
 
         foreach ($modifiedFiles as $file) {
-            if (!is_file(ABSPATH . $file)) {
+            if (!file_exists(ABSPATH . $file) || !is_file(ABSPATH . $file)) {
                 continue;
             }
 

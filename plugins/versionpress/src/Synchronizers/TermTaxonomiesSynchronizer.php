@@ -11,10 +11,6 @@ use wpdb;
 
 class TermTaxonomiesSynchronizer extends SynchronizerBase {
 
-    function __construct(Storage $storage, $wpdb, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
-        parent::__construct($storage, $wpdb, $dbSchema, $urlReplacer, $shortcodesReplacer, 'term_taxonomy');
-    }
-
     function synchronize($task, $entitiesToSynchronize = null) {
         $this->database->query("drop index term_id_taxonomy on {$this->database->term_taxonomy}");
         $result = parent::synchronize($task, $entitiesToSynchronize);

@@ -44,6 +44,7 @@ class ChangeInfoEnvelope implements ChangeInfo {
         "translation" => 'VersionPress\ChangeInfos\BulkTranslationChangeInfo',
         "user" => 'VersionPress\ChangeInfos\BulkUserChangeInfo',
         "usermeta" => 'VersionPress\ChangeInfos\BulkUserMetaChangeInfo',
+        "versionpress" => 'VersionPress\ChangeInfos\BulkRevertChangeInfo',
     );
 
     /**

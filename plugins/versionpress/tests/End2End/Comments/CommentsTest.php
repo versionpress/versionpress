@@ -39,6 +39,23 @@ class CommentsTest extends End2EndTestCase {
     }
 
     /**
+     *
+     * @test
+     */
+    public function spamCommentIsNotCommitted() {
+
+        self::$worker->prepare_createSpamComment();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->createSpamComment();
+
+        $commitAsserter->assertNumCommits(0);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
      * @test
      * @testdox New comment creates 'comment/create' action
      */

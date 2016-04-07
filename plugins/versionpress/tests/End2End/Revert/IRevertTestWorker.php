@@ -24,4 +24,18 @@ interface IRevertTestWorker extends ITestWorker {
     public function clickOnCancel();
 
     public function prepare_undoWithNotCleanWorkingDirectory();
+
+    public function prepare_undoToTheSameState();
+
+    public function prepare_rollbackToTheSameState();
+    public function rollbackToTheSameState();
+    
+    public function prepare_undoMultipleCommits();
+    public function undoMultipleCommits();
+
+    public function prepare_undoMultipleDependentCommits();
+    public function undoMultipleDependentCommits();
+
+    public function prepare_undoMultipleCommitsThatCannotBeReverted();
+    public function undoMultipleCommitsThatCannotBeReverted();
 }

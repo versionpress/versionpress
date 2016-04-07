@@ -67,7 +67,7 @@ use VersionPress\Utils\RequirementsChecker;
                 <ul>
                     <li>
                         <span class="icon icon-notification"></span>
-                        You are activating an <strong>Early Access version</strong>. If you encounter any issues please let us know <a href="https://github.com/versionpress/support">on GitHub</a>. <a href="http://docs.versionpress.net/en/getting-started/about-eap">Learn more about EAP</a>.
+                        You are activating an <strong>Early Access version</strong>. If you encounter any issues please let us know <a href="https://github.com/versionpress/support">on GitHub</a>. <a href="http://docs.versionpress.net/en/getting-started/about-eap">Learn more</a>.
                     </li>
                     <li>
                         <span class="icon icon-notification"></span>

@@ -5,6 +5,7 @@
 /wp-config.php
 {{abspath}}/wp-config.php
 .maintenance
+versionpress.maintenance
 /.htaccess
 /web.config
 

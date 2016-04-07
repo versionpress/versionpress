@@ -1,56 +1,7 @@
 @import "../common/mixins";
 @sepWidth: 15px;
 
-.no-wp {
-  table {
-    &.fixed {
-      table-layout: fixed;
-    }
-    &.widefat {
-      background: #fff;
-      border: 1px solid #e5e5e5;
-      box-shadow: 0 1px 1px rgba(0,0,0,.04);
-    }
-  }
-  .widefat {
-    border-spacing: 0;
-    width: 100%;
-    clear: both;
-    margin: 0;
-
-    * {
-      word-wrap: break-word;
-    }
-
-    td,
-    th {
-      overflow: hidden;
-      color: #555;
-      padding: 8px 10px;
-    }
-
-    th {
-      font-weight: 400;
-      text-align: left;
-      line-height: 1.3;
-      font-size: 14px;
-    }
-
-    td {
-      font-size: 13px;
-      line-height: 1.5;
-      vertical-align: top;
-    }
-
-    a {
-      text-decoration: none;
-    }
-  }
-}
-
 .vp-table {
-  margin-top: 20px !important;
-
   .loading & {
     .loading;
   }
@@ -66,6 +17,14 @@
 
   tbody tr {
     background-color: #f9f9f9;
+  }
+
+  input[type=checkbox] {
+    background: #fff;
+
+    &[disabled] {
+      background: #f7f7f7;
+    }
   }
 
   .merge-icon {
@@ -120,8 +79,60 @@
     border-bottom: 0;
   }
 
+  .column-cb {
+    cursor: pointer;
+    width: 38px !important;
+    padding: 8px 10px 8px 10px !important;
+
+    input[type=checkbox] {
+      vertical-align: middle;
+      margin: -4px 0 0 0 !important;
+    }
+
+    &:hover input[type=checkbox]:not([disabled]) {
+      border: 1px solid #5b9dd9;
+      box-shadow: 0 0 2px rgba(30, 140, 190, 0.8);
+    }
+  }
+
+  .column-environment {
+    position: relative;
+    padding: 0 !important;
+    overflow: visible !important;
+    width: 12px;
+
+    div {
+      position: absolute;
+      white-space: nowrap;
+      overflow: hidden;
+      height: 100%;
+      max-width: 6px;
+      padding: 8px 0 8px 6px;
+      color: #fff;
+      transition: max-width,padding 0.3s;
+    }
+
+    &:hover {
+      div {
+        max-width: 200px;
+        padding: 8px 10px 8px 20px;
+      }
+    }
+  }
+
   .column-date {
     width: 135px;
+  }
+
+  .column-author {
+    padding: 7px 0 8px 10px !important;
+    width: 30px;
+    height: 36px;
+
+    .avatar {
+      display: block;
+      border-radius: 4px;
+    }
   }
 
   .column-actions {
@@ -241,6 +252,10 @@
 
       li {
         margin: 0;
+      }
+
+      .environment {
+        margin-top: 8px;
       }
     }
   }

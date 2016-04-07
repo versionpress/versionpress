@@ -15,10 +15,6 @@ use wpdb;
  */
 class PostsSynchronizer extends SynchronizerBase {
 
-    function __construct(Storage $storage, Database $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
-        parent::__construct($storage, $database, $dbSchema, $urlReplacer, $shortcodesReplacer, 'post');
-    }
-
     protected function doEntitySpecificActions() {
         if ($this->passNumber == 1) {
             return false;

@@ -1,49 +1,4 @@
-.no-wp {
-
-  body {
-    color: #444;
-    font-family: "Open Sans", sans-serif;
-    font-size: 13px;
-    line-height: 1.4;
-    min-width: 600px;
-    -webkit-font-smoothing: subpixel-antialiased;
-    padding: 0 30px 65px 20px;
-    background: #f1f1f1;
-  }
-
-  a,
-  div {
-    outline: 0;
-  }
-
-  a {
-    color: #0074a2;
-    transition-property: border, background, color;
-    transition-duration: .05s;
-    transition-timing-function: ease-in-out;
-
-    &:active,
-    &:hover {
-      color: #2ea2cc;
-    }
-
-    &:focus {
-      color: #124964;
-      box-shadow: 0 0 0 1px #5b9dd9,
-                  0 0 2px 1px rgba(30,140,190,.8);
-    }
-  }
-
-  p {
-    font-size: 13px;
-    line-height: 1.5;
-    margin: 1em 0;
-  }
-
-  #vp {
-    padding-top: 20px;
-  }
-}
+@import '../legacy/Wordpress';
 
 #vp {
   box-sizing: border-box;
@@ -55,5 +10,5 @@
 }
 
 .hide {
-  display: none;
+  display: none !important;
 }

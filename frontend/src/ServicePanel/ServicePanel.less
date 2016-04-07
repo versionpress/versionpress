@@ -1,37 +1,11 @@
-@import '../common/forms';
-
-.no-wp {
-  .welcome-panel {
-    position: relative;
-    overflow: auto;
-    margin: 16px 0;
-    padding: 23px 10px;
-    border: 1px solid #e5e5e5;
-    box-shadow: 0 1px 1px rgba(0,0,0,.04);
-    background: #fff;
-    font-size: 13px;
-    line-height: 2.1;
-
-    h3 {
-      margin: 0;
-      font-size: 21px;
-      font-weight: 400;
-      line-height: 1.2;
-    }
-
-    h4 {
-      margin: 1.33em 0 0;
-      font-size: 16px;
-    }
-  }
-}
+@import '../common/mixins';
 
 .ServicePanel {
   clear: both;
 
   &-wrapper {
     overflow-y: hidden;
-    max-height: 500px;
+    max-height: 600px;
     margin: 20px 0;
 
     transition-property: margin, max-height;
@@ -44,41 +18,27 @@
     }
   }
 
-
   &.welcome-panel {
     margin-top: 0;
     margin-bottom: 0;
-    padding-bottom: 20px;
+    padding: 20px;
   }
 
-  &-row {
-    padding: 10px 0;
-    clear: both;
+  &-warning {
+    margin-top: 0 !important;
+    border-left: 5px solid #ffba00;
+    font-size: 18px !important;
+    padding: 1em;
   }
 
-  &-label {
-    display: block;
-    font-weight: bold;
-    cursor: pointer;
+  &-inner {
+    width: 90%;
+    max-width: 1000px;
   }
 
-  &-input {
-    input,
-    textarea {
-      line-height: 1.5;
-      width: 300px;
-      padding: 5px;
-      display: block;
-    }
-
-    textarea {
-      height: 6em;
-      resize: none;
-    }
-
-    &[data-description]:after {
-      display: block;
-      content: attr(data-description);
-    }
+  li {
+    font-size: 14px;
+    line-height: 1.65;
+    margin-bottom: 10px;
   }
 }

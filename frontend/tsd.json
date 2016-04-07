@@ -36,7 +36,7 @@
       "commit": "4f7b7e01d3a9622bfab0bef469e169529e60c66b"
     },
     "react/react.d.ts": {
-      "commit": "e69fe60f2d6377ea4fae539493997b098f52cad1"
+      "commit": "552fe5d3e45ef9c8ecd3eda2b6a24d2546c438f4"
     },
     "superagent/superagent.d.ts": {
       "commit": "e69fe60f2d6377ea4fae539493997b098f52cad1"
@@ -46,6 +46,9 @@
     },
     "react/react-dom.d.ts": {
       "commit": "e69fe60f2d6377ea4fae539493997b098f52cad1"
+    },
+    "react/react-addons-update.d.ts": {
+      "commit": "552fe5d3e45ef9c8ecd3eda2b6a24d2546c438f4"
     }
   }
 }

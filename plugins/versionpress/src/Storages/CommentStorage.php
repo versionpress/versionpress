@@ -18,6 +18,16 @@ class CommentStorage extends DirectoryStorage {
         $this->database = $database;
     }
 
+    public function shouldBeSaved($data) {
+        $isExistingEntity = $this->entityExistedBeforeThisRequest($data);
+
+        if ($isExistingEntity && $data['comment_approved'] === 'spam') {
+            return true;
+        }
+
+        return parent::shouldBeSaved($data);
+    }
+
     protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
 
         if ($action === 'edit') {

@@ -13,9 +13,6 @@ use wpdb;
  * Comments synchronizer, the simplest VPID one (simply uses base class implementation)
  */
 class CommentsSynchronizer extends SynchronizerBase {
-    function __construct(Storage $storage, Database $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
-        parent::__construct($storage, $database, $dbSchema, $urlReplacer, $shortcodesReplacer, 'comment');
-    }
 
     protected function doEntitySpecificActions() {
         parent::doEntitySpecificActions();

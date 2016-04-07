@@ -6,7 +6,8 @@ Description: Git-versioning plugin for WordPress
 Version: DEV
 Author: VersionPress
 Author URI: http://versionpress.net/
-License: GPLv2 or later
+License: GPLv3
+License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 */
 
 use VersionPress\Api\VersionPressApi;
@@ -489,26 +490,7 @@ function vp_register_hooks() {
         }
 
         add_action($actionName, function () use ($allRulesInInterval) {
-            global $versionPressContainer;
-            $dbSchemaInfo = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
-            $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
-            $wpdb = $versionPressContainer->resolve(VersionPressServices::WPDB);
-            $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
-
-            foreach ($allRulesInInterval as $entityName => $rulesWithInterval) {
-                $storageFactory->getStorage($entityName)->ignoreFrequentlyWrittenEntities = false;
-
-                $table = $dbSchemaInfo->getPrefixedTableName($entityName);
-                foreach ($rulesWithInterval as $ruleAndInterval) {
-                    $restriction = \VersionPress\Utils\QueryLanguageUtils::createSqlRestrictionFromRule($ruleAndInterval['rule']);
-                    $sql = "SELECT * FROM $table WHERE $restriction";
-
-                    $results = $wpdb->get_results($sql, ARRAY_A);
-                    foreach ($results as $data) {
-                        $wpdbMirrorBridge->update($table, $data, $data);
-                    }
-                }
-            }
+            vp_save_frequently_written_entities($allRulesInInterval);
         });
     }
 
@@ -843,7 +825,7 @@ function _vp_revert($reverterMethod) {
     $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
 
     vp_enable_maintenance();
-    $revertStatus = call_user_func(array($reverter, $reverterMethod), $commitHash);
+    $revertStatus = call_user_func(array($reverter, $reverterMethod), array($commitHash));
     vp_disable_maintenance();
     $adminPage = menu_page_url('versionpress', false);
 
@@ -864,9 +846,9 @@ function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
         return;
     }
 
-    $adminBarText = "<span style=\"color:#FF8800;font-weight:bold\">VersionPress EAP running</span>";
+    $adminBarText = "<span style=\"color:#FF8800;font-weight:bold\">VersionPress running</span>";
     $popoverTitle = "Note";
-    $popoverText = "<p style='margin-top: 5px;'>You are running <strong>VersionPress " . VersionPress::getVersion() . "</strong> which is an <strong style='font-size: 1.15em;'>EAP release</strong>. Please understand that EAP releases are early versions of the software and as such might not fully support certain workflows, 3<sup>rd</sup> party plugins, hosts etc.<br /><br /><strong>We recommend that you keep a safe backup of the site at all times</strong></p>";
+    $popoverText = "<p style='margin-top: 5px;'>You are running <strong>VersionPress " . VersionPress::getVersion() . "</strong> which is an <strong style='font-size: 1.15em;'>Early Access release</strong>. As such, it might not fully support certain workflows, 3<sup>rd</sup> party plugins, hosts etc.<br /><br /><strong>We recommend that you keep a safe backup of the site at all times</strong></p>";
     $popoverText .= "<p><a href='http://docs.versionpress.net/en/release-notes' target='_blank'>Learn more about VersionPress releases</a></p>";
 
     $adminBar->add_node(array(

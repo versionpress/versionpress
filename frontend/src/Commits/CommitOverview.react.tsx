@@ -21,8 +21,11 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     this.state = {expandedLists: []};
   }
 
-  private static renderEntityNamesWithDuplicates(changes: Change[], countOfDuplicates): JSX.Element[] {
-    return changes.map((change: Change) => {
+  private static renderEntityNamesWithDuplicates(changes: Change[]): JSX.Element[] {
+    let filteredChanges = ArrayUtils.filterDuplicates<Change>(changes, change => change.type + '|||' + change.action + '|||' + change.name);
+    let countOfDuplicates = ArrayUtils.countDuplicates(changes, change => [change.type, change.action, change.name]);
+
+    return filteredChanges.map((change: Change) => {
       let duplicatesOfChange = countOfDuplicates[change.type][change.action][change.name];
       let duplicatesSuffix = duplicatesOfChange > 1 ? (' (' + duplicatesOfChange + '×)') : '';
       return (
@@ -46,7 +49,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     if (change.type === 'postmeta') {
       return change.tags['VP-PostMeta-Key'];
     }
-    
+
     if (change.type === 'commentmeta') {
       return change.tags['VP-CommentMeta-Key'];
     }
@@ -66,6 +69,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     return (
       <ul className='overview-list'>
         {this.formatChanges(this.props.commit.changes).map((line, i) => <li key={i}>{line}</li>)}
+        {this.renderEnvironment()}
       </ul>
     );
   }
@@ -79,21 +83,16 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     }
 
     let displayedLines = [];
-    let changesByTypeAndAction = ArrayUtils.groupBy(
-      ArrayUtils.filterDuplicates<Change>(changes, change => change.type + '|||' + change.action + '|||' + change.name),
-        change => [change.type, change.action]
-    );
-
-    let countOfDuplicates = ArrayUtils.countDuplicates(changes, change => [change.type, change.action, change.name]);
+    let changesByTypeAndAction = ArrayUtils.groupBy(changes, change => [change.type, change.action]);
 
     for (let type in changesByTypeAndAction) {
       for (let action in changesByTypeAndAction[type]) {
         let lines: any[];
 
         if (type === 'usermeta') {
-          lines = this.getLinesForUsermeta(changesByTypeAndAction[type][action], countOfDuplicates, action);
+          lines = this.getLinesForUsermeta(changesByTypeAndAction[type][action], action);
         } else if (type === 'postmeta') {
-          lines = this.getLinesForPostmeta(changesByTypeAndAction[type][action], countOfDuplicates, action);
+          lines = this.getLinesForPostmeta(changesByTypeAndAction[type][action], action);
         } else if (type === 'versionpress' && (action === 'undo' || action === 'rollback')) {
           lines = this.getLinesForRevert(changesByTypeAndAction[type][action], action);
         } else if (type === 'versionpress' && (action === 'activate' || action === 'deactivate')) {
@@ -103,9 +102,9 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
         } else if (type === 'comment') {
           lines = this.getLinesForComments(changesByTypeAndAction[type][action], action);
         } else if (type === 'post') {
-          lines = this.getLinesForPosts(changesByTypeAndAction[type][action], countOfDuplicates, action);
+          lines = this.getLinesForPosts(changesByTypeAndAction[type][action], action);
         } else {
-          lines = this.getLinesForOtherChanges(changesByTypeAndAction[type][action], countOfDuplicates, type, action);
+          lines = this.getLinesForOtherChanges(changesByTypeAndAction[type][action], type, action);
         }
 
         displayedLines = displayedLines.concat(lines);
@@ -115,12 +114,12 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     return displayedLines;
   }
 
-  private getLinesForUsermeta(changedMeta: Change[], countOfDuplicates, action: string) {
-    return this.getLinesForMeta('usermeta', 'user', 'VP-User-Login', changedMeta, countOfDuplicates, action);
+  private getLinesForUsermeta(changedMeta: Change[], action: string) {
+    return this.getLinesForMeta('usermeta', 'user', 'VP-User-Login', changedMeta, action);
   }
 
-  private getLinesForPostmeta(changedMeta: Change[], countOfDuplicates, action: string) {
-    return this.getLinesForMeta('postmeta', 'post', 'VP-Post-Title', changedMeta, countOfDuplicates, action);
+  private getLinesForPostmeta(changedMeta: Change[], action: string) {
+    return this.getLinesForMeta('postmeta', 'post', 'VP-Post-Title', changedMeta, action);
   }
 
   private getLinesForComments(changedComments: Change[], action: string) {
@@ -165,12 +164,12 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     return lines;
   }
 
-  private getLinesForPosts(changedPosts: Change[], countOfDuplicates, action: string) {
+  private getLinesForPosts(changedPosts: Change[], action: string) {
     let lines = [];
     let changedPostsByType = ArrayUtils.groupBy(changedPosts, post => post.tags['VP-Post-Type']);
 
     for (let postType in changedPostsByType) {
-      let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changedPostsByType[postType], countOfDuplicates);
+      let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changedPostsByType[postType]);
       let suffix = null;
 
       if (action === 'trash' || action === 'untrash') {
@@ -185,12 +184,12 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     return lines;
   }
 
-  private getLinesForMeta(entityName, parentEntity, groupByTag, changedMeta: Change[], countOfDuplicates, action: string) {
+  private getLinesForMeta(entityName, parentEntity, groupByTag, changedMeta: Change[], action: string) {
     let lines = [];
     let metaByTag = ArrayUtils.groupBy(changedMeta, c => c.tags[groupByTag]);
 
     for (let tagValue in metaByTag) {
-      let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(metaByTag[tagValue], countOfDuplicates);
+      let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(metaByTag[tagValue]);
 
       let lineSuffix = [
         ' for ',
@@ -206,13 +205,16 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
   }
 
   private getLinesForRevert(changes: Change[], action) {
-    let change = changes[0]; // Both undo and rollback are always only 1 change.
-    let commitDetails = change.tags['VP-Commit-Details'];
-    if (action === 'undo') {
-      let date = commitDetails['date'];
-      return [`Reverted change was made ${moment(date).fromNow()} (${moment(date).format('LLL')})`];
-    } else {
+    if (action === 'rollback') {
+      let change = changes[0]; // Rollback is always only 1 change.
+      let commitDetails = change.tags['VP-Commit-Details'];
       return [`The state is same as it was in "${commitDetails['message']}"`];
+    } else {
+      return changes.map((change: Change) => {
+        let commitDetails = change.tags['VP-Commit-Details'];
+        let date = commitDetails['date'];
+        return `Reverted change "${commitDetails['message']}" was made ${moment(date).fromNow()} (${moment(date).format('LLL')})`;
+      });
     }
   }
 
@@ -238,8 +240,8 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     return [line];
   }
 
-  private getLinesForOtherChanges(changes, countOfDuplicates, type, action) {
-    let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changes, countOfDuplicates);
+  private getLinesForOtherChanges(changes: Change[], type, action) {
+    let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changes);
     let line = this.renderOverviewLine(type, action, changedEntities);
     return [line];
   }
@@ -288,6 +290,14 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
         {entityList}
       </span>
     );
+  }
+
+  private renderEnvironment() {
+    return (
+      <li className='environment'>
+        <em>Environment: {this.props.commit.environment}</em>
+      </li>
+    )
   }
 
   private expandList(listKey) {

@@ -5,6 +5,7 @@ namespace VersionPress\Synchronizers;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesReplacer;
+use VersionPress\Database\VpidRepository;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use wpdb;
@@ -23,6 +24,9 @@ class SynchronizerFactory {
      */
     private $dbSchema;
 
+    /** @var VpidRepository */
+    private $vpidRepository;
+
     /** @var AbsoluteUrlReplacer */
     private $urlReplacer;
 
@@ -30,23 +34,24 @@ class SynchronizerFactory {
     private $shortcodesReplacer;
 
     private $synchronizerClasses = array(
-        'post' => 'VersionPress\Synchronizers\PostsSynchronizer',
-        'postmeta' => 'VersionPress\Synchronizers\PostMetaSynchronizer',
-        'comment' => 'VersionPress\Synchronizers\CommentsSynchronizer',
-        'commentmeta' => 'VersionPress\Synchronizers\CommentMetaSynchronizer',
-        'option' => 'VersionPress\Synchronizers\OptionsSynchronizer',
-        'user' => 'VersionPress\Synchronizers\UsersSynchronizer',
-        'usermeta' => 'VersionPress\Synchronizers\UserMetaSynchronizer',
-        'term' => 'VersionPress\Synchronizers\TermsSynchronizer',
-        'termmeta' => 'VersionPress\Synchronizers\TermMetaSynchronizer',
-        'term_taxonomy' => 'VersionPress\Synchronizers\TermTaxonomiesSynchronizer',
+        'post' => PostsSynchronizer::class,
+        'postmeta' => PostMetaSynchronizer::class,
+        'comment' => CommentsSynchronizer::class,
+        'commentmeta' => CommentMetaSynchronizer::class,
+        'option' => OptionsSynchronizer::class,
+        'user' => UsersSynchronizer::class,
+        'usermeta' => UserMetaSynchronizer::class,
+        'term' => TermsSynchronizer::class,
+        'termmeta' => TermMetaSynchronizer::class,
+        'term_taxonomy' => TermTaxonomiesSynchronizer::class,
     );
     private $synchronizationSequence = array('user', 'usermeta', 'term', 'termmeta', 'term_taxonomy', 'post', 'postmeta', 'comment', 'commentmeta', 'option');
 
-    function __construct(StorageFactory $storageFactory, Database $database, DbSchemaInfo $dbSchema, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
+    function __construct(StorageFactory $storageFactory, Database $database, DbSchemaInfo $dbSchema, VpidRepository $vpidRepository, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
         $this->storageFactory = $storageFactory;
         $this->database = $database;
         $this->dbSchema = $dbSchema;
+        $this->vpidRepository = $vpidRepository;
         $this->urlReplacer = $urlReplacer;
         $this->shortcodesReplacer = $shortcodesReplacer;
         $this->adjustSynchronizationSequenceToDbVersion();
@@ -58,7 +63,7 @@ class SynchronizerFactory {
      */
     public function createSynchronizer($synchronizerName) {
         $synchronizerClass = $this->synchronizerClasses[$synchronizerName];
-        return new $synchronizerClass($this->getStorage($synchronizerName), $this->database, $this->dbSchema, $this->urlReplacer, $this->shortcodesReplacer);
+        return new $synchronizerClass($this->getStorage($synchronizerName), $this->database, $this->dbSchema->getEntityInfo($synchronizerName), $this->dbSchema, $this->vpidRepository, $this->urlReplacer, $this->shortcodesReplacer);
     }
 
     public function getSynchronizationSequence() {

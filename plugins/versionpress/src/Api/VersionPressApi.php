@@ -23,6 +23,7 @@ use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\BugReporter;
+use VersionPress\Utils\QueryLanguageUtils;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -55,6 +56,9 @@ class VersionPressApi {
             'args' => array(
                 'page' => array(
                     'default' => '0'
+                ),
+                'query' => array(
+                    'default' => array()
                 )
             ),
             'permission_callback' => array($this, 'checkPermissions')
@@ -62,9 +66,9 @@ class VersionPressApi {
 
         register_rest_route($namespace, '/undo', array(
             'methods' => WP_REST_Server::READABLE,
-            'callback' => $this->handleAsAdminSectionRoute('undoCommit'),
+            'callback' => $this->handleAsAdminSectionRoute('undoCommits'),
             'args' => array(
-                'commit' => array(
+                'commits' => array(
                     'required' => true
                 )
             ),
@@ -177,6 +181,13 @@ class VersionPressApi {
      */
     public function getCommits(WP_REST_Request $request) {
         $gitLogPaginator = new GitLogPaginator($this->gitRepository);
+
+        $query = urldecode(stripslashes($request['query']));
+        $rules = QueryLanguageUtils::createRulesFromQueries(array($query));
+        $gitLogQuery = !empty($rules)
+            ? QueryLanguageUtils::createGitLogQueryFromRule($rules[0])
+            : '';
+        $gitLogPaginator->setQuery($gitLogQuery);
         $gitLogPaginator->setCommitsPerPage(25);
 
         $page = intval($request['page']);
@@ -186,12 +197,7 @@ class VersionPressApi {
             return new WP_Error('notice', 'No more commits to show.', array('status' => 404));
         }
 
-        $preActivationHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
-        if (empty($preActivationHash)) {
-            $initialCommitHash = $this->gitRepository->getInitialCommit()->getHash();
-        } else {
-            $initialCommitHash = $this->gitRepository->getChildCommit($preActivationHash);
-        }
+        $initialCommitHash = $this->getInitialCommitHash();
 
         $isChildOfInitialCommit = $this->gitRepository->wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
         $isFirstCommit = $page === 0;
@@ -220,6 +226,11 @@ class VersionPressApi {
                 "isMerge" => $commit->isMerge(),
                 "environment" => $environment,
                 "changes" => array_merge($this->convertChangeInfoList($changeInfoList), $fileChanges),
+                "author" => array(
+                    "name" => $commit->getAuthorName(),
+                    "email" => $commit->getAuthorEmail(),
+                    "avatar" => get_avatar_url($commit->getAuthorEmail())
+                )
             );
             $isFirstCommit = false;
         }
@@ -233,17 +244,25 @@ class VersionPressApi {
      * @param WP_REST_Request $request
      * @return WP_REST_Response|WP_Error
      */
-    public function undoCommit(WP_REST_Request $request) {
-        $commitHash = $request['commit'];
+    public function undoCommits(WP_REST_Request $request) {
+        $commitHashes = explode(',', $request['commits']);
 
-        if (!preg_match('/^[0-9a-f]+$/', $commitHash)) {
-            return new WP_Error(
-                'error',
-                'Invalid commit hash',
-                array('status' => 404));
+        $initialCommitHash = $this->getInitialCommitHash();
+
+        foreach ($commitHashes as $commitHash) {
+            $log = $this->gitRepository->log($commitHash);
+            if (!preg_match('/^[0-9a-f]+$/', $commitHash) || count($log) === 0) {
+                return new WP_Error( 'error', 'Invalid commit hash', array('status' => 404));
+            }
+            if ($log[0]->isMerge()) {
+                return new WP_Error( 'error', 'Cannot undo merge commit', array('status' => 403));
+            }
+            if (!$this->gitRepository->wasCreatedAfter($commitHash, $initialCommitHash)) {
+                return new WP_Error( 'error', 'Cannot undo changes before initial commit', array('status' => 403));
+            }
         }
 
-        return $this->revertCommit('undo', $commitHash);
+        return $this->revertCommits('undo', $commitHashes);
     }
 
     /**
@@ -253,14 +272,20 @@ class VersionPressApi {
     public function rollbackToCommit(WP_REST_Request $request) {
         $commitHash = $request['commit'];
 
-        if (!preg_match('/^[0-9a-f]+$/', $commitHash)) {
-            return new WP_Error(
-                'error',
-                'Invalid commit hash',
-                array('status' => 404));
+        $initialCommitHash = $this->getInitialCommitHash();
+
+        $log = $this->gitRepository->log($commitHash);
+        if (!preg_match('/^[0-9a-f]+$/', $commitHash) || count($log) === 0) {
+            return new WP_Error( 'error', 'Invalid commit hash', array('status' => 404));
+        }
+        if (!$this->gitRepository->wasCreatedAfter($commitHash, $initialCommitHash) && $log[0]->getHash() !== $initialCommitHash) {
+            return new WP_Error( 'error', 'Cannot roll back before initial commit', array('status' => 403));
+        }
+        if ($log[0]->getHash() === $this->gitRepository->getLastCommitHash()) {
+            return new WP_Error( 'error', 'Nothing to commit. Current state is the same as the one you want rollback to.', array('status' => 403));
         }
 
-        return $this->revertCommit('rollback', $commitHash);
+        return $this->revertCommits('rollback', array($commitHash));
     }
 
     /**
@@ -272,12 +297,12 @@ class VersionPressApi {
 
     /**
      * @param string $reverterMethod
-     * @param string $commit
+     * @param array $commit
      * @return WP_REST_Response|WP_Error
      */
-    public function revertCommit($reverterMethod, $commit) {
+    public function revertCommits($reverterMethod, $commits) {
         vp_enable_maintenance();
-        $revertStatus = call_user_func(array($this->reverter, $reverterMethod), $commit);
+        $revertStatus = call_user_func(array($this->reverter, $reverterMethod), $commits);
         vp_disable_maintenance();
 
         if ($revertStatus !== RevertStatus::OK) {
@@ -360,8 +385,15 @@ class VersionPressApi {
 
         $latestCommit = $request['latestCommit'];
 
+        $query = urldecode(stripslashes($request['query']));
+        $rules = QueryLanguageUtils::createRulesFromQueries(array($query));
+        $gitLogQuery = !empty($rules)
+            ? QueryLanguageUtils::createGitLogQueryFromRule($rules[0])
+            : '';
+        $repoLatestCommit = $repository->getLastCommitHash($gitLogQuery);
+
         return new WP_REST_Response(array(
-            "update" => $repository->wasCreatedAfter("HEAD", $latestCommit),
+            "update" => $repository->wasCreatedAfter($repoLatestCommit, $latestCommit),
             "cleanWorkingDirectory" => $repository->isCleanWorkingDirectory()
         ));
     }
@@ -417,8 +449,7 @@ class VersionPressApi {
         if (ArrayUtils::any($status, function ($fileStatus) {
             $vpdbName = basename(VP_VPDB_DIR);
             return Strings::contains($fileStatus[1], $vpdbName);
-        })
-        ) {
+        })) {
             $this->updateDatabase($status);
         }
 
@@ -573,5 +604,16 @@ class VersionPressApi {
         }, $changedFiles);
 
         return $fileChanges;
+    }
+
+    /**
+     * @return string
+     */
+    private function getInitialCommitHash() {
+        $preActivationHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
+        if (empty($preActivationHash)) {
+            return $this->gitRepository->getInitialCommit()->getHash();
+        }
+        return $this->gitRepository->getChildCommit($preActivationHash);
     }
 }

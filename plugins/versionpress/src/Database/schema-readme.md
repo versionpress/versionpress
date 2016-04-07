@@ -90,7 +90,7 @@ concept of “parent entities”.
 ## Frequently written entities
 
 Some entities are changed very often (view counter, akismet spam count, etc.). It is possible to save them once in a while.
-They are specified in section `frequently-written`. It's a list of selectors or combination of selector and custom interval.
+They are specified in section `frequently-written`. It's a list of selectors or combination of selector and custom interval. Default interval is `1hour`.
 
     frequently-written:
         - 'column_name: value'
@@ -98,6 +98,8 @@ They are specified in section `frequently-written`. It's a list of selectors or 
           interval: 5min
 
 The interval is parsed by PHP function `strtotime`, so it can be whatever the function takes.
+
+In case of clone/staging setup don't set the interval too short (below `1min`). The shorter the interval is, the more likely is the merge conflict.
 
 ## Ignoring entities
 
