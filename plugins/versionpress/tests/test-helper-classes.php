@@ -2,7 +2,7 @@
 
 $directoryIterator = new RecursiveDirectoryIterator(__DIR__, FilesystemIterator::SKIP_DOTS);
 $filterIterator = new RecursiveCallbackFilterIterator($directoryIterator, function (SplFileInfo $current, $key, RecursiveDirectoryIterator $iterator) {
-    $ignoredDirectories = array('node_modules', 'vagrant');
+    $ignoredDirectories = array('node_modules');
     $filename = $current->getFilename();
 
     if (in_array($filename, $ignoredDirectories)) {

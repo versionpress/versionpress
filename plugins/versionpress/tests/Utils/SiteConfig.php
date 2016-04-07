@@ -19,15 +19,7 @@ class SiteConfig {
     public $name;
 
     /**
-     * Whether the site runs locally or in a Vagrant machine. Is detected from the $host
-     * property - it is false if host is "localhost", true otherwise.
-     *
-     * @var bool
-     */
-    public $isVagrant;
-
-    /**
-     * Host where the machine runs. "localhost" for local sites, anything else assumes a Vagrant site.
+     * Host where the machine runs. "localhost" for local site.
      *
      * @var string
      */
@@ -41,8 +33,8 @@ class SiteConfig {
 
     /**
      * DB host as should be configured in wp-config.php. Note that this may be "localhost" even
-     * if the machine itself runs on a different (Vagrant) host, so it is quite normal that
-     * $host is something like "vagrant.local" and $dbHost is "localhost" (local for that machine).
+     * if the machine itself runs on a different host, so it is quite normal that
+     * $host is something like "machine.local" and $dbHost is "localhost" (local for that machine).
      *
      * @var string
      */
