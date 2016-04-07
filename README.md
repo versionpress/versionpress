@@ -14,7 +14,7 @@ VersionPress is young :hatching_chick: . It works fine on simpler sites and you'
 To **use** VersionPress:
 
 1. Make sure you read the [Early Access notes](http://docs.versionpress.net/en/getting-started/about-eap).
-2. Download the latest version from <http://versionpress.net/>.
+2. Download the latest version from [GitHub releases](https://github.com/versionpress/versionpress/releases). **It must be the built ZIP**, e.g., `versionpress-3.0.zip`, not the source codes ZIP!
 3. Install to your WordPress site.
 4. Read the [quick start tutorial](http://blog.versionpress.net/2015/05/versionpress-1-0-walkthrough/) and [part 2 on staging](http://blog.versionpress.net/2015/09/versionpress-2-0-staging/).
 5. Enjoy!
