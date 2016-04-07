@@ -37,7 +37,7 @@ class CommitterTest extends \PHPUnit_Framework_TestCase {
             $from = $i * $numberOfFilesInEachCommit;
             $to = ($i + 1) * $numberOfFilesInEachCommit;
 
-            $process = new Process("php generate-files-and-commit.php --from=$from --to=$to");
+            $process = new Process("php generate-files-and-commit.php --from=$from --to=$to", __DIR__);
             $process->start();
             $runningProcesses[] = $process;
         }
