@@ -91,8 +91,8 @@ option:
       site_icon: post
       page_on_front: post
       page_for_posts: post
-      default_category: term_taxonomy
-      default_email_category: term_taxonomy
+      default_category: term
+      default_email_category: term
       widget_nav_menu[/\d+/]["nav_menu"]: term
       widget_pages[/\d+/]["exclude"]: post
   frequently-written:
