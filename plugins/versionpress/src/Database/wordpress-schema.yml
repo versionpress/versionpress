@@ -98,6 +98,7 @@ option:
       featured-content["tag-id"]: term
       theme_mods_*["nav_menu_locations"][/.*/]: term
       theme_mods_*["header_image_data"]["attachment_id"]: post
+      theme_mods_*["custom_logo"]: post
   frequently-written:
     - 'option_name: akismet_spam_count'
   ignored-entities:
