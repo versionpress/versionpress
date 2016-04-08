@@ -75,4 +75,23 @@ class MediaTest extends End2EndTestCase {
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
+
+    /**
+     * @test
+     * @depends uploadingFileCreatesPostCreateAction
+     */
+    public function editationOfFileCreatesCommit() {
+        self::$worker->prepare_editFile();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->editFile();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/edit");
+        $commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
+        $commitAsserter->assertCommitPath("A", "wp-content/uploads/*");
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
 }
