@@ -21,7 +21,6 @@ class TestConfigTest extends PHPUnit_Framework_TestCase {
         // 'sites' section
         $this->assertArrayHasKey('vp01', $config->sites);
         $this->assertEquals("VP Test @ localhost", $config->sites["vp01"]->title);
-        $this->assertFalse($config->sites["vp01"]->isVagrant);
 
     }
 }
