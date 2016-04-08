@@ -61,11 +61,17 @@ VersionPress knows what ID to be looking for in the foreign entity name because 
 
 When the reference to entity depends on another column value, use value-reference. It is neccessary to specify column where is the dependency (source column), 
 column where is the foreign id itself (value column) and the name of foreign entity. Instead of the static name of entity it is possible to use dynamic mapping.
-For the mapping can be used either a function or static method. Mapping function or method are prefixed with `@`. 
+For the mapping can be used either a function or static method. Mapping function or method are prefixed with `@`.
+ 
+If the ID is in a serialized object, you can specify the path by a suffix of the source column. It looks like array access but also supports regular expressions - see the sample below.
+
+Value references also supports wildcards in the name of source column. It's useful e.g. for options named `theme_mods_{name of the theme}`.
 
     value-references:
         <source_column_name>@<value_column_name>:
             <source_column_value>: <foreign_entity_name | @mapping_function>
+            <source_column_value>["path-in-serialized-objects"][/\d+/][0]: <foreign_entity_name | @mapping_function>
+            <columns_with_prefix_*>: <foreign_entity_name | @mapping_function>
 
 Another type of references are the M:N references. Sometimes (for example between posts and term_taxonomies) we need to describe
 an M:N relationship (junction table in the SQL). To do that we can use this format

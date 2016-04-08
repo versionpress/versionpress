@@ -212,7 +212,8 @@ class Reverter {
 
         foreach ($entityInfo->valueReferences as $reference => $referencedEntityName) {
             list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
-            if (!isset($entity[$sourceColumn]) || $entity[$sourceColumn] != $sourceValue || !isset($entity[$valueColumn])) {
+
+            if (!isset($entity[$sourceColumn]) || ($entity[$sourceColumn] != $sourceValue && !ReferenceUtils::valueMatchesWildcard($sourceValue, $entity[$sourceColumn])) || !isset($entity[$valueColumn])) {
                 continue;
             }
 
@@ -314,7 +315,7 @@ class Reverter {
                     list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
 
                     foreach ($possiblyReferencingEntities as $possiblyReferencingEntity) {
-                        if (isset($possiblyReferencingEntity[$sourceColumn]) && $possiblyReferencingEntity[$sourceColumn] == $sourceValue && isset($possiblyReferencingEntity[$valueColumn])) {
+                        if (isset($possiblyReferencingEntity[$sourceColumn]) && ($possiblyReferencingEntity[$sourceColumn] == $sourceValue || ReferenceUtils::valueMatchesWildcard($sourceValue, $possiblyReferencingEntity[$sourceColumn])) && isset($possiblyReferencingEntity[$valueColumn])) {
                             if ((is_numeric($possiblyReferencingEntity[$valueColumn]) && intval($possiblyReferencingEntity[$valueColumn]) === 0) || $possiblyReferencingEntity[$valueColumn] === '') {
                                 continue;
                             }

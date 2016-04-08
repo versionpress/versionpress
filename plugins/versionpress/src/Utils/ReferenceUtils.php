@@ -140,4 +140,25 @@ class ReferenceUtils {
 
         return $paths;
     }
+
+    public static function valueMatchesWildcard($valueWithWildcards, $value) {
+        // https://regex101.com/r/tC8zD4/3
+        $re = "/(?<escaped>(?:(?:\\\\\\\\)|(?:\\\\\\*))+)|(?<asterisk>\\*)|(?<string>[^\\\\\\*]+)/";
+
+        $regex = preg_replace_callback($re, function ($match) {
+            if ($match['escaped'] !== '') {
+                return preg_quote(stripslashes($match['escaped']), '/');
+            }
+
+            if ($match['asterisk'] === '*') {
+                return '.*';
+            }
+
+            return preg_quote($match['string'], '/');
+
+        }, $valueWithWildcards);
+
+        return preg_match("/^{$regex}$/", $value);
+
+    }
 }
