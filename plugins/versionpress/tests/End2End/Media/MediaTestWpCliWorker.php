@@ -35,4 +35,13 @@ class MediaTestWpCliWorker extends WpCliWorker implements IMediaTestWorker {
     public function deleteFile() {
         $this->wpAutomation->deletePost($this->postId);
     }
+
+    public function prepare_editFile() {
+        throw new \PHPUnit_Framework_SkippedTestError("File cannot be changed using WP-CLI.");
+    }
+
+    public function editFile() {
+    }
+
+
 }

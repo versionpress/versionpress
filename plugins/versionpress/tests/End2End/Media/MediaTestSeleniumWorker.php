@@ -26,7 +26,8 @@ class MediaTestSeleniumWorker extends SeleniumWorker implements IMediaTestWorker
         $this->byCssSelector('#async-upload')->value($this->filePath); // separator is actually OS-specific here
         $this->byCssSelector('#html-upload')->click();
 
-        $this->waitForElement('.thumbnail', 3000);}
+        $this->waitForElement('.thumbnail', 3000);
+    }
 
     public function prepare_editFileName() {
     }
@@ -47,4 +48,23 @@ class MediaTestSeleniumWorker extends SeleniumWorker implements IMediaTestWorker
         $this->acceptAlert();
         $this->waitForAjax();
     }
+
+    public function prepare_editFile() {
+        $this->uploadFile();
+    }
+
+    public function editFile() {
+        $this->byCssSelector('.attachment:first-child .thumbnail')->click(); // click must be on the .thumbnail element
+        $this->waitForElement('.edit-attachment-frame', 300);
+
+        $this->byCssSelector('.edit-attachment')->click();
+        $this->waitForElement('.imgedit-rleft', 500);
+        $this->byCssSelector('.imgedit-rleft')->click();
+        sleep(1); // wait for javascript in this case to rotate the image
+        $this->byCssSelector(".imgedit-submit-btn:not([disabled=disabled])")->click();
+
+        $this->waitForAjax();
+    }
+
+
 }

@@ -291,6 +291,12 @@ function vp_register_hooks() {
 
     add_action('set_object_terms', vp_create_update_post_terms_hook($mirror, $vpidRepository));
 
+    add_filter('wp_save_image_editor_file', function ($saved, $filename, $image, $mime_type, $post_id) use ($vpidRepository, $committer) {
+        $vpid = $vpidRepository->getVpidForEntity('post', $post_id);
+        $post = get_post($post_id);
+        $committer->forceChangeInfo(new \VersionPress\ChangeInfos\PostChangeInfo('edit', $vpid, $post->post_type, $post->post_title));
+    }, 10, 5);
+
     add_filter('plugin_install_action_links', function ($links, $plugin) {
         $compatibility = CompatibilityChecker::testCompatibilityBySlug($plugin['slug']);
         if ($compatibility === CompatibilityResult::COMPATIBLE) {
