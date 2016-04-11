@@ -42,10 +42,10 @@ class WpdbMirrorBridge {
 
         $id = $this->database->insert_id;
         $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($table);
-
         if (!$entityInfo) {
             return;
         }
+        $data = $this->database->get_row("SELECT * FROM `$table` WHERE `$entityInfo->idColumnName` = '$id'", ARRAY_A);
 
         $entityName = $entityInfo->entityName;
         $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityName, $data);
