@@ -95,6 +95,7 @@ option:
       default_email_category: term
       widget_nav_menu[/\d+/]["nav_menu"]: term
       widget_pages[/\d+/]["exclude"]: post
+      nav_menu_options["auto_add"][/\d+/]: term
   frequently-written:
     - 'option_name: akismet_spam_count'
   ignored-entities:
