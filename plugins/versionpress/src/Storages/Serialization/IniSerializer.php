@@ -400,7 +400,10 @@ class IniSerializer {
                 return Strings::startsWith($maybeRelatedKey, $key);
             }, ARRAY_FILTER_USE_KEY);
 
-            $deserialized = array_diff_key($deserialized, $relatedKeys);
+            $keysToUnset = $relatedKeys;
+            unset($keysToUnset[$key]); // unset all related lines except the first one (it will be replaced without changing position in the array)
+
+            $deserialized = array_diff_key($deserialized, $keysToUnset);
             $deserialized[$key] = SerializedDataToIniConverter::fromIniLines($key, $relatedKeys);
         }
 

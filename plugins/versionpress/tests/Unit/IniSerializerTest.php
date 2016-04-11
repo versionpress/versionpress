@@ -1235,4 +1235,23 @@ INI
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
     }
+
+    /**
+     * @test
+     */
+    public function serializationDoesntChangeTheOrder() {
+        $serializedString = serialize(777);
+
+        $data = ["Section" => ["data" => $serializedString, "another_data" => "value"]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> 777
+another_data = "value"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
 }
