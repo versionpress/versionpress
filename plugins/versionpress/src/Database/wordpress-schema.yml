@@ -91,10 +91,11 @@ option:
       site_icon: post
       page_on_front: post
       page_for_posts: post
-      default_category: term_taxonomy
-      default_email_category: term_taxonomy
+      default_category: term
+      default_email_category: term
       widget_nav_menu[/\d+/]["nav_menu"]: term
       widget_pages[/\d+/]["exclude"]: post
+      nav_menu_options["auto_add"][/\d+/]: term
       featured-content["tag-id"]: term
       theme_mods_*["nav_menu_locations"][/.*/]: term
       theme_mods_*["header_image_data"]["attachment_id"]: post

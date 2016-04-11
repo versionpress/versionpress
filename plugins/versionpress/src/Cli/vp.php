@@ -114,6 +114,24 @@ class VPCommand extends WP_CLI_Command {
     }
 
     /**
+     * Checks if VersionPress requirements are met.
+     *
+     * @subcommand check-requirements
+     *
+     * @when before_wp_load
+     */
+    public function checkRequirements($args, $assoc_args) {
+
+        defined('SHORTINIT') or define('SHORTINIT', true);
+
+        $this->requireWpConfig();
+
+        require_once __DIR__ . '/../../bootstrap.php';
+
+        $this->checkVpRequirements($assoc_args, RequirementsChecker::ENVIRONMENT);
+    }
+
+    /**
      * Starts tracking the site
      *
      * --yes
@@ -124,7 +142,7 @@ class VPCommand extends WP_CLI_Command {
     public function activate($args, $assoc_args) {
         global $versionPressContainer;
 
-        $this->checkVpRequirements($assoc_args);
+        $this->checkVpRequirements($assoc_args, RequirementsChecker::SITE);
 
         /**
          * @var Initializer $initializer
@@ -174,15 +192,8 @@ class VPCommand extends WP_CLI_Command {
 
         defined('SHORTINIT') or define('SHORTINIT', true);
 
-        $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
-        $commonConfigName = 'wp-config.common.php';
-
-        require_once dirname($wpConfigPath) . '/' . $commonConfigName;
-        require_once $wpConfigPath;
+        $this->requireWpConfig();
         require_once __DIR__ . '/../../bootstrap.php';
-        require_once ABSPATH . WPINC . '/formatting.php';
-        require_once ABSPATH . WPINC . '/theme.php';
-        require_once ABSPATH . WPINC . '/link-template.php';
 
         if (!VersionPress::isActive()) {
             WP_CLI::error('Unfortunately, this site was not tracked by VersionPress. Therefore, it cannot be restored.');
@@ -191,7 +202,7 @@ class VPCommand extends WP_CLI_Command {
         // Check if the site is installed
         $process = VPCommandUtils::runWpCliCommand('core', 'is-installed');
         if ($process->isSuccessful()) {
-            $this->checkVpRequirements($assoc_args);
+            $this->checkVpRequirements($assoc_args, RequirementsChecker::ENVIRONMENT);
             WP_CLI::confirm("It looks like the site is OK. Do you really want to run the 'restore-site' command?", $assoc_args);
         }
 
@@ -1044,18 +1055,19 @@ class VPCommand extends WP_CLI_Command {
 
     /**
      * @param $assoc_args
+     * @param $requirementsScope string of the requirements
      */
-    private function checkVpRequirements($assoc_args) {
+    private function checkVpRequirements($assoc_args, $requirementsScope) {
+        require_once ABSPATH . WPINC . '/formatting.php';
+        require_once ABSPATH . WPINC . '/theme.php';
+        require_once ABSPATH . WPINC . '/link-template.php';
+
         global $versionPressContainer;
 
         $database = $versionPressContainer->resolve(VersionPressServices::WPDB);
         $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
 
-        if (count($assoc_args) > 0) {
-            $requirementsChecker = new RequirementsChecker($database, $schema, RequirementsChecker::ENVIRONMENT);
-        } else {
-            $requirementsChecker = new RequirementsChecker($database, $schema);
-        }
+        $requirementsChecker = new RequirementsChecker($database, $schema, $requirementsScope);
 
         $report = $requirementsChecker->getRequirements();
 
@@ -1080,6 +1092,25 @@ class VPCommand extends WP_CLI_Command {
 
         if (!$requirementsChecker->isEverythingFulfilled()) {
             WP_CLI::confirm('There are some warnings. Continue?', $assoc_args);
+        }
+    }
+
+    /**
+     * Tries to require Wordpress config files. Throws WP-CLI error when files not found.
+     */
+    private function requireWpConfig() {
+        $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
+        $commonConfigName = 'wp-config.common.php';
+        $commonConfigPath = dirname($wpConfigPath) . '/' . $commonConfigName;
+        if (file_exists($wpConfigPath)) {
+            require_once $wpConfigPath;
+        } else {
+            WP_CLI::error('wp-config.php file not found');
+        }
+        if (file_exists($commonConfigName)) {
+            require_once $commonConfigPath;
+        } else {
+            WP_CLI::error($commonConfigName . ' file not found.');
         }
     }
 

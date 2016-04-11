@@ -19,7 +19,6 @@ use VersionPress\Utils\ProcessUtils;
  *  - NPM packages installed in <project_root>
  *  - Gulp (`gulp -v` works in console)
  *  - `test-config.yml` file created in `versionpress/tests`
- *  - Vagrant configuration as described on the wiki
  *
  * Currently, WpAutomation is a set of static functions as of v1; other options will be considered for v2, see WP-56.
  *
@@ -100,7 +99,7 @@ class WpAutomation {
     public function copyVersionPressFiles() {
         $versionPressDir = __DIR__ . '/../..';
         $gulpBaseDir = $versionPressDir . '/../..'; // project root as checked out from our repository
-        $this->exec('gulp test-deploy', $gulpBaseDir, true, false, array('VP_DEPLOY_TARGET' => $this->siteConfig->path)); // this also cleans the destination directory, see gulpfile.js "clean" task
+        $this->exec('gulp test-deploy', $gulpBaseDir, false, array('VP_DEPLOY_TARGET' => $this->siteConfig->path)); // this also cleans the destination directory, see gulpfile.js "clean" task
     }
 
     public function activateVersionPress() {
@@ -513,7 +512,7 @@ class WpAutomation {
                 $downloadCommand .= " --locale=$wpLocale";
             }
 
-            $this->exec($downloadCommand, null, false);
+            $this->exec($downloadCommand, null);
         }
     }
 
@@ -570,27 +569,23 @@ class WpAutomation {
     }
 
     /**
-     * Executes a command. If the command is WP-CLI command (starts with "wp ...") it might be rewritten
-     * for remote execution on Vagrant depending on the config 'is-vagrant' value.
+     * Executes a command. If the command is WP-CLI command (starts with "wp ...") 
      *
      * @param string $command
      * @param string $executionPath Working directory for the command. If null, the path will be determined
-     *   automatically (for WP-CLI commands, it depends whether they will be run locally or on Vagrant).
-     * @param bool $autoSshTunnelling By default WP-CLI commands are rewritten to their SSH version if the site config
-     *   says the site is a Vagrant site. In rare cases like "wp core download" we need to run WP-CLI locally even
-     *   though the site is "remote" and setting this parameter to false enables that.
+     *   automatically.
      *
      * @param bool $debug
      * @param null|array $env
      * @return string When process execution is not successful
      * @throws Exception
      */
-    private function exec($command, $executionPath = null, $autoSshTunnelling = true, $debug = false, $env = null) {
+    private function exec($command, $executionPath = null, $debug = false, $env = null) {
 
-        $command = $this->rewriteWpCliCommand($command, $autoSshTunnelling);
+        $command = $this->rewriteWpCliCommand($command);
 
         if (!$executionPath) {
-            $executionPath = $this->siteConfig->isVagrant ? __DIR__ . '/..' : $this->siteConfig->path;
+            $executionPath = $this->siteConfig->path;
         }
 
         // Changing env variables for debugging
@@ -640,21 +635,18 @@ class WpAutomation {
 
         foreach ((array)$args as $name => $value) {
             if (is_int($name)) { // positional argument
-                $cliCommand .= " " . $this->vagrantSensitiveEscapeShellArg($value);
+                $cliCommand .= " " . ProcessUtils::escapeshellarg($value, null);
             } elseif ($value !== null) {
-                $escapedValue = $this->vagrantSensitiveEscapeShellArg($value);
+                $escapedValue = ProcessUtils::escapeshellarg($value, null);
                 $cliCommand .= " --$name=$escapedValue";
             } else {
                 $cliCommand .= " --$name";
             }
         }
 
-        return $this->exec($cliCommand, null, true, $debug);
+        return $this->exec($cliCommand, null, $debug);
     }
 
-    private function vagrantSensitiveEscapeShellArg($arg) {
-        return ProcessUtils::escapeshellarg($arg, $this->siteConfig->isVagrant ? "linux" : null);
-    }
 
     /**
      * Rewrites WP-CLI command to use a well-known binary and to possibly rewrite it for remote
@@ -665,17 +657,13 @@ class WpAutomation {
      * @param $autoSshTunnelling
      * @return string
      */
-    private function rewriteWpCliCommand($command, $autoSshTunnelling) {
+    private function rewriteWpCliCommand($command) {
 
         if (!Strings::startsWith($command, "wp ")) {
             return $command;
         }
 
         $command = substr($command, 3); // strip "wp " prefix
-
-        if ($this->siteConfig->isVagrant && $autoSshTunnelling) {
-            $command = "ssh \"$command\" --host=" . escapeshellarg($this->siteConfig->name);
-        }
 
         $command = "php " . escapeshellarg($this->getWpCli()) . " $command";
 
@@ -687,8 +675,7 @@ class WpAutomation {
     /**
      * Checks whether a WP-CLI binary is available, possibly downloads it and returns the path to it.
      *
-     * We use a custom WP-CLI PHAR (latest stable) mainly because this is what wp-cli-ssh installs into Vagrant virtual
-     * machines and we want to get the same behavior both locally and in Vagrant boxes. The local custom binary
+     * We use a custom WP-CLI PHAR (latest stable). The local custom binary
      * is re-downloaded every day to keep it fresh (stable WP-CLI releases go out every couple of months).
      *
      * @return string The path to the custom WP-CLI PHAR.

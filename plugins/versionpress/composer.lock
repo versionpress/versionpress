@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8c0dc6f54e6e7ee6ad9dc16132d0686d",
-    "content-hash": "01241adb20d57de1013ce1216eed1aac",
+    "hash": "e8a60052bdd9a43a572a7f79b4e04aa4",
+    "content-hash": "cb709f39c63246034489bfa2baad2e0d",
     "packages": [
         {
             "name": "imnotjames/curlfile-compat",
@@ -654,56 +654,6 @@
                 "strip"
             ],
             "time": "2014-08-26 08:19:08"
-        },
-        {
-            "name": "janvoracek/wp-cli-ssh",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/JanVoracek/wp-cli-ssh.git",
-                "reference": "3eddb32806d1c45ab1081995bd3984992d39850d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/JanVoracek/wp-cli-ssh/zipball/3eddb32806d1c45ab1081995bd3984992d39850d",
-                "reference": "3eddb32806d1c45ab1081995bd3984992d39850d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.2"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "wp-cli-ssh.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPLv2"
-            ],
-            "authors": [
-                {
-                    "name": "Jonathan Bardo",
-                    "email": "jonathan.bardo@x-team.com",
-                    "homepage": "https://github.com/jonathanbardo",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Weston Ruter",
-                    "email": "weston@x-team.com",
-                    "homepage": "http://weston.ruter.net",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Invoke WP-CLI on another server via SSH from local machine",
-            "homepage": "https://github.com/x-team/wp-cli-ssh",
-            "keywords": [
-                "remote",
-                "ssh",
-                "wp-cli"
-            ],
-            "time": "2015-10-05 15:18:42"
         },
         {
             "name": "mikey179/vfsStream",
@@ -1567,8 +1517,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "janvoracek/comment-stripper": 20,
-        "janvoracek/wp-cli-ssh": 20
+        "janvoracek/comment-stripper": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
