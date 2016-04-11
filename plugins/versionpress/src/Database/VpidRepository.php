@@ -59,7 +59,7 @@ class VpidRepository {
         foreach ($entityInfo->valueReferences as $referenceName => $targetEntity) {
             list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) = array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
 
-            if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn])) {
+            if (isset($entity[$sourceColumn]) && ($entity[$sourceColumn] === $sourceValue || ReferenceUtils::valueMatchesWildcard($sourceValue, $entity[$sourceColumn])) && isset($entity[$valueColumn])) {
 
                 if ($this->isNullReference($entity[$valueColumn])) {
                     continue;
@@ -104,7 +104,7 @@ class VpidRepository {
         foreach ($entityInfo->valueReferences as $referenceName => $targetEntity) {
             list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) = array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
 
-            if ($entity[$sourceColumn] === $sourceValue && isset($entity[$valueColumn])) {
+            if (isset($entity[$sourceColumn]) && ($entity[$sourceColumn] === $sourceValue || ReferenceUtils::valueMatchesWildcard($sourceValue, $entity[$sourceColumn])) && isset($entity[$valueColumn])) {
 
                 if ($this->isNullReference($entity[$valueColumn])) {
                     continue;

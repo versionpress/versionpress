@@ -96,6 +96,10 @@ option:
       widget_nav_menu[/\d+/]["nav_menu"]: term
       widget_pages[/\d+/]["exclude"]: post
       nav_menu_options["auto_add"][/\d+/]: term
+      featured-content["tag-id"]: term
+      theme_mods_*["nav_menu_locations"][/.*/]: term
+      theme_mods_*["header_image_data"]["attachment_id"]: post
+      theme_mods_*["custom_logo"]: post
   frequently-written:
     - 'option_name: akismet_spam_count'
   ignored-entities:
