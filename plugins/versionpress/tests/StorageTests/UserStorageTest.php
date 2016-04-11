@@ -17,7 +17,6 @@ class UserStorageTest extends \PHPUnit_Framework_TestCase {
         "user_email" => "versionpress@example.com",
         "user_url" => "",
         "user_registered" => "2015-02-02 14:19:58",
-        "user_activation_key" => "",
         "user_status" => 0,
         "display_name" => "admin",
         "vp_id" => "3EC9EF54CAF94300BBA89111FA833222",
