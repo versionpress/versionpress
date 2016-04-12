@@ -205,7 +205,7 @@ class VpidRepository {
         /** @var Database $database */
         $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
 
-        $menuItemType = $database->get_col("select meta_value from {$database->postmeta} pm join {$database->vpid} vpid on pm.post_id = vpid.id where pm.meta_key = '_menu_item_type' and vp.vp_id = UNHEX({$postmeta['vp_post_id']})");
+        $menuItemType = $database->get_col("select meta_value from {$database->postmeta} pm join {$database->vpid} vpid on pm.post_id = vpid.id where pm.meta_key = '_menu_item_type' and vpid.vp_id = UNHEX(\"{$postmeta['vp_post_id']}\")");
 
         if ($menuItemType === 'taxonomy') {
             return 'term_taxonomy';
