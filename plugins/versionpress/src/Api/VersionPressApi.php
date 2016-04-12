@@ -12,9 +12,11 @@ use VersionPress\ChangeInfos\PluginChangeInfo;
 use VersionPress\ChangeInfos\RevertChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
+use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Commit;
+use VersionPress\Git\CommitMessage;
 use VersionPress\Git\GitLogPaginator;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
@@ -210,7 +212,8 @@ class VersionPressApi {
             $changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
             $isEnabled = $isChildOfInitialCommit || $canRollbackToThisCommit || $commit->getHash() === $initialCommitHash;
 
-            $fileChanges = $this->getFileChanges($commit);
+            $skipVpdbFiles = $changeInfo->getChangeInfoList()[0] instanceof TrackedChangeInfo;
+            $fileChanges = $this->getFileChanges($commit, $skipVpdbFiles);
 
             $environment = $changeInfo instanceof ChangeInfoEnvelope ? $changeInfo->getEnvironment() : '?';
             $changeInfoList = $changeInfo instanceof ChangeInfoEnvelope ? $changeInfo->getChangeInfoList() : array();
@@ -225,7 +228,7 @@ class VersionPressApi {
                 "isInitial" => $commit->getHash() === $initialCommitHash,
                 "isMerge" => $commit->isMerge(),
                 "environment" => $environment,
-                "changes" => array_merge($this->convertChangeInfoList($changeInfoList), $fileChanges),
+                "changes" => array_values(array_filter(array_merge($this->convertChangeInfoList($changeInfoList), $fileChanges))),
                 "author" => array(
                     "name" => $commit->getAuthorName(),
                     "email" => $commit->getAuthorEmail(),
@@ -453,7 +456,9 @@ class VersionPressApi {
             $this->updateDatabase($status);
         }
 
-        $this->gitRepository->commit($request['commit-message'], $authorName, $authorEmail);
+        $changeInfoEnvelope = new ChangeInfoEnvelope([new UntrackedChangeInfo(new CommitMessage($request['commit-message']))]);
+
+        $this->gitRepository->commit($changeInfoEnvelope->getCommitMessage(), $authorName, $authorEmail);
         return new WP_REST_Response(true);
     }
 
@@ -580,17 +585,20 @@ class VersionPressApi {
 
     /**
      * @param Commit $commit
+     * @param bool $skipVpdbFiles
      * @return array
      */
-    private function getFileChanges(Commit $commit) {
+    private function getFileChanges(Commit $commit, $skipVpdbFiles) {
         $changedFiles = $commit->getChangedFiles();
 
-        $changedFiles = array_filter($changedFiles, function ($changedFile) {
-            $path = str_replace('\\', '/', ABSPATH . $changedFile['path']);
-            $vpdbPath = str_replace('\\', '/', VP_VPDB_DIR);
+        if ($skipVpdbFiles) {
+            $changedFiles = array_filter($changedFiles, function ($changedFile) {
+                $path = str_replace('\\', '/', ABSPATH . $changedFile['path']);
+                $vpdbPath = str_replace('\\', '/', VP_VPDB_DIR);
 
-            return !Strings::startsWith($path, $vpdbPath);
-        });
+                return !Strings::startsWith($path, $vpdbPath);
+            });
+        }
 
         $fileChanges = array_map(function ($changedFile) {
             $status = $changedFile['status'];

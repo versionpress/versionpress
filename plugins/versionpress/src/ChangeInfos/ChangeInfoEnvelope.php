@@ -120,6 +120,10 @@ class ChangeInfoEnvelope implements ChangeInfo {
             array_pop($splittedBodies);
         }
 
+        if (count($splittedBodies) === 0 || $lastBody === "") {
+            $changeInfoList[] = UntrackedChangeInfo::buildFromCommitMessage($commitMessage);
+        }
+
         foreach ($splittedBodies as $body) {
             $partialCommitMessage = new CommitMessage("", $body);
             /** @var ChangeInfo $matchingChangeInfoType */
@@ -174,9 +178,13 @@ class ChangeInfoEnvelope implements ChangeInfo {
     private function groupBulkActions($changeInfoList) {
         $bulkChangeInfoClasses = $this->bulkChangeInfoClasses;
 
-        $groupedChangeInfos = ArrayUtils::mapreduce($changeInfoList, function (TrackedChangeInfo $item, $mapEmit) {
-            $key = "{$item->getEntityName()}/{$item->getAction()}";
-            $mapEmit($key, $item);
+        $groupedChangeInfos = ArrayUtils::mapreduce($changeInfoList, function (ChangeInfo $item, $mapEmit) {
+            if ($item instanceof TrackedChangeInfo) {
+                $key = "{$item->getEntityName()}/{$item->getAction()}";
+                $mapEmit($key, $item);
+            } else {
+                $mapEmit(spl_object_hash($item), $item);
+            }
         }, function ($key, $items, $reduceEmit) use ($bulkChangeInfoClasses) {
             /** @var TrackedChangeInfo[] $items */
             if (count($items) > 1) {
