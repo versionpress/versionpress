@@ -5,7 +5,7 @@ namespace VersionPress\Database;
  * DB access class used by VersionPress, and VersionPress only. It is a proxy to `$wpdb` with the same API
  * but always uses the original, unrewritten `query()` implementation. The client code usually just accesses
  * the `$database` object which it gets from the DI container. VersionPress code almost never uses $wpdb directly.
- * 
+ *
  * To explain the motivation a little bit, when VersionPress is installed, it rewrites the `wpdb` class
  * and adds its own logic into DB-manipulating methods. That is good for WordPress and all the 3rd party
  * plugins but not for VersionPress itself - it needs the raw `query()` functionality not to trigger
@@ -57,7 +57,6 @@ namespace VersionPress\Database;
  * @property string collate
  * @property string func_call
  * @property bool is_mysql
-
  * @method init_charset()
  * @method set_charset($dbh, $charset = NULL, $collate = NULL)
  * @method set_sql_mode($modes = array())
@@ -111,9 +110,12 @@ class Database {
      */
     private $wpdb;
 
+    public $vpid;
+
 
     public function __construct($wpdb) {
         $this->wpdb = $wpdb;
+        $this->vpid = $wpdb->prefix . 'vp_id';
     }
 
     public function __get($name) {

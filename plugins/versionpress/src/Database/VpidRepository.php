@@ -81,7 +81,9 @@ class VpidRepository {
                 }
 
                 /** @var Cursor[] $cursors */
-                $cursors = array_map(function ($path) use (&$entity, $valueColumn) { return new Cursor($entity[$valueColumn], $path); }, $paths);
+                $cursors = array_map(function ($path) use (&$entity, $valueColumn) {
+                    return new Cursor($entity[$valueColumn], $path);
+                }, $paths);
 
                 foreach ($cursors as $cursor) {
                     $ids = $cursor->getValue();
@@ -118,7 +120,9 @@ class VpidRepository {
                 }
 
                 /** @var Cursor[] $cursors */
-                $cursors = array_map(function ($path) use (&$entity, $valueColumn) { return new Cursor($entity[$valueColumn], $path); }, $paths);
+                $cursors = array_map(function ($path) use (&$entity, $valueColumn) {
+                    return new Cursor($entity[$valueColumn], $path);
+                }, $paths);
 
                 foreach ($cursors as $cursor) {
                     $vpids = $cursor->getValue();
@@ -198,12 +202,10 @@ class VpidRepository {
      */
     public static function getMenuReference($postmeta) {
         global $versionPressContainer;
-        /** @var \VersionPress\Storages\StorageFactory $storageFactory */
-        $storageFactory = $versionPressContainer->resolve(VersionPressServices::STORAGE_FACTORY);
-        /** @var \VersionPress\Storages\PostMetaStorage $postmetaStorage */
-        $postmetaStorage = $storageFactory->getStorage('postmeta');
-        $menuItemTypePostmeta = $postmetaStorage->loadEntityByName('_menu_item_type', $postmeta['vp_post_id']);
-        $menuItemType = $menuItemTypePostmeta['meta_value'];
+        /** @var Database $database */
+        $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
+
+        $menuItemType = $database->get_col("select meta_value from {$database->postmeta} pm join {$database->vpid} vpid on pm.post_id = vpid.id where pm.meta_key = '_menu_item_type' and vp.vp_id = UNHEX({$postmeta['vp_post_id']})");
 
         if ($menuItemType === 'taxonomy') {
             return 'term_taxonomy';
