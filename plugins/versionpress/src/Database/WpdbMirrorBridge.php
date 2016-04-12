@@ -210,7 +210,7 @@ class WpdbMirrorBridge {
 
         $table = $this->dbSchemaInfo->getPrefixedTableName($entityName);
         $idColumnName = $this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName;
-        $data = $this->database->get_row("SELECT * FROM `$table` WHERE `$idColumnName` = '$id'", ARRAY_A);
+        $data = array_merge($this->database->get_row("SELECT * FROM `$table` WHERE `$idColumnName` = '$id'", ARRAY_A), $data);
 
         $data['vp_id'] = $vpId;
         $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityName, $data);
