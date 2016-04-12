@@ -711,10 +711,12 @@ class wpdb {
      * @param string $name The private member to get, and optionally process
      * @return mixed The private member
      */
-    public function __get( $name ) {
-        if ( 'col_info' == $name )
+    public function __get($name) {
+        if ('col_info' == $name)
             $this->load_col_info();
-
+        if ('vp_id' == $name) {
+            return $this->prefix . 'vp_id';
+        }
         return $this->$name;
     }
 

@@ -110,12 +110,12 @@ class Database {
      */
     private $wpdb;
 
-    public $vpid;
+    public $vp_id;
 
 
     public function __construct($wpdb) {
         $this->wpdb = $wpdb;
-        $this->vpid = $wpdb->prefix . 'vp_id';
+        $this->vp_id = $wpdb->prefix . 'vp_id';
     }
 
     public function __get($name) {

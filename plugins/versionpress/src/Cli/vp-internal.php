@@ -144,10 +144,10 @@ class VPInternalCommand extends WP_CLI_Command {
      */
     public function getEntityId($args = array(), $assoc_args = array()) {
         global $versionPressContainer;
-        /** @var wpdb $wpdb */
-        $wpdb = $versionPressContainer->resolve(VersionPressServices::WPDB);
-        $sql = "SELECT ID FROM " . $wpdb->prefix . "vp_id WHERE vp_id=UNHEX('" . $assoc_args["vpid"] . "')";
-        $newId = $wpdb->get_col($sql);
+        /** @var Database $database */
+        $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
+        $sql = "SELECT ID FROM " . $database->vp_id . " WHERE vp_id=UNHEX('" . $assoc_args["vpid"] . "')";
+        $newId = $database->get_col($sql);
         if (isset($newId[0])) {
             echo $newId[0];
 

@@ -204,7 +204,7 @@ class DBAsserter {
     }
 
     private static function getVpIdMap() {
-        $vpIdTable = self::selectAll(self::$schemaInfo->getPrefixedTableName('vp_id'));
+        $vpIdTable = self::selectAll(self::$vp_database->vp_id);
         $idMap = array();
         foreach ($vpIdTable as $row) {
             $idMap[$row['table']][$row['id']] = strtoupper(bin2hex($row['vp_id']));

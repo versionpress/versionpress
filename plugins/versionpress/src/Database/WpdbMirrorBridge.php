@@ -283,7 +283,7 @@ class WpdbMirrorBridge {
 
         $parentReference = $entityInfo->parentReference;
         $parent = $entityInfo->references[$parentReference];
-        $vpIdTable = $this->dbSchemaInfo->getPrefixedTableName('vp_id');
+        $vpIdTable = $this->database->vp_id;
         $entityTable = $this->dbSchemaInfo->getPrefixedTableName($metaEntityName);
         $parentTable = $this->dbSchemaInfo->getTableName($parent);
         $idColumnName = $this->dbSchemaInfo->getEntityInfo($metaEntityName)->idColumnName;

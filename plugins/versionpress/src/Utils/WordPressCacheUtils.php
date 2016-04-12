@@ -54,7 +54,7 @@ class WordPressCacheUtils {
      */
     private static function getIdsForVpids($vpids, $database) {
         $vpidsForRestriction = self::joinVpidsForRestriction($vpids);
-        return $database->get_col("SELECT id FROM {$database->prefix}vp_id WHERE vp_id IN ($vpidsForRestriction)");
+        return $database->get_col("SELECT id FROM {$database->vp_id} WHERE vp_id IN ($vpidsForRestriction)");
     }
 
     private static function joinVpidsForRestriction($vpids) {
