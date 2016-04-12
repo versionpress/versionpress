@@ -139,8 +139,8 @@ class Initializer {
         $table_prefix = $this->database->prefix;
         $process = array();
 
-        $process[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_id`";
-        $process[] = "CREATE TABLE `{$table_prefix}vp_id` (
+        $process[] = "DROP TABLE IF EXISTS `{$this->database->vp_id}`";
+        $process[] = "CREATE TABLE `{$this->database->vp_id}` (
           `vp_id` BINARY(16) NOT NULL,
           `table` VARCHAR(64) NOT NULL,
           `id` BIGINT(20) NOT NULL,
@@ -207,7 +207,7 @@ class Initializer {
             $idPairs = array_combine($wordpressIds, $vpIds);
             $this->idCache[$entityName] = $this->idCache[$entityName] + $idPairs; // merge arrays with preserving keys
             $sqlValues = join(', ', ArrayUtils::map(function ($vpId, $id) use ($tableName) { return "('$tableName', $id, UNHEX('$vpId'))"; }, $idPairs));
-            $query = "INSERT INTO {$this->getTableName('vp_id')} (`table`, id, vp_id) VALUES $sqlValues";
+            $query = "INSERT INTO {$this->database->vp_id} (`table`, id, vp_id) VALUES $sqlValues";
             $this->database->query($query);
             $this->checkTimeout();
         }

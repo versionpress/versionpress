@@ -641,21 +641,21 @@ function vp_admin_post_confirm_deactivation() {
     $wpdbMirrorBridge->disable();
 
     MergeDriverInstaller::uninstallMergeDriver(VP_PROJECT_ROOT);
+    
+    /** @var \VersionPress\Database\Database $database */
+    $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
+    
 
-    global $wpdb;
-
-    $table_prefix = $wpdb->prefix;
-
-    $queries[] = "DROP TABLE IF EXISTS `{$table_prefix}vp_id`";
+    $queries[] = "DROP TABLE IF EXISTS `{$database->vp_id}`";
 
     $vpOptionsReflection = new ReflectionClass('VersionPress\Initialization\VersionPressOptions');
     $usermetaToDelete = array_values($vpOptionsReflection->getConstants());
     $queryRestriction = '"' . join('", "', $usermetaToDelete) . '"';
 
-    $queries[] = "DELETE FROM `{$table_prefix}usermeta` WHERE meta_key IN ({$queryRestriction})";
+    $queries[] = "DELETE FROM `{$database->usermeta}` WHERE meta_key IN ({$queryRestriction})";
 
     foreach ($queries as $query) {
-        $wpdb->query($query);
+        $database->query($query);
     }
 
 
