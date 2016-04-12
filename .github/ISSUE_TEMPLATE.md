@@ -1,9 +1,9 @@
-Only technical issues go here; if you have trouble installing VersionPress or using it please visit https://github.com/versionpress/support first.
+Visit https://github.com/versionpress/support first please, or chat with us on Gitter.
 
 Good issue contains:
 
 - Clear description
-- An example / screenshot / GIF
-- Info about environment, if relevant
+- An example, screenshot or GIF
+- Info about the environment (VP and WP version, OS etc.) if relevant
 
 Thanks!
