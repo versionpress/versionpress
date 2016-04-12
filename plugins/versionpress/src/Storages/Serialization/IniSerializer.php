@@ -48,6 +48,8 @@ class IniSerializer {
         "=" => "<<<eq>>>",
     );
 
+    private static $numberMarker = '<<<VP-Number>>>';
+
     /**
      * Serializes sectioned data array into an INI string
      *
@@ -143,6 +145,7 @@ class IniSerializer {
     public static function deserialize($string) {
         $string = self::eolWorkaround_addPlaceholders($string);
         $string = self::sanitizeSectionsAndKeys_addPlaceholders($string);
+        $string = self::preserveNumbers($string);
         $deserialized = parse_ini_string($string, true, INI_SCANNER_RAW);
         $deserialized = self::restoreTypesOfValues($deserialized);
         $deserialized = self::sanitizeSectionsAndKeys_removePlaceholders($deserialized);
@@ -256,6 +259,13 @@ class IniSerializer {
         return implode("\r\n", $output);
     }
 
+    private static function preserveNumbers($iniString) {
+        // https://regex101.com/r/pH5hE9/2
+        $re = "/= \\d+(?:\\.\\d+)?\\r?\\n/m";
+        return preg_replace_callback($re, function ($m) {
+            return str_replace('= ', '= ' . self::$numberMarker, $m[0]);
+        }, $iniString);
+    }
 
     /**
      * Serializes key-value pair
@@ -265,7 +275,7 @@ class IniSerializer {
      * @return string
      */
     private static function serializeKeyValuePair($key, $value) {
-        return $key . " = " . (is_numeric($value) ? $value : '"' . self::escapeString($value) . '"');
+        return $key . " = " . (is_string($value) ? '"' . self::escapeString($value) . '"' : $value);
     }
 
     private static function sanitizeSectionsAndKeys_addPlaceholders($string) {
@@ -347,8 +357,8 @@ class IniSerializer {
         foreach ($deserialized as $key => $value) {
             if (is_array($value)) {
                 $result[$key] = self::restoreTypesOfValues($value);
-            } else if (is_numeric($value)) {
-                $result[$key] = $value + 0;
+            } else if (Strings::startsWith($value, self::$numberMarker)) {
+                $result[$key] = str_replace(self::$numberMarker, '', $value) + 0; // strip the marker and convert to number
             } else {
                 $result[$key] = self::unescapeString($value);
             }

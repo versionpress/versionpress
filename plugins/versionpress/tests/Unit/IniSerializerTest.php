@@ -114,21 +114,20 @@ INI
     /**
      * @test
      */
-    public function numericStringsSerializedAsNumbers() {
+    public function numericStringsSerializedAsStrings() {
 
         $data = array("Section" => array("key1" => "0", "key2" => "1", "key3" => "11.1"));
-        $deserializedData = array("Section" => array("key1" => 0, "key2" => 1, "key3" => 11.1));
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
-key1 = 0
-key2 = 1
-key3 = 11.1
+key1 = "0"
+key2 = "1"
+key3 = "11.1"
 
 INI
         );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
-        $this->assertSame($deserializedData, IniSerializer::deserialize($ini));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
 
     }
 
@@ -1247,6 +1246,60 @@ INI
 [Section]
 data = <<<serialized>>> 777
 another_data = "value"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializationDoesntChangeTypeOfNumericString() {
+
+        $data = ["Section" => ["data" => "777"]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = "777"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializationDoesntChangeTypeOfNumericStringInSerializedData() {
+        $serializedString = serialize("777");
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> "777"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializationDoesntChangeTypeOfNumericStringInArray() {
+        $serializedString = serialize(["777"]);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = "777"
 
 INI
         );
