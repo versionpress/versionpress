@@ -12,9 +12,11 @@ use VersionPress\ChangeInfos\PluginChangeInfo;
 use VersionPress\ChangeInfos\RevertChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
+use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Commit;
+use VersionPress\Git\CommitMessage;
 use VersionPress\Git\GitLogPaginator;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
@@ -225,7 +227,7 @@ class VersionPressApi {
                 "isInitial" => $commit->getHash() === $initialCommitHash,
                 "isMerge" => $commit->isMerge(),
                 "environment" => $environment,
-                "changes" => array_merge($this->convertChangeInfoList($changeInfoList), $fileChanges),
+                "changes" => array_values(array_filter(array_merge($this->convertChangeInfoList($changeInfoList), $fileChanges))),
                 "author" => array(
                     "name" => $commit->getAuthorName(),
                     "email" => $commit->getAuthorEmail(),
@@ -453,7 +455,9 @@ class VersionPressApi {
             $this->updateDatabase($status);
         }
 
-        $this->gitRepository->commit($request['commit-message'], $authorName, $authorEmail);
+        $changeInfoEnvelope = new ChangeInfoEnvelope([new UntrackedChangeInfo(new CommitMessage($request['commit-message']))]);
+
+        $this->gitRepository->commit($changeInfoEnvelope->getCommitMessage(), $authorName, $authorEmail);
         return new WP_REST_Response(true);
     }
 

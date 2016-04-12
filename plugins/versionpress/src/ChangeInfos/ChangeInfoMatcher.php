@@ -50,10 +50,6 @@ class ChangeInfoMatcher {
      * @return ChangeInfoEnvelope|UntrackedChangeInfo
      */
     public static function buildChangeInfo(CommitMessage $commitMessage) {
-        if (self::findMatchingChangeInfo($commitMessage) === 'VersionPress\ChangeInfos\UntrackedChangeInfo') {
-            return UntrackedChangeInfo::buildFromCommitMessage($commitMessage);
-        }
-
         return ChangeInfoEnvelope::buildFromCommitMessage($commitMessage);
     }
 
