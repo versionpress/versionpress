@@ -212,7 +212,8 @@ class VersionPressApi {
             $changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
             $isEnabled = $isChildOfInitialCommit || $canRollbackToThisCommit || $commit->getHash() === $initialCommitHash;
 
-            $fileChanges = $this->getFileChanges($commit);
+            $skipVpdbFiles = $changeInfo->getChangeInfoList()[0] instanceof TrackedChangeInfo;
+            $fileChanges = $this->getFileChanges($commit, $skipVpdbFiles);
 
             $environment = $changeInfo instanceof ChangeInfoEnvelope ? $changeInfo->getEnvironment() : '?';
             $changeInfoList = $changeInfo instanceof ChangeInfoEnvelope ? $changeInfo->getChangeInfoList() : array();
@@ -584,17 +585,20 @@ class VersionPressApi {
 
     /**
      * @param Commit $commit
+     * @param bool $skipVpdbFiles
      * @return array
      */
-    private function getFileChanges(Commit $commit) {
+    private function getFileChanges(Commit $commit, $skipVpdbFiles) {
         $changedFiles = $commit->getChangedFiles();
 
-        $changedFiles = array_filter($changedFiles, function ($changedFile) {
-            $path = str_replace('\\', '/', ABSPATH . $changedFile['path']);
-            $vpdbPath = str_replace('\\', '/', VP_VPDB_DIR);
+        if ($skipVpdbFiles) {
+            $changedFiles = array_filter($changedFiles, function ($changedFile) {
+                $path = str_replace('\\', '/', ABSPATH . $changedFile['path']);
+                $vpdbPath = str_replace('\\', '/', VP_VPDB_DIR);
 
-            return !Strings::startsWith($path, $vpdbPath);
-        });
+                return !Strings::startsWith($path, $vpdbPath);
+            });
+        }
 
         $fileChanges = array_map(function ($changedFile) {
             $status = $changedFile['status'];
