@@ -57,6 +57,10 @@ class SerializedDataToIniConverter {
         $value = substr($lines[$key], strlen(self::SERIALIZED_MARKER) + 1); // + space
         unset($lines[$key]);
 
+        if (is_numeric($value)) {
+            $value += 0; // convert to number
+        }
+
         return self::convertValueToSerializedString($value, $lines);
     }
 
@@ -79,11 +83,13 @@ class SerializedDataToIniConverter {
 
                 return ['type' => 'string', 'value' => $str];
             case 'i':
+                $number = StringUtils::substringFromTo(self::$value, self::$index, strpos(self::$value, ';', self::$index));
+                self::$index += strlen($number) + 1; // ;
+                return ['type' => 'int', 'value' => intval($number)];
             case 'd':
                 $number = StringUtils::substringFromTo(self::$value, self::$index, strpos(self::$value, ';', self::$index));
                 self::$index += strlen($number) + 1; // ;
-                return ['type' => $type === 'i' ? 'int' : 'double', 'value' => $number];
-
+                return ['type' => 'double', 'value' => doubleval($number)];
             case 'b':
                 $strVal = StringUtils::substringFromTo(self::$value, self::$index, strpos(self::$value, ';', self::$index));
                 self::$index += 2; // <0|1>;
@@ -133,7 +139,7 @@ class SerializedDataToIniConverter {
                 $number = StringUtils::substringFromTo(self::$value, self::$index, strpos(self::$value, ';', self::$index));
                 self::$index += strlen($number) + 1; // ;
 
-                return ['type' => $type === 'r' ? '*pointer*' : '*reference*', 'value' => $number];
+                return ['type' => $type === 'r' ? '*pointer*' : '*reference*', 'value' => intval($number)];
             default:
                 return [];
         }
@@ -195,18 +201,18 @@ class SerializedDataToIniConverter {
     }
 
     private static function primitiveToEscapedString($value) {
-        if (is_numeric($value)) {
-            return (string)$value;
+        if (is_string($value)) {
+            $value = str_replace('\\', '\\\\', $value);
+            $value = str_replace('"', '\"', $value);
+
+            return '"' . $value . '"';
         }
 
         if (is_bool($value)) {
             return $value ? 'true' : 'false';
         }
 
-        $value = str_replace('\\', '\\\\', $value);
-        $value = str_replace('"', '\"', $value);
-
-        return '"' . $value . '"';
+        return (string)$value;
     }
 
     /**
@@ -227,8 +233,12 @@ class SerializedDataToIniConverter {
             $value = $matches[2];
         }
 
-        if ($type === null && is_numeric($value)) {
-            return (Strings::contains($value, '.') ? 'd' : 'i') . ':' . $value . ';';
+        if ($type === null && is_int($value)) {
+            return 'i:' . $value . ';';
+        }
+
+        if ($type === null && is_double($value)) {
+            return 'd:' . $value . ';';
         }
 
         if ($type === 'boolean') {
@@ -317,6 +327,10 @@ class SerializedDataToIniConverter {
             $keyLength = $indexOfFirstClosingBracket - $indexAfterFirstOpeningBracket;
 
             $subkey = substr($relatedKey, $indexAfterFirstOpeningBracket, $keyLength);
+
+            if (!Strings::startsWith($subkey, '"')) {
+                $subkey += 0; // convert to number
+            }
 
             if (is_callable($subkeyTransformFn)) {
                 $subkey = $subkeyTransformFn($subkey);
