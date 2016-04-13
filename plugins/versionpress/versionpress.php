@@ -104,7 +104,7 @@ add_filter('automatic_updates_is_vcs_checkout', function () {
 });
 
 function disable_plugin_activation() {
-    wp_die('<h1> VersionPress could not be activated</h1> <p>Seems that your copy of VersionPress was not build correctly. Please build it from <a href="https://github.com/versionpress/versionpress/blob/master/docs/Dev-Setup.md">sources</a> or <a href="https://github.com/versionpress/versionpress/releases/latest"> download from GitHub</a>');
+    wp_die('<h1> VersionPress could not be activated</h1> <p>It seems that your copy of VersionPress was not built correctly. Please download <a href="https://github.com/versionpress/versionpress/releases">release ZIP file from GitHub</a> and <a href="' . get_admin_url() . 'plugin-install.php?tab=upload">install it again</a>.');
 }
 
 function vp_register_hooks() {
