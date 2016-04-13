@@ -135,9 +135,17 @@ gulp.task('clean', false, function (cb) {
 
 
 /**
- * Copies files defined by `srcDef` to `buildDir`
+ * Builds frontend and copies files defined by `srcDef` to `buildDir`
  */
-gulp.task('copy', false, ['clean', 'prepare-src-definition', 'frontend-deploy'], function (cb) {
+gulp.task('copy', false, ['clean', 'prepare-src-definition', 'frontend-build-and-deploy'], function (cb) {
+    var srcOptions = {dot: true, base: vpDir};
+    return gulp.src(srcDef, srcOptions).pipe(gulp.dest(buildDir));
+});
+
+/**
+ * Copies files defined by `srcDef` to `buildDir` without building frontend
+ */
+gulp.task('copy-without-build', false, ['clean', 'prepare-src-definition', 'frontend-deploy'], function (cb) {
     var srcOptions = {dot: true, base: vpDir};
     return gulp.src(srcDef, srcOptions).pipe(gulp.dest(buildDir));
 });
@@ -316,7 +324,7 @@ gulp.task('build', 'Task that exports production build', ['clean-build'], functi
  * Task called from WpAutomation to copy the plugin files to the test directory
  * specified in `test-config.yml`. Basically does only the `copy` task.
  */
-gulp.task('test-deploy', 'Task called from WpAutomation to copy the plugin files to the test directory.', ['prepare-test-deploy', 'copy']);
+gulp.task('test-deploy', 'Task called from WpAutomation to copy the plugin files to the test directory.', ['prepare-test-deploy', 'copy-without-build']);
 
 /**
  * Inits dev environment.
