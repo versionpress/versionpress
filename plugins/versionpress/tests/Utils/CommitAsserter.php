@@ -301,13 +301,14 @@ class CommitAsserter {
      */
     private function getNonIgnoredCommits() {
         if (!$this->commitCache) {
-            $unfilteredCommits = $this->gitRepository->log("{$this->startCommit->getHash()}..HEAD");
-            $that = $this;
-            $filteredCommits = array_filter($unfilteredCommits, function ($commit) use ($that) {
-                $changeInfo = $that->getChangeInfo($commit);
-                return $changeInfo instanceof UntrackedChangeInfo || !in_array(ChangeInfoUtils::getFullAction($changeInfo), $that->ignoreCommitsWithActions);
-            });
-            $this->commitCache = array_values($filteredCommits); // array_values reindexes the array from zero
+            $commits = $this->gitRepository->log("{$this->startCommit->getHash()}..HEAD");
+            if ($this->ignoreCommitsWithActions) {
+                $commits = array_filter($commits, function ($commit) {
+                    $changeInfo = $this->getChangeInfo($commit);
+                    return $changeInfo instanceof UntrackedChangeInfo || !in_array(ChangeInfoUtils::getFullAction($changeInfo), $this->ignoreCommitsWithActions);
+                });
+            }
+            $this->commitCache = array_values($commits); // array_values reindexes the array from zero
         }
         return $this->commitCache;
     }
