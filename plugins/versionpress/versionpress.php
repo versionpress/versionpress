@@ -38,6 +38,11 @@ use VersionPress\VersionPress;
 
 defined('ABSPATH') or die("Direct access not allowed");
 
+if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
+    register_activation_hook(__FILE__, 'disable_plugin_activation');
+    return;
+}
+
 require_once(__DIR__ . '/bootstrap.php');
 
 if (defined('WP_CLI') && WP_CLI) {
@@ -97,6 +102,10 @@ add_filter('automatic_updates_is_vcs_checkout', function () {
     $forceUpdate = UninstallationUtil::uninstallationShouldRemoveGitRepo(); // first commit was created by VersionPress
     return !$forceUpdate; // 'false' forces the update
 });
+
+function disable_plugin_activation() {
+    wp_die('<h1> VersionPress could not be activated</h1> <p>Seems that your copy of VersionPress was not build correctly. Please build it from <a href="https://github.com/versionpress/versionpress/blob/master/docs/Dev-Setup.md">sources</a> or <a href="https://github.com/versionpress/versionpress/releases/latest"> download from GitHub</a>');
+}
 
 function vp_register_hooks() {
     global $versionPressContainer;
