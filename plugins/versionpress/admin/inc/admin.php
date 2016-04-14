@@ -29,66 +29,34 @@ if (isset($_GET['error'])) {
     $error = isset( $errors[ $_GET['error'] ] ) ? $errors[ $_GET['error'] ] : null;
 }
 
-if (isset($_GET['bug-report'])) {
-    if ($_GET['bug-report'] === 'ok') {
-        $error = array(
-            'class' => 'updated',
-            'message' => 'Bug report was sent. Thank you.'
-        );
-    } elseif ($_GET['bug-report'] === 'err') {
-        $error = array(
-            'class' => 'error',
-            'message' => 'There was a problem with sending bug report. Please try it again. Thank you.'
-        );
-    }
-}
-
 if ( ! empty( $error ) ) {
     echo "<div class='$error[class]'><p>$error[message]</p></div>";
 }
-
-$displayServicePanel = false;
-$displayServicePanel |= isset($_GET['bug-report']);
 ?>
 
 <button id="vp-service-panel-button"><span class="icon icon-cog"></span></button>
 <h2 id="vp-page-header">VersionPress</h2>
 
-<div id="vp-service-panel" class="welcome-panel <?php if ($displayServicePanel) echo "displayed"; ?>">
-    <h3>VersionPress Service Panel</h3>
-    <h4>Bug report</h4>
-    <form action="<?php echo admin_url('admin-post.php'); ?>" method="post">
-        <input type="hidden" name="action" value="vp_send_bug_report">
-        <table class="form-table">
-            <tbody>
-            <tr>
-                <th scope="row">
-                    <label for="vp-bug-email">Email</label>
-                </th>
+<div id="vp-service-panel" class="ServicePanel welcome-panel">
+    <p class='warning'>
+        Currently, VersionPress is in an <a href="http://docs.versionpress.net/en/getting-started/about-eap"><strong>Early Access phase</strong></a>.<br />
+        Please understand that EAP releases are early versions of the software and as such might not fully support certain workflows, 3rd party plugins, hosts etc.
+    </p>
 
-                <td>
-                    <input type="email" value="" id="vp-bug-email" name="email">
-                    <br>
-                    <span class="description">We will respond you to this email.</span>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row">
-                    <label for="vp-bug-description">Bug description</label>
-                </th>
-
-                <td>
-                    <textarea rows="4" cols="22" id="vp-bug-description" name="description"></textarea>
-                    <br>
-                    <span class="description">Please tell us what you were doing when the bug occured.</span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-        <p class="submit">
-            <?php submit_button("Send bug report", "submit", "vp_send_bug_report", false); ?>
-        </p>
-    </form>
+    <h3>Community and support</h3>
+    <ul>
+        <li>
+            Having trouble using VersionPress?
+            Our <a href="http://docs.versionpress.net">documentation</a> has you covered.
+        </li>
+        <li>
+            Can’t find what you need?
+            Please visit our <a href="https://github.com/versionpress/support">support&nbsp;repository</a>.
+        </li>
+        <li>
+            <a href="<?php echo admin_url('/admin.php?page=versionpress/admin/system-info.php');?>">System information</a> page.
+        </li>
+    </ul>
 </div>
 
 <?php
