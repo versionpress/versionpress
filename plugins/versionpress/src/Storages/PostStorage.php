@@ -23,15 +23,6 @@ class PostStorage extends DirectoryStorage {
         return parent::shouldBeSaved($data);
     }
 
-    protected function removeUnwantedColumns($entity) {
-        static $excludeList = array('comment_count');
-        foreach ($excludeList as $excludeKey) {
-            unset($entity[$excludeKey]);
-        }
-
-        return $entity;
-    }
-
     protected function createChangeInfo($oldEntity, $newEntity, $action) {
         $diff = array();
         if ($action === 'edit') { // determine more specific edit action

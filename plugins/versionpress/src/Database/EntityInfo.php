@@ -136,6 +136,10 @@ class EntityInfo {
 
     private $ignoredEntities = array();
 
+    public $hasIgnoredColumns = false;
+    
+    private $ignoredColumns = array();
+
     /**
      * Does the parsing and sets all properties
      *
@@ -211,6 +215,33 @@ class EntityInfo {
         if (isset($schemaInfo['ignored-entities'])) {
             $this->ignoredEntities = $schemaInfo['ignored-entities'];
         }
+
+        if (isset($schemaInfo['ignored-columns'])) {
+            $this->ignoredColumns = $schemaInfo['ignored-columns'];
+            $this->hasIgnoredColumns = true;
+        }
+        
+    }
+    
+    public function getIgnoredColumnFunctionName($columnName) {
+        foreach($this->ignoredColumns as $column) {
+             if(is_array($column)) {
+                return substr($column[$columnName], 1);
+            }
+        }
+        return null;
+    }
+
+    public function getIgnoredColumnNames() {
+        $columnNames = array ();
+        foreach($this->ignoredColumns as $column) {
+            if(is_string($column)) {
+                $columnNames[] = $column;
+            } else {
+                $columnNames[] = array_keys($column)[0];
+            }
+        }
+        return $columnNames;
     }
 
     public function isVirtualReference($reference) {

@@ -19,6 +19,10 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase {
             'ignored-entities' => array(
                 'some_field: value other_field: a',
                 'other_field: value'
+            ),
+            'ignored-columns' => array(
+                'ignored_column',
+                array('other_ignored_column' => '@\SomeNamespace\SomeClass::someFunction')
             )
         )
     );
@@ -120,5 +124,12 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase {
         );
 
         $this->assertFalse($this->entityInfo->isIgnoredEntity($entity));
+    }
+
+    /**
+     * @test
+     */
+    public function ignoredColumnsAreIdentifiedCorrectly() {
+        $this->assertEquals([], array_diff(array('ignored_column', 'other_ignored_column'), $this->entityInfo->getIgnoredColumnNames()));
     }
 }

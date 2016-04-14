@@ -22,6 +22,7 @@ abstract class SynchronizerBase implements Synchronizer {
 
     const SYNCHRONIZE_MN_REFERENCES = 'mn-references';
     const DO_ENTITY_SPECIFIC_ACTIONS = 'entity-specific-actions';
+    const COMPUTE_COLUMN_VALUES = 'compute-column-values';
     const REPLACE_SHORTCODES = 'replace-shortcodes';
 
     private $entityName;
@@ -96,10 +97,15 @@ abstract class SynchronizerBase implements Synchronizer {
             $this->updateDatabase($entities);
             $this->fixSimpleReferences($entities);
             $fixedMnReferences = $this->fixMnReferences($entities);
+            $doneComputeColumnValues = $this->computeColumnValues();
             $doneEntitySpecificActions = $this->doEntitySpecificActions();
 
             if (!$doneEntitySpecificActions) {
                 $remainingTasks[] = self::DO_ENTITY_SPECIFIC_ACTIONS;
+            }
+
+            if (!$doneComputeColumnValues) {
+                $remainingTasks[] = self::COMPUTE_COLUMN_VALUES;
             }
 
             if (!$fixedMnReferences) {
@@ -113,6 +119,10 @@ abstract class SynchronizerBase implements Synchronizer {
 
         if ($task === self::SYNCHRONIZE_MN_REFERENCES) {
             $this->fixMnReferences($entities);
+        }
+
+        if ($task === self::COMPUTE_COLUMN_VALUES) {
+            $this->computeColumnValues();
         }
 
         if ($task === self::DO_ENTITY_SPECIFIC_ACTIONS) {
@@ -498,7 +508,23 @@ abstract class SynchronizerBase implements Synchronizer {
         return true;
     }
 
-
+    /**
+     * Specific Entities might contain ignored colums, which values should be computed on synchronizing process
+     * for example, VersionPress\Synchronizers\PostsSynchronizer
+     * 
+     * @return bool If false, the method will be called again in a second pass.
+     */
+    protected function computeColumnValues() {
+        if($this->entityInfo->hasIgnoredColumns) {
+            foreach ($this->entityInfo->getIgnoredColumnNames() as $columnName) {
+                $computeFunction = $this->entityInfo->getIgnoredColumnFunctionName($columnName);
+                if($computeFunction) {
+                    call_user_func($computeFunction);
+                }
+            }
+        }
+        return true;
+    }
 
     //--------------------------------------
     // Helper functions

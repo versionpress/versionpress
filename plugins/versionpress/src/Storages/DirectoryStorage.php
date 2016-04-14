@@ -31,7 +31,11 @@ abstract class DirectoryStorage extends Storage {
     /** @var bool[] */
     private $existenceCache = array();
 
-
+    /**
+     * DirectoryStorage constructor.
+     * @param string $directory
+     * @param \VersionPress\Database\EntityInfo $entityInfo
+     */
     public function __construct($directory, $entityInfo) {
         parent::__construct($entityInfo);
         $this->directory = $directory;
@@ -160,6 +164,9 @@ abstract class DirectoryStorage extends Storage {
     }
 
     protected function removeUnwantedColumns($entity) {
+        foreach ($this->entityInfo->getIgnoredColumnNames() as $column) {
+            unset($entity[$column]);
+        }
         return $entity;
     }
 
