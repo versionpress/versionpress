@@ -1,6 +1,7 @@
 <?php
 namespace VersionPress\Git;
 
+use Nette\Utils\Strings;
 use VersionPress\Utils\PathUtils;
 use VersionPress\Utils\StringUtils;
 
@@ -92,7 +93,19 @@ class MergeDriverInstaller {
         }
 
         if ($driver == MergeDriverInstaller::DRIVER_PHP || ($driver == MergeDriverInstaller::DRIVER_AUTO && DIRECTORY_SEPARATOR == '\\')) {
-            $mergeDriverScript = '"' . PHP_BINARY . '" "' . $pluginDir . '/src/Git/merge-drivers/ini-merge.php' . '"';
+
+            // Finding the PHP binary is a bit tricky because web server requests don't use the main PHP binary at all
+            // (they either use `mod_php` or call `php-cgi`). PHP_BINARY is only correct when the process
+            // is initiated from the command line, e.g., via WP-CLI when cloning.
+            //
+            // We'll only fix the path for Windows because on Linux and Mac OS, Bash driver is used most of time
+            // and the tests are started from command line so PHP_BINARY is fine there too.
+            $phpBinary = PHP_BINARY;
+            if (DIRECTORY_SEPARATOR == '\\' && !Strings::endsWith($phpBinary, 'php.exe')) {
+                $phpBinary = realpath(ini_get('extension_dir') . '/..') . '/php.exe';
+            }
+
+            $mergeDriverScript = '"' . $phpBinary . '" "' . $pluginDir . '/src/Git/merge-drivers/ini-merge.php' . '"';
         }
 
         $gitconfigVariables = array(
