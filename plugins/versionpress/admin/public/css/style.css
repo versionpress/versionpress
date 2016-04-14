@@ -76,6 +76,17 @@
     padding: 2px 12px;
 }
 
+#vp-service-panel .warning {
+    margin-top: 0 !important;
+    border-left: 5px solid #ffba00;
+    font-size: 18px !important;
+    padding: 1em;
+}
+
+#vp-service-panel li {
+    list-style: disc;
+}
+
 .welcome-panel {
     padding: 23px 10px;
 }

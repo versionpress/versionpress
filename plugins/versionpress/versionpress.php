@@ -668,20 +668,6 @@ function vp_send_headers() {
     }
 }
 
-add_action('admin_post_vp_send_bug_report', 'vp_send_bug_report');
-
-function vp_send_bug_report() {
-    $email = $_POST['email'];
-    $description = $_POST['description'];
-
-    $bugReporter = new BugReporter('http://versionpress.net/report-problem');
-    $reportedSuccessfully = $bugReporter->reportBug($email, $description);
-
-    $result = $reportedSuccessfully ? "ok" : "err";
-    wp_safe_redirect(add_query_arg('bug-report', $result, menu_page_url('versionpress', false)));
-    exit();
-}
-
 add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are just one step less important :) */);
 
 /**
