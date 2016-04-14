@@ -1,26 +1,30 @@
-.webui-popover p {
+.webui-popover-versionpress-compatibility-popover p {
     font-size: 13px;
     font-family: "Open Sans", sans-serif;
     margin: 1em 0;
     line-height: 1.5;
 }
 
-.webui-popover a {
+.webui-popover-versionpress-compatibility-popover a {
     color: #0074a2;
     text-decoration: underline;
 }
 
-.webui-popover h3 {
+.webui-popover-versionpress-compatibility-popover h3 {
     clear: none;
 }
 
-.webui-popover .spinner {
+.webui-popover-versionpress-compatibility-popover .spinner {
     display: block;
     float: none;
     margin: 17px auto 6px;
 }
 
-.webui-popover .webui-popover-title .title-content {
+.webui-popover-versionpress-compatibility-popover .webui-popover-title {
+    margin: 0;
+}
+
+.webui-popover-versionpress-compatibility-popover .webui-popover-title .title-content {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -28,12 +32,12 @@
     width: 94%
 }
 
-.webui-popover .button-container {
+.webui-popover-versionpress-compatibility-popover .button-container {
     margin-top: 15px;
     text-align: center;
 }
 
-.webui-popover .arrow {
+.webui-popover-versionpress-compatibility-popover .arrow {
     overflow: auto;
     left: auto;
     margin-left: auto;
@@ -41,7 +45,21 @@
     z-index: auto;
 }
 
-.webui-popover-title em {
+.webui-popover-versionpress-compatibility-popover .webui-popover-title em {
     font-weight: normal;
     font-style: normal;
+}
+
+.webui-popover-versionpress-compatibility-popover .webui-popover-content p {
+    margin-top: .5em;
+    margin-bottom: .5em;
+}
+
+.vp-compatibility-popup-buttons {
+    margin-top: 1em;
+}
+
+.vp-compatibility-popup-buttons .button {
+    float: right;
+    margin-left: 3px;
 }

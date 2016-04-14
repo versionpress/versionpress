@@ -178,20 +178,6 @@ h2.vp-deactivation-header {
     display: none;
 }
 
-.vp-compatibility-popup-buttons {
-    margin-top: 1em;
-}
-
-.vp-compatibility-popup-buttons .button {
-    float: right;
-    margin-left: 3px;
-}
-
-.webui-popover-versionpress-compatibility-popover .webui-popover-content p {
-    margin-top: .5em;
-    margin-bottom: .5em;
-}
-
 .vp-index .welcome-panel {
     padding-bottom: 23px;
     margin-top: 20px;
