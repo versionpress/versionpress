@@ -201,11 +201,12 @@ class VersionPressApi {
 
         $initialCommitHash = $this->getInitialCommitHash();
 
+        $isChildOfInitialCommit = $this->gitRepository->wasCreatedAfter($commits[0]->getHash(), $initialCommitHash);
         $isFirstCommit = $page === 0;
 
         $result = array();
         foreach ($commits as $commit) {
-            $isChildOfInitialCommit = $this->gitRepository->wasCreatedAfter($commit->getHash(), $initialCommitHash);
+            $isChildOfInitialCommit = $isChildOfInitialCommit && $this->gitRepository->wasCreatedAfter($commit->getHash(), $initialCommitHash);
             $canUndoCommit = $isChildOfInitialCommit && !$commit->isMerge();
             $canRollbackToThisCommit = !$isFirstCommit && ($isChildOfInitialCommit || $commit->getHash() === $initialCommitHash);
             $changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());

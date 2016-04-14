@@ -256,7 +256,8 @@ class GitRepository {
      */
     public function wasCreatedAfter($commitHash, $afterWhichCommitHash) {
         $range = sprintf("%s..%s", $afterWhichCommitHash, $commitHash);
-        $cmd = "git log %s --oneline";
+        // One commit is enough, only empty/not empty matters in this case
+        $cmd = "git log %s --oneline --max-count=1";
         return $this->runShellCommandWithStandardOutput($cmd, $range) != null;
     }
 
