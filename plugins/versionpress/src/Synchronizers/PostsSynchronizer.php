@@ -21,17 +21,16 @@ class PostsSynchronizer extends SynchronizerBase {
         if ($this->passNumber == 1) {
             return false;
         }
-        
+
         $this->clearCache();
         return true;
     }
 
 
-    public static function fixCommentCounts() {
-        $versionPressContainer = DIContainer::getConfiguredInstance();
-        /** @var Database $database */
-        $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
-
+    /**
+     * @param Database $database
+     */
+    public static function fixCommentCounts($database) {
         $sql = "update {$database->prefix}posts set comment_count =
      (select count(*) from {$database->prefix}comments where comment_post_ID = {$database->prefix}posts.ID and comment_approved = 1);";
         $database->query($sql);
