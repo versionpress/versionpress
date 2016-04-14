@@ -1,4 +1,7 @@
 <?php
+
+use VersionPress\VersionPress;
+
 $apiConfig = array(
     'root' => get_site_url(),
     'adminUrl' => get_admin_url(),
@@ -13,5 +16,6 @@ $apiConfig = array(
 </script>
 
 <?php
-wp_enqueue_style('versionpress_gui_style', plugins_url('../public/gui/app.css', __FILE__));
-wp_enqueue_script('versionpress_gui_script', plugins_url('../public/gui/app.js', __FILE__));
+$vpVersion = VersionPress::getVersion();
+wp_enqueue_style('versionpress_gui_style', plugins_url('../public/gui/app.css', __FILE__), [], $vpVersion);
+wp_enqueue_script('versionpress_gui_script', plugins_url('../public/gui/app.js', __FILE__), [], $vpVersion);
