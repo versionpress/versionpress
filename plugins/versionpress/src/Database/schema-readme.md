@@ -121,4 +121,4 @@ It is possible to ignore some entity columns (don't save them into INI files) an
 
     ignored-columns:
         - comment_count: '@\VersionPress\Synchronizers\PostsSynchronizer::fixCommentCounts'
-        - 'user_activation_key'
+        - user_activation_key

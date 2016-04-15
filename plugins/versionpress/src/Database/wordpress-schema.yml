@@ -55,7 +55,7 @@ user:
   table: users
   id: ID
   ignored-columns:
-    - 'user_activation_key'
+    - user_activation_key
 
 term:
   table: terms
