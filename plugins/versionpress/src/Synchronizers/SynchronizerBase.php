@@ -518,10 +518,8 @@ abstract class SynchronizerBase implements Synchronizer {
      * for example, VersionPress\Synchronizers\PostsSynchronizer
      */
     protected function computeColumnValues() {
-        if ($this->entityInfo->hasIgnoredColumns) {
-            foreach ($this->entityInfo->getIgnoredColumns() as $columnName => $function) {
-                call_user_func($function, $this->database);
-            }
+        foreach ($this->entityInfo->getIgnoredColumns() as $columnName => $function) {
+            call_user_func($function, $this->database);
         }
     }
 

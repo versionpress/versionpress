@@ -136,9 +136,7 @@ class EntityInfo {
     private $frequentlyWritten = array();
 
     private $ignoredEntities = array();
-
-    public $hasIgnoredColumns = false;
-
+    
     private $ignoredColumns = array();
 
     /**
@@ -226,7 +224,6 @@ class EntityInfo {
                     $this->ignoredColumns[array_keys($column)[0]] = substr(array_values($column)[0], 1);
                 }
             }
-            $this->hasIgnoredColumns = true;
         }
 
     }
