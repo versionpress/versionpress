@@ -1,6 +1,7 @@
 <?php
 
 namespace VersionPress\Database;
+
 use Nette\Utils\Arrays;
 use Nette\Utils\Strings;
 use VersionPress\Utils\QueryLanguageUtils;
@@ -137,7 +138,7 @@ class EntityInfo {
     private $ignoredEntities = array();
 
     public $hasIgnoredColumns = false;
-    
+
     private $ignoredColumns = array();
 
     /**
@@ -220,12 +221,12 @@ class EntityInfo {
             $this->ignoredColumns = $schemaInfo['ignored-columns'];
             $this->hasIgnoredColumns = true;
         }
-        
+
     }
     
     public function getIgnoredColumnFunctionName($columnName) {
-        foreach($this->ignoredColumns as $column) {
-             if(is_array($column)) {
+        foreach ($this->ignoredColumns as $column) {
+            if (is_array($column)) {
                 return substr($column[$columnName], 1);
             }
         }
@@ -233,9 +234,9 @@ class EntityInfo {
     }
 
     public function getIgnoredColumnNames() {
-        $columnNames = array ();
-        foreach($this->ignoredColumns as $column) {
-            if(is_string($column)) {
+        $columnNames = array();
+        foreach ($this->ignoredColumns as $column) {
+            if (is_string($column)) {
                 $columnNames[] = $column;
             } else {
                 $columnNames[] = array_keys($column)[0];

@@ -216,7 +216,9 @@ abstract class SynchronizerBase implements Synchronizer {
      */
     protected function filterEntities($entities) {
         $urlReplacer = $this->urlReplacer;
-        return array_map(function ($entity) use ($urlReplacer) { return $urlReplacer->restore($entity); }, $entities);
+        return array_map(function ($entity) use ($urlReplacer) {
+            return $urlReplacer->restore($entity);
+        }, $entities);
     }
 
 
@@ -308,8 +310,12 @@ abstract class SynchronizerBase implements Synchronizer {
 
     private function deleteEntitiesWhichAreNotInStorage($entities) {
         if ($this->selectiveSynchronization) {
-            $savedVpIds = array_map(function ($entity) { return $entity['vp_id']; }, $entities);
-            $vpIdsToSynchronize = array_map(function ($entity) { return $entity['vp_id']; }, $this->entitiesToSynchronize);
+            $savedVpIds = array_map(function ($entity) {
+                return $entity['vp_id'];
+            }, $entities);
+            $vpIdsToSynchronize = array_map(function ($entity) {
+                return $entity['vp_id'];
+            }, $this->entitiesToSynchronize);
 
             $sql = sprintf('SELECT id FROM %s WHERE `table` = "%s" ', $this->database->vp_id, $this->tableName);
             $sql .= sprintf('AND HEX(vp_id) IN ("%s") ', join('", "', $vpIdsToSynchronize));
@@ -455,7 +461,9 @@ abstract class SynchronizerBase implements Synchronizer {
 
             $sql = sprintf("SELECT id FROM %s WHERE HEX(vp_id) IN ('%s')",
                 $this->getPrefixedTableName('vp_id'),
-                join("', '", array_map(function ($entity) { return $entity['vp_id']; }, $entities)));
+                join("', '", array_map(function ($entity) {
+                    return $entity['vp_id'];
+                }, $entities)));
             $processedIds = array_merge($this->database->get_col($sql), $this->deletedIds);
 
             if ($this->selectiveSynchronization) {
@@ -508,19 +516,16 @@ abstract class SynchronizerBase implements Synchronizer {
     /**
      * Specific Entities might contain ignored colums, which values should be computed on synchronizing process
      * for example, VersionPress\Synchronizers\PostsSynchronizer
-     * 
-     * @return bool If false, the method will be called again in a second pass.
      */
     protected function computeColumnValues() {
-        if($this->entityInfo->hasIgnoredColumns) {
+        if ($this->entityInfo->hasIgnoredColumns) {
             foreach ($this->entityInfo->getIgnoredColumnNames() as $columnName) {
                 $computeFunction = $this->entityInfo->getIgnoredColumnFunctionName($columnName);
-                if($computeFunction) {
+                if ($computeFunction) {
                     call_user_func($computeFunction, $this->database);
                 }
             }
         }
-        return true;
     }
 
     //--------------------------------------

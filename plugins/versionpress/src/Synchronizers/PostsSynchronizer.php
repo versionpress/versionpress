@@ -22,7 +22,7 @@ class PostsSynchronizer extends SynchronizerBase {
         WordPressCacheUtils::clearPostCache(array_column($this->entities, 'vp_id'), $this->database);
         return true;
     }
-    
+
     /**
      * @param Database $database
      */
