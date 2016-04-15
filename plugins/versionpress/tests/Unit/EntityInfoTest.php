@@ -130,6 +130,6 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function ignoredColumnsAreIdentifiedCorrectly() {
-        $this->assertEquals([], array_diff(array('ignored_column', 'other_ignored_column'), $this->entityInfo->getIgnoredColumnNames()));
+        $this->assertEquals([], array_diff(array('ignored_column', 'other_ignored_column'), array_keys($this->entityInfo->getIgnoredColumns())));
     }
 }
