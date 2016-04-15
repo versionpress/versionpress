@@ -24,7 +24,6 @@ use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\ArrayUtils;
-use VersionPress\Utils\BugReporter;
 use VersionPress\Utils\QueryLanguageUtils;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -100,20 +99,6 @@ class VersionPressApi {
             'args' => array(
                 'commit' => array(
                     'default' => null
-                )
-            ),
-            'permission_callback' => array($this, 'checkPermissions')
-        ));
-
-        register_rest_route($namespace, '/submit-bug', array(
-            'methods' => WP_REST_Server::CREATABLE,
-            'callback' => array($this, 'submitBug'),
-            'args' => array(
-                'email' => array(
-                    'required' => true
-                ),
-                'description' => array(
-                    'required' => true
                 )
             ),
             'permission_callback' => array($this, 'checkPermissions')
@@ -341,28 +326,6 @@ class VersionPressApi {
         }
 
         return new WP_REST_Response(array('diff' => $diff));
-    }
-
-    /**
-     * @param WP_REST_Request $request
-     * @return WP_REST_Response|WP_Error
-     */
-    public function submitBug(WP_REST_Request $request) {
-        $email = $request['email'];
-        $description = $request['description'];
-
-        $bugReporter = new BugReporter('http://versionpress.net/report-problem');
-        $reportedSuccessfully = $bugReporter->reportBug($email, $description);
-
-        if ($reportedSuccessfully) {
-            return new WP_REST_Response(true);
-        } else {
-            return new WP_Error(
-                'error',
-                'There was a problem with sending bug report. Please try it again. Thank you.',
-                array('status' => 403)
-            );
-        }
     }
 
     /**
