@@ -13,13 +13,10 @@ class VpidRepository {
     private $database;
     /** @var DbSchemaInfo */
     private $schemaInfo;
-    /** @var string */
-    private $vpidTableName;
 
     public function __construct($database, DbSchemaInfo $schemaInfo) {
         $this->database = $database;
         $this->schemaInfo = $schemaInfo;
-        $this->vpidTableName = $database->vp_id;
     }
 
     /**
@@ -31,11 +28,11 @@ class VpidRepository {
      */
     public function getVpidForEntity($entityName, $id) {
         $tableName = $this->schemaInfo->getTableName($entityName);
-        return $this->database->get_var("SELECT HEX(vp_id) FROM $this->vpidTableName WHERE id = '$id' AND `table` = '$tableName'");
+        return $this->database->get_var("SELECT HEX(vp_id) FROM {$this->database->vp_id} WHERE id = '$id' AND `table` = '$tableName'");
     }
 
     public function getIdForVpid($vpid) {
-        return intval($this->database->get_var("SELECT id FROM $this->vpidTableName WHERE vp_id = UNHEX('$vpid')"));
+        return intval($this->database->get_var("SELECT id FROM {$this->database->vp_id} WHERE vp_id = UNHEX('$vpid')"));
     }
 
     public function replaceForeignKeysWithReferences($entityName, $entity) {
@@ -154,13 +151,13 @@ class VpidRepository {
 
     public function deleteId($entityName, $id) {
         $tableName = $this->schemaInfo->getTableName($entityName);
-        $deleteQuery = "DELETE FROM {$this->vpIdTableName} WHERE `table` = \"$tableName\" AND id = '$id'";
+        $deleteQuery = "DELETE FROM {$this->database->vp_id} WHERE `table` = \"$tableName\" AND id = '$id'";
         $this->database->query($deleteQuery);
     }
 
     private function saveId($entityName, $id, $vpId) {
         $tableName = $this->schemaInfo->getTableName($entityName);
-        $query = "INSERT INTO {$this->vpidTableName} (`vp_id`, `table`, `id`) VALUES (UNHEX('$vpId'), \"$tableName\", $id)";
+        $query = "INSERT INTO {$this->database->vp_id} (`vp_id`, `table`, `id`) VALUES (UNHEX('$vpId'), \"$tableName\", $id)";
         $this->database->query($query);
     }
 
