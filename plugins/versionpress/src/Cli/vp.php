@@ -969,21 +969,6 @@ class VPCommand extends WP_CLI_Command {
         WP_CLI::success("wp-config.php updated");
     }
 
-    private static function updateConfigConstant($config, $constant, $value) {
-        // https://regex101.com/r/zD3mJ4/3 - just remove the "g" modifier which is there for testing only
-        $re = "/(define\\s*\\(\\s*['\"]{$constant}['\"]\\s*,\\s*['\"]).*(['\"]\\s*\\)\\s*;)/m";
-        return preg_replace($re, "\${1}{$value}\${2}", $config, 1);
-    }
-
-    private static function createConfigConstant($config, $constant, $value) {
-        $tablePrefixPos = strpos($config, 'table_prefix');
-        $lineAfterTablePrefixPos = strpos($config, "\n", $tablePrefixPos) + 1;
-
-        $constantDefinition = "define('$constant', '$value');\n";
-
-        return substr($config, 0, $lineAfterTablePrefixPos) . $constantDefinition . substr($config, $lineAfterTablePrefixPos);
-    }
-
     /**
      * Returns URL for a remote name, or null if the remote isn't configured.
      * For example, for "origin", it might return "https://github.com/project/repo.git".
