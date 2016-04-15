@@ -519,11 +519,8 @@ abstract class SynchronizerBase implements Synchronizer {
      */
     protected function computeColumnValues() {
         if ($this->entityInfo->hasIgnoredColumns) {
-            foreach ($this->entityInfo->getIgnoredColumnNames() as $columnName) {
-                $computeFunction = $this->entityInfo->getIgnoredColumnFunctionName($columnName);
-                if ($computeFunction) {
-                    call_user_func($computeFunction, $this->database);
-                }
+            foreach ($this->entityInfo->getIgnoredColumns() as $columnName => $function) {
+                call_user_func($function, $this->database);
             }
         }
     }

@@ -168,7 +168,7 @@ abstract class DirectoryStorage extends Storage {
     }
 
     protected function removeUnwantedColumns($entity) {
-        foreach ($this->entityInfo->getIgnoredColumnNames() as $column) {
+        foreach ($this->entityInfo->getIgnoredColumns() as $column => $computeFunction) {
             unset($entity[$column]);
         }
         return $entity;

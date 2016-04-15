@@ -218,31 +218,21 @@ class EntityInfo {
         }
 
         if (isset($schemaInfo['ignored-columns'])) {
-            $this->ignoredColumns = $schemaInfo['ignored-columns'];
+
+            foreach ($schemaInfo['ignored-columns'] as $column) {
+                if (is_string($column)) {
+                    $this->ignoredColumns[$column] = function () {}; // if column does not have any compute function we create 'NOOP' function
+                } else {
+                    $this->ignoredColumns[array_keys($column)[0]] = substr(array_values($column)[0], 1);
+                }
+            }
             $this->hasIgnoredColumns = true;
         }
 
     }
-    
-    public function getIgnoredColumnFunctionName($columnName) {
-        foreach ($this->ignoredColumns as $column) {
-            if (is_array($column)) {
-                return substr($column[$columnName], 1);
-            }
-        }
-        return null;
-    }
 
-    public function getIgnoredColumnNames() {
-        $columnNames = array();
-        foreach ($this->ignoredColumns as $column) {
-            if (is_string($column)) {
-                $columnNames[] = $column;
-            } else {
-                $columnNames[] = array_keys($column)[0];
-            }
-        }
-        return $columnNames;
+    public function getIgnoredColumns() {
+        return $this->ignoredColumns;
     }
 
     public function isVirtualReference($reference) {
