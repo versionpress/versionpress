@@ -21,7 +21,7 @@ export default class ServicePanel extends React.Component<ServicePanelProps, {}>
           <div className='ServicePanel-inner'>
             <p className='ServicePanel-warning'>
               Currently, VersionPress is in an <a href="http://docs.versionpress.net/en/getting-started/about-eap"><strong>Early Access phase</strong></a>.<br />
-              Please understand that EAP releases are early versions of the software and as such might not fully support certain workflows, 3rd party plugins, hosts etc.
+              As such, it might not fully support certain workflows, 3rd party plugins, hosts etc.
             </p>
 
             <h3>Community and support</h3>
