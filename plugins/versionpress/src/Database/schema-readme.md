@@ -117,7 +117,7 @@ It is possible to ignore some entities (don't save them into INI files). You can
 
 ## Ignoring entities columns
 
-It is possible to ignore some entity columns (don'ts save them into INI files) and have their values computed if necessary. You can just write column name or combination of column name and function which should be called for computing column value when it is restored. Instance of `VersionPress\Database\Database` is passed as argument to a function call.
+It is possible to ignore some entity columns (don't save them into INI files) and have their values computed if necessary. You can just write column name or combination of column name and function which should be called. Function is used for computing column value during synchronization process. Instance of `VersionPress\Database\Database` is passed as an argument to a function call.
 
     ignored-columns:
         - comment_count: '@\VersionPress\Synchronizers\PostsSynchronizer::fixCommentCounts'
