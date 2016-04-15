@@ -13,6 +13,8 @@ post:
     #  - Attachments without post_title
     #  - Updating draft via AJAX
     #  - Any changes saved by clicking "Preview"
+  ignored-columns:
+    - comment_count: '@\VersionPress\Synchronizers\PostsSynchronizer::fixCommentCounts'
 
 
 postmeta:
@@ -52,6 +54,8 @@ commentmeta:
 user:
   table: users
   id: ID
+  ignored-columns:
+    - user_activation_key
 
 term:
   table: terms

@@ -31,7 +31,11 @@ abstract class DirectoryStorage extends Storage {
     /** @var bool[] */
     private $existenceCache = array();
 
-
+    /**
+     * DirectoryStorage constructor.
+     * @param string $directory
+     * @param \VersionPress\Database\EntityInfo $entityInfo
+     */
     public function __construct($directory, $entityInfo) {
         parent::__construct($entityInfo);
         $this->directory = $directory;
@@ -68,7 +72,9 @@ abstract class DirectoryStorage extends Storage {
 
         if (count($diff) > 0) {
             $newEntity = array_merge($oldEntity, $diff);
-            $newEntity = array_filter($newEntity, function ($value) { return $value !== false; });
+            $newEntity = array_filter($newEntity, function ($value) {
+                return $value !== false;
+            });
 
             FileSystem::mkdir(dirname($this->getEntityFilename($vpid)));
             file_put_contents($filename, $this->serializeEntity($vpid, $newEntity));
@@ -154,12 +160,17 @@ abstract class DirectoryStorage extends Storage {
 
     private function loadAllFromFiles($entityFiles) {
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
-        $entities = array_map(array($this, 'deserializeEntity'), array_filter(@array_map('file_get_contents', $entityFiles), function ($item) { return $item !== FALSE; }));
+        $entities = array_map(array($this, 'deserializeEntity'), array_filter(@array_map('file_get_contents', $entityFiles), function ($item) {
+            return $item !== FALSE;
+        }));
         $vpIds = ArrayUtils::column($entities, $this->entityInfo->vpidColumnName);
         return array_combine($vpIds, $entities);
     }
 
     protected function removeUnwantedColumns($entity) {
+        foreach ($this->entityInfo->getIgnoredColumns() as $column => $computeFunction) {
+            unset($entity[$column]);
+        }
         return $entity;
     }
 

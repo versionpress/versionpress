@@ -1,6 +1,7 @@
 <?php
 
 namespace VersionPress\Database;
+
 use Nette\Utils\Arrays;
 use Nette\Utils\Strings;
 use VersionPress\Utils\QueryLanguageUtils;
@@ -135,6 +136,8 @@ class EntityInfo {
     private $frequentlyWritten = array();
 
     private $ignoredEntities = array();
+    
+    private $ignoredColumns = array();
 
     /**
      * Does the parsing and sets all properties
@@ -211,6 +214,22 @@ class EntityInfo {
         if (isset($schemaInfo['ignored-entities'])) {
             $this->ignoredEntities = $schemaInfo['ignored-entities'];
         }
+
+        if (isset($schemaInfo['ignored-columns'])) {
+
+            foreach ($schemaInfo['ignored-columns'] as $column) {
+                if (is_string($column)) {
+                    $this->ignoredColumns[$column] = function () {}; // if column does not have any compute function we create 'NOOP' function
+                } else {
+                    $this->ignoredColumns[array_keys($column)[0]] = substr(array_values($column)[0], 1);
+                }
+            }
+        }
+
+    }
+
+    public function getIgnoredColumns() {
+        return $this->ignoredColumns;
     }
 
     public function isVirtualReference($reference) {
