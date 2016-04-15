@@ -83,7 +83,7 @@ class WpAutomation {
     }
 
     /**
-     * Returns true if VerisonPress is active and tracking the site
+     * Returns true if VersionPress is active and tracking the site
      *
      * @return bool
      */
@@ -102,6 +102,10 @@ class WpAutomation {
         $this->exec('gulp test-deploy', $gulpBaseDir, false, array('VP_DEPLOY_TARGET' => $this->siteConfig->path)); // this also cleans the destination directory, see gulpfile.js "clean" task
     }
 
+    /**
+     * Activates VersionPress as a plugin (does not start tracking the site; use `initializeVersionPress()`
+     * for that).
+     */
     public function activateVersionPress() {
         $activateCommand = "wp plugin activate versionpress";
         $this->exec($activateCommand);
@@ -449,7 +453,7 @@ class WpAutomation {
     }
 
     /**
-     * Activates VersionPress plugin and runs the Initializer
+     * Activates VersionPress plugin and runs the Initializer. For just activation, use `activateVersionPress()`.
      */
     public function initializeVersionPress() {
         $this->runWpCliCommand('plugin', 'activate', array('versionpress'));
