@@ -18,15 +18,11 @@ use wpdb;
 class PostsSynchronizer extends SynchronizerBase {
 
     protected function doEntitySpecificActions() {
-        if ($this->passNumber == 1) {
-            return false;
-        }
-
-        $this->clearCache();
+        parent::doEntitySpecificActions();
+        WordPressCacheUtils::clearPostCache(array_column($this->entities, 'vp_id'), $this->database);
         return true;
     }
-
-
+    
     /**
      * @param Database $database
      */
@@ -34,9 +30,5 @@ class PostsSynchronizer extends SynchronizerBase {
         $sql = "update {$database->prefix}posts set comment_count =
      (select count(*) from {$database->prefix}comments where comment_post_ID = {$database->prefix}posts.ID and comment_approved = 1);";
         $database->query($sql);
-    }
-
-    private function clearCache() {
-        WordPressCacheUtils::clearPostCache(array_column($this->entities, 'vp_id'), $this->database);
     }
 }

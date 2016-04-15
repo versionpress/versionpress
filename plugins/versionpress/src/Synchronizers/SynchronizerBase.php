@@ -97,15 +97,10 @@ abstract class SynchronizerBase implements Synchronizer {
             $this->updateDatabase($entities);
             $this->fixSimpleReferences($entities);
             $fixedMnReferences = $this->fixMnReferences($entities);
-            $doneComputeColumnValues = $this->computeColumnValues();
             $doneEntitySpecificActions = $this->doEntitySpecificActions();
 
             if (!$doneEntitySpecificActions) {
                 $remainingTasks[] = self::DO_ENTITY_SPECIFIC_ACTIONS;
-            }
-
-            if (!$doneComputeColumnValues) {
-                $remainingTasks[] = self::COMPUTE_COLUMN_VALUES;
             }
 
             if (!$fixedMnReferences) {
@@ -115,6 +110,8 @@ abstract class SynchronizerBase implements Synchronizer {
             if ($this->shortcodesReplacer->entityCanContainShortcodes($this->entityName)) {
                 $remainingTasks[] = self::REPLACE_SHORTCODES;
             }
+
+            $remainingTasks[] = self::COMPUTE_COLUMN_VALUES;
         }
 
         if ($task === self::SYNCHRONIZE_MN_REFERENCES) {
