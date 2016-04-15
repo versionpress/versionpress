@@ -113,6 +113,11 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase {
             return;
         }
 
+        $this->logIn();
+
+    }
+
+    protected function logIn() {
         $this->url('wp-admin');
         usleep(100 * 1000); // sometimes we need to wait for the page to fully load
 

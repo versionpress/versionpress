@@ -32,14 +32,17 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * @test
      */
     public function completeUninstallationOfUnactivatedPluginRemovesAllFiles() {
+
         self::_installVersionPress();
+
+        $this->logIn();
         $this->url('wp-admin/plugins.php');
         $this->byCssSelector('#versionpress .delete a')->click();
         $this->byCssSelector('.wrap form:nth-of-type(1) input#submit')->click();
 
         $this->waitForElement('.plugins-php #message.updated');
 
-        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-includes/wpdb.php.original');
+        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-includes/wp-db.php.original');
         $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/plugins/versionpress');
         $this->assertFileNotExists(self::$testConfig->testSite->path . '/.git');
     }
