@@ -124,7 +124,10 @@ class VPCommand extends WP_CLI_Command {
 
         defined('SHORTINIT') or define('SHORTINIT', true);
 
-        $this->requireWpConfig();
+        $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
+        $commonConfigName = 'wp-config.common.php';
+
+        $this->requireWpConfig($wpConfigPath, $commonConfigName);
 
         require_once __DIR__ . '/../../bootstrap.php';
 
@@ -192,7 +195,10 @@ class VPCommand extends WP_CLI_Command {
 
         defined('SHORTINIT') or define('SHORTINIT', true);
 
-        $this->requireWpConfig();
+        $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
+        $commonConfigName = 'wp-config.common.php';
+
+        $this->requireWpConfig($wpConfigPath, $commonConfigName);
         require_once __DIR__ . '/../../bootstrap.php';
 
         if (!VersionPress::isActive()) {
@@ -1098,9 +1104,7 @@ class VPCommand extends WP_CLI_Command {
     /**
      * Tries to require Wordpress config files. Throws WP-CLI error when files not found.
      */
-    private function requireWpConfig() {
-        $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
-        $commonConfigName = 'wp-config.common.php';
+    private function requireWpConfig($wpConfigPath, $commonConfigName) {
         $commonConfigPath = dirname($wpConfigPath) . '/' . $commonConfigName;
         if (file_exists($wpConfigPath)) {
             require_once $wpConfigPath;
