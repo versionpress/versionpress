@@ -11,6 +11,7 @@ use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\GitConfig;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
@@ -750,6 +751,9 @@ class VPCommand extends WP_CLI_Command {
         } else {
             VPCommandUtils::exec("git config --local push.default $currentPushType");
         }
+
+        $gitConfigPath = VP_PROJECT_ROOT . '/.git/config';
+        GitConfig::removeEmptySections($gitConfigPath);
 
         $process = $this->runVPInternalCommand('finish-push', array(), $remotePath);
         if ($process->isSuccessful()) {

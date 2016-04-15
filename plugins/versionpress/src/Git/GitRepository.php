@@ -90,6 +90,9 @@ class GitRepository {
         } else {
             $this->runShellCommand('git config --local user.email %s', $localConfigUserEmail);
         }
+
+        $gitConfigPath = $this->workingDirectoryRoot . '/.git/config';
+        GitConfig::removeEmptySections($gitConfigPath);
     }
 
     /**
