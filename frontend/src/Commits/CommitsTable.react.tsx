@@ -38,8 +38,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
   }
 
   render() {
-    const firstCommit = this.props.commits[0];
-    const displayTopNote = firstCommit && !firstCommit.isEnabled;
+    let noteDisplayed = false;
 
     return (
       <table className='vp-table widefat fixed'>
@@ -53,10 +52,6 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
             <th className='column-actions' />
           </tr>
         </thead>
-        {displayTopNote
-          ? this.renderNote()
-          : null
-        }
         {this.props.commits.map((commit: Commit, index: number) => {
           const row = <CommitsTableRow
                         key={commit.hash}
@@ -69,10 +64,11 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
                         diffProvider={this.props.diffProvider}
                       />;
 
-          if (commit.isInitial && index < this.props.commits.length - 1) {
+          if (!noteDisplayed && !commit.isEnabled && index < this.props.commits.length - 1) {
+            noteDisplayed = true;
             return [
-              row,
-              this.renderNote()
+              this.renderNote(),
+              row
             ];
           }
           return row;
