@@ -15,12 +15,6 @@ class TermTaxonomyStorage extends DirectoryStorage {
         $this->termStorage = $termStorage;
     }
 
-    protected function removeUnwantedColumns($entity) {
-        $entity = parent::removeUnwantedColumns($entity);
-        unset($entity['count']);
-        return $entity;
-    }
-
     protected function createChangeInfo($oldEntity, $newEntity, $action) {
         $taxonomy = isset($newEntity['taxonomy']) ? $newEntity['taxonomy'] : $oldEntity['taxonomy'];
         $vpid = isset($newEntity['vp_id']) ? $newEntity['vp_id'] : $oldEntity['vp_id'];
