@@ -12,7 +12,7 @@ common-site-config:
     admin-name: admin
     admin-email: versionpress@example.com
     admin-pass: admin
-    wp-version: 4.4
+    wp-version: 4.5
     wp-locale: en_US
     wp-autoupdate: false
 
@@ -22,8 +22,8 @@ test-site: vp01
 # Type of workers that will run the tests (selenium / wp-cli)
 end2end-test-type: selenium
 
-# Version of WP-CLI that will be used (e.g. 0.19.0 / latest-stable)
-wp-cli-version: 0.21.1
+# Version of WP-CLI that will be used (e.g. 0.23.0 / latest-stable)
+wp-cli-version: 0.23.0
 
 # Configured sites
 sites:

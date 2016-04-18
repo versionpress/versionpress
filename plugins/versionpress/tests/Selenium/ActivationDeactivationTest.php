@@ -34,7 +34,7 @@ class ActivationDeactivationTest extends SeleniumTestCase {
     public function completeUninstallationOfUnactivatedPluginRemovesAllFiles() {
         self::_installVersionPress();
         $this->url('wp-admin/plugins.php');
-        $this->byCssSelector('#versionpress .delete a')->click();
+        $this->byCssSelector('.delete a[href*=\'versionpress\']')->click();
         $this->byCssSelector('.wrap form:nth-of-type(1) input#submit')->click();
 
         $this->waitForElement('.plugins-php #message.updated');
@@ -142,7 +142,7 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      */
     public function deactivateShowsConfirmationScreen() {
         $this->url('wp-admin/plugins.php');
-        $this->byCssSelector('#versionpress .deactivate a')->click();
+        $this->byCssSelector('.deactivate a[href*=\'versionpress\']')->click();
 
 
         if (WpVersionComparer::compare(TestConfig::createDefaultConfig()->testSite->wpVersion, '4.2-beta1') < 0) {
@@ -173,7 +173,7 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      */
     public function confirmingDeactivationFullyDeactivatesVersionPress() {
 
-        $this->byCssSelector('#versionpress .deactivate a')->click();
+        $this->byCssSelector('.deactivate a[href*=\'versionpress\']')->click();
 
         if (WpVersionComparer::compare(TestConfig::createDefaultConfig()->testSite->wpVersion, '4.2-beta1') < 0) {
             $deactivationUrl = 'versionpress/admin/deactivate.php';
@@ -197,11 +197,11 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * @depends confirmingDeactivationFullyDeactivatesVersionPress
      */
     public function deactivateBeforeFullActivationSkipsConfirmation() {
-        $this->byCssSelector('#versionpress .activate a')->click();
-        $this->byCssSelector('#versionpress .deactivate a')->click();
+        $this->byCssSelector('.activate a[href*=\'versionpress\']')->click();
+        $this->byCssSelector('.deactivate a[href*=\'versionpress\']')->click();
 
         $this->assertContains('wp-admin/plugins.php', $this->url());
-        $this->assertElementExists('#versionpress .activate a');
+        $this->assertElementExists('.activate a[href*=\'versionpress\']');
     }
 
 
@@ -211,7 +211,7 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      */
     public function completeUninstallationRemovesGitRepo() {
 
-        $this->byCssSelector('#versionpress .delete a')->click();
+        $this->byCssSelector('.delete a[href*=\'versionpress\']')->click();
         $this->byCssSelector('.wrap form:nth-of-type(1) input#submit')->click();
 
         $this->waitForElement('.plugins-php #message.updated');
@@ -229,7 +229,7 @@ class ActivationDeactivationTest extends SeleniumTestCase {
 
     private function _activateVersionPress() {
         $this->url('wp-admin/plugins.php');
-        $this->byCssSelector('#versionpress .activate a')->click();
+        $this->byCssSelector('.activate a[href*=\'versionpress\']')->click();
         $this->waitAfterRedirect();
     }
 

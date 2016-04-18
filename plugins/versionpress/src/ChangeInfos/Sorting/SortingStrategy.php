@@ -191,7 +191,7 @@ class SortingStrategy {
         /*
          * TODO: Needs refactor
          * For two VersionPress\ChangeInfos\PostChangeInfo objects, the action precendence is
-         *  "create" > "delete" > "edit" > all other actions
+         *  "create" > "delete" > "trash" > "edit" > all other actions
          */
         if ($changeInfo1->getAction() == "create") {
             return -1;
@@ -204,6 +204,10 @@ class SortingStrategy {
         } else if ($changeInfo1->getAction() == "draft") {
             return -1;
         } else if ($changeInfo2->getAction() == "draft") {
+            return 1;
+        } else if ($changeInfo1->getAction() == "trash") {
+            return -1;
+        } else if ($changeInfo2->getAction() == "trash") {
             return 1;
         } else if ($changeInfo1->getAction() == "edit") {
             return -1;
