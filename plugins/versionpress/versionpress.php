@@ -38,6 +38,11 @@ use VersionPress\VersionPress;
 
 defined('ABSPATH') or die("Direct access not allowed");
 
+if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
+    register_activation_hook(__FILE__, 'disable_plugin_activation');
+    return;
+}
+
 require_once(__DIR__ . '/bootstrap.php');
 
 if (defined('WP_CLI') && WP_CLI) {
@@ -97,6 +102,10 @@ add_filter('automatic_updates_is_vcs_checkout', function () {
     $forceUpdate = UninstallationUtil::uninstallationShouldRemoveGitRepo(); // first commit was created by VersionPress
     return !$forceUpdate; // 'false' forces the update
 });
+
+function disable_plugin_activation() {
+    wp_die('<h1> VersionPress could not be activated</h1> <p>It seems that your copy of VersionPress was not built correctly. Please download <a href="https://github.com/versionpress/versionpress/releases">release ZIP file from GitHub</a> and <a href="' . get_admin_url() . 'plugin-install.php?tab=upload">install it again</a>.');
+}
 
 function vp_register_hooks() {
     global $versionPressContainer;
@@ -650,20 +659,6 @@ function vp_send_headers() {
     }
 }
 
-add_action('admin_post_vp_send_bug_report', 'vp_send_bug_report');
-
-function vp_send_bug_report() {
-    $email = $_POST['email'];
-    $description = $_POST['description'];
-
-    $bugReporter = new BugReporter('http://versionpress.net/report-problem');
-    $reportedSuccessfully = $bugReporter->reportBug($email, $description);
-
-    $result = $reportedSuccessfully ? "ok" : "err";
-    wp_safe_redirect(add_query_arg('bug-report', $result, menu_page_url('versionpress', false)));
-    exit();
-}
-
 add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are just one step less important :) */);
 
 /**
@@ -867,20 +862,22 @@ add_action('admin_enqueue_scripts', 'vp_enqueue_styles_and_scripts');
 add_action('wp_enqueue_scripts', 'vp_enqueue_styles_and_scripts');
 function vp_enqueue_styles_and_scripts() {
     if (is_admin_bar_showing()) {
-        wp_enqueue_style('versionpress_popover_style', plugins_url('admin/public/css/jquery.webui-popover.min.css', __FILE__));
-        wp_enqueue_style('versionpress_popover_custom_style', plugins_url('admin/public/css/popover-custom.css', __FILE__));
+        $vpVersion = VersionPress::getVersion();
+        wp_enqueue_style('versionpress_popover_style', plugins_url('admin/public/css/jquery.webui-popover.min.css', __FILE__), [], $vpVersion);
+        wp_enqueue_style('versionpress_popover_custom_style', plugins_url('admin/public/css/popover-custom.css', __FILE__), [], $vpVersion);
 
         wp_enqueue_script('jquery');
-        wp_enqueue_script('versionpress_popover_script', plugins_url('admin/public/js/jquery.webui-popover.min.js', __FILE__), 'jquery');
+        wp_enqueue_script('versionpress_popover_script', plugins_url('admin/public/js/jquery.webui-popover.min.js', __FILE__), 'jquery', $vpVersion);
     }
 }
 
 add_action('admin_enqueue_scripts', 'vp_enqueue_admin_styles_and_scripts');
 function vp_enqueue_admin_styles_and_scripts() {
-    wp_enqueue_style('versionpress_admin_style', plugins_url('admin/public/css/style.css', __FILE__));
-    wp_enqueue_style('versionpress_admin_icons', plugins_url('admin/public/icons/style.css', __FILE__));
+    $vpVersion = VersionPress::getVersion();
+    wp_enqueue_style('versionpress_admin_style', plugins_url('admin/public/css/style.css', __FILE__), [], $vpVersion);
+    wp_enqueue_style('versionpress_admin_icons', plugins_url('admin/public/icons/style.css', __FILE__), [], $vpVersion);
 
-    wp_enqueue_script('versionpress_admin_script', plugins_url('admin/public/js/vp-admin.js', __FILE__));
+    wp_enqueue_script('versionpress_admin_script', plugins_url('admin/public/js/vp-admin.js', __FILE__), [], $vpVersion);
 }
 
 //---------------------------------

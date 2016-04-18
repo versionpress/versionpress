@@ -293,11 +293,20 @@ gulp.task('init-frontend', false, function () {
  * Sets git to be case sensitive.
  */
 gulp.task('git-config', false, function (cb) {
-    return git.exec({args: 'config core.ignorecase false'}, function (err, stdout) {
+    git.exec({args: 'config core.ignorecase false'}, function (err, stdout) {
         if (err) {
             console.log(err);
+            cb();
         }
-        cb();
+        
+        git.exec({args: 'config core.filemode false'}, function (err, stdout) {
+            if (err) {
+                console.log(err);
+                cb();
+            }
+        
+            cb();
+        });
     });
 });
 
