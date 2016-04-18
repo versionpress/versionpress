@@ -11,6 +11,7 @@ use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\Committer;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
@@ -922,6 +923,69 @@ class VPCommand extends WP_CLI_Command {
         }
     }
 
+    /**
+     * Updates VersionPress
+     *
+     * ## OPTIONS
+     *
+     * <zip>
+     * : Path to ZIP file containing VersionPress.
+     *
+     * ## EXAMPLES
+     *
+     *     wp vp update ../versionpress-4.0.zip
+     *
+     * @synopsis <zip>
+     *
+     */
+    public function update($args = array(), $assoc_args = array()) {
+        global $versionPressContainer;
+
+        $zip = $args[0];
+        if (!is_file($zip)) {
+            WP_CLI::error("File '$zip' not found.");
+        }
+
+        $this->switchMaintenance('on');
+
+        /** @var Committer $committer */
+        $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
+        $committer->disableCommit();
+
+        vp_deactivate();
+        WP_CLI::success('Deactivated VersionPress');
+
+        /** @var \Plugin_Upgrader $upgrader */
+        $upgrader = WP_CLI\Utils\get_upgrader(WP_CLI\DestructivePluginUpgrader::class);
+        $upgrader->skin = new SilentUpgraderSkin();
+
+        $result = $upgrader->run([
+            'package' => $zip,
+            'destination' => WP_PLUGIN_DIR,
+            'hook_extra' => [
+                'type' => 'plugin',
+                'action' => 'update',
+                'plugin' => 'versionpress/versionpress.php',
+            ]
+        ]);
+
+        if ($result) {
+            WP_CLI::success('Updated VersionPress');
+
+            $process = $this->runVPInternalCommand('finish-update');
+            echo $process->getConsoleOutput();
+
+            $this->switchMaintenance('off');
+        } else {
+            WP_CLI::error(join("\n",[
+                'Update failed. Unfortunatelly, you have to manually update VersionPress.',
+                ' 1. Delete wp-content/versionpress.',
+                ' 2. Extract the ZIP to wp-content/versionpress.',
+                ' 3. Run \'wp plugin activate versionpress\' and \'wp vp activate\'.',
+                ' 4. Delete the \'.maintenance\' file.',
+            ]));
+        }
+    }
 
     /**
      * Checks if some tables with the given prefix exist in the database

@@ -14,6 +14,7 @@ use VersionPress\Utils\StringUtils;
  *
  *     VP-Action: versionpress/install   <-- DEPRECATED, replaced by versionpress/activate
  *                versionpress/activate/1.0
+ *                versionpress/update/2.0
  *                versionpress/deactivate
  *
  */
@@ -60,6 +61,9 @@ class VersionPressChangeInfo extends TrackedChangeInfo {
 
             case "deactivate":
                 return "Deactivated VersionPress";
+
+            case "update":
+                return "Updated to VersionPress " . $this->versionPressVersion;
 
             default:
                 // just in case, this path shouldn't really be reached
