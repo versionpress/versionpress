@@ -50,9 +50,9 @@ class WpdbMirrorBridge {
         $entityName = $entityInfo->entityName;
         $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityName, $data);
 
-        array_walk($data, function (&$key, $value) {
+        array_walk($data, function (&$value, $key) {
             if ($value === false) {
-                $key = '';
+                $value = '';
             }
         });
 
