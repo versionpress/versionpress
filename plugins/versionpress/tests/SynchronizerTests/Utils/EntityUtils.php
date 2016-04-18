@@ -8,7 +8,7 @@ use VersionPress\Utils\IdUtil;
 class EntityUtils {
 
     public static function prepareOption($name, $value) {
-        return array('option_name' => $name, 'option_value' => $value);
+        return array('option_name' => $name, 'option_value' => $value, 'autoload' => 'yes');
     }
 
     public static function prepareUser($vpId = null, $userValues = array()) {
@@ -38,6 +38,8 @@ class EntityUtils {
         $post = array_merge(array(
             'post_date' => "2015-02-02 14:19:59",
             'post_date_gmt' => "2015-02-02 14:19:59",
+            'post_modified' => '0000-00-00 00:00:00',
+            'post_modified_gmt' => '0000-00-00 00:00:00',
             'post_content' => "Welcome to WordPress. This is your first post. Edit or delete it, then start blogging!",
             'post_title' => "Hello world!",
             'post_excerpt' => "",
@@ -54,6 +56,8 @@ class EntityUtils {
             'post_type' => "post",
             'post_mime_type' => "",
             'vp_id' => $vpId,
+            'vp_post_parent' => 0,
+            'vp_post_author' => 0,
         ), $postValues);
 
         if ($authorVpId !== null) {
@@ -121,8 +125,15 @@ class EntityUtils {
             'comment_author_email' => 'joetester@example.com',
             'comment_author_url' => '',
             'comment_date' => '2012-12-12 12:12:12',
+            'comment_date_gmt' => '0000-00-00 00:00:00',
             'comment_content' => 'Some content',
             'comment_approved' => 1,
+            'comment_author_IP' => '',
+            'comment_karma' => 0,
+            'comment_agent' => '',
+            'comment_type' => '',
+            'comment_parent' => 0,
+            'vp_comment_parent' => 0,
             'vp_id' => $vpId,
         ), $commentValues);
 
@@ -180,6 +191,8 @@ class EntityUtils {
         if ($description !== null) {
             $termTaxonomy['description'] = $description;
         }
+
+        $termTaxonomy['vp_parent'] = 0;
 
         return $termTaxonomy;
 

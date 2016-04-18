@@ -120,8 +120,11 @@ class DBAsserter {
             $dbEntity = self::$shortcodesReplacer->replaceShortcodesInEntity($entityName, $dbEntity);
 
             foreach ($dbEntity as $column => $value) {
-                if (!isset($storageEntity[$column])) {
+                if ($entityInfo->idColumnName === $column || isset($entityInfo->getIgnoredColumns()[$column])) {
                     continue;
+                }
+                if (!isset($storageEntity[$column])) {
+                    throw new \PHPUnit_Framework_AssertionFailedError("{$entityName}[$column] with value = $value, ID = $id not found in storage");
                 }
 
                 if (is_string($storageEntity[$column])) {

@@ -49,6 +49,13 @@ class WpdbMirrorBridge {
 
         $entityName = $entityInfo->entityName;
         $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityName, $data);
+
+        array_walk($data, function (&$value, $key) {
+            if ($value === false) {
+                $value = '';
+            }
+        });
+
         $shouldBeSaved = $this->mirror->shouldBeSaved($entityName, $data);
 
         if (!$shouldBeSaved) {
@@ -73,6 +80,12 @@ class WpdbMirrorBridge {
 
         $entityName = $entityInfo->entityName;
         $data = array_merge($where, $data);
+
+        array_walk($data, function (&$value, $key) {
+            if ($value === false) {
+                $value = '';
+            }
+        });
 
         if (!$entityInfo->usesGeneratedVpids) { // options etc.
             $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityName, $data);

@@ -2,6 +2,7 @@
 
 namespace VersionPress\Synchronizers;
 
+use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Storages\Storage;
@@ -19,22 +20,17 @@ class TermTaxonomiesSynchronizer extends SynchronizerBase {
     }
 
     protected function doEntitySpecificActions() {
-        if ($this->passNumber == 1) {
-            return false;
-        }
-
-        $this->fixPostsCount();
-        $this->clearCache();
+        WordPressCacheUtils::clearTermCache(array_column($this->entities, 'vp_term_id'), $this->database);
         return true;
     }
 
-    private function fixPostsCount() {
-        $sql = "update {$this->database->term_taxonomy} tt set tt.count =
-          (select count(*) from {$this->database->term_relationships} tr where tr.term_taxonomy_id = tt.term_taxonomy_id);";
-        $this->database->query($sql);
+    /**
+     * @param Database $database
+     */
+    public static function fixPostsCount($database) {
+        $sql = "update {$database->term_taxonomy} tt set tt.count =
+          (select count(*) from {$database->term_relationships} tr where tr.term_taxonomy_id = tt.term_taxonomy_id);";
+        $database->query($sql);
     }
 
-    private function clearCache() {
-        WordPressCacheUtils::clearTermCache(array_column($this->entities, 'vp_term_id'), $this->database);
-    }
 }
