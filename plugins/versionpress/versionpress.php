@@ -76,7 +76,7 @@ if (VersionPress::isActive()) {
 // Replacing wpdb
 //----------------------------------
     register_shutdown_function(function () {
-        if (!WpdbReplacer::isReplaced() && !defined('VP_DEACTIVATING')) {
+        if (!WpdbReplacer::isReplaced() && !defined('VP_DEACTIVATING') && VersionPress::isActive()) {
             WpdbReplacer::replaceMethods();
         }
     });
