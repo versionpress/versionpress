@@ -137,12 +137,18 @@ class Initializer {
     }
 
     private function tryToUseIdsFromDatabase() {
+        $vpidTableExists = (bool)$this->database->get_row("SHOW TABLES LIKE '{$this->database->vp_id}'");
+
+        if (!$vpidTableExists) {
+            return;
+        }
+
         $vpidRows = $this->database->get_results("SELECT `table`, id, HEX(vp_id) vp_id FROM {$this->database->vp_id}");
         foreach ($vpidRows as $row) {
             $this->idCache[$this->dbSchema->getEntityInfoByTableName($row->table)->entityName][$row->id] = $row->vp_id;
         }
     }
-    
+
     public function createVersionPressTables() {
         $process = array();
 
