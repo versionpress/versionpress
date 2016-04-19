@@ -137,8 +137,8 @@ class MergeDriverInstaller {
         if (file_exists($gitattributesPath)) {
             $gitAttributes = file_get_contents($gitattributesPath);
             $gitAttributes = str_replace($gitattributesContents, '', $gitAttributes);
-            if(trim($gitAttributes) === '') {
-                unlink ($gitattributesPath);
+            if (trim($gitAttributes) === '') {
+                unlink($gitattributesPath);
             } else {
                 file_put_contents($gitattributesPath, $gitAttributes);
 

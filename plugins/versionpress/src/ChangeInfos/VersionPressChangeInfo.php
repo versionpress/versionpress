@@ -88,6 +88,7 @@ class VersionPressChangeInfo extends TrackedChangeInfo {
                     array("type" => "path", "path" => VP_VPDB_DIR . "/*"),
                     array("type" => "path", "path" => ABSPATH . WPINC . "/wp-db.php"),
                     array("type" => "path", "path" => ABSPATH . WPINC . "/wp-db.php.original"),
+                    array("type" => "path", "path" => ABSPATH . "/.gitattributes"),
                 );
             default:
                 return array(array("type" => "path", "path" => "*"));
