@@ -35,7 +35,7 @@ Let's discuss a workflow that seems basic but actually covers almost any real-wo
  
   **See also**
  
-  The workflow has been showcased in the blog post [VersionPress 2.0: Easy Staging](http://blog.versionpress.net/2015/09/versionpress-2-0-staging/).
+  The workflow has been showcased in the blog post [VersionPress 2.0: Easy Staging](https://blog.versionpress.net/2015/09/versionpress-2-0-staging/).
  
 </div>
 
