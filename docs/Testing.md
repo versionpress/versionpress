@@ -133,7 +133,7 @@ This is especially useful:
 2. If you want to **debug** some test
 3. If you want to run a **specific end2end test**, e.g., `PostsTest`.
 
-Just right-click on desired directory / class (`tests` for all, `tests/Unit` for unit tests etc.) and choose *Run*. (For End2End tests with Selenium worker, you need to start the Selenium server manually first.)
+Just right-click on desired directory / class (`tests` for all, `tests/Unit` for unit tests etc.) and choose *Run*. (For End2End tests with Selenium worker, you need to start the Selenium server first. You can use `gulp start-selenium`.)
 
 
 ### Logging
