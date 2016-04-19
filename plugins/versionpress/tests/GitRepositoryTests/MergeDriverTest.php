@@ -85,7 +85,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
         $gitattributesContents = file_get_contents(__DIR__ . '/../../src/Initialization/.gitattributes.tpl');
         $gitConfigContents = "[merge \"vp-ini\"]";
         $gitattributesVariables = array(
-            'vpdb-dir' => rtrim(ltrim(PathUtils::getRelativePath(self::$repositoryDir, self::$repositoryDir), '.'), '/\\')
+            'vpdb-dir' => self::$repositoryDir
         );
         $gitattributesContents = StringUtils::fillTemplateString($gitattributesVariables, $gitattributesContents);
         file_put_contents(self::$repositoryDir . "/.gitattributes", $gitattributesContents);
