@@ -10,6 +10,7 @@
  * @see vp_admin_post_confirm_deactivation()
  */
 
+use VersionPress\DI\VersionPressServices;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\SecurityUtils;
 use VersionPress\Utils\UninstallationUtil;
@@ -17,6 +18,27 @@ use VersionPress\Utils\UninstallationUtil;
 defined('WP_UNINSTALL_PLUGIN') or die('Direct access not allowed');
 
 require_once(dirname(__FILE__) . '/bootstrap.php');
+
+global $versionPressContainer;
+
+/** @var \VersionPress\Database\Database $database */
+$database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
+
+
+$queries[] = "DROP TABLE IF EXISTS `{$database->vp_id}`";
+
+$vpOptionsReflection = new ReflectionClass('VersionPress\Initialization\VersionPressOptions');
+$usermetaToDelete = array_values($vpOptionsReflection->getConstants());
+$queryRestriction = '"' . join('", "', $usermetaToDelete) . '"';
+
+$queries[] = "DELETE FROM `{$database->usermeta}` WHERE meta_key IN ({$queryRestriction})";
+
+foreach ($queries as $query) {
+    $database->query($query);
+}
+
+delete_option('vp_rest_api_plugin_version');
+
 
 if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
 

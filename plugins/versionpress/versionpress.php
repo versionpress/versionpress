@@ -637,38 +637,13 @@ function vp_admin_post_confirm_deactivation() {
         FileSystem::remove(VERSIONPRESS_ACTIVATION_FILE);
     }
 
-    FileSystem::remove(VP_VPDB_DIR);
-
-
     global $versionPressContainer;
     /** @var Committer $committer */
     $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
     $committer->forceChangeInfo(new VersionPressChangeInfo("deactivate"));
 
-    /** @var WpdbMirrorBridge $wpdbMirrorBridge */
-    $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
-    $wpdbMirrorBridge->disable();
-
     MergeDriverInstaller::uninstallMergeDriver(VP_PROJECT_ROOT);
     
-    /** @var \VersionPress\Database\Database $database */
-    $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
-    
-
-    $queries[] = "DROP TABLE IF EXISTS `{$database->vp_id}`";
-
-    $vpOptionsReflection = new ReflectionClass('VersionPress\Initialization\VersionPressOptions');
-    $usermetaToDelete = array_values($vpOptionsReflection->getConstants());
-    $queryRestriction = '"' . join('", "', $usermetaToDelete) . '"';
-
-    $queries[] = "DELETE FROM `{$database->usermeta}` WHERE meta_key IN ({$queryRestriction})";
-
-    foreach ($queries as $query) {
-        $database->query($query);
-    }
-
-
-    delete_option('vp_rest_api_plugin_version');
     deactivate_plugins("versionpress/versionpress.php", true);
 
     if (defined('WP_ADMIN')) {
