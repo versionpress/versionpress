@@ -649,7 +649,7 @@ function vp_admin_post_confirm_deactivation() {
     $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
     $wpdbMirrorBridge->disable();
 
-    MergeDriverInstaller::uninstallMergeDriver(VP_PROJECT_ROOT);
+    MergeDriverInstaller::uninstallMergeDriver(VP_PROJECT_ROOT, VERSIONPRESS_PLUGIN_DIR, VP_VPDB_DIR);
     
     /** @var \VersionPress\Database\Database $database */
     $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);

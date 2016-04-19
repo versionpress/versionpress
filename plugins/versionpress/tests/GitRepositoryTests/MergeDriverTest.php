@@ -51,9 +51,20 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
      */
     public function mergeDriverUninstalledCorrectly() {
         $this->installMergeDriver('auto');
-        MergeDriverInstaller::uninstallMergeDriver(self::$repositoryDir);
+        file_put_contents(self::$repositoryDir . "/.gitattributes", "*.txt text", FILE_APPEND);
+        MergeDriverInstaller::uninstallMergeDriver(self::$repositoryDir, __DIR__ . '/../..', self::$repositoryDir);
         $this->assertNotContains('vp-ini', file_get_contents(self::$repositoryDir . "/.git/config"));
         $this->assertNotContains('merge=vp-ini', file_get_contents(self::$repositoryDir . "/.gitattributes"));
+    }
+
+    /**
+     * @test
+     */
+    public function gitAttributesRemovedCorrectlyAfterUninstall() {
+        $this->installMergeDriver('auto');
+        MergeDriverInstaller::uninstallMergeDriver(self::$repositoryDir, __DIR__ . '/../..', self::$repositoryDir);
+        $this->assertNotContains('vp-ini', file_get_contents(self::$repositoryDir . "/.git/config"));
+        $this->assertFileNotExists(self::$repositoryDir . "/.gitattributes");
     }
 
     /**
