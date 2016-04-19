@@ -86,7 +86,7 @@ class Initializer {
      * @var ShortcodesReplacer
      */
     private $shortcodesReplacer;
-    private $idCache;
+    private $idCache = [];
     private $executionStartTime;
 
     function __construct(
@@ -113,12 +113,13 @@ class Initializer {
     /**
      * Main entry point
      */
-    public function initializeVersionPress() {
+    public function initializeVersionPress($isUpdate = false) {
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
         @set_time_limit(0); // intentionally @ - if it's disabled we can't do anything but try the initialization
         $this->reportProgressChange(InitializerStates::START);
         vp_enable_maintenance();
         try {
+            $this->tryToUseIdsFromDatabase();
             $this->createVersionPressTables();
             $this->lockDatabase();
             $this->saveDatabaseToStorages();
@@ -127,7 +128,7 @@ class Initializer {
             $this->activateVersionPress();
             $this->copyAccessRulesFiles();
             $this->createCommonConfig();
-            $this->doInitializationCommit();
+            $this->doInitializationCommit($isUpdate);
             vp_disable_maintenance();
             $this->reportProgressChange(InitializerStates::FINISHED);
         } catch (InitializationAbortedException $ex) {
@@ -135,8 +136,20 @@ class Initializer {
         }
     }
 
+    private function tryToUseIdsFromDatabase() {
+        $vpidTableExists = (bool)$this->database->get_row("SHOW TABLES LIKE '{$this->database->vp_id}'");
+
+        if (!$vpidTableExists) {
+            return;
+        }
+
+        $vpidRows = $this->database->get_results("SELECT `table`, id, HEX(vp_id) vp_id FROM {$this->database->vp_id}");
+        foreach ($vpidRows as $row) {
+            $this->idCache[$this->dbSchema->getEntityInfoByTableName($row->table)->entityName][$row->id] = $row->vp_id;
+        }
+    }
+
     public function createVersionPressTables() {
-        $table_prefix = $this->database->prefix;
         $process = array();
 
         $process[] = "DROP TABLE IF EXISTS `{$this->database->vp_id}`";
@@ -199,13 +212,20 @@ class Initializer {
         $storage = $this->storageFactory->getStorage($entityName);
         $entities = array_filter($entities, function ($entity) use ($storage) { return $storage->shouldBeSaved($entity); });
         $chunks = array_chunk($entities, 1000);
-        $this->idCache[$entityName] = array();
 
         foreach ($chunks as $entitiesInChunk) {
             $wordpressIds = ArrayUtils::column($entitiesInChunk, $idColumnName);
-            $vpIds = array_map(array('VersionPress\Utils\IdUtil', 'newId'), $entitiesInChunk);
-            $idPairs = array_combine($wordpressIds, $vpIds);
-            $this->idCache[$entityName] = $this->idCache[$entityName] + $idPairs; // merge arrays with preserving keys
+            $idPairs = [];
+
+            foreach ($wordpressIds as $id) {
+                $id = intval($id);
+                if (!isset($this->idCache[$entityName], $this->idCache[$entityName][$id])) {
+                    $this->idCache[$entityName][$id] = IdUtil::newId();
+                }
+
+                $idPairs[$id] = $this->idCache[$entityName][$id];
+            }
+
             $sqlValues = join(', ', ArrayUtils::map(function ($vpId, $id) use ($tableName) { return "('$tableName', $id, UNHEX('$vpId'))"; }, $idPairs));
             $query = "INSERT INTO {$this->database->vp_id} (`table`, id, vp_id) VALUES $sqlValues";
             $this->database->query($query);
@@ -364,7 +384,6 @@ class Initializer {
         return $usermeta;
     }
 
-
     /**
      * Rolls back database if it was locked by `lockDatabase()` and an unexpected shutdown occurred.
      */
@@ -389,7 +408,6 @@ class Initializer {
         $this->reportProgressChange(InitializerStates::DB_WORK_DONE);
     }
 
-
     private function createGitRepository() {
         if (!$this->repository->isVersioned()) {
             $this->reportProgressChange(InitializerStates::CREATING_GIT_REPOSITORY);
@@ -400,15 +418,13 @@ class Initializer {
         MergeDriverInstaller::installMergeDriver(VP_PROJECT_ROOT, VERSIONPRESS_PLUGIN_DIR, VP_VPDB_DIR);
     }
 
-
     private function activateVersionPress() {
         WpdbReplacer::replaceMethods();
         touch(VERSIONPRESS_ACTIVATION_FILE);
         $this->reportProgressChange(InitializerStates::VERSIONPRESS_ACTIVATED);
     }
 
-
-    private function doInitializationCommit() {
+    private function doInitializationCommit($isUpdate) {
         $this->checkTimeout();
 
         // Since WP-217 the `.active` file contains not the SHA1 of the first commit that VersionPress
@@ -419,7 +435,7 @@ class Initializer {
 
 
         $this->reportProgressChange(InitializerStates::CREATING_INITIAL_COMMIT);
-        $installationChangeInfo = new VersionPressChangeInfo("activate", VersionPress::getVersion());
+        $installationChangeInfo = new VersionPressChangeInfo($isUpdate ? "update" : "activate", VersionPress::getVersion());
 
         $currentUser = wp_get_current_user();
         /** @noinspection PhpUndefinedFieldInspection */
@@ -508,9 +524,6 @@ class Initializer {
             file_put_contents($gitignorePath, $vpGitignore);
         }
     }
-
-
-
 
     private function createCommonConfig() {
         $configPath = WordPressMissingFunctions::getWpConfigPath();

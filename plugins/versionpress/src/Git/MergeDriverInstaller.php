@@ -145,11 +145,13 @@ class MergeDriverInstaller {
             }
         }
 
-        $gitConfig = file_get_contents($gitconfigPath);
-        // https://regex101.com/r/eJ4rJ5/4
-        $mergeDriverRegex = "/(\\[merge \\\"vp\\-ini\\\"\\]\\r?\\n)([^\\[]*)/";
-        $gitConfig = preg_replace($mergeDriverRegex, '', $gitConfig, 1);
-        file_put_contents($gitconfigPath, $gitConfig);
+        if (file_exists($gitconfigPath)) {
+            $gitConfig = file_get_contents($gitconfigPath);
+            // https://regex101.com/r/eJ4rJ5/4
+            $mergeDriverRegex = "/(\\[merge \\\"vp\\-ini\\\"\\]\\r?\\n)([^\\[]*)/";
+            $gitConfig = preg_replace($mergeDriverRegex, '', $gitConfig, 1);
+            file_put_contents($gitconfigPath, $gitConfig);
+        }
     }
 
 }

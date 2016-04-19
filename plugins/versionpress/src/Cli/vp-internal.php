@@ -6,6 +6,7 @@ use VersionPress\Database\Database;
 use VersionPress\Database\VpidRepository;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\MergeDriverInstaller;
+use VersionPress\Initialization\Initializer;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\WpConfigEditor;
 use WP_CLI;
@@ -81,6 +82,23 @@ class VPInternalCommand extends WP_CLI_Command {
         $this->flushRewriteRules();
         WP_CLI::success("Database synchronized");
 
+    }
+
+    /**
+     * Finishes the update with new version
+     *
+     * @subcommand finish-update
+     */
+    public function finishUpdate($args, $assoc_args) {
+        global $versionPressContainer;
+        activate_plugins("versionpress/versionpress.php");
+        WP_CLI::success('Re-activated VersionPress');
+
+        /** @var Initializer $initializer */
+        $initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);
+        $initializer->initializeVersionPress(true);
+
+        WP_CLI::success('VersionPress is tracking your site');
     }
 
     /**
