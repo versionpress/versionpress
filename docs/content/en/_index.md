@@ -1,6 +1,6 @@
 # VersionPress Documentation #
 
-Welcome to [VersionPress](http://versionpress.net/) documentation. VersionPress itself is intuitive to use but some things like core concepts or installation details require more attention and are described here.
+Welcome to [VersionPress](https://versionpress.net/) documentation. VersionPress itself is intuitive to use but some things like core concepts or installation details require more attention and are described here.
 
 <figure style="width: 90%;">
   <img src="../media/successful-activation.png" alt="Hello VersionPress" /> 

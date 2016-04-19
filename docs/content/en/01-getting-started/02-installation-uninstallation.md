@@ -91,7 +91,7 @@ VersionPress depends on several external libraries for launching Git processes, 
 
 ## Installation
 
-VersionPress can be obtained via the main [versionpress.net website](http://versionpress.net/). When you have the ZIP file, the installation is pretty standard:
+VersionPress can be obtained via the main [versionpress.net website](https://versionpress.net/). When you have the ZIP file, the installation is pretty standard:
 
 1. Log in to the admin screens
 2. Go to *Plugins > Add New > Upload*

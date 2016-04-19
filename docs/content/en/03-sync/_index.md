@@ -2,7 +2,7 @@
 
 This sections discusses how VersionPress handles multiple site instances like *staging* and *live*, cloning and merging between them, etc.
 
-See also the [blog post on staging](http://blog.versionpress.net/2015/09/versionpress-2-0-staging/).
+See also the [blog post on staging](https://blog.versionpress.net/2015/09/versionpress-2-0-staging/).
 
 <div class="note">
  

@@ -30,7 +30,7 @@ You can also switch to the *Full diff* mode which displays complete contents of 
 
 Related:
 
- - Blog post [VersionPress 2.0: New User Interface](http://blog.versionpress.net/2015/09/versionpress-2-0-new-user-interface/)
+ - Blog post [VersionPress 2.0: New User Interface](https://blog.versionpress.net/2015/09/versionpress-2-0-new-user-interface/)
 
 
 ## Undoing changes
@@ -39,7 +39,7 @@ When something goes wrong, you can use the [Undo and Rollback feature](../featur
 
 Related:
 
- - Blog post [VersionPress 1.0 Walkthrough](http://blog.versionpress.net/2015/05/versionpress-1-0-walkthrough/)
+ - Blog post [VersionPress 1.0 Walkthrough](https://blog.versionpress.net/2015/05/versionpress-1-0-walkthrough/)
 
 
 ## Sync / staging workflows
@@ -48,4 +48,4 @@ Since VersionPress 2.0, [sync / staging workflows](../sync) are supported. See t
 
 Related:
 
- - Blog post [VersionPress 2.0: Simple Staging](http://blog.versionpress.net/2015/09/versionpress-2-0-staging/)
+ - Blog post [VersionPress 2.0: Simple Staging](https://blog.versionpress.net/2015/09/versionpress-2-0-staging/)
