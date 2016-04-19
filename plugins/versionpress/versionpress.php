@@ -28,7 +28,6 @@ use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Storages\Mirror;
 use VersionPress\Storages\StorageFactory;
-use VersionPress\Utils\BugReporter;
 use VersionPress\Utils\CompatibilityChecker;
 use VersionPress\Utils\CompatibilityResult;
 use VersionPress\Utils\FileSystem;
