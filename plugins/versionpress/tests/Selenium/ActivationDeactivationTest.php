@@ -187,7 +187,6 @@ class ActivationDeactivationTest extends SeleniumTestCase {
         $this->assertContains('wp-admin/plugins.php', $this->url());
 
         $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-includes/wpdb.php.original');
-        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/vpdb');
         $this->assertFileExists(self::$testConfig->testSite->path . '/.git');
 
     }
@@ -218,6 +217,7 @@ class ActivationDeactivationTest extends SeleniumTestCase {
 
         $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-includes/wpdb.php.original');
         $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/plugins/versionpress');
+        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/vpdb');
         $this->assertFileNotExists(self::$testConfig->testSite->path . '/.git');
 
     }
