@@ -41,7 +41,7 @@ There are some terms that you will see often both in this documentation and in t
 <dd>Another, more technical word for a change in the Git terminology.</dd>
 
 <dt>entity</dt>
-<dd>For example a post or a comment. These are things that VersionPress tracks. We use this rather abstract term instead of e.g. a "database row" because not all tracked entities do necessarily need to be database rows.</dd>
+<dd>For example, a post or a comment. These are things that VersionPress tracks. We use this rather abstract term instead of e.g. a "database row" because not all tracked entities do necessarily need to be database rows.</dd>
 
 </dl>
 
