@@ -967,7 +967,7 @@ class VPCommand extends WP_CLI_Command {
 
         /** @var \Plugin_Upgrader $upgrader */
         $upgrader = WP_CLI\Utils\get_upgrader(WP_CLI\DestructivePluginUpgrader::class);
-        $upgrader->skin = new SilentUpgraderSkin();
+        $upgrader->skin = new SilentUpgraderSkin(); // Use silent upgrader skin - we don't need any output from the upgrader
 
         $result = $upgrader->run([
             'package' => $zip,
