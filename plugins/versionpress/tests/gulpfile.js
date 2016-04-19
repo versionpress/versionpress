@@ -20,6 +20,11 @@ gulp.task('default', function () {
         }
 
         console.log('');
+        console.log(chalk.bold('Commands:'));
+        console.log('gulp run-tests');
+        console.log('gulp start-selenium');
+        console.log('');
+        console.log(chalk.bold.underline('gulp run-tests'));
         console.log(chalk.cyan('Usage:') + ' ' + chalk.bold('gulp run-tests [--force-setup[=before-suite|before-class]]'));
         console.log('');
         console.log(chalk.cyan('Options:'));
