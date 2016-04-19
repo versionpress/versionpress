@@ -8,9 +8,9 @@ var fs = require('fs');
 var selenium = require('selenium-standalone');
 
 // Run this task to get the help
-gulp.task('default', function() {
+gulp.task('default', function () {
 
-    tcpPortUsed.check(4444).then(function(isInUse) {
+    tcpPortUsed.check(4444).then(function (isInUse) {
 
         var portStatus = '';
         if (isInUse) {
@@ -40,7 +40,18 @@ gulp.task('default', function() {
 
 });
 
-gulp.task('run-tests', function(cb) {
+var seleniumProcess;
+
+gulp.task('check-port', function (cb) {
+    tcpPortUsed.check(4444).then(function (isInUse) {
+        if (isInUse) {
+            return cb('Port 4444 is already used by another process');
+        }
+        cb();
+    });
+});
+
+gulp.task('start-selenium', ['check-port'], function (cb) {
     // check for more recent versions of selenium here:
     // http://selenium-release.storage.googleapis.com/index.html
     var seleniumVersion = '2.47.1';
@@ -49,60 +60,64 @@ gulp.task('run-tests', function(cb) {
         version: seleniumVersion,
         baseURL: 'http://selenium-release.storage.googleapis.com',
         drivers: {},
-        logger: function(message) {
+        logger: function (message) {
             console.log(message)
         }
-    }, function(err) {
+    }, function (err) {
         if (err) return cb(err);
 
         selenium.start({
             version: seleniumVersion
-        }, function(err, child) {
+        }, function (err, child) {
             if (err) return cb(err);
 
-            if (argv['force-setup'] !== undefined) {
-
-                if (argv['force-setup'] === true) {
-                    // just --force-setup without any value, default to before-suite
-                    argv['force-setup'] = "before-suite";
-                }
-                process.env['VP_FORCE_SETUP'] = argv['force-setup'];
-            }
-
-            var phpUnitCmd = fs.realpathSync(path.join('..', 'vendor', 'bin', 'phpunit'));
-            var isWindows = (process.platform.lastIndexOf('win') === 0);
-            if (isWindows) {
-                phpUnitCmd += ".bat";
-            }
-            var phpUnitCmdArgs = [
-                "--log-tap=./phpunit-log.tap.txt",
-                "--testdox-text=./phpunit-log.testdox.txt",
-                "--verbose",
-                "--colors"
-            ];
-
-            var outFile = fs.createWriteStream('phpunit-log.txt');
-
-
-            var phpunit = childProcess.spawn(phpUnitCmd, phpUnitCmdArgs);
-            phpunit.stdout.on('data', function(data) {
-                process.stdout.write(data);
-                outFile.write(data);
-            });
-            phpunit.stdout.on('end', function(data) {
-                outFile.end();
-                child.kill();
-                cb();
-            });
-
-            phpunit.on('error', function(err) {
-                console.log("Error");
-                console.log(err);
-                child.kill();
-                cb();
-            });
+            seleniumProcess = child;
+            cb();
         })
     })
+});
 
+gulp.task('run-tests', ['start-selenium'], function (cb) {
+    if (argv['force-setup'] !== undefined) {
+
+        if (argv['force-setup'] === true) {
+            // just --force-setup without any value, default to before-suite
+            argv['force-setup'] = "before-suite";
+        }
+        process.env['VP_FORCE_SETUP'] = argv['force-setup'];
+    }
+
+    var phpUnitCmd = fs.realpathSync(path.join('..', 'vendor', 'bin', 'phpunit'));
+    var isWindows = (process.platform.lastIndexOf('win') === 0);
+    if (isWindows) {
+        phpUnitCmd += ".bat";
+    }
+    var phpUnitCmdArgs = [
+        "--log-tap=./phpunit-log.tap.txt",
+        "--testdox-text=./phpunit-log.testdox.txt",
+        "--verbose",
+        "--colors"
+    ];
+
+    var outFile = fs.createWriteStream('phpunit-log.txt');
+    var phpunit = childProcess.spawn(phpUnitCmd, phpUnitCmdArgs);
+
+    phpunit.stdout.on('data', function (data) {
+        process.stdout.write(data);
+        outFile.write(data);
+    });
+    phpunit.stdout.on('end', function (data) {
+        outFile.end();
+        seleniumProcess.kill();
+        cb();
+    });
+
+    phpunit.on('error', function (err) {
+        console.log("Error");
+        console.log(err);
+        outFile.end();
+        seleniumProcess.kill();
+        cb();
+    });
 });
 
