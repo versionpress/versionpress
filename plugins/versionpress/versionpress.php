@@ -28,7 +28,6 @@ use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Storages\Mirror;
 use VersionPress\Storages\StorageFactory;
-use VersionPress\Utils\BugReporter;
 use VersionPress\Utils\CompatibilityChecker;
 use VersionPress\Utils\CompatibilityResult;
 use VersionPress\Utils\FileSystem;
@@ -642,7 +641,7 @@ function vp_admin_post_confirm_deactivation() {
     $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
     $committer->forceChangeInfo(new VersionPressChangeInfo("deactivate"));
 
-    MergeDriverInstaller::uninstallMergeDriver(VP_PROJECT_ROOT);
+    MergeDriverInstaller::uninstallMergeDriver(VP_PROJECT_ROOT, VERSIONPRESS_PLUGIN_DIR, VP_VPDB_DIR);
     
     deactivate_plugins("versionpress/versionpress.php", true);
 

@@ -4,6 +4,7 @@ namespace VersionPress\Tests\GitRepositoryTests;
 use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Tests\Utils\MergeAsserter;
 use VersionPress\Tests\Utils\MergeDriverTestUtils;
+use VersionPress\Utils\PathUtils;
 use VersionPress\Utils\StringUtils;
 
 class MergeDriverTest extends \PHPUnit_Framework_TestCase {
@@ -51,9 +52,57 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
      */
     public function mergeDriverUninstalledCorrectly() {
         $this->installMergeDriver('auto');
-        MergeDriverInstaller::uninstallMergeDriver(self::$repositoryDir);
+        file_put_contents(self::$repositoryDir . "/.gitattributes", "*.txt text");
+        MergeDriverInstaller::uninstallMergeDriver(self::$repositoryDir, __DIR__ . '/../..', self::$repositoryDir);
         $this->assertNotContains('vp-ini', file_get_contents(self::$repositoryDir . "/.git/config"));
         $this->assertNotContains('merge=vp-ini', file_get_contents(self::$repositoryDir . "/.gitattributes"));
+    }
+
+    /**
+     * @test
+     */
+    public function gitAttributesRemovedWhenEmpty() {
+        $this->installMergeDriver('auto');
+        MergeDriverInstaller::uninstallMergeDriver(self::$repositoryDir, __DIR__ . '/../..', self::$repositoryDir);
+        $this->assertFileNotExists(self::$repositoryDir . "/.gitattributes");
+    }
+
+    /**
+     * @test
+     */
+    public function gitAttributesIsSameAfterInstallAndUninstall() {
+        $gitAttributesContent = "*.txt text\n*.jpg binary";
+        file_put_contents(self::$repositoryDir . "/.gitattributes", $gitAttributesContent);
+        $this->installMergeDriver('auto');
+        MergeDriverInstaller::uninstallMergeDriver(self::$repositoryDir, __DIR__ . '/../..', self::$repositoryDir);
+        $this->assertEquals($gitAttributesContent, file_get_contents(self::$repositoryDir . "/.gitattributes"));
+    }
+
+    /**
+     * @test
+     */
+    public function mergeDriverIsNotAddedWhenPresent() {
+        $gitattributesContents = file_get_contents(__DIR__ . '/../../src/Initialization/.gitattributes.tpl');
+        $gitConfigContents = "[merge \"vp-ini\"]";
+        $gitattributesVariables = array(
+            'vpdb-dir' => self::$repositoryDir
+        );
+        $gitattributesContents = StringUtils::fillTemplateString($gitattributesVariables, $gitattributesContents);
+        file_put_contents(self::$repositoryDir . "/.gitattributes", $gitattributesContents);
+        file_put_contents(self::$repositoryDir . "/.git/config", $gitConfigContents);
+        $this->installMergeDriver('auto');
+        $this->assertEquals($gitConfigContents, file_get_contents(self::$repositoryDir . "/.git/config"));
+        $this->assertEquals($gitattributesContents, file_get_contents(self::$repositoryDir . "/.gitattributes"));
+    }
+
+    /**
+     * @test
+     */
+    public function gitAttributesRemovedCorrectlyAfterUninstall() {
+        $this->installMergeDriver('auto');
+        MergeDriverInstaller::uninstallMergeDriver(self::$repositoryDir, __DIR__ . '/../..', self::$repositoryDir);
+        $this->assertNotContains('vp-ini', file_get_contents(self::$repositoryDir . "/.git/config"));
+        $this->assertFileNotExists(self::$repositoryDir . "/.gitattributes");
     }
 
     /**
@@ -75,7 +124,7 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
         MergeDriverTestUtils::writeIniFile('file.ini', '2011-11-11 11:11:11');
         MergeDriverTestUtils::commit('Initial commit to common ancestor');
-        
+
         MergeDriverTestUtils::runGitCommand('git checkout -b test-branch');
 
         MergeDriverTestUtils::writeIniFile('file.ini', '2012-12-12 12:12:12');
@@ -162,7 +211,6 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
         MergeAsserter::assertCleanMerge('git merge test-branch');
     }
-
 
 
 }

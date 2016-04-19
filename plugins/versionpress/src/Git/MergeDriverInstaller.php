@@ -57,17 +57,17 @@ class MergeDriverInstaller {
         $gitattributesVariables = array(
             'vpdb-dir' => rtrim(ltrim(PathUtils::getRelativePath($rootDir, $vpdbDir), '.'), '/\\')
         );
-        $gitattributesContents = "\n" . StringUtils::fillTemplateString($gitattributesVariables, $gitattributesContents);
+        $gitattributesContents = StringUtils::fillTemplateString($gitattributesVariables, $gitattributesContents);
 
-        $appendFlag = null;
         if (is_file($gitattributesPath)) {
-            $appendFlag = FILE_APPEND;
-            if (strpos(file_get_contents($gitattributesPath), 'merge=vp-ini') !== false) {
+            $gitAttributesFileContents = file_get_contents($gitattributesPath);
+            if (strpos($gitAttributesFileContents, $gitattributesContents) !== false) {
                 return;
             }
+            $gitattributesContents = $gitattributesContents . $gitAttributesFileContents;
         }
 
-        file_put_contents($gitattributesPath, $gitattributesContents, $appendFlag);
+        file_put_contents($gitattributesPath, $gitattributesContents);
     }
 
 
@@ -123,14 +123,26 @@ class MergeDriverInstaller {
      *
      * @param string $rootDir
      */
-    public static function uninstallMergeDriver($rootDir) {
+    public static function uninstallMergeDriver($rootDir, $pluginDir, $vpdbDir) {
         $gitconfigPath = $rootDir . '/.git/config';
         $gitattributesPath = $rootDir . '/.gitattributes';
 
+        $gitattributesContents = file_get_contents($pluginDir . '/src/Initialization/.gitattributes.tpl');
+
+        $gitattributesVariables = array(
+            'vpdb-dir' => rtrim(ltrim(PathUtils::getRelativePath($rootDir, $vpdbDir), '.'), '/\\')
+        );
+        $gitattributesContents = StringUtils::fillTemplateString($gitattributesVariables, $gitattributesContents);
+
         if (file_exists($gitattributesPath)) {
             $gitAttributes = file_get_contents($gitattributesPath);
-            $gitAttributes = preg_replace('/(.*)merge=vp-ini/', '', $gitAttributes);
-            file_put_contents($gitattributesPath, $gitAttributes);
+            $gitAttributes = str_replace($gitattributesContents, '', $gitAttributes);
+            if (trim($gitAttributes) === '') {
+                unlink($gitattributesPath);
+            } else {
+                file_put_contents($gitattributesPath, $gitAttributes);
+
+            }
         }
 
         if (file_exists($gitconfigPath)) {
