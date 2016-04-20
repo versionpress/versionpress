@@ -21,7 +21,7 @@ class CommentStorage extends DirectoryStorage {
     public function shouldBeSaved($data) {
         $isExistingEntity = $this->entityExistedBeforeThisRequest($data);
 
-        if ($isExistingEntity && $data['comment_approved'] === 'spam') {
+        if ($isExistingEntity && isset($data['comment_approved']) && $data['comment_approved'] === 'spam') {
             return true;
         }
 
