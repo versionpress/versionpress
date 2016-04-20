@@ -426,15 +426,34 @@ class VersionPressApi {
     }
 
     private function updateDatabase($status) {
-        $diff = $this->gitRepository->getDiff();
-        $vpidRegex = "/([\\da-f]{32})/i";
+        $fullDiff = $this->gitRepository->getDiff();
+
+        $diffFiles = explode('diff --git', $fullDiff);
+
         $vpdbName = basename(VP_VPDB_DIR);
+        $vpidRegex = "/([\\da-f]{32})/i";
         $optionRegex = "/.*{$vpdbName}[\\/\\\\]options[\\/\\\\].+[\\/\\\\](.+)\\.ini/i";
 
-        preg_match_all($vpidRegex, $diff, $vpidMatches);
-        preg_match_all($optionRegex, $diff, $optionNameMatches);
+        $entitiesToSynchronize = [];
 
-        $entitiesToSynchronize = array_unique(array_merge($vpidMatches[1], $optionNameMatches[1]));
+        foreach ($diffFiles as $diff) {
+            $firstLine = substr($diff, 0, strpos($diff, "\n"));
+            $parent = null;
+
+            if (preg_match($optionRegex, $firstLine, $matches)) {
+                $entitiesToSynchronize[] = ['vp_id' => $matches[1], 'parent' => null];
+            } elseif (preg_match($vpidRegex, $firstLine, $matches)) {
+                $parent = $matches[1];
+            }
+
+            preg_match_all($vpidRegex, $diff, $vpidMatches);
+
+            foreach ($vpidMatches[1] as $match) {
+                $entitiesToSynchronize[] = ['vp_id' => $match, 'parent' => $parent];
+            }
+        }
+
+        $entitiesToSynchronize = array_unique($entitiesToSynchronize, SORT_REGULAR);
         $this->synchronizationProcess->synchronize($entitiesToSynchronize);
     }
 
