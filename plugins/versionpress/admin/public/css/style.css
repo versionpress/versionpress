@@ -23,6 +23,11 @@
     width: 48%;
 }
 
+.vp-activation-panel h4 {
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
 /*------------------------------
  * Admin pages
  *------------------------------*/

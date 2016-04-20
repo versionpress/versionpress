@@ -7,13 +7,6 @@ use VersionPress\Utils\RequirementsChecker;
 
 ?>
 
-<style>
-    h4 {
-        margin-top: 30px;
-        margin-bottom: 10px;
-    }
-</style>
-
 <script>
 
 jQuery(document).ready(function($) {
@@ -112,7 +105,7 @@ jQuery(document).ready(function($) {
                         E.g., <code>production</code>, <code>dev</code> or <code>my-machine</code>. This will help you identify this environment later.
 
                         <div style="margin-top: 10px;">
-                            <label for="envname"><?php _e('Environment name:') ?></label>
+                            <label for="envname">Environment name:</label>
                             <input name="envname" type="text" id="envname" value="default" />
 
                         </div>
