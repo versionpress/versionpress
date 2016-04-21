@@ -101,7 +101,7 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase
             ]
         ]);
 
-        $termStorageMock = $this->getMockBuilder('VersionPress\Storages\TermStorage')
+        $termStorageMock = $this->getMockBuilder(TermStorage::class)
             ->disableOriginalConstructor()->getMock();
         $termStorageMock->expects($this->any())->method('loadEntity')->will($this->returnValue([
             "name" => "Uncategorized",

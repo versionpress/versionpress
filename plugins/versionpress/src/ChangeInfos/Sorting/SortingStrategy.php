@@ -4,13 +4,24 @@ namespace VersionPress\ChangeInfos\Sorting;
 
 use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\BulkChangeInfo;
+use VersionPress\ChangeInfos\CommentChangeInfo;
+use VersionPress\ChangeInfos\CommentMetaChangeInfo;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\OptionChangeInfo;
+use VersionPress\ChangeInfos\PluginChangeInfo;
 use VersionPress\ChangeInfos\PostChangeInfo;
+use VersionPress\ChangeInfos\PostMetaChangeInfo;
+use VersionPress\ChangeInfos\RevertChangeInfo;
 use VersionPress\ChangeInfos\TermChangeInfo;
+use VersionPress\ChangeInfos\TermMetaChangeInfo;
+use VersionPress\ChangeInfos\TermTaxonomyChangeInfo;
 use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\TranslationChangeInfo;
+use VersionPress\ChangeInfos\UserChangeInfo;
+use VersionPress\ChangeInfos\UserMetaChangeInfo;
+use VersionPress\ChangeInfos\VersionPressChangeInfo;
+use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
 use VersionPress\Utils\ArrayUtils;
 
 class SortingStrategy
@@ -24,22 +35,22 @@ class SortingStrategy
      * @var string[]
      */
     private $priorityOrder = [
-        'VersionPress\ChangeInfos\WordPressUpdateChangeInfo',
-        'VersionPress\ChangeInfos\VersionPressChangeInfo',
-        'VersionPress\ChangeInfos\UserChangeInfo',
-        'VersionPress\ChangeInfos\PostChangeInfo',
-        'VersionPress\ChangeInfos\CommentChangeInfo',
-        'VersionPress\ChangeInfos\RevertChangeInfo',
-        'VersionPress\ChangeInfos\PluginChangeInfo',
-        'VersionPress\ChangeInfos\ThemeChangeInfo',
-        'VersionPress\ChangeInfos\TermChangeInfo',
-        'VersionPress\ChangeInfos\TermTaxonomyChangeInfo',
-        'VersionPress\ChangeInfos\TranslationChangeInfo',
-        'VersionPress\ChangeInfos\OptionChangeInfo',
-        'VersionPress\ChangeInfos\PostMetaChangeInfo',
-        'VersionPress\ChangeInfos\UserMetaChangeInfo',
-        'VersionPress\ChangeInfos\TermMetaChangeInfo',
-        'VersionPress\ChangeInfos\CommentMetaChangeInfo'
+        WordPressUpdateChangeInfo::class,
+        VersionPressChangeInfo::class,
+        UserChangeInfo::class,
+        PostChangeInfo::class,
+        CommentChangeInfo::class,
+        RevertChangeInfo::class,
+        PluginChangeInfo::class,
+        ThemeChangeInfo::class,
+        TermChangeInfo::class,
+        TermTaxonomyChangeInfo::class,
+        TranslationChangeInfo::class,
+        OptionChangeInfo::class,
+        PostMetaChangeInfo::class,
+        UserMetaChangeInfo::class,
+        TermMetaChangeInfo::class,
+        CommentMetaChangeInfo::class,
     ];
 
     public function sort($changeInfoList)

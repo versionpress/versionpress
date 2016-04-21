@@ -4,6 +4,16 @@ namespace VersionPress\Tests\Unit;
 
 use PHPUnit_Framework_TestCase;
 use VersionPress\ChangeInfos\BulkChangeInfo;
+use VersionPress\ChangeInfos\BulkCommentChangeInfo;
+use VersionPress\ChangeInfos\BulkOptionChangeInfo;
+use VersionPress\ChangeInfos\BulkPluginChangeInfo;
+use VersionPress\ChangeInfos\BulkPostChangeInfo;
+use VersionPress\ChangeInfos\BulkPostMetaChangeInfo;
+use VersionPress\ChangeInfos\BulkTermChangeInfo;
+use VersionPress\ChangeInfos\BulkThemeChangeInfo;
+use VersionPress\ChangeInfos\BulkTranslationChangeInfo;
+use VersionPress\ChangeInfos\BulkUserChangeInfo;
+use VersionPress\ChangeInfos\BulkUserMetaChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\CommentChangeInfo;
@@ -135,28 +145,28 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
                     new CommentChangeInfo('spam', '1234567890', 'author', 'Some post'),
                     new CommentChangeInfo('spam', '0987654321', 'other author', 'Some post'),
                 ],
-                'VersionPress\ChangeInfos\BulkCommentChangeInfo'
+                BulkCommentChangeInfo::class
             ],
             [
                 [
                     new OptionChangeInfo('edit', 'some_option'),
                     new OptionChangeInfo('edit', 'other_option'),
                 ],
-                'VersionPress\ChangeInfos\BulkOptionChangeInfo'
+                BulkOptionChangeInfo::class
             ],
             [
                 [
                     new PluginChangeInfo('some-plugin.php', 'delete', 'Some plugin'),
                     new PluginChangeInfo('other-plugin.php', 'delete', 'Other plugin'),
                 ],
-                'VersionPress\ChangeInfos\BulkPluginChangeInfo'
+                BulkPluginChangeInfo::class
             ],
             [
                 [
                     new TranslationChangeInfo('update', 'en_US', 'theme', 'twentythirteen'),
                     new TranslationChangeInfo('update', 'en_US', 'theme', 'twentyfifteen'),
                 ],
-                'VersionPress\ChangeInfos\BulkTranslationChangeInfo'
+                BulkTranslationChangeInfo::class
             ],
             [
                 [
@@ -164,42 +174,42 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
                     new PostChangeInfo('trash', '0987654321', 'post', 'Other post'),
                     new PostChangeInfo('trash', 'ABCDEFEDCB', 'post', 'Different post'),
                 ],
-                'VersionPress\ChangeInfos\BulkPostChangeInfo'
+                BulkPostChangeInfo::class
             ],
             [
                 [
                     new PostMetaChangeInfo('create', '1234567890', 'post', 'Some post', 'ABCDEF', 'some-meta'),
                     new PostMetaChangeInfo('create', '0987654321', 'post', 'Some post', 'ABCDEF', 'other-meta'),
                 ],
-                'VersionPress\ChangeInfos\BulkPostMetaChangeInfo'
+                BulkPostMetaChangeInfo::class
             ],
             [
                 [
                     new TermChangeInfo('create', '1234567890', 'Some term', 'category'),
                     new TermChangeInfo('create', '0987654321', 'Other term', 'tag'),
                 ],
-                'VersionPress\ChangeInfos\BulkTermChangeInfo'
+                BulkTermChangeInfo::class
             ],
             [
                 [
                     new ThemeChangeInfo('some-theme', 'delete', 'Some theme'),
                     new ThemeChangeInfo('other-theme', 'delete', 'Other theme'),
                 ],
-                'VersionPress\ChangeInfos\BulkThemeChangeInfo'
+                BulkThemeChangeInfo::class
             ],
             [
                 [
                     new UserChangeInfo('delete', '1234567890', 'some.user'),
                     new UserChangeInfo('delete', '0987654321', 'other.user'),
                 ],
-                'VersionPress\ChangeInfos\BulkUserChangeInfo'
+                BulkUserChangeInfo::class
             ],
             [
                 [
                     new UserMetaChangeInfo('create', '1234567890', 'some.user', 'some-meta', 'ABCDEF'),
                     new UserMetaChangeInfo('create', '0987654321', 'some.user', 'other-meta', 'ABCDEF'),
                 ],
-                'VersionPress\ChangeInfos\BulkUserMetaChangeInfo'
+                BulkUserMetaChangeInfo::class
             ],
         ];
     }

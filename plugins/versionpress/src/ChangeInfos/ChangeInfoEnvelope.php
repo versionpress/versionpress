@@ -34,18 +34,18 @@ class ChangeInfoEnvelope implements ChangeInfo
     private $sortingStrategy;
 
     private $bulkChangeInfoClasses = [
-        "comment" => 'VersionPress\ChangeInfos\BulkCommentChangeInfo',
-        "option" => 'VersionPress\ChangeInfos\BulkOptionChangeInfo',
-        "plugin" => 'VersionPress\ChangeInfos\BulkPluginChangeInfo',
-        "post" => 'VersionPress\ChangeInfos\BulkPostChangeInfo',
-        "postmeta" => 'VersionPress\ChangeInfos\BulkPostMetaChangeInfo',
-        "term" => 'VersionPress\ChangeInfos\BulkTermChangeInfo',
-        "termmeta" => 'VersionPress\ChangeInfos\BulkTermMetaChangeInfo',
-        "theme" => 'VersionPress\ChangeInfos\BulkThemeChangeInfo',
-        "translation" => 'VersionPress\ChangeInfos\BulkTranslationChangeInfo',
-        "user" => 'VersionPress\ChangeInfos\BulkUserChangeInfo',
-        "usermeta" => 'VersionPress\ChangeInfos\BulkUserMetaChangeInfo',
-        "versionpress" => 'VersionPress\ChangeInfos\BulkRevertChangeInfo',
+        "comment" => BulkCommentChangeInfo::class,
+        "option" => BulkOptionChangeInfo::class,
+        "plugin" => BulkPluginChangeInfo::class,
+        "post" => BulkPostChangeInfo::class,
+        "postmeta" => BulkPostMetaChangeInfo::class,
+        "term" => BulkTermChangeInfo::class,
+        "termmeta" => BulkTermMetaChangeInfo::class,
+        "theme" => BulkThemeChangeInfo::class,
+        "translation" => BulkTranslationChangeInfo::class,
+        "user" => BulkUserChangeInfo::class,
+        "usermeta" => BulkUserMetaChangeInfo::class,
+        "versionpress" => BulkRevertChangeInfo::class,
     ];
 
     /**

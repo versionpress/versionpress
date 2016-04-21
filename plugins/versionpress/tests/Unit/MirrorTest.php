@@ -3,6 +3,7 @@
 namespace VersionPress\Tests\Unit;
 
 use VersionPress\Storages\Mirror;
+use VersionPress\Storages\Storage;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 
@@ -13,11 +14,11 @@ class MirrorTest extends \PHPUnit_Framework_TestCase
      */
     public function mirrorCallsTheReplacerOnSavingEntity()
     {
-        $fakeStorageFactory = $this->getMockBuilder('VersionPress\Storages\StorageFactory')
+        $fakeStorageFactory = $this->getMockBuilder(StorageFactory::class)
             ->disableOriginalConstructor()->getMock();
-        $fakeReplacer = $this->getMockBuilder('VersionPress\Utils\AbsoluteUrlReplacer')
+        $fakeReplacer = $this->getMockBuilder(AbsoluteUrlReplacer::class)
             ->disableOriginalConstructor()->getMock();
-        $fakeStorage = $this->getMockBuilder('VersionPress\Storages\Storage')
+        $fakeStorage = $this->getMockBuilder(Storage::class)
             ->disableOriginalConstructor()->getMockForAbstractClass();
 
         $fakeStorageFactory->expects($this->any())->method('getStorage')->will($this->returnValue($fakeStorage));
@@ -39,11 +40,11 @@ class MirrorTest extends \PHPUnit_Framework_TestCase
         $entityName = 'some-entity';
         $someEntity = ['foo' => 'bar'];
 
-        $fakeStorageFactory = $this->getMockBuilder('VersionPress\Storages\StorageFactory')
+        $fakeStorageFactory = $this->getMockBuilder(StorageFactory::class)
             ->disableOriginalConstructor()->getMock();
-        $fakeReplacer = $this->getMockBuilder('VersionPress\Utils\AbsoluteUrlReplacer')
+        $fakeReplacer = $this->getMockBuilder(AbsoluteUrlReplacer::class)
             ->disableOriginalConstructor()->getMock();
-        $fakeStorage = $this->getMockBuilder('VersionPress\Storages\Storage')
+        $fakeStorage = $this->getMockBuilder(Storage::class)
             ->disableOriginalConstructor()->getMockForAbstractClass();
 
         $fakeReplacer->expects($this->once())->method('replace')->will($this->returnArgument(0));

@@ -1,6 +1,8 @@
 <?php
 
 use Composer\Autoload\ClassLoader;
+use VersionPress\Storages\Mirror;
+use VersionPress\Storages\StorageFactory;
 
 $opts = ['from:', 'to:'];
 $args = getopt('', $opts);
@@ -76,18 +78,18 @@ $repositoryDir = __DIR__ . '/repository';
 
 $changeList = createFiles($repositoryDir, $args['from'], $args['to']);
 
-$mirror = getMock('\VersionPress\Storages\Mirror');
+$mirror = getMock(Mirror::class);
 $mirror->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)
     ->method('getChangeList')
     ->will(new PHPUnit_Framework_MockObject_Stub_Return($changeList));
 
-$storageFactory = getMock('\VersionPress\Storages\StorageFactory');
+$storageFactory = getMock(StorageFactory::class);
 
 $gitRepository = new \VersionPress\Git\GitRepository($repositoryDir, __DIR__);
 
 /**
- * @var \VersionPress\Storages\Mirror $mirror
- * @var \VersionPress\Storages\StorageFactory $storageFactory
+ * @var Mirror $mirror
+ * @var StorageFactory $storageFactory
  */
 
 $committer = new \VersionPress\Git\Committer($mirror, $gitRepository, $storageFactory);

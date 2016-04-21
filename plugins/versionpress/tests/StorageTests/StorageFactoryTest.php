@@ -4,7 +4,16 @@ namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Storages\CommentStorage;
+use VersionPress\Storages\OptionStorage;
+use VersionPress\Storages\PostMetaStorage;
+use VersionPress\Storages\PostStorage;
 use VersionPress\Storages\StorageFactory;
+use VersionPress\Storages\TermMetaStorage;
+use VersionPress\Storages\TermStorage;
+use VersionPress\Storages\TermTaxonomyStorage;
+use VersionPress\Storages\UserMetaStorage;
+use VersionPress\Storages\UserStorage;
 
 class StorageFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,15 +25,15 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase
     public function factoryCreatesRightStorages()
     {
         $storages = [
-            'post' => 'VersionPress\Storages\PostStorage',
-            'comment' => 'VersionPress\Storages\CommentStorage',
-            'option' => 'VersionPress\Storages\OptionStorage',
-            'term' => 'VersionPress\Storages\TermStorage',
-            'termmeta' => 'VersionPress\Storages\TermMetaStorage',
-            'term_taxonomy' => 'VersionPress\Storages\TermTaxonomyStorage',
-            'user' => 'VersionPress\Storages\UserStorage',
-            'usermeta' => 'VersionPress\Storages\UserMetaStorage',
-            'postmeta' => 'VersionPress\Storages\PostMetaStorage',
+            'post' => PostStorage::class,
+            'comment' => CommentStorage::class,
+            'option' => OptionStorage::class,
+            'term' => TermStorage::class,
+            'termmeta' => TermMetaStorage::class,
+            'term_taxonomy' => TermTaxonomyStorage::class,
+            'user' => UserStorage::class,
+            'usermeta' => UserMetaStorage::class,
+            'postmeta' => PostMetaStorage::class,
         ];
 
         /** @var \wpdb $wpdbStub */

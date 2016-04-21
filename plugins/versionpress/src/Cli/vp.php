@@ -1254,5 +1254,5 @@ class VPCommand extends WP_CLI_Command
 }
 
 if (defined('WP_CLI') && WP_CLI) {
-    WP_CLI::add_command('vp', 'VersionPress\Cli\VPCommand');
+    WP_CLI::add_command('vp', VPCommand::class);
 }

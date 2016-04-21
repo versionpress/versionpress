@@ -6,6 +6,9 @@ use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
 use VersionPress\Git\ChangeInfoPreprocessors\ChangeInfoPreprocessor;
+use VersionPress\Git\ChangeInfoPreprocessors\EditActionChangeInfoPreprocessor;
+use VersionPress\Git\ChangeInfoPreprocessors\PostChangeInfoPreprocessor;
+use VersionPress\Git\ChangeInfoPreprocessors\PostTermSplittingPreprocessor;
 use VersionPress\Storages\Mirror;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\FileSystem;
@@ -134,9 +137,9 @@ class Committer
     private function preprocessChangeInfoList($changeInfoList)
     {
         $preprocessors = [
-            'VersionPress\Git\ChangeInfoPreprocessors\EditActionChangeInfoPreprocessor',
-            'VersionPress\Git\ChangeInfoPreprocessors\PostChangeInfoPreprocessor',
-            'VersionPress\Git\ChangeInfoPreprocessors\PostTermSplittingPreprocessor',
+            EditActionChangeInfoPreprocessor::class,
+            PostChangeInfoPreprocessor::class,
+            PostTermSplittingPreprocessor::class,
         ];
 
         $changeInfoLists = [$changeInfoList];

@@ -18,29 +18,29 @@ class ChangeInfoMatcher
     private static $changeInfoMap = [
 
         // VersionPress actions:
-        "versionpress/(?!(undo|rollback)).*" => 'VersionPress\ChangeInfos\VersionPressChangeInfo',
-        "versionpress/(undo|rollback)/.*" => 'VersionPress\ChangeInfos\RevertChangeInfo',
+        "versionpress/(?!(undo|rollback)).*" => VersionPressChangeInfo::class,
+        "versionpress/(undo|rollback)/.*" => RevertChangeInfo::class,
 
         // WordPress core actions:
-        "translation/.*" => 'VersionPress\ChangeInfos\TranslationChangeInfo',
-        "plugin/.*" => 'VersionPress\ChangeInfos\PluginChangeInfo',
-        "theme/.*" => 'VersionPress\ChangeInfos\ThemeChangeInfo',
-        "wordpress/update/.*" => 'VersionPress\ChangeInfos\WordPressUpdateChangeInfo',
+        "translation/.*" => TranslationChangeInfo::class,
+        "plugin/.*" => PluginChangeInfo::class,
+        "theme/.*" => ThemeChangeInfo::class,
+        "wordpress/update/.*" => WordPressUpdateChangeInfo::class,
 
         // Actions on entities:
-        "post/.*" => 'VersionPress\ChangeInfos\PostChangeInfo',
-        "postmeta/.*" => 'VersionPress\ChangeInfos\PostMetaChangeInfo',
-        "comment/.*" => 'VersionPress\ChangeInfos\CommentChangeInfo',
-        "option/.*" => 'VersionPress\ChangeInfos\OptionChangeInfo',
-        "term/.*" => 'VersionPress\ChangeInfos\TermChangeInfo',
-        "termmeta/.*" => 'VersionPress\ChangeInfos\TermMetaChangeInfo',
-        "term_taxonomy/.*" => 'VersionPress\ChangeInfos\TermTaxonomyChangeInfo',
-        "usermeta/.*" => 'VersionPress\ChangeInfos\UserMetaChangeInfo',
-        "commentmeta/.*" => 'VersionPress\ChangeInfos\CommentMetaChangeInfo',
-        "user/.*" => 'VersionPress\ChangeInfos\UserChangeInfo',
+        "post/.*" => PostChangeInfo::class,
+        "postmeta/.*" => PostMetaChangeInfo::class,
+        "comment/.*" => CommentChangeInfo::class,
+        "option/.*" => OptionChangeInfo::class,
+        "term/.*" => TermChangeInfo::class,
+        "termmeta/.*" => TermMetaChangeInfo::class,
+        "term_taxonomy/.*" => TermTaxonomyChangeInfo::class,
+        "usermeta/.*" => UserMetaChangeInfo::class,
+        "commentmeta/.*" => CommentMetaChangeInfo::class,
+        "user/.*" => UserChangeInfo::class,
 
         // Unknown action:
-        "" => 'VersionPress\ChangeInfos\UntrackedChangeInfo',
+        "" => UntrackedChangeInfo::class,
 
     ];
 

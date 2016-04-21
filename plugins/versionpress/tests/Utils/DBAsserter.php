@@ -49,7 +49,7 @@ class DBAsserter
         self::$testConfig = TestConfig::createDefaultConfig();
 
         $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
-        $schemaReflection = new \ReflectionClass('VersionPress\Database\DbSchemaInfo');
+        $schemaReflection = new \ReflectionClass(DbSchemaInfo::class);
         $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.yml';
         $shortcodeFile = dirname($schemaReflection->getFileName()) . '/wordpress-shortcodes.yml';
 

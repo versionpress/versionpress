@@ -107,7 +107,7 @@ class QueryLanguageUtils
             $escapedKey = self::escapeGitLogArgument($key);
             $rule[$escapedKey] = ($key === 'date')
                 ? $rule[$escapedKey] = $array
-                : array_map(['VersionPress\Utils\QueryLanguageUtils', 'escapeGitLogArgument'], $array);
+                : array_map([QueryLanguageUtils::class, 'escapeGitLogArgument'], $array);
         }
 
         if (!empty($rule['author'])) {
@@ -343,7 +343,7 @@ class QueryLanguageUtils
 
     private static function tokensToSqlString($valueTokens)
     {
-        return join('', array_map(['VersionPress\Utils\QueryLanguageUtils', 'tokenToSqlString'], $valueTokens));
+        return join('', array_map([QueryLanguageUtils::class, 'tokenToSqlString'], $valueTokens));
     }
 
     private static function tokenToSqlString($token)

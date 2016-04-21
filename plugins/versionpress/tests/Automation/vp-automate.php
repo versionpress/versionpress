@@ -345,5 +345,5 @@ class VpAutomateCommand extends \WP_CLI_Command
 }
 
 if (defined('WP_CLI') && WP_CLI) {
-    WP_CLI::add_command('vp-automate', 'VersionPress\Tests\Automation\VpAutomateCommand');
+    WP_CLI::add_command('vp-automate', VpAutomateCommand::class);
 }

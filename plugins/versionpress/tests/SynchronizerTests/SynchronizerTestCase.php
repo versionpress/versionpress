@@ -41,7 +41,7 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
         self::setUpSite();
         DBAsserter::assertFilesEqualDatabase();
 
-        $schemaReflection = new \ReflectionClass('VersionPress\Database\DbSchemaInfo');
+        $schemaReflection = new \ReflectionClass(DbSchemaInfo::class);
         $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.yml';
         $shortcodeFile = dirname($schemaReflection->getFileName()) . '/wordpress-shortcodes.yml';
 

@@ -2,6 +2,7 @@
 namespace VersionPress\Utils;
 
 use VersionPress\ChangeInfos\ChangeInfoMatcher;
+use VersionPress\ChangeInfos\VersionPressChangeInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitRepository;
 
@@ -26,7 +27,7 @@ class UninstallationUtil
         $initialCommit = $repository->getInitialCommit();
         return $initialCommit && ChangeInfoMatcher::matchesChangeInfo(
             $initialCommit->getMessage(),
-            'VersionPress\ChangeInfos\VersionPressChangeInfo'
+            VersionPressChangeInfo::class
         );
     }
 }

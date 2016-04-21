@@ -271,5 +271,5 @@ class VPInternalCommand extends WP_CLI_Command
 }
 
 if (defined('WP_CLI') && WP_CLI) {
-    WP_CLI::add_command('vp-internal', 'VersionPress\Cli\VPInternalCommand');
+    WP_CLI::add_command('vp-internal', VPInternalCommand::class);
 }

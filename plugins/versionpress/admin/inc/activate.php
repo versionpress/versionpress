@@ -3,6 +3,7 @@
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Initialization\InitializationConfig;
 use VersionPress\Initialization\Initializer;
+use VersionPress\Initialization\InitializerStates;
 use VersionPress\Utils\JsRedirect;
 use VersionPress\VersionPress;
 
@@ -18,7 +19,7 @@ function _vp_show_progress_message($progressMessage)
     // We currently only output messages that are defined in VersionPress\Initialization\InitializerStates
     // which captures the main progress points without too many details
 
-    $initializerStatesReflection = new ReflectionClass('VersionPress\Initialization\InitializerStates');
+    $initializerStatesReflection = new ReflectionClass(InitializerStates::class);
     $progressConstantValues = array_values($initializerStatesReflection->getConstants());
     if (in_array($progressMessage, $progressConstantValues)) {
         /** @noinspection PhpParamsInspection */

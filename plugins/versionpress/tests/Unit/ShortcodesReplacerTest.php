@@ -2,7 +2,9 @@
 
 namespace VersionPress\Tests\Unit;
 
+use VersionPress\Database\ShortcodesInfo;
 use VersionPress\Database\ShortcodesReplacer;
+use VersionPress\Database\VpidRepository;
 
 class ShortcodesReplacerTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,7 +32,7 @@ class ShortcodesReplacerTest extends \PHPUnit_Framework_TestCase
             include_once __DIR__ . '/../../../../ext-libs/wordpress/wp-includes/shortcodes.php';
         }
 
-        $this->shortcodesInfo = $this->getMockBuilder('VersionPress\Database\ShortcodesInfo')
+        $this->shortcodesInfo = $this->getMockBuilder(ShortcodesInfo::class)
             ->disableOriginalConstructor()->getMock();
         $this->shortcodesInfo->expects($this->any())
             ->method('getAllShortcodeNames')
@@ -44,7 +46,7 @@ class ShortcodesReplacerTest extends \PHPUnit_Framework_TestCase
             ->method('getShortcodeLocations')
             ->will($this->returnValue($this->postShortcodesSchema));
 
-        $this->vpidRepository = $this->getMockBuilder('VersionPress\Database\VpidRepository')
+        $this->vpidRepository = $this->getMockBuilder(VpidRepository::class)
             ->disableOriginalConstructor()->getMock();
         $this->vpidRepository->expects($this->any())
             ->method('getVpidForEntity')
