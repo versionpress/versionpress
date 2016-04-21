@@ -30,14 +30,14 @@ class PluginsTest extends End2EndTestCase {
         $testDataPath = __DIR__ . '/../test-data';
         self::$pluginInfo = array(
             'zipfile' => realpath($testDataPath . '/hello-dolly.1.6.zip'),
-            'css-id' => 'hello-dolly',
+            'url-fragment' => 'hello-dolly',
             'name' => 'Hello Dolly',
             'affected-path' => 'hello-dolly/*',
         );
 
         self::$secondPluginInfo = array(
             'zipfile' => realpath($testDataPath . '/hello-dolly.1.6-2.zip'),
-            'css-id' => 'hello-dolly-2',
+            'url-fragment' => 'hello-dolly-2',
             'name' => 'Hello Dolly 2',
             'affected-path' => 'hello-dolly-2/*',
         );

@@ -30,21 +30,21 @@ class PluginsTestWpCliWorker extends WpCliWorker implements IPluginsTestWorker {
     }
 
     public function activatePlugin() {
-        $this->wpAutomation->runWpCliCommand('plugin', 'activate', array($this->pluginInfo['css-id']));
+        $this->wpAutomation->runWpCliCommand('plugin', 'activate', array($this->pluginInfo['url-fragment']));
     }
 
     public function prepare_deactivatePlugin() {
     }
 
     public function deactivatePlugin() {
-        $this->wpAutomation->runWpCliCommand('plugin', 'deactivate', array($this->pluginInfo['css-id']));
+        $this->wpAutomation->runWpCliCommand('plugin', 'deactivate', array($this->pluginInfo['url-fragment']));
     }
 
     public function prepare_deletePlugin() {
     }
 
     public function deletePlugin() {
-        $this->wpAutomation->runWpCliCommand('plugin', 'delete', array($this->pluginInfo['css-id']));
+        $this->wpAutomation->runWpCliCommand('plugin', 'delete', array($this->pluginInfo['url-fragment']));
     }
 
     public function prepare_installTwoPlugins() {
@@ -58,20 +58,20 @@ class PluginsTestWpCliWorker extends WpCliWorker implements IPluginsTestWorker {
     }
 
     public function activateTwoPlugins() {
-        $this->wpAutomation->runWpCliCommand('plugin', 'activate', array($this->pluginInfo['css-id'], $this->secondPluginInfo['css-id']));
+        $this->wpAutomation->runWpCliCommand('plugin', 'activate', array($this->pluginInfo['url-fragment'], $this->secondPluginInfo['url-fragment']));
     }
 
     public function prepare_deactivateTwoPlugins() {
     }
 
     public function deactivateTwoPlugins() {
-        $this->wpAutomation->runWpCliCommand('plugin', 'deactivate', array($this->pluginInfo['css-id'], $this->secondPluginInfo['css-id']));
+        $this->wpAutomation->runWpCliCommand('plugin', 'deactivate', array($this->pluginInfo['url-fragment'], $this->secondPluginInfo['url-fragment']));
     }
 
     public function prepare_uninstallTwoPlugins() {
     }
 
     public function uninstallTwoPlugins() {
-        $this->wpAutomation->runWpCliCommand('plugin', 'delete', array($this->pluginInfo['css-id'], $this->secondPluginInfo['css-id']));
+        $this->wpAutomation->runWpCliCommand('plugin', 'delete', array($this->pluginInfo['url-fragment'], $this->secondPluginInfo['url-fragment']));
     }
 }

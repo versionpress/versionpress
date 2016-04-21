@@ -33,7 +33,7 @@ class PluginsTestSeleniumWorker extends SeleniumWorker implements IPluginsTestWo
     }
 
     public function activatePlugin() {
-        $this->byCssSelector("#" . self::$pluginInfo['css-id'] . " .activate a")->click();
+        $this->byCssSelector(".activate a[href*='" .  self::$pluginInfo['url-fragment'] . "']")->click();
         $this->waitAfterRedirect();
     }
 
@@ -42,7 +42,7 @@ class PluginsTestSeleniumWorker extends SeleniumWorker implements IPluginsTestWo
     }
 
     public function deactivatePlugin() {
-        $this->byCssSelector("#" . self::$pluginInfo['css-id'] . " .deactivate a")->click();
+        $this->byCssSelector(".deactivate a[href*='" .  self::$pluginInfo['url-fragment'] . "']")->click();
         $this->waitAfterRedirect();
     }
 
@@ -50,7 +50,7 @@ class PluginsTestSeleniumWorker extends SeleniumWorker implements IPluginsTestWo
     }
 
     public function deletePlugin() {
-        $this->byCssSelector("#" . self::$pluginInfo['css-id'] . " .delete a")->click();
+        $this->byCssSelector(".delete a[href*='" .  self::$pluginInfo['url-fragment'] . "']")->click();
         $this->waitAfterRedirect();
         $this->byCssSelector("#submit")->click();
         $this->waitAfterRedirect();
@@ -93,8 +93,8 @@ class PluginsTestSeleniumWorker extends SeleniumWorker implements IPluginsTestWo
 
     private function performBulkAction($action) {
         // select two plugins
-        $this->byCssSelector('#' . self::$pluginInfo['css-id'] . ' .check-column input[type=checkbox]')->click();
-        $this->byCssSelector('#' . self::$secondPluginInfo['css-id'] . ' .check-column input[type=checkbox]')->click();
+        $this->byCssSelector('.check-column input[value*="' .  self::$pluginInfo['url-fragment'] . '"]')->click();
+        $this->byCssSelector('.check-column input[value*="' .  self::$secondPluginInfo['url-fragment'] . '"]')->click();
         // choose bulk edit
         $this->select($this->byId('bulk-action-selector-top'))->selectOptionByValue($action);
         $this->jsClickAndWait('#doaction');
