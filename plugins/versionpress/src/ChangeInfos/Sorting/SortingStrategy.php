@@ -219,42 +219,24 @@ class SortingStrategy
          */
         if ($changeInfo1->getAction() == "create") {
             return -1;
-        } else {
-            if ($changeInfo2->getAction() == "create") {
-                return 1;
-            } else {
-                if ($changeInfo1->getAction() == "delete") {
-                    return -1;
-                } else {
-                    if ($changeInfo2->getAction() == "delete") {
-                        return 1;
-                    } else {
-                        if ($changeInfo1->getAction() == "draft") {
-                            return -1;
-                        } else {
-                            if ($changeInfo2->getAction() == "draft") {
-                                return 1;
-                            } else {
-                                if ($changeInfo1->getAction() == "trash") {
-                                    return -1;
-                                } else {
-                                    if ($changeInfo2->getAction() == "trash") {
-                                        return 1;
-                                    } else {
-                                        if ($changeInfo1->getAction() == "edit") {
-                                            return -1;
-                                        } else {
-                                            if ($changeInfo2->getAction() == "edit") {
-                                                return 1;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        } elseif ($changeInfo2->getAction() == "create") {
+            return 1;
+        } elseif ($changeInfo1->getAction() == "delete") {
+            return -1;
+        } elseif ($changeInfo2->getAction() == "delete") {
+            return 1;
+        } elseif ($changeInfo1->getAction() == "draft") {
+            return -1;
+        } elseif ($changeInfo2->getAction() == "draft") {
+            return 1;
+        } elseif ($changeInfo1->getAction() == "trash") {
+            return -1;
+        } elseif ($changeInfo2->getAction() == "trash") {
+            return 1;
+        } elseif ($changeInfo1->getAction() == "edit") {
+            return -1;
+        } elseif ($changeInfo2->getAction() == "edit") {
+            return 1;
         }
 
         return 0;
