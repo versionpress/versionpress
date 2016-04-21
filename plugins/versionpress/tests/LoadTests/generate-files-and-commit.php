@@ -1,6 +1,8 @@
 <?php
 
-$opts = array('from:', 'to:');
+use Composer\Autoload\ClassLoader;
+
+$opts = ['from:', 'to:'];
 $args = getopt('', $opts);
 
 if (count($args) < count($opts)) {
@@ -11,47 +13,57 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
 
 \Tracy\Debugger::enable(\Tracy\Debugger::DEVELOPMENT, __DIR__);
 
-$classloader = new \Composer\Autoload\ClassLoader();
+$classloader = new ClassLoader();
 $classloader->addPsr4('VersionPress\\', __DIR__ . '/../../src');
 $classloader->register();
 
-class FooChangeInfo extends \VersionPress\ChangeInfos\TrackedChangeInfo {
+// @codingStandardsIgnoreLine
+class FooChangeInfo extends \VersionPress\ChangeInfos\TrackedChangeInfo
+{
 
     private $files;
 
-    public function __construct($files) {
+    public function __construct($files)
+    {
         $this->files = $files;
     }
 
-    function getChangeDescription() {
+    public function getChangeDescription()
+    {
         return join("\n", $this->files);
     }
 
-    static function buildFromCommitMessage(\VersionPress\Git\CommitMessage $commitMessage) {
+    public static function buildFromCommitMessage(\VersionPress\Git\CommitMessage $commitMessage)
+    {
     }
 
-    function getEntityName() {
+    public function getEntityName()
+    {
         return "file";
     }
 
-    function getAction() {
+    public function getAction()
+    {
         return "create";
     }
 
-    protected function getActionTagValue() {
+    protected function getActionTagValue()
+    {
         return "{$this->getEntityName()}/{$this->getAction()}";
     }
 
-    public function getCustomTags() {
-        return array();
+    public function getCustomTags()
+    {
+        return [];
     }
 
-    public function getChangedFiles() {
+    public function getChangedFiles()
+    {
         return array_map(function ($file) {
-            return array(
+            return [
                 'type' => 'path',
                 'path' => $file
-            );
+            ];
         }, $this->files);
     }
 }
@@ -80,11 +92,12 @@ $gitRepository = new \VersionPress\Git\GitRepository($repositoryDir, __DIR__);
 
 $committer = new \VersionPress\Git\Committer($mirror, $gitRepository, $storageFactory);
 $committer->commit();
-function createFiles($dir, $from, $to) {
+function createFiles($dir, $from, $to)
+{
     return array_map(function ($n) use ($dir) {
         $file = $dir . "/$n.txt";
         touch($file);
-        return createChangeInfo(array($file));
+        return createChangeInfo([$file]);
     }, range($from, $to - 1));
 }
 
@@ -92,24 +105,28 @@ function createFiles($dir, $from, $to) {
  * @param $originalClassName
  * @return PHPUnit_Framework_MockObject_MockObject
  */
-function getMock($originalClassName) {
+function getMock($originalClassName)
+{
     return PHPUnit_Framework_MockObject_Generator::getMock(
         $originalClassName,
-        array(),
-        array(),
+        [],
+        [],
         '',
-        false);
+        false
+    );
 }
 
 /**
  * @param $className
  * @return PHPUnit_Framework_MockObject_MockObject
  */
-function getMockForAbstractClass($className) {
+function getMockForAbstractClass($className)
+{
     return PHPUnit_Framework_MockObject_Generator::getMockForAbstractClass($className);
 }
 
-function createChangeInfo($files) {
+function createChangeInfo($files)
+{
 
     $fooChangeInfo = new FooChangeInfo($files);
 
@@ -118,10 +135,12 @@ function createChangeInfo($files) {
 }
 
 
-function is_user_logged_in() {
+function is_user_logged_in()
+{
     return false;
 }
 
-function get_plugin_data() {
-    return array('Version' => '0.0');
+function get_plugin_data()
+{
+    return ['Version' => '0.0'];
 }

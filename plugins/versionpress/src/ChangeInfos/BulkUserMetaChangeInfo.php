@@ -5,9 +5,11 @@ namespace VersionPress\ChangeInfos;
 use Nette\Utils\Strings;
 use VersionPress\Utils\StringUtils;
 
-class BulkUserMetaChangeInfo extends BulkChangeInfo {
+class BulkUserMetaChangeInfo extends BulkChangeInfo
+{
 
-    public function getChangeDescription() {
+    public function getChangeDescription()
+    {
         if ($this->count === 1) {
             return $this->changeInfos[0]->getChangeDescription();
         }

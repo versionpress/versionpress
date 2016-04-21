@@ -8,7 +8,8 @@ use VersionPress\Git\GitRepository;
 /**
  * Small helper class
  */
-class UninstallationUtil {
+class UninstallationUtil
+{
 
     /**
      * Returns true if VP uninstallation should remove the Git repo from the root folder (and back it
@@ -17,11 +18,15 @@ class UninstallationUtil {
      *
      * @return bool
      */
-    public static function uninstallationShouldRemoveGitRepo() {
+    public static function uninstallationShouldRemoveGitRepo()
+    {
         global $versionPressContainer;
         /** @var GitRepository $repository */
         $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
         $initialCommit = $repository->getInitialCommit();
-        return $initialCommit && ChangeInfoMatcher::matchesChangeInfo($initialCommit->getMessage(), 'VersionPress\ChangeInfos\VersionPressChangeInfo');
+        return $initialCommit && ChangeInfoMatcher::matchesChangeInfo(
+            $initialCommit->getMessage(),
+            'VersionPress\ChangeInfos\VersionPressChangeInfo'
+        );
     }
 }

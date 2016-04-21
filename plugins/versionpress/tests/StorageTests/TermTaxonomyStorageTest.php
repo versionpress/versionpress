@@ -3,29 +3,27 @@
 namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\EntityInfo;
-use VersionPress\Storages\PostMetaStorage;
-use VersionPress\Storages\PostStorage;
 use VersionPress\Storages\TermStorage;
 use VersionPress\Storages\TermTaxonomyStorage;
-use VersionPress\Storages\UserMetaStorage;
-use VersionPress\Storages\UserStorage;
 use VersionPress\Utils\FileSystem;
 
-class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
+class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase
+{
     /** @var TermTaxonomyStorage */
     private $storage;
 
-    private $testingTermTaxonomy = array(
+    private $testingTermTaxonomy = [
         "taxonomy" => "category",
         "description" => "",
         "vp_id" => "2AEF07792E494B31A15FCB392E9D37B5",
         "vp_term_id" => "566D438B716C404D8CC384AE8F86A974",
-    );
+    ];
 
     /**
      * @test
      */
-    public function savedTermTaxonomyEqualsLoadedTermTaxonomy() {
+    public function savedTermTaxonomyEqualsLoadedTermTaxonomy()
+    {
         $this->storage->save($this->testingTermTaxonomy);
         $loadedTermTaxonomy = $this->storage->loadEntity($this->testingTermTaxonomy['vp_id']);
         $this->assertEquals($this->testingTermTaxonomy, $loadedTermTaxonomy);
@@ -34,7 +32,8 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function loadAllReturnsOnlyOriginalEntities() {
+    public function loadAllReturnsOnlyOriginalEntities()
+    {
         $this->storage->save($this->testingTermTaxonomy);
         $loadedTermTaxonomies = $this->storage->loadAll();
         $this->assertTrue(count($loadedTermTaxonomies) === 1);
@@ -44,7 +43,8 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function storageDoesNotContainDeletedEntities() {
+    public function storageDoesNotContainDeletedEntities()
+    {
         $anotherTestingTermTaxonomy = $this->testingTermTaxonomy;
         $anotherTestingTermTaxonomy['taxonomy'] = 'tag';
         $anotherTestingTermTaxonomy['vp_id'] = 'CB6EBE2FD5D54BD9A5E1B54565A6E862';
@@ -65,7 +65,8 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function savedTaxonomyDoesNotContainVpIdKey() {
+    public function savedTaxonomyDoesNotContainVpIdKey()
+    {
         $this->storage->save($this->testingTermTaxonomy);
         $fileName = $this->storage->getEntityFilename($this->testingTermTaxonomy['vp_id']);
         $content = file_get_contents($fileName);
@@ -75,7 +76,8 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function savedTaxonomyDoesNotContainCount() {
+    public function savedTaxonomyDoesNotContainCount()
+    {
         $termTaxonomy = $this->testingTermTaxonomy;
         $termTaxonomy['count'] = 7;
 
@@ -85,32 +87,35 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse(strpos($content, 'count'), 'Entity contains a count key');
     }
 
-    protected function setUp() {
+    protected function setUp()
+    {
         parent::setUp();
 
-        $termTaxonomyInfo = new EntityInfo(array(
-            'term_taxonomy' => array(
+        $termTaxonomyInfo = new EntityInfo([
+            'term_taxonomy' => [
                 'id' => 'term_taxonomy_id',
-                'references' => array(
+                'references' => [
                     'parent' => 'term',
                     'term_id' => 'term'
-                )
-            )
-        ));
+                ]
+            ]
+        ]);
 
-        $termStorageMock = $this->getMockBuilder('VersionPress\Storages\TermStorage')->disableOriginalConstructor()->getMock();
-        $termStorageMock->expects($this->any())->method('loadEntity')->will($this->returnValue(array(
+        $termStorageMock = $this->getMockBuilder('VersionPress\Storages\TermStorage')
+            ->disableOriginalConstructor()->getMock();
+        $termStorageMock->expects($this->any())->method('loadEntity')->will($this->returnValue([
             "name" => "Uncategorized",
             "slug" => "uncategorized",
             "term_group" => 0,
             "vp_id" => "566D438B716C404D8CC384AE8F86A974",
-        )));
+        ]));
 
         /** @var TermStorage $termStorageMock */
         $this->storage = new TermTaxonomyStorage(__DIR__ . '/term_taxonomies', $termTaxonomyInfo, $termStorageMock);
     }
 
-    protected function tearDown() {
+    protected function tearDown()
+    {
         parent::tearDown();
         FileSystem::remove(__DIR__ . '/term_taxonomies');
     }

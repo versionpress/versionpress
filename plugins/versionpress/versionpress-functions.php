@@ -9,8 +9,10 @@ use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Committer;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\FileSystem;
+use VersionPress\Utils\QueryLanguageUtils;
 
-function vp_flush_regenerable_options() {
+function vp_flush_regenerable_options()
+{
     wp_cache_flush();
     $taxonomies = get_taxonomies();
     foreach ($taxonomies as $taxonomy) {
@@ -20,7 +22,8 @@ function vp_flush_regenerable_options() {
     }
 }
 
-function vp_commit_all_frequently_written_entities() {
+function vp_commit_all_frequently_written_entities()
+{
     global $versionPressContainer;
 
     /**
@@ -38,7 +41,8 @@ function vp_commit_all_frequently_written_entities() {
 
 }
 
-function vp_save_frequently_written_entities($rules) {
+function vp_save_frequently_written_entities($rules)
+{
     global $versionPressContainer;
 
     /**
@@ -58,7 +62,7 @@ function vp_save_frequently_written_entities($rules) {
         $table = $dbSchemaInfo->getPrefixedTableName($entityName);
 
         foreach ($rulesWithInterval as $ruleAndInterval) {
-            $restriction = \VersionPress\Utils\QueryLanguageUtils::createSqlRestrictionFromRule($ruleAndInterval['rule']);
+            $restriction = QueryLanguageUtils::createSqlRestrictionFromRule($ruleAndInterval['rule']);
             $sql = "SELECT * FROM $table WHERE $restriction";
 
             $results = $database->get_results($sql, ARRAY_A);
@@ -69,30 +73,37 @@ function vp_save_frequently_written_entities($rules) {
     }
 }
 
-function vp_enable_maintenance() {
+function vp_enable_maintenance()
+{
     $maintenance_string = '<?php define("VP_MAINTENANCE", true); $upgrading = ' . time() . '; ?>';
     file_put_contents(ABSPATH . '.maintenance', $maintenance_string);
 }
 
-function vp_disable_maintenance() {
+function vp_disable_maintenance()
+{
     FileSystem::remove(ABSPATH . '.maintenance');
 }
 
-function vp_is_ajax() {
+function vp_is_ajax()
+{
     return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
 }
 
-function vp_verify_nonce($name) {
+function vp_verify_nonce($name)
+{
     if (!wp_verify_nonce(@$_REQUEST['_wpnonce'], $name)) {
         wp_die(
             '<h1>' . __('Cheatin&#8217; uh?') . '</h1>' .
-            '<p>' . __('Or maybe it\'s just a long time since you opened previous page. In this case please try it again.') . '</p>',
+            '<p>' .
+            __('Or maybe it\'s just a long time since you opened previous page. In this case please try it again.') .
+            '</p>',
             403
         );
     }
 }
 
-function vp_check_permissions() {
+function vp_check_permissions()
+{
     if (!current_user_can('manage_options')) {
         wp_die(
             '<h1>' . __('Cheatin&#8217; uh?') . '</h1>' .
@@ -106,7 +117,8 @@ function vp_check_permissions() {
  * Multiple methods of disabling output buffering.
  * @see http://www.binarytides.com/php-output-content-browser-realtime-buffering/
  */
-function vp_disable_output_buffering() {
+function vp_disable_output_buffering()
+{
     // Turn off output buffering
     ini_set('output_buffering', 'off');
     // Turn off PHP output compression
@@ -114,7 +126,9 @@ function vp_disable_output_buffering() {
 
     // Flush (send) the output buffer and turn off output buffering
     /** @noinspection PhpUsageOfSilenceOperatorInspection */
-    while (@ob_end_flush()) ;
+    while (@ob_end_flush()) {
+        ;
+    }
 
     // Implicitly flush the buffer(s)
     ini_set('implicit_flush', true);
@@ -124,7 +138,9 @@ function vp_disable_output_buffering() {
     header("Content-type: text/plain");
     header('Cache-Control: no-cache'); // recommended to prevent caching of event data.
 
-    for ($i = 0; $i < 1000; $i++) echo ' ';
+    for ($i = 0; $i < 1000; $i++) {
+        echo ' ';
+    }
 
     ob_flush();
     flush();

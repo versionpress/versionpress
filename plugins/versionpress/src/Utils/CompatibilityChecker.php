@@ -2,8 +2,10 @@
 
 namespace VersionPress\Utils;
 
-class CompatibilityChecker {
-    public static function testCompatibilityBySlug($slug) {
+class CompatibilityChecker
+{
+    public static function testCompatibilityBySlug($slug)
+    {
         if (isset(RequirementsChecker::$compatiblePlugins[$slug])) {
             return CompatibilityResult::COMPATIBLE;
         } elseif (isset(RequirementsChecker::$incompatiblePlugins[$slug])) {
@@ -13,7 +15,8 @@ class CompatibilityChecker {
         }
     }
 
-    public static function testCompatibilityByPluginFile($pluginFile) {
+    public static function testCompatibilityByPluginFile($pluginFile)
+    {
         if ($pluginFile === 'versionpress/versionpress.php') {
             return CompatibilityResult::VERSIONPRESS;
         }

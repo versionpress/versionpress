@@ -4,13 +4,15 @@ namespace VersionPress\Tests\End2End\Pages;
 
 use VersionPress\Tests\End2End\Utils\PostTypeTestCase;
 
-class PagesTest extends PostTypeTestCase {
+class PagesTest extends PostTypeTestCase
+{
 
     /**
      * @test
      * @testdox New page creates 'post/create' action
      */
-    public function addingPageCreatesPostCreateAction() {
+    public function addingPageCreatesPostCreateAction()
+    {
         $this->runAddPostTest();
     }
 
@@ -20,7 +22,8 @@ class PagesTest extends PostTypeTestCase {
      *
      * @depends addingPageCreatesPostCreateAction
      */
-    public function updatingPageCreatesPostEditAction() {
+    public function updatingPageCreatesPostEditAction()
+    {
         $this->runUpdatePostTest();
     }
 
@@ -30,7 +33,8 @@ class PagesTest extends PostTypeTestCase {
      *
      * @depends updatingPageCreatesPostEditAction
      */
-    public function updatingPageViaQuickEditWorksEquallyWell() {
+    public function updatingPageViaQuickEditWorksEquallyWell()
+    {
         $this->runUpdatePostViaQuickEditTest();
     }
 
@@ -40,7 +44,8 @@ class PagesTest extends PostTypeTestCase {
      *
      * @depends addingPageCreatesPostCreateAction
      */
-    public function trashingPageCreatesPostTrashAction() {
+    public function trashingPageCreatesPostTrashAction()
+    {
         $this->runTrashPostTest();
     }
 
@@ -50,7 +55,8 @@ class PagesTest extends PostTypeTestCase {
      *
      * @depends trashingPageCreatesPostTrashAction
      */
-    public function undoCreatesPostUntrashAction() {
+    public function undoCreatesPostUntrashAction()
+    {
         $this->runUndoTrashTest();
     }
 
@@ -60,7 +66,8 @@ class PagesTest extends PostTypeTestCase {
      *
      * @depends undoCreatesPostUntrashAction
      */
-    public function deletePermanentlyCreatesPostDeleteAction() {
+    public function deletePermanentlyCreatesPostDeleteAction()
+    {
         $this->runDeletePostTest();
     }
 
@@ -70,7 +77,8 @@ class PagesTest extends PostTypeTestCase {
      *
      * @depends deletePermanentlyCreatesPostDeleteAction
      */
-    public function creatingDraftCreatesPostDraftAction() {
+    public function creatingDraftCreatesPostDraftAction()
+    {
         $this->runDraftTest();
     }
 
@@ -80,7 +88,8 @@ class PagesTest extends PostTypeTestCase {
      *
      * @depends creatingDraftCreatesPostDraftAction
      */
-    public function previewingDraftDoesNotCreateCommit() {
+    public function previewingDraftDoesNotCreateCommit()
+    {
         $this->runPreviewDraftTest();
     }
 
@@ -90,7 +99,8 @@ class PagesTest extends PostTypeTestCase {
      *
      * @depends creatingDraftCreatesPostDraftAction
      */
-    public function publishingDraftCreatesPostPublishAction() {
+    public function publishingDraftCreatesPostPublishAction()
+    {
         $this->runPublishDraftTest();
     }
 
@@ -98,7 +108,8 @@ class PagesTest extends PostTypeTestCase {
      * @test
      * @testdox Editation multiple pages creates bulk action
      */
-    public function editationOfMultiplePagesCreatesBulkAction() {
+    public function editationOfMultiplePagesCreatesBulkAction()
+    {
         $this->runEditationOfMultiplePostsCreatesBulkAction();
     }
 
@@ -106,7 +117,8 @@ class PagesTest extends PostTypeTestCase {
      * @test
      * @testdox Trashing multiple pages creates bulk action
      */
-    public function trashingOfMultiplePagesCreatesBulkAction() {
+    public function trashingOfMultiplePagesCreatesBulkAction()
+    {
         $this->runTrashingMultiplePostsCreatesBulkAction();
     }
 
@@ -114,7 +126,8 @@ class PagesTest extends PostTypeTestCase {
      * @test
      * @testdox Untrashing multiple pages creates bulk action
      */
-    public function untrashingOfMultiplePagesCreatesBulkAction() {
+    public function untrashingOfMultiplePagesCreatesBulkAction()
+    {
         $this->runUntrashingMultiplePostsCreatesBulkAction();
     }
 
@@ -122,7 +135,8 @@ class PagesTest extends PostTypeTestCase {
      * @test
      * @testdox Deleting multiple pages creates bulk action
      */
-    public function deletingOfMultiplePagesCreatesBulkAction() {
+    public function deletingOfMultiplePagesCreatesBulkAction()
+    {
         $this->runDeletingMultiplePostsCreatesBulkAction();
     }
 
@@ -130,7 +144,8 @@ class PagesTest extends PostTypeTestCase {
      * @test
      * @testdox Publishing multiple pages creates bulk action
      */
-    public function publishingOfMultiplePagesCreatesBulkAction() {
+    public function publishingOfMultiplePagesCreatesBulkAction()
+    {
         $this->runPublishingMultiplePostsCreatesBulkAction();
     }
 }

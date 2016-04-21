@@ -18,7 +18,8 @@ use VersionPress\Utils\StringUtils;
  *                versionpress/deactivate
  *
  */
-class VersionPressChangeInfo extends TrackedChangeInfo {
+class VersionPressChangeInfo extends TrackedChangeInfo
+{
 
 
     private $action;
@@ -29,29 +30,33 @@ class VersionPressChangeInfo extends TrackedChangeInfo {
      * @param string $action
      * @param string $versionPressVersion
      */
-    function __construct($action, $versionPressVersion = null) {
+    public function __construct($action, $versionPressVersion = null)
+    {
         $this->action = $action;
         $this->versionPressVersion = $versionPressVersion;
     }
 
-    public function getEntityName() {
+    public function getEntityName()
+    {
         return "versionpress";
     }
 
-    public function getAction() {
+    public function getAction()
+    {
         return $this->action;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
+    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    {
         $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         list(, $action, $versionPressVersion) = array_pad(explode("/", $actionTag, 3), 3, "");
         return new self($action, $versionPressVersion);
     }
 
-    public function getChangeDescription() {
+    public function getChangeDescription()
+    {
 
         switch ($this->action) {
-
             case "install":
                 // Pre-1.0-beta2 message, see also WP-219
                 return "Installed VersionPress";
@@ -68,12 +73,11 @@ class VersionPressChangeInfo extends TrackedChangeInfo {
             default:
                 // just in case, this path shouldn't really be reached
                 return Strings::capitalize(StringUtils::verbToPastTense($this->action)) . " VersionPress";
-
         }
-
     }
 
-    protected function getActionTagValue() {
+    protected function getActionTagValue()
+    {
         $actionTag = "versionpress/$this->action";
         if ($this->versionPressVersion) {
             $actionTag .= "/" . $this->versionPressVersion;
@@ -81,21 +85,23 @@ class VersionPressChangeInfo extends TrackedChangeInfo {
         return $actionTag;
     }
 
-    public function getCustomTags() {
-        return array();
+    public function getCustomTags()
+    {
+        return [];
     }
 
-    public function getChangedFiles() {
+    public function getChangedFiles()
+    {
         switch ($this->action) {
             case "deactivate":
-                return array(
-                    array("type" => "path", "path" => VP_VPDB_DIR . "/*"),
-                    array("type" => "path", "path" => ABSPATH . WPINC . "/wp-db.php"),
-                    array("type" => "path", "path" => ABSPATH . WPINC . "/wp-db.php.original"),
-                    array("type" => "path", "path" => ABSPATH . "/.gitattributes"),
-                );
+                return [
+                    ["type" => "path", "path" => VP_VPDB_DIR . "/*"],
+                    ["type" => "path", "path" => ABSPATH . WPINC . "/wp-db.php"],
+                    ["type" => "path", "path" => ABSPATH . WPINC . "/wp-db.php.original"],
+                    ["type" => "path", "path" => ABSPATH . "/.gitattributes"],
+                ];
             default:
-                return array(array("type" => "path", "path" => "*"));
+                return [["type" => "path", "path" => "*"]];
         }
     }
 }

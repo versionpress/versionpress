@@ -6,7 +6,8 @@ use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 
-class OptionsTest extends End2EndTestCase {
+class OptionsTest extends End2EndTestCase
+{
 
     /** @var IOptionsTestWorker */
     private static $worker;
@@ -15,7 +16,8 @@ class OptionsTest extends End2EndTestCase {
      * @test
      * @testdox Changing option creates 'option/edit' action
      */
-    public function changingOptionCreatesOptionEditAction() {
+    public function changingOptionCreatesOptionEditAction()
+    {
         self::$worker->prepare_changeOption();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -33,7 +35,8 @@ class OptionsTest extends End2EndTestCase {
      * @test
      * @testdox Changing more option creates bulk 'option/edit' action
      */
-    public function changingMoreOptionsCreatesOptionEditAction() {
+    public function changingMoreOptionsCreatesOptionEditAction()
+    {
         self::$worker->prepare_changeTwoOptions();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);

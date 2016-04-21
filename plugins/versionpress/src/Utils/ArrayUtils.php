@@ -2,15 +2,19 @@
 
 namespace VersionPress\Utils;
 
-class ArrayUtils {
+class ArrayUtils
+{
 
-    public static function parametrize($array) {
-        $out = array();
-        foreach ($array as $key => $value)
-            if(empty($value))
+    public static function parametrize($array)
+    {
+        $out = [];
+        foreach ($array as $key => $value) {
+            if (empty($value)) {
                 $out[] = "$key=''";
-            else
+            } else {
                 $out[] = "$key=$value";
+            }
+        }
         return $out;
     }
 
@@ -22,9 +26,12 @@ class ArrayUtils {
      * @param $array
      * @param string $cmp_function
      */
-    public static function stablesort(&$array, $cmp_function = 'strcmp') {
+    public static function stablesort(&$array, $cmp_function = 'strcmp')
+    {
         // Arrays of size < 2 require no action.
-        if (count($array) < 2) return;
+        if (count($array) < 2) {
+            return;
+        }
         // Split the array in half
         $halfway = count($array) / 2;
         $array1 = array_slice($array, 0, $halfway);
@@ -38,7 +45,7 @@ class ArrayUtils {
             return;
         }
         // Merge the two sorted arrays into a single sorted array
-        $array = array();
+        $array = [];
         $ptr1 = $ptr2 = 0;
         while ($ptr1 < count($array1) && $ptr2 < count($array2)) {
             if (call_user_func($cmp_function, $array1[$ptr1], $array2[$ptr2]) < 1) {
@@ -48,8 +55,12 @@ class ArrayUtils {
             }
         }
         // Merge the remainder
-        while ($ptr1 < count($array1)) $array[] = $array1[$ptr1++];
-        while ($ptr2 < count($array2)) $array[] = $array2[$ptr2++];
+        while ($ptr1 < count($array1)) {
+            $array[] = $array1[$ptr1++];
+        }
+        while ($ptr2 < count($array2)) {
+            $array[] = $array2[$ptr2++];
+        }
         return;
     }
 
@@ -60,7 +71,8 @@ class ArrayUtils {
      * @param mixed $array Array is generally expected but any value may be provided (will return false)
      * @return bool
      */
-    public static function isAssociative($array) {
+    public static function isAssociative($array)
+    {
         if (!is_array($array)) {
             return false;
         }
@@ -74,7 +86,8 @@ class ArrayUtils {
      * @param callable $predicate
      * @return bool
      */
-    public static function any($array, $predicate) {
+    public static function any($array, $predicate)
+    {
         foreach ($array as $key => $item) {
             if ($predicate($item, $key)) {
                 return true;
@@ -91,7 +104,8 @@ class ArrayUtils {
      * @param callable $predicate
      * @return bool
      */
-    public static function all($array, $predicate) {
+    public static function all($array, $predicate)
+    {
         foreach ($array as $key => $item) {
             if (!$predicate($item, $key)) {
                 return false;
@@ -110,7 +124,8 @@ class ArrayUtils {
      * @param mixed $indexKey
      * @return array
      */
-    public static function column($array, $columnKey, $indexKey = null) {
+    public static function column($array, $columnKey, $indexKey = null)
+    {
         if (function_exists('array_column')) {
             return call_user_func_array('array_column', func_get_args());
         }
@@ -125,7 +140,10 @@ class ArrayUtils {
             return null;
         }
         if (!is_array($params[0])) {
-            trigger_error('array_column() expects parameter 1 to be array, ' . gettype($params[0]) . ' given', E_USER_WARNING);
+            trigger_error(
+                'array_column() expects parameter 1 to be array, ' . gettype($params[0]) . ' given',
+                E_USER_WARNING
+            );
             return null;
         }
         if (!is_int($params[1])
@@ -147,22 +165,22 @@ class ArrayUtils {
             return false;
         }
         $paramsInput = $params[0];
-        $paramsColumnKey = ($params[1] !== null) ? (string) $params[1] : null;
+        $paramsColumnKey = ($params[1] !== null) ? (string)$params[1] : null;
         $paramsIndexKey = null;
         if (isset($params[2])) {
             if (is_float($params[2]) || is_int($params[2])) {
-                $paramsIndexKey = (int) $params[2];
+                $paramsIndexKey = (int)$params[2];
             } else {
-                $paramsIndexKey = (string) $params[2];
+                $paramsIndexKey = (string)$params[2];
             }
         }
-        $resultArray = array();
+        $resultArray = [];
         foreach ($paramsInput as $row) {
             $key = $value = null;
             $keySet = $valueSet = false;
             if ($paramsIndexKey !== null && array_key_exists($paramsIndexKey, $row)) {
                 $keySet = true;
-                $key = (string) $row[$paramsIndexKey];
+                $key = (string)$row[$paramsIndexKey];
             }
             if ($paramsColumnKey === null) {
                 $valueSet = true;
@@ -190,23 +208,26 @@ class ArrayUtils {
      * $mapFn    has signature ($item, $mapEmit) where $item is item from data and $mapEmit is emit function
      * $reduceFn has signature ($key, $items, $reduceEmit) where $key is the key the data are grouped by,
      *           $items is the group and $reduce emit is an emit function
-     * $mapEmit has signature ($key, $value) where $key is the key the data are grouped by and $value is a transformed item
+     * $mapEmit has signature ($key, $value) where $key is the key the data are grouped by and $value is
+     *          a transformed item
      * $reduceEmit has signature ($obj) where $obj is the transformed group
      *
      * @param $data
      * @param $mapFn
      * @param $reduceFn
+     * @return array
      */
-    public static function mapreduce($data, $mapFn, $reduceFn) {
-        $mapResult = array();
-        $reduceResult = array();
+    public static function mapreduce($data, $mapFn, $reduceFn)
+    {
+        $mapResult = [];
+        $reduceResult = [];
 
         $mapEmit = function ($key, $value) use (&$mapResult) {
-          $mapResult[$key][] = $value;
+            $mapResult[$key][] = $value;
         };
 
         $reduceEmit = function ($obj) use (&$reduceResult) {
-          $reduceResult[] = $obj;
+            $reduceResult[] = $obj;
         };
 
         foreach ($data as $item) {
@@ -228,7 +249,8 @@ class ArrayUtils {
      * @param array $array
      * @return array
      */
-    public static function map($mapFn, $array) {
+    public static function map($mapFn, $array)
+    {
         return array_map(function ($key) use ($mapFn, $array) {
             return $mapFn($array[$key], $key);
         }, array_keys($array));

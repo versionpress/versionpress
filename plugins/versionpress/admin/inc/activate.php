@@ -12,7 +12,8 @@ use VersionPress\VersionPress;
  *
  * @param string $progressMessage
  */
-function _vp_show_progress_message($progressMessage) {
+function _vp_show_progress_message($progressMessage)
+{
 
     // We currently only output messages that are defined in VersionPress\Initialization\InitializerStates
     // which captures the main progress points without too many details
@@ -97,16 +98,20 @@ function _vp_show_progress_message($progressMessage) {
             <p class="initialization-done">All done, we're now redirecting you (or <a
                     href="<?php menu_page_url('versionpress', false) ?>">click here</a>).
             </p>
-        <?php
+            <?php
             JsRedirect::redirect(menu_page_url('versionpress', false), InitializationConfig::REDIRECT_AFTER_MS);
         } else { ?>
             <p class="initialization-done">
                 Ouch. The initialization took too long and was terminated by the server.<br>
                 Please increase
-                <a href="http://php.net/manual/en/info.configuration.php#ini.max-execution-time" target="_blank">maximal execution time</a>
-                and <a href="<?php admin_url('admin.php?page=versionpress/admin/index.php&init_versionpress'); ?>">try it again</a>.
+                <a href="http://php.net/manual/en/info.configuration.php#ini.max-execution-time" target="_blank">maximal
+                    execution time</a>
+                and <a href="<?php admin_url('admin.php?page=versionpress/admin/index.php&init_versionpress'); ?>">try
+                    it again</a>.
             </p>
-        <?php } ?>
+        <?php
+        }
+        ?>
 
     </div>
 

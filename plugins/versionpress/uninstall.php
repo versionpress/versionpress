@@ -42,7 +42,6 @@ delete_option('vp_rest_api_plugin_version');
 FileSystem::remove(VP_VPDB_DIR);
 
 if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
-
     $backupsDir = WP_CONTENT_DIR . '/vpbackups';
     if (!file_exists($backupsDir)) {
         FileSystem::mkdir($backupsDir);
@@ -60,6 +59,4 @@ if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
     if (FileSystem::filesHaveSameContents($productionGitignore, $templateGitignore)) {
         FileSystem::remove($productionGitignore);
     }
-
 }
-

@@ -7,12 +7,14 @@ namespace VersionPress\Utils;
  * It's used mainly from our internal WP-CLI command `update-config`.
  *
  */
-class WpConfigEditor {
+class WpConfigEditor
+{
 
     private $wpConfigPath;
     private $isCommonConfig;
 
-    public function __construct($wpConfigPath, $isCommonConfig) {
+    public function __construct($wpConfigPath, $isCommonConfig)
+    {
         $this->wpConfigPath = $wpConfigPath;
         $this->isCommonConfig = $isCommonConfig;
     }
@@ -25,9 +27,11 @@ class WpConfigEditor {
      * @param string|number|bool $value
      * @param bool $usePlainValue The value is used as-is, without quoting.
      */
-    public function updateConfigConstant($constantName, $value, $usePlainValue = false) {
+    public function updateConfigConstant($constantName, $value, $usePlainValue = false)
+    {
         // https://regex101.com/r/jE0eJ6/2
-        $constantRegex = "/^(\\s*define\\s*\\(\\s*['\"]" . preg_quote($constantName, '/') . "['\"]\\s*,\\s*).*(\\s*\\)\\s*;\\s*)$/m";
+        $constantRegex = "/^(\\s*define\\s*\\(\\s*['\"]" . preg_quote($constantName, '/') .
+            "['\"]\\s*,\\s*).*(\\s*\\)\\s*;\\s*)$/m";
         $constantTemplate = "define('{$constantName}', %s);\n";
 
         self::updateConfig($value, $constantRegex, $constantTemplate, $usePlainValue);
@@ -41,7 +45,8 @@ class WpConfigEditor {
      * @param string|number|bool $value
      * @param bool $usePlainValue The value is used as-is, without quoting.
      */
-    public function updateConfigVariable($variableName, $value, $usePlainValue = false) {
+    public function updateConfigVariable($variableName, $value, $usePlainValue = false)
+    {
         // https://regex101.com/r/oO7gX7/5
         $variableRegex = "/^(\\\${$variableName}\\s*=\\s*).*(;\\s*)$/m";
         $variableTemplate = "\${$variableName} = %s;\n";
@@ -49,7 +54,8 @@ class WpConfigEditor {
         self::updateConfig($value, $variableRegex, $variableTemplate, $usePlainValue);
     }
 
-    private function updateConfig($value, $replaceRegex, $definitionTemplate, $usePlainValue) {
+    private function updateConfig($value, $replaceRegex, $definitionTemplate, $usePlainValue)
+    {
         $wpConfigContent = file_get_contents($this->wpConfigPath);
 
         $phpizedValue = $usePlainValue ? $value : var_export($value, true);
@@ -60,7 +66,9 @@ class WpConfigEditor {
             $wpConfigContent = preg_replace($replaceRegex, "\${1}$phpizedValue\${2}", $wpConfigContent);
         } else {
             $originalContent = $wpConfigContent;
-            $endOfEditableSection = $this->isCommonConfig ? strlen($originalContent) : strpos($wpConfigContent, '/* That\'s all, stop editing! Happy blogging. */');
+            $endOfEditableSection = $this->isCommonConfig ?
+                strlen($originalContent) :
+                strpos($wpConfigContent, '/* That\'s all, stop editing! Happy blogging. */');
 
             if ($endOfEditableSection === false) {
                 throw new \Exception('Editable section not found.');

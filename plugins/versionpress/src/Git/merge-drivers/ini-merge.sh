@@ -12,28 +12,28 @@ declare -a datesArray=("post_modified" "post_modified_gmt")
 # Iterate through array of date fields
 for i in "${datesArray[@]}"
 do
-	# Find Values
-	aDateString=$(sed -ne "s/$i = \"\([^'\"]*\)\"/\1/p" $A)
-	aDateString=${aDateString//[$'\r\n']/}
+    # Find Values
+    aDateString=$(sed -ne "s/$i = \"\([^'\"]*\)\"/\1/p" $A)
+    aDateString=${aDateString//[$'\r\n']/}
 
-	# If the file does not contain value from array, we can skip it
-	if [[ -z "$aDateString" ]]; then
-		break
-	fi
+    # If the file does not contain value from array, we can skip it
+    if [[ -z "$aDateString" ]]; then
+        break
+    fi
 
-	bDateString=$(sed -ne "s/$i = \"\([^'\"]*\)\"/\1/p" $B)
-	bDateString=${bDateString//[$'\r\n']/}
+    bDateString=$(sed -ne "s/$i = \"\([^'\"]*\)\"/\1/p" $B)
+    bDateString=${bDateString//[$'\r\n']/}
 
-	# Transform them to Numbers
-	aDateNumber=${aDateString//[-: ]/}
-	bDateNumber=${bDateString//[-: ]/}
+    # Transform them to Numbers
+    aDateNumber=${aDateString//[-: ]/}
+    bDateNumber=${bDateString//[-: ]/}
 
-	# Compare and make both values same
-	if [ "$aDateNumber" -lt "$bDateNumber" ]; then
-		sed -i '' "s/$i = \"\([^\r\n\"]*\)\"\([\r\n]*\)/$i = \"$bDateString\"\2/g" $A
-	else
-  		sed -i '' "s/$i = \"\([^\r\n\"]*\)\"\([\r\n]*\)/$i = \"$aDateString\"\2/g" $B
-	fi
+    # Compare and make both values same
+    if [ "$aDateNumber" -lt "$bDateNumber" ]; then
+        sed -i '' "s/$i = \"\([^\r\n\"]*\)\"\([\r\n]*\)/$i = \"$bDateString\"\2/g" $A
+    else
+          sed -i '' "s/$i = \"\([^\r\n\"]*\)\"\([\r\n]*\)/$i = \"$aDateString\"\2/g" $B
+    fi
 
 
 done
@@ -56,5 +56,5 @@ sed -e ':a' -e 'N' -e '$!ba' -e 's/\n###VP###//g' -i '' $O
 
 # If Git merge fails, we should also 'fail'
 if [ $GIT_MERGE_EXIT_CODE -ne 0 ]; then
-	exit 1
+    exit 1
 fi

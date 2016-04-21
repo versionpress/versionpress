@@ -4,12 +4,12 @@ namespace VersionPress\Tests\Utils;
 
 use VersionPress\Git\GitConfig;
 use VersionPress\Git\GitRepository;
-use VersionPress\Git\MergeDriverInstaller;
-use VersionPress\Utils\FileSystem;
 use VersionPress\Storages\Serialization\IniSerializer;
+use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\Process;
 
-class MergeDriverTestUtils {
+class MergeDriverTestUtils
+{
 
     private static $repositoryDir;
 
@@ -18,7 +18,8 @@ class MergeDriverTestUtils {
      */
     private static $gitRepository;
 
-    public static function initRepository($repositoryDir) {
+    public static function initRepository($repositoryDir)
+    {
         self::$repositoryDir = $repositoryDir;
         $driverScriptName = 'ini-merge.php';
         $driverScript = __DIR__ . '/../../src/Git/merge-drivers/' . $driverScriptName;
@@ -36,47 +37,71 @@ class MergeDriverTestUtils {
     }
 
 
-    public static function destroyRepository() {
+    public static function destroyRepository()
+    {
         FileSystem::remove(self::$repositoryDir);
     }
 
 
-    public static function writeIniFile($fileName, $date, $content = 'Default content', $title = 'Default title') {
-        $data = array("GUID" => array('post_modified' => $date, 'post_modified_gmt' => $date, 'title' => $title, 'content' => $content));
+    public static function writeIniFile($fileName, $date, $content = 'Default content', $title = 'Default title')
+    {
+        $data = [
+            "GUID" => [
+                'post_modified' => $date,
+                'post_modified_gmt' => $date,
+                'title' => $title,
+                'content' => $content
+            ]
+        ];
         file_put_contents(self::$repositoryDir . '/' . $fileName, IniSerializer::serialize($data));
     }
 
-    public static function createIniFileWithoutDateFields($fileName, $content = 'Default content', $title = 'Default title') {
-        $data = array("GUID" => array('title' => $title, 'content' => $content));
+    public static function createIniFileWithoutDateFields(
+        $fileName,
+        $content = 'Default content',
+        $title = 'Default title'
+    ) {
+        $data = ["GUID" => ['title' => $title, 'content' => $content]];
         file_put_contents(self::$repositoryDir . '/' . $fileName, IniSerializer::serialize($data));
     }
 
-    public static function commit($message = 'Default commit message') {
+    public static function commit($message = 'Default commit message')
+    {
         self::$gitRepository->stageAll();
         self::$gitRepository->commit($message, GitConfig::$wpcliUserName, GitConfig::$wpcliUserEmail);
     }
 
-    public static function createIniFileAndCommit($originDate, $fileName, $message, $content = 'Default content', $title = 'Default title') {
+    public static function createIniFileAndCommit(
+        $originDate,
+        $fileName,
+        $message,
+        $content = 'Default content',
+        $title = 'Default title'
+    ) {
         self::writeIniFile($fileName, $originDate, $content, $title);
         self::commit($message);
     }
 
-    public static function createIniFileWithoutDateFieldsAndCommit($fileName, $message, $content = 'Default content', $title = 'Default title') {
+    public static function createIniFileWithoutDateFieldsAndCommit(
+        $fileName,
+        $message,
+        $content = 'Default content',
+        $title = 'Default title'
+    ) {
         self::createIniFileWithoutDateFields($fileName, $content, $title);
         self::commit($message);
     }
 
     /**
      * Runs Git command in the test repo and returns the exit code.
-     * 
+     *
      * @param string $cmd
      * @return int Exit code
      */
-    public static function runGitCommand($cmd) {
+    public static function runGitCommand($cmd)
+    {
         $process = new Process($cmd, self::$repositoryDir);
         $process->run();
         return $process->getExitCode();
     }
-
-
 }

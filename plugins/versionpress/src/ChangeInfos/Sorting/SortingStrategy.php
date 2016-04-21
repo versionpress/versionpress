@@ -2,7 +2,6 @@
 
 namespace VersionPress\ChangeInfos\Sorting;
 
-
 use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\BulkChangeInfo;
 use VersionPress\ChangeInfos\EntityChangeInfo;
@@ -14,7 +13,8 @@ use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\TranslationChangeInfo;
 use VersionPress\Utils\ArrayUtils;
 
-class SortingStrategy {
+class SortingStrategy
+{
 
     /**
      * List of change info classes ordered by their priorities.
@@ -23,7 +23,7 @@ class SortingStrategy {
      *
      * @var string[]
      */
-    private $priorityOrder = array(
+    private $priorityOrder = [
         'VersionPress\ChangeInfos\WordPressUpdateChangeInfo',
         'VersionPress\ChangeInfos\VersionPressChangeInfo',
         'VersionPress\ChangeInfos\UserChangeInfo',
@@ -40,10 +40,11 @@ class SortingStrategy {
         'VersionPress\ChangeInfos\UserMetaChangeInfo',
         'VersionPress\ChangeInfos\TermMetaChangeInfo',
         'VersionPress\ChangeInfos\CommentMetaChangeInfo'
-    );
+    ];
 
-    function sort($changeInfoList) {
-        ArrayUtils::stablesort($changeInfoList, array($this, 'compareChangeInfo'));
+    public function sort($changeInfoList)
+    {
+        ArrayUtils::stablesort($changeInfoList, [$this, 'compareChangeInfo']);
         return $changeInfoList;
     }
 
@@ -55,7 +56,8 @@ class SortingStrategy {
      * @return int If $changeInfo1 is more important, returns -1, and the opposite for $changeInfo2. ChangeInfos
      *   of same priorities return zero.
      */
-    public function compareChangeInfo($changeInfo1, $changeInfo2) {
+    public function compareChangeInfo($changeInfo1, $changeInfo2)
+    {
         $class1 = get_class($changeInfo1);
         $class2 = get_class($changeInfo2);
 
@@ -96,9 +98,10 @@ class SortingStrategy {
         }
 
         if (($changeInfo1 instanceof EntityChangeInfo && $changeInfo2 instanceof EntityChangeInfo)
-         || ($changeInfo1 instanceof EntityChangeInfo && $changeInfo2 instanceof BulkChangeInfo)
-         || ($changeInfo1 instanceof BulkChangeInfo && $changeInfo2 instanceof EntityChangeInfo)
-         || ($changeInfo1 instanceof BulkChangeInfo && $changeInfo2 instanceof BulkChangeInfo)) {
+            || ($changeInfo1 instanceof EntityChangeInfo && $changeInfo2 instanceof BulkChangeInfo)
+            || ($changeInfo1 instanceof BulkChangeInfo && $changeInfo2 instanceof EntityChangeInfo)
+            || ($changeInfo1 instanceof BulkChangeInfo && $changeInfo2 instanceof BulkChangeInfo)
+        ) {
             // Generally, the "create" action takes precedence
             if ($changeInfo1->getAction() === "create") {
                 return -1;
@@ -127,12 +130,15 @@ class SortingStrategy {
      * @param ThemeChangeInfo $changeInfo2
      * @return int
      */
-    private function compareThemeChangeInfo($changeInfo1, $changeInfo2) {
+    private function compareThemeChangeInfo($changeInfo1, $changeInfo2)
+    {
         // For two VersionPress\ChangeInfos\ThemeChangeInfo objects, the "switch" one wins
         if ($changeInfo1->getAction() == "switch") {
             return -1;
-        } else if ($changeInfo2->getAction() == "switch") {
-            return 1;
+        } else {
+            if ($changeInfo2->getAction() == "switch") {
+                return 1;
+            }
         }
 
         return 0;
@@ -143,13 +149,16 @@ class SortingStrategy {
      * @param OptionChangeInfo $changeInfo2
      * @return int
      */
-    private function compareOptionChangeInfo($changeInfo1, $changeInfo2) {
+    private function compareOptionChangeInfo($changeInfo1, $changeInfo2)
+    {
 
         // The WPLANG option always has the lowest priority (it is a "noise")
         if ($changeInfo1->getEntityId() == "WPLANG") {
             return 1;
-        } else if ($changeInfo2->getEntityId() == "WPLANG") {
-            return -1;
+        } else {
+            if ($changeInfo2->getEntityId() == "WPLANG") {
+                return -1;
+            }
         }
 
         // The "create" action takes precedence
@@ -171,12 +180,15 @@ class SortingStrategy {
      * @param TermChangeInfo $changeInfo2
      * @return int
      */
-    private function compareTermChangeInfo($changeInfo1, $changeInfo2) {
+    private function compareTermChangeInfo($changeInfo1, $changeInfo2)
+    {
         // For two VersionPress\ChangeInfos\TermChangeInfo objects, the "delete" one wins
         if ($changeInfo1->getAction() == "delete") {
             return -1;
-        } else if ($changeInfo2->getAction() == "delete") {
-            return 1;
+        } else {
+            if ($changeInfo2->getAction() == "delete") {
+                return 1;
+            }
         }
 
         return 0;
@@ -187,7 +199,8 @@ class SortingStrategy {
      * @param PostChangeInfo $changeInfo2
      * @return int
      */
-    private function comparePostChangeInfo($changeInfo1, $changeInfo2) {
+    private function comparePostChangeInfo($changeInfo1, $changeInfo2)
+    {
         /*
          * TODO: Needs refactor
          * For two VersionPress\ChangeInfos\PostChangeInfo objects, the action precendence is
@@ -195,24 +208,42 @@ class SortingStrategy {
          */
         if ($changeInfo1->getAction() == "create") {
             return -1;
-        } else if ($changeInfo2->getAction() == "create") {
-            return 1;
-        } else if ($changeInfo1->getAction() == "delete") {
-            return -1;
-        } else if ($changeInfo2->getAction() == "delete") {
-            return 1;
-        } else if ($changeInfo1->getAction() == "draft") {
-            return -1;
-        } else if ($changeInfo2->getAction() == "draft") {
-            return 1;
-        } else if ($changeInfo1->getAction() == "trash") {
-            return -1;
-        } else if ($changeInfo2->getAction() == "trash") {
-            return 1;
-        } else if ($changeInfo1->getAction() == "edit") {
-            return -1;
-        } else if ($changeInfo2->getAction() == "edit") {
-            return 1;
+        } else {
+            if ($changeInfo2->getAction() == "create") {
+                return 1;
+            } else {
+                if ($changeInfo1->getAction() == "delete") {
+                    return -1;
+                } else {
+                    if ($changeInfo2->getAction() == "delete") {
+                        return 1;
+                    } else {
+                        if ($changeInfo1->getAction() == "draft") {
+                            return -1;
+                        } else {
+                            if ($changeInfo2->getAction() == "draft") {
+                                return 1;
+                            } else {
+                                if ($changeInfo1->getAction() == "trash") {
+                                    return -1;
+                                } else {
+                                    if ($changeInfo2->getAction() == "trash") {
+                                        return 1;
+                                    } else {
+                                        if ($changeInfo1->getAction() == "edit") {
+                                            return -1;
+                                        } else {
+                                            if ($changeInfo2->getAction() == "edit") {
+                                                return 1;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         return 0;
@@ -223,18 +254,22 @@ class SortingStrategy {
      * @param TranslationChangeInfo $changeInfo2
      * @return int
      */
-    private function compareTranslationChangeInfo($changeInfo1, $changeInfo2) {
+    private function compareTranslationChangeInfo($changeInfo1, $changeInfo2)
+    {
         // For two VersionPress\ChangeInfos\TranslationChangeInfo objects, the "activate" one wins
         if ($changeInfo1->getAction() == "activate") {
             return -1;
-        } else if ($changeInfo2->getAction() == "activate") {
-            return 1;
+        } else {
+            if ($changeInfo2->getAction() == "activate") {
+                return 1;
+            }
         }
 
         return 0;
     }
 
-    private function stripBulkFromClassName($className) {
+    private function stripBulkFromClassName($className)
+    {
         if (Strings::contains($className, "Bulk")) {
             $className = Strings::replace($className, "~Bulk~");
         }

@@ -1,13 +1,14 @@
 <?php
+// @codingStandardsIgnoreFile
 
 namespace VersionPress\Initialization;
-
-use VersionPress\Database\ParsedQueryData;
-use VersionPress\Database\SqlQueryParser;
 
 /**
  * Methods in this class are used by WpdbReplacer. It pastes them into the wpdb class.
  * We have them in this class because of refactoring.
+ *
+ * !!! IMPORTANT !!!
+ * Do NOT use any use statements in this file! They are not copied to the wp-db.php.
  *
  * @property null last_error
  * @property null last_query
@@ -20,9 +21,11 @@ use VersionPress\Database\SqlQueryParser;
  * @method __wp_delete($table, $where, $where_format)
  * @method __wp_query($query)
  */
-class ReplacerMethods {
+class ReplacerMethods
+{
 
-    public function insert($table, $data, $format = null) {
+    public function insert($table, $data, $format = null)
+    {
         global $versionPressContainer;
         if ($versionPressContainer == null) {
             return $this->__wp_insert($table, $data, $format);
@@ -45,7 +48,8 @@ class ReplacerMethods {
 
     }
 
-    public function update($table, $data, $where, $format = null, $where_format = null) {
+    public function update($table, $data, $where, $format = null, $where_format = null)
+    {
         global $versionPressContainer;
         if ($versionPressContainer == null) {
             return $this->__wp_update($table, $data, $where, $format, $where_format);
@@ -67,7 +71,8 @@ class ReplacerMethods {
         return $r;
     }
 
-    public function delete($table, $where, $where_format = null) {
+    public function delete($table, $where, $where_format = null)
+    {
         global $versionPressContainer;
         if ($versionPressContainer == null) {
             return $this->__wp_delete($table, $where, $where_format);
@@ -91,7 +96,8 @@ class ReplacerMethods {
         return $r;
     }
 
-    public function query($query) {
+    public function query($query)
+    {
         global $versionPressContainer;
         if ($versionPressContainer == null || $this->vp_use_original_query_method) {
             return $this->__wp_query($query);
@@ -99,7 +105,7 @@ class ReplacerMethods {
 
         $r = null;
 
-        /** @var SqlQueryParser $sqlQueryParser */
+        /** @var \VersionPress\Database\SqlQueryParser $sqlQueryParser */
         $sqlQueryParser = $versionPressContainer->resolve(\VersionPress\DI\VersionPressServices::SQL_QUERY_PARSER);
 
         $parsedQueryData = $sqlQueryParser->parseQuery($query);
@@ -140,7 +146,7 @@ class ReplacerMethods {
      * @since VersionPress
      * @var array
      */
-    private $vp_field_backup = array();
+    private $vp_field_backup = [];
 
     /**
      * Used by VersionPress to avoid 'patched' query() method call when update,insert,delete methods are called
@@ -153,21 +159,23 @@ class ReplacerMethods {
     /**
      * @since VersionPress
      */
-    private function vp_backup_fields() {
-        $this->vp_field_backup = array(
+    private function vp_backup_fields()
+    {
+        $this->vp_field_backup = [
             "last_error" => $this->last_error,
             "last_query" => $this->last_query,
             "last_result" => $this->last_result,
             "rows_affected" => $this->rows_affected,
             "num_rows" => $this->num_rows,
             "insert_id" => $this->insert_id,
-        );
+        ];
     }
-    
+
     /**
      * @since VersionPress
      */
-    private function vp_restore_fields() {
+    private function vp_restore_fields()
+    {
         $this->last_error = $this->vp_field_backup["last_error"];
         $this->last_query = $this->vp_field_backup["last_query"];
         $this->last_result = $this->vp_field_backup["last_result"];
@@ -179,7 +187,8 @@ class ReplacerMethods {
     /**
      * @since VersionPress
      */
-    public static function vp_restore_original() {
+    public static function vp_restore_original()
+    {
         $wpdbClassPath = ABSPATH . WPINC . '/wp-db.php';
         $wpdbOriginalPath = $wpdbClassPath . '.original';
         if (file_exists($wpdbOriginalPath)) {
@@ -187,6 +196,4 @@ class ReplacerMethods {
             unlink($wpdbOriginalPath);
         }
     }
-
-
 }

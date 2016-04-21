@@ -1,4 +1,5 @@
 <?php
+// @codingStandardsIgnoreFile
 
 if (!function_exists('wp_is_numeric_array')) {
     /**

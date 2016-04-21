@@ -11,7 +11,8 @@ use VersionPress\Utils\WordPressMissingFunctions;
  * way around it.
  *
  */
-class ShortcodesReplacer {
+class ShortcodesReplacer
+{
     /** @var ShortcodesInfo */
     private $shortcodesInfo;
     /** @var VpidRepository */
@@ -21,7 +22,8 @@ class ShortcodesReplacer {
      * @param ShortcodesInfo $shortcodeInfo
      * @param VpidRepository $vpidRepository
      */
-    public function __construct(ShortcodesInfo $shortcodeInfo, VpidRepository $vpidRepository) {
+    public function __construct(ShortcodesInfo $shortcodeInfo, VpidRepository $vpidRepository)
+    {
         $this->shortcodesInfo = $shortcodeInfo;
         $this->vpidRepository = $vpidRepository;
     }
@@ -32,9 +34,14 @@ class ShortcodesReplacer {
      * @param string $string
      * @return string
      */
-    private function replaceShortcodes($string) {
+    private function replaceShortcodes($string)
+    {
         $pattern = get_shortcode_regex($this->shortcodesInfo->getAllShortcodeNames());
-        return preg_replace_callback("/$pattern/", $this->createReplaceCallback(array($this, 'getVpidByEntityNameAndId')), $string);
+        return preg_replace_callback(
+            "/$pattern/",
+            $this->createReplaceCallback([$this, 'getVpidByEntityNameAndId']),
+            $string
+        );
     }
 
     /**
@@ -43,9 +50,10 @@ class ShortcodesReplacer {
      * @param string $string
      * @return string
      */
-    private function restoreShortcodes($string) {
+    private function restoreShortcodes($string)
+    {
         $pattern = get_shortcode_regex($this->shortcodesInfo->getAllShortcodeNames());
-        return preg_replace_callback("/$pattern/", $this->createReplaceCallback(array($this, 'getIdByVpid')), $string);
+        return preg_replace_callback("/$pattern/", $this->createReplaceCallback([$this, 'getIdByVpid']), $string);
     }
 
     /**
@@ -55,7 +63,8 @@ class ShortcodesReplacer {
      * @param array $entity Entity data, see {@link WpdbMirrorBridge}
      * @return array Entity data
      */
-    public function replaceShortcodesInEntity($entityName, $entity) {
+    public function replaceShortcodesInEntity($entityName, $entity)
+    {
         if (!$this->entityCanContainShortcodes($entityName)) {
             return $entity;
         }
@@ -76,7 +85,8 @@ class ShortcodesReplacer {
      * @param array $entity Entity data, see {@link WpdbMirrorBridge}
      * @return array Entity data
      */
-    public function restoreShortcodesInEntity($entityName, $entity) {
+    public function restoreShortcodesInEntity($entityName, $entity)
+    {
         if (!$this->entityCanContainShortcodes($entityName)) {
             return $entity;
         }
@@ -96,7 +106,8 @@ class ShortcodesReplacer {
      * @param string $entityName
      * @return bool
      */
-    public function entityCanContainShortcodes($entityName) {
+    public function entityCanContainShortcodes($entityName)
+    {
         $shortcodeLocations = $this->shortcodesInfo->getShortcodeLocations();
         return isset($shortcodeLocations[$entityName]);
     }
@@ -108,7 +119,8 @@ class ShortcodesReplacer {
      * @param string $field E.g., 'post_content'
      * @return bool
      */
-    public function fieldCanContainShortcodes($entityName, $field) {
+    public function fieldCanContainShortcodes($entityName, $field)
+    {
         if (!$this->entityCanContainShortcodes($entityName)) {
             return false;
         }
@@ -119,7 +131,8 @@ class ShortcodesReplacer {
         return array_search($field, $allowedFields) !== false;
     }
 
-    private function createReplaceCallback($idProvider) {
+    private function createReplaceCallback($idProvider)
+    {
         $shortcodesInfo = $this->shortcodesInfo;
 
         return function ($m) use ($shortcodesInfo, $idProvider) {
@@ -146,11 +159,13 @@ class ShortcodesReplacer {
         };
     }
 
-    private function getVpidByEntityNameAndId($entityName, $id) {
+    private function getVpidByEntityNameAndId($entityName, $id)
+    {
         return $this->vpidRepository->getVpidForEntity($entityName, $id) ?: $id;
     }
 
-    private function getIdByVpid($entityName, $vpid) {
+    private function getIdByVpid($entityName, $vpid)
+    {
         return $this->vpidRepository->getIdForVpid($vpid) ?: $vpid;
     }
 }

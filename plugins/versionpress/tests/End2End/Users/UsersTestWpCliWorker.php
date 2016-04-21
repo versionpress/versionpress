@@ -6,105 +6,152 @@ use Nette\Utils\Random;
 use Nette\Utils\Strings;
 use VersionPress\Tests\End2End\Utils\WpCliWorker;
 
-class UsersTestWpCliWorker extends WpCliWorker implements IUsersTestWorker {
+class UsersTestWpCliWorker extends WpCliWorker implements IUsersTestWorker
+{
 
     private $testUser;
     private $userId;
     private $originalEmail;
     private $originalFirstName;
 
-    public function setTestUser($testUser) {
-        $this->testUser = array(
+    public function setTestUser($testUser)
+    {
+        $this->testUser = [
             'user_login' => $testUser['login'],
             'user_email' => $testUser['email'],
             'user_pass' => $testUser['password'],
             'first_name' => $testUser['first-name'],
             'last_name' => $testUser['last-name'],
-        );
+        ];
     }
 
-    public function prepare_createUser() {
+    public function prepare_createUser()
+    {
     }
 
-    public function createUser() {
+    public function createUser()
+    {
         $this->userId = $this->wpAutomation->createUser($this->testUser);
     }
 
-    public function prepare_editUser() {
-        $user = json_decode($this->wpAutomation->runWpCliCommand('user', 'get', array($this->userId, 'format' => 'json')));
+    public function prepare_editUser()
+    {
+        $user = json_decode($this->wpAutomation->runWpCliCommand(
+            'user',
+            'get',
+            [$this->userId, 'format' => 'json']
+        ));
         $this->originalEmail = $user->user_email;
-        $this->wpAutomation->editUser($this->userId, array('user_email' => 'random.email' . Random::generate() . '@example.com'));
+        $this->wpAutomation->editUser(
+            $this->userId,
+            ['user_email' => 'random.email' . Random::generate() . '@example.com']
+        );
     }
 
-    public function editUser() {
-        $this->wpAutomation->editUser($this->userId, array('user_email' => $this->originalEmail));
+    public function editUser()
+    {
+        $this->wpAutomation->editUser($this->userId, ['user_email' => $this->originalEmail]);
     }
 
-    public function prepare_editUsermeta() {
-        $this->originalFirstName = trim($this->wpAutomation->runWpCliCommand('user', 'meta', array('get', $this->userId, 'first_name')));
-        $this->wpAutomation->runWpCliCommand('user', 'meta', array('update', $this->userId, 'first_name', 'Random First Name ' . Random::generate()));
+    public function prepare_editUsermeta()
+    {
+        $this->originalFirstName = trim($this->wpAutomation->runWpCliCommand(
+            'user',
+            'meta',
+            ['get', $this->userId, 'first_name']
+        ));
+        $this->wpAutomation->runWpCliCommand(
+            'user',
+            'meta',
+            ['update', $this->userId, 'first_name', 'Random First Name ' . Random::generate()]
+        );
     }
 
-    public function editUsermeta() {
-        $this->wpAutomation->runWpCliCommand('user', 'meta', array('update', $this->userId, 'first_name', $this->originalFirstName));
+    public function editUsermeta()
+    {
+        $this->wpAutomation->runWpCliCommand(
+            'user',
+            'meta',
+            ['update', $this->userId, 'first_name', $this->originalFirstName]
+        );
     }
 
-    function prepare_deleteUsermeta() {
+    public function prepare_deleteUsermeta()
+    {
         $this->createUser();
     }
 
-    public function deleteUsermeta() {
-        $this->wpAutomation->runWpCliCommand('user', 'meta', array('delete', $this->userId, 'last_name'));
+    public function deleteUsermeta()
+    {
+        $this->wpAutomation->runWpCliCommand('user', 'meta', ['delete', $this->userId, 'last_name']);
     }
 
-    public function prepare_deleteUser() {
+    public function prepare_deleteUser()
+    {
     }
 
-    public function deleteUser() {
+    public function deleteUser()
+    {
         $this->wpAutomation->deleteUser($this->userId);
     }
 
-    public function prepare_editTwoUsers() {
-        $this->userId = array();
+    public function prepare_editTwoUsers()
+    {
+        $this->userId = [];
         $this->userId[] = $this->wpAutomation->createUser($this->prepareTestUser());
         $this->userId[] = $this->wpAutomation->createUser($this->prepareTestUser());
     }
 
-    public function editTwoUsers() {
-        $this->wpAutomation->runWpCliCommand('user', 'update', array_merge($this->userId, array('display_name' => 'changed name')));
+    public function editTwoUsers()
+    {
+        $this->wpAutomation->runWpCliCommand(
+            'user',
+            'update',
+            array_merge($this->userId, ['display_name' => 'changed name'])
+        );
     }
 
-    public function prepare_deleteTwoUsers() {
-        $this->userId = array();
+    public function prepare_deleteTwoUsers()
+    {
+        $this->userId = [];
         $this->userId[] = $this->wpAutomation->createUser($this->prepareTestUser());
         $this->userId[] = $this->wpAutomation->createUser($this->prepareTestUser());
     }
 
-    public function deleteTwoUsers() {
-        $this->wpAutomation->runWpCliCommand('user', 'delete', array_merge($this->userId, array('yes' => null)));
+    public function deleteTwoUsers()
+    {
+        $this->wpAutomation->runWpCliCommand('user', 'delete', array_merge($this->userId, ['yes' => null]));
     }
 
-    private function prepareTestUser() {
-        return array(
+    private function prepareTestUser()
+    {
+        return [
             'user_login' => 'bulk_' . Random::generate(),
             'user_email' => 'bulk.' . Random::generate() . '@example.com',
             'user_pass' => Random::generate(),
             'first_name' => Random::generate(),
             'last_name' => Random::generate(),
-        );
+        ];
     }
 
-    public function prepare_editTwoUsermeta() {
+    public function prepare_editTwoUsermeta()
+    {
         throw new \PHPUnit_Framework_SkippedTestError("There is no way to change multiple usermeta using WP-CLI");
     }
 
-    public function editTwoUsermeta() {
+    public function editTwoUsermeta()
+    {
     }
 
-    public function tearDownAfterClass() {
-        $users = json_decode($this->wpAutomation->runWpCliCommand('user', 'list', array('format' => 'json')));
-        $userLogins = array_map(function ($user) { return $user->user_login; }, $users);
-        $usersForBulkTests = array_filter($userLogins, function ($login) { return Strings::startsWith($login, 'bulk_'); });
-        $this->wpAutomation->runWpCliCommand('user', 'delete', array_merge($usersForBulkTests, array('yes' => null)));
+    public function tearDownAfterClass()
+    {
+        $users = json_decode($this->wpAutomation->runWpCliCommand('user', 'list', ['format' => 'json']));
+        $userLogins = array_map(function ($user) {
+            return $user->user_login;
+        }, $users);
+        $usersForBulkTests = array_filter($userLogins, function ($login) {
+            return Strings::startsWith($login, 'bulk_');
+        });
+        $this->wpAutomation->runWpCliCommand('user', 'delete', array_merge($usersForBulkTests, ['yes' => null]));
     }
 }

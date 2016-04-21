@@ -4,12 +4,14 @@ namespace VersionPress\Tests\Selenium;
 
 use VersionPress\Tests\Utils\CommitAsserter;
 
-class ThemeCustomizerTest extends SeleniumTestCase {
+class ThemeCustomizerTest extends SeleniumTestCase
+{
     /**
      * @test
      * @testdox Every change made in customizer creates 'theme/customize' action
      */
-    public function everyChangeMadeInCustomizerCreatesThemeCustomizeAction() {
+    public function everyChangeMadeInCustomizerCreatesThemeCustomizeAction()
+    {
         $this->url('wp-admin/customize.php');
         $this->byCssSelector('#accordion-section-title_tagline .accordion-section-title')->click();
         $this->setValue('#customize-control-blogname input', 'Some name');

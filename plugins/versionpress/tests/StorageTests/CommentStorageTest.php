@@ -8,11 +8,12 @@ use VersionPress\Storages\CommentStorage;
 use VersionPress\Tests\End2End\Utils\AnonymousObject;
 use VersionPress\Utils\FileSystem;
 
-class CommentStorageTest extends \PHPUnit_Framework_TestCase {
+class CommentStorageTest extends \PHPUnit_Framework_TestCase
+{
     /** @var CommentStorage */
     private $storage;
 
-    private $testingComment = array(
+    private $testingComment = [
         "comment_author" => "Mr WordPress",
         "comment_author_email" => "",
         "comment_author_url" => "https://wordpress.org/",
@@ -26,12 +27,13 @@ class CommentStorageTest extends \PHPUnit_Framework_TestCase {
         "comment_type" => "",
         "vp_id" => "927D63C187164CA1BCEAB2B13B29C8F0",
         "vp_comment_post_ID" => "F0E1B6313B7A48E49A1B38DF382B350D",
-    );
+    ];
 
     /**
      * @test
      */
-    public function savedCommentEqualsLoadedComment() {
+    public function savedCommentEqualsLoadedComment()
+    {
         $this->storage->save($this->testingComment);
         $loadedComment = $this->storage->loadEntity($this->testingComment['vp_id']);
         $this->assertEquals($this->testingComment, $loadedComment);
@@ -40,7 +42,8 @@ class CommentStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function loadAllReturnsOnlyOriginalEntities() {
+    public function loadAllReturnsOnlyOriginalEntities()
+    {
         $this->storage->save($this->testingComment);
         $loadedComments = $this->storage->loadAll();
         $this->assertTrue(count($loadedComments) === 1);
@@ -50,35 +53,45 @@ class CommentStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function savedCommentDoesNotContainVpIdKey() {
+    public function savedCommentDoesNotContainVpIdKey()
+    {
         $this->storage->save($this->testingComment);
         $fileName = $this->storage->getEntityFilename($this->testingComment['vp_id']);
         $content = file_get_contents($fileName);
         $this->assertFalse(strpos($content, 'vp_id'), 'Entity contains a vp_id key');
     }
 
-    protected function setUp() {
+    protected function setUp()
+    {
         parent::setUp();
-        $entityInfo = new EntityInfo(array(
-            'comment' => array(
+        $entityInfo = new EntityInfo([
+            'comment' => [
                 'table' => 'comments',
                 'id' => 'ID',
-                'references' => array (
+                'references' => [
                     'comment_post_ID' => 'post',
                     'comment_parent' => 'comment',
-                )
-            )
-        ));
+                ]
+            ]
+        ]);
         if (file_exists(__DIR__ . '/comments')) {
             FileSystem::remove(__DIR__ . '/comments');
         }
         mkdir(__DIR__ . '/comments');
-        $wpdbFake = new AnonymousObject(array('prefix' => '', 'posts' => 'posts', 'vp_id' => 'vp_id',  'get_row' => function () { return new AnonymousObject(array('post_title' => '')); }));
+        $wpdbFake = new AnonymousObject([
+            'prefix' => '',
+            'posts' => 'posts',
+            'vp_id' => 'vp_id',
+            'get_row' => function () {
+                return new AnonymousObject(['post_title' => '']);
+            }
+        ]);
         $database = new Database($wpdbFake);
         $this->storage = new CommentStorage(__DIR__ . '/comments', $entityInfo, $database);
     }
 
-    protected function tearDown() {
+    protected function tearDown()
+    {
         parent::tearDown();
         FileSystem::remove(__DIR__ . '/comments');
     }

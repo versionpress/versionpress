@@ -14,7 +14,8 @@ use VersionPress\Git\CommitMessage;
  *     VP-Post-Type: (post|page)
  *     VP-Post-UpdatedProperties: post_title,post_content,post_status
  */
-class PostChangeInfo extends EntityChangeInfo {
+class PostChangeInfo extends EntityChangeInfo
+{
 
     const POST_TITLE_TAG = "VP-Post-Title";
     const POST_TYPE_TAG = "VP-Post-Type";
@@ -25,7 +26,7 @@ class PostChangeInfo extends EntityChangeInfo {
      *
      * @var array
      */
-    private static $CONTENT_PROPERTIES = array("post_content", "post_title");
+    private static $CONTENT_PROPERTIES = ["post_content", "post_title"];
 
     /**
      * Type of the post - "post", "page" or "nav_menu_item"
@@ -44,22 +45,26 @@ class PostChangeInfo extends EntityChangeInfo {
      */
     private $postUpdatedProperties;
 
-    public function __construct($action, $entityId, $postType, $postTitle, $postUpdatedProperties = array()) {
+    public function __construct($action, $entityId, $postType, $postTitle, $postUpdatedProperties = [])
+    {
         parent::__construct("post", $action, $entityId);
         $this->postType = $postType;
         $this->postTitle = $postTitle;
         $this->postUpdatedProperties = $postUpdatedProperties;
     }
 
-    public function getPostType() {
+    public function getPostType()
+    {
         return $this->postType;
     }
 
-    public function getPostTitle() {
+    public function getPostTitle()
+    {
         return $this->postTitle;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
+    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    {
         $tags = $commitMessage->getVersionPressTags();
 
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
@@ -67,12 +72,14 @@ class PostChangeInfo extends EntityChangeInfo {
 
         $titleTag = isset($tags[self::POST_TITLE_TAG]) ? $tags[self::POST_TITLE_TAG] : $entityId;
         $type = isset($tags[self::POST_TYPE_TAG]) ? $tags[self::POST_TYPE_TAG] : "post";
-        $updatedProperties = isset($tags[self::POST_UPDATED_PROPERTIES_TAG]) ? explode(",", $tags[self::POST_UPDATED_PROPERTIES_TAG]) : array();
+        $updatedProperties = isset($tags[self::POST_UPDATED_PROPERTIES_TAG]) ?
+            explode(",", $tags[self::POST_UPDATED_PROPERTIES_TAG]) : [];
 
         return new self($action, $entityId, $type, $titleTag, $updatedProperties);
     }
 
-    public function getChangeDescription() {
+    public function getChangeDescription()
+    {
         if ($this->postType === "nav_menu_item") {
             return "Updated menu items";
         }
@@ -98,30 +105,34 @@ class PostChangeInfo extends EntityChangeInfo {
         }
     }
 
-    public function getChangedFiles() {
+    public function getChangedFiles()
+    {
         $changes = parent::getChangedFiles();
-        if ($this->postType !== "attachment") return $changes;
+        if ($this->postType !== "attachment") {
+            return $changes;
+        }
 
         $uploadDir = wp_upload_dir();
-        $changes[] = array("type" => "path", "path" => path_join($uploadDir['basedir'], '*'));
+        $changes[] = ["type" => "path", "path" => path_join($uploadDir['basedir'], '*')];
         return $changes;
     }
 
-    public function getCustomTags() {
-        return array(
+    public function getCustomTags()
+    {
+        return [
             self::POST_TITLE_TAG => $this->postTitle,
             self::POST_TYPE_TAG => $this->postType,
             self::POST_UPDATED_PROPERTIES_TAG => implode(",", $this->postUpdatedProperties),
-        );
+        ];
     }
 
-    public function getPostUpdatedProperties() {
+    public function getPostUpdatedProperties()
+    {
         return $this->postUpdatedProperties;
     }
 
-    public function setPostUpdatedProperties($postUpdatedProperties) {
+    public function setPostUpdatedProperties($postUpdatedProperties)
+    {
         $this->postUpdatedProperties = $postUpdatedProperties;
     }
-
-
 }

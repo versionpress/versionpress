@@ -2,21 +2,24 @@
 
 namespace VersionPress\Tests\End2End\Media;
 
-use PHPUnit_Extensions_Selenium2TestCase_Keys;
 use VersionPress\Tests\End2End\Utils\SeleniumWorker;
 
-class MediaTestSeleniumWorker extends SeleniumWorker implements IMediaTestWorker {
+class MediaTestSeleniumWorker extends SeleniumWorker implements IMediaTestWorker
+{
 
     private $filePath;
 
-    public function setUploadedFilePath($filePath) {
+    public function setUploadedFilePath($filePath)
+    {
         $this->filePath = $filePath;
     }
 
-    public function prepare_uploadFile() {
+    public function prepare_uploadFile()
+    {
     }
 
-    public function uploadFile() {
+    public function uploadFile()
+    {
         // Couldn't find out how to automate the default (and more modern) upload.php so let's go via media-new.php
         // see http://stackoverflow.com/q/27607453/21728
         $this->url('wp-admin/media-new.php');
@@ -29,10 +32,12 @@ class MediaTestSeleniumWorker extends SeleniumWorker implements IMediaTestWorker
         $this->waitForElement('.thumbnail', 3000);
     }
 
-    public function prepare_editFileName() {
+    public function prepare_editFileName()
+    {
     }
 
-    public function editFileName() {
+    public function editFileName()
+    {
         $this->byCssSelector('.attachment:first-child .thumbnail')->click(); // click must be on the .thumbnail element
         $this->waitForElement('.edit-attachment-frame', 300);
         $this->setValue('.setting[data-setting=title] input', 'updated image title');
@@ -40,20 +45,24 @@ class MediaTestSeleniumWorker extends SeleniumWorker implements IMediaTestWorker
         $this->waitForAjax();
     }
 
-    public function prepare_deleteFile() {
+    public function prepare_deleteFile()
+    {
     }
 
-    public function deleteFile() {
+    public function deleteFile()
+    {
         $this->byCssSelector('.delete-attachment')->click();
         $this->acceptAlert();
         $this->waitForAjax();
     }
 
-    public function prepare_editFile() {
+    public function prepare_editFile()
+    {
         $this->uploadFile();
     }
 
-    public function editFile() {
+    public function editFile()
+    {
         $this->byCssSelector('.attachment:first-child .thumbnail')->click(); // click must be on the .thumbnail element
         $this->waitForElement('.edit-attachment-frame', 300);
 
@@ -65,6 +74,4 @@ class MediaTestSeleniumWorker extends SeleniumWorker implements IMediaTestWorker
 
         $this->waitForAjax();
     }
-
-
 }

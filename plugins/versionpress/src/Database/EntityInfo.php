@@ -2,7 +2,6 @@
 
 namespace VersionPress\Database;
 
-use Nette\Utils\Arrays;
 use Nette\Utils\Strings;
 use VersionPress\Utils\QueryLanguageUtils;
 
@@ -10,7 +9,8 @@ use VersionPress\Utils\QueryLanguageUtils;
  * Info about an entity. Basically represents a section of the YAML schema file -  find
  * the parsing logic in the constructor.
  */
-class EntityInfo {
+class EntityInfo
+{
 
     const FREQUENTLY_WRITTEN_DEFAULT_INTERVAL = 'hourly';
 
@@ -82,7 +82,7 @@ class EntityInfo {
      *
      * @var array
      */
-    public $references = array();
+    public $references = [];
 
     /**
      * Just like $references, only for M:N relationships (with junction table).
@@ -101,11 +101,12 @@ class EntityInfo {
      *
      * @var array
      */
-    public $mnReferences = array();
+    public $mnReferences = [];
 
     /**
      * The same as $references, only for dependent columns.
-     * The key consists of name of column, where reference source is stored with its value and column, where is name of referenced entities.
+     * The key consists of name of column, where reference source is stored with its value and column,
+     * where is name of referenced entities.
      *
      *     array(
      *       'meta_key=_thumbnail_id@meta_value' => 'post',
@@ -114,7 +115,7 @@ class EntityInfo {
      *
      * @var array
      */
-    public $valueReferences = array();
+    public $valueReferences = [];
 
     /**
      * True if entity has references. Basically returns count($references) > 0.
@@ -131,13 +132,13 @@ class EntityInfo {
      */
     public $parentReference;
 
-    private $virtualReferences = array();
+    private $virtualReferences = [];
 
-    private $frequentlyWritten = array();
+    private $frequentlyWritten = [];
 
-    private $ignoredEntities = array();
-    
-    private $ignoredColumns = array();
+    private $ignoredEntities = [];
+
+    private $ignoredColumns = [];
 
     /**
      * Does the parsing and sets all properties
@@ -151,7 +152,8 @@ class EntityInfo {
      *      )
      *   ))
      */
-    public function __construct($entitySchema) {
+    public function __construct($entitySchema)
+    {
         list($key) = array_keys($entitySchema);
         $this->entityName = $key;
 
@@ -216,10 +218,10 @@ class EntityInfo {
         }
 
         if (isset($schemaInfo['ignored-columns'])) {
-
             foreach ($schemaInfo['ignored-columns'] as $column) {
                 if (is_string($column)) {
-                    $this->ignoredColumns[$column] = function () {}; // if column does not have any compute function we create 'NOOP' function
+                    $this->ignoredColumns[$column] = function () {
+                    }; // if column does not have any compute function we create 'NOOP' function
                 } else {
                     $this->ignoredColumns[array_keys($column)[0]] = substr(array_values($column)[0], 1);
                 }
@@ -228,43 +230,52 @@ class EntityInfo {
 
     }
 
-    public function getIgnoredColumns() {
+    public function getIgnoredColumns()
+    {
         return $this->ignoredColumns;
     }
 
-    public function isVirtualReference($reference) {
+    public function isVirtualReference($reference)
+    {
         return isset($this->virtualReferences[$reference]);
     }
 
-    public function isFrequentlyWrittenEntity($entity) {
+    public function isFrequentlyWrittenEntity($entity)
+    {
         $rulesAndIntervals = $this->getRulesAndIntervalsForFrequentlyWrittenEntities();
         $rules = array_column($rulesAndIntervals, 'rule');
         return QueryLanguageUtils::entityMatchesSomeRule($entity, $rules);
     }
 
-    public function isIgnoredEntity($entity) {
+    public function isIgnoredEntity($entity)
+    {
         $rules = $this->getRulesForIgnoredEntities();
         return QueryLanguageUtils::entityMatchesSomeRule($entity, $rules);
     }
 
-    public function getRulesAndIntervalsForFrequentlyWrittenEntities() {
-        $queries = array_map(function ($banan) {
-            return is_string($banan) ? $banan : $banan['query'];
+    public function getRulesAndIntervalsForFrequentlyWrittenEntities()
+    {
+        $queries = array_map(function ($queryMaybeWithInterval) {
+            return is_string($queryMaybeWithInterval) ? $queryMaybeWithInterval : $queryMaybeWithInterval['query'];
         }, $this->frequentlyWritten);
 
         $rules = QueryLanguageUtils::createRulesFromQueries($queries);
 
-        $rulesAndIntervals = array();
+        $rulesAndIntervals = [];
         foreach ($rules as $key => $rule) {
-            $interval = isset($this->frequentlyWritten[$key]['interval']) ? $this->frequentlyWritten[$key]['interval'] : self::FREQUENTLY_WRITTEN_DEFAULT_INTERVAL;
-            $rulesAndIntervals[] = array('rule' => $rule, 'interval' => $interval);
+            $interval = isset($this->frequentlyWritten[$key]['interval'])
+                ? $this->frequentlyWritten[$key]['interval']
+                : self::FREQUENTLY_WRITTEN_DEFAULT_INTERVAL;
+
+            $rulesAndIntervals[] = ['rule' => $rule, 'interval' => $interval];
         }
 
 
         return $rulesAndIntervals;
     }
 
-    public function getRulesForIgnoredEntities() {
+    public function getRulesForIgnoredEntities()
+    {
         return QueryLanguageUtils::createRulesFromQueries($this->ignoredEntities);
     }
 }

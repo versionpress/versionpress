@@ -26,7 +26,8 @@ use wpdb;
  * These internal commands are mostly used by public `wp vp` commands.
  *
  */
-class VPInternalCommand extends WP_CLI_Command {
+class VPInternalCommand extends WP_CLI_Command
+{
 
     /**
      * Finishes clone operation
@@ -39,7 +40,8 @@ class VPInternalCommand extends WP_CLI_Command {
      * @subcommand finish-init-clone
      *
      */
-    public function finishInitClone($args, $assoc_args) {
+    public function finishInitClone($args, $assoc_args)
+    {
         global $versionPressContainer;
 
         // Truncate tables
@@ -49,7 +51,9 @@ class VPInternalCommand extends WP_CLI_Command {
         $tables = $database->tables();
 
         if (!isset($assoc_args["truncate-options"])) {
-            $tables = array_filter($tables, function ($table) use ($database) { return $table !== $database->options; });
+            $tables = array_filter($tables, function ($table) use ($database) {
+                return $table !== $database->options;
+            });
         }
 
         foreach ($tables as $table) {
@@ -72,7 +76,7 @@ class VPInternalCommand extends WP_CLI_Command {
         MergeDriverInstaller::installMergeDriver(VP_PROJECT_ROOT, VERSIONPRESS_PLUGIN_DIR, VP_VPDB_DIR);
         WP_CLI::success("Git merge driver added");
 
-        
+
         // Run synchronization
 
         /** @var SynchronizationProcess $syncProcess */
@@ -89,7 +93,8 @@ class VPInternalCommand extends WP_CLI_Command {
      *
      * @subcommand finish-update
      */
-    public function finishUpdate($args, $assoc_args) {
+    public function finishUpdate($args, $assoc_args)
+    {
         global $versionPressContainer;
         activate_plugins("versionpress/versionpress.php");
         WP_CLI::success('Re-activated VersionPress');
@@ -108,7 +113,8 @@ class VPInternalCommand extends WP_CLI_Command {
      * : Desired state of maintenance mode. Possible values are 'on' or 'off'.
      *
      */
-    public function maintenance($args) {
+    public function maintenance($args)
+    {
         $mode = $args[0];
         if ($mode === 'on') {
             vp_enable_maintenance();
@@ -123,7 +129,8 @@ class VPInternalCommand extends WP_CLI_Command {
      * @subcommand finish-push
      *
      */
-    public function finishPush($args, $assoc_args) {
+    public function finishPush($args, $assoc_args)
+    {
         global $versionPressContainer;
 
         // Update working copy
@@ -144,7 +151,8 @@ class VPInternalCommand extends WP_CLI_Command {
         vp_enable_maintenance();
     }
 
-    private function flushRewriteRules() {
+    private function flushRewriteRules()
+    {
         set_transient('vp_flush_rewrite_rules', 1);
         /**
          * @see VPCommand::flushRewriteRules
@@ -160,7 +168,8 @@ class VPInternalCommand extends WP_CLI_Command {
      * @synopsis --vpid=<vpid>
      *
      */
-    public function getEntityId($args = array(), $assoc_args = array()) {
+    public function getEntityId($args = [], $assoc_args = [])
+    {
         global $versionPressContainer;
         /** @var Database $database */
         $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
@@ -168,7 +177,6 @@ class VPInternalCommand extends WP_CLI_Command {
         $newId = $database->get_col($sql);
         if (isset($newId[0])) {
             echo $newId[0];
-
         }
     }
 
@@ -180,7 +188,8 @@ class VPInternalCommand extends WP_CLI_Command {
      * @synopsis --id=<id> --name=<name>
      *
      */
-    public function getEntityVpid($args = array(), $assoc_args = array()) {
+    public function getEntityVpid($args = [], $assoc_args = [])
+    {
         global $versionPressContainer;
         /** @var wpdb $wpdb */
         $wpdb = $versionPressContainer->resolve(VersionPressServices::WPDB);
@@ -215,7 +224,8 @@ class VPInternalCommand extends WP_CLI_Command {
      *
      * @when before_wp_load
      */
-    public function updateConfig($args = array(), $assoc_args = array()) {
+    public function updateConfig($args = [], $assoc_args = [])
+    {
         $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
         $updateCommonConfig = isset($assoc_args['common']);
 
@@ -244,7 +254,8 @@ class VPInternalCommand extends WP_CLI_Command {
                 $wpConfigEditor->updateConfigConstant($constantOrVariableName, $value, $usePlainValue);
             }
         } catch (\Exception $e) {
-            WP_CLI::error('Cannot find place for defining the ' . ($isVariable ? 'variable' : 'constant')  . '. Config was probably edited manually.');
+            WP_CLI::error('Cannot find place for defining the ' . ($isVariable ? 'variable' : 'constant') .
+                '. Config was probably edited manually.');
         }
     }
 
@@ -253,7 +264,8 @@ class VPInternalCommand extends WP_CLI_Command {
      *
      * @subcommand commit-frequently-written-entities
      */
-    public function commitFrequentlyWrittenEntities($args = array(), $assoc_args = array()) {
+    public function commitFrequentlyWrittenEntities($args = [], $assoc_args = [])
+    {
         vp_commit_all_frequently_written_entities();
     }
 }

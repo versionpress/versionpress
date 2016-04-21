@@ -7,20 +7,21 @@ use VersionPress\Storages\PostMetaStorage;
 use VersionPress\Storages\PostStorage;
 use VersionPress\Utils\FileSystem;
 
-class PostMetaStorageTest extends \PHPUnit_Framework_TestCase {
+class PostMetaStorageTest extends \PHPUnit_Framework_TestCase
+{
     /** @var PostMetaStorage */
     private $storage;
     /** @var PostStorage */
     private $postStorage;
 
-    private $testingPostMeta = array(
+    private $testingPostMeta = [
         'meta_key' => 'some-meta',
         'meta_value' => 'value',
         'vp_id' => "F11A5FF2219A3430E099B3838C42EBCA",
         'vp_post_id' => "F0E1B6313B7A48E49A1B38DF382B350D",
-    );
+    ];
 
-    private $testingPost = array(
+    private $testingPost = [
         'post_date' => "2015-02-02 14:19:59",
         'post_date_gmt' => "2015-02-02 14:19:59",
         'post_content' => "Welcome to WordPress. This is your first post. Edit or delete it, then start blogging!",
@@ -40,12 +41,13 @@ class PostMetaStorageTest extends \PHPUnit_Framework_TestCase {
         'post_mime_type' => "",
         'vp_id' => "F0E1B6313B7A48E49A1B38DF382B350D",
         'vp_post_author' => "3EC9EF54CAF94300BBA89111FA833222",
-    );
+    ];
 
     /**
      * @test
      */
-    public function savedPostMetaEqualsLoadedPostMeta() {
+    public function savedPostMetaEqualsLoadedPostMeta()
+    {
         $this->postStorage->save($this->testingPost);
         $this->storage->save($this->testingPostMeta);
         $loadedPost = $this->storage->loadEntity($this->testingPostMeta['vp_id'], $this->testingPost['vp_id']);
@@ -55,7 +57,8 @@ class PostMetaStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function loadAllReturnsOnlyOriginalEntities() {
+    public function loadAllReturnsOnlyOriginalEntities()
+    {
         $this->postStorage->save($this->testingPost);
         $this->storage->save($this->testingPostMeta);
         $loadedPostMeta = $this->storage->loadAll();
@@ -63,35 +66,37 @@ class PostMetaStorageTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->testingPostMeta == reset($loadedPostMeta));
     }
 
-    protected function setUp() {
+    protected function setUp()
+    {
         parent::setUp();
-        $postInfo = new EntityInfo(array(
-            'post' => array(
+        $postInfo = new EntityInfo([
+            'post' => [
                 'table' => 'posts',
                 'id' => 'ID',
-                'references' => array (
+                'references' => [
                     'post_author' => 'user',
                     'post_parent' => 'post',
-                )
-            )
-        ));
+                ]
+            ]
+        ]);
 
-        $postMetaInfo = new EntityInfo(array(
-            'postmeta' => array(
+        $postMetaInfo = new EntityInfo([
+            'postmeta' => [
                 'id' => 'meta_id',
                 'parent-reference' => 'post_id',
-                'references' => array (
+                'references' => [
                     'post_id' => 'post',
-                )
-            )
-        ));
+                ]
+            ]
+        ]);
 
         mkdir(__DIR__ . '/posts');
         $this->postStorage = new PostStorage(__DIR__ . '/posts', $postInfo);
         $this->storage = new PostMetaStorage($this->postStorage, $postMetaInfo);
     }
 
-    protected function tearDown() {
+    protected function tearDown()
+    {
         parent::tearDown();
         FileSystem::remove(__DIR__ . '/posts');
     }

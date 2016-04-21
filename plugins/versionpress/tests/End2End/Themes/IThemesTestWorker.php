@@ -4,7 +4,8 @@ namespace VersionPress\Tests\End2End\Themes;
 
 use VersionPress\Tests\End2End\Utils\ITestWorker;
 
-interface IThemesTestWorker extends ITestWorker {
+interface IThemesTestWorker extends ITestWorker
+{
 
     /**
      * @param array $themeInfo Required keys are:
@@ -25,17 +26,22 @@ interface IThemesTestWorker extends ITestWorker {
     public function setSecondThemeInfo($themeInfo);
 
     public function prepare_uploadTheme();
+
     public function uploadTheme();
 
     public function prepare_switchTheme();
+
     public function switchTheme();
 
     public function prepare_deleteTheme();
+
     public function deleteTheme();
 
     public function prepare_uploadTwoThemes();
+
     public function uploadTwoThemes();
 
     public function prepare_deleteTwoThemes();
+
     public function deleteTwoThemes();
 }

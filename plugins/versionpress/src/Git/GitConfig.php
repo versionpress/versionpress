@@ -2,11 +2,13 @@
 
 namespace VersionPress\Git;
 
-class GitConfig {
+class GitConfig
+{
     public static $wpcliUserName = "WP-CLI";
     public static $wpcliUserEmail = "wpcli@localhost";
 
-    public static function removeEmptySections($gitConfigPath) {
+    public static function removeEmptySections($gitConfigPath)
+    {
         $gitConfigContent = file_get_contents($gitConfigPath);
 
         // https://regex101.com/r/nD0zI5/2

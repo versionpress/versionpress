@@ -2,7 +2,6 @@
 
 namespace VersionPress\Tests\End2End\Translations;
 
-use Nette\Utils\Random;
 use VersionPress\Tests\End2End\Utils\WpCliWorker;
 
 class TranslationsTestWpCliWorker extends WpCliWorker implements ITranslationsTestWorker
@@ -10,10 +9,11 @@ class TranslationsTestWpCliWorker extends WpCliWorker implements ITranslationsTe
 
     private $originalLanguage;
 
-    public function prepare_switchLanguage() {
+    public function prepare_switchLanguage()
+    {
         try {
-            $this->wpAutomation->runWpCliCommand('core language', 'install', array('en_GB'));
-            $this->originalLanguage = trim($this->wpAutomation->runWpCliCommand('option', 'get', array('WPLANG')));
+            $this->wpAutomation->runWpCliCommand('core language', 'install', ['en_GB']);
+            $this->originalLanguage = trim($this->wpAutomation->runWpCliCommand('option', 'get', ['WPLANG']));
         } catch (\Exception $e) {
             $this->originalLanguage = ''; // the language wasn't changed yet
         }
@@ -21,7 +21,8 @@ class TranslationsTestWpCliWorker extends WpCliWorker implements ITranslationsTe
         $this->wpAutomation->editOption('WPLANG', $newLanguage);
     }
 
-    public function switchLanguage() {
+    public function switchLanguage()
+    {
         $this->wpAutomation->editOption('WPLANG', $this->originalLanguage);
     }
 }

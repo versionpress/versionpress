@@ -7,22 +7,24 @@ use VersionPress\Storages\OptionStorage;
 use VersionPress\Tests\Utils\ArrayAsserter;
 use VersionPress\Utils\FileSystem;
 
-class OptionStorageTest extends \PHPUnit_Framework_TestCase {
+class OptionStorageTest extends \PHPUnit_Framework_TestCase
+{
     /** @var OptionStorage */
     private $storage;
 
-    private $testingOption = array(
+    private $testingOption = [
         "option_name" => "blogdescription",
         "option_value" => "Just another WordPress site",
         "autoload" => "yes",
-    );
+    ];
 
     private $sampleTaxonomy = 'some_taxonomy';
 
     /**
      * @test
      */
-    public function savedOptionEqualsLoadedOption() {
+    public function savedOptionEqualsLoadedOption()
+    {
         $this->storage->save($this->testingOption);
         $loadedOption = $this->storage->loadEntity($this->testingOption['option_name']);
         ArrayAsserter::assertSimilar($this->testingOption, $loadedOption);
@@ -31,12 +33,13 @@ class OptionStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function nullValueOptionMatchesWithEmptyStringValueOption() {
-        $testingOption = array(
+    public function nullValueOptionMatchesWithEmptyStringValueOption()
+    {
+        $testingOption = [
             "option_name" => "some option",
             "option_value" => null,
             "autoload" => "yes",
-        );
+        ];
         $this->storage->save($testingOption);
         $changeInfo = $this->storage->save($testingOption);
         $this->assertNull($changeInfo);
@@ -45,7 +48,8 @@ class OptionStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function loadAllReturnsOnlyOriginalEntities() {
+    public function loadAllReturnsOnlyOriginalEntities()
+    {
         $this->storage->save($this->testingOption);
         $loadedOptions = $this->storage->loadAll();
         $this->assertTrue(count($loadedOptions) === 1);
@@ -55,7 +59,8 @@ class OptionStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function savedOptionDoesNotContainOptionNameKey() {
+    public function savedOptionDoesNotContainOptionNameKey()
+    {
         $this->storage->save($this->testingOption);
         $fileName = $this->storage->getEntityFilename($this->testingOption['option_name']);
         $content = file_get_contents($fileName);
@@ -65,8 +70,9 @@ class OptionStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function savedOptionDoesNotContainOptionId() {
-        $optionWithId = array_merge(array('option_id' => 1), $this->testingOption);
+    public function savedOptionDoesNotContainOptionId()
+    {
+        $optionWithId = array_merge(['option_id' => 1], $this->testingOption);
         $this->storage->save($optionWithId);
         $fileName = $this->storage->getEntityFilename($this->testingOption['option_name']);
         $content = file_get_contents($fileName);
@@ -76,12 +82,13 @@ class OptionStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function storageSupportsOptionsWithDotsInName() {
-        $testingOption = array(
+    public function storageSupportsOptionsWithDotsInName()
+    {
+        $testingOption = [
             "option_name" => "some option with . in name",
             "option_value" => "some value",
             "autoload" => "yes",
-        );
+        ];
 
         $this->storage->save($testingOption);
         $loadedOption = $this->storage->loadEntity($testingOption['option_name']);
@@ -91,12 +98,13 @@ class OptionStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function taxonomyChildrenAreNotSaved() {
-        $option = array(
+    public function taxonomyChildrenAreNotSaved()
+    {
+        $option = [
             "option_name" => $this->sampleTaxonomy . "_children",
             "option_value" => "some value",
             "autoload" => "yes",
-        );
+        ];
 
         $this->storage->save($option);
         $loadedOptions = $this->storage->loadAll();
@@ -107,47 +115,50 @@ class OptionStorageTest extends \PHPUnit_Framework_TestCase {
      * @test
      * @dataProvider specialNamesProvider
      */
-    public function optionNameCanContainSpecialChars($optionName) {
-        $option = array(
+    public function optionNameCanContainSpecialChars($optionName)
+    {
+        $option = [
             'option_name' => $optionName,
             'option_value' => 'foo',
             'autoload' => 'yes',
-        );
+        ];
 
         $this->storage->save($option);
         $loadedOption = $this->storage->loadEntity($optionName);
         ArrayAsserter::assertSimilar($option, $loadedOption);
     }
 
-    public function specialNamesProvider() {
-        return array(
-            array('name_with_<'),
-            array('name_with_>'),
-            array('name_with_:'),
-            array('name_with_?'),
-            array('name_with_*'),
-            array('name_with_|'),
-            array('name_with_"'),
-            array('name_with_/'),
-            array('name_with_\\'),
-            array('.'),
-            array('..'),
-            array(' '),
-            array('+'),
-            array('%2B'),
-        );
+    public function specialNamesProvider()
+    {
+        return [
+            ['name_with_<'],
+            ['name_with_>'],
+            ['name_with_:'],
+            ['name_with_?'],
+            ['name_with_*'],
+            ['name_with_|'],
+            ['name_with_"'],
+            ['name_with_/'],
+            ['name_with_\\'],
+            ['.'],
+            ['..'],
+            [' '],
+            ['+'],
+            ['%2B'],
+        ];
     }
 
     /**
      * @test
      * @dataProvider ignoredOptionNamesProvider
      */
-    public function ignoredOptionAreNotSaved($optionName) {
-        $option = array(
+    public function ignoredOptionAreNotSaved($optionName)
+    {
+        $option = [
             'option_name' => $optionName,
             'option_value' => 'foo',
             'autoload' => 'yes',
-        );
+        ];
 
         $this->assertFalse($this->storage->shouldBeSaved($option));
     }
@@ -155,10 +166,11 @@ class OptionStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * See $entityInfo in $this->setUp for rules for ignored options
      */
-    public function ignoredOptionNamesProvider() {
-        return array(
-            array('ignored_option'),
-        );
+    public function ignoredOptionNamesProvider()
+    {
+        return [
+            ['ignored_option'],
+        ];
     }
 
     /**
@@ -166,17 +178,18 @@ class OptionStorageTest extends \PHPUnit_Framework_TestCase {
      *
      * @test
      */
-    public function vpidShouldBeReplaceableWithZero() {
-        $testingOption = array(
+    public function vpidShouldBeReplaceableWithZero()
+    {
+        $testingOption = [
             'option_name' => 'some_option',
             'option_value' => 'FE00B4B4D5FE4FD4ACAFF9D11A78F44E',
             'autoload' => 'yes'
-        );
+        ];
 
-        $updatedOption = array(
+        $updatedOption = [
             'option_name' => 'some_option',
             'option_value' => 0
-        );
+        ];
 
         $expectedOption = array_merge($testingOption, $updatedOption);
 
@@ -187,22 +200,24 @@ class OptionStorageTest extends \PHPUnit_Framework_TestCase {
         ArrayAsserter::assertSimilar($expectedOption, $loadedOption);
     }
 
-    protected function setUp() {
+    protected function setUp()
+    {
         parent::setUp();
-        $entityInfo = new EntityInfo(array(
-            'option' => array(
+        $entityInfo = new EntityInfo([
+            'option' => [
                 'table' => 'options',
                 'vpid' => 'option_name',
-                'ignored-entities' => array(
+                'ignored-entities' => [
                     'option_name: ignored_option',
-                ),
-            )
-        ));
+                ],
+            ]
+        ]);
 
-        $this->storage = new OptionStorage(__DIR__ . '/options', $entityInfo, 'prefix_', array($this->sampleTaxonomy));
+        $this->storage = new OptionStorage(__DIR__ . '/options', $entityInfo, 'prefix_', [$this->sampleTaxonomy]);
     }
 
-    protected function tearDown() {
+    protected function tearDown()
+    {
         parent::tearDown();
         FileSystem::remove(__DIR__ . '/options');
     }

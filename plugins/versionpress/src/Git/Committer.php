@@ -4,9 +4,8 @@ namespace VersionPress\Git;
 use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
+use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
 use VersionPress\Git\ChangeInfoPreprocessors\ChangeInfoPreprocessor;
-use VersionPress\Git\GitConfig;
-use VersionPress\Git\GitRepository;
 use VersionPress\Storages\Mirror;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\FileSystem;
@@ -16,7 +15,8 @@ use VersionPress\Utils\Mutex;
  * Creates commits using the `GitStatic` class. By default, it detects the change from the `$mirror` object
  * but it can also be forced by calling the `forceChangeInfo()` method.
  */
-class Committer {
+class Committer
+{
 
     /**
      * @var Mirror
@@ -28,7 +28,7 @@ class Committer {
      *
      * @var TrackedChangeInfo[]
      */
-    private $forcedChangeInfos = array();
+    private $forcedChangeInfos = [];
     /**
      * @var GitRepository
      */
@@ -44,9 +44,10 @@ class Committer {
      */
     private $storageFactory;
     private $fileForPostpone = 'postponed-commits';
-    private $postponedChangeInfos = array();
+    private $postponedChangeInfos = [];
 
-    public function __construct(Mirror $mirror, GitRepository $repository, StorageFactory $storageFactory) {
+    public function __construct(Mirror $mirror, GitRepository $repository, StorageFactory $storageFactory)
+    {
         $this->mirror = $mirror;
         $this->repository = $repository;
         $this->storageFactory = $storageFactory;
@@ -56,8 +57,11 @@ class Committer {
      * Checks if there is any change in the `$mirror` and commits it. If there was a forced
      * change set, it takes precedence.
      */
-    public function commit() {
-        if ($this->commitDisabled) return;
+    public function commit()
+    {
+        if ($this->commitDisabled) {
+            return;
+        }
 
         if (count($this->forcedChangeInfos) > 0) {
             $changeInfoList = $this->forcedChangeInfos;
@@ -84,12 +88,14 @@ class Committer {
             $authorName = $currentUser->display_name;
             /** @noinspection PhpUndefinedFieldInspection */
             $authorEmail = $currentUser->user_email;
-        } else if (defined('WP_CLI') && WP_CLI) {
-            $authorName = GitConfig::$wpcliUserName;
-            $authorEmail = GitConfig::$wpcliUserEmail;
         } else {
-            $authorName = "Non-admin action";
-            $authorEmail = "nonadmin@example.com";
+            if (defined('WP_CLI') && WP_CLI) {
+                $authorName = GitConfig::$wpcliUserName;
+                $authorEmail = GitConfig::$wpcliUserEmail;
+            } else {
+                $authorName = "Non-admin action";
+                $authorEmail = "nonadmin@example.com";
+            }
         }
 
         $changeInfoLists = $this->preprocessChangeInfoList($changeInfoList);
@@ -112,7 +118,7 @@ class Committer {
 
         $mutex->release();
 
-        if (count($this->forcedChangeInfos) > 0 && $this->forcedChangeInfos[0] instanceof \VersionPress\ChangeInfos\WordPressUpdateChangeInfo) {
+        if (count($this->forcedChangeInfos) > 0 && $this->forcedChangeInfos[0] instanceof WordPressUpdateChangeInfo) {
             FileSystem::remove(ABSPATH . 'versionpress.maintenance');
         }
 
@@ -120,23 +126,24 @@ class Committer {
     }
 
     /**
-     * Removes some ChangeInfo objects and replaces them with another. For example, it replaces post/draft and post/publish
-     * actions with single post/create action.
+     * Removes some ChangeInfo objects and replaces them with another. For example, it replaces post/draft
+     * and post/publish actions with single post/create action.
      * @param TrackedChangeInfo[] $changeInfoList
      * @return TrackedChangeInfo[][]
      */
-    private function preprocessChangeInfoList($changeInfoList) {
-        $preprocessors = array(
+    private function preprocessChangeInfoList($changeInfoList)
+    {
+        $preprocessors = [
             'VersionPress\Git\ChangeInfoPreprocessors\EditActionChangeInfoPreprocessor',
             'VersionPress\Git\ChangeInfoPreprocessors\PostChangeInfoPreprocessor',
             'VersionPress\Git\ChangeInfoPreprocessors\PostTermSplittingPreprocessor',
-        );
+        ];
 
-        $changeInfoLists = array($changeInfoList);
+        $changeInfoLists = [$changeInfoList];
         foreach ($preprocessors as $preprocessorClass) {
             /** @var ChangeInfoPreprocessor $preprocessor */
             $preprocessor = new $preprocessorClass();
-            $processedLists = array();
+            $processedLists = [];
             foreach ($changeInfoLists as $changeInfoList) {
                 $processedLists = array_merge($processedLists, $preprocessor->process($changeInfoList));
             }
@@ -151,18 +158,21 @@ class Committer {
      * might have been captured by the VersionPress\Storages\Mirror.
      *
      * There can be more forced changed infos and they behave the same as more ChangeInfos returned
-     * by the VersionPress\Storages\Mirror, i.e. are wrapped in a VersionPress\ChangeInfos\ChangeInfoEnvelope and sorted by priorities.
+     * by the VersionPress\Storages\Mirror, i.e. are wrapped in a VersionPress\ChangeInfos\ChangeInfoEnvelope
+     * and sorted by priorities.
      *
      * @param TrackedChangeInfo $changeInfo
      */
-    public function forceChangeInfo(TrackedChangeInfo $changeInfo) {
+    public function forceChangeInfo(TrackedChangeInfo $changeInfo)
+    {
         $this->forcedChangeInfos[] = $changeInfo;
     }
 
     /**
      * All `commit()` calls are ignored after calling this method.
      */
-    public function disableCommit() {
+    public function disableCommit()
+    {
         $this->commitDisabled = true;
     }
 
@@ -172,7 +182,8 @@ class Committer {
      *
      * @param string $key Key for postponedChangeInfos commit
      */
-    public function postponeCommit($key) {
+    public function postponeCommit($key)
+    {
         $this->commitPostponed = true;
         $this->postponeKey = $key;
     }
@@ -182,7 +193,8 @@ class Committer {
      *
      * @param string $key Key for postponedChangeInfos commit
      */
-    public function discardPostponedCommit($key) {
+    public function discardPostponedCommit($key)
+    {
         $postponed = $this->loadPostponedChangeInfos();
         if (isset($postponed[$key])) {
             unset($postponed[$key]);
@@ -195,7 +207,8 @@ class Committer {
      *
      * @param string $key Key for postponedChangeInfos commit
      */
-    public function usePostponedChangeInfos($key) {
+    public function usePostponedChangeInfos($key)
+    {
         $postponed = $this->loadPostponedChangeInfos();
         if (isset($postponed[$key])) {
             $this->postponedChangeInfos = array_merge($this->postponedChangeInfos, $postponed[$key]);
@@ -211,11 +224,13 @@ class Committer {
      *
      * @return bool
      */
-    private function shouldCommit() {
+    private function shouldCommit()
+    {
         return !$this->existsMaintenanceFile();
     }
 
-    private function existsMaintenanceFile() {
+    private function existsMaintenanceFile()
+    {
         $maintenanceFile = ABSPATH . 'versionpress.maintenance';
         return file_exists($maintenanceFile);
     }
@@ -226,7 +241,8 @@ class Committer {
      *
      * @param TrackedChangeInfo|ChangeInfoEnvelope $changeInfo
      */
-    private function stageRelatedFiles($changeInfo) {
+    private function stageRelatedFiles($changeInfo)
+    {
         if ($changeInfo instanceof ChangeInfoEnvelope) {
             /** @var TrackedChangeInfo $subChangeInfo */
             foreach ($changeInfo->getChangeInfoList() as $subChangeInfo) {
@@ -259,11 +275,12 @@ class Committer {
     /**
      * @param ChangeInfo[] $changeInfoList
      */
-    private function postponeChangeInfo($changeInfoList) {
+    private function postponeChangeInfo($changeInfoList)
+    {
         $postponed = $this->loadPostponedChangeInfos();
 
         if (!isset($postponed[$this->postponeKey])) {
-            $postponed[$this->postponeKey] = array();
+            $postponed[$this->postponeKey] = [];
         }
 
         $postponed[$this->postponeKey] = $changeInfoList;
@@ -273,26 +290,29 @@ class Committer {
     /**
      * @return TrackedChangeInfo[key][]
      */
-    private function loadPostponedChangeInfos() {
+    private function loadPostponedChangeInfos()
+    {
         $file = VERSIONPRESS_TEMP_DIR . '/' . $this->fileForPostpone;
         if (is_file($file)) {
             $serializedPostponedChangeInfos = file_get_contents($file);
             return unserialize($serializedPostponedChangeInfos);
         }
-        return array();
+        return [];
     }
 
     /**
      * @param TrackedChangeInfo [key][] $postponedChangeInfos
      */
-    private function savePostponedChangeInfos($postponedChangeInfos) {
+    private function savePostponedChangeInfos($postponedChangeInfos)
+    {
         $file = VERSIONPRESS_TEMP_DIR . '/' . $this->fileForPostpone;
         $serializedPostponedChangeInfos = serialize($postponedChangeInfos);
         file_put_contents($file, $serializedPostponedChangeInfos);
     }
 
-    private function flushChangeLists() {
+    private function flushChangeLists()
+    {
         $this->mirror->flushChangeList();
-        $this->forcedChangeInfos = array();
+        $this->forcedChangeInfos = [];
     }
 }

@@ -2,13 +2,15 @@
 
 namespace VersionPress;
 
-class VersionPress {
+class VersionPress
+{
     /**
      * Returns VersionPress version as specified in plugin metadata
      *
      * @return string
      */
-    public static function getVersion() {
+    public static function getVersion()
+    {
         if (!function_exists('get_plugin_data')) {
             require_once(ABSPATH . 'wp-admin/includes/plugin.php');
         }
@@ -21,7 +23,8 @@ class VersionPress {
      *
      * @return string
      */
-    public static function getEnvironment() {
+    public static function getEnvironment()
+    {
         return defined('VP_ENVIRONMENT') ? VP_ENVIRONMENT : 'master';
     }
 
@@ -31,7 +34,8 @@ class VersionPress {
      *
      * @return bool
      */
-    public static function isActive() {
+    public static function isActive()
+    {
         return defined('VERSIONPRESS_ACTIVATION_FILE') && file_exists(VERSIONPRESS_ACTIVATION_FILE);
     }
 }

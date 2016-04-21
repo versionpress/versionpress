@@ -6,12 +6,14 @@ use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 
-class MediaTest extends End2EndTestCase {
+class MediaTest extends End2EndTestCase
+{
 
     /** @var IMediaTestWorker */
     private static $worker;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass()
+    {
         parent::setUpBeforeClass();
         self::$worker->setUploadedFilePath(realpath(__DIR__ . '/../test-data/test.png'));
     }
@@ -20,14 +22,15 @@ class MediaTest extends End2EndTestCase {
      * @test
      * @testdox Uploading file creates 'post/create' action
      */
-    public function uploadingFileCreatesPostCreateAction() {
+    public function uploadingFileCreatesPostCreateAction()
+    {
         self::$worker->prepare_uploadFile();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         self::$worker->uploadFile();
 
-        $commitAsserter->ignoreCommits(array("usermeta/create", "usermeta/edit"));
+        $commitAsserter->ignoreCommits(["usermeta/create", "usermeta/edit"]);
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/create");
@@ -42,7 +45,8 @@ class MediaTest extends End2EndTestCase {
      * @testdox Editing file name creates 'post/edit' action
      * @depends uploadingFileCreatesPostCreateAction
      */
-    public function editingFileNameCreatesPostEditAction() {
+    public function editingFileNameCreatesPostEditAction()
+    {
         self::$worker->prepare_editFileName();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -61,7 +65,8 @@ class MediaTest extends End2EndTestCase {
      * @testdox Deleting file creates 'post/delete' action
      * @depends editingFileNameCreatesPostEditAction
      */
-    public function deletingFileCreatesPostDeleteAction() {
+    public function deletingFileCreatesPostDeleteAction()
+    {
         self::$worker->prepare_deleteFile();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -80,7 +85,8 @@ class MediaTest extends End2EndTestCase {
      * @test
      * @depends uploadingFileCreatesPostCreateAction
      */
-    public function editationOfFileCreatesCommit() {
+    public function editationOfFileCreatesCommit()
+    {
         self::$worker->prepare_editFile();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);

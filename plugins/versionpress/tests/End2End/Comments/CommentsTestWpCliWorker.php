@@ -4,156 +4,187 @@ namespace VersionPress\Tests\End2End\Comments;
 
 use VersionPress\Tests\End2End\Utils\WpCliWorker;
 
-class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker {
+class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
+{
 
     private $testPostId = 0;
     private $lastCreatedComment;
 
-    public function prepare_createCommentAwaitingModeration() {
+    public function prepare_createCommentAwaitingModeration()
+    {
         $this->testPostId = $this->createTestPost();
     }
 
-    public function createCommentAwaitingModeration() {
-        $comment = array(
+    public function createCommentAwaitingModeration()
+    {
+        $comment = [
             'comment_author' => 'John Tester',
             'comment_author_email' => 'john.tester@example.com',
             'comment_content' => 'Public comment',
             'comment_approved' => "0",
             'comment_post_ID' => $this->testPostId
-        );
+        ];
 
         $this->wpAutomation->createComment($comment);
     }
 
-    public function prepare_createSpamComment() {
+    public function prepare_createSpamComment()
+    {
     }
 
-    public function createSpamComment() {
-        $comment = array(
+    public function createSpamComment()
+    {
+        $comment = [
             'comment_author' => 'John Tester',
             'comment_author_email' => 'john.tester@example.com',
             'comment_content' => 'Public comment',
             'comment_approved' => "spam",
             'comment_post_ID' => $this->testPostId
-        );
+        ];
 
         $this->wpAutomation->createComment($comment);
     }
 
-    public function prepare_createComment() {
+    public function prepare_createComment()
+    {
     }
 
-    public function createComment() {
+    public function createComment()
+    {
         $author = $this->testConfig->testSite->adminName;
         $email = $this->testConfig->testSite->adminEmail;
-        $comment = array(
+        $comment = [
             'comment_author' => $author,
             'comment_author_email' => $email,
             'comment_content' => 'Comment by ' . $author,
             'user_id' => 1,
             'comment_post_ID' => $this->testPostId
-        );
+        ];
 
         $this->lastCreatedComment = $this->wpAutomation->createComment($comment);
     }
 
-    public function prepare_editComment() {
+    public function prepare_editComment()
+    {
     }
 
-    public function editComment() {
+    public function editComment()
+    {
         $author = $this->testConfig->testSite->adminName;
-        $comment = array(
+        $comment = [
             'comment_content' => 'Updated comment by ' . $author,
-        );
+        ];
         $this->wpAutomation->editComment($this->lastCreatedComment, $comment);
     }
 
-    public function prepare_trashComment() {
+    public function prepare_trashComment()
+    {
     }
 
-    public function trashComment() {
+    public function trashComment()
+    {
         $this->wpAutomation->trashComment($this->lastCreatedComment);
     }
 
-    public function prepare_untrashComment() {
+    public function prepare_untrashComment()
+    {
     }
 
-    public function untrashComment() {
+    public function untrashComment()
+    {
         $this->wpAutomation->untrashComment($this->lastCreatedComment);
     }
 
-    public function prepare_deleteComment() {
+    public function prepare_deleteComment()
+    {
     }
 
-    public function deleteComment() {
+    public function deleteComment()
+    {
         $this->wpAutomation->deleteComment($this->lastCreatedComment);
     }
 
-    public function prepare_unapproveComment() {
+    public function prepare_unapproveComment()
+    {
         $author = $this->testConfig->testSite->adminName;
         $email = $this->testConfig->testSite->adminEmail;
-        $comment = array(
+        $comment = [
             'comment_author' => $author,
             'comment_author_email' => $email,
             'comment_content' => 'Comment by ' . $author,
             'user_id' => 1,
             'comment_post_ID' => $this->testPostId
-        );
+        ];
 
         $this->lastCreatedComment = $this->wpAutomation->createComment($comment);
     }
 
-    public function unapproveComment() {
+    public function unapproveComment()
+    {
         $this->wpAutomation->unapproveComment($this->lastCreatedComment);
     }
 
-    public function prepare_approveComment() {
+    public function prepare_approveComment()
+    {
     }
 
-    public function approveComment() {
+    public function approveComment()
+    {
         $this->wpAutomation->approveComment($this->lastCreatedComment);
     }
 
-    public function prepare_markAsSpam() {
+    public function prepare_markAsSpam()
+    {
     }
 
-    public function markAsSpam() {
+    public function markAsSpam()
+    {
         $this->wpAutomation->spamComment($this->lastCreatedComment);
     }
 
-    public function prepare_markAsNotSpam() {
+    public function prepare_markAsNotSpam()
+    {
     }
 
-    public function markAsNotSpam() {
+    public function markAsNotSpam()
+    {
         $this->wpAutomation->unspamComment($this->lastCreatedComment);
     }
 
-    private function createTestPost() {
-        $post = array(
+    private function createTestPost()
+    {
+        $post = [
             "post_type" => "post",
             "post_status" => "publish",
             "post_title" => "Test post for comments",
             "post_date" => "2011-11-11 11:11:11",
             "post_content" => "Test post",
             "post_author" => 1
-        );
+        ];
 
         return $this->wpAutomation->createPost($post);
     }
 
-    public function prepare_editTwoComments() {
-        $this->lastCreatedComment = array();
+    public function prepare_editTwoComments()
+    {
+        $this->lastCreatedComment = [];
         $comment = $this->prepareTestComment();
 
         $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
         $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
     }
 
-    public function editTwoComments() {
-        $this->wpAutomation->runWpCliCommand('comment', 'update', array_merge($this->lastCreatedComment, array('comment_content' => 'Changed content')));
+    public function editTwoComments()
+    {
+        $this->wpAutomation->runWpCliCommand(
+            'comment',
+            'update',
+            array_merge($this->lastCreatedComment, ['comment_content' => 'Changed content'])
+        );
     }
 
-    private function prepareTestComment() {
+    private function prepareTestComment()
+    {
         $author = $this->testConfig->testSite->adminName;
         $email = $this->testConfig->testSite->adminEmail;
 
@@ -161,51 +192,62 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
             $this->testPostId = $this->createTestPost();
         }
 
-        return array(
+        return [
             'comment_author' => $author,
             'comment_author_email' => $email,
             'comment_content' => 'Comment by ' . $author,
             'user_id' => 1,
             'comment_post_ID' => $this->testPostId
-        );
+        ];
     }
 
-    public function prepare_commentmetaCreate() {
-        $this->lastCreatedComment = array();
+    public function prepare_commentmetaCreate()
+    {
+        $this->lastCreatedComment = [];
         $comment = $this->prepareTestComment();
         $this->lastCreatedComment = $this->wpAutomation->createComment($comment);
     }
 
-    public function commentmetaCreate() {
+    public function commentmetaCreate()
+    {
         $this->wpAutomation->createCommentMeta($this->lastCreatedComment, 'dummy_meta', 'dummy_meta_value');
     }
 
-    public function prepare_deleteTwoComments() {
-        $this->lastCreatedComment = array();
+    public function prepare_deleteTwoComments()
+    {
+        $this->lastCreatedComment = [];
         $comment = $this->prepareTestComment();
 
         $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
         $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
     }
 
-    public function deleteTwoComments() {
-        $this->wpAutomation->runWpCliCommand('comment', 'delete', array_merge($this->lastCreatedComment, array('force' => null)));
+    public function deleteTwoComments()
+    {
+        $this->wpAutomation->runWpCliCommand(
+            'comment',
+            'delete',
+            array_merge($this->lastCreatedComment, ['force' => null])
+        );
     }
 
-    public function prepare_moveTwoCommentsInTrash() {
-        $this->lastCreatedComment = array();
+    public function prepare_moveTwoCommentsInTrash()
+    {
+        $this->lastCreatedComment = [];
         $comment = $this->prepareTestComment();
 
         $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
         $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
     }
 
-    public function moveTwoCommentsInTrash() {
+    public function moveTwoCommentsInTrash()
+    {
         $this->wpAutomation->runWpCliCommand('comment', 'delete', $this->lastCreatedComment);
     }
 
-    public function prepare_moveTwoCommentsFromTrash() {
-        $this->lastCreatedComment = array();
+    public function prepare_moveTwoCommentsFromTrash()
+    {
+        $this->lastCreatedComment = [];
         $trashedComment = $this->prepareTestComment();
         $trashedComment['comment_approved'] = 'trash';
 
@@ -213,24 +255,36 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
         $this->lastCreatedComment[] = $this->wpAutomation->createComment($trashedComment);
     }
 
-    public function moveTwoCommentsFromTrash() {
-        $this->wpAutomation->runWpCliCommand('comment', 'update', array_merge($this->lastCreatedComment, array('comment_approved' => 1)));
+    public function moveTwoCommentsFromTrash()
+    {
+        $this->wpAutomation->runWpCliCommand(
+            'comment',
+            'update',
+            array_merge($this->lastCreatedComment, ['comment_approved' => 1])
+        );
     }
 
-    public function prepare_markTwoCommentsAsSpam() {
-        $this->lastCreatedComment = array();
+    public function prepare_markTwoCommentsAsSpam()
+    {
+        $this->lastCreatedComment = [];
         $comment = $this->prepareTestComment();
 
         $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
         $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
     }
 
-    public function markTwoCommentsAsSpam() {
-        $this->wpAutomation->runWpCliCommand('comment', 'update', array_merge($this->lastCreatedComment, array('comment_approved' => 'spam')));
+    public function markTwoCommentsAsSpam()
+    {
+        $this->wpAutomation->runWpCliCommand(
+            'comment',
+            'update',
+            array_merge($this->lastCreatedComment, ['comment_approved' => 'spam'])
+        );
     }
 
-    public function prepare_markTwoSpamCommentsAsNotSpam() {
-        $this->lastCreatedComment = array();
+    public function prepare_markTwoSpamCommentsAsNotSpam()
+    {
+        $this->lastCreatedComment = [];
         $comment = $this->prepareTestComment();
 
         $this->lastCreatedComment[] = $lastId = $this->wpAutomation->createComment($comment);
@@ -239,24 +293,36 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
         $this->wpAutomation->editComment($lastId, ['comment_approved' => 'spam']);
     }
 
-    public function markTwoSpamCommentsAsNotSpam() {
-        $this->wpAutomation->runWpCliCommand('comment', 'update', array_merge($this->lastCreatedComment, array('comment_approved' => 1)));
+    public function markTwoSpamCommentsAsNotSpam()
+    {
+        $this->wpAutomation->runWpCliCommand(
+            'comment',
+            'update',
+            array_merge($this->lastCreatedComment, ['comment_approved' => 1])
+        );
     }
 
-    public function prepare_unapproveTwoComments() {
-        $this->lastCreatedComment = array();
+    public function prepare_unapproveTwoComments()
+    {
+        $this->lastCreatedComment = [];
         $comment = $this->prepareTestComment();
 
         $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
         $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
     }
 
-    public function unapproveTwoComments() {
-        $this->wpAutomation->runWpCliCommand('comment', 'update', array_merge($this->lastCreatedComment, array('comment_approved' => 0)));
+    public function unapproveTwoComments()
+    {
+        $this->wpAutomation->runWpCliCommand(
+            'comment',
+            'update',
+            array_merge($this->lastCreatedComment, ['comment_approved' => 0])
+        );
     }
 
-    public function prepare_approveTwoComments() {
-        $this->lastCreatedComment = array();
+    public function prepare_approveTwoComments()
+    {
+        $this->lastCreatedComment = [];
         $comment = $this->prepareTestComment();
         $comment['comment_approved'] = 0;
 
@@ -264,16 +330,21 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
         $this->lastCreatedComment[] = $this->wpAutomation->createComment($comment);
     }
 
-    public function approveTwoComments() {
-        $this->wpAutomation->runWpCliCommand('comment', 'update', array_merge($this->lastCreatedComment, array('comment_approved' => 1)));
+    public function approveTwoComments()
+    {
+        $this->wpAutomation->runWpCliCommand(
+            'comment',
+            'update',
+            array_merge($this->lastCreatedComment, ['comment_approved' => 1])
+        );
     }
 
-    public function prepare_commentmetaDelete() {
+    public function prepare_commentmetaDelete()
+    {
     }
 
-    public function commentmetaDelete() {
+    public function commentmetaDelete()
+    {
         $this->wpAutomation->deleteCommentMeta($this->lastCreatedComment, 'dummy_meta');
     }
-
-
 }

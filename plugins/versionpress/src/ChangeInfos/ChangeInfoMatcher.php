@@ -5,7 +5,8 @@ namespace VersionPress\ChangeInfos;
 use Exception;
 use VersionPress\Git\CommitMessage;
 
-class ChangeInfoMatcher {
+class ChangeInfoMatcher
+{
 
     /**
      * Map between partial regex describing the format of the VP-Action tag
@@ -14,7 +15,7 @@ class ChangeInfoMatcher {
      *
      * @var array
      */
-    private static $changeInfoMap = array(
+    private static $changeInfoMap = [
 
         // VersionPress actions:
         "versionpress/(?!(undo|rollback)).*" => 'VersionPress\ChangeInfos\VersionPressChangeInfo',
@@ -41,7 +42,7 @@ class ChangeInfoMatcher {
         // Unknown action:
         "" => 'VersionPress\ChangeInfos\UntrackedChangeInfo',
 
-    );
+    ];
 
     /**
      * For a given commit message, creates ChangeInfoEnvelope containing all ChangeInfo.
@@ -49,24 +50,28 @@ class ChangeInfoMatcher {
      * @param CommitMessage $commitMessage
      * @return ChangeInfoEnvelope|UntrackedChangeInfo
      */
-    public static function buildChangeInfo(CommitMessage $commitMessage) {
+    public static function buildChangeInfo(CommitMessage $commitMessage)
+    {
         return ChangeInfoEnvelope::buildFromCommitMessage($commitMessage);
     }
 
     /**
-     * Returns matching ChangeInfo type for a given commit message. Matching is done based on the value of the VP-Action tag.
+     * Returns matching ChangeInfo type for a given commit message.
+     * Matching is done based on the value of the VP-Action tag.
      *
      * @param CommitMessage $commitMessage
      * @throws Exception When no matching ChangeInfo type is found (should never happen)
      * @return string "Class" of the matching ChangeInfo object
      */
-    public static function findMatchingChangeInfo(CommitMessage $commitMessage) {
+    public static function findMatchingChangeInfo(CommitMessage $commitMessage)
+    {
 
         if (substr_count($commitMessage->getBody(), TrackedChangeInfo::ACTION_TAG) > 1) {
-            return "VersionPress\ChangeInfos\ChangeInfoEnvelope";
+            return ChangeInfoEnvelope::class;
         }
 
-        $actionTagValue = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG); // can be empty string which is not a problem
+        // can be empty string which is not a problem
+        $actionTagValue = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
 
         foreach (self::$changeInfoMap as $actionTagExpression => $changeInfoType) {
             $regex = "~^" . $actionTagExpression . "$~";
@@ -86,8 +91,8 @@ class ChangeInfoMatcher {
      * @param string $changeInfoClass
      * @return bool
      */
-    public static function matchesChangeInfo(CommitMessage $commitMessage, $changeInfoClass) {
+    public static function matchesChangeInfo(CommitMessage $commitMessage, $changeInfoClass)
+    {
         return self::findMatchingChangeInfo($commitMessage) == $changeInfoClass;
     }
-
 }

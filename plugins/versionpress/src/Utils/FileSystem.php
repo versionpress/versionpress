@@ -1,6 +1,7 @@
 <?php
 
 namespace VersionPress\Utils;
+
 use FilesystemIterator;
 use Nette\Utils\Strings;
 use RecursiveDirectoryIterator;
@@ -11,7 +12,8 @@ use Traversable;
  * Helper functions to work with filesystem. Currently, the functions use either bare implementation
  * or {@link http://symfony.com/doc/master/components/filesystem/introduction.html Symfony Filesystem}.
  */
-class FileSystem {
+class FileSystem
+{
 
     /**
      * Renames (moves) origin to target.
@@ -22,7 +24,8 @@ class FileSystem {
      * @param string $target
      * @param bool $overwrite
      */
-    public static function rename($origin, $target, $overwrite = false) {
+    public static function rename($origin, $target, $overwrite = false)
+    {
 
         self::possiblyFixGitPermissions($origin);
 
@@ -37,7 +40,8 @@ class FileSystem {
      *
      * @param string|Traversable $path Path to a file or directory.
      */
-    public static function remove($path) {
+    public static function remove($path)
+    {
 
         self::possiblyFixGitPermissions($path);
 
@@ -50,13 +54,17 @@ class FileSystem {
      *
      * @param string $path Path to a directory.
      */
-    public static function removeContent($path) {
+    public static function removeContent($path)
+    {
 
         if (!is_dir($path)) {
             return;
         }
 
-        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
 
         foreach ($iterator as $item) {
             if ($item->isDir() && Strings::endsWith($iterator->key(), ".git")) {
@@ -75,11 +83,13 @@ class FileSystem {
      * @param string $target
      * @param bool $override
      */
-    public static function copy($origin, $target, $override = false) {
+    public static function copy($origin, $target, $override = false)
+    {
         $fs = new \Symfony\Component\Filesystem\Filesystem();
 
-        if (!$override && $fs->exists($target))
+        if (!$override && $fs->exists($target)) {
             return;
+        }
 
         $fs->copy($origin, $target, $override);
     }
@@ -92,7 +102,8 @@ class FileSystem {
      * @param string $origin
      * @param string $target
      */
-    public static function copyDir($origin, $target) {
+    public static function copyDir($origin, $target)
+    {
         $fs = new \Symfony\Component\Filesystem\Filesystem();
         $fs->mirror($origin, $target);
     }
@@ -103,7 +114,8 @@ class FileSystem {
      * @param string $dir
      * @param int $mode
      */
-    public static function mkdir($dir, $mode = 0750) {
+    public static function mkdir($dir, $mode = 0750)
+    {
         $fs = new \Symfony\Component\Filesystem\Filesystem();
         $fs->mkdir($dir, $mode);
     }
@@ -115,19 +127,21 @@ class FileSystem {
      *
      * @param $path
      */
-    private static function possiblyFixGitPermissions($path) {
+    private static function possiblyFixGitPermissions($path)
+    {
 
         $gitDir = null;
         if (is_dir($path)) {
             if (basename($path) == '.git') {
                 $gitDir = $path;
-            } else if (is_dir($path . '/.git')) {
-                $gitDir = $path . '/.git';
+            } else {
+                if (is_dir($path . '/.git')) {
+                    $gitDir = $path . '/.git';
+                }
             }
         }
 
         if ($gitDir) {
-
             $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($gitDir));
 
             foreach ($iterator as $item) {
@@ -137,9 +151,7 @@ class FileSystem {
                     chmod($item, 0640);
                 }
             }
-
         }
-
     }
 
     /**
@@ -149,7 +161,8 @@ class FileSystem {
      * @param $file2
      * @return bool
      */
-    public static function filesHaveSameContents($file1, $file2) {
+    public static function filesHaveSameContents($file1, $file2)
+    {
         return sha1_file($file1) == sha1_file($file2);
     }
 }

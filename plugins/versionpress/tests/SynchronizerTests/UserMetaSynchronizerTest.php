@@ -11,7 +11,8 @@ use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 
-class UserMetaSynchronizerTest extends SynchronizerTestCase {
+class UserMetaSynchronizerTest extends SynchronizerTestCase
+{
     /** @var UserMetaStorage */
     private $storage;
     /** @var UserStorage */
@@ -23,19 +24,37 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
     private static $vpId;
     private static $userVpId;
 
-    protected function setUp() {
+    protected function setUp()
+    {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('usermeta');
         $this->userStorage = self::$storageFactory->getStorage('user');
-        $this->synchronizer = new UserMetaSynchronizer($this->storage, self::$database, self::$schemaInfo->getEntityInfo('usermeta') ,self::$schemaInfo, self::$vpidRepository, self::$urlReplacer, self::$shortcodesReplacer);
-        $this->usersSynchronizer = new UsersSynchronizer($this->userStorage, self::$database, self::$schemaInfo->getEntityInfo('user') ,self::$schemaInfo, self::$vpidRepository, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->synchronizer = new UserMetaSynchronizer(
+            $this->storage,
+            self::$database,
+            self::$schemaInfo->getEntityInfo('usermeta'),
+            self::$schemaInfo,
+            self::$vpidRepository,
+            self::$urlReplacer,
+            self::$shortcodesReplacer
+        );
+        $this->usersSynchronizer = new UsersSynchronizer(
+            $this->userStorage,
+            self::$database,
+            self::$schemaInfo->getEntityInfo('user'),
+            self::$schemaInfo,
+            self::$vpidRepository,
+            self::$urlReplacer,
+            self::$shortcodesReplacer
+        );
     }
 
     /**
      * @test
      * @testdox Synchronizer adds new usermeta to the database
      */
-    public function synchronizerAddsNewUserMetaToDatabase() {
+    public function synchronizerAddsNewUserMetaToDatabase()
+    {
         $this->createUserMeta();
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
@@ -46,7 +65,8 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
      * @test
      * @testdox Synchronizer updates changed usermeta in the database
      */
-    public function synchronizerUpdatesChangedUserMetaInDatabase() {
+    public function synchronizerUpdatesChangedUserMetaInDatabase()
+    {
         $this->editUserMeta();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
@@ -56,7 +76,8 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
      * @test
      * @testdox Synchronizer replaces absolute URLs
      */
-    public function synchronizerReplacesAbsoluteUrls() {
+    public function synchronizerReplacesAbsoluteUrls()
+    {
         $this->editUserMeta('some-meta', AbsoluteUrlReplacer::PLACEHOLDER);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
@@ -66,7 +87,8 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
      * @test
      * @testdox Synchronizer removes deleted usermeta from the database
      */
-    public function synchronizerRemovesDeletedUserMetaFromDatabase() {
+    public function synchronizerRemovesDeletedUserMetaFromDatabase()
+    {
         $this->deleteUserMeta();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
@@ -77,7 +99,8 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
      * @test
      * @testdox Synchronizer adds new usermeta to the database (selective synchronization)
      */
-    public function synchronizerAddsNewUserMetaToDatabase_selective() {
+    public function synchronizerAddsNewUserMetaToDatabase_selective()
+    {
         $entitiesToSynchronize = $this->createUserMeta();
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
@@ -88,7 +111,8 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
      * @test
      * @testdox Synchronizer updates changed usermeta in the database (selective synchronization)
      */
-    public function synchronizerUpdatesChangedUserMetaInDatabase_selective() {
+    public function synchronizerUpdatesChangedUserMetaInDatabase_selective()
+    {
         $entitiesToSynchronize = $this->editUserMeta();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         DBAsserter::assertFilesEqualDatabase();
@@ -98,14 +122,16 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
      * @test
      * @testdox Synchronizer removes deleted usermeta from the database (selective synchronization)
      */
-    public function synchronizerRemovesDeletedUserMetaFromDatabase_selective() {
+    public function synchronizerRemovesDeletedUserMetaFromDatabase_selective()
+    {
         $entitiesToSynchronize = $this->deleteUserMeta();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    private function createUserMeta() {
+    private function createUserMeta()
+    {
         $user = EntityUtils::prepareUser();
         self::$userVpId = $user['vp_id'];
         $this->userStorage->save($user);
@@ -113,27 +139,28 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase {
         $this->storage->save($usermeta);
 
         self::$vpId = $usermeta['vp_id'];
-        return array(
-            array('vp_id' => self::$vpId, 'parent' => self::$userVpId),
-            array('vp_id' => self::$userVpId, 'parent' => self::$userVpId),
-        );
+        return [
+            ['vp_id' => self::$vpId, 'parent' => self::$userVpId],
+            ['vp_id' => self::$userVpId, 'parent' => self::$userVpId],
+        ];
     }
 
-    private function editUserMeta($key = 'some-meta', $value = 'another value') {
+    private function editUserMeta($key = 'some-meta', $value = 'another value')
+    {
         $this->storage->save(EntityUtils::prepareUserMeta(self::$vpId, self::$userVpId, $key, $value));
-        return array(
-            array('vp_id' => self::$vpId, 'parent' => self::$userVpId),
-        );
+        return [
+            ['vp_id' => self::$vpId, 'parent' => self::$userVpId],
+        ];
     }
 
-    private function deleteUserMeta() {
+    private function deleteUserMeta()
+    {
         $this->storage->delete(EntityUtils::prepareUserMeta(self::$vpId, self::$userVpId));
         $this->userStorage->delete(EntityUtils::prepareUser(self::$userVpId));
 
-        return array(
-            array('vp_id' => self::$vpId, 'parent' => self::$userVpId),
-            array('vp_id' => self::$userVpId, 'parent' => self::$userVpId),
-        );
+        return [
+            ['vp_id' => self::$vpId, 'parent' => self::$userVpId],
+            ['vp_id' => self::$userVpId, 'parent' => self::$userVpId],
+        ];
     }
-
 }

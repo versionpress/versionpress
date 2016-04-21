@@ -10,7 +10,8 @@ use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\Database\EntityInfo;
 
-class ChangeInfoUtils {
+class ChangeInfoUtils
+{
 
     /**
      * Returns full action such as "post/edit" or "wordpress/update".
@@ -22,7 +23,8 @@ class ChangeInfoUtils {
      * @param ChangeInfo $changeInfo
      * @return string
      */
-    public static function getFullAction($changeInfo) {
+    public static function getFullAction($changeInfo)
+    {
         $actualChangeInfo = self::getTrackedChangeInfo($changeInfo);
         return sprintf("%s/%s", $actualChangeInfo->getEntityName(), $actualChangeInfo->getAction());
     }
@@ -32,7 +34,8 @@ class ChangeInfoUtils {
      * @param string $tagKey
      * @return string|null Value or null if key not found
      */
-    public static function getCustomTagValue($changeInfo, $tagKey) {
+    public static function getCustomTagValue($changeInfo, $tagKey)
+    {
         $actualChangeInfo = self::getTrackedChangeInfo($changeInfo);
         $customTags = $actualChangeInfo->getCustomTags();
         if (isset($customTags[$tagKey])) {
@@ -43,7 +46,8 @@ class ChangeInfoUtils {
 
     }
 
-    public static function getVpid($changeInfo) {
+    public static function getVpid($changeInfo)
+    {
         $actualChangeInfo = self::getTrackedChangeInfo($changeInfo);
         if ($actualChangeInfo instanceof EntityChangeInfo) {
             return $actualChangeInfo->getEntityId();
@@ -61,11 +65,13 @@ class ChangeInfoUtils {
      * @param TrackedChangeInfo|ChangeInfoEnvelope $changeInfo2
      * @return bool
      */
-    public static function captureSameAction($changeInfo1, $changeInfo2) {
+    public static function captureSameAction($changeInfo1, $changeInfo2)
+    {
 
         if (self::firstIsEnvelopeContainingSecond($changeInfo1, $changeInfo2) ||
             self::firstIsEnvelopeContainingSecond($changeInfo2, $changeInfo1) ||
-            self::bothAreEnvelopesContainingTheSame($changeInfo1, $changeInfo2)) {
+            self::bothAreEnvelopesContainingTheSame($changeInfo1, $changeInfo2)
+        ) {
             return true;
         }
 
@@ -101,7 +107,8 @@ class ChangeInfoUtils {
      * @param ChangeInfo $changeInfo
      * @return TrackedChangeInfo
      */
-    public static function getTrackedChangeInfo($changeInfo) {
+    public static function getTrackedChangeInfo($changeInfo)
+    {
 
         if ($changeInfo instanceof ChangeInfoEnvelope) {
             /** @var ChangeInfoEnvelope $changeInfo */
@@ -116,8 +123,10 @@ class ChangeInfoUtils {
         }
     }
 
-    private static function firstIsEnvelopeContainingSecond($firstChangeInfo, $secondChangeInfo) {
-        $initialConditionsSatisfied = $firstChangeInfo instanceof ChangeInfoEnvelope && $secondChangeInfo instanceof TrackedChangeInfo;
+    private static function firstIsEnvelopeContainingSecond($firstChangeInfo, $secondChangeInfo)
+    {
+        $initialConditionsSatisfied = $firstChangeInfo instanceof ChangeInfoEnvelope
+            && $secondChangeInfo instanceof TrackedChangeInfo;
 
         if (!$initialConditionsSatisfied) {
             return false;
@@ -132,8 +141,10 @@ class ChangeInfoUtils {
      * @param ChangeInfoEnvelope $secondChangeInfo
      * @return bool
      */
-    private static function bothAreEnvelopesContainingTheSame($firstChangeInfo, $secondChangeInfo) {
-        $initialConditionsSatisfied = $firstChangeInfo instanceof ChangeInfoEnvelope && $secondChangeInfo instanceof ChangeInfoEnvelope;
+    private static function bothAreEnvelopesContainingTheSame($firstChangeInfo, $secondChangeInfo)
+    {
+        $initialConditionsSatisfied = $firstChangeInfo instanceof ChangeInfoEnvelope
+            && $secondChangeInfo instanceof ChangeInfoEnvelope;
 
         if (!$initialConditionsSatisfied) {
             return false;
@@ -154,7 +165,8 @@ class ChangeInfoUtils {
      * @param TrackedChangeInfo[] $secondChangeInfoList
      * @return bool
      */
-    private static function listsContainSameChangeInfos($firstChangeInfoList, $secondChangeInfoList) {
+    private static function listsContainSameChangeInfos($firstChangeInfoList, $secondChangeInfoList)
+    {
         $length = count($firstChangeInfoList);
         for ($i = 0; $i < $length; $i++) {
             $changeInfoInFirstList = $firstChangeInfoList[$i];
@@ -174,9 +186,9 @@ class ChangeInfoUtils {
      * @return bool
      * @throws \Exception
      */
-    public static function containsAction($changeInfo, $fullAction) {
+    public static function containsAction($changeInfo, $fullAction)
+    {
         if ($changeInfo instanceof ChangeInfoEnvelope) {
-
             $changeInfos = $changeInfo->getChangeInfoList();
             foreach ($changeInfos as $ci) {
                 if (self::getFullAction($ci) == $fullAction) {
@@ -184,7 +196,6 @@ class ChangeInfoUtils {
                 }
             }
             return false;
-
         } else {
             throw new \Exception("Only ChangeInfoEnvelopes are supported");
         }

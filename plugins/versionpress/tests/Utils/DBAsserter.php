@@ -8,13 +8,14 @@ use VersionPress\Database\ShortcodesInfo;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Database\VpidRepository;
 use VersionPress\DI\DIContainer;
+use VersionPress\Storages\StorageFactory;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Utils\AbsoluteUrlReplacer;
-use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\ReferenceUtils;
 
-class DBAsserter {
+class DBAsserter
+{
     /** @var DbSchemaInfo */
     private static $schemaInfo;
     /** @var StorageFactory */
@@ -33,7 +34,8 @@ class DBAsserter {
     private static $vpidRepository;
 
 
-    public static function assertFilesEqualDatabase() {
+    public static function assertFilesEqualDatabase()
+    {
         self::staticInitialization();
         $entityNames = self::$schemaInfo->getAllEntityNames();
         foreach ($entityNames as $entityName) {
@@ -42,7 +44,8 @@ class DBAsserter {
         self::clearGlobalVariables();
     }
 
-    private static function staticInitialization() {
+    private static function staticInitialization()
+    {
         self::$testConfig = TestConfig::createDefaultConfig();
 
         $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
@@ -60,7 +63,11 @@ class DBAsserter {
         self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
 
         $wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
-        $rawTaxonomies = $wpAutomation->runWpCliCommand('taxonomy', 'list', array('format' => 'json', 'fields' => 'name'));
+        $rawTaxonomies = $wpAutomation->runWpCliCommand(
+            'taxonomy',
+            'list',
+            ['format' => 'json', 'fields' => 'name']
+        );
         $taxonomies = ArrayUtils::column(json_decode($rawTaxonomies, true), 'name');
 
         $dbHost = self::$testConfig->testSite->dbHost;
@@ -84,7 +91,8 @@ class DBAsserter {
     /**
      * @param $entityName
      */
-    private static function assertEntitiesEqualDatabase($entityName) {
+    private static function assertEntitiesEqualDatabase($entityName)
+    {
         $storage = self::$storageFactory->getStorage($entityName);
         $entityInfo = self::$schemaInfo->getEntityInfo($entityName);
 
@@ -92,7 +100,7 @@ class DBAsserter {
         $idMap = self::getVpIdMap();
         $allDbEntities = self::identifyEntities($entityName, $allDbEntities, $idMap);
         $allDbEntities = self::replaceForeignKeys($entityName, $allDbEntities, $idMap);
-        $dbEntities = array_filter($allDbEntities, array($storage, 'shouldBeSaved'));
+        $dbEntities = array_filter($allDbEntities, [$storage, 'shouldBeSaved']);
 
 
         $urlReplacer = new AbsoluteUrlReplacer(self::$testConfig->testSite->url);
@@ -109,11 +117,13 @@ class DBAsserter {
                 $problematicEntities = self::findExceedingEntities($entityName, $storageEntities, $dbEntities);
             }
 
-            throw new \PHPUnit_Framework_AssertionFailedError("Different count of synchronized entities ($entityName): DB = $countOfentitiesInDb, storage = $countOfentitiesInStorage\nProblematic entities: " . join(", ", $problematicEntities));
+            throw new \PHPUnit_Framework_AssertionFailedError(
+                "Different count of synchronized entities ($entityName): DB = $countOfentitiesInDb, " .
+                "storage = $countOfentitiesInStorage\nProblematic entities: " . join(", ", $problematicEntities)
+            );
         }
 
         foreach ($dbEntities as $dbEntity) {
-
             $id = $dbEntity[$entityInfo->vpidColumnName];
             $storageEntity = $storageEntities[$id];
 
@@ -124,7 +134,9 @@ class DBAsserter {
                     continue;
                 }
                 if (!isset($storageEntity[$column])) {
-                    throw new \PHPUnit_Framework_AssertionFailedError("{$entityName}[$column] with value = $value, ID = $id not found in storage");
+                    throw new \PHPUnit_Framework_AssertionFailedError(
+                        "{$entityName}[$column] with value = $value, ID = $id not found in storage"
+                    );
                 }
 
                 if (is_string($storageEntity[$column])) {
@@ -136,13 +148,15 @@ class DBAsserter {
                 }
 
                 if ($storageEntity[$column] != $value) {
-                    throw new \PHPUnit_Framework_AssertionFailedError("Different values ({$entityName}[$column]: $id): DB = $value, storage = $storageEntity[$column]");
+                    throw new \PHPUnit_Framework_AssertionFailedError(
+                        "Different values ({$entityName}[$column]: $id): DB = $value, storage = $storageEntity[$column]"
+                    );
                 }
             }
         }
 
-        $missingReferences = array();
-        $exceedingReferences = array();
+        $missingReferences = [];
+        $exceedingReferences = [];
 
         foreach ($entityInfo->mnReferences as $reference => $targetEntity) {
             if ($entityInfo->isVirtualReference($reference)) {
@@ -158,30 +172,42 @@ class DBAsserter {
             $sourceTable = self::$schemaInfo->getTableName($referenceDetails['source-entity']);
             $targetTable = self::$schemaInfo->getTableName($referenceDetails['target-entity']);
 
-            $junctionTableContent = self::fetchAll("SELECT HEX(s_vp_id.vp_id), HEX(t_vp_id.vp_id) FROM $prefixedJunctionTable j JOIN $prefixedVpIdTable s_vp_id ON j.$sourceColumn = s_vp_id.id AND s_vp_id.`table`='$sourceTable' JOIN $prefixedVpIdTable t_vp_id ON j.$targetColumn = t_vp_id.id AND t_vp_id.`table` = '$targetTable'", MYSQLI_NUM);
+            $junctionTableContent = self::fetchAll(
+                "SELECT HEX(s_vp_id.vp_id), HEX(t_vp_id.vp_id) FROM $prefixedJunctionTable j
+                 JOIN $prefixedVpIdTable s_vp_id ON j.$sourceColumn = s_vp_id.id AND s_vp_id.`table`='$sourceTable'
+                 JOIN $prefixedVpIdTable t_vp_id ON j.$targetColumn = t_vp_id.id AND t_vp_id.`table` = '$targetTable'",
+                MYSQLI_NUM
+            );
 
-            $checkedReferences = array();
-            $missingReferences[$junctionTable] = array();
+            $checkedReferences = [];
+            $missingReferences[$junctionTable] = [];
             foreach ($storageEntities as $storageEntity) {
                 if (!isset($storageEntity["vp_$targetEntity"])) {
                     continue;
                 }
 
                 foreach ($storageEntity["vp_$targetEntity"] as $referenceVpId) {
-                    if (!ArrayUtils::any($junctionTableContent, function ($junctionRow) use ($storageEntity, $referenceVpId) {
-                        return $junctionRow[0] === $storageEntity['vp_id'] && $junctionRow[1] === $referenceVpId;
-                    })
-                    ) {
-                        $missingReferences[$junctionTable][] = array($sourceColumn => $storageEntity['vp_id'], $targetColumn => $referenceVpId);
+                    if (!ArrayUtils::any(
+                        $junctionTableContent,
+                        function ($junctionRow) use ($storageEntity, $referenceVpId) {
+                            return $junctionRow[0] === $storageEntity['vp_id'] && $junctionRow[1] === $referenceVpId;
+                        }
+                    )) {
+                        $missingReferences[$junctionTable][] = [
+                            $sourceColumn => $storageEntity['vp_id'],
+                            $targetColumn => $referenceVpId
+                        ];
                     }
-                    $checkedReferences[] = array($storageEntity['vp_id'], $referenceVpId);
+                    $checkedReferences[] = [$storageEntity['vp_id'], $referenceVpId];
                 }
             }
 
             $exceedingReferences[$junctionTable] = array_map(
                 function ($pair) use ($sourceColumn, $targetColumn) {
-                    return array($sourceColumn => $pair[0], $targetColumn => $pair[1]);
-                }, array_filter($junctionTableContent,
+                    return [$sourceColumn => $pair[0], $targetColumn => $pair[1]];
+                },
+                array_filter(
+                    $junctionTableContent,
                     function ($pair) use ($checkedReferences) {
                         foreach ($checkedReferences as $reference) {
                             if ($reference[0] === $pair[0] && $reference[1] === $pair[1]) {
@@ -189,7 +215,8 @@ class DBAsserter {
                             }
                         }
                         return true;
-                    })
+                    }
+                )
             );
         }
 
@@ -197,25 +224,29 @@ class DBAsserter {
         self::reportResultOfMnReferenceCheck($exceedingReferences, "Exceeding");
     }
 
-    private static function selectAll($table) {
+    private static function selectAll($table)
+    {
         return self::fetchAll("SELECT * FROM $table");
     }
 
-    private static function fetchAll($query, $resultType = MYSQLI_ASSOC) {
+    private static function fetchAll($query, $resultType = MYSQLI_ASSOC)
+    {
         $res = self::$database->query($query);
         return $res->fetch_all($resultType);
     }
 
-    private static function getVpIdMap() {
+    private static function getVpIdMap()
+    {
         $vpIdTable = self::selectAll(self::$vp_database->vp_id);
-        $idMap = array();
+        $idMap = [];
         foreach ($vpIdTable as $row) {
             $idMap[$row['table']][$row['id']] = strtoupper(bin2hex($row['vp_id']));
         }
         return $idMap;
     }
 
-    private static function identifyEntities($entityName, $entities, $idMap) {
+    private static function identifyEntities($entityName, $entities, $idMap)
+    {
         $entityInfo = self::$schemaInfo->getEntityInfo($entityName);
         if (!$entityInfo->usesGeneratedVpids) {
             return $entities;
@@ -234,15 +265,17 @@ class DBAsserter {
         return $entities;
     }
 
-    private static function replaceForeignKeys($entityName, $dbEntities, $idMap) {
-        $entities = array();
+    private static function replaceForeignKeys($entityName, $dbEntities, $idMap)
+    {
+        $entities = [];
         foreach ($dbEntities as $entity) {
             $entities[] = self::$vpidRepository->replaceForeignKeysWithReferences($entityName, $entity);
         }
         return $entities;
     }
 
-    private static function findMissingEntities($entityName, $storageEntities, $dbEntities) {
+    private static function findMissingEntities($entityName, $storageEntities, $dbEntities)
+    {
         $storageVpIds = array_keys($storageEntities);
         $idColumnName = self::$schemaInfo->getEntityInfo($entityName)->vpidColumnName;
         foreach ($dbEntities as $dbEntity) {
@@ -251,8 +284,9 @@ class DBAsserter {
         return $storageVpIds;
     }
 
-    private static function findExceedingEntities($entityName, $storageEntities, $dbEntities) {
-        $exceedingEntities = array();
+    private static function findExceedingEntities($entityName, $storageEntities, $dbEntities)
+    {
+        $exceedingEntities = [];
         $vpidColumnName = self::$schemaInfo->getEntityInfo($entityName)->vpidColumnName;
         $idColumnName = self::$schemaInfo->getEntityInfo($entityName)->idColumnName;
 
@@ -267,7 +301,8 @@ class DBAsserter {
         return $exceedingEntities;
     }
 
-    private static function reportResultOfMnReferenceCheck($referenceResult, $verb) {
+    private static function reportResultOfMnReferenceCheck($referenceResult, $verb)
+    {
         foreach ($referenceResult as $junctionTable => $references) {
             if (count($references) == 0) {
                 continue;
@@ -282,11 +317,14 @@ class DBAsserter {
                 $list .= "] ";
             }
 
-            throw new \PHPUnit_Framework_AssertionFailedError(sprintf($verb . " M:N reference in table %s %s", $junctionTable, $list));
+            throw new \PHPUnit_Framework_AssertionFailedError(
+                sprintf($verb . " M:N reference in table %s %s", $junctionTable, $list)
+            );
         }
     }
 
-    private static function isInIdMap($idMap, $targetEntity, $id) {
+    private static function isInIdMap($idMap, $targetEntity, $id)
+    {
         return isset($idMap[self::$schemaInfo->getTableName($targetEntity)])
         && isset($idMap[self::$schemaInfo->getTableName($targetEntity)][$id]);
     }
@@ -295,16 +333,19 @@ class DBAsserter {
      * Defines global constants, container and wpdb dynamic mapping of value references.
      * It's not pretty, but makes the mapping functions very flexible (they can have various dependecies).
      */
-    private static function defineGlobalVariables() {
+    private static function defineGlobalVariables()
+    {
         global $versionPressContainer, $wpdb;
 
-        defined('VERSIONPRESS_PLUGIN_DIR') || define('VERSIONPRESS_PLUGIN_DIR', self::$testConfig->testSite->path . '/wp-content/plugins/versionpress');
+        defined('VERSIONPRESS_PLUGIN_DIR') || define('VERSIONPRESS_PLUGIN_DIR', self::$testConfig->testSite->path .
+            '/wp-content/plugins/versionpress');
         defined('VP_VPDB_DIR') || define('VP_VPDB_DIR', self::$testConfig->testSite->path . '/wp-content/vpdb');
         $versionPressContainer = DIContainer::getConfiguredInstance();
         $wpdb = self::$wpdb;
     }
 
-    private static function clearGlobalVariables() {
+    private static function clearGlobalVariables()
+    {
         global $versionPressContainer, $wpdb;
         $versionPressContainer = null;
         $wpdb = null;

@@ -2,29 +2,32 @@
 
 namespace VersionPress\Tests\LoadTests;
 
-
 use VersionPress\Git\GitRepository;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\Process;
 
-class CommitterTest extends \PHPUnit_Framework_TestCase {
+class CommitterTest extends \PHPUnit_Framework_TestCase
+{
 
     private static $repositoryDir;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass()
+    {
         self::$repositoryDir = __DIR__ . '/repository';
         FileSystem::remove(self::$repositoryDir);
         mkdir(self::$repositoryDir);
     }
 
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass()
+    {
         FileSystem::remove(self::$repositoryDir);
     }
 
     /**
      * @test
      */
-    public function committerIsThreadSafe() {
+    public function committerIsThreadSafe()
+    {
         $gitRepository = new GitRepository(self::$repositoryDir, __DIR__);
         $gitRepository->init();
 
@@ -32,7 +35,7 @@ class CommitterTest extends \PHPUnit_Framework_TestCase {
         $numberOfFilesInEachCommit = 10;
 
         /** @var Process[] $runningProcesses */
-        $runningProcesses = array();
+        $runningProcesses = [];
         for ($i = 0; $i < $numberOfParallelCommits; $i++) {
             $from = $i * $numberOfFilesInEachCommit;
             $to = ($i + 1) * $numberOfFilesInEachCommit;
@@ -51,7 +54,11 @@ class CommitterTest extends \PHPUnit_Framework_TestCase {
 
         foreach ($log as $commit) {
             $files = $commit->getChangedFiles();
-            $this->assertCount($numberOfFilesInEachCommit, $files, "Files: \n" . join("\n", array_column($files, 'path')));
+            $this->assertCount(
+                $numberOfFilesInEachCommit,
+                $files,
+                "Files: \n" . join("\n", array_column($files, 'path'))
+            );
         }
     }
 }

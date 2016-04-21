@@ -6,7 +6,8 @@ use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 
-class CommentsTest extends End2EndTestCase {
+class CommentsTest extends End2EndTestCase
+{
 
     /** @var ICommentsTestWorker */
     private static $worker;
@@ -23,7 +24,8 @@ class CommentsTest extends End2EndTestCase {
      * @test
      * @testdox Creating comment as an unauthenticated user creates 'comment/create-pending' action
      */
-    public function publicCommentAwaitsModeration() {
+    public function publicCommentAwaitsModeration()
+    {
 
         self::$worker->prepare_createCommentAwaitingModeration();
 
@@ -42,7 +44,8 @@ class CommentsTest extends End2EndTestCase {
      *
      * @test
      */
-    public function spamCommentIsNotCommitted() {
+    public function spamCommentIsNotCommitted()
+    {
 
         self::$worker->prepare_createSpamComment();
 
@@ -59,7 +62,8 @@ class CommentsTest extends End2EndTestCase {
      * @test
      * @testdox New comment creates 'comment/create' action
      */
-    public function addingCommentCreatesCommentCreateAction() {
+    public function addingCommentCreatesCommentCreateAction()
+    {
 
         self::$worker->prepare_createComment();
 
@@ -80,7 +84,8 @@ class CommentsTest extends End2EndTestCase {
      * @testdox Editing comment creates 'comment/edit' action
      * @depends addingCommentCreatesCommentCreateAction
      */
-    public function editingCommentCreatesCommentEditAction() {
+    public function editingCommentCreatesCommentEditAction()
+    {
         self::$worker->prepare_editComment();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -100,7 +105,8 @@ class CommentsTest extends End2EndTestCase {
      * @testdox Trashing comment creates 'comment/trash' action
      * @depends editingCommentCreatesCommentEditAction
      */
-    public function trashingCommentCreatesCommentTrashAction() {
+    public function trashingCommentCreatesCommentTrashAction()
+    {
         self::$worker->prepare_trashComment();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -119,7 +125,8 @@ class CommentsTest extends End2EndTestCase {
      * @testdox Untrashing comment creates 'comment/untrash' action
      * @depends trashingCommentCreatesCommentTrashAction
      */
-    public function untrashingCommentCreatesCommentUntrashAction() {
+    public function untrashingCommentCreatesCommentUntrashAction()
+    {
         self::$worker->prepare_untrashComment();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -138,7 +145,8 @@ class CommentsTest extends End2EndTestCase {
      * @testdox Deleting comment creates 'comment/delete' action
      * @depends untrashingCommentCreatesCommentUntrashAction
      */
-    public function deletingCommentCreatesCommentDeleteAction() {
+    public function deletingCommentCreatesCommentDeleteAction()
+    {
         self::$worker->prepare_deleteComment();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -157,7 +165,8 @@ class CommentsTest extends End2EndTestCase {
      * @testdox Unapproving comment creates 'comment/unapprove' action
      * @depends addingCommentCreatesCommentCreateAction
      */
-    public function unapproveComment() {
+    public function unapproveComment()
+    {
         self::$worker->prepare_unapproveComment();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -176,7 +185,8 @@ class CommentsTest extends End2EndTestCase {
      * @testdox Approving comment creates 'comment/approve' action
      * @depends unapproveComment
      */
-    public function approveComment() {
+    public function approveComment()
+    {
         self::$worker->prepare_approveComment();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -195,7 +205,8 @@ class CommentsTest extends End2EndTestCase {
      * @testdox Marking as spam creates 'comment/spam' action
      * @depends approveComment
      */
-    public function markAsSpam() {
+    public function markAsSpam()
+    {
         self::$worker->prepare_markAsSpam();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -214,7 +225,8 @@ class CommentsTest extends End2EndTestCase {
      * @testdox Marking as not spam creates 'comment/unspam' action
      * @depends markAsSpam
      */
-    public function markAsNotSpam() {
+    public function markAsNotSpam()
+    {
         self::$worker->prepare_markAsNotSpam();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -232,7 +244,8 @@ class CommentsTest extends End2EndTestCase {
      * @test
      * @testdox Editing multiple comments creates bulk action
      */
-    public function editingMultipleCommentsCreatesBulkAction() {
+    public function editingMultipleCommentsCreatesBulkAction()
+    {
         self::$worker->prepare_editTwoComments();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -249,7 +262,8 @@ class CommentsTest extends End2EndTestCase {
      * @test
      * @testdox Deleting multiple comments creates bulk action
      */
-    public function deletingMultipleCommentsCreatesBulkAction() {
+    public function deletingMultipleCommentsCreatesBulkAction()
+    {
         self::$worker->prepare_deleteTwoComments();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -266,7 +280,8 @@ class CommentsTest extends End2EndTestCase {
      * @test
      * @testdox Trashing multiple comments creates bulk action
      */
-    public function trashingMultipleCommentsCreatesBulkAction() {
+    public function trashingMultipleCommentsCreatesBulkAction()
+    {
         self::$worker->prepare_moveTwoCommentsInTrash();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -283,7 +298,8 @@ class CommentsTest extends End2EndTestCase {
      * @test
      * @testdox Untrashing multiple comments creates bulk action
      */
-    public function untrashingMultipleCommentsCreatesBulkAction() {
+    public function untrashingMultipleCommentsCreatesBulkAction()
+    {
         self::$worker->prepare_moveTwoCommentsFromTrash();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -300,7 +316,8 @@ class CommentsTest extends End2EndTestCase {
      * @test
      * @testdox Marking multiple comments as spam creates bulk action
      */
-    public function markingMultipleCommentsAsSpamCreatesBulkAction() {
+    public function markingMultipleCommentsAsSpamCreatesBulkAction()
+    {
         self::$worker->prepare_markTwoCommentsAsSpam();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -317,7 +334,8 @@ class CommentsTest extends End2EndTestCase {
      * @test
      * @testdox Marking multiple spam comments as not spam creates bulk action
      */
-    public function markingMultipleSpamCommentsAsNotSpamCreatesBulkAction() {
+    public function markingMultipleSpamCommentsAsNotSpamCreatesBulkAction()
+    {
         self::$worker->prepare_markTwoSpamCommentsAsNotSpam();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -334,7 +352,8 @@ class CommentsTest extends End2EndTestCase {
      * @test
      * @testdox Unapproving multiple comments creates bulk action
      */
-    public function unapprovingMultipleCommentsCreatesBulkAction() {
+    public function unapprovingMultipleCommentsCreatesBulkAction()
+    {
         self::$worker->prepare_unapproveTwoComments();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -351,7 +370,8 @@ class CommentsTest extends End2EndTestCase {
      * @test
      * @testdox Approving multiple comments creates bulk action
      */
-    public function approvingMultipleCommentsCreatesBulkAction() {
+    public function approvingMultipleCommentsCreatesBulkAction()
+    {
         self::$worker->prepare_approveTwoComments();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -363,12 +383,13 @@ class CommentsTest extends End2EndTestCase {
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
-    
+
     /**
      * @test
      * @testdox Adding commentmeta to comment creates 'commentmeta/create' action
      */
-    public function addingCommentmetaCreatesCommentmetaCreateAction() {
+    public function addingCommentmetaCreatesCommentmetaCreateAction()
+    {
         self::$worker->prepare_commentmetaCreate();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -386,7 +407,8 @@ class CommentsTest extends End2EndTestCase {
      * @testdox Deleting commentmeta of comment creates 'commentmeta/delete' action
      * @depends addingCommentmetaCreatesCommentmetaCreateAction
      */
-    public function deleteCommentmetaCreatesCommentmetaDeleteAction() {
+    public function deleteCommentmetaCreatesCommentmetaDeleteAction()
+    {
         self::$worker->prepare_commentmetaDelete();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -399,4 +421,3 @@ class CommentsTest extends End2EndTestCase {
         DBAsserter::assertFilesEqualDatabase();
     }
 }
-

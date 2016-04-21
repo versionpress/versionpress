@@ -5,9 +5,11 @@ namespace VersionPress\Storages;
 use VersionPress\ChangeInfos\TermChangeInfo;
 use VersionPress\Utils\EntityUtils;
 
-class TermStorage extends DirectoryStorage {
+class TermStorage extends DirectoryStorage
+{
 
-    protected function createChangeInfo($oldEntity, $newEntity, $action = null) {
+    protected function createChangeInfo($oldEntity, $newEntity, $action = null)
+    {
         $diff = EntityUtils::getDiff($oldEntity, $newEntity);
 
         if ($oldEntity && isset($diff['name'])) {

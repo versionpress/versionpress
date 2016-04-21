@@ -4,25 +4,28 @@ namespace VersionPress\Tests\Selenium;
 
 use VersionPress\Tests\Utils\CommitAsserter;
 
-class PublicWebTest extends SeleniumTestCase {
+class PublicWebTest extends SeleniumTestCase
+{
 
     private static $testPostId;
-    private static $testPost = array(
+    private static $testPost = [
         "post_type" => "post",
         "post_status" => "publish",
         "post_title" => "Test post for testing public web",
         "post_date" => "2012-11-10 09:08:07",
         "post_content" => "Test post content",
         "post_author" => 1
-    );
+    ];
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass()
+    {
         parent::setUpBeforeClass();
         self::$autologin = false;
         self::$testPostId = self::$wpAutomation->createPost(self::$testPost);
     }
 
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass()
+    {
         parent::tearDownAfterClass();
         self::$autologin = true;
         self::$wpAutomation->deletePost(self::$testPostId);
@@ -32,7 +35,8 @@ class PublicWebTest extends SeleniumTestCase {
      * @test
      * @testdox Public web is accessible
      */
-    public function publicWebIsAccessible() {
+    public function publicWebIsAccessible()
+    {
 
         $this->logOut();
 
@@ -45,7 +49,8 @@ class PublicWebTest extends SeleniumTestCase {
      * @test
      * @depends publicWebIsAccessible
      */
-    public function commentCanBeAdded() {
+    public function commentCanBeAdded()
+    {
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
         $this->url('?p=' . self::$testPostId);

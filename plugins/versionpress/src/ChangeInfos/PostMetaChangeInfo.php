@@ -17,7 +17,8 @@ use VersionPress\Utils\StringUtils;
  *     VP-Post-Id: VPID
  *
  */
-class PostMetaChangeInfo extends EntityChangeInfo {
+class PostMetaChangeInfo extends EntityChangeInfo
+{
 
     const POST_TITLE_TAG = "VP-Post-Title";
     const POST_TYPE_TAG = "VP-Post-Type";
@@ -36,7 +37,8 @@ class PostMetaChangeInfo extends EntityChangeInfo {
     /** @var string */
     private $metaKey;
 
-    public function __construct($action, $entityId, $postType, $postTitle, $postVpId, $metaKey) {
+    public function __construct($action, $entityId, $postType, $postTitle, $postVpId, $metaKey)
+    {
         parent::__construct("postmeta", $action, $entityId);
         $this->postType = $postType;
         $this->postTitle = $postTitle;
@@ -44,7 +46,8 @@ class PostMetaChangeInfo extends EntityChangeInfo {
         $this->metaKey = $metaKey;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
+    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
         list(, $action, $entityId) = explode("/", $actionTag, 3);
@@ -55,7 +58,8 @@ class PostMetaChangeInfo extends EntityChangeInfo {
         return new self($action, $entityId, $type, $titleTag, $postVpId, $metaKey);
     }
 
-    public function getChangeDescription() {
+    public function getChangeDescription()
+    {
         $verb = "Edited";
         $subject = "post-meta '{$this->metaKey}'";
         $rest = "for {$this->postType} '{$this->postTitle}'";
@@ -64,10 +68,12 @@ class PostMetaChangeInfo extends EntityChangeInfo {
             $verb = "Changed";
             $subject = "featured image";
 
-            if ($this->getAction() === "create")
+            if ($this->getAction() === "create") {
                 $verb = "Set";
-            if ($this->getAction() === "delete")
+            }
+            if ($this->getAction() === "delete") {
                 $verb = "Removed";
+            }
         } elseif ($this->getAction() === "create" || $this->getAction() === "delete") {
             $verb = Strings::firstUpper(StringUtils::verbToPastTense($this->getAction()));
         }
@@ -75,16 +81,18 @@ class PostMetaChangeInfo extends EntityChangeInfo {
         return sprintf("%s %s %s", $verb, $subject, $rest);
     }
 
-    public function getCustomTags() {
-        return array(
+    public function getCustomTags()
+    {
+        return [
             self::POST_TITLE_TAG => $this->postTitle,
             self::POST_TYPE_TAG => $this->postType,
             self::POST_META_KEY => $this->metaKey,
             self::POST_VPID_TAG => $this->postVpId,
-        );
+        ];
     }
 
-    public function getParentId() {
+    public function getParentId()
+    {
         return $this->postVpId;
     }
 }

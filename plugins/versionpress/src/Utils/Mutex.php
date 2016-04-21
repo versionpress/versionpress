@@ -5,7 +5,8 @@ namespace VersionPress\Utils;
 /**
  * Inspired by http://stackoverflow.com/a/6967839/1243495
  */
-class Mutex {
+class Mutex
+{
 
     /** @var string Name of the mutex */
     private $name;
@@ -17,20 +18,23 @@ class Mutex {
     /** @var string directory for creating mutex */
     private $lockDir;
 
-    public function __construct($dir, $name, $timeout = 60) {
+    public function __construct($dir, $name, $timeout = 60)
+    {
         $this->name = $name;
         $this->timeout = $timeout;
         $this->lockDir = $dir;
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         $this->release();
     }
 
     /**
      * Locks the mutex. The lock is automatically released after $timeout.
      */
-    public function lock() {
+    public function lock()
+    {
         clearstatcache();
         $lockname = $this->getLockName();
         $dirCreated = @filectime($lockname);
@@ -52,7 +56,8 @@ class Mutex {
      * Releases the lock. Returns false on failure.
      * @return bool
      */
-    public function release() {
+    public function release()
+    {
         if ($this->isLockedByThisThread) {
             $this->isLockedByThisThread = false;
             return rmdir($this->getLockName());
@@ -61,7 +66,8 @@ class Mutex {
         return false;
     }
 
-    private function getLockName() {
+    private function getLockName()
+    {
         return $this->lockDir . '/' . $this->name . '.lock';
     }
 }

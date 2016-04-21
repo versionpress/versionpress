@@ -4,6 +4,7 @@ namespace VersionPress\Tests\End2End\Utils;
 
 use VersionPress\Tests\Utils\TestConfig;
 
-interface ITestWorker {
+interface ITestWorker
+{
     public function __construct(TestConfig $testConfig);
 }

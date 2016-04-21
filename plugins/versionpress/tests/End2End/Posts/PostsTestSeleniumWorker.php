@@ -5,26 +5,31 @@ namespace VersionPress\Tests\End2End\Posts;
 use Nette\Utils\Random;
 use VersionPress\Tests\End2End\Utils\PostTypeTestSeleniumWorker;
 
-class PostsTestSeleniumWorker extends PostTypeTestSeleniumWorker {
+class PostsTestSeleniumWorker extends PostTypeTestSeleniumWorker
+{
 
-    public function getPostType() {
+    public function getPostType()
+    {
         return "post";
     }
 
-    public function prepare_createTagInEditationForm() {
+    public function prepare_createTagInEditationForm()
+    {
         $this->url($this->getPostTypeScreenUrl());
         $this->jsClickAndWait('#the-list tr:first-child .row-actions .edit a');
         $this->waitAfterRedirect();
     }
 
-    public function createTagInEditationForm() {
+    public function createTagInEditationForm()
+    {
         $this->byCssSelector('#new-tag-post_tag')->value(Random::generate());
         $this->jsClickAndWait('#post_tag .tagadd');
         $this->byCssSelector('form#post #publish')->click();
         $this->waitAfterRedirect();
     }
 
-    public function prepare_changePostFormat() {
+    public function prepare_changePostFormat()
+    {
         $this->url($this->getPostTypeScreenUrl());
         $this->prepareTestPost();
 
@@ -32,13 +37,15 @@ class PostsTestSeleniumWorker extends PostTypeTestSeleniumWorker {
         $this->waitAfterRedirect();
     }
 
-    public function changePostFormat() {
+    public function changePostFormat()
+    {
         $this->byCssSelector('input[type=radio]#post-format-quote')->click();
         $this->byCssSelector('form#post #publish')->click();
         $this->waitAfterRedirect();
     }
 
-    public function prepare_deletePostmeta() {
+    public function prepare_deletePostmeta()
+    {
         $this->url($this->getPostTypeScreenUrl());
         $this->prepareTestPost();
         $this->byCssSelector('form#post #publish')->click();
@@ -46,7 +53,7 @@ class PostsTestSeleniumWorker extends PostTypeTestSeleniumWorker {
         $this->byCssSelector('#show-settings-link')->click();
         $this->byCssSelector('form#adv-settings #postcustom-hide')->click();
         $this->waitForElement('#metavalue');
-        if($this->elementExists("#enternew")) {
+        if ($this->elementExists("#enternew")) {
             $this->jsClickAndWait('#newmetaleft #enternew');
         }
         $this->waitForElement('#metakeyinput');
@@ -56,7 +63,8 @@ class PostsTestSeleniumWorker extends PostTypeTestSeleniumWorker {
         $this->waitForElement("input[id^='deletemeta']");
     }
 
-    public function deletePostmeta() {
+    public function deletePostmeta()
+    {
         $this->jsClickAndWait("input[id^='deletemeta']");
         $this->waitAfterRedirect();
     }
