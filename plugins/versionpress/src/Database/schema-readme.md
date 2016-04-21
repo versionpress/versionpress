@@ -182,7 +182,7 @@ mn-references:
   ~<junction_table_name>.<column_name>: <foreign_entity_name>
 ```
 
-Virtual references are not stored in INI files but the relationships are checked during reverts. For example, when restoring a post that references a category that no longer exists, this operation will fail.
+Virtual references are not stored in INI files but the relationships are checked during reverts. For example, when a revert would delete a category (revert of `term_taxonomy/create`) and there is some post referencing it, the operation would fail.
 
 
 ### Parent references
@@ -212,7 +212,7 @@ entity:
       interval: 5min
 ```
 
-The values in the `frequently-written` array can either be strings which are then interpreted as  queries, or objects with `query` and `interval` keys. The interval is parsed by the `strtotime()` PHP function and the default value is one hour.
+The values in the `frequently-written` array can either be strings which are then interpreted as queries, or objects with `query` and `interval` keys. The interval is parsed by the `strtotime()` PHP function and the default value is one hour.
 
 
 ## Ignoring entities
