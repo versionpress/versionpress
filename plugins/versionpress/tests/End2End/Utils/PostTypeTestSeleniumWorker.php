@@ -156,6 +156,7 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
         $this->keys(\PHPUnit_Extensions_Selenium2TestCase_Keys::TAB);
         sleep(1);
         $this->waitForAjax();
+        $this->waitForElement("#sample-permalink");
         $this->url($this->getPostTypeScreenUrl());
         $this->acceptAlert();
     }
