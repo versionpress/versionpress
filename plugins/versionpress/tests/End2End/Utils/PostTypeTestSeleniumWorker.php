@@ -152,8 +152,8 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
 
     public function makeDraftFromUnsavedPost() {
         $this->byCssSelector('form#post input#title')->value('Test ' . $this->getPostType() . ' with featured image');
-        $this->byCssSelector('button#content-tmce')->click(); // set focus somewhere outside the title
-        sleep(1);
+        $this->keys(\PHPUnit_Extensions_Selenium2TestCase_Keys::TAB);
+        $this->waitForElement('#sample-permalink');
         $this->waitForAjax();
         $this->url($this->getPostTypeScreenUrl());
         $this->acceptAlert();
