@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<ruleset name="VersionPress Standard">
+    <rule ref="PSR2"/>
+
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <exclude-pattern>*Worker.php</exclude-pattern>
+        <exclude-pattern>*Test.php</exclude-pattern>
+    </rule>
+
+    <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+        <exclude-pattern>admin/deactivate.php</exclude-pattern>
+        <exclude-pattern>admin/system-info.php</exclude-pattern>
+        <exclude-pattern>admin/inc/activate.php</exclude-pattern>
+        <exclude-pattern>bootstrap.php</exclude-pattern>
+        <exclude-pattern>src/Api/VersionPressApi.php</exclude-pattern>
+        <exclude-pattern>src/Cli/vp.php</exclude-pattern>
+        <exclude-pattern>src/Cli/vp-internal.php</exclude-pattern>
+        <exclude-pattern>versionpress.php</exclude-pattern>
+    </rule>
+
+    <arg value="swp"/>
+    <arg name="extensions" value="php"/>
+
+    <file>./</file>
+
+    <exclude-pattern>*/tests/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/temp/*</exclude-pattern>
+    <exclude-pattern>*/log/*</exclude-pattern>
+</ruleset>
