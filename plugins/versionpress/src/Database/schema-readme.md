@@ -1,124 +1,244 @@
-# YAML Schema Format #
+# Database Schema Format
 
-Some essential information about database entities and their relationships is described in a [YAML](http://yaml.org/) format which is then parsed and made accessible via the `VersionPress\Database\DbSchemaInfo` class. This excerpt from `wordpress-schema.yml` is basically a complete example of all the possible options:
+VersionPress needs to understand database entities and their relationships in order to track them properly. WordPress does not provide enough information about this so VersionPress depends on a set of YAML files, so called "schema files", that define everything important about the database entities.
 
-    post:
-        table: posts
-        id: ID
-        references:
-            post_author: user
-            post_parent: post
-        mn-references:
-            term_relationships.term_taxonomy_id: term_taxonomy
+> Note: Currently, there is just `wordpress-schema.yml` describing the base WordPress structure. In the future, plugins and themes will be able to provide their own schemata and the system will be extensible. 
 
-    postmeta:
-        id: meta_id
-        parent-reference: post_id
-        references:
-            post_id: post
-        value-references:
-            meta_key@meta_value:
-                _thumbnail_id: post
-                _menu_item_object_id: '@\VersionPress\Database\VpidRepository::getMenuReference'
+For example, this is how posts are described:
 
-    user:
-        table: posts
-        id: ID
+```
+post:
+  table: posts
+  id: ID
+  references:
+    post_author: user
+    post_parent: post
+  mn-references:
+    term_relationships.term_taxonomy_id: term_taxonomy
+  ignored-entities:
+    - 'post_type: revision'
+    - 'post_status: auto-draft'
+  ignored-columns:
+    - comment_count: '@\VersionPress\Synchronizers\PostsSynchronizer::fixCommentCounts'
+```
 
-    option:
-        table: options
-        vpid: option_name
-        frequently-written:
-            - 'option_name: akismet_spam_count'
-            - query: 'option_name: request_counter'
-              interval: 5min
-        ignored-entities:
-            - 'option_name: _*'
-            - 'option_name: siteurl'
 
 ## Defining entities
 
-The top-level keys are **entity names** (`post`, `user`, `usermeta` and `option` in this example). By default, the entity names **match database table names** without a prefix, however it is possible to specify different table name (e.g. post > posts). Also there is a record in the schema file for every database table that is being tracked. (There may be database tables that VersionPress doesn't care about and those are not in the schema; that's fine.)
+The top-level keys in YAML files define entity names such as `post`, `comment`, `user`, `option` or `postmeta`. Entity names use a singular form.
+
+By default, the entity names match database table names without the `wp_` (or custom) prefix. It is possible to specify a different table name using the `table` property:
+
+```
+post:
+  table: posts
+  ...
+```
+
+Again, this is prefix-less; something like `wp_` will be added automatically.
 
 
 ## Identifying entities
 
-VersionPress needs to know how to identify entities. There are two approaches, and they are designated by either using `id` or `vpid` in the schema:
+VersionPress needs to know how to identify entities. There are two approaches and they are represented by either using `id` or `vpid` in the schema:
 
- * **id** points to a standard WordPress auto-increment primary key. **VersionPress will generate VPIDs** for such entities because simple numeric ID is generally not enough to uniquely identify an entity across multiple environments (would cause conflicts). Most entities are of this type – posts, comments, users etc.
+ * **`id`** points to a standard WordPress auto-increment primary key. **VersionPress will generate VPIDs** (globally unique IDs) for such entities. Most entities are of this type – posts, comments, users etc.
 
- * **vpid**, unlike `id`, directly points VersionPress to use the given column as a unique identifier and skip the whole VPID generation and maintenance process. So entities of this type **will not have an artificial VPID** – they will have a natural one. The `options` table is an example of this – even though it has an `option_id` auto-increment primary key, from VersionPress's point of view the unique identifier is `option_name`.
+ * **`vpid`** points VersionPress directly to use the given column as a unique identifier and skip the whole VPID generation and maintenance process. Entities of this type **will not have artificial VPIDs**. The `options` table is an example of this – even though it has an `option_id` auto-increment primary key, from VersionPress' point of view the unique identifier is `option_name`.
 
+Examples:
+
+```
+post:
+  table: posts
+  id: ID
+
+option:
+  table: options
+  vpid: option_name
+
+```
 
 ## References
 
-WordPress db schema doesn't store foreign keys so we need to. An entity can have zero to n references to other entities, in which case it uses the format
+VersionPress needs to understands relationships between entities so that it can update their IDs between environments. There are several types of references, each using a slightly different notation in the schema file.
 
-    references:
-        <my_column_name>: <foreign_entity_name>
 
-VersionPress knows what ID to be looking for in the foreign entity name because it is also described somewhere in the schema.
+### Basic references
 
-When the reference to entity depends on another column value, use value-reference. It is neccessary to specify column where is the dependency (source column), 
-column where is the foreign id itself (value column) and the name of foreign entity. Instead of the static name of entity it is possible to use dynamic mapping.
-For the mapping can be used either a function or static method. Mapping function or method are prefixed with `@`.
+The most basic references are "foreign key" ones:
+
+```
+references:
+  <my_column_name>: <foreign_entity_name>
+```
+
+For example, this is what post references look like:
+
+```
+post:
+  references:
+    post_author: user
+    post_parent: post
+```
+
+
+### Value references
+
+Value references are used when a reference to an entity depends on another column value. For example, options might point to posts, terms or users and it will depend on which option it is.
+
+The syntax is:
+
+```
+value-references:
+  <source_column_name>@<value_column_name>:
+    <source_column_value>: <foreign_entity_name | @mapping_function>
+    <source_column_value>["path-in-serialized-objects"][/\d+/][0]: <foreign_entity_name | @mapping_function>
+    <columns_with_prefix_*>: <foreign_entity_name | @mapping_function>
+```
+
+As you can see, there are quite a few options. The simplest are static values which are used e.g. by options:
+
+
+```
+option:
+  value-references:
+    option_name@option_value:
+      page_on_front: post
+      default_category: term
+      ...
+```
+
+If the entity type needs to be determined dynamically it can reference a PHP function:
+
+```
+postmeta:
+  value-references:
+    meta_key@meta_value:
+      _menu_item_object_id: '@\VersionPress\Database\VpidRepository::getMenuReference'
+```
+
+Note that there are no parenthesis at the end of this (it's a method reference, not a call) and that it is prefixed with `@`. The function gets the entity as a parameter and returns a target entity name. For example, for `_menu_item_object_id`, the function looks for a related DB row with `_menu_item_type` and returns its value.
  
-If the ID is in a serialized object, you can specify the path by a suffix of the source column. It looks like array access but also supports regular expressions - see the sample below.
+If the ID is in a serialized object, you can specify the path by a suffix of the source column. It looks like array access but also supports regular expressions, for example:
 
-Value references also supports wildcards in the name of source column. It's useful e.g. for options named `theme_mods_{name of the theme}`.
+```
+option:
+  value-references:
+    option_name@option_value:
+      widget_pages[/\d+/]["exclude"]: post
+```
 
-    value-references:
-        <source_column_name>@<value_column_name>:
-            <source_column_value>: <foreign_entity_name | @mapping_function>
-            <source_column_value>["path-in-serialized-objects"][/\d+/][0]: <foreign_entity_name | @mapping_function>
-            <columns_with_prefix_*>: <foreign_entity_name | @mapping_function>
+To visualize this, the `widget_pages` option contains a value like `a:2:{i:2;a:3:{s:5:"title";s:0:"";s:7:"exclude";s:7:"1, 2, 3";...}...}` which, unserialized, looks like this:
 
-Another type of references are the M:N references. Sometimes (for example between posts and term_taxonomies) we need to describe
-an M:N relationship (junction table in the SQL). To do that we can use this format
+```
+[
+  2 => [
+    "title" => "",
+    "sortby" => "post_title",
+    "exclude" => "1, 2, 3"
+  ],
+  "_multiwidget" => 1
+]
+```
 
-    mn-references:
-        <junction_table_name>.<column_name>: <foreign_entity_name>
-        ~<junction_table_name>.<column_name>: <foreign_entity_name>
+The schema says that the numbers in the "exclude" key point to posts.
 
-As you can see, the reference can be prefixed with a tilde (~). It means that the reference is virtual - the entity does not contain
-the data but is's checked in Reverter. The reference is usually saved within the foreign entity (e.g. the `post` contains a list of `term_taxonomy` VPIDs
-but the `term_taxonomy` does NOT contain a list of `post` VPIDs).
+Value references also support wildcards in the name of the source column. It's useful e.g. for options named `theme_mods_<name of theme>`. An example that mixes this with the serialized data syntax is:
 
-Some entities are saved within other entities (e.g. the `postmeta` are saved in the same .ini file with `post` they belong to). As part of this we introduced
-concept of “parent entities”.
+```
+option:
+  value-references:
+    option_name@option_value:
+      theme_mods_*["nav_menu_locations"][/.*/]: term
+      theme_mods_*["header_image_data"]["attachment_id"]: post
+      theme_mods_*["custom_logo"]: post
+```
 
-    postmeta:
-        id: meta_id
-        parent-reference: post_id
- 
- The field `parent-reference` contains the name of one of the simple references. This specifies within which entity will be the child entity saved.
+
+### M:N references
+
+Some entities are in an M:N relationship like posts and term_taxonomies. The format to capture this is:
+
+```
+mn-references:
+  <junction_table_name_without_prefix>.<column_name>: <foreign_entity_name>
+```
+
+This is a concrete example from the post entity:
+
+```
+post:
+  mn-references:
+    term_relationships.term_taxonomy_id: term_taxonomy
+```
+
+One entity is considered "master" which is kind of arbitrary (technically, they are equal) but here, we decided that posts will store tags and categories, not the other way around. INI files of posts will store the references.
+
+References can also be prefixed with a tilde (`~`) which makes them virtual:
+
+```
+mn-references:
+  ~<junction_table_name_without_prefix>.<column_name>: <foreign_entity_name>
+```
+
+Virtual references are not stored in INI files but the relationships are checked during reverts. For example, when a revert would delete a category (revert of `term_taxonomy/create`) and there is some post referencing it, the operation would fail.
+
+
+### Parent references
+
+Some entities are stored within other entities, for example, postmeta are stored in the same INI file as their parent post. This is captured using a `parent-reference` property:
+
+```
+postmeta:
+  parent-reference: post_id
+  references:
+    post_id: post
+
+```
+
+This references one of the basic reference column names, not the final entity. The notation above reads "postmeta stores a parent reference in the `post_id` column and that points to the `post` entity".
+
 
 ## Frequently written entities
 
-Some entities are changed very often (view counter, akismet spam count, etc.). It is possible to save them once in a while.
-They are specified in section `frequently-written`. It's a list of selectors or combination of selector and custom interval. Default interval is `1hour`.
+Some entities are changed very often, e.g., view counters, Akismet spam count, etc. VersionPress only saves them once in a while and the `frequently-written` section influences this:
 
-    frequently-written:
-        - 'column_name: value'
-        - query: 'column1_name: value1 column2_name: value2'
-          interval: 5min
+```
+entity:
+  frequently-written:
+    - 'column_name: value'
+    - query: 'column1_name: value1 column2_name: value2'
+      interval: 5min
+```
 
-The interval is parsed by PHP function `strtotime`, so it can be whatever the function takes.
+The values in the `frequently-written` array can either be strings which are then interpreted as queries, or objects with `query` and `interval` keys. Queries use the same syntax as search / filtering in the UI, with some small differences like that the date range operator cannot be used but overall, the syntax is pretty intuitive. The interval is parsed by the `strtotime()` PHP function and the default value is one hour.
 
-In case of clone/staging setup don't set the interval too short (below `1min`). The shorter the interval is, the more likely is the merge conflict.
 
 ## Ignoring entities
 
-It is possible to ignore some entities (don't save them into INI files). You can just write some queries identifying those entities.
+Some entities should be ignored, i.e., not tracked at all, like transient options, environment-specific things etc. This is an example from the `option` entity:
 
-    ignored-entities:
-        - 'option_name: _*'
-        - 'option_name: siteurl'
+```
+  ignored-entities:
+    - 'option_name: _transient_*'
+    - 'option_name: _site_transient_*'
+    - 'option_name: siteurl'
+```
 
-## Ignoring entities columns
+Again, queries are used. Wildcards are supported.
 
-It is possible to ignore some entity columns (don't save them into INI files) and have their values computed if necessary. You can just write column name or combination of column name and function which should be called. Function is used for computing column value during synchronization process. Instance of `VersionPress\Database\Database` is passed as an argument to a function call.
 
-    ignored-columns:
-        - comment_count: '@\VersionPress\Synchronizers\PostsSynchronizer::fixCommentCounts'
-        - user_activation_key
+### Ignoring columns
+
+It is possible to ignore just parts of entities – their columns. The columns might either be ignored entirely or computed dynamically using a PHP function:
+
+```
+entity:
+  ignored-columns:
+    - column_name_1
+    - column_name_2
+    - computed_column_name: '@functionReference'
+```
+
+The function is called whenever VersionPress does its INI files => DB synchronization. The function will get an instance of `VersionPress\Database\Database` as an argument and is expected to update the database appropriately.

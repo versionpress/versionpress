@@ -54,7 +54,9 @@ class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker
     {
         $this->url('wp-admin/nav-menus.php');
         $this->byCssSelector('.menu-item:first-child .item-edit')->click();
+        $this->waitForElement('.edit-menu-item-title');
         $titleInput = $this->byCssSelector('.menu-item:first-child .edit-menu-item-title');
+        sleep(1);
         $titleInput->clear();
         $titleInput->value("Updated navigation label");
         $this->byCssSelector('#save_menu_header')->click();

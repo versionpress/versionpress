@@ -9,25 +9,30 @@ use VersionPress\VersionPress;
 
 /**
  * Function executed from VersionPress\Initialization\Initializer that is given the progress message, decides
- * whether it is suitable for output and if so, calls `show_message()` (WP function).
+ * whether it is suitable for output and if so, calls WP's `show_message()` function. Displaying can be forced
+ * using the $forceDisplay parameter.
  *
  * @param string $progressMessage
+ * @param bool $forceDisplay If true, displays the message regardless of its presence in InitializerStates enum
  */
-function _vp_show_progress_message($progressMessage)
+function _vp_show_progress_message($progressMessage, $forceDisplay = false)
 {
 
     // We currently only output messages that are defined in VersionPress\Initialization\InitializerStates
-    // which captures the main progress points without too many details
+    // which captures the main progress points without too many details. Or if $forceDisplay is true.
+    $shouldDisplayMessage = $forceDisplay;
+    if (!$shouldDisplayMessage) {
+        $initializerStatesReflection = new ReflectionClass(InitializerStates::class);
+        $progressConstantValues = array_values($initializerStatesReflection->getConstants());
+        $shouldDisplayMessage = in_array($progressMessage, $progressConstantValues);
+    }
 
-    $initializerStatesReflection = new ReflectionClass(InitializerStates::class);
-    $progressConstantValues = array_values($initializerStatesReflection->getConstants());
-    if (in_array($progressMessage, $progressConstantValues)) {
+    if ($shouldDisplayMessage) {
         /** @noinspection PhpParamsInspection */
         /** @noinspection PhpInternalEntityUsedInspection */
         show_message($progressMessage);
     }
 }
-
 ?>
 
 <style>
@@ -80,14 +85,29 @@ function _vp_show_progress_message($progressMessage)
 
         <div class="initialization-progress">
             <?php
-            global $versionPressContainer;
 
-            /**
-             * @var Initializer $initializer
-             */
+            // Set the env name in wp-config.php
+            if (isset($_GET['envname']) && \VersionPress\Utils\WorkflowUtils::isCloneNameValid($_GET['envname'])) {
+                $envName = $_GET['envname'];
+            } else {
+                $envName = 'default';
+            }
+
+            $wpConfigPath = \VersionPress\Utils\WordPressMissingFunctions::getWpConfigPath();
+            $wpConfigEditor = new \VersionPress\Utils\WpConfigEditor($wpConfigPath, false);
+            $wpConfigEditor->updateConfigConstant('VP_ENVIRONMENT', $envName);
+
+            _vp_show_progress_message("Environment set to '$envName'", true);
+
+
+            // Do the initialization
+            global $versionPressContainer;
+            /** @var Initializer $initializer */
             $initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);
             $initializer->onProgressChanged[] = '_vp_show_progress_message';
-            $initializer->initializeVersionPress(); // This is a long-running operation
+
+            $initializer->initializeVersionPress();
+
 
             $successfullyInitialized = VersionPress::isActive();
 

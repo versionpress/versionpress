@@ -23,6 +23,7 @@ use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\PathUtils;
 use VersionPress\Utils\RequirementsChecker;
+use VersionPress\Utils\WorkflowUtils;
 use VersionPress\VersionPress;
 use WP_CLI;
 use WP_CLI_Command;
@@ -393,7 +394,7 @@ class VPCommand extends WP_CLI_Command
 
         $name = $assoc_args['name'];
 
-        if (preg_match('/[^a-zA-Z0-9-_]/', $name)) {
+        if (!WorkflowUtils::isCloneNameValid($name)) {
             // @codingStandardsIgnoreLine
             WP_CLI::error("Clone name '$name' is not valid. It can only contain letters, numbers, hyphens and underscores.");
         }
