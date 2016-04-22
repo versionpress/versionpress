@@ -7,6 +7,24 @@ use VersionPress\Utils\RequirementsChecker;
 
 ?>
 
+<script>
+
+jQuery(document).ready(function($) {
+    $('#activate-versionpress-btn').click(function (e) {
+        var envname = $('#envname').val();
+
+        // Quick and dirty validation; the canonical regexp is in WorkflowUtils::isCloneNameValid().
+        if (!/^[a-zA-Z0-9-_]+$/.test(envname)) {
+            alert('Please use letters, numbers, \'-\' and \'_\' for environment name only');
+            e.preventDefault();
+        }
+
+        $(this).attr('href', this.href + '&envname=' + encodeURIComponent(envname));
+    });
+});
+
+</script>
+
 <div class="welcome-panel vp-activation-panel">
 
     <div class="welcome-panel-content">
@@ -78,6 +96,25 @@ use VersionPress\Utils\RequirementsChecker;
                         <strong>Have a backup</strong>. Seriously.
                     </li>
                 </ul>
+
+                <h4>Name your environment</h4>
+
+                <ul>
+                    <li>
+                        <span class="dashicons dashicons-info icon" style="color: #5b9dd9; font-size: 1.2em; left: -28px;"></span>
+                        E.g., <code>production</code>, <code>dev</code> or <code>my-machine</code>. This will help you identify this environment later.
+
+                        <div style="margin-top: 10px;">
+                            <label for="envname">Environment name:</label>
+                            <input name="envname" type="text" id="envname" value="default" />
+
+                        </div>
+
+                    </li>
+                </ul>
+
+
+
 
 
             </div>
