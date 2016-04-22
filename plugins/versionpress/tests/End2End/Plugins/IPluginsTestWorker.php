@@ -4,7 +4,8 @@ namespace VersionPress\Tests\End2End\Plugins;
 
 use VersionPress\Tests\End2End\Utils\ITestWorker;
 
-interface IPluginsTestWorker extends ITestWorker {
+interface IPluginsTestWorker extends ITestWorker
+{
 
     /**
      *
@@ -26,26 +27,34 @@ interface IPluginsTestWorker extends ITestWorker {
     public function setSecondPluginInfo($secondPluginInfo);
 
     public function prepare_installPlugin();
+
     public function installPlugin();
 
     public function prepare_activatePlugin();
+
     public function activatePlugin();
 
     public function prepare_deactivatePlugin();
+
     public function deactivatePlugin();
 
     public function prepare_deletePlugin();
+
     public function deletePlugin();
 
     public function prepare_installTwoPlugins();
+
     public function installTwoPlugins();
 
     public function prepare_activateTwoPlugins();
+
     public function activateTwoPlugins();
 
     public function prepare_deactivateTwoPlugins();
+
     public function deactivateTwoPlugins();
 
     public function prepare_uninstallTwoPlugins();
+
     public function uninstallTwoPlugins();
 }

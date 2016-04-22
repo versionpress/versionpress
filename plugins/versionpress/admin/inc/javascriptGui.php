@@ -2,14 +2,14 @@
 
 use VersionPress\VersionPress;
 
-$apiConfig = array(
+$apiConfig = [
     'root' => get_site_url(),
     'adminUrl' => get_admin_url(),
     'urlPrefix' => rest_get_url_prefix(),
     'queryParam' => 'rest_route',
     'permalinkStructure' => get_option('permalink_structure'),
     'nonce' => wp_create_nonce('wp_rest')
-);
+];
 ?>
 <script>
     var VP_API_Config = <?php echo json_encode($apiConfig); ?>

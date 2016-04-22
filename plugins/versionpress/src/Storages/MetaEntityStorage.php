@@ -2,7 +2,6 @@
 
 namespace VersionPress\Storages;
 
-
 use Nette\Utils\Strings;
 use VersionPress\Database\EntityInfo;
 
@@ -15,7 +14,8 @@ use VersionPress\Database\EntityInfo;
  * The MetaEntityStorage typically transforms the entity to the format metioned above and then saves it using
  * parent storage as a field of the parent entity.
  */
-abstract class MetaEntityStorage extends Storage {
+abstract class MetaEntityStorage extends Storage
+{
 
     private $lastVpId;
 
@@ -26,7 +26,8 @@ abstract class MetaEntityStorage extends Storage {
     /** @var Storage */
     private $parentStorage;
 
-    function __construct(Storage $parentStorage, EntityInfo $entityInfo, $keyName, $valueName) {
+    public function __construct(Storage $parentStorage, EntityInfo $entityInfo, $keyName, $valueName)
+    {
         parent::__construct($entityInfo);
         $this->parentStorage = $parentStorage;
         $this->keyName = $keyName;
@@ -34,7 +35,8 @@ abstract class MetaEntityStorage extends Storage {
         $this->parentReferenceName = "vp_$entityInfo->parentReference";
     }
 
-    public function save($data) {
+    public function save($data)
+    {
 
         if (!$this->shouldBeSaved($data)) {
             return null;
@@ -64,7 +66,8 @@ abstract class MetaEntityStorage extends Storage {
         return $this->createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParent, $newParent, $action);
     }
 
-    public function delete($restriction) {
+    public function delete($restriction)
+    {
         $parentVpId = $restriction[$this->parentReferenceName];
         $parent = $this->parentStorage->loadEntity($parentVpId, null);
         $fieldToDelete = $this->getJoinedKeyByVpId($parent, $restriction['vp_id']);
@@ -76,21 +79,30 @@ abstract class MetaEntityStorage extends Storage {
         $newParentEntity = $parent;
 
         $this->parentStorage->save($parent);
-        return $this->createChangeInfoWithParentEntity($oldEntity, $oldEntity, $oldParentEntity, $newParentEntity, 'delete');
+        return $this->createChangeInfoWithParentEntity(
+            $oldEntity,
+            $oldEntity,
+            $oldParentEntity,
+            $newParentEntity,
+            'delete'
+        );
     }
 
-    public function saveLater($data) {
+    public function saveLater($data)
+    {
         $transformedData = $this->transformToParentEntityField($data);
         $this->parentStorage->saveLater($transformedData);
     }
 
-    public function commit() {
+    public function commit()
+    {
         $this->parentStorage->commit();
     }
 
-    public function loadAll() {
+    public function loadAll()
+    {
         $parentEntities = $this->parentStorage->loadAll();
-        $entities = array();
+        $entities = [];
 
         foreach ($parentEntities as $parent) {
             foreach ($parent as $field => $value) {
@@ -100,13 +112,13 @@ abstract class MetaEntityStorage extends Storage {
                 list ($key, $vpId) = explode('#', $field, 2);
                 $entities[$vpId] = $this->extractEntityFromParentByVpId($parent, $vpId);
             }
-
         }
 
         return $entities;
     }
 
-    function exists($vpId, $parentId) {
+    public function exists($vpId, $parentId)
+    {
         $parentExists = $this->parentStorage->exists($parentId, null);
         if (!$parentExists) {
             return false;
@@ -114,39 +126,57 @@ abstract class MetaEntityStorage extends Storage {
         return (bool)$this->getJoinedKeyByVpId($this->parentStorage->loadEntity($parentId, null), $vpId);
     }
 
-    public function getEntityFilename($vpId, $parentId) {
+    public function getEntityFilename($vpId, $parentId)
+    {
         return $this->parentStorage->getEntityFilename($parentId, null);
     }
 
-    public function getPathCommonToAllEntities() {
+    public function getPathCommonToAllEntities()
+    {
         return $this->parentStorage->getPathCommonToAllEntities();
     }
 
-    public function loadEntity($id, $parentId) {
+    public function loadEntity($id, $parentId)
+    {
         $parent = $this->parentStorage->loadEntity($parentId, null);
         return $this->extractEntityFromParentByVpId($parent, $id);
     }
 
-    public function loadEntityByName($name, $parentId) {
+    public function loadEntityByName($name, $parentId)
+    {
         $parent = $this->parentStorage->loadEntity($parentId, null);
         return $this->extractEntityFromParentByName($parent, $name);
     }
 
-    protected function createChangeInfo($oldParentEntity, $newParentEntity, $action) {
+    protected function createChangeInfo($oldParentEntity, $newParentEntity, $action)
+    {
         $oldEntity = $this->extractEntityFromParentByVpId($oldParentEntity, $this->lastVpId);
         $newEntity = $this->extractEntityFromParentByVpId($newParentEntity, $this->lastVpId);
-        return $this->createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action);
+        return $this->createChangeInfoWithParentEntity(
+            $oldEntity,
+            $newEntity,
+            $oldParentEntity,
+            $newParentEntity,
+            $action
+        );
     }
 
-    protected abstract function createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action);
+    abstract protected function createChangeInfoWithParentEntity(
+        $oldEntity,
+        $newEntity,
+        $oldParentEntity,
+        $newParentEntity,
+        $action
+    );
 
-    private function transformToParentEntityField($values) {
+    private function transformToParentEntityField($values)
+    {
         $joinedKey = $this->createJoinedKey($values[$this->keyName], $values['vp_id']);
 
-        $data = array(
+        $data = [
             'vp_id' => $values[$this->parentReferenceName],
             $joinedKey => $values[$this->valueName]
-        );
+        ];
         return $data;
     }
 
@@ -158,7 +188,8 @@ abstract class MetaEntityStorage extends Storage {
      * @param $vpId
      * @return string
      */
-    protected function createJoinedKey($key, $vpId) {
+    protected function createJoinedKey($key, $vpId)
+    {
         return sprintf('%s#%s', $key, $vpId);
     }
 
@@ -171,12 +202,13 @@ abstract class MetaEntityStorage extends Storage {
      * @param $key
      * @return array
      */
-    protected function splitJoinedKey($key) {
+    protected function splitJoinedKey($key)
+    {
         $splittedKey = explode('#', $key, 2);
-        return array(
+        return [
             $this->keyName => $splittedKey[0],
             'vp_id' => $splittedKey[1],
-        );
+        ];
     }
 
     /**
@@ -186,7 +218,8 @@ abstract class MetaEntityStorage extends Storage {
      * @param $vpId
      * @return string|null
      */
-    private function getJoinedKeyByVpId($parent, $vpId) {
+    private function getJoinedKeyByVpId($parent, $vpId)
+    {
         foreach ($parent as $field => $value) {
             if (Strings::contains($field, $vpId)) {
                 return $field;
@@ -203,7 +236,8 @@ abstract class MetaEntityStorage extends Storage {
      * @param $name
      * @return string|null
      */
-    private function getJoinedKeyByName($parent, $name) {
+    private function getJoinedKeyByName($parent, $name)
+    {
         foreach ($parent as $field => $value) {
             if (Strings::startsWith($field, "$name#")) {
                 return $field;
@@ -218,7 +252,8 @@ abstract class MetaEntityStorage extends Storage {
      * @param $vpId
      * @return array|null
      */
-    protected function extractEntityFromParentByVpId($parentEntity, $vpId) {
+    protected function extractEntityFromParentByVpId($parentEntity, $vpId)
+    {
         if (!$parentEntity) {
             return null;
         }
@@ -232,7 +267,8 @@ abstract class MetaEntityStorage extends Storage {
         return $this->extractEntityFromParent($parentEntity, $joinedKey);
     }
 
-    protected function extractEntityFromParentByName($parentEntity, $name) {
+    protected function extractEntityFromParentByName($parentEntity, $name)
+    {
         if (!$parentEntity) {
             return null;
         }
@@ -246,22 +282,27 @@ abstract class MetaEntityStorage extends Storage {
         return $this->extractEntityFromParent($parentEntity, $joinedKey);
     }
 
-    private function extractEntityFromParent($parentEntity, $joinedKey) {
+    private function extractEntityFromParent($parentEntity, $joinedKey)
+    {
         $splittedKey = $this->splitJoinedKey($joinedKey);
-        $entity = array(
+        $entity = [
             $this->keyName => $splittedKey[$this->keyName],
             $this->valueName => $parentEntity[$joinedKey],
             'vp_id' => $splittedKey['vp_id'],
             $this->parentReferenceName => $parentEntity['vp_id'],
-        );
+        ];
 
         return $entity;
     }
 
-    function shouldBeSaved($data) {
-        return parent::shouldBeSaved($data) && isset($data[$this->parentReferenceName]) && $this->parentStorage->exists($data[$this->parentReferenceName], null);
+    public function shouldBeSaved($data)
+    {
+        return parent::shouldBeSaved($data)
+        && isset($data[$this->parentReferenceName])
+        && $this->parentStorage->exists($data[$this->parentReferenceName], null);
     }
 
-    function prepareStorage() {
+    public function prepareStorage()
+    {
     }
 }

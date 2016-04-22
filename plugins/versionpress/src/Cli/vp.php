@@ -31,7 +31,8 @@ use WP_CLI_Command;
 /**
  * VersionPress CLI commands.
  */
-class VPCommand extends WP_CLI_Command {
+class VPCommand extends WP_CLI_Command
+{
 
     /**
      * Configures VersionPress. See options for details.
@@ -50,29 +51,30 @@ class VPCommand extends WP_CLI_Command {
      * : The new value. If missing, just prints out current value.
      *
      */
-    public function config($args, $assoc_args) {
+    public function config($args, $assoc_args)
+    {
         /**
          * common: will be saved into wp-config.common.php
          * type: type of constant
          *   absolute-path: will be saved as-is
          *   dynamic-path: part of the path (to wp-config.php) will be replaced with __DIR__ constant
          */
-        $allowedConstants = array(
-            'VP_GIT_BINARY' => array(
+        $allowedConstants = [
+            'VP_GIT_BINARY' => [
                 'common' => false,
                 'type' => 'absolute-path',
-            ),
-            'VP_PROJECT_ROOT' => array(
+            ],
+            'VP_PROJECT_ROOT' => [
                 'common' => true,
                 'type' => 'dynamic-path',
                 'root' => dirname(\WP_CLI\Utils\locate_wp_config()),
-            ),
-            'VP_VPDB_DIR' => array(
+            ],
+            'VP_VPDB_DIR' => [
                 'common' => true,
                 'type' => 'dynamic-path',
                 'root' => dirname(\WP_CLI\Utils\locate_wp_config()),
-            ),
-        );
+            ],
+        ];
 
         $constant = $args[0];
 
@@ -123,7 +125,8 @@ class VPCommand extends WP_CLI_Command {
      *
      * @when before_wp_load
      */
-    public function checkRequirements($args, $assoc_args) {
+    public function checkRequirements($args, $assoc_args)
+    {
 
         defined('SHORTINIT') or define('SHORTINIT', true);
 
@@ -145,7 +148,8 @@ class VPCommand extends WP_CLI_Command {
      *
      * @synopsis [--yes]
      */
-    public function activate($args, $assoc_args) {
+    public function activate($args, $assoc_args)
+    {
         global $versionPressContainer;
 
         $this->checkVpRequirements($assoc_args, RequirementsChecker::SITE);
@@ -194,7 +198,8 @@ class VPCommand extends WP_CLI_Command {
      *
      * @when before_wp_load
      */
-    public function restoreSite($args, $assoc_args) {
+    public function restoreSite($args, $assoc_args)
+    {
 
         defined('SHORTINIT') or define('SHORTINIT', true);
 
@@ -205,14 +210,18 @@ class VPCommand extends WP_CLI_Command {
         require_once __DIR__ . '/../../bootstrap.php';
 
         if (!VersionPress::isActive()) {
-            WP_CLI::error('Unfortunately, this site was not tracked by VersionPress. Therefore, it cannot be restored.');
+            WP_CLI::error('Unfortunately, this site was not tracked by VersionPress.
+            Therefore, it cannot be restored.');
         }
 
         // Check if the site is installed
         $process = VPCommandUtils::runWpCliCommand('core', 'is-installed');
         if ($process->isSuccessful()) {
             $this->checkVpRequirements($assoc_args, RequirementsChecker::ENVIRONMENT);
-            WP_CLI::confirm("It looks like the site is OK. Do you really want to run the 'restore-site' command?", $assoc_args);
+            WP_CLI::confirm(
+                "It looks like the site is OK. Do you really want to run the 'restore-site' command?",
+                $assoc_args
+            );
         }
 
         $this->dropTables();
@@ -233,14 +242,15 @@ class VPCommand extends WP_CLI_Command {
         unlink(VERSIONPRESS_ACTIVATION_FILE);
 
 
-        // Create WP tables. The only important thing is site URL, all else will be rewritten later during synchronization.
-        $installArgs = array(
+        // Create WP tables.
+        // The only important thing is site URL, all else will be rewritten later during synchronization.
+        $installArgs = [
             'url' => $url,
             'title' => 'x',
             'admin_user' => 'x',
             'admin_password' => 'x',
             'admin_email' => 'x@example.com',
-        );
+        ];
 
         if (version_compare(WP_CLI_VERSION, '0.22.0', '>=')) {
             $installArgs['skip-email'] = null;
@@ -264,7 +274,7 @@ class VPCommand extends WP_CLI_Command {
         }
 
 
-        // The next couple of the steps need to be done after the WP is fully loaded; we use `finish-init-clone` for that
+        // The next couple of the steps need to be done after WP is fully loaded; we use `finish-init-clone` for that
         // The main reason for this is that we need properly set WP_CONTENT_DIR constant for reading from storages
         $process = $this->runVPInternalCommand('finish-init-clone');
         WP_CLI::log($process->getConsoleOutput());
@@ -280,7 +290,8 @@ class VPCommand extends WP_CLI_Command {
      *
      * @param array $assoc_args
      */
-    private function prepareDatabase($assoc_args) {
+    private function prepareDatabase($assoc_args)
+    {
 
         $process = VPCommandUtils::runWpCliCommand('db', 'create');
 
@@ -362,11 +373,15 @@ class VPCommand extends WP_CLI_Command {
      *    - Populates database tables with data
      *    - Makes the site accessible as 'http://localhost/myclone'
      *
-     * @synopsis --name=<name> [--siteurl=<url>] [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--force] [--yes]
+     * @synopsis --name=<name> [--siteurl=<url>] [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass=<dbpass>]
+     *           [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>]
+     *           [--force] [--yes]
      *
      * @subcommand clone
+     *
      */
-    public function clone_($args = array(), $assoc_args = array()) {
+    public function cloneSite($args = [], $assoc_args = [])
+    {
         global $table_prefix;
 
         if (isset($assoc_args['force'])) {
@@ -380,6 +395,7 @@ class VPCommand extends WP_CLI_Command {
         $name = $assoc_args['name'];
 
         if (!WorkflowUtils::isCloneNameValid($name)) {
+            // @codingStandardsIgnoreLine
             WP_CLI::error("Clone name '$name' is not valid. It can only contain letters, numbers, hyphens and underscores.");
         }
 
@@ -398,6 +414,7 @@ class VPCommand extends WP_CLI_Command {
 
         // Checking the DB prefix, regex from wp-admin/setup-config.php
         if (isset($assoc_args['dbprefix']) && preg_match('|[^a-z0-9_]|i', $cloneDbPrefix)) {
+            // @codingStandardsIgnoreLine
             WP_CLI::error("Table prefix '$cloneDbPrefix' is not valid. It can only contain letters, numbers and underscores. Please choose different one.");
         }
 
@@ -418,10 +435,12 @@ class VPCommand extends WP_CLI_Command {
         $urlChanged = !isset($assoc_args['siteurl']) && !Strings::contains($cloneUrl, $cloneDirName);
 
         if (is_dir($clonePath)) {
+            // @codingStandardsIgnoreLine
             WP_CLI::confirm("Directory '" . basename($clonePath) . "' already exists, it will be deleted before cloning. Proceed?", $assoc_args);
         }
 
         if ($this->someWpTablesExist($cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix)) {
+            // @codingStandardsIgnoreLine
             WP_CLI::confirm("Database tables for the clone already exist, they will be dropped and re-created. Proceed?", $assoc_args);
         }
 
@@ -453,8 +472,8 @@ class VPCommand extends WP_CLI_Command {
         $process = VPCommandUtils::exec($addRemoteCommand, $currentWpPath);
 
         if (!$process->isSuccessful()) {
-
-            $overwriteRemote = VPCommandUtils::cliQuestion("The Git repo of this site already defines remote '$name', overwrite it?", array("y", "n"), $assoc_args);
+            // @codingStandardsIgnoreLine
+            $overwriteRemote = VPCommandUtils::cliQuestion("The Git repo of this site already defines remote '$name', overwrite it?", ["y", "n"], $assoc_args);
 
             if ($overwriteRemote == "y") {
                 $addRemoteCommand = str_replace(" add ", " set-url ", $addRemoteCommand);
@@ -465,7 +484,6 @@ class VPCommand extends WP_CLI_Command {
                     WP_CLI::success("Updated remote configuration");
                 }
             }
-
         } else {
             WP_CLI::success("Clone added as a remote");
         }
@@ -495,7 +513,17 @@ class VPCommand extends WP_CLI_Command {
         $wpConfigFile = $clonePath . '/wp-config.php';
         copy(\WP_CLI\Utils\locate_wp_config(), $wpConfigFile);
 
-        $this->updateConfig($clonePath, $name, $cloneDbUser, $cloneDbPassword, $cloneDbName, $cloneDbHost, $cloneDbPrefix, $cloneDbCharset, $cloneDbCollate);
+        $this->updateConfig(
+            $clonePath,
+            $name,
+            $cloneDbUser,
+            $cloneDbPassword,
+            $cloneDbName,
+            $cloneDbHost,
+            $cloneDbPrefix,
+            $cloneDbCharset,
+            $cloneDbCollate
+        );
 
         // Copy VersionPress
         FileSystem::copyDir(VERSIONPRESS_PLUGIN_DIR, $cloneVpPluginPath);
@@ -503,7 +531,12 @@ class VPCommand extends WP_CLI_Command {
 
         // Finish the process by doing the standard restore-site
         $relativePathToThisFile = PathUtils::getRelativePath($currentWpPath, __FILE__);
-        $process = VPCommandUtils::runWpCliCommand('vp', 'restore-site', array('siteurl' => $cloneUrl, 'yes' => null, 'require' => $relativePathToThisFile), $clonePath);
+        $process = VPCommandUtils::runWpCliCommand(
+            'vp',
+            'restore-site',
+            ['siteurl' => $cloneUrl, 'yes' => null, 'require' => $relativePathToThisFile],
+            $clonePath
+        );
         WP_CLI::log(trim($process->getConsoleOutput()));
 
         if ($process->isSuccessful()) {
@@ -537,8 +570,8 @@ class VPCommand extends WP_CLI_Command {
      * @param string $cloneDirName
      * @return string
      */
-    private function suggestCloneUrl($originUrl, $originDirName, $cloneDirName) {
-
+    private function suggestCloneUrl($originUrl, $originDirName, $cloneDirName)
+    {
         if (!Strings::contains($originUrl, $originDirName)) {
             return null;
         }
@@ -572,21 +605,23 @@ class VPCommand extends WP_CLI_Command {
      *
      * @synopsis [--from=<name|path|url>]
      */
-    public function pull($args = array(), $assoc_args = array()) {
-
+    public function pull($args = [], $assoc_args = [])
+    {
         global $versionPressContainer;
 
         if (!VersionPress::isActive()) {
-            WP_CLI::error('This site is not tracked by VersionPress. Please run "wp vp activate" before cloning / merging.');
+            WP_CLI::error(
+                'This site is not tracked by VersionPress. Please run "wp vp activate" before cloning / merging.'
+            );
         }
 
         $remote = isset($assoc_args['from']) ? $assoc_args['from'] : 'origin';
 
-        $process = VPCommandUtils::exec("git config --get remote.". escapeshellarg($remote) . ".url");
+        $process = VPCommandUtils::exec("git config --get remote." . escapeshellarg($remote) . ".url");
         $remoteUrl = $process->getConsoleOutput();
 
         if (is_dir($remoteUrl)) {
-            $this->runVPInternalCommand('commit-frequently-written-entities', array(), $remoteUrl);
+            $this->runVPInternalCommand('commit-frequently-written-entities', [], $remoteUrl);
         } else {
             // We currently do not support commiting frequently written entities for repositories on a different server
         }
@@ -600,7 +635,6 @@ class VPCommand extends WP_CLI_Command {
         if ($process->isSuccessful()) {
             WP_CLI::success("Pulled changes from '$remote'");
         } else {
-
             if (stripos($process->getConsoleOutput(), 'automatic merge failed') !== false) {
                 WP_CLI::warning("");
                 WP_CLI::warning("CONFLICTS DETECTED. Your options:");
@@ -624,9 +658,7 @@ class VPCommand extends WP_CLI_Command {
                     WP_CLI::success("That last step will turn the maintenance mode off.");
                     WP_CLI::success("You can also abort the merge manually by running `git merge --abort`");
                     exit();
-
                 } else {
-
                     $process = VPCommandUtils::exec('git merge --abort');
                     if ($process->isSuccessful()) {
                         $this->switchMaintenance('off');
@@ -637,13 +669,10 @@ class VPCommand extends WP_CLI_Command {
                         WP_CLI::error("and also don't fortget to turn off the maintenance mode.");
                     }
                 }
-
-
             } else { // not a merge conflict, some other error
                 $this->switchMaintenance('off');
                 WP_CLI::error("Changes from $remote couldn't be pulled. Details:\n\n" . $process->getConsoleOutput());
             }
-
         }
 
         // Run synchronization
@@ -675,7 +704,8 @@ class VPCommand extends WP_CLI_Command {
      *
      * @subcommand apply-changes
      */
-    public function applyChanges($args = array(), $assoc_args = array()) {
+    public function applyChanges($args = [], $assoc_args = [])
+    {
 
         global $versionPressContainer;
 
@@ -717,10 +747,13 @@ class VPCommand extends WP_CLI_Command {
      *
      * @synopsis [--to=<name|path>]
      */
-    public function push($args = array(), $assoc_args = array()) {
+    public function push($args = [], $assoc_args = [])
+    {
 
         if (!VersionPress::isActive()) {
-            WP_CLI::error('This site is not tracked by VersionPress. Please run "wp vp activate" before cloning / merging.');
+            WP_CLI::error(
+                'This site is not tracked by VersionPress. Please run "wp vp activate" before cloning / merging.'
+            );
         }
 
         $remoteName = isset($assoc_args['to']) ? $assoc_args['to'] : 'origin';
@@ -739,7 +772,9 @@ class VPCommand extends WP_CLI_Command {
         $currentPushType = trim(VPCommandUtils::exec('git config --local push.default')->getOutput());
         VPCommandUtils::exec('git config --local push.default simple');
 
-        $pushCommand = "git push --set-upstream $remoteName master"; // hardcoded branch name until we support custom branches
+        // hardcoded branch name until we support custom branches
+        $pushCommand = "git push --set-upstream $remoteName master";
+
         $process = VPCommandUtils::exec($pushCommand);
         if ($process->isSuccessful()) {
             WP_CLI::success("Changes successfully pushed");
@@ -757,7 +792,7 @@ class VPCommand extends WP_CLI_Command {
         $gitConfigPath = VP_PROJECT_ROOT . '/.git/config';
         GitConfig::removeEmptySections($gitConfigPath);
 
-        $process = $this->runVPInternalCommand('finish-push', array(), $remotePath);
+        $process = $this->runVPInternalCommand('finish-push', [], $remotePath);
         if ($process->isSuccessful()) {
             WP_CLI::success("Remote database synchronized");
         } else {
@@ -784,7 +819,8 @@ class VPCommand extends WP_CLI_Command {
      *
      * @when before_wp_load
      */
-    public function undo($args = array(), $assoc_args = array()) {
+    public function undo($args = [], $assoc_args = [])
+    {
         global $versionPressContainer;
 
         if (!VersionPress::isActive()) {
@@ -817,7 +853,11 @@ class VPCommand extends WP_CLI_Command {
         $status = $reverter->undo($commits);
 
         if ($status === RevertStatus::VIOLATED_REFERENTIAL_INTEGRITY) {
-            WP_CLI::error("Violated referential integrity. Objects with missing references cannot be restored. For example we cannot restore comment where the related post was deleted.", false);
+            WP_CLI::error(
+                "Violated referential integrity. Objects with missing references cannot be restored. " .
+                "For example we cannot restore comment where the related post was deleted.",
+                false
+            );
         }
 
         if ($status === RevertStatus::MERGE_CONFLICT) {
@@ -861,7 +901,8 @@ class VPCommand extends WP_CLI_Command {
      * @when before_wp_load
      *
      */
-    public function rollback($args = array(), $assoc_args = array()) {
+    public function rollback($args = [], $assoc_args = [])
+    {
         global $versionPressContainer;
 
         if (!VersionPress::isActive()) {
@@ -890,7 +931,7 @@ class VPCommand extends WP_CLI_Command {
 
         $this->switchMaintenance('on');
 
-        $status = $reverter->rollback(array($hash));
+        $status = $reverter->rollback([$hash]);
 
         if ($status === RevertStatus::NOTHING_TO_COMMIT) {
             WP_CLI::error("Nothing to commit. Current state is the same as the one you want rollback to.", false);
@@ -908,9 +949,10 @@ class VPCommand extends WP_CLI_Command {
         $this->flushRewriteRules();
     }
 
-    private function dropTables() {
+    private function dropTables()
+    {
         global $versionPressContainer;
-        $tables = array(
+        $tables = [
             'users',
             'usermeta',
             'posts',
@@ -924,13 +966,13 @@ class VPCommand extends WP_CLI_Command {
             'term_relationships',
             'commentmeta',
             'vp_id',
-        );
+        ];
         /** @var DbSchemaInfo $schema */
         $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
-        $tables = array_map(array($schema, 'getPrefixedTableName'), $tables);
+        $tables = array_map([$schema, 'getPrefixedTableName'], $tables);
 
         foreach ($tables as $table) {
-            VPCommandUtils::runWpCliCommand('db', 'query', array("DROP TABLE IF EXISTS `$table`"));
+            VPCommandUtils::runWpCliCommand('db', 'query', ["DROP TABLE IF EXISTS `$table`"]);
         }
     }
 
@@ -949,7 +991,8 @@ class VPCommand extends WP_CLI_Command {
      * @synopsis <zip>
      *
      */
-    public function update($args = array(), $assoc_args = array()) {
+    public function update($args = [], $assoc_args = [])
+    {
         global $versionPressContainer;
 
         $zip = $args[0];
@@ -968,7 +1011,8 @@ class VPCommand extends WP_CLI_Command {
 
         /** @var \Plugin_Upgrader $upgrader */
         $upgrader = WP_CLI\Utils\get_upgrader(WP_CLI\DestructivePluginUpgrader::class);
-        $upgrader->skin = new SilentUpgraderSkin(); // Use silent upgrader skin - we don't need any output from the upgrader
+        // Use silent upgrader skin - we don't need any output from the upgrader
+        $upgrader->skin = new SilentUpgraderSkin();
 
         $result = $upgrader->run([
             'package' => $zip,
@@ -988,7 +1032,7 @@ class VPCommand extends WP_CLI_Command {
 
             $this->switchMaintenance('off');
         } else {
-            WP_CLI::error(join("\n",[
+            WP_CLI::error(join("\n", [
                 'Update failed. Unfortunatelly, you have to manually update VersionPress.',
                 ' 1. Delete wp-content/versionpress.',
                 ' 2. Extract the ZIP to wp-content/versionpress.',
@@ -1008,7 +1052,8 @@ class VPCommand extends WP_CLI_Command {
      * @param string $dbPrefix
      * @return bool
      */
-    private function someWpTablesExist($dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix) {
+    private function someWpTablesExist($dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix)
+    {
         $wpdb = new \wpdb($dbUser, $dbPassword, $dbName, $dbHost);
         $wpdb->set_prefix($dbPrefix);
         $tables = $wpdb->get_col("SHOW TABLES LIKE '{$dbPrefix}_%'");
@@ -1016,10 +1061,20 @@ class VPCommand extends WP_CLI_Command {
         return count($wpTables) > 0;
     }
 
-    private function updateConfig($clonePath, $environment, $dbUser, $dbPassword, $dbName, $dbHost, $dbPrefix, $dbCharset, $dbCollate) {
+    private function updateConfig(
+        $clonePath,
+        $environment,
+        $dbUser,
+        $dbPassword,
+        $dbName,
+        $dbHost,
+        $dbPrefix,
+        $dbCharset,
+        $dbCollate
+    ) {
         $environmentConstant = 'VP_ENVIRONMENT';
 
-        $replacements = array(
+        $replacements = [
             "DB_NAME" => $dbName,
             "DB_USER" => $dbUser,
             "DB_PASSWORD" => $dbPassword,
@@ -1027,12 +1082,12 @@ class VPCommand extends WP_CLI_Command {
             "DB_CHARSET" => $dbCharset,
             "DB_COLLATE" => $dbCollate,
             $environmentConstant => $environment,
-        );
+        ];
 
-        $this->runVPInternalCommand('update-config', array('table_prefix', $dbPrefix, 'variable' => null), $clonePath);
+        $this->runVPInternalCommand('update-config', ['table_prefix', $dbPrefix, 'variable' => null], $clonePath);
 
         foreach ($replacements as $constant => $value) {
-            $this->runVPInternalCommand('update-config', array($constant, $value), $clonePath);
+            $this->runVPInternalCommand('update-config', [$constant, $value], $clonePath);
         }
 
         WP_CLI::success("wp-config.php updated");
@@ -1045,7 +1100,8 @@ class VPCommand extends WP_CLI_Command {
      * @param string $name Remote name, e.g., "origin"
      * @return string|null Remote URL, or null if remote isn't configured
      */
-    private function getRemoteUrl($name) {
+    private function getRemoteUrl($name)
+    {
         $listRemotesCommand = "git remote -v";
         $remotesRaw = VPCommandUtils::exec($listRemotesCommand)->getConsoleOutput();
 
@@ -1055,7 +1111,7 @@ class VPCommand extends WP_CLI_Command {
             return null;
         }
 
-        $remotes = array();
+        $remotes = [];
         foreach ($matches[1] as $i => $cloneName) {
             $url = $matches[2][$i];
             $remotes[$cloneName] = $url;
@@ -1076,23 +1132,30 @@ class VPCommand extends WP_CLI_Command {
      * @param string $onOrOff "on" | "off"
      * @param string|null $remoteName
      */
-    private function switchMaintenance($onOrOff, $remoteName = null) {
+    private function switchMaintenance($onOrOff, $remoteName = null)
+    {
         $remotePath = $remoteName ? $this->getRemoteUrl($remoteName) : null;
-        $process = $this->runVPInternalCommand('maintenance', array($onOrOff), $remotePath);
+        $process = $this->runVPInternalCommand('maintenance', [$onOrOff], $remotePath);
 
         if ($process->isSuccessful()) {
             WP_CLI::success("Maintenance mode turned $onOrOff" . ($remoteName ? " for '$remoteName'" : ""));
         } else {
-            WP_CLI::error("Maintenance mode couldn't be switched" . ($remoteName ? " for '$remoteName'" : "") . ". Details:\n\n" . $process->getConsoleOutput());
+            WP_CLI::error(
+                "Maintenance mode couldn't be switched" .
+                ($remoteName ? " for '$remoteName'" : "") .
+                ". Details:\n\n" . $process->getConsoleOutput()
+            );
         }
     }
 
-    private function runVPInternalCommand($subcommand, $args = array(), $cwd = null) {
-        $args = $args + array('require' => __DIR__ . '/vp-internal.php');
+    private function runVPInternalCommand($subcommand, $args = [], $cwd = null)
+    {
+        $args = $args + ['require' => __DIR__ . '/vp-internal.php'];
         return VPCommandUtils::runWpCliCommand('vp-internal', $subcommand, $args, $cwd);
     }
 
-    private function flushRewriteRules() {
+    private function flushRewriteRules()
+    {
         set_transient('vp_flush_rewrite_rules', 1);
         /**
          * If it fails, we just flush the rewrite rules on the next request.
@@ -1104,12 +1167,13 @@ class VPCommand extends WP_CLI_Command {
         wp_remote_get(get_home_url());
     }
 
-    private function setConfigUrl($urlConstant, $pathConstant, $defaultPath, $baseUrl) {
+    private function setConfigUrl($urlConstant, $pathConstant, $defaultPath, $baseUrl)
+    {
         if (defined($pathConstant) && constant($pathConstant) !== $defaultPath) {
             $relativePathToWpContent = str_replace(getcwd(), '', realpath(constant($pathConstant)));
             $url = $baseUrl . str_replace('//', '/', '/' . $relativePathToWpContent);
 
-            $this->runVPInternalCommand('update-config', array($urlConstant, $url));
+            $this->runVPInternalCommand('update-config', [$urlConstant, $url]);
         }
     }
 
@@ -1117,7 +1181,8 @@ class VPCommand extends WP_CLI_Command {
      * @param $assoc_args
      * @param $requirementsScope string of the requirements
      */
-    private function checkVpRequirements($assoc_args, $requirementsScope) {
+    private function checkVpRequirements($assoc_args, $requirementsScope)
+    {
         require_once ABSPATH . WPINC . '/formatting.php';
         require_once ABSPATH . WPINC . '/theme.php';
         require_once ABSPATH . WPINC . '/link-template.php';
@@ -1157,8 +1222,11 @@ class VPCommand extends WP_CLI_Command {
 
     /**
      * Tries to require Wordpress config files. Throws WP-CLI error when files not found.
+     * @param string $wpConfigPath
+     * @param string $commonConfigName
      */
-    private function requireWpConfig($wpConfigPath, $commonConfigName) {
+    private function requireWpConfig($wpConfigPath, $commonConfigName)
+    {
         $commonConfigPath = dirname($wpConfigPath) . '/' . $commonConfigName;
         if (file_exists($wpConfigPath)) {
             require_once $wpConfigPath;
@@ -1176,7 +1244,8 @@ class VPCommand extends WP_CLI_Command {
      * @param GitRepository $repository
      * @return string
      */
-    private function getInitialCommitHash(GitRepository $repository) {
+    private function getInitialCommitHash(GitRepository $repository)
+    {
         $preActivationHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
         if (empty($preActivationHash)) {
             return $repository->getInitialCommit()->getHash();
@@ -1186,5 +1255,5 @@ class VPCommand extends WP_CLI_Command {
 }
 
 if (defined('WP_CLI') && WP_CLI) {
-    WP_CLI::add_command('vp', 'VersionPress\Cli\VPCommand');
+    WP_CLI::add_command('vp', VPCommand::class);
 }

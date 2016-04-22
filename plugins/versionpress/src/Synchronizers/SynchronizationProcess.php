@@ -2,14 +2,16 @@
 
 namespace VersionPress\Synchronizers;
 
-class SynchronizationProcess {
+class SynchronizationProcess
+{
 
     /**
      * @var SynchronizerFactory
      */
     private $synchronizerFactory;
 
-    function __construct(SynchronizerFactory $synchronizerFactory) {
+    public function __construct(SynchronizerFactory $synchronizerFactory)
+    {
         $this->synchronizerFactory = $synchronizerFactory;
     }
 
@@ -18,7 +20,8 @@ class SynchronizationProcess {
      *
      * @param array $vpidsToSynchronize List of VPIDS of entities which will be synchronized.
      */
-    function synchronize(array $vpidsToSynchronize) {
+    public function synchronize(array $vpidsToSynchronize)
+    {
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
         @set_time_limit(0); // intentionally @ - if it's disabled we can't do anything but try the synchronization
 
@@ -27,7 +30,11 @@ class SynchronizationProcess {
 
         $synchronizationTasks = array_map(function ($synchronizerName) use ($vpidsToSynchronize, $synchronizerFactory) {
             $synchronizer = $synchronizerFactory->createSynchronizer($synchronizerName);
-            return array('synchronizer' => $synchronizer, 'task' => Synchronizer::SYNCHRONIZE_EVERYTHING, 'entities' => $vpidsToSynchronize);
+            return [
+                'synchronizer' => $synchronizer,
+                'task' => Synchronizer::SYNCHRONIZE_EVERYTHING,
+                'entities' => $vpidsToSynchronize
+            ];
         }, $allSynchronizers);
 
         $this->runSynchronizationTasks($synchronizationTasks);
@@ -36,17 +43,23 @@ class SynchronizationProcess {
     /**
      * Runs synchronization for all managed entities.
      */
-    public function synchronizeAll() {
+    public function synchronizeAll()
+    {
         $synchronizerFactory = $this->synchronizerFactory;
         $synchronizationTasks = array_map(function ($synchronizerName) use ($synchronizerFactory) {
             $synchronizer = $synchronizerFactory->createSynchronizer($synchronizerName);
-            return array ('synchronizer' => $synchronizer, 'task' => Synchronizer::SYNCHRONIZE_EVERYTHING, 'entities' => null);
+            return [
+                'synchronizer' => $synchronizer,
+                'task' => Synchronizer::SYNCHRONIZE_EVERYTHING,
+                'entities' => null
+            ];
         }, $synchronizerFactory->getSynchronizationSequence());
 
         $this->runSynchronizationTasks($synchronizationTasks);
     }
 
-    private function runSynchronizationTasks(array $synchronizationTasks) {
+    private function runSynchronizationTasks(array $synchronizationTasks)
+    {
         while (count($synchronizationTasks) > 0) {
             $task = array_shift($synchronizationTasks);
             /** @var Synchronizer $synchronizer */
@@ -54,7 +67,11 @@ class SynchronizationProcess {
             $remainingTasks = $synchronizer->synchronize($task['task'], $task['entities']);
 
             foreach ($remainingTasks as $remainingTask) {
-                $synchronizationTasks[] = array('synchronizer' => $synchronizer, 'task' => $remainingTask, 'entities' => $task['entities']);
+                $synchronizationTasks[] = [
+                    'synchronizer' => $synchronizer,
+                    'task' => $remainingTask,
+                    'entities' => $task['entities']
+                ];
             }
         }
     }

@@ -2,12 +2,10 @@
 
 namespace VersionPress\ChangeInfos;
 
-
-use Nette\Utils\Strings;
 use VersionPress\Git\CommitMessage;
-use VersionPress\Utils\StringUtils;
 
-class CommentMetaChangeInfo extends EntityChangeInfo {
+class CommentMetaChangeInfo extends EntityChangeInfo
+{
 
     const COMMENT_META_KEY = "VP-CommentMeta-Key";
     const COMMENT_VPID_TAG = "VP-Comment-Id";
@@ -18,13 +16,15 @@ class CommentMetaChangeInfo extends EntityChangeInfo {
     /** @var string */
     private $metaKey;
 
-    public function __construct($action, $entityId, $commentVpId, $metaKey) {
+    public function __construct($action, $entityId, $commentVpId, $metaKey)
+    {
         parent::__construct("commentmeta", $action, $entityId);
         $this->commentVpId = $commentVpId;
         $this->metaKey = $metaKey;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
+    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
         list(, $action, $entityId) = explode("/", $actionTag, 3);
@@ -33,7 +33,8 @@ class CommentMetaChangeInfo extends EntityChangeInfo {
         return new self($action, $entityId, $commentVpid, $metaKey);
     }
 
-    public function getChangeDescription() {
+    public function getChangeDescription()
+    {
         if ($this->getAction() === "create") {
             return "New comment-meta '{$this->metaKey}' created";
         }
@@ -45,14 +46,16 @@ class CommentMetaChangeInfo extends EntityChangeInfo {
         return "Edited comment-meta '{$this->metaKey}'";
     }
 
-    public function getCustomTags() {
-        return array(
+    public function getCustomTags()
+    {
+        return [
             self::COMMENT_META_KEY => $this->metaKey,
             self::COMMENT_VPID_TAG => $this->commentVpId
-        );
+        ];
     }
 
-    public function getParentId() {
+    public function getParentId()
+    {
         return $this->commentVpId;
     }
 }

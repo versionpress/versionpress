@@ -10,7 +10,8 @@ use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use wpdb;
 
-class SynchronizerFactory {
+class SynchronizerFactory
+{
     /**
      * @var StorageFactory
      */
@@ -33,7 +34,7 @@ class SynchronizerFactory {
     /** @var ShortcodesReplacer */
     private $shortcodesReplacer;
 
-    private $synchronizerClasses = array(
+    private $synchronizerClasses = [
         'post' => PostsSynchronizer::class,
         'postmeta' => PostMetaSynchronizer::class,
         'comment' => CommentsSynchronizer::class,
@@ -44,10 +45,28 @@ class SynchronizerFactory {
         'term' => TermsSynchronizer::class,
         'termmeta' => TermMetaSynchronizer::class,
         'term_taxonomy' => TermTaxonomiesSynchronizer::class,
-    );
-    private $synchronizationSequence = array('user', 'usermeta', 'term', 'termmeta', 'term_taxonomy', 'post', 'postmeta', 'comment', 'commentmeta', 'option');
+    ];
+    private $synchronizationSequence = [
+        'user',
+        'usermeta',
+        'term',
+        'termmeta',
+        'term_taxonomy',
+        'post',
+        'postmeta',
+        'comment',
+        'commentmeta',
+        'option'
+    ];
 
-    function __construct(StorageFactory $storageFactory, Database $database, DbSchemaInfo $dbSchema, VpidRepository $vpidRepository, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
+    public function __construct(
+        StorageFactory $storageFactory,
+        Database $database,
+        DbSchemaInfo $dbSchema,
+        VpidRepository $vpidRepository,
+        AbsoluteUrlReplacer $urlReplacer,
+        ShortcodesReplacer $shortcodesReplacer
+    ) {
         $this->storageFactory = $storageFactory;
         $this->database = $database;
         $this->dbSchema = $dbSchema;
@@ -61,20 +80,26 @@ class SynchronizerFactory {
      * @param $synchronizerName
      * @return Synchronizer
      */
-    public function createSynchronizer($synchronizerName) {
+    public function createSynchronizer($synchronizerName)
+    {
         $synchronizerClass = $this->synchronizerClasses[$synchronizerName];
-        return new $synchronizerClass($this->getStorage($synchronizerName), $this->database, $this->dbSchema->getEntityInfo($synchronizerName), $this->dbSchema, $this->vpidRepository, $this->urlReplacer, $this->shortcodesReplacer);
+        return new $synchronizerClass($this->getStorage($synchronizerName), $this->database,
+            $this->dbSchema->getEntityInfo($synchronizerName), $this->dbSchema, $this->vpidRepository,
+            $this->urlReplacer, $this->shortcodesReplacer);
     }
 
-    public function getSynchronizationSequence() {
+    public function getSynchronizationSequence()
+    {
         return $this->synchronizationSequence;
     }
 
-    private function getStorage($synchronizerName) {
+    private function getStorage($synchronizerName)
+    {
         return $this->storageFactory->getStorage($synchronizerName);
     }
 
-    private function adjustSynchronizationSequenceToDbVersion() {
+    private function adjustSynchronizationSequenceToDbVersion()
+    {
         $allSupportedEntities = $this->dbSchema->getAllEntityNames();
         $this->synchronizationSequence = array_intersect($this->synchronizationSequence, $allSupportedEntities);
     }

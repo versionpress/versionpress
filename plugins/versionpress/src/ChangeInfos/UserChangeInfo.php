@@ -13,19 +13,22 @@ use VersionPress\Git\CommitMessage;
  *
  * @see UserMetaChangeInfo
  */
-class UserChangeInfo extends EntityChangeInfo {
+class UserChangeInfo extends EntityChangeInfo
+{
 
     const USER_LOGIN = "VP-User-Login";
 
     /** @var string */
     private $userLogin;
 
-    public function __construct($action, $entityId, $userLogin) {
+    public function __construct($action, $entityId, $userLogin)
+    {
         parent::__construct("user", $action, $entityId);
         $this->userLogin = $userLogin;
     }
 
-    public function getChangeDescription() {
+    public function getChangeDescription()
+    {
         if ($this->getAction() === "create") {
             return "New user '{$this->userLogin}'";
         }
@@ -37,7 +40,8 @@ class UserChangeInfo extends EntityChangeInfo {
         return "Edited user '{$this->userLogin}'";
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
+    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
         $userLogin = $tags[self::USER_LOGIN];
@@ -45,11 +49,10 @@ class UserChangeInfo extends EntityChangeInfo {
         return new self($action, $entityId, $userLogin);
     }
 
-    public function getCustomTags() {
-        return array(
+    public function getCustomTags()
+    {
+        return [
             self::USER_LOGIN => $this->userLogin
-        );
+        ];
     }
-
-
 }

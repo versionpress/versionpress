@@ -1,13 +1,11 @@
 <?php
 namespace VersionPress\Git\ChangeInfoPreprocessors;
 
-
 use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\EntityChangeInfo;
-use VersionPress\ChangeInfos\PostChangeInfo;
-use VersionPress\ChangeInfos\TrackedChangeInfo;
 
-class EditActionChangeInfoPreprocessor implements ChangeInfoPreprocessor {
+class EditActionChangeInfoPreprocessor implements ChangeInfoPreprocessor
+{
 
     /**
      * More actions '* /edit' for same entity are replaced with one '* /edit' action.
@@ -15,33 +13,41 @@ class EditActionChangeInfoPreprocessor implements ChangeInfoPreprocessor {
      * @param ChangeInfo[] $changeInfoList
      * @return ChangeInfo[][]
      */
-    function process($changeInfoList) {
+    public function process($changeInfoList)
+    {
 
         // 1) Find all post/edit
-        $entities = $this->getChangeInfosByIndicies($changeInfoList, array("edit"));
+        $entities = $this->getChangeInfosByIndicies($changeInfoList, ["edit"]);
 
         // 2) Replace all post/edit with single post/edit action
         foreach ($entities as $entityId => $changeInfos) {
             $edits = $changeInfos['edit'];
             if (count($edits) > 1) {
-                $updatedProperties = array();
+                $updatedProperties = [];
                 /** @var EntityChangeInfo $firstEditChangeInfo */
                 $firstEditChangeInfo = $changeInfoList[$changeInfos["edit"][0]];
                 foreach ($edits as $edit) {
                     /** @var EntityChangeInfo $editChangeInfo */
                     $editChangeInfo = $changeInfoList[$edit];
-                    if (method_exists($editChangeInfo, "getPostUpdatedProperties")) {  // Only PostChangeInfo has this method, and we need to track updated values in Posts.
-                        $updatedProperties = array_unique(array_merge($updatedProperties, $editChangeInfo->getPostUpdatedProperties()));
+
+                    // Only PostChangeInfo has this method, and we need to track updated values in Posts.
+                    if (method_exists($editChangeInfo, "getPostUpdatedProperties")) {
+                        $updatedProperties = array_unique(array_merge(
+                            $updatedProperties,
+                            $editChangeInfo->getPostUpdatedProperties()
+                        ));
                     }
                     unset($changeInfoList[$edit]);
                 }
-                if (method_exists($firstEditChangeInfo, "setPostUpdatedProperties")) { // We need to merge values from several PostChangeInfos into one
+
+                // We need to merge values from several PostChangeInfos into one
+                if (method_exists($firstEditChangeInfo, "setPostUpdatedProperties")) {
                     $firstEditChangeInfo->setPostUpdatedProperties($updatedProperties);
                 }
                 $changeInfoList[] = $firstEditChangeInfo;
             }
         }
-        return array($changeInfoList);
+        return [$changeInfoList];
     }
 
     /**
@@ -50,8 +56,9 @@ class EditActionChangeInfoPreprocessor implements ChangeInfoPreprocessor {
      * @param array $indicies
      * @return array
      */
-    private function getChangeInfosByIndicies($changeInfoList, $indicies) {
-        $entities = array();
+    private function getChangeInfosByIndicies($changeInfoList, $indicies)
+    {
+        $entities = [];
         foreach ($changeInfoList as $key => $changeInfo) {
             if ($changeInfo instanceof EntityChangeInfo && in_array($changeInfo->getAction(), $indicies)) {
                 $entities[$changeInfo->getEntityId()][$changeInfo->getAction()][] = $key;
@@ -59,5 +66,4 @@ class EditActionChangeInfoPreprocessor implements ChangeInfoPreprocessor {
         }
         return $entities;
     }
-
 }

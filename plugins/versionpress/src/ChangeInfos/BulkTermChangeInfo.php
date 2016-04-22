@@ -2,12 +2,13 @@
 
 namespace VersionPress\ChangeInfos;
 
-use Tracy\Debugger;
 use VersionPress\Utils\StringUtils;
 
-class BulkTermChangeInfo extends BulkChangeInfo {
+class BulkTermChangeInfo extends BulkChangeInfo
+{
 
-    public function getChangeDescription() {
+    public function getChangeDescription()
+    {
         if ($this->count === 1) {
             return $this->changeInfos[0]->getChangeDescription();
         }
@@ -21,7 +22,8 @@ class BulkTermChangeInfo extends BulkChangeInfo {
         return parent::getChangeDescription();
     }
 
-    private function getTaxonomyName() {
+    private function getTaxonomyName()
+    {
         /** @var TermChangeInfo $termChangeInfo */
         $termChangeInfo = $this->changeInfos[0];
         return $termChangeInfo->getTaxonomyName();

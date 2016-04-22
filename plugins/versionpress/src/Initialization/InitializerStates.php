@@ -2,7 +2,8 @@
 
 namespace VersionPress\Initialization;
 
-class InitializerStates {
+class InitializerStates
+{
 
     const START = "Starting up";
 

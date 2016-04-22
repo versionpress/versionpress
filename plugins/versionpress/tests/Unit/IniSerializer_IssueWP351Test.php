@@ -1,14 +1,17 @@
 <?php
+// @codingStandardsIgnoreFile
 
 namespace VersionPress\Tests\Unit;
 
 use VersionPress\Storages\Serialization\IniSerializer;
 use VersionPress\Utils\StringUtils;
 
-class IniSerializer_IssueWP351Test extends \PHPUnit_Framework_TestCase {
+class IniSerializer_IssueWP351Test extends \PHPUnit_Framework_TestCase
+{
 
     /** @test */
-    public function full() {
+    public function full()
+    {
         $ini = StringUtils::crlfize(<<<'INI'
 [4FABE013BD2443C0BB80BBA89FF7AF6A]
 post_date = "2013-04-02 11:23:53"
@@ -94,11 +97,12 @@ vp_id = "4FABE013BD2443C0BB80BBA89FF7AF6A"
 vp_post_author = "D040169AA8054643B5C2E8D06016C85A"
 
 INI
-);
-        $data = array("4FABE013BD2443C0BB80BBA89FF7AF6A" => array(
-            "post_date" => "2013-04-02 11:23:53",
-            "post_date_gmt" => "2013-04-02 11:23:53",
-            "post_content" => StringUtils::crlfize(<<<'INI'
+        );
+        $data = [
+            "4FABE013BD2443C0BB80BBA89FF7AF6A" => [
+                "post_date" => "2013-04-02 11:23:53",
+                "post_date_gmt" => "2013-04-02 11:23:53",
+                "post_content" => StringUtils::crlfize(<<<'INI'
 [av_section color='alternate_color' custom_bg='' src='' position='top left' repeat='no-repeat' attach='scroll' padding='default' shadow='no-shadow']
 [av_table purpose='pricing' caption='']
 [av_row row_style='avia-heading-row'][av_cell col_style='']Private Plan[/av_cell][av_cell col_style='avia-highlight-col']Business Plan[/av_cell][av_cell col_style='']Mega Plan[/av_cell][/av_row]
@@ -163,24 +167,25 @@ INI
 [/av_cell][/av_row]
 [/av_table]
 INI
-            ),
-            "post_content_filtered" => "",
-            "post_title" => "Pricing and data Table",
-            "post_excerpt" => "",
-            "post_status" => "publish",
-            "post_type" => "page",
-            "comment_status" => "open",
-            "ping_status" => "open",
-            "post_password" => "",
-            "post_name" => "pricing-and-data-tables",
-            "to_ping" => "",
-            "pinged" => "",
-            "menu_order" => 0,
-            "post_mime_type" => "",
-            "guid" => "http://www.kriesi.at/themes/enfold/?page_id=862",
-            "vp_id" => "4FABE013BD2443C0BB80BBA89FF7AF6A",
-            "vp_post_author" => "D040169AA8054643B5C2E8D06016C85A",
-        ));
+                ),
+                "post_content_filtered" => "",
+                "post_title" => "Pricing and data Table",
+                "post_excerpt" => "",
+                "post_status" => "publish",
+                "post_type" => "page",
+                "comment_status" => "open",
+                "ping_status" => "open",
+                "post_password" => "",
+                "post_name" => "pricing-and-data-tables",
+                "to_ping" => "",
+                "pinged" => "",
+                "menu_order" => 0,
+                "post_mime_type" => "",
+                "guid" => "http://www.kriesi.at/themes/enfold/?page_id=862",
+                "vp_id" => "4FABE013BD2443C0BB80BBA89FF7AF6A",
+                "vp_post_author" => "D040169AA8054643B5C2E8D06016C85A",
+            ]
+        ];
 
         $this->assertEquals($data, IniSerializer::deserialize($ini), "Deserialization failed - arrays are different");
         $this->assertEquals($ini, IniSerializer::serialize($data), "Serialization failed - strings are different");

@@ -10,25 +10,29 @@ use VersionPress\Git\CommitMessage;
  *
  * @see TrackedChangeInfo
  */
-class UntrackedChangeInfo implements ChangeInfo {
+class UntrackedChangeInfo implements ChangeInfo
+{
 
     /** @var CommitMessage */
     private $commitMessage;
 
-    public function __construct(CommitMessage $commitMessage) {
+    public function __construct(CommitMessage $commitMessage)
+    {
         $this->commitMessage = $commitMessage;
     }
 
-    public function getCommitMessage() {
+    public function getCommitMessage()
+    {
         return $this->commitMessage;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
+    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    {
         return new self($commitMessage);
     }
 
-    public function getChangeDescription() {
+    public function getChangeDescription()
+    {
         return $this->commitMessage->getSubject();
     }
-
 }

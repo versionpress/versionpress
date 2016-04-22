@@ -7,7 +7,8 @@ use Nette\Utils\Strings;
 /**
  * Converts option names between property, env var and CLI argument conventions
  */
-class OptionsConventionConverter {
+class OptionsConventionConverter
+{
 
     /**
      * Converts 'optionName' to 'VP_OPTION_NAME', i.e. from property convention to env var convention
@@ -15,7 +16,8 @@ class OptionsConventionConverter {
      * @param string $propertyName
      * @return string
      */
-    public static function getEnvVarOptionName($propertyName) {
+    public static function getEnvVarOptionName($propertyName)
+    {
         $words = Strings::split($propertyName, '/(?=[A-Z])/');
         array_unshift($words, "VP");
         return strtoupper(join("_", $words));
@@ -27,9 +29,9 @@ class OptionsConventionConverter {
      * @param string $propertyName
      * @return string
      */
-    public static function getCliOptionName($propertyName) {
+    public static function getCliOptionName($propertyName)
+    {
         $words = Strings::split($propertyName, '/(?=[A-Z])/');
         return strtolower(join("-", $words));
     }
-
 }

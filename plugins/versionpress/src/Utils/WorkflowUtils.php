@@ -1,6 +1,5 @@
 <?php
 
-
 namespace VersionPress\Utils;
 
 /**
@@ -8,10 +7,10 @@ namespace VersionPress\Utils;
  * for now. This will probably be refactored into its own namespace and better
  * structured classes one day.
  */
-class WorkflowUtils {
-
-    public static function isCloneNameValid($cloneName) {
+class WorkflowUtils
+{
+    public static function isCloneNameValid($cloneName)
+    {
         return preg_match('/^[a-zA-Z0-9-_]+$/', $cloneName) === 1;
     }
-
 }

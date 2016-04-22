@@ -4,44 +4,55 @@ namespace VersionPress\Tests\GitRepositoryTests;
 use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Tests\Utils\MergeAsserter;
 use VersionPress\Tests\Utils\MergeDriverTestUtils;
-use VersionPress\Utils\PathUtils;
 use VersionPress\Utils\StringUtils;
 
-class MergeDriverTest extends \PHPUnit_Framework_TestCase {
+class MergeDriverTest extends \PHPUnit_Framework_TestCase
+{
 
     private static $repositoryDir;
 
-    public function driverProvider() {
+    public function driverProvider()
+    {
         return [
             [MergeDriverInstaller::DRIVER_BASH],
             [MergeDriverInstaller::DRIVER_PHP]
         ];
     }
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass()
+    {
         self::$repositoryDir = __DIR__ . '/repository';
     }
 
-    public function setUp() {
+    public function setUp()
+    {
         MergeDriverTestUtils::initRepository(self::$repositoryDir);
     }
 
-    public function tearDown() {
+    public function tearDown()
+    {
         MergeDriverTestUtils::destroyRepository();
     }
 
     /**
      * @param string $driver See MergeDriverInstaller::installMergeDriver()'s $driver parameter
      */
-    private function installMergeDriver($driver) {
-        MergeDriverInstaller::installMergeDriver(self::$repositoryDir, __DIR__ . '/../..', self::$repositoryDir, $driver);
+    private function installMergeDriver($driver)
+    {
+        MergeDriverInstaller::installMergeDriver(
+            self::$repositoryDir,
+            __DIR__ . '/../..',
+            self::$repositoryDir,
+            $driver
+        );
     }
 
 
     /**
      * @test
      */
-    public function mergeDriverInstalledCorrectly() {
+    public function mergeDriverInstalledCorrectly()
+    {
         $this->installMergeDriver('auto');
         $this->assertContains('vp-ini', file_get_contents(self::$repositoryDir . "/.git/config"));
         $this->assertContains('merge=vp-ini', file_get_contents(self::$repositoryDir . "/.gitattributes"));
@@ -50,7 +61,8 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function mergeDriverUninstalledCorrectly() {
+    public function mergeDriverUninstalledCorrectly()
+    {
         $this->installMergeDriver('auto');
         file_put_contents(self::$repositoryDir . "/.gitattributes", "*.txt text");
         MergeDriverInstaller::uninstallMergeDriver(self::$repositoryDir, __DIR__ . '/../..', self::$repositoryDir);
@@ -61,7 +73,8 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function gitAttributesRemovedWhenEmpty() {
+    public function gitAttributesRemovedWhenEmpty()
+    {
         $this->installMergeDriver('auto');
         MergeDriverInstaller::uninstallMergeDriver(self::$repositoryDir, __DIR__ . '/../..', self::$repositoryDir);
         $this->assertFileNotExists(self::$repositoryDir . "/.gitattributes");
@@ -70,7 +83,8 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function gitAttributesIsSameAfterInstallAndUninstall() {
+    public function gitAttributesIsSameAfterInstallAndUninstall()
+    {
         $gitAttributesContent = "*.txt text\n*.jpg binary";
         file_put_contents(self::$repositoryDir . "/.gitattributes", $gitAttributesContent);
         $this->installMergeDriver('auto');
@@ -81,12 +95,13 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function mergeDriverIsNotAddedWhenPresent() {
+    public function mergeDriverIsNotAddedWhenPresent()
+    {
         $gitattributesContents = file_get_contents(__DIR__ . '/../../src/Initialization/.gitattributes.tpl');
         $gitConfigContents = "[merge \"vp-ini\"]";
-        $gitattributesVariables = array(
+        $gitattributesVariables = [
             'vpdb-dir' => self::$repositoryDir
-        );
+        ];
         $gitattributesContents = StringUtils::fillTemplateString($gitattributesVariables, $gitattributesContents);
         file_put_contents(self::$repositoryDir . "/.gitattributes", $gitattributesContents);
         file_put_contents(self::$repositoryDir . "/.git/config", $gitConfigContents);
@@ -98,7 +113,8 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function gitAttributesRemovedCorrectlyAfterUninstall() {
+    public function gitAttributesRemovedCorrectlyAfterUninstall()
+    {
         $this->installMergeDriver('auto');
         MergeDriverInstaller::uninstallMergeDriver(self::$repositoryDir, __DIR__ . '/../..', self::$repositoryDir);
         $this->assertNotContains('vp-ini', file_get_contents(self::$repositoryDir . "/.git/config"));
@@ -113,7 +129,8 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider driverProvider
      * @param string $driver
      */
-    public function mergedDatesWithoutConflict($driver) {
+    public function mergedDatesWithoutConflict($driver)
+    {
 
         if (DIRECTORY_SEPARATOR == '\\' && $driver == MergeDriverInstaller::DRIVER_BASH) {
             $this->markTestSkipped('No Bash on Windows.');
@@ -148,7 +165,8 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider driverProvider
      * @param string $driver
      */
-    public function conflictingContentsCreatedConflict($driver) {
+    public function conflictingContentsCreatedConflict($driver)
+    {
 
         if (DIRECTORY_SEPARATOR == '\\' && $driver == MergeDriverInstaller::DRIVER_BASH) {
             $this->markTestSkipped('No Bash on Windows.');
@@ -185,7 +203,8 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider driverProvider
      * @param string $driver
      */
-    public function changesOnAdjacentLinesMergeWithoutConflict($driver) {
+    public function changesOnAdjacentLinesMergeWithoutConflict($driver)
+    {
 
         if (DIRECTORY_SEPARATOR == '\\' && $driver == MergeDriverInstaller::DRIVER_BASH) {
             $this->markTestSkipped('No Bash on Windows.');
@@ -211,6 +230,4 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase {
 
         MergeAsserter::assertCleanMerge('git merge test-branch');
     }
-
-
 }

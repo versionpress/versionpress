@@ -6,12 +6,14 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * Describes shortcodes and their references to DB entities.
- * 
+ *
  * The information is loaded from a *-shortcodes.yml file.
  */
-class ShortcodesInfo {
+class ShortcodesInfo
+{
 
-    public function __construct($shortcodeFile) {
+    public function __construct($shortcodeFile)
+    {
         $this->shortcodeSchema = Yaml::parse(file_get_contents($shortcodeFile));
     }
 
@@ -20,7 +22,8 @@ class ShortcodesInfo {
      *
      * @return string[]
      */
-    public function getAllShortcodeNames() {
+    public function getAllShortcodeNames()
+    {
         return array_keys($this->shortcodeSchema['shortcodes']);
     }
 
@@ -33,11 +36,12 @@ class ShortcodesInfo {
      *   'include' => 'post'
      * ]
      * ```
-     * 
+     *
      * @param string $shortcodeName
      * @return array
      */
-    public function getShortcodeInfo($shortcodeName) {
+    public function getShortcodeInfo($shortcodeName)
+    {
         return $this->shortcodeSchema['shortcodes'][$shortcodeName];
     }
 
@@ -56,7 +60,8 @@ class ShortcodesInfo {
      *
      * @return array
      */
-    public function getShortcodeLocations() {
+    public function getShortcodeLocations()
+    {
         return $this->shortcodeSchema['shortcode-locations'];
     }
 }

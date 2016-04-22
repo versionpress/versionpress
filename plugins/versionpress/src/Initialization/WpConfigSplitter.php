@@ -11,22 +11,24 @@ use Nette\Utils\Strings;
  * into tracked file.
  *
  */
-class WpConfigSplitter {
+class WpConfigSplitter
+{
 
-    private static $constantsForExtraction = array(
+    private static $constantsForExtraction = [
         'WP_CONTENT_DIR',
         'WP_PLUGIN_DIR',
         'UPLOADS',
-    );
+    ];
 
-    public static function split($wpConfigPath, $commonConfigName) {
+    public static function split($wpConfigPath, $commonConfigName)
+    {
         $wpConfigDir = dirname($wpConfigPath);
         $commonConfigPath = $wpConfigDir . '/' . $commonConfigName;
 
         self::ensureCommonConfigInclude($wpConfigPath, $commonConfigName);
 
         $configLines = file($wpConfigPath);
-        $commonConfigLines = is_file($commonConfigPath) ? file($commonConfigPath) : array("<?php\n");
+        $commonConfigLines = is_file($commonConfigPath) ? file($commonConfigPath) : ["<?php\n"];
 
         // https://regex101.com/r/zD3mJ4/2
         $constantsForRegex = join('|', self::$constantsForExtraction);
@@ -55,7 +57,8 @@ class WpConfigSplitter {
      * @param $wpConfigPath
      * @param $commonConfigName
      */
-    public static function ensureCommonConfigInclude($wpConfigPath, $commonConfigName) {
+    public static function ensureCommonConfigInclude($wpConfigPath, $commonConfigName)
+    {
         $include = <<<DOC
 // Configuration common to all environments
 include_once __DIR__ . '/$commonConfigName';

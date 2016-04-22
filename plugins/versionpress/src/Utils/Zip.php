@@ -10,8 +10,10 @@ use ZipArchive;
  * Helper class for zipping bug report.
  * Inspired by http://stackoverflow.com/a/1334949/1243495
  */
-class Zip {
-    public static function zipDirectory($directory, $zipFile) {
+class Zip
+{
+    public static function zipDirectory($directory, $zipFile)
+    {
         if (!extension_loaded('zip') || !file_exists($directory)) {
             return false;
         }
@@ -33,7 +35,7 @@ class Zip {
                 $file = str_replace('\\', '/', $file);
 
                 // Ignore "." and ".." folders
-                if (in_array(substr($file, strrpos($file, '/') + 1), array('.', '..'))) {
+                if (in_array(substr($file, strrpos($file, '/') + 1), ['.', '..'])) {
                     continue;
                 }
 

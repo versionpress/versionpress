@@ -58,13 +58,13 @@ namespace VersionPress\Database;
  * @property string func_call
  * @property bool is_mysql
  * @method init_charset()
- * @method set_charset($dbh, $charset = NULL, $collate = NULL)
- * @method set_sql_mode($modes = array())
+ * @method set_charset($dbh, $charset = null, $collate = null)
+ * @method set_sql_mode($modes = [])
  * @method string|\WP_Error set_prefix($prefix, $set_table_names = true)
  * @method int set_blog_id($blog_id, $site_id = 0)
- * @method string get_blog_prefix($blog_id = NULL)
+ * @method string get_blog_prefix($blog_id = null)
  * @method array tables($scope = 'all', $prefix = true, $blog_id = 0)
- * @method select($db, $dbh = NULL)
+ * @method select($db, $dbh = null)
  * @method string _weak_escape($string)
  * @method string _real_escape($string)
  * @method string|array _escape($data)
@@ -79,15 +79,15 @@ namespace VersionPress\Database;
  * @method flush()
  * @method bool db_connect($allow_bail = true)
  * @method bool|void check_connection($allow_bail = true)
- * @method int|false insert($table, $data, $format = NULL)
- * @method int|false replace($table, $data, $format = NULL)
- * @method int|false _insert_replace_helper($table, $data, $format = NULL, $type = 'INSERT')
- * @method int|false update($table, $data, $where, $format = NULL, $where_format = NULL)
- * @method int|false delete($table, $where, $where_format = NULL)
- * @method string|null get_var($query = NULL, $x = 0, $y = 0)
- * @method array|object|null|void get_row($query = NULL, $output = OBJECT, $y = 0)
- * @method array get_col($query = NULL, $x = 0)
- * @method array|object|null get_results($query = NULL, $output = OBJECT)
+ * @method int|false insert($table, $data, $format = null)
+ * @method int|false replace($table, $data, $format = null)
+ * @method int|false _insert_replace_helper($table, $data, $format = null, $type = 'INSERT')
+ * @method int|false update($table, $data, $where, $format = null, $where_format = null)
+ * @method int|false delete($table, $where, $where_format = null)
+ * @method string|null get_var($query = null, $x = 0, $y = 0)
+ * @method array|object|null|void get_row($query = null, $output = OBJECT, $y = 0)
+ * @method array get_col($query = null, $x = 0)
+ * @method array|object|null get_results($query = null, $output = OBJECT)
  * @method string|false|\WP_Error get_col_charset($table, $column)
  * @method array|false|\WP_Error get_col_length($table, $column)
  * @method string|\WP_Error strip_invalid_text_for_column($table, $column, $value)
@@ -103,7 +103,8 @@ namespace VersionPress\Database;
  * @method string|array get_caller()
  * @method null|string db_version()
  */
-class Database {
+class Database
+{
 
     /**
      * @var \wpdb
@@ -113,20 +114,24 @@ class Database {
     public $vp_id;
 
 
-    public function __construct($wpdb) {
+    public function __construct($wpdb)
+    {
         $this->wpdb = $wpdb;
         $this->vp_id = $wpdb->prefix . 'vp_id';
     }
 
-    public function __get($name) {
+    public function __get($name)
+    {
         return $this->wpdb->$name;
     }
 
-    function __set($name, $value) {
+    public function __set($name, $value)
+    {
         $this->wpdb->$name = $value;
     }
 
-    function __call($name, $arguments) {
+    public function __call($name, $arguments)
+    {
         return call_user_func_array([$this->wpdb, $name], $arguments);
     }
 
@@ -136,7 +141,8 @@ class Database {
      * @param string $query Database query
      * @return int|false Number of rows affected/selected or false on error
      */
-    public function query($query) {
+    public function query($query)
+    {
         $rawQueryMethodName = "__wp_query";
         if (method_exists("wpdb", $rawQueryMethodName)) {
             return $this->wpdb->$rawQueryMethodName($query);
@@ -144,5 +150,4 @@ class Database {
             return $this->wpdb->query($query);
         }
     }
-
 }

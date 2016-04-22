@@ -2,7 +2,8 @@
 
 namespace VersionPress\Utils;
 
-class CompatibilityResult {
+class CompatibilityResult
+{
     const COMPATIBLE = 'compatible';
     const UNTESTED = 'untested';
     const INCOMPATIBLE = 'incompatible';

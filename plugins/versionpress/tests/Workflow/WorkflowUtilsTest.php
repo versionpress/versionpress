@@ -1,17 +1,17 @@
 <?php
 
-
 namespace VersionPress\Tests\Workflow;
-
 
 use VersionPress\Utils\WorkflowUtils;
 
-class WorkflowUtilsTest extends \PHPUnit_Framework_TestCase {
+class WorkflowUtilsTest extends \PHPUnit_Framework_TestCase
+{
 
     /**
      * @test
      */
-    public function isCloneNameValidReturnsTrueForValidNames() {
+    public function isCloneNameValidReturnsTrueForValidNames()
+    {
         $this->assertTrue(WorkflowUtils::isCloneNameValid('a'));
         $this->assertTrue(WorkflowUtils::isCloneNameValid('_'));
         $this->assertTrue(WorkflowUtils::isCloneNameValid('-'));
@@ -22,7 +22,8 @@ class WorkflowUtilsTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function isCloneNameValidReturnsFalseForInvalidNames() {
+    public function isCloneNameValidReturnsFalseForInvalidNames()
+    {
         $this->assertFalse(WorkflowUtils::isCloneNameValid('**'));
         $this->assertFalse(WorkflowUtils::isCloneNameValid(''));
         $this->assertFalse(WorkflowUtils::isCloneNameValid('abc**'));

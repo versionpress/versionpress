@@ -33,7 +33,7 @@
  *------------------------------*/
 
 #wpbody {
-	padding-right: 10px;
+    padding-right: 10px;
 }
 
 
@@ -43,20 +43,20 @@
 }
 
 #versionpress-commits-table .column-date {
-	width: 100px;
+    width: 100px;
 }
 
 #versionpress-commits-table .column-commit-id {
-	width: 60px;
+    width: 60px;
 }
 
 #versionpress-commits-table .column-commit-id {
-	/*width: 100%;*/
+    /*width: 100%;*/
 }
 
 
 #versionpress-commits-table .column-actions {
-	width: 170px;
+    width: 170px;
 }
 
 .vp-requirements-check li p.closed {

@@ -8,13 +8,15 @@ use VersionPress\Utils\IdUtil;
 use VersionPress\Utils\ReferenceUtils;
 use wpdb;
 
-class VpidRepository {
+class VpidRepository
+{
     /** @var Database */
     private $database;
     /** @var DbSchemaInfo */
     private $schemaInfo;
 
-    public function __construct($database, DbSchemaInfo $schemaInfo) {
+    public function __construct($database, DbSchemaInfo $schemaInfo)
+    {
         $this->database = $database;
         $this->schemaInfo = $schemaInfo;
     }
@@ -26,20 +28,23 @@ class VpidRepository {
      * @param $id
      * @return null|string
      */
-    public function getVpidForEntity($entityName, $id) {
+    public function getVpidForEntity($entityName, $id)
+    {
         $tableName = $this->schemaInfo->getTableName($entityName);
-        return $this->database->get_var("SELECT HEX(vp_id) FROM {$this->database->vp_id} WHERE id = '$id' AND `table` = '$tableName'");
+        return $this->database->get_var("SELECT HEX(vp_id) FROM {$this->database->vp_id} " .
+            "WHERE id = '$id' AND `table` = '$tableName'");
     }
 
-    public function getIdForVpid($vpid) {
+    public function getIdForVpid($vpid)
+    {
         return intval($this->database->get_var("SELECT id FROM {$this->database->vp_id} WHERE vp_id = UNHEX('$vpid')"));
     }
 
-    public function replaceForeignKeysWithReferences($entityName, $entity) {
+    public function replaceForeignKeysWithReferences($entityName, $entity)
+    {
         $entityInfo = $this->schemaInfo->getEntityInfo($entityName);
 
         foreach ($entityInfo->references as $referenceName => $targetEntity) {
-
             if (isset($entity[$referenceName])) {
                 if ($this->isNullReference($entity[$referenceName])) {
                     $referenceVpids = 0;
@@ -50,14 +55,16 @@ class VpidRepository {
                 $entity['vp_' . $referenceName] = $referenceVpids;
                 unset($entity[$referenceName]);
             }
-
         }
 
         foreach ($entityInfo->valueReferences as $referenceName => $targetEntity) {
-            list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) = array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
+            list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) =
+                array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
 
-            if (isset($entity[$sourceColumn]) && ($entity[$sourceColumn] === $sourceValue || ReferenceUtils::valueMatchesWildcard($sourceValue, $entity[$sourceColumn])) && isset($entity[$valueColumn])) {
-
+            if (isset($entity[$sourceColumn]) && ($entity[$sourceColumn] === $sourceValue ||
+                    ReferenceUtils::valueMatchesWildcard($sourceValue, $entity[$sourceColumn]))
+                && isset($entity[$valueColumn])
+            ) {
                 if ($this->isNullReference($entity[$valueColumn])) {
                     continue;
                 }
@@ -97,14 +104,18 @@ class VpidRepository {
         return $entity;
     }
 
-    public function restoreForeignKeys($entityName, $entity) {
+    public function restoreForeignKeys($entityName, $entity)
+    {
         $entityInfo = $this->schemaInfo->getEntityInfo($entityName);
 
         foreach ($entityInfo->valueReferences as $referenceName => $targetEntity) {
-            list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) = array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
+            list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) =
+                array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
 
-            if (isset($entity[$sourceColumn]) && ($entity[$sourceColumn] === $sourceValue || ReferenceUtils::valueMatchesWildcard($sourceValue, $entity[$sourceColumn])) && isset($entity[$valueColumn])) {
-
+            if (isset($entity[$sourceColumn]) && ($entity[$sourceColumn] === $sourceValue ||
+                    ReferenceUtils::valueMatchesWildcard($sourceValue, $entity[$sourceColumn])) &&
+                isset($entity[$valueColumn])
+            ) {
                 if ($this->isNullReference($entity[$valueColumn])) {
                     continue;
                 }
@@ -136,7 +147,8 @@ class VpidRepository {
         return $entity;
     }
 
-    public function identifyEntity($entityName, $data, $id) {
+    public function identifyEntity($entityName, $data, $id)
+    {
         if ($this->schemaInfo->getEntityInfo($entityName)->usesGeneratedVpids) {
             $data['vp_id'] = IdUtil::newId();
             $this->saveId($entityName, $id, $data['vp_id']);
@@ -149,19 +161,23 @@ class VpidRepository {
         return $data;
     }
 
-    public function deleteId($entityName, $id) {
+    public function deleteId($entityName, $id)
+    {
         $tableName = $this->schemaInfo->getTableName($entityName);
         $deleteQuery = "DELETE FROM {$this->database->vp_id} WHERE `table` = \"$tableName\" AND id = '$id'";
         $this->database->query($deleteQuery);
     }
 
-    private function saveId($entityName, $id, $vpId) {
+    private function saveId($entityName, $id, $vpId)
+    {
         $tableName = $this->schemaInfo->getTableName($entityName);
-        $query = "INSERT INTO {$this->database->vp_id} (`vp_id`, `table`, `id`) VALUES (UNHEX('$vpId'), \"$tableName\", $id)";
+        $query = "INSERT INTO {$this->database->vp_id} (`vp_id`, `table`, `id`)
+                  VALUES (UNHEX('$vpId'), \"$tableName\", $id)";
         $this->database->query($query);
     }
 
-    private function fillId($entityName, $data, $id) {
+    private function fillId($entityName, $data, $id)
+    {
         $idColumnName = $this->schemaInfo->getEntityInfo($entityName)->idColumnName;
         if (!isset($data[$idColumnName])) {
             $data[$idColumnName] = $id;
@@ -169,17 +185,20 @@ class VpidRepository {
         return $data;
     }
 
-    private function isNullReference($id) {
+    private function isNullReference($id)
+    {
         return (is_numeric($id) && intval($id) === 0) || $id === '';
     }
 
-    private function replaceIdsInString($targetEntity, $stringWithIds) {
+    private function replaceIdsInString($targetEntity, $stringWithIds)
+    {
         return preg_replace_callback('/(\d+)/', function ($match) use ($targetEntity) {
             return $this->getVpidForEntity($targetEntity, $match[0]) ?: $match[0];
         }, $stringWithIds);
     }
 
-    private function restoreIdsInString($stringWithVpids) {
+    private function restoreIdsInString($stringWithVpids)
+    {
         $stringWithIds = preg_replace_callback(IdUtil::getRegexMatchingId(), function ($match) {
             return $this->getIdForVpid($match[0]) ?: $match[0];
         }, $stringWithVpids);
@@ -195,12 +214,15 @@ class VpidRepository {
      * @param $postmeta
      * @return null|string
      */
-    public static function getMenuReference($postmeta) {
+    public static function getMenuReference($postmeta)
+    {
         global $versionPressContainer;
         /** @var Database $database */
         $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
 
-        $menuItemType = $database->get_col("select meta_value from {$database->postmeta} pm join {$database->vp_id} vpid on pm.post_id = vpid.id where pm.meta_key = '_menu_item_type' and vpid.vp_id = UNHEX(\"{$postmeta['vp_post_id']}\")");
+        $menuItemType = $database->get_col("select meta_value from {$database->postmeta} pm join {$database->vp_id} vpid
+                                            on pm.post_id = vpid.id where pm.meta_key = '_menu_item_type'
+                                            and vpid.vp_id = UNHEX(\"{$postmeta['vp_post_id']}\")");
 
         if ($menuItemType === 'taxonomy') {
             return 'term_taxonomy';

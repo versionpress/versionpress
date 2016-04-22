@@ -9,10 +9,13 @@ use Symfony\Component\Yaml\Yaml;
  * and what are the relationships between them. The information is loaded from a *.yml file
  * which is described in `schema-readme.md`.
  */
-class DbSchemaInfo {
+class DbSchemaInfo
+{
 
     /**
-     * Parsed YAML schema - to see what it looks like, paste the YAML into {@link http://yaml-online-parser.appspot.com/}).
+     * Parsed YAML schema - to see what it looks like
+     * paste the YAML into {@link http://yaml-online-parser.appspot.com/}).
+     *
      * Parsed in constructor.
      *
      * @var array|int|mixed|DateTime|null|string
@@ -37,8 +40,10 @@ class DbSchemaInfo {
     /**
      * @param string $schemaFile Path to a *.yml file to read from disk
      * @param string $prefix
+     * @param int $dbVersion WordPress DB version (global variable $wp_db_version)
      */
-    function __construct($schemaFile, $prefix, $dbVersion) {
+    public function __construct($schemaFile, $prefix, $dbVersion)
+    {
         $yamlSchema = file_get_contents($schemaFile);
         $this->dbVersion = $dbVersion;
         $this->prefix = $prefix;
@@ -51,9 +56,10 @@ class DbSchemaInfo {
      * @param $entityName
      * @return EntityInfo
      */
-    public function getEntityInfo($entityName) {
+    public function getEntityInfo($entityName)
+    {
         if (!isset($this->entityInfoRegistry[$entityName])) {
-            $this->entityInfoRegistry[$entityName] = new EntityInfo(array($entityName => $this->schema[$entityName]));
+            $this->entityInfoRegistry[$entityName] = new EntityInfo([$entityName => $this->schema[$entityName]]);
         }
 
         return $this->entityInfoRegistry[$entityName];
@@ -65,7 +71,8 @@ class DbSchemaInfo {
      *
      * @return array
      */
-    public function getAllEntityNames() {
+    public function getAllEntityNames()
+    {
         return array_keys($this->schema);
     }
 
@@ -75,7 +82,8 @@ class DbSchemaInfo {
      * @param $entityName
      * @return string
      */
-    public function getTableName($entityName) {
+    public function getTableName($entityName)
+    {
         $tableName = $this->isEntity($entityName) ? $this->getEntityInfo($entityName)->tableName : $entityName;
         return $tableName;
     }
@@ -86,7 +94,8 @@ class DbSchemaInfo {
      * @param $entityName
      * @return string
      */
-    public function getPrefixedTableName($entityName) {
+    public function getPrefixedTableName($entityName)
+    {
         return $this->prefix . $this->getTableName($entityName);
     }
 
@@ -96,12 +105,14 @@ class DbSchemaInfo {
      * @param $tableName
      * @return EntityInfo
      */
-    public function getEntityInfoByTableName($tableName) {
+    public function getEntityInfoByTableName($tableName)
+    {
         $entityNames = $this->getAllEntityNames();
         foreach ($entityNames as $entityName) {
             $entityInfo = $this->getEntityInfo($entityName);
-            if ($entityInfo->tableName === $tableName)
+            if ($entityInfo->tableName === $tableName) {
                 return $entityInfo;
+            }
         }
         return null;
     }
@@ -112,7 +123,8 @@ class DbSchemaInfo {
      * @param $tableName
      * @return EntityInfo
      */
-    public function getEntityInfoByPrefixedTableName($tableName) {
+    public function getEntityInfoByPrefixedTableName($tableName)
+    {
         $tableName = substr($tableName, strlen($this->prefix));
         return $this->getEntityInfoByTableName($tableName);
     }
@@ -123,7 +135,8 @@ class DbSchemaInfo {
      * @param $entityName
      * @return bool
      */
-    public function isChildEntity($entityName) {
+    public function isChildEntity($entityName)
+    {
         return $this->getEntityInfo($entityName)->parentReference !== null;
     }
 
@@ -132,8 +145,9 @@ class DbSchemaInfo {
      *
      * @return array
      */
-    public function getRulesForFrequentlyWrittenEntities() {
-        $frequentlyWrittenEntities = array();
+    public function getRulesForFrequentlyWrittenEntities()
+    {
+        $frequentlyWrittenEntities = [];
         foreach ($this->getAllEntityNames() as $entityName) {
             $entityInfo = $this->getEntityInfo($entityName);
             $frequentlyWrittenEntities[$entityName] = $entityInfo->getRulesAndIntervalsForFrequentlyWrittenEntities();
@@ -143,9 +157,10 @@ class DbSchemaInfo {
     }
 
 
-    public function getIntervalsForFrequentlyWrittenEntities() {
+    public function getIntervalsForFrequentlyWrittenEntities()
+    {
         $rulesByEntity = $this->getRulesForFrequentlyWrittenEntities();
-        $intervals = array();
+        $intervals = [];
 
         foreach ($rulesByEntity as $rules) {
             foreach ($rules as $rule) {
@@ -163,7 +178,8 @@ class DbSchemaInfo {
      * @param $entityOrTableName
      * @return bool
      */
-    private function isEntity($entityOrTableName) {
+    private function isEntity($entityOrTableName)
+    {
         return in_array($entityOrTableName, $this->getAllEntityNames());
     }
 
@@ -174,7 +190,8 @@ class DbSchemaInfo {
      * @param $schema
      * @return array
      */
-    private function useSchemaForCurrentVersion($schema) {
+    private function useSchemaForCurrentVersion($schema)
+    {
         $currentDbVersion = $this->dbVersion;
         return array_filter($schema, function ($entitySchema) use ($currentDbVersion) {
             if (!isset($entitySchema['since'])) {

@@ -21,32 +21,39 @@ use VersionPress\Utils\StringUtils;
  * Note: there was an intention to use VP-Option-Value tag before but it was never implemented and
  * it is not clear how to approach this. See WP-147.
  */
-class OptionChangeInfo extends EntityChangeInfo {
+class OptionChangeInfo extends EntityChangeInfo
+{
 
-    public function __construct($action, $entityId) {
+    public function __construct($action, $entityId)
+    {
         parent::__construct("option", $action, $entityId);
     }
 
-    function getChangeDescription() {
-        return Strings::capitalize(StringUtils::verbToPastTense($this->getAction())) . " option '{$this->getEntityId()}'";
+    public function getChangeDescription()
+    {
+        $pastTense = StringUtils::verbToPastTense($this->getAction());
+        return Strings::capitalize($pastTense) . " option '{$this->getEntityId()}'";
     }
 
-    static function buildFromCommitMessage(CommitMessage $commitMessage) {
+    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
         list(, $action, $entityId) = explode("/", $actionTag, 3);
         return new self($action, $entityId);
     }
 
-    public function getCustomTags() {
-        return array();
+    public function getCustomTags()
+    {
+        return [];
     }
 
-    public function getChangedFiles() {
+    public function getChangedFiles()
+    {
 
         $result = parent::getChangedFiles();
         if ($this->getEntityId() == "rewrite_rules") {
-            $result[] = array("type" => "path", "path" => ABSPATH . ".htaccess");
+            $result[] = ["type" => "path", "path" => ABSPATH . ".htaccess"];
         }
 
         return $result;

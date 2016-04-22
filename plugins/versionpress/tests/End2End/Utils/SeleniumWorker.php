@@ -1,11 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Jan
- * Date: 26. 2. 2015
- * Time: 9:33
- */
+
 namespace VersionPress\Tests\End2End\Utils;
+
 use Nette\Utils\Strings;
 use PHPUnit_Extensions_Selenium2TestCase_SessionStrategy_Isolated;
 use PHPUnit_Extensions_Selenium2TestCase_SessionStrategy_Shared;
@@ -18,8 +14,9 @@ use VersionPress\Tests\Utils\TestConfig;
 use VersionPress\Tests\Utils\WpVersionComparer;
 
 /**
+ * @codingStandardsIgnoreStart
  * @method void acceptAlert() Press OK on an alert, or confirms a dialog
- * @method mixed alertText() alertText($value = NULL) Gets the alert dialog text, or sets the text for a prompt dialog
+ * @method mixed alertText() alertText($value = null) Gets the alert dialog text, or sets the text for a prompt dialog
  * @method void back()
  * @method \PHPUnit_Extensions_Selenium2TestCase_Element byClassName() byClassName($value)
  * @method \PHPUnit_Extensions_Selenium2TestCase_Element byCssSelector() byCssSelector($value)
@@ -45,7 +42,7 @@ use VersionPress\Tests\Utils\WpVersionComparer;
  * @method string source() Returns the HTML source of the page
  * @method \PHPUnit_Extensions_Selenium2TestCase_Session_Timeouts timeouts()
  * @method string title()
- * @method void|string url() url($url = NULL)
+ * @method void|string url() url($url = null)
  * @method \PHPUnit_Extensions_Selenium2TestCase_ElementCriteria using() using($strategy) Factory Method for Criteria objects
  * @method void window() window($name) Changes the focus to another window
  * @method string windowHandle() Retrieves the current window handle
@@ -57,8 +54,10 @@ use VersionPress\Tests\Utils\WpVersionComparer;
  * @method void closeWindow() Close the current window.
  * @method void close() Close the current window and clear session data.
  * @method \PHPUnit_Extensions_Selenium2TestCase_Element active() Get the element on the page that currently has focus.
+ * @codingStandardsIgnoreEnd
  */
-class SeleniumWorker implements ITestWorker {
+class SeleniumWorker implements ITestWorker
+{
     /** @var \PHPUnit_Extensions_Selenium2TestCase_Session */
     protected $session;
     /** @var \PHPUnit_Extensions_Selenium2TestCase_Session */
@@ -70,7 +69,8 @@ class SeleniumWorker implements ITestWorker {
 
     protected static $autologin = true;
 
-    public function __construct(TestConfig $testConfig) {
+    public function __construct(TestConfig $testConfig)
+    {
         self::$testConfig = $testConfig;
 
         if (!self::$sharedSession) {
@@ -81,28 +81,32 @@ class SeleniumWorker implements ITestWorker {
         self::setUpPage();
     }
 
-    private static function startSession() {
-        $parameters = array(
+    private static function startSession()
+    {
+        $parameters = [
             'host' => 'localhost',
             'port' => 4444,
-            'browser' => NULL,
-            'desiredCapabilities' => array(),
+            'browser' => null,
+            'desiredCapabilities' => [],
             'seleniumServerRequestsTimeout' => 60,
             'browserName' => 'firefox',
             'browserUrl' => new PHPUnit_Extensions_Selenium2TestCase_URL(self::$testConfig->testSite->url)
-        );
+        ];
 
         if (isset(self::$testConfig->seleniumConfig->firefoxBinary)) {
-            $parameters['desiredCapabilities'] = array('firefox_binary' => self::$testConfig->seleniumConfig->firefoxBinary);
+            $parameters['desiredCapabilities'] = ['firefox_binary' => self::$testConfig->seleniumConfig->firefoxBinary];
         }
 
-        $strategy = new PHPUnit_Extensions_Selenium2TestCase_SessionStrategy_Shared(new PHPUnit_Extensions_Selenium2TestCase_SessionStrategy_Isolated());
+        $strategy = new PHPUnit_Extensions_Selenium2TestCase_SessionStrategy_Shared(
+            new PHPUnit_Extensions_Selenium2TestCase_SessionStrategy_Isolated()
+        );
         self::$sharedSession = $strategy->session($parameters);
         self::$wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
     }
 
-    function __call($name, $arguments) {
-        return call_user_func_array(array($this->session, $name), $arguments);
+    public function __call($name, $arguments)
+    {
+        return call_user_func_array([$this->session, $name], $arguments);
     }
 
     /**
@@ -111,7 +115,8 @@ class SeleniumWorker implements ITestWorker {
      *
      * @param bool $force Force all the automation actions to be taken regardless of the site state
      */
-    public static function setUpSite($force) {
+    public static function setUpSite($force)
+    {
 
         if ($force || !self::$wpAutomation->isSiteSetUp()) {
             self::$wpAutomation->setUpSite();
@@ -124,13 +129,15 @@ class SeleniumWorker implements ITestWorker {
 
     }
 
-    public function setUpPage() {
+    public function setUpPage()
+    {
         if (self::$autologin) {
             $this->loginIfNecessary();
         }
     }
 
-    protected function loginIfNecessary() {
+    protected function loginIfNecessary()
+    {
         if ($this->elementExists('#wpadminbar')) {
             return;
         }
@@ -148,7 +155,8 @@ class SeleniumWorker implements ITestWorker {
         $this->byId("loginform")->submit();
     }
 
-    protected function logOut() {
+    protected function logOut()
+    {
         $this->url('wp-login.php?action=logout');
         $this->byCssSelector('body>p>a')->click();
         $this->waitAfterRedirect();
@@ -166,7 +174,8 @@ class SeleniumWorker implements ITestWorker {
      * @param $cssSelector
      * @param $value
      */
-    protected function setValue($cssSelector, $value) {
+    protected function setValue($cssSelector, $value)
+    {
 
         // Implementation note: calling $element->clear() causes image edit form in WP 4.1 to dispatch
         // an unwanted AJAX request, which is why we need to clear the value using JavaScript.
@@ -183,11 +192,12 @@ class SeleniumWorker implements ITestWorker {
      * @param string $code JavaScript code
      * @return string JS result, if any
      */
-    public function executeScript($code) {
-        return $this->execute(array(
+    public function executeScript($code)
+    {
+        return $this->execute([
             'script' => $code,
-            'args' => array()
-        ));
+            'args' => []
+        ]);
     }
 
     /**
@@ -196,7 +206,8 @@ class SeleniumWorker implements ITestWorker {
      *
      * @param string $cssSelector
      */
-    protected function jsClick($cssSelector) {
+    protected function jsClick($cssSelector)
+    {
         $this->executeScript("jQuery(\"$cssSelector\")[0].click()");
     }
 
@@ -205,7 +216,8 @@ class SeleniumWorker implements ITestWorker {
      *
      * @param string $cssSelector
      */
-    protected function jsClickAndWait($cssSelector) {
+    protected function jsClickAndWait($cssSelector)
+    {
         $this->jsClick($cssSelector);
         usleep(100 * 1000);
         $this->waitForAjax();
@@ -216,14 +228,17 @@ class SeleniumWorker implements ITestWorker {
      *
      * @param string $cssSelector
      */
-    protected function assertElementExists($cssSelector) {
+    protected function assertElementExists($cssSelector)
+    {
         if (!$this->elementExists($cssSelector)) {
             PHPUnit_Framework_Assert::fail("Element \"$cssSelector\" does not exist");
         }
     }
 
-    protected function elementExists($cssSelector) {
+    protected function elementExists($cssSelector)
+    {
         try {
+            // @codingStandardsIgnoreLine
             // See e.g. https://github.com/giorgiosironi/phpunit-selenium/blob/a6fdffdd56f4884ef39e09a9c62e5e4eb273e42c/Tests/Selenium2TestCaseTest.php#L1065
             $this->byCssSelector($cssSelector);
             return true;
@@ -237,7 +252,8 @@ class SeleniumWorker implements ITestWorker {
      *
      * @param string $text
      */
-    protected function setTinyMCEContent($text) {
+    protected function setTinyMCEContent($text)
+    {
         try {
             $this->executeScript("tinyMCE.activeEditor.setContent('$text')");
         } catch (\PHPUnit_Extensions_Selenium2TestCase_WebDriverException $ex) {
@@ -260,7 +276,8 @@ class SeleniumWorker implements ITestWorker {
      * @param string $cssSelector
      * @param int $timeout Timeout in milliseconds. Default: 3 seconds.
      */
-    protected function waitForElement($cssSelector, $timeout = 3000) {
+    protected function waitForElement($cssSelector, $timeout = 3000)
+    {
         $previousImplicitWait = $this->timeouts()->getLastImplicitWaitValue();
         $this->timeouts()->implicitWait($timeout);
         $this->assertElementExists($cssSelector);
@@ -273,7 +290,8 @@ class SeleniumWorker implements ITestWorker {
      *
      * @param int $timeout Milliseconds
      */
-    protected function waitAfterRedirect($timeout = 15000) {
+    protected function waitAfterRedirect($timeout = 15000)
+    {
         $this->waitUntilTrue(function (SeleniumWorkerBasedFakeTestCase $testCase) {
             return $testCase->executeScript("return document.readyState;") == "complete";
         }, $timeout);
@@ -287,7 +305,8 @@ class SeleniumWorker implements ITestWorker {
      * @param $callback
      * @param $timeout
      */
-    protected function waitUntilTrue($callback, $timeout = null) {
+    protected function waitUntilTrue($callback, $timeout = null)
+    {
         $this->waitUntil(function (SeleniumWorkerBasedFakeTestCase $testCase) use ($callback) {
             $result = call_user_func($callback, $testCase);
             return $result === true ? true : null;
@@ -297,7 +316,8 @@ class SeleniumWorker implements ITestWorker {
     /**
      * Wait for all AJAX requests caused by jQuery are done.
      */
-    protected function waitForAjax() {
+    protected function waitForAjax()
+    {
         $this->waitUntilTrue(function (SeleniumWorkerBasedFakeTestCase $testCase) {
             return $testCase->executeScript("return jQuery.active;") === 0;
         }, 15000);
@@ -310,12 +330,14 @@ class SeleniumWorker implements ITestWorker {
      * @param null $timeout
      * @return mixed
      */
-    protected function waitUntil($callback, $timeout = NULL) {
+    protected function waitUntil($callback, $timeout = null)
+    {
         $waitUntil = new PHPUnit_Extensions_Selenium2TestCase_WaitUntil(new SeleniumWorkerBasedFakeTestCase($this));
         return $waitUntil->run($callback, $timeout);
     }
 
-    protected function isWpVersionLowerThan($version) {
+    protected function isWpVersionLowerThan($version)
+    {
         return WpVersionComparer::compare(self::$testConfig->testSite->wpVersion, $version) < 0;
     }
 }

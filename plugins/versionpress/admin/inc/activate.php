@@ -3,6 +3,7 @@
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Initialization\InitializationConfig;
 use VersionPress\Initialization\Initializer;
+use VersionPress\Initialization\InitializerStates;
 use VersionPress\Utils\JsRedirect;
 use VersionPress\VersionPress;
 
@@ -14,13 +15,14 @@ use VersionPress\VersionPress;
  * @param string $progressMessage
  * @param bool $forceDisplay If true, displays the message regardless of its presence in InitializerStates enum
  */
-function _vp_show_progress_message($progressMessage, $forceDisplay = false) {
+function _vp_show_progress_message($progressMessage, $forceDisplay = false)
+{
 
     // We currently only output messages that are defined in VersionPress\Initialization\InitializerStates
     // which captures the main progress points without too many details. Or if $forceDisplay is true.
     $shouldDisplayMessage = $forceDisplay;
     if (!$shouldDisplayMessage) {
-        $initializerStatesReflection = new ReflectionClass('VersionPress\Initialization\InitializerStates');
+        $initializerStatesReflection = new ReflectionClass(InitializerStates::class);
         $progressConstantValues = array_values($initializerStatesReflection->getConstants());
         $shouldDisplayMessage = in_array($progressMessage, $progressConstantValues);
     }
@@ -31,7 +33,6 @@ function _vp_show_progress_message($progressMessage, $forceDisplay = false) {
         show_message($progressMessage);
     }
 }
-
 ?>
 
 <style>
@@ -118,16 +119,15 @@ function _vp_show_progress_message($progressMessage, $forceDisplay = false) {
             <p class="initialization-done">All done, we're now redirecting you (or <a
                     href="<?php menu_page_url('versionpress', false) ?>">click here</a>).
             </p>
-        <?php
+            <?php
             JsRedirect::redirect(menu_page_url('versionpress', false), InitializationConfig::REDIRECT_AFTER_MS);
         } else { ?>
             <p class="initialization-done">
-                Ouch. The initialization took too long and was terminated by the server.<br>
-                Please increase
-                <a href="http://php.net/manual/en/info.configuration.php#ini.max-execution-time" target="_blank">maximal execution time</a>
-                and <a href="<?php admin_url('admin.php?page=versionpress/admin/index.php&init_versionpress'); ?>">try it again</a>.
+                Ouch. The initialization took too long and was terminated by the server.<br>Please increase <a href="http://php.net/manual/en/info.configuration.php#ini.max-execution-time" target="_blank">maximal execution time</a> and <a href="<?php admin_url('admin.php?page=versionpress/admin/index.php&init_versionpress'); ?>">try it again</a>.
             </p>
-        <?php } ?>
+        <?php
+        }
+        ?>
 
     </div>
 

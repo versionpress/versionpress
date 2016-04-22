@@ -10,7 +10,8 @@ use Nette\Utils\Strings;
  *
  * @link http://doc.nette.org/en/2.2/strings
  */
-class StringUtils {
+class StringUtils
+{
 
     /**
      * Converts given verb to past sense. E.g., "install" -> "installed",
@@ -19,7 +20,8 @@ class StringUtils {
      * @param string $verb
      * @return string
      */
-    public static function verbToPastTense($verb) {
+    public static function verbToPastTense($verb)
+    {
         return $verb . (Strings::endsWith($verb, "e") ? "d" : "ed");
     }
 
@@ -29,7 +31,8 @@ class StringUtils {
      * @param string $str LF line endings
      * @return string CRLF line endings
      */
-    public static function crlfize($str) {
+    public static function crlfize($str)
+    {
         return str_replace("\n", "\r\n", str_replace("\r\n", "\n", $str));
     }
 
@@ -42,8 +45,9 @@ class StringUtils {
      * @param string $string
      * @return string
      */
-    public static function pluralize($string) {
-        $plural = array(
+    public static function pluralize($string)
+    {
+        $plural = [
             '/(quiz)$/i' => "$1zes",
             '/^(ox)$/i' => "$1en",
             '/([m|l])ouse$/i' => "$1ice",
@@ -63,9 +67,9 @@ class StringUtils {
             '/(us)$/i' => "$1es",
             '/s$/i' => "s",
             '/$/' => "s"
-        );
+        ];
 
-        $irregular = array(
+        $irregular = [
             'move' => 'moves',
             'foot' => 'feet',
             'goose' => 'geese',
@@ -75,9 +79,9 @@ class StringUtils {
             'tooth' => 'teeth',
             'person' => 'people',
             'valve' => 'valves'
-        );
+        ];
 
-        $uncountable = array(
+        $uncountable = [
             'sheep',
             'fish',
             'deer',
@@ -87,39 +91,46 @@ class StringUtils {
             'rice',
             'information',
             'equipment'
-        );
+        ];
 
         // save some time in the case that singular and plural are the same
-        if (in_array(strtolower($string), $uncountable))
+        if (in_array(strtolower($string), $uncountable)) {
             return $string;
+        }
 
 
         // check for irregular singular forms
         foreach ($irregular as $pattern => $result) {
             $pattern = '/' . $pattern . '$/i';
 
-            if (preg_match($pattern, $string))
+            if (preg_match($pattern, $string)) {
                 return preg_replace($pattern, $result, $string);
+            }
         }
 
         // check for matches using regular expressions
         foreach ($plural as $pattern => $result) {
-            if (preg_match($pattern, $string))
+            if (preg_match($pattern, $string)) {
                 return preg_replace($pattern, $result, $string);
+            }
         }
 
         return $string;
     }
 
     /**
-     * Fills template string placeholders with variables provided in $variables array. Placeholders pattern: {{variable-name}}
+     * Fills template string placeholders with variables provided in $variables array.
+     * Placeholders pattern: {{variable-name}}
      *
-     * @param array $variables  associative array with keys as variable names.
+     * @param array $variables associative array with keys as variable names.
      * @param string $templateString template string which contains placeholders for variables to be expanded.
      * @return string templateString with expanded variable placeholders
      */
-    public static function fillTemplateString($variables, $templateString) {
-        $search = array_map(function ($var) { return sprintf('{{%s}}', $var); }, array_keys($variables));
+    public static function fillTemplateString($variables, $templateString)
+    {
+        $search = array_map(function ($var) {
+            return sprintf('{{%s}}', $var);
+        }, array_keys($variables));
         $replace = array_values($variables);
         return str_replace($search, $replace, $templateString);
     }
@@ -130,7 +141,8 @@ class StringUtils {
      * @param $value
      * @return bool
      */
-    public static function isSerializedValue($value) {
+    public static function isSerializedValue($value)
+    {
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
         $test = @unserialize(($value)); // it throws an error and returns false if $value is not a serialized object
         return $test !== false || $value === 'b:0;';
@@ -144,7 +156,8 @@ class StringUtils {
      * @param string $haystack
      * @return string
      */
-    public static function replaceFirst($needle, $replace, $haystack) {
+    public static function replaceFirst($needle, $replace, $haystack)
+    {
         $needlePosition = strpos($haystack, $needle);
         if ($needlePosition === false) {
             return $haystack;
@@ -162,7 +175,8 @@ class StringUtils {
      * @param int $to
      * @return string
      */
-    public static function substringFromTo($str, $from, $to) {
+    public static function substringFromTo($str, $from, $to)
+    {
         return substr($str, $from, $to - $from);
     }
 }

@@ -9,7 +9,8 @@ use SqlParser\Statements\InsertStatement;
 use SqlParser\Statements\ReplaceStatement;
 use SqlParser\Statements\UpdateStatement;
 
-class SqlQueryParser {
+class SqlQueryParser
+{
 
     /**
      * @var DbSchemaInfo
@@ -23,11 +24,12 @@ class SqlQueryParser {
 
     /**
      * SqlQueryParser constructor.
-     * 
+     *
      * @param DbSchemaInfo $schema
      * @param Database $database
      */
-    public function __construct($schema, $database) {
+    public function __construct($schema, $database)
+    {
         $this->schema = $schema;
         $this->database = $database;
     }
@@ -37,7 +39,8 @@ class SqlQueryParser {
      * @param string $query
      * @return ParsedQueryData
      */
-    public function parseQuery($query) {
+    public function parseQuery($query)
+    {
         $parser = $this->getParser($query);
         $sqlStatement = $parser->statements[0];
         if ($sqlStatement instanceof UpdateStatement) {
@@ -60,7 +63,8 @@ class SqlQueryParser {
      * @param Database $database
      * @return ParsedQueryData
      */
-    private function parseUpdateQuery($parser, $query, $schema, $database) {
+    private function parseUpdateQuery($parser, $query, $schema, $database)
+    {
         /** @var UpdateStatement $sqlStatement */
         $sqlStatement = $parser->statements[0];
         $table = $sqlStatement->tables[0]->table;
@@ -91,7 +95,8 @@ class SqlQueryParser {
      * @param DbSchemaInfo $schema
      * @return ParsedQueryData
      */
-    private function parseInsertQuery($parser, $query, $schema) {
+    private function parseInsertQuery($parser, $query, $schema)
+    {
         /** @var InsertStatement $sqlStatement */
         $sqlStatement = $parser->statements[0];
         $queryType = ParsedQueryData::INSERT_QUERY;
@@ -130,7 +135,8 @@ class SqlQueryParser {
      * @param $database Database
      * @return ParsedQueryData
      */
-    private function parseDeleteQuery($parser, $query, $schema, $database) {
+    private function parseDeleteQuery($parser, $query, $schema, $database)
+    {
         /** @var DeleteStatement $sqlStatement */
         $sqlStatement = $parser->statements[0];
         $table = $sqlStatement->from[0]->table;
@@ -161,7 +167,8 @@ class SqlQueryParser {
      * @param DeleteStatement|UpdateStatement $primarySqlStatement
      * @return array
      */
-    private function getWhereFragments($parser, $sqlQuery, $primarySqlStatement) {
+    private function getWhereFragments($parser, $sqlQuery, $primarySqlStatement)
+    {
         if ($primarySqlStatement->where != null) {
             $whereFragments = $primarySqlStatement->where;
             return $whereFragments;
@@ -173,9 +180,9 @@ class SqlQueryParser {
                     $whereFragments = $secondarySqlStatement->where;
                     return $whereFragments;
                 }
-
             }
-        } elseif ($parser->errors != null && $primarySqlStatement->where == null && strpos($sqlQuery, 'WHERE') === false) {
+        } elseif ($parser->errors != null && $primarySqlStatement->where == null
+            && strpos($sqlQuery, 'WHERE') === false) {
             $whereFragments = ['1=1'];
             return $whereFragments;
         }
@@ -192,7 +199,8 @@ class SqlQueryParser {
      * @param Statement $sqlStatement
      * @return array
      */
-    private function getColumnDataToSet($sqlStatement) {
+    private function getColumnDataToSet($sqlStatement)
+    {
 
         if ($sqlStatement instanceof UpdateStatement) {
             $dataSet = [];
@@ -226,7 +234,8 @@ class SqlQueryParser {
      * @param string $idColumn
      * @return string
      */
-    private function getSelectQuery($parser, $idColumn) {
+    private function getSelectQuery($parser, $idColumn)
+    {
         $selectQuery = "SELECT $idColumn FROM ";
         $sqlStatement = $parser->statements[0];
         if ($sqlStatement instanceof InsertStatement) {
@@ -268,12 +277,12 @@ class SqlQueryParser {
      * @param $query
      * @return Parser
      */
-    private function getParser($query) {
+    private function getParser($query)
+    {
         $containsUsingPattern = "/(.*)(USING ?\\(([^\\)]+)\\))(.*)/"; //https://regex101.com/r/vF6dI5/1
         $parser = new Parser($query);
         if (preg_match_all($containsUsingPattern, $query, $matches)) {
             return $this->getParserFromQueryWithUsingClause($query, $parser, $matches, $containsUsingPattern);
-
         }
         return $parser;
     }
@@ -285,7 +294,8 @@ class SqlQueryParser {
      * @param string $table
      * @return mixed
      */
-    private function resolveIdColumn($schema, $table) {
+    private function resolveIdColumn($schema, $table)
+    {
 
         $entity = $schema->getEntityInfoByPrefixedTableName($table);
         return $entity == null ? null : $entity->idColumnName;
@@ -298,7 +308,8 @@ class SqlQueryParser {
      * @param string $table
      * @return mixed
      */
-    private function resolveEntityName($schema, $table) {
+    private function resolveEntityName($schema, $table)
+    {
 
         $entity = $schema->getEntityInfoByPrefixedTableName($table);
         return $entity == null ? null : $entity->entityName;
@@ -311,7 +322,8 @@ class SqlQueryParser {
      * @param $containsUsingPattern
      * @return Parser
      */
-    private function getParserFromQueryWithUsingClause($query, $parser, $matches, $containsUsingPattern) {
+    private function getParserFromQueryWithUsingClause($query, $parser, $matches, $containsUsingPattern)
+    {
         /** @var DeleteStatement|InsertStatement $sqlStatement */
         $sqlStatement = $parser->statements[0];
         $transformedPart = 'ON ';
@@ -333,5 +345,4 @@ class SqlQueryParser {
         $transformedQuery = preg_replace($containsUsingPattern, '$1' . $transformedPart . '$4', $query);
         return new Parser($transformedQuery);
     }
-
 }

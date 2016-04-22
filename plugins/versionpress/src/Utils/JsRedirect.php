@@ -2,7 +2,8 @@
 
 namespace VersionPress\Utils;
 
-class JsRedirect {
+class JsRedirect
+{
 
 
     /**
@@ -11,7 +12,8 @@ class JsRedirect {
      * @param string $url
      * @param int $timeout Delay in milliseconds
      */
-    public static function redirect($url, $timeout = 0) {
+    public static function redirect($url, $timeout = 0)
+    {
         $redirectionJs = <<<JS
 <script type="text/javascript">
     window.setTimeout(function () {
@@ -21,4 +23,4 @@ class JsRedirect {
 JS;
         echo $redirectionJs;
     }
-} 
+}

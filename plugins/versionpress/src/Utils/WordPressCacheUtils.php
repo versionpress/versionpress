@@ -4,8 +4,10 @@ namespace VersionPress\Utils;
 
 use VersionPress\Database\Database;
 
-class WordPressCacheUtils {
-    public static function clearPostCache($vpids, $database) {
+class WordPressCacheUtils
+{
+    public static function clearPostCache($vpids, $database)
+    {
         if (count($vpids) === 0 || !function_exists('clean_post_cache')) {
             return;
         }
@@ -17,7 +19,8 @@ class WordPressCacheUtils {
         }
     }
 
-    public static function clearTermCache($vpids, $database) {
+    public static function clearTermCache($vpids, $database)
+    {
         if (count($vpids) === 0 || !function_exists('clean_term_cache')) {
             return;
         }
@@ -26,7 +29,8 @@ class WordPressCacheUtils {
         clean_term_cache($termIds);
     }
 
-    public static function clearUserCache($vpids, $database) {
+    public static function clearUserCache($vpids, $database)
+    {
         if (count($vpids) === 0 || !function_exists('clean_user_cache')) {
             return;
         }
@@ -38,7 +42,8 @@ class WordPressCacheUtils {
         }
     }
 
-    public static function clearCommentCache($vpids, $database) {
+    public static function clearCommentCache($vpids, $database)
+    {
         if (count($vpids) === 0 || !function_exists('clean_comment_cache')) {
             return;
         }
@@ -52,12 +57,14 @@ class WordPressCacheUtils {
      * @param Database $database
      * @return mixed
      */
-    private static function getIdsForVpids($vpids, $database) {
+    private static function getIdsForVpids($vpids, $database)
+    {
         $vpidsForRestriction = self::joinVpidsForRestriction($vpids);
         return $database->get_col("SELECT id FROM {$database->vp_id} WHERE vp_id IN ($vpidsForRestriction)");
     }
 
-    private static function joinVpidsForRestriction($vpids) {
+    private static function joinVpidsForRestriction($vpids)
+    {
         $vpidsForRestriction = join(', ', array_map(function ($vpid) {
             return "UNHEX('$vpid')";
         }, $vpids));

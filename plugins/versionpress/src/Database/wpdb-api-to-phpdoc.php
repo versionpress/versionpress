@@ -19,7 +19,8 @@ foreach ($properties as $property) {
 
 echo "\n";
 
-// Generate annotations for all public methods as @method <return type> <name>(<parameters with default value if there is any>)
+// Generate annotations for all public methods as
+// @method <return type> <name>(<parameters with default value if there is any>)
 $methods = $wpdbReflection->getMethods(ReflectionMethod::IS_PUBLIC);
 foreach ($methods as $method) {
     $parameters = $method->getParameters();
@@ -34,7 +35,11 @@ foreach ($methods as $method) {
             if ($parameter->isDefaultValueConstant()) {
                 $default = $parameter->getDefaultValueConstantName();
             } else {
-                $default = str_replace(['array (', "\n"], ['array(', ''], var_export($parameter->getDefaultValue(), true));
+                $default = str_replace(
+                    ['array (', "\n"],
+                    ['array(', ''],
+                    var_export($parameter->getDefaultValue(), true)
+                );
             }
         } else {
             $default = null;

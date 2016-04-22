@@ -3,18 +3,13 @@
 namespace VersionPress\Tests\End2End\Utils;
 
 use PHPUnit_Framework_TestCase;
-use Tracy\Debugger;
-use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Git\GitRepository;
-use VersionPress\Storages\StorageFactory;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\TestConfig;
 use VersionPress\Tests\Utils\TestRunnerOptions;
-use VersionPress\Utils\ArrayUtils;
-use VersionPress\Utils\ReferenceUtils;
 
-class End2EndTestCase extends PHPUnit_Framework_TestCase {
+class End2EndTestCase extends PHPUnit_Framework_TestCase
+{
 
     /** @var TestConfig */
     protected static $testConfig;
@@ -25,26 +20,30 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase {
 
     private static $skipAllBecauseOfMissingWorker = false;
 
-    public function __construct($name = NULL, array $data = array(), $dataName = '') {
+    public function __construct($name = null, array $data = [], $dataName = '')
+    {
         parent::__construct($name, $data, $dataName);
         $this->staticInitialization();
         $this->gitRepository = new GitRepository(self::$testConfig->testSite->path);
         self::$wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
     }
 
-    protected function setUp() {
+    protected function setUp()
+    {
         parent::setUp();
         if (self::$skipAllBecauseOfMissingWorker) {
             $this->markTestSkipped('Missing worker');
         }
     }
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass()
+    {
         parent::setUpBeforeClass();
         self::setUpSite(TestRunnerOptions::getInstance()->forceSetup == "before-class");
     }
 
-    private function staticInitialization() {
+    private function staticInitialization()
+    {
         self::$testConfig = TestConfig::createDefaultConfig();
 
         $class = get_called_class();
@@ -70,7 +69,8 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase {
      *
      * @param bool $force Force all the automation actions to be taken regardless of the site state
      */
-    private static function setUpSite($force) {
+    private static function setUpSite($force)
+    {
 
         if ($force || !self::$wpAutomation->isSiteSetUp()) {
             self::$wpAutomation->setUpSite();

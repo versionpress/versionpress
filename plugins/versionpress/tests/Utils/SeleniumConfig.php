@@ -2,7 +2,8 @@
 
 namespace VersionPress\Tests\Utils;
 
-class SeleniumConfig {
+class SeleniumConfig
+{
 
     /**
      * Path to a Firefox binary. Null means that system Firefox should be used instead.

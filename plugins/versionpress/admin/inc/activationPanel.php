@@ -31,7 +31,9 @@ jQuery(document).ready(function($) {
 
         <h3>Welcome to VersionPress!</h3>
 
-        <p class="about-description">VersionPress needs a one-time activation step that initializes its internal storage. <strong>This step is resource-intensive and might take a while</strong> if your site has many entities (posts, comments etc.). The site will be put in maintanenance mode until it finishes.</p>
+        <p class="about-description">
+            VersionPress needs a one-time activation step that initializes its internal storage. <strong>This step is resource-intensive and might take a while</strong> if your site has many entities (posts, comments etc.). The site will be put in maintanenance mode until it finishes.
+        </p>
 
         <div class="checks-and-warnings">
 
@@ -66,16 +68,19 @@ jQuery(document).ready(function($) {
                         ?>
                         <li>
                             <span class="icon icon-warning"></span>
-                            Note: This website is already versioned in Git (the repository is either your custom or has been created by a previous installation of VersionPress).
-                            VersionPress will add some rules into `.gitignore` and install a custom merge driver for its own files.
-                            It is not a problem for VersionPress, just be sure that you know what you are doing.
+                            Note: This website is already versioned in Git (the repository is either your custom or has been created by a previous installation of VersionPress). VersionPress will add some rules into `.gitignore` and install a custom merge driver for its own files. It is not a problem for VersionPress, just be sure that you know what you are doing.
                         </li>
                         <?php
                     }
                     ?>
                 </ul>
 
-                <div><a href="<?php echo esc_url(admin_url('admin.php?page=versionpress/admin/system-info.php')) ?>">View full system info</a><?php if (!$requirementsChecker->isWithoutCriticalErrors()) { ?>, <a href="https://github.com/versionpress/support">get support on GitHub</a><?php } ?></div>
+                <div>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=versionpress/admin/system-info.php')) ?>">View full system info</a>
+                    <?php if (!$requirementsChecker->isWithoutCriticalErrors()) { ?>
+                    , <a href="https://github.com/versionpress/support">get support on GitHub</a>
+                    <?php } ?>
+                </div>
 
             </div>
 

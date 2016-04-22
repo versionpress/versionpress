@@ -2,6 +2,7 @@
 
 namespace VersionPress\Initialization;
 
-class InitializationAbortedException extends \Exception {
+class InitializationAbortedException extends \Exception
+{
 
 }

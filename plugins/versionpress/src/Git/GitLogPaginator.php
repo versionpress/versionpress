@@ -4,7 +4,8 @@ namespace VersionPress\Git;
 /**
  * Useful for pagination of git log. Uses the `GitStatic` class.
  */
-class GitLogPaginator {
+class GitLogPaginator
+{
 
     /**
      * @var GitRepository
@@ -15,7 +16,8 @@ class GitLogPaginator {
     private $numberOfCommits;
     private $query = '';
 
-    function __construct(GitRepository $repository) {
+    public function __construct(GitRepository $repository)
+    {
         $this->repository = $repository;
     }
 
@@ -26,7 +28,8 @@ class GitLogPaginator {
      * @param $pageNumber
      * @return Commit[]
      */
-    public function getPage($pageNumber) {
+    public function getPage($pageNumber)
+    {
         $this->numberOfCommits = $this->repository->getNumberOfCommits($this->query);
 
         $firstCommitIndex = $pageNumber * $this->commitsPerPage;
@@ -39,8 +42,8 @@ class GitLogPaginator {
         }
 
         $query = $this->query .
-                    ' --skip=' . $firstCommitIndex .
-                    ' --max-count=' . $this->commitsPerPage;
+            ' --skip=' . $firstCommitIndex .
+            ' --max-count=' . $this->commitsPerPage;
 
         return $this->repository->log($query);
     }
@@ -50,21 +53,24 @@ class GitLogPaginator {
      *
      * @return boolean
      */
-    public function isLastPage() {
+    public function isLastPage()
+    {
         return $this->isLastPage;
     }
 
     /**
      * @param int $commitsPerPage
      */
-    public function setCommitsPerPage($commitsPerPage) {
+    public function setCommitsPerPage($commitsPerPage)
+    {
         $this->commitsPerPage = $commitsPerPage;
     }
 
     /**
      * @param string $query
      */
-    public function setQuery($query) {
+    public function setQuery($query)
+    {
         $this->query = $query;
     }
 
@@ -77,12 +83,13 @@ class GitLogPaginator {
      * @param $currentPage
      * @return array
      */
-    public function getPrettySteps($currentPage) {
+    public function getPrettySteps($currentPage)
+    {
         $page = $currentPage;
         $pageCount = ceil($this->numberOfCommits / (double)$this->commitsPerPage);
 
         if ($pageCount < 2) {
-            return array();
+            return [];
         }
 
         $arr = range(max(0, $page - 3), min($pageCount - 1, $page + 3));

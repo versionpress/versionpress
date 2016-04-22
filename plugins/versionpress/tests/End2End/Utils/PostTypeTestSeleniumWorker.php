@@ -2,17 +2,19 @@
 
 namespace VersionPress\Tests\End2End\Utils;
 
-use VersionPress\Tests\Utils\WpVersionComparer;
 use VersionPress\Utils\PathUtils;
 
-abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPostTypeTestWorker {
+abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPostTypeTestWorker
+{
 
     abstract public function getPostType();
 
-    public function prepare_addPost() {
+    public function prepare_addPost()
+    {
     }
 
-    public function addPost() {
+    public function addPost()
+    {
         $this->url($this->getPostTypeScreenUrl());
         $this->prepareTestPost();
 
@@ -20,10 +22,12 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
         $this->waitAfterRedirect();
     }
 
-    public function prepare_updatePost() {
+    public function prepare_updatePost()
+    {
     }
 
-    public function updatePost() {
+    public function updatePost()
+    {
         $titleField = $this->byCssSelector('form#post input#title');
         $titleField->clear();
         $titleField->value("Updated " . $this->getPostType());
@@ -32,10 +36,12 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
         $this->waitAfterRedirect();
     }
 
-    public function prepare_quickEditPost() {
+    public function prepare_quickEditPost()
+    {
     }
 
-    public function quickEditPost() {
+    public function quickEditPost()
+    {
         $this->url($this->getPostTypeScreenUrl());
         $this->jsClickAndWait('#the-list tr:first-child .row-actions .editinline');
 
@@ -45,45 +51,55 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
         $this->jsClickAndWait('#the-list tr.inline-edit-row .save');
     }
 
-    public function prepare_trashPost() {
+    public function prepare_trashPost()
+    {
     }
 
-    public function trashPost() {
+    public function trashPost()
+    {
         $this->jsClickAndWait('#the-list tr:first-child .row-actions .submitdelete');
         $this->waitAfterRedirect();
     }
 
-    public function prepare_untrashPost() {
+    public function prepare_untrashPost()
+    {
     }
 
-    public function untrashPost() {
+    public function untrashPost()
+    {
         $this->jsClickAndWait('#message.updated a');
 
         $this->assertElementExists('#message.updated'); // "1 post restored from the Trash"
     }
 
-    public function prepare_deletePost() {
+    public function prepare_deletePost()
+    {
         $this->trashPost();
     }
 
-    public function deletePost() {
+    public function deletePost()
+    {
         $this->byCssSelector('.trash a')->click();
         $this->deletePostPermanently();
     }
 
-    public function prepare_createDraft() {
+    public function prepare_createDraft()
+    {
     }
 
-    public function createDraft() {
+    public function createDraft()
+    {
         $this->prepareTestPost();
         $this->byCssSelector('form#post #save-post')->click();
         $this->waitForElement('#message.updated');
     }
 
-    public function prepare_previewDraft() {
+    public function prepare_previewDraft()
+    {
     }
 
-    public function previewDraft() {
+    public function previewDraft()
+    {
         $this->setTinyMCEContent("Updated content");
 
         $previewLink = $this->byCssSelector('form#post #post-preview');
@@ -94,25 +110,30 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
         $this->window('');
     }
 
-    public function cleanup_previewDraft() {
+    public function cleanup_previewDraft()
+    {
         $this->byCssSelector('#save-post')->click();
         $this->waitAfterRedirect();
     }
 
-    public function prepare_publishDraft() {
+    public function prepare_publishDraft()
+    {
     }
 
-    public function publishDraft() {
+    public function publishDraft()
+    {
         $this->setTinyMCEContent("Published content");
         $this->byCssSelector('form#post input#publish')->click();
         $this->waitForElement('#message.updated');
     }
 
-    public function prepare_previewUnsavedPost() {
+    public function prepare_previewUnsavedPost()
+    {
         $this->url($this->getPostTypeScreenUrl());
     }
 
-    public function previewUnsavedPost() {
+    public function previewUnsavedPost()
+    {
         $this->prepareTestPost();
         $previewLink = $this->byCssSelector('form#post #post-preview');
         $previewWindowId = $previewLink->attribute('target');
@@ -123,12 +144,19 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
         $this->url($this->getPostTypeScreenUrl());
     }
 
-    public function prepare_setFeaturedImageForUnsavedPost() {
+    public function prepare_setFeaturedImageForUnsavedPost()
+    {
         $this->url($this->getPostTypeScreenUrl());
-        $addNewSelector = $this->isWpVersionLowerThan('4.3-alpha1') ? '.edit-php #wpbody-content .wrap a.add-new-h2' : '.edit-php #wpbody-content .wrap a.page-title-action';
+        $addNewSelector = $this->isWpVersionLowerThan('4.3-alpha1')
+            ? '.edit-php #wpbody-content .wrap a.add-new-h2'
+            : '.edit-php #wpbody-content .wrap a.page-title-action';
         $this->byCssSelector($addNewSelector)->click();
         $this->waitAfterRedirect();
-        $attachments = json_decode(self::$wpAutomation->runWpCliCommand('post', 'list', array('post_type' => 'attachment', 'format' => 'json')));
+        $attachments = json_decode(self::$wpAutomation->runWpCliCommand(
+            'post',
+            'list',
+            ['post_type' => 'attachment', 'format' => 'json']
+        ));
         if (count($attachments) > 0) {
             return;
         }
@@ -137,7 +165,8 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
         self::$wpAutomation->importMedia($imagePath);
     }
 
-    public function setFeaturedImageForUnsavedPost() {
+    public function setFeaturedImageForUnsavedPost()
+    {
         $this->byCssSelector('#set-post-thumbnail')->click();
         $this->waitForAjax();
         $this->byCssSelector('.media-router .media-menu-item:nth-of-type(2)')->click();
@@ -146,10 +175,12 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
         $this->byCssSelector('.media-button')->click();
     }
 
-    public function prepare_makeDraftFromUnsavedPost() {
+    public function prepare_makeDraftFromUnsavedPost()
+    {
     }
 
-    public function makeDraftFromUnsavedPost() {
+    public function makeDraftFromUnsavedPost()
+    {
         $this->byCssSelector('form#post input#title')->value('Test ' . $this->getPostType() . ' with featured image');
         $this->keys(\PHPUnit_Extensions_Selenium2TestCase_Keys::TAB);
         $this->waitForElement('#sample-permalink');
@@ -161,14 +192,16 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
     /**
      * @return string
      */
-    protected function getPostTypeScreenUrl() {
+    protected function getPostTypeScreenUrl()
+    {
         return 'wp-admin/edit.php?post_type=' . $this->getPostType() . '&orderby=date&order=desc';
     }
 
     /**
      * Deletes post permanently. Wait for the operation to complete.
      */
-    private function deletePostPermanently() {
+    private function deletePostPermanently()
+    {
         // The CSS selector for 'Delete Permanently' is actually exactly the same as when trashing
         // the post, so is the update message, so we just use that method internally
         $this->trashPost();
@@ -177,32 +210,38 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
     /**
      * From the main page for given post type, clicks "Add new" and fills in the post title and content
      */
-    protected function prepareTestPost() {
-        $addNewSelector = $this->isWpVersionLowerThan('4.3-alpha1') ? '.edit-php #wpbody-content .wrap a.add-new-h2' : '.edit-php #wpbody-content .wrap a.page-title-action';
+    protected function prepareTestPost()
+    {
+        $addNewSelector = $this->isWpVersionLowerThan('4.3-alpha1')
+            ? '.edit-php #wpbody-content .wrap a.add-new-h2'
+            : '.edit-php #wpbody-content .wrap a.page-title-action';
         $this->byCssSelector($addNewSelector)->click();
         $this->waitAfterRedirect();
         $this->byCssSelector('form#post input#title')->value("Test " . $this->getPostType());
         $this->setTinyMCEContent("Test content");
     }
 
-    public function prepare_changeStatusOfTwoPosts() {
-        $post = array(
+    public function prepare_changeStatusOfTwoPosts()
+    {
+        $post = [
             "post_type" => $this->getPostType(),
             "post_status" => "publish",
             "post_title" => "Test post",
             "post_content" => "Test post",
             "post_author" => 1
-        );
+        ];
         self::$wpAutomation->createPost($post);
         self::$wpAutomation->createPost($post);
     }
 
-    public function changeStatusOfTwoPosts() {
+    public function changeStatusOfTwoPosts()
+    {
         $this->url($this->getPostTypeScreenUrl());
         $this->changeStatusOfTwoLastPosts('private');
     }
 
-    private function changeStatusOfTwoLastPosts($status) {
+    private function changeStatusOfTwoLastPosts($status)
+    {
         $this->performBulkActionWithTwoLastPosts('edit');
 
         // change status and submit
@@ -210,58 +249,67 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
         $this->jsClickAndWait('#bulk_edit');
     }
 
-    public function prepare_moveTwoPostsInTrash() {
-        $post = array(
+    public function prepare_moveTwoPostsInTrash()
+    {
+        $post = [
             "post_type" => $this->getPostType(),
             "post_status" => "publish",
             "post_title" => "Test post",
             "post_content" => "Test post",
             "post_author" => 1
-        );
+        ];
         self::$wpAutomation->createPost($post);
         self::$wpAutomation->createPost($post);
     }
 
-    public function moveTwoPostsInTrash() {
+    public function moveTwoPostsInTrash()
+    {
         $this->url($this->getPostTypeScreenUrl());
         $this->performBulkActionWithTwoLastPosts('trash');
     }
 
-    public function prepare_moveTwoPostsFromTrash() {
+    public function prepare_moveTwoPostsFromTrash()
+    {
     }
 
-    public function moveTwoPostsFromTrash() {
+    public function moveTwoPostsFromTrash()
+    {
         $this->url($this->getPostTypeScreenUrl() . '&post_status=trash'); // open trash
         $this->performBulkActionWithTwoLastPosts('untrash');
     }
 
-    public function prepare_deleteTwoPosts() {
-        $trashedPost = array(
+    public function prepare_deleteTwoPosts()
+    {
+        $trashedPost = [
             "post_type" => $this->getPostType(),
             "post_status" => "trash",
             "post_title" => "Test post",
             "post_content" => "Test post",
             "post_author" => 1
-        );
+        ];
         self::$wpAutomation->createPost($trashedPost);
         self::$wpAutomation->createPost($trashedPost);
     }
 
-    public function deleteTwoPosts() {
+    public function deleteTwoPosts()
+    {
         $this->url($this->getPostTypeScreenUrl() . '&post_status=trash'); // open trash
         $this->performBulkActionWithTwoLastPosts('delete');
     }
 
-    public function prepare_publishTwoPosts() {
+    public function prepare_publishTwoPosts()
+    {
         $this->url($this->getPostTypeScreenUrl());
         $this->changeStatusOfTwoLastPosts('draft');
     }
 
-    public function publishTwoPosts() {
+    public function publishTwoPosts()
+    {
         $this->changeStatusOfTwoLastPosts('publish');
     }
 
-    private function performBulkActionWithTwoLastPosts($action) {
+    private function performBulkActionWithTwoLastPosts($action)
+    {
         // select two last posts
         $tableClass = $this->getPostType() . 's';
         $this->jsClick("table.$tableClass tbody tr:nth-child(1) .check-column input[type=checkbox]");

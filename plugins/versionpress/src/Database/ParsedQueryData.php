@@ -2,8 +2,8 @@
 
 namespace VersionPress\Database;
 
-
-class ParsedQueryData {
+class ParsedQueryData
+{
 
     /**
      * Table name parsed from the source sql query. Usually prefixed e.g. `wp_posts`
@@ -40,7 +40,6 @@ class ParsedQueryData {
      */
     public $data;
 
-    
 
     /**
      * SELECT query created from provided source query (INSERT, UPDATE, DELETE)
@@ -67,9 +66,8 @@ class ParsedQueryData {
     const INSERT_UPDATE_QUERY = 'INSERT_UPDATE';
 
 
-    public function __construct($queryType) {
+    public function __construct($queryType)
+    {
         $this->queryType = $queryType;
     }
-
-
 }

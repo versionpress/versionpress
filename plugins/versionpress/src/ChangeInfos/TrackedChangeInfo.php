@@ -16,7 +16,8 @@ use VersionPress\Git\CommitMessage;
  * @see CommitMessage::getVersionPressTags()
  * @see UntrackedChangeInfo Changes created outside of VersionPress.
  */
-abstract class TrackedChangeInfo implements ChangeInfo {
+abstract class TrackedChangeInfo implements ChangeInfo
+{
 
     /**
      * VP tag common to all tracked change infos. It is the only required tag for them.
@@ -30,7 +31,7 @@ abstract class TrackedChangeInfo implements ChangeInfo {
      *
      * @return string
      */
-    abstract function getEntityName();
+    abstract public function getEntityName();
 
     /**
      * The action done on the object type, for instance "install" or "activate" if the object was a plugin.
@@ -38,10 +39,11 @@ abstract class TrackedChangeInfo implements ChangeInfo {
      *
      * @return string
      */
-    abstract function getAction();
+    abstract public function getAction();
 
 
-    public function getCommitMessage() {
+    public function getCommitMessage()
+    {
         return new CommitMessage($this->getChangeDescription(), $this->getCommitMessageBody());
     }
 
@@ -56,10 +58,11 @@ abstract class TrackedChangeInfo implements ChangeInfo {
      *
      * @return string
      */
-    private function getCommitMessageBody() {
+    private function getCommitMessageBody()
+    {
         $actionTag = $this->getActionTagValue();
 
-        $tags = array();
+        $tags = [];
         if ($actionTag) {
             $tags[self::ACTION_TAG] = $actionTag;
         }
@@ -110,5 +113,4 @@ abstract class TrackedChangeInfo implements ChangeInfo {
      * @return array
      */
     abstract public function getChangedFiles();
-
 }

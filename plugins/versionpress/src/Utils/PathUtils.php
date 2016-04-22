@@ -2,7 +2,8 @@
 
 namespace VersionPress\Utils;
 
-class PathUtils {
+class PathUtils
+{
     /**
      * Calculates relative path from two absolute paths.
      *
@@ -10,12 +11,13 @@ class PathUtils {
      * @param string $to Directory or file the relativa path will lead to.
      * @return string
      */
-    public static function getRelativePath($from, $to) {
+    public static function getRelativePath($from, $to)
+    {
         // Windows FTW!
         $from = str_replace('\\', '/', $from);
         $to = str_replace('\\', '/', $to);
 
-        $from = preg_replace('~([^/]*)/+([^/]*)~', '$1/$2',$from);
+        $from = preg_replace('~([^/]*)/+([^/]*)~', '$1/$2', $from);
         $to = preg_replace('~([^/]*)/+([^/]*)~', '$1/$2', $to);
 
         $from = rtrim($from, '/');
@@ -37,7 +39,8 @@ class PathUtils {
         return implode('/', $relPath);
     }
 
-    private static function countCommonDepth($from, $to) {
+    private static function countCommonDepth($from, $to)
+    {
         $depth = 0;
 
         while (isset($from[$depth], $to[$depth]) && $from[$depth] === $to[$depth]) {

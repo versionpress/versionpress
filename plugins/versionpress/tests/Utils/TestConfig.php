@@ -7,7 +7,8 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Test config, loaded from test-config.yml
  */
-class TestConfig {
+class TestConfig
+{
 
     /**
      * @var SeleniumConfig
@@ -44,7 +45,8 @@ class TestConfig {
 
     public static $defaultConfigFile;
 
-    function __construct($configFile) {
+    public function __construct($configFile)
+    {
         $rawConfig = Yaml::parse(file_get_contents($configFile));
 
         $this->seleniumConfig = new SeleniumConfig();
@@ -53,7 +55,7 @@ class TestConfig {
         $this->end2endTestType = $rawConfig['end2end-test-type'];
         $this->wpCliVersion = $rawConfig['wp-cli-version'];
 
-        $this->sites = array();
+        $this->sites = [];
         foreach ($rawConfig['sites'] as $siteId => $rawSiteConfig) {
             $rawSiteConfig = array_merge_recursive($rawConfig['common-site-config'], $rawSiteConfig);
 
@@ -78,9 +80,9 @@ class TestConfig {
             $this->sites[$siteId]->adminPassword = $rawSiteConfig['wp-site']['admin-pass'];
             $this->sites[$siteId]->adminEmail = $rawSiteConfig['wp-site']['admin-email'];
             $this->sites[$siteId]->wpVersion = $rawSiteConfig['wp-site']['wp-version'];
-            $this->sites[$siteId]->wpLocale = isset($rawSiteConfig['wp-site']['wp-locale']) ? $rawSiteConfig['wp-site']['wp-locale'] : null;
+            $this->sites[$siteId]->wpLocale = isset($rawSiteConfig['wp-site']['wp-locale'])
+                ? $rawSiteConfig['wp-site']['wp-locale'] : null;
             $this->sites[$siteId]->wpAutoupdate = $rawSiteConfig['wp-site']['wp-autoupdate'];
-
         }
 
         $this->testSite = $this->sites[$rawConfig['test-site']];
@@ -91,8 +93,8 @@ class TestConfig {
      *
      * @return TestConfig
      */
-    public static function createDefaultConfig() {
+    public static function createDefaultConfig()
+    {
         return new self(self::$defaultConfigFile);
     }
-
 }

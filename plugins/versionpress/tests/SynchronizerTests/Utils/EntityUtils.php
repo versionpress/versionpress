@@ -5,18 +5,21 @@ namespace VersionPress\Tests\SynchronizerTests\Utils;
 use Nette\Utils\Random;
 use VersionPress\Utils\IdUtil;
 
-class EntityUtils {
+class EntityUtils
+{
 
-    public static function prepareOption($name, $value) {
-        return array('option_name' => $name, 'option_value' => $value, 'autoload' => 'yes');
+    public static function prepareOption($name, $value)
+    {
+        return ['option_name' => $name, 'option_value' => $value, 'autoload' => 'yes'];
     }
 
-    public static function prepareUser($vpId = null, $userValues = array()) {
+    public static function prepareUser($vpId = null, $userValues = [])
+    {
         if ($vpId === null) {
             $vpId = IdUtil::newId();
         }
 
-        return array_merge(array(
+        return array_merge([
             "user_login" => "JoeTester",
             "user_pass" => '$P$B3hfEaUjEIkzHqzDHQ5kCALiUGv3rt1',
             "user_nicename" => "JoeTester",
@@ -27,15 +30,16 @@ class EntityUtils {
             "user_status" => 0,
             "display_name" => "JoeTester",
             "vp_id" => $vpId,
-        ), $userValues);
+        ], $userValues);
     }
 
-    public static function preparePost($vpId = null, $authorVpId = null, $postValues = array()) {
+    public static function preparePost($vpId = null, $authorVpId = null, $postValues = [])
+    {
         if ($vpId === null) {
             $vpId = IdUtil::newId();
         }
 
-        $post = array_merge(array(
+        $post = array_merge([
             'post_date' => "2015-02-02 14:19:59",
             'post_date_gmt' => "2015-02-02 14:19:59",
             'post_modified' => '0000-00-00 00:00:00',
@@ -58,7 +62,7 @@ class EntityUtils {
             'vp_id' => $vpId,
             'vp_post_parent' => 0,
             'vp_post_author' => 0,
-        ), $postValues);
+        ], $postValues);
 
         if ($authorVpId !== null) {
             $post['vp_post_author'] = $authorVpId;
@@ -67,14 +71,15 @@ class EntityUtils {
         return $post;
     }
 
-    public static function prepareUserMeta($vpId = null, $userVpId = null, $key = null, $value = null) {
+    public static function prepareUserMeta($vpId = null, $userVpId = null, $key = null, $value = null)
+    {
         if ($vpId === null) {
             $vpId = IdUtil::newId();
         }
 
-        $usermeta = array(
+        $usermeta = [
             'vp_id' => $vpId
-        );
+        ];
 
         if ($userVpId !== null) {
             $usermeta['vp_user_id'] = $userVpId;
@@ -91,14 +96,15 @@ class EntityUtils {
         return $usermeta;
     }
 
-    public static function preparePostMeta($vpId = null, $postVpId = null, $key = null, $value = null) {
+    public static function preparePostMeta($vpId = null, $postVpId = null, $key = null, $value = null)
+    {
         if ($vpId === null) {
             $vpId = IdUtil::newId();
         }
 
-        $postmeta = array(
+        $postmeta = [
             'vp_id' => $vpId
-        );
+        ];
 
         if ($postVpId !== null) {
             $postmeta['vp_post_id'] = $postVpId;
@@ -115,12 +121,13 @@ class EntityUtils {
         return $postmeta;
     }
 
-    public static function prepareComment($vpId = null, $postVpId = null, $authorVpId = null, $commentValues = array()) {
+    public static function prepareComment($vpId = null, $postVpId = null, $authorVpId = null, $commentValues = [])
+    {
         if ($vpId === null) {
             $vpId = IdUtil::newId();
         }
 
-        $comment = array_merge(array(
+        $comment = array_merge([
             'comment_author' => 'Joe Tester',
             'comment_author_email' => 'joetester@example.com',
             'comment_author_url' => '',
@@ -135,7 +142,7 @@ class EntityUtils {
             'comment_parent' => 0,
             'vp_comment_parent' => 0,
             'vp_id' => $vpId,
-        ), $commentValues);
+        ], $commentValues);
 
         if ($postVpId !== null) {
             $comment['vp_comment_post_ID'] = $postVpId;
@@ -148,17 +155,18 @@ class EntityUtils {
         return $comment;
     }
 
-    public static function prepareTerm($vpId = null, $name = null, $slug = null) {
+    public static function prepareTerm($vpId = null, $name = null, $slug = null)
+    {
         if ($vpId === null) {
             $vpId = IdUtil::newId();
         }
 
-        $term = array(
+        $term = [
             'vp_id' => $vpId,
             'name' => 'Some term',
             'slug' => 'some-term',
             'term_group' => 0
-        );
+        ];
 
         if (isset($name)) {
             $term['name'] = $name;
@@ -171,14 +179,15 @@ class EntityUtils {
         return $term;
     }
 
-    public static function prepareTermTaxonomy($vpId = null, $termVpId = null, $taxonomy = null, $description = null) {
+    public static function prepareTermTaxonomy($vpId = null, $termVpId = null, $taxonomy = null, $description = null)
+    {
         if ($vpId === null) {
             $vpId = IdUtil::newId();
         }
 
-        $termTaxonomy = array(
+        $termTaxonomy = [
             'vp_id' => $vpId
-        );
+        ];
 
         if ($termVpId !== null) {
             $termTaxonomy['vp_term_id'] = $termVpId;
@@ -198,14 +207,15 @@ class EntityUtils {
 
     }
 
-    public static function prepareTermMeta($vpId = null, $termVpId = null, $key = null, $value = null) {
+    public static function prepareTermMeta($vpId = null, $termVpId = null, $key = null, $value = null)
+    {
         if ($vpId === null) {
             $vpId = IdUtil::newId();
         }
 
-        $termmeta = array(
+        $termmeta = [
             'vp_id' => $vpId
-        );
+        ];
 
         if ($termVpId !== null) {
             $termmeta['vp_term_id'] = $termVpId;

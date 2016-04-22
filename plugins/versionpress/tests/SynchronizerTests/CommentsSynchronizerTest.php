@@ -2,7 +2,6 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
-use Nette\Utils\Random;
 use VersionPress\Storages\CommentStorage;
 use VersionPress\Storages\PostStorage;
 use VersionPress\Storages\UserStorage;
@@ -13,9 +12,9 @@ use VersionPress\Synchronizers\UsersSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
-use VersionPress\Utils\IdUtil;
 
-class CommentsSynchronizerTest extends SynchronizerTestCase {
+class CommentsSynchronizerTest extends SynchronizerTestCase
+{
     /** @var CommentStorage */
     private $storage;
     /** @var PostStorage */
@@ -32,21 +31,47 @@ class CommentsSynchronizerTest extends SynchronizerTestCase {
     private static $postVpId;
     private static $vpId;
 
-    protected function setUp() {
+    protected function setUp()
+    {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('comment');
         $this->postStorage = self::$storageFactory->getStorage('post');
         $this->userStorage = self::$storageFactory->getStorage('user');
-        $this->synchronizer = new CommentsSynchronizer($this->storage, self::$database, self::$schemaInfo->getEntityInfo('comment') ,self::$schemaInfo, self::$vpidRepository, self::$urlReplacer, self::$shortcodesReplacer);
-        $this->postsSynchronizer = new PostsSynchronizer($this->postStorage, self::$database, self::$schemaInfo->getEntityInfo('post') ,self::$schemaInfo, self::$vpidRepository, self::$urlReplacer, self::$shortcodesReplacer);
-        $this->usersSynchronizer = new UsersSynchronizer($this->userStorage, self::$database, self::$schemaInfo->getEntityInfo('user') ,self::$schemaInfo, self::$vpidRepository, self::$urlReplacer, self::$shortcodesReplacer);
+        $this->synchronizer = new CommentsSynchronizer(
+            $this->storage,
+            self::$database,
+            self::$schemaInfo->getEntityInfo('comment'),
+            self::$schemaInfo,
+            self::$vpidRepository,
+            self::$urlReplacer,
+            self::$shortcodesReplacer
+        );
+        $this->postsSynchronizer = new PostsSynchronizer(
+            $this->postStorage,
+            self::$database,
+            self::$schemaInfo->getEntityInfo('post'),
+            self::$schemaInfo,
+            self::$vpidRepository,
+            self::$urlReplacer,
+            self::$shortcodesReplacer
+        );
+        $this->usersSynchronizer = new UsersSynchronizer(
+            $this->userStorage,
+            self::$database,
+            self::$schemaInfo->getEntityInfo('user'),
+            self::$schemaInfo,
+            self::$vpidRepository,
+            self::$urlReplacer,
+            self::$shortcodesReplacer
+        );
     }
 
     /**
      * @test
      * @testdox Synchronizer adds new comment to the database
      */
-    public function synchronizerAddsNewCommentToDatabase() {
+    public function synchronizerAddsNewCommentToDatabase()
+    {
         $this->createComment();
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->postsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
@@ -59,7 +84,8 @@ class CommentsSynchronizerTest extends SynchronizerTestCase {
      * @test
      * @testdox Synchronizer updates changed comment in the database
      */
-    public function synchronizerUpdatesChangedCommentInDatabase() {
+    public function synchronizerUpdatesChangedCommentInDatabase()
+    {
         $this->editComment();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
@@ -69,7 +95,8 @@ class CommentsSynchronizerTest extends SynchronizerTestCase {
      * @test
      * @testdox Synchronizer replaces absolute URLs
      */
-    public function synchronizerReplacesAbsoluteUrls() {
+    public function synchronizerReplacesAbsoluteUrls()
+    {
         $this->editComment('comment_content', AbsoluteUrlReplacer::PLACEHOLDER);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
@@ -79,7 +106,8 @@ class CommentsSynchronizerTest extends SynchronizerTestCase {
      * @test
      * @testdox Synchronizer removes deleted comment from the database
      */
-    public function synchronizerRemovesDeletedCommentFromDatabase() {
+    public function synchronizerRemovesDeletedCommentFromDatabase()
+    {
         $this->deleteComment();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->postsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
@@ -91,7 +119,8 @@ class CommentsSynchronizerTest extends SynchronizerTestCase {
      * @test
      * @testdox Synchronizer adds new comment to the database (selective synchronization)
      */
-    public function synchronizerAddsNewCommentToDatabase_selective() {
+    public function synchronizerAddsNewCommentToDatabase_selective()
+    {
         $entitiesToSynchronize = $this->createComment();
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         $this->postsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
@@ -104,7 +133,8 @@ class CommentsSynchronizerTest extends SynchronizerTestCase {
      * @test
      * @testdox Synchronizer updates changed comment in the database (selective synchronization)
      */
-    public function synchronizerUpdatesChangedCommentInDatabase_selective() {
+    public function synchronizerUpdatesChangedCommentInDatabase_selective()
+    {
         $entitiesToSynchronize = $this->editComment();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         DBAsserter::assertFilesEqualDatabase();
@@ -114,7 +144,8 @@ class CommentsSynchronizerTest extends SynchronizerTestCase {
      * @test
      * @testdox Synchronizer removes deleted comment from the database (selective synchronization)
      */
-    public function synchronizerRemovesDeletedCommentFromDatabase_selective() {
+    public function synchronizerRemovesDeletedCommentFromDatabase_selective()
+    {
         $entitiesToSynchronize = $this->deleteComment();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         $this->postsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
@@ -122,7 +153,8 @@ class CommentsSynchronizerTest extends SynchronizerTestCase {
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    private function createComment() {
+    private function createComment()
+    {
         $author = EntityUtils::prepareUser();
         self::$authorVpId = $author['vp_id'];
         $this->userStorage->save($author);
@@ -137,29 +169,31 @@ class CommentsSynchronizerTest extends SynchronizerTestCase {
          * is not yet synchronized. It's OK in this case. */
         @$this->storage->save($comment);
 
-        return array(
-            array('vp_id' => self::$authorVpId, 'parent' => self::$authorVpId),
-            array('vp_id' => self::$postVpId, 'parent' => self::$postVpId),
-            array('vp_id' => self::$vpId, 'parent' => self::$vpId),
-        );
+        return [
+            ['vp_id' => self::$authorVpId, 'parent' => self::$authorVpId],
+            ['vp_id' => self::$postVpId, 'parent' => self::$postVpId],
+            ['vp_id' => self::$vpId, 'parent' => self::$vpId],
+        ];
     }
 
-    private function editComment($key = 'comment_content', $value = 'another content') {
-        $this->storage->save(EntityUtils::prepareComment(self::$vpId, null, null, array($key => $value)));
-        return array(
-            array('vp_id' => self::$vpId, 'parent' => self::$vpId),
-        );
+    private function editComment($key = 'comment_content', $value = 'another content')
+    {
+        $this->storage->save(EntityUtils::prepareComment(self::$vpId, null, null, [$key => $value]));
+        return [
+            ['vp_id' => self::$vpId, 'parent' => self::$vpId],
+        ];
     }
 
-    private function deleteComment() {
+    private function deleteComment()
+    {
         $this->storage->delete(EntityUtils::prepareComment(self::$vpId));
         $this->postStorage->delete(EntityUtils::preparePost(self::$postVpId));
         $this->userStorage->delete(EntityUtils::prepareUser(self::$authorVpId));
 
-        return array(
-            array('vp_id' => self::$authorVpId, 'parent' => self::$authorVpId),
-            array('vp_id' => self::$postVpId, 'parent' => self::$postVpId),
-            array('vp_id' => self::$vpId, 'parent' => self::$vpId),
-        );
+        return [
+            ['vp_id' => self::$authorVpId, 'parent' => self::$authorVpId],
+            ['vp_id' => self::$postVpId, 'parent' => self::$postVpId],
+            ['vp_id' => self::$vpId, 'parent' => self::$vpId],
+        ];
     }
 }

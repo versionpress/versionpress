@@ -3,26 +3,25 @@
 namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\EntityInfo;
-use VersionPress\Storages\PostMetaStorage;
-use VersionPress\Storages\PostStorage;
 use VersionPress\Storages\UserMetaStorage;
 use VersionPress\Storages\UserStorage;
 use VersionPress\Utils\FileSystem;
 
-class UserMetaStorageTest extends \PHPUnit_Framework_TestCase {
+class UserMetaStorageTest extends \PHPUnit_Framework_TestCase
+{
     /** @var UserMetaStorage */
     private $storage;
     /** @var UserStorage */
     private $userStorage;
 
-    private $testingUserMeta = array(
+    private $testingUserMeta = [
         'meta_key' => 'lastname',
         'meta_value' => 'Doe',
         'vp_id' => "F11A5FF2219A3430E099B3838C42EBCA",
         'vp_user_id' => "3EC9EF54CAF94300BBA89111FA833222",
-    );
+    ];
 
-    private $testingUser = array(
+    private $testingUser = [
         "user_login" => "admin",
         "user_pass" => '$P$B3hfEaUjEIkzHqzDHQ5kCALiUGv3rt1',
         "user_nicename" => "admin",
@@ -33,12 +32,13 @@ class UserMetaStorageTest extends \PHPUnit_Framework_TestCase {
         "user_status" => 0,
         "display_name" => "admin",
         "vp_id" => "3EC9EF54CAF94300BBA89111FA833222",
-    );
+    ];
 
     /**
      * @test
      */
-    public function savedUserMetaEqualsLoadedUserMeta() {
+    public function savedUserMetaEqualsLoadedUserMeta()
+    {
         $this->userStorage->save($this->testingUser);
         $this->storage->save($this->testingUserMeta);
         $loadedUserMeta = $this->storage->loadEntity($this->testingUserMeta['vp_id'], $this->testingUser['vp_id']);
@@ -48,7 +48,8 @@ class UserMetaStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function loadAllReturnsOnlyOriginalEntities() {
+    public function loadAllReturnsOnlyOriginalEntities()
+    {
         $this->userStorage->save($this->testingUser);
         $this->storage->save($this->testingUserMeta);
         $loadedUserMeta = $this->storage->loadAll();
@@ -56,31 +57,33 @@ class UserMetaStorageTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->testingUserMeta == reset($loadedUserMeta));
     }
 
-    protected function setUp() {
+    protected function setUp()
+    {
         parent::setUp();
-        $userInfo = new EntityInfo(array(
-            'user' => array(
+        $userInfo = new EntityInfo([
+            'user' => [
                 'table' => 'users',
                 'id' => 'ID',
-            )
-        ));
+            ]
+        ]);
 
-        $userMetaInfo = new EntityInfo(array(
-            'usermeta' => array(
+        $userMetaInfo = new EntityInfo([
+            'usermeta' => [
                 'id' => 'umeta_id',
                 'parent-reference' => 'user_id',
-                'references' => array (
+                'references' => [
                     'user_id' => 'user',
-                )
-            )
-        ));
+                ]
+            ]
+        ]);
 
         mkdir(__DIR__ . '/users');
         $this->userStorage = new UserStorage(__DIR__ . '/users', $userInfo);
         $this->storage = new UserMetaStorage($this->userStorage, $userMetaInfo, 'prefix_');
     }
 
-    protected function tearDown() {
+    protected function tearDown()
+    {
         parent::tearDown();
         FileSystem::remove(__DIR__ . '/users');
     }

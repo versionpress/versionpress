@@ -13,7 +13,8 @@ use VersionPress\Git\CommitMessage;
  *     VP-Term-Name: Uncategorized
  *
  */
-class TermTaxonomyChangeInfo extends EntityChangeInfo {
+class TermTaxonomyChangeInfo extends EntityChangeInfo
+{
 
     const TAXONOMY_TAG = "VP-TermTaxonomy-Taxonomy";
     const TERM_NAME_TAG = "VP-Term-Name";
@@ -23,13 +24,15 @@ class TermTaxonomyChangeInfo extends EntityChangeInfo {
     /** @var string */
     private $termName;
 
-    public function __construct($action, $entityId, $taxonomy, $termName) {
+    public function __construct($action, $entityId, $taxonomy, $termName)
+    {
         parent::__construct("term_taxonomy", $action, $entityId);
         $this->taxonomy = $taxonomy;
         $this->termName = $termName;
     }
 
-    public function getChangeDescription() {
+    public function getChangeDescription()
+    {
         $taxonomy = $this->getTaxonomyName();
 
         switch ($this->getAction()) {
@@ -42,7 +45,8 @@ class TermTaxonomyChangeInfo extends EntityChangeInfo {
         return "Edited {$taxonomy} '{$this->termName}'";
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
+    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
         list(, $action, $entityId) = explode("/", $actionTag, 3);
@@ -51,22 +55,28 @@ class TermTaxonomyChangeInfo extends EntityChangeInfo {
         return new self($action, $entityId, $taxonomy, $termName);
     }
 
-    public function getCustomTags() {
-        $tags = array(
+    public function getCustomTags()
+    {
+        $tags = [
             self::TERM_NAME_TAG => $this->termName,
             self::TAXONOMY_TAG => $this->taxonomy,
-        );
+        ];
 
         return $tags;
     }
 
-    public function getTaxonomyName() {
+    public function getTaxonomyName()
+    {
         return str_replace("_", " ", $this->taxonomy);
     }
 
-    public function getChangedFiles() {
+    public function getChangedFiles()
+    {
         $changes = parent::getChangedFiles();
-        $changes[] = array("type" => "all-storage-files", "entity" => "option"); // sometimes term change can affect option (e.g. deleting menu)
+        $changes[] = [
+            "type" => "all-storage-files",
+            "entity" => "option"
+        ]; // sometimes term change can affect option (e.g. deleting menu)
         return $changes;
     }
 }

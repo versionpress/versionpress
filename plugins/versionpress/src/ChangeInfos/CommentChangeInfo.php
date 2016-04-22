@@ -1,6 +1,7 @@
 <?php
 
 namespace VersionPress\ChangeInfos;
+
 use VersionPress\Git\CommitMessage;
 
 /**
@@ -13,7 +14,8 @@ use VersionPress\Git\CommitMessage;
  *     VP-Comment-PostTitle: Hello world
  *
  */
-class CommentChangeInfo extends EntityChangeInfo {
+class CommentChangeInfo extends EntityChangeInfo
+{
 
     const POST_TITLE_TAG = "VP-Comment-PostTitle";
     const AUTHOR_TAG = "VP-Comment-Author";
@@ -24,13 +26,15 @@ class CommentChangeInfo extends EntityChangeInfo {
     /** @var string */
     private $commentedPost;
 
-    public function __construct($action, $entityId, $commentAuthor, $commentedPost) {
+    public function __construct($action, $entityId, $commentAuthor, $commentedPost)
+    {
         parent::__construct("comment", $action, $entityId);
         $this->commentAuthor = $commentAuthor;
         $this->commentedPost = $commentedPost;
     }
 
-    function getChangeDescription() {
+    public function getChangeDescription()
+    {
         switch ($this->getAction()) {
             case "create":
                 return "New comment for post '{$this->commentedPost}'";
@@ -55,7 +59,8 @@ class CommentChangeInfo extends EntityChangeInfo {
         return "Edited comment for post '{$this->commentedPost}'";
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
+    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
         $commentAuthor = $tags[self::AUTHOR_TAG];
@@ -64,10 +69,11 @@ class CommentChangeInfo extends EntityChangeInfo {
         return new self($action, $entityId, $commentAuthor, $commentedPost);
     }
 
-    public function getCustomTags() {
-        return array(
+    public function getCustomTags()
+    {
+        return [
             self::AUTHOR_TAG => $this->commentAuthor,
             self::POST_TITLE_TAG => $this->commentedPost
-        );
+        ];
     }
 }

@@ -6,7 +6,8 @@ use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 
-class TranslationsTest extends End2EndTestCase {
+class TranslationsTest extends End2EndTestCase
+{
 
     /** @var ITranslationsTestWorker */
     private static $worker;
@@ -15,7 +16,8 @@ class TranslationsTest extends End2EndTestCase {
      * @test
      * @testdox Switching language creates 'translation/activate' action
      */
-    public function switchingLanguageCreatesLanguageActivateAction() {
+    public function switchingLanguageCreatesLanguageActivateAction()
+    {
         self::$worker->prepare_switchLanguage();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -24,7 +26,7 @@ class TranslationsTest extends End2EndTestCase {
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction('translation/activate');
-        $commitAsserter->assertCommitPath(array('A', 'M'), '%vpdb%/options/*');
+        $commitAsserter->assertCommitPath(['A', 'M'], '%vpdb%/options/*');
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }

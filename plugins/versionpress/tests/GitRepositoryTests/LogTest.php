@@ -6,14 +6,16 @@ use VersionPress\Git\CommitMessage;
 use VersionPress\Git\GitRepository;
 use VersionPress\Utils\FileSystem;
 
-class LogTest extends \PHPUnit_Framework_TestCase {
+class LogTest extends \PHPUnit_Framework_TestCase
+{
 
     private static $repositoryPath;
     private static $tempPath;
     /** @var GitRepository */
     private static $repository;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass()
+    {
         parent::setUpBeforeClass();
         self::$repositoryPath = __DIR__ . '/repository';
         self::$tempPath = __DIR__ . '/temp';
@@ -22,13 +24,15 @@ class LogTest extends \PHPUnit_Framework_TestCase {
         mkdir(self::$tempPath);
     }
 
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass()
+    {
         parent::tearDownAfterClass();
         FileSystem::remove(self::$repositoryPath);
         FileSystem::remove(self::$tempPath);
     }
 
-    protected function setUp() {
+    protected function setUp()
+    {
         parent::setUp();
         FileSystem::removeContent(self::$repositoryPath);
         FileSystem::removeContent(self::$tempPath);
@@ -38,15 +42,17 @@ class LogTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function logReturnsEmptyArrayInEmptyRepository() {
+    public function logReturnsEmptyArrayInEmptyRepository()
+    {
         $log = self::$repository->log();
-        $this->assertEquals(array(), $log);
+        $this->assertEquals([], $log);
     }
 
     /**
      * @test
      */
-    public function logReturnsOneEntryAfterOneCommit() {
+    public function logReturnsOneEntryAfterOneCommit()
+    {
         touch(self::$repositoryPath . '/somefile');
         self::$repository->stageAll();
         self::$repository->commit(new CommitMessage("Some commit"), "Author name", "author@example.com");
@@ -58,7 +64,8 @@ class LogTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function commitContainsListOfChangedFiles() {
+    public function commitContainsListOfChangedFiles()
+    {
         touch(self::$repositoryPath . '/somefile');
         touch(self::$repositoryPath . '/otherfile');
         self::$repository->stageAll();
@@ -67,10 +74,10 @@ class LogTest extends \PHPUnit_Framework_TestCase {
         $log = self::$repository->log();
         $lastCommit = $log[0];
 
-        $expectedChangedFiles = array(
-            array('status' => 'A', 'path' => 'otherfile'), // the files have to be ordered alphabetically
-            array('status' => 'A', 'path' => 'somefile'),
-        );
+        $expectedChangedFiles = [
+            ['status' => 'A', 'path' => 'otherfile'], // the files have to be ordered alphabetically
+            ['status' => 'A', 'path' => 'somefile'],
+        ];
 
         $this->assertEquals($expectedChangedFiles, $lastCommit->getChangedFiles());
     }
@@ -78,7 +85,8 @@ class LogTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function allCommitsContainListOfChangedFiles() {
+    public function allCommitsContainListOfChangedFiles()
+    {
         touch(self::$repositoryPath . '/somefile');
         self::$repository->stageAll();
         self::$repository->commit(new CommitMessage("Some commit"), "Author name", "author@example.com");
@@ -91,17 +99,17 @@ class LogTest extends \PHPUnit_Framework_TestCase {
         $log = self::$repository->log();
         $lastCommit = $log[0];
 
-        $expectedChangedFilesInLastCommit = array(
-            array('status' => 'A', 'path' => 'otherfile'),
-        );
+        $expectedChangedFilesInLastCommit = [
+            ['status' => 'A', 'path' => 'otherfile'],
+        ];
 
         $this->assertEquals($expectedChangedFilesInLastCommit, $lastCommit->getChangedFiles());
 
 
         $previousCommit = $log[1];
-        $expectedChangedFilesInPreviousCommit = array(
-            array('status' => 'A', 'path' => 'somefile'),
-        );
+        $expectedChangedFilesInPreviousCommit = [
+            ['status' => 'A', 'path' => 'somefile'],
+        ];
 
         $this->assertEquals($expectedChangedFilesInPreviousCommit, $previousCommit->getChangedFiles());
     }

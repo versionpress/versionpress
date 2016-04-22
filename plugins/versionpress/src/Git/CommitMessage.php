@@ -1,6 +1,7 @@
 <?php
 
 namespace VersionPress\Git;
+
 use Nette\Utils\Strings;
 
 /**
@@ -9,14 +10,15 @@ use Nette\Utils\Strings;
  *
  * Note about the "[VP]" prefix: this class just doesn't care. When the commit is first created,
  * external code will typically put prefix-less subject into this object. Only when
- * {@link VersionPress\Git\GitRepository::commit()} executes the commit itself will get the [VP] prefix. On the other hand,
- * when the commit is read from the repository and parsed back into this object,
+ * {@link VersionPress\Git\GitRepository::commit()} executes the commit itself will get the [VP] prefix.
+ * On the other hand, when the commit is read from the repository and parsed back into this object,
  * it will typically have the [VP] prefix. It doesn't matter as VersionPress typically only
  * works with the commit body and its VP tags.
  *
  * @see Commit  Represents the whole commit
  */
-class CommitMessage {
+class CommitMessage
+{
 
     /**
      * @var string
@@ -38,7 +40,8 @@ class CommitMessage {
      * @param string $subject First line of the commit message
      * @param string $body Optional, lines 3..n
      */
-    function __construct($subject, $body = null) {
+    public function __construct($subject, $body = null)
+    {
         $this->subject = $subject;
         $this->body = $body;
     }
@@ -48,7 +51,8 @@ class CommitMessage {
      *
      * @return string
      */
-    public function getSubject() {
+    public function getSubject()
+    {
         return $this->subject;
     }
 
@@ -58,7 +62,8 @@ class CommitMessage {
      *
      * @return string
      */
-    public function getBody() {
+    public function getBody()
+    {
         return $this->body;
     }
 
@@ -68,7 +73,8 @@ class CommitMessage {
      *
      * @return array Array of tagName => value (trimmed)
      */
-    public function getVersionPressTags() {
+    public function getVersionPressTags()
+    {
         if (!$this->tags) {
             $tagLines = array_filter(
                 array_map("trim", explode("\n", $this->getBody())),
@@ -76,7 +82,7 @@ class CommitMessage {
                     return Strings::startsWith($line, "VP-") || Strings::startsWith($line, "X-VP-");
                 }
             );
-            $tags = array();
+            $tags = [];
             foreach ($tagLines as $line) {
                 list($key, $value) = array_map("trim", explode(":", $line, 2));
                 $tags[$key] = $value;
@@ -93,7 +99,8 @@ class CommitMessage {
      * @param $tagName
      * @return string
      */
-    public function getVersionPressTag($tagName) {
+    public function getVersionPressTag($tagName)
+    {
         $tags = $this->getVersionPressTags();
         return isset($tags[$tagName]) ? $tags[$tagName] : "";
     }

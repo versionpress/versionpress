@@ -16,7 +16,8 @@ use VersionPress\Utils\StringUtils;
  *     VP-Term-Id: VPID
  *
  */
-class TermMetaChangeInfo extends EntityChangeInfo {
+class TermMetaChangeInfo extends EntityChangeInfo
+{
 
     const TERM_NAME_TAG = "VP-Term-Name";
     const TERM_META_KEY = "VP-TermMeta-Key";
@@ -31,14 +32,16 @@ class TermMetaChangeInfo extends EntityChangeInfo {
     /** @var string */
     private $metaKey;
 
-    public function __construct($action, $entityId, $termName, $termVpId, $metaKey) {
+    public function __construct($action, $entityId, $termName, $termVpId, $metaKey)
+    {
         parent::__construct("termmeta", $action, $entityId);
         $this->termName = $termName;
         $this->termVpId = $termVpId;
         $this->metaKey = $metaKey;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
+    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
         list(, $action, $entityId) = explode("/", $actionTag, 3);
@@ -48,7 +51,8 @@ class TermMetaChangeInfo extends EntityChangeInfo {
         return new self($action, $entityId, $termName, $termVpid, $metaKey);
     }
 
-    public function getChangeDescription() {
+    public function getChangeDescription()
+    {
         $verb = "Edited";
         $subject = "term-meta '{$this->metaKey}'";
         $rest = "for term '{$this->termName}'";
@@ -60,15 +64,17 @@ class TermMetaChangeInfo extends EntityChangeInfo {
         return sprintf("%s %s %s", $verb, $subject, $rest);
     }
 
-    public function getCustomTags() {
-        return array(
+    public function getCustomTags()
+    {
+        return [
             self::TERM_NAME_TAG => $this->termName,
             self::TERM_META_KEY => $this->metaKey,
             self::TERM_VPID_TAG => $this->termVpId,
-        );
+        ];
     }
 
-    public function getParentId() {
+    public function getParentId()
+    {
         return $this->termVpId;
     }
 }

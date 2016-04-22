@@ -30,7 +30,7 @@
     <orderEntry type="module-library">
       <library name="PHP">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/../../ext-libs/vendor/wp-cli" />
+          <root url="file://$MODULE_DIR$/../../ext-libs/vendor" />
           <root url="file://$MODULE_DIR$/../../ext-libs/wordpress" />
           <root url="file://$MODULE_DIR$/vendor/composer" />
           <root url="file://$MODULE_DIR$/vendor/fzaninotto/faker" />
@@ -39,13 +39,11 @@
           <root url="file://$MODULE_DIR$/vendor/icecave/semver" />
           <root url="file://$MODULE_DIR$/vendor/imnotjames/curlfile-compat" />
           <root url="file://$MODULE_DIR$/vendor/janvoracek/comment-stripper" />
-          <root url="file://$MODULE_DIR$/vendor/janvoracek/wp-cli-ssh" />
           <root url="file://$MODULE_DIR$/vendor/michelf/php-markdown" />
+          <root url="file://$MODULE_DIR$/vendor/mikey179/vfsStream" />
           <root url="file://$MODULE_DIR$/vendor/nette/caching" />
           <root url="file://$MODULE_DIR$/vendor/nette/database" />
           <root url="file://$MODULE_DIR$/vendor/nette/finder" />
-          <root url="file://$MODULE_DIR$/vendor/nette/neon" />
-          <root url="file://$MODULE_DIR$/vendor/nette/robot-loader" />
           <root url="file://$MODULE_DIR$/vendor/nette/utils" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/php-code-coverage" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/php-file-iterator" />
@@ -59,13 +57,15 @@
           <root url="file://$MODULE_DIR$/vendor/sebastian/diff" />
           <root url="file://$MODULE_DIR$/vendor/sebastian/exporter" />
           <root url="file://$MODULE_DIR$/vendor/sebastian/recursion-context" />
+          <root url="file://$MODULE_DIR$/vendor/squizlabs/php_codesniffer" />
           <root url="file://$MODULE_DIR$/vendor/symfony/filesystem" />
           <root url="file://$MODULE_DIR$/vendor/symfony/process" />
           <root url="file://$MODULE_DIR$/vendor/symfony/yaml" />
           <root url="file://$MODULE_DIR$/vendor/tracy/tracy" />
+          <root url="file://$MODULE_DIR$/vendor/udan11/sql-parser" />
         </CLASSES>
         <SOURCES>
-          <root url="file://$MODULE_DIR$/../../ext-libs/vendor/wp-cli" />
+          <root url="file://$MODULE_DIR$/../../ext-libs/vendor" />
           <root url="file://$MODULE_DIR$/../../ext-libs/wordpress" />
           <root url="file://$MODULE_DIR$/vendor/composer" />
           <root url="file://$MODULE_DIR$/vendor/fzaninotto/faker" />
@@ -74,13 +74,11 @@
           <root url="file://$MODULE_DIR$/vendor/icecave/semver" />
           <root url="file://$MODULE_DIR$/vendor/imnotjames/curlfile-compat" />
           <root url="file://$MODULE_DIR$/vendor/janvoracek/comment-stripper" />
-          <root url="file://$MODULE_DIR$/vendor/janvoracek/wp-cli-ssh" />
           <root url="file://$MODULE_DIR$/vendor/michelf/php-markdown" />
+          <root url="file://$MODULE_DIR$/vendor/mikey179/vfsStream" />
           <root url="file://$MODULE_DIR$/vendor/nette/caching" />
           <root url="file://$MODULE_DIR$/vendor/nette/database" />
           <root url="file://$MODULE_DIR$/vendor/nette/finder" />
-          <root url="file://$MODULE_DIR$/vendor/nette/neon" />
-          <root url="file://$MODULE_DIR$/vendor/nette/robot-loader" />
           <root url="file://$MODULE_DIR$/vendor/nette/utils" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/php-code-coverage" />
           <root url="file://$MODULE_DIR$/vendor/phpunit/php-file-iterator" />
@@ -94,10 +92,22 @@
           <root url="file://$MODULE_DIR$/vendor/sebastian/diff" />
           <root url="file://$MODULE_DIR$/vendor/sebastian/exporter" />
           <root url="file://$MODULE_DIR$/vendor/sebastian/recursion-context" />
+          <root url="file://$MODULE_DIR$/vendor/squizlabs/php_codesniffer" />
           <root url="file://$MODULE_DIR$/vendor/symfony/filesystem" />
           <root url="file://$MODULE_DIR$/vendor/symfony/process" />
           <root url="file://$MODULE_DIR$/vendor/symfony/yaml" />
           <root url="file://$MODULE_DIR$/vendor/tracy/tracy" />
+          <root url="file://$MODULE_DIR$/vendor/udan11/sql-parser" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="PHARS">
+        <CLASSES>
+          <root url="phar://$MODULE_DIR$/../../ext-libs/vendor/symfony/dependency-injection/Tests/Fixtures/includes/ProjectWithXsdExtensionInPhar.phar/" />
+        </CLASSES>
+        <SOURCES>
+          <root url="phar://$MODULE_DIR$/../../ext-libs/vendor/symfony/dependency-injection/Tests/Fixtures/includes/ProjectWithXsdExtensionInPhar.phar/" />
         </SOURCES>
       </library>
     </orderEntry>

@@ -2,7 +2,8 @@
 
 namespace VersionPress\Git;
 
-class RevertStatus {
+class RevertStatus
+{
 
     const OK = 'ok';
     const MERGE_CONFLICT = 'merge-conflict';

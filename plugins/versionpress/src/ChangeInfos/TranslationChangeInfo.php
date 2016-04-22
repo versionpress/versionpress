@@ -1,6 +1,7 @@
 <?php
 
 namespace VersionPress\ChangeInfos;
+
 use Nette\Utils\Strings;
 use VersionPress\Git\CommitMessage;
 use VersionPress\Utils\StringUtils;
@@ -17,7 +18,8 @@ use VersionPress\Utils\StringUtils;
  *     VP-Translation-Name: akismet
  *
  */
-class TranslationChangeInfo extends TrackedChangeInfo {
+class TranslationChangeInfo extends TrackedChangeInfo
+{
 
     private static $OBJECT_TYPE = "translation";
     const LANGUAGE_CODE_TAG = "VP-Language-Code";
@@ -47,7 +49,8 @@ class TranslationChangeInfo extends TrackedChangeInfo {
      * @param string $type See VP-Translation-Type tag documentation in the class docs
      * @param string $name Additional name information for types plugin, theme
      */
-    public function __construct($action, $languageCode, $languageName,  $type = 'core', $name = null) {
+    public function __construct($action, $languageCode, $languageName, $type = 'core', $name = null)
+    {
         $this->action = $action;
         $this->languageCode = $languageCode ? $languageCode : 'en_US';
         $this->languageName = $languageName;
@@ -55,19 +58,23 @@ class TranslationChangeInfo extends TrackedChangeInfo {
         $this->name = $name;
     }
 
-    public function getEntityName() {
+    public function getEntityName()
+    {
         return self::$OBJECT_TYPE;
     }
 
-    public function getAction() {
+    public function getAction()
+    {
         return $this->action;
     }
 
-    public function getLanguageCode() {
+    public function getLanguageCode()
+    {
         return $this->languageCode;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
+    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    {
         $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         $languageCode = $commitMessage->getVersionPressTag(self::LANGUAGE_CODE_TAG);
         $languageName = $commitMessage->getVersionPressTag(self::LANGUAGE_NAME_TAG);
@@ -77,28 +84,33 @@ class TranslationChangeInfo extends TrackedChangeInfo {
         return new self($action, $languageCode, $languageName, $type, $name);
     }
 
-    public function getChangeDescription() {
+    public function getChangeDescription()
+    {
         if ($this->action === 'activate') {
             return "Site language switched to '{$this->languageName}'";
         }
 
-        return Strings::capitalize(StringUtils::verbToPastTense($this->action)) . " translation '{$this->languageName}'";
+        $pastTense = StringUtils::verbToPastTense($this->action);
+        return Strings::capitalize($pastTense) . " translation '{$this->languageName}'";
     }
 
-    protected function getActionTagValue() {
+    protected function getActionTagValue()
+    {
         return "{$this->getEntityName()}/{$this->getAction()}";
     }
 
-    public function getCustomTags() {
-        return array(
+    public function getCustomTags()
+    {
+        return [
             self::LANGUAGE_CODE_TAG => $this->languageCode,
             self::LANGUAGE_NAME_TAG => $this->languageName,
             self::TRANSLATION_TYPE_TAG => $this->type,
             self::TRANSLATION_NAME_TAG => $this->name
-        );
+        ];
     }
 
-    public function getChangedFiles() {
+    public function getChangedFiles()
+    {
         $path = WP_CONTENT_DIR . "/languages/";
 
         if ($this->type === "core") {
@@ -107,10 +119,10 @@ class TranslationChangeInfo extends TrackedChangeInfo {
             $path .= $this->type . "s/" . $this->name . "-" . $this->languageCode . ".*";
         }
 
-        $filesChange = array("type" => "path", "path" => $path);
+        $filesChange = ["type" => "path", "path" => $path];
 
-        $optionChange = array("type" => "all-storage-files", "entity" => "option");
+        $optionChange = ["type" => "all-storage-files", "entity" => "option"];
 
-        return array($filesChange, $optionChange);
+        return [$filesChange, $optionChange];
     }
 }
