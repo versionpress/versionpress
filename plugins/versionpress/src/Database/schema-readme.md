@@ -212,7 +212,7 @@ entity:
       interval: 5min
 ```
 
-The values in the `frequently-written` array can either be strings which are then interpreted as queries, or objects with `query` and `interval` keys. The interval is parsed by the `strtotime()` PHP function and the default value is one hour.
+The values in the `frequently-written` array can either be strings which are then interpreted as queries, or objects with `query` and `interval` keys. Queries use the same syntax as search / filtering in the UI, with some small differences like that the date range operator cannot be used but overall, the syntax is pretty intuitive. The interval is parsed by the `strtotime()` PHP function and the default value is one hour.
 
 
 ## Ignoring entities
