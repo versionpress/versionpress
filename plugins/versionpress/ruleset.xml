@@ -18,6 +18,10 @@
         <exclude-pattern>versionpress.php</exclude-pattern>
     </rule>
 
+    <rule ref="Generic.Files.LineLength.TooLong">
+        <exclude-pattern>admin/*</exclude-pattern>
+    </rule>
+
     <arg value="swp"/>
     <arg name="extensions" value="php"/>
 

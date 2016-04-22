@@ -103,12 +103,7 @@ function _vp_show_progress_message($progressMessage)
             JsRedirect::redirect(menu_page_url('versionpress', false), InitializationConfig::REDIRECT_AFTER_MS);
         } else { ?>
             <p class="initialization-done">
-                Ouch. The initialization took too long and was terminated by the server.<br>
-                Please increase
-                <a href="http://php.net/manual/en/info.configuration.php#ini.max-execution-time" target="_blank">maximal
-                    execution time</a>
-                and <a href="<?php admin_url('admin.php?page=versionpress/admin/index.php&init_versionpress'); ?>">try
-                    it again</a>.
+                Ouch. The initialization took too long and was terminated by the server.<br>Please increase <a href="http://php.net/manual/en/info.configuration.php#ini.max-execution-time" target="_blank">maximal execution time</a> and <a href="<?php admin_url('admin.php?page=versionpress/admin/index.php&init_versionpress'); ?>">try it again</a>.
             </p>
         <?php
         }

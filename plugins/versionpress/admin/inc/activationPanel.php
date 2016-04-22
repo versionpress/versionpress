@@ -14,9 +14,7 @@ use VersionPress\Utils\RequirementsChecker;
         <h3>Welcome to VersionPress!</h3>
 
         <p class="about-description">
-            VersionPress needs a one-time activation step that initializes its internal storage.
-            <strong>This step is resource-intensive and might take a while</strong> if your site has many entities
-            (posts, comments etc.). The site will be put in maintanenance mode until it finishes.
+            VersionPress needs a one-time activation step that initializes its internal storage. <strong>This step is resource-intensive and might take a while</strong> if your site has many entities (posts, comments etc.). The site will be put in maintanenance mode until it finishes.
         </p>
 
         <div class="checks-and-warnings">
@@ -52,10 +50,7 @@ use VersionPress\Utils\RequirementsChecker;
                         ?>
                         <li>
                             <span class="icon icon-warning"></span>
-                            Note: This website is already versioned in Git (the repository is either your custom or
-                            has been created by a previous installation of VersionPress). VersionPress will add some
-                            rules into `.gitignore` and install a custom merge driver for its own files.
-                            It is not a problem for VersionPress, just be sure that you know what you are doing.
+                            Note: This website is already versioned in Git (the repository is either your custom or has been created by a previous installation of VersionPress). VersionPress will add some rules into `.gitignore` and install a custom merge driver for its own files. It is not a problem for VersionPress, just be sure that you know what you are doing.
                         </li>
                         <?php
                     }
@@ -63,8 +58,7 @@ use VersionPress\Utils\RequirementsChecker;
                 </ul>
 
                 <div>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=versionpress/admin/system-info.php')) ?>">
-                        View full system info</a>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=versionpress/admin/system-info.php')) ?>">View full system info</a>
                     <?php if (!$requirementsChecker->isWithoutCriticalErrors()) { ?>
                     , <a href="https://github.com/versionpress/support">get support on GitHub</a>
                     <?php } ?>
@@ -78,15 +72,11 @@ use VersionPress\Utils\RequirementsChecker;
                 <ul>
                     <li>
                         <span class="icon icon-notification"></span>
-                        You are activating an <strong>Early Access version</strong>. If you encounter any issues please
-                        let us know <a href="https://github.com/versionpress/support">on GitHub</a>.
-                        <a href="http://docs.versionpress.net/en/getting-started/about-eap">Learn more</a>.
+                        You are activating an <strong>Early Access version</strong>. If you encounter any issues please let us know <a href="https://github.com/versionpress/support">on GitHub</a>. <a href="http://docs.versionpress.net/en/getting-started/about-eap">Learn more</a>.
                     </li>
                     <li>
                         <span class="icon icon-notification"></span>
-                        Be careful when using <strong>third-party plugins</strong>. Some of them work fine, some might
-                        be problematic in combination with VersionPress.
-                        <a href="http://docs.versionpress.net/en/feature-focus/external-plugins">Learn more</a>.
+                        Be careful when using <strong>third-party plugins</strong>. Some of them work fine, some might be problematic in combination with VersionPress. <a href="http://docs.versionpress.net/en/feature-focus/external-plugins">Learn more</a>.
                     </li>
                     <li>
                         <span class="icon icon-notification"></span>
