@@ -162,7 +162,7 @@ Some entities are in an M:N relationship like posts and term_taxonomies. The for
 
 ```
 mn-references:
-  <junction_table_name>.<column_name>: <foreign_entity_name>
+  <junction_table_name_without_prefix>.<column_name>: <foreign_entity_name>
 ```
 
 This is a concrete example from the post entity:
@@ -179,7 +179,7 @@ References can also be prefixed with a tilde (`~`) which makes them virtual:
 
 ```
 mn-references:
-  ~<junction_table_name>.<column_name>: <foreign_entity_name>
+  ~<junction_table_name_without_prefix>.<column_name>: <foreign_entity_name>
 ```
 
 Virtual references are not stored in INI files but the relationships are checked during reverts. For example, when a revert would delete a category (revert of `term_taxonomy/create`) and there is some post referencing it, the operation would fail.
