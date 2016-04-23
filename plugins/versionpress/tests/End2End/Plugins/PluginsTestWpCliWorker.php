@@ -37,7 +37,7 @@ class PluginsTestWpCliWorker extends WpCliWorker implements IPluginsTestWorker
 
     public function activatePlugin()
     {
-        $this->wpAutomation->runWpCliCommand('plugin', 'activate', [$this->pluginInfo['css-id']]);
+        $this->wpAutomation->runWpCliCommand('plugin', 'activate', array($this->pluginInfo['url-fragment']));
     }
 
     public function prepare_deactivatePlugin()
@@ -46,7 +46,7 @@ class PluginsTestWpCliWorker extends WpCliWorker implements IPluginsTestWorker
 
     public function deactivatePlugin()
     {
-        $this->wpAutomation->runWpCliCommand('plugin', 'deactivate', [$this->pluginInfo['css-id']]);
+        $this->wpAutomation->runWpCliCommand('plugin', 'deactivate', array($this->pluginInfo['url-fragment']));
     }
 
     public function prepare_deletePlugin()
@@ -55,7 +55,7 @@ class PluginsTestWpCliWorker extends WpCliWorker implements IPluginsTestWorker
 
     public function deletePlugin()
     {
-        $this->wpAutomation->runWpCliCommand('plugin', 'delete', [$this->pluginInfo['css-id']]);
+        $this->wpAutomation->runWpCliCommand('plugin', 'delete', array($this->pluginInfo['url-fragment']));
     }
 
     public function prepare_installTwoPlugins()
@@ -80,7 +80,7 @@ class PluginsTestWpCliWorker extends WpCliWorker implements IPluginsTestWorker
         $this->wpAutomation->runWpCliCommand(
             'plugin',
             'activate',
-            [$this->pluginInfo['css-id'], $this->secondPluginInfo['css-id']]
+            [$this->pluginInfo['url-fragment'], $this->secondPluginInfo['url-fragment']]
         );
     }
 
@@ -93,7 +93,7 @@ class PluginsTestWpCliWorker extends WpCliWorker implements IPluginsTestWorker
         $this->wpAutomation->runWpCliCommand(
             'plugin',
             'deactivate',
-            [$this->pluginInfo['css-id'], $this->secondPluginInfo['css-id']]
+            [$this->pluginInfo['url-fragment'], $this->secondPluginInfo['url-fragment']]
         );
     }
 
@@ -106,7 +106,7 @@ class PluginsTestWpCliWorker extends WpCliWorker implements IPluginsTestWorker
         $this->wpAutomation->runWpCliCommand(
             'plugin',
             'delete',
-            [$this->pluginInfo['css-id'], $this->secondPluginInfo['css-id']]
+            [$this->pluginInfo['url-fragment'], $this->secondPluginInfo['url-fragment']]
         );
     }
 }
