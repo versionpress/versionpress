@@ -25,7 +25,7 @@ class VersionPress
      */
     public static function getEnvironment()
     {
-        return defined('VP_ENVIRONMENT') ? VP_ENVIRONMENT : 'master';
+        return defined('VP_ENVIRONMENT') ? VP_ENVIRONMENT : 'default';
     }
 
     /**
