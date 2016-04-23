@@ -9,8 +9,7 @@
     "michelf/php-markdown": "1.4.*",
     "symfony/filesystem": "~2.5",
     "imnotjames/curlfile-compat": "0.0.1",
-    "udan11/sql-parser": "^3.0",
-    "squizlabs/php_codesniffer": "^2.6"
+    "udan11/sql-parser": "^3.0"
   },
   "config": {
     "platform": {
@@ -24,7 +23,8 @@
     "nette/database": "2.2.*",
     "fzaninotto/faker": "1.4.*",
     "icecave/semver": "3.0.3",
-    "mikey179/vfsStream": "^1.6"
+    "mikey179/vfsStream": "^1.6",
+    "squizlabs/php_codesniffer": "^2.6"
   },
   "autoload": {
     "psr-4": {
