@@ -19,7 +19,7 @@ class VersionPress
     }
 
     /**
-     * Returns name of current environment (master for original site, clone name for clone).
+     * Returns name of current environment (default for original site, clone name for clone).
      *
      * @return string
      */

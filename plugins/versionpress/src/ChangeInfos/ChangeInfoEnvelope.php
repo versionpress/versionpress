@@ -21,7 +21,7 @@ class ChangeInfoEnvelope implements ChangeInfo
 
     /**
      * VP meta tag that says the name of current environment. For clone it's the name of clone,
-     * for original site it's master. It's based on constant {@link VP_ENVIRONMENT}.
+     * for original site it's 'default'. It's based on constant {@link VP_ENVIRONMENT}.
      */
     const VP_ENVIRONMENT_TAG = "X-VP-Environment";
 
