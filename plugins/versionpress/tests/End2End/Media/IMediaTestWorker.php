@@ -4,7 +4,8 @@ namespace VersionPress\Tests\End2End\Media;
 
 use VersionPress\Tests\End2End\Utils\ITestWorker;
 
-interface IMediaTestWorker extends ITestWorker {
+interface IMediaTestWorker extends ITestWorker
+{
 
     public function setUploadedFilePath($filePath);
 

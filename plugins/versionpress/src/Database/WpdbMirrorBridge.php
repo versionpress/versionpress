@@ -7,7 +7,8 @@ use VersionPress\Storages\Mirror;
  * Bridge between hooks in {@see wpdb} and {@see Mirror}. Transforms WordPress data to the form suitable for Mirror.
  * Especially, it transforms WP ids to VPIDs.
  */
-class WpdbMirrorBridge {
+class WpdbMirrorBridge
+{
 
     /** @var Mirror */
     private $mirror;
@@ -27,7 +28,13 @@ class WpdbMirrorBridge {
     /** @var bool */
     private $disabled;
 
-    function __construct($database, Mirror $mirror, DbSchemaInfo $dbSchemaInfo, VpidRepository $vpidRepository, ShortcodesReplacer $shortcodesReplacer) {
+    public function __construct(
+        $database,
+        Mirror $mirror,
+        DbSchemaInfo $dbSchemaInfo,
+        VpidRepository $vpidRepository,
+        ShortcodesReplacer $shortcodesReplacer
+    ) {
         $this->database = $database;
         $this->mirror = $mirror;
         $this->dbSchemaInfo = $dbSchemaInfo;
@@ -35,7 +42,8 @@ class WpdbMirrorBridge {
         $this->shortcodesReplacer = $shortcodesReplacer;
     }
 
-    function insert($table, $data) {
+    public function insert($table, $data)
+    {
         if ($this->disabled) {
             return;
         }
@@ -49,6 +57,13 @@ class WpdbMirrorBridge {
 
         $entityName = $entityInfo->entityName;
         $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityName, $data);
+
+        array_walk($data, function (&$value, $key) {
+            if ($value === false) {
+                $value = '';
+            }
+        });
+
         $shouldBeSaved = $this->mirror->shouldBeSaved($entityName, $data);
 
         if (!$shouldBeSaved) {
@@ -60,7 +75,8 @@ class WpdbMirrorBridge {
         $this->mirror->save($entityName, $data);
     }
 
-    function update($table, $data, $where) {
+    public function update($table, $data, $where)
+    {
         if ($this->disabled) {
             return;
         }
@@ -73,6 +89,12 @@ class WpdbMirrorBridge {
 
         $entityName = $entityInfo->entityName;
         $data = array_merge($where, $data);
+
+        array_walk($data, function (&$value, $key) {
+            if ($value === false) {
+                $value = '';
+            }
+        });
 
         if (!$entityInfo->usesGeneratedVpids) { // options etc.
             $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityName, $data);
@@ -87,15 +109,17 @@ class WpdbMirrorBridge {
         }
     }
 
-    function delete($table, $where, $parentIds) {
+    public function delete($table, $where, $parentIds)
+    {
         if ($this->disabled) {
             return;
         }
 
         $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($table);
 
-        if (!$entityInfo)
+        if (!$entityInfo) {
             return;
+        }
 
         $entityName = $entityInfo->entityName;
 
@@ -112,7 +136,8 @@ class WpdbMirrorBridge {
                 continue; // already deleted - deleting postmeta is sometimes called twice
             }
 
-            if ($this->dbSchemaInfo->isChildEntity($entityName) && !isset($where["vp_{$entityInfo->parentReference}"])) {
+            if ($this->dbSchemaInfo->isChildEntity($entityName)
+                && !isset($where["vp_{$entityInfo->parentReference}"])) {
                 $where["vp_{$entityInfo->parentReference}"] = $parentIds[$id];
             }
 
@@ -129,7 +154,8 @@ class WpdbMirrorBridge {
      * @param $where
      * @return array
      */
-    public function getParentIdsBeforeDelete($table, $where) {
+    public function getParentIdsBeforeDelete($table, $where)
+    {
         $entityInfo = $this->dbSchemaInfo->getEntityInfoByPrefixedTableName($table);
         if (!$entityInfo) {
             return [];
@@ -151,7 +177,8 @@ class WpdbMirrorBridge {
     /**
      * @param ParsedQueryData $parsedQueryData
      */
-    public function query($parsedQueryData) {
+    public function query($parsedQueryData)
+    {
         if ($this->disabled) {
             return;
         }
@@ -166,7 +193,7 @@ class WpdbMirrorBridge {
             case ParsedQueryData::UPDATE_QUERY:
                 $this->processUpdateQuery($parsedQueryData);
                 break;
-            case  ParsedQueryData::DELETE_QUERY:
+            case ParsedQueryData::DELETE_QUERY:
                 $this->processDeleteQuery($parsedQueryData, $entityInfo);
                 break;
             case ParsedQueryData::INSERT_QUERY:
@@ -187,7 +214,8 @@ class WpdbMirrorBridge {
      * @param array $where
      * @return array
      */
-    private function getIdsForRestriction($entityName, $where) {
+    private function getIdsForRestriction($entityName, $where)
+    {
         $idColumnName = $this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName;
         $table = $this->dbSchemaInfo->getPrefixedTableName($entityName);
 
@@ -205,12 +233,16 @@ class WpdbMirrorBridge {
         return $ids;
     }
 
-    private function updateEntity($data, $entityName, $id) {
+    private function updateEntity($data, $entityName, $id)
+    {
         $vpId = $this->vpidRepository->getVpidForEntity($entityName, $id);
 
         $table = $this->dbSchemaInfo->getPrefixedTableName($entityName);
         $idColumnName = $this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName;
-        $data = array_merge($this->database->get_row("SELECT * FROM `$table` WHERE `$idColumnName` = '$id'", ARRAY_A), $data);
+        $data = array_merge(
+            $this->database->get_row("SELECT * FROM `$table` WHERE `$idColumnName` = '$id'", ARRAY_A),
+            $data
+        );
 
         $data['vp_id'] = $vpId;
         $data = $this->vpidRepository->replaceForeignKeysWithReferences($entityName, $data);
@@ -228,7 +260,8 @@ class WpdbMirrorBridge {
             return;
         }
 
-        $savePostmeta = !$vpId && $entityName === 'post'; // the post exists in DB for a while but until now it wasn't tracked, so we have to save its postmeta
+        // the post exists in DB for a while but until now it wasn't tracked, so we have to save its postmeta
+        $savePostmeta = !$vpId && $entityName === 'post';
 
         if (!$vpId) {
             $data = $this->vpidRepository->identifyEntity($entityName, $data, $id);
@@ -241,7 +274,11 @@ class WpdbMirrorBridge {
             return;
         }
 
-        $postmeta = $this->database->get_results("SELECT meta_id, meta_key, meta_value FROM {$this->database->postmeta} WHERE post_id = {$id}", ARRAY_A);
+        $postmeta = $this->database->get_results(
+            "SELECT meta_id, meta_key, meta_value FROM {$this->database->postmeta} WHERE post_id = {$id}",
+            ARRAY_A
+        );
+
         foreach ($postmeta as $meta) {
             $meta['vp_post_id'] = $data['vp_id'];
 
@@ -269,17 +306,19 @@ class WpdbMirrorBridge {
      * @param $where
      * @return array List of ids
      */
-    private function detectAllAffectedIds($entityName, $data, $where) {
+    private function detectAllAffectedIds($entityName, $data, $where)
+    {
         $idColumnName = $this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName;
 
         if (isset($where[$idColumnName])) {
-            return array($where[$idColumnName]);
+            return [$where[$idColumnName]];
         }
 
         return $this->getIdsForRestriction($entityName, $where);
     }
 
-    private function fillParentId($metaEntityName, $entityInfo, $id) {
+    private function fillParentId($metaEntityName, $entityInfo, $id)
+    {
 
         $parentReference = $entityInfo->parentReference;
         $parent = $entityInfo->references[$parentReference];
@@ -288,14 +327,18 @@ class WpdbMirrorBridge {
         $parentTable = $this->dbSchemaInfo->getTableName($parent);
         $idColumnName = $this->dbSchemaInfo->getEntityInfo($metaEntityName)->idColumnName;
 
-        return $this->database->get_var("SELECT HEX(vp_id) FROM $vpIdTable WHERE `table` = '{$parentTable}' AND ID = (SELECT {$parentReference} FROM $entityTable WHERE {$idColumnName} = '$id')");
-
+        return $this->database->get_var(
+            "SELECT HEX(vp_id) FROM $vpIdTable
+             WHERE `table` = '{$parentTable}'
+             AND ID = (SELECT {$parentReference} FROM $entityTable WHERE {$idColumnName} = '$id')"
+        );
     }
 
     /**
      * Disables all actions. Useful for deactivating VersionPress.
      */
-    public function disable() {
+    public function disable()
+    {
         $this->disabled = true;
     }
 
@@ -304,7 +347,8 @@ class WpdbMirrorBridge {
      *
      * @param ParsedQueryData $parsedQueryData
      */
-    private function processUpdateQuery($parsedQueryData) {
+    private function processUpdateQuery($parsedQueryData)
+    {
 
         foreach ($parsedQueryData->ids as $id) {
             $this->updateEntity([], $parsedQueryData->entityName, $id);
@@ -318,7 +362,8 @@ class WpdbMirrorBridge {
      * @param ParsedQueryData $parsedQueryData
      * @param $entityInfo
      */
-    private function processDeleteQuery($parsedQueryData, $entityInfo) {
+    private function processDeleteQuery($parsedQueryData, $entityInfo)
+    {
         if (!$entityInfo->usesGeneratedVpids) {
             foreach ($parsedQueryData->ids as $id) {
                 $where[$parsedQueryData->idColumnName] = $id;
@@ -349,14 +394,18 @@ class WpdbMirrorBridge {
      *
      * @param ParsedQueryData $parsedQueryData
      */
-    private function processInsertQuery($parsedQueryData) {
+    private function processInsertQuery($parsedQueryData)
+    {
 
 
         $id = $this->database->insert_id;
         $entitiesCount = count($parsedQueryData->data);
 
         for ($i = 0; $i < $entitiesCount; $i++) {
-            $data = $this->vpidRepository->replaceForeignKeysWithReferences($parsedQueryData->entityName, $parsedQueryData->data[$i]);
+            $data = $this->vpidRepository->replaceForeignKeysWithReferences(
+                $parsedQueryData->entityName,
+                $parsedQueryData->data[$i]
+            );
             $shouldBeSaved = $this->mirror->shouldBeSaved($parsedQueryData->entityName, $data);
 
             if (!$shouldBeSaved) {
@@ -372,11 +421,16 @@ class WpdbMirrorBridge {
      *
      * @param ParsedQueryData $parsedQueryData
      */
-    private function processInsertUpdateQuery($parsedQueryData) {
+    private function processInsertUpdateQuery($parsedQueryData)
+    {
 
         if ($parsedQueryData->ids != 0) {
             $id = $parsedQueryData->ids;
-            $data = $this->vpidRepository->replaceForeignKeysWithReferences($parsedQueryData->entityName, $parsedQueryData->data[0]);
+            $data = $this->vpidRepository->replaceForeignKeysWithReferences(
+                $parsedQueryData->entityName,
+                $parsedQueryData->data[0]
+            );
+
             $shouldBeSaved = $this->mirror->shouldBeSaved($parsedQueryData->entityName, $data);
 
             if (!$shouldBeSaved) {
@@ -390,8 +444,4 @@ class WpdbMirrorBridge {
         }
 
     }
-
-
 }
-
-

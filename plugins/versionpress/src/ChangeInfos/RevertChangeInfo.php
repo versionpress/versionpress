@@ -17,7 +17,8 @@ use VersionPress\Git\GitRepository;
  * of the hash part of the main VP-Action tag.)
  *
  */
-class RevertChangeInfo extends TrackedChangeInfo {
+class RevertChangeInfo extends TrackedChangeInfo
+{
 
     const OBJECT_TYPE = "versionpress";
     const ACTION_UNDO = "undo";
@@ -29,30 +30,36 @@ class RevertChangeInfo extends TrackedChangeInfo {
     /** @var string */
     private $commitHash;
 
-    function __construct($action, $commitHash) {
+    public function __construct($action, $commitHash)
+    {
         $this->action = $action;
         $this->commitHash = $commitHash;
     }
 
-    public function getEntityName() {
+    public function getEntityName()
+    {
         return self::OBJECT_TYPE;
     }
 
-    public function getAction() {
+    public function getAction()
+    {
         return $this->action;
     }
 
-    public function getCommitHash() {
+    public function getCommitHash()
+    {
         return $this->commitHash;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
+    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    {
         $tags = $commitMessage->getVersionPressTags();
         list(, $action, $commitHash) = explode("/", $tags[TrackedChangeInfo::ACTION_TAG], 3);
         return new self($action, $commitHash);
     }
 
-    public function getChangeDescription() {
+    public function getChangeDescription()
+    {
         global $versionPressContainer; // temporary solution todo: find better way to pass the dependency
         /** @var GitRepository $repository */
         $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
@@ -66,15 +73,18 @@ class RevertChangeInfo extends TrackedChangeInfo {
         return sprintf("Rollback to the same state as of %s", $revertedCommit->getDate()->format('d-M-y H:i:s'));
     }
 
-    protected function getActionTagValue() {
+    protected function getActionTagValue()
+    {
         return sprintf("%s/%s/%s", self::OBJECT_TYPE, $this->getAction(), $this->commitHash);
     }
 
-    public function getCustomTags() {
-        return array();
+    public function getCustomTags()
+    {
+        return [];
     }
 
-    public function getChangedFiles() {
-        return array(array("type" => "path", "path" => "*"));
+    public function getChangedFiles()
+    {
+        return [["type" => "path", "path" => "*"]];
     }
 }

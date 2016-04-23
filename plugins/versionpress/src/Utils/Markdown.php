@@ -1,10 +1,12 @@
 <?php
 
 namespace VersionPress\Utils;
+
 /**
  * Markdown helper class
  */
-class Markdown {
+class Markdown
+{
 
     /**
      * Transforms Markdown to HTML using {@link https://michelf.ca/projects/php-markdown/ PHP Markdown}.
@@ -14,7 +16,8 @@ class Markdown {
      * @param $text
      * @return string HTML
      */
-    public static function transform($text) {
+    public static function transform($text)
+    {
         $html = \Michelf\Markdown::defaultTransform($text);
         if (strstr($text, "\n")) {
             return $html;

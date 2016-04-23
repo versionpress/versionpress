@@ -2,9 +2,11 @@
 
 namespace VersionPress\ChangeInfos;
 
-class BulkCommentChangeInfo extends BulkChangeInfo {
+class BulkCommentChangeInfo extends BulkChangeInfo
+{
 
-    public function getChangeDescription() {
+    public function getChangeDescription()
+    {
         if ($this->count === 1) {
             return $this->changeInfos[0]->getChangeDescription();
         }

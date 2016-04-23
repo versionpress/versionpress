@@ -11,11 +11,12 @@ use VersionPress\Storages\StorageFactory;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Tests\Utils\TestConfig;
-use VersionPress\Utils\Process;
 use VersionPress\Utils\AbsoluteUrlReplacer;
+use VersionPress\Utils\Process;
 use wpdb;
 
-class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
+class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
+{
 
     /** @var DbSchemaInfo */
     protected static $schemaInfo;
@@ -32,14 +33,15 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
     /** @var VpidRepository */
     protected static $vpidRepository;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass()
+    {
         parent::setUpBeforeClass();
         self::$testConfig = TestConfig::createDefaultConfig();
 
         self::setUpSite();
         DBAsserter::assertFilesEqualDatabase();
 
-        $schemaReflection = new \ReflectionClass('VersionPress\Database\DbSchemaInfo');
+        $schemaReflection = new \ReflectionClass(DbSchemaInfo::class);
         $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.yml';
         $shortcodeFile = dirname($schemaReflection->getFileName()) . '/wordpress-shortcodes.yml';
 
@@ -65,11 +67,12 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
         self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, self::$vpidRepository);
 
         $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
-        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$database, array());
+        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$database, []);
         self::$urlReplacer = new AbsoluteUrlReplacer(self::$testConfig->testSite->url);
     }
 
-    private static function setUpSite() {
+    private static function setUpSite()
+    {
         $wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
         if (!$wpAutomation->isSiteSetUp()) {
             $wpAutomation->setUpSite();
@@ -80,9 +83,12 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase {
         }
     }
 
-    public static function tearDownAfterClass() {
-        $process = new Process("git add -A && git commit -m " . escapeshellarg("Commited changes made by " . get_called_class()), self::$testConfig->testSite->path);
+    public static function tearDownAfterClass()
+    {
+        $process = new Process(
+            "git add -A && git commit -m " . escapeshellarg("Commited changes made by " . get_called_class()),
+            self::$testConfig->testSite->path
+        );
         $process->run();
     }
-
 }

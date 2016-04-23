@@ -6,20 +6,22 @@ use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 
-class UsersTest extends End2EndTestCase {
+class UsersTest extends End2EndTestCase
+{
 
     /** @var IUsersTestWorker */
     private static $worker;
 
-    private static $testUser = array(
+    private static $testUser = [
         'login' => 'JohnTester',
         'email' => 'john.tester@example.com',
         'password' => 'password',
         'first-name' => 'John',
         'last-name' => 'Tester',
-    );
+    ];
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass()
+    {
         parent::setUpBeforeClass();
         self::$worker->setTestUser(self::$testUser);
     }
@@ -28,7 +30,8 @@ class UsersTest extends End2EndTestCase {
      * @test
      * @testdox Adding users creates 'user/create' action
      */
-    public function addingUserCreatesUserCreateAction() {
+    public function addingUserCreatesUserCreateAction()
+    {
         self::$worker->prepare_createUser();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -48,7 +51,8 @@ class UsersTest extends End2EndTestCase {
      * @testdox Editing user's email creates 'user/edit' action
      * @depends addingUserCreatesUserCreateAction
      */
-    public function editingUserCreatesUserEditAction() {
+    public function editingUserCreatesUserEditAction()
+    {
         self::$worker->prepare_editUser();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -68,7 +72,8 @@ class UsersTest extends End2EndTestCase {
      * @testdox Editing user's name creates 'usermeta/edit' action
      * @depends addingUserCreatesUserCreateAction
      */
-    public function editingUsermetaCreatesUsermetaEditAction() {
+    public function editingUsermetaCreatesUsermetaEditAction()
+    {
         self::$worker->prepare_editUsermeta();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -88,7 +93,8 @@ class UsersTest extends End2EndTestCase {
      * @testdox Deleting user creates 'user/delete' action
      * @depends editingUserCreatesUserEditAction
      */
-    public function deletingUserCreatesUserDeleteAction() {
+    public function deletingUserCreatesUserDeleteAction()
+    {
         self::$worker->prepare_deleteUser();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -107,7 +113,8 @@ class UsersTest extends End2EndTestCase {
      * @test
      * @testdox Editing multiple users creates bulk action
      */
-    public function editingMultipleUsersCreatesBulkAction() {
+    public function editingMultipleUsersCreatesBulkAction()
+    {
         self::$worker->prepare_editTwoUsers();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -124,7 +131,8 @@ class UsersTest extends End2EndTestCase {
      * @test
      * @testdox Deleting multiple users creates bulk action
      */
-    public function deletingMultipleUsersCreatesBulkAction() {
+    public function deletingMultipleUsersCreatesBulkAction()
+    {
         self::$worker->prepare_deleteTwoUsers();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -142,7 +150,8 @@ class UsersTest extends End2EndTestCase {
      * @test
      * @testdox Editing multiple usermeta creates bulk action
      */
-    public function editingMultipleUsermetaCreatesBulkAction() {
+    public function editingMultipleUsermetaCreatesBulkAction()
+    {
         self::$worker->prepare_editTwoUsermeta();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -159,7 +168,8 @@ class UsersTest extends End2EndTestCase {
      * @test
      * @testdox Deleting usermeta creates multiple usermeta creates 'usermeta/delete' action
      */
-    public function deletingUsermetaCreatesUsermetaDeleteAction() {
+    public function deletingUsermetaCreatesUsermetaDeleteAction()
+    {
         self::$worker->prepare_deleteUsermeta();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -174,7 +184,8 @@ class UsersTest extends End2EndTestCase {
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass()
+    {
         parent::tearDownAfterClass();
         self::$worker->tearDownAfterClass();
     }

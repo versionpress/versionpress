@@ -2,9 +2,11 @@
 
 namespace VersionPress\Utils;
 
-class WordPressMissingFunctions {
+class WordPressMissingFunctions
+{
 
-    public static function getWpConfigPath() {
+    public static function getWpConfigPath()
+    {
         $defaultWpConfigPath = realpath(ABSPATH . 'wp-config.php');
         $elevatedWpConfigPath = realpath(ABSPATH . '../wp-config.php');
 
@@ -15,8 +17,9 @@ class WordPressMissingFunctions {
         return $elevatedWpConfigPath;
     }
 
-    public static function renderShortcode($shortcodeTag, $attributes) {
-        $renderedAttributes = array();
+    public static function renderShortcode($shortcodeTag, $attributes)
+    {
+        $renderedAttributes = [];
 
         foreach ($attributes as $attribute => $value) {
             $renderedAttributes[] = sprintf('%s="%s"', $attribute, $value);

@@ -5,7 +5,8 @@ namespace VersionPress\Tests\Utils;
 /**
  * Represents a single testing site
  */
-class SiteConfig {
+class SiteConfig
+{
 
     //----------------------
     // General settings
@@ -13,7 +14,7 @@ class SiteConfig {
 
     /**
      * Site name - its associative key in the test-config array
-     * 
+     *
      * @var string
      */
     public $name;
@@ -112,5 +113,4 @@ class SiteConfig {
      * @var bool
      */
     public $wpAutoupdate;
-
 }

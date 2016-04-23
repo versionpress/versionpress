@@ -4,9 +4,11 @@ namespace VersionPress\ChangeInfos;
 
 use VersionPress\Utils\StringUtils;
 
-class BulkPostChangeInfo extends BulkChangeInfo {
+class BulkPostChangeInfo extends BulkChangeInfo
+{
 
-    public function getChangeDescription() {
+    public function getChangeDescription()
+    {
         /** @var PostChangeInfo $postChangeInfo */
         $postChangeInfo = $this->changeInfos[0];
         $postTypePlural = StringUtils::pluralize($postChangeInfo->getPostType());

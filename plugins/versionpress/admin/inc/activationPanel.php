@@ -7,13 +7,33 @@ use VersionPress\Utils\RequirementsChecker;
 
 ?>
 
+<script>
+
+jQuery(document).ready(function($) {
+    $('#activate-versionpress-btn').click(function (e) {
+        var envname = $('#envname').val();
+
+        // Quick and dirty validation; the canonical regexp is in WorkflowUtils::isCloneNameValid().
+        if (!/^[a-zA-Z0-9-_]+$/.test(envname)) {
+            alert('Please use letters, numbers, \'-\' and \'_\' for environment name only');
+            e.preventDefault();
+        }
+
+        $(this).attr('href', this.href + '&envname=' + encodeURIComponent(envname));
+    });
+});
+
+</script>
+
 <div class="welcome-panel vp-activation-panel">
 
     <div class="welcome-panel-content">
 
         <h3>Welcome to VersionPress!</h3>
 
-        <p class="about-description">VersionPress needs a one-time activation step that initializes its internal storage. <strong>This step is resource-intensive and might take a while</strong> if your site has many entities (posts, comments etc.). The site will be put in maintanenance mode until it finishes.</p>
+        <p class="about-description">
+            VersionPress needs a one-time activation step that initializes its internal storage. <strong>This step is resource-intensive and might take a while</strong> if your site has many entities (posts, comments etc.). The site will be put in maintanenance mode until it finishes.
+        </p>
 
         <div class="checks-and-warnings">
 
@@ -48,16 +68,19 @@ use VersionPress\Utils\RequirementsChecker;
                         ?>
                         <li>
                             <span class="icon icon-warning"></span>
-                            Note: This website is already versioned in Git (the repository is either your custom or has been created by a previous installation of VersionPress).
-                            VersionPress will add some rules into `.gitignore` and install a custom merge driver for its own files.
-                            It is not a problem for VersionPress, just be sure that you know what you are doing.
+                            Note: This website is already versioned in Git (the repository is either your custom or has been created by a previous installation of VersionPress). VersionPress will add some rules into `.gitignore` and install a custom merge driver for its own files. It is not a problem for VersionPress, just be sure that you know what you are doing.
                         </li>
                         <?php
                     }
                     ?>
                 </ul>
 
-                <div><a href="<?php echo esc_url(admin_url('admin.php?page=versionpress/admin/system-info.php')) ?>">View full system info</a><?php if (!$requirementsChecker->isWithoutCriticalErrors()) { ?>, <a href="https://github.com/versionpress/support">get support on GitHub</a><?php } ?></div>
+                <div>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=versionpress/admin/system-info.php')) ?>">View full system info</a>
+                    <?php if (!$requirementsChecker->isWithoutCriticalErrors()) { ?>
+                    , <a href="https://github.com/versionpress/support">get support on GitHub</a>
+                    <?php } ?>
+                </div>
 
             </div>
 
@@ -78,6 +101,25 @@ use VersionPress\Utils\RequirementsChecker;
                         <strong>Have a backup</strong>. Seriously.
                     </li>
                 </ul>
+
+                <h4>Name your environment</h4>
+
+                <ul>
+                    <li>
+                        <span class="dashicons dashicons-info icon" style="color: #5b9dd9; font-size: 1.2em; left: -28px;"></span>
+                        E.g., <code>production</code>, <code>dev</code> or <code>my-machine</code>. This will help you identify this environment later.
+
+                        <div style="margin-top: 10px;">
+                            <label for="envname">Environment name:</label>
+                            <input name="envname" type="text" id="envname" value="default" />
+
+                        </div>
+
+                    </li>
+                </ul>
+
+
+
 
 
             </div>

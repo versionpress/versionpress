@@ -7,14 +7,16 @@ use VersionPress\Git\GitRepository;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Utils\FileSystem;
 
-class RevertTest extends \PHPUnit_Framework_TestCase {
+class RevertTest extends \PHPUnit_Framework_TestCase
+{
 
     private static $repositoryPath;
     private static $tempPath;
     /** @var GitRepository */
     private static $repository;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass()
+    {
         parent::setUpBeforeClass();
         self::$repositoryPath = __DIR__ . '/repository';
         self::$tempPath = __DIR__ . '/temp';
@@ -23,13 +25,15 @@ class RevertTest extends \PHPUnit_Framework_TestCase {
         mkdir(self::$tempPath);
     }
 
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass()
+    {
         parent::tearDownAfterClass();
         FileSystem::remove(self::$repositoryPath);
         FileSystem::remove(self::$tempPath);
     }
 
-    protected function setUp() {
+    protected function setUp()
+    {
         parent::setUp();
         FileSystem::removeContent(self::$repositoryPath);
         FileSystem::removeContent(self::$tempPath);
@@ -41,7 +45,8 @@ class RevertTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function revertTakesBackChangesFromLastCommit() {
+    public function revertTakesBackChangesFromLastCommit()
+    {
         $this->commitFile('some-file', 'Some commit');
         $hash = self::$repository->getLastCommitHash();
 
@@ -60,7 +65,8 @@ class RevertTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function revertTakesBackChangesFromSpecificCommit() {
+    public function revertTakesBackChangesFromSpecificCommit()
+    {
         $this->commitFile('some-file', 'Some commit');
         $hash = self::$repository->getLastCommitHash();
         $this->commitFile('other-file', 'Other commit');
@@ -81,7 +87,8 @@ class RevertTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function revertCannotTakeBackOverwrittenChanges() {
+    public function revertCannotTakeBackOverwrittenChanges()
+    {
         $this->commitFile('some-file', 'Some commit', 'Some content');
         $hash = self::$repository->getLastCommitHash();
         $this->commitFile('some-file', 'Other commit', 'Other content');
@@ -100,7 +107,8 @@ class RevertTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function revertAllTakesBackAllChanges() {
+    public function revertAllTakesBackAllChanges()
+    {
         $hash = self::$repository->getLastCommitHash();
         $this->commitFile('some-file', 'Some commit');
         $this->commitFile('other-file', 'Other commit');
@@ -121,7 +129,8 @@ class RevertTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function revertAllTakesBackChangesFromMultipleBranches() {
+    public function revertAllTakesBackChangesFromMultipleBranches()
+    {
         $hash = self::$repository->getLastCommitHash();
         VPCommandUtils::exec('git branch test', self::$repositoryPath);
         $this->commitFile('some-file', 'Some commit');
@@ -146,7 +155,8 @@ class RevertTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function revertAllCanRevertToCommitInParallelBranch() {
+    public function revertAllCanRevertToCommitInParallelBranch()
+    {
         VPCommandUtils::exec('git branch test', self::$repositoryPath);
         $this->commitFile('some-file', 'Some commit');
         VPCommandUtils::exec('git checkout test', self::$repositoryPath);
@@ -167,11 +177,13 @@ class RevertTest extends \PHPUnit_Framework_TestCase {
         $commitAsserter->assertCommitPath('D', 'some-file');
     }
 
-    private function commit($message) {
+    private function commit($message)
+    {
         self::$repository->commit($message, 'Author name', 'author@example.com');
     }
 
-    private function commitFile($file, $commitMessage, $fileContent = '') {
+    private function commitFile($file, $commitMessage, $fileContent = '')
+    {
         file_put_contents(self::$repositoryPath . '/' . $file, $fileContent);
         self::$repository->stageAll();
         $this->commit($commitMessage);

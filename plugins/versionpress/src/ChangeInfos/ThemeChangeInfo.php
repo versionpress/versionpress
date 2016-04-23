@@ -1,6 +1,7 @@
 <?php
 
 namespace VersionPress\ChangeInfos;
+
 use Nette\Utils\Strings;
 use VersionPress\Git\CommitMessage;
 use VersionPress\Utils\StringUtils;
@@ -16,7 +17,8 @@ use VersionPress\Utils\StringUtils;
  * Note: theme is `edit`ed via the built in text editor.
  *
  */
-class ThemeChangeInfo extends TrackedChangeInfo {
+class ThemeChangeInfo extends TrackedChangeInfo
+{
 
     private static $OBJECT_TYPE = "theme";
     const THEME_NAME_TAG = "VP-Theme-Name";
@@ -35,7 +37,8 @@ class ThemeChangeInfo extends TrackedChangeInfo {
      * @param string $action One of the supported actions, see this class's docs
      * @param string $themeName If not provided, found automatically based on $themeId
      */
-    public function __construct($themeId, $action, $themeName = null) {
+    public function __construct($themeId, $action, $themeName = null)
+    {
         $this->themeId = $themeId;
         $this->action = $action;
 
@@ -47,22 +50,26 @@ class ThemeChangeInfo extends TrackedChangeInfo {
         $this->themeName = $themeName;
     }
 
-    public function getEntityName() {
+    public function getEntityName()
+    {
         return self::$OBJECT_TYPE;
     }
 
-    public function getAction() {
+    public function getAction()
+    {
         return $this->action;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
+    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    {
         $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         $themeName = $commitMessage->getVersionPressTag(self::THEME_NAME_TAG);
         list(, $action, $themeId) = explode("/", $actionTag, 3);
         return new self($themeId, $action, $themeName);
     }
 
-    public function getChangeDescription() {
+    public function getChangeDescription()
+    {
 
         if ($this->action === 'switch') {
             return "Theme switched to '{$this->themeName}'";
@@ -71,19 +78,22 @@ class ThemeChangeInfo extends TrackedChangeInfo {
         return Strings::capitalize(StringUtils::verbToPastTense($this->action)) . " theme '{$this->themeName}'";
     }
 
-    public function getChangedFiles() {
-        $themeChange = array("type" => "path", "path" => $path = WP_CONTENT_DIR . "/themes/" . $this->themeId . "/*");
-        $optionChange = array("type" => "all-storage-files", "entity" => "option");
-        return array($themeChange, $optionChange);
+    public function getChangedFiles()
+    {
+        $themeChange = ["type" => "path", "path" => $path = WP_CONTENT_DIR . "/themes/" . $this->themeId . "/*"];
+        $optionChange = ["type" => "all-storage-files", "entity" => "option"];
+        return [$themeChange, $optionChange];
     }
 
-    protected function getActionTagValue() {
+    protected function getActionTagValue()
+    {
         return "{$this->getEntityName()}/{$this->getAction()}/" . $this->themeId;
     }
 
-    public function getCustomTags() {
-        return array(
+    public function getCustomTags()
+    {
+        return [
             self::THEME_NAME_TAG => $this->themeName
-        );
+        ];
     }
 }

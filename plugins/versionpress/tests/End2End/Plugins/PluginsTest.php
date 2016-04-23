@@ -2,12 +2,13 @@
 
 namespace VersionPress\Tests\End2End\Plugins;
 
-use VersionPress\Utils\Process;
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
+use VersionPress\Utils\Process;
 
-class PluginsTest extends End2EndTestCase {
+class PluginsTest extends End2EndTestCase
+{
 
     /** @var IPluginsTestWorker */
     private static $worker;
@@ -24,41 +25,45 @@ class PluginsTest extends End2EndTestCase {
      */
     private static $secondPluginInfo;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass()
+    {
         parent::setUpBeforeClass();
 
         $testDataPath = __DIR__ . '/../test-data';
-        self::$pluginInfo = array(
+        self::$pluginInfo = [
             'zipfile' => realpath($testDataPath . '/hello-dolly.1.6.zip'),
             'url-fragment' => 'hello-dolly',
             'name' => 'Hello Dolly',
             'affected-path' => 'hello-dolly/*',
-        );
+        ];
 
-        self::$secondPluginInfo = array(
+        self::$secondPluginInfo = [
             'zipfile' => realpath($testDataPath . '/hello-dolly.1.6-2.zip'),
             'url-fragment' => 'hello-dolly-2',
             'name' => 'Hello Dolly 2',
             'affected-path' => 'hello-dolly-2/*',
-        );
+        ];
 
         self::$worker->setPluginInfo(self::$pluginInfo);
         self::$worker->setSecondPluginInfo(self::$secondPluginInfo);
 
         // possibly delete single-file Hello dolly
         try {
-            self::$wpAutomation->runWpCliCommand('plugin', 'uninstall', array('hello'));
+            self::$wpAutomation->runWpCliCommand('plugin', 'uninstall', ['hello']);
         } catch (\Exception $e) {
         }
 
         // possibly delete our testing plugins
         try {
-            self::$wpAutomation->runWpCliCommand('plugin', 'uninstall', array('hello-dolly'));
-            self::$wpAutomation->runWpCliCommand('plugin', 'uninstall', array('hello-dolly-2'));
+            self::$wpAutomation->runWpCliCommand('plugin', 'uninstall', ['hello-dolly']);
+            self::$wpAutomation->runWpCliCommand('plugin', 'uninstall', ['hello-dolly-2']);
         } catch (\Exception $e) {
         }
 
-        $process = new Process("git add -A && git commit -m " . escapeshellarg("Plugin setup"), self::$testConfig->testSite->path);
+        $process = new Process(
+            "git add -A && git commit -m " . escapeshellarg("Plugin setup"),
+            self::$testConfig->testSite->path
+        );
         $process->run();
     }
 
@@ -66,7 +71,8 @@ class PluginsTest extends End2EndTestCase {
      * @test
      * @testdox Uploading plugin creates 'plugin/install' action
      */
-    public function uploadingPluginCreatesPluginInstallAction() {
+    public function uploadingPluginCreatesPluginInstallAction()
+    {
         self::$worker->prepare_installPlugin();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -86,7 +92,8 @@ class PluginsTest extends End2EndTestCase {
      * @testdox Activating plugin creates 'plugin/activate' action
      * @depends uploadingPluginCreatesPluginInstallAction
      */
-    public function activatingPluginCreatesPluginActivateAction() {
+    public function activatingPluginCreatesPluginActivateAction()
+    {
         self::$worker->prepare_activatePlugin();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -106,7 +113,8 @@ class PluginsTest extends End2EndTestCase {
      * @testdox Deactivating plugin creates 'plugin/deactivate' action
      * @depends activatingPluginCreatesPluginActivateAction
      */
-    public function deactivatingPluginCreatesPluginDeactivateAction() {
+    public function deactivatingPluginCreatesPluginDeactivateAction()
+    {
         self::$worker->prepare_deactivatePlugin();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -126,7 +134,8 @@ class PluginsTest extends End2EndTestCase {
      * @testdox Deleting plugin creates 'plugin/delete' action
      * @depends deactivatingPluginCreatesPluginDeactivateAction
      */
-    public function deletingPluginCreatesPluginDeleteAction() {
+    public function deletingPluginCreatesPluginDeleteAction()
+    {
         self::$worker->prepare_deletePlugin();
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
@@ -144,7 +153,8 @@ class PluginsTest extends End2EndTestCase {
      * @test
      * @testdox Installing two plugins creates a bulk action
      */
-    public function installingTwoPluginsCreatesBulkAction() {
+    public function installingTwoPluginsCreatesBulkAction()
+    {
         self::$worker->prepare_installTwoPlugins();
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
@@ -162,7 +172,8 @@ class PluginsTest extends End2EndTestCase {
      * @test
      * @testdox Activation of two plugins creates a bulk action
      */
-    public function activatingTwoPluginsCreatesBulkAction() {
+    public function activatingTwoPluginsCreatesBulkAction()
+    {
         self::$worker->prepare_activateTwoPlugins();
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
@@ -179,7 +190,8 @@ class PluginsTest extends End2EndTestCase {
      * @test
      * @testdox Deactivation of two plugins creates a bulk action
      */
-    public function deactivatingTwoPluginsCreatesBulkAction() {
+    public function deactivatingTwoPluginsCreatesBulkAction()
+    {
         self::$worker->prepare_deactivateTwoPlugins();
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
@@ -196,7 +208,8 @@ class PluginsTest extends End2EndTestCase {
      * @test
      * @testdox Uninstalling two plugins creates a bulk action
      */
-    public function uninstallingTwoPluginsCreatesBulkAction() {
+    public function uninstallingTwoPluginsCreatesBulkAction()
+    {
         self::$worker->prepare_uninstallTwoPlugins();
         $commitAsserter = new CommitAsserter($this->gitRepository);
 

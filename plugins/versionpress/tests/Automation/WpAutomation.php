@@ -4,11 +4,10 @@ namespace VersionPress\Tests\Automation;
 
 use Exception;
 use Nette\Utils\Strings;
-use VersionPress\Utils\Process;
 use VersionPress\Tests\Utils\SiteConfig;
 use VersionPress\Utils\FileSystem;
+use VersionPress\Utils\Process;
 use VersionPress\Utils\ProcessUtils;
-
 
 /**
  * Automates some common tasks like setting up a WP site, installing VersionPress, working with posts, comments etc.
@@ -25,7 +24,8 @@ use VersionPress\Utils\ProcessUtils;
  * Note: Currently, the intention is to add supported tasks as public methods to this class. If this gets
  * unwieldy it will probably be split into multiple files / classes.
  */
-class WpAutomation {
+class WpAutomation
+{
 
 
     /** @var SiteConfig */
@@ -37,7 +37,8 @@ class WpAutomation {
      * @param SiteConfig $siteConfig
      * @param string $wpCliVersion
      */
-    function __construct($siteConfig, $wpCliVersion) {
+    public function __construct($siteConfig, $wpCliVersion)
+    {
         $this->siteConfig = $siteConfig;
         $this->wpCliVersion = $wpCliVersion;
     }
@@ -55,7 +56,8 @@ class WpAutomation {
      *
      * @param array $entityCounts
      */
-    public function setUpSite($entityCounts = array()) {
+    public function setUpSite($entityCounts = [])
+    {
         $this->prepareFiles();
         $this->createConfigFile();
         $this->clearDatabase();
@@ -73,7 +75,8 @@ class WpAutomation {
      *
      * @return bool
      */
-    public function isSiteSetUp() {
+    public function isSiteSetUp()
+    {
         try {
             $this->runWpCliCommand("core", "is-installed");
             return true;
@@ -83,11 +86,12 @@ class WpAutomation {
     }
 
     /**
-     * Returns true if VerisonPress is active and tracking the site
+     * Returns true if VersionPress is active and tracking the site
      *
      * @return bool
      */
-    public function isVersionPressInitialized() {
+    public function isVersionPressInitialized()
+    {
         return is_file($this->siteConfig->path . '/wp-content/vpdb/.active');
     }
 
@@ -96,20 +100,32 @@ class WpAutomation {
      * a Gulp script which specifies which paths to include and which ones to ignore.
      * See <project_root>\gulpfile.js.
      */
-    public function copyVersionPressFiles() {
+    public function copyVersionPressFiles()
+    {
         $versionPressDir = __DIR__ . '/../..';
         $gulpBaseDir = $versionPressDir . '/../..'; // project root as checked out from our repository
-        $this->exec('gulp test-deploy', $gulpBaseDir, false, array('VP_DEPLOY_TARGET' => $this->siteConfig->path)); // this also cleans the destination directory, see gulpfile.js "clean" task
+        $this->exec(
+            'gulp test-deploy',
+            $gulpBaseDir,
+            false,
+            ['VP_DEPLOY_TARGET' => $this->siteConfig->path]
+        ); // this also cleans the destination directory, see gulpfile.js "clean" task
     }
 
-    public function activateVersionPress() {
+    /**
+     * Activates VersionPress as a plugin (does not start tracking the site; use `initializeVersionPress()`
+     * for that).
+     */
+    public function activateVersionPress()
+    {
         $activateCommand = "wp plugin activate versionpress";
         $this->exec($activateCommand);
     }
 
-    public function uninstallVersionPress() {
-        $this->runWpCliCommand('plugin', 'deactivate', array('versionpress'));
-        $this->runWpCliCommand('plugin', 'uninstall', array('versionpress'));
+    public function uninstallVersionPress()
+    {
+        $this->runWpCliCommand('plugin', 'deactivate', ['versionpress']);
+        $this->runWpCliCommand('plugin', 'uninstall', ['versionpress']);
     }
 
     /**
@@ -119,7 +135,8 @@ class WpAutomation {
      * @param array $post (as wp_insert_post)
      * @return int
      */
-    public function createPost(array $post) {
+    public function createPost(array $post)
+    {
         $post["porcelain"] = null; // wp-Cli returns only id
         return intval($this->runWpCliCommand('post', 'create', $post));
     }
@@ -130,7 +147,8 @@ class WpAutomation {
      * @param $id
      * @param $changes
      */
-    public function editPost($id, $changes) {
+    public function editPost($id, $changes)
+    {
         array_unshift($changes, $id);
         $this->runWpCliCommand('post', 'update', $changes);
     }
@@ -140,8 +158,9 @@ class WpAutomation {
      *
      * @param $id
      */
-    public function deletePost($id) {
-        $args = array($id, '--force');
+    public function deletePost($id)
+    {
+        $args = [$id, '--force'];
         $this->runWpCliCommand('post', 'delete', $args);
     }
 
@@ -151,7 +170,8 @@ class WpAutomation {
      * @param array $comment (as wp_insert_comment)
      * @return int
      */
-    public function createComment(array $comment) {
+    public function createComment(array $comment)
+    {
         $comment["porcelain"] = null;  // wp-Cli returns only id
         return intval($this->runWpCliCommand("comment", "create", $comment));
     }
@@ -164,7 +184,8 @@ class WpAutomation {
      * @param $name
      * @param $value
      */
-    public function createCommentMeta($id, $name, $value) {
+    public function createCommentMeta($id, $name, $value)
+    {
         $this->runWpCliCommand('comment', 'meta update', func_get_args());
     }
 
@@ -174,7 +195,8 @@ class WpAutomation {
      * @param $id
      * @param $name
      */
-    public function deleteCommentMeta($id, $name) {
+    public function deleteCommentMeta($id, $name)
+    {
         $this->runWpCliCommand('comment', 'meta delete', func_get_args());
     }
 
@@ -184,7 +206,8 @@ class WpAutomation {
      * @param $id
      * @param $changes
      */
-    public function editComment($id, $changes) {
+    public function editComment($id, $changes)
+    {
         array_unshift($changes, $id);
         $this->runWpCliCommand('comment', 'update', $changes);
     }
@@ -194,37 +217,45 @@ class WpAutomation {
      *
      * @param $id
      */
-    public function deleteComment($id) {
-        $args = array($id, '--force');
+    public function deleteComment($id)
+    {
+        $args = [$id, '--force'];
         $this->runWpCliCommand('comment', 'delete', $args);
     }
 
-    public function trashComment($id) {
-        $this->runWpCliCommand('comment', 'trash', array($id));
+    public function trashComment($id)
+    {
+        $this->runWpCliCommand('comment', 'trash', [$id]);
     }
 
-    public function untrashComment($id) {
-        $this->runWpCliCommand('comment', 'untrash', array($id));
+    public function untrashComment($id)
+    {
+        $this->runWpCliCommand('comment', 'untrash', [$id]);
     }
 
-    public function approveComment($id) {
-        $this->runWpCliCommand('comment', 'approve', array($id));
+    public function approveComment($id)
+    {
+        $this->runWpCliCommand('comment', 'approve', [$id]);
     }
 
-    public function unapproveComment($id) {
-        $this->runWpCliCommand('comment', 'unapprove', array($id));
+    public function unapproveComment($id)
+    {
+        $this->runWpCliCommand('comment', 'unapprove', [$id]);
     }
 
-    public function spamComment($id) {
-        $this->runWpCliCommand('comment', 'spam', array($id));
+    public function spamComment($id)
+    {
+        $this->runWpCliCommand('comment', 'spam', [$id]);
     }
 
-    public function unspamComment($id) {
-        $this->runWpCliCommand('comment', 'unspam', array($id));
+    public function unspamComment($id)
+    {
+        $this->runWpCliCommand('comment', 'unspam', [$id]);
     }
 
-    public function getComments() {
-        return json_decode($this->runWpCliCommand('comment', 'list', array('format' => 'json')));
+    public function getComments()
+    {
+        return json_decode($this->runWpCliCommand('comment', 'list', ['format' => 'json']));
     }
 
     /**
@@ -233,8 +264,9 @@ class WpAutomation {
      * @param array $user (as wp_insert_comment)
      * @return int
      */
-    public function createUser(array $user) {
-        $args = array($user["user_login"], $user["user_email"]);
+    public function createUser(array $user)
+    {
+        $args = [$user["user_login"], $user["user_email"]];
         unset($user["user_login"], $user["user_email"]);
         $args = array_merge($args, $user);
         $args["porcelain"] = null;  // wp-Cli returns only id
@@ -247,7 +279,8 @@ class WpAutomation {
      * @param $id
      * @param $changes
      */
-    public function editUser($id, $changes) {
+    public function editUser($id, $changes)
+    {
         array_unshift($changes, $id);
         $this->runWpCliCommand('user', 'update', $changes);
     }
@@ -257,8 +290,9 @@ class WpAutomation {
      *
      * @param $id
      */
-    public function deleteUser($id) {
-        $args = array($id, 'yes' => null);
+    public function deleteUser($id)
+    {
+        $args = [$id, 'yes' => null];
         $this->runWpCliCommand('user', 'delete', $args);
     }
 
@@ -269,7 +303,8 @@ class WpAutomation {
      * @param $name
      * @param $value
      */
-    public function editUserMeta($id, $name, $value) {
+    public function editUserMeta($id, $name, $value)
+    {
         $this->runWpCliCommand('user', 'meta update', func_get_args());
     }
 
@@ -279,8 +314,9 @@ class WpAutomation {
      * @param string $name
      * @param mixed $value
      */
-    public function createOption($name, $value) {
-        $this->runWpCliCommand('option', 'add', array($name, $value));
+    public function createOption($name, $value)
+    {
+        $this->runWpCliCommand('option', 'add', [$name, $value]);
     }
 
     /**
@@ -289,8 +325,9 @@ class WpAutomation {
      * @param string $name
      * @param mixed $value
      */
-    public function editOption($name, $value) {
-        $this->runWpCliCommand('option', 'update', array($name, $value));
+    public function editOption($name, $value)
+    {
+        $this->runWpCliCommand('option', 'update', [$name, $value]);
     }
 
     /**
@@ -298,8 +335,9 @@ class WpAutomation {
      *
      * @param string $name
      */
-    public function deleteOption($name) {
-        $this->runWpCliCommand('option', 'delete', array($name));
+    public function deleteOption($name)
+    {
+        $this->runWpCliCommand('option', 'delete', [$name]);
     }
 
     /**
@@ -307,14 +345,15 @@ class WpAutomation {
      *
      * @return string
      */
-    public function getCurrentTheme() {
+    public function getCurrentTheme()
+    {
         $status = $this->runWpCliCommand('theme', 'status');
         $status = preg_replace("/\033\[[^m]*m/", '', $status); // remove formatting
 
         preg_match_all("/^[^A-Z]*([A-Z]+)[^a-z]+([a-z\-]+).*$/m", $status, $matches);
 
         foreach ($matches[1] as $lineNumber => $status) {
-            if (\Nette\Utils\Strings::contains($status, 'A')) {
+            if (Strings::contains($status, 'A')) {
                 return $matches[2][$lineNumber];
             }
         }
@@ -325,8 +364,9 @@ class WpAutomation {
     /**
      * @param string $theme Theme stylesheet
      */
-    public function switchTheme($theme) {
-        $this->runWpCliCommand('theme', 'activate', array($theme));
+    public function switchTheme($theme)
+    {
+        $this->runWpCliCommand('theme', 'activate', [$theme]);
     }
 
     /**
@@ -334,8 +374,9 @@ class WpAutomation {
      *
      * @return array
      */
-    public function getSidebars() {
-        $sidebarsJson = $this->runWpCliCommand('sidebar', 'list', array('format' => 'json', 'fields' => 'id'));
+    public function getSidebars()
+    {
+        $sidebarsJson = $this->runWpCliCommand('sidebar', 'list', ['format' => 'json', 'fields' => 'id']);
         $sidebars = json_decode($sidebarsJson);
         $sidebarIds = array_map(function ($sidebar) {
             return $sidebar->id;
@@ -352,8 +393,9 @@ class WpAutomation {
      * @param string $sidebar sidebar id
      * @return array
      */
-    public function getWidgets($sidebar) {
-        $widgetsJson = $this->runWpCliCommand('widget', 'list', array($sidebar, 'format' => 'json', 'fields' => 'id'));
+    public function getWidgets($sidebar)
+    {
+        $widgetsJson = $this->runWpCliCommand('widget', 'list', [$sidebar, 'format' => 'json', 'fields' => 'id']);
         $widgets = json_decode($widgetsJson);
         $widgetIds = array_map(function ($widget) {
             return $widget->id;
@@ -366,15 +408,17 @@ class WpAutomation {
      *
      * @param string[]|string $widgets Name of widget or list of widgets
      */
-    public function deleteWidgets($widgets) {
+    public function deleteWidgets($widgets)
+    {
         $widgets = trim(is_array($widgets) ? join(' ', $widgets) : $widgets);
         if (strlen($widgets) > 0) {
             $this->exec('wp widget delete ' . $widgets);
         }
     }
 
-    public function importMedia($files) {
-        return $this->runWpCliCommand('media', 'import', array($files, 'porcelain' => null));
+    public function importMedia($files)
+    {
+        return $this->runWpCliCommand('media', 'import', [$files, 'porcelain' => null]);
     }
 
     /**
@@ -383,10 +427,12 @@ class WpAutomation {
      * @param string $name
      * @return int
      */
-    public function createMenu($name) {
-        $menu = array(
+    public function createMenu($name)
+    {
+        $menu = [
             $name,
-            "porcelain" => null);
+            "porcelain" => null
+        ];
         return intval($this->runWpCliCommand("menu", "create", $menu));
     }
 
@@ -396,11 +442,13 @@ class WpAutomation {
      * @param $id
      * @param $name
      */
-    public function editMenu($id, $name) {
-        $changes = array(
+    public function editMenu($id, $name)
+    {
+        $changes = [
             "nav_menu",
             $id,
-            "name" => $name);
+            "name" => $name
+        ];
         $this->runWpCliCommand("term", "update", $changes);
     }
 
@@ -412,7 +460,8 @@ class WpAutomation {
      * @param array $item
      * @return int
      */
-    public function addMenuItem($menu, $type, $item) {
+    public function addMenuItem($menu, $type, $item)
+    {
         array_unshift($item, $menu);
         $item["porcelain"] = null;
         return intval($this->runWpCliCommand("menu", "item add-" . $type, $item));
@@ -425,7 +474,8 @@ class WpAutomation {
      * @param array $changes
      * @return int
      */
-    public function editMenuItem($id, $changes) {
+    public function editMenuItem($id, $changes)
+    {
         array_unshift($changes, $id);
         $this->runWpCliCommand("menu", "item update", $changes);
     }
@@ -435,8 +485,9 @@ class WpAutomation {
      *
      * @param int $id
      */
-    public function removeMenuItem($id) {
-        $this->runWpCliCommand("menu", "item delete", array($id));
+    public function removeMenuItem($id)
+    {
+        $this->runWpCliCommand("menu", "item delete", [$id]);
     }
 
     /**
@@ -444,17 +495,18 @@ class WpAutomation {
      *
      * @param int|string $menu
      */
-    public function deleteMenu($menu) {
-        $this->runWpCliCommand("menu", "delete", array($menu));
+    public function deleteMenu($menu)
+    {
+        $this->runWpCliCommand("menu", "delete", [$menu]);
     }
 
     /**
-     * Activates VersionPress plugin and runs the Initializer
+     * Activates VersionPress plugin and runs the Initializer. For just activation, use `activateVersionPress()`.
      */
-    public function initializeVersionPress() {
-        $this->runWpCliCommand('plugin', 'activate', array('versionpress'));
-        $code = 'global $versionPressContainer; $initializer = $versionPressContainer->resolve(VersionPress\DI\VersionPressServices::INITIALIZER); $initializer->initializeVersionPress();';
-        $this->runWpCliCommand('eval', null, array($code));
+    public function initializeVersionPress()
+    {
+        $this->runWpCliCommand('plugin', 'activate', ['versionpress']);
+        $this->runWpCliCommand('vp', 'activate');
     }
 
     /**
@@ -470,7 +522,8 @@ class WpAutomation {
      * @param $entityCounts
      * @throws Exception
      */
-    public function populateSite($entityCounts) {
+    public function populateSite($entityCounts)
+    {
         if (count($entityCounts) == 0) {
             return;
         }
@@ -490,7 +543,8 @@ class WpAutomation {
      * Puts WP directory to a default state, as if one manually downloaded the WordPress ZIP
      * and extracted it there. Removes all old files if necessary.
      */
-    private function prepareFiles() {
+    private function prepareFiles()
+    {
         $this->ensureCleanInstallationIsAvailable();
         FileSystem::removeContent($this->siteConfig->path);
         FileSystem::copyDir($this->getCleanInstallationPath(), $this->siteConfig->path);
@@ -500,7 +554,8 @@ class WpAutomation {
      * Ensures that the clean installation of WordPress is available locally. If not,
      * downloads it from wp.org and stores it as `<clean-installations-dir>/<version>`.
      */
-    private function ensureCleanInstallationIsAvailable() {
+    private function ensureCleanInstallationIsAvailable()
+    {
 
         if (!is_dir($this->getCleanInstallationPath())) {
             $downloadPath = $this->getCleanInstallationPath();
@@ -521,7 +576,8 @@ class WpAutomation {
      *
      * @return string
      */
-    private function getCleanInstallationPath() {
+    private function getCleanInstallationPath()
+    {
 
         $homeDir = getenv('HOME') ?: getenv('HOMEDRIVE') . getenv('HOMEPATH');
         $wpCliCacheDir = getenv('WP_CLI_CACHE_DIR') ?: "$homeDir/.wp-cli/cache";
@@ -532,13 +588,18 @@ class WpAutomation {
     /**
      * Creates wp-config.php
      */
-    private function createConfigFile() {
-        $args = array();
+    private function createConfigFile()
+    {
+        $args = [];
         $args["dbname"] = $this->siteConfig->dbName;
         $args["dbuser"] = $this->siteConfig->dbUser;
         $args["dbprefix"] = $this->siteConfig->dbTablePrefix;
-        if ($this->siteConfig->dbPassword) $args["dbpass"] = $this->siteConfig->dbPassword;
-        if ($this->siteConfig->dbHost) $args["dbhost"] = $this->siteConfig->dbHost;
+        if ($this->siteConfig->dbPassword) {
+            $args["dbpass"] = $this->siteConfig->dbPassword;
+        }
+        if ($this->siteConfig->dbHost) {
+            $args["dbhost"] = $this->siteConfig->dbHost;
+        }
 
         $args["skip-salts"] = null;
 
@@ -548,28 +609,30 @@ class WpAutomation {
     /**
      * Deletes all tables from the database.
      */
-    private function clearDatabase() {
-        $this->runWpCliCommand("db", "reset", array("yes" => null));
+    private function clearDatabase()
+    {
+        $this->runWpCliCommand("db", "reset", ["yes" => null]);
     }
 
     /**
      * Installs WordPress. Assumes that files have been prepared on the file system, database is clean
      * and wp-config.php has been created.
      */
-    private function installWp() {
-        $cmdArgs = array(
+    private function installWp()
+    {
+        $cmdArgs = [
             "url" => $this->siteConfig->url,
             "title" => $this->siteConfig->title,
             "admin_name" => $this->siteConfig->adminName,
             "admin_email" => $this->siteConfig->adminEmail,
             "admin_password" => $this->siteConfig->adminPassword
-        );
+        ];
 
         $this->runWpCliCommand("core", "install", $cmdArgs);
     }
 
     /**
-     * Executes a command. If the command is WP-CLI command (starts with "wp ...") 
+     * Executes a command. If the command is WP-CLI command (starts with "wp ...")
      *
      * @param string $command
      * @param string $executionPath Working directory for the command. If null, the path will be determined
@@ -580,7 +643,8 @@ class WpAutomation {
      * @return string When process execution is not successful
      * @throws Exception
      */
-    private function exec($command, $executionPath = null, $debug = false, $env = null) {
+    private function exec($command, $executionPath = null, $debug = false, $env = null)
+    {
 
         $command = $this->rewriteWpCliCommand($command);
 
@@ -607,7 +671,10 @@ class WpAutomation {
         $process->run();
 
         if (!$process->isSuccessful()) {
-            throw new Exception("Error executing cmd '$command' from working directory '$executionPath':\n{$process->getConsoleOutput()}");
+            throw new Exception(
+                "Error executing cmd '$command' from working directory " .
+                "'$executionPath':\n{$process->getConsoleOutput()}"
+            );
         }
 
         return $process->getOutput();
@@ -618,14 +685,15 @@ class WpAutomation {
      * http://wp-Cli.org/commands/
      *
      * @param string $command Like "core"
-     * @param string $subcommand Like "config". Might be null, e.g. if the main command is "eval" there is no subcommand.
-     * @param array $args Like array("dbname" => "wordpress", "dbuser" => "wpuser", "positionalargument") which will produce
-     *   something like `--dbname='wordpress' --dbuser='wpuser' 'positionalargument'`
+     * @param string $subcommand Like "config". Might be null, e.g. if the main command is "eval" there is no subcommand
+     * @param array $args Like array("dbname" => "wordpress", "dbuser" => "wpuser", "positionalargument") which will
+     *                    produce something like `--dbname='wordpress' --dbuser='wpuser' 'positionalargument'`
      * @param bool $debug
      * @return string
      * @throws Exception
      */
-    public function runWpCliCommand($command, $subcommand, $args = array(), $debug = false) {
+    public function runWpCliCommand($command, $subcommand, $args = [], $debug = false)
+    {
 
         $cliCommand = "wp $command";
 
@@ -657,7 +725,8 @@ class WpAutomation {
      * @param $autoSshTunnelling
      * @return string
      */
-    private function rewriteWpCliCommand($command) {
+    private function rewriteWpCliCommand($command)
+    {
 
         if (!Strings::startsWith($command, "wp ")) {
             return $command;
@@ -680,14 +749,16 @@ class WpAutomation {
      *
      * @return string The path to the custom WP-CLI PHAR.
      */
-    public function getWpCli() {
+    public function getWpCli()
+    {
         $wpCliName = "wp-cli-{$this->wpCliVersion}.phar";
 
 
         $wpCliPath = sys_get_temp_dir() . '/' . $wpCliName;
         $wpCliTmpPath = $wpCliPath . '.tmp';
 
-        if (!file_exists($wpCliPath) || ($this->wpCliVersion === "latest-stable" && $this->fileIsOlderThanDays($wpCliPath, 1))) {
+        if (!file_exists($wpCliPath)
+            || ($this->wpCliVersion === "latest-stable" && $this->fileIsOlderThanDays($wpCliPath, 1))) {
             $pharResource = @fopen($this->getWpCliDownloadUrl(), 'r');
             if (!$pharResource) {
                 return $wpCliPath; // we're probably offline or there was some kind of network error
@@ -704,28 +775,40 @@ class WpAutomation {
         return $wpCliPath;
     }
 
-    private function fileIsOlderThanDays($filePath, $days) {
+    private function fileIsOlderThanDays($filePath, $days)
+    {
         return time() - filemtime($filePath) >= 60 * 60 * 24 * $days;
     }
 
-    private function getWpCliDownloadUrl() {
+    private function getWpCliDownloadUrl()
+    {
         if ($this->wpCliVersion === "latest-stable") {
             return "https://github.com/wp-cli/builds/blob/gh-pages/phar/wp-cli.phar?raw=true";
         } else {
-            return "https://github.com/wp-cli/wp-cli/releases/download/v{$this->wpCliVersion}/wp-cli-{$this->wpCliVersion}.phar";
+            return "https://github.com/wp-cli/wp-cli/releases/download/" .
+            "v{$this->wpCliVersion}/wp-cli-{$this->wpCliVersion}.phar";
         }
     }
 
-    private function checkLatestStableChecksum($wpCliTmpPath) {
-        $checksum = trim(file_get_contents('https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar.md5'));
+    private function checkLatestStableChecksum($wpCliTmpPath)
+    {
+        $checksum = trim(file_get_contents(
+            'https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar.md5'
+        ));
         return $checksum == md5_file($wpCliTmpPath);
     }
 
-    private function disableAutoUpdate() {
-        file_put_contents($this->siteConfig->path . '/wp-config.php', "\ndefine( 'AUTOMATIC_UPDATER_DISABLED', true );\n", FILE_APPEND);
+    private function disableAutoUpdate()
+    {
+        file_put_contents(
+            $this->siteConfig->path . '/wp-config.php',
+            "\ndefine( 'AUTOMATIC_UPDATER_DISABLED', true );\n",
+            FILE_APPEND
+        );
     }
 
-    public function disableDebugger() {
+    public function disableDebugger()
+    {
         $bootstrapFile = $this->siteConfig->path . '/wp-content/plugins/versionpress/bootstrap.php';
         $lines = file($bootstrapFile);
         $lines = array_filter($lines, function ($line) {

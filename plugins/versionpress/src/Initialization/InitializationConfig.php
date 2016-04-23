@@ -2,8 +2,8 @@
 
 namespace VersionPress\Initialization;
 
-
-class InitializationConfig {
+class InitializationConfig
+{
 
     /**
      * Delay between initialization completes and the user is redirected

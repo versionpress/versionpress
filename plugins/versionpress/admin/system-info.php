@@ -5,21 +5,21 @@ use VersionPress\Utils\SystemInfo;
 defined('ABSPATH') or die("Direct access not allowed");
 
 $outputFormat = isset($_GET['f']) ? $_GET['f'] : null;
-$supportedOutputFormats = array(
+$supportedOutputFormats = [
     've',
     'tc'
-);
+];
 if (!in_array($outputFormat, $supportedOutputFormats)) {
     $outputFormat = $supportedOutputFormats[0];
 }
 
 $systemInfo = SystemInfo::getAllInfo();
 
-function vp_display_system_info_array($array, $outputFormat) {
+function vp_display_system_info_array($array, $outputFormat)
+{
 
     switch ($outputFormat) {
         case 've': // var_export
-
             echo '<pre><code style="language-php">';
             echo esc_html(var_export($array, true));
             echo '</code></pre>';
@@ -29,7 +29,6 @@ function vp_display_system_info_array($array, $outputFormat) {
         case 'tc':
             \Tracy\Debugger::dump($array);
             break;
-
     }
 
 }
@@ -65,10 +64,11 @@ function vp_display_system_info_array($array, $outputFormat) {
 
 <div>
     Format:
-    <a href="<?php echo esc_url(admin_url('admin.php?page=versionpress/admin/system-info.php&f=ve')) ?>">var_export</a> |
+    <a href="<?php echo esc_url(admin_url('admin.php?page=versionpress/admin/system-info.php&f=ve')) ?>">var_export</a>
+    |
     <a href="<?php echo esc_url(admin_url('admin.php?page=versionpress/admin/system-info.php&f=tc')) ?>">tracy</a>
 
-    <br />
+    <br/>
 
 
     Jump to:

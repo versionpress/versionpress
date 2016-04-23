@@ -6,13 +6,15 @@ use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\TestConfig;
 use VersionPress\Utils\PathUtils;
 
-class WpCliWorker implements ITestWorker {
+class WpCliWorker implements ITestWorker
+{
 
     protected $wpAutomation;
     /** @var TestConfig */
     protected $testConfig;
 
-    public function __construct(TestConfig $testConfig) {
+    public function __construct(TestConfig $testConfig)
+    {
         $this->wpAutomation = new WpAutomation($testConfig->testSite, $testConfig->wpCliVersion);
         $this->testConfig = $testConfig;
     }
@@ -23,7 +25,8 @@ class WpCliWorker implements ITestWorker {
      * @param $absolutePath
      * @return string
      */
-    protected function getRelativePath($absolutePath) {
+    protected function getRelativePath($absolutePath)
+    {
         return PathUtils::getRelativePath($this->testConfig->testSite->path, $absolutePath);
     }
 }

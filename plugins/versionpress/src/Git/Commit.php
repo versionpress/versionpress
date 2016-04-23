@@ -1,9 +1,11 @@
 <?php
 
 namespace VersionPress\Git;
+
 use DateTime;
 
-class Commit {
+class Commit
+{
 
     /** @var string */
     private $hash;
@@ -27,7 +29,7 @@ class Commit {
     private $isMerge;
 
     /** @var array */
-    private $changedFiles = array();
+    private $changedFiles = [];
 
     /**
      * Creates instance from string matching pattern:
@@ -37,8 +39,11 @@ class Commit {
      * @param $rawStatus string
      * @return Commit
      */
-    public static function buildFromString($rawCommit, $rawStatus) {
-        list($hash, $date, $relativeDate, $authorName, $authorEmail, $parentHashes, $messageHead, $messageBody) = explode(chr(30), $rawCommit);
+    public static function buildFromString($rawCommit, $rawStatus)
+    {
+        list($hash, $date, $relativeDate, $authorName, $authorEmail, $parentHashes, $messageHead, $messageBody) =
+            explode(chr(30), $rawCommit);
+
         $commit = new Commit();
         $commit->hash = $hash;
         $commit->date = new DateTime($date);
@@ -54,7 +59,7 @@ class Commit {
 
         foreach (explode("\n", $rawStatus) as $line) {
             list($status, $path) = explode("\t", $line);
-            $commit->changedFiles[] = array("status" => $status, "path" => $path);
+            $commit->changedFiles[] = ["status" => $status, "path" => $path];
         }
 
         return $commit;
@@ -63,7 +68,8 @@ class Commit {
     /**
      * @return string
      */
-    public function getHash() {
+    public function getHash()
+    {
         return $this->hash;
     }
 
@@ -72,56 +78,64 @@ class Commit {
      *
      * @return string
      */
-    public function getShortHash() {
+    public function getShortHash()
+    {
         return substr($this->hash, 0, 7);
     }
 
     /**
      * @return DateTime
      */
-    public function getDate() {
+    public function getDate()
+    {
         return $this->date;
     }
 
     /**
      * @return string
      */
-    public function getRelativeDate() {
+    public function getRelativeDate()
+    {
         return $this->relativeDate;
     }
 
     /**
      * @return string
      */
-    public function getAuthorName() {
+    public function getAuthorName()
+    {
         return $this->authorName;
     }
 
     /**
      * @return string
      */
-    public function getAuthorEmail() {
+    public function getAuthorEmail()
+    {
         return $this->authorEmail;
     }
 
     /**
      * @return CommitMessage
      */
-    public function getMessage() {
+    public function getMessage()
+    {
         return $this->message;
     }
 
     /**
      * @return boolean
      */
-    public function isMerge() {
+    public function isMerge()
+    {
         return $this->isMerge;
     }
 
     /**
      * @return array Array of things like `array("status" => "M", "path" => "wp-content/vpdb/something.ini" )`
      */
-    public function getChangedFiles() {
+    public function getChangedFiles()
+    {
         return $this->changedFiles;
     }
 }

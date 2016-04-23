@@ -1,6 +1,7 @@
 <?php
 
 namespace VersionPress\Synchronizers;
+
 /**
  * Synchronizers synchronize entities from {@link EntityStorage storages} back to the database.
  *
@@ -15,7 +16,8 @@ namespace VersionPress\Synchronizers;
  *
  * Synchronizers are run by the {@link VersionPress\Synchronizers\SynchronizationProcess}.
  */
-interface Synchronizer {
+interface Synchronizer
+{
 
     const SYNCHRONIZE_EVERYTHING = 'everything';
 
@@ -33,8 +35,9 @@ interface Synchronizer {
      * If it's an array, the synchronizer will synchronize only those entities.
      *
      * @param string $task
-     * @param array $entitiesToSynchronize List of VPIDs and their possible parents {@see SynchronizationProcess::synchronize()}
+     * @param array $entitiesToSynchronize List of VPIDs and their possible parents
+     *                                     {@see SynchronizationProcess::synchronize()}
      * @return string[]
      */
-    function synchronize($task, $entitiesToSynchronize = null);
+    public function synchronize($task, $entitiesToSynchronize = null);
 }

@@ -1,4 +1,6 @@
 <?php
+// @codingStandardsIgnoreFile
+
 /**
  * REST API: WP_REST_Server class
  *

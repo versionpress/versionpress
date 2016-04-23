@@ -6,21 +6,23 @@ use VersionPress\Database\EntityInfo;
 use VersionPress\Storages\TermStorage;
 use VersionPress\Utils\FileSystem;
 
-class TermStorageTest extends \PHPUnit_Framework_TestCase {
+class TermStorageTest extends \PHPUnit_Framework_TestCase
+{
     /** @var TermStorage */
     private $storage;
 
-    private $testingTerm = array(
+    private $testingTerm = [
         "name" => "Uncategorized",
         "slug" => "uncategorized",
         "term_group" => 0,
         "vp_id" => "566D438B716C404D8CC384AE8F86A974",
-    );
+    ];
 
     /**
      * @test
      */
-    public function savedTermEqualsLoadedTerm() {
+    public function savedTermEqualsLoadedTerm()
+    {
         $this->storage->save($this->testingTerm);
         $loadedTerm = $this->storage->loadEntity($this->testingTerm['vp_id']);
         $this->assertEquals($this->testingTerm, $loadedTerm);
@@ -29,7 +31,8 @@ class TermStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function loadAllReturnsOnlyOriginalEntities() {
+    public function loadAllReturnsOnlyOriginalEntities()
+    {
         $this->storage->save($this->testingTerm);
         $loadedTerms = $this->storage->loadAll();
         $this->assertTrue(count($loadedTerms) === 1);
@@ -39,26 +42,29 @@ class TermStorageTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function savedTermDoesNotContainVpIdKey() {
+    public function savedTermDoesNotContainVpIdKey()
+    {
         $this->storage->save($this->testingTerm);
         $fileName = $this->storage->getEntityFilename($this->testingTerm['vp_id']);
         $content = file_get_contents($fileName);
         $this->assertFalse(strpos($content, 'vp_id'), 'Entity contains a vp_id key');
     }
 
-    protected function setUp() {
+    protected function setUp()
+    {
         parent::setUp();
-        $entityInfo = new EntityInfo(array(
-            'term' => array(
+        $entityInfo = new EntityInfo([
+            'term' => [
                 'table' => 'terms',
                 'id' => 'term_id',
-            )
-        ));
+            ]
+        ]);
 
         $this->storage = new TermStorage(__DIR__ . '/terms', $entityInfo);
     }
 
-    protected function tearDown() {
+    protected function tearDown()
+    {
         parent::tearDown();
         FileSystem::remove(__DIR__ . '/terms');
     }

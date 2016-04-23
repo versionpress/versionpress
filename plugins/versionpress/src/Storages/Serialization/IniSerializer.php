@@ -26,9 +26,10 @@ use VersionPress\Utils\StringUtils;
  *
  * @package VersionPress\Utils
  */
-class IniSerializer {
+class IniSerializer
+{
 
-    private static $sanitizedChars = array(
+    private static $sanitizedChars = [
         "[" => "<<<lbrac>>>",
         "]" => "<<<rbrac>>>",
         "\"" => "<<<dblquot>>>",
@@ -46,7 +47,7 @@ class IniSerializer {
         "|" => "<<<pipe>>>",
         "\t" => "<<<tab>>>",
         "=" => "<<<eq>>>",
-    );
+    ];
 
     private static $numberMarker = '<<<VP-Number>>>';
 
@@ -57,13 +58,16 @@ class IniSerializer {
      * @return string Nested INI format
      * @throws \Exception
      */
-    public static function serialize($data) {
-        $output = array();
+    public static function serialize($data)
+    {
+        $output = [];
         foreach ($data as $sectionName => $section) {
             if (!is_array($section)) {
                 throw new \Exception("INI serializer only supports sectioned data");
-            } else if (empty($section)) {
-                throw new \Exception("Empty sections are not supported");
+            } else {
+                if (empty($section)) {
+                    throw new \Exception("Empty sections are not supported");
+                }
             }
             $output = array_merge($output, self::serializeSection($sectionName, $section));
         }
@@ -77,8 +81,9 @@ class IniSerializer {
      * @param array $data
      * @return array Array of strings that will be lines in the output INI string
      */
-    private static function serializeSection($sectionName, $data) {
-        $output = array();
+    private static function serializeSection($sectionName, $data)
+    {
+        $output = [];
         $output[] = "[$sectionName]";
         $output = array_merge($output, self::serializeData($data));
 
@@ -91,10 +96,13 @@ class IniSerializer {
         return $output;
     }
 
-    private static function serializeData($data) {
-        $output = array();
+    private static function serializeData($data)
+    {
+        $output = [];
         foreach ($data as $key => $value) {
-            if ($key == '') continue;
+            if ($key == '') {
+                continue;
+            }
             if (is_array($value)) {
                 foreach ($value as $arrayKey => $arrayValue) {
                     $output[] = self::serializeKeyValuePair($key . "[$arrayKey]", $arrayValue);
@@ -116,7 +124,8 @@ class IniSerializer {
      * @param $str
      * @return mixed
      */
-    private static function escapeString($str) {
+    private static function escapeString($str)
+    {
         $str = str_replace('\\', '\\\\', $str);
         $str = str_replace('"', '\\"', $str);
         return $str;
@@ -129,7 +138,8 @@ class IniSerializer {
      * @param $str
      * @return mixed
      */
-    private static function unescapeString($str) {
+    private static function unescapeString($str)
+    {
         $str = str_replace('\\\\', '\\', $str);
         $str = str_replace('\\"', '"', $str);
         return $str;
@@ -142,7 +152,8 @@ class IniSerializer {
      * @param string $string INI string
      * @return array Array structure corresponding to the INI format
      */
-    public static function deserialize($string) {
+    public static function deserialize($string)
+    {
         $string = self::eolWorkaround_addPlaceholders($string);
         $string = self::sanitizeSectionsAndKeys_addPlaceholders($string);
         $string = self::preserveNumbers($string);
@@ -170,7 +181,8 @@ class IniSerializer {
      * @param string $iniString
      * @return mixed
      */
-    private static function eolWorkaround_addPlaceholders($iniString) {
+    private static function eolWorkaround_addPlaceholders($iniString) // @codingStandardsIgnoreLine
+    {
         $prefaceString = ' = "'; // sequence of characters before string value
 
         $position = 0;
@@ -197,26 +209,26 @@ class IniSerializer {
             $isEndOfString = false;
 
             while (!$isEndOfString) {
-
                 if ($iniString[$position] === '\\') {
                     // Found escaped character
                     // Skip this one and the following one
                     $position += 2;
                     continue;
-                } else if ($iniString[$position] === '"') {
-                    // This is it. Unescaped double-quote means that the string value ends here.
-                    $isEndOfString = true;
-                    $stringEndPos = $position;
                 } else {
-                    // Regular character. Boooring - move along.
-                    $position += 1;
+                    if ($iniString[$position] === '"') {
+                        // This is it. Unescaped double-quote means that the string value ends here.
+                        $isEndOfString = true;
+                        $stringEndPos = $position;
+                    } else {
+                        // Regular character. Boooring - move along.
+                        $position += 1;
+                    }
                 }
             }
 
             // OK. We have the beginning and the end. Let's replace all line-endings with placeholders.
             $value = StringUtils::substringFromTo($iniString, $stringBeginPos, $stringEndPos);
             $result .= self::getReplacedEolString($value, 'charsToPlaceholders');
-
         }
 
         return $result;
@@ -226,13 +238,16 @@ class IniSerializer {
      * @param $deserializedArray
      * @return array
      */
-    private static function eolWorkaround_removePlaceholders($deserializedArray) {
+    private static function eolWorkaround_removePlaceholders($deserializedArray) // @codingStandardsIgnoreLine
+    {
 
         foreach ($deserializedArray as $key => $value) {
             if (is_array($value)) {
                 $deserializedArray[$key] = self::eolWorkaround_removePlaceholders($value);
-            } else if (is_string($value)) {
-                $deserializedArray[$key] = self::getReplacedEolString($value, "placeholdersToChars");
+            } else {
+                if (is_string($value)) {
+                    $deserializedArray[$key] = self::getReplacedEolString($value, "placeholdersToChars");
+                }
             }
         }
 
@@ -240,12 +255,13 @@ class IniSerializer {
 
     }
 
-    private static function getReplacedEolString($str, $direction) {
+    private static function getReplacedEolString($str, $direction)
+    {
 
-        $replacement = array(
+        $replacement = [
             "\n" => "<<<[EOL-LF]>>>",
             "\r" => "<<<[EOL-CR]>>>",
-        );
+        ];
 
         $from = ($direction == "charsToPlaceholders") ? array_keys($replacement) : array_values($replacement);
         $to = ($direction == "charsToPlaceholders") ? array_values($replacement) : array_keys($replacement);
@@ -255,11 +271,13 @@ class IniSerializer {
     }
 
 
-    private static function outputToString($output) {
+    private static function outputToString($output)
+    {
         return implode("\r\n", $output);
     }
 
-    private static function preserveNumbers($iniString) {
+    private static function preserveNumbers($iniString)
+    {
         // https://regex101.com/r/pH5hE9/2
         $re = "/= \\d+(?:\\.\\d+)?\\r?\\n/m";
         return preg_replace_callback($re, function ($m) {
@@ -274,11 +292,13 @@ class IniSerializer {
      * @param string|int|float $value String or a numeric value (number or string containing number)
      * @return string
      */
-    private static function serializeKeyValuePair($key, $value) {
+    private static function serializeKeyValuePair($key, $value)
+    {
         return $key . " = " . (is_string($value) ? '"' . self::escapeString($value) . '"' : $value);
     }
 
-    private static function sanitizeSectionsAndKeys_addPlaceholders($string) {
+    private static function sanitizeSectionsAndKeys_addPlaceholders($string) // @codingStandardsIgnoreLine
+    {
         $sanitizedChars = self::$sanitizedChars;
         // Replace brackets in section names
         // https://regex101.com/r/bT2nO7/2
@@ -297,8 +317,9 @@ class IniSerializer {
         return $string;
     }
 
-    private static function sanitizeSectionsAndKeys_removePlaceholders($deserialized) {
-        $result = array();
+    private static function sanitizeSectionsAndKeys_removePlaceholders($deserialized) // @codingStandardsIgnoreLine
+    {
+        $result = [];
         foreach ($deserialized as $key => $value) {
             $key = strtr($key, array_flip(self::$sanitizedChars));
             if (is_array($value)) {
@@ -331,7 +352,8 @@ class IniSerializer {
      * @param $deserialized
      * @return array
      */
-    private static function expandArrays($deserialized) {
+    private static function expandArrays($deserialized)
+    {
         $dataWithExpandedArrays = [];
 
         foreach ($deserialized as $key => $value) {
@@ -352,15 +374,19 @@ class IniSerializer {
         return $dataWithExpandedArrays;
     }
 
-    private static function restoreTypesOfValues($deserialized) {
-        $result = array();
+    private static function restoreTypesOfValues($deserialized)
+    {
+        $result = [];
         foreach ($deserialized as $key => $value) {
             if (is_array($value)) {
                 $result[$key] = self::restoreTypesOfValues($value);
-            } else if (Strings::startsWith($value, self::$numberMarker)) {
-                $result[$key] = str_replace(self::$numberMarker, '', $value) + 0; // strip the marker and convert to number
             } else {
-                $result[$key] = self::unescapeString($value);
+                if (Strings::startsWith($value, self::$numberMarker)) {
+                    // strip the marker and convert to number
+                    $result[$key] = str_replace(self::$numberMarker, '', $value) + 0;
+                } else {
+                    $result[$key] = self::unescapeString($value);
+                }
             }
         }
         return $result;
@@ -394,14 +420,17 @@ class IniSerializer {
      * @param $deserialized
      * @return array
      */
-    private static function restorePhpSerializedData($deserialized) {
+    private static function restorePhpSerializedData($deserialized)
+    {
         $keysToRestore = [];
 
         foreach ($deserialized as $key => $value) {
             if (is_array($value)) {
                 $deserialized[$key] = self::restorePhpSerializedData($value);
-            } else if (Strings::startsWith($value, SerializedDataToIniConverter::SERIALIZED_MARKER)) {
-                $keysToRestore[] = $key;
+            } else {
+                if (Strings::startsWith($value, SerializedDataToIniConverter::SERIALIZED_MARKER)) {
+                    $keysToRestore[] = $key;
+                }
             }
         }
 
@@ -411,7 +440,8 @@ class IniSerializer {
             }, ARRAY_FILTER_USE_KEY);
 
             $keysToUnset = $relatedKeys;
-            unset($keysToUnset[$key]); // unset all related lines except the first one (it will be replaced without changing position in the array)
+            // unset all related lines except the first one (it will be replaced without changing position in the array)
+            unset($keysToUnset[$key]);
 
             $deserialized = array_diff_key($deserialized, $keysToUnset);
             $deserialized[$key] = SerializedDataToIniConverter::fromIniLines($key, $relatedKeys);

@@ -6,13 +6,15 @@ use VersionPress\Tests\End2End\Utils\PostTypeTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 
-class PostsTest extends PostTypeTestCase {
+class PostsTest extends PostTypeTestCase
+{
 
     /**
      * @test
      * @testdox New post creates 'post/create' action
      */
-    public function addingPostCreatesPostCreateAction() {
+    public function addingPostCreatesPostCreateAction()
+    {
         $this->runAddPostTest();
     }
 
@@ -22,7 +24,8 @@ class PostsTest extends PostTypeTestCase {
      *
      * @depends addingPostCreatesPostCreateAction
      */
-    public function updatingPostCreatesPostEditAction() {
+    public function updatingPostCreatesPostEditAction()
+    {
         $this->runUpdatePostTest();
     }
 
@@ -32,7 +35,8 @@ class PostsTest extends PostTypeTestCase {
      *
      * @depends updatingPostCreatesPostEditAction
      */
-    public function updatingPostViaQuickEditWorksEquallyWell() {
+    public function updatingPostViaQuickEditWorksEquallyWell()
+    {
         $this->runUpdatePostViaQuickEditTest();
     }
 
@@ -42,7 +46,8 @@ class PostsTest extends PostTypeTestCase {
      *
      * @depends addingPostCreatesPostCreateAction
      */
-    public function trashingPostCreatesPostTrashAction() {
+    public function trashingPostCreatesPostTrashAction()
+    {
         $this->runTrashPostTest();
     }
 
@@ -52,7 +57,8 @@ class PostsTest extends PostTypeTestCase {
      *
      * @depends trashingPostCreatesPostTrashAction
      */
-    public function undoCreatesPostUntrashAction() {
+    public function undoCreatesPostUntrashAction()
+    {
         $this->runUndoTrashTest();
     }
 
@@ -62,7 +68,8 @@ class PostsTest extends PostTypeTestCase {
      *
      * @depends undoCreatesPostUntrashAction
      */
-    public function deletePermanentlyCreatesPostDeleteAction() {
+    public function deletePermanentlyCreatesPostDeleteAction()
+    {
         $this->runDeletePostTest();
     }
 
@@ -72,7 +79,8 @@ class PostsTest extends PostTypeTestCase {
      *
      * @depends deletePermanentlyCreatesPostDeleteAction
      */
-    public function creatingDraftCreatesPostDraftAction() {
+    public function creatingDraftCreatesPostDraftAction()
+    {
         $this->runDraftTest();
     }
 
@@ -82,7 +90,8 @@ class PostsTest extends PostTypeTestCase {
      *
      * @depends creatingDraftCreatesPostDraftAction
      */
-    public function previewingDraftDoesNotCreateCommit() {
+    public function previewingDraftDoesNotCreateCommit()
+    {
         $this->runPreviewDraftTest();
     }
 
@@ -92,7 +101,8 @@ class PostsTest extends PostTypeTestCase {
      *
      * @depends creatingDraftCreatesPostDraftAction
      */
-    public function publishingDraftCreatesPostPublishAction() {
+    public function publishingDraftCreatesPostPublishAction()
+    {
         $this->runPublishDraftTest();
     }
 
@@ -101,7 +111,8 @@ class PostsTest extends PostTypeTestCase {
      * @testdox Previewing unsaved post creates a draft
      *
      */
-    public function previewingUnsavedPostCreatesDraft() {
+    public function previewingUnsavedPostCreatesDraft()
+    {
         $this->runPreviewUnsavedPostTest();
     }
 
@@ -109,7 +120,8 @@ class PostsTest extends PostTypeTestCase {
      * @test
      * @testdox Creating tag in the editation form creates separate commit
      */
-    public function creatingTagInEditationFormCreatesSeparateCommit() {
+    public function creatingTagInEditationFormCreatesSeparateCommit()
+    {
         self::$worker->prepare_createTagInEditationForm();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -129,7 +141,8 @@ class PostsTest extends PostTypeTestCase {
      * @test
      * @testdox Setting featured image to an unsaved post does not commit
      */
-    public function settingFeaturedImageToUnsavedPostDoesNotCommit() {
+    public function settingFeaturedImageToUnsavedPostDoesNotCommit()
+    {
         $this->runSetFeaturedImageForUnsavedPostTest();
     }
 
@@ -139,7 +152,8 @@ class PostsTest extends PostTypeTestCase {
      *
      * @depends settingFeaturedImageToUnsavedPostDoesNotCommit
      */
-    public function turningUnsavedPostWithFeaturedImageIntoDraftSavesTheFeaturedImage() {
+    public function turningUnsavedPostWithFeaturedImageIntoDraftSavesTheFeaturedImage()
+    {
         $this->runMakeDraftFromUnsavedPostWithFeaturedImageTest();
     }
 
@@ -147,7 +161,8 @@ class PostsTest extends PostTypeTestCase {
      * @test
      * @testdox Changing post format updates its taxonomy
      */
-    public function changingPostFormatUpdatesItsTaxonomy() {
+    public function changingPostFormatUpdatesItsTaxonomy()
+    {
         self::$worker->prepare_changePostFormat();
         $commitAsserter = new CommitAsserter($this->gitRepository);
         self::$worker->changePostFormat();
@@ -155,7 +170,10 @@ class PostsTest extends PostTypeTestCase {
         $commitAsserter->ignoreCommits('term/create');
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction('post/edit');
-        $commitAsserter->assertCommitTag('VP-Post-UpdatedProperties', 'vp_term_taxonomy,post_modified,post_modified_gmt');
+        $commitAsserter->assertCommitTag(
+            'VP-Post-UpdatedProperties',
+            'vp_term_taxonomy,post_modified,post_modified_gmt'
+        );
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -164,7 +182,8 @@ class PostsTest extends PostTypeTestCase {
      * @test
      * @testdox Editation multiple posts creates bulk action
      */
-    public function editationOfMultiplePostsCreatesBulkAction() {
+    public function editationOfMultiplePostsCreatesBulkAction()
+    {
         $this->runEditationOfMultiplePostsCreatesBulkAction();
     }
 
@@ -172,7 +191,8 @@ class PostsTest extends PostTypeTestCase {
      * @test
      * @testdox Trashing multiple posts creates bulk action
      */
-    public function trashingOfMultiplePostsCreatesBulkAction() {
+    public function trashingOfMultiplePostsCreatesBulkAction()
+    {
         $this->runTrashingMultiplePostsCreatesBulkAction();
     }
 
@@ -180,7 +200,8 @@ class PostsTest extends PostTypeTestCase {
      * @test
      * @testdox Untrashing multiple posts creates bulk action
      */
-    public function untrashingOfMultiplePostsCreatesBulkAction() {
+    public function untrashingOfMultiplePostsCreatesBulkAction()
+    {
         $this->runUntrashingMultiplePostsCreatesBulkAction();
     }
 
@@ -188,7 +209,8 @@ class PostsTest extends PostTypeTestCase {
      * @test
      * @testdox Deleting multiple posts creates bulk action
      */
-    public function deletingOfMultiplePostsCreatesBulkAction() {
+    public function deletingOfMultiplePostsCreatesBulkAction()
+    {
         $this->runDeletingMultiplePostsCreatesBulkAction();
     }
 
@@ -196,7 +218,8 @@ class PostsTest extends PostTypeTestCase {
      * @test
      * @testdox Publishing multiple posts creates bulk action
      */
-    public function publishingOfMultiplePostsCreatesBulkAction() {
+    public function publishingOfMultiplePostsCreatesBulkAction()
+    {
         $this->runPublishingMultiplePostsCreatesBulkAction();
     }
 
@@ -204,7 +227,8 @@ class PostsTest extends PostTypeTestCase {
      * @test
      * @testdox Deleting post meta creates 'postmeta/delete' action
      */
-    public function deletingOfPostmetaCreatesPostmetaDeleteAction() {
+    public function deletingOfPostmetaCreatesPostmetaDeleteAction()
+    {
         self::$worker->prepare_deletePostmeta();
         $commitAsserter = new CommitAsserter($this->gitRepository);
         self::$worker->deletePostmeta();

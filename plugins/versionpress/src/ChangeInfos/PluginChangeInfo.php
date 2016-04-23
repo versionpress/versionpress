@@ -1,6 +1,7 @@
 <?php
 
 namespace VersionPress\ChangeInfos;
+
 use Nette\Utils\Strings;
 use VersionPress\Git\CommitMessage;
 use VersionPress\Utils\StringUtils;
@@ -19,7 +20,8 @@ use VersionPress\Utils\StringUtils;
  *     VP-Action: plugin/install/akismet/akismet.php
  *
  */
-class PluginChangeInfo extends TrackedChangeInfo {
+class PluginChangeInfo extends TrackedChangeInfo
+{
 
     private static $OBJECT_TYPE = "plugin";
     const PLUGIN_NAME_TAG = "VP-Plugin-Name";
@@ -34,46 +36,54 @@ class PluginChangeInfo extends TrackedChangeInfo {
     private $action;
 
     /**
-     * @param string $pluginFile Something like "hello.php", or for plugins with their own folders, "akismet/akismet.php"
+     * @param string $pluginFile Something like "hello.php" or for plugins with their own folders "akismet/akismet.php"
      * @param string $action See VP-Action tag documentation in the class docs
      * @param string $pluginName If not provided, finds the plugin name automatically based on $pluginFile
      */
-    public function __construct($pluginFile, $action, $pluginName = null) {
+    public function __construct($pluginFile, $action, $pluginName = null)
+    {
         $this->pluginFile = $pluginFile;
         $this->action = $action;
         $this->pluginName = $pluginName ? $pluginName : $this->findPluginName();
     }
 
-    public function getEntityName() {
+    public function getEntityName()
+    {
         return self::$OBJECT_TYPE;
     }
 
-    public function getAction() {
+    public function getAction()
+    {
         return $this->action;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
+    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    {
         $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         $pluginName = $commitMessage->getVersionPressTag(self::PLUGIN_NAME_TAG);
         list(, $action, $pluginFile) = explode("/", $actionTag, 3);
         return new self($pluginFile, $action, $pluginName);
     }
 
-    public function getChangeDescription() {
+    public function getChangeDescription()
+    {
         return Strings::capitalize(StringUtils::verbToPastTense($this->action)) . " plugin '{$this->pluginName}'";
     }
 
-    protected function getActionTagValue() {
+    protected function getActionTagValue()
+    {
         return "{$this->getEntityName()}/{$this->getAction()}/" . $this->pluginFile;
     }
 
-    public function getCustomTags() {
-        return array(
+    public function getCustomTags()
+    {
+        return [
             self::PLUGIN_NAME_TAG => $this->pluginName
-        );
+        ];
     }
 
-    private function findPluginName() {
+    private function findPluginName()
+    {
         if (!function_exists('get_plugins')) {
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
         }
@@ -82,7 +92,8 @@ class PluginChangeInfo extends TrackedChangeInfo {
         return $plugins[$this->pluginFile]["Name"];
     }
 
-    public function getChangedFiles() {
+    public function getChangedFiles()
+    {
         $pluginPath = WP_PLUGIN_DIR . "/";
         if (dirname($this->pluginFile) == ".") {
             // single-file plugin like hello.php
@@ -92,9 +103,9 @@ class PluginChangeInfo extends TrackedChangeInfo {
             $pluginPath .= dirname($this->pluginFile) . "/*";
         }
 
-        $pluginChange = array("type" => "path", "path" => $pluginPath);
-        $optionChange = array("type" => "path", "path" => VP_VPDB_DIR);
+        $pluginChange = ["type" => "path", "path" => $pluginPath];
+        $optionChange = ["type" => "path", "path" => VP_VPDB_DIR];
 
-        return array($pluginChange, $optionChange);
+        return [$pluginChange, $optionChange];
     }
 }

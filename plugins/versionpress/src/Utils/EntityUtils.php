@@ -1,12 +1,14 @@
 <?php
 
 namespace VersionPress\Utils;
+
 /**
  * VersionPress "entities" are often just associative arrays, often not even complete
  * (for instance if the SQL update method is captured and only part of the entity data
  * is available). Here are some helper methods for such arrays.
  */
-class EntityUtils {
+class EntityUtils
+{
 
     /**
      * Used by storages to determine a diff between two entity data. Note that the data might
@@ -27,8 +29,9 @@ class EntityUtils {
      * @return array Key=>value pairs of things that are new or changed in $newEntity (they can
      *               never be "removed", that will never happen when capturing SQL UPDATE actions)
      */
-    public static function getDiff($oldEntityData, $newEntityData) {
-        $diff = array();
+    public static function getDiff($oldEntityData, $newEntityData)
+    {
+        $diff = [];
         foreach ($newEntityData as $key => $value) {
             if (!isset($oldEntityData[$key]) || self::isChanged($oldEntityData[$key], $value)) {
                 $diff[$key] = $value;
@@ -47,7 +50,8 @@ class EntityUtils {
      * @param $newValue
      * @return bool
      */
-    private static function isChanged($oldData, $newValue) {
+    private static function isChanged($oldData, $newValue)
+    {
         if (is_numeric($oldData) && is_numeric($newValue)) {
             return $oldData != $newValue;
         }
@@ -56,5 +60,4 @@ class EntityUtils {
         }
         return $oldData !== $newValue;
     }
-
 }

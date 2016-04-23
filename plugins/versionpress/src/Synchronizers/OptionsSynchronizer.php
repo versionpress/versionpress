@@ -11,14 +11,14 @@ use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\QueryLanguageUtils;
-use VersionPress\Utils\ReferenceUtils;
 use wpdb;
 
 /**
  * Options synchronizer. Skips transient options and a couple of hardcoded values like
  * `cron` or `siteurl`, see the `synchronize()` method.
  */
-class OptionsSynchronizer implements Synchronizer {
+class OptionsSynchronizer implements Synchronizer
+{
 
     /** @var OptionStorage */
     private $optionStorage;
@@ -38,7 +38,15 @@ class OptionsSynchronizer implements Synchronizer {
     /** @var VpidRepository */
     private $vpidRepository;
 
-    function __construct(Storage $storage, Database $database, EntityInfo $entityInfo, DbSchemaInfo $dbSchemaInfo, VpidRepository $vpidRepository, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
+    public function __construct(
+        Storage $storage,
+        Database $database,
+        EntityInfo $entityInfo,
+        DbSchemaInfo $dbSchemaInfo,
+        VpidRepository $vpidRepository,
+        AbsoluteUrlReplacer $urlReplacer,
+        ShortcodesReplacer $shortcodesReplacer
+    ) {
         $this->optionStorage = $storage;
         $this->database = $database;
         $this->urlReplacer = $urlReplacer;
@@ -48,7 +56,8 @@ class OptionsSynchronizer implements Synchronizer {
         $this->vpidRepository = $vpidRepository;
     }
 
-    function synchronize($task, $entitiesToSynchronize = null) {
+    public function synchronize($task, $entitiesToSynchronize = null)
+    {
         $this->maybeInit($entitiesToSynchronize);
         $options = $this->options;
 
@@ -59,9 +68,14 @@ class OptionsSynchronizer implements Synchronizer {
 
                 $option = $this->urlReplacer->restore($option);
                 $option = $this->maybeRestoreReference($option);
-                if (!isset($option['autoload'])) $option['autoload'] = 'yes'; // default value
-                if (!isset($option['option_value'])) $option['option_value'] = '';
-                $syncQuery .= "(\"$optionName\", \"" . $this->database->_real_escape($option['option_value']) . "\", \"$option[autoload]\"),";
+                if (!isset($option['autoload'])) {
+                    $option['autoload'] = 'yes';
+                } // default value
+                if (!isset($option['option_value'])) {
+                    $option['option_value'] = '';
+                }
+                $syncQuery .= "(\"$optionName\", \"" . $this->database->_real_escape($option['option_value']) .
+                    "\", \"$option[autoload]\"),";
             }
 
             $syncQuery[strlen($syncQuery) - 1] = " "; // strip last comma
@@ -92,21 +106,23 @@ class OptionsSynchronizer implements Synchronizer {
         }
 
         $this->database->query($deleteSql);
-        return array();
+        return [];
     }
 
-    private function maybeInit($optionsToSynchronize) {
+    private function maybeInit($optionsToSynchronize)
+    {
         if ($this->options === null) {
             $this->options = $this->loadOptionsFromStorage($optionsToSynchronize);
         }
     }
 
-    private function loadOptionsFromStorage($optionsToSynchronize) {
+    private function loadOptionsFromStorage($optionsToSynchronize)
+    {
         if ($optionsToSynchronize === null) {
             return $this->optionStorage->loadAll();
         }
 
-        $options = array();
+        $options = [];
         foreach ($optionsToSynchronize as $optionToSynchronize) {
             $optionName = $optionToSynchronize['vp_id'];
             if ($this->optionStorage->exists($optionName)) {
@@ -118,7 +134,8 @@ class OptionsSynchronizer implements Synchronizer {
         return $options;
     }
 
-    private function maybeRestoreReference($option) {
+    private function maybeRestoreReference($option)
+    {
         return $this->vpidRepository->restoreForeignKeys('option', $option);
     }
 }

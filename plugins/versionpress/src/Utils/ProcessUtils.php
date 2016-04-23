@@ -2,7 +2,8 @@
 
 namespace VersionPress\Utils;
 
-class ProcessUtils {
+class ProcessUtils
+{
 
     /**
      * Similar to built-in escapeshellarg() but allows to pass OS according to which
@@ -12,16 +13,17 @@ class ProcessUtils {
      * @param string|null $os "windows", "linux" or null to use the OS detection in escapeshellarg()
      * @return mixed|string
      */
-    public static function escapeshellarg($arg, $os = null) {
+    public static function escapeshellarg($arg, $os = null)
+    {
 
         if (!$os) {
             return escapeshellarg($arg);
         }
 
         if ($os == "windows") {
-            return self::_drush_escapeshellarg_windows($arg);
+            return self::escapeshellargWindows($arg);
         } else {
-            return self::_drush_escapeshellarg_linux($arg);
+            return self::escapeshellargLinux($arg);
         }
 
     }
@@ -33,7 +35,8 @@ class ProcessUtils {
      * @param $arg
      * @return mixed|string
      */
-    public static function _drush_escapeshellarg_linux($arg) {
+    private static function escapeshellargLinux($arg)
+    {
         // For single quotes existing in the string, we will "exit"
         // single-quote mode, add a \' and then "re-enter"
         // single-quote mode.  The result of this is that
@@ -46,7 +49,7 @@ class ProcessUtils {
         // usually are NOT replaced. However, this was done deliberately to be more
         // conservative when running _drush_escapeshellarg_linux on Windows
         // (this can happen when generating a command to run on a remote Linux server.)
-        $arg = str_replace(array("\t", "\n", "\r", "\0", "\x0B"), ' ', $arg);
+        $arg = str_replace(["\t", "\n", "\r", "\0", "\x0B"], ' ', $arg);
 
         // Add surrounding quotes.
         $arg = "'" . $arg . "'";
@@ -56,12 +59,15 @@ class ProcessUtils {
 
     /**
      * Windows shell escaping from Drush:
+     *
+     * @codingStandardsIgnoreLine
      * http://drupalcontrib.org/api/drupal/contributions!drush!includes!exec.inc/function/_drush_escapeshellarg_windows/7
-
+     *
      * @param $arg
      * @return mixed|string
      */
-    public static function _drush_escapeshellarg_windows($arg) {
+    private static function escapeshellargWindows($arg)
+    {
         // Double up existing backslashes
         $arg = preg_replace('/\\\/', '\\\\\\\\', $arg);
 

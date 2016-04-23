@@ -2,96 +2,119 @@
 
 namespace VersionPress\Tests\End2End\Plugins;
 
-use VersionPress\Utils\PathUtils;
 use VersionPress\Tests\End2End\Utils\SeleniumWorker;
+use VersionPress\Utils\PathUtils;
 
-class PluginsTestSeleniumWorker extends SeleniumWorker implements IPluginsTestWorker {
+class PluginsTestSeleniumWorker extends SeleniumWorker implements IPluginsTestWorker
+{
 
     private static $pluginInfo;
     private static $secondPluginInfo;
 
-    public function setPluginInfo($pluginInfo) {
+    public function setPluginInfo($pluginInfo)
+    {
         self::$pluginInfo = $pluginInfo;
     }
 
-    public function setSecondPluginInfo($secondPluginInfo) {
+    public function setSecondPluginInfo($secondPluginInfo)
+    {
         self::$secondPluginInfo = $secondPluginInfo;
     }
 
-    public function prepare_installPlugin() {
+    public function prepare_installPlugin()
+    {
         $this->url('wp-admin/plugin-install.php?tab=upload');
     }
 
-    public function installPlugin() {
+    public function installPlugin()
+    {
         $this->byCssSelector('#pluginzip')->value(self::$pluginInfo['zipfile']);
         $this->byCssSelector('#install-plugin-submit')->click();
         $this->waitAfterRedirect();
     }
 
-    public function prepare_activatePlugin() {
+    public function prepare_activatePlugin()
+    {
         $this->url("wp-admin/plugins.php");
     }
 
-    public function activatePlugin() {
+    public function activatePlugin()
+    {
         $this->byCssSelector(".activate a[href*='" .  self::$pluginInfo['url-fragment'] . "']")->click();
         $this->waitAfterRedirect();
     }
 
-    public function prepare_deactivatePlugin() {
+    public function prepare_deactivatePlugin()
+    {
         $this->url("wp-admin/plugins.php");
     }
 
-    public function deactivatePlugin() {
+    public function deactivatePlugin()
+    {
         $this->byCssSelector(".deactivate a[href*='" .  self::$pluginInfo['url-fragment'] . "']")->click();
         $this->waitAfterRedirect();
     }
 
-    public function prepare_deletePlugin() {
+    public function prepare_deletePlugin()
+    {
     }
 
-    public function deletePlugin() {
+    public function deletePlugin() 
+    {
         $this->byCssSelector(".delete a[href*='" .  self::$pluginInfo['url-fragment'] . "']")->click();
         $this->waitAfterRedirect();
         $this->byCssSelector("#submit")->click();
         $this->waitAfterRedirect();
     }
 
-    public function prepare_installTwoPlugins() {
+    public function prepare_installTwoPlugins()
+    {
         throw new \PHPUnit_Framework_SkippedTestError('There is no way to install more plugins at once using selenium');
     }
 
-    public function installTwoPlugins() {
+    public function installTwoPlugins()
+    {
     }
 
-    public function prepare_activateTwoPlugins() {
+    public function prepare_activateTwoPlugins()
+    {
         $plugin1Path = PathUtils::getRelativePath(self::$testConfig->testSite->path, self::$pluginInfo['zipfile']);
-        $plugin2Path = PathUtils::getRelativePath(self::$testConfig->testSite->path, self::$secondPluginInfo['zipfile']);
-        self::$wpAutomation->runWpCliCommand('plugin', 'install', array($plugin1Path, $plugin2Path));
+        $plugin2Path = PathUtils::getRelativePath(
+            self::$testConfig->testSite->path,
+            self::$secondPluginInfo['zipfile']
+        );
+        self::$wpAutomation->runWpCliCommand('plugin', 'install', [$plugin1Path, $plugin2Path]);
         $this->url("wp-admin/plugins.php");
     }
 
-    public function activateTwoPlugins() {
+    public function activateTwoPlugins()
+    {
         $this->performBulkAction('activate-selected');
     }
 
-    public function prepare_deactivateTwoPlugins() {
+    public function prepare_deactivateTwoPlugins()
+    {
         $this->url("wp-admin/plugins.php");
     }
 
-    public function deactivateTwoPlugins() {
+    public function deactivateTwoPlugins()
+    {
         $this->performBulkAction('deactivate-selected');
     }
 
-    public function prepare_uninstallTwoPlugins() {
+    public function prepare_uninstallTwoPlugins()
+    {
         $this->url("wp-admin/plugins.php");
     }
 
-    public function uninstallTwoPlugins() {
+    public function uninstallTwoPlugins()
+    {
         $this->performBulkAction('delete-selected');
         $this->byId('submit')->click();
     }
 
-    private function performBulkAction($action) {
+    private function performBulkAction($action)
+    {
         // select two plugins
         $this->byCssSelector('.check-column input[value*="' .  self::$pluginInfo['url-fragment'] . '"]')->click();
         $this->byCssSelector('.check-column input[value*="' .  self::$secondPluginInfo['url-fragment'] . '"]')->click();

@@ -6,10 +6,10 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use RegexIterator;
+use VersionPress\Storages\Serialization\IniSerializer;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\EntityUtils;
 use VersionPress\Utils\FileSystem;
-use VersionPress\Storages\Serialization\IniSerializer;
 
 /**
  * Saves entities to files in a common directory. Useful for entities that either
@@ -21,28 +21,31 @@ use VersionPress\Storages\Serialization\IniSerializer;
  * Note that the same file can be used by multiple entities. For example, both
  * the main post data and postmeta for it are stored in the same INI file.
  */
-abstract class DirectoryStorage extends Storage {
+abstract class DirectoryStorage extends Storage
+{
 
     /** @var string */
     private $directory;
 
-    private $uncommittedEntities = array();
+    private $uncommittedEntities = [];
 
     /** @var bool[] */
-    private $existenceCache = array();
+    private $existenceCache = [];
 
     /**
      * DirectoryStorage constructor.
      * @param string $directory
      * @param \VersionPress\Database\EntityInfo $entityInfo
      */
-    public function __construct($directory, $entityInfo) {
+    public function __construct($directory, $entityInfo)
+    {
         parent::__construct($entityInfo);
         $this->directory = $directory;
         $this->entityInfo = $entityInfo;
     }
 
-    public function save($data) {
+    public function save($data)
+    {
         $vpid = $data[$this->entityInfo->vpidColumnName];
 
         if (!$vpid) {
@@ -80,14 +83,14 @@ abstract class DirectoryStorage extends Storage {
             file_put_contents($filename, $this->serializeEntity($vpid, $newEntity));
 
             return $this->createChangeInfo($oldEntity, $newEntity, !$isExistingEntity ? 'create' : 'edit');
-
         } else {
             return null;
         }
 
     }
 
-    public function delete($restriction) {
+    public function delete($restriction)
+    {
         $fileName = $this->getEntityFilename($restriction[$this->entityInfo->vpidColumnName]);
         if (is_file($fileName)) {
             $entity = $this->loadEntity($restriction[$this->entityInfo->vpidColumnName]);
@@ -98,11 +101,12 @@ abstract class DirectoryStorage extends Storage {
         }
     }
 
-    public function saveLater($data) {
+    public function saveLater($data)
+    {
         $vpid = $data[$this->entityInfo->vpidColumnName];
 
         if (!isset($this->uncommittedEntities[$vpid])) {
-            $this->uncommittedEntities[$vpid] = array();
+            $this->uncommittedEntities[$vpid] = [];
         }
 
         $originalEntity = $this->uncommittedEntities[$vpid];
@@ -110,46 +114,55 @@ abstract class DirectoryStorage extends Storage {
         $this->uncommittedEntities[$vpid] = $newEntity;
     }
 
-    public function commit() {
+    public function commit()
+    {
         foreach ($this->uncommittedEntities as $entity) {
             $this->save($entity);
         }
 
-        $this->uncommittedEntities = array();
+        $this->uncommittedEntities = [];
     }
 
-    public function loadAll() {
+    public function loadAll()
+    {
         $entityFiles = $this->getEntityFiles();
         $entities = $this->loadAllFromFiles($entityFiles);
         return $entities;
     }
 
-    public function prepareStorage() {
+    public function prepareStorage()
+    {
         FileSystem::mkdir($this->directory);
     }
 
-    public function getEntityFilename($id, $parentId = null) {
+    public function getEntityFilename($id, $parentId = null)
+    {
         $vpidPath = Strings::substring($id, 0, 2) . '/' . $id;
         return $this->directory . '/' . $vpidPath . '.ini';
     }
 
-    public function getPathCommonToAllEntities() {
+    public function getPathCommonToAllEntities()
+    {
         return $this->directory;
     }
 
-    protected function deserializeEntity($serializedEntity) {
+    protected function deserializeEntity($serializedEntity)
+    {
         $entity = IniSerializer::deserialize($serializedEntity);
         return $this->flattenEntity($entity);
     }
 
-    protected function serializeEntity($vpid, $entity) {
-        unset ($entity[$this->entityInfo->vpidColumnName]);
-        return IniSerializer::serialize(array($vpid => $entity));
+    protected function serializeEntity($vpid, $entity)
+    {
+        unset($entity[$this->entityInfo->vpidColumnName]);
+        return IniSerializer::serialize([$vpid => $entity]);
     }
 
-    private function getEntityFiles() {
-        if (!is_dir($this->directory))
-            return array();
+    private function getEntityFiles()
+    {
+        if (!is_dir($this->directory)) {
+            return [];
+        }
 
         $directoryIterator = new RecursiveDirectoryIterator($this->directory);
         $recursiveIterator = new RecursiveIteratorIterator($directoryIterator);
@@ -158,32 +171,40 @@ abstract class DirectoryStorage extends Storage {
         return array_keys(iterator_to_array($iniFilesIterator));
     }
 
-    private function loadAllFromFiles($entityFiles) {
+    private function loadAllFromFiles($entityFiles)
+    {
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
-        $entities = array_map(array($this, 'deserializeEntity'), array_filter(@array_map('file_get_contents', $entityFiles), function ($item) {
-            return $item !== FALSE;
-        }));
+        $entities = array_map(
+            [$this, 'deserializeEntity'],
+            array_filter(@array_map('file_get_contents', $entityFiles), function ($item) {
+                return $item !== false;
+            })
+        );
         $vpIds = ArrayUtils::column($entities, $this->entityInfo->vpidColumnName);
         return array_combine($vpIds, $entities);
     }
 
-    protected function removeUnwantedColumns($entity) {
+    protected function removeUnwantedColumns($entity)
+    {
         foreach ($this->entityInfo->getIgnoredColumns() as $column => $computeFunction) {
             unset($entity[$column]);
         }
         return $entity;
     }
 
-    public function exists($id, $parentId = null) {
+    public function exists($id, $parentId = null)
+    {
         return file_exists($this->getEntityFilename($id));
     }
 
-    public function loadEntity($id, $parentId = null) {
-        $entities = $this->loadAllFromFiles(array($this->getEntityFilename($id)));
-        return isset($entities[$id]) ? $entities[$id] : FALSE;
+    public function loadEntity($id, $parentId = null)
+    {
+        $entities = $this->loadAllFromFiles([$this->getEntityFilename($id)]);
+        return isset($entities[$id]) ? $entities[$id] : false;
     }
 
-    protected function flattenEntity($entity) {
+    protected function flattenEntity($entity)
+    {
         if (count($entity) === 0) {
             return $entity;
         }
@@ -196,7 +217,8 @@ abstract class DirectoryStorage extends Storage {
         return $flatEntity;
     }
 
-    protected function entityExistedBeforeThisRequest($data) {
+    protected function entityExistedBeforeThisRequest($data)
+    {
         if (!isset($data['vp_id'])) {
             return false;
         }

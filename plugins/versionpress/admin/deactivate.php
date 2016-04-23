@@ -16,10 +16,11 @@ defined('ABSPATH') or die("Direct access not allowed");
  * @param string $type See `submit_button()`'s $type parameter
  * @param string $cssClass Optional CSS class to be used for the button
  */
-function _vp_button($label, $action, $type = "delete", $cssClass = "") {
+function _vp_button($label, $action, $type = "delete", $cssClass = "")
+{
     echo "<form action='" . esc_url(admin_url('admin-post.php')) . "' method='post' class='" . esc_attr($cssClass) . "'>";
     echo "<input type='hidden' name='action' value='$action' />";
-    submit_button($label, $type, $action, false, $other_attributes = array("id" => $action));
+    submit_button($label, $type, $action, false, $other_attributes = ["id" => $action]);
     wp_nonce_field('deactivate-plugin_versionpress/versionpress.php');
     echo "</form>";
 }
@@ -28,7 +29,6 @@ function _vp_button($label, $action, $type = "delete", $cssClass = "") {
 
 <div class="wrap vp-deactivation">
     <h2 class="vp-deactivation-header">VersionPress deactivation</h2>
-
 
 
     <div class="error below-h2">
@@ -61,7 +61,7 @@ function _vp_button($label, $action, $type = "delete", $cssClass = "") {
                     If you <strong>uninstall</strong> VersionPress later (by clicking the Delete button on the Plugins page) the Git repository will be moved to the <code>wp-content/vpbackups</code> folder. The site will appear unversioned but you can always restore the repository from there should you need to.
                 </li>
 
-            <?php
+                <?php
             }
             ?>
         </ul>

@@ -2,8 +2,6 @@
 namespace VersionPress\Tests\Selenium;
 
 use Exception;
-use Icecave\SemVer\Comparator;
-use Icecave\SemVer\Version;
 use VersionPress\Initialization\InitializationConfig;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Tests\Utils\TestConfig;
@@ -13,12 +11,14 @@ use VersionPress\Tests\Utils\WpVersionComparer;
 /**
  * Tests VersionPress deactivation / reactivation / uninstallation flow.
  */
-class ActivationDeactivationTest extends SeleniumTestCase {
+class ActivationDeactivationTest extends SeleniumTestCase
+{
 
     /**
      * We're overriding the default setUpBeforeClass()
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass()
+    {
         if (TestRunnerOptions::getInstance()->forceSetup == "before-class" || !self::$wpAutomation->isSiteSetUp()) {
             self::$wpAutomation->setUpSite();
         }
@@ -31,8 +31,9 @@ class ActivationDeactivationTest extends SeleniumTestCase {
     /**
      * @test
      */
-    public function completeUninstallationOfUnactivatedPluginRemovesAllFiles() {
-        self::_installVersionPress();
+    public function completeUninstallationOfUnactivatedPluginRemovesAllFiles()
+    {
+        self::installVersionPress();
         $this->url('wp-admin/plugins.php');
         $this->byCssSelector('.delete a[href*=\'versionpress\']')->click();
         $this->byCssSelector('.wrap form:nth-of-type(1) input#submit')->click();
@@ -52,9 +53,10 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * @test
      * @see vp_gettext_filter_plugin_activated() Nag string is constructed here
      */
-    public function successfulActivationDisplaysInitializationHintInTheActivationMessage() {
-        self::_installVersionPress();
-        $this->_activateVersionPress();
+    public function successfulActivationDisplaysInitializationHintInTheActivationMessage()
+    {
+        self::installVersionPress();
+        $this->activateVersionPress();
         $this->assertContains("VersionPress", $this->byCssSelector('#message.updated p')->text());
         $this->assertElementExists('#message.updated p a');
     }
@@ -63,7 +65,8 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * @test
      * @depends successfulActivationDisplaysInitializationHintInTheActivationMessage
      */
-    public function nagIsDisplayedOnSubsequentRequests() {
+    public function nagIsDisplayedOnSubsequentRequests()
+    {
         $this->url('wp-admin/index.php');
         $this->assertElementExists('.vp-activation-nag');
     }
@@ -72,8 +75,13 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * @test
      * @depends nagIsDisplayedOnSubsequentRequests
      */
-    public function visitingVersionPressScreenShowsInitializationInformation() {
-        $updateConfigArgs = array('VERSIONPRESS_GUI', 'html', 'require' => 'wp-content/plugins/versionpress/src/Cli/vp-internal.php');
+    public function visitingVersionPressScreenShowsInitializationInformation()
+    {
+        $updateConfigArgs = [
+            'VERSIONPRESS_GUI',
+            'html',
+            'require' => 'wp-content/plugins/versionpress/src/Cli/vp-internal.php'
+        ];
         self::$wpAutomation->runWpCliCommand('vp-internal', 'update-config', $updateConfigArgs);
 
 
@@ -85,7 +93,8 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * @test
      * @depends visitingVersionPressScreenShowsInitializationInformation
      */
-    public function successfulActivationRedirectsToMainVersionPressTableAndAltersWpdbClass() {
+    public function successfulActivationRedirectsToMainVersionPressTableAndAltersWpdbClass()
+    {
         $wpdbFile = self::$testConfig->testSite->path . '/wp-includes/wp-db.php';
         $wpdbOriginalFile = $wpdbFile . '.original';
         $this->assertFileNotExists($wpdbOriginalFile);
@@ -105,7 +114,8 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * @test
      * @depends successfulActivationRedirectsToMainVersionPressTableAndAltersWpdbClass
      */
-    public function afterActivationTheFilesystemMatchDatabase() {
+    public function afterActivationTheFilesystemMatchDatabase()
+    {
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -117,7 +127,8 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * @test
      *
      */
-    public function versionPressRestoresMethodsInWpdbAfterReplacingWithOriginal() {
+    public function versionPressRestoresMethodsInWpdbAfterReplacingWithOriginal()
+    {
         $isReplacedCall = 'echo VersionPress\Initialization\WpdbReplacer::isReplaced();';
         $restoreCall = 'VersionPress\Initialization\WpdbReplacer::restoreOriginal();';
 
@@ -125,7 +136,7 @@ class ActivationDeactivationTest extends SeleniumTestCase {
         $isReplaced = (bool)self::$wpAutomation->runWpCliCommand('eval', null, $isReplacedCall);
         $this->assertTrue($isReplaced);
 
-        $isReplaced = (bool)self::$wpAutomation->runWpCliCommand('eval', null, $restoreCall.$isReplacedCall);
+        $isReplaced = (bool)self::$wpAutomation->runWpCliCommand('eval', null, $restoreCall . $isReplacedCall);
         $this->assertFalse($isReplaced);
 
         $isReplaced = (bool)self::$wpAutomation->runWpCliCommand('eval', null, $isReplacedCall);
@@ -140,7 +151,8 @@ class ActivationDeactivationTest extends SeleniumTestCase {
     /**
      * @test
      */
-    public function deactivateShowsConfirmationScreen() {
+    public function deactivateShowsConfirmationScreen()
+    {
         $this->url('wp-admin/plugins.php');
         $this->byCssSelector('.deactivate a[href*=\'versionpress\']')->click();
 
@@ -158,7 +170,8 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * @test
      * @depends deactivateShowsConfirmationScreen
      */
-    public function cancelDeactivationReturnsToPluginPage() {
+    public function cancelDeactivationReturnsToPluginPage()
+    {
 
         $this->byCssSelector('#cancel_deactivation')->click();
 
@@ -171,7 +184,8 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * @test
      * @depends cancelDeactivationReturnsToPluginPage
      */
-    public function confirmingDeactivationFullyDeactivatesVersionPress() {
+    public function confirmingDeactivationFullyDeactivatesVersionPress()
+    {
 
         $this->byCssSelector('.deactivate a[href*=\'versionpress\']')->click();
 
@@ -187,7 +201,6 @@ class ActivationDeactivationTest extends SeleniumTestCase {
         $this->assertContains('wp-admin/plugins.php', $this->url());
 
         $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-includes/wpdb.php.original');
-        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/vpdb');
         $this->assertFileExists(self::$testConfig->testSite->path . '/.git');
 
     }
@@ -196,7 +209,8 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * @test
      * @depends confirmingDeactivationFullyDeactivatesVersionPress
      */
-    public function deactivateBeforeFullActivationSkipsConfirmation() {
+    public function deactivateBeforeFullActivationSkipsConfirmation()
+    {
         $this->byCssSelector('.activate a[href*=\'versionpress\']')->click();
         $this->byCssSelector('.deactivate a[href*=\'versionpress\']')->click();
 
@@ -209,7 +223,8 @@ class ActivationDeactivationTest extends SeleniumTestCase {
      * @test
      * @depends deactivateBeforeFullActivationSkipsConfirmation
      */
-    public function completeUninstallationRemovesGitRepo() {
+    public function completeUninstallationRemovesGitRepo()
+    {
 
         $this->byCssSelector('.delete a[href*=\'versionpress\']')->click();
         $this->byCssSelector('.wrap form:nth-of-type(1) input#submit')->click();
@@ -218,6 +233,7 @@ class ActivationDeactivationTest extends SeleniumTestCase {
 
         $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-includes/wpdb.php.original');
         $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/plugins/versionpress');
+        $this->assertFileNotExists(self::$testConfig->testSite->path . '/wp-content/vpdb');
         $this->assertFileNotExists(self::$testConfig->testSite->path . '/.git');
 
     }
@@ -227,13 +243,15 @@ class ActivationDeactivationTest extends SeleniumTestCase {
     // Helper functions
     //---------------------
 
-    private function _activateVersionPress() {
+    private function activateVersionPress()
+    {
         $this->url('wp-admin/plugins.php');
         $this->byCssSelector('.activate a[href*=\'versionpress\']')->click();
         $this->waitAfterRedirect();
     }
 
-    private static function _installVersionPress() {
+    private static function installVersionPress()
+    {
         try {
             self::$wpAutomation->uninstallVersionPress();
         } catch (Exception $e) {
@@ -241,6 +259,4 @@ class ActivationDeactivationTest extends SeleniumTestCase {
 
         self::$wpAutomation->copyVersionPressFiles();
     }
-
-
 }

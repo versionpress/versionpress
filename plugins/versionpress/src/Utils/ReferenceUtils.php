@@ -4,7 +4,8 @@ namespace VersionPress\Utils;
 
 use VersionPress\Database\DbSchemaInfo;
 
-class ReferenceUtils {
+class ReferenceUtils
+{
 
     /**
      * Returns complex info about the M:N reference. The source is always the given entity, target is the second one.
@@ -12,19 +13,21 @@ class ReferenceUtils {
      * @param DbSchemaInfo $dbSchema
      * @param $entityName
      * @param $reference
-     * @return array The details has keys 'junction-table', 'source-entity', 'source-column', 'target-entity' and 'target-column'.
+     * @return array The details has keys 'junction-table', 'source-entity', 'source-column',
+     *   'target-entity' and 'target-column'.
      */
-    public static function getMnReferenceDetails(DbSchemaInfo $dbSchema, $entityName, $reference) {
+    public static function getMnReferenceDetails(DbSchemaInfo $dbSchema, $entityName, $reference)
+    {
         list($junctionTable, $targetColumn) = explode(".", $reference);
         $targetEntity = $dbSchema->getEntityInfo($entityName)->mnReferences[$reference];
         $sourceColumn = self::getSourceColumn($dbSchema, $entityName, $targetEntity, $junctionTable);
-        return array(
+        return [
             'junction-table' => $junctionTable,
             'source-entity' => $entityName,
             'source-column' => $sourceColumn,
             'target-entity' => $targetEntity,
             'target-column' => $targetColumn,
-        );
+        ];
     }
 
     /**
@@ -33,7 +36,8 @@ class ReferenceUtils {
      * @param string $reference
      * @return array The details has keys 'source-column', 'source-value', 'value-column'
      */
-    public static function getValueReferenceDetails($reference) {
+    public static function getValueReferenceDetails($reference)
+    {
         list($keyCol, $valueColumn) = explode("@", $reference);
         list($sourceColumn, $sourceValue) = explode("=", $keyCol);
         if (strpos($sourceValue, '[') !== false) {
@@ -42,12 +46,12 @@ class ReferenceUtils {
             $pathInStructure = '';
         }
 
-        return array(
+        return [
             'source-column' => $sourceColumn,
-            'source-value'  => $sourceValue,
+            'source-value' => $sourceValue,
             'value-column' => $valueColumn,
             'path-in-structure' => $pathInStructure,
-        );
+        ];
     }
 
     /**
@@ -65,7 +69,8 @@ class ReferenceUtils {
      * @param $junctionTable
      * @return string
      */
-    private static function getSourceColumn(DbSchemaInfo $dbSchema, $sourceEntity, $targetEntity, $junctionTable) {
+    private static function getSourceColumn(DbSchemaInfo $dbSchema, $sourceEntity, $targetEntity, $junctionTable)
+    {
         $targetEntityMnReferences = $dbSchema->getEntityInfo($targetEntity)->mnReferences;
         foreach ($targetEntityMnReferences as $reference => $referencedEntity) {
             list($referencedTable, $referenceColumn) = explode(".", $reference);
@@ -95,18 +100,21 @@ class ReferenceUtils {
      * @param string $pathInStructure
      * @return array
      */
-    public static function getMatchingPaths($value, $pathInStructure) {
+    public static function getMatchingPaths($value, $pathInStructure)
+    {
         // https://regex101.com/r/vR8yK3/2
         $re = "/(?:\\[(?<number>\\d+)|\"(?<string>(?:[^\"\\\\]|\\\\.)*)\"|\\/(?<regex>(?:[^\\/\\\\]|\\\\.)*)\\/)\\]+/";
         preg_match_all($re, $pathInStructure, $matches, PREG_SET_ORDER);
         $pathParts = array_map(function ($match) {
             if (strlen($match['number']) > 0) {
                 return ['type' => 'exact-value', 'value' => intval($match['number'])];
-            } else if (strlen($match['string']) > 0) {
-                return ['type' => 'exact-value', 'value' => $match['string']];
             } else {
-                $regex = "/^$match[regex]$/";
-                return ['type' => 'regex', 'value' => $regex];
+                if (strlen($match['string']) > 0) {
+                    return ['type' => 'exact-value', 'value' => $match['string']];
+                } else {
+                    $regex = "/^$match[regex]$/";
+                    return ['type' => 'regex', 'value' => $regex];
+                }
             }
         }, $matches);
 
@@ -115,7 +123,8 @@ class ReferenceUtils {
         return $paths;
     }
 
-    private static function getMatchingPathsFromSubtree($value, $pathParts) {
+    private static function getMatchingPathsFromSubtree($value, $pathParts)
+    {
         if (!is_array($value) && !is_object($value)) {
             return [];
         }
@@ -125,7 +134,8 @@ class ReferenceUtils {
 
         foreach ($value as $key => $subTree) {
             if (($currentLevelKey['type'] === 'exact-value' && $currentLevelKey['value'] === $key) ||
-                ($currentLevelKey['type'] === 'regex' && preg_match($currentLevelKey['value'], $key))) {
+                ($currentLevelKey['type'] === 'regex' && preg_match($currentLevelKey['value'], $key))
+            ) {
                 if (count($pathParts) > 0) {
                     $subPaths = self::getMatchingPathsFromSubtree($subTree, $pathParts);
                     foreach ($subPaths as $subPath) {
@@ -141,7 +151,8 @@ class ReferenceUtils {
         return $paths;
     }
 
-    public static function valueMatchesWildcard($valueWithWildcards, $value) {
+    public static function valueMatchesWildcard($valueWithWildcards, $value)
+    {
         // https://regex101.com/r/tC8zD4/3
         $re = "/(?<escaped>(?:(?:\\\\\\\\)|(?:\\\\\\*))+)|(?<asterisk>\\*)|(?<string>[^\\\\\\*]+)/";
 

@@ -24,7 +24,8 @@ use wpdb;
 /**
  * Internal VersionPress automation commands. Some of them depend on tests-config.ini.
  */
-class VpAutomateCommand extends \WP_CLI_Command {
+class VpAutomateCommand extends \WP_CLI_Command
+{
 
     /** @var Faker\Generator */
     private $faker;
@@ -42,7 +43,8 @@ class VpAutomateCommand extends \WP_CLI_Command {
      *
      * @subcommand start-over
      */
-    public function startOver($args, $assoc_args) {
+    public function startOver($args, $assoc_args)
+    {
         vp_admin_post_confirm_deactivation();
         FileSystem::remove(ABSPATH . '.git');
         activate_plugin('versionpress/versionpress.php');
@@ -74,20 +76,21 @@ class VpAutomateCommand extends \WP_CLI_Command {
      * @subcommand generate
      *
      */
-    public function generate($args, $assoc_args) {
+    public function generate($args, $assoc_args)
+    {
         global $wpdb;
         $this->faker = Faker\Factory::create();
 
         $this->database = new Database($wpdb);
-        
 
-        $preferedOrder = array(
+
+        $preferedOrder = [
             'options',
             'users',
             'terms',
             'posts',
             'comments'
-        );
+        ];
 
         foreach ($preferedOrder as $entity) {
             if (!isset($assoc_args[$entity])) {
@@ -98,8 +101,9 @@ class VpAutomateCommand extends \WP_CLI_Command {
         }
     }
 
-    private function generateEntities($entity, $count) {
-        $entities = array();
+    private function generateEntities($entity, $count)
+    {
+        $entities = [];
         Debugger::timer();
         for ($i = 0; $i < $count; $i++) {
             $entities[] = $this->generateEntity($entity);
@@ -112,11 +116,13 @@ class VpAutomateCommand extends \WP_CLI_Command {
         $connection = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
         $connection->query("SET GLOBAL max_allowed_packet=100*1024*1024");
         $chunks = array_chunk($insertQueries, 50);
+
         foreach ($chunks as $chunk) {
             $connection->multi_query(join(" ", $chunk));
-            while ($connection->next_result()) // flush multi_queries
-            {
-                if (!$connection->more_results()) break;
+            while ($connection->next_result()) { // flush multi_queries
+                if (!$connection->more_results()) {
+                    break;
+                }
             }
         }
 
@@ -125,7 +131,8 @@ class VpAutomateCommand extends \WP_CLI_Command {
         $connection->close();
     }
 
-    private function generateEntity($entity) {
+    private function generateEntity($entity)
+    {
         switch ($entity) {
             case 'options':
                 return $this->generateOption();
@@ -141,20 +148,22 @@ class VpAutomateCommand extends \WP_CLI_Command {
         return null;
     }
 
-    private function generateOption() {
+    private function generateOption()
+    {
         $optionName = "vp_random_" . Random::generate(10, 'a-z');
         $optionValue = $this->faker->words(rand(1, 20));
         add_option($optionName, $optionValue);
-        return array();
+        return [];
     }
 
-    private function generateUser() {
+    private function generateUser()
+    {
         $firstName = $this->faker->firstName;
         $lastName = $this->faker->lastName;
         $fullName = $firstName . ' ' . $lastName;
         $userName = $this->faker->userName;
 
-        $userdata = array(
+        $userdata = [
             'user_pass' => 'password',
             'user_login' => $userName,
             'user_nicename' => $fullName,
@@ -164,22 +173,24 @@ class VpAutomateCommand extends \WP_CLI_Command {
             'first_name' => $firstName,
             'last_name' => $lastName,
             'date_registered' => $this->faker->dateTime->format('Y-m-d H:i:s'),
-        );
+        ];
 
         wp_insert_user($userdata);
-        return array();
+        return [];
     }
 
-    private function generateTerm() {
-        $taxonomies = array('post_tag', 'category');
+    private function generateTerm()
+    {
+        $taxonomies = ['post_tag', 'category'];
 
         $name = $this->faker->word;
         $randomTaxonomy = self::randomEntry($taxonomies);
         wp_insert_term($name, $randomTaxonomy);
-        return array();
+        return [];
     }
 
-    private function generatePost() {
+    private function generatePost()
+    {
         static $authors;
 
         if (!$authors) {
@@ -189,20 +200,21 @@ class VpAutomateCommand extends \WP_CLI_Command {
         $contentLength = rand(50, 1000); // characters
 
         $date = new DateTime();
-        $post = $this->preparePost(array(
+        $post = $this->preparePost([
             "post_type" => "post",
             "post_status" => "publish",
             "post_title" => $this->generateLoremIpsum(1, false),
             "post_date" => $date->format('Y-m-d H:i:s'),
             "post_content" => $this->generateLoremIpsum($contentLength),
             "post_author" => self::randomEntry($authors)
-        ));
+        ]);
 
         return $post;
 
     }
 
-    private function generateComment() {
+    private function generateComment()
+    {
         static $posts;
         static $authors;
 
@@ -214,7 +226,7 @@ class VpAutomateCommand extends \WP_CLI_Command {
         $commentLength = rand(2, 50);
         $hasUserId = rand(0, 10) < 7;
 
-        $comment = $this->prepareComment(array(
+        $comment = $this->prepareComment([
             'comment_author' => $this->faker->name,
             'comment_author_email' => $this->faker->email,
             'comment_author_url' => $this->faker->url,
@@ -223,49 +235,47 @@ class VpAutomateCommand extends \WP_CLI_Command {
             'comment_approved' => 1,
             'comment_post_ID' => self::randomEntry($posts),
             'user_id' => $hasUserId ? self::randomEntry($authors) : 0
-        ));
+        ]);
 
         return $comment;
     }
 
-    private static function randomEntry(array $array) {
+    private static function randomEntry(array $array)
+    {
         return $array[array_rand($array, 1)];
     }
 
-    private static function randomEntries(array $array, $count) {
-        $randomKeys = (array)array_rand($array, $count);
-        return array_map(function ($key) use ($array) {
-            return $array[$key];
-        }, $randomKeys);
-    }
-
-    private function getFieldFn($field) {
+    private function getFieldFn($field)
+    {
         return function ($user) use ($field) {
             return $user->{$field};
         };
     }
 
-    private function preparePost($post) {
-        $defaults = array(
+    private function preparePost($post)
+    {
+        $defaults = [
             'post_date_gmt' => $post['post_date'],
             'post_name' => $this->faker->slug,
             'post_modified' => $post['post_date'],
             'post_modified_gmt' => $post['post_date'],
             'guid' => $this->faker->uuid,
-        );
+        ];
 
         return array_merge($defaults, $post);
     }
 
-    private function prepareComment($comment) {
-        $defaults = array(
+    private function prepareComment($comment)
+    {
+        $defaults = [
             'comment_date_gmt' => $comment['comment_date'],
-        );
+        ];
 
         return array_merge($defaults, $comment);
     }
 
-    private function buildInsertQueries($table, $entities) {
+    private function buildInsertQueries($table, $entities)
+    {
         if (count($entities) == 0) {
             return "";
         }
@@ -284,18 +294,45 @@ class VpAutomateCommand extends \WP_CLI_Command {
         }, $valueStrings);
     }
 
-    private function generateLoremIpsum($countOfSentences, $period = true) {
+    private function generateLoremIpsum($countOfSentences, $period = true)
+    {
         static $lipsum;
         if (!$lipsum) {
-            $lipsum = array(
-                'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur',
-                'adipiscing', 'elit', 'curabitur', 'vel', 'hendrerit', 'libero',
-                'eleifend', 'blandit', 'nunc', 'ornare', 'odio', 'ut',
-                'orci', 'gravida', 'imperdiet', 'nullam', 'purus', 'lacinia',
-                'a', 'pretium', 'quis', 'congue', 'praesent', 'sagittis');
+            $lipsum = [
+                'lorem',
+                'ipsum',
+                'dolor',
+                'sit',
+                'amet',
+                'consectetur',
+                'adipiscing',
+                'elit',
+                'curabitur',
+                'vel',
+                'hendrerit',
+                'libero',
+                'eleifend',
+                'blandit',
+                'nunc',
+                'ornare',
+                'odio',
+                'ut',
+                'orci',
+                'gravida',
+                'imperdiet',
+                'nullam',
+                'purus',
+                'lacinia',
+                'a',
+                'pretium',
+                'quis',
+                'congue',
+                'praesent',
+                'sagittis'
+            ];
         }
 
-        $sentences = array();
+        $sentences = [];
         for ($i = 0; $i < $countOfSentences; $i++) {
             $sentenceLength = rand(5, 20);
             $randomWords = array_intersect_key($lipsum, array_flip(array_rand($lipsum, $sentenceLength)));
@@ -305,9 +342,8 @@ class VpAutomateCommand extends \WP_CLI_Command {
 
         return join(" ", $sentences);
     }
-
 }
 
 if (defined('WP_CLI') && WP_CLI) {
-    WP_CLI::add_command('vp-automate', 'VersionPress\Tests\Automation\VpAutomateCommand');
+    WP_CLI::add_command('vp-automate', VpAutomateCommand::class);
 }

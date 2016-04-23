@@ -15,7 +15,8 @@ use VersionPress\Git\CommitMessage;
  *     VP-Term-Taxonomy: category
  *
  */
-class TermChangeInfo extends EntityChangeInfo {
+class TermChangeInfo extends EntityChangeInfo
+{
 
     const TERM_NAME_TAG = "VP-Term-Name";
     const TERM_OLD_NAME_TAG = "VP-Term-OldName";
@@ -30,14 +31,16 @@ class TermChangeInfo extends EntityChangeInfo {
     /** @var string */
     private $taxonomy;
 
-    public function __construct($action, $entityId, $termName, $taxonomy, $oldTermName = null) {
+    public function __construct($action, $entityId, $termName, $taxonomy, $oldTermName = null)
+    {
         parent::__construct("term", $action, $entityId);
         $this->termName = $termName;
         $this->taxonomy = $taxonomy;
         $this->oldTermName = $oldTermName;
     }
 
-    public function getChangeDescription() {
+    public function getChangeDescription()
+    {
         $taxonomy = $this->getTaxonomyName();
 
         switch ($this->getAction()) {
@@ -52,7 +55,8 @@ class TermChangeInfo extends EntityChangeInfo {
         return "Edited {$taxonomy} '{$this->termName}'";
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
+    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
         list(, $action, $entityId) = explode("/", $actionTag, 3);
@@ -62,11 +66,12 @@ class TermChangeInfo extends EntityChangeInfo {
         return new self($action, $entityId, $name, $taxonomy, $oldName);
     }
 
-    public function getCustomTags() {
-        $tags = array(
+    public function getCustomTags()
+    {
+        $tags = [
             self::TERM_NAME_TAG => $this->termName,
             self::TERM_TAXONOMY_TAG => $this->taxonomy,
-        );
+        ];
 
         if ($this->getAction() === "rename") {
             $tags[self::TERM_OLD_NAME_TAG] = $this->oldTermName;
@@ -75,13 +80,18 @@ class TermChangeInfo extends EntityChangeInfo {
         return $tags;
     }
 
-    public function getTaxonomyName() {
+    public function getTaxonomyName()
+    {
         return str_replace("_", " ", $this->taxonomy);
     }
 
-    public function getChangedFiles() {
+    public function getChangedFiles()
+    {
         $changes = parent::getChangedFiles();
-        $changes[] = array("type" => "all-storage-files", "entity" => "option"); // sometimes term change can affect option (e.g. deleting menu)
+        $changes[] = [
+            "type" => "all-storage-files",
+            "entity" => "option"
+        ]; // sometimes term change can affect option (e.g. deleting menu)
         return $changes;
     }
 }

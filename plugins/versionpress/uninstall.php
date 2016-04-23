@@ -10,6 +10,8 @@
  * @see vp_admin_post_confirm_deactivation()
  */
 
+use VersionPress\DI\VersionPressServices;
+use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\SecurityUtils;
 use VersionPress\Utils\UninstallationUtil;
@@ -18,8 +20,29 @@ defined('WP_UNINSTALL_PLUGIN') or die('Direct access not allowed');
 
 require_once(dirname(__FILE__) . '/bootstrap.php');
 
-if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
+global $versionPressContainer;
 
+/** @var \VersionPress\Database\Database $database */
+$database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
+
+
+$queries[] = "DROP TABLE IF EXISTS `{$database->vp_id}`";
+
+$vpOptionsReflection = new ReflectionClass(VersionPressOptions::class);
+$usermetaToDelete = array_values($vpOptionsReflection->getConstants());
+$queryRestriction = '"' . join('", "', $usermetaToDelete) . '"';
+
+$queries[] = "DELETE FROM `{$database->usermeta}` WHERE meta_key IN ({$queryRestriction})";
+
+foreach ($queries as $query) {
+    $database->query($query);
+}
+
+delete_option('vp_rest_api_plugin_version');
+
+FileSystem::remove(VP_VPDB_DIR);
+
+if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
     $backupsDir = WP_CONTENT_DIR . '/vpbackups';
     if (!file_exists($backupsDir)) {
         FileSystem::mkdir($backupsDir);
@@ -37,6 +60,4 @@ if (UninstallationUtil::uninstallationShouldRemoveGitRepo()) {
     if (FileSystem::filesHaveSameContents($productionGitignore, $templateGitignore)) {
         FileSystem::remove($productionGitignore);
     }
-
 }
-

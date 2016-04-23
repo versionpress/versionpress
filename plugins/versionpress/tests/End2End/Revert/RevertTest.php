@@ -7,7 +7,8 @@ use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 
-class RevertTest extends End2EndTestCase {
+class RevertTest extends End2EndTestCase
+{
 
     /** @var IRevertTestWorker */
     private static $worker;
@@ -16,7 +17,8 @@ class RevertTest extends End2EndTestCase {
      * @test
      * @testdox Undo reverts changes in given commit
      */
-    public function undoRevertChangesInGivenCommit() {
+    public function undoRevertChangesInGivenCommit()
+    {
         $changes = self::$worker->prepare_undoLastCommit();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -35,7 +37,8 @@ class RevertTest extends End2EndTestCase {
      * @test
      * @testdox Undo reverts only one commit
      */
-    public function undoRevertsOnlyOneCommit() {
+    public function undoRevertsOnlyOneCommit()
+    {
         $changes = self::$worker->prepare_undoSecondCommit();
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
@@ -53,7 +56,8 @@ class RevertTest extends End2EndTestCase {
      * @test
      * @testdox Undo commit can be also reverted.
      */
-    public function undoCommitCanBeAlsoReverted() {
+    public function undoCommitCanBeAlsoReverted()
+    {
         $changes = self::$worker->prepare_undoRevertedCommit();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -73,7 +77,8 @@ class RevertTest extends End2EndTestCase {
      * @test
      * @testdox Comment deletion cannot be reverted if the commented post no longer exists
      */
-    public function entityWithMissingReferenceCannotBeRestoredWithRevert() {
+    public function entityWithMissingReferenceCannotBeRestoredWithRevert()
+    {
         self::$worker->prepare_tryRestoreEntityWithMissingReference();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -88,7 +93,8 @@ class RevertTest extends End2EndTestCase {
      * @test
      * @testdox Rollback reverts all changes made after chosen commit
      */
-    public function rollbackRevertsAllChangesMadeAfterChosenCommit() {
+    public function rollbackRevertsAllChangesMadeAfterChosenCommit()
+    {
         $changes = self::$worker->prepare_rollbackMoreChanges();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -106,7 +112,8 @@ class RevertTest extends End2EndTestCase {
      * @test
      * @testdox Clicking on Cancel only hides the popup
      */
-    public function clickingOnCancelOnlyHidesThePopup() {
+    public function clickingOnCancelOnlyHidesThePopup()
+    {
         self::$worker->prepare_clickOnCancel();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -122,7 +129,8 @@ class RevertTest extends End2EndTestCase {
      * @test
      * @testdox OK button is disabled if the working directory is not clean
      */
-    public function undoDoesNothingIfTheWorkingDirectoryIsNotClean() {
+    public function undoDoesNothingIfTheWorkingDirectoryIsNotClean()
+    {
         self::$worker->prepare_undoWithNotCleanWorkingDirectory();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -139,7 +147,8 @@ class RevertTest extends End2EndTestCase {
     /**
      * @test
      */
-    public function rollbackWorksWithMergeCommits() {
+    public function rollbackWorksWithMergeCommits()
+    {
         $commitHash = $this->gitRepository->getLastCommitHash();
         $sitePath = self::$testConfig->testSite->path;
 
@@ -153,7 +162,7 @@ class RevertTest extends End2EndTestCase {
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
-        self::$wpAutomation->runWpCliCommand('vp', 'rollback', array($commitHash));
+        self::$wpAutomation->runWpCliCommand('vp', 'rollback', [$commitHash]);
 
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCleanWorkingDirectory();
@@ -167,7 +176,8 @@ class RevertTest extends End2EndTestCase {
      * @test
      * @testdox Undo to the same state should not do anything
      */
-    public function undoToTheSameStateDoesNothing() {
+    public function undoToTheSameStateDoesNothing()
+    {
         self::$worker->prepare_undoToTheSameState();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -183,7 +193,8 @@ class RevertTest extends End2EndTestCase {
      * @test
      * @testdox Rollback to the same state should not do anything
      */
-    public function rollbackToTheSameStateDoesNothing() {
+    public function rollbackToTheSameStateDoesNothing()
+    {
         self::$worker->prepare_rollbackToTheSameState();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -194,12 +205,13 @@ class RevertTest extends End2EndTestCase {
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
-    
+
     /**
      * @test
      * @testdox Undo multiple commits should create one commit
      */
-    public function undoMultipleCommitsCreatesOneCommit() {
+    public function undoMultipleCommitsCreatesOneCommit()
+    {
         $changes = self::$worker->prepare_undoMultipleCommits();
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
@@ -212,11 +224,12 @@ class RevertTest extends End2EndTestCase {
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
-    
+
     /**
      * @test
      */
-    public function undoMultipleCommitsDetectsMissingReferencesCorrectly() {
+    public function undoMultipleCommitsDetectsMissingReferencesCorrectly()
+    {
         $changes = self::$worker->prepare_undoMultipleDependentCommits();
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
@@ -234,7 +247,8 @@ class RevertTest extends End2EndTestCase {
      * @test
      * @testdox Undo multiple commits should do nothing id one change cannot be reverted
      */
-    public function undoMultipleCommitsDoesNothingIfOneChangeCannotBeReverted() {
+    public function undoMultipleCommitsDoesNothingIfOneChangeCannotBeReverted()
+    {
         self::$worker->prepare_undoMultipleCommitsThatCannotBeReverted();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);

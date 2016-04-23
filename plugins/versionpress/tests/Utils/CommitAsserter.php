@@ -12,7 +12,6 @@ use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\Git\Commit;
 
-
 /**
  * A short-lived object with lifespan of one test method that stores the most recent
  * commit on creation and then asserts that there were expected number of commits since then,
@@ -20,7 +19,8 @@ use VersionPress\Git\Commit;
  *
  * Can be used from any type of tests (Selenium, WP-CLI, ...).
  */
-class CommitAsserter {
+class CommitAsserter
+{
 
 
     /**
@@ -55,7 +55,8 @@ class CommitAsserter {
      *
      * @param \VersionPress\Git\GitRepository $gitRepository
      */
-    function __construct($gitRepository) {
+    public function __construct($gitRepository)
+    {
         $this->gitRepository = $gitRepository;
         $this->startCommit = $gitRepository->getCommit($gitRepository->getLastCommitHash());
     }
@@ -66,7 +67,7 @@ class CommitAsserter {
     // Pre-assertion setup
     //---------------------------
 
-    private $ignoreCommitsWithActions = array();
+    private $ignoreCommitsWithActions = [];
 
     /**
      * Ignores commits of given action(s)
@@ -79,8 +80,9 @@ class CommitAsserter {
      *
      * @param string|string[] $action An action like "usermeta/edit", or an array of them
      */
-    public function ignoreCommits($action) {
-            $this->ignoreCommitsWithActions = (array) $action;
+    public function ignoreCommits($action)
+    {
+        $this->ignoreCommitsWithActions = (array)$action;
     }
 
 
@@ -94,11 +96,15 @@ class CommitAsserter {
      *
      * @param int $numExpectedCommits
      */
-    public function assertNumCommits($numExpectedCommits) {
+    public function assertNumCommits($numExpectedCommits)
+    {
         $commits = $this->getNonIgnoredCommits();
         $numActualCommits = count($commits);
         if ($numExpectedCommits !== $numActualCommits) {
-            PHPUnit_Framework_Assert::fail("There were $numActualCommits commit(s) after {$this->startCommit->getShortHash()} while we expected $numExpectedCommits");
+            PHPUnit_Framework_Assert::fail(
+                "There were $numActualCommits commit(s) after {$this->startCommit->getShortHash()} " .
+                "while we expected $numExpectedCommits"
+            );
         }
     }
 
@@ -116,20 +122,25 @@ class CommitAsserter {
      *   (with the highest priority). If this param is set to true the whole envelope is searched for
      *   the given action.
      */
-    public function assertCommitAction($expectedAction, $whichCommit = 0, $regardlessOfPriority = false) {
+    public function assertCommitAction($expectedAction, $whichCommit = 0, $regardlessOfPriority = false)
+    {
         $commit = $this->getCommit($whichCommit);
         $changeInfo = $this->getChangeInfo($commit);
 
         if ($regardlessOfPriority) {
             $changeInfoContainsAction = ChangeInfoUtils::containsAction($changeInfo, $expectedAction);
             if (!$changeInfoContainsAction) {
-                PHPUnit_Framework_Assert::fail("Action '$expectedAction' not found in commit {$commit->getShortHash()}");
+                PHPUnit_Framework_Assert::fail(
+                    "Action '$expectedAction' not found in commit {$commit->getShortHash()}"
+                );
             }
         } else {
             $commitAction = ChangeInfoUtils::getFullAction($changeInfo);
 
             if ($expectedAction != $commitAction) {
-                PHPUnit_Framework_Assert::fail("Expected action '$expectedAction' but was '$commitAction' in commit {$commit->getShortHash()}");
+                PHPUnit_Framework_Assert::fail(
+                    "Expected action '$expectedAction' but was '$commitAction' in commit {$commit->getShortHash()}"
+                );
             }
         }
 
@@ -141,7 +152,8 @@ class CommitAsserter {
      * @param string $expectedAction Expected action, e.g., "post/edit" or "plugin/activate".
      * @param int $expectedCountOfGroupedActions
      */
-    public function assertBulkAction($expectedAction, $expectedCountOfGroupedActions) {
+    public function assertBulkAction($expectedAction, $expectedCountOfGroupedActions)
+    {
         $commit = $this->getCommit(0);
         $changeInfoEnvelope = $this->getChangeInfo($commit);
 
@@ -153,17 +165,22 @@ class CommitAsserter {
         $changeInfoList = $changeInfoEnvelope->getReorganizedInfoList();
         $firstChangeInfo = $changeInfoList[0];
 
-        if(!($firstChangeInfo instanceof BulkChangeInfo)) {
+        if (!($firstChangeInfo instanceof BulkChangeInfo)) {
             PHPUnit_Framework_Assert::fail("Commit is not a bulk action");
         }
 
         if (ChangeInfoUtils::getFullAction($firstChangeInfo) !== $expectedAction) {
-            PHPUnit_Framework_Assert::fail("Bulk action '{$firstChangeInfo->getAction()}' expected to be '{$expectedAction}'");
+            PHPUnit_Framework_Assert::fail(
+                "Bulk action '{$firstChangeInfo->getAction()}' expected to be '{$expectedAction}'"
+            );
         }
 
         $countOfGroupedActions = count($firstChangeInfo->getChangeInfos());
         if ($countOfGroupedActions !== $expectedCountOfGroupedActions) {
-            PHPUnit_Framework_Assert::fail("Expected that bulk action contains $expectedCountOfGroupedActions actions instead of $countOfGroupedActions.");
+            PHPUnit_Framework_Assert::fail(
+                "Expected that bulk action contains $expectedCountOfGroupedActions actions " .
+                "instead of $countOfGroupedActions."
+            );
         }
     }
 
@@ -178,7 +195,8 @@ class CommitAsserter {
      * @param int $whichCommit See $whichCommitParameter documentation. "HEAD" by default.
      * @param int $referenceCommit See $whichCommitParameter documentation. "HEAD^" by default.
      */
-    public function assertCommitsAreEquivalent($whichCommit = 0, $referenceCommit = -1) {
+    public function assertCommitsAreEquivalent($whichCommit = 0, $referenceCommit = -1)
+    {
         $commit = $this->getCommit($whichCommit);
         $referenceCommit = $this->getCommit($referenceCommit);
 
@@ -186,20 +204,26 @@ class CommitAsserter {
         $referenceCommitChangeInfo = $this->getChangeInfo($referenceCommit);
 
         if (!($commitChangeInfo instanceof TrackedChangeInfo || $commitChangeInfo instanceof ChangeInfoEnvelope) ||
-            !($referenceCommitChangeInfo instanceof TrackedChangeInfo || $referenceCommitChangeInfo instanceof ChangeInfoEnvelope)
-        ) {
-            PHPUnit_Framework_Assert::fail("Sorry, this assertion is only available for TrackedChangedInfo or ChangeInfoEnvelope commits");
+            !($referenceCommitChangeInfo instanceof TrackedChangeInfo
+                || $referenceCommitChangeInfo instanceof ChangeInfoEnvelope)) {
+            PHPUnit_Framework_Assert::fail(
+                "Sorry, this assertion is only available for TrackedChangedInfo or ChangeInfoEnvelope commits"
+            );
         }
 
         /** @var TrackedChangeInfo $commitChangeInfo */
         /** @var TrackedChangeInfo $referenceCommitChangeInfo */
 
         if (!ChangeInfoUtils::captureSameAction($commitChangeInfo, $referenceCommitChangeInfo)) {
-            PHPUnit_Framework_Assert::fail("Commit " . $commit->getHash() . " does not capture the same action as reference commit " . $referenceCommit->getHash());
+            PHPUnit_Framework_Assert::fail(
+                "Commit " . $commit->getHash() . " does not capture the same action as reference commit " .
+                $referenceCommit->getHash()
+            );
         }
     }
 
-    public function assertCommitTag($tagKey, $tagValue) {
+    public function assertCommitTag($tagKey, $tagValue)
+    {
         $changeInfo = $this->getChangeInfo($this->getCommit());
         $foundCustomTagValue = ChangeInfoUtils::getCustomTagValue($changeInfo, $tagKey);
 
@@ -221,12 +245,14 @@ class CommitAsserter {
      *
      * Placeholders are case sensitive.
      *
-     * @param string $type Standard git "M" (modified), "A" (added), "D" (deleted) etc. or array of actions for more possibilities.
+     * @param string $type Standard git "M" (modified), "A" (added), "D" (deleted) etc.
+     *                     or array of actions for more possibilities.
      * @param string $path Path relative to repo root. Supports wildcards, e.g. "wp-content/uploads/*",
-     *   and placeholders, e.g., "%vpdb%/posts/%VPID%.ini"
+     *                     and placeholders, e.g., "%vpdb%/posts/%VPID%.ini"
      * @param int $whichCommit See $whichCommitParameter documentation. "HEAD" by default.
      */
-    public function assertCommitPath($type, $path, $whichCommit = 0) {
+    public function assertCommitPath($type, $path, $whichCommit = 0)
+    {
         $revRange = $this->getRevRange($whichCommit);
         $path = $this->expandPath($path, $whichCommit);
         $affectedFiles = $this->gitRepository->getModifiedFilesWithStatus($revRange);
@@ -245,7 +271,8 @@ class CommitAsserter {
      * @param $changes
      * @param int $whichCommit See $whichCommitParameter documentation. "HEAD" by default.
      */
-    public function assertCommitPaths($changes, $whichCommit = 0) {
+    public function assertCommitPaths($changes, $whichCommit = 0)
+    {
         foreach ($changes as $change) {
             $this->assertCommitPath($change[0], $change[1], $whichCommit);
         }
@@ -257,26 +284,33 @@ class CommitAsserter {
      * @param int $count Expected count of affected files.
      * @param int $whichCommit See $whichCommitParameter documentation. "HEAD" by default.
      */
-    public function assertCountOfAffectedFiles($count, $whichCommit = 0) {
+    public function assertCountOfAffectedFiles($count, $whichCommit = 0)
+    {
         $revRange = $this->getRevRange($whichCommit);
         $affectedFiles = $this->gitRepository->getModifiedFilesWithStatus($revRange);
         $countOfAffectedFiles = count($affectedFiles);
         if ($countOfAffectedFiles != $count) {
             $adverb = $countOfAffectedFiles < $count ? "less" : "more";
-            PHPUnit_Framework_Assert::fail("Commit affected $adverb files ($countOfAffectedFiles) then expected ($count)");
+            PHPUnit_Framework_Assert::fail(
+                "Commit affected $adverb files ($countOfAffectedFiles) then expected ($count)"
+            );
         }
     }
 
-    public function assertCountOfUntrackedFiles($count) {
+    public function assertCountOfUntrackedFiles($count)
+    {
         $gitStatus = $this->gitRepository->getStatus(true);
         $countOfUntrackedFiles = count($gitStatus);
         if ($countOfUntrackedFiles != $count) {
             $adverb = $countOfUntrackedFiles < $count ? "less" : "more";
-            PHPUnit_Framework_Assert::fail("In the working directory is $adverb untracked files ($countOfUntrackedFiles) then expected ($count)");
+            PHPUnit_Framework_Assert::fail(
+                "In the working directory is $adverb untracked files ($countOfUntrackedFiles) then expected ($count)"
+            );
         }
     }
 
-    public function assertCleanWorkingDirectory() {
+    public function assertCleanWorkingDirectory()
+    {
         $gitStatus = $this->gitRepository->getStatus();
         if (!empty($gitStatus)) {
             PHPUnit_Framework_Assert::fail("Expected clean working directory but got:\n$gitStatus");
@@ -299,13 +333,15 @@ class CommitAsserter {
      *
      * @return Commit[]
      */
-    private function getNonIgnoredCommits() {
+    private function getNonIgnoredCommits()
+    {
         if (!$this->commitCache) {
             $commits = $this->gitRepository->log("{$this->startCommit->getHash()}..HEAD");
             if ($this->ignoreCommitsWithActions) {
                 $commits = array_filter($commits, function ($commit) {
                     $changeInfo = $this->getChangeInfo($commit);
-                    return $changeInfo instanceof UntrackedChangeInfo || !in_array(ChangeInfoUtils::getFullAction($changeInfo), $this->ignoreCommitsWithActions);
+                    return $changeInfo instanceof UntrackedChangeInfo
+                    || !in_array(ChangeInfoUtils::getFullAction($changeInfo), $this->ignoreCommitsWithActions);
                 });
             }
             $this->commitCache = array_values($commits); // array_values reindexes the array from zero
@@ -318,7 +354,8 @@ class CommitAsserter {
      * @param int $whichCommit See $whichCommitParameter documentation. The most recent commit by default.
      * @return Commit
      */
-    private function getCommit($whichCommit = 0) {
+    private function getCommit($whichCommit = 0)
+    {
         $nonIgnoredCommits = $this->getNonIgnoredCommits();
         $index = abs($whichCommit);
         if (isset($nonIgnoredCommits[$index])) {
@@ -335,7 +372,8 @@ class CommitAsserter {
      * @param Commit $commit
      * @return ChangeInfoEnvelope|UntrackedChangeInfo
      */
-    protected function getChangeInfo($commit) {
+    protected function getChangeInfo($commit)
+    {
         return ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
     }
 
@@ -346,11 +384,13 @@ class CommitAsserter {
      * @param int $whichCommit
      * @return string
      */
-    private function getRevRange($whichCommit) {
+    private function getRevRange($whichCommit)
+    {
 
         $nonIgnoredCommits = $this->getNonIgnoredCommits();
         $commit = $nonIgnoredCommits[abs($whichCommit)];
-        $revRange = "{$commit->getHash()}^..{$commit->getHash()}"; // will fail if commit is the first one but that should never happen
+        // will fail if commit is the first one but that should never happen
+        $revRange = "{$commit->getHash()}^..{$commit->getHash()}";
 
         return $revRange;
     }
@@ -362,7 +402,8 @@ class CommitAsserter {
      * @return mixed
      * @throws Exception
      */
-    private function expandPath($path, $whichCommit) {
+    private function expandPath($path, $whichCommit)
+    {
         if (Strings::contains($path, "%vpdb%")) {
             $path = str_replace("%vpdb%", "wp-content/vpdb", $path);
         }

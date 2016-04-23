@@ -18,7 +18,8 @@ use wpdb;
  *
  * TODO this needs a better name
  */
-abstract class SynchronizerBase implements Synchronizer {
+abstract class SynchronizerBase implements Synchronizer
+{
 
     const SYNCHRONIZE_MN_REFERENCES = 'mn-references';
     const DO_ENTITY_SPECIFIC_ACTIONS = 'entity-specific-actions';
@@ -63,7 +64,7 @@ abstract class SynchronizerBase implements Synchronizer {
     private $deletedIds;
 
     /**
-     * @param Storage $storage Specific Synchronizers will use specific storage types, see VersionPress\Synchronizers\SynchronizerFactory
+     * @param Storage $storage Specific Synchronizers will use specific storage types, see SynchronizerFactory
      * @param Database $database
      * @param EntityInfo $entityInfo
      * @param DbSchemaInfo $dbSchemaInfo
@@ -71,7 +72,15 @@ abstract class SynchronizerBase implements Synchronizer {
      * @param AbsoluteUrlReplacer $urlReplacer
      * @param ShortcodesReplacer $shortcodesReplacer
      */
-    function __construct(Storage $storage, Database $database, EntityInfo $entityInfo, DbSchemaInfo $dbSchemaInfo, VpidRepository $vpidRepository, AbsoluteUrlReplacer $urlReplacer, ShortcodesReplacer $shortcodesReplacer) {
+    public function __construct(
+        Storage $storage,
+        Database $database,
+        EntityInfo $entityInfo,
+        DbSchemaInfo $dbSchemaInfo,
+        VpidRepository $vpidRepository,
+        AbsoluteUrlReplacer $urlReplacer,
+        ShortcodesReplacer $shortcodesReplacer
+    ) {
         $this->storage = $storage;
         $this->database = $database;
         $this->entityInfo = $entityInfo;
@@ -84,14 +93,15 @@ abstract class SynchronizerBase implements Synchronizer {
         $this->prefixedTableName = $this->database->prefix . $this->tableName;
     }
 
-    function synchronize($task, $entitiesToSynchronize = null) {
+    public function synchronize($task, $entitiesToSynchronize = null)
+    {
         $this->passNumber += 1;
         $this->selectiveSynchronization = is_array($entitiesToSynchronize);
         $this->entitiesToSynchronize = $entitiesToSynchronize;
 
         $this->maybeInit($entitiesToSynchronize);
         $entities = $this->entities;
-        $remainingTasks = array();
+        $remainingTasks = [];
 
         if ($task === Synchronizer::SYNCHRONIZE_EVERYTHING) {
             $this->updateDatabase($entities);
@@ -133,7 +143,8 @@ abstract class SynchronizerBase implements Synchronizer {
         return $remainingTasks;
     }
 
-    private function maybeInit($entitiesToSynchronize) {
+    private function maybeInit($entitiesToSynchronize)
+    {
         if ($this->entities !== null) {
             return;
         }
@@ -152,17 +163,22 @@ abstract class SynchronizerBase implements Synchronizer {
      * @param $entitiesToSynchronize
      * @return array
      */
-    private function loadEntitiesFromStorage($entitiesToSynchronize) {
+    private function loadEntitiesFromStorage($entitiesToSynchronize)
+    {
         if ($this->selectiveSynchronization) {
-            $entities = array();
+            $entities = [];
             foreach ($entitiesToSynchronize as $entityToSynchronize) {
                 if ($this->storage->exists($entityToSynchronize['vp_id'], $entityToSynchronize['parent'])) {
-                    $entities[] = $this->storage->loadEntity($entityToSynchronize['vp_id'], $entityToSynchronize['parent']);
-                } else if ($this->storage->exists($entityToSynchronize['vp_id'], null)) {
-                    $entities[] = $this->storage->loadEntity($entityToSynchronize['vp_id'], null);
+                    $entities[] = $this->storage->loadEntity(
+                        $entityToSynchronize['vp_id'],
+                        $entityToSynchronize['parent']
+                    );
+                } else {
+                    if ($this->storage->exists($entityToSynchronize['vp_id'], null)) {
+                        $entities[] = $this->storage->loadEntity($entityToSynchronize['vp_id'], null);
+                    }
                 }
             }
-
         } else {
             $entities = $this->storage->loadAll();
         }
@@ -177,7 +193,8 @@ abstract class SynchronizerBase implements Synchronizer {
      * @param array $entities Entities as loaded from the storage
      * @return array Entities as transformed (if at all) by this synchronizer
      */
-    protected function transformEntities($entities) {
+    protected function transformEntities($entities)
+    {
         foreach ($entities as &$entity) {
             foreach ($entity as $field => $value) {
                 if (Strings::match($field, "/.*#[0-9a-f]+/i")) {
@@ -200,7 +217,8 @@ abstract class SynchronizerBase implements Synchronizer {
      *
      * @param $entities
      */
-    private function updateDatabase($entities) {
+    private function updateDatabase($entities)
+    {
         $entities = $this->filterEntities($entities);
 
         $this->addOrUpdateEntities($entities);
@@ -214,7 +232,8 @@ abstract class SynchronizerBase implements Synchronizer {
      * @param $entities
      * @return mixed
      */
-    protected function filterEntities($entities) {
+    protected function filterEntities($entities)
+    {
         $urlReplacer = $this->urlReplacer;
         return array_map(function ($entity) use ($urlReplacer) {
             return $urlReplacer->restore($entity);
@@ -222,7 +241,8 @@ abstract class SynchronizerBase implements Synchronizer {
     }
 
 
-    private function addOrUpdateEntities($entities) {
+    private function addOrUpdateEntities($entities)
+    {
         foreach ($entities as $entity) {
             $vpId = $entity['vp_id'];
             $isExistingEntity = $this->isExistingEntity($vpId);
@@ -235,12 +255,14 @@ abstract class SynchronizerBase implements Synchronizer {
         }
     }
 
-    private function updateEntityInDatabase($entity) {
+    private function updateEntityInDatabase($entity)
+    {
         $updateQuery = $this->buildUpdateQuery($entity);
         $this->executeQuery($updateQuery);
     }
 
-    private function createEntityInDatabase($entity) {
+    private function createEntityInDatabase($entity)
+    {
         $createQuery = $this->buildCreateQuery($entity);
         $this->executeQuery($createQuery);
         $id = $this->database->insert_id;
@@ -254,7 +276,8 @@ abstract class SynchronizerBase implements Synchronizer {
      * @param string $vpid
      * @return bool
      */
-    private function isExistingEntity($vpid) {
+    private function isExistingEntity($vpid)
+    {
         return (bool)$this->getId($vpid);
     }
 
@@ -264,16 +287,26 @@ abstract class SynchronizerBase implements Synchronizer {
      * @param $vpid
      * @return null|string Null if no mapping for a given `vp_id` is found
      */
-    private function getId($vpid) {
-        return $this->database->get_var("SELECT id FROM {$this->database->vp_id} WHERE `table` = \"{$this->tableName}\" AND vp_id = UNHEX('$vpid')");
+    private function getId($vpid)
+    {
+        return $this->database->get_var(
+            "SELECT id FROM {$this->database->vp_id} WHERE `table` = \"{$this->tableName}\" AND vp_id = UNHEX('$vpid')"
+        );
     }
 
-    private function buildUpdateQuery($updateData) {
+    private function buildUpdateQuery($updateData)
+    {
         $id = $updateData['vp_id'];
-        $query = "UPDATE {$this->prefixedTableName} JOIN (SELECT * FROM {$this->database->vp_id} WHERE `table` = '{$this->tableName}') filtered_vp_id ON {$this->prefixedTableName}.{$this->idColumnName} = filtered_vp_id.id SET";
+        $query = "UPDATE {$this->prefixedTableName}
+                  JOIN (SELECT * FROM {$this->database->vp_id} WHERE `table` = '{$this->tableName}') filtered_vp_id
+                  ON {$this->prefixedTableName}.{$this->idColumnName} = filtered_vp_id.id SET";
         foreach ($updateData as $key => $value) {
-            if ($key == $this->idColumnName) continue;
-            if (Strings::startsWith($key, 'vp_')) continue;
+            if ($key == $this->idColumnName) {
+                continue;
+            }
+            if (Strings::startsWith($key, 'vp_')) {
+                continue;
+            }
             $query .= " `$key` = " . (is_numeric($value) ? $value : '"' . $this->database->_escape($value) . '"') . ',';
         }
         $query[strlen($query) - 1] = ' '; // strip the last comma
@@ -281,7 +314,8 @@ abstract class SynchronizerBase implements Synchronizer {
         return $query;
     }
 
-    protected function buildCreateQuery($entity) {
+    protected function buildCreateQuery($entity)
+    {
         unset($entity[$this->idColumnName]);
         $columns = array_keys($entity);
         $columns = array_filter($columns, function ($column) {
@@ -294,7 +328,9 @@ abstract class SynchronizerBase implements Synchronizer {
         $query = "INSERT INTO {$this->prefixedTableName} ({$columnsString}) VALUES (";
 
         foreach ($columns as $column) {
-            $query .= (is_numeric($entity[$column]) ? $entity[$column] : '"' . $this->database->_escape($entity[$column]) . '"') . ", ";
+            $query .= (is_numeric($entity[$column])
+                    ? $entity[$column]
+                    : '"' . $this->database->_escape($entity[$column]) . '"') . ", ";
         }
 
         $query[strlen($query) - 2] = ' '; // strip the last comma
@@ -302,13 +338,15 @@ abstract class SynchronizerBase implements Synchronizer {
         return $query;
     }
 
-    private function createIdentifierRecord($vp_id, $id) {
+    private function createIdentifierRecord($vp_id, $id)
+    {
         $query = "INSERT INTO {$this->database->vp_id} (`table`, vp_id, id)
             VALUES (\"{$this->tableName}\", UNHEX('$vp_id'), $id)";
         $this->executeQuery($query);
     }
 
-    private function deleteEntitiesWhichAreNotInStorage($entities) {
+    private function deleteEntitiesWhichAreNotInStorage($entities)
+    {
         if ($this->selectiveSynchronization) {
             $savedVpIds = array_map(function ($entity) {
                 return $entity['vp_id'];
@@ -322,25 +360,29 @@ abstract class SynchronizerBase implements Synchronizer {
             $sql .= sprintf('AND HEX(vp_id) NOT IN ("%s")', join('", "', $savedVpIds));
 
             $ids = $this->database->get_col($sql);
-
         } else {
             $vpIdsUnhexed = array_map(function ($entity) {
                 return 'UNHEX("' . $entity['vp_id'] . '")';
             }, $entities);
 
-            $ids = $this->database->get_col("SELECT id FROM {$this->database->vp_id} " .
-                "WHERE `table` = \"{$this->tableName}\"" . (count($vpIdsUnhexed) > 0 ? "AND vp_id NOT IN (" . join(",", $vpIdsUnhexed) . ")" : ""));
+            $ids = $this->database->get_col(
+                "SELECT id FROM {$this->database->vp_id} WHERE `table` = \"{$this->tableName}\"" .
+                (count($vpIdsUnhexed) > 0 ? "AND vp_id NOT IN (" . join(",", $vpIdsUnhexed) . ")" : "")
+            );
         }
 
         $this->deletedIds = $ids;
 
-        if (count($ids) == 0)
+        if (count($ids) == 0) {
             return;
+        }
 
         $idsString = join(',', $ids);
 
         $this->executeQuery("DELETE FROM {$this->prefixedTableName} WHERE {$this->idColumnName} IN ({$idsString})");
-        $this->executeQuery("DELETE FROM {$this->database->vp_id} WHERE `table` = \"{$this->tableName}\" AND id IN ({$idsString})");
+        $this->executeQuery(
+            "DELETE FROM {$this->database->vp_id} WHERE `table` = \"{$this->tableName}\" AND id IN ({$idsString})"
+        );
     }
 
 
@@ -349,7 +391,8 @@ abstract class SynchronizerBase implements Synchronizer {
     // Step 3 - Fixing references
     //--------------------------------------
 
-    private function fixSimpleReferences($entities) {
+    private function fixSimpleReferences($entities)
+    {
         if (!$this->entityInfo->hasReferences) {
             return;
         }
@@ -365,10 +408,11 @@ abstract class SynchronizerBase implements Synchronizer {
      *
      * @param $entity
      */
-    private function fixSimpleReferencesOfOneEntity($entity) {
+    private function fixSimpleReferencesOfOneEntity($entity)
+    {
         $references = $this->entityInfo->references;
 
-        $referencesToUpdate = array();
+        $referencesToUpdate = [];
         foreach ($references as $reference => $referencedEntity) {
             $vpReference = "vp_$reference";
             if (isset($entity[$vpReference])) {
@@ -401,14 +445,17 @@ abstract class SynchronizerBase implements Synchronizer {
      *
      * @param $entity
      */
-    private function fixValueReferencesOfOneEntity($entity) {
+    private function fixValueReferencesOfOneEntity($entity)
+    {
         $references = $this->entityInfo->valueReferences;
 
-        $referencesToUpdate = array();
+        $referencesToUpdate = [];
         foreach ($references as $reference => $referencedEntity) {
-            list($sourceColumn, $sourceValue, $valueColumn) = array_values(ReferenceUtils::getValueReferenceDetails($reference));
+            list($sourceColumn, $sourceValue, $valueColumn) =
+                array_values(ReferenceUtils::getValueReferenceDetails($reference));
 
-            if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue && isset($entity[$valueColumn])) {
+            if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue
+                && isset($entity[$valueColumn])) {
                 $referencesToUpdate[$valueColumn] = $entity[$valueColumn];
             }
         }
@@ -433,7 +480,8 @@ abstract class SynchronizerBase implements Synchronizer {
         $this->database->query($updateSql);
     }
 
-    private function fixMnReferences($entities) {
+    private function fixMnReferences($entities)
+    {
         $referencesToSave = $this->getExistingMnReferences($entities);
         $vpIdsToLoad = $this->getAllVpIdsUsedInReferences($referencesToSave);
         $idMap = $this->getIdsForVpIds($vpIdsToLoad);
@@ -459,16 +507,20 @@ abstract class SynchronizerBase implements Synchronizer {
                 return "($sourceId, $targetId)";
             }, $relations);
 
-            $sql = sprintf("SELECT id FROM %s WHERE HEX(vp_id) IN ('%s')",
+            $sql = sprintf(
+                "SELECT id FROM %s WHERE HEX(vp_id) IN ('%s')",
                 $this->getPrefixedTableName('vp_id'),
                 join("', '", array_map(function ($entity) {
                     return $entity['vp_id'];
-                }, $entities)));
+                }, $entities))
+            );
             $processedIds = array_merge($this->database->get_col($sql), $this->deletedIds);
 
             if ($this->selectiveSynchronization) {
                 if (count($processedIds) > 0) {
-                    $this->database->query("DELETE FROM $prefixedTable WHERE $sourceColumn IN (" . join(", ", $processedIds) . ")");
+                    $this->database->query(
+                        "DELETE FROM $prefixedTable WHERE $sourceColumn IN (" . join(", ", $processedIds) . ")"
+                    );
                 }
             } else {
                 $this->database->query("TRUNCATE TABLE $prefixedTable");
@@ -482,9 +534,10 @@ abstract class SynchronizerBase implements Synchronizer {
         return true;
     }
 
-    private function getIdsForVpIds($referencesToUpdate) {
+    private function getIdsForVpIds($referencesToUpdate)
+    {
         if (count($referencesToUpdate) === 0) {
-            return array(array(0, 0));
+            return [[0, 0]];
         }
 
         $vpIdTable = $this->getPrefixedTableName('vp_id');
@@ -494,8 +547,11 @@ abstract class SynchronizerBase implements Synchronizer {
 
         $vpIdsRestriction = join(', ', $vpIds);
 
-        $result = $this->database->get_results("SELECT HEX(vp_id), id FROM $vpIdTable WHERE vp_id IN ($vpIdsRestriction)", ARRAY_N);
-        $result[] = array(0, 0);
+        $result = $this->database->get_results(
+            "SELECT HEX(vp_id), id FROM $vpIdTable WHERE vp_id IN ($vpIdsRestriction)",
+            ARRAY_N
+        );
+        $result[] = [0, 0];
         return array_combine(ArrayUtils::column($result, 0), ArrayUtils::column($result, 1));
     }
 
@@ -504,12 +560,13 @@ abstract class SynchronizerBase implements Synchronizer {
     //--------------------------------------
 
     /**
-     * Specific Synchronizers might do entity-specific actions, for example, VersionPress\Synchronizers\PostsSynchronizer
+     * Specific Synchronizers might do entity-specific actions, for example, PostsSynchronizer
      * updates comment count in the database (something we don't track in the storage).
      *
      * @return bool If false, the method will be called again in a second pass.
      */
-    protected function doEntitySpecificActions() {
+    protected function doEntitySpecificActions()
+    {
         return true;
     }
 
@@ -517,7 +574,8 @@ abstract class SynchronizerBase implements Synchronizer {
      * Specific Entities might contain ignored colums, which values should be computed on synchronizing process
      * for example, VersionPress\Synchronizers\PostsSynchronizer
      */
-    protected function computeColumnValues() {
+    protected function computeColumnValues()
+    {
         foreach ($this->entityInfo->getIgnoredColumns() as $columnName => $function) {
             call_user_func($function, $this->database);
         }
@@ -528,7 +586,8 @@ abstract class SynchronizerBase implements Synchronizer {
     //--------------------------------------
 
 
-    private function getPrefixedTableName($tableName) {
+    private function getPrefixedTableName($tableName)
+    {
         return $this->database->prefix . $tableName;
     }
 
@@ -538,7 +597,8 @@ abstract class SynchronizerBase implements Synchronizer {
      * @param $query
      * @return false|int
      */
-    private function executeQuery($query) {
+    private function executeQuery($query)
+    {
         $result = $this->database->query($query);
         return $result;
     }
@@ -547,10 +607,11 @@ abstract class SynchronizerBase implements Synchronizer {
      * @param $entities
      * @return array
      */
-    private function getExistingMnReferences($entities) {
+    private function getExistingMnReferences($entities)
+    {
         $mnReferences = $this->entityInfo->mnReferences;
 
-        $referencesToFix = array();
+        $referencesToFix = [];
         foreach ($entities as $entity) {
             foreach ($mnReferences as $reference => $referencedEntity) {
                 $vpReference = "vp_$referencedEntity";
@@ -559,10 +620,10 @@ abstract class SynchronizerBase implements Synchronizer {
                 }
 
                 foreach ($entity[$vpReference] as $referencedVpId) {
-                    $referencesToFix[$reference][] = array(
+                    $referencesToFix[$reference][] = [
                         'vp_id' => $entity['vp_id'],
                         'referenced_vp_id' => $referencedVpId
-                    );
+                    ];
                 }
             }
         }
@@ -573,8 +634,9 @@ abstract class SynchronizerBase implements Synchronizer {
      * @param $referencesToSave
      * @return array
      */
-    private function getAllVpIdsUsedInReferences($referencesToSave) {
-        $vpIds = array();
+    private function getAllVpIdsUsedInReferences($referencesToSave)
+    {
+        $vpIds = [];
         foreach ($referencesToSave as $relations) {
             foreach ($relations as $relation) {
                 $vpIds[] = $relation['vp_id'];
@@ -585,7 +647,8 @@ abstract class SynchronizerBase implements Synchronizer {
         return $vpIds;
     }
 
-    private function idMapContainsAllVpIds($idMap, $vpIds) {
+    private function idMapContainsAllVpIds($idMap, $vpIds)
+    {
         foreach ($vpIds as $vpId) {
             if (!isset($idMap[$vpId])) {
                 return false;
@@ -594,7 +657,8 @@ abstract class SynchronizerBase implements Synchronizer {
         return true;
     }
 
-    private function restoreShortcodesInAllEntities() {
+    private function restoreShortcodesInAllEntities()
+    {
         foreach ($this->entities as $entity) {
             $replacedEntity = $this->shortcodesReplacer->restoreShortcodesInEntity($this->entityName, $entity);
             if ($entity != $replacedEntity) {

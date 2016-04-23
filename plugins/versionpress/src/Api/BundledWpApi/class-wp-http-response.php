@@ -1,4 +1,6 @@
 <?php
+// @codingStandardsIgnoreFile
+
 /**
  * HTTP API: WP_HTTP_Response class
  *

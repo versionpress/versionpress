@@ -1,4 +1,5 @@
 <?php
+// @codingStandardsIgnoreFile
 
 if ( ! function_exists( 'json_last_error_msg' ) ) :
     /**

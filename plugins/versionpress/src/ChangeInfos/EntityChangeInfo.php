@@ -17,7 +17,8 @@ namespace VersionPress\ChangeInfos;
  *   tags are used when the commit is read later and human-friendly message is rendered in the UI.
  *
  */
-abstract class EntityChangeInfo extends TrackedChangeInfo {
+abstract class EntityChangeInfo extends TrackedChangeInfo
+{
 
     /** @var string */
     private $entityName;
@@ -33,13 +34,15 @@ abstract class EntityChangeInfo extends TrackedChangeInfo {
      * @param string $action Action, the middle segment of the VP-Action tag
      * @param string $entityId VPID, the last segment od the VP-Action tag
      */
-    public function __construct($entityName, $action, $entityId) {
+    public function __construct($entityName, $action, $entityId)
+    {
         $this->entityName = $entityName;
         $this->action = $action;
         $this->entityId = $entityId;
     }
 
-    public function getEntityName() {
+    public function getEntityName()
+    {
         return $this->entityName;
     }
 
@@ -50,7 +53,8 @@ abstract class EntityChangeInfo extends TrackedChangeInfo {
      *
      * @return string
      */
-    public function getAction() {
+    public function getAction()
+    {
         return $this->action;
     }
 
@@ -60,29 +64,32 @@ abstract class EntityChangeInfo extends TrackedChangeInfo {
      *
      * @return string
      */
-    public function getEntityId() {
+    public function getEntityId()
+    {
         return $this->entityId;
     }
 
     /**
-     * Used to construct a commit message body. This base class implementation is enough for all EntityChangeInfo subclasses
-     * so thay don't override it. What they need to provide is the {@link getCustomTags()} implementation.
+     * Used to construct a commit message body. This base class implementation is enough for all EntityChangeInfo
+     * subclasses so thay don't override it. What they need to provide is the {@link getCustomTags()} implementation.
      *
      * @return string
      */
-    protected function getActionTagValue() {
+    protected function getActionTagValue()
+    {
         return "{$this->getEntityName()}/{$this->getAction()}/{$this->getEntityId()}";
     }
 
-    public function getChangedFiles() {
-        $change = array(
+    public function getChangedFiles()
+    {
+        $change = [
             "type" => "storage-file",
             "entity" => $this->getEntityName(),
             "id" => $this->getEntityId(),
             "parent-id" => $this->getParentId()
-        );
+        ];
 
-        return array($change);
+        return [$change];
     }
 
     /**
@@ -91,7 +98,8 @@ abstract class EntityChangeInfo extends TrackedChangeInfo {
      *
      * @return string|null
      */
-    public function getParentId() {
+    public function getParentId()
+    {
         return null;
     }
 }

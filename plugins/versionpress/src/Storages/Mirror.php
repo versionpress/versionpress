@@ -8,18 +8,20 @@ use VersionPress\Utils\AbsoluteUrlReplacer;
  * Reflects database changes to storages. It is a facade / entry point to a set
  * of storages {@link VersionPress\Storages\Storage storages} that implement the actual functionality.
  */
-class Mirror {
+class Mirror
+{
 
     /** @var StorageFactory */
     private $storageFactory;
 
     /** @var TrackedChangeInfo[] */
-    private $changeList = array();
+    private $changeList = [];
 
     /** @var AbsoluteUrlReplacer */
     private $urlReplacer;
 
-    function __construct(StorageFactory $storageFactory, AbsoluteUrlReplacer $urlReplacer) {
+    public function __construct(StorageFactory $storageFactory, AbsoluteUrlReplacer $urlReplacer)
+    {
         $this->storageFactory = $storageFactory;
         $this->urlReplacer = $urlReplacer;
     }
@@ -32,7 +34,8 @@ class Mirror {
      * @param string $entityName Entity type determines the storage used
      * @param array $data Data passed to the `VersionPress\Storages\Storage::save()` method
      */
-    public function save($entityName, $data) {
+    public function save($entityName, $data)
+    {
         $storage = $this->storageFactory->getStorage($entityName);
         if ($storage == null) {
             return;
@@ -53,7 +56,8 @@ class Mirror {
      * @param string $entityName Entity type determines the storage used
      * @param array $restriction Restriction passed to the `VersionPress\Storages\Storage::delete()` method
      */
-    public function delete($entityName, $restriction) {
+    public function delete($entityName, $restriction)
+    {
         $storage = $this->storageFactory->getStorage($entityName);
         if ($storage == null) {
             return;
@@ -71,7 +75,8 @@ class Mirror {
      *
      * @return TrackedChangeInfo[]
      */
-    public function getChangeList() {
+    public function getChangeList()
+    {
         return $this->changeList;
     }
 
@@ -84,10 +89,12 @@ class Mirror {
      * @param array $data Data passed to VersionPress\Storages\Storage::shouldBeSaved()
      * @return bool
      */
-    public function shouldBeSaved($entityName, $data) {
+    public function shouldBeSaved($entityName, $data)
+    {
         $storage = $this->storageFactory->getStorage($entityName);
-        if ($storage === null)
+        if ($storage === null) {
             return false;
+        }
         return $storage->shouldBeSaved($data);
     }
 
@@ -95,8 +102,8 @@ class Mirror {
      * Dumps a list of {@see VersionPress\ChangeInfos\ChangeInfo} objects captured by this mirror.
      * Capturing new changes starts again from this point.
      */
-    public function flushChangeList() {
-        $this->changeList = array();
+    public function flushChangeList()
+    {
+        $this->changeList = [];
     }
-
 }

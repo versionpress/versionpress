@@ -2,7 +2,8 @@
 
 namespace VersionPress\DI;
 
-final class VersionPressServices {
+final class VersionPressServices
+{
     const STORAGE_FACTORY = 'storage-factory';
     const MIRROR = 'mirror';
     const DB_SCHEMA = 'db-schema';
@@ -21,6 +22,7 @@ final class VersionPressServices {
     const SHORTCODES_INFO = 'shortcodes-info';
     const SQL_QUERY_PARSER = 'sql-query-parser';
 
-    private function __construct() {
+    private function __construct()
+    {
     }
 }

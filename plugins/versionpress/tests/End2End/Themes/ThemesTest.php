@@ -6,7 +6,8 @@ use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 
-class ThemesTest extends End2EndTestCase {
+class ThemesTest extends End2EndTestCase
+{
 
     /**
      * @see IThemesTestWorker::setThemeInfo()
@@ -19,22 +20,23 @@ class ThemesTest extends End2EndTestCase {
     private static $worker;
 
 
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass()
+    {
         parent::setUpBeforeClass();
         $testDataPath = __DIR__ . '/../test-data';
-        self::$themeInfo = array(
+        self::$themeInfo = [
             'zipfile' => realpath($testDataPath . '/test-theme.zip'),
             'stylesheet' => 'test-theme',
             'name' => 'Test Theme',
             'affected-path' => 'test-theme/*',
-        );
+        ];
 
-        self::$secondThemeInfo = array(
+        self::$secondThemeInfo = [
             'zipfile' => realpath($testDataPath . '/test-theme-2.zip'),
             'stylesheet' => 'test-theme-2',
             'name' => 'Test Theme 2',
             'affected-path' => 'test-theme-2/*',
-        );
+        ];
 
         self::$worker->setThemeInfo(self::$themeInfo);
         self::$worker->setSecondThemeInfo(self::$secondThemeInfo);
@@ -44,7 +46,8 @@ class ThemesTest extends End2EndTestCase {
      * @test
      * @testdox Uploading theme creates 'theme/install' action
      */
-    public function uploadingThemeCreatesThemeInstallAction() {
+    public function uploadingThemeCreatesThemeInstallAction()
+    {
         self::$worker->prepare_uploadTheme();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -63,7 +66,8 @@ class ThemesTest extends End2EndTestCase {
      * @test
      * @testdox Switching theme create 'theme/switch' action
      */
-    public function switchingThemeCreatesThemeSwitchAction() {
+    public function switchingThemeCreatesThemeSwitchAction()
+    {
         self::$worker->prepare_switchTheme();
         $currentTheme = self::$wpAutomation->getCurrentTheme();
 
@@ -74,7 +78,7 @@ class ThemesTest extends End2EndTestCase {
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("theme/switch");
         $commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
-        $commitAsserter->assertCommitPath(array("A", "M"), "%vpdb%/options/cu/current_theme.ini");
+        $commitAsserter->assertCommitPath(["A", "M"], "%vpdb%/options/cu/current_theme.ini");
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
 
@@ -85,7 +89,8 @@ class ThemesTest extends End2EndTestCase {
      * @test
      * @testdox Deleting theme creates 'theme/delete' action
      */
-    public function deletingThemeCreatesThemeDeleteAction() {
+    public function deletingThemeCreatesThemeDeleteAction()
+    {
         self::$worker->prepare_deleteTheme();
 
         $commitAsserter = new CommitAsserter($this->gitRepository);
@@ -104,7 +109,8 @@ class ThemesTest extends End2EndTestCase {
      * @test
      * @testdox Uploading two themes creates a bulk action
      */
-    public function uploadingTwoThemesCreatesBulkAction() {
+    public function uploadingTwoThemesCreatesBulkAction()
+    {
         self::$worker->prepare_uploadTwoThemes();
         $commitAsserter = new CommitAsserter($this->gitRepository);
 
@@ -122,7 +128,8 @@ class ThemesTest extends End2EndTestCase {
      * @test
      * @testdox Deleting two themes creates a bulk action
      */
-    public function deletingTwoThemesCreatesBulkAction() {
+    public function deletingTwoThemesCreatesBulkAction()
+    {
         self::$worker->prepare_deleteTwoThemes();
         $commitAsserter = new CommitAsserter($this->gitRepository);
 

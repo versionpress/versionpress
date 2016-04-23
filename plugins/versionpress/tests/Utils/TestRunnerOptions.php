@@ -11,7 +11,8 @@ namespace VersionPress\Tests\Utils;
  *
  * Command-line parameters take precedence over env variables.
  */
-class TestRunnerOptions {
+class TestRunnerOptions
+{
 
     /**
      * @var TestRunnerOptions
@@ -23,19 +24,21 @@ class TestRunnerOptions {
      */
     public $forceSetup;
 
-    protected function __construct() {
+    protected function __construct()
+    {
     }
 
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (!self::$instance) {
             self::$instance = new TestRunnerOptions();
         }
         return self::$instance;
     }
 
-    public function configureInstance($optionsSpecification) {
+    public function configureInstance($optionsSpecification)
+    {
         foreach ($optionsSpecification as $testingOption => $supportedValues) {
-
             $envVarValue = $this->getEnvVarValue($testingOption);
             if ($envVarValue !== false) {
                 $this->$testingOption = $envVarValue;
@@ -45,7 +48,6 @@ class TestRunnerOptions {
             if ($cliValue !== false) {
                 $this->$testingOption = $cliValue;
             }
-
         }
     }
 
@@ -55,20 +57,22 @@ class TestRunnerOptions {
      * @param string $testingOptionInPropertyConvention Option name in property convention, e.g., 'optionName'
      * @return string|bool False if env var does not exist, string otherwise
      */
-    private function getEnvVarValue($testingOptionInPropertyConvention) {
+    private function getEnvVarValue($testingOptionInPropertyConvention)
+    {
         return getenv(OptionsConventionConverter::getEnvVarOptionName($testingOptionInPropertyConvention));
     }
 
     /**
-     * Wrapper around `getopt()` that supports property naming convention, e.g., 'optionName' instead of '--option-name'.
+     * Wrapper around `getopt()` that supports property naming convention, e.g., 'optionName' instead of '--option-name'
      *
      * @param $testingOptionInPropertyConvention
      * @return string|bool False if CLI argument was missing or string with its value
      */
-    private function getCliArgValue($testingOptionInPropertyConvention) {
+    private function getCliArgValue($testingOptionInPropertyConvention)
+    {
 
         $cliOptionName = OptionsConventionConverter::getCliOptionName($testingOptionInPropertyConvention);
-        $cliOptions = getopt("", array("$cliOptionName::"));
+        $cliOptions = getopt("", ["$cliOptionName::"]);
 
         if (!empty($cliOptions)) {
             return $cliOptions[$cliOptionName];
@@ -76,6 +80,4 @@ class TestRunnerOptions {
             return false;
         }
     }
-
-
 }

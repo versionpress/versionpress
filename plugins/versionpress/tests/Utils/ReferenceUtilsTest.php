@@ -2,15 +2,16 @@
 
 namespace VersionPress\Tests\Utils;
 
-
 use VersionPress\Utils\ReferenceUtils;
 
-class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase {
+class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase
+{
 
     /**
      * @test
      */
-    public function simpleNumericKey() {
+    public function simpleNumericKey()
+    {
         $pathInStructure = '[0]';
         $value = [0 => 'value'];
 
@@ -22,7 +23,8 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function nestedNumericKeys() {
+    public function nestedNumericKeys()
+    {
         $pathInStructure = '[0][1]';
         $value = [0 => [1 => 'value']];
 
@@ -34,7 +36,8 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function moreNestedNumericKeys() {
+    public function moreNestedNumericKeys()
+    {
         $pathInStructure = '[0][1][2]';
         $value = [0 => [1 => [2 => 'value']]];
 
@@ -46,7 +49,8 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function combinedNumericAndStringKeys() {
+    public function combinedNumericAndStringKeys()
+    {
         $pathInStructure = '[0]["some-key"][1]';
         $value = [0 => ['some-key' => [1 => 'value']]];
 
@@ -58,7 +62,8 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function structureWithNotMatchingData() {
+    public function structureWithNotMatchingData()
+    {
         $pathInStructure = '[0]["some-key"][1]';
         $value = [
             0 => ['some-key' => [1 => 'value']],
@@ -73,7 +78,8 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function simpleRegex() {
+    public function simpleRegex()
+    {
         $pathInStructure = '[/\d+/]';
         $value = [
             0 => 'value',
@@ -88,7 +94,8 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function simpleRegexWithNotMatchingData() {
+    public function simpleRegexWithNotMatchingData()
+    {
         $pathInStructure = '[/\d+/]';
         $value = [
             0 => 'value',
@@ -105,7 +112,8 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function morePatternsWithNotMatchingData() {
+    public function morePatternsWithNotMatchingData()
+    {
         $pathInStructure = '[/\d+/][/some-.*/][/[0-9]+/]';
         $value = [
             0 => ['some-key' => [1 => 'value']],

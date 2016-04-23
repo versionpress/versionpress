@@ -5,8 +5,8 @@ use Nette\Utils\Strings;
 use VersionPress\Utils\PathUtils;
 use VersionPress\Utils\StringUtils;
 
-
-class MergeDriverInstaller {
+class MergeDriverInstaller
+{
 
     const DRIVER_BASH = 'bash';
     const DRIVER_PHP = 'php';
@@ -33,9 +33,11 @@ class MergeDriverInstaller {
      * @param string $rootDir Where to install the driver
      * @param string $pluginDir Path to VersionPress (plugin) - used to look up templates and merge drivers
      * @param string $vpdbDir Location of the VPDB dir (where the INI files are)
-     * @param string $driver DRIVER_BASH | DRIVER_PHP | DRIVER_AUTO (default; will use PHP driver for Windows, Bash otherwise)
+     * @param string $driver DRIVER_BASH | DRIVER_PHP | DRIVER_AUTO (default; will use PHP driver for Windows,
+     *                       Bash otherwise)
      */
-    public static function installMergeDriver($rootDir, $pluginDir, $vpdbDir, $driver = self::DRIVER_AUTO) {
+    public static function installMergeDriver($rootDir, $pluginDir, $vpdbDir, $driver = self::DRIVER_AUTO)
+    {
         self::installGitattributes($rootDir, $pluginDir, $vpdbDir);
         self::installGitConfig($rootDir, $pluginDir, $driver);
     }
@@ -49,25 +51,26 @@ class MergeDriverInstaller {
      * @param string $pluginDir
      * @param string $vpdbDir
      */
-    private static function installGitattributes($rootDir, $pluginDir, $vpdbDir) {
+    private static function installGitattributes($rootDir, $pluginDir, $vpdbDir)
+    {
 
         $gitattributesPath = $rootDir . '/.gitattributes';
         $gitattributesContents = file_get_contents($pluginDir . '/src/Initialization/.gitattributes.tpl');
 
-        $gitattributesVariables = array(
+        $gitattributesVariables = [
             'vpdb-dir' => rtrim(ltrim(PathUtils::getRelativePath($rootDir, $vpdbDir), '.'), '/\\')
-        );
-        $gitattributesContents = "\n" . StringUtils::fillTemplateString($gitattributesVariables, $gitattributesContents);
+        ];
+        $gitattributesContents = StringUtils::fillTemplateString($gitattributesVariables, $gitattributesContents);
 
-        $appendFlag = null;
         if (is_file($gitattributesPath)) {
-            $appendFlag = FILE_APPEND;
-            if (strpos(file_get_contents($gitattributesPath), 'merge=vp-ini') !== false) {
+            $gitAttributesFileContents = file_get_contents($gitattributesPath);
+            if (strpos($gitAttributesFileContents, $gitattributesContents) !== false) {
                 return;
             }
+            $gitattributesContents = $gitattributesContents . $gitAttributesFileContents;
         }
 
-        file_put_contents($gitattributesPath, $gitattributesContents, $appendFlag);
+        file_put_contents($gitattributesPath, $gitattributesContents);
     }
 
 
@@ -78,7 +81,8 @@ class MergeDriverInstaller {
      * @param string $pluginDir
      * @param string $driver
      */
-    private static function installGitConfig($rootDir, $pluginDir, $driver) {
+    private static function installGitConfig($rootDir, $pluginDir, $driver)
+    {
 
         $gitconfigPath = $rootDir . '/.git/config';
         if (strpos(file_get_contents($gitconfigPath), '[merge "vp-ini"]') !== false) {
@@ -87,13 +91,14 @@ class MergeDriverInstaller {
         $gitconfigContents = file_get_contents($pluginDir . '/src/Initialization/gitconfig.tpl');
 
         $mergeDriverScript = '';
-        if ($driver == MergeDriverInstaller::DRIVER_BASH || ($driver == MergeDriverInstaller::DRIVER_AUTO && DIRECTORY_SEPARATOR == '/')) {
+        if ($driver == MergeDriverInstaller::DRIVER_BASH
+            || ($driver == MergeDriverInstaller::DRIVER_AUTO && DIRECTORY_SEPARATOR == '/')) {
             $mergeDriverScript = $pluginDir . '/src/Git/merge-drivers/ini-merge.sh';
             chmod($mergeDriverScript, 0750);
         }
 
-        if ($driver == MergeDriverInstaller::DRIVER_PHP || ($driver == MergeDriverInstaller::DRIVER_AUTO && DIRECTORY_SEPARATOR == '\\')) {
-
+        if ($driver == MergeDriverInstaller::DRIVER_PHP
+            || ($driver == MergeDriverInstaller::DRIVER_AUTO && DIRECTORY_SEPARATOR == '\\')) {
             // Finding the PHP binary is a bit tricky because web server requests don't use the main PHP binary at all
             // (they either use `mod_php` or call `php-cgi`). PHP_BINARY is only correct when the process
             // is initiated from the command line, e.g., via WP-CLI when cloning.
@@ -108,9 +113,9 @@ class MergeDriverInstaller {
             $mergeDriverScript = '"' . $phpBinary . '" "' . $pluginDir . '/src/Git/merge-drivers/ini-merge.php' . '"';
         }
 
-        $gitconfigVariables = array(
+        $gitconfigVariables = [
             'merge-driver-script' => str_replace('\\', '/', $mergeDriverScript)
-        );
+        ];
 
         $gitconfigContents = StringUtils::fillTemplateString($gitconfigVariables, $gitconfigContents);
         file_put_contents($gitconfigPath, $gitconfigContents, FILE_APPEND);
@@ -122,22 +127,37 @@ class MergeDriverInstaller {
      * and .git/config.
      *
      * @param string $rootDir
+     * @param string $pluginDir
+     * @param string $vpdbDir
      */
-    public static function uninstallMergeDriver($rootDir) {
+    public static function uninstallMergeDriver($rootDir, $pluginDir, $vpdbDir)
+    {
         $gitconfigPath = $rootDir . '/.git/config';
         $gitattributesPath = $rootDir . '/.gitattributes';
 
+        $gitattributesContents = file_get_contents($pluginDir . '/src/Initialization/.gitattributes.tpl');
+
+        $gitattributesVariables = [
+            'vpdb-dir' => rtrim(ltrim(PathUtils::getRelativePath($rootDir, $vpdbDir), '.'), '/\\')
+        ];
+        $gitattributesContents = StringUtils::fillTemplateString($gitattributesVariables, $gitattributesContents);
+
         if (file_exists($gitattributesPath)) {
             $gitAttributes = file_get_contents($gitattributesPath);
-            $gitAttributes = preg_replace('/(.*)merge=vp-ini/', '', $gitAttributes);
-            file_put_contents($gitattributesPath, $gitAttributes);
+            $gitAttributes = str_replace($gitattributesContents, '', $gitAttributes);
+            if (trim($gitAttributes) === '') {
+                unlink($gitattributesPath);
+            } else {
+                file_put_contents($gitattributesPath, $gitAttributes);
+            }
         }
 
-        $gitConfig = file_get_contents($gitconfigPath);
-        // https://regex101.com/r/eJ4rJ5/4
-        $mergeDriverRegex = "/(\\[merge \\\"vp\\-ini\\\"\\]\\r?\\n)([^\\[]*)/";
-        $gitConfig = preg_replace($mergeDriverRegex, '', $gitConfig, 1);
-        file_put_contents($gitconfigPath, $gitConfig);
+        if (file_exists($gitconfigPath)) {
+            $gitConfig = file_get_contents($gitconfigPath);
+            // https://regex101.com/r/eJ4rJ5/4
+            $mergeDriverRegex = "/(\\[merge \\\"vp\\-ini\\\"\\]\\r?\\n)([^\\[]*)/";
+            $gitConfig = preg_replace($mergeDriverRegex, '', $gitConfig, 1);
+            file_put_contents($gitconfigPath, $gitConfig);
+        }
     }
-
 }

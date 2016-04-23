@@ -4,54 +4,57 @@ namespace VersionPress\Tests\Unit;
 
 use VersionPress\Database\EntityInfo;
 
-class EntityInfoTest extends \PHPUnit_Framework_TestCase {
+class EntityInfoTest extends \PHPUnit_Framework_TestCase
+{
 
-    private $entitySchema = array(
-        'some-entity' => array(
+    private $entitySchema = [
+        'some-entity' => [
             'vpid' => 'column',
-            'frequently-written' => array(
+            'frequently-written' => [
                 'some_field: value other_field: a',
-                array(
+                [
                     'query' => 'other_field: value',
                     'interval' => '5 min'
-                )
-            ),
-            'ignored-entities' => array(
+                ]
+            ],
+            'ignored-entities' => [
                 'some_field: value other_field: a',
                 'other_field: value'
-            ),
-            'ignored-columns' => array(
+            ],
+            'ignored-columns' => [
                 'ignored_column',
-                array('other_ignored_column' => '@\SomeNamespace\SomeClass::someFunction')
-            )
-        )
-    );
+                ['other_ignored_column' => '@\SomeNamespace\SomeClass::someFunction']
+            ]
+        ]
+    ];
 
     /** @var EntityInfo */
     private $entityInfo;
 
-    protected function setUp() {
+    protected function setUp()
+    {
         $this->entityInfo = new EntityInfo($this->entitySchema);
     }
 
     /**
      * @test
      */
-    public function rulesAndIntervalsOfFrequentlyWrittenEntitiesEqualEntitySchema() {
-        $expectedRules = array(
-            array(
+    public function rulesAndIntervalsOfFrequentlyWrittenEntitiesEqualEntitySchema()
+    {
+        $expectedRules = [
+            [
                 'rule' =>
-                    array(
-                        'some_field' => array('value'),
-                        'other_field' => array('a'),
-                    ),
+                    [
+                        'some_field' => ['value'],
+                        'other_field' => ['a'],
+                    ],
                 'interval' => 'hourly',
-            ),
-            array(
-                'rule' => array('other_field' => array('value')),
+            ],
+            [
+                'rule' => ['other_field' => ['value']],
                 'interval' => '5 min',
-            )
-        );
+            ]
+        ];
 
         $this->assertSame($expectedRules, $this->entityInfo->getRulesAndIntervalsForFrequentlyWrittenEntities());
     }
@@ -59,16 +62,17 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function rulesOfIgnoredEntitiesEqualEntitySchema() {
-        $expectedRules = array(
-            array(
-                'some_field' => array('value'),
-                'other_field' => array('a'),
-            ),
-            array(
-                'other_field' => array('value')
-            ),
-        );
+    public function rulesOfIgnoredEntitiesEqualEntitySchema()
+    {
+        $expectedRules = [
+            [
+                'some_field' => ['value'],
+                'other_field' => ['a'],
+            ],
+            [
+                'other_field' => ['value']
+            ],
+        ];
 
         $this->assertSame($expectedRules, $this->entityInfo->getRulesForIgnoredEntities());
     }
@@ -76,11 +80,12 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function frequentlyWrittenEntityIsCorrectlyIdentified() {
-        $entity = array(
+    public function frequentlyWrittenEntityIsCorrectlyIdentified()
+    {
+        $entity = [
             'some_field' => 'value',
             'other_field' => 'a',
-        );
+        ];
 
         $this->assertTrue($this->entityInfo->isFrequentlyWrittenEntity($entity));
     }
@@ -88,10 +93,11 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function commonEntityIsNotFalselyIdentifiedAsFrequentlyWritten() {
-        $entity = array(
+    public function commonEntityIsNotFalselyIdentifiedAsFrequentlyWritten()
+    {
+        $entity = [
             'some_field' => 'value'
-        );
+        ];
 
         $this->assertFalse($this->entityInfo->isFrequentlyWrittenEntity($entity));
     }
@@ -99,11 +105,12 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function ignoredEntityIsCorrectlyIdentified() {
-        $entity = array(
+    public function ignoredEntityIsCorrectlyIdentified()
+    {
+        $entity = [
             'some_field' => 'value',
             'other_field' => 'a',
-        );
+        ];
 
         $this->assertTrue($this->entityInfo->isIgnoredEntity($entity));
     }
@@ -111,17 +118,18 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function commonEntityIsNotFalselyIdentifiedAsIgnored() {
-        $entity = array(
+    public function commonEntityIsNotFalselyIdentifiedAsIgnored()
+    {
+        $entity = [
             'some_field' => 'value'
-        );
+        ];
 
         $this->assertFalse($this->entityInfo->isIgnoredEntity($entity));
 
-        $entity = array(
+        $entity = [
             'some_field' => 'value',
             'other_field' => 'b',
-        );
+        ];
 
         $this->assertFalse($this->entityInfo->isIgnoredEntity($entity));
     }
@@ -129,7 +137,11 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function ignoredColumnsAreIdentifiedCorrectly() {
-        $this->assertEquals([], array_diff(array('ignored_column', 'other_ignored_column'), array_keys($this->entityInfo->getIgnoredColumns())));
+    public function ignoredColumnsAreIdentifiedCorrectly()
+    {
+        $this->assertEquals([], array_diff(
+            ['ignored_column', 'other_ignored_column'],
+            array_keys($this->entityInfo->getIgnoredColumns())
+        ));
     }
 }

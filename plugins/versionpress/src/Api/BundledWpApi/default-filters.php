@@ -1,5 +1,5 @@
 <?php
-
+// @codingStandardsIgnoreFile
 
 // REST API filters.
 add_action( 'xmlrpc_rsd_apis',            'rest_output_rsd' );

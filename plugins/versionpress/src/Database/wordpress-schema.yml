@@ -75,6 +75,8 @@ term_taxonomy:
     term_id: term
   mn-references:
     ~term_relationships.object_id: post
+  ignored-columns:
+    - count: '@\VersionPress\Synchronizers\TermTaxonomiesSynchronizer::fixPostsCount'
 
 usermeta:
   id: umeta_id
@@ -123,4 +125,7 @@ option:
     - 'option_name: auth_salt'
     - 'option_name: logged_in_key'
     - 'option_name: logged_in_salt'
+    - 'option_name: theme_switched'
     # All {$taxonomy}_children are also ignored - see OptionStorage
+  ignored-columns:
+    - option_id

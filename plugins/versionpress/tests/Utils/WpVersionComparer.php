@@ -6,7 +6,8 @@ use Icecave\SemVer\Comparator;
 use Icecave\SemVer\Version;
 use Nette\Utils\Strings;
 
-class WpVersionComparer {
+class WpVersionComparer
+{
     /**
      * Compares two WP versions.
      * Returns:
@@ -18,7 +19,8 @@ class WpVersionComparer {
      * @param string $v2
      * @return int
      */
-    public static function compare($v1, $v2) {
+    public static function compare($v1, $v2)
+    {
         $semver1 = Version::parse(self::toSemVer($v1));
         $semver2 = Version::parse(self::toSemVer($v2));
         $versionComparator = new Comparator();
@@ -26,7 +28,8 @@ class WpVersionComparer {
         return $versionComparator->compare($semver1, $semver2);
     }
 
-    private static function toSemVer($v1) {
+    private static function toSemVer($v1)
+    {
         $shortVersionMatcher = "/^(\\d\\.\\d)(-.*)?$/";
         $matches = Strings::match($v1, $shortVersionMatcher);
 

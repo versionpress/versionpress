@@ -6,7 +6,6 @@ use VersionPress\ChangeInfos\VersionPressChangeInfo;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesReplacer;
-use VersionPress\Database\ShortcodesInfo;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Git\GitConfig;
 use VersionPress\Git\GitRepository;
@@ -33,7 +32,8 @@ use wpdb;
  *
  * @see VpAutomateCommand::startOver
  */
-class Initializer {
+class Initializer
+{
 
     const TIME_FOR_ABORTION = 5;
 
@@ -42,7 +42,7 @@ class Initializer {
      *
      * @var callable[]
      */
-    public $onProgressChanged = array();
+    public $onProgressChanged = [];
 
     /**
      * @var Database
@@ -86,10 +86,10 @@ class Initializer {
      * @var ShortcodesReplacer
      */
     private $shortcodesReplacer;
-    private $idCache;
+    private $idCache = [];
     private $executionStartTime;
 
-    function __construct(
+    public function __construct(
         $database,
         DbSchemaInfo $dbSchema,
         StorageFactory $storageFactory,
@@ -97,7 +97,8 @@ class Initializer {
         GitRepository $repository,
         AbsoluteUrlReplacer $urlReplacer,
         VpidRepository $vpidRepository,
-        ShortcodesReplacer $shortcodesReplacer) {
+        ShortcodesReplacer $shortcodesReplacer
+    ) {
 
         $this->database = $database;
         $this->dbSchema = $dbSchema;
@@ -112,13 +113,16 @@ class Initializer {
 
     /**
      * Main entry point
+     * @param bool $isUpdate Initializer creates `versionpress/update` action if is set to true
      */
-    public function initializeVersionPress() {
+    public function initializeVersionPress($isUpdate = false)
+    {
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
         @set_time_limit(0); // intentionally @ - if it's disabled we can't do anything but try the initialization
         $this->reportProgressChange(InitializerStates::START);
         vp_enable_maintenance();
         try {
+            $this->tryToUseIdsFromDatabase();
             $this->createVersionPressTables();
             $this->lockDatabase();
             $this->saveDatabaseToStorages();
@@ -127,7 +131,7 @@ class Initializer {
             $this->activateVersionPress();
             $this->copyAccessRulesFiles();
             $this->createCommonConfig();
-            $this->doInitializationCommit();
+            $this->doInitializationCommit($isUpdate);
             vp_disable_maintenance();
             $this->reportProgressChange(InitializerStates::FINISHED);
         } catch (InitializationAbortedException $ex) {
@@ -135,9 +139,23 @@ class Initializer {
         }
     }
 
-    public function createVersionPressTables() {
-        $table_prefix = $this->database->prefix;
-        $process = array();
+    private function tryToUseIdsFromDatabase()
+    {
+        $vpidTableExists = (bool)$this->database->get_row("SHOW TABLES LIKE '{$this->database->vp_id}'");
+
+        if (!$vpidTableExists) {
+            return;
+        }
+
+        $vpidRows = $this->database->get_results("SELECT `table`, id, HEX(vp_id) vp_id FROM {$this->database->vp_id}");
+        foreach ($vpidRows as $row) {
+            $this->idCache[$this->dbSchema->getEntityInfoByTableName($row->table)->entityName][$row->id] = $row->vp_id;
+        }
+    }
+
+    public function createVersionPressTables()
+    {
+        $process = [];
 
         $process[] = "DROP TABLE IF EXISTS `{$this->database->vp_id}`";
         $process[] = "CREATE TABLE `{$this->database->vp_id}` (
@@ -156,7 +174,8 @@ class Initializer {
         $this->reportProgressChange(InitializerStates::DB_TABLES_CREATED);
     }
 
-    private function lockDatabase() {
+    private function lockDatabase()
+    {
         return; // disabled for testing
         /** @noinspection PhpUnreachableStatementInspection */
         $entityNames = $this->dbSchema->getAllEntityNames();
@@ -165,15 +184,16 @@ class Initializer {
             return "`{$dbSchema->getPrefixedTableName($entityName)}`";
         }, $entityNames);
 
-        $lockQueries = array();
+        $lockQueries = [];
         $lockQueries[] = "FLUSH TABLES " . join(",", $tableNames) . " WITH READ LOCK;";
         $lockQueries[] = "SET AUTOCOMMIT=0;";
         $lockQueries[] = "START TRANSACTION;";
 
-        register_shutdown_function(array('self', 'rollbackDatabase'));
+        register_shutdown_function(['self', 'rollbackDatabase']);
 
-        foreach ($lockQueries as $lockQuery)
+        foreach ($lockQueries as $lockQuery) {
             $this->database->query($lockQuery);
+        }
 
         $this->isDatabaseLocked = true;
     }
@@ -184,7 +204,8 @@ class Initializer {
      *
      * @param string $entityName E.g., "post"
      */
-    private function createVpidsForEntitiesOfType($entityName) {
+    private function createVpidsForEntitiesOfType($entityName)
+    {
 
         if (!$this->dbSchema->getEntityInfo($entityName)->usesGeneratedVpids) {
             return;
@@ -197,16 +218,27 @@ class Initializer {
         $entities = $this->replaceForeignKeysWithReferencesInAllEntities($entityName, $entities);
 
         $storage = $this->storageFactory->getStorage($entityName);
-        $entities = array_filter($entities, function ($entity) use ($storage) { return $storage->shouldBeSaved($entity); });
+        $entities = array_filter($entities, function ($entity) use ($storage) {
+            return $storage->shouldBeSaved($entity);
+        });
         $chunks = array_chunk($entities, 1000);
-        $this->idCache[$entityName] = array();
 
         foreach ($chunks as $entitiesInChunk) {
             $wordpressIds = ArrayUtils::column($entitiesInChunk, $idColumnName);
-            $vpIds = array_map(array('VersionPress\Utils\IdUtil', 'newId'), $entitiesInChunk);
-            $idPairs = array_combine($wordpressIds, $vpIds);
-            $this->idCache[$entityName] = $this->idCache[$entityName] + $idPairs; // merge arrays with preserving keys
-            $sqlValues = join(', ', ArrayUtils::map(function ($vpId, $id) use ($tableName) { return "('$tableName', $id, UNHEX('$vpId'))"; }, $idPairs));
+            $idPairs = [];
+
+            foreach ($wordpressIds as $id) {
+                $id = intval($id);
+                if (!isset($this->idCache[$entityName], $this->idCache[$entityName][$id])) {
+                    $this->idCache[$entityName][$id] = IdUtil::newId();
+                }
+
+                $idPairs[$id] = $this->idCache[$entityName][$id];
+            }
+
+            $sqlValues = join(', ', ArrayUtils::map(function ($vpId, $id) use ($tableName) {
+                return "('$tableName', $id, UNHEX('$vpId'))";
+            }, $idPairs));
             $query = "INSERT INTO {$this->database->vp_id} (`table`, id, vp_id) VALUES $sqlValues";
             $this->database->query($query);
             $this->checkTimeout();
@@ -216,7 +248,8 @@ class Initializer {
     /**
      * Saves all eligible entities into the file system storage (the 'db' folder)
      */
-    private function saveDatabaseToStorages() {
+    private function saveDatabaseToStorages()
+    {
 
         if (is_dir(VP_VPDB_DIR)) {
             FileSystem::remove(VP_VPDB_DIR);
@@ -237,7 +270,8 @@ class Initializer {
      *
      * @param string $entityName
      */
-    private function saveEntitiesOfTypeToStorage($entityName) {
+    private function saveEntitiesOfTypeToStorage($entityName)
+    {
         $storage = $this->storageFactory->getStorage($entityName);
 
         $entities = $this->getEntitiesFromDatabase($entityName);
@@ -250,7 +284,9 @@ class Initializer {
 
         $urlReplacer = $this->urlReplacer;
         $entities = $this->extendEntitiesWithVpids($entityName, $entities);
-        $entities = array_map(function ($entity) use ($urlReplacer) { return $urlReplacer->replace($entity); }, $entities);
+        $entities = array_map(function ($entity) use ($urlReplacer) {
+            return $urlReplacer->replace($entity);
+        }, $entities);
         $entities = $this->doEntitySpecificActions($entityName, $entities);
         $storage->prepareStorage();
 
@@ -264,14 +300,16 @@ class Initializer {
         }
     }
 
-    private function saveStandardEntities(Storage $storage, $entities) {
+    private function saveStandardEntities(Storage $storage, $entities)
+    {
         foreach ($entities as $entity) {
             $storage->save($entity);
             $this->checkTimeout();
         }
     }
 
-    private function saveMetaEntities(Storage $storage, $entities, $parentReference) {
+    private function saveMetaEntities(Storage $storage, $entities, $parentReference)
+    {
         if (count($entities) == 0) {
             return;
         }
@@ -287,14 +325,16 @@ class Initializer {
         $storage->commit();
     }
 
-    private function replaceForeignKeysWithReferencesInAllEntities($entityName, $entities) {
+    private function replaceForeignKeysWithReferencesInAllEntities($entityName, $entities)
+    {
         $vpidRepository = $this->vpidRepository;
         return array_map(function ($entity) use ($vpidRepository, $entityName) {
             return $vpidRepository->replaceForeignKeysWithReferences($entityName, $entity);
         }, $entities);
     }
 
-    private function replaceShortcodesInAllEntities($entityName, $entities) {
+    private function replaceShortcodesInAllEntities($entityName, $entities)
+    {
         $shortcodesReplacer = $this->shortcodesReplacer;
 
         return array_map(function ($entity) use ($entityName, $shortcodesReplacer) {
@@ -302,7 +342,8 @@ class Initializer {
         }, $entities);
     }
 
-    private function extendEntitiesWithVpids($entityName, $entities) {
+    private function extendEntitiesWithVpids($entityName, $entities)
+    {
         if (!$this->dbSchema->getEntityInfo($entityName)->usesGeneratedVpids) {
             return $entities;
         }
@@ -318,17 +359,19 @@ class Initializer {
         return $entities;
     }
 
-    private function doEntitySpecificActions($entityName, $entities) {
+    private function doEntitySpecificActions($entityName, $entities)
+    {
         if ($entityName === 'post') {
-            return array_map(array($this, 'extendPostWithTaxonomies'), $entities);
+            return array_map([$this, 'extendPostWithTaxonomies'], $entities);
         }
         if ($entityName === 'usermeta') {
-            return array_map(array($this, 'restoreUserIdInUsermeta'), $entities);
+            return array_map([$this, 'restoreUserIdInUsermeta'], $entities);
         }
         return $entities;
     }
 
-    public function extendPostWithTaxonomies($post) {
+    public function extendPostWithTaxonomies($post)
+    {
         $idColumnName = $this->dbSchema->getEntityInfo('post')->idColumnName;
         $id = $post[$idColumnName];
 
@@ -344,7 +387,7 @@ class Initializer {
                     return $idCache['term_taxonomy'][$term->term_taxonomy_id];
                 }, $terms);
 
-                $currentTaxonomies = isset($post['vp_term_taxonomy']) ? $post['vp_term_taxonomy'] : array();
+                $currentTaxonomies = isset($post['vp_term_taxonomy']) ? $post['vp_term_taxonomy'] : [];
                 $post['vp_term_taxonomy'] = array_merge($currentTaxonomies, $referencedTaxonomies);
             }
         }
@@ -352,7 +395,8 @@ class Initializer {
         return $post;
     }
 
-    private function restoreUserIdInUsermeta($usermeta) {
+    private function restoreUserIdInUsermeta($usermeta)
+    {
         $userIds = $this->idCache['user'];
         foreach ($userIds as $userId => $vpId) {
             if (strval($vpId) === strval($usermeta['vp_user_id'])) {
@@ -364,11 +408,11 @@ class Initializer {
         return $usermeta;
     }
 
-
     /**
      * Rolls back database if it was locked by `lockDatabase()` and an unexpected shutdown occurred.
      */
-    private function rollbackDatabase() {
+    private function rollbackDatabase()
+    {
         if ($this->isDatabaseLocked) {
             $this->database->query("ROLLBACK");
             $this->database->query("UNLOCK TABLES");
@@ -379,7 +423,8 @@ class Initializer {
     /**
      * Commits db changes if database has been locked
      */
-    private function commitDatabase() {
+    private function commitDatabase()
+    {
         if ($this->isDatabaseLocked) {
             $this->database->query("COMMIT");
             $this->database->query("UNLOCK TABLES");
@@ -389,8 +434,8 @@ class Initializer {
         $this->reportProgressChange(InitializerStates::DB_WORK_DONE);
     }
 
-
-    private function createGitRepository() {
+    private function createGitRepository()
+    {
         if (!$this->repository->isVersioned()) {
             $this->reportProgressChange(InitializerStates::CREATING_GIT_REPOSITORY);
             $this->repository->init();
@@ -400,15 +445,15 @@ class Initializer {
         MergeDriverInstaller::installMergeDriver(VP_PROJECT_ROOT, VERSIONPRESS_PLUGIN_DIR, VP_VPDB_DIR);
     }
 
-
-    private function activateVersionPress() {
+    private function activateVersionPress()
+    {
         WpdbReplacer::replaceMethods();
         touch(VERSIONPRESS_ACTIVATION_FILE);
         $this->reportProgressChange(InitializerStates::VERSIONPRESS_ACTIVATED);
     }
 
-
-    private function doInitializationCommit() {
+    private function doInitializationCommit($isUpdate)
+    {
         $this->checkTimeout();
 
         // Since WP-217 the `.active` file contains not the SHA1 of the first commit that VersionPress
@@ -419,7 +464,10 @@ class Initializer {
 
 
         $this->reportProgressChange(InitializerStates::CREATING_INITIAL_COMMIT);
-        $installationChangeInfo = new VersionPressChangeInfo("activate", VersionPress::getVersion());
+        $installationChangeInfo = new VersionPressChangeInfo(
+            $isUpdate ? "update" : "activate",
+            VersionPress::getVersion()
+        );
 
         $currentUser = wp_get_current_user();
         /** @noinspection PhpUndefinedFieldInspection */
@@ -451,7 +499,8 @@ class Initializer {
      *
      * @param string $message
      */
-    private function reportProgressChange($message) {
+    private function reportProgressChange($message)
+    {
         foreach ($this->onProgressChanged as $listener) {
             call_user_func($listener, $message);
         }
@@ -465,14 +514,16 @@ class Initializer {
      * @param $entityName
      * @return string
      */
-    private function getTableName($entityName) {
+    private function getTableName($entityName)
+    {
         return $this->dbSchema->getPrefixedTableName($entityName);
     }
 
     /**
      * Copies the .htaccess and web.config files into the vpdb directory.
      */
-    private function copyAccessRulesFiles() {
+    private function copyAccessRulesFiles()
+    {
         SecurityUtils::protectDirectory(VP_PROJECT_ROOT . "/.git");
         SecurityUtils::protectDirectory(VP_VPDB_DIR);
     }
@@ -481,17 +532,18 @@ class Initializer {
     /**
      * Installs Gitignore to the repository root, or does nothing if the file already exists.
      */
-    private function installGitignore() {
+    private function installGitignore()
+    {
 
         $gitignorePath = VP_PROJECT_ROOT . '/.gitignore';
 
         $vpGitignore = file_get_contents(__DIR__ . '/.gitignore.tpl');
 
-        $gitIgnoreVariables = array(
+        $gitIgnoreVariables = [
             'wp-content' => '/' . PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_CONTENT_DIR),
             'wp-plugins' => '/' . PathUtils::getRelativePath(VP_PROJECT_ROOT, WP_PLUGIN_DIR),
             'abspath' => '/' . PathUtils::getRelativePath(VP_PROJECT_ROOT, ABSPATH),
-        );
+        ];
 
         $vpGitignore = StringUtils::fillTemplateString($gitIgnoreVariables, $vpGitignore);
 
@@ -503,23 +555,21 @@ class Initializer {
             }
 
             file_put_contents($gitignorePath, "\n" . $vpGitignore, FILE_APPEND);
-
         } else {
             file_put_contents($gitignorePath, $vpGitignore);
         }
     }
 
-
-
-
-    private function createCommonConfig() {
+    private function createCommonConfig()
+    {
         $configPath = WordPressMissingFunctions::getWpConfigPath();
         $commonConfigName = 'wp-config.common.php';
 
         WpConfigSplitter::split($configPath, $commonConfigName);
     }
 
-    private function adjustGitProcessTimeout() {
+    private function adjustGitProcessTimeout()
+    {
         $maxExecutionTime = intval(ini_get('max_execution_time'));
 
         if ($maxExecutionTime === 0) {
@@ -535,13 +585,15 @@ class Initializer {
         $this->repository->setGitProcessTimeout($processTimeout);
     }
 
-    private function checkTimeout() {
+    private function checkTimeout()
+    {
         if ($this->timeoutIsClose()) {
             $this->abortInitialization();
         }
     }
 
-    private function timeoutIsClose() {
+    private function timeoutIsClose()
+    {
         $maxExecutionTime = intval(ini_get('max_execution_time'));
 
         if ($maxExecutionTime === 0) {
@@ -554,7 +606,8 @@ class Initializer {
         return $remainingTime <= self::TIME_FOR_ABORTION; // in seconds
     }
 
-    private function abortInitialization() {
+    private function abortInitialization()
+    {
         touch(VERSIONPRESS_PLUGIN_DIR . '/.abort-initialization');
 
         if (VersionPress::isActive()) {
@@ -569,15 +622,18 @@ class Initializer {
      * @param $entityName
      * @return mixed
      */
-    private function getEntitiesFromDatabase($entityName) {
+    private function getEntitiesFromDatabase($entityName)
+    {
         if ($this->dbSchema->isChildEntity($entityName)) {
             $entityInfo = $this->dbSchema->getEntityInfo($entityName);
             $parentReference = $entityInfo->parentReference;
 
-            return $this->database->get_results("SELECT * FROM {$this->getTableName($entityName)} ORDER BY {$parentReference}", ARRAY_A);
+            return $this->database->get_results(
+                "SELECT * FROM {$this->getTableName($entityName)} ORDER BY {$parentReference}",
+                ARRAY_A
+            );
         }
 
         return $this->database->get_results("SELECT * FROM {$this->getTableName($entityName)}", ARRAY_A);
     }
-
 }

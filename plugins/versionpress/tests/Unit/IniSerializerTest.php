@@ -11,7 +11,8 @@ use VersionPress\Utils\StringUtils;
  * Tests covering IniSerializer. There are also IniSerializer_Issue* tests which contain
  * tests cases for reported issues.
  */
-class IniSerializerTest extends PHPUnit_Framework_TestCase {
+class IniSerializerTest extends PHPUnit_Framework_TestCase
+{
 
 
     //--------------------------------
@@ -21,17 +22,19 @@ class IniSerializerTest extends PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function throwsOnNonSectionedData() {
+    public function throwsOnNonSectionedData()
+    {
         $this->setExpectedException('Exception');
-        IniSerializer::serialize(array("key" => "value"));
+        IniSerializer::serialize(["key" => "value"]);
     }
 
     /**
      * @test
      */
-    public function throwsOnEmptySection() {
+    public function throwsOnEmptySection()
+    {
         $this->setExpectedException('Exception');
-        IniSerializer::serialize(array("Section" => array()));
+        IniSerializer::serialize(["Section" => []]);
     }
 
 
@@ -51,9 +54,10 @@ class IniSerializerTest extends PHPUnit_Framework_TestCase {
      *
      * @test
      */
-    public function smallestPossibleExample() {
+    public function smallestPossibleExample()
+    {
 
-        $data = array("Section" => array("key" => ""));
+        $data = ["Section" => ["key" => ""]];
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
 key = ""
@@ -75,9 +79,10 @@ INI
     /**
      * @test
      */
-    public function strings() {
+    public function strings()
+    {
 
-        $data = array("Section" => array("key1" => "value1", "key2" => "value2"));
+        $data = ["Section" => ["key1" => "value1", "key2" => "value2"]];
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
 key1 = "value1"
@@ -94,9 +99,10 @@ INI
     /**
      * @test
      */
-    public function numericValues() {
+    public function numericValues()
+    {
 
-        $data = array("Section" => array("key1" => 0, "key2" => 1, "key3" => 1.1));
+        $data = ["Section" => ["key1" => 0, "key2" => 1, "key3" => 1.1]];
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
 key1 = 0
@@ -114,9 +120,10 @@ INI
     /**
      * @test
      */
-    public function numericStringsSerializedAsStrings() {
+    public function numericStringsSerializedAsStrings()
+    {
 
-        $data = array("Section" => array("key1" => "0", "key2" => "1", "key3" => "11.1"));
+        $data = ["Section" => ["key1" => "0", "key2" => "1", "key3" => "11.1"]];
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
 key1 = "0"
@@ -134,9 +141,10 @@ INI
     /**
      * @test
      */
-    public function arraysAsSquareBrackets() {
+    public function arraysAsSquareBrackets()
+    {
 
-        $data = array("Section" => array("key" => array("val1", "val2")));
+        $data = ["Section" => ["key" => ["val1", "val2"]]];
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
 key[0] = "val1"
@@ -161,13 +169,14 @@ INI
     /**
      * @test
      */
-    public function backslash_single() {
+    public function backslash_single()
+    {
 
-        $data = array(
-            "Section" => array(
+        $data = [
+            "Section" => [
                 "key1" => "My \\ site"
-            )
-        );
+            ]
+        ];
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
 key1 = "My \\ site"
@@ -183,13 +192,14 @@ INI
     /**
      * @test
      */
-    public function backslash_double() {
+    public function backslash_double()
+    {
 
-        $data = array(
-            "Section" => array(
+        $data = [
+            "Section" => [
                 "key1" => "My \\\\ site"
-            )
-        );
+            ]
+        ];
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
 key1 = "My \\\\ site"
@@ -205,13 +215,14 @@ INI
     /**
      * @test
      */
-    public function backslash_tripple() {
+    public function backslash_tripple()
+    {
 
-        $data = array(
-            "Section" => array(
+        $data = [
+            "Section" => [
                 "key1" => "My \\\\\\ site"
-            )
-        );
+            ]
+        ];
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
 key1 = "My \\\\\\ site"
@@ -227,14 +238,15 @@ INI
     /**
      * @test
      */
-    public function backslash_atTheEndOfString() {
+    public function backslash_atTheEndOfString()
+    {
 
-        $data = array(
-            "Section" => array(
+        $data = [
+            "Section" => [
                 "key1" => "Value \\",
                 "key2" => "Value \\",
-            )
-        );
+            ]
+        ];
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
 key1 = "Value \\"
@@ -251,9 +263,10 @@ INI
     /**
      * @test
      */
-    public function doubleQuoteEscaping() {
+    public function doubleQuoteEscaping()
+    {
 
-        $data = array("Section" => array("key1" => "\"Hello\""));
+        $data = ["Section" => ["key1" => "\"Hello\""]];
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
 key1 = "\"Hello\""
@@ -271,9 +284,10 @@ INI
      *
      * @test
      */
-    public function doubleQuoteEscapingAtTheEOL() {
+    public function doubleQuoteEscapingAtTheEOL()
+    {
 
-        $data = array("Section" => array("key1" => "\"\r\nwhatever\""));
+        $data = ["Section" => ["key1" => "\"\r\nwhatever\""]];
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
 key1 = "\"
@@ -290,14 +304,18 @@ INI
     /**
      * @test
      */
-    public function doubleQuoteEscaping_HereDoc() {
+    public function doubleQuoteEscaping_HereDoc()
+    {
 
         // Note: double quotes in heredoc MUST NOT be escaped with "\", although
         // PHP manual states that it optionally might be
-        $data = array("Section" => array("key1" => <<<VAL
+        $data = [
+            "Section" => [
+                "key1" => <<<VAL
 "Hello"
 VAL
-        ));
+            ]
+        ];
 
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
@@ -314,13 +332,18 @@ INI
     /**
      * @test
      */
-    public function hashSignCommentInsideQuotes() {
+    public function hashSignCommentInsideQuotes()
+    {
 
-        $data = array("Section" => array("key1" => StringUtils::crlfize(<<<VAL
+        $data = [
+            "Section" => [
+                "key1" => StringUtils::crlfize(<<<VAL
 First line of the value
 # Continued value - should not be treated as comment
 VAL
-        )));
+                )
+            ]
+        ];
 
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
@@ -338,8 +361,9 @@ INI
     /**
      * @test
      */
-    public function dollarSignInsideQuotes() {
-        $data = array("Section" => array("key1" => 'some$value', "key2" => 'another${value'));
+    public function dollarSignInsideQuotes()
+    {
+        $data = ["Section" => ["key1" => 'some$value', "key2" => 'another${value']];
 
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
@@ -356,13 +380,18 @@ INI
     /**
      * @test
      */
-    public function semicolonCommentInsideQuotes() {
+    public function semicolonCommentInsideQuotes()
+    {
 
-        $data = array("Section" => array("key1" => StringUtils::crlfize(<<<VAL
+        $data = [
+            "Section" => [
+                "key1" => StringUtils::crlfize(<<<VAL
 First line of the value
 ; Continued value - should not be treated as comment
 VAL
-        )));
+                )
+            ]
+        ];
 
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
@@ -381,9 +410,10 @@ INI
     /**
      * @test
      */
-    public function newLineHandlingInsideValues_LF() {
+    public function newLineHandlingInsideValues_LF()
+    {
 
-        $data = array("Section" => array("key1" => "Hello\nWorld"));
+        $data = ["Section" => ["key1" => "Hello\nWorld"]];
         $ini = "[Section]\r\nkey1 = \"Hello\nWorld\"\r\n";
 
         $this->assertSame($ini, IniSerializer::serialize($data));
@@ -394,9 +424,10 @@ INI
     /**
      * @test
      */
-    public function newLineHandlingInsideValues_CR() {
+    public function newLineHandlingInsideValues_CR()
+    {
 
-        $data = array("Section" => array("key1" => "Hello\rWorld"));
+        $data = ["Section" => ["key1" => "Hello\rWorld"]];
         $ini = "[Section]\r\nkey1 = \"Hello\rWorld\"\r\n";
 
         $this->assertSame($ini, IniSerializer::serialize($data));
@@ -407,9 +438,10 @@ INI
     /**
      * @test
      */
-    public function newLineHandlingInsideValues_CRLF() {
+    public function newLineHandlingInsideValues_CRLF()
+    {
 
-        $data = array("Section" => array("key1" => "Hello\r\nWorld"));
+        $data = ["Section" => ["key1" => "Hello\r\nWorld"]];
         $ini = "[Section]\r\nkey1 = \"Hello\r\nWorld\"\r\n";
 
         $this->assertSame($ini, IniSerializer::serialize($data));
@@ -420,9 +452,10 @@ INI
     /**
      * @test
      */
-    public function newLineHandling_BlankLines() {
+    public function newLineHandling_BlankLines()
+    {
 
-        $data = array("Section" => array("key1" => "\r\n"));
+        $data = ["Section" => ["key1" => "\r\n"]];
         $ini = "[Section]\r\nkey1 = \"\r\n\"\r\n";
 
         $this->assertSame($ini, IniSerializer::serialize($data));
@@ -433,7 +466,8 @@ INI
     /**
      * @test
      */
-    public function newLineHandling_NewLineAfterStringMark() {
+    public function newLineHandling_NewLineAfterStringMark()
+    {
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
 key1 = "$
@@ -442,10 +476,12 @@ key1 = "$
 INI
         );
 
-        $data = array("Section" => array(
-            "key1" => StringUtils::crlfize("$
+        $data = [
+            "Section" => [
+                "key1" => StringUtils::crlfize("$
 ")
-        ));
+            ]
+        ];
 
         $this->assertSame($data, IniSerializer::deserialize($ini));
         $this->assertSame($ini, IniSerializer::serialize($data));
@@ -454,11 +490,12 @@ INI
     /**
      * @test
      */
-    public function specialCharactersAreTakenLiterally() {
+    public function specialCharactersAreTakenLiterally()
+    {
 
         // e.g., "\n" should not have any special meaning
 
-        $data = array("Section" => array("key1" => '\n'));
+        $data = ["Section" => ["key1" => '\n']];
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]
 key1 = "\\n"
@@ -475,9 +512,10 @@ INI
      * @test
      * @dataProvider specialCharactersProvider
      */
-    public function specialCharactersInSectionName($specialCharacter) {
+    public function specialCharactersInSectionName($specialCharacter)
+    {
 
-        $data = array("Sect{$specialCharacter}ion" => array("somekey" => "value"));
+        $data = ["Sect{$specialCharacter}ion" => ["somekey" => "value"]];
         $ini = StringUtils::crlfize(<<<INI
 [Sect{$specialCharacter}ion]
 somekey = "value"
@@ -494,9 +532,10 @@ INI
      * @test
      * @dataProvider specialCharactersProvider
      */
-    public function specialCharacterInKey($specialCharacter) {
+    public function specialCharacterInKey($specialCharacter)
+    {
 
-        $data = array("Section" => array("some{$specialCharacter}key" => "value"));
+        $data = ["Section" => ["some{$specialCharacter}key" => "value"]];
         $ini = StringUtils::crlfize(<<<INI
 [Section]
 some{$specialCharacter}key = "value"
@@ -514,9 +553,10 @@ INI
      * @test
      * @dataProvider specialCharactersInValueProvider
      */
-    public function specialCharacterInValue($specialCharacter) {
+    public function specialCharacterInValue($specialCharacter)
+    {
 
-        $data = array("Section" => array("somekey" => "val{$specialCharacter}ue"));
+        $data = ["Section" => ["somekey" => "val{$specialCharacter}ue"]];
         $ini = StringUtils::crlfize(<<<INI
 [Section]
 somekey = "val{$specialCharacter}ue"
@@ -529,17 +569,56 @@ INI
 
     }
 
-    public function specialCharactersProvider() {
-        return array_map(function ($specialChar) {
-            return array($specialChar);
-        },
-            array(
-                "\\", "\"", "[]", "$", "%", "'", ";", "+", "-", "/", "#", "&", "!", ".",
-                "~", "^", "`", "?", ":", ",", "*", "<", ">", "(", ")", "@", "{", "}",
-                "|", "_", " ", "\t", "ěščřžýáíéúůóďťňôâĺ", "茶", "русский", "حصان", "="));
+    public function specialCharactersProvider()
+    {
+        return array_map(
+            function ($specialChar) {
+                return [$specialChar];
+            },
+            [
+                "\\",
+                "\"",
+                "[]",
+                "$",
+                "%",
+                "'",
+                ";",
+                "+",
+                "-",
+                "/",
+                "#",
+                "&",
+                "!",
+                ".",
+                "~",
+                "^",
+                "`",
+                "?",
+                ":",
+                ",",
+                "*",
+                "<",
+                ">",
+                "(",
+                ")",
+                "@",
+                "{",
+                "}",
+                "|",
+                "_",
+                " ",
+                "\t",
+                "ěščřžýáíéúůóďťňôâĺ",
+                "茶",
+                "русский",
+                "حصان",
+                "="
+            ]
+        );
     }
 
-    public function specialCharactersInValueProvider() {
+    public function specialCharactersInValueProvider()
+    {
         // Double quotes and backslashes are escaped see WP-458 and WP-619
         return array_filter($this->specialCharactersProvider(), function ($val) {
             return $val[0] !== "\"" && $val[0] !== "\\";
@@ -549,9 +628,10 @@ INI
     /**
      * @test
      */
-    public function twoSections() {
+    public function twoSections()
+    {
 
-        $data = array("Section1" => array("key" => "value"), "Section2" => array("key" => "value"));
+        $data = ["Section1" => ["key" => "value"], "Section2" => ["key" => "value"]];
         $ini = StringUtils::crlfize(<<<'INI'
 [Section1]
 key = "value"
@@ -570,8 +650,9 @@ INI
     /**
      * @test
      */
-    public function sectionWithDotInName() {
-        $data = array("Section.Name" => array("key" => "value"));
+    public function sectionWithDotInName()
+    {
+        $data = ["Section.Name" => ["key" => "value"]];
         $ini = StringUtils::crlfize(<<<'INI'
 [Section.Name]
 key = "value"
@@ -586,7 +667,8 @@ INI
     /**
      * @test
      */
-    public function serializedString() {
+    public function serializedString()
+    {
         $serializedString = serialize('some string');
 
         $data = ["Section" => ["data" => $serializedString]];
@@ -604,7 +686,8 @@ INI
     /**
      * @test
      */
-    public function serializedInteger() {
+    public function serializedInteger()
+    {
         $serializedString = serialize(777);
 
         $data = ["Section" => ["data" => $serializedString]];
@@ -622,7 +705,8 @@ INI
     /**
      * @test
      */
-    public function serializedDouble() {
+    public function serializedDouble()
+    {
         $serializedString = serialize(1.2);
 
         $data = ["Section" => ["data" => $serializedString]];
@@ -640,7 +724,8 @@ INI
     /**
      * @test
      */
-    public function serializedBoolean() {
+    public function serializedBoolean()
+    {
         $serializedString = serialize(false);
 
         $data = ["Section" => ["data" => $serializedString]];
@@ -658,7 +743,8 @@ INI
     /**
      * @test
      */
-    public function serializedEmptyArray() {
+    public function serializedEmptyArray()
+    {
         $serializedString = serialize([]);
 
         $data = ["Section" => ["data" => $serializedString]];
@@ -676,7 +762,8 @@ INI
     /**
      * @test
      */
-    public function serializedArrayWithString() {
+    public function serializedArrayWithString()
+    {
         $serializedString = serialize(['some string']);
 
         $data = ["Section" => ["data" => $serializedString]];
@@ -696,7 +783,8 @@ INI
      * @test
      * @dataProvider specialCharactersInValueProvider
      */
-    public function serializedArrayWithSpecialStrings($str) {
+    public function serializedArrayWithSpecialStrings($str)
+    {
         $serializedString = serialize([$str, $str, $str]);
 
         $data = ["Section" => ["data" => $serializedString]];
@@ -718,7 +806,8 @@ INI
     /**
      * @test
      */
-    public function serializedArrayWithEscapedSpecialStrings() {
+    public function serializedArrayWithEscapedSpecialStrings()
+    {
         $serializedString = serialize(["\\", "\"", "\\\""]);
 
         $data = ["Section" => ["data" => $serializedString]];
@@ -740,7 +829,8 @@ INI
     /**
      * @test
      */
-    public function serializedOption() {
+    public function serializedOption()
+    {
         $sidebarWidgets = [
             'wp_inactive_widgets' => [],
             'sidebar-1' => ['search-2', 'recent-posts-2', 'recent-comments-2'],
@@ -771,7 +861,8 @@ INI
     /**
      * @test
      */
-    public function serializedComplexArray() {
+    public function serializedComplexArray()
+    {
         $array = [
             'numeric index',
             'string index' => 1234,
@@ -813,7 +904,8 @@ INI
     /**
      * @test
      */
-    public function serializedEmptyStdClass() {
+    public function serializedEmptyStdClass()
+    {
         $serializedString = serialize(new \stdClass());
 
         $data = ["Section" => ["data" => $serializedString]];
@@ -831,7 +923,8 @@ INI
     /**
      * @test
      */
-    public function serializedStdClassWithAttribute() {
+    public function serializedStdClassWithAttribute()
+    {
         $object = new \stdClass();
         $object->attribute = 'value';
 
@@ -853,7 +946,8 @@ INI
     /**
      * @test
      */
-    public function serializedStdClassWithMultipleAttributes() {
+    public function serializedStdClassWithMultipleAttributes()
+    {
         $object = new \stdClass();
         $object->stringAttribute = 'value';
         $object->numericAttribute = 1.004;
@@ -882,7 +976,8 @@ INI
     /**
      * @test
      */
-    public function serializedCustomClassWithPublicAttribute() {
+    public function serializedCustomClassWithPublicAttribute()
+    {
         $object = new IniSerializer_FooPublic('value');
 
         $serializedString = serialize($object);
@@ -903,7 +998,8 @@ INI
     /**
      * @test
      */
-    public function serializedCustomClassWithProtectedAttribute() {
+    public function serializedCustomClassWithProtectedAttribute()
+    {
         $object = new IniSerializer_FooProtected('value');
 
         $serializedString = serialize($object);
@@ -924,7 +1020,8 @@ INI
     /**
      * @test
      */
-    public function serializedCustomClassWithPrivateAttribute() {
+    public function serializedCustomClassWithPrivateAttribute()
+    {
         $object = new IniSerializer_FooPrivate('value');
 
         $serializedString = serialize($object);
@@ -945,7 +1042,8 @@ INI
     /**
      * @test
      */
-    public function serializedCustomClassWithSleepMethod() {
+    public function serializedCustomClassWithSleepMethod()
+    {
         $object = new IniSerializer_FooWithCleanup('value');
 
         $serializedString = serialize($object);
@@ -966,7 +1064,8 @@ INI
     /**
      * @test
      */
-    public function serializedNull() {
+    public function serializedNull()
+    {
         $serializedString = serialize(null);
 
         $data = ["Section" => ["data" => $serializedString]];
@@ -984,7 +1083,8 @@ INI
     /**
      * @test
      */
-    public function serializedMultipleSameObjects() {
+    public function serializedMultipleSameObjects()
+    {
         $object = new \stdClass();
 
         $serializedString = serialize([$object, $object, $object]);
@@ -1007,7 +1107,8 @@ INI
     /**
      * @test
      */
-    public function serializedMultipleDifferentObjects() {
+    public function serializedMultipleDifferentObjects()
+    {
         $serializedString = serialize([new \stdClass(), new \stdClass(), new \stdClass()]);
 
         $data = ["Section" => ["data" => $serializedString]];
@@ -1028,7 +1129,8 @@ INI
     /**
      * @test
      */
-    public function serializedReferenceToArray() {
+    public function serializedReferenceToArray()
+    {
         $array = [];
         $array['inception'] = &$array;
 
@@ -1051,7 +1153,8 @@ INI
     /**
      * @test
      */
-    public function serializedMoreComplexArrayReferences() {
+    public function serializedMoreComplexArrayReferences()
+    {
         $parent = [];
         $a = ['parent' => &$parent];
         $b = ['parent' => &$parent];
@@ -1077,7 +1180,8 @@ INI
     /**
      * @test
      */
-    public function serializedEvenMoreComplexArrayReferences() {
+    public function serializedEvenMoreComplexArrayReferences()
+    {
         $parent = [];
         $a = ['parent' => &$parent];
         $b = ['parent' => &$parent];
@@ -1118,7 +1222,8 @@ INI
     /**
      * @test
      */
-    public function serializedReferenceToClass() {
+    public function serializedReferenceToClass()
+    {
         $class = new \stdClass();
         $class->inception = &$class;
 
@@ -1140,7 +1245,8 @@ INI
     /**
      * @test
      */
-    public function serializedMoreComplexClassReferences() {
+    public function serializedMoreComplexClassReferences()
+    {
         $parent = new \stdClass();
         $a = new \stdClass();
         $b = new \stdClass();
@@ -1178,7 +1284,8 @@ INI
     /**
      * @test
      */
-    public function serializedMultipleDifferentData() {
+    public function serializedMultipleDifferentData()
+    {
 
         $data = [
             123,
@@ -1220,10 +1327,11 @@ INI
     /**
      * @test
      */
-    public function longString() {
+    public function longString()
+    {
         $loremIpsum = StringUtils::crlfize(Lorem::text(50000));
 
-        $data = array("Section" => array("key" => $loremIpsum));
+        $data = ["Section" => ["key" => $loremIpsum]];
         $ini = StringUtils::crlfize(<<<INI
 [Section]
 key = "$loremIpsum"
@@ -1238,7 +1346,8 @@ INI
     /**
      * @test
      */
-    public function serializationDoesntChangeTheOrder() {
+    public function serializationDoesntChangeTheOrder()
+    {
         $serializedString = serialize(777);
 
         $data = ["Section" => ["data" => $serializedString, "another_data" => "value"]];
@@ -1257,7 +1366,8 @@ INI
     /**
      * @test
      */
-    public function serializationDoesntChangeTypeOfNumericString() {
+    public function serializationDoesntChangeTypeOfNumericString()
+    {
 
         $data = ["Section" => ["data" => "777"]];
         $ini = StringUtils::crlfize(<<<'INI'
@@ -1274,7 +1384,8 @@ INI
     /**
      * @test
      */
-    public function serializationDoesntChangeTypeOfNumericStringInSerializedData() {
+    public function serializationDoesntChangeTypeOfNumericStringInSerializedData()
+    {
         $serializedString = serialize("777");
 
         $data = ["Section" => ["data" => $serializedString]];
@@ -1292,7 +1403,8 @@ INI
     /**
      * @test
      */
-    public function serializationDoesntChangeTypeOfNumericStringInArray() {
+    public function serializationDoesntChangeTypeOfNumericStringInArray()
+    {
         $serializedString = serialize(["777"]);
 
         $data = ["Section" => ["data" => $serializedString]];
