@@ -58,6 +58,10 @@ class OptionsSynchronizer implements Synchronizer
 
     public function synchronize($task, $entitiesToSynchronize = null)
     {
+        if (is_array($entitiesToSynchronize) && count($entitiesToSynchronize) === 0) {
+            return [];
+        }
+
         $this->maybeInit($entitiesToSynchronize);
         $options = $this->options;
 
