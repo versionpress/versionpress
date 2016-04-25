@@ -17,6 +17,7 @@ Here are a couple of hosts that we or our users confirmed work fine with Version
  - [WebFaction](https://www.webfaction.com/) – hosting for developers
  - [Uberspace](https://uberspace.de/) – hosting space in Germany (Git 1.7 pre-installed, upgradable to 1.9+) 
  - [Pair Shared Hosting](https://www.pair.com/hosting/shared/) – by pair Networks
+ - [Elbia Hosting (SK)](http://www.elbiahosting.sk/) – Slovak hosting company
 
 <div class="note">
   <strong>Help us improve this list</strong>
