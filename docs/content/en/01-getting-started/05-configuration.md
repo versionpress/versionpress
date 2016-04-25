@@ -1,40 +1,51 @@
 # Configuration
 
-Some technical aspects of VersionPress can be configured by defining constants in `wp-config.php` or using an associated WP-CLI command.
-
-<div class="important">
-  <strong>Note</strong>
-  <p>You shouldn't typically need to update the configuration. Do it only if you know what you are doing.</p>
-</div>
+Some technical aspects of VersionPress can be configured by defining constants in `wp-config.php` or using an associated WP-CLI command. Furthermore, VersionPress introduces a `wp-config.common.php` file that is required by `wp-config.php` and stores common (shared) configuration.
 
 
-## Configuration system overview
+## Local vs. shared configuration
 
-VersionPress uses two levels of configuration files:
+Most of the constant in `wp-config.php` are local, specific to a given environment. For example, database connection needs to be different on staging and production sites. Because of that, VersionPress omits `wp-config.php` from version control, however, some options should – or even must – be shared. For example, `WP_CONTENT_DIR` or `WP_PLUGIN_DIR` must be shared as the site structure needs to be the same on all environments.
 
- - `wp-config.php` for environment-specific constants (it's not versioned),
- - `wp-config.common.php` for constants common to all environments (it's part of the Git repository).
+To support this, VersionPress 3.0 introduced a `wp-config.common.php` file which is version-controlled and `require`'d by the built-in `wp-config.php` file. The whole system looks like this:
 
-
-It is recommended to use the WP-CLI command, however, it is possible to add/change the constants manually. Just be sure they are in the right file.
-
-### WP-CLI command
-
-As an alternative to manual editing, you can use the **`vp config`** WP-CLI command like this:
-
-    wp vp config <constant> <value>
-    
-    # e.g., set custom Git path:
-    wp vp config VP_GIT_BINARY '/custom/path/to/git'
-
-This will work if you have [WP-CLI installed](https://github.com/wp-cli/wp-cli/wiki/Alternative-Install-Methods) and VersionPress plugin activated. Run `wp help vp config` to see the help.
+**wp-config.php** (comes with WordPress, .gitignored):
 
 
-## Config options
+```
+<?php
+include_once __DIR__ . '/wp-config.common.php';
 
-This section lists all the supported constants.
+define('DB_NAME', 'dbname');
+define('DB_USER', 'dbuser');
+// etc.
+```
 
-### VP\_GIT\_BINARY
+**wp-config.common.php** (created when VersionPress is activated, version-controlled):
+
+```
+<?php
+define('WP_CONTENT_DIR', 'custom_dir');
+```
+
+You can define all the common WordPress config constants in these files (e.g., `WP_DEBUG`, `AUTOSAVE_INTERVAL` and [others](https://codex.wordpress.org/Editing_wp-config.php)) but VersionPress also comes with its own config constants.
+
+
+## VersionPress config constants
+
+The constants below influence some technical aspects of how VersionPress works. You should not typically need to update them but if you do, we strongly recommend using a WP-CLI command `wp vp config` to do it. For example, to set a custom Git path, run:
+
+```
+wp vp config VP_GIT_BINARY '/custom/path/to/git'
+```
+
+This will work if you have [WP-CLI installed](https://github.com/wp-cli/wp-cli/wiki/Alternative-Install-Methods) and VersionPress activated.
+
+Below are listed some of the supported constants. To get an always-up-to-date list, run `wp help vp config`.
+
+
+<span id="git-binary"></span>
+### VP_GIT_BINARY
 
 *Default: `git`*  
 *Configuration file: `wp-config.php`*
@@ -42,3 +53,11 @@ This section lists all the supported constants.
 By default, VersionPress calls just `git` which leaves the path resolution up to the operating system. That might be problematic on some server configurations which use different `PATH` for different users (the web server user might not be the same user under which you are logged in), there might be some `PATH` caching involved, etc. If VersionPress cannot detect Git for some reason, use this option.
 
 
+### VP_PROJECT_ROOT
+
+[TODO]
+
+
+### VP_VPDB_DIR
+
+[TODO]
