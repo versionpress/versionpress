@@ -21,7 +21,7 @@ Here are a couple of hosts that we or our users confirmed work fine with Version
 
 <div class="note">
   <strong>Help us improve this list</strong>
-  <p>If you know of a host that supports VersionPress please <a href="https://github.com/versionpress/docs">add it to these docs</a>.</p>
+  <p>If you know of a host that supports VersionPress please <a href="https://github.com/versionpress/docs/blob/master/content/en/07-integrations/04-hosts.md">send a pull request</a>.</p>
 </div>
 
 
