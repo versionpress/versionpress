@@ -32,10 +32,11 @@ class VPInternalCommand extends WP_CLI_Command
     /**
      * Finishes clone operation
      *
-     * --truncate-options
+     * ## OPTIONS
+     *
+     * [--truncate-options]
      * : By default, options table is not truncated. This flag changes the behavior.
      *
-     * @synopsis [--truncate-options]
      *
      * @subcommand finish-init-clone
      *
@@ -109,6 +110,8 @@ class VPInternalCommand extends WP_CLI_Command
     /**
      * Turns on or off the maintenance mode.
      *
+     * ## OPTIONS
+     *
      * <mode>
      * : Desired state of maintenance mode. Possible values are 'on' or 'off'.
      *
@@ -163,9 +166,12 @@ class VPInternalCommand extends WP_CLI_Command
     /**
      * Gets `id` of an entity from `vp_id` table
      *
+     * ## OPTIONS
+     *
+     * --vpid=<vpid>
+     *
      * @subcommand get-entity-id
      *
-     * @synopsis --vpid=<vpid>
      *
      */
     public function getEntityId($args = [], $assoc_args = [])
@@ -183,9 +189,14 @@ class VPInternalCommand extends WP_CLI_Command
     /**
      * Gets `vp_id` Guid of an entity from id and entity name
      *
+     * ## OPTIONS
+     *
+     * --id=<id>
+     * 
+     * --name=<name>
+     *
      * @subcommand get-entity-vpid
      *
-     * @synopsis --id=<id> --name=<name>
      *
      */
     public function getEntityVpid($args = [], $assoc_args = [])
@@ -209,18 +220,17 @@ class VPInternalCommand extends WP_CLI_Command
      * <value>
      * : Desired value. Supported types are: string, int, float and bool.
      *
-     * --plain
+     * [--plain]
      * : The value will be used as is - without type detection, quoting etc.
      *
-     * --variable
+     * [--variable]
      * : Will set a variable instead of constant. Useful for $table_prefix.
      *
-     * --common
+     * [--common]
      * : The constant / variable will be set in wp-config.common.php.
      *
      * @subcommand update-config
      *
-     * @synopsis <constant> <value> [--plain] [--variable] [--common]
      *
      * @when before_wp_load
      */
