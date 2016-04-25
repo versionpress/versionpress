@@ -28,7 +28,9 @@ class WpConfigSplitter
         self::ensureCommonConfigInclude($wpConfigPath, $commonConfigName);
 
         $configLines = file($wpConfigPath);
-        $commonConfigLines = is_file($commonConfigPath) ? file($commonConfigPath) : ["<?php\n"];
+        $commonConfigLines = is_file($commonConfigPath)
+            ? file($commonConfigPath)
+            : file(__DIR__ . '/wp-config.common.tpl.php');
 
         // https://regex101.com/r/zD3mJ4/2
         $constantsForRegex = join('|', self::$constantsForExtraction);
