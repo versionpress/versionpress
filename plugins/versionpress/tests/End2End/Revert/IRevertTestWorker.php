@@ -48,4 +48,8 @@ interface IRevertTestWorker extends ITestWorker
     public function prepare_undoMultipleCommitsThatCannotBeReverted();
 
     public function undoMultipleCommitsThatCannotBeReverted();
+
+    public function prepare_undoNonDbChange();
+
+    public function undoNonDbChange();
 }

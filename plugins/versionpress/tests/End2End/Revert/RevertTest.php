@@ -258,4 +258,24 @@ class RevertTest extends End2EndTestCase
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
+
+    /**
+     * @test
+     * @testdox Non-DB change doesn't break the database
+     */
+    public function undoOfNonDbChangeDoesntBreakDatabase()
+    {
+        $changes = self::$worker->prepare_undoNonDbChange();
+
+        $commitAsserter = new CommitAsserter($this->gitRepository);
+
+        self::$worker->undoNonDbChange();
+
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('versionpress/undo');
+        $commitAsserter->assertCountOfAffectedFiles(count($changes));
+        $commitAsserter->assertCommitPaths($changes);
+        $commitAsserter->assertCleanWorkingDirectory();
+        DBAsserter::assertFilesEqualDatabase();
+    }
 }

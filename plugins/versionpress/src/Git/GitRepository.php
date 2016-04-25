@@ -26,12 +26,12 @@ class GitRepository
      */
     public function __construct(
         $workingDirectoryRoot,
-        $tempDirectory = ".",
+        $tempDirectory = null,
         $commitMessagePrefix = "[VP] ",
         $gitBinary = "git"
     ) {
         $this->workingDirectoryRoot = $workingDirectoryRoot;
-        $this->tempDirectory = $tempDirectory;
+        $this->tempDirectory = $tempDirectory ?: __DIR__;
         $this->commitMessagePrefix = $commitMessagePrefix;
         $this->gitBinary = $gitBinary;
     }

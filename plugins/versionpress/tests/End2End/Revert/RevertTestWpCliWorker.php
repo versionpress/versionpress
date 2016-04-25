@@ -184,6 +184,20 @@ class RevertTestWpCliWorker extends WpCliWorker implements IRevertTestWorker
         } // Intentionally empty catch. Violated referetial integrity throws an exception.
     }
 
+    public function prepare_undoNonDbChange()
+    {
+        $themeFile = 'wp-content/themes/twentyfifteen/header.php';
+        file_put_contents($this->testConfig->testSite->path . '/' . $themeFile, '');
+        $this->repository->stageAll($themeFile);
+        $this->repository->commit('Manual commit', 'John Tester', 'john.tester@example.com');
+        return [['M', $themeFile]];
+    }
+
+    public function undoNonDbChange()
+    {
+        $this->undoLastCommit();
+    }
+
     //---------------------
     // Helper methods
     //---------------------
