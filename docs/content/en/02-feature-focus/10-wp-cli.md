@@ -27,7 +27,7 @@ When VersionPress is installed *and activated* on the plugins screen, `cd` into 
 
 If VersionPress is not active or cannot be active, for example, in case of a broken site, use `--require` to load a specific WP-CLI command. For example, `restore-site` will usually need this so it will be called like this:
 
-    $ wp vp restore-site --require=wp-content/plugins/versionpress/src/Cli/vp.php
+    $ wp vp restore-site --siteurl='http://localhost/mysite' --require=wp-content/plugins/versionpress/src/Cli/vp.php
 
 
 ## Command reference ##
@@ -73,14 +73,14 @@ Restores site from a Git repository.
 
 You will typically use this command in two main situations:
 
- 1. Something **went wrong with the database** and you want to restore it
+ 1. Something **went really wrong with the database** and you want to restore it
  2. You want to restore a site **just from a Git repository**, e.g., after a fresh clone from GitHub on a new machine
 
 Let's focus on the first scenario now. In the worst case, you completely lost the database and running `wp vp restore-site` then will basically work like a restore of a backup, i.e., it will re-create the database tables (for tables that VersionPress can restore; it will leave other tables in the database alone so for example it will *not* do anything with tables that are not WordPress related) and fill it with the site's data. This is useful also when the database was not completely lost, just something went wrong with it, e.g. by some plugin bug, human error and so on. Again, `wp vp restore-site` will just bring it back to an OK state.
 
-Note that with this command, you will most usually **need to include the `--require=...` parameter** because on a broken or non-existent site, WP-CLI will not be able to automatically detect the `vp` command. The complete command invocation will usually look like this:
+Note that with this command, you will **need to include the `--require=...` parameter** because on a broken or non-existent site, WP-CLI will not be able to automatically detect the `vp` command. The complete command invocation will usually look like this:
 
-    $ wp vp restore-site --require=wp-content/plugins/versionpress/src/Cli/vp.php
+    $ wp vp restore-site --siteurl='http://localhost/mysite' --require=wp-content/plugins/versionpress/src/Cli/vp.php
 
 
 The other, **development scenario** assumes that the only thing you have is a Git clone of a site. That is quite extreme because not only you don't have a database at all but you also don't have these two vital things due to the fact that VersionPress doesn't store them in the Git repo (for good reasons [described here](../feature-focus/change-tracking#whats-not-tracked)):
@@ -91,9 +91,9 @@ The other, **development scenario** assumes that the only thing you have is a Gi
 The second point means that you can't immediately run `wp vp restore-site` because there is no such thing as a `vp` command yet on the site. Follow these steps:
 
  1. Manually put VersionPress into to `wp-content/plugins/versionpress` folder.
- 2. Run `wp vp restore-site` from the site root, possibly with command-line arguments specifying the database name, its user etc. (There are defaults for all the options but you will probably want to change them as, for example, the default connection uses the `root` user without any password, etc.)
-
-For the full list of command-line arguments of this command, run `wp help vp restore-site`.
+ 2. Run `wp core config` from the site root to setup the database.
+ 3. Run `wp vp restore-site` with `siteurl` and `require` parameters.
+ 4. Enjoy your up and running site.
 
 
 ### vp clone
