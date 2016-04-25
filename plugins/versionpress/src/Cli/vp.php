@@ -143,10 +143,9 @@ class VPCommand extends WP_CLI_Command
     /**
      * Starts tracking the site
      *
-     * --yes
+     * [--yes]
      * : Answer yes to the confirmation message.
      *
-     * @synopsis [--yes]
      */
     public function activate($args, $assoc_args)
     {
@@ -180,7 +179,7 @@ class VPCommand extends WP_CLI_Command
      * --siteurl=<url>
      * : The address of the restored site.
      *
-     * --yes
+     * [--yes]
      * : Answer yes to the confirmation message.
      *
      * ## DESCRIPTION
@@ -192,7 +191,6 @@ class VPCommand extends WP_CLI_Command
      *
      * If you just cloned the site from another repository, run `wp core config` first.
      *
-     * @synopsis --siteurl=<url> [--yes]
      *
      * @subcommand restore-site
      *
@@ -326,36 +324,36 @@ class VPCommand extends WP_CLI_Command
      * : Name of the clone. Used as a directory name, part of the DB prefix
      * and an argument to the pull & push commands later.
      *
-     * --siteurl=<url>
+     * [--siteurl=<url>]
      * : URL of the clone. By default, the original URL is searched for <cwd>
      * and replaced with the clone name.
      *
-     * --dbname=<dbname>
+     * [--dbname=<dbname>]
      * : Database name for the clone.
      *
-     * --dbuser=<dbuser>
+     * [--dbuser=<dbuser>]
      * : Database user for the clone.
      *
-     * --dbpass=<dbpass>
+     * [--dbpass=<dbpass>]
      * : Database user password for the clone.
      *
-     * --dbhost=<dbhost>
+     * [--dbhost=<dbhost>]
      * : Database host for the clone.
      *
-     * --dbprefix=<dbprefix>
+     * [--dbprefix=<dbprefix>]
      * : Database table prefix for the clone.
      *
-     * --dbcharset=<dbcharset>
+     * [--dbcharset=<dbcharset>]
      * : Database charset for the clone.
      *
-     * --dbcollate=<dbcollate>
+     * [--dbcollate=<dbcollate>]
      * : Database collation for the clone.
      *
-     * --force
+     * [--force]
      * : Forces cloning even if the target directory or DB tables exists.
      * Basically provides --yes to all warnings / confirmations.
      *
-     * --yes
+     * [--yes]
      * : Another way to force the clone
      *
      * ## EXAMPLES
@@ -373,9 +371,6 @@ class VPCommand extends WP_CLI_Command
      *    - Populates database tables with data
      *    - Makes the site accessible as 'http://localhost/myclone'
      *
-     * @synopsis --name=<name> [--siteurl=<url>] [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass=<dbpass>]
-     *           [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>]
-     *           [--force] [--yes]
      *
      * @subcommand clone
      *
@@ -584,7 +579,7 @@ class VPCommand extends WP_CLI_Command
      *
      * ## OPTIONS
      *
-     * --from=<name|path|url>
+     * [--from=<name|path|url>]
      * : Where to pull from. Can be a clone name (specified previously during the
      * 'clone' command), a path or a URL. Defaults to 'origin' which is
      * automatically set in every clone by the 'clone' command.
@@ -603,7 +598,6 @@ class VPCommand extends WP_CLI_Command
      * This will pull the changes from 'origin' which was set to the parent site during the
      * 'clone' command.
      *
-     * @synopsis [--from=<name|path|url>]
      */
     public function pull($args = [], $assoc_args = [])
     {
@@ -729,7 +723,7 @@ class VPCommand extends WP_CLI_Command
      *
      * ## OPTIONS
      *
-     * --to=<name|path>
+     * [--to=<name|path>]
      * : Name of the clone or a path to it. Defaults to 'origin' which, in a clone,
      * points to its original site.
      *
@@ -745,7 +739,6 @@ class VPCommand extends WP_CLI_Command
      *     wp vp push --to=clonename
      *
      *
-     * @synopsis [--to=<name|path>]
      */
     public function push($args = [], $assoc_args = [])
     {
@@ -815,7 +808,6 @@ class VPCommand extends WP_CLI_Command
      *
      *     wp vp undo a34bc28,d12ef22
      *
-     * @synopsis <commit>
      *
      * @when before_wp_load
      */
@@ -896,7 +888,6 @@ class VPCommand extends WP_CLI_Command
      *
      *     wp vp rollback a34bc28
      *
-     * @synopsis <commit>
      *
      * @when before_wp_load
      *
@@ -988,7 +979,6 @@ class VPCommand extends WP_CLI_Command
      *
      *     wp vp update ../versionpress-4.0.zip
      *
-     * @synopsis <zip>
      *
      */
     public function update($args = [], $assoc_args = [])
