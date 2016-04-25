@@ -56,7 +56,7 @@ The following discusses some of the important details if you want to contribute.
 
 ### Our development process
 
-**Major versions** (1.0, 2.0 etc.) are released every few months. Each major version has a [corresponding milestone](https://github.com/versionpress/versionpress/milestones/) and issues are assigned to it by the core team. Issues not assigned to any milestone are in a backlog – we want to do them one day but there's no immediate plans yet.
+**Major versions** (1.0, 2.0 etc.) are released every few months. Each major version has a [corresponding milestone](https://github.com/versionpress/versionpress/milestones/) and issues are assigned to it by the core team. Issues not assigned to any milestone are in a backlog – we want to do them one day but there are no immediate plans.
 
 **Issues** are the most important tool to plan and manage almost everything around VersionPress:
 
