@@ -117,7 +117,7 @@ Applies changes found on the disk to the database. Useful e.g. after resolving m
 
 ### vp check-requirements
 
-Checks if all requirements for using VersionPress are met on the target environment. 
+Checks if all requirements for using VersionPress are met on the target environment.
 
 This command is useful when you make changes on the server and want to check whether VersionPress requirements are still met.
 
