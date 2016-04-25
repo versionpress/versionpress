@@ -74,21 +74,6 @@ Note: VersionPress is currently not being tested on HHVM.
 
 Some advanced users like having their plugins directory and other folders outside of the document root. This is currently not supported by VersionPress (it will be one day).
 
-
-### External libraries
-
-VersionPress depends on several external libraries for launching Git processes, working with the file system, etc. The nature of PHP is such that if some other plugin happens to include the same library but in an incompatible version, it might cause issues to VersionPress – or vice versa. There is not much we can do about it so here's just the list of those dependencies so that you know:
-
- - `tracy/tracy` 2.2
- - `nette/utils` 2.2
- - `nette/robot-loader` 2.2
- - `nette/neon` 2.2
- - `symfony/process` 2.5
- - `symfony/filesystem` 2.5
- - `michelf/php-markdown` 1.4
- - `ifsnop/mysqldump-php` 1.x
-
-
 ## Installation
 
 VersionPress can be obtained via the main [versionpress.net website](https://versionpress.net/). When you have the ZIP file, the installation is pretty standard:
