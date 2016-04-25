@@ -192,7 +192,7 @@ class VPInternalCommand extends WP_CLI_Command
      * ## OPTIONS
      *
      * --id=<id>
-     * 
+     *
      * --name=<name>
      *
      * @subcommand get-entity-vpid
