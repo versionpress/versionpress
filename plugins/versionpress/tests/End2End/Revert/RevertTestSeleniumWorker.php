@@ -150,6 +150,32 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
 
     }
 
+    public function prepare_undoNonDbChange()
+    {
+        $this->switchToJavaScriptGui();
+        $themeFile = 'wp-content/themes/twentyfifteen/header.php';
+        file_put_contents(self::$testConfig->testSite->path . '/' . $themeFile, '');
+        $this->url('wp-admin/admin.php?page=versionpress/');
+        $this->waitForElement('.CommitPanel');
+        $this->jsClick('.CommitPanel-notice-toggle');
+        $this->waitForElement('.CommitPanel-commit-button');
+        $this->jsClick('.CommitPanel-commit-button');
+        $this->waitForElement('.CommitPanel-commit-input');
+        $this->byCssSelector('.CommitPanel-commit-input')->value('Manual commit');
+        $this->jsClick('.CommitPanel-commit-button');
+        sleep(1);
+
+        $this->switchToHtmlGui();
+        $this->url('wp-admin/admin.php?page=versionpress/');
+
+        return [['M', $themeFile]];
+    }
+
+    public function undoNonDbChange()
+    {
+        $this->revertLastCommit();
+    }
+
     //---------------------
     // Helper methods
     //---------------------
@@ -210,6 +236,16 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         $updateConfigArgs = [
             'VERSIONPRESS_GUI',
             'html',
+            'require' => 'wp-content/plugins/versionpress/src/Cli/vp-internal.php'
+        ];
+        self::$wpAutomation->runWpCliCommand('vp-internal', 'update-config', $updateConfigArgs);
+    }
+
+    private function switchToJavaScriptGui()
+    {
+        $updateConfigArgs = [
+            'VERSIONPRESS_GUI',
+            'javascript',
             'require' => 'wp-content/plugins/versionpress/src/Cli/vp-internal.php'
         ];
         self::$wpAutomation->runWpCliCommand('vp-internal', 'update-config', $updateConfigArgs);
