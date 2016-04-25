@@ -62,7 +62,7 @@ The following discusses some of the important details if you want to contribute.
 
 - We create them for new features, bugs, improvements or even larger things like planning documents. **We strongly prefer issues over wiki** or other documents as they are actionable and time-framed.
 - [This set of **labels**](https://github.com/versionpress/versionpress/wiki/Issues#labels) is used to categorize issues.
-- Issues go through **four states**: 'open', 'in progress', 'in review' and 'closed'. There's an [**overv.io board**](https://overv.io/workspace/JanVoracek/cautious-tarsier/) board to visualize that. Also, overv.io helps us set priorities – tickets higher up will be worked on first.
+- Issues go through **four states**: 'open', 'in progress', 'in review' and 'closed'. There's an [**overv.io board**](https://overv.io/versionpress/versionpress/) board to visualize that. Also, overv.io helps us set priorities – tickets higher up will be worked on first.
 
 Regarding **branches**, the current release being worked on is **`master`**. It is hence inherently unsafe, even though we do our best to keep it in a good shape.
 
@@ -80,7 +80,7 @@ For small / "safe" changes like updating a README or other Markdown files, quick
 Here are the details:
 
 
-1. When you start working on an issue, **move it to the 'in progress' state** (either visually on the [overv.io board](https://overv.io/workspace/JanVoracek/cautious-tarsier/) or by assigning the `in progress` label to the issue) and **create a new feature branch** for it. Name it `<issue number>-<short description>`, e.g., `123-row-filtering`.
+1. When you start working on an issue, **move it to the 'in progress' state** (either visually on the [overv.io board](https://overv.io/versionpress/versionpress/) or by assigning the `in progress` label to the issue) and **create a new feature branch** for it. Name it `<issue number>-<short description>`, e.g., `123-row-filtering`.
 
     - **Every feature branch should branch off of master**, not another feature branch, even if it depends on it. For dependent feature branches, simply merge between them. This is mainly because when you're going to open a PR for it, you will need to select the target branch (GitHub doesn't let you to change this later) and `master` is the only sensible choice there.
     
@@ -98,7 +98,7 @@ Here are the details:
         It means that the commit belongs to issue `#123`. It makes looking up issues from commits easier.   
 
 
-3. When ready, push the branch, **open a pull request** for it and **move the issue to the 'in review' state** (again, either visually in [overv.io](https://overv.io/workspace/JanVoracek/cautious-tarsier/) or by removing the `in progress` label and adding the `in review` one). You can open a PR early to gather feedback, no worries, you can always add commits to it later. The branch can be push-forced if necessary, it is a "sandbox" to make it great.
+3. When ready, push the branch, **open a pull request** for it and **move the issue to the 'in review' state** (again, either visually in [overv.io](https://overv.io/versionpress/versionpress/) or by removing the `in progress` label and adding the `in review` one). You can open a PR early to gather feedback, no worries, you can always add commits to it later. The branch can be push-forced if necessary, it is a "sandbox" to make it great.
 
     This is an example of a good pull request: [versionpress/versionpress#744](https://github.com/versionpress/versionpress/pull/744). The body usually contains something like:
     
