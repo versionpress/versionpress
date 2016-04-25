@@ -2,7 +2,7 @@
 // NOTE: VersionPress must be fully activated for these commands to be available
 
 // WORD-WRAPPING of the doc comments: 75 chars for option description, 90 chars for everything else,
-// see https://github.com/wp-cli/wp-cli/wiki/Commands-Cookbook#longdesc.
+// see http://wp-cli.org/docs/commands-cookbook/#longdesc.
 // In this source file, wrap long desc at col 97 and option desc at col 84.
 
 namespace VersionPress\Cli;
