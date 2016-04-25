@@ -59,6 +59,7 @@ Open the project at `plugins/versionpress` (still in a *project folder*) and the
 5. External dependencies (`PROJECT_ROOT/ext-libs`) need to be added manually. Go to *Settings > Languages & Frameworks > PHP* and add:
     - `ext-libs/wordpress`
     - `ext-libs/vendor/wp-cli`
+6. Specify a path to Code Sniffer in *Settings* > *Languages & Frameworks* > *PHP* > *Code Sniffer*, click the three dots, _PHP Code Sniffer (phpcs) path_. The path should point to `vendor/bin/phpcs`. After this is done, PhpStorm will start checking the code style locally which is useful because the same checks run on Travis CI once the code is pushed to GitHub. 
 
 
 ### PhpStorm + the 'frontend' project
