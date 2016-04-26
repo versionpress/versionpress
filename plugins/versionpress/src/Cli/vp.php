@@ -100,14 +100,21 @@ class VPCommand extends WP_CLI_Command
 
         if ($valueType === 'dynamic-path') {
             $root = $allowedConstants[$constant]['root'];
+            $fullPath = realpath($value);
 
-            $relativePath = PathUtils::getRelativePath($value, $root);
+            if ($fullPath === false) {
+                WP_CLI::error('Path ' . var_export($value, true) . ' does not exist');
+            }
+
+            $relativePath = PathUtils::getRelativePath($root, $fullPath);
             $updateConfigArgs[1] = '__DIR__' . ($relativePath === '' ? '' : " . '/$relativePath'");
             $updateConfigArgs['plain'] = null;
         }
 
         if ($valueType === 'absolute-path') {
-            $updateConfigArgs['plain'] = null;
+            if (file_exists($value)) {
+                WP_CLI::error('Path ' . var_export($value, true) . ' does not exist');
+            }
         }
 
         if ($isCommon) {
