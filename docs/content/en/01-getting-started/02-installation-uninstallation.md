@@ -70,9 +70,14 @@ WordPress can run on an old and [long unsupported](http://php.net/eol.php) PHP 5
 Note: VersionPress is currently not being tested on HHVM.
 
 
-### Path customizations
+### Project structure
 
-Some advanced users like having their plugins directory and other folders outside of the document root. This is currently not supported by VersionPress (it will be one day).
+Some advanced users like having WordPress in its own directory or move plugins, themes or uploads in another directory. VersionPress supports following scenarios:
+
+- giving WordPress its own directory
+- renaming `wp-content`, `plugins` or `uploads` directories.
+
+See [custom project structure](../feature-focus/custom-project-structure) page for more.
 
 ## Installation
 

@@ -55,7 +55,12 @@ By default, VersionPress calls just `git` which leaves the path resolution up to
 
 ### VP_PROJECT_ROOT
 
-[TODO]
+*Default: `ABSPATH`*  
+*Configuration file: `wp-config.common.php`*
+
+By default, VersionPress creates the repository (and the `.git` directory) in the `ABSPATH` directory. If you [move WordPress into its own directory](../feature-focus/custom-project-structure#giving-wordpress-its-own-directory), you have to define this constant to reflect the original `ABSPATH`.
+
+
 
 
 ### VP_VPDB_DIR
