@@ -13,15 +13,35 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 defined('ABSPATH') or die("Direct access not allowed");
 
 if (version_compare(PHP_VERSION, '5.6', '<')) {
-    register_activation_hook(__FILE__, 'vp_trigger_old_php_error');
+    global $pagenow;
 
-    function vp_trigger_old_php_error()
-    {
-        wp_die('<h1>VersionPress could not be activated</h1>
-            <p>
-                You are using an unsupported version of PHP. We recommend using one of the
-                <a href="http://php.net/supported-versions.php">actively supported</a>.
-            </p>');
+    if ($pagenow == 'plugins.php') {
+        $phpVersionMessage = 'VersionPress requires PHP 5.6 or higher, your version is ' . phpversion() . '. ';
+        $phpVersionMessage .= 'Please upgrade PHP or deactivate VersionPress.';
+
+        add_action("after_plugin_row_versionpress/versionpress.php", 'vp_php_version_inline_error', 10, 2);
+        function vp_php_version_inline_error($file, $plugin_data)
+        {
+            global $phpVersionMessage;
+
+            $wp_list_table = _get_list_table('WP_Plugins_List_Table');
+            echo '<tr class="active plugin-update-tr">';
+            echo '<td colspan="' . $wp_list_table->get_column_count() . '" class="plugin-update colspanchange">';
+            echo '<div class="update-message">';
+            echo $phpVersionMessage;
+            echo '</div></td></tr>';
+        }
+
+        add_action('admin_notices', 'vp_php_version_admin_error_notice');
+        function vp_php_version_admin_error_notice()
+        {
+            global $phpVersionMessage;
+
+            $class = 'notice notice-error';
+            $message = $phpVersionMessage;
+
+            printf('<div class="%1$s"><p>%2$s</p></div>', $class, $message);
+        }
     }
 
     return;
