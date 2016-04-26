@@ -18,6 +18,8 @@ class WpConfigSplitter
         'WP_CONTENT_DIR',
         'WP_PLUGIN_DIR',
         'UPLOADS',
+        'VP_VPDB_DIR',
+        'VP_PROJECT_ROOT',
     ];
 
     public static function split($wpConfigPath, $commonConfigName)
