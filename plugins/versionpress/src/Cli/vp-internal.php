@@ -7,6 +7,7 @@ use VersionPress\Database\VpidRepository;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Initialization\Initializer;
+use VersionPress\Initialization\WpConfigSplitter;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\WpConfigEditor;
 use WP_CLI;
@@ -239,16 +240,17 @@ class VPInternalCommand extends WP_CLI_Command
         $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
         $updateCommonConfig = isset($assoc_args['common']);
 
+        require_once __DIR__ . '/VPCommandUtils.php';
+        require_once __DIR__ . '/../Initialization/WpConfigSplitter.php';
+        require_once __DIR__ . '/../Utils/WpConfigEditor.php';
+
         if ($updateCommonConfig) {
-            $wpConfigPath = dirname($wpConfigPath) . '/wp-config.common.php';
+            $wpConfigPath = dirname($wpConfigPath) . '/' . WpConfigSplitter::COMMON_CONFIG_NAME;
         }
 
         if ($wpConfigPath === false) {
             WP_CLI::error('Config file does not exist. Please run `wp core config` first.');
         }
-
-        require_once __DIR__ . '/VPCommandUtils.php';
-        require_once __DIR__ . '/../Utils/WpConfigEditor.php';
 
         $constantOrVariableName = $args[0];
         $isVariable = isset($assoc_args['variable']);

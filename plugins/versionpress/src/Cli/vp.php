@@ -131,9 +131,8 @@ class VPCommand extends WP_CLI_Command
         defined('SHORTINIT') or define('SHORTINIT', true);
 
         $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
-        $commonConfigName = 'wp-config.common.php';
 
-        $this->requireWpConfig($wpConfigPath, $commonConfigName);
+        $this->requireWpConfig($wpConfigPath, WpConfigSplitter::COMMON_CONFIG_NAME);
 
         require_once __DIR__ . '/../../bootstrap.php';
 
@@ -202,9 +201,8 @@ class VPCommand extends WP_CLI_Command
         defined('SHORTINIT') or define('SHORTINIT', true);
 
         $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
-        $commonConfigName = 'wp-config.common.php';
 
-        $this->requireWpConfig($wpConfigPath, $commonConfigName);
+        $this->requireWpConfig($wpConfigPath, WpConfigSplitter::COMMON_CONFIG_NAME);
         require_once __DIR__ . '/../../bootstrap.php';
 
         if (!VersionPress::isActive()) {
@@ -229,7 +227,7 @@ class VPCommand extends WP_CLI_Command
         $this->setConfigUrl('WP_CONTENT_URL', 'WP_CONTENT_DIR', ABSPATH . 'wp-content', $url);
         $this->setConfigUrl('WP_PLUGIN_URL', 'WP_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins', $url);
 
-        WpConfigSplitter::ensureCommonConfigInclude($wpConfigPath, $commonConfigName);
+        WpConfigSplitter::ensureCommonConfigInclude($wpConfigPath);
 
         // Create or empty database
         $this->prepareDatabase($assoc_args);
@@ -1223,7 +1221,7 @@ class VPCommand extends WP_CLI_Command
         } else {
             WP_CLI::error('wp-config.php file not found');
         }
-        if (file_exists($commonConfigName)) {
+        if (file_exists($commonConfigPath)) {
             require_once $commonConfigPath;
         } else {
             WP_CLI::error($commonConfigName . ' file not found.');
