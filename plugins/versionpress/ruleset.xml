@@ -16,6 +16,7 @@
         <exclude-pattern>src/Cli/vp.php</exclude-pattern>
         <exclude-pattern>src/Cli/vp-internal.php</exclude-pattern>
         <exclude-pattern>versionpress.php</exclude-pattern>
+        <exclude-pattern>setup-hooks.php</exclude-pattern>
     </rule>
 
     <rule ref="Generic.Files.LineLength.TooLong">
