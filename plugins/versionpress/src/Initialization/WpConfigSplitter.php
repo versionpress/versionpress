@@ -14,6 +14,8 @@ use Nette\Utils\Strings;
 class WpConfigSplitter
 {
 
+    const COMMON_CONFIG_NAME = 'wp-config.common.php';
+
     private static $constantsForExtraction = [
         'WP_CONTENT_DIR',
         'WP_PLUGIN_DIR',
@@ -22,7 +24,7 @@ class WpConfigSplitter
         'VP_PROJECT_ROOT',
     ];
 
-    public static function split($wpConfigPath, $commonConfigName)
+    public static function split($wpConfigPath, $commonConfigName = self::COMMON_CONFIG_NAME)
     {
         $wpConfigDir = dirname($wpConfigPath);
         $commonConfigPath = $wpConfigDir . '/' . $commonConfigName;
@@ -61,7 +63,7 @@ class WpConfigSplitter
      * @param $wpConfigPath
      * @param $commonConfigName
      */
-    public static function ensureCommonConfigInclude($wpConfigPath, $commonConfigName)
+    public static function ensureCommonConfigInclude($wpConfigPath, $commonConfigName = self::COMMON_CONFIG_NAME)
     {
         $include = <<<DOC
 // Configuration common to all environments

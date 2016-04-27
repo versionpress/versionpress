@@ -563,9 +563,7 @@ class Initializer
     private function createCommonConfig()
     {
         $configPath = WordPressMissingFunctions::getWpConfigPath();
-        $commonConfigName = 'wp-config.common.php';
-
-        WpConfigSplitter::split($configPath, $commonConfigName);
+        WpConfigSplitter::split($configPath);
     }
 
     private function adjustGitProcessTimeout()

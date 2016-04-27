@@ -18,6 +18,7 @@ use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Git\Reverter;
 use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\VersionPressOptions;
+use VersionPress\Initialization\WpConfigSplitter;
 use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Storages\Mirror;
 use VersionPress\Utils\CompatibilityChecker;
@@ -25,6 +26,7 @@ use VersionPress\Utils\CompatibilityResult;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\IdUtil;
 use VersionPress\Utils\UninstallationUtil;
+use VersionPress\Utils\WordPressMissingFunctions;
 use VersionPress\VersionPress;
 
 defined('ABSPATH') or die("Direct access not allowed");
@@ -603,6 +605,7 @@ function vp_gettext_filter_plugin_activated($translation, $text, $domain)
  */
 function vp_activate()
 {
+    WpConfigSplitter::split(WordPressMissingFunctions::getWpConfigPath());
     set_transient('vp_just_activated', '1', 10);
 }
 
