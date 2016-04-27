@@ -3,7 +3,7 @@
 use VersionPress\VersionPress;
 
 $apiConfig = [
-    'root' => get_site_url(),
+    'root' => get_home_url(),
     'adminUrl' => get_admin_url(),
     'urlPrefix' => rest_get_url_prefix(),
     'queryParam' => 'rest_route',
