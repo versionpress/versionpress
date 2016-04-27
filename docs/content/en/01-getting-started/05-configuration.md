@@ -52,6 +52,14 @@ Below are listed some of the supported constants. To get an always-up-to-date li
 
 By default, VersionPress calls just `git` which leaves the path resolution up to the operating system. That might be problematic on some server configurations which use different `PATH` for different users (the web server user might not be the same user under which you are logged in), there might be some `PATH` caching involved, etc. If VersionPress cannot detect Git for some reason, use this option.
 
+### VP\_VPDB\_DIR
+
+*Default: `WP_CONTENT_DIR . '/vpdb'`*  
+*Configuration file: `wp-config.common.php`*
+
+By default, VersionPress saves all its content into the `vpdb` directory under `WP_CONTENT_DIR`. You can change it by setting this constant. `VP_VPDB_DIR` must be under the `VP_PROJECT_ROOT`.
+
+
 
 ### VP_PROJECT_ROOT
 
