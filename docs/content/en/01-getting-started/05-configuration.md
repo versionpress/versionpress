@@ -46,7 +46,7 @@ By default, VersionPress calls just `git` which leaves the path resolution up to
 *Default: `WP_CONTENT_DIR . '/vpdb'`*  
 *Configuration file: `wp-config.common.php`*
 
-By default, VersionPress saves all its content into the `vpdb` directory under `WP_CONTENT_DIR`. You can change it by setting this constant.
+By default, VersionPress saves all its content into the `vpdb` directory under `WP_CONTENT_DIR`. You can change it by setting this constant. `VP_VPDB_DIR` must be under the `VP_PROJECT_ROOT`.
 
 
 
