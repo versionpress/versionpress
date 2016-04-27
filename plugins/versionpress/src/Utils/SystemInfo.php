@@ -113,6 +113,8 @@ class SystemInfo
         $info = [];
 
         $info['wp-version'] = get_bloginfo('version');
+        $info['siteurl'] = get_site_url();
+        $info['home'] = get_home_url();
 
         if (!function_exists('get_plugins')) {
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
