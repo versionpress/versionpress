@@ -51,6 +51,10 @@ class IniSerializer
 
     private static $numberMarker = '<<<VP-Number>>>';
 
+    private static $nullMarker = '<<<VP-Null>>>>';
+
+    private static $nullValue = '<null>';
+
     /**
      * Serializes sectioned data array into an INI string
      *
@@ -157,6 +161,7 @@ class IniSerializer
         $string = self::eolWorkaround_addPlaceholders($string);
         $string = self::sanitizeSectionsAndKeys_addPlaceholders($string);
         $string = self::preserveNumbers($string);
+        $string = self::preserveNULLs($string);
         $deserialized = parse_ini_string($string, true, INI_SCANNER_RAW);
         $deserialized = self::restoreTypesOfValues($deserialized);
         $deserialized = self::sanitizeSectionsAndKeys_removePlaceholders($deserialized);
@@ -285,6 +290,15 @@ class IniSerializer
         }, $iniString);
     }
 
+    private static function preserveNULLs($iniString)
+    {
+        https://regex101.com/r/tF2wK2/1
+        $re = "/= (<null>)\\r?\\n/m";
+        return preg_replace_callback($re, function ($m) {
+            return str_replace('= ', '= ' . self::$nullMarker, $m[0]);
+        }, $iniString);
+    }
+
     /**
      * Serializes key-value pair
      *
@@ -294,7 +308,12 @@ class IniSerializer
      */
     private static function serializeKeyValuePair($key, $value)
     {
-        return $key . " = " . (is_string($value) ? '"' . self::escapeString($value) . '"' : $value);
+        if (is_null($value)) {
+            $value = self::$nullValue;
+        } elseif (is_string($value)) {
+            $value = '"' . self::escapeString($value) . '"';
+        }
+        return $key . " = " . $value;
     }
 
     private static function sanitizeSectionsAndKeys_addPlaceholders($string) // @codingStandardsIgnoreLine
@@ -384,6 +403,8 @@ class IniSerializer
                 if (Strings::startsWith($value, self::$numberMarker)) {
                     // strip the marker and convert to number
                     $result[$key] = str_replace(self::$numberMarker, '', $value) + 0;
+                } elseif (Strings::startsWith($value, self::$nullMarker)) {
+                    $result[$key] = null;
                 } else {
                     $result[$key] = self::unescapeString($value);
                 }

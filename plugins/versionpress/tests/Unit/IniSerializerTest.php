@@ -1419,4 +1419,36 @@ INI
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
     }
+
+    /**
+     * @test
+     */
+    public function nullValueSerializesCorrectly()
+    {
+        $data = ["Section" => ["data" => null]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <null>
+
+INI
+        );
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function stringContaingNullPlaceholderIsDeserializedToOriginalString()
+    {
+        $data = ["Section" => ["data" => "<null>"]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = "<null>"
+
+INI
+        );
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
 }

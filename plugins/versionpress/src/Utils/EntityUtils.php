@@ -33,7 +33,7 @@ class EntityUtils
     {
         $diff = [];
         foreach ($newEntityData as $key => $value) {
-            if (!isset($oldEntityData[$key]) || self::isChanged($oldEntityData[$key], $value)) {
+            if (!array_key_exists($key, $oldEntityData) || self::isChanged($oldEntityData[$key], $value)) {
                 $diff[$key] = $value;
             }
         }
