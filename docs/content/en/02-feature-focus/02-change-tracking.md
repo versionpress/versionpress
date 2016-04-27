@@ -163,7 +163,9 @@ You can use any Git client for it or, since VersionPress 2.0, there is a GUI for
 
 VersionPress treats manual commits exactly the same as auto-generated commits – they will be visible in the table, [undo or rollback](./undo-and-rollback) them, etc.
 
+## Frequent DB writes
 
+Some entities are changed very often, e.g., view counters, Akismet spam count, etc. VersionPress only saves them once in an hour. Thus, you don't need to worry about being flooded with commits.
 
 ## What's not tracked
 
