@@ -7,7 +7,8 @@ namespace VersionPress\Utils;
  * (for instance if the SQL update method is captured and only part of the entity data
  * is available). Here are some helper methods for such arrays.
  */
-class EntityUtils {
+class EntityUtils
+{
 
     /**
      * Used by storages to determine a diff between two entity data. Note that the data might

@@ -51,7 +51,7 @@ class IniSerializer
 
     private static $numberMarker = '<<<VP-Number>>>';
 
-    private static $nullMarker= '<null>';
+    private static $nullMarker = '<null>';
 
     /**
      * Serializes sectioned data array into an INI string
