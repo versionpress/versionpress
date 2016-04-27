@@ -3,20 +3,20 @@
     <rule ref="PSR2"/>
 
     <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
-        <exclude-pattern>*Worker.php</exclude-pattern>
-        <exclude-pattern>*Test.php</exclude-pattern>
+        <exclude-pattern type="relative">*Worker.php</exclude-pattern>
+        <exclude-pattern type="relative">*Test.php</exclude-pattern>
     </rule>
 
     <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
-        <exclude-pattern>admin/deactivate.php</exclude-pattern>
-        <exclude-pattern>admin/system-info.php</exclude-pattern>
-        <exclude-pattern>admin/inc/activate.php</exclude-pattern>
-        <exclude-pattern>bootstrap.php</exclude-pattern>
-        <exclude-pattern>src/Api/VersionPressApi.php</exclude-pattern>
-        <exclude-pattern>src/Cli/vp.php</exclude-pattern>
-        <exclude-pattern>src/Cli/vp-internal.php</exclude-pattern>
-        <exclude-pattern>versionpress.php</exclude-pattern>
-        <exclude-pattern>setup-hooks.php</exclude-pattern>
+        <exclude-pattern type="relative">admin/deactivate.php</exclude-pattern>
+        <exclude-pattern type="relative">admin/system-info.php</exclude-pattern>
+        <exclude-pattern type="relative">admin/inc/activate.php</exclude-pattern>
+        <exclude-pattern type="relative">bootstrap.php</exclude-pattern>
+        <exclude-pattern type="relative">src/Api/VersionPressApi.php</exclude-pattern>
+        <exclude-pattern type="relative">src/Cli/vp.php</exclude-pattern>
+        <exclude-pattern type="relative">src/Cli/vp-internal.php</exclude-pattern>
+        <exclude-pattern type="relative">versionpress.php</exclude-pattern>
+        <exclude-pattern type="relative">setup-hooks.php</exclude-pattern>
     </rule>
 
     <rule ref="Generic.Files.LineLength.TooLong">
@@ -28,7 +28,8 @@
 
     <file>./</file>
 
-    <exclude-pattern>*/tests/*</exclude-pattern>
-    <exclude-pattern>*/vendor/*</exclude-pattern>
-    <exclude-pattern>*/log/*</exclude-pattern>
+    <exclude-pattern type="relative">tests/*</exclude-pattern>
+    <exclude-pattern type="relative">vendor/*</exclude-pattern>
+    <exclude-pattern type="relative">log/*</exclude-pattern>
+    <exclude-pattern type="relative">temp/*</exclude-pattern>
 </ruleset>
