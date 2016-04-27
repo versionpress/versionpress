@@ -30,6 +30,5 @@
 
     <exclude-pattern>*/tests/*</exclude-pattern>
     <exclude-pattern>*/vendor/*</exclude-pattern>
-    <exclude-pattern>*/temp/*</exclude-pattern>
     <exclude-pattern>*/log/*</exclude-pattern>
 </ruleset>
