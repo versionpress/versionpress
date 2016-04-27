@@ -51,6 +51,8 @@ class IniSerializer
 
     private static $numberMarker = '<<<VP-Number>>>';
 
+    private static $nullMarker= '<null>';
+
     /**
      * Serializes sectioned data array into an INI string
      *
@@ -294,7 +296,12 @@ class IniSerializer
      */
     private static function serializeKeyValuePair($key, $value)
     {
-        return $key . " = " . (is_string($value) ? '"' . self::escapeString($value) . '"' : $value);
+        if (is_null($value)) {
+            $value = self::$nullMarker;
+        } elseif (is_string($value)) {
+            $value = '"' . self::escapeString($value) . '"';
+        }
+        return $key . " = " . $value;
     }
 
     private static function sanitizeSectionsAndKeys_addPlaceholders($string) // @codingStandardsIgnoreLine
@@ -384,6 +391,8 @@ class IniSerializer
                 if (Strings::startsWith($value, self::$numberMarker)) {
                     // strip the marker and convert to number
                     $result[$key] = str_replace(self::$numberMarker, '', $value) + 0;
+                } elseif ($value === self::$nullMarker) {
+                    $result[$key] = null;
                 } else {
                     $result[$key] = self::unescapeString($value);
                 }
