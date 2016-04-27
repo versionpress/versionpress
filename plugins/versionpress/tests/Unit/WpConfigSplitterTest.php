@@ -101,9 +101,6 @@ define( 'AUTOMATIC_UPDATER_DISABLED', true );
 DOC;
 
     private $commonConfig = <<<'DOC'
-<?php
-// Configuration common to all VersionPress environments, included from `wp-config.php`.
-// Learn more at https://docs.versionpress.net/en/getting-started/configuration
 define( 'WP_CONTENT_DIR', '/Users/johndoe/Sites/wp/app' ); // Do not remove. Removing this line could break your site. Added by Security > Settings > Change Content Directory.
 define('WP_PLUGIN_DIR', WP_CONTENT_DIR . '/addons');
 define('UPLOADS', 'uploads');
@@ -120,6 +117,8 @@ DOC;
         $this->wpConfigPath = __DIR__ . '/wp-config.php';
         $this->commonConfigPath = dirname($this->wpConfigPath) . '/' . $this->commonConfigName;
         file_put_contents($this->wpConfigPath, $this->originalConfig);
+        $commonConfigTemplate = file_get_contents('../../src/Initialization/wp-config.common.tpl.php');
+        $this->commonConfig = $commonConfigTemplate . $this->commonConfig;
         @unlink($this->commonConfigPath);
     }
 
