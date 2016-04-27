@@ -285,7 +285,7 @@ class SerializedDataToIniConverter
             return self::convertObjectToSerializedString($type, $relatedLines);
         }
 
-        if ($type === 'null') {
+        if ($type === 'null' || $value === null) {
             return 'N;';
         }
 
