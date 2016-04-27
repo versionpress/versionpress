@@ -86,14 +86,14 @@ VP tags are pieces of metadata that VersionPress stores with each commit. For ex
 VP-Action: option/edit/blogname
 
 X-VP-Version: 3.0
-X-VP-Environment: master
+X-VP-Environment: staging
 ```
 
 You can search for VP tags, either in a full form or without the `VP-` / `X-VP-` prefix. Some examples that will work equally fine against the commit above are:
 
-- `environment: master`
-- `X-VP-Environment: master`
-- `VP-environment: MASTER`
+- `environment: staging`
+- `X-VP-Environment: staging`
+- `VP-environment: STAGING`
 - `action: option/edit/blogname`
 - `VP-Action: option/edit/*`
 - `Action: */edit/*`
