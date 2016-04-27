@@ -4,7 +4,7 @@ since: 3.0
 
 # Custom project structure
 
-Some advanced users like having WordPress in its own directory or move plugins, themes or uploads in another directory. VersionPress supports some scenarios.
+Some advanced users like having WordPress in its own directory or move plugins, themes or uploads in another directory. VersionPress supports some scenarios. Just remember that all files related to the site have to be under the project root ([`VP_PROJECT_ROOT`](../getting-started/configuration#vp_project_root)).
 
 <div class="important">
   <strong>Note</strong>
