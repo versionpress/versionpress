@@ -52,7 +52,10 @@ All of the syntaxes above can be freely combined.
 
 Author of the action. You can use author name or his/her email, wildcards are supported.
 
-Anonymous actions like posting a comment on a blog are tracked under a virtual user `nonadmin@example.com`.
+There are two special authors:
+
+- `author:nonadmin@example.com` finds anonymous actions like posting a comment on a blog.
+- `author:wp-cli` finds actions done via [WP-CLI](http://wp-cli.org/).
 
 
 ### `date:`
