@@ -24,7 +24,7 @@ The server environment must match certain requirements, some of which are checke
 
 Minimum system requirements are (as a general rule, **we recommend using the latest versions of everything**):
 
- - WordPress 4.4 or higher (3.9+ should work but is not thoroughly tested)
+ - WordPress 4.4 or higher (4.1+ should work but is not thoroughly tested)
  - PHP 5.6 or higher
  - Git 1.9 or higher installed on the server
  - Apache, nginx or IIS 7+ web server
