@@ -207,6 +207,8 @@ class VPCommand extends WP_CLI_Command
 
         defined('SHORTINIT') or define('SHORTINIT', true);
 
+        require_once __DIR__ . '/../Initialization/WpConfigSplitter.php';
+
         $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
 
         $this->requireWpConfig($wpConfigPath, WpConfigSplitter::COMMON_CONFIG_NAME);
