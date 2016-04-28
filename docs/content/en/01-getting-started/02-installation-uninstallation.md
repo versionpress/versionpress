@@ -25,7 +25,7 @@ The server environment must match certain requirements, some of which are checke
 Minimum system requirements are (as a general rule, **we recommend using the latest versions of everything**):
 
  - WordPress 4.1 or higher (3.9+ should work but is not thoroughly tested)
- - PHP 5.3 or higher
+ - PHP 5.6 or higher
  - Git 1.9 or higher installed on the server
  - Apache or IIS 7+ web server
  - Safe mode turned off
@@ -63,9 +63,9 @@ The sensitive locations are:
 We ship `.htaccess` rules for Apache, `web.config` rules for IIS and `wp-content/plugins/versionpress/versionpress-nginx.conf` template for nginx but please confirm manually that direct access to e.g. `yoursite/.git/config` is prevented.
 
 
-### PHP 5.3
+### PHP 5.6
 
-WordPress can run on an old and [long unsupported](http://php.net/eol.php) PHP 5.2. We also started with this version but eventually dropped it so that we could use the newer language features and some 3<sup>rd</sup> party libraries that are 5.3+ only. We recommend using one of the [actively supported](http://php.net/supported-versions.php) PHP versions.
+WordPress can run on an old and [long unsupported](http://php.net/eol.php) PHP 5.2. We also started with this version but eventually dropped it so that we could use the newer language features and some 3<sup>rd</sup> party libraries. We recommend using one of the [actively supported](http://php.net/supported-versions.php) PHP versions.
 
 Note: VersionPress is currently not being tested on HHVM.
 
