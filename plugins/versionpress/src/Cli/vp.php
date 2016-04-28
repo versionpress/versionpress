@@ -401,10 +401,10 @@ class VPCommand extends WP_CLI_Command
             WP_CLI::error("Clone name '$name' is not valid. It can only contain letters, numbers, hyphens and underscores.");
         }
 
-        $currentWpPath = get_home_path();
+        $currentWpPath = realpath(VP_PROJECT_ROOT);
         $cloneDirName = $name;
         $clonePath = dirname($currentWpPath) . '/' . $cloneDirName;
-        $cloneVpPluginPath = $clonePath . '/' . str_replace(realpath(ABSPATH), '', realpath(VERSIONPRESS_PLUGIN_DIR));
+        $cloneVpPluginPath = $clonePath . '/' . str_replace($currentWpPath, '', realpath(VERSIONPRESS_PLUGIN_DIR));
 
         $cloneDbUser = isset($assoc_args['dbuser']) ? $assoc_args['dbuser'] : DB_USER;
         $cloneDbPassword = isset($assoc_args['dbpass']) ? $assoc_args['dbpass'] : DB_PASSWORD;
@@ -426,7 +426,7 @@ class VPCommand extends WP_CLI_Command
             $prefixChanged = true;
         }
 
-        $currentUrl = get_site_url();
+        $currentUrl = get_home_url();
         $suggestedUrl = $this->suggestCloneUrl($currentUrl, basename($currentWpPath), $cloneDirName);
 
         if (!$suggestedUrl && !isset($assoc_args['siteurl'])) {
@@ -512,8 +512,9 @@ class VPCommand extends WP_CLI_Command
         }
 
         // Copy & Update wp-config
-        $wpConfigFile = $clonePath . '/wp-config.php';
-        copy(\WP_CLI\Utils\locate_wp_config(), $wpConfigFile);
+        $wpConfigFile = \WP_CLI\Utils\locate_wp_config();
+        $cloneConfigFile = str_replace($currentWpPath, $clonePath, $wpConfigFile);
+        copy($wpConfigFile, $cloneConfigFile);
 
         $this->updateConfig(
             $clonePath,

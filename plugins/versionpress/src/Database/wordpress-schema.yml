@@ -113,7 +113,6 @@ option:
     - 'option_name: _site_transient_*'
     - 'option_name: cron'
     - 'option_name: home'
-    - 'option_name: siteurl'
     - 'option_name: db_upgraded'
     - 'option_name: rewrite_rules'
     - 'option_name: recently_edited'
