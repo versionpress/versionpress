@@ -57,14 +57,14 @@ class CommitMessage
     }
 
     /**
-     * Returns commit message subject without prefix set in constant VP_COMMIT_MESSAGE_PREFIX
-     * 
+     * Returns commit message subject without prefix set in constant VERSIONPRESS_COMMIT_MESSAGE_PREFIX
+     *
      * @return string
      */
     public function getUnprefixedSubject()
     {
-        if (Strings::startsWith($this->subject, VP_COMMIT_MESSAGE_PREFIX)) {
-            return substr($this->subject, strlen(VP_COMMIT_MESSAGE_PREFIX), strlen($this->subject));
+        if (Strings::startsWith($this->subject, VERSIONPRESS_COMMIT_MESSAGE_PREFIX)) {
+            return substr($this->subject, strlen(VERSIONPRESS_COMMIT_MESSAGE_PREFIX), strlen($this->subject));
         }
         return $this->subject;
     }

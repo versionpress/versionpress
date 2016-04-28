@@ -54,11 +54,11 @@ if (!defined('VERSIONPRESS_REQUIRE_API_AUTH')) {
     define('VERSIONPRESS_REQUIRE_API_AUTH', true);
 }
 
-if (!defined('VP_COMMIT_MESSAGE_PREFIX')) {
+if (!defined('VERSIONPRESS_COMMIT_MESSAGE_PREFIX')) {
     /**
      * Prefix added in front of each commit message subject created by VersionPress
      */
-    define('VP_COMMIT_MESSAGE_PREFIX', '[VP] ');
+    define('VERSIONPRESS_COMMIT_MESSAGE_PREFIX', '[VP] ');
 }
 
 require_once(VERSIONPRESS_PLUGIN_DIR . '/vendor/autoload.php');
