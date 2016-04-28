@@ -148,7 +148,7 @@ class DIContainer
         });
 
         $dic->register(VersionPressServices::REPOSITORY, function () {
-            return new GitRepository(VP_PROJECT_ROOT, VERSIONPRESS_TEMP_DIR, "[VP] ", VP_GIT_BINARY);
+            return new GitRepository(VP_PROJECT_ROOT, VERSIONPRESS_TEMP_DIR, VP_COMMIT_MESSAGE_PREFIX, VP_GIT_BINARY);
         });
 
         $dic->register(VersionPressServices::VPID_REPOSITORY, function () use ($dic) {

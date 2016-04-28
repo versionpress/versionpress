@@ -33,6 +33,6 @@ class UntrackedChangeInfo implements ChangeInfo
 
     public function getChangeDescription()
     {
-        return $this->commitMessage->getSubject();
+        return $this->commitMessage->getUnprefixedSubject();
     }
 }
