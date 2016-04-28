@@ -68,7 +68,7 @@ class WpConfigEditor
             $originalContent = $wpConfigContent;
             $endOfEditableSection = $this->isCommonConfig ?
                 strlen($originalContent) :
-                strpos($wpConfigContent, '/* That\'s all, stop editing! Happy blogging. */');
+                $this->findPositionForAddingNewDefinition($wpConfigContent);
 
             if ($endOfEditableSection === false) {
                 throw new \Exception('Editable section not found.');
@@ -80,5 +80,34 @@ class WpConfigEditor
         }
 
         file_put_contents($this->wpConfigPath, $wpConfigContent);
+    }
+
+    private function findPositionForAddingNewDefinition($wpConfigContent)
+    {
+        // https://regex101.com/r/aB8rY4/1
+        $thatsAllCommentPattern = "/\\/\\*.*!.*\\*\\//"; // one-line comment containing exclamation mark
+        preg_match($thatsAllCommentPattern, $wpConfigContent, $matches, PREG_OFFSET_CAPTURE);
+
+        if ($matches) {
+            return $matches[0][1];
+        }
+
+        // https://regex101.com/r/fY6eC6/1
+        $ifDefinedAbspathPattern = "/if.*defined.*ABSPATH.*/";
+        preg_match($ifDefinedAbspathPattern, $wpConfigContent, $matches, PREG_OFFSET_CAPTURE);
+
+        if ($matches) {
+            return $matches[0][1];
+        }
+
+        // https://regex101.com/r/vG5rB0/1
+        $requireWpSettingsPattern = "/require.*wp-settings/";
+        preg_match($requireWpSettingsPattern, $wpConfigContent, $matches, PREG_OFFSET_CAPTURE);
+
+        if ($matches) {
+            return $matches[0][1];
+        }
+
+        return 0;
     }
 }
