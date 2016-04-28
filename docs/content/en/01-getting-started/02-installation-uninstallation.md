@@ -24,14 +24,14 @@ The server environment must match certain requirements, some of which are checke
 
 Minimum system requirements are (as a general rule, **we recommend using the latest versions of everything**):
 
- - WordPress 4.1 or higher (3.9+ should work but is not thoroughly tested)
+ - WordPress 4.4 or higher (4.1+ should work but is not thoroughly tested)
  - PHP 5.6 or higher
  - Git 1.9 or higher installed on the server
- - Apache or IIS 7+ web server
+ - Apache, nginx or IIS 7+ web server
  - Safe mode turned off
  - `proc_open()` enabled
  - Write permissions in the site root and everywhere under it
- - No path customizations at the moment (e.g., custom location for `wp-content`)
+ - Standard WordPress configuration system (`wp-config.php`)
 
 On top of that, if you want to use the [multi-instance / sync features](../sync) of VersionPress 2.0, probably even more control over the requirement will be required. In practice, this means that a custom server / VPS is your best bet. See also the section on [hosting providers](../integrations/hosts).
 
