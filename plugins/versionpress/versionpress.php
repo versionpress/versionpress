@@ -12,6 +12,9 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
 defined('ABSPATH') or die("Direct access not allowed");
 
+/** Useful for registering hooks in setup-hooks.php */
+define('VERSIONPRESS_PLUGIN_FILE', __FILE__);
+
 if (version_compare(PHP_VERSION, '5.6', '<')) {
     global $pagenow;
 

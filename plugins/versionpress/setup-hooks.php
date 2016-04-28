@@ -566,8 +566,8 @@ function vp_create_update_post_terms_hook(Mirror $mirror, VpidRepository $vpidRe
 // Activation and deactivation
 //----------------------------------
 
-register_activation_hook(__FILE__, 'vp_activate');
-register_deactivation_hook(__FILE__, 'vp_deactivate');
+register_activation_hook(VERSIONPRESS_PLUGIN_FILE, 'vp_activate');
+register_deactivation_hook(VERSIONPRESS_PLUGIN_FILE, 'vp_deactivate');
 add_action('admin_post_cancel_deactivation', 'vp_admin_post_cancel_deactivation');
 add_action('admin_post_confirm_deactivation', 'vp_admin_post_confirm_deactivation');
 add_action('send_headers', 'vp_send_headers');
@@ -905,13 +905,13 @@ function vp_enqueue_styles_and_scripts()
         $vpVersion = VersionPress::getVersion();
         wp_enqueue_style(
             'versionpress_popover_style',
-            plugins_url('admin/public/css/jquery.webui-popover.min.css', __FILE__),
+            plugins_url('admin/public/css/jquery.webui-popover.min.css', VERSIONPRESS_PLUGIN_FILE),
             [],
             $vpVersion
         );
         wp_enqueue_style(
             'versionpress_popover_custom_style',
-            plugins_url('admin/public/css/popover-custom.css', __FILE__),
+            plugins_url('admin/public/css/popover-custom.css', VERSIONPRESS_PLUGIN_FILE),
             [],
             $vpVersion
         );
@@ -919,7 +919,7 @@ function vp_enqueue_styles_and_scripts()
         wp_enqueue_script('jquery');
         wp_enqueue_script(
             'versionpress_popover_script',
-            plugins_url('admin/public/js/jquery.webui-popover.min.js', __FILE__),
+            plugins_url('admin/public/js/jquery.webui-popover.min.js', VERSIONPRESS_PLUGIN_FILE),
             'jquery',
             $vpVersion
         );
@@ -930,12 +930,23 @@ add_action('admin_enqueue_scripts', 'vp_enqueue_admin_styles_and_scripts');
 function vp_enqueue_admin_styles_and_scripts()
 {
     $vpVersion = VersionPress::getVersion();
-    wp_enqueue_style('versionpress_admin_style', plugins_url('admin/public/css/style.css', __FILE__), [], $vpVersion);
-    wp_enqueue_style('versionpress_admin_icons', plugins_url('admin/public/icons/style.css', __FILE__), [], $vpVersion);
+    wp_enqueue_style(
+        'versionpress_admin_style',
+        plugins_url('admin/public/css/style.css', VERSIONPRESS_PLUGIN_FILE),
+        [],
+        $vpVersion
+    );
+
+    wp_enqueue_style(
+        'versionpress_admin_icons',
+        plugins_url('admin/public/icons/style.css', VERSIONPRESS_PLUGIN_FILE),
+        [],
+        $vpVersion
+    );
 
     wp_enqueue_script(
         'versionpress_admin_script',
-        plugins_url('admin/public/js/vp-admin.js', __FILE__),
+        plugins_url('admin/public/js/vp-admin.js', VERSIONPRESS_PLUGIN_FILE),
         [],
         $vpVersion
     );
