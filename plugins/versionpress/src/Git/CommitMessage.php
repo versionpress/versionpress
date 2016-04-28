@@ -57,6 +57,19 @@ class CommitMessage
     }
 
     /**
+     * Returns commit message subject without prefix set in constant VERSIONPRESS_COMMIT_MESSAGE_PREFIX
+     *
+     * @return string
+     */
+    public function getUnprefixedSubject()
+    {
+        if (Strings::startsWith($this->subject, VERSIONPRESS_COMMIT_MESSAGE_PREFIX)) {
+            return substr($this->subject, strlen(VERSIONPRESS_COMMIT_MESSAGE_PREFIX), strlen($this->subject));
+        }
+        return $this->subject;
+    }
+
+    /**
      * Rest of the commit message (all text except the subject). Usually
      * just the VP tags but body might also contain some other information.
      *

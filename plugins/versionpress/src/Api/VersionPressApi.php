@@ -534,7 +534,7 @@ class VersionPressApi
             ],
             RevertStatus::VIOLATED_REFERENTIAL_INTEGRITY => [
                 'class' => 'error',
-                'message' => 'Error: Objects with missing references cannot be restored. '.
+                'message' => 'Error: Objects with missing references cannot be restored. ' .
                     'For example we cannot restore comment where the related post was deleted.',
                 'status' => 403
             ],
@@ -606,7 +606,7 @@ class VersionPressApi
         if ($changeInfo instanceof RevertChangeInfo) {
             $commit = $this->gitRepository->getCommit($changeInfo->getCommitHash());
             $change['tags']['VP-Commit-Details'] = [
-                'message' => $commit->getMessage()->getSubject(),
+                'message' => $commit->getMessage()->getUnprefixedSubject(),
                 'date' => $commit->getDate()->format(\DateTime::ISO8601)
             ];
         }
