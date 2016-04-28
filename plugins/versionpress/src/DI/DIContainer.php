@@ -164,7 +164,7 @@ class DIContainer
         });
 
         $dic->register(VersionPressServices::URL_REPLACER, function () {
-            return new AbsoluteUrlReplacer(get_site_url());
+            return new AbsoluteUrlReplacer(get_home_url());
         });
 
         $dic->register(VersionPressServices::SHORTCODES_REPLACER, function () use ($dic) {
