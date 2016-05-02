@@ -8,11 +8,11 @@
   "filesGlob": [
     "src/**/*.ts",
     "src/**/*.tsx",
-    "typings/typings.d.ts",
+    "typings/browser.d.ts",
     "!./node_modules/**/*.ts",
     "!./node_modules/**/*.tsx"
   ],
   "files": [
-    "typings/typings.d.ts"
+    "typings/browser.d.ts"
   ]
 }

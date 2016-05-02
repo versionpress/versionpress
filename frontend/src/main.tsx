@@ -1,4 +1,4 @@
-/// <reference path='../typings/typings.d.ts' />
+/// <reference path='../typings/browser.d.ts' />
 
 /* tslint:disable:variable-name no-unused-variable */
 
