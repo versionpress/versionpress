@@ -5,25 +5,13 @@
   "path": "typings/tsd",
   "bundle": "typings/tsd/tsd.d.ts",
   "installed": {
-    "assertion-error/assertion-error.d.ts": {
-      "commit": "e69fe60f2d6377ea4fae539493997b098f52cad1"
-    },
-    "chai/chai.d.ts": {
-      "commit": "e69fe60f2d6377ea4fae539493997b098f52cad1"
-    },
     "core-js/core-js.d.ts": {
       "commit": "e69fe60f2d6377ea4fae539493997b098f52cad1"
     },
     "diff/diff.d.ts": {
       "commit": "e69fe60f2d6377ea4fae539493997b098f52cad1"
     },
-    "sinon/sinon.d.ts": {
-      "commit": "e69fe60f2d6377ea4fae539493997b098f52cad1"
-    },
     "lodash/lodash.d.ts": {
-      "commit": "e69fe60f2d6377ea4fae539493997b098f52cad1"
-    },
-    "mocha/mocha.d.ts": {
       "commit": "e69fe60f2d6377ea4fae539493997b098f52cad1"
     },
     "moment/moment.d.ts": {
