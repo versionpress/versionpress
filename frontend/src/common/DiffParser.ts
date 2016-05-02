@@ -11,7 +11,7 @@ export default class DiffParser {
     for (let i = 0; i < lines.length; i++) {
       let line = lines[i];
       let nextLine = lines[i + 1];
-      let afterNextLine = lines [i + 2]
+      let afterNextLine = lines [i + 2];
       let lineMatch = line.match(/^---\s(\S+)/);
       let nextLineMatch = nextLine ? nextLine.match(/^\+\+\+\s(\S+)/) : null;
       let afterNextLineMatch = afterNextLine ? afterNextLine.match(/^(diff --git)/) : true;
@@ -27,7 +27,7 @@ export default class DiffParser {
         i++; // Skip the +++ line
 
       } else if (line.match(/^(new|deleted) file mode .*/) && afterNextLineMatch) { // Empty files
-        let addedFileMatch = lines[i-1].match(/^diff --git (.*) (.*)/);
+        let addedFileMatch = lines[i - 1].match(/^diff --git (.*) (.*)/);
         let addDeleteMatch = line.match(/^(new|deleted) file mode .*/);
         addDeleteMatch[1] === 'new' ? addedFileMatch[1] = '/dev/null' : addedFileMatch[2] = '/dev/null';
         diffs.push({from: addedFileMatch[1], to: addedFileMatch[2], chunks: [], type: 'plain'});
