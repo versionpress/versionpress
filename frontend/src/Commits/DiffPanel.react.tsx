@@ -105,8 +105,23 @@ export default class DiffPanel extends React.Component<DiffPanelProps, any> {
     return [left, right];
   }
 
-  private static formatChunks(chunks: any[]) {
+  private static formatInfoForPlainFileDiff(diff) {
+    let chunks = diff.chunks;
     let result = [];
+    
+    if(chunks.length === 0) {
+      let message;
+      if (diff.from === '/dev/null') {
+        message = 'Added empty file';
+      } else {
+        message = 'Removed empty file';
+      }
+
+      result.push(<div className='binary-file-info'>{message}</div>);
+      return result;
+    }
+
+
     let chunkTables = chunks.map((chunk, i) =>
         DiffPanel.createTableFromChunk(chunk, i)
     );
@@ -172,7 +187,7 @@ export default class DiffPanel extends React.Component<DiffPanelProps, any> {
           <div className='DiffPanel' key={i}>
             <h4 className='heading'>{(diff.from === '/dev/null' ? diff.to : diff.from).substr(2)}</h4>
             {diff.type === 'plain'
-              ? DiffPanel.formatChunks(diff.chunks)
+              ? DiffPanel.formatInfoForPlainFileDiff(diff)
               : DiffPanel.formatInfoForBinaryFileDiff(diff)
             }
           </div>
