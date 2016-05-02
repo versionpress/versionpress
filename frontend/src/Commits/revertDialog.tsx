@@ -1,5 +1,3 @@
-/// <reference path='../../typings/browser.d.ts' />
-
 import * as React from 'react';
 import * as request from 'superagent';
 import * as portal from '../common/portal';

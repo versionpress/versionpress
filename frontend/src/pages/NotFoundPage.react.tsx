@@ -1,5 +1,3 @@
-/// <reference path='../../typings/browser.d.ts' />
-
 import * as React from 'react';
 
 export default class NotFoundPage extends React.Component<{}, {}> {

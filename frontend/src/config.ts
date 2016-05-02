@@ -1,4 +1,3 @@
-/// <reference path='../typings/browser.d.ts' />
 /// <reference path='./VersionPressConfig.d.ts' />
 
 import * as _ from 'lodash';

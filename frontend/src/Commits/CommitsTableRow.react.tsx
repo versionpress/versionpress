@@ -1,4 +1,3 @@
-/// <reference path='../../typings/browser.d.ts' />
 /// <reference path='./Commits.d.ts' />
 
 import * as React from 'react';

@@ -1,5 +1,3 @@
-/// <reference path='../typings/browser.d.ts' />
-
 import * as React from 'react';
 import {Route, DefaultRoute, NotFoundRoute } from 'react-router';
 import App from './app/App.react';
