@@ -51,7 +51,7 @@ interface HomePageState {
 export default class HomePage extends React.Component<HomePageProps, HomePageState> {
 
   static contextTypes: React.ValidationMap<any> = {
-    router: React.PropTypes.func.isRequired
+    router: React.PropTypes.func.isRequired,
   };
 
   private refreshInterval;
@@ -69,7 +69,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       displayServicePanel: false,
       displayWelcomePanel: false,
       displayUpdateNotice: false,
-      dirtyWorkingDirectory: false
+      dirtyWorkingDirectory: false,
     };
 
     this.onFilter = this.onFilter.bind(this);
@@ -86,7 +86,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         : res.body)
       : {
       code: 'error',
-      message: 'Connection Error: VersionPress is not able to connect to WordPress site. Please try refreshing the page.'
+      message: 'Connection Error: VersionPress is not able to connect to WordPress site. Please try refreshing the page.',
     };
   }
 
@@ -126,7 +126,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             commits: [],
             message: HomePage.getErrorMessage(res),
             loading: false,
-            displayUpdateNotice: false
+            displayUpdateNotice: false,
           });
         } else {
           this.setState({
@@ -134,7 +134,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             commits: res.body.commits as Commit[],
             message: null,
             loading: false,
-            displayUpdateNotice: false
+            displayUpdateNotice: false,
           });
           this.checkUpdate();
         }
@@ -164,13 +164,13 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         if (err) {
           this.setState({
             displayUpdateNotice: false,
-            dirtyWorkingDirectory: false
+            dirtyWorkingDirectory: false,
           });
           clearInterval(this.refreshInterval);
         } else {
           this.setState({
             displayUpdateNotice: !this.props.params.page && res.body.update === true,
-            dirtyWorkingDirectory: res.body.cleanWorkingDirectory !== true
+            dirtyWorkingDirectory: res.body.cleanWorkingDirectory !== true,
           });
         }
       });
@@ -188,7 +188,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         if (err) {
           this.setState({message: HomePage.getErrorMessage(res), loading: false});
         } else {
-          const router:ReactRouter.Context = (this.context as any).router;
+          const router: ReactRouter.Context = (this.context as any).router;
           router.transitionTo(routes.home);
           document.location.reload();
         }
@@ -207,7 +207,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         if (err) {
           this.setState({message: HomePage.getErrorMessage(res), loading: false});
         } else {
-          const router:ReactRouter.Context = (this.context as any).router;
+          const router: ReactRouter.Context = (this.context as any).router;
           router.transitionTo(routes.home);
           document.location.reload();
         }
@@ -270,7 +270,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
         const step = (index < lastIndex ? -1 : 1);
         const cond = index + step;
-        for (let i = lastIndex; i != cond; i += step) {
+        for (let i = lastIndex; i !== cond; i += step) {
           const current = this.state.commits[i];
           const index = indexOf(selected, current);
           if (check && index === -1) {
@@ -284,7 +284,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
     this.setState({
       selected: selected,
-      lastSelected: (bulk ? null : lastSelected)
+      lastSelected: (bulk ? null : lastSelected),
     });
   }
 
@@ -302,7 +302,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   onClearSelection() {
     this.setState({
       selected: [],
-      lastSelected: null
+      lastSelected: null,
     });
   }
 
@@ -324,8 +324,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             dirtyWorkingDirectory: false,
             message: {
               code: 'updated',
-              message: 'Changes have been committed.'
-            }
+              message: 'Changes have been committed.',
+            },
           });
           this.fetchCommits();
         }
@@ -348,8 +348,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             dirtyWorkingDirectory: false,
             message: {
               code: 'updated',
-              message: 'Changes have been discarded.'
-            }
+              message: 'Changes have been discarded.',
+            },
           });
         }
         return !err;
@@ -358,11 +358,11 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
   onFilter(query: string) {
     this.setState({
-      query: query
+      query: query,
     }, () => {
       const page = (parseInt(this.props.params.page, 10) - 1) || 0;
       if (page > 0) {
-        const router:ReactRouter.Context = (this.context as any).router;
+        const router: ReactRouter.Context = (this.context as any).router;
         router.transitionTo(routes.home);
       } else {
         this.fetchCommits();

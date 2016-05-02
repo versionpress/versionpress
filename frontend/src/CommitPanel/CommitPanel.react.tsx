@@ -115,7 +115,7 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
             detailsLevel: detailsLevel,
             gitStatus: gitStatus,
             error: null,
-            loading: false
+            loading: false,
           })
         ).catch(err => {
           this.setState({detailsLevel: detailsLevel, error: err.message, loading: false});
@@ -127,7 +127,7 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
             detailsLevel: detailsLevel,
             diff: diff,
             error: null,
-            loading: false
+            loading: false,
           })
         ).catch(err => {
           this.setState({detailsLevel: detailsLevel, error: err.message, loading: false});

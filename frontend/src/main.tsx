@@ -1,7 +1,5 @@
 /// <reference path='../typings/browser.d.ts' />
 
-/* tslint:disable:variable-name no-unused-variable */
-
 import * as React from 'react';
 import * as DOM from 'react-dom';
 import * as ReactRouter from 'react-router';

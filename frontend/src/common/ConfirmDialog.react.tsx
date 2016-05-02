@@ -30,7 +30,7 @@ export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {
     cancelButtonText: 'Cancel',
     okButtonClickHandler: function() {},
     cancelButtonClickHandler: function() {},
-    loading: false
+    loading: false,
   };
 
   handleOkClick() {

@@ -72,7 +72,7 @@ export default class CommitsTableRow extends React.Component<CommitsTableRowProp
             detailsLevel: detailsLevel,
             diff: diff,
             error: null,
-            loading: false
+            loading: false,
           })
         ).catch(err => {
           this.setState({detailsLevel: detailsLevel, error: err.message, loading: false});

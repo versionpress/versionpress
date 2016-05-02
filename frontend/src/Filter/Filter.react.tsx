@@ -8,7 +8,7 @@ interface FilterProps extends React.Props<JSX.Element> {
   onSubmit: (values: string) => void;
 }
 
-export default class Filter extends React.Component<FilterProps,{}> {
+export default class Filter extends React.Component<FilterProps, {}> {
 
   private submitted = false;
 
@@ -26,7 +26,7 @@ export default class Filter extends React.Component<FilterProps,{}> {
     // Prevent form submit multiple times via both onSearch and onSubmit
     // (Happens only with empty input value and pressing Enter)
     this.submitted = true;
-    setTimeout(() => { this.submitted = false }, 10);
+    setTimeout(() => { this.submitted = false; }, 10);
 
     const query = e.target['s'].value;
 

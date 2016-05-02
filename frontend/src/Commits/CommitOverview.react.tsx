@@ -195,7 +195,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
         ' for ',
         <span className='type'>{parentEntity}</span>,
         ' ',
-        <span className='identifier'>{tagValue}</span>
+        <span className='identifier'>{tagValue}</span>,
       ];
       let line = this.renderOverviewLine(entityName, action, changedEntities, lineSuffix);
       lines.push(line);
@@ -297,7 +297,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
       <li className='environment'>
         <em>Environment: {this.props.commit.environment}</em>
       </li>
-    )
+    );
   }
 
   private expandList(listKey) {

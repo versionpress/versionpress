@@ -13,7 +13,7 @@ interface Commit {
     name: string;
     email: string;
     avatar: string;
-  }
+  };
 }
 
 interface Change {

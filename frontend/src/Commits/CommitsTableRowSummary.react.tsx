@@ -159,7 +159,7 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
     if (!this.props.enableActions) {
       return;
     }
-    
+
     const target = e.target as HTMLInputElement;
     let checked;
 

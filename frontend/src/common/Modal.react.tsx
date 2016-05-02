@@ -25,7 +25,7 @@ export default class Modal extends React.Component<ModalProps, any> {
 
   static defaultProps = {
     backgroundClickToClose: true,
-    showCloseIcon: true
+    showCloseIcon: true,
   };
 
   componentDidMount() {
