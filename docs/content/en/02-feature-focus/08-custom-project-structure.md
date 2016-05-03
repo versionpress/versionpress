@@ -1,5 +1,5 @@
 ---
-since: 3.0
+since: '3.0'
 ---
 
 # Custom project structure
