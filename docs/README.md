@@ -29,7 +29,7 @@ The system works like this:
  - Doc topics optionally specify which version they apply to using the `since:` tag. For example, the topic on WP-CLI commands is available since VersionPress 2.0 and [the file](https://raw.githubusercontent.com/versionpress/docs/3ad7f2728b7134d2d7fd19b753b210d0c7b38871/content/en/02-feature-focus/10-wp-cli.md) indicates this with `since: 2.0` in its [front matter](http://jekyllrb.com/docs/frontmatter/).
  - The global configuration indicates which version to render, and for example if the shown version should be 1.0, the topic on WP-CLI is excluded from the navigation.
 
-The `since:` tag can be specified either for a specific page at the top of the Markdown document or for the whole section in its `config.yaml`, see e.g. [the sync section's config.yaml](https://github.com/versionpress/docs/blob/3ad7f2728b7134d2d7fd19b753b210d0c7b38871/content/en/03-sync/config.yaml).
+The `since:` tag can be specified either for a specific page at the top of the Markdown document or for the whole section in its `config.yml`, see e.g. [the sync section's config.yml](https://github.com/versionpress/docs/blob/9738af100e640a525c2ae0119bc3060f175b65a9/content/en/03-sync/config.yml).
 
 
 
@@ -66,3 +66,12 @@ When a PR is merged into `master`, it is automatically deployed to [docs.version
 ## Localization
 
 We currently only have an English version living in the `content/en` directory. In the future, localized versions will live in sibling directories. Contributions welcome.
+
+## Redirects
+
+Simple redirects can be added project's `config.yml` placed in repository root. Currently only plain strings (see below) can be used. If some rules are found in `redirects` section, exact match on requested URL (without starting `/` and tailing query string) is performed. URLs used in matching rules should contain language and slug of parsed markdown document file. User is redirect to new url with HTTP status code `301` without query string preserved.
+
+```
+redirects:
+  'en/getting-started/concepts': 'en/feature-focus'
+```
