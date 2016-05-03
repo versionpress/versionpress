@@ -24,6 +24,8 @@ We're currently working on a **CI solution** with the goal to run the slow but t
 
 ## Setup
 
+This section assumes that you have set up your local development environment – see [**Dev-Setup**](https://github.com/versionpress/versionpress/blob/master/docs/Dev-Setup.md).
+
 To be able to run the tests you have to create a **test config file**. You can copy a sample from `plugins/versionpress/tests/test-config.sample.yml` to `test-config.yml` in the same directory. Update these values to match your local environment:
 
  - `selenium` > `firefox-binary` — path to your Firefox executable (see notes on Selenium below),
