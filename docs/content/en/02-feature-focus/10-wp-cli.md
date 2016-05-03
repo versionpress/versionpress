@@ -1,5 +1,5 @@
 ---
-since: 2.0
+since: '2.0'
 ---
 
 # WP-CLI Commands #
