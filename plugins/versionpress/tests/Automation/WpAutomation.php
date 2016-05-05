@@ -61,7 +61,7 @@ class WpAutomation
         $this->prepareFiles();
         $this->createConfigFile();
         $this->clearDatabase();
-        $this->installWp();
+        $this->installWordPress();
 
         if (!$this->siteConfig->wpAutoupdate) {
             $this->disableAutoUpdate();
@@ -618,7 +618,7 @@ class WpAutomation
      * Installs WordPress. Assumes that files have been prepared on the file system, database is clean
      * and wp-config.php has been created.
      */
-    private function installWp()
+    public function installWordPress()
     {
         $cmdArgs = [
             "url" => $this->siteConfig->url,
