@@ -18,7 +18,7 @@ The server environment must match certain requirements, some of which are checke
 </figure>
 
 <div class="important">
-  <strong>Important</strong>
+  <p><strong>Important</strong></p>
   <p>VersionPress is a lot more involved than most other WordPress plugins. Please pay attention to this section before proceeding with installation.</p> 
 </div>
 

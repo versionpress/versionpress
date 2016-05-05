@@ -50,7 +50,7 @@ The `since:` tag can be specified either for a specific page at the top of the M
 
 ```
 <div class="note">
-  <strong>Note title</strong>
+  <p><strong>Note title</strong></p>
   <p>This will be rendered in a highlighted box.</p>
 </div>
 ```

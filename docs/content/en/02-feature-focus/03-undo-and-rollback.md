@@ -3,7 +3,7 @@
 Undo and rollback are two essential, most visible features of VersionPress. They share some common behavior but are typically used for different purposes.
 
 <div class="important">
-  <strong>Warning</strong>
+  <p><strong>Warning</strong></p>
   <p>Reverts manipulate the database and if there are any kind of problems, the database might be left in a broken state. That is why we strongly recommend having an external site backup at least during the EAP period.</p>
 </div>
 
@@ -56,9 +56,6 @@ Merge commits join two lines of development back together. For example, if you d
 Merge commits cannot be undone because there is no opposite state to them, i.e., there is no logical "reverse change" that we could apply to the current state of the site.
 
 <div class="note">
- 
-  **Note to Git users**
- 
-  In Git, you can get rid of the merge commit by doing e.g. `git reset --hard` and it's still the way in VersionPress if you want to **get rid of** a merge. However, the semantics of an **undo** are different, as described above.
- 
+  <p><strong>Note to Git users</strong></p>
+  <p>In Git, you can get rid of the merge commit by doing e.g. `git reset --hard` and it's still the way in VersionPress if you want to **get rid of** a merge. However, the semantics of an **undo** are different, as described above.</p>
 </div> 
