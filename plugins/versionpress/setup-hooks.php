@@ -33,7 +33,7 @@ defined('ABSPATH') or die("Direct access not allowed");
 
 if (defined('WP_CLI') && WP_CLI) {
     require_once(__DIR__ . '/src/Cli/vp.php');
-    WP_CLI::add_command('vp', VPCommand::class);
+    require_once(__DIR__ . '/src/Cli/vp-composer.php');
 }
 
 if (defined('VP_MAINTENANCE')) {

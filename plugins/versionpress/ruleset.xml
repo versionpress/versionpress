@@ -14,6 +14,7 @@
         <exclude-pattern type="relative">bootstrap.php</exclude-pattern>
         <exclude-pattern type="relative">src/Api/VersionPressApi.php</exclude-pattern>
         <exclude-pattern type="relative">src/Cli/vp.php</exclude-pattern>
+        <exclude-pattern type="relative">src/Cli/vp-composer.php</exclude-pattern>
         <exclude-pattern type="relative">src/Cli/vp-internal.php</exclude-pattern>
         <exclude-pattern type="relative">versionpress.php</exclude-pattern>
         <exclude-pattern type="relative">setup-hooks.php</exclude-pattern>

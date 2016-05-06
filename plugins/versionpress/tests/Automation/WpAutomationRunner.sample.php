@@ -65,6 +65,8 @@ class WpAutomationRunnerSample extends \PHPUnit_Framework_TestCase
         $wpAutomation->installWordPress();
         $wpAutomation->copyVersionPressFiles();
         $wpAutomation->activateVersionPress();
+
+        $wpAutomation->runWpCliCommand('vp', 'config', ['VP_PROJECT_ROOT', '.']);
     }
 
     /**
