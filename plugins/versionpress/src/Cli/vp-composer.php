@@ -8,6 +8,8 @@
 namespace VersionPress\Cli;
 
 use VersionPress\ChangeInfos\PluginChangeInfo;
+use VersionPress\ChangeInfos\ThemeChangeInfo;
+use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Committer;
 use VersionPress\Utils\Process;
@@ -20,6 +22,17 @@ use WP_CLI_Command;
  */
 class VPComposerCommand extends WP_CLI_Command
 {
+
+    private $pluginsThemesTransient = 'vp_composer_plugins_themes';
+
+    /**
+     * @subcommand prepare-for-composer-changes
+     */
+    public function prepareForComposerChanges($args, $assoc_args)
+    {
+        set_transient($this->pluginsThemesTransient, $this->getPackages());
+    }
+
     /**
      * Commits all changes made by Composer.
      *
@@ -33,6 +46,13 @@ class VPComposerCommand extends WP_CLI_Command
             WP_CLI::error('VersionPress is not active. Changes will be not committed.');
         }
 
+        $pluginsAndThemesBeforeUpdate = get_transient($this->pluginsThemesTransient);
+        delete_transient($this->pluginsThemesTransient);
+        $currentPluginsAndThemes = $this->getPackages();
+
+        $plugins = array_merge($pluginsAndThemesBeforeUpdate['plugins'], $currentPluginsAndThemes['plugins']);
+        $themes = array_merge($pluginsAndThemesBeforeUpdate['themes'], $currentPluginsAndThemes['themes']);
+
         /** @var Committer $committer */
         $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
         $changes = $this->detectChanges();
@@ -40,34 +60,54 @@ class VPComposerCommand extends WP_CLI_Command
         $removedPackages = $changes['removed'];
         $updatedPackages = $changes['updated'];
 
-        $changeInfos = array_merge(
-            array_map(function ($package) {
+        $changeInfos = array_values(array_filter(array_merge(
+            array_map(function ($package) use ($plugins, $themes) {
                 if ($package['type'] === 'wordpress-plugin') {
-                    return new PluginChangeInfo($package['name'], 'install', $package['name']);
+                    return $this->createPluginChangeInfo('install', $package['name'], $plugins);
+                }
+
+                if ($package['type'] === 'wordpress-theme') {
+                    return $this->createThemeChangeInfo('install', $package['name'], $themes);
                 }
 
                 return null;
 
             }, $installedPackages),
-            array_map(function ($package) {
+            array_map(function ($package) use ($plugins, $themes) {
                 if ($package['type'] === 'wordpress-plugin') {
-                    return new PluginChangeInfo($package['name'], 'delete', $package['name']);
+                    return $this->createPluginChangeInfo('delete', $package['name'], $plugins);
+                }
+
+                if ($package['type'] === 'wordpress-theme') {
+                    return $this->createThemeChangeInfo('delete', $package['name'], $themes);
                 }
 
                 return null;
 
             }, $removedPackages),
-            array_map(function ($package) {
+            array_map(function ($package) use ($plugins, $themes) {
                 if ($package['type'] === 'wordpress-plugin') {
-                    return new PluginChangeInfo($package['name'], 'update', $package['name']);
+                    return $this->createPluginChangeInfo('update', $package['name'], $plugins);
+                }
+
+                if ($package['type'] === 'wordpress-theme') {
+                    return $this->createThemeChangeInfo('update', $package['name'], $themes);
+                }
+
+                if ($package['type'] === 'wordpress-core') {
+                    return new WordPressUpdateChangeInfo($package['version']);
                 }
 
                 return null;
 
             }, $updatedPackages)
-        );
+        )));
 
-        var_dump($changeInfos);
+        foreach ($changeInfos as $changeInfo) {
+            $committer->forceChangeInfo($changeInfo);
+        }
+
+        $committer->commit();
     }
 
     private function detectChanges()
@@ -86,9 +126,9 @@ class VPComposerCommand extends WP_CLI_Command
         $removedPackages = array_diff_key($previousPackages, $currentPackages);
 
         $packagesWithChangedVersion = array_filter(
-            array_intersect_key($previousPackages, $currentPackages),
-            function ($package) use ($currentPackages) {
-                return $package['version'] !== $currentPackages[$package['name']]['version'];
+            array_intersect_key($currentPackages, $previousPackages),
+            function ($package) use ($previousPackages) {
+                return $package['version'] !== $previousPackages[$package['name']]['version'];
             }
         );
 
@@ -113,6 +153,40 @@ class VPComposerCommand extends WP_CLI_Command
                 ];
             }, $lockFile['packages'])
         );
+    }
+
+    private function getPackages()
+    {
+        return ['plugins' => get_plugins(), 'themes' => wp_get_themes()];
+    }
+
+    private function createPluginChangeInfo($action, $fullPackageName, $plugins)
+    {
+        list($vendor, $packageName) = explode('/', $fullPackageName);
+
+        foreach ($plugins as $pluginFile => $plugin) {
+            list($pluginDirectory) = explode('/', $pluginFile, 2);
+
+            if ($packageName === $pluginDirectory) {
+                return new PluginChangeInfo($pluginFile, $action, $plugin['Name']);
+            }
+        }
+
+        return null;
+    }
+
+    private function createThemeChangeInfo($action, $fullPackageName, $themes)
+    {
+        list($vendor, $packageName) = explode('/', $fullPackageName);
+
+        foreach ($themes as $themeName => $theme) {
+            /** @var $theme \WP_Theme */
+            if ($packageName === $themeName) {
+                return new ThemeChangeInfo($theme->get_template(), $action, $theme->get('Name'));
+            }
+        }
+
+        return null;
     }
 }
 
