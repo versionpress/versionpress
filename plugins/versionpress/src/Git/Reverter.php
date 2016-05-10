@@ -128,7 +128,7 @@ class Reverter
 
         $this->synchronizationProcess->synchronize($vpIdsInModifiedFiles);
 
-        do_action('vp_revert');
+        do_action('vp_revert', $modifiedFiles);
         return RevertStatus::OK;
     }
 
