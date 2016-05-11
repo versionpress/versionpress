@@ -662,7 +662,7 @@ function vp_admin_post_confirm_deactivation()
     $wpConfigPath = \VersionPress\Utils\WordPressMissingFunctions::getWpConfigPath();
     \VersionPress\Utils\WpConfigEditor::removeVersionPressConstants([
         $wpConfigPath,
-        WpConfigSplitter::COMMON_CONFIG_NAME,
+        dirname($wpConfigPath . '/' . WpConfigSplitter::COMMON_CONFIG_NAME),
     ]);
     global $versionPressContainer;
     /** @var Committer $committer */

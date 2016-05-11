@@ -13,6 +13,13 @@ class WpConfigEditor
     private $wpConfigPath;
     private $isCommonConfig;
 
+    private static $vpPublicConstants = [
+        'VP_VPDB_DIR',
+        'VP_PROJECT_ROOT',
+        'VP_ENVIRONMENT',
+        'VP_GIT_BINARY',
+    ];
+
     public function __construct($wpConfigPath, $isCommonConfig)
     {
         $this->wpConfigPath = $wpConfigPath;
@@ -38,16 +45,16 @@ class WpConfigEditor
     }
 
     /**
-     * Removes constants starting with 'VP_' from config files.
+     * Removes VersionPress public constants from config files.
      * @param array $configFiles List of config file paths from which constants should be removed.
      */
     public static function removeVersionPressConstants($configFiles)
     {
         foreach ($configFiles as $configFile) {
-            //https://regex101.com/r/iG7bE7/2
-            $constantRegex = "/^(\\s*define\\s*\\(\\s*['\"](VP)_.*['\"]\\s*,\\s*).*(\\s*\\)\\s*;\\s*)$/m";
+            $constantsForRegex = join('|', self::$vpPublicConstants);
+            $defineRegexPattern = "/(define\\s*\\(\\s*['\"]($constantsForRegex)['\"]\\s*,.*\\)\\s*;)/m";
             $wpConfigContent = file_get_contents($configFile);
-            file_put_contents($configFile, preg_replace($constantRegex, '', $wpConfigContent));
+            file_put_contents($configFile, preg_replace($defineRegexPattern, '', $wpConfigContent));
         }
     }
 
