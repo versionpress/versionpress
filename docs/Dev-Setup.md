@@ -173,9 +173,15 @@ That's it. Enable Xdebug in the browser, click "Start listening" in PhpStorm and
 
 Some pieces of code run from the conosle (e.g., WP-CLI commands). Here is how to debug them:
 
-1. Turn on Xdebug in `php.ini`
-    - Careful is you use WampServer: it uses different `php.ini` for the web server and for the command line; you need to update `C:\wamp\bin\php-xyz\php.ini`
-2. Run `SET XDEBUG_CONFIG=idekey=xdebug` on Windows / `export XDEBUG_CONFIG="idekey=session_name"` on Linux / Mac
+1. Turn on Xdebug in `php.ini` (careful is you use WampServer: it uses different `php.ini` for the web server and for the command line; you need to update `C:\wamp\bin\php\php-x.y.z\php.ini`):
+
+    ```
+    [xdebug]
+    zend_extension = ...
+    xdebug.remote_enable = on
+    ```
+ 
+2. Run `export XDEBUG_CONFIG="idekey=session_name"` on Linux & Mac / `SET XDEBUG_CONFIG=idekey=xdebug` on Windows
 3. Start zero config debug in PhpStorm
 4. Run the CLI command
 

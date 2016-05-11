@@ -625,8 +625,8 @@ class VersionPressApi
 
         if ($skipVpdbFiles) {
             $changedFiles = array_filter($changedFiles, function ($changedFile) {
-                $path = str_replace('\\', '/', ABSPATH . $changedFile['path']);
-                $vpdbPath = str_replace('\\', '/', VP_VPDB_DIR);
+                $path = str_replace('\\', '/', realpath(VP_PROJECT_ROOT) . '/' . $changedFile['path']);
+                $vpdbPath = str_replace('\\', '/', realpath(VP_VPDB_DIR));
 
                 return !Strings::startsWith($path, $vpdbPath);
             });

@@ -112,7 +112,7 @@ class VPCommand extends WP_CLI_Command
         }
 
         if ($valueType === 'absolute-path') {
-            if (file_exists($value)) {
+            if (!file_exists($value)) {
                 WP_CLI::error('Path ' . var_export($value, true) . ' does not exist');
             }
         }
