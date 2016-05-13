@@ -3,7 +3,6 @@
 namespace VersionPress\Utils;
 
 use Exception;
-use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
@@ -121,6 +120,16 @@ class RequirementsChecker
             'help' => 'VersionPress automatically tries to secure certain locations, like `wp-content/vpdb`. You either don\'t have a supported web server or rules cannot be enforced. [Learn more](http://docs.versionpress.net/en/getting-started/installation-uninstallation#supported-web-servers).'
         ];
         if ($checkScope === RequirementsChecker::SITE) {
+            if (file_exists(VP_PROJECT_ROOT . '/composer.json')) {
+                $this->requirements[] = [
+                    'name' => 'Composer scripts',
+                    'level' => 'warning',
+                    'fulfilled' => $this->testComposerJson(),
+                    // @codingStandardsIgnoreLine
+                    'help' => 'Your project uses Composer but `pre-update-cmd` or `post-update-cmd` scripts in `composer.json` are already defined. VersionPress needs to run a WP-CLI commands in these scripts to automatically commit changes of Composer packages. Please update your scripts to run [the WP-CLI commands](http://docs.versionpress.net/en/feature-focus/composer).'
+                ];
+            }
+
             $this->requirements[] = [
                 'name' => 'wpdb hook',
                 'level' => 'critical',
@@ -330,5 +339,20 @@ class RequirementsChecker
             }
         }
         return $unsupportedPluginsCount;
+    }
+
+    private function testComposerJson()
+    {
+        $composerJsonPath = VP_PROJECT_ROOT . '/composer.json';
+        $composerJson = json_decode(file_get_contents($composerJsonPath));
+        if (!isset($composerJson->scripts)) {
+            return true;
+        }
+
+        if (isset($composerJson->scripts->{'pre-update-cmd'}) || isset($composerJson->scripts->{'post-update-cmd'})) {
+            return false;
+        }
+
+        return true;
     }
 }
