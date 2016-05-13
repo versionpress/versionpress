@@ -12,12 +12,12 @@ As described on the [installation page](../getting-started/installation-uninstal
 Here are a couple of hosts that we or our users confirmed work fine with VersionPress:
 
  - [FastComet](http://www.fastcomet.com/) – SSD cloud hosting with CloudFlare & 24/7 Premium Support
- - [SiteGround](https://www.siteground.com/) – a popular WordPress host
  - [Byte](https://www.byte.nl/) – performance webhosting in Netherlands
  - [WebFaction](https://www.webfaction.com/) – hosting for developers
  - [Uberspace](https://uberspace.de/) – hosting space in Germany (Git 1.7 pre-installed, upgradable to 1.9+) 
  - [Pair Shared Hosting](https://www.pair.com/hosting/shared/) – by pair Networks
  - [Elbia Hosting (SK)](http://www.elbiahosting.sk/) – Slovak hosting company
+ - [SiteGround](https://www.siteground.com/) – VersionPress can be installed but [some issues have been reported](https://github.com/versionpress/support/issues/46)
 
 <div class="note">
   <p><strong>Help us improve this list</strong></p>
