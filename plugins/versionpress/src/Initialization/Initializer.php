@@ -131,6 +131,7 @@ class Initializer
             $this->activateVersionPress();
             $this->copyAccessRulesFiles();
             $this->createCommonConfig();
+            $this->installComposerScripts();
             $this->doInitializationCommit($isUpdate);
             vp_disable_maintenance();
             $this->reportProgressChange(InitializerStates::FINISHED);
@@ -634,5 +635,28 @@ class Initializer
         }
 
         return $this->database->get_results("SELECT * FROM {$this->getTableName($entityName)}", ARRAY_A);
+    }
+
+    private function installComposerScripts()
+    {
+        $composerJsonPath = VP_PROJECT_ROOT . '/composer.json';
+        if (!file_exists($composerJsonPath)) {
+            return;
+        }
+
+        $composerJson = json_decode(file_get_contents($composerJsonPath));
+
+        if (!isset($composerJson->scripts)) {
+            $composerJson->scripts = new \stdClass();
+        }
+
+        if ((!isset($composerJson->scripts->{'pre-update-cmd'}) || $composerJson->scripts->{'pre-update-cmd'} === '') &&
+            (!isset($composerJson->scripts->{'post-update-cmd'}) || $composerJson->scripts->{'post-update-cmd'} === '')
+        ) {
+            $composerJson->scripts->{'pre-update-cmd'} = 'wp vp-composer prepare-for-composer-changes';
+            $composerJson->scripts->{'post-update-cmd'} = 'wp vp-composer commit-composer-changes';
+
+            file_put_contents($composerJsonPath, json_encode($composerJson, JSON_PRETTY_PRINT));
+        }
     }
 }
