@@ -52,6 +52,7 @@ class WpConfigEditor
     {
         foreach ($configFiles as $configFile) {
             $constantsForRegex = join('|', self::$vpPublicConstants);
+            // https://regex101.com/r/zD3mJ4/2
             $defineRegexPattern = "/(define\\s*\\(\\s*['\"]($constantsForRegex)['\"]\\s*,.*\\)\\s*;)/m";
             $wpConfigContent = file_get_contents($configFile);
             file_put_contents($configFile, preg_replace($defineRegexPattern, '', $wpConfigContent));
