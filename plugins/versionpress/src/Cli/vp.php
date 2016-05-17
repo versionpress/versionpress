@@ -278,6 +278,10 @@ class VPCommand extends WP_CLI_Command
             WP_CLI::error($process->getConsoleOutput());
         }
 
+        // Fail-safe for gitignored WordPress
+        if (!WpdbReplacer::isReplaced()) {
+            WpdbReplacer::replaceMethods();
+        }
 
         // The next couple of the steps need to be done after WP is fully loaded; we use `finish-init-clone` for that
         // The main reason for this is that we need properly set WP_CONTENT_DIR constant for reading from storages
