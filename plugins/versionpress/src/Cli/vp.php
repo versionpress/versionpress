@@ -1088,10 +1088,17 @@ class VPCommand extends WP_CLI_Command
             $environmentConstant => $environment,
         ];
 
-        $this->runVPInternalCommand('update-config', ['table_prefix', $dbPrefix, 'variable' => null], $clonePath);
+        $process = $this->runVPInternalCommand(
+            'update-config',
+            ['table_prefix', $dbPrefix, 'variable' => null],
+            $clonePath
+        );
+
+        echo $process->getConsoleOutput();
 
         foreach ($replacements as $constant => $value) {
-            $this->runVPInternalCommand('update-config', [$constant, $value], $clonePath);
+            $process = $this->runVPInternalCommand('update-config', [$constant, $value], $clonePath);
+            echo $process->getConsoleOutput();
         }
 
         WP_CLI::success("wp-config.php updated");
