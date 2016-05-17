@@ -542,9 +542,10 @@ class Initializer
         $vpGitignore = file_get_contents(__DIR__ . '/.gitignore.tpl');
 
         $gitIgnoreVariables = [
-            'wp-content' => '/' . PathUtils::getRelativePath($projectRoot, realpath(WP_CONTENT_DIR)),
-            'wp-plugins' => '/' . PathUtils::getRelativePath($projectRoot, realpath(WP_PLUGIN_DIR)),
-            'abspath' => '/' . PathUtils::getRelativePath($projectRoot, realpath(ABSPATH)),
+            'wp-content' => rtrim('/' . PathUtils::getRelativePath($projectRoot, realpath(WP_CONTENT_DIR)), '/'),
+            'wp-plugins' => rtrim('/' . PathUtils::getRelativePath($projectRoot, realpath(WP_PLUGIN_DIR)), '/'),
+            'abspath' => rtrim('/' . PathUtils::getRelativePath($projectRoot, realpath(ABSPATH)), '/'),
+            'abspath-parent' => rtrim('/' . PathUtils::getRelativePath($projectRoot, realpath(dirname(ABSPATH))), '/'),
         ];
 
         $vpGitignore = StringUtils::fillTemplateString($gitIgnoreVariables, $vpGitignore);
