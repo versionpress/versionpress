@@ -22,6 +22,7 @@ use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\PathUtils;
+use VersionPress\Utils\Process;
 use VersionPress\Utils\RequirementsChecker;
 use VersionPress\Utils\WorkflowUtils;
 use VersionPress\VersionPress;
@@ -606,6 +607,9 @@ class VPCommand extends WP_CLI_Command
      * 'clone' command), a path or a URL. Defaults to 'origin' which is
      * automatically set in every clone by the 'clone' command.
      *
+     * [--continue]
+     * : Finishes the pull after solving merge conflicts.
+     *
      * ## EXAMPLES
      *
      * Let's have a site 'wpsite' and a clone 'myclone' created from it. To pull the changes
@@ -623,13 +627,26 @@ class VPCommand extends WP_CLI_Command
      */
     public function pull($args = [], $assoc_args = [])
     {
-        global $versionPressContainer;
-
         if (!VersionPress::isActive()) {
             WP_CLI::error(
                 'This site is not tracked by VersionPress. Please run "wp vp activate" before cloning / merging.'
             );
         }
+
+        if (isset($assoc_args['continue'])) {
+            $process = new Process('git diff --name-only --diff-filter=U', VP_PROJECT_ROOT);
+            $process->run();
+
+            if ($process->getConsoleOutput() !== '') {
+                WP_CLI::error(
+                    'There are still some conflicts. Please resolve them and run `wp vp pull --continue` again.'
+                );
+            }
+
+            $this->finishPull();
+            return;
+        }
+
 
         $remote = isset($assoc_args['from']) ? $assoc_args['from'] : 'origin';
 
@@ -669,7 +686,7 @@ class VPCommand extends WP_CLI_Command
                     WP_CLI::success("");
                     WP_CLI::success(" 1. Resolve the conflicts manually as in a standard Git workflow");
                     WP_CLI::success(" 2. Stage and `git commit` the changes");
-                    WP_CLI::success(" 3. Return here and run `wp vp apply-changes`");
+                    WP_CLI::success(" 3. Return here and run `wp vp pull --continue`");
                     WP_CLI::success("");
                     WP_CLI::success("That last step will turn the maintenance mode off.");
                     WP_CLI::success("You can also abort the merge manually by running `git merge --abort`");
@@ -688,6 +705,23 @@ class VPCommand extends WP_CLI_Command
             } else { // not a merge conflict, some other error
                 $this->switchMaintenance('off');
                 WP_CLI::error("Changes from $remote couldn't be pulled. Details:\n\n" . $process->getConsoleOutput());
+            }
+        }
+
+        $this->finishPull();
+
+    }
+
+    private function finishPull()
+    {
+        global $versionPressContainer;
+
+        if (file_exists(VP_PROJECT_ROOT . '/composer.json')) {
+            $process = VPCommandUtils::exec('composer install', VP_PROJECT_ROOT);
+            if ($process->isSuccessful()) {
+                WP_CLI::success('Installed Composer dependencies');
+            } else {
+                WP_CLI::error('Composer dependencies could not be restored.');
             }
         }
 
