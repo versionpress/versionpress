@@ -9,6 +9,7 @@ use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Initialization\Initializer;
 use VersionPress\Initialization\WpConfigSplitter;
 use VersionPress\Synchronizers\SynchronizationProcess;
+use VersionPress\Utils\WordPressMissingFunctions;
 use VersionPress\Utils\WpConfigEditor;
 use WP_CLI;
 use WP_CLI_Command;
@@ -237,12 +238,13 @@ class VPInternalCommand extends WP_CLI_Command
      */
     public function updateConfig($args = [], $assoc_args = [])
     {
-        $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
-        $updateCommonConfig = isset($assoc_args['common']);
-
         require_once __DIR__ . '/VPCommandUtils.php';
         require_once __DIR__ . '/../Initialization/WpConfigSplitter.php';
         require_once __DIR__ . '/../Utils/WpConfigEditor.php';
+        require_once __DIR__ . '/../Utils/WordPressMissingFunctions.php';
+
+        $wpConfigPath = WordPressMissingFunctions::getWpConfigPath();
+        $updateCommonConfig = isset($assoc_args['common']);
 
         if ($updateCommonConfig) {
             $wpConfigPath = dirname($wpConfigPath) . '/' . WpConfigSplitter::COMMON_CONFIG_NAME;
