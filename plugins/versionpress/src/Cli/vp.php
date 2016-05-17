@@ -233,8 +233,10 @@ class VPCommand extends WP_CLI_Command
         $url = $assoc_args['siteurl'];
 
         // Update URLs in wp-config.php
+        define('VP_INDEX_DIR', dirname(\WP_CLI\Utils\locate_wp_config())); // just for the following method
         $this->setConfigUrl('WP_CONTENT_URL', 'WP_CONTENT_DIR', ABSPATH . 'wp-content', $url);
         $this->setConfigUrl('WP_PLUGIN_URL', 'WP_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins', $url);
+        $this->setConfigUrl('WP_HOME', 'VP_INDEX_DIR', VP_PROJECT_ROOT, $url);
 
         WpConfigSplitter::ensureCommonConfigInclude($wpConfigPath);
 
@@ -1172,9 +1174,9 @@ class VPCommand extends WP_CLI_Command
     private function setConfigUrl($urlConstant, $pathConstant, $defaultPath, $baseUrl)
     {
         if (defined($pathConstant) && constant($pathConstant) !== $defaultPath) {
-            $relativePathToWpContent = str_replace(getcwd(), '', realpath(constant($pathConstant)));
-            $url = $baseUrl . str_replace('//', '/', '/' . $relativePathToWpContent);
-
+            $wpConfigDir = dirname(\WP_CLI\Utils\locate_wp_config());
+            $relativePathToWpContent = str_replace($wpConfigDir, '', realpath(constant($pathConstant)));
+            $url = rtrim(rtrim($baseUrl, '/') . str_replace('//', '/', '/' . $relativePathToWpContent), '/');
             $this->runVPInternalCommand('update-config', [$urlConstant, $url]);
         }
     }
