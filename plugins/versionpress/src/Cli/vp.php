@@ -205,6 +205,14 @@ class VPCommand extends WP_CLI_Command
     public function restoreSite($args, $assoc_args)
     {
 
+        if (file_exists(getcwd() . '/composer.json')) {
+            $proc = proc_open("composer install", [1 => ["pipe","w"], ["pipe","w"]], $_);
+            $result = proc_close($proc);
+            if ($result !== 0) {
+                WP_CLI::error('Composer dependencies could not be restored.');
+            }
+        }
+
         defined('SHORTINIT') or define('SHORTINIT', true);
 
         require_once __DIR__ . '/../Initialization/WpConfigSplitter.php';
