@@ -853,8 +853,8 @@ INI
      */
     public function serializedStringWithNewLines()
     {
-        $arrayWithHtml = ["meta_key" => "who_is_the_best", "meta_value" => "VersionPress\r\nis\r\nthe\r\nbest"];
-        $serializedString = serialize($arrayWithHtml);
+        $arrayWithNewLines = ["meta_key" => "who_is_the_best", "meta_value" => "VersionPress\r\nis\r\nthe\r\nbest"];
+        $serializedString = serialize($arrayWithNewLines);
         $data = ["Section" => ["data" => $serializedString]];
         $ini = StringUtils::crlfize(<<<'INI'
 [Section]

@@ -259,12 +259,6 @@ class SerializedDataToIniConverter
     {
         $type = null; // string or number
 
-        //@see IniSerializer::getReplacedEolString
-        $eolReplacement = [
-            "<<<[EOL-LF]>>>" => "\n",
-            "<<<[EOL-CR]>>>" => "\r",
-        ];
-
         // https://regex101.com/r/gJ1oF2/1
         if (preg_match('/^<(\*?[\w\d\\\\]+\*?)> ?(.*)/', $value, $matches)) {
             $type = $matches[1]; // detect type and value from eg. `<boolean> false`
@@ -311,8 +305,7 @@ class SerializedDataToIniConverter
         if ($type !== null && is_string($value)) {
             $value = '<' . $type . '>' . $value;
         }
-        $valueWithoutEolPlaceholders = str_replace(array_keys($eolReplacement), array_values($eolReplacement), $value);
-        return 's:' . strlen($valueWithoutEolPlaceholders) . ':"' . $value . '";';
+        return 's:' . strlen($value) . ':"' . $value . '";';
     }
 
     /**
