@@ -145,6 +145,16 @@ class VPInternalCommand extends WP_CLI_Command
             WP_CLI::error("Working directory couldn't be reset");
         }
 
+        // Install current Composer dependencies
+        if (file_exists(VP_PROJECT_ROOT . '/composer.json')) {
+            $process = VPCommandUtils::exec('composer install', VP_PROJECT_ROOT);
+            if ($process->isSuccessful()) {
+                WP_CLI::success('Installed Composer dependencies');
+            } else {
+                WP_CLI::error('Composer dependencies could not be restored.');
+            }
+        }
+
         // Run synchronization
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
