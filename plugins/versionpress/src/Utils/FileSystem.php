@@ -27,7 +27,6 @@ class FileSystem
     public static function rename($origin, $target, $overwrite = false)
     {
 
-        self::possiblyFixGitPermissions($origin);
 
         $fs = new \Symfony\Component\Filesystem\Filesystem();
         $fs->rename($origin, $target, $overwrite);
@@ -43,7 +42,6 @@ class FileSystem
     public static function remove($path)
     {
 
-        self::possiblyFixGitPermissions($path);
 
         $fs = new \Symfony\Component\Filesystem\Filesystem();
         $fs->remove($path);
@@ -66,11 +64,6 @@ class FileSystem
             RecursiveIteratorIterator::CHILD_FIRST
         );
 
-        foreach ($iterator as $item) {
-            if ($item->isDir() && Strings::endsWith($iterator->key(), ".git")) {
-                self::possiblyFixGitPermissions($iterator->key());
-            }
-        }
 
         $fs = new \Symfony\Component\Filesystem\Filesystem();
         $fs->remove($iterator);
@@ -119,40 +112,7 @@ class FileSystem
         $fs = new \Symfony\Component\Filesystem\Filesystem();
         $fs->mkdir($dir, $mode);
     }
-
-    /**
-     * If the path is either a `.git` repository itself or a directory that contains it,
-     * this method attempts to set correct permissions on the `.git` folder to avoid issues
-     * on Windows.
-     *
-     * @param $path
-     */
-    private static function possiblyFixGitPermissions($path)
-    {
-
-        $gitDir = null;
-        if (is_dir($path)) {
-            if (basename($path) == '.git') {
-                $gitDir = $path;
-            } else {
-                if (is_dir($path . '/.git')) {
-                    $gitDir = $path . '/.git';
-                }
-            }
-        }
-
-        if ($gitDir) {
-            $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($gitDir));
-
-            foreach ($iterator as $item) {
-                if (is_dir($item)) {
-                    chmod($item, 0750);
-                } else {
-                    chmod($item, 0640);
-                }
-            }
-        }
-    }
+    
 
     /**
      * Compares two files and returns true if their contents is equal
