@@ -2,6 +2,21 @@
 
 import * as request from 'superagent';
 import config from '../config';
+import {getValidVPJSON} from '../common/StringUtils';
+
+request.parse['application/json'] = function(str: string) {
+  let parsedJSON;
+  try {
+    parsedJSON = JSON.parse(str);
+  } catch (e) {
+    const validJSON = getValidVPJSON(str);
+    parsedJSON = JSON.parse(validJSON);
+  }
+  if ('__VP__' in parsedJSON || ('code' in parsedJSON && 'message' in parsedJSON)) {
+    return parsedJSON;
+  }
+  throw new Error("Error: Parser is unable to parse the response");
+};
 
 export function getApiLink(endpoint: string) {
   if (/^\/index.php\/.*/.test(<string> config.api.permalinkStructure)) {
