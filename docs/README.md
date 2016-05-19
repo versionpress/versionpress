@@ -69,9 +69,12 @@ We currently only have an English version living in the `content/en` directory. 
 
 ## Redirects
 
-Simple redirects can be added project's `config.yml` placed in repository root. Currently only plain strings (see below) can be used. If some rules are found in `redirects` section, exact match on requested URL (without starting `/` and tailing query string) is performed. URLs used in matching rules should contain language and slug of parsed markdown document file. User is redirect to new url with HTTP status code `301` without query string preserved.
+URL redirects can be specified in `content/config.yml` like so:
 
 ```
 redirects:
-  'en/getting-started/concepts': 'en/feature-focus'
+  'en/getting-started/old-name': 'en/getting-started/new-name'
 ```
+
+Note that there is no leading slash. This leads to HTTP 301 Moved Permanently.
+
