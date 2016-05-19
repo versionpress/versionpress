@@ -59,14 +59,13 @@ export function getValidVPJSON(str: string) {
 
   function findFirstFreeQuote(openBrackets, from, dir, cond: (i: number, openBrackets: number) => boolean) {
     let inQuotes = false;
-    let backslash = false;
     let i;
 
     for (i = from; cond(i, openBrackets); i += dir) {
-      backslash = i > 0 && str[i - 1] === '\\'
-        ? !backslash
-        : false;
-      if (backslash) {
+      let j = 1;
+      while (i - j >= 0 && str[i - j] === '\\') { j += 1; }
+      // Odd count of backslashes => current char is escaped
+      if (j % 2 === 0) {
         continue;
       }
 
