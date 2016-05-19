@@ -5,12 +5,7 @@ import config from '../config';
 
 const noCache = function (request) {
   var timestamp = Date.now().toString();
-  if (request._query !== undefined && request._query[0]) {
-    request._query[0] += '&' + timestamp;
-  } else {
-    request._query = [timestamp];
-  }
-
+  request.query(timestamp);
   return request;
 };
 
