@@ -52,3 +52,55 @@ export function pluralize(word: string) {
 export function join(array: any[], separator: string = ', ' , lastSeparator: string = ' and ') {
   return ArrayUtils.interspace(array, separator, lastSeparator).join('');
 }
+
+export function getValidVPJSON(str: string) {
+  const index = str.indexOf('__VP__');
+  const len = str.length;
+
+  function findFirstFreeQuote(openBrackets, from, dir, cond: (i: number, openBrackets: number) => boolean) {
+    let inQuotes = false;
+    let backslash = false;
+    let i;
+
+    for (i = from; cond(i, openBrackets); i += dir) {
+      backslash = i > 0 && str[i - 1] === '\\'
+        ? !backslash
+        : false;
+      if (backslash) {
+        continue;
+      }
+
+      if (str[i] === '\"') {
+        inQuotes = !inQuotes;
+        continue;
+      }
+
+      if (!inQuotes) {
+        if (str[i] === '{') {
+          openBrackets += 1;
+        } else if (str[i] === '}') {
+          openBrackets -= 1;
+        }
+      }
+    }
+
+    if (openBrackets != 0) return null;
+    return i;
+  }
+
+  const start = findFirstFreeQuote(-1, index - 2, -1, (i, openBrackets) => openBrackets < 0 && i >= 0);
+  const end = findFirstFreeQuote(1, index + 7, 1, (i, openBrackets) => openBrackets > 0 && i < len);
+
+  if (start === null || end === null) {
+    return null;
+  }
+
+  const start2 = findFirstFreeQuote(-1, start - 1, -1, (i, openBrackets) => openBrackets < 0 && i >= 0);
+  const end2 = findFirstFreeQuote(1, end, 1, (i, openBrackets) => openBrackets > 0 && i < len);
+
+  if (start2 === null || end2 === null) {
+    return str.substring(start + 1, end);
+  }
+
+  return str.substring(start2 + 1, end2);
+}
