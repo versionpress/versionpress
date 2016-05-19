@@ -3,6 +3,12 @@
 import * as request from 'superagent';
 import config from '../config';
 
+const noCache = function (request) {
+  var timestamp = Date.now().toString();
+  request.query(timestamp);
+  return request;
+};
+
 export function getApiLink(endpoint: string) {
   if (/^\/index.php\/.*/.test(<string> config.api.permalinkStructure)) {
     return config.api.root + '/index.php/' + config.api.urlPrefix + '/versionpress/' + endpoint;
@@ -16,7 +22,8 @@ export function getApiLink(endpoint: string) {
 export function get(endpoint: string) {
   const req = request
     .get(getApiLink(endpoint))
-    .accept('application/json');
+    .accept('application/json')
+    .use(noCache);
 
   return config.api.nonce
     ? req.set('X-WP-Nonce', config.api.nonce)
