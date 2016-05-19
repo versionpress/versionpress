@@ -58,8 +58,14 @@ class WpAutomation
      */
     public function setUpSite($entityCounts = [])
     {
-        $this->prepareFiles();
-        $this->createConfigFile();
+        FileSystem::removeContent($this->siteConfig->path);
+
+        if ($this->siteConfig->installationType === 'standard') {
+            $this->prepareStandardWpInstallation();
+        } elseif ($this->siteConfig->installationType === 'composer') {
+            $this->createPedestalBasedSite();
+        }
+
         $this->clearDatabase();
         $this->installWordPress();
 
@@ -92,7 +98,8 @@ class WpAutomation
      */
     public function isVersionPressInitialized()
     {
-        return is_file($this->siteConfig->path . '/wp-content/vpdb/.active');
+        $vpdbDir = $this->runWpCliCommand('eval', null, ['defined("VP_VPDB_DIR") && print(VP_VPDB_DIR);']);
+        return $vpdbDir !== '' && is_file($vpdbDir . '/.active');
     }
 
     /**
@@ -506,7 +513,7 @@ class WpAutomation
     public function initializeVersionPress()
     {
         $this->runWpCliCommand('plugin', 'activate', ['versionpress']);
-        $this->runWpCliCommand('vp', 'activate');
+        $this->runWpCliCommand('vp', 'activate', ['yes' => null]);
     }
 
     /**
@@ -543,11 +550,11 @@ class WpAutomation
      * Puts WP directory to a default state, as if one manually downloaded the WordPress ZIP
      * and extracted it there. Removes all old files if necessary.
      */
-    private function prepareFiles()
+    private function prepareStandardWpInstallation()
     {
         $this->ensureCleanInstallationIsAvailable();
-        FileSystem::removeContent($this->siteConfig->path);
         FileSystem::copyDir($this->getCleanInstallationPath(), $this->siteConfig->path);
+        $this->createConfigFile();
     }
 
     /**
@@ -816,5 +823,27 @@ class WpAutomation
         });
 
         file_put_contents($bootstrapFile, join("\n", $lines));
+    }
+
+    private function createPedestalBasedSite()
+    {
+        $process = new Process('composer create-project -s dev versionpress/pedestal .', $this->siteConfig->path);
+        $process->run();
+
+        $this->updateConfigConstant('DB_NAME', $this->siteConfig->dbName);
+        $this->updateConfigConstant('DB_USER', $this->siteConfig->dbUser);
+        $this->updateConfigConstant('DB_PASSWORD', $this->siteConfig->dbPassword);
+        $this->updateConfigConstant('DB_HOST', $this->siteConfig->dbHost);
+        $this->updateConfigConstant('WP_HOME', $this->siteConfig->url);
+    }
+
+    private function updateConfigConstant($constant, $value, $variable = false)
+    {
+        $vpInternalCommandFile = __DIR__ . '/../../src/Cli/vp-internal.php';
+        $this->runWpCliCommand(
+            'vp-internal',
+            'update-config',
+            [$constant, $value, 'require' => $vpInternalCommandFile]
+        );
     }
 }

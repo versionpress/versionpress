@@ -64,6 +64,7 @@ class TestConfig
             // General settings
             $this->sites[$siteId]->name = $siteId;
             $this->sites[$siteId]->host = $rawSiteConfig['host'];
+            $this->sites[$siteId]->installationType = $rawSiteConfig['installation-type'];
 
             // DB config
             $this->sites[$siteId]->dbHost = $rawSiteConfig['db']['host'];
