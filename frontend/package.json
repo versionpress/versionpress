@@ -46,7 +46,7 @@
   "devDependencies": {
     "chai": "3.4.1",
     "gulp-tslint": "3.6.0",
-    "karma": "0.13.15",
+    "karma": "0.13.22",
     "karma-chai": "0.1.0",
     "karma-chai-sinon": "0.1.5",
     "karma-chrome-launcher": "0.2.1",
