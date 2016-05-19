@@ -33,7 +33,7 @@ export default class FlashMessage extends React.Component<FlashMessageProps, Fla
           {this.props.details
             ? <a
                 className={'FlashMessage-detailsLink' + (this.state.showDetails ? '-displayed' : '-hidden')}
-                href=""
+                href='#'
                 onClick={this.toggleDetails.bind(this)}
               >Details </a>
             : null}
