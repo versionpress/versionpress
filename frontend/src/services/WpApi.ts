@@ -15,7 +15,7 @@ request.parse['application/json'] = function(str: string) {
   if ('__VP__' in parsedJSON || ('code' in parsedJSON && 'message' in parsedJSON)) {
     return parsedJSON;
   }
-  throw new Error("Error: Parser is unable to parse the response");
+  throw new Error('Error: Parser is unable to parse the response');
 };
 
 export function getApiLink(endpoint: string) {

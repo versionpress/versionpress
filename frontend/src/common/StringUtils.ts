@@ -84,7 +84,9 @@ export function getValidVPJSON(str: string) {
       }
     }
 
-    if (openBrackets != 0) return null;
+    if (openBrackets !== 0) {
+      return null;
+    }
     return i;
   }
 

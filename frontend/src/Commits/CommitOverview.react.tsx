@@ -297,7 +297,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
       <li className='environment'>
         <em>Environment: {this.props.commit.environment}</em>
       </li>
-    )
+    );
   }
 
   private expandList(listKey) {

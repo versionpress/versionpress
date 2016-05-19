@@ -197,7 +197,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         if (err) {
           this.setState({message: HomePage.getErrorMessage(res, err), loading: false});
         } else {
-          const router:ReactRouter.Context = (this.context as any).router;
+          const router: ReactRouter.Context = (this.context as any).router;
           router.transitionTo(routes.home);
           document.location.reload();
         }
@@ -216,7 +216,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         if (err) {
           this.setState({message: HomePage.getErrorMessage(res, err), loading: false});
         } else {
-          const router:ReactRouter.Context = (this.context as any).router;
+          const router: ReactRouter.Context = (this.context as any).router;
           router.transitionTo(routes.home);
           document.location.reload();
         }
@@ -279,7 +279,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
         const step = (index < lastIndex ? -1 : 1);
         const cond = index + step;
-        for (let i = lastIndex; i != cond; i += step) {
+        for (let i = lastIndex; i !== cond; i += step) {
           const current = this.state.commits[i];
           const index = indexOf(selected, current);
           if (check && index === -1) {
@@ -371,7 +371,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     }, () => {
       const page = (parseInt(this.props.params.page, 10) - 1) || 0;
       if (page > 0) {
-        const router:ReactRouter.Context = (this.context as any).router;
+        const router: ReactRouter.Context = (this.context as any).router;
         router.transitionTo(routes.home);
       } else {
         this.fetchCommits();
