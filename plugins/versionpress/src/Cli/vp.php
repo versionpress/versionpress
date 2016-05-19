@@ -407,7 +407,7 @@ class VPCommand extends WP_CLI_Command
 
         $currentWpPath = realpath(VP_PROJECT_ROOT);
         $cloneDirName = $name;
-        $clonePath = isset($assoc_args['dirpath']) ? realpath($currentWpPath.$assoc_args['dirpath']) : dirname($currentWpPath) . '/' . $cloneDirName;
+        $clonePath = isset($assoc_args['dirpath']) ? realpath($currentWpPath . '/' . $assoc_args['dirpath']) : dirname($currentWpPath) . '/' . $cloneDirName;
         $cloneVpPluginPath = $clonePath . '/' . str_replace($currentWpPath, '', realpath(VERSIONPRESS_PLUGIN_DIR));
 
         $cloneDbUser = isset($assoc_args['dbuser']) ? $assoc_args['dbuser'] : DB_USER;
