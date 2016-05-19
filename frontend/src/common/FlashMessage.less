@@ -1,0 +1,41 @@
+.FlashMessage {
+  &-details {
+    display: block;
+  }
+
+  a&-detailsLink {
+    &-displayed,
+    &-hidden {
+      position: relative;
+
+      &:after {
+        display: inline-block;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        content: '';
+        width: 0;
+        height: 0;
+        vertical-align: middle;
+      }
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+    &-displayed:after {
+      margin-left: 2px;
+      border-top: 4px dashed;
+      border-top: 4px solid\9;
+      border-right: 4px solid transparent;
+      border-left: 4px solid transparent;
+    }
+    &-hidden:after {
+      margin-left: 4px;
+      border-left: 4px dashed;
+      border-left: 4px solid\9;
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+    }
+  }
+}

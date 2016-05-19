@@ -39,7 +39,8 @@ interface HomePageState {
   lastSelected?: Commit;
   message?: {
     code: string,
-    message: string
+    message: string,
+    details?: string
   };
   loading?: boolean;
   displayServicePanel?: boolean;
@@ -89,7 +90,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     console.error(err);
     return {
       code: 'error',
-      message: 'Connection Error: VersionPress is not able to connect to WordPress site. Please try refreshing the page.'
+      message: 'VersionPress is not able to connect to WordPress site. Please try refreshing the page.',
+      details: err
     };
   }
 
