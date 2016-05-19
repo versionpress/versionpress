@@ -170,7 +170,7 @@ class VersionPressApi
 
     /**
      * Prevents unexpected output from displaying to output, adds it to the response json instead.
-     * 
+     *
      * @param callable|string $routeHandler
      * @return \Closure
      */
