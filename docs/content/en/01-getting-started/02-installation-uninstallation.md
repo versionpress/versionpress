@@ -108,17 +108,17 @@ Since [VersionPress 3.0](../release-notes/3.0), the simplest way to update is to
 wp vp update ./versionpress.zip
 ```
 
-This will keep the Git repo and continue tracking the site fine, however, keep in mind that the original history becomes unactionable: you will not be able to undo old changes or roll back to previous states. We will need [full migrations support](https://github.com/versionpress/versionpress/issues/275) for that. 
+This will keep the Git repo and continue tracking the site fine, however, keep in mind that the original history becomes unactionable: you will not be able to undo old changes or roll back to previous states. ([Full migrations](https://github.com/versionpress/versionpress/issues/275) are on our roadmap). 
 
-If you cannot use the method above, for example, because you don't have WP-CLI available on the server, this is the **manual update method**:
+If you cannot use the WP-CLI update method, these are the manual steps:
 
 1. Put the site in a maintenance mode.
 2. Deactivate VersionPress (just deactivate, do not uninstall).
-3. Delete the contents of `wp-content/plugins/versionpress` and extract the current version there.
+3. Delete the contents of `wp-content/plugins/versionpress` and extract the new version there.
 4. Activate & initialize the plugin again.
 5. Disable the maintenance mode.
 
-The difference from the automated method is that the internal representation of the database has been regenerated from scratch so you won't be able to track the history of database entities easily.
+The difference from the automated method is that the internal representation of the database has been regenerated from scratch so you won't be able to track the history of database entities easily. We will improve the GUI update method in the future.
 
 
 ## Uninstallation
