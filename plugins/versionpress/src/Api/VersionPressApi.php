@@ -40,6 +40,8 @@ class VersionPressApi
     /** @var SynchronizationProcess */
     private $synchronizationProcess;
 
+    const NAMESPACE_VP = 'versionpress';
+
     public function __construct(
         GitRepository $gitRepository,
         Reverter $reverter,
@@ -55,9 +57,7 @@ class VersionPressApi
      */
     public function registerRoutes()
     {
-        $namespace = 'versionpress';
-
-        register_rest_route($namespace, '/commits', [
+        $this->registerRestRoute('/commits', [
             'methods' => WP_REST_Server::READABLE,
             'callback' => [$this, 'getCommits'],
             'args' => [
@@ -67,89 +67,87 @@ class VersionPressApi
                 'query' => [
                     'default' => []
                 ]
-            ],
-            'permission_callback' => [$this, 'checkPermissions']
+            ]
         ]);
 
-        register_rest_route($namespace, '/undo', [
+        $this->registerRestRoute('/undo', [
             'methods' => WP_REST_Server::READABLE,
             'callback' => $this->handleAsAdminSectionRoute('undoCommits'),
             'args' => [
                 'commits' => [
                     'required' => true
                 ]
-            ],
-            'permission_callback' => [$this, 'checkPermissions']
+            ]
         ]);
 
-        register_rest_route($namespace, '/rollback', [
+        $this->registerRestRoute('/rollback', [
             'methods' => WP_REST_Server::READABLE,
             'callback' => $this->handleAsAdminSectionRoute('rollbackToCommit'),
             'args' => [
                 'commit' => [
                     'required' => true
                 ]
-            ],
-            'permission_callback' => [$this, 'checkPermissions']
+            ]
         ]);
 
-        register_rest_route($namespace, '/can-revert', [
+        $this->registerRestRoute('/can-revert', [
             'methods' => WP_REST_Server::READABLE,
-            'callback' => [$this, 'canRevert'],
-            'permission_callback' => [$this, 'checkPermissions']
+            'callback' => [$this, 'canRevert']
         ]);
 
-        register_rest_route($namespace, '/diff', [
+        $this->registerRestRoute('/diff', [
             'methods' => WP_REST_Server::READABLE,
             'callback' => [$this, 'getDiff'],
             'args' => [
                 'commit' => [
                     'default' => null
                 ]
-            ],
-            'permission_callback' => [$this, 'checkPermissions']
+            ]
         ]);
 
-        register_rest_route($namespace, '/display-welcome-panel', [
+        $this->registerRestRoute('/display-welcome-panel', [
             'methods' => WP_REST_Server::READABLE,
-            'callback' => [$this, 'displayWelcomePanel'],
-            'permission_callback' => [$this, 'checkPermissions']
+            'callback' => [$this, 'displayWelcomePanel']
         ]);
 
-        register_rest_route($namespace, '/hide-welcome-panel', [
+        $this->registerRestRoute('/hide-welcome-panel', [
             'methods' => WP_REST_Server::CREATABLE,
-            'callback' => $this->handleAsAdminSectionRoute('hideWelcomePanel'),
-            'permission_callback' => [$this, 'checkPermissions']
+            'callback' => $this->handleAsAdminSectionRoute('hideWelcomePanel')
         ]);
 
-        register_rest_route($namespace, '/should-update', [
+        $this->registerRestRoute('/should-update', [
             'methods' => WP_REST_Server::READABLE,
-            'callback' => [$this, 'shouldUpdate'],
-            'permission_callback' => [$this, 'checkPermissions']
+            'callback' => [$this, 'shouldUpdate']
         ]);
 
-        register_rest_route($namespace, '/git-status', [
+        $this->registerRestRoute('/git-status', [
             'methods' => WP_REST_Server::READABLE,
-            'callback' => [$this, 'getGitStatus'],
-            'permission_callback' => [$this, 'checkPermissions']
+            'callback' => [$this, 'getGitStatus']
         ]);
 
-        register_rest_route($namespace, '/commit', [
+        $this->registerRestRoute('/commit', [
             'methods' => WP_REST_Server::CREATABLE,
             'callback' => $this->handleAsAdminSectionRoute('commit'),
             'args' => [
                 'commit-message' => [
                     'required' => true
                 ]
-            ],
-            'permission_callback' => [$this, 'checkPermissions']
+            ]
         ]);
 
-        register_rest_route($namespace, '/discard-changes', [
+        $this->registerRestRoute('/discard-changes', [
             'methods' => WP_REST_Server::CREATABLE,
-            'callback' => $this->handleAsAdminSectionRoute('discardChanges'),
-            'permission_callback' => [$this, 'checkPermissions']
+            'callback' => $this->handleAsAdminSectionRoute('discardChanges')
         ]);
+    }
+
+    private function registerRestRoute($route, $args = [], $override = false)
+    {
+        $args['callback'] = $this->handleErrorOutput($args['callback']);
+        if (!isset($args['permission_callback'])) {
+            $args['permission_callback'] = [$this, 'checkPermissions'];
+        }
+        return register_rest_route(self::NAMESPACE_VP, $route, $args, $override);
     }
 
     /**
@@ -157,7 +155,7 @@ class VersionPressApi
      * in admin section of WordPress even if the routes are called using AJAX (WordPress native function is_admin()
      * evaluates call correctly.
      *
-     * @param $routeHandler
+     * @param string $routeHandler
      * @return \Closure
      */
     private function handleAsAdminSectionRoute($routeHandler)
@@ -167,6 +165,45 @@ class VersionPressApi
                 define('WP_ADMIN', true);
             }
             return $this->$routeHandler($request);
+        };
+    }
+
+    /**
+     * Prevents unexpected output from displaying to output, adds it to the response json instead.
+     * 
+     * @param callable|string $routeHandler
+     * @return \Closure
+     */
+    private function handleErrorOutput($routeHandler)
+    {
+        return function (WP_REST_Request $request) use ($routeHandler) {
+            ob_start();
+            /** @var WP_REST_Response|WP_Error $response */
+            $response = is_callable($routeHandler)
+                ? $routeHandler($request)
+                : $this->$routeHandler($request);
+
+            $data = ($response instanceof WP_Error)
+                ? $response->get_error_data()
+                : $response->get_data();
+            if (!is_array($data)) {
+                $data = [$data];
+            }
+
+            $data['__VP__'] = true;
+
+            if (ob_get_length() > 0) {
+                $bufferContents = ob_get_clean();
+                $data['phpBuffer'] = $bufferContents;
+            }
+
+            if ($response instanceof WP_Error) {
+                $response->add_data($data);
+            } else {
+                $response->set_data($data);
+            }
+
+            return $response;
         };
     }
 
