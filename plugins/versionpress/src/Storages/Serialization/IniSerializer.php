@@ -165,9 +165,9 @@ class IniSerializer
         $deserialized = parse_ini_string($string, true, INI_SCANNER_RAW);
         $deserialized = self::restoreTypesOfValues($deserialized);
         $deserialized = self::sanitizeSectionsAndKeys_removePlaceholders($deserialized);
+        $deserialized = self::eolWorkaround_removePlaceholders($deserialized);
         $deserialized = self::restorePhpSerializedData($deserialized);
         $deserialized = self::expandArrays($deserialized);
-        $deserialized = self::eolWorkaround_removePlaceholders($deserialized);
         return $deserialized;
     }
 
