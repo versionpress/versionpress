@@ -1,5 +1,3 @@
-/// <reference path='../../typings/typings.d.ts' />
-
 import * as React from 'react';
 
 interface CommitPanelOverviewProps extends React.Props<JSX.Element> {

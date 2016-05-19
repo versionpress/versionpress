@@ -38,7 +38,7 @@ export function pluralize(word: string) {
     '(us)$'                 : '$1es',
     '(meta)$'               : '$1',
     's$'                    : 's',
-    '$'                     : 's'
+    '$'                     : 's',
   };
 
   for (let reg in plural) {

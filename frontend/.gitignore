@@ -6,8 +6,7 @@
 /node_modules
 
 # TypeScript definition files
-/typings/tsd
-/typings/tsd.d.ts
+/typings
 
 # Local config files
 /src/config.local.ts

@@ -18,7 +18,6 @@
       true,
       2
     ],
-    "interface-name": false,
     "jsdoc-format": true,
     "label-position": true,
     "label-undefined": true,
@@ -53,18 +52,21 @@
     "no-eval": true,
     "no-string-literal": false,
     "no-switch-case-fall-through": true,
-    "no-trailing-comma": true,
     "no-trailing-whitespace": true,
     "no-unreachable": true,
     "no-unused-expression": true,
-    "no-unused-variable": true,
+    "no-unused-variable": [
+      true,
+      "react"
+    ],
     "no-use-before-declare": true,
-    "no-var-requires": false,
+    "no-var-keyword": false,
+    "no-var-requires": true,
     "one-line": [
       true,
-      "check-open-brace",
       "check-catch",
       "check-else",
+      "check-open-brace",
       "check-whitespace"
     ],
     "quotemark": [
@@ -74,13 +76,24 @@
     "radix": true,
     "semicolon": true,
     "switch-default": true,
-    "triple-equals": true,
+    "trailing-comma": [
+      true,
+      {
+        "multiline": "always",
+        "singleline": "never"
+      }
+    ],
+    "triple-equals": [
+      true,
+      "allow-null-check"
+    ],
     "typedef": [
       true,
       "property-declaration"
     ],
     "typedef-whitespace": [
-      true, {
+      true,
+      {
         "call-signature": "nospace",
         "index-signature": "nospace",
         "parameter": "nospace",
@@ -91,15 +104,18 @@
     "use-strict": false,
     "variable-name": [
       true,
-      "allow-leading-underscore"
+      "allow-leading-underscore",
+      "ban-keywords"
     ],
     "whitespace": [
       true,
       "check-branch",
       "check-decl",
       "check-operator",
+      "check-module",
       "check-separator",
-      "check-type"
+      "check-type",
+      "check-typecast"
     ]
   }
 }

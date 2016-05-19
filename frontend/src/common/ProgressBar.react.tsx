@@ -1,5 +1,3 @@
-/// <reference path='../../typings/typings.d.ts' />
-
 import * as React from 'react';
 
 import './ProgressBar.less';
@@ -15,21 +13,21 @@ export default class ProgressBar extends React.Component<React.Props<JSX.Element
     super();
     this.state = {
       display: false,
-      progress: 0
+      progress: 0,
     };
   }
 
   progress(progress: number) {
     this.setState({
       progress: progress,
-      display: progress < 100
+      display: progress < 100,
     });
   }
 
   render() {
     const styles = {
       transform: `translate3d(${this.state.progress - 100}%,0px,0px)`,
-      display: (this.state.display ? 'inline-block' : 'none')
+      display: (this.state.display ? 'inline-block' : 'none'),
     };
     const className = 'ProgressBar';
     return (

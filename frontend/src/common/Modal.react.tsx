@@ -1,5 +1,3 @@
-/// <reference path='../../typings/typings.d.ts' />
-
 import * as React from 'react';
 import * as portal from './portal';
 
@@ -25,7 +23,7 @@ export default class Modal extends React.Component<ModalProps, any> {
 
   static defaultProps = {
     backgroundClickToClose: true,
-    showCloseIcon: true
+    showCloseIcon: true,
   };
 
   componentDidMount() {

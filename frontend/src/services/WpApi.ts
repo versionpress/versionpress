@@ -1,5 +1,3 @@
-/// <reference path='../../typings/typings.d.ts' />
-
 import * as request from 'superagent';
 import config from '../config';
 

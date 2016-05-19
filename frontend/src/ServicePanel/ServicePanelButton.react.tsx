@@ -1,5 +1,3 @@
-/// <reference path='../../typings/typings.d.ts' />
-
 import * as React from 'react';
 
 import './ServicePanelButton.less';

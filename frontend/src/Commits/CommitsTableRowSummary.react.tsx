@@ -1,4 +1,3 @@
-/// <reference path='../../typings/typings.d.ts' />
 /// <reference path='./Commits.d.ts' />
 
 import * as React from 'react';
@@ -159,7 +158,7 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
     if (!this.props.enableActions) {
       return;
     }
-    
+
     const target = e.target as HTMLInputElement;
     let checked;
 

@@ -1,4 +1,3 @@
-/// <reference path='../../typings/typings.d.ts' />
 /// <reference path='./Commits.d.ts' />
 
 import * as React from 'react';
@@ -72,7 +71,7 @@ export default class CommitsTableRow extends React.Component<CommitsTableRowProp
             detailsLevel: detailsLevel,
             diff: diff,
             error: null,
-            loading: false
+            loading: false,
           })
         ).catch(err => {
           this.setState({detailsLevel: detailsLevel, error: err.message, loading: false});

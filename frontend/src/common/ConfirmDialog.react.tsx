@@ -1,5 +1,3 @@
-/// <reference path='../../typings/typings.d.ts' />
-
 import * as React from 'react';
 import * as portal from './portal';
 
@@ -30,7 +28,7 @@ export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {
     cancelButtonText: 'Cancel',
     okButtonClickHandler: function() {},
     cancelButtonClickHandler: function() {},
-    loading: false
+    loading: false,
   };
 
   handleOkClick() {

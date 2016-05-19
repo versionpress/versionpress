@@ -1,5 +1,3 @@
-/// <reference path='../../typings/typings.d.ts' />
-
 import * as React from 'react';
 
 interface CommitsTableNoteProps extends React.Props<JSX.Element> {

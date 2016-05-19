@@ -1,4 +1,3 @@
-/// <reference path='../../typings/typings.d.ts' />
 /// <reference path='../Commits/Commits.d.ts' />
 
 import * as React from 'react';
@@ -7,7 +6,7 @@ import './BulkActionPanel.less';
 
 interface BulkActionPanelProps extends React.Props<JSX.Element> {
   enableActions: boolean;
-  onBulkAction: (string) => void;
+  onBulkAction: (action: string) => void;
   onClearSelection: () => void;
   selected: Commit[];
 }
@@ -50,7 +49,7 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
           />
           <div className={'BulkActionPanel-note' + (selected.length === 0 ? ' hide' : '')}>
             ({selected.length} {selected.length === 1 ? 'change' : 'changes'} selected;{' '}
-            <a className='BulkActionPanel-clear' href="#" onClick={this.onClearSelection.bind(this)}>clear selection</a>
+            <a className='BulkActionPanel-clear' href='#' onClick={this.onClearSelection.bind(this)}>clear selection</a>
             )
           </div>
         </div>
