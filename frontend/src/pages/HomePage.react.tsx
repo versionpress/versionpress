@@ -153,9 +153,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         if (err) {
           return;
         }
-        const body = Array.isArray(res.body)
-          ? res.body[0]
-          : res.body;
+        const body = Array.isArray(res.body) ? res.body[0] : res.body;
         if (body === true) {
           this.setState({displayWelcomePanel: true});
         } else {
