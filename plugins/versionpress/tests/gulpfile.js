@@ -59,7 +59,7 @@ gulp.task('check-port', function (cb) {
 gulp.task('start-selenium', ['check-port'], function (cb) {
     // check for more recent versions of selenium here:
     // http://selenium-release.storage.googleapis.com/index.html
-    var seleniumVersion = '2.47.1';
+    var seleniumVersion = '2.53.0';
 
     selenium.install({
         version: seleniumVersion,
