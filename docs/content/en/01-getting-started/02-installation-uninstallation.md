@@ -100,25 +100,26 @@ Upon successful activation, you should see a screen like this:
 </figure>
 
 
-## Update / upgrade
+## Update
 
-The update process is manual at the moment and always described in the [release notes](../release-notes) for a specific version. We will have an automated upgrade method in the future.
+Since [VersionPress 3.0](../release-notes/3.0), the simplest way to update is to run the `wp vp update` command, e.g.:
 
-### Manual upgrade
+```
+wp vp update ./versionpress.zip
+```
 
-Manual upgrade is always described in the release notes for the release, including info about how to do it, which versions are upgradable etc. Generally, do this:
+This will keep the Git repo and continue tracking the site fine, however, keep in mind that the original history becomes unactionable: you will not be able to undo old changes or roll back to previous states. ([Full migrations](https://github.com/versionpress/versionpress/issues/275) are on our roadmap). 
 
- 1. Put the site in a [maintenance mode](http://www.hongkiat.com/blog/wordpress-maintenance/)
- 2. Replace the `wp-content/plugins/versionpress` directory on the server
- 3. Do any version-specific changes that are described in the [release notes](../release-notes)
- 4. Disable the maintenance mode
+If you cannot use the WP-CLI update method, these are the manual steps:
 
-This keeps the VersionPress repository in place and active which means that you will be able to revert the older changes, go back to the states done by the previous version of VersionPress, etc. If you decide to deactivate, delete and re-upload VersionPress it will create a new repository for you which is typically not something you'd want. (See the end of this page for an overview of possible VersionPress states.)
+1. Put the site in a maintenance mode.
+2. Deactivate VersionPress (just deactivate, do not uninstall).
+3. Delete the contents of `wp-content/plugins/versionpress` and extract the new version there.
+4. Activate & initialize the plugin again.
+5. Disable the maintenance mode.
 
+The difference from the automated method is that the internal representation of the database has been regenerated from scratch so you won't be able to track the history of database entities easily. We will improve the GUI update method in the future.
 
-### Automated upgrade
-
-This is coming in a future update of VersionPress. See the [roadmap](../release-notes/roadmap).
 
 ## Uninstallation
 
