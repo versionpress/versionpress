@@ -121,14 +121,17 @@ class FileSystem
     }
 
     /**
-     * If the path is either a `.git` repository itself or a directory that contains it,
-     * this method attempts to set correct permissions on the `.git` folder to avoid issues
-     * on Windows.
+     * Git for Windows makes files in `.git/objects` read-only. This method removes the flag
+     * so that operations like removing the folder work.
      *
-     * @param $path
+     * @param string $path Either path to `.git` itself or its parent directory (repo root)
      */
     private static function possiblyFixGitPermissions($path)
     {
+
+        if (DIRECTORY_SEPARATOR == '/') {
+            return;
+        }
 
         $gitDir = null;
         if (is_dir($path)) {
@@ -142,12 +145,12 @@ class FileSystem
         }
 
         if ($gitDir) {
-            $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($gitDir));
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($gitDir . '/objects', FilesystemIterator::SKIP_DOTS)
+            );
 
             foreach ($iterator as $item) {
-                if (is_dir($item)) {
-                    chmod($item, 0750);
-                } else {
+                if (is_file($item)) {
                     chmod($item, 0640);
                 }
             }
