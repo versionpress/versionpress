@@ -557,12 +557,17 @@ class WpAutomation
     private function ensureCleanInstallationIsAvailable()
     {
 
-        if (!is_dir($this->getCleanInstallationPath())) {
-            $downloadPath = $this->getCleanInstallationPath();
-            FileSystem::mkdir($downloadPath);
+        $cleanInstallationPath = $this->getCleanInstallationPath();
+
+        if (!is_dir($cleanInstallationPath) || !is_file($cleanInstallationPath . '/wp-settings.php')) {
+            if (!is_dir($cleanInstallationPath)) {
+                FileSystem::mkdir($cleanInstallationPath);
+            } else {
+                FileSystem::removeContent($cleanInstallationPath);
+            }
             $wpVersion = $this->siteConfig->wpVersion;
             $wpLocale = $this->siteConfig->wpLocale;
-            $downloadCommand = "wp core download --path=\"$downloadPath\" --version=\"$wpVersion\"";
+            $downloadCommand = "wp core download --path=\"$cleanInstallationPath\" --version=\"$wpVersion\"";
             if ($wpLocale) {
                 $downloadCommand .= " --locale=$wpLocale";
             }
