@@ -27,6 +27,7 @@ class FileSystem
     public static function rename($origin, $target, $overwrite = false)
     {
 
+        self::possiblyFixGitPermissions($origin);
 
         $fs = new \Symfony\Component\Filesystem\Filesystem();
         $fs->rename($origin, $target, $overwrite);
@@ -42,6 +43,7 @@ class FileSystem
     public static function remove($path)
     {
 
+        self::possiblyFixGitPermissions($path);
 
         $fs = new \Symfony\Component\Filesystem\Filesystem();
         $fs->remove($path);
@@ -64,6 +66,11 @@ class FileSystem
             RecursiveIteratorIterator::CHILD_FIRST
         );
 
+        foreach ($iterator as $item) {
+            if ($item->isDir() && Strings::endsWith($iterator->key(), ".git")) {
+                self::possiblyFixGitPermissions($iterator->key());
+            }
+        }
 
         $fs = new \Symfony\Component\Filesystem\Filesystem();
         $fs->remove($iterator);
@@ -112,7 +119,43 @@ class FileSystem
         $fs = new \Symfony\Component\Filesystem\Filesystem();
         $fs->mkdir($dir, $mode);
     }
-    
+
+    /**
+     * Git for Windows makes files in `.git/objects` read-only. This method removes the flag
+     * so that operations like removing the folder work.
+     *
+     * @param string $path Either path to `.git` itself or its parent directory (repo root)
+     */
+    private static function possiblyFixGitPermissions($path)
+    {
+
+        if (DIRECTORY_SEPARATOR == '/') {
+            return;
+        }
+
+        $gitDir = null;
+        if (is_dir($path)) {
+            if (basename($path) == '.git') {
+                $gitDir = $path;
+            } else {
+                if (is_dir($path . '/.git')) {
+                    $gitDir = $path . '/.git';
+                }
+            }
+        }
+
+        if ($gitDir) {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($gitDir . '/objects', FilesystemIterator::SKIP_DOTS)
+            );
+
+            foreach ($iterator as $item) {
+                if (is_file($item)) {
+                    chmod($item, 0640);
+                }
+            }
+        }
+    }
 
     /**
      * Compares two files and returns true if their contents is equal
