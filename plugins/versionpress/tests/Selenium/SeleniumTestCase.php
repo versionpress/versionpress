@@ -24,6 +24,11 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
      */
     protected static $wpAutomation;
 
+    /**
+     * @var string
+     */
+    protected static $wpAdminPath;
+
 
     /**
      * If true, {@link loginIfNecessary} is called on {@link setUpSite}.
@@ -71,6 +76,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
 
         if (!self::$testConfig) {
             self::$testConfig = TestConfig::createDefaultConfig();
+            self::$wpAdminPath = self::$testConfig->testSite->wpAdminPath;
         }
 
         if (!self::$wpAutomation) {
@@ -121,7 +127,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
             return;
         }
 
-        $this->url('wp-admin');
+        $this->url(self::$wpAdminPath);
         usleep(100 * 1000); // sometimes we need to wait for the page to fully load
 
         if (!$this->elementExists('#user_login')) {
@@ -136,7 +142,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
 
     protected function logOut()
     {
-        $this->url('wp-login.php?action=logout');
+        $this->url(dirname(self::$wpAdminPath) . '/wp-login.php?action=logout');
         $this->byCssSelector('body>p>a')->click();
         $this->waitAfterRedirect();
     }

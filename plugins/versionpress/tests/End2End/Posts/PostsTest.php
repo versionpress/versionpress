@@ -124,16 +124,16 @@ class PostsTest extends PostTypeTestCase
     {
         self::$worker->prepare_createTagInEditationForm();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->createTagInEditationForm();
 
-        $commitAsserter->assertNumCommits(2);
-        $commitAsserter->assertCommitAction('post/edit');
-        $commitAsserter->assertCommitAction('term/create', 1);
-        $commitAsserter->assertCommitTag("VP-Post-Type", self::$worker->getPostType());
-        $commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "vp_term_taxonomy");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(2);
+        $this->commitAsserter->assertCommitAction('post/edit');
+        $this->commitAsserter->assertCommitAction('term/create', 1);
+        $this->commitAsserter->assertCommitTag("VP-Post-Type", self::$worker->getPostType());
+        $this->commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "vp_term_taxonomy");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -164,17 +164,17 @@ class PostsTest extends PostTypeTestCase
     public function changingPostFormatUpdatesItsTaxonomy()
     {
         self::$worker->prepare_changePostFormat();
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
         self::$worker->changePostFormat();
 
-        $commitAsserter->ignoreCommits('term/create');
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction('post/edit');
-        $commitAsserter->assertCommitTag(
+        $this->commitAsserter->ignoreCommits('term/create');
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction('post/edit');
+        $this->commitAsserter->assertCommitTag(
             'VP-Post-UpdatedProperties',
             'vp_term_taxonomy,post_modified,post_modified_gmt'
         );
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -230,11 +230,11 @@ class PostsTest extends PostTypeTestCase
     public function deletingOfPostmetaCreatesPostmetaDeleteAction()
     {
         self::$worker->prepare_deletePostmeta();
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
         self::$worker->deletePostmeta();
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction('postmeta/delete');
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction('postmeta/delete');
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 }

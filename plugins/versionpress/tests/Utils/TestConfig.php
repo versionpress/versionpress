@@ -76,6 +76,7 @@ class TestConfig
             // WP site config
             $this->sites[$siteId]->path = $rawSiteConfig['wp-site']['path'];
             $this->sites[$siteId]->url = $rawSiteConfig['wp-site']['url'];
+            $this->sites[$siteId]->wpAdminPath = $rawSiteConfig['wp-site']['wp-admin-path'];
             $this->sites[$siteId]->title = $rawSiteConfig['wp-site']['title'];
             $this->sites[$siteId]->adminName = $rawSiteConfig['wp-site']['admin-name'];
             $this->sites[$siteId]->adminPassword = $rawSiteConfig['wp-site']['admin-pass'];

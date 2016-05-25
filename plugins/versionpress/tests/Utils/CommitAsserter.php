@@ -48,20 +48,33 @@ class CommitAsserter
      */
     private $whichCommitParameter;
 
+    private $pathPlaceholders;
+
     /**
      * Create CommitAsserter to start tracking the git repo for future asserts. Should generally
      * be called after a test setup (if there is any) and before all the actual work. Asserts follow
      * after it.
      *
      * @param \VersionPress\Git\GitRepository $gitRepository
+     * @param string[] $pathPlaceholders
      */
-    public function __construct($gitRepository)
+    public function __construct($gitRepository, $pathPlaceholders = [])
     {
         $this->gitRepository = $gitRepository;
-        $this->startCommit = $gitRepository->getCommit($gitRepository->getLastCommitHash());
+        $this->pathPlaceholders = $pathPlaceholders;
+        if ($gitRepository->isVersioned()) {
+            $this->startCommit = $gitRepository->getCommit($gitRepository->getLastCommitHash());
+        }
     }
 
 
+    public function reset()
+    {
+        $this->startCommit = $this->gitRepository->getCommit($this->gitRepository->getLastCommitHash());
+        $this->ignoreCommitsWithActions = [];
+
+
+    }
 
     //---------------------------
     // Pre-assertion setup
@@ -404,8 +417,8 @@ class CommitAsserter
      */
     private function expandPath($path, $whichCommit)
     {
-        if (Strings::contains($path, "%vpdb%")) {
-            $path = str_replace("%vpdb%", "wp-content/vpdb", $path);
+        foreach ($this->pathPlaceholders as $placeholder => $value) {
+            $path = str_replace("%$placeholder%", $value, $path);
         }
 
         $containsVpId = Strings::contains($path, "%VPID%");

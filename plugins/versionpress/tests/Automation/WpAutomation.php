@@ -98,7 +98,7 @@ class WpAutomation
      */
     public function isVersionPressInitialized()
     {
-        $vpdbDir = $this->runWpCliCommand('eval', null, ['defined("VP_VPDB_DIR") && print(VP_VPDB_DIR);']);
+        $vpdbDir = $this->getVpdbDir();
         return $vpdbDir !== '' && is_file($vpdbDir . '/.active');
     }
 
@@ -845,5 +845,64 @@ class WpAutomation
             'update-config',
             [$constant, $value, 'require' => $vpInternalCommandFile]
         );
+    }
+
+    public function getVpdbDir()
+    {
+        static $vpdbDir = false;
+
+        if ($vpdbDir === false) {
+            $vpdbDir = $this->runWpCliCommand('eval', null, ['defined("VP_VPDB_DIR") && print(VP_VPDB_DIR);']) ?: null;
+        }
+
+        return $vpdbDir;
+    }
+
+    public function getAbspath()
+    {
+        static $abspath = false;
+
+        if ($abspath === false) {
+            $abspath = $this->runWpCliCommand('eval', null, ['print(ABSPATH);']) ?: null;
+        }
+
+        return $abspath;
+    }
+
+    public function getUploadsDir()
+    {
+        static $uploads = false;
+
+        if ($uploads === false) {
+            $uploads = $this->runWpCliCommand('eval', null, ['print(wp_upload_dir()["basedir"]);']) ?: null;
+        }
+
+        return $uploads;
+    }
+
+    public function getPluginsDir()
+    {
+        static $pluginsDir = false;
+
+        if ($pluginsDir === false) {
+            $pluginsDir = $this->runWpCliCommand('eval', null, ['print(WP_PLUGIN_DIR);']) ?: null;
+        }
+
+        return $pluginsDir;
+    }
+
+    public function getWebRoot()
+    {
+        static $pluginsDir = false;
+
+        if ($pluginsDir === false) {
+            $pluginsDir = $this->runWpCliCommand(
+                'eval',
+                null,
+                ['print(dirname(\WP_CLI\Utils\locate_wp_config()));']
+            ) ?: null;
+        }
+
+        return $pluginsDir;
     }
 }

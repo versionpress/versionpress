@@ -20,14 +20,14 @@ class TranslationsTest extends End2EndTestCase
     {
         self::$worker->prepare_switchLanguage();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->switchLanguage();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction('translation/activate');
-        $commitAsserter->assertCommitPath(['A', 'M'], '%vpdb%/options/*');
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction('translation/activate');
+        $this->commitAsserter->assertCommitPath(['A', 'M'], '%vpdb%/options/*');
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 }

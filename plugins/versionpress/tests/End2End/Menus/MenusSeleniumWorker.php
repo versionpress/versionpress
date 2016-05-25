@@ -15,7 +15,7 @@ class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker
 
     public function createMenu()
     {
-        $this->url('wp-admin/nav-menus.php?action=edit&menu=0');
+        $this->url(self::$wpAdminPath . '/nav-menus.php?action=edit&menu=0');
         $this->byCssSelector('#menu-name')->clear();
         $this->byCssSelector('#menu-name')->value('Test menu');
         $this->byCssSelector('#save_menu_header')->click();
@@ -28,7 +28,7 @@ class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker
 
     public function editMenu()
     {
-        $this->url('wp-admin/nav-menus.php');
+        $this->url(self::$wpAdminPath . '/nav-menus.php');
         $titleInput = $this->byCssSelector('#menu-name');
         $titleInput->clear();
         $titleInput->value('Updated menu');
@@ -42,7 +42,7 @@ class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker
 
     public function addMenuItem()
     {
-        $this->url('wp-admin/nav-menus.php');
+        $this->url(self::$wpAdminPath . '/nav-menus.php');
         $this->addNewMenuItem();
     }
 
@@ -52,7 +52,7 @@ class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker
 
     public function editMenuItem()
     {
-        $this->url('wp-admin/nav-menus.php');
+        $this->url(self::$wpAdminPath . '/nav-menus.php');
         $this->byCssSelector('.menu-item:first-child .item-edit')->click();
         $this->waitForElement('.edit-menu-item-title');
         $titleInput = $this->byCssSelector('.menu-item:first-child .edit-menu-item-title');
@@ -69,7 +69,7 @@ class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker
 
     public function createMenuItemDraft()
     {
-        $this->url('wp-admin/nav-menus.php');
+        $this->url(self::$wpAdminPath . '/nav-menus.php');
         $this->byCssSelector('a[data-type=page-all]')->click();
         $this->byCssSelector('#page-all .menu-item-checkbox:first-of-type')->click();
         $this->byCssSelector('.submit-add-to-menu')->click();
@@ -94,17 +94,18 @@ class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker
             )
         );
 
+        $pluginsDir = self::$wpAutomation->getPluginsDir();
         $updateConfigArgs = [
             'VERSIONPRESS_GUI',
             'html',
-            'require' => 'wp-content/plugins/versionpress/src/Cli/vp-internal.php'
+            'require' => $pluginsDir . '/versionpress/src/Cli/vp-internal.php'
         ];
         self::$wpAutomation->runWpCliCommand('vp-internal', 'update-config', $updateConfigArgs);
     }
 
     public function deleteOrphanedMenuItems()
     {
-        $this->url('wp-admin/admin.php?page=versionpress/');
+        $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
         $this->acceptAlert();
         $this->byCssSelector('.vp-undo:first-of-type')->click();
         $this->waitForAjax();
@@ -116,7 +117,7 @@ class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker
 
     public function removeMenuItem()
     {
-        $this->url('wp-admin/nav-menus.php');
+        $this->url(self::$wpAdminPath . '/nav-menus.php');
         $this->byCssSelector('.menu-item:first-child .item-edit')->click();
         usleep(200 * 1000); // Wait for the UI animation
         $this->byCssSelector('.menu-item:first-child .item-delete')->click();
@@ -128,7 +129,7 @@ class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker
 
     public function prepare_removeMenuItemWithChildren()
     {
-        $this->url('wp-admin/nav-menus.php');
+        $this->url(self::$wpAdminPath . '/nav-menus.php');
         $menuId = intval($this->byId('menu')->value());
 
         $item = [1, 'title' => 'Parent'];
@@ -143,7 +144,7 @@ class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker
 
     public function removeMenuItemWithChildren()
     {
-        $this->url('wp-admin/nav-menus.php');
+        $this->url(self::$wpAdminPath . '/nav-menus.php');
         $this->byCssSelector('.menu-item:nth-of-type(2) .item-edit')->click();
         usleep(200 * 1000); // Wait for the UI animation
         $this->byCssSelector('.menu-item:nth-of-type(2) .item-delete')->click();
@@ -158,7 +159,7 @@ class MenusTestSeleniumWorker extends SeleniumWorker implements IMenusTestWorker
 
     public function deleteMenu()
     {
-        $this->url('wp-admin/nav-menus.php');
+        $this->url(self::$wpAdminPath . '/nav-menus.php');
         $this->byCssSelector('.menu-delete')->click();
         $this->acceptAlert();
         $this->waitAfterRedirect();

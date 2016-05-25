@@ -47,22 +47,21 @@ class DBAsserter
     private static function staticInitialization()
     {
         self::$testConfig = TestConfig::createDefaultConfig();
+        $wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
 
-        $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
         $schemaReflection = new \ReflectionClass(DbSchemaInfo::class);
         $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.yml';
         $shortcodeFile = dirname($schemaReflection->getFileName()) . '/wordpress-shortcodes.yml';
 
         /** @var $wp_db_version */
-        require(self::$testConfig->testSite->path . '/wp-includes/version.php');
+        require($wpAutomation->getAbspath() . '/wp-includes/version.php');
 
         if (!function_exists('get_shortcode_regex')) {
-            require_once(self::$testConfig->testSite->path . '/wp-includes/shortcodes.php');
+            require_once($wpAutomation->getAbspath() . '/wp-includes/shortcodes.php');
         }
 
         self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
 
-        $wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
         $rawTaxonomies = $wpAutomation->runWpCliCommand(
             'taxonomy',
             'list',
@@ -83,6 +82,7 @@ class DBAsserter
         self::$vpidRepository = new VpidRepository(self::$vp_database, self::$schemaInfo);
         self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, self::$vpidRepository);
 
+        $vpdbPath = $wpAutomation->getVpdbDir();
         self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$vp_database, $taxonomies);
 
         self::defineGlobalVariables();

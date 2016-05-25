@@ -9,7 +9,7 @@ class TranslationsTestSeleniumWorker extends SeleniumWorker implements ITranslat
 
     public function prepare_switchLanguage()
     {
-        $this->url('wp-admin/options-general.php');
+        $this->url(self::$wpAdminPath . '/options-general.php');
     }
 
     public function switchLanguage()

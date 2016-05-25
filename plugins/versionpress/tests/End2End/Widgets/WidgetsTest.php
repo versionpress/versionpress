@@ -33,24 +33,24 @@ class WidgetsTest extends End2EndTestCase
     {
         self::$worker->prepare_createWidget();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->createWidget();
 
-        $commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertNumCommits(1);
 
         if (self::$testConfig->end2endTestType === 'selenium' &&
             WpVersionComparer::compare(self::$testConfig->testSite->wpVersion, '4.4-beta1') >= 0
         ) {
-            $commitAsserter->assertCommitAction('option/edit');
-            $commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
+            $this->commitAsserter->assertCommitAction('option/edit');
+            $this->commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
         } else {
-            $commitAsserter->assertCommitAction('option/create');
-            $commitAsserter->assertCommitPath('A', '%vpdb%/options/%VPID%.ini');
+            $this->commitAsserter->assertCommitAction('option/create');
+            $this->commitAsserter->assertCommitPath('A', '%vpdb%/options/%VPID%.ini');
         }
 
-        $commitAsserter->assertCountOfAffectedFiles(2);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertCountOfAffectedFiles(2);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -63,15 +63,15 @@ class WidgetsTest extends End2EndTestCase
     {
         self::$worker->prepare_createWidget();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->createWidget();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction('option/edit');
-        $commitAsserter->assertCountOfAffectedFiles(2);
-        $commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction('option/edit');
+        $this->commitAsserter->assertCountOfAffectedFiles(2);
+        $this->commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -83,15 +83,15 @@ class WidgetsTest extends End2EndTestCase
     {
         self::$worker->prepare_editWidget();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->editWidget();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction('option/edit');
-        $commitAsserter->assertCountOfAffectedFiles(1);
-        $commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction('option/edit');
+        $this->commitAsserter->assertCountOfAffectedFiles(1);
+        $this->commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -103,15 +103,15 @@ class WidgetsTest extends End2EndTestCase
     {
         self::$worker->prepare_deleteWidget();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->deleteWidget();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction('option/edit');
-        $commitAsserter->assertCountOfAffectedFiles(2);
-        $commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction('option/edit');
+        $this->commitAsserter->assertCountOfAffectedFiles(2);
+        $this->commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 

@@ -34,15 +34,15 @@ class UsersTest extends End2EndTestCase
     {
         self::$worker->prepare_createUser();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->createUser();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("user/create");
-        $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
-        $commitAsserter->assertCommitPath("A", "%vpdb%/users/%VPID%.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("user/create");
+        $this->commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
+        $this->commitAsserter->assertCommitPath("A", "%vpdb%/users/%VPID%.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -55,15 +55,15 @@ class UsersTest extends End2EndTestCase
     {
         self::$worker->prepare_editUser();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->editUser();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("user/edit");
-        $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID%.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("user/edit");
+        $this->commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
+        $this->commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID%.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -76,15 +76,15 @@ class UsersTest extends End2EndTestCase
     {
         self::$worker->prepare_editUsermeta();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->editUsermeta();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("usermeta/edit");
-        $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID(VP-User-Id)%.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("usermeta/edit");
+        $this->commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
+        $this->commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID(VP-User-Id)%.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -97,15 +97,15 @@ class UsersTest extends End2EndTestCase
     {
         self::$worker->prepare_deleteUser();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->deleteUser();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("user/delete");
-        $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
-        $commitAsserter->assertCommitPath("D", "%vpdb%/users/%VPID%.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("user/delete");
+        $this->commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
+        $this->commitAsserter->assertCommitPath("D", "%vpdb%/users/%VPID%.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -117,13 +117,13 @@ class UsersTest extends End2EndTestCase
     {
         self::$worker->prepare_editTwoUsers();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->editTwoUsers();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction("user/edit", 2);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction("user/edit", 2);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -135,13 +135,13 @@ class UsersTest extends End2EndTestCase
     {
         self::$worker->prepare_deleteTwoUsers();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->deleteTwoUsers();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction("user/delete", 2);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction("user/delete", 2);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -154,13 +154,13 @@ class UsersTest extends End2EndTestCase
     {
         self::$worker->prepare_editTwoUsermeta();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->editTwoUsermeta();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction("usermeta/edit", 2);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction("usermeta/edit", 2);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -172,15 +172,15 @@ class UsersTest extends End2EndTestCase
     {
         self::$worker->prepare_deleteUsermeta();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->deleteUsermeta();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("usermeta/delete");
-        $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID(VP-User-Id)%.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("usermeta/delete");
+        $this->commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
+        $this->commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID(VP-User-Id)%.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 

@@ -2,17 +2,22 @@
 
 namespace VersionPress\Tests\Selenium;
 
+use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\End2End\Utils\HttpStatusCodeUtil;
 use VersionPress\Tests\Utils\TestConfig;
+use VersionPress\Utils\PathUtils;
 
 class SecurityTest extends \PHPUnit_Framework_TestCase
 {
-
+    /** @var TestConfig */
     private static $testConfig;
+    /** @var WpAutomation */
+    private static $wpAutomation;
 
     public function __construct()
     {
         self::$testConfig = TestConfig::createDefaultConfig();
+        self::$wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
     }
 
     /**
@@ -22,7 +27,7 @@ class SecurityTest extends \PHPUnit_Framework_TestCase
     {
         $url = self::$testConfig->testSite->url . "/.git/config";
         $statusCode = HttpStatusCodeUtil::getStatusCode($url);
-        $this->assertEquals(403, $statusCode, "Wrong HTTP status codes");
+        $this->assertTrue($statusCode === 403 || $statusCode === 404, "Wrong HTTP status code ($statusCode)");
     }
 
     /**
@@ -30,9 +35,11 @@ class SecurityTest extends \PHPUnit_Framework_TestCase
      */
     public function vpdbDoesntAllowDirectAccess()
     {
-        $url = self::$testConfig->testSite->url . "/wp-content/vpdb/web.config";
+        $vpdbDir = self::$wpAutomation->getVpdbDir();
+        $relativePathToVpdb = PathUtils::getRelativePath(self::$wpAutomation->getWebRoot(), $vpdbDir);
+        $url = self::$testConfig->testSite->url . '/' . $relativePathToVpdb . "/web.config";
         $statusCode = HttpStatusCodeUtil::getStatusCode($url);
-        $this->assertEquals(403, $statusCode, "Wrong HTTP status codes");
+        $this->assertTrue($statusCode === 403 || $statusCode === 404, "Wrong HTTP status code ($statusCode)");
     }
 
     /**
@@ -40,8 +47,11 @@ class SecurityTest extends \PHPUnit_Framework_TestCase
      */
     public function vpconfigDoesntAllowDirectAccess()
     {
-        $url = self::$testConfig->testSite->url . "/wp-content/plugins/versionpress/vpconfig.yml";
+        $pluginsDir = self::$wpAutomation->getPluginsDir();
+        $relativePathToPluginsDir = PathUtils::getRelativePath(self::$wpAutomation->getWebRoot(), $pluginsDir);
+
+        $url = self::$testConfig->testSite->url . '/' . $relativePathToPluginsDir . "/versionpress/vpconfig.yml";
         $statusCode = HttpStatusCodeUtil::getStatusCode($url);
-        $this->assertEquals(403, $statusCode, "Wrong HTTP status codes");
+        $this->assertTrue($statusCode === 403 || $statusCode === 404, "Wrong HTTP status code ($statusCode)");
     }
 }

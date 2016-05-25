@@ -86,6 +86,11 @@ class SiteConfig
     public $url;
 
     /**
+     * @var string
+     */
+    public $wpAdminPath = 'wp-admin';
+
+    /**
      * Site title
      *
      * @var string
