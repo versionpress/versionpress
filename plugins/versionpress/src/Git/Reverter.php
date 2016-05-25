@@ -408,12 +408,12 @@ class Reverter
         $optionNameRegex = "/^\\[(.*)\\]\\r?$/m";
 
         foreach ($modifiedFiles as $file) {
-            if (!file_exists(ABSPATH . $file) || !is_file(ABSPATH . $file)) {
+            if (!is_file(VP_PROJECT_ROOT . '/' . $file)) {
                 continue;
             }
 
             if (preg_match($optionFileRegex, $file)) {
-                $firstLine = fgets(fopen(ABSPATH . $file, 'r'));
+                $firstLine = fgets(fopen(VP_PROJECT_ROOT . '/' . $file, 'r'));
                 preg_match($optionNameRegex, $firstLine, $optionNameMatch);
                 $vpIds[] = ['vp_id' => $optionNameMatch[1], 'parent' => null];
             }
@@ -422,7 +422,7 @@ class Reverter
             /** @noinspection PhpUsageOfSilenceOperatorInspection */
             $parent = @$matches[0];
 
-            $content = file_get_contents(ABSPATH . $file);
+            $content = file_get_contents(VP_PROJECT_ROOT . '/' . $file);
             preg_match_all($vpIdRegex, $content, $matches);
             $vpIds = array_merge($vpIds, array_map(function ($vpId) use ($parent) {
                 return ['vp_id' => $vpId, 'parent' => $parent];
