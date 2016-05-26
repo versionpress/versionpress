@@ -1,5 +1,7 @@
 /// <reference path='../../typings/typings.d.ts' />
 
+/* tslint:disable:variable-name */
+
 import * as React from 'react';
 import * as request from 'superagent';
 import * as portal from '../common/portal';

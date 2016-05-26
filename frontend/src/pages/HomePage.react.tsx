@@ -39,7 +39,8 @@ interface HomePageState {
   lastSelected?: Commit;
   message?: {
     code: string,
-    message: string
+    message: string,
+    details?: string
   };
   loading?: boolean;
   displayServicePanel?: boolean;
@@ -79,14 +80,18 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     this.checkUpdate = this.checkUpdate.bind(this);
   }
 
-  static getErrorMessage(res: request.Response) {
-    return res
-      ? (Array.isArray(res.body)
-        ? res.body[0]
-        : res.body)
-      : {
+  static getErrorMessage(res: request.Response, err: any) {
+    if (res) {
+      const body = Array.isArray(res.body) ? res.body[0] : res.body;
+      if ('code' in body && 'message' in body) {
+        return body;
+      }
+    }
+    console.error(err);
+    return {
       code: 'error',
-      message: 'Connection Error: VersionPress is not able to connect to WordPress site. Please try refreshing the page.'
+      message: 'VersionPress is not able to connect to WordPress site. Please try refreshing the page.',
+      details: err
     };
   }
 
@@ -124,7 +129,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           this.setState({
             pages: [],
             commits: [],
-            message: HomePage.getErrorMessage(res),
+            message: HomePage.getErrorMessage(res, err),
             loading: false,
             displayUpdateNotice: false
           });
@@ -145,7 +150,11 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     WpApi
       .get('display-welcome-panel')
       .end((err: any, res: request.Response) => {
-        if (res.body === true) {
+        if (err) {
+          return;
+        }
+        const body = Array.isArray(res.body) ? res.body[0] : res.body;
+        if (body === true) {
           this.setState({displayWelcomePanel: true});
         } else {
           this.setState({displayWelcomePanel: false});
@@ -186,9 +195,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: HomePage.getErrorMessage(res), loading: false});
+          this.setState({message: HomePage.getErrorMessage(res, err), loading: false});
         } else {
-          const router:ReactRouter.Context = (this.context as any).router;
+          const router: ReactRouter.Context = (this.context as any).router;
           router.transitionTo(routes.home);
           document.location.reload();
         }
@@ -205,9 +214,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: HomePage.getErrorMessage(res), loading: false});
+          this.setState({message: HomePage.getErrorMessage(res, err), loading: false});
         } else {
-          const router:ReactRouter.Context = (this.context as any).router;
+          const router: ReactRouter.Context = (this.context as any).router;
           router.transitionTo(routes.home);
           document.location.reload();
         }
@@ -220,7 +229,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         .get('git-status')
         .end((err, res: request.Response) => {
           if (err) {
-            reject(HomePage.getErrorMessage(res));
+            reject(HomePage.getErrorMessage(res, err));
           } else {
             resolve(res.body);
           }
@@ -236,7 +245,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         .query(query)
         .end((err, res: request.Response) => {
           if (err) {
-            reject(HomePage.getErrorMessage(res));
+            reject(HomePage.getErrorMessage(res, err));
           } else {
             resolve(res.body.diff);
           }
@@ -270,7 +279,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
         const step = (index < lastIndex ? -1 : 1);
         const cond = index + step;
-        for (let i = lastIndex; i != cond; i += step) {
+        for (let i = lastIndex; i !== cond; i += step) {
           const current = this.state.commits[i];
           const index = indexOf(selected, current);
           if (check && index === -1) {
@@ -318,7 +327,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: HomePage.getErrorMessage(res)});
+          this.setState({message: HomePage.getErrorMessage(res, err)});
         } else {
           this.setState({
             dirtyWorkingDirectory: false,
@@ -342,7 +351,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .on('progress', (e: {percent: number}) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: HomePage.getErrorMessage(res)});
+          this.setState({message: HomePage.getErrorMessage(res, err)});
         } else {
           this.setState({
             dirtyWorkingDirectory: false,
@@ -362,7 +371,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     }, () => {
       const page = (parseInt(this.props.params.page, 10) - 1) || 0;
       if (page > 0) {
-        const router:ReactRouter.Context = (this.context as any).router;
+        const router: ReactRouter.Context = (this.context as any).router;
         router.transitionTo(routes.home);
       } else {
         this.fetchCommits();

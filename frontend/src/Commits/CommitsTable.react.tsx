@@ -103,7 +103,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
     const displaySelectAll = this.props.commits.some((commit: Commit) => commit.canUndo);
 
     if (!displaySelectAll) {
-      return <td className='column-cb' />
+      return <td className='column-cb' />;
     }
 
     const allSelected = !_.differenceBy(selectableCommits, this.props.selected, ((value: Commit) => value.hash)).length;
