@@ -302,6 +302,9 @@ class SerializedDataToIniConverter
             $value = preg_replace('/^"(.*)"$/', '$1', $value);
         }
 
+        if ($type !== null && is_string($value)) {
+            $value = '<' . $type . '>' . $value;
+        }
         return 's:' . strlen($value) . ':"' . $value . '";';
     }
 

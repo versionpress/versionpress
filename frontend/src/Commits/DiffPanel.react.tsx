@@ -107,7 +107,7 @@ export default class DiffPanel extends React.Component<DiffPanelProps, any> {
   private static formatInfoForPlainFileDiff(diff) {
     let chunks = diff.chunks;
     let result = [];
-    
+
     if (chunks.length === 0) {
       let message;
       if (diff.from === '/dev/null') {
@@ -119,7 +119,6 @@ export default class DiffPanel extends React.Component<DiffPanelProps, any> {
       result.push(<div className='binary-file-info'>{message}</div>);
       return result;
     }
-
 
     let chunkTables = chunks.map((chunk, i) =>
         DiffPanel.createTableFromChunk(chunk, i)

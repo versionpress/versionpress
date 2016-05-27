@@ -17,6 +17,28 @@ class RelativePathsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedRelativePath, $relativePath, "Wrong relative path from: '{$from}' to: '{$to}'.");
     }
 
+    /**
+     * @test
+     * @dataProvider specialPathsProvider
+     */
+    public function specialPaths($from, $to, $expected)
+    {
+        $relativePath = PathUtils::getRelativePath($from, $to);
+        $this->assertEquals($expected, $relativePath, "Wrong relative path from: '{$from}' to: '{$to}'.");
+    }
+
+    public function specialPathsProvider()
+    {
+        return [
+            ['/some/path/..', '/some/other/path', 'other/path'],
+            ['/some/path/.', '/some/other/path', '../other/path'],
+            ['/some/path', '/some/other/../path', ''],
+            ['/some/path/..', '/some/./other/./path', 'other/path'],
+            ['/some/long/../path', '/some/other/path', '../other/path'],
+            ['/some/./path', '/some/other/path', '../other/path'],
+        ];
+    }
+
     public function pathProvider()
     {
         $testedRoots = [

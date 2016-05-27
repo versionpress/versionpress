@@ -8,7 +8,7 @@ class PathUtils
      * Calculates relative path from two absolute paths.
      *
      * @param string $from It has to be a directory!
-     * @param string $to Directory or file the relativa path will lead to.
+     * @param string $to Directory or file the relative path will lead to.
      * @return string
      */
     public static function getRelativePath($from, $to)
@@ -25,6 +25,9 @@ class PathUtils
 
         $from = explode('/', $from);
         $to = explode('/', $to);
+
+        $from = self::realpath($from);
+        $to = self::realpath($to);
 
         $depthOfCommonPath = self::countCommonDepth($from, $to);
         $relPath = array_slice($to, $depthOfCommonPath);
@@ -48,5 +51,30 @@ class PathUtils
         }
 
         return $depth;
+    }
+
+    /**
+     * Removes '.' and '..' fragments from path.
+     *
+     * @param array $pathFragments
+     * @return array
+     */
+    private static function realpath(array $pathFragments)
+    {
+        $realpath = [];
+        foreach ($pathFragments as $fragment) {
+            if ($fragment === '.') {
+                continue;
+            }
+
+            if ($fragment === '..') {
+                array_pop($realpath);
+                continue;
+            }
+
+            $realpath[] = $fragment;
+        }
+
+        return $realpath;
     }
 }
