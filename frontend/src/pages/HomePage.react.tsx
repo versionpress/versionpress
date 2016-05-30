@@ -230,7 +230,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           if (err) {
             reject(HomePage.getErrorMessage(res, err));
           } else {
-            resolve(res.body);
+            resolve(res.body.status);
           }
         });
     });
