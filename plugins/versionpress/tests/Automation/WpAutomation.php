@@ -825,6 +825,11 @@ class WpAutomation
         file_put_contents($bootstrapFile, join("\n", $lines));
     }
 
+    /**
+     * Creates project structure similar to Bedrock.
+     * Pedestal (https://github.com/versionpress/pedestal) is inpired by Bedrock. It only have
+     * a standard wp-config-based configuration system and predefined Composer scripts for VersionPress.
+     */
     private function createPedestalBasedSite()
     {
         $process = new Process('composer create-project -s dev versionpress/pedestal .', $this->siteConfig->path);
