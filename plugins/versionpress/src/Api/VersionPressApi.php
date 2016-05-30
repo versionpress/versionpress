@@ -461,7 +461,9 @@ class VersionPressApi
         /** @var GitRepository $repository */
         $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
 
-        return new WP_REST_Response($repository->getStatus(true));
+        return new WP_REST_Response([
+            'status' => $repository->getStatus(true)
+        ]);
     }
 
     /**
