@@ -124,6 +124,10 @@ class EntityInfo
      */
     public $hasReferences = false;
 
+    public $changeInfoFactoryFn = null;
+
+    public $storageClass = null;
+
     /**
      * If entity is child entity (meta, term_taxonomy etc.), this contains name of reference
      * to its parent.
@@ -226,6 +230,14 @@ class EntityInfo
                     $this->ignoredColumns[array_keys($column)[0]] = substr(array_values($column)[0], 1);
                 }
             }
+        }
+
+        if (isset($schemaInfo['changeinfo-fn'])) {
+            $this->changeInfoFactoryFn = $schemaInfo['changeinfo-fn'];
+        }
+
+        if (isset($schemaInfo['storage'])) {
+            $this->storageClass = $schemaInfo['storage'];
         }
 
     }

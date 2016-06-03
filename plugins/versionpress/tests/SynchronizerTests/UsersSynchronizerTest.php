@@ -2,6 +2,7 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\UserStorage;
 use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Synchronizers\UsersSynchronizer;
@@ -11,7 +12,7 @@ use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class UsersSynchronizerTest extends SynchronizerTestCase
 {
-    /** @var UserStorage */
+    /** @var DirectoryStorage */
     private $storage;
     /** @var UsersSynchronizer */
     private $synchronizer;

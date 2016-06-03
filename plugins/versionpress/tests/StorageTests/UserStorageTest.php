@@ -3,12 +3,13 @@
 namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\EntityInfo;
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\UserStorage;
 use VersionPress\Utils\FileSystem;
 
 class UserStorageTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var UserStorage */
+    /** @var DirectoryStorage */
     private $storage;
 
     private $testingUser = [
@@ -62,11 +63,13 @@ class UserStorageTest extends \PHPUnit_Framework_TestCase
             'user' => [
                 'table' => 'users',
                 'id' => 'ID',
+                'changeinfo-fn' => function () {
+                },
             ]
         ]);
 
         mkdir(__DIR__ . '/users');
-        $this->storage = new UserStorage(__DIR__ . '/users', $entityInfo);
+        $this->storage = new DirectoryStorage(__DIR__ . '/users', $entityInfo);
     }
 
     protected function tearDown()

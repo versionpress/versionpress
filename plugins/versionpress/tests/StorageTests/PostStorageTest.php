@@ -72,6 +72,8 @@ class PostStorageTest extends \PHPUnit_Framework_TestCase
             'post' => [
                 'table' => 'posts',
                 'id' => 'ID',
+                'changeinfo-fn' => function () {
+                },
                 'references' => [
                     'post_author' => 'user',
                     'post_parent' => 'post',

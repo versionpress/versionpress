@@ -3,15 +3,17 @@
 namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\EntityInfo;
+use VersionPress\Storages\DirectoryStorage;
+use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Storages\TermMetaStorage;
 use VersionPress\Storages\TermStorage;
 use VersionPress\Utils\FileSystem;
 
 class TermMetaStorageTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var TermMetaStorage */
+    /** @var MetaEntityStorage */
     private $storage;
-    /** @var TermStorage */
+    /** @var DirectoryStorage */
     private $termStorage;
 
     private $testingTermMeta = [
@@ -60,6 +62,8 @@ class TermMetaStorageTest extends \PHPUnit_Framework_TestCase
             'term' => [
                 'table' => 'terms',
                 'id' => 'term_id',
+                'changeinfo-fn' => function () {
+                },
             ]
         ]);
 
@@ -67,6 +71,8 @@ class TermMetaStorageTest extends \PHPUnit_Framework_TestCase
             'termmeta' => [
                 'id' => 'meta_id',
                 'parent-reference' => 'term_id',
+                'changeinfo-fn' => function () {
+                },
                 'references' => [
                     'term_id' => 'term',
                 ]
@@ -74,8 +80,8 @@ class TermMetaStorageTest extends \PHPUnit_Framework_TestCase
         ]);
 
         mkdir(__DIR__ . '/terms');
-        $this->termStorage = new TermStorage(__DIR__ . '/terms', $userInfo);
-        $this->storage = new TermMetaStorage($this->termStorage, $termMetaInfo);
+        $this->termStorage = new DirectoryStorage(__DIR__ . '/terms', $userInfo);
+        $this->storage = new MetaEntityStorage($this->termStorage, $termMetaInfo, 'prefix_');
     }
 
     protected function tearDown()

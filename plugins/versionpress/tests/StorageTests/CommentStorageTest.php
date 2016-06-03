@@ -68,6 +68,8 @@ class CommentStorageTest extends \PHPUnit_Framework_TestCase
             'comment' => [
                 'table' => 'comments',
                 'id' => 'ID',
+                'changeinfo-fn' => function () {
+                },
                 'references' => [
                     'comment_post_ID' => 'post',
                     'comment_parent' => 'comment',

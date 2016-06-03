@@ -2,6 +2,7 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\TermStorage;
 use VersionPress\Storages\TermTaxonomyStorage;
 use VersionPress\Synchronizers\Synchronizer;
@@ -13,9 +14,9 @@ use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class TermTaxonomiesSynchronizerTest extends SynchronizerTestCase
 {
-    /** @var TermTaxonomyStorage */
+    /** @var DirectoryStorage */
     private $storage;
-    /** @var TermStorage */
+    /** @var DirectoryStorage */
     private $termStorage;
     /** @var TermTaxonomiesSynchronizer */
     private $synchronizer;

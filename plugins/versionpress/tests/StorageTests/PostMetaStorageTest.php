@@ -3,13 +3,14 @@
 namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\EntityInfo;
+use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Storages\PostMetaStorage;
 use VersionPress\Storages\PostStorage;
 use VersionPress\Utils\FileSystem;
 
 class PostMetaStorageTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var PostMetaStorage */
+    /** @var MetaEntityStorage */
     private $storage;
     /** @var PostStorage */
     private $postStorage;
@@ -73,6 +74,8 @@ class PostMetaStorageTest extends \PHPUnit_Framework_TestCase
             'post' => [
                 'table' => 'posts',
                 'id' => 'ID',
+                'changeinfo-fn' => function () {
+                },
                 'references' => [
                     'post_author' => 'user',
                     'post_parent' => 'post',
@@ -84,6 +87,8 @@ class PostMetaStorageTest extends \PHPUnit_Framework_TestCase
             'postmeta' => [
                 'id' => 'meta_id',
                 'parent-reference' => 'post_id',
+                'changeinfo-fn' => function () {
+                },
                 'references' => [
                     'post_id' => 'post',
                 ]
@@ -92,7 +97,7 @@ class PostMetaStorageTest extends \PHPUnit_Framework_TestCase
 
         mkdir(__DIR__ . '/posts');
         $this->postStorage = new PostStorage(__DIR__ . '/posts', $postInfo);
-        $this->storage = new PostMetaStorage($this->postStorage, $postMetaInfo);
+        $this->storage = new MetaEntityStorage($this->postStorage, $postMetaInfo, 'prefix_');
     }
 
     protected function tearDown()

@@ -6,6 +6,7 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use RegexIterator;
+use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\Storages\Serialization\IniSerializer;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\EntityUtils;
@@ -21,7 +22,7 @@ use VersionPress\Utils\FileSystem;
  * Note that the same file can be used by multiple entities. For example, both
  * the main post data and postmeta for it are stored in the same INI file.
  */
-abstract class DirectoryStorage extends Storage
+class DirectoryStorage extends Storage
 {
 
     /** @var string */
@@ -229,5 +230,10 @@ abstract class DirectoryStorage extends Storage
         }
 
         return $this->existenceCache[$id];
+    }
+
+    protected function createChangeInfo($oldEntity, $newEntity, $action)
+    {
+        return call_user_func_array($this->entityInfo->changeInfoFactoryFn, func_get_args());
     }
 }

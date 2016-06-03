@@ -32,32 +32,4 @@ class PostStorage extends DirectoryStorage
 
         return parent::shouldBeSaved($data);
     }
-
-    protected function createChangeInfo($oldEntity, $newEntity, $action)
-    {
-        $diff = [];
-        if ($action === 'edit') { // determine more specific edit action
-
-            $diff = EntityUtils::getDiff($oldEntity, $newEntity);
-
-            if (isset($diff['post_status']) && $diff['post_status'] === 'trash') {
-                $action = 'trash';
-            } elseif (isset($diff['post_status']) && $oldEntity['post_status'] === 'trash') {
-                $action = 'untrash';
-            } elseif (isset($diff['post_status']) && $oldEntity['post_status'] === 'draft' &&
-                $newEntity['post_status'] === 'publish'
-            ) {
-                $action = 'publish';
-            }
-        }
-
-        if ($action == 'create' && $newEntity['post_status'] === 'draft') {
-            $action = 'draft';
-        }
-
-        $title = $newEntity['post_title'];
-        $type = $newEntity['post_type'];
-
-        return new PostChangeInfo($action, $newEntity['vp_id'], $type, $title, array_keys($diff));
-    }
 }

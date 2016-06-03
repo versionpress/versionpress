@@ -3,15 +3,17 @@
 namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\EntityInfo;
+use VersionPress\Storages\DirectoryStorage;
+use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Storages\UserMetaStorage;
 use VersionPress\Storages\UserStorage;
 use VersionPress\Utils\FileSystem;
 
 class UserMetaStorageTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var UserMetaStorage */
+    /** @var MetaEntityStorage */
     private $storage;
-    /** @var UserStorage */
+    /** @var DirectoryStorage */
     private $userStorage;
 
     private $testingUserMeta = [
@@ -64,12 +66,16 @@ class UserMetaStorageTest extends \PHPUnit_Framework_TestCase
             'user' => [
                 'table' => 'users',
                 'id' => 'ID',
+                'changeinfo-fn' => function () {
+                },
             ]
         ]);
 
         $userMetaInfo = new EntityInfo([
             'usermeta' => [
                 'id' => 'umeta_id',
+                'changeinfo-fn' => function () {
+                },
                 'parent-reference' => 'user_id',
                 'references' => [
                     'user_id' => 'user',
@@ -78,8 +84,8 @@ class UserMetaStorageTest extends \PHPUnit_Framework_TestCase
         ]);
 
         mkdir(__DIR__ . '/users');
-        $this->userStorage = new UserStorage(__DIR__ . '/users', $userInfo);
-        $this->storage = new UserMetaStorage($this->userStorage, $userMetaInfo, 'prefix_');
+        $this->userStorage = new DirectoryStorage(__DIR__ . '/users', $userInfo);
+        $this->storage = new MetaEntityStorage($this->userStorage, $userMetaInfo, 'prefix_');
     }
 
     protected function tearDown()

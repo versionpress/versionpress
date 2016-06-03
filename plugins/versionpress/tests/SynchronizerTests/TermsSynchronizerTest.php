@@ -2,6 +2,7 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\TermStorage;
 use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Synchronizers\TermsSynchronizer;
@@ -11,7 +12,7 @@ use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class TermsSynchronizerTest extends SynchronizerTestCase
 {
-    /** @var TermStorage */
+    /** @var DirectoryStorage */
     private $storage;
     /** @var TermsSynchronizer */
     private $synchronizer;

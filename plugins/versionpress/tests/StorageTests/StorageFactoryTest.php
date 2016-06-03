@@ -5,6 +5,8 @@ namespace VersionPress\Tests\StorageTests;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Storages\CommentStorage;
+use VersionPress\Storages\DirectoryStorage;
+use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Storages\OptionStorage;
 use VersionPress\Storages\PostMetaStorage;
 use VersionPress\Storages\PostStorage;
@@ -28,12 +30,12 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase
             'post' => PostStorage::class,
             'comment' => CommentStorage::class,
             'option' => OptionStorage::class,
-            'term' => TermStorage::class,
-            'termmeta' => TermMetaStorage::class,
-            'term_taxonomy' => TermTaxonomyStorage::class,
-            'user' => UserStorage::class,
-            'usermeta' => UserMetaStorage::class,
-            'postmeta' => PostMetaStorage::class,
+            'term' => DirectoryStorage::class,
+            'termmeta' => MetaEntityStorage::class,
+            'term_taxonomy' => DirectoryStorage::class,
+            'user' => DirectoryStorage::class,
+            'usermeta' => MetaEntityStorage::class,
+            'postmeta' => MetaEntityStorage::class,
         ];
 
         /** @var \wpdb $wpdbStub */

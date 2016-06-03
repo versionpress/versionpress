@@ -3,12 +3,13 @@
 namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\EntityInfo;
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\TermStorage;
 use VersionPress\Utils\FileSystem;
 
 class TermStorageTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var TermStorage */
+    /** @var DirectoryStorage */
     private $storage;
 
     private $testingTerm = [
@@ -57,10 +58,12 @@ class TermStorageTest extends \PHPUnit_Framework_TestCase
             'term' => [
                 'table' => 'terms',
                 'id' => 'term_id',
+                'changeinfo-fn' => function () {
+                },
             ]
         ]);
 
-        $this->storage = new TermStorage(__DIR__ . '/terms', $entityInfo);
+        $this->storage = new DirectoryStorage(__DIR__ . '/terms', $entityInfo);
     }
 
     protected function tearDown()

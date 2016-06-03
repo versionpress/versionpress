@@ -3,6 +3,7 @@
 namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Storages\CommentStorage;
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\PostStorage;
 use VersionPress\Storages\UserStorage;
 use VersionPress\Synchronizers\CommentsSynchronizer;
@@ -19,7 +20,7 @@ class CommentsSynchronizerTest extends SynchronizerTestCase
     private $storage;
     /** @var PostStorage */
     private $postStorage;
-    /** @var UserStorage */
+    /** @var DirectoryStorage */
     private $userStorage;
     /** @var CommentsSynchronizer */
     private $synchronizer;

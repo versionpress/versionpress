@@ -2,6 +2,7 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\PostStorage;
 use VersionPress\Storages\TermStorage;
 use VersionPress\Storages\TermTaxonomyStorage;
@@ -20,11 +21,11 @@ class PostsSynchronizerTest extends SynchronizerTestCase
 {
     /** @var PostStorage */
     private $storage;
-    /** @var UserStorage */
+    /** @var DirectoryStorage */
     private $userStorage;
-    /** @var TermStorage */
+    /** @var DirectoryStorage */
     private $termStorage;
-    /** @var TermTaxonomyStorage */
+    /** @var DirectoryStorage */
     private $termTaxonomyStorage;
 
     /** @var PostsSynchronizer */

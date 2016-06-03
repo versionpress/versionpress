@@ -54,6 +54,14 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
 
         self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
 
+        foreach (self::$schemaInfo->getAllEntityNames() as $entityName) {
+            $entityInfo = self::$schemaInfo->getEntityInfo($entityName);
+            if (isset($entityInfo->changeInfoFactoryFn)) {
+                $entityInfo->changeInfoFactoryFn = function () {
+                };
+            }
+        }
+
         $dbHost = self::$testConfig->testSite->dbHost;
         $dbUser = self::$testConfig->testSite->dbUser;
         $dbPassword = self::$testConfig->testSite->dbPassword;

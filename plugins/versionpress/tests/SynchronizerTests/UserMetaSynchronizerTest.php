@@ -2,6 +2,8 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
+use VersionPress\Storages\DirectoryStorage;
+use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Storages\UserMetaStorage;
 use VersionPress\Storages\UserStorage;
 use VersionPress\Synchronizers\Synchronizer;
@@ -13,9 +15,9 @@ use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class UserMetaSynchronizerTest extends SynchronizerTestCase
 {
-    /** @var UserMetaStorage */
+    /** @var MetaEntityStorage */
     private $storage;
-    /** @var UserStorage */
+    /** @var DirectoryStorage */
     private $userStorage;
     /** @var UserMetaSynchronizer */
     private $synchronizer;

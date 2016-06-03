@@ -14,8 +14,9 @@ use VersionPress\Database\EntityInfo;
  * The MetaEntityStorage typically transforms the entity to the format metioned above and then saves it using
  * parent storage as a field of the parent entity.
  */
-abstract class MetaEntityStorage extends Storage
+class MetaEntityStorage extends Storage
 {
+    const PREFIX_PLACEHOLDER = "<<table-prefix>>";
 
     private $lastVpId;
 
@@ -25,11 +26,21 @@ abstract class MetaEntityStorage extends Storage
 
     /** @var Storage */
     private $parentStorage;
+    /**
+     * @var
+     */
+    private $dbPrefix;
 
-    public function __construct(Storage $parentStorage, EntityInfo $entityInfo, $keyName, $valueName)
-    {
+    public function __construct(
+        Storage $parentStorage,
+        EntityInfo $entityInfo,
+        $dbPrefix,
+        $keyName = 'meta_key',
+        $valueName = 'meta_value'
+    ) {
         parent::__construct($entityInfo);
         $this->parentStorage = $parentStorage;
+        $this->dbPrefix = $dbPrefix;
         $this->keyName = $keyName;
         $this->valueName = $valueName;
         $this->parentReferenceName = "vp_$entityInfo->parentReference";
@@ -161,13 +172,15 @@ abstract class MetaEntityStorage extends Storage
         );
     }
 
-    abstract protected function createChangeInfoWithParentEntity(
+    protected function createChangeInfoWithParentEntity(
         $oldEntity,
         $newEntity,
         $oldParentEntity,
         $newParentEntity,
         $action
-    );
+    ) {
+        return call_user_func_array($this->entityInfo->changeInfoFactoryFn, func_get_args());
+    }
 
     private function transformToParentEntityField($values)
     {
@@ -190,7 +203,7 @@ abstract class MetaEntityStorage extends Storage
      */
     protected function createJoinedKey($key, $vpId)
     {
-        return sprintf('%s#%s', $key, $vpId);
+        return sprintf('%s#%s', $this->maybeReplacePrefixWithPlaceholder($key), $vpId);
     }
 
     /**
@@ -206,7 +219,7 @@ abstract class MetaEntityStorage extends Storage
     {
         $splittedKey = explode('#', $key, 2);
         return [
-            $this->keyName => $splittedKey[0],
+            $this->keyName => $this->maybeReplacePlaceholderWithPrefix($splittedKey[0]),
             'vp_id' => $splittedKey[1],
         ];
     }
@@ -293,6 +306,22 @@ abstract class MetaEntityStorage extends Storage
         ];
 
         return $entity;
+    }
+
+    private function maybeReplacePrefixWithPlaceholder($key)
+    {
+        if (Strings::startsWith($key, $this->dbPrefix)) {
+            return self::PREFIX_PLACEHOLDER . Strings::substring($key, Strings::length($this->dbPrefix));
+        }
+        return $key;
+    }
+
+    private function maybeReplacePlaceholderWithPrefix($key)
+    {
+        if (Strings::startsWith($key, self::PREFIX_PLACEHOLDER)) {
+            return $this->dbPrefix . Strings::substring($key, Strings::length(self::PREFIX_PLACEHOLDER));
+        }
+        return $key;
     }
 
     public function shouldBeSaved($data)

@@ -3,13 +3,14 @@
 namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\EntityInfo;
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\TermStorage;
 use VersionPress\Storages\TermTaxonomyStorage;
 use VersionPress\Utils\FileSystem;
 
 class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var TermTaxonomyStorage */
+    /** @var DirectoryStorage */
     private $storage;
 
     private $testingTermTaxonomy = [
@@ -94,6 +95,8 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase
         $termTaxonomyInfo = new EntityInfo([
             'term_taxonomy' => [
                 'id' => 'term_taxonomy_id',
+                'changeinfo-fn' => function () {
+                },
                 'references' => [
                     'parent' => 'term',
                     'term_id' => 'term'
@@ -101,7 +104,7 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase
             ]
         ]);
 
-        $termStorageMock = $this->getMockBuilder(TermStorage::class)
+        $termStorageMock = $this->getMockBuilder(DirectoryStorage::class)
             ->disableOriginalConstructor()->getMock();
         $termStorageMock->expects($this->any())->method('loadEntity')->will($this->returnValue([
             "name" => "Uncategorized",
@@ -110,8 +113,8 @@ class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase
             "vp_id" => "566D438B716C404D8CC384AE8F86A974",
         ]));
 
-        /** @var TermStorage $termStorageMock */
-        $this->storage = new TermTaxonomyStorage(__DIR__ . '/term_taxonomies', $termTaxonomyInfo, $termStorageMock);
+        /** @var DirectoryStorage $termStorageMock */
+        $this->storage = new DirectoryStorage(__DIR__ . '/term_taxonomies', $termTaxonomyInfo);
     }
 
     protected function tearDown()
