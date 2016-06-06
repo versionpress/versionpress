@@ -8,7 +8,13 @@ Some advanced users like having WordPress in its own directory or move plugins, 
 
 <div class="important">
   <p><strong>Note</strong></p>
-  <p>It's highly recomended to adjust your project structure <strong>before</strong> activating VersionPress.</p>
+  <p>It's highly recomended to adjust your project structure <em>before</em> fully initalizing VersionPress. The recommended sequence of steps is:</p>
+  <ol>
+    <li>Customize your WordPress site structure.</li>
+    <li>Install and active VersionPress as a plugin – do <em>not</em> go through the full initialization yet.</li>
+    <li>Follow the instructions below, i.e., set some config constant like <code>VP_PROJECT_ROOT</code>.</li>
+    <li>Fully initialize VersionPress.</li>
+  </ol>
 </div>
 
 ## Giving WordPress its own directory
