@@ -25,19 +25,24 @@ To be fully supported, plugins must be described for VersionPress. This includes
 - Actions
 - Data model (see `wordpress-schema.yml`)
 - Shortcodes (see `wordpress-shortcodes.yml`)
-- Ignored folders 
-
-### Actions
-
-TODO
+- Ignored folders
 
 ### Data model (schema)
 
-TODO
+To make VersionPress work properly it needs to understand the database schema of the plugin. It needs to know what tables the plugin uses, which columns contain the primary keys and what relations are between the tables.
+
+To define the data model you have to create a "schema file" and provide it with your plugin (see section [Discovery mechanism](#discovery-mechanism) for more). You can find more about the schema file in the [schema readme](../versionpress/plugins/src/Database/schema-readme.md).
+
+
+### Actions
+
+Every logical change of an entity is represented by an action. When you change a site title the action will be `option/edit/blogname`. This action defines which message will be used for a commit message.
+
+To define the action you have to create an "action file" and provide it with your plugin.
 
 ### Shortcodes
 
-TODO
+VersionPress also needs to know your shortcodes if they reference DB entities. Similar to the data model, you have to provide a file containing definitions of shortcodes. You can find more about the file in the [shortcodes readme](../versionpress/plugins/src/Database/shortcodes-readme.md).
 
 ### Ignored folders
 
