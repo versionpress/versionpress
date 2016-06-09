@@ -38,7 +38,26 @@ To define the data model you have to create a "schema file" and provide it with 
 
 Every logical change of an entity is represented by an action. When you change a site title the action will be `option/edit/blogname`. This action defines which message will be used for a commit message.
 
-To define the action you have to create an "action file" and provide it with your plugin.
+To define the actions you have to create an "action file" and provide it with your plugin.
+
+Example of action file:
+
+    post:
+      tags:
+        post-title: post_title
+        post-type: post_type
+      actions:
+        create: Created %post-type% '%post-title%'
+        edit: Edited %post-type% '%post-title%'
+        trash:
+          message: %post-type% '%post-title%' moved to trash
+          priority: 7
+
+Every entity has two sections: `tags` and `actions`. Tags are values from the entity saved within the commit. You can use them from messages. The "actions" section contains all actions related to the entity and messages that will be displayed from them. Optionally, you can specify the priority. Default value is 10 (it works like filters / hooks).
+
+> Note: We also consider relative priorities like `post/trash` has higher priority than `post/edit` etc. but it's far more difficult.
+
+For actions that are not related to entities (e.g. manipulating with plugins / themes) you can use a filter (TODO).
 
 ### Shortcodes
 
