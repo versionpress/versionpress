@@ -65,7 +65,7 @@ VersionPress also needs to know your shortcodes if they reference DB entities. S
 
 ### Ignored folders
 
-TODO
+Feel free to use custom `.gitignore` for files in the plugin directory. You can also ignore files / directories outside the plugin directory. There is a filter to let VersionPress know which files / directories you want to ignore (TODO).
 
 
 ## Discovery mechanism
