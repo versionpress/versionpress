@@ -125,13 +125,8 @@ class ChangeInfoFactory
         return new PostChangeInfo($action, $newEntity['vp_id'], $type, $title, array_keys($diff));
     }
 
-    public static function createTermMetaChangeInfo(
-        $oldEntity,
-        $newEntity,
-        $oldParentEntity,
-        $newParentEntity,
-        $action
-    ) {
+    public static function createTermMetaChangeInfo($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action)
+    {
         $termName = $newParentEntity['name'];
         $termVpid = $newParentEntity['vp_id'];
 
@@ -141,13 +136,8 @@ class ChangeInfoFactory
         return new TermMetaChangeInfo($action, $vpid, $termName, $termVpid, $metaKey);
     }
 
-    public static function createUserMetaChangeInfo(
-        $oldEntity,
-        $newEntity,
-        $oldParentEntity,
-        $newParentEntity,
-        $action
-    ) {
+    public static function createUserMetaChangeInfo($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action)
+    {
         $userMetaVpId = $newEntity['vp_id'];
         $userLogin = $newParentEntity['user_login'];
         $userMetaKey = $newEntity['meta_key'];
@@ -156,13 +146,8 @@ class ChangeInfoFactory
         return new UserMetaChangeInfo($action, $userMetaVpId, $userLogin, $userMetaKey, $userVpId);
     }
 
-    public static function createCommentMetaChangeInfo(
-        $oldEntity,
-        $newEntity,
-        $oldParentEntity,
-        $newParentEntity,
-        $action
-    ) {
+    public static function createCommentMetaChangeInfo($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action)
+    {
         $commentVpId = $newParentEntity['vp_id'];
 
         $vpId = $newEntity['vp_id'];
@@ -171,13 +156,8 @@ class ChangeInfoFactory
         return new CommentMetaChangeInfo($action, $vpId, $commentVpId, $metaKey);
     }
 
-    public static function createPostMetaChangeInfo(
-        $oldEntity,
-        $newEntity,
-        $oldParentEntity,
-        $newParentEntity,
-        $action
-    ) {
+    public static function createPostMetaChangeInfo($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action)
+    {
         $postTitle = $newParentEntity['post_title'];
         $postType = $newParentEntity['post_type'];
         $postVpId = $newParentEntity['vp_id'];

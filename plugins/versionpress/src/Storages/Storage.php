@@ -73,15 +73,19 @@ abstract class Storage
      */
     public function shouldBeSaved($data)
     {
+        $shouldBeSaved = true;
+
         if ($this->entityInfo->isIgnoredEntity($data)) {
-            return false;
+            $shouldBeSaved = false;
         }
 
-        if (!$this->ignoreFrequentlyWrittenEntities) {
-            return true;
+        if ($this->ignoreFrequentlyWrittenEntities) {
+            $isFrequentlyWrittenEntity = $this->entityInfo->isFrequentlyWrittenEntity($data);
+            $shouldBeSaved &= !$isFrequentlyWrittenEntity;
         }
 
-        return !$this->entityInfo->isFrequentlyWrittenEntity($data);
+        $entityName = $this->entityInfo->entityName;
+        return apply_filters("vp_entity_should_be_saved_$entityName", $shouldBeSaved, $data, $this);
     }
 
     /**

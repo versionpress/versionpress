@@ -3,12 +3,12 @@
 namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\EntityInfo;
-use VersionPress\Storages\PostStorage;
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Utils\FileSystem;
 
 class PostStorageTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var PostStorage */
+    /** @var DirectoryStorage */
     private $storage;
 
     private $testingPost = [
@@ -81,7 +81,7 @@ class PostStorageTest extends \PHPUnit_Framework_TestCase
             ]
         ]);
         mkdir(__DIR__ . '/posts');
-        $this->storage = new PostStorage(__DIR__ . '/posts', $entityInfo);
+        $this->storage = new DirectoryStorage(__DIR__ . '/posts', $entityInfo);
     }
 
     protected function tearDown()

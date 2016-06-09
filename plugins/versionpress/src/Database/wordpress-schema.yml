@@ -1,7 +1,6 @@
 post:
   table: posts
   id: ID
-  storage: 'VersionPress\Storages\PostStorage'
   changeinfo-fn: 'VersionPress\Storages\ChangeInfoFactory::createPostChangeInfo'
   references:
     post_author: user

@@ -218,7 +218,7 @@ class DirectoryStorage extends Storage
         return $flatEntity;
     }
 
-    protected function entityExistedBeforeThisRequest($data)
+    public function entityExistedBeforeThisRequest($data)
     {
         if (!isset($data['vp_id'])) {
             return false;

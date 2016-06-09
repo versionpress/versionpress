@@ -3,10 +3,6 @@
 namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Storages\DirectoryStorage;
-use VersionPress\Storages\PostStorage;
-use VersionPress\Storages\TermStorage;
-use VersionPress\Storages\TermTaxonomyStorage;
-use VersionPress\Storages\UserStorage;
 use VersionPress\Synchronizers\PostsSynchronizer;
 use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Synchronizers\TermsSynchronizer;
@@ -19,7 +15,7 @@ use VersionPress\Utils\WordPressMissingFunctions;
 
 class PostsSynchronizerTest extends SynchronizerTestCase
 {
-    /** @var PostStorage */
+    /** @var DirectoryStorage */
     private $storage;
     /** @var DirectoryStorage */
     private $userStorage;

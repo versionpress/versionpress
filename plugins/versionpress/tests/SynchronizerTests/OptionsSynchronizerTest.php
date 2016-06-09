@@ -2,8 +2,8 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\OptionStorage;
-use VersionPress\Storages\PostStorage;
 use VersionPress\Synchronizers\OptionsSynchronizer;
 use VersionPress\Synchronizers\PostsSynchronizer;
 use VersionPress\Synchronizers\Synchronizer;
@@ -16,7 +16,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
 
     /** @var OptionStorage */
     private $storage;
-    /** @var PostStorage */
+    /** @var DirectoryStorage */
     private $postStorage;
     /** @var OptionsSynchronizer */
     private $synchronizer;

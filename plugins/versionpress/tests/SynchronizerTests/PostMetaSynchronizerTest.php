@@ -4,9 +4,6 @@ namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\MetaEntityStorage;
-use VersionPress\Storages\PostMetaStorage;
-use VersionPress\Storages\PostStorage;
-use VersionPress\Storages\UserStorage;
 use VersionPress\Synchronizers\PostMetaSynchronizer;
 use VersionPress\Synchronizers\PostsSynchronizer;
 use VersionPress\Synchronizers\Synchronizer;
@@ -19,7 +16,7 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase
 {
     /** @var MetaEntityStorage */
     private $storage;
-    /** @var PostStorage */
+    /** @var DirectoryStorage */
     private $postStorage;
     /** @var DirectoryStorage */
     private $userStorage;

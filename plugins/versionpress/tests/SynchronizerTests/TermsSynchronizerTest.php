@@ -3,7 +3,6 @@
 namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Storages\DirectoryStorage;
-use VersionPress\Storages\TermStorage;
 use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Synchronizers\TermsSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;

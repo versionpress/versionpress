@@ -8,14 +8,7 @@ use VersionPress\Storages\CommentStorage;
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Storages\OptionStorage;
-use VersionPress\Storages\PostMetaStorage;
-use VersionPress\Storages\PostStorage;
 use VersionPress\Storages\StorageFactory;
-use VersionPress\Storages\TermMetaStorage;
-use VersionPress\Storages\TermStorage;
-use VersionPress\Storages\TermTaxonomyStorage;
-use VersionPress\Storages\UserMetaStorage;
-use VersionPress\Storages\UserStorage;
 
 class StorageFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,7 +20,7 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase
     public function factoryCreatesRightStorages()
     {
         $storages = [
-            'post' => PostStorage::class,
+            'post' => DirectoryStorage::class,
             'comment' => CommentStorage::class,
             'option' => OptionStorage::class,
             'term' => DirectoryStorage::class,

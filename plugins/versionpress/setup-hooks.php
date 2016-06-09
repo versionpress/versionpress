@@ -523,6 +523,34 @@ function vp_register_hooks()
         });
     }
 
+    // Entity hooks
+    add_filter('vp_entity_should_be_saved_post', function ($shouldBeSaved, $data, $storage) {
+        /** @var \VersionPress\Storages\DirectoryStorage $storage */
+        $isExistingEntity = $storage->entityExistedBeforeThisRequest($data);
+
+        // ignore saving draft on preview
+        if ($isExistingEntity && isset($_POST['wp-preview']) && $_POST['wp-preview'] === 'dopreview') {
+            return false;
+        }
+
+        // ignoring ajax autosaves
+        if ($isExistingEntity && isset($data['post_status']) && ($data['post_status'] === 'draft' &&
+                defined('DOING_AJAX') && DOING_AJAX === true)
+        ) {
+            return false;
+        }
+
+        if (!$isExistingEntity && isset($data['post_type']) && $data['post_type'] === 'attachment' &&
+            !isset($data['post_title'])
+        ) {
+            return false;
+        }
+
+        return $shouldBeSaved;
+
+    }, 10, 3);
+
+
     register_shutdown_function([$committer, 'commit']);
 }
 

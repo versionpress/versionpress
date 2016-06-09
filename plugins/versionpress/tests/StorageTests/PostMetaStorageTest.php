@@ -3,16 +3,15 @@
 namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\EntityInfo;
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\MetaEntityStorage;
-use VersionPress\Storages\PostMetaStorage;
-use VersionPress\Storages\PostStorage;
 use VersionPress\Utils\FileSystem;
 
 class PostMetaStorageTest extends \PHPUnit_Framework_TestCase
 {
     /** @var MetaEntityStorage */
     private $storage;
-    /** @var PostStorage */
+    /** @var DirectoryStorage */
     private $postStorage;
 
     private $testingPostMeta = [
@@ -96,7 +95,7 @@ class PostMetaStorageTest extends \PHPUnit_Framework_TestCase
         ]);
 
         mkdir(__DIR__ . '/posts');
-        $this->postStorage = new PostStorage(__DIR__ . '/posts', $postInfo);
+        $this->postStorage = new DirectoryStorage(__DIR__ . '/posts', $postInfo);
         $this->storage = new MetaEntityStorage($this->postStorage, $postMetaInfo, 'prefix_');
     }
 

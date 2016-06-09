@@ -4,8 +4,6 @@ namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\MetaEntityStorage;
-use VersionPress\Storages\UserMetaStorage;
-use VersionPress\Storages\UserStorage;
 use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Synchronizers\UserMetaSynchronizer;
 use VersionPress\Synchronizers\UsersSynchronizer;

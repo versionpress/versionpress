@@ -3,8 +3,6 @@
 namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Storages\DirectoryStorage;
-use VersionPress\Storages\TermStorage;
-use VersionPress\Storages\TermTaxonomyStorage;
 use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Synchronizers\TermsSynchronizer;
 use VersionPress\Synchronizers\TermTaxonomiesSynchronizer;
