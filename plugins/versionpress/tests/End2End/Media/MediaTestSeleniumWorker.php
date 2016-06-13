@@ -22,7 +22,7 @@ class MediaTestSeleniumWorker extends SeleniumWorker implements IMediaTestWorker
     {
         // Couldn't find out how to automate the default (and more modern) upload.php so let's go via media-new.php
         // see http://stackoverflow.com/q/27607453/21728
-        $this->url('wp-admin/media-new.php');
+        $this->url(self::$wpAdminPath . '/media-new.php');
         if (!$this->byCssSelector('#html-upload')->displayed()) {
             $this->byCssSelector('.upload-flash-bypass a')->click();
         }

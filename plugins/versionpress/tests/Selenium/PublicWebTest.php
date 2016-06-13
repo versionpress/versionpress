@@ -3,6 +3,7 @@
 namespace VersionPress\Tests\Selenium;
 
 use VersionPress\Tests\Utils\CommitAsserter;
+use VersionPress\Utils\PathUtils;
 
 class PublicWebTest extends SeleniumTestCase
 {
@@ -51,7 +52,9 @@ class PublicWebTest extends SeleniumTestCase
      */
     public function commentCanBeAdded()
     {
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $vpdbPath = self::$wpAutomation->getVpdbDir();
+        $relativePathToVpdb = PathUtils::getRelativePath(self::$testConfig->testSite->path, $vpdbPath);
+        $commitAsserter = new CommitAsserter($this->gitRepository, ['vpdb' => $relativePathToVpdb]);
 
         $this->url('?p=' . self::$testPostId);
 

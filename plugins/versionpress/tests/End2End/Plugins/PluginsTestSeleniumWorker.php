@@ -23,7 +23,7 @@ class PluginsTestSeleniumWorker extends SeleniumWorker implements IPluginsTestWo
 
     public function prepare_installPlugin()
     {
-        $this->url('wp-admin/plugin-install.php?tab=upload');
+        $this->url(self::$wpAdminPath . '/plugin-install.php?tab=upload');
     }
 
     public function installPlugin()
@@ -35,7 +35,7 @@ class PluginsTestSeleniumWorker extends SeleniumWorker implements IPluginsTestWo
 
     public function prepare_activatePlugin()
     {
-        $this->url("wp-admin/plugins.php");
+        $this->url(self::$wpAdminPath . "/plugins.php");
     }
 
     public function activatePlugin()
@@ -46,7 +46,7 @@ class PluginsTestSeleniumWorker extends SeleniumWorker implements IPluginsTestWo
 
     public function prepare_deactivatePlugin()
     {
-        $this->url("wp-admin/plugins.php");
+        $this->url(self::$wpAdminPath . "/plugins.php");
     }
 
     public function deactivatePlugin()
@@ -84,7 +84,7 @@ class PluginsTestSeleniumWorker extends SeleniumWorker implements IPluginsTestWo
             self::$secondPluginInfo['zipfile']
         );
         self::$wpAutomation->runWpCliCommand('plugin', 'install', [$plugin1Path, $plugin2Path]);
-        $this->url("wp-admin/plugins.php");
+        $this->url(self::$wpAdminPath . "/plugins.php");
     }
 
     public function activateTwoPlugins()
@@ -94,7 +94,7 @@ class PluginsTestSeleniumWorker extends SeleniumWorker implements IPluginsTestWo
 
     public function prepare_deactivateTwoPlugins()
     {
-        $this->url("wp-admin/plugins.php");
+        $this->url(self::$wpAdminPath . "/plugins.php");
     }
 
     public function deactivateTwoPlugins()
@@ -104,7 +104,7 @@ class PluginsTestSeleniumWorker extends SeleniumWorker implements IPluginsTestWo
 
     public function prepare_uninstallTwoPlugins()
     {
-        $this->url("wp-admin/plugins.php");
+        $this->url(self::$wpAdminPath . "/plugins.php");
     }
 
     public function uninstallTwoPlugins()

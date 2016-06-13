@@ -39,6 +39,9 @@ class ChangeInfoMatcher
         "commentmeta/.*" => CommentMetaChangeInfo::class,
         "user/.*" => UserChangeInfo::class,
 
+        // Other actions
+        "composer/.*" => ComposerChangeInfo::class,
+
         // Unknown action:
         "" => UntrackedChangeInfo::class,
 

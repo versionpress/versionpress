@@ -6,6 +6,7 @@ use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\BulkChangeInfo;
 use VersionPress\ChangeInfos\CommentChangeInfo;
 use VersionPress\ChangeInfos\CommentMetaChangeInfo;
+use VersionPress\ChangeInfos\ComposerChangeInfo;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\OptionChangeInfo;
 use VersionPress\ChangeInfos\PluginChangeInfo;
@@ -43,6 +44,7 @@ class SortingStrategy
         RevertChangeInfo::class,
         PluginChangeInfo::class,
         ThemeChangeInfo::class,
+        ComposerChangeInfo::class,
         TermChangeInfo::class,
         TermTaxonomyChangeInfo::class,
         TranslationChangeInfo::class,

@@ -12,7 +12,7 @@ class ThemeCustomizerTest extends SeleniumTestCase
      */
     public function everyChangeMadeInCustomizerCreatesThemeCustomizeAction()
     {
-        $this->url('wp-admin/customize.php');
+        $this->url(self::$wpAdminPath . '/customize.php');
         $this->byCssSelector('#accordion-section-title_tagline .accordion-section-title')->click();
         $this->setValue('#customize-control-blogname input', 'Some name');
         $this->byId('save')->click();

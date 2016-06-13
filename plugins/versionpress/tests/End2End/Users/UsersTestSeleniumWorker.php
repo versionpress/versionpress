@@ -19,7 +19,7 @@ class UsersTestSeleniumWorker extends SeleniumWorker implements IUsersTestWorker
 
     public function prepare_createUser()
     {
-        $this->url('wp-admin/user-new.php');
+        $this->url(self::$wpAdminPath . '/user-new.php');
     }
 
     public function createUser()
@@ -38,7 +38,7 @@ class UsersTestSeleniumWorker extends SeleniumWorker implements IUsersTestWorker
 
     public function prepare_editUser()
     {
-        $this->url('wp-admin/users.php');
+        $this->url(self::$wpAdminPath . '/users.php');
         $this->jsClick(".username a:contains('{$this->testUser['login']}')");
         $this->waitAfterRedirect();
     }
@@ -55,7 +55,7 @@ class UsersTestSeleniumWorker extends SeleniumWorker implements IUsersTestWorker
 
     public function prepare_editUsermeta()
     {
-        $this->url('wp-admin/users.php');
+        $this->url(self::$wpAdminPath . '/users.php');
         $this->jsClick(".username a:contains('{$this->testUser['login']}')");
         $this->waitAfterRedirect();
     }
@@ -71,7 +71,7 @@ class UsersTestSeleniumWorker extends SeleniumWorker implements IUsersTestWorker
 
     public function prepare_deleteUser()
     {
-        $this->url('wp-admin/users.php');
+        $this->url(self::$wpAdminPath . '/users.php');
         $this->executeScript(
             "jQuery(\"a:contains('{$this->testUser['login']}')\").parents('td').find('.delete a')[0].click()"
         );
@@ -107,7 +107,7 @@ class UsersTestSeleniumWorker extends SeleniumWorker implements IUsersTestWorker
 
     public function deleteTwoUsers()
     {
-        $this->url('wp-admin/users.php');
+        $this->url(self::$wpAdminPath . '/users.php');
 
         foreach ($this->userIds as $id) {
             $this->jsClick("#user-$id .check-column input[type=checkbox]");
@@ -139,7 +139,7 @@ class UsersTestSeleniumWorker extends SeleniumWorker implements IUsersTestWorker
     {
         $this->userIds = self::$wpAutomation->createUser($this->prepareTestUser());
 
-        $this->url('wp-admin/users.php');
+        $this->url(self::$wpAdminPath . '/users.php');
         $this->jsClick("#user-{$this->userIds} .username a");
         $this->waitAfterRedirect();
     }
