@@ -4,6 +4,7 @@ namespace VersionPress\Storages;
 
 use VersionPress\ChangeInfos\CommentChangeInfo;
 use VersionPress\ChangeInfos\CommentMetaChangeInfo;
+use VersionPress\ChangeInfos\OptionChangeInfo;
 use VersionPress\ChangeInfos\PostChangeInfo;
 use VersionPress\ChangeInfos\PostMetaChangeInfo;
 use VersionPress\ChangeInfos\TermChangeInfo;
@@ -166,5 +167,10 @@ class ChangeInfoFactory
         $metaKey = $newEntity['meta_key'];
 
         return new PostMetaChangeInfo($action, $vpId, $postType, $postTitle, $postVpId, $metaKey);
+    }
+
+    public static function createOptionChangeInfo($oldEntity, $newEntity, $action)
+    {
+        return new OptionChangeInfo($action, $newEntity['option_name']);
     }
 }

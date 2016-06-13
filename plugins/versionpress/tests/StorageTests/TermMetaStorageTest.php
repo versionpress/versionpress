@@ -80,7 +80,7 @@ class TermMetaStorageTest extends StorageTestCase
         ]);
 
         mkdir(__DIR__ . '/terms');
-        $this->termStorage = new DirectoryStorage(__DIR__ . '/terms', $userInfo);
+        $this->termStorage = new DirectoryStorage(__DIR__ . '/terms', $userInfo, 'prefix_');
         $this->storage = new MetaEntityStorage($this->termStorage, $termMetaInfo, 'prefix_');
     }
 

@@ -4,10 +4,8 @@ namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Storages\CommentStorage;
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\MetaEntityStorage;
-use VersionPress\Storages\OptionStorage;
 use VersionPress\Storages\StorageFactory;
 
 class StorageFactoryTest extends \PHPUnit_Framework_TestCase
@@ -21,8 +19,8 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $storages = [
             'post' => DirectoryStorage::class,
-            'comment' => CommentStorage::class,
-            'option' => OptionStorage::class,
+            'comment' => DirectoryStorage::class,
+            'option' => DirectoryStorage::class,
             'term' => DirectoryStorage::class,
             'termmeta' => MetaEntityStorage::class,
             'term_taxonomy' => DirectoryStorage::class,
@@ -32,7 +30,9 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase
         ];
 
         /** @var \wpdb $wpdbStub */
-        $wpdbStub = $this->getMockBuilder('\wpdb')->disableOriginalConstructor()->getMock();
+
+        $wpdbStub = new \stdClass();
+        $wpdbStub->prefix = 'prefix_';
 
         $database = new Database($wpdbStub);
 

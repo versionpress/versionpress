@@ -95,7 +95,7 @@ class PostMetaStorageTest extends StorageTestCase
         ]);
 
         mkdir(__DIR__ . '/posts');
-        $this->postStorage = new DirectoryStorage(__DIR__ . '/posts', $postInfo);
+        $this->postStorage = new DirectoryStorage(__DIR__ . '/posts', $postInfo, 'prefix_');
         $this->storage = new MetaEntityStorage($this->postStorage, $postMetaInfo, 'prefix_');
     }
 

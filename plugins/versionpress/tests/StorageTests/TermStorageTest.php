@@ -63,7 +63,7 @@ class TermStorageTest extends StorageTestCase
             ]
         ]);
 
-        $this->storage = new DirectoryStorage(__DIR__ . '/terms', $entityInfo);
+        $this->storage = new DirectoryStorage(__DIR__ . '/terms', $entityInfo, 'prefix_');
     }
 
     protected function tearDown()

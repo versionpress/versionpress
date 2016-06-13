@@ -114,7 +114,7 @@ class TermTaxonomyStorageTest extends StorageTestCase
         ]));
 
         /** @var DirectoryStorage $termStorageMock */
-        $this->storage = new DirectoryStorage(__DIR__ . '/term_taxonomies', $termTaxonomyInfo);
+        $this->storage = new DirectoryStorage(__DIR__ . '/term_taxonomies', $termTaxonomyInfo, 'prefix_');
     }
 
     protected function tearDown()

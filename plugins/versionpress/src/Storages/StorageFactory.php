@@ -48,10 +48,6 @@ class StorageFactory
             return null;
         }
 
-        if ($entityName === 'option') { // Temporary special case
-            return new OptionStorage($this->vpdbDir . '/options', $entityInfo, $this->database->prefix, $this->taxonomies);
-        }
-
         if ($this->dbSchemaInfo->isChildEntity($entityName)) {
             if (isset($entityInfo->storageClass)) {
                 $storageClass = $entityInfo->storageClass;
@@ -71,7 +67,7 @@ class StorageFactory
             $storageClass = DirectoryStorage::class;
         }
 
-        return new $storageClass($this->vpdbDir . '/' . $entityInfo->tableName, $entityInfo);
+        return new $storageClass($this->vpdbDir . '/' . $entityInfo->tableName, $entityInfo, $this->database->prefix);
     }
 
     public function getAllSupportedStorages()

@@ -16,8 +16,6 @@ use VersionPress\Database\EntityInfo;
  */
 class MetaEntityStorage extends Storage
 {
-    const PREFIX_PLACEHOLDER = "<<table-prefix>>";
-
     private $lastVpId;
 
     protected $keyName;
@@ -26,21 +24,11 @@ class MetaEntityStorage extends Storage
 
     /** @var Storage */
     private $parentStorage;
-    /**
-     * @var
-     */
-    private $dbPrefix;
 
-    public function __construct(
-        Storage $parentStorage,
-        EntityInfo $entityInfo,
-        $dbPrefix,
-        $keyName = 'meta_key',
-        $valueName = 'meta_value'
-    ) {
-        parent::__construct($entityInfo);
+    public function __construct(Storage $parentStorage, EntityInfo $entityInfo, $dbPrefix, $keyName = 'meta_key', $valueName = 'meta_value')
+    {
+        parent::__construct($entityInfo, $dbPrefix);
         $this->parentStorage = $parentStorage;
-        $this->dbPrefix = $dbPrefix;
         $this->keyName = $keyName;
         $this->valueName = $valueName;
         $this->parentReferenceName = "vp_$entityInfo->parentReference";
@@ -203,7 +191,7 @@ class MetaEntityStorage extends Storage
      */
     protected function createJoinedKey($key, $vpId)
     {
-        return sprintf('%s#%s', $this->maybeReplacePrefixWithPlaceholder($key), $vpId);
+        return sprintf('%s#%s', $key, $vpId);
     }
 
     /**
@@ -219,7 +207,7 @@ class MetaEntityStorage extends Storage
     {
         $splittedKey = explode('#', $key, 2);
         return [
-            $this->keyName => $this->maybeReplacePlaceholderWithPrefix($splittedKey[0]),
+            $this->keyName => $splittedKey[0],
             'vp_id' => $splittedKey[1],
         ];
     }
@@ -306,22 +294,6 @@ class MetaEntityStorage extends Storage
         ];
 
         return $entity;
-    }
-
-    private function maybeReplacePrefixWithPlaceholder($key)
-    {
-        if (Strings::startsWith($key, $this->dbPrefix)) {
-            return self::PREFIX_PLACEHOLDER . Strings::substring($key, Strings::length($this->dbPrefix));
-        }
-        return $key;
-    }
-
-    private function maybeReplacePlaceholderWithPrefix($key)
-    {
-        if (Strings::startsWith($key, self::PREFIX_PLACEHOLDER)) {
-            return $this->dbPrefix . Strings::substring($key, Strings::length(self::PREFIX_PLACEHOLDER));
-        }
-        return $key;
     }
 
     public function shouldBeSaved($data)

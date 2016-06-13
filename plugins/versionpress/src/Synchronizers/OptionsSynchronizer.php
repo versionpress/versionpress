@@ -6,7 +6,7 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\EntityInfo;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Database\VpidRepository;
-use VersionPress\Storages\OptionStorage;
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\ArrayUtils;
@@ -20,7 +20,7 @@ use wpdb;
 class OptionsSynchronizer implements Synchronizer
 {
 
-    /** @var OptionStorage */
+    /** @var DirectoryStorage */
     private $optionStorage;
 
     /** @var Database */

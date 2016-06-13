@@ -69,7 +69,7 @@ class UserStorageTest extends StorageTestCase
         ]);
 
         mkdir(__DIR__ . '/users');
-        $this->storage = new DirectoryStorage(__DIR__ . '/users', $entityInfo);
+        $this->storage = new DirectoryStorage(__DIR__ . '/users', $entityInfo, 'prefix_');
     }
 
     protected function tearDown()

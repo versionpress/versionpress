@@ -81,7 +81,7 @@ class PostStorageTest extends StorageTestCase
             ]
         ]);
         mkdir(__DIR__ . '/posts');
-        $this->storage = new DirectoryStorage(__DIR__ . '/posts', $entityInfo);
+        $this->storage = new DirectoryStorage(__DIR__ . '/posts', $entityInfo, 'prefix_');
     }
 
     protected function tearDown()

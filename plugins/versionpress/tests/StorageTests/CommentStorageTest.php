@@ -4,13 +4,13 @@ namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\Database;
 use VersionPress\Database\EntityInfo;
-use VersionPress\Storages\CommentStorage;
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Tests\End2End\Utils\AnonymousObject;
 use VersionPress\Utils\FileSystem;
 
 class CommentStorageTest extends StorageTestCase
 {
-    /** @var CommentStorage */
+    /** @var DirectoryStorage */
     private $storage;
 
     private $testingComment = [
@@ -88,8 +88,8 @@ class CommentStorageTest extends StorageTestCase
                 return new AnonymousObject(['post_title' => '']);
             }
         ]);
-        $database = new Database($wpdbFake);
-        $this->storage = new CommentStorage(__DIR__ . '/comments', $entityInfo, $database);
+
+        $this->storage = new DirectoryStorage(__DIR__ . '/comments', $entityInfo, 'prefix_');
     }
 
     protected function tearDown()

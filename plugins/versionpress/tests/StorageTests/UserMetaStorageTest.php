@@ -84,7 +84,7 @@ class UserMetaStorageTest extends StorageTestCase
         ]);
 
         mkdir(__DIR__ . '/users');
-        $this->userStorage = new DirectoryStorage(__DIR__ . '/users', $userInfo);
+        $this->userStorage = new DirectoryStorage(__DIR__ . '/users', $userInfo, 'prefix_');
         $this->storage = new MetaEntityStorage($this->userStorage, $userMetaInfo, 'prefix_');
     }
 

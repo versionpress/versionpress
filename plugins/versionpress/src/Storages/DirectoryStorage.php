@@ -37,10 +37,11 @@ class DirectoryStorage extends Storage
      * DirectoryStorage constructor.
      * @param string $directory
      * @param \VersionPress\Database\EntityInfo $entityInfo
+     * @param string $dbPrefix
      */
-    public function __construct($directory, $entityInfo)
+    public function __construct($directory, $entityInfo, $dbPrefix)
     {
-        parent::__construct($entityInfo);
+        parent::__construct($entityInfo, $dbPrefix);
         $this->directory = $directory;
         $this->entityInfo = $entityInfo;
     }
@@ -138,25 +139,16 @@ class DirectoryStorage extends Storage
 
     public function getEntityFilename($id, $parentId = null)
     {
-        $vpidPath = Strings::substring($id, 0, 2) . '/' . $id;
+        $sanitizedEntityId = urlencode($id);
+        $sanitizedEntityId = str_replace('.', '%2E', $sanitizedEntityId);
+
+        $vpidPath = Strings::substring($sanitizedEntityId, 0, 2) . '/' . $sanitizedEntityId;
         return $this->directory . '/' . $vpidPath . '.ini';
     }
 
     public function getPathCommonToAllEntities()
     {
         return $this->directory;
-    }
-
-    protected function deserializeEntity($serializedEntity)
-    {
-        $entity = IniSerializer::deserialize($serializedEntity);
-        return $this->flattenEntity($entity);
-    }
-
-    protected function serializeEntity($vpid, $entity)
-    {
-        unset($entity[$this->entityInfo->vpidColumnName]);
-        return IniSerializer::serialize([$vpid => $entity]);
     }
 
     private function getEntityFiles()
@@ -202,20 +194,6 @@ class DirectoryStorage extends Storage
     {
         $entities = $this->loadAllFromFiles([$this->getEntityFilename($id)]);
         return isset($entities[$id]) ? $entities[$id] : false;
-    }
-
-    protected function flattenEntity($entity)
-    {
-        if (count($entity) === 0) {
-            return $entity;
-        }
-
-        reset($entity);
-        $vpid = key($entity);
-        $flatEntity = $entity[$vpid];
-        $flatEntity[$this->entityInfo->vpidColumnName] = $vpid;
-
-        return $flatEntity;
     }
 
     public function entityExistedBeforeThisRequest($data)

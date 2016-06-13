@@ -1,5 +1,6 @@
 <?php
 
+use Nette\Utils\Strings;
 use VersionPress\Api\VersionPressApi;
 use VersionPress\ChangeInfos\PluginChangeInfo;
 use VersionPress\ChangeInfos\PostChangeInfo;
@@ -548,6 +549,32 @@ function vp_register_hooks()
 
         return $shouldBeSaved;
 
+    }, 10, 3);
+
+    add_filter('vp_entity_should_be_saved_comment', function ($shouldBeSaved, $data, $storage) {
+        /** @var \VersionPress\Storages\DirectoryStorage $storage */
+        $isExistingEntity = $storage->entityExistedBeforeThisRequest($data);
+
+        if ($isExistingEntity && isset($data['comment_approved']) && $data['comment_approved'] === 'spam') {
+            return true;
+        }
+
+        return $shouldBeSaved;
+    }, 10, 3);
+
+    add_filter('vp_entity_should_be_saved_option', function ($shouldBeSaved, $data, $storage) {
+        global $wp_taxonomies;
+
+        $name = $data['option_name'];
+        $taxonomies = array_keys((array)$wp_taxonomies);
+
+        $taxonomyChildrenSuffix = '_children';
+        if (!Strings::endsWith($name, $taxonomyChildrenSuffix)) {
+            return $shouldBeSaved;
+        }
+
+        $maybeTaxonomyName = Strings::substring($name, 0, Strings::length($name) - Strings::length($taxonomyChildrenSuffix));
+        return in_array($maybeTaxonomyName, $taxonomies);
     }, 10, 3);
 
 

@@ -3,13 +3,13 @@
 namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\EntityInfo;
-use VersionPress\Storages\OptionStorage;
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Tests\Utils\ArrayAsserter;
 use VersionPress\Utils\FileSystem;
 
 class OptionStorageTest extends StorageTestCase
 {
-    /** @var OptionStorage */
+    /** @var DirectoryStorage */
     private $storage;
 
     private $testingOption = [
@@ -93,22 +93,6 @@ class OptionStorageTest extends StorageTestCase
         $this->storage->save($testingOption);
         $loadedOption = $this->storage->loadEntity($testingOption['option_name']);
         ArrayAsserter::assertSimilar($testingOption, $loadedOption);
-    }
-
-    /**
-     * @test
-     */
-    public function taxonomyChildrenAreNotSaved()
-    {
-        $option = [
-            "option_name" => $this->sampleTaxonomy . "_children",
-            "option_value" => "some value",
-            "autoload" => "yes",
-        ];
-
-        $this->storage->save($option);
-        $loadedOptions = $this->storage->loadAll();
-        $this->assertEquals(0, count($loadedOptions));
     }
 
     /**
@@ -207,13 +191,18 @@ class OptionStorageTest extends StorageTestCase
             'option' => [
                 'table' => 'options',
                 'vpid' => 'option_name',
+                'changeinfo-fn' => function () {
+                },
                 'ignored-entities' => [
                     'option_name: ignored_option',
+                ],
+                'ignored-columns' => [
+                    'option_id'
                 ],
             ]
         ]);
 
-        $this->storage = new OptionStorage(__DIR__ . '/options', $entityInfo, 'prefix_', [$this->sampleTaxonomy]);
+        $this->storage = new DirectoryStorage(__DIR__ . '/options', $entityInfo, 'prefix_');
     }
 
     protected function tearDown()

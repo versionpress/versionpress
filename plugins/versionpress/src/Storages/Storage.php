@@ -1,8 +1,10 @@
 <?php
 namespace VersionPress\Storages;
 
+use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\Database\EntityInfo;
+use VersionPress\Storages\Serialization\IniSerializer;
 
 /**
  * Stores an entity to a file that can be versioned by Git. Storages are chosen by {@link VersionPress\Storages\Mirror},
@@ -11,6 +13,8 @@ use VersionPress\Database\EntityInfo;
  */
 abstract class Storage
 {
+
+    const PREFIX_PLACEHOLDER = "<<table-prefix>>";
 
     /** @var bool */
     protected $isTransaction;
@@ -21,9 +25,13 @@ abstract class Storage
     /** @var EntityInfo */
     protected $entityInfo;
 
-    public function __construct(EntityInfo $entityInfo)
+    /** @var string */
+    private $dbPrefix;
+
+    public function __construct(EntityInfo $entityInfo, $dbPrefix)
     {
         $this->entityInfo = $entityInfo;
+        $this->dbPrefix = $dbPrefix;
     }
 
     /**
@@ -81,7 +89,7 @@ abstract class Storage
 
         if ($this->ignoreFrequentlyWrittenEntities) {
             $isFrequentlyWrittenEntity = $this->entityInfo->isFrequentlyWrittenEntity($data);
-            $shouldBeSaved &= !$isFrequentlyWrittenEntity;
+            $shouldBeSaved = $shouldBeSaved && !$isFrequentlyWrittenEntity;
         }
 
         $entityName = $this->entityInfo->entityName;
@@ -145,4 +153,54 @@ abstract class Storage
      * Transfers data from memory (saved by Storage::saveLater()) to the files.
      */
     abstract public function commit();
+
+    protected function deserializeEntity($serializedEntity)
+    {
+        if ($serializedEntity === '') {
+            return [];
+        }
+
+        $entity = IniSerializer::deserialize($serializedEntity);
+        $entity = $this->flattenEntity($entity);
+        $entity[$this->entityInfo->vpidColumnName] = $this->maybeReplacePlaceholderWithPrefix($entity[$this->entityInfo->vpidColumnName]);
+        return $entity;
+    }
+
+    protected function serializeEntity($vpid, $entity)
+    {
+        $vpid = $this->maybeReplacePrefixWithPlaceholder($vpid);
+
+        unset($entity[$this->entityInfo->vpidColumnName]);
+        return IniSerializer::serialize([$vpid => $entity]);
+    }
+
+    private function flattenEntity($entity)
+    {
+        if (count($entity) === 0) {
+            return $entity;
+        }
+
+        reset($entity);
+        $vpid = key($entity);
+        $flatEntity = $entity[$vpid];
+        $flatEntity[$this->entityInfo->vpidColumnName] = $vpid;
+
+        return $flatEntity;
+    }
+
+    private function maybeReplacePrefixWithPlaceholder($key)
+    {
+        if (Strings::startsWith($key, $this->dbPrefix)) {
+            return self::PREFIX_PLACEHOLDER . Strings::substring($key, Strings::length($this->dbPrefix));
+        }
+        return $key;
+    }
+
+    private function maybeReplacePlaceholderWithPrefix($key)
+    {
+        if (Strings::startsWith($key, self::PREFIX_PLACEHOLDER)) {
+            return $this->dbPrefix . Strings::substring($key, Strings::length(self::PREFIX_PLACEHOLDER));
+        }
+        return $key;
+    }
 }

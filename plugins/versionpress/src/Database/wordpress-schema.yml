@@ -38,7 +38,6 @@ postmeta:
 comment:
   table: comments
   id: comment_ID
-  storage: 'VersionPress\Storages\CommentStorage'
   changeinfo-fn: 'VersionPress\Storages\ChangeInfoFactory::createCommentChangeInfo'
   references:
     comment_post_ID: post
@@ -102,7 +101,7 @@ usermeta:
 option:
   table: options
   vpid: option_name
-  storage: 'VersionPress\Storages\OptionStorage'
+  changeinfo-fn: 'VersionPress\Storages\ChangeInfoFactory::createOptionChangeInfo'
   value-references:
     option_name@option_value:
       site_icon: post
@@ -136,6 +135,6 @@ option:
     - 'option_name: logged_in_key'
     - 'option_name: logged_in_salt'
     - 'option_name: theme_switched'
-    # All {$taxonomy}_children are also ignored - see OptionStorage
+    # All {$taxonomy}_children are also ignored - see filter `vp_entity_should_be_saved_option`
   ignored-columns:
     - option_id

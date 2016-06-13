@@ -2,7 +2,6 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
-use VersionPress\Storages\CommentStorage;
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Synchronizers\CommentsSynchronizer;
 use VersionPress\Synchronizers\PostsSynchronizer;
@@ -14,7 +13,7 @@ use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class CommentsSynchronizerTest extends SynchronizerTestCase
 {
-    /** @var CommentStorage */
+    /** @var DirectoryStorage */
     private $storage;
     /** @var DirectoryStorage */
     private $postStorage;

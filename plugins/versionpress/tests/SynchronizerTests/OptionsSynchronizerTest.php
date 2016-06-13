@@ -3,7 +3,6 @@
 namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Storages\DirectoryStorage;
-use VersionPress\Storages\OptionStorage;
 use VersionPress\Synchronizers\OptionsSynchronizer;
 use VersionPress\Synchronizers\PostsSynchronizer;
 use VersionPress\Synchronizers\Synchronizer;
@@ -14,7 +13,7 @@ use VersionPress\Utils\AbsoluteUrlReplacer;
 class OptionsSynchronizerTest extends SynchronizerTestCase
 {
 
-    /** @var OptionStorage */
+    /** @var DirectoryStorage */
     private $storage;
     /** @var DirectoryStorage */
     private $postStorage;
