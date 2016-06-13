@@ -7,7 +7,7 @@ use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Utils\FileSystem;
 
-class PostMetaStorageTest extends \PHPUnit_Framework_TestCase
+class PostMetaStorageTest extends StorageTestCase
 {
     /** @var MetaEntityStorage */
     private $storage;

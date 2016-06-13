@@ -7,7 +7,7 @@ use VersionPress\Storages\OptionStorage;
 use VersionPress\Tests\Utils\ArrayAsserter;
 use VersionPress\Utils\FileSystem;
 
-class OptionStorageTest extends \PHPUnit_Framework_TestCase
+class OptionStorageTest extends StorageTestCase
 {
     /** @var OptionStorage */
     private $storage;

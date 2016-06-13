@@ -7,7 +7,7 @@ use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\UserStorage;
 use VersionPress\Utils\FileSystem;
 
-class UserStorageTest extends \PHPUnit_Framework_TestCase
+class UserStorageTest extends StorageTestCase
 {
     /** @var DirectoryStorage */
     private $storage;

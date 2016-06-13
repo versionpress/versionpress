@@ -9,7 +9,7 @@ use VersionPress\Storages\TermMetaStorage;
 use VersionPress\Storages\TermStorage;
 use VersionPress\Utils\FileSystem;
 
-class TermMetaStorageTest extends \PHPUnit_Framework_TestCase
+class TermMetaStorageTest extends StorageTestCase
 {
     /** @var MetaEntityStorage */
     private $storage;

@@ -8,7 +8,7 @@ use VersionPress\Storages\CommentStorage;
 use VersionPress\Tests\End2End\Utils\AnonymousObject;
 use VersionPress\Utils\FileSystem;
 
-class CommentStorageTest extends \PHPUnit_Framework_TestCase
+class CommentStorageTest extends StorageTestCase
 {
     /** @var CommentStorage */
     private $storage;

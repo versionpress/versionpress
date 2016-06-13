@@ -6,7 +6,7 @@ use VersionPress\Database\EntityInfo;
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Utils\FileSystem;
 
-class PostStorageTest extends \PHPUnit_Framework_TestCase
+class PostStorageTest extends StorageTestCase
 {
     /** @var DirectoryStorage */
     private $storage;

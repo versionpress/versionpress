@@ -8,7 +8,7 @@ use VersionPress\Storages\TermStorage;
 use VersionPress\Storages\TermTaxonomyStorage;
 use VersionPress\Utils\FileSystem;
 
-class TermTaxonomyStorageTest extends \PHPUnit_Framework_TestCase
+class TermTaxonomyStorageTest extends StorageTestCase
 {
     /** @var DirectoryStorage */
     private $storage;
