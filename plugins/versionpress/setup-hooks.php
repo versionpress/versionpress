@@ -34,7 +34,7 @@ defined('ABSPATH') or die("Direct access not allowed");
 
 if (defined('WP_CLI') && WP_CLI) {
     require_once(__DIR__ . '/src/Cli/vp.php');
-    WP_CLI::add_command('vp', VPCommand::class);
+    require_once(__DIR__ . '/src/Cli/vp-composer.php');
 }
 
 if (defined('VP_MAINTENANCE')) {
@@ -370,11 +370,26 @@ function vp_register_hooks()
         return $actions;
     }, 10, 2);
 
-    add_action('vp_revert', function () {
+    add_action('vp_revert', function ($modifiedFiles) {
         // We have to flush the rewrite rules in the next request, because
         // in the current one the changed rewrite rules are not yet effective.
         set_transient('vp_flush_rewrite_rules', 1);
         vp_flush_regenerable_options();
+
+        // Update composer dependencies
+        if (array_search('composer.lock', $modifiedFiles) || array_search('composer.json', $modifiedFiles)) {
+            putenv('COMPOSER_HOME=' . VP_PROJECT_ROOT . '/vendor/bin/composer');
+            $originalCwd = getcwd();
+            chdir(VP_PROJECT_ROOT);
+
+            $input = new \Symfony\Component\Console\Input\ArrayInput(['command' => 'install']);
+            $output = new \Symfony\Component\Console\Output\NullOutput();
+            $application = new \Composer\Console\Application();
+            $application->setAutoExit(false); // prevent `$application->run` method from exitting the script
+            $application->run($input, $output);
+            $application->getComposer();
+            chdir($originalCwd);
+        }
     });
 
     add_action('pre_delete_term', function ($term, $taxonomy) use ($database, $wpdbMirrorBridge) {

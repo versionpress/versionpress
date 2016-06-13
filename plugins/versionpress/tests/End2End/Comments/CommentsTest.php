@@ -29,14 +29,14 @@ class CommentsTest extends End2EndTestCase
 
         self::$worker->prepare_createCommentAwaitingModeration();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->createCommentAwaitingModeration();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("comment/create-pending");
-        $commitAsserter->assertCommitPath("A", "%vpdb%/comments/%VPID%.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("comment/create-pending");
+        $this->commitAsserter->assertCommitPath("A", "%vpdb%/comments/%VPID%.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -49,12 +49,12 @@ class CommentsTest extends End2EndTestCase
 
         self::$worker->prepare_createSpamComment();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->createSpamComment();
 
-        $commitAsserter->assertNumCommits(0);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(0);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -67,15 +67,15 @@ class CommentsTest extends End2EndTestCase
 
         self::$worker->prepare_createComment();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->createComment();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("comment/create");
-        $commitAsserter->assertCommitTag("VP-Comment-Author", self::$testConfig->testSite->adminName);
-        $commitAsserter->assertCommitPath("A", "%vpdb%/comments/%VPID%.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("comment/create");
+        $this->commitAsserter->assertCommitTag("VP-Comment-Author", self::$testConfig->testSite->adminName);
+        $this->commitAsserter->assertCommitPath("A", "%vpdb%/comments/%VPID%.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -88,15 +88,15 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_editComment();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->editComment();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("comment/edit");
-        $commitAsserter->assertCommitTag("VP-Comment-Author", self::$testConfig->testSite->adminName);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("comment/edit");
+        $this->commitAsserter->assertCommitTag("VP-Comment-Author", self::$testConfig->testSite->adminName);
+        $this->commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -109,14 +109,14 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_trashComment();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->trashComment();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("comment/trash");
-        $commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("comment/trash");
+        $this->commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -129,14 +129,14 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_untrashComment();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->untrashComment();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("comment/untrash");
-        $commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("comment/untrash");
+        $this->commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -149,14 +149,14 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_deleteComment();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->deleteComment();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("comment/delete");
-        $commitAsserter->assertCommitPath("D", "%vpdb%/comments/%VPID%.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("comment/delete");
+        $this->commitAsserter->assertCommitPath("D", "%vpdb%/comments/%VPID%.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -169,14 +169,14 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_unapproveComment();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->unapproveComment();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("comment/unapprove");
-        $commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("comment/unapprove");
+        $this->commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -189,14 +189,14 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_approveComment();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->approveComment();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("comment/approve");
-        $commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("comment/approve");
+        $this->commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -209,14 +209,14 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_markAsSpam();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->markAsSpam();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("comment/spam");
-        $commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("comment/spam");
+        $this->commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -229,14 +229,14 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_markAsNotSpam();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->markAsNotSpam();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("comment/unspam");
-        $commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("comment/unspam");
+        $this->commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -248,13 +248,13 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_editTwoComments();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->editTwoComments();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction('comment/edit', 2);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction('comment/edit', 2);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -266,13 +266,13 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_deleteTwoComments();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->deleteTwoComments();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction('comment/delete', 2);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction('comment/delete', 2);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -284,13 +284,13 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_moveTwoCommentsInTrash();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->moveTwoCommentsInTrash();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction('comment/trash', 2);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction('comment/trash', 2);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -302,13 +302,13 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_moveTwoCommentsFromTrash();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->moveTwoCommentsFromTrash();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction('comment/untrash', 2);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction('comment/untrash', 2);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -320,13 +320,13 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_markTwoCommentsAsSpam();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->markTwoCommentsAsSpam();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction('comment/spam', 2);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction('comment/spam', 2);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -338,13 +338,13 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_markTwoSpamCommentsAsNotSpam();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->markTwoSpamCommentsAsNotSpam();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction('comment/unspam', 2);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction('comment/unspam', 2);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -356,13 +356,13 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_unapproveTwoComments();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->unapproveTwoComments();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction('comment/unapprove', 2);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction('comment/unapprove', 2);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -374,13 +374,13 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_approveTwoComments();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->approveTwoComments();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction('comment/approve', 2);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction('comment/approve', 2);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -392,13 +392,13 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_commentmetaCreate();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->commentmetaCreate();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("commentmeta/create", 0, true);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("commentmeta/create", 0, true);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -411,13 +411,13 @@ class CommentsTest extends End2EndTestCase
     {
         self::$worker->prepare_commentmetaDelete();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->commentmetaDelete();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("commentmeta/delete", 0, true);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("commentmeta/delete", 0, true);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 }

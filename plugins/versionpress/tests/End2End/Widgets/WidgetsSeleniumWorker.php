@@ -9,7 +9,7 @@ class WidgetsTestSeleniumWorker extends SeleniumWorker implements IWidgetsTestWo
 
     public function prepare_createWidget()
     {
-        $this->url('wp-admin/widgets.php');
+        $this->url(self::$wpAdminPath . '/widgets.php');
         $this->jsClick("#widget-list .widget:contains('Calendar') .widget-control-edit");
         $this->waitAfterRedirect();
     }
@@ -23,7 +23,7 @@ class WidgetsTestSeleniumWorker extends SeleniumWorker implements IWidgetsTestWo
 
     public function prepare_editWidget()
     {
-        $this->url('wp-admin/widgets.php');
+        $this->url(self::$wpAdminPath . '/widgets.php');
     }
 
     public function editWidget()
@@ -38,7 +38,7 @@ class WidgetsTestSeleniumWorker extends SeleniumWorker implements IWidgetsTestWo
 
     public function prepare_deleteWidget()
     {
-        $this->url('wp-admin/widgets.php');
+        $this->url(self::$wpAdminPath . '/widgets.php');
     }
 
     public function deleteWidget()

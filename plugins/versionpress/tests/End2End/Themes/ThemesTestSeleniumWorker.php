@@ -21,7 +21,7 @@ class ThemesTestSeleniumWorker extends SeleniumWorker implements IThemesTestWork
 
     public function prepare_uploadTheme()
     {
-        $this->url('wp-admin/theme-install.php?upload');
+        $this->url(self::$wpAdminPath . '/theme-install.php?upload');
     }
 
     public function uploadTheme()
@@ -33,7 +33,7 @@ class ThemesTestSeleniumWorker extends SeleniumWorker implements IThemesTestWork
 
     public function prepare_switchTheme()
     {
-        $this->url('wp-admin/themes.php');
+        $this->url(self::$wpAdminPath . '/themes.php');
     }
 
     public function switchTheme()
@@ -44,7 +44,7 @@ class ThemesTestSeleniumWorker extends SeleniumWorker implements IThemesTestWork
 
     public function prepare_deleteTheme()
     {
-        $this->url('wp-admin/themes.php');
+        $this->url(self::$wpAdminPath . '/themes.php');
     }
 
     public function deleteTheme()

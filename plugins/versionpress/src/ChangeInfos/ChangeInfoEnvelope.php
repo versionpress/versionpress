@@ -46,6 +46,7 @@ class ChangeInfoEnvelope implements ChangeInfo
         "user" => BulkUserChangeInfo::class,
         "usermeta" => BulkUserMetaChangeInfo::class,
         "versionpress" => BulkRevertChangeInfo::class,
+        "composer" => ComposerChangeInfo::class,
     ];
 
     /**

@@ -22,6 +22,7 @@ use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\PathUtils;
+use VersionPress\Utils\Process;
 use VersionPress\Utils\RequirementsChecker;
 use VersionPress\Utils\WorkflowUtils;
 use VersionPress\VersionPress;
@@ -205,6 +206,14 @@ class VPCommand extends WP_CLI_Command
     public function restoreSite($args, $assoc_args)
     {
 
+        if (file_exists(getcwd() . '/composer.json')) {
+            $proc = proc_open("composer install", [1 => ["pipe","w"], ["pipe","w"]], $_);
+            $result = proc_close($proc);
+            if ($result !== 0) {
+                WP_CLI::error('Composer dependencies could not be restored.');
+            }
+        }
+
         defined('SHORTINIT') or define('SHORTINIT', true);
 
         require_once __DIR__ . '/../Initialization/WpConfigSplitter.php';
@@ -233,8 +242,10 @@ class VPCommand extends WP_CLI_Command
         $url = $assoc_args['siteurl'];
 
         // Update URLs in wp-config.php
+        define('VP_INDEX_DIR', dirname(\WP_CLI\Utils\locate_wp_config())); // just for the following method
         $this->setConfigUrl('WP_CONTENT_URL', 'WP_CONTENT_DIR', ABSPATH . 'wp-content', $url);
         $this->setConfigUrl('WP_PLUGIN_URL', 'WP_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins', $url);
+        $this->setConfigUrl('WP_HOME', 'VP_INDEX_DIR', VP_PROJECT_ROOT, $url);
 
         WpConfigSplitter::ensureCommonConfigInclude($wpConfigPath);
 
@@ -278,6 +289,10 @@ class VPCommand extends WP_CLI_Command
             WP_CLI::error($process->getConsoleOutput());
         }
 
+        // Fail-safe for gitignored WordPress
+        if (!WpdbReplacer::isReplaced()) {
+            WpdbReplacer::replaceMethods();
+        }
 
         // The next couple of the steps need to be done after WP is fully loaded; we use `finish-init-clone` for that
         // The main reason for this is that we need properly set WP_CONTENT_DIR constant for reading from storages
@@ -592,6 +607,9 @@ class VPCommand extends WP_CLI_Command
      * 'clone' command), a path or a URL. Defaults to 'origin' which is
      * automatically set in every clone by the 'clone' command.
      *
+     * [--continue]
+     * : Finishes the pull after solving merge conflicts.
+     *
      * ## EXAMPLES
      *
      * Let's have a site 'wpsite' and a clone 'myclone' created from it. To pull the changes
@@ -609,13 +627,26 @@ class VPCommand extends WP_CLI_Command
      */
     public function pull($args = [], $assoc_args = [])
     {
-        global $versionPressContainer;
-
         if (!VersionPress::isActive()) {
             WP_CLI::error(
                 'This site is not tracked by VersionPress. Please run "wp vp activate" before cloning / merging.'
             );
         }
+
+        if (isset($assoc_args['continue'])) {
+            $process = new Process('git diff --name-only --diff-filter=U', VP_PROJECT_ROOT);
+            $process->run();
+
+            if ($process->getConsoleOutput() !== '') {
+                WP_CLI::error(
+                    'There are still some conflicts. Please resolve them and run `wp vp pull --continue` again.'
+                );
+            }
+
+            $this->finishPull();
+            return;
+        }
+
 
         $remote = isset($assoc_args['from']) ? $assoc_args['from'] : 'origin';
 
@@ -655,7 +686,7 @@ class VPCommand extends WP_CLI_Command
                     WP_CLI::success("");
                     WP_CLI::success(" 1. Resolve the conflicts manually as in a standard Git workflow");
                     WP_CLI::success(" 2. Stage and `git commit` the changes");
-                    WP_CLI::success(" 3. Return here and run `wp vp apply-changes`");
+                    WP_CLI::success(" 3. Return here and run `wp vp pull --continue`");
                     WP_CLI::success("");
                     WP_CLI::success("That last step will turn the maintenance mode off.");
                     WP_CLI::success("You can also abort the merge manually by running `git merge --abort`");
@@ -674,6 +705,23 @@ class VPCommand extends WP_CLI_Command
             } else { // not a merge conflict, some other error
                 $this->switchMaintenance('off');
                 WP_CLI::error("Changes from $remote couldn't be pulled. Details:\n\n" . $process->getConsoleOutput());
+            }
+        }
+
+        $this->finishPull();
+
+    }
+
+    private function finishPull()
+    {
+        global $versionPressContainer;
+
+        if (file_exists(VP_PROJECT_ROOT . '/composer.json')) {
+            $process = VPCommandUtils::exec('composer install', VP_PROJECT_ROOT);
+            if ($process->isSuccessful()) {
+                WP_CLI::success('Installed Composer dependencies');
+            } else {
+                WP_CLI::error('Composer dependencies could not be restored.');
             }
         }
 
@@ -1082,10 +1130,17 @@ class VPCommand extends WP_CLI_Command
             $environmentConstant => $environment,
         ];
 
-        $this->runVPInternalCommand('update-config', ['table_prefix', $dbPrefix, 'variable' => null], $clonePath);
+        $process = $this->runVPInternalCommand(
+            'update-config',
+            ['table_prefix', $dbPrefix, 'variable' => null],
+            $clonePath
+        );
+
+        echo $process->getConsoleOutput();
 
         foreach ($replacements as $constant => $value) {
-            $this->runVPInternalCommand('update-config', [$constant, $value], $clonePath);
+            $process = $this->runVPInternalCommand('update-config', [$constant, $value], $clonePath);
+            echo $process->getConsoleOutput();
         }
 
         WP_CLI::success("wp-config.php updated");
@@ -1168,9 +1223,9 @@ class VPCommand extends WP_CLI_Command
     private function setConfigUrl($urlConstant, $pathConstant, $defaultPath, $baseUrl)
     {
         if (defined($pathConstant) && constant($pathConstant) !== $defaultPath) {
-            $relativePathToWpContent = str_replace(getcwd(), '', realpath(constant($pathConstant)));
-            $url = $baseUrl . str_replace('//', '/', '/' . $relativePathToWpContent);
-
+            $wpConfigDir = dirname(\WP_CLI\Utils\locate_wp_config());
+            $relativePathToWpContent = str_replace($wpConfigDir, '', realpath(constant($pathConstant)));
+            $url = rtrim(rtrim($baseUrl, '/') . str_replace('//', '/', '/' . $relativePathToWpContent), '/');
             $this->runVPInternalCommand('update-config', [$urlConstant, $url]);
         }
     }

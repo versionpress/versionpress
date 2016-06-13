@@ -18,6 +18,7 @@ var composer = require('gulp-composer');
 var git = require('gulp-git');
 var merge = require('merge-stream');
 var runSequence = require('run-sequence');
+var execSync = require('child_process').execSync;
 
 
 /**
@@ -91,7 +92,7 @@ gulp.task('prepare-test-deploy', false, function () {
     if (isRelative(sitePath)) {
         sitePath = vpDir + '/tests/' + sitePath;
     }
-    buildDir = sitePath + "/wp-content/plugins/versionpress";
+    buildDir = execSync('wp eval "echo WP_PLUGIN_DIR;"', {cwd: sitePath, encoding: 'utf8'}) + '/versionpress';
 
     isTestDeployBuild = true;
 });

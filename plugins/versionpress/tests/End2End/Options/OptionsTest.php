@@ -20,14 +20,14 @@ class OptionsTest extends End2EndTestCase
     {
         self::$worker->prepare_changeOption();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->changeOption();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction('option/edit');
-        $commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction('option/edit');
+        $this->commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -39,14 +39,14 @@ class OptionsTest extends End2EndTestCase
     {
         self::$worker->prepare_changeTwoOptions();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->changeTwoOptions();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction('option/edit', 2);
-        $commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction('option/edit', 2);
+        $this->commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 }

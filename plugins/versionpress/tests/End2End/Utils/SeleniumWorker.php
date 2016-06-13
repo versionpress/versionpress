@@ -66,12 +66,15 @@ class SeleniumWorker implements ITestWorker
     protected static $wpAutomation;
     /** @var TestConfig */
     protected static $testConfig;
+    /** @var string */
+    protected static $wpAdminPath;
 
     protected static $autologin = true;
 
     public function __construct(TestConfig $testConfig)
     {
         self::$testConfig = $testConfig;
+        self::$wpAdminPath = $testConfig->testSite->wpAdminPath;
 
         if (!self::$sharedSession) {
             self::startSession();
@@ -142,7 +145,7 @@ class SeleniumWorker implements ITestWorker
             return;
         }
 
-        $this->url('wp-admin');
+        $this->url(self::$wpAdminPath);
         usleep(100 * 1000); // sometimes we need to wait for the page to fully load
 
         if (!$this->elementExists('#user_login')) {

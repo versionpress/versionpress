@@ -32,11 +32,14 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
     protected static $shortcodesReplacer;
     /** @var VpidRepository */
     protected static $vpidRepository;
+    /** @var WpAutomation */
+    private static $wpAutomation;
 
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
         self::$testConfig = TestConfig::createDefaultConfig();
+        self::$wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
 
         self::setUpSite();
         DBAsserter::assertFilesEqualDatabase();
@@ -46,10 +49,10 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
         $shortcodeFile = dirname($schemaReflection->getFileName()) . '/wordpress-shortcodes.yml';
 
         /** @var $wp_db_version */
-        require(self::$testConfig->testSite->path . '/wp-includes/version.php');
+        require(self::$wpAutomation->getAbspath() . '/wp-includes/version.php');
 
         if (!function_exists('get_shortcode_regex')) {
-            require_once(self::$testConfig->testSite->path . '/wp-includes/shortcodes.php');
+            require_once(self::$wpAutomation->getAbspath() . '/wp-includes/shortcodes.php');
         }
 
         self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
@@ -74,20 +77,19 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
         self::$vpidRepository = new VpidRepository(self::$database, self::$schemaInfo);
         self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, self::$vpidRepository);
 
-        $vpdbPath = self::$testConfig->testSite->path . '/wp-content/vpdb';
+        $vpdbPath = self::$wpAutomation->getVpdbDir();
         self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$database, []);
         self::$urlReplacer = new AbsoluteUrlReplacer(self::$testConfig->testSite->url);
     }
 
     private static function setUpSite()
     {
-        $wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
-        if (!$wpAutomation->isSiteSetUp()) {
-            $wpAutomation->setUpSite();
+        if (!self::$wpAutomation->isSiteSetUp()) {
+            self::$wpAutomation->setUpSite();
         }
-        if (!$wpAutomation->isVersionPressInitialized()) {
-            $wpAutomation->copyVersionPressFiles();
-            $wpAutomation->initializeVersionPress();
+        if (!self::$wpAutomation->isVersionPressInitialized()) {
+            self::$wpAutomation->copyVersionPressFiles();
+            self::$wpAutomation->initializeVersionPress();
         }
     }
 

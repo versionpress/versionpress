@@ -82,7 +82,12 @@ class ThemeChangeInfo extends TrackedChangeInfo
     {
         $themeChange = ["type" => "path", "path" => $path = WP_CONTENT_DIR . "/themes/" . $this->themeId . "/*"];
         $optionChange = ["type" => "all-storage-files", "entity" => "option"];
-        return [$themeChange, $optionChange];
+        $composerChanges = [
+            ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.json'],
+            ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.lock'],
+        ];
+
+        return array_merge([$themeChange, $optionChange], $composerChanges);
     }
 
     protected function getActionTagValue()

@@ -186,11 +186,11 @@ class RevertTestWpCliWorker extends WpCliWorker implements IRevertTestWorker
 
     public function prepare_undoNonDbChange()
     {
-        $themeFile = 'wp-content/themes/twentyfifteen/header.php';
-        file_put_contents($this->testConfig->testSite->path . '/' . $themeFile, '');
-        $this->repository->stageAll($themeFile);
+        $newFile = 'vp-file.txt';
+        file_put_contents($this->testConfig->testSite->path . '/' . $newFile, '');
+        $this->repository->stageAll($newFile);
         $this->repository->commit('Manual commit', 'John Tester', 'john.tester@example.com');
-        return [['M', $themeFile]];
+        return [['D', $newFile]];
     }
 
     public function undoNonDbChange()

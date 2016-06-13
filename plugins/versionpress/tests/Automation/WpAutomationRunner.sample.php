@@ -4,6 +4,8 @@ namespace VersionPress\Tests\Automation;
 
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Tests\Utils\TestConfig;
+use VersionPress\Utils\FileSystem;
+use VersionPress\Utils\Process;
 
 /**
  * An example of how to run WpAutomation methods from PhpStorm via "unit tests".
@@ -23,6 +25,8 @@ class WpAutomationRunnerSample extends \PHPUnit_Framework_TestCase
         $wpAutomation->setUpSite();
         $wpAutomation->copyVersionPressFiles();
         $wpAutomation->activateVersionPress();
+
+        $wpAutomation->runWpCliCommand('vp', 'config', ['VP_PROJECT_ROOT', '.']);
     }
 
     /**

@@ -104,6 +104,9 @@ class WordPressUpdateChangeInfo extends TrackedChangeInfo
 
             // Translations
             ["type" => "path", "path" => WP_CONTENT_DIR . '/languages/*'],
+
+            ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.json'],
+            ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.lock'],
         ];
     }
 }

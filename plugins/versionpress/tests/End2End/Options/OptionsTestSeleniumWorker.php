@@ -9,7 +9,7 @@ class OptionsTestSeleniumWorker extends SeleniumWorker implements IOptionsTestWo
 
     public function prepare_changeOption()
     {
-        $this->url('wp-admin/options-general.php');
+        $this->url(self::$wpAdminPath . '/options-general.php');
     }
 
     public function changeOption()
@@ -21,7 +21,7 @@ class OptionsTestSeleniumWorker extends SeleniumWorker implements IOptionsTestWo
 
     public function prepare_changeTwoOptions()
     {
-        $this->url('wp-admin/options-general.php');
+        $this->url(self::$wpAdminPath . '/options-general.php');
     }
 
     public function changeTwoOptions()

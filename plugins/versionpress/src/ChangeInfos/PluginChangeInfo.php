@@ -105,7 +105,11 @@ class PluginChangeInfo extends TrackedChangeInfo
 
         $pluginChange = ["type" => "path", "path" => $pluginPath];
         $optionChange = ["type" => "path", "path" => VP_VPDB_DIR];
+        $composerChanges = [
+            ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.json'],
+            ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.lock'],
+        ];
 
-        return [$pluginChange, $optionChange];
+        return array_merge([$pluginChange, $optionChange], $composerChanges);
     }
 }

@@ -3,6 +3,7 @@
 namespace VersionPress\Tests\End2End\Revert;
 
 use VersionPress\Tests\End2End\Utils\SeleniumWorker;
+use VersionPress\Utils\Process;
 
 class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWorker
 {
@@ -11,7 +12,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
     {
         $this->createTestPost();
         $this->switchToHtmlGui();
-        $this->url('wp-admin/admin.php?page=versionpress/');
+        $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
         return [['D', '%vpdb%/posts/*']];
     }
 
@@ -25,7 +26,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         self::$wpAutomation->editOption('blogname', 'Blogname for undo test');
         $this->createTestPost();
         $this->switchToHtmlGui();
-        $this->url('wp-admin/admin.php?page=versionpress/');
+        $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
         return [['M', '%vpdb%/options/*']];
     }
 
@@ -38,7 +39,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
     {
         $this->createTestPost();
         $this->switchToHtmlGui();
-        $this->url('wp-admin/admin.php?page=versionpress/');
+        $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
         return [['A', '%vpdb%/posts/*']];
     }
 
@@ -49,7 +50,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         self::$wpAutomation->deleteComment($commentId);
         self::$wpAutomation->deletePost($postId);
         $this->switchToHtmlGui();
-        $this->url('wp-admin/admin.php?page=versionpress/');
+        $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
     }
 
     public function tryRestoreEntityWithMissingReference()
@@ -64,7 +65,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         $this->createCommentForPost($postId);
         self::$wpAutomation->editOption('blogname', 'Blogname for rollback test');
         $this->switchToHtmlGui();
-        $this->url('wp-admin/admin.php?page=versionpress/');
+        $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
         return [
             ['D', '%vpdb%/posts/*'],
             ['D', '%vpdb%/comments/*'],
@@ -81,7 +82,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
     {
         $this->createTestPost();
         $this->switchToHtmlGui();
-        $this->url('wp-admin/admin.php?page=versionpress/');
+        $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
     }
 
     public function clickOnCancel()
@@ -96,14 +97,14 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
     {
         $this->createTestPost();
         $this->switchToHtmlGui();
-        $this->url('wp-admin/admin.php?page=versionpress/');
+        $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
     }
 
     public function prepare_undoToTheSameState()
     {
         $this->createTestPost();
         $this->switchToHtmlGui();
-        $this->url('wp-admin/admin.php?page=versionpress/');
+        $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
         $this->undoLastCommit();
     }
 
@@ -112,7 +113,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         $postId = $this->createTestPost();
         self::$wpAutomation->deletePost($postId);
         $this->switchToHtmlGui();
-        $this->url('wp-admin/admin.php?page=versionpress/');
+        $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
     }
 
     public function rollbackToTheSameState()
@@ -153,9 +154,9 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
     public function prepare_undoNonDbChange()
     {
         $this->switchToJavaScriptGui();
-        $themeFile = 'wp-content/themes/twentyfifteen/header.php';
-        file_put_contents(self::$testConfig->testSite->path . '/' . $themeFile, '');
-        $this->url('wp-admin/admin.php?page=versionpress/');
+        $newFile = '/vp-file.txt';
+        file_put_contents(self::$testConfig->testSite->path . '/' . $newFile, '');
+        $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
         $this->waitForElement('.CommitPanel');
         $this->jsClick('.CommitPanel-notice-toggle');
         $this->waitForElement('.CommitPanel-commit-button');
@@ -166,9 +167,9 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         sleep(1);
 
         $this->switchToHtmlGui();
-        $this->url('wp-admin/admin.php?page=versionpress/');
+        $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
 
-        return [['M', $themeFile]];
+        return [['D', $newFile]];
     }
 
     public function undoNonDbChange()
@@ -191,7 +192,9 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
             "post_author" => 1
         ];
 
-        return self::$wpAutomation->createPost($post);
+        $postId = self::$wpAutomation->createPost($post);
+        (new Process('echo foo'))->run();
+        return $postId;
     }
 
     private function createCommentForPost($postId)
@@ -207,7 +210,9 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
             "comment_post_ID" => $postId,
         ];
 
-        return self::$wpAutomation->createComment($comment);
+        $commentId = self::$wpAutomation->createComment($comment);
+        (new Process('echo foo'))->run();
+        return $commentId;
     }
 
     private function revertLastCommit()
@@ -233,20 +238,22 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
 
     private function switchToHtmlGui()
     {
+        $pluginsDir = self::$wpAutomation->getPluginsDir();
         $updateConfigArgs = [
             'VERSIONPRESS_GUI',
             'html',
-            'require' => 'wp-content/plugins/versionpress/src/Cli/vp-internal.php'
+            'require' => $pluginsDir . '/versionpress/src/Cli/vp-internal.php'
         ];
         self::$wpAutomation->runWpCliCommand('vp-internal', 'update-config', $updateConfigArgs);
     }
 
     private function switchToJavaScriptGui()
     {
+        $pluginsDir = self::$wpAutomation->getPluginsDir();
         $updateConfigArgs = [
             'VERSIONPRESS_GUI',
             'javascript',
-            'require' => 'wp-content/plugins/versionpress/src/Cli/vp-internal.php'
+            'require' => $pluginsDir . '/versionpress/src/Cli/vp-internal.php'
         ];
         self::$wpAutomation->runWpCliCommand('vp-internal', 'update-config', $updateConfigArgs);
     }

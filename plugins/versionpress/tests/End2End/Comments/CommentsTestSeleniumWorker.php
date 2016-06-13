@@ -73,7 +73,7 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
 
     protected function logOut()
     {
-        $this->url('wp-login.php?action=logout');
+        $this->url(dirname(self::$wpAdminPath) . '/wp-login.php?action=logout');
         $this->byCssSelector('body>p>a')->click();
         $this->waitAfterRedirect();
     }
@@ -117,21 +117,21 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
 
     public function untrashComment()
     {
-        $this->url('wp-admin/edit-comments.php?comment_status=trash');
+        $this->url(self::$wpAdminPath . '/edit-comments.php?comment_status=trash');
         $this->jsClickAndWait('#the-comment-list tr:first-child .untrash a');
     }
 
     public function prepare_deleteComment()
     {
-        $this->url('wp-admin/edit-comments.php');
+        $this->url(self::$wpAdminPath . '/edit-comments.php');
         $this->jsClickAndWait('#the-comment-list tr:first-child .trash a');
-        $this->url('wp-admin/edit-comments.php?comment_status=trash');
+        $this->url(self::$wpAdminPath . '/edit-comments.php?comment_status=trash');
     }
 
     public function deleteComment()
     {
         $this->jsClickAndWait('#the-comment-list tr:first-child .delete a');
-        $this->url('wp-admin/edit-comments.php');
+        $this->url(self::$wpAdminPath . '/edit-comments.php');
     }
 
     public function prepare_unapproveComment()
@@ -141,7 +141,7 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
 
     public function unapproveComment()
     {
-        $this->url('wp-admin/edit-comments.php');
+        $this->url(self::$wpAdminPath . '/edit-comments.php');
         $this->jsClickAndWait('#the-comment-list tr:first-child .unapprove a');
     }
 
@@ -151,7 +151,7 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
 
     public function approveComment()
     {
-        $this->url('wp-admin/edit-comments.php?comment_status=moderated');
+        $this->url(self::$wpAdminPath . '/edit-comments.php?comment_status=moderated');
         $this->jsClickAndWait('#the-comment-list tr:first-child .approve a');
     }
 
@@ -161,7 +161,7 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
 
     public function markAsSpam()
     {
-        $this->url('wp-admin/edit-comments.php');
+        $this->url(self::$wpAdminPath . '/edit-comments.php');
         $this->jsClickAndWait('#the-comment-list tr:first-child .spam a');
     }
 
@@ -171,7 +171,7 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
 
     public function markAsNotSpam()
     {
-        $this->url('wp-admin/edit-comments.php?comment_status=spam');
+        $this->url(self::$wpAdminPath . '/edit-comments.php?comment_status=spam');
         $this->jsClickAndWait('#the-comment-list tr:first-child .unspam a');
     }
 
@@ -195,7 +195,7 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
 
     public function deleteTwoComments()
     {
-        $this->url('wp-admin/edit-comments.php?comment_status=trash');
+        $this->url(self::$wpAdminPath . '/edit-comments.php?comment_status=trash');
         $this->performBulkActionWithTwoLastComments('delete');
     }
 
@@ -209,7 +209,7 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
 
     public function moveTwoCommentsInTrash()
     {
-        $this->url('wp-admin/edit-comments.php');
+        $this->url(self::$wpAdminPath . '/edit-comments.php');
         $this->performBulkActionWithTwoLastComments('trash');
     }
 
@@ -219,7 +219,7 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
 
     public function moveTwoCommentsFromTrash()
     {
-        $this->url('wp-admin/edit-comments.php?comment_status=trash');
+        $this->url(self::$wpAdminPath . '/edit-comments.php?comment_status=trash');
         $this->performBulkActionWithTwoLastComments('untrash');
     }
 
@@ -229,7 +229,7 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
 
     public function markTwoCommentsAsSpam()
     {
-        $this->url('wp-admin/edit-comments.php');
+        $this->url(self::$wpAdminPath . '/edit-comments.php');
         $this->performBulkActionWithTwoLastComments('spam');
     }
 
@@ -239,7 +239,7 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
 
     public function markTwoSpamCommentsAsNotSpam()
     {
-        $this->url('wp-admin/edit-comments.php?comment_status=spam');
+        $this->url(self::$wpAdminPath . '/edit-comments.php?comment_status=spam');
         $this->performBulkActionWithTwoLastComments('unspam');
     }
 
@@ -259,7 +259,7 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
 
     public function unapproveTwoComments()
     {
-        $this->url('wp-admin/edit-comments.php');
+        $this->url(self::$wpAdminPath . '/edit-comments.php');
         $this->performBulkActionWithTwoLastComments('unapprove');
     }
 
@@ -269,7 +269,7 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
 
     public function approveTwoComments()
     {
-        $this->url('wp-admin/edit-comments.php?comment_status=moderated');
+        $this->url(self::$wpAdminPath . '/edit-comments.php?comment_status=moderated');
         $this->performBulkActionWithTwoLastComments('approve');
     }
 
@@ -298,7 +298,7 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
 
     public function commentmetaCreate()
     {
-        $this->url('wp-admin/edit-comments.php');
+        $this->url(self::$wpAdminPath . '/edit-comments.php');
         $this->jsClickAndWait('#the-comment-list tr:first-child .spam a');
     }
 
@@ -308,7 +308,7 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
 
     public function commentmetaDelete()
     {
-        $this->url('wp-admin/edit-comments.php?comment_status=spam');
+        $this->url(self::$wpAdminPath . '/edit-comments.php?comment_status=spam');
         $this->jsClickAndWait('#the-comment-list tr:first-child .unspam a');
     }
 }
