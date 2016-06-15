@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 interface CommitPanelOverviewProps extends React.Props<JSX.Element> {
-  gitStatus: Wp.GetGitStatusResponse;
+  gitStatus: VpApi.GetGitStatusResponse;
 }
 
 interface CommitPanelOverviewState {

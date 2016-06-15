@@ -1,4 +1,4 @@
-declare module Wp {
+declare module VpApi {
   interface GetCommitsResponse {
     pages: number[];
     commits: Commit[];
