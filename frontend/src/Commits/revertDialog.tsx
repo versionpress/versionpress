@@ -42,7 +42,7 @@ export function revertDialog(title: React.ReactNode, okHandler: Function) {
   const req = WpApi
     .get('can-revert')
     .end((err: any, res: request.Response) => {
-      const data = res.body.data;
+      const data = res.body.data as Wp.CanRevertResponse;
       if (data === true) {
         const body = <UndoEnabledDialog />;
         portal.confirmDialog(title, body, okHandler, () => {}, {});

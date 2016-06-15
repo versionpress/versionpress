@@ -125,7 +125,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .query({page: page, query: encodeURIComponent(this.state.query)})
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
-        const data = res.body.data;
+        const data = res.body.data as Wp.GetCommitsResponse;
         if (err) {
           this.setState({
             pages: [],
@@ -151,7 +151,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     WpApi
       .get('display-welcome-panel')
       .end((err: any, res: request.Response) => {
-        const data = res.body.data;
+        const data = res.body.data as Wp.DisplayWelcomePanelResponse;
         if (err) {
           return;
         }
@@ -171,7 +171,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .get('should-update')
       .query({query: encodeURIComponent(this.state.query), latestCommit: this.state.commits[0].hash})
       .end((err: any, res: request.Response) => {
-        const data = res.body.data;
+        const data = res.body.data as Wp.ShouldUpdateResponse;
         if (err) {
           this.setState({
             displayUpdateNotice: false,
@@ -230,7 +230,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       WpApi
         .get('git-status')
         .end((err, res: request.Response) => {
-          const data = res.body.data;
+          const data = res.body.data as Wp.GetGitStatusResponse;
           if (err) {
             reject(HomePage.getErrorMessage(res, err));
           } else {
@@ -247,7 +247,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         .get('diff')
         .query(query)
         .end((err, res: request.Response) => {
-          const data = res.body.data;
+          const data = res.body.data as Wp.GetDiffResponse;
           if (err) {
             reject(HomePage.getErrorMessage(res, err));
           } else {
