@@ -28,7 +28,6 @@ Minimum system requirements are (as a general rule, **we recommend using the lat
  - PHP 5.6 or higher
  - Git 1.9 or higher installed on the server
  - Apache, nginx or IIS 7+ web server
- - Safe mode turned off
  - `proc_open()` enabled
  - Write permissions in the site root and everywhere under it
  - Standard WordPress configuration system (`wp-config.php`)
