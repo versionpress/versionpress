@@ -970,8 +970,6 @@ function vp_enqueue_admin_styles_and_scripts()
 //---------------------------------
 // API
 //---------------------------------
-require(__DIR__ . "/src/Api/BundledWpApi/rest-api.php");
-
 add_action('rest_api_init', 'versionpress_api_init');
 function versionpress_api_init()
 {
