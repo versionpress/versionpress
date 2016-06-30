@@ -32,37 +32,41 @@ class DBAsserter
     private static $shortcodesReplacer;
     /** @var VpidRepository */
     private static $vpidRepository;
+    /** @var WpAutomation */
+    private static $wpAutomation;
 
 
     public static function assertFilesEqualDatabase()
     {
+        HookMock::setUp(HookMock::TRUE_HOOKS);
         self::staticInitialization();
         $entityNames = self::$schemaInfo->getAllEntityNames();
         foreach ($entityNames as $entityName) {
             self::assertEntitiesEqualDatabase($entityName);
         }
         self::clearGlobalVariables();
+        HookMock::tearDown();
     }
 
     private static function staticInitialization()
     {
         self::$testConfig = TestConfig::createDefaultConfig();
-        $wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
+        self::$wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
 
         $schemaReflection = new \ReflectionClass(DbSchemaInfo::class);
         $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.yml';
         $shortcodeFile = dirname($schemaReflection->getFileName()) . '/wordpress-shortcodes.yml';
 
         /** @var $wp_db_version */
-        require($wpAutomation->getAbspath() . '/wp-includes/version.php');
+        require(self::$wpAutomation->getAbspath() . '/wp-includes/version.php');
 
         if (!function_exists('get_shortcode_regex')) {
-            require_once($wpAutomation->getAbspath() . '/wp-includes/shortcodes.php');
+            require_once(self::$wpAutomation->getAbspath() . '/wp-includes/shortcodes.php');
         }
 
         self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
 
-        $rawTaxonomies = $wpAutomation->runWpCliCommand(
+        $rawTaxonomies = self::$wpAutomation->runWpCliCommand(
             'taxonomy',
             'list',
             ['format' => 'json', 'fields' => 'name']
@@ -82,8 +86,10 @@ class DBAsserter
         self::$vpidRepository = new VpidRepository(self::$vp_database, self::$schemaInfo);
         self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, self::$vpidRepository);
 
-        $vpdbPath = $wpAutomation->getVpdbDir();
+        $vpdbPath = self::$wpAutomation->getVpdbDir();
         self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$vp_database, $taxonomies);
+
+        require(self::$wpAutomation->getPluginsDir() . '/versionpress/.versionpress/hooks.php');
 
         self::defineGlobalVariables();
     }
@@ -335,19 +341,28 @@ class DBAsserter
      */
     private static function defineGlobalVariables()
     {
-        global $versionPressContainer, $wpdb;
+        global $versionPressContainer, $wpdb, $wp_taxonomies;
 
         defined('VERSIONPRESS_PLUGIN_DIR') || define('VERSIONPRESS_PLUGIN_DIR', self::$testConfig->testSite->path .
             '/wp-content/plugins/versionpress');
         defined('VP_VPDB_DIR') || define('VP_VPDB_DIR', self::$testConfig->testSite->path . '/wp-content/vpdb');
         $versionPressContainer = DIContainer::getConfiguredInstance();
         $wpdb = self::$wpdb;
+
+        $rawTaxonomies = self::$wpAutomation->runWpCliCommand(
+            'taxonomy',
+            'list',
+            ['format' => 'json', 'fields' => 'name']
+        );
+        $taxonomies = ArrayUtils::column(json_decode($rawTaxonomies, true), 'name');
+        $wp_taxonomies = array_combine($taxonomies, $taxonomies);
     }
 
     private static function clearGlobalVariables()
     {
-        global $versionPressContainer, $wpdb;
+        global $versionPressContainer, $wpdb, $wp_taxonomies;
         $versionPressContainer = null;
         $wpdb = null;
+        $wp_taxonomies = null;
     }
 }

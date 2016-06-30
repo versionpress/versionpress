@@ -2,15 +2,17 @@
 
 namespace VersionPress\Tests\StorageTests;
 
+use VersionPress\Tests\Utils\HookMock;
+
 class StorageTestCase extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        \WP_Mock::setUp();
+        HookMock::setUp(HookMock::WP_MOCK);
     }
 
     protected function tearDown()
     {
-        \WP_Mock::tearDown();
+        HookMock::tearDown();
     }
 }

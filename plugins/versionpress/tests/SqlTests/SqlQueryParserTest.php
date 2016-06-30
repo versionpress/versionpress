@@ -9,6 +9,7 @@ use PHPUnit_Framework_TestCase;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ParsedQueryData;
 use VersionPress\Database\SqlQueryParser;
+use VersionPress\Tests\Utils\HookMock;
 
 class SqlQueryParserTest extends PHPUnit_Framework_TestCase
 {
@@ -26,11 +27,17 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
+        HookMock::setUp(HookMock::WP_MOCK);
         self::$DbSchemaInfo = new DbSchemaInfo(
             __DIR__ . '/../../src/Database/wordpress-schema.yml',
             'wp_',
             PHP_INT_MAX
         );
+    }
+
+    public static function tearDownAfterClass()
+    {
+        HookMock::tearDown();
     }
 
     public function setup()
