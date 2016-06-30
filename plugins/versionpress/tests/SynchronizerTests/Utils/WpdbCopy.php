@@ -4,6 +4,42 @@
 define("WP_DEBUG", false);
 define("WP_DEBUG_DISPLAY", false);
 
+
+if ( ! defined( 'OBJECT' ) ) {
+define( 'OBJECT', 'OBJECT' );
+}
+
+if ( ! defined( 'Object' ) ) {
+    define( 'Object', 'OBJECT' );
+}
+
+if ( ! defined( 'object' ) ) {
+    define( 'object', 'OBJECT' );
+}
+
+/**
+ * @since 2.5.0
+ */
+if ( ! defined( 'OBJECT_K' ) ) {
+    define( 'OBJECT_K', 'OBJECT_K' );
+}
+
+/**
+ * @since 0.71
+ */
+if ( ! defined( 'ARRAY_A' ) ) {
+    define( 'ARRAY_A', 'ARRAY_A' );
+}
+
+/**
+ * @since 0.71
+ */
+if ( ! defined( 'ARRAY_N' ) ) {
+    define( 'ARRAY_N', 'ARRAY_N' );
+}
+
+
+
 function is_multisite()
 {
     return false;
