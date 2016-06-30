@@ -5,7 +5,22 @@ namespace VersionPress\Tests\Utils;
 use VersionPress\Utils\ArrayUtils;
 
 /**
- * TODO
+ * Class used for mocking hooks in tests.
+ *
+ * It does two types of "mocking":
+ *   a) The first type simulates behavior of WordPress (TRUE_HOOKS). With this type you can call `add_filter` and `apply_filters`
+ *      and the registered filter will be actually executed.
+ *   b) The second type uses WP_MOCK. You can use all features of WP_MOCK if you choose it. The problem is,
+ *      WP_MOCK does not execute the registered hooks; therefore, we introduced this thin wrapper.
+ *
+ * Usage:
+ *
+ * Just call `HookMock::setUp` with desired type of mocking in the `setUp` method of your test case
+ * and `HookMock::tearDown` in the `tearDown` method.
+ *
+ * Note:
+ * For now, this class supports only filters.
+ *
  */
 class HookMock
 {
