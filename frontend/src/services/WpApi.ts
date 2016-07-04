@@ -1,4 +1,5 @@
 /// <reference path='../../typings/typings.d.ts' />
+/// <reference path='./Wp.d.ts' />
 
 import * as request from 'superagent';
 import config from '../config';

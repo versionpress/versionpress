@@ -82,7 +82,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
   static getErrorMessage(res: request.Response, err: any) {
     if (res) {
-      const body = Array.isArray(res.body) ? res.body[0] : res.body;
+      const body = res.body;
       if ('code' in body && 'message' in body) {
         return body;
       }
@@ -125,6 +125,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .query({page: page, query: encodeURIComponent(this.state.query)})
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
+        const data = res.body.data as VpApi.GetCommitsResponse;
         if (err) {
           this.setState({
             pages: [],
@@ -135,8 +136,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           });
         } else {
           this.setState({
-            pages: res.body.pages.map(c => c + 1),
-            commits: res.body.commits as Commit[],
+            pages: data.pages.map(c => c + 1),
+            commits: data.commits,
             message: null,
             loading: false,
             displayUpdateNotice: false
@@ -150,10 +151,11 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     WpApi
       .get('display-welcome-panel')
       .end((err: any, res: request.Response) => {
+        const data = res.body.data as VpApi.DisplayWelcomePanelResponse;
         if (err) {
           return;
         }
-        if (res.body[0] === true) {
+        if (data === true) {
           this.setState({displayWelcomePanel: true});
         } else {
           this.setState({displayWelcomePanel: false});
@@ -169,6 +171,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .get('should-update')
       .query({query: encodeURIComponent(this.state.query), latestCommit: this.state.commits[0].hash})
       .end((err: any, res: request.Response) => {
+        const data = res.body.data as VpApi.ShouldUpdateResponse;
         if (err) {
           this.setState({
             displayUpdateNotice: false,
@@ -177,8 +180,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           clearInterval(this.refreshInterval);
         } else {
           this.setState({
-            displayUpdateNotice: !this.props.params.page && res.body.update === true,
-            dirtyWorkingDirectory: res.body.cleanWorkingDirectory !== true
+            displayUpdateNotice: !this.props.params.page && data.update === true,
+            dirtyWorkingDirectory: data.cleanWorkingDirectory !== true
           });
         }
       });
@@ -227,10 +230,11 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       WpApi
         .get('git-status')
         .end((err, res: request.Response) => {
+          const data = res.body.data as VpApi.GetGitStatusResponse;
           if (err) {
             reject(HomePage.getErrorMessage(res, err));
           } else {
-            resolve(res.body);
+            resolve(data);
           }
         });
     });
@@ -243,10 +247,11 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         .get('diff')
         .query(query)
         .end((err, res: request.Response) => {
+          const data = res.body.data as VpApi.GetDiffResponse;
           if (err) {
             reject(HomePage.getErrorMessage(res, err));
           } else {
-            resolve(res.body.diff);
+            resolve(data.diff);
           }
         });
     });
