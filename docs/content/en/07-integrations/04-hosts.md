@@ -18,6 +18,7 @@ Here are a couple of hosts that we or our users confirmed work fine with Version
  - [Pair Shared Hosting](https://www.pair.com/hosting/shared/) – by pair Networks
  - [Elbia Hosting (SK)](http://www.elbiahosting.sk/) – Slovak hosting company
  - [SiteGround](https://www.siteground.com/) – VersionPress can be installed but [some issues have been reported](https://github.com/versionpress/support/issues/46)
+ - [WebHostFace](https://www.webhostface.com/) – SSD-powered hosting with Free SSLs & 24/7 Expert WordPress Support
 
 <div class="note">
   <p><strong>Help us improve this list</strong></p>
