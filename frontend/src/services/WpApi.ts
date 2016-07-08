@@ -1,5 +1,5 @@
 /// <reference path='../../typings/typings.d.ts' />
-/// <reference path='./Wp.d.ts' />
+/// <reference path='./VpApi.d.ts' />
 
 import * as request from 'superagent';
 import config from '../config';
