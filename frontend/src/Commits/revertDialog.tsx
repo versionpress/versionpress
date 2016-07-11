@@ -48,5 +48,5 @@ export function revertDialog(title: React.ReactNode, okHandler: Function) {
     });
 
   const cancelHandler = () => { req.abort(); };
-  portal.confirmDialog(title, '', () => {}, cancelHandler, {loading: true});
+  portal.confirmDialog(title, '', () => {}, cancelHandler, {isLoading: true});
 }
