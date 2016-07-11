@@ -466,7 +466,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           currentPage={parseInt(this.props.params.page, 10) || 1}
           pages={this.state.pages}
           commits={this.state.commits}
-          selected={this.state.selectedCommits}
+          selectedCommits={this.state.selectedCommits}
           enableActions={enableActions}
           onCommitSelect={this.onCommitSelect}
           onUndo={this.onUndo}

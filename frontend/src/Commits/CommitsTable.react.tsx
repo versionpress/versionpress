@@ -16,7 +16,7 @@ interface CommitsTableProps extends React.Props<JSX.Element> {
   currentPage: number;
   pages: number[];
   commits: Commit[];
-  selected: Commit[];
+  selectedCommits: Commit[];
   enableActions: boolean;
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
@@ -56,7 +56,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
                         key={commit.hash}
                         commit={commit}
                         enableActions={this.props.enableActions}
-                        isSelected={indexOf(this.props.selected, commit) !== -1}
+                        isSelected={indexOf(this.props.selectedCommits, commit) !== -1}
                         onUndo={this.props.onUndo}
                         onRollback={this.props.onRollback}
                         onCommitSelect={this.props.onCommitSelect}
@@ -105,7 +105,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
       return <td className='column-cb' />;
     }
 
-    const allSelected = !_.differenceBy(selectableCommits, this.props.selected, ((value: Commit) => value.hash)).length;
+    const allSelected = !_.differenceBy(selectableCommits, this.props.selectedCommits, ((value: Commit) => value.hash)).length;
     return (
       <td className='column-cb manage-column check-column'>
         <label className='screen-reader-text' htmlFor='CommitsTable-selectAll'>Select All</label>
