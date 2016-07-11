@@ -14,7 +14,9 @@ export default class CommitPanelOverview extends React.Component<CommitPanelOver
 
   constructor() {
     super();
-    this.state = { isExpanded: false };
+    this.state = {
+      isExpanded: false
+    };
   }
 
   render() {
@@ -51,7 +53,9 @@ export default class CommitPanelOverview extends React.Component<CommitPanelOver
   }
 
   private expand() {
-    this.setState({ isExpanded: true });
+    this.setState({
+      isExpanded: true
+    });
   }
 
   private getActionVerb(action: string) {
