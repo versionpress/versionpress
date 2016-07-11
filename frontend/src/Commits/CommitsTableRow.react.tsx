@@ -49,7 +49,7 @@ export default class CommitsTableRow extends React.Component<CommitsTableRowProp
               commit={this.props.commit}
               detailsLevel={this.state.detailsLevel}
               diff={this.state.diff}
-              loading={this.state.isLoading}
+              isLoading={this.state.isLoading}
             />
         }
       </tbody>
