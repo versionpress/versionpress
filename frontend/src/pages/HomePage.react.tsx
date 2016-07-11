@@ -34,7 +34,7 @@ interface HomePageState {
   pages?: number[];
   query?: string;
   commits?: Commit[];
-  selected?: Commit[];
+  selectedCommits?: Commit[];
   lastSelected?: Commit;
   message?: {
     code: string,
@@ -62,7 +62,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       pages: [],
       query: '',
       commits: [],
-      selected: [],
+      selectedCommits: [],
       lastSelected: null,
       message: null,
       loading: true,
@@ -256,7 +256,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   }
 
   onCommitSelect(commits: Commit[], check: boolean, shiftKey: boolean) {
-    let selected = this.state.selected,
+    let selectedCommits = this.state.selectedCommits,
         lastSelected = this.state.lastSelected;
     const bulk = commits.length > 1;
 
@@ -278,19 +278,19 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         const step = (index < lastIndex ? -1 : 1);
         const cond = index + step;
         for (let i = lastIndex; i !== cond; i += step) {
-          const current = this.state.commits[i];
-          const index = indexOf(selected, current);
+          const currentCommit = this.state.commits[i];
+          const index = indexOf(selectedCommits, currentCommit);
           if (check && index === -1) {
-            selected = update(selected, {$push: [current]});
+            selectedCommits = update(selectedCommits, {$push: [currentCommit]});
           } else if (!check && index !== -1) {
-            selected = update(selected, {$splice: [[index, 1]]});
+            selectedCommits = update(selectedCommits, {$splice: [[index, 1]]});
           }
-          lastSelected = current;
+          lastSelected = currentCommit;
         }
       });
 
     this.setState({
-      selected: selected,
+      selectedCommits: selectedCommits,
       lastSelected: (bulk ? null : lastSelected),
     });
   }
@@ -298,9 +298,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   onBulkAction(action: string) {
     if (action === 'undo') {
       const title = (
-        <span>Undo <em>{this.state.selected.length} {this.state.selected.length === 1 ? 'change' : 'changes'}</em>?</span>
+        <span>Undo <em>{this.state.selectedCommits.length} {this.state.selectedCommits.length === 1 ? 'change' : 'changes'}</em>?</span>
       );
-      const hashes = this.state.selected.map((commit: Commit) => commit.hash);
+      const hashes = this.state.selectedCommits.map((commit: Commit) => commit.hash);
 
       revertDialog.revertDialog.call(this, title, () => this.undoCommits(hashes));
     }
@@ -308,7 +308,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
   onClearSelection() {
     this.setState({
-      selected: [],
+      selectedCommits: [],
       lastSelected: null,
     });
   }
@@ -459,14 +459,14 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             enableActions={enableActions}
             onBulkAction={this.onBulkAction.bind(this)}
             onClearSelection={this.onClearSelection.bind(this)}
-            selected={this.state.selected}
+            selectedCommits={this.state.selectedCommits}
           />
         </div>
         <CommitsTable
           currentPage={parseInt(this.props.params.page, 10) || 1}
           pages={this.state.pages}
           commits={this.state.commits}
-          selected={this.state.selected}
+          selected={this.state.selectedCommits}
           enableActions={enableActions}
           onCommitSelect={this.onCommitSelect}
           onUndo={this.onUndo}

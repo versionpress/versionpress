@@ -8,7 +8,7 @@ interface BulkActionPanelProps extends React.Props<JSX.Element> {
   enableActions: boolean;
   onBulkAction: (action: string) => void;
   onClearSelection: () => void;
-  selected: Commit[];
+  selectedCommits: Commit[];
 }
 
 export default class BulkActionPanel extends React.Component<BulkActionPanelProps, {}> {
@@ -29,7 +29,7 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
   }
 
   render() {
-    const selected = this.props.selected;
+    const { selectedCommits, enableActions } = this.props;
 
     return (
       <div className='BulkActionPanel'>
@@ -45,10 +45,10 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
             className='button action'
             value='Apply'
             onClick={this.onBulkAction.bind(this)}
-            disabled={!this.props.enableActions || selected.length === 0}
+            disabled={!enableActions || selectedCommits.length === 0}
           />
-          <div className={'BulkActionPanel-note' + (selected.length === 0 ? ' hide' : '')}>
-            ({selected.length} {selected.length === 1 ? 'change' : 'changes'} selected;{' '}
+          <div className={'BulkActionPanel-note' + (selectedCommits.length === 0 ? ' hide' : '')}>
+            ({selectedCommits.length} {selectedCommits.length === 1 ? 'change' : 'changes'} selected;{' '}
             <a className='BulkActionPanel-clear' href='#' onClick={this.onClearSelection.bind(this)}>clear selection</a>
             )
           </div>
