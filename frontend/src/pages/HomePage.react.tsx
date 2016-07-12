@@ -41,7 +41,7 @@ interface HomePageState {
     message: string,
     details?: string
   };
-  loading?: boolean;
+  isLoading?: boolean;
   displayServicePanel?: boolean;
   displayWelcomePanel?: boolean;
   displayUpdateNotice?: boolean;
@@ -65,7 +65,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       selectedCommits: [],
       lastSelectedCommit: null,
       message: null,
-      loading: true,
+      isLoading: true,
       displayServicePanel: false,
       displayWelcomePanel: false,
       displayUpdateNotice: false,
@@ -109,7 +109,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
   fetchCommits(params = this.props.params) {
     const router: ReactRouter.Context = (this.context as any).router;
-    this.setState({ loading: true });
+    this.setState({
+      isLoading: true
+    });
     const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
 
@@ -129,7 +131,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             pages: [],
             commits: [],
             message: HomePage.getErrorMessage(res, err),
-            loading: false,
+            isLoading: false,
             displayUpdateNotice: false,
           });
         } else {
@@ -137,7 +139,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             pages: res.body.pages.map(c => c + 1),
             commits: res.body.commits as Commit[],
             message: null,
-            loading: false,
+            isLoading: false,
             displayUpdateNotice: false,
           });
           this.checkUpdate();
@@ -153,15 +155,19 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           return;
         }
         if (res.body[0] === true) {
-          this.setState({displayWelcomePanel: true});
+          this.setState({
+            displayWelcomePanel: true
+          });
         } else {
-          this.setState({displayWelcomePanel: false});
+          this.setState({
+            displayWelcomePanel: false
+          });
         }
       });
   }
 
   checkUpdate() {
-    if (!this.state.commits.length || this.state.loading) {
+    if (!this.state.commits.length || this.state.isLoading) {
       return;
     }
     WpApi
@@ -186,14 +192,19 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   undoCommits(commits: string[]) {
     const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
-    this.setState({ loading: true });
+    this.setState({
+      isLoading: true
+    });
     WpApi
       .get('undo')
       .query({commits: commits})
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: HomePage.getErrorMessage(res, err), loading: false});
+          this.setState({
+            message: HomePage.getErrorMessage(res, err),
+            isLoading: false
+          });
         } else {
           const router: ReactRouter.Context = (this.context as any).router;
           router.transitionTo(routes.home);
@@ -205,14 +216,19 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   rollbackToCommit(hash: string) {
     const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
-    this.setState({ loading: true });
+    this.setState({
+      isLoading: true
+    });
     WpApi
       .get('rollback')
       .query({commit: hash})
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: HomePage.getErrorMessage(res, err), loading: false});
+          this.setState({
+            message: HomePage.getErrorMessage(res, err),
+            isLoading: false
+          });
         } else {
           const router: ReactRouter.Context = (this.context as any).router;
           router.transitionTo(routes.home);
@@ -252,7 +268,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   }
 
   toggleServicePanel() {
-    this.setState({displayServicePanel: !this.state.displayServicePanel});
+    this.setState({
+      displayServicePanel: !this.state.displayServicePanel
+    });
   }
 
   onCommitSelect(commits: Commit[], check: boolean, shiftKey: boolean) {
@@ -324,7 +342,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .on('progress', (e) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: HomePage.getErrorMessage(res, err)});
+          this.setState({
+            message: HomePage.getErrorMessage(res, err)
+          });
         } else {
           this.setState({
             dirtyWorkingDirectory: false,
@@ -348,7 +368,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .on('progress', (e: {percent: number}) => progressBar.progress(e.percent))
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.setState({message: HomePage.getErrorMessage(res, err)});
+          this.setState({
+            message: HomePage.getErrorMessage(res, err)
+          });
         } else {
           this.setState({
             dirtyWorkingDirectory: false,
@@ -401,7 +423,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   onWelcomePanelHide(e) {
     e.preventDefault();
 
-    this.setState({displayWelcomePanel: false});
+    this.setState({
+      displayWelcomePanel: false
+    });
 
     WpApi
       .post('hide-welcome-panel')
@@ -414,11 +438,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     const enableActions = !this.state.dirtyWorkingDirectory;
 
     return (
-      <div className={this.state.loading ? 'loading' : ''}>
+      <div className={this.state.isLoading ? 'loading' : ''}>
         <ProgressBar ref='progress' />
-        <ServicePanelButton
-          onClick={this.toggleServicePanel.bind(this)}
-        />
+        <ServicePanelButton onClick={this.toggleServicePanel.bind(this)} />
         <h1 className='vp-header'>VersionPress</h1>
         {this.state.message
           ? <FlashMessage {...this.state.message} />
