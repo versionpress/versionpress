@@ -186,8 +186,6 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           clearInterval(this.refreshInterval);
         } else {
           this.setState({
-            displayUpdateNotice: !this.props.params.page && res.body.update === true,
-            isDirtyWorkingDirectory: res.body.cleanWorkingDirectory !== true,
             displayUpdateNotice: !this.props.params.page && data.update === true,
             dirtyWorkingDirectory: data.cleanWorkingDirectory !== true,
           });
