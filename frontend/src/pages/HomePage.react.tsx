@@ -35,7 +35,7 @@ interface HomePageState {
   query?: string;
   commits?: Commit[];
   selectedCommits?: Commit[];
-  lastSelected?: Commit;
+  lastSelectedCommit?: Commit;
   message?: {
     code: string,
     message: string,
@@ -63,7 +63,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       query: '',
       commits: [],
       selectedCommits: [],
-      lastSelected: null,
+      lastSelectedCommit: null,
       message: null,
       loading: true,
       displayServicePanel: false,
@@ -256,8 +256,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   }
 
   onCommitSelect(commits: Commit[], check: boolean, shiftKey: boolean) {
-    let selectedCommits = this.state.selectedCommits,
-        lastSelected = this.state.lastSelected;
+    let { selectedCommits, lastSelectedCommit } = this.state;
     const bulk = commits.length > 1;
 
     commits
@@ -267,7 +266,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         const index = indexOf(this.state.commits, commit);
 
         if (!bulk && shiftKey) {
-          const last = this.state.lastSelected;
+          const last = this.state.lastSelectedCommit;
           lastIndex = indexOf(this.state.commits, last);
         }
 
@@ -285,13 +284,13 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           } else if (!check && index !== -1) {
             selectedCommits = update(selectedCommits, {$splice: [[index, 1]]});
           }
-          lastSelected = currentCommit;
+          lastSelectedCommit = currentCommit;
         }
       });
 
     this.setState({
       selectedCommits: selectedCommits,
-      lastSelected: (bulk ? null : lastSelected),
+      lastSelectedCommit: (bulk ? null : lastSelectedCommit),
     });
   }
 
@@ -309,7 +308,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   onClearSelection() {
     this.setState({
       selectedCommits: [],
-      lastSelected: null,
+      lastSelectedCommit: null,
     });
   }
 
