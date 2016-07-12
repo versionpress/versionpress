@@ -187,7 +187,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         } else {
           this.setState({
             displayUpdateNotice: !this.props.params.page && data.update === true,
-            dirtyWorkingDirectory: data.cleanWorkingDirectory !== true,
+            isDirtyWorkingDirectory: data.cleanWorkingDirectory !== true,
           });
         }
       });
