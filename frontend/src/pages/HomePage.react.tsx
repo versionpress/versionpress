@@ -45,7 +45,7 @@ interface HomePageState {
   displayServicePanel?: boolean;
   displayWelcomePanel?: boolean;
   displayUpdateNotice?: boolean;
-  dirtyWorkingDirectory?: boolean;
+  isDirtyWorkingDirectory?: boolean;
 }
 
 export default class HomePage extends React.Component<HomePageProps, HomePageState> {
@@ -69,7 +69,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       displayServicePanel: false,
       displayWelcomePanel: false,
       displayUpdateNotice: false,
-      dirtyWorkingDirectory: false,
+      isDirtyWorkingDirectory: false,
     };
 
     this.onFilter = this.onFilter.bind(this);
@@ -177,13 +177,13 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         if (err) {
           this.setState({
             displayUpdateNotice: false,
-            dirtyWorkingDirectory: false,
+            isDirtyWorkingDirectory: false,
           });
           clearInterval(this.refreshInterval);
         } else {
           this.setState({
             displayUpdateNotice: !this.props.params.page && res.body.update === true,
-            dirtyWorkingDirectory: res.body.cleanWorkingDirectory !== true,
+            isDirtyWorkingDirectory: res.body.cleanWorkingDirectory !== true,
           });
         }
       });
@@ -347,7 +347,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           });
         } else {
           this.setState({
-            dirtyWorkingDirectory: false,
+            isDirtyWorkingDirectory: false,
             message: {
               code: 'updated',
               message: 'Changes have been committed.',
@@ -373,7 +373,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           });
         } else {
           this.setState({
-            dirtyWorkingDirectory: false,
+            isDirtyWorkingDirectory: false,
             message: {
               code: 'updated',
               message: 'Changes have been discarded.',
@@ -435,7 +435,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   }
 
   render() {
-    const enableActions = !this.state.dirtyWorkingDirectory;
+    const enableActions = !this.state.isDirtyWorkingDirectory;
 
     return (
       <div className={this.state.isLoading ? 'loading' : ''}>
@@ -447,7 +447,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           : null
         }
         <ServicePanel isVisible={this.state.displayServicePanel} />
-        {this.state.dirtyWorkingDirectory
+        {this.state.isDirtyWorkingDirectory
           ? <CommitPanel
               diffProvider={{ getDiff: this.getDiff }}
               gitStatusProvider={{ getGitStatus: this.getGitStatus }}
