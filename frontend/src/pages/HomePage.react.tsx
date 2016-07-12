@@ -425,9 +425,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           ? <FlashMessage {...this.state.message} />
           : null
         }
-        <ServicePanel
-          display={this.state.displayServicePanel}
-        />
+        <ServicePanel isVisible={this.state.displayServicePanel} />
         {this.state.dirtyWorkingDirectory
           ? <CommitPanel
               diffProvider={{ getDiff: this.getDiff }}

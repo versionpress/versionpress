@@ -4,13 +4,13 @@ import config from '../config';
 import './ServicePanel.less';
 
 interface ServicePanelProps extends React.Props<JSX.Element> {
-  display: boolean;
+  isVisible: boolean;
 }
 
 export default class ServicePanel extends React.Component<ServicePanelProps, {}> {
 
   render() {
-    const className = 'ServicePanel-wrapper' + (this.props.display ? '' : ' ServicePanel-wrapper--hide');
+    const className = 'ServicePanel-wrapper' + (this.props.isVisible ? '' : ' ServicePanel-wrapper--hide');
     const systemInfoUrl = config.api.adminUrl + '/admin.php?page=versionpress/admin/system-info.php';
 
     return (
