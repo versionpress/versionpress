@@ -1,0 +1,101 @@
+post:
+  tags:
+    VP-Post-Title: post_title
+    VP-Post-Type: post_type
+  actions:
+    create: Created %VP-Post-Type% '%VP-Post-Title%'
+    trash: %VP-Post-Type% '%VP-Post-Title%' moved to trash
+    untrash: %VP-Post-Type% '%VP-Post-Title%' moved from trash
+    delete: Deleted %VP-Post-Type% '%VP-Post-Title%'
+    draft: Created draft for %VP-Post-Type% '%VP-Post-Title%'
+    publish: Published %VP-Post-Type% '%VP-Post-Title%'
+    edit: Edited %VP-Post-Type% '%VP-Post-Title%'
+    update: Updated %VP-Post-Type% '%VP-Post-Title%'
+
+user:
+  tags:
+    VP-User-Login: user_login
+  actions:
+    create: Created user '%VP-User-Login%'
+    edit: Edited user '%VP-User-Login%'
+    delete: Deleted user '%VP-User-Login%'
+
+option:
+  actions:
+    create: Created option '%VPID%'
+    edit: Edited option '%VPID%'
+    delete: Deleted option '%VPID%'
+
+comment:
+  tags:
+    VP-Comment-PostTitle: /
+    VP-Comment-Author: comment_author
+  actions:
+    create: New comment for post '%VP-Comment-PostTitle%'
+    edit: Edited comment for post '%VP-Comment-PostTitle%'
+    delete: Deleted comment for post '%VP-Comment-PostTitle%
+    trash: Comment for post '%VP-Comment-PostTitle%' moved to trash
+    untrash: Comment for post '%VP-Comment-PostTitle%' moved from trash
+    approve: Approved comment for post '%VP-Comment-PostTitle%'
+    unapprove: Unapproved comment for post '%VP-Comment-PostTitle%'
+    spam: Comment for post '%VP-Comment-PostTitle%' marked as spam
+    unspam: Comment for post '%VP-Comment-PostTitle%' marked as not spam
+    create-pending: New comment for post '%VP-Comment-PostTitle%' (pending approval)
+
+term:
+  tags:
+    VP-Term-Name: name
+    VP-Term-OldName: /
+    VP-Term-Taxonomy: /
+  actions:
+    create: New %VP-Term-Taxonomy% '%VP-Term-Name%'
+    delete: Deleted %VP-Term-Taxonomy% '%VP-Term-Name%'
+    rename: %VP-Term-Taxonomy% '%VP-Term-OldName%' renamed to '%VP-Term-Name%'
+    edit: Edited %VP-Term-Taxonomy% '%VP-Term-Name%'
+
+term_taxonomy:
+  tags:
+    VP-TermTaxonomy-Taxonomy: taxonomy
+    VP-Term-Name: /
+  actions:
+    create: New %VP-TermTaxonomy-Taxonomy% '%VP-Term-Name%'
+    edit: Edited %VP-TermTaxonomy-Taxonomy% '%VP-Term-Name%'
+    delete: Deleted %VP-TermTaxonomy-Taxonomy% '%VP-Term-Name%'
+
+commentmeta:
+  tags:
+    VP-Comment-Id: vp_comment_id
+    VP-CommentMeta-Key: meta_key
+  actions:
+    create: Created commentmeta '%VP-CommentMeta-Key%'
+    edit: Edited commentmeta '%VP-CommentMeta-Key%'
+    delete: Deleted commentmeta '%VP-CommentMeta-Key%'
+
+usermeta:
+  tags:
+    VP-User-Id: vp_user_id
+    VP-UserMeta-Key: meta_key
+  actions:
+    create: Created usermeta '%VP-UserMeta-Key%'
+    edit: Edited usermeta '%VP-UserMeta-Key%'
+    delete: Deleted usermeta '%VP-UserMeta-Key%'
+
+termmeta:
+  tags:
+    VP-Term-Id: vp_term_id
+    VP-TermMeta-Key: meta_key
+  actions:
+    create: Created termmeta '%VP-TermMeta-Key%'
+    edit: Edited termmeta '%VP-TermMeta-Key%'
+    delete: Deleted termmeta '%VP-TermMeta-Key%'
+
+postmeta:
+  tags:
+    VP-Post-Id: vp_post_id
+    VP-PostMeta-Key: meta_key
+    VP-Post-Type: /
+    VP-Post-Title: /
+  actions:
+    create: Created postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'
+    edit: Edited postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'
+    delete: Deleted postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'

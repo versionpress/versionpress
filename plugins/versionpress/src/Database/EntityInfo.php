@@ -124,8 +124,6 @@ class EntityInfo
      */
     public $hasReferences = false;
 
-    public $changeInfoFactoryFn = null;
-
     public $storageClass = null;
 
     /**
@@ -230,10 +228,6 @@ class EntityInfo
                     $this->ignoredColumns[array_keys($column)[0]] = substr(array_values($column)[0], 1);
                 }
             }
-        }
-
-        if (isset($schemaInfo['changeinfo-fn'])) {
-            $this->changeInfoFactoryFn = $schemaInfo['changeinfo-fn'];
         }
 
         if (isset($schemaInfo['storage'])) {

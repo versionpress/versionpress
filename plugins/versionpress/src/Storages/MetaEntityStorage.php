@@ -3,7 +3,10 @@
 namespace VersionPress\Storages;
 
 use Nette\Utils\Strings;
+use VersionPress\ChangeInfos\ChangeInfoUtils;
+use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\Database\EntityInfo;
+use VersionPress\Git\ActionsInfo;
 
 /**
  * Stores meta entities like postmeta and usermeta. It means that the meta entities are stored together
@@ -24,11 +27,16 @@ class MetaEntityStorage extends Storage
 
     /** @var Storage */
     private $parentStorage;
+    /**
+     * @var ActionsInfo
+     */
+    private $actionsInfo;
 
-    public function __construct(Storage $parentStorage, EntityInfo $entityInfo, $dbPrefix, $keyName = 'meta_key', $valueName = 'meta_value')
+    public function __construct(Storage $parentStorage, EntityInfo $entityInfo, $dbPrefix, ActionsInfo $actionsInfo, $keyName = 'meta_key', $valueName = 'meta_value')
     {
         parent::__construct($entityInfo, $dbPrefix);
         $this->parentStorage = $parentStorage;
+        $this->actionsInfo = $actionsInfo;
         $this->keyName = $keyName;
         $this->valueName = $valueName;
         $this->parentReferenceName = "vp_$entityInfo->parentReference";
@@ -160,14 +168,23 @@ class MetaEntityStorage extends Storage
         );
     }
 
-    protected function createChangeInfoWithParentEntity(
-        $oldEntity,
-        $newEntity,
-        $oldParentEntity,
-        $newParentEntity,
-        $action
-    ) {
-        return call_user_func_array($this->entityInfo->changeInfoFactoryFn, func_get_args());
+    protected function createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action)
+    {
+        $vpidColumnName = $this->entityInfo->vpidColumnName;
+
+        $entityName = $this->entityInfo->entityName;
+        $vpid = isset($newEntity[$vpidColumnName]) ? $newEntity[$vpidColumnName] : $oldEntity[$vpidColumnName];
+        $automaticallySavedTags = $this->actionsInfo->getTags($entityName);
+        $tags = ChangeInfoUtils::extractTags($automaticallySavedTags, $oldEntity, $newEntity);
+
+        $changeInfo = new EntityChangeInfo($this->entityInfo, $this->actionsInfo, $action, $vpid, $tags, []);
+        $files = $changeInfo->getChangedFiles();
+
+        $action = apply_filters("vp_meta_entity_action_{$entityName}", $action, $oldEntity, $newEntity, $oldParentEntity, $newParentEntity);
+        $tags = apply_filters("vp_meta_entity_tags_{$entityName}", $tags, $oldEntity, $newEntity, $action, $oldParentEntity, $newParentEntity);
+        $files = apply_filters("vp_meta_entity_files_{$entityName}", $files, $oldEntity, $newEntity, $oldParentEntity, $newParentEntity);
+
+        return new EntityChangeInfo($this->entityInfo, $this->actionsInfo, $action, $vpid, $tags, $files);
     }
 
     private function transformToParentEntityField($values)

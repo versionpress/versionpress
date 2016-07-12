@@ -33,22 +33,6 @@ class ChangeInfoEnvelope implements ChangeInfo
     /** @var SortingStrategy */
     private $sortingStrategy;
 
-    private $bulkChangeInfoClasses = [
-        "comment" => BulkCommentChangeInfo::class,
-        "option" => BulkOptionChangeInfo::class,
-        "plugin" => BulkPluginChangeInfo::class,
-        "post" => BulkPostChangeInfo::class,
-        "postmeta" => BulkPostMetaChangeInfo::class,
-        "term" => BulkTermChangeInfo::class,
-        "termmeta" => BulkTermMetaChangeInfo::class,
-        "theme" => BulkThemeChangeInfo::class,
-        "translation" => BulkTranslationChangeInfo::class,
-        "user" => BulkUserChangeInfo::class,
-        "usermeta" => BulkUserMetaChangeInfo::class,
-        "versionpress" => BulkRevertChangeInfo::class,
-        "composer" => ComposerChangeInfo::class,
-    ];
-
     /**
      * @var null|string
      */
@@ -133,7 +117,7 @@ class ChangeInfoEnvelope implements ChangeInfo
         foreach ($splittedBodies as $body) {
             $partialCommitMessage = new CommitMessage("", $body);
             /** @var ChangeInfo $matchingChangeInfoType */
-            $matchingChangeInfoType = ChangeInfoMatcher::findMatchingChangeInfo($partialCommitMessage);
+
             $changeInfoList[] = $matchingChangeInfoType::buildFromCommitMessage($partialCommitMessage);
         }
 
@@ -189,8 +173,6 @@ class ChangeInfoEnvelope implements ChangeInfo
 
     private function groupBulkActions($changeInfoList)
     {
-        $bulkChangeInfoClasses = $this->bulkChangeInfoClasses;
-
         $groupedChangeInfos = ArrayUtils::mapreduce($changeInfoList, function (ChangeInfo $item, $mapEmit) {
             if ($item instanceof TrackedChangeInfo) {
                 $key = "{$item->getEntityName()}/{$item->getAction()}";
@@ -198,15 +180,10 @@ class ChangeInfoEnvelope implements ChangeInfo
             } else {
                 $mapEmit(spl_object_hash($item), $item);
             }
-        }, function ($key, $items, $reduceEmit) use ($bulkChangeInfoClasses) {
+        }, function ($key, $items, $reduceEmit) {
             /** @var TrackedChangeInfo[] $items */
             if (count($items) > 1) {
-                $entityName = $items[0]->getEntityName();
-                if (isset($bulkChangeInfoClasses[$entityName])) {
-                    $reduceEmit(new $bulkChangeInfoClasses[$entityName]($items));
-                } else {
-                    $reduceEmit($items);
-                }
+                $reduceEmit(new BulkChangeInfo($items));
             } else {
                 $reduceEmit($items[0]);
             }

@@ -1,7 +1,6 @@
 post:
   table: posts
   id: ID
-  changeinfo-fn: 'VersionPress\Storages\ChangeInfoFactory::createPostChangeInfo'
   references:
     post_author: user
     post_parent: post
@@ -21,7 +20,6 @@ post:
 postmeta:
   id: meta_id
   parent-reference: post_id
-  changeinfo-fn: 'VersionPress\Storages\ChangeInfoFactory::createPostMetaChangeInfo'
   references:
     post_id: post
   value-references:
@@ -38,7 +36,6 @@ postmeta:
 comment:
   table: comments
   id: comment_ID
-  changeinfo-fn: 'VersionPress\Storages\ChangeInfoFactory::createCommentChangeInfo'
   references:
     comment_post_ID: post
     user_id: user
@@ -49,7 +46,6 @@ comment:
 commentmeta:
   table: commentmeta
   id: meta_id
-  changeinfo-fn: 'VersionPress\Storages\ChangeInfoFactory::createCommentMetaChangeInfo'
   parent-reference: comment_id
   references:
     comment_id: comment
@@ -58,38 +54,32 @@ commentmeta:
 user:
   table: users
   id: ID
-  changeinfo-fn: 'VersionPress\Storages\ChangeInfoFactory::createUserChangeInfo'
   ignored-columns:
     - user_activation_key
 
 term:
   table: terms
   id: term_id
-  changeinfo-fn: 'VersionPress\Storages\ChangeInfoFactory::createTermChangeInfo'
 
 termmeta:
   since: 35329
   id: meta_id
-  changeinfo-fn: 'VersionPress\Storages\ChangeInfoFactory::createTermMetaChangeInfo'
   parent-reference: term_id
   references:
     term_id: term
 
 term_taxonomy:
   id: term_taxonomy_id
-  changeinfo-fn: 'VersionPress\Storages\ChangeInfoFactory::createTermTaxonomyChangeInfo'
   references:
     parent: term
     term_id: term
   mn-references:
     ~term_relationships.object_id: post
   ignored-columns:
-    - count: '@\VersionPress\Synchronizers\TermTaxonomiesSynchronizer::fixPostsCount'
 
 usermeta:
   id: umeta_id
   parent-reference: user_id
-  changeinfo-fn: 'VersionPress\Storages\ChangeInfoFactory::createUserMetaChangeInfo'
   references:
     user_id: user
   ignored-entities:
@@ -101,7 +91,6 @@ usermeta:
 option:
   table: options
   vpid: option_name
-  changeinfo-fn: 'VersionPress\Storages\ChangeInfoFactory::createOptionChangeInfo'
   value-references:
     option_name@option_value:
       site_icon: post

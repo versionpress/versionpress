@@ -36,13 +36,4 @@ interface ChangeInfo
      * @return string
      */
     public function getChangeDescription();
-
-    /**
-     * Factory method - builds a ChangeInfo object from a commit message. Used when VersionPress
-     * table is constructed; hooks use the normal constructor.
-     *
-     * @param CommitMessage $commitMessage
-     * @return ChangeInfo
-     */
-    public static function buildFromCommitMessage(CommitMessage $commitMessage);
 }

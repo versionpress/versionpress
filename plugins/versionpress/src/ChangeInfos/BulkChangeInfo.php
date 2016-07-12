@@ -7,7 +7,7 @@ use Nette\Utils\Strings;
 use VersionPress\Git\CommitMessage;
 use VersionPress\Utils\StringUtils;
 
-abstract class BulkChangeInfo implements ChangeInfo
+class BulkChangeInfo implements ChangeInfo
 {
 
     /** @var TrackedChangeInfo[] */
@@ -46,16 +46,25 @@ abstract class BulkChangeInfo implements ChangeInfo
 
     public function getChangeDescription()
     {
+        $entityName = $this->getEntityName();
+        $action = $this->getAction();
+
         if ($this->count === 1) {
-            return $this->changeInfos[0]->getChangeDescription();
+            $defaultDescription = $this->changeInfos[0]->getChangeDescription();
+        } else {
+            $defaultDescription = sprintf(
+                "%s %d %s",
+                Strings::capitalize(StringUtils::verbToPastTense($action)),
+                $this->count,
+                StringUtils::pluralize($entityName)
+            );
         }
 
-        return sprintf(
-            "%s %d %s",
-            Strings::capitalize(StringUtils::verbToPastTense($this->getAction())),
-            $this->count,
-            StringUtils::pluralize($this->getEntityName())
-        );
+        $tags = array_map(function (TrackedChangeInfo $changeInfo) {
+            return $changeInfo->getCustomTags();
+        }, $this->changeInfos);
+
+        return apply_filters("vp_bulk_change_description_{$entityName}", $defaultDescription, $action, $this->count, $tags);
     }
 
     public function getAction()

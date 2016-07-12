@@ -90,7 +90,8 @@ class StringUtils
             'money',
             'rice',
             'information',
-            'equipment'
+            'equipment',
+            'meta',
         ];
 
         // save some time in the case that singular and plural are the same

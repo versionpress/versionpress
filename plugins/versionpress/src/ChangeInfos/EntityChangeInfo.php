@@ -2,6 +2,9 @@
 
 namespace VersionPress\ChangeInfos;
 
+use VersionPress\Database\EntityInfo;
+use VersionPress\Git\ActionsInfo;
+
 /**
  * Base class for entity change infos like PostChangeInfo, CommentChangeInfo etc.
  * An entity is a database-tracked object that usually has a VPID (but not alwasy, see e.g. options).
@@ -17,11 +20,11 @@ namespace VersionPress\ChangeInfos;
  *   tags are used when the commit is read later and human-friendly message is rendered in the UI.
  *
  */
-abstract class EntityChangeInfo extends TrackedChangeInfo
+class EntityChangeInfo extends TrackedChangeInfo
 {
 
-    /** @var string */
-    private $entityName;
+    /** @var EntityInfo */
+    private $entityInfo;
 
     /** @var string */
     private $action;
@@ -29,21 +32,37 @@ abstract class EntityChangeInfo extends TrackedChangeInfo
     /** @var string */
     private $entityId;
 
+    /** @var array */
+    private $customTags;
+
+    /** @var array */
+    private $customFiles;
+
+    /** @var ActionsInfo */
+    private $actionsInfo;
+
+    /** @var string */
+    private $commitMessageSubject;
+
     /**
-     * @param string $entityName Entity name, used for the first segment of VP-Action tag
-     * @param string $action Action, the middle segment of the VP-Action tag
-     * @param string $entityId VPID, the last segment od the VP-Action tag
+     * @param EntityInfo $entityInfo
+     * @param ActionsInfo $actionsInfo
+     * @param string $action
+     * @param string $entityId
+     * @param array $customTags
      */
-    public function __construct($entityName, $action, $entityId)
+    public function __construct($entityInfo, $actionsInfo, $action, $entityId, $customTags, $customFiles)
     {
-        $this->entityName = $entityName;
+        $this->entityInfo = $entityInfo;
         $this->action = $action;
         $this->entityId = $entityId;
+        $this->customTags = $customTags;
+        $this->customFiles = $customFiles;
     }
 
     public function getEntityName()
     {
-        return $this->entityName;
+        return $this->entityInfo->entityName;
     }
 
     /**
@@ -69,6 +88,15 @@ abstract class EntityChangeInfo extends TrackedChangeInfo
         return $this->entityId;
     }
 
+    public function getChangeDescription()
+    {
+        if (empty($this->commitMessageSubject)) {
+            $this->commitMessageSubject = $this->actionsInfo->createCommitMessage($this->getEntityName(), $this->getAction(), $this->getEntityId(), $this->getCustomTags());
+        }
+
+        return $this->commitMessageSubject;
+    }
+
     /**
      * Used to construct a commit message body. This base class implementation is enough for all EntityChangeInfo
      * subclasses so thay don't override it. What they need to provide is the {@link getCustomTags()} implementation.
@@ -80,6 +108,11 @@ abstract class EntityChangeInfo extends TrackedChangeInfo
         return "{$this->getEntityName()}/{$this->getAction()}/{$this->getEntityId()}";
     }
 
+    public function getCustomTags()
+    {
+        return $this->customTags;
+    }
+
     public function getChangedFiles()
     {
         $change = [
@@ -89,7 +122,7 @@ abstract class EntityChangeInfo extends TrackedChangeInfo
             "parent-id" => $this->getParentId()
         ];
 
-        return [$change];
+        return array_merge([$change], $this->customFiles);
     }
 
     /**

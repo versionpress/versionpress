@@ -6,8 +6,9 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use RegexIterator;
-use VersionPress\ChangeInfos\ChangeInfo;
-use VersionPress\Storages\Serialization\IniSerializer;
+use VersionPress\ChangeInfos\ChangeInfoUtils;
+use VersionPress\ChangeInfos\EntityChangeInfo;
+use VersionPress\Git\ActionsInfo;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\EntityUtils;
 use VersionPress\Utils\FileSystem;
@@ -33,17 +34,22 @@ class DirectoryStorage extends Storage
     /** @var bool[] */
     private $existenceCache = [];
 
+    /** @var ActionsInfo */
+    private $actionsInfo;
+
     /**
      * DirectoryStorage constructor.
      * @param string $directory
      * @param \VersionPress\Database\EntityInfo $entityInfo
      * @param string $dbPrefix
+     * @param ActionsInfo $actionsInfo
      */
-    public function __construct($directory, $entityInfo, $dbPrefix)
+    public function __construct($directory, $entityInfo, $dbPrefix, $actionsInfo)
     {
         parent::__construct($entityInfo, $dbPrefix);
         $this->directory = $directory;
         $this->entityInfo = $entityInfo;
+        $this->actionsInfo = $actionsInfo;
     }
 
     public function save($data)
@@ -212,6 +218,21 @@ class DirectoryStorage extends Storage
 
     protected function createChangeInfo($oldEntity, $newEntity, $action)
     {
-        return call_user_func_array($this->entityInfo->changeInfoFactoryFn, func_get_args());
+        $vpidColumnName = $this->entityInfo->vpidColumnName;
+        $entityName = $this->entityInfo->entityName;
+        $vpid = isset($newEntity[$vpidColumnName]) ? $newEntity[$vpidColumnName] : $oldEntity[$vpidColumnName];
+
+        $automaticallySavedTags = $this->actionsInfo->getTags($entityName);
+        $tags = ChangeInfoUtils::extractTags($automaticallySavedTags, $oldEntity, $newEntity);
+
+        $files = [];
+        $changeInfo = new EntityChangeInfo($this->entityInfo, $this->actionsInfo, $action, $vpid, $tags, $files);
+        $files = $changeInfo->getChangedFiles();
+
+        $action = apply_filters("vp_entity_action_{$entityName}", $action, $oldEntity, $newEntity);
+        $tags = apply_filters("vp_entity_tags_{$entityName}", $tags, $oldEntity, $newEntity, $action);
+        $files = apply_filters("vp_entity_files_{$entityName}", $files, $oldEntity, $newEntity);
+
+        return new EntityChangeInfo($this->entityInfo, $this->actionsInfo, $action, $vpid, $tags, $files);
     }
 }
