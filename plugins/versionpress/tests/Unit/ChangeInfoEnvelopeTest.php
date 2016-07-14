@@ -17,6 +17,7 @@ use VersionPress\ChangeInfos\BulkUserMetaChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\CommentChangeInfo;
+use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\OptionChangeInfo;
 use VersionPress\ChangeInfos\PluginChangeInfo;
 use VersionPress\ChangeInfos\PostChangeInfo;
@@ -27,6 +28,8 @@ use VersionPress\ChangeInfos\TranslationChangeInfo;
 use VersionPress\ChangeInfos\UserChangeInfo;
 use VersionPress\ChangeInfos\UserMetaChangeInfo;
 use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
+use VersionPress\Database\EntityInfo;
+use VersionPress\Git\ActionsInfo;
 
 class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
 {
@@ -49,11 +52,15 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
     public function entityChangeInfoWithCreateActionHasHigherPriorityThanOtherActions()
     {
 
-        $normalPriorityPostChangeInfo = new PostChangeInfo("edit", "postChangeInfo1VPID", "post", "Test title 1");
-        $higherPriorityPostChangeInfo = new PostChangeInfo("create", "postChangeInfo2VPID", "post", "Test title 2");
+        $entityInfo = $this->createEntityInfoMock('some_entity');
+        $lowerPriorityActionsInfo = $this->createActionsInfoMock(15);
+        $normalPriorityActionsInfo = $this->createActionsInfoMock(10);
 
-        $input = [$normalPriorityPostChangeInfo, $higherPriorityPostChangeInfo];
-        $expectedSorted = [$higherPriorityPostChangeInfo, $normalPriorityPostChangeInfo];
+        $lowerPriorityChangeInfo = new EntityChangeInfo($entityInfo, $lowerPriorityActionsInfo, 'edit', 'vpid');
+        $normalPriorityChangeInfo = new EntityChangeInfo($entityInfo, $normalPriorityActionsInfo, 'create', 'vpid');
+
+        $input = [$lowerPriorityChangeInfo, $normalPriorityChangeInfo];
+        $expectedSorted = [$normalPriorityChangeInfo, $lowerPriorityChangeInfo];
 
         $changeInfoEnvelope = new ChangeInfoEnvelope($input, "1.0");
         $sortedByChangeInfoEnvelope = $changeInfoEnvelope->getReorganizedInfoList();
@@ -64,44 +71,31 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
     /** @test */
     public function bulkChangeInfoDoesNotAffectChangeInfoOrder()
     {
-        $higherPriorityPostChangeInfo = new PostChangeInfo("create", "1234567890", "post", "Test title");
-        $lowerPriorityPostChangeInfo1 = new PostChangeInfo("edit", "1234567890", "post", "Other title");
-        $lowerPriorityPostChangeInfo2 = new PostChangeInfo("edit", "1234567890", "post", "Different title");
+        $entityInfo = $this->createEntityInfoMock('some_entity');
+        $higherPriorityActionsInfo = $this->createActionsInfoMock(10);
+        $lowerPriorityActionsInfo = $this->createActionsInfoMock(15);
 
-        $input = [$higherPriorityPostChangeInfo, $lowerPriorityPostChangeInfo1, $lowerPriorityPostChangeInfo2];
+        $higherPriorityChangeInfo = new EntityChangeInfo($entityInfo, $higherPriorityActionsInfo, 'create', 'vpid');
+        $lowerPriorityChangeInfo1 = new EntityChangeInfo($entityInfo, $lowerPriorityActionsInfo, 'edit', 'vpid');
+        $lowerPriorityChangeInfo2 = new EntityChangeInfo($entityInfo, $lowerPriorityActionsInfo, 'edit', 'vpid');
+
+        $input = [$higherPriorityChangeInfo, $lowerPriorityChangeInfo1, $lowerPriorityChangeInfo2];
         $changeInfoEnvelope = new ChangeInfoEnvelope($input, "1.0");
         $sortedByChangeInfoEnvelope = $changeInfoEnvelope->getReorganizedInfoList();
         $sortedByChangeInfoEnvelope = $this->ungroupChangeInfos($sortedByChangeInfoEnvelope);
         $this->assertEquals($input, $sortedByChangeInfoEnvelope);
     }
 
-
-    /** @test */
-    public function themeChangeInfoWithSwitchActionHasHigherPriorityThanOtherThemeActions()
-    {
-
-        $normalPriorityThemeChangeInfo = new ThemeChangeInfo("testtheme", "edit", "Test theme");
-        $higherPriorityThemeChangeInfo = new ThemeChangeInfo("testtheme", "switch", "Test theme");
-
-        $input = [$normalPriorityThemeChangeInfo, $higherPriorityThemeChangeInfo];
-        $expectedSorted = [$higherPriorityThemeChangeInfo, $normalPriorityThemeChangeInfo];
-
-        $changeInfoEnvelope = new ChangeInfoEnvelope($input, "1.0");
-        $sortedByChangeInfoEnvelope = $changeInfoEnvelope->getReorganizedInfoList();
-
-        $this->assertEquals($sortedByChangeInfoEnvelope, $expectedSorted);
-    }
-
     /**
      * @test
      * @dataProvider changeInfosRepresentingBulkActions
      */
-    public function bulkActionsAreGroupedIntoBulkChangeInfo($changeInfos, $expectedClass)
+    public function bulkActionsAreGroupedIntoBulkChangeInfo($changeInfos)
     {
         $changeInfoEnvelope = new ChangeInfoEnvelope($changeInfos, '1.0');
         $groupedChangeInfoList = $changeInfoEnvelope->getReorganizedInfoList();
         $this->assertCount(1, $groupedChangeInfoList);
-        $this->assertInstanceOf($expectedClass, $groupedChangeInfoList[0]);
+        $this->assertInstanceOf(BulkChangeInfo::class, $groupedChangeInfoList[0]);
     }
 
     //------------------------------------
@@ -117,11 +111,16 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
     public function samePriorityExamples()
     {
 
+        $entityName = 'some_entity';
+
+        $entityInfoMock = $this->createEntityInfoMock($entityName);
+        $actionsInfoMock = $this->createActionsInfoMock(10);
+
         $wordpressUpdateChangeInfo1 = new WordPressUpdateChangeInfo("4.0");
         $wordPressUpdateChangeInfo2 = new WordPressUpdateChangeInfo("4.1");
 
-        $normalPriorityPostChangeInfo1 = new PostChangeInfo("edit", "postChangeInfo1VPID", "post", "Test title 1");
-        $normalPriorityPostChangeInfo2 = new PostChangeInfo("edit", "postChangeInfo2VPID", "post", "Test title 2");
+        $normalPriorityPostChangeInfo1 = new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'edit', 'vpid');
+        $normalPriorityPostChangeInfo2 = new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'edit', 'vpid');
 
         return [
             [
@@ -139,77 +138,22 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
 
     public function changeInfosRepresentingBulkActions()
     {
+        $entityInfoMock = $this->createEntityInfoMock('some_entity');
+        $actionsInfoMock = $this->createActionsInfoMock(10);
+
         return [
             [
                 [
-                    new CommentChangeInfo('spam', '1234567890', 'author', 'Some post'),
-                    new CommentChangeInfo('spam', '0987654321', 'other author', 'Some post'),
-                ],
-                BulkCommentChangeInfo::class
+                    new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'edit', '1st vpid'),
+                    new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'edit', '2nd vpid'),
+                ]
             ],
             [
                 [
-                    new OptionChangeInfo('edit', 'some_option'),
-                    new OptionChangeInfo('edit', 'other_option'),
-                ],
-                BulkOptionChangeInfo::class
-            ],
-            [
-                [
-                    new PluginChangeInfo('some-plugin.php', 'delete', 'Some plugin'),
-                    new PluginChangeInfo('other-plugin.php', 'delete', 'Other plugin'),
-                ],
-                BulkPluginChangeInfo::class
-            ],
-            [
-                [
-                    new TranslationChangeInfo('update', 'en_US', 'theme', 'twentythirteen'),
-                    new TranslationChangeInfo('update', 'en_US', 'theme', 'twentyfifteen'),
-                ],
-                BulkTranslationChangeInfo::class
-            ],
-            [
-                [
-                    new PostChangeInfo('trash', '1234567890', 'post', 'Some post'),
-                    new PostChangeInfo('trash', '0987654321', 'post', 'Other post'),
-                    new PostChangeInfo('trash', 'ABCDEFEDCB', 'post', 'Different post'),
-                ],
-                BulkPostChangeInfo::class
-            ],
-            [
-                [
-                    new PostMetaChangeInfo('create', '1234567890', 'post', 'Some post', 'ABCDEF', 'some-meta'),
-                    new PostMetaChangeInfo('create', '0987654321', 'post', 'Some post', 'ABCDEF', 'other-meta'),
-                ],
-                BulkPostMetaChangeInfo::class
-            ],
-            [
-                [
-                    new TermChangeInfo('create', '1234567890', 'Some term', 'category'),
-                    new TermChangeInfo('create', '0987654321', 'Other term', 'tag'),
-                ],
-                BulkTermChangeInfo::class
-            ],
-            [
-                [
-                    new ThemeChangeInfo('some-theme', 'delete', 'Some theme'),
-                    new ThemeChangeInfo('other-theme', 'delete', 'Other theme'),
-                ],
-                BulkThemeChangeInfo::class
-            ],
-            [
-                [
-                    new UserChangeInfo('delete', '1234567890', 'some.user'),
-                    new UserChangeInfo('delete', '0987654321', 'other.user'),
-                ],
-                BulkUserChangeInfo::class
-            ],
-            [
-                [
-                    new UserMetaChangeInfo('create', '1234567890', 'some.user', 'some-meta', 'ABCDEF'),
-                    new UserMetaChangeInfo('create', '0987654321', 'some.user', 'other-meta', 'ABCDEF'),
-                ],
-                BulkUserMetaChangeInfo::class
+                    new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'edit', '1st vpid'),
+                    new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'edit', '2nd vpid'),
+                    new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'edit', '3rd vpid'),
+                ]
             ],
         ];
     }
@@ -232,5 +176,28 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
         }
 
         return $ungrouped;
+    }
+
+    /**
+     * @param string $entityName
+     * @return \PHPUnit_Framework_MockObject_MockObject|EntityInfo
+     */
+    private function createEntityInfoMock($entityName)
+    {
+        $entityInfoMock = $this->getMockBuilder(EntityInfo::class)->disableOriginalConstructor()->getMock();
+        $entityInfoMock->expects($this->any())->method('__get')->with($this->equalTo('entityName'))->will($this->returnValue($entityName));
+
+        return $entityInfoMock;
+    }
+
+    /**
+     * @param int $priority
+     * @return \PHPUnit_Framework_MockObject_MockObject|ActionsInfo
+     */
+    private function createActionsInfoMock($priority)
+    {
+        $actionsInfoMock = $this->getMockBuilder(ActionsInfo::class)->disableOriginalConstructor()->getMock();
+        $actionsInfoMock->expects($this->any())->method('getActionPriority')->will($this->returnValue($priority));
+        return $actionsInfoMock;
     }
 }

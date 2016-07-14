@@ -50,8 +50,9 @@ class EntityChangeInfo extends TrackedChangeInfo
      * @param string $action
      * @param string $entityId
      * @param array $customTags
+     * @param array $customFiles
      */
-    public function __construct($entityInfo, $actionsInfo, $action, $entityId, $customTags, $customFiles)
+    public function __construct($entityInfo, $actionsInfo, $action, $entityId, $customTags = [], $customFiles = [])
     {
         $this->entityInfo = $entityInfo;
         $this->action = $action;
