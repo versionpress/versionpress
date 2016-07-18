@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as classNames from 'classnames';
 
 import './ProgressBar.less';
 
@@ -32,10 +33,15 @@ export default class ProgressBar extends React.Component<React.Props<JSX.Element
       display: (isVisible ? 'inline-block' : 'none'),
     };
 
+    const spinnerClassName = classNames({
+      'ProgressBar-spinner': true,
+      'hide': !isVisible
+    });
+
     return (
       <div className='ProgressBar'>
         <div className='ProgressBar-bar' style={styles}>
-          <div className={'ProgressBar-spinner' + (isVisible ? '' : ' hide')}></div>
+          <div className={spinnerClassName}></div>
           <div className='ProgressBar-spinner-icon'></div>
         </div>
       </div>
