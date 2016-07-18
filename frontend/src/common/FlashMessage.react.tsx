@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as classNames from 'classnames';
 
 import './FlashMessage.less';
 
@@ -16,28 +17,38 @@ export default class FlashMessage extends React.Component<FlashMessageProps, Fla
 
   constructor() {
     super();
-    this.state = { showDetails: false };
+    this.state = {
+      showDetails: false
+    };
   }
 
   render() {
-    if (this.props.code === null) {
+    const { code, message, details } = this.props;
+    const { showDetails } = this.state;
+
+    if (code === null) {
       return null;
     }
 
+    const linkClassName = classNames({
+      'FlashMessage-detailsLink-displayed': showDetails,
+      'FlashMessage-detailsLink-hidden': !showDetails
+    });
+
     return (
-      <div className={this.props.code}>
+      <div className={code}>
         <p>
-          {this.props.message} {' '}
-          {this.props.details
+          {message} {' '}
+          {details
             ? <a
-                className={'FlashMessage-detailsLink' + (this.state.showDetails ? '-displayed' : '-hidden')}
+                className={linkClassName}
                 href='#'
                 onClick={this.toggleDetails.bind(this)}
               >Details </a>
             : null}
         </p>
-        {this.props.details && this.state.showDetails
-          ? <p className='FlashMessage-details'>{this.props.details.toString()}</p>
+        {details && showDetails
+          ? <p className='FlashMessage-details'>{details.toString()}</p>
           : null}
       </div>
     );
@@ -45,7 +56,9 @@ export default class FlashMessage extends React.Component<FlashMessageProps, Fla
 
   toggleDetails(e: React.MouseEvent) {
     e.preventDefault();
-    this.setState({ showDetails: !this.state.showDetails });
+    this.setState({
+      showDetails: !this.state.showDetails
+    });
   }
 
 }
