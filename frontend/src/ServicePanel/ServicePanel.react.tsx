@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as classNames from 'classnames';
 import config from '../config';
 
 import './ServicePanel.less';
@@ -10,11 +11,14 @@ interface ServicePanelProps extends React.Props<JSX.Element> {
 export default class ServicePanel extends React.Component<ServicePanelProps, {}> {
 
   render() {
-    const className = 'ServicePanel-wrapper' + (this.props.isVisible ? '' : ' ServicePanel-wrapper--hide');
+    const wrapperClassName = classNames({
+      'ServicePanel-wrapper': true,
+      'ServicePanel-wrapper--hide': !this.props.isVisible
+    });
     const systemInfoUrl = config.api.adminUrl + '/admin.php?page=versionpress/admin/system-info.php';
 
     return (
-      <div className={className}>
+      <div className={wrapperClassName}>
         <div className='ServicePanel welcome-panel'>
           <div className='ServicePanel-inner'>
             <p className='ServicePanel-warning'>
