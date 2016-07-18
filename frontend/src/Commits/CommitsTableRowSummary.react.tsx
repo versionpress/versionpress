@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import * as moment from 'moment';
+import * as classNames from 'classnames';
 import * as portal from '../common/portal';
 import {UndoDisabledDialog} from '../Commits/revertDialog';
 import {getGitBranchColor} from '../services/GitBranchColorProvider';
@@ -20,14 +21,32 @@ interface CommitsTableRowSummaryProps extends React.Props<JSX.Element> {
 export default class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps, {}> {
 
   render() {
-    if (this.props.commit === null) {
+    const { commit, enableActions, isSelected, detailsLevel } = this.props;
+
+    if (commit === null) {
       return null;
     }
-    const commit = this.props.commit;
-    const className = (commit.isEnabled ? '' : 'disabled') + (this.props.detailsLevel !== 'none' ? ' displayed-details' : '');
+
+    const rowClassName = classNames({
+      'disabled': !commit.isEnabled,
+      'displayed-details': detailsLevel !== 'none'
+    });
+
+    const undoClassName = classNames({
+      'vp-table-undo': true,
+      'disabled': commit.isMerge || !enableActions
+    });
+
+    const rollbackClassName = classNames({
+      'vp-table-rollback': true,
+      'disabled': !enableActions
+    });
 
     return (
-      <tr className={className} onClick={() => this.toggleDetails()}>
+      <tr
+        className={rowClassName}
+        onClick={() => this.toggleDetails()}
+      >
         <td className='column-environment'>
           {commit.environment === '?'
             ? null
@@ -36,8 +55,8 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
         </td>
         {commit.canUndo
           ? <td className='column-cb' onClick={this.onCheckboxClick.bind(this)}><input type='checkbox'
-                                                                                       checked={this.props.isSelected}
-                                                                                       disabled={!this.props.enableActions}
+                                                                                       checked={isSelected}
+                                                                                       disabled={!enableActions}
                                                                                        readOnly={true}/></td>
           : <td className='column-cb' />
         }
@@ -57,16 +76,16 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
             : null
           }
           {this.renderMessage(commit.message)}
-          {this.props.detailsLevel !== 'none'
+          {detailsLevel !== 'none'
             ? <div className='detail-buttons'>
                 <button
                   className='button'
-                  disabled={this.props.detailsLevel === 'overview'}
+                  disabled={detailsLevel === 'overview'}
                   onClick={(e) => { this.changeDetailsLevel('overview'); e.stopPropagation(); }}
                 >Overview</button>
                 <button
                   className='button'
-                  disabled={this.props.detailsLevel === 'full-diff'}
+                  disabled={detailsLevel === 'full-diff'}
                   onClick={(e) => { this.changeDetailsLevel('full-diff'); e.stopPropagation(); }}
                 >Full diff</button>
               </div>
@@ -76,17 +95,17 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
         <td className='column-actions'>
           {(commit.canUndo || commit.isMerge) && commit.isEnabled
             ? <a
-                className={'vp-table-undo ' + (commit.isMerge || !this.props.enableActions ? 'disabled' : '')}
+                className={undoClassName}
                 href='#'
                 onClick={commit.isMerge
                           ? (e) => { this.renderUndoMergeDialog(); e.stopPropagation(); }
-                          : this.props.enableActions
+                          : enableActions
                             ? (e) => { this.props.onUndo(e); e.stopPropagation(); }
                             : (e) => { this.renderDisabledDialog(); e.stopPropagation(); }
                         }
                 title={commit.isMerge
                         ? 'Merge commit cannot be undone.'
-                        : !this.props.enableActions
+                        : !enableActions
                           ? 'You have uncommitted changes in your WordPress directory.'
                           : null
                       }
@@ -97,13 +116,13 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
           }
           {commit.canRollback && commit.isEnabled
             ? <a
-                className={'vp-table-rollback ' + (!this.props.enableActions ? 'disabled' : '')}
+                className={rollbackClassName}
                 href='#'
-                onClick={this.props.enableActions
+                onClick={enableActions
                           ? (e) => { this.props.onRollback(e); e.stopPropagation(); }
                           : (e) => { this.renderDisabledDialog(); e.stopPropagation(); }
                         }
-                title={!this.props.enableActions
+                title={!enableActions
                         ? 'You have uncommitted changes in your WordPress directory.'
                         : null
                       }
