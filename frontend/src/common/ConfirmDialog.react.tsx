@@ -11,7 +11,7 @@ interface ConfirmDialogProps extends React.Props<JSX.Element> {
   cancelButtonClickHandler?: Function;
   okButtonClasses?: string;
   cancelButtonClasses?: string;
-  loading?: boolean;
+  isLoading?: boolean;
 }
 
 export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {}> {
@@ -28,7 +28,7 @@ export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {
     cancelButtonText: 'Cancel',
     okButtonClickHandler: function() {},
     cancelButtonClickHandler: function() {},
-    loading: false,
+    isLoading: false,
   };
 
   handleOkClick() {
@@ -47,7 +47,7 @@ export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {
     const okButtonClasses = 'ConfirmDialog-button button button-primary ' + this.props.okButtonClasses;
     const cancelButtonClasses = 'ConfirmDialog-button button ' + this.props.cancelButtonClasses;
 
-    return !this.props.loading
+    return !this.props.isLoading
       ? <div className='ConfirmDialog'>
           <div className='ConfirmDialog-message'>{this.props.message}</div>
           <div className='ConfirmDialog-buttons'>

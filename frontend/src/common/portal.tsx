@@ -24,7 +24,7 @@ export function confirmDialog(title: React.ReactNode, body: React.ReactNode, okH
   }
   closePortal();
   openPortal(
-    <Modal title={title} closeModalCallback={cancelHandler}>
+    <Modal title={title} onClose={cancelHandler}>
       <ConfirmDialog message={body} {...options} />
     </Modal>
   );

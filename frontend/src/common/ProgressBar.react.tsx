@@ -3,7 +3,7 @@ import * as React from 'react';
 import './ProgressBar.less';
 
 interface ProgressBarState {
-  display?: boolean;
+  isVisible?: boolean;
   progress?: number;
 }
 
@@ -12,7 +12,7 @@ export default class ProgressBar extends React.Component<React.Props<JSX.Element
   constructor() {
     super();
     this.state = {
-      display: false,
+      isVisible: false,
       progress: 0,
     };
   }
@@ -20,20 +20,22 @@ export default class ProgressBar extends React.Component<React.Props<JSX.Element
   progress(progress: number) {
     this.setState({
       progress: progress,
-      display: progress < 100,
+      isVisible: progress < 100,
     });
   }
 
   render() {
+    const { isVisible, progress } = this.state;
+
     const styles = {
-      transform: `translate3d(${this.state.progress - 100}%,0px,0px)`,
-      display: (this.state.display ? 'inline-block' : 'none'),
+      transform: `translate3d(${progress - 100}%,0px,0px)`,
+      display: (isVisible ? 'inline-block' : 'none'),
     };
-    const className = 'ProgressBar';
+
     return (
-      <div className={className}>
+      <div className='ProgressBar'>
         <div className='ProgressBar-bar' style={styles}>
-          <div className={'ProgressBar-spinner' + (this.state.display ? '' : ' hide')}></div>
+          <div className={'ProgressBar-spinner' + (isVisible ? '' : ' hide')}></div>
           <div className='ProgressBar-spinner-icon'></div>
         </div>
       </div>

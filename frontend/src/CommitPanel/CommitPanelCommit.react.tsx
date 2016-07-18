@@ -8,19 +8,21 @@ interface CommitPanelCommitProps extends React.Props<JSX.Element> {
 }
 
 interface CommitPanelCommitState {
-  displayForm: boolean;
+  isFormVisible: boolean;
 }
 
 export default class CommitPanelCommit extends React.Component<CommitPanelCommitProps, CommitPanelCommitState> {
 
   constructor() {
     super();
-    this.state = { displayForm: false };
+    this.state = {
+      isFormVisible: false
+    };
     this.onSubmit = this.onSubmit.bind(this);
   }
 
   render() {
-    return this.state.displayForm
+    return this.state.isFormVisible
       ? this.renderForm()
       : this.renderButtons();
   }
@@ -85,11 +87,15 @@ export default class CommitPanelCommit extends React.Component<CommitPanelCommit
   }
 
   private displayForm() {
-    this.setState({ displayForm: true });
+    this.setState({
+      isFormVisible: true
+    });
   }
 
   private hideForm() {
-    this.setState({ displayForm: false });
+    this.setState({
+      isFormVisible: false
+    });
   }
 
 }

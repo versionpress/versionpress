@@ -4,8 +4,8 @@ import * as portal from './portal';
 import './Modal.less';
 
 interface ModalProps extends React.Props<JSX.Element> {
-  closeModalCallback?: Function;
-  backgroundClickToClose?: boolean;
+  onClose?: Function;
+  enableBackgroundClickToClose?: boolean;
   showCloseIcon?: boolean;
   title?: React.ReactNode;
   children?: React.ReactElement<any>;
@@ -22,7 +22,7 @@ export default class Modal extends React.Component<ModalProps, any> {
   }
 
   static defaultProps = {
-    backgroundClickToClose: true,
+    enableBackgroundClickToClose: true,
     showCloseIcon: true,
   };
 
@@ -65,7 +65,7 @@ export default class Modal extends React.Component<ModalProps, any> {
   }
 
   backgroundClickHandler(e) {
-    if (this.props.backgroundClickToClose && e.target.getAttribute('data-clickcatcher')) {
+    if (this.props.enableBackgroundClickToClose && e.target.getAttribute('data-clickcatcher')) {
       this.closeModalHandler(e);
     }
   }
@@ -73,8 +73,8 @@ export default class Modal extends React.Component<ModalProps, any> {
   closeModalHandler(e) {
     e.stopPropagation();
 
-    if (typeof this.props.closeModalCallback === 'function') {
-      this.props.closeModalCallback();
+    if (typeof this.props.onClose === 'function') {
+      this.props.onClose();
     }
     portal.closePortal();
   }

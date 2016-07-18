@@ -19,14 +19,17 @@ interface CommitPanelState {
   diff?: string;
   gitStatus?: string[][];
   error?: string;
-  loading?: boolean;
+  isLoading?: boolean;
 }
 
 export default class CommitPanel extends React.Component<CommitPanelProps, CommitPanelState> {
 
   constructor() {
     super();
-    this.state = {detailsLevel: 'none', loading: false};
+    this.state = {
+      detailsLevel: 'none',
+      isLoading: false
+    };
   }
 
   render() {
@@ -64,7 +67,8 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
     if (!this.state.error && this.state.detailsLevel === 'none') {
       return null;
     }
-    const className = 'CommitPanel-details' + (this.state.loading ? ' loading' : '');
+
+    const className = 'CommitPanel-details' + (this.state.isLoading ? ' loading' : '');
     const content = this.state.detailsLevel === 'overview'
       ? <CommitPanelOverview gitStatus={this.state.gitStatus} />
       : <CommitPanelDetails diff={this.state.diff} />;
@@ -72,7 +76,7 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
     return (
       <div className={className}>
         {this.renderToggle()}
-        {this.state.loading
+        {this.state.isLoading
           ? <div className='CommitPanel-details-loader'></div>
           : null
         }
@@ -107,31 +111,49 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
 
   private changeDetailsLevel(detailsLevel: string) {
     if (detailsLevel === 'overview' && !this.state.gitStatus) {
-      this.setState({loading: true});
+      this.setState({
+        isLoading: true
+      });
+
       this.props.gitStatusProvider.getGitStatus()
         .then(gitStatus => this.setState({
             detailsLevel: detailsLevel,
             gitStatus: gitStatus,
             error: null,
-            loading: false,
+            isLoading: false,
           })
         ).catch(err => {
-          this.setState({detailsLevel: detailsLevel, error: err.message, loading: false});
+          this.setState({
+            detailsLevel: detailsLevel,
+            error: err.message,
+            isLoading: false
+          });
         });
     } else if (detailsLevel === 'full-diff' && !this.state.diff) {
-      this.setState({loading: true});
+      this.setState({
+        isLoading: true
+      });
+
       this.props.diffProvider.getDiff('')
         .then(diff => this.setState({
             detailsLevel: detailsLevel,
             diff: diff,
             error: null,
-            loading: false,
+            isLoading: false,
           })
         ).catch(err => {
-          this.setState({detailsLevel: detailsLevel, error: err.message, loading: false});
+          this.setState({
+            detailsLevel: detailsLevel,
+            error: err.message,
+            isLoading: false
+          });
         });
     } else {
-      this.setState({detailsLevel: detailsLevel, error: null, loading: false});
+      this.setState({
+        detailsLevel: detailsLevel,
+        error: null,
+        isLoading: false
+      });
     }
   }
 

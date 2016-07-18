@@ -9,22 +9,17 @@ interface CommitsTableRowDetailsProps extends React.Props<JSX.Element> {
   commit: Commit;
   detailsLevel: string;
   diff?: string;
-  loading?: boolean;
+  isLoading?: boolean;
 }
 
 export default class CommitsTableRowDetails extends React.Component<CommitsTableRowDetailsProps, {}> {
-
-  constructor() {
-    super();
-    this.state = {display: 'none'};
-  }
 
   render() {
     if (this.props.commit === null || this.props.detailsLevel === 'none') {
       return <tr />;
     }
     const commit = this.props.commit;
-    const className = 'details-row' + (commit.isEnabled ? '' : 'disabled') + (this.props.loading ? ' loading' : '');
+    const className = 'details-row' + (commit.isEnabled ? '' : 'disabled') + (this.props.isLoading ? ' loading' : '');
     const detailsClass = 'details';
 
     const overview = <CommitOverview commit={commit} />;
@@ -36,7 +31,7 @@ export default class CommitsTableRowDetails extends React.Component<CommitsTable
         <td />
         <td />
         <td>
-          {this.props.loading
+          {this.props.isLoading
             ? <div className='details-row-loader'/>
             : null
           }
