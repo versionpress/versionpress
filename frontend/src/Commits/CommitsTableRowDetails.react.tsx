@@ -1,6 +1,7 @@
 /// <reference path='./Commits.d.ts' />
 
 import * as React from 'react';
+import * as classNames from 'classnames';
 
 import CommitOverview from './CommitOverview.react';
 import DiffPanel from './DiffPanel.react';
@@ -15,43 +16,48 @@ interface CommitsTableRowDetailsProps extends React.Props<JSX.Element> {
 export default class CommitsTableRowDetails extends React.Component<CommitsTableRowDetailsProps, {}> {
 
   render() {
-    if (this.props.commit === null || this.props.detailsLevel === 'none') {
+    const { commit, detailsLevel, isLoading, diff } = this.props;
+
+    if (commit === null || detailsLevel === 'none') {
       return <tr />;
     }
-    const commit = this.props.commit;
-    const className = 'details-row' + (commit.isEnabled ? '' : 'disabled') + (this.props.isLoading ? ' loading' : '');
-    const detailsClass = 'details';
 
-    const overview = <CommitOverview commit={commit} />;
+    const rowClassName = classNames({
+      'details-row': true,
+      'disabled': !commit.isEnabled,
+      'loading': isLoading
+    });
 
     const overviewRow = (
-      <tr className={className}>
+      <tr className={rowClassName}>
         <td />
         <td />
         <td />
         <td />
         <td>
-          {this.props.isLoading
+          {isLoading
             ? <div className='details-row-loader'/>
             : null
           }
-          <div className={detailsClass}>{overview}</div>
+          <div className='details'>
+            <CommitOverview commit={commit} />
+          </div>
         </td>
         <td />
       </tr>
     );
 
     const fullDiffRow = (
-      <tr className={className}>
+      <tr className={rowClassName}>
         <td colSpan={6}>
-          <div className={detailsClass}>
-            <DiffPanel diff={this.props.diff} />
+          <div className='details'>
+            <DiffPanel diff={diff} />
           </div>
         </td>
       </tr>
     );
 
-    return this.props.detailsLevel === 'overview' ? overviewRow : fullDiffRow;
+    return detailsLevel === 'overview' ? overviewRow : fullDiffRow;
   }
 
 }

@@ -1,6 +1,8 @@
+
 /// <reference path='../Commits/Commits.d.ts' />
 
 import * as React from 'react';
+import * as classNames from 'classnames';
 
 import './BulkActionPanel.less';
 
@@ -31,6 +33,11 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
   render() {
     const { selectedCommits, enableActions } = this.props;
 
+    const noteClassName = classNames({
+      'BulkActionPanel-note': true,
+      'hide': selectedCommits.length === 0
+    });
+
     return (
       <div className='BulkActionPanel'>
         <div className='alignleft actions bulkactions'>
@@ -47,7 +54,7 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
             onClick={this.onBulkAction.bind(this)}
             disabled={!enableActions || selectedCommits.length === 0}
           />
-          <div className={'BulkActionPanel-note' + (selectedCommits.length === 0 ? ' hide' : '')}>
+          <div className={noteClassName}>
             ({selectedCommits.length} {selectedCommits.length === 1 ? 'change' : 'changes'} selected;{' '}
             <a className='BulkActionPanel-clear' href='#' onClick={this.onClearSelection.bind(this)}>clear selection</a>
             )

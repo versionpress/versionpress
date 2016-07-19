@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as classNames from 'classnames';
 
 import CommitPanelCommit from './CommitPanelCommit.react';
 import CommitPanelNotice from './CommitPanelNotice.react';
@@ -33,16 +34,21 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
   }
 
   render() {
-    const className = 'CommitPanel-notice' + (this.state.detailsLevel !== 'none' ? ' CommitPanel-notice--expanded' : '');
+    const { detailsLevel } = this.state;
+
+    const noticeClassName = classNames({
+      'CommitPanel-notice': true,
+      'CommitPanel-notice--expanded': detailsLevel !== 'none'
+    });
 
     return (
       <div className='CommitPanel'>
-        <div className={className}>
+        <div className={noticeClassName}>
           <CommitPanelNotice
-            onDetailsLevelChanged={detailsLevel => this.changeDetailsLevel(detailsLevel)}
-            detailsLevel={this.state.detailsLevel}
+            onDetailsLevelChanged={newDetailsLevel => this.changeDetailsLevel(newDetailsLevel)}
+            detailsLevel={detailsLevel}
           />
-          {this.state.detailsLevel !== 'none'
+          {detailsLevel !== 'none'
             ? <CommitPanelCommit
                 onCommit={this.props.onCommit}
                 onDiscard={this.props.onDiscard}
@@ -68,13 +74,16 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
       return null;
     }
 
-    const className = 'CommitPanel-details' + (this.state.isLoading ? ' loading' : '');
+    const detailsClassName = classNames({
+      'CommitPanel-details': true,
+      'loading': this.state.isLoading
+    });
     const content = this.state.detailsLevel === 'overview'
       ? <CommitPanelOverview gitStatus={this.state.gitStatus} />
       : <CommitPanelDetails diff={this.state.diff} />;
 
     return (
-      <div className={className}>
+      <div className={detailsClassName}>
         {this.renderToggle()}
         {this.state.isLoading
           ? <div className='CommitPanel-details-loader'></div>

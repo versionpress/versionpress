@@ -5,6 +5,7 @@ import * as ReactRouter from 'react-router';
 import * as request from 'superagent';
 import * as moment from 'moment';
 import * as Promise from 'core-js/es6/promise';
+import * as classNames from 'classnames';
 import update = require('react-addons-update');
 import BulkActionPanel from '../BulkActionPanel/BulkActionPanel.react';
 import CommitPanel from '../CommitPanel/CommitPanel.react';
@@ -443,8 +444,12 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   render() {
     const enableActions = !this.state.isDirtyWorkingDirectory;
 
+    const homePageClassName = classNames({
+      'loading': this.state.isLoading
+    });
+
     return (
-      <div className={this.state.isLoading ? 'loading' : ''}>
+      <div className={homePageClassName}>
         <ProgressBar ref='progress' />
         <ServicePanelButton onClick={this.toggleServicePanel.bind(this)} />
         <h1 className='vp-header'>VersionPress</h1>

@@ -3,6 +3,7 @@
   "env": "browser",
   "version": false,
   "ambientDependencies": {
+    "classnames": "registry:dt/classnames#0.0.0+20160316155526",
     "core-js": "registry:dt/core-js#0.0.0+20160317120654",
     "diff": "registry:dt/diff#0.0.0+20160318080727",
     "moment": "registry:dt/moment#2.8.0+20160316155526",
