@@ -31,12 +31,10 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
       'disabled': !commit.isEnabled,
       'displayed-details': detailsLevel !== 'none'
     });
-
     const undoClassName = classNames({
       'vp-table-undo': true,
       'disabled': commit.isMerge || !enableActions
     });
-
     const rollbackClassName = classNames({
       'vp-table-rollback': true,
       'disabled': !enableActions
