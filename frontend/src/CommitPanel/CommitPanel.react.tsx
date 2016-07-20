@@ -25,12 +25,57 @@ interface CommitPanelState {
 
 export default class CommitPanel extends React.Component<CommitPanelProps, CommitPanelState> {
 
-  constructor() {
-    super();
-    this.state = {
-      detailsLevel: 'none',
-      isLoading: false
-    };
+  state: CommitPanelState = {
+    detailsLevel: 'none',
+    isLoading: false
+  }
+
+  onChangeDetailsLevel = (detailsLevel: string) => {
+    if (detailsLevel === 'overview' && !this.state.gitStatus) {
+      this.setState({
+        isLoading: true
+      });
+
+      this.props.gitStatusProvider.getGitStatus()
+        .then(gitStatus => this.setState({
+            detailsLevel: detailsLevel,
+            gitStatus: gitStatus,
+            error: null,
+            isLoading: false,
+          })
+        ).catch(err => {
+        this.setState({
+          detailsLevel: detailsLevel,
+          error: err.message,
+          isLoading: false
+        });
+      });
+    } else if (detailsLevel === 'full-diff' && !this.state.diff) {
+      this.setState({
+        isLoading: true
+      });
+
+      this.props.diffProvider.getDiff('')
+        .then(diff => this.setState({
+            detailsLevel: detailsLevel,
+            diff: diff,
+            error: null,
+            isLoading: false,
+          })
+        ).catch(err => {
+        this.setState({
+          detailsLevel: detailsLevel,
+          error: err.message,
+          isLoading: false
+        });
+      });
+    } else {
+      this.setState({
+        detailsLevel: detailsLevel,
+        error: null,
+        isLoading: false
+      });
+    }
   }
 
   render() {
@@ -45,7 +90,7 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
       <div className='CommitPanel'>
         <div className={noticeClassName}>
           <CommitPanelNotice
-            onDetailsLevelChanged={newDetailsLevel => this.changeDetailsLevel(newDetailsLevel)}
+            onDetailsLevelChanged={this.onChangeDetailsLevel}
             detailsLevel={detailsLevel}
           />
           {detailsLevel !== 'none'
@@ -107,63 +152,15 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
         <button
           className='button'
           disabled={this.state.detailsLevel === 'overview'}
-          onClick={() => this.changeDetailsLevel('overview')}
+          onClick={() => this.onChangeDetailsLevel('overview')}
         >Overview</button>
         <button
           className='button'
           disabled={this.state.detailsLevel === 'full-diff'}
-          onClick={() => this.changeDetailsLevel('full-diff')}
+          onClick={() => this.onChangeDetailsLevel('full-diff')}
         >Full diff</button>
       </div>
     );
-  }
-
-  private changeDetailsLevel(detailsLevel: string) {
-    if (detailsLevel === 'overview' && !this.state.gitStatus) {
-      this.setState({
-        isLoading: true
-      });
-
-      this.props.gitStatusProvider.getGitStatus()
-        .then(gitStatus => this.setState({
-            detailsLevel: detailsLevel,
-            gitStatus: gitStatus,
-            error: null,
-            isLoading: false,
-          })
-        ).catch(err => {
-          this.setState({
-            detailsLevel: detailsLevel,
-            error: err.message,
-            isLoading: false
-          });
-        });
-    } else if (detailsLevel === 'full-diff' && !this.state.diff) {
-      this.setState({
-        isLoading: true
-      });
-
-      this.props.diffProvider.getDiff('')
-        .then(diff => this.setState({
-            detailsLevel: detailsLevel,
-            diff: diff,
-            error: null,
-            isLoading: false,
-          })
-        ).catch(err => {
-          this.setState({
-            detailsLevel: detailsLevel,
-            error: err.message,
-            isLoading: false
-          });
-        });
-    } else {
-      this.setState({
-        detailsLevel: detailsLevel,
-        error: null,
-        isLoading: false
-      });
-    }
   }
 
 }
