@@ -13,21 +13,11 @@ interface CommitPanelCommitState {
 
 export default class CommitPanelCommit extends React.Component<CommitPanelCommitProps, CommitPanelCommitState> {
 
-  constructor() {
-    super();
-    this.state = {
-      isFormVisible: false
-    };
-    this.onSubmit = this.onSubmit.bind(this);
+  state: CommitPanelCommitState = {
+    isFormVisible: false
   }
 
-  render() {
-    return this.state.isFormVisible
-      ? this.renderForm()
-      : this.renderButtons();
-  }
-
-  onSubmit(e: React.SyntheticEvent) {
+  onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const message = e.target['message'].value;
@@ -37,7 +27,7 @@ export default class CommitPanelCommit extends React.Component<CommitPanelCommit
     }
   }
 
-  onDiscard(e: React.MouseEvent) {
+  onDiscard = (e: React.MouseEvent) => {
     e.preventDefault();
     const body = <div>This action cannot be undone, are you sure?</div>;
     const options = { okButtonText: 'Proceed' };
@@ -45,16 +35,38 @@ export default class CommitPanelCommit extends React.Component<CommitPanelCommit
     portal.confirmDialog('Warning', body, this.props.onDiscard, () => {}, options);
   }
 
+  onCommitClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    this.setState({
+      isFormVisible: true
+    });
+  }
+
+  onCancelCommitClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    this.setState({
+      isFormVisible: false
+    });
+  }
+
+  render() {
+    return this.state.isFormVisible
+      ? this.renderForm()
+      : this.renderButtons();
+  }
+
   private renderButtons() {
     return (
       <div className='CommitPanel-commit'>
         <a
           className='button button-primary CommitPanel-commit-button'
-          onClick={() => this.displayForm()}
+          onClick={this.onCommitClick}
         >Commit changes</a>
         <a
           className='button CommitPanel-commit-button'
-          onClick={this.onDiscard.bind(this)}
+          onClick={this.onDiscard}
         >Discard changes</a>
       </div>
     );
@@ -77,25 +89,13 @@ export default class CommitPanelCommit extends React.Component<CommitPanelCommit
           />
           <input
             className='button CommitPanel-commit-button'
-            onClick={() => this.hideForm()}
+            onClick={this.onCancelCommitClick}
             type='button'
             value='Cancel'
           />
         </form>
       </div>
     );
-  }
-
-  private displayForm() {
-    this.setState({
-      isFormVisible: true
-    });
-  }
-
-  private hideForm() {
-    this.setState({
-      isFormVisible: false
-    });
   }
 
 }
