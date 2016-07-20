@@ -90,7 +90,7 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
       <div className='CommitPanel'>
         <div className={noticeClassName}>
           <CommitPanelNotice
-            onDetailsLevelChanged={this.onChangeDetailsLevel}
+            onDetailsLevelChange={this.onChangeDetailsLevel}
             detailsLevel={detailsLevel}
           />
           {detailsLevel !== 'none'
