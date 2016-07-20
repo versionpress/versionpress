@@ -76,6 +76,7 @@ term_taxonomy:
   mn-references:
     ~term_relationships.object_id: post
   ignored-columns:
+    - count: '@\VersionPress\Synchronizers\TermTaxonomiesSynchronizer::fixPostsCount'
 
 usermeta:
   id: umeta_id
