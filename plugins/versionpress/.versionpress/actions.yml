@@ -66,28 +66,49 @@ commentmeta:
   tags:
     VP-Comment-Id: vp_comment_id
     VP-CommentMeta-Key: meta_key
+  parent-id-tag: VP-Comment-Id
   actions:
-    create: Created commentmeta '%VP-CommentMeta-Key%'
-    edit: Edited commentmeta '%VP-CommentMeta-Key%'
-    delete: Deleted commentmeta '%VP-CommentMeta-Key%'
+    create:
+      message: Created commentmeta '%VP-CommentMeta-Key%'
+      priority: 15
+    edit:
+      message: Edited commentmeta '%VP-CommentMeta-Key%'
+      priority: 15
+    delete:
+      message: Deleted commentmeta '%VP-CommentMeta-Key%'
+      priority: 15
 
 usermeta:
   tags:
     VP-User-Id: vp_user_id
     VP-UserMeta-Key: meta_key
+  parent-id-tag: VP-User-Id
   actions:
-    create: Created usermeta '%VP-UserMeta-Key%'
-    edit: Edited usermeta '%VP-UserMeta-Key%'
-    delete: Deleted usermeta '%VP-UserMeta-Key%'
+    create:
+      message: Created usermeta '%VP-UserMeta-Key%'
+      priority: 15
+    edit:
+      message: Edited usermeta '%VP-UserMeta-Key%'
+      priority: 15
+    delete:
+      message: Deleted usermeta '%VP-UserMeta-Key%'
+      priority: 15
 
 termmeta:
   tags:
     VP-Term-Id: vp_term_id
     VP-TermMeta-Key: meta_key
+  parent-id-tag: VP-Term-Id
   actions:
-    create: Created termmeta '%VP-TermMeta-Key%'
-    edit: Edited termmeta '%VP-TermMeta-Key%'
-    delete: Deleted termmeta '%VP-TermMeta-Key%'
+    create:
+      message: Created termmeta '%VP-TermMeta-Key%'
+      priority: 15
+    edit:
+      message: Edited termmeta '%VP-TermMeta-Key%'
+      priority: 15
+    delete:
+      message: Deleted termmeta '%VP-TermMeta-Key%'
+      priority: 15
 
 postmeta:
   tags:
@@ -95,7 +116,14 @@ postmeta:
     VP-PostMeta-Key: meta_key
     VP-Post-Type: /
     VP-Post-Title: /
+  parent-id-tag: VP-Post-Id
   actions:
-    create: Created postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'
-    edit: Edited postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'
-    delete: Deleted postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'
+    create:
+      message: Created postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'
+      priority: 15
+    edit:
+      message: Edited postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'
+      priority: 15
+    delete:
+      message: Deleted postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'
+      priority: 15
