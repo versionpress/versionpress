@@ -25,8 +25,11 @@ interface CommitPanelState {
 
 export default class CommitPanel extends React.Component<CommitPanelProps, CommitPanelState> {
 
-  state: CommitPanelState = {
+  state = {
     detailsLevel: 'none',
+    diff: null,
+    gitStatus: null,
+    error: null,
     isLoading: false
   }
 

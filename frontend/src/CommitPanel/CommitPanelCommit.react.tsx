@@ -13,7 +13,7 @@ interface CommitPanelCommitState {
 
 export default class CommitPanelCommit extends React.Component<CommitPanelCommitProps, CommitPanelCommitState> {
 
-  state: CommitPanelCommitState = {
+  state = {
     isFormVisible: false
   }
 
