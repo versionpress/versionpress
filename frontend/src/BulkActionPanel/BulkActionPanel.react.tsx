@@ -1,4 +1,3 @@
-
 /// <reference path='../Commits/Commits.d.ts' />
 
 import * as React from 'react';
@@ -15,7 +14,7 @@ interface BulkActionPanelProps extends React.Props<JSX.Element> {
 
 export default class BulkActionPanel extends React.Component<BulkActionPanelProps, {}> {
 
-  onBulkAction(e: MouseEvent) {
+  onBulkAction = (e: React.MouseEvent) => {
     e.preventDefault();
     const value = (this.refs['action'] as HTMLSelectElement).value;
     if (value === '-1') {
@@ -25,7 +24,7 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
     this.props.onBulkAction(value);
   }
 
-  onClearSelection(e: MouseEvent) {
+  onClearSelection = (e: React.MouseEvent) => {
     e.preventDefault();
     this.props.onClearSelection();
   }
@@ -51,12 +50,12 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
             id='BulkActionPanel-doaction'
             className='button action'
             value='Apply'
-            onClick={this.onBulkAction.bind(this)}
+            onClick={this.onBulkAction}
             disabled={!enableActions || selectedCommits.length === 0}
           />
           <div className={noteClassName}>
             ({selectedCommits.length} {selectedCommits.length === 1 ? 'change' : 'changes'} selected;{' '}
-            <a className='BulkActionPanel-clear' href='#' onClick={this.onClearSelection.bind(this)}>clear selection</a>
+            <a className='BulkActionPanel-clear' href='#' onClick={this.onClearSelection}>clear selection</a>
             )
           </div>
         </div>
