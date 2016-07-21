@@ -1,7 +1,9 @@
 <?php
 namespace VersionPress\ChangeInfos;
 
+use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\CommitMessage;
 use VersionPress\Git\GitRepository;
 
@@ -51,7 +53,7 @@ class RevertChangeInfo extends TrackedChangeInfo
         return $this->commitHash;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
     {
         $tags = $commitMessage->getVersionPressTags();
         list(, $action, $commitHash) = explode("/", $tags[TrackedChangeInfo::ACTION_TAG], 3);

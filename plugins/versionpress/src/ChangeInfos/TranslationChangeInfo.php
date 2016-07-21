@@ -3,6 +3,8 @@
 namespace VersionPress\ChangeInfos;
 
 use Nette\Utils\Strings;
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\CommitMessage;
 use VersionPress\Utils\StringUtils;
 
@@ -73,7 +75,7 @@ class TranslationChangeInfo extends TrackedChangeInfo
         return $this->languageCode;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
     {
         $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         $languageCode = $commitMessage->getVersionPressTag(self::LANGUAGE_CODE_TAG);

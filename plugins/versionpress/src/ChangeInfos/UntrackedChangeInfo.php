@@ -1,6 +1,8 @@
 <?php
 namespace VersionPress\ChangeInfos;
 
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\CommitMessage;
 
 /**
@@ -26,7 +28,7 @@ class UntrackedChangeInfo implements ChangeInfo
         return $this->commitMessage;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
     {
         return new self($commitMessage);
     }

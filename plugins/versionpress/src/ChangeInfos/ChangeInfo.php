@@ -2,6 +2,8 @@
 
 namespace VersionPress\ChangeInfos;
 
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\CommitMessage;
 
 /**
@@ -36,4 +38,15 @@ interface ChangeInfo
      * @return string
      */
     public function getChangeDescription();
+
+    /**
+     * Factory method - builds a ChangeInfo object from a commit message. Used when VersionPress
+     * table is constructed; hooks use the normal constructor.
+     *
+     * @param CommitMessage $commitMessage
+     * @param DbSchemaInfo $dbSchema
+     * @param ActionsInfo $actionsInfo
+     * @return ChangeInfo
+     */
+    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo);
 }

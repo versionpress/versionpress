@@ -1,6 +1,8 @@
 <?php
 namespace VersionPress\ChangeInfos;
 
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\CommitMessage;
 
 /**
@@ -48,7 +50,7 @@ class WordPressUpdateChangeInfo extends TrackedChangeInfo
         return $this->newVersion;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
     {
         $tags = $commitMessage->getVersionPressTags();
         $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];

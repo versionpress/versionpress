@@ -3,6 +3,8 @@
 namespace VersionPress\ChangeInfos;
 
 use Nette\Utils\Strings;
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\CommitMessage;
 use VersionPress\Utils\StringUtils;
 
@@ -60,7 +62,7 @@ class ThemeChangeInfo extends TrackedChangeInfo
         return $this->action;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
     {
         $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
         $themeName = $commitMessage->getVersionPressTag(self::THEME_NAME_TAG);
