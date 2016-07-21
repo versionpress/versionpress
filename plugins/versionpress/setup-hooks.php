@@ -2,6 +2,7 @@
 
 use Nette\Utils\Strings;
 use VersionPress\Api\VersionPressApi;
+use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\PluginChangeInfo;
 use VersionPress\ChangeInfos\PostChangeInfo;
 use VersionPress\ChangeInfos\TermChangeInfo;
@@ -14,6 +15,7 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Database\WpdbMirrorBridge;
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\Committer;
 use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Git\Reverter;
@@ -313,19 +315,21 @@ function vp_register_hooks()
         }
     }, 10, 2);
 
-    add_action('pre_delete_term', function ($termId, $taxonomy) use ($committer, $vpidRepository) {
+    add_action('pre_delete_term', function ($termId, $taxonomy) use ($committer, $vpidRepository, $dbSchemaInfo, $actionsInfo) {
         $termVpid = $vpidRepository->getVpidForEntity('term', $termId);
         $term = get_term($termId, $taxonomy);
-        $committer->forceChangeInfo(new TermChangeInfo('delete', $termVpid, $term->name, $taxonomy));
+        $termEntityInfo = $dbSchemaInfo->getEntityInfo('term');
+        $changeInfo = new EntityChangeInfo($termEntityInfo, $actionsInfo, 'delete', $termVpid, ['VP-Term-Name' => $term->name, 'VP-Term-Taxonomy' => $taxonomy]);
+        $committer->forceChangeInfo($changeInfo);
     }, 10, 2);
 
     add_action('set_object_terms', vp_create_update_post_terms_hook($mirror, $vpidRepository));
 
-    // @codingStandardsIgnoreLine
-    add_filter('wp_save_image_editor_file', function ($saved, $filename, $image, $mime_type, $post_id) use ($vpidRepository, $committer) {
+    add_filter('wp_save_image_editor_file', function ($saved, $filename, $image, $mime_type, $post_id) use ($vpidRepository, $committer, $dbSchemaInfo, $actionsInfo) {
         $vpid = $vpidRepository->getVpidForEntity('post', $post_id);
         $post = get_post($post_id);
-        $committer->forceChangeInfo(new PostChangeInfo('edit', $vpid, $post->post_type, $post->post_title));
+        $changeInfo = new EntityChangeInfo($dbSchemaInfo->getEntityInfo('post'), $actionsInfo, 'edit', $vpid, ['VP-Post-Type' => $post->post_type, 'VP-Post-Title' => $post->post_title]);
+        $committer->forceChangeInfo($changeInfo);
     }, 10, 5);
 
     add_filter('plugin_install_action_links', function ($links, $plugin) {
@@ -1018,7 +1022,9 @@ function versionpress_api_init()
     $gitRepository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
     $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
     $synchronizationProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
+    $dbSchema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
+    $actionsInfo = $versionPressContainer->resolve(VersionPressServices::ACTIONS_INFO);
 
-    $vpApi = new VersionPressApi($gitRepository, $reverter, $synchronizationProcess);
+    $vpApi = new VersionPressApi($gitRepository, $reverter, $synchronizationProcess, $dbSchema, $actionsInfo);
     $vpApi->registerRoutes();
 }
