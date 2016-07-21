@@ -105,6 +105,26 @@ function vp_register_hooks()
     $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
     /** @var \VersionPress\Database\Database $database */
     $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
+    /** @var ActionsInfo $actionsInfo */
+    $actionsInfo = $versionPressContainer->resolve(VersionPressServices::ACTIONS_INFO);
+
+
+
+    add_action('init', function () {
+        if (!function_exists('get_plugins')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+
+        $plugins = wp_get_active_and_valid_plugins();
+
+        foreach ($plugins as $pluginFile) {
+            $pluginDir = dirname($pluginFile);
+            $hooksFile = $pluginDir . '/.versionpress/hooks.php';
+            if (file_exists($hooksFile)) {
+                require_once $hooksFile;
+            }
+        }
+    });
 
     /**
      *  Hook for saving taxonomies into files
