@@ -3,6 +3,8 @@
 namespace VersionPress\Tests\End2End\Utils;
 
 use PHPUnit_Framework_TestCase;
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\GitRepository;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\CommitAsserter;
@@ -37,10 +39,11 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase
         $uploadsDir = self::$wpAutomation->getUploadsDir();
         $relativePathToUploads = PathUtils::getRelativePath(self::$testConfig->testSite->path, $uploadsDir);
 
-        $this->commitAsserter = new CommitAsserter(
-            $this->gitRepository,
-            ['vpdb' => $relativePathToVpdb, 'uploads' => $relativePathToUploads]
-        );
+        $dbSchema = new DbSchemaInfo(self::$wpAutomation->getPluginsDir() . '/versionpress/src/Database/wordpress-schema.yml', self::$testConfig->testSite->dbTablePrefix, PHP_INT_MAX);
+
+        $actionsInfo = new ActionsInfo([self::$wpAutomation->getPluginsDir() . '/versionpress/.versionpress/actions.yml']);
+
+        $this->commitAsserter = new CommitAsserter($this->gitRepository, $dbSchema, $actionsInfo, ['vpdb' => $relativePathToVpdb, 'uploads' => $relativePathToUploads]);
     }
 
     protected function setUp()

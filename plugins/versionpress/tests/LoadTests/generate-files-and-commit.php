@@ -3,6 +3,7 @@
 use Composer\Autoload\ClassLoader;
 use VersionPress\Storages\Mirror;
 use VersionPress\Storages\StorageFactory;
+use VersionPress\Tests\Utils\HookMock;
 
 $opts = ['from:', 'to:'];
 $args = getopt('', $opts);
@@ -18,6 +19,8 @@ require_once(__DIR__ . '/../../vendor/autoload.php');
 $classloader = new ClassLoader();
 $classloader->addPsr4('VersionPress\\', __DIR__ . '/../../src');
 $classloader->register();
+
+HookMock::setUp(HookMock::TRUE_HOOKS);
 
 // @codingStandardsIgnoreLine
 class FooChangeInfo extends \VersionPress\ChangeInfos\TrackedChangeInfo

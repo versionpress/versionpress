@@ -4,6 +4,7 @@ namespace VersionPress\Tests\StorageTests;
 
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Git\ActionsInfo;
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Storages\StorageFactory;
@@ -35,6 +36,7 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase
         $wpdbStub->prefix = 'prefix_';
 
         $database = new Database($wpdbStub);
+        $actionsInfo = $this->getMockBuilder(ActionsInfo::class)->disableOriginalConstructor()->getMock();
 
         $factory = new StorageFactory(
             __DIR__ . '/vpdb',
@@ -44,11 +46,12 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase
                 PHP_INT_MAX
             ),
             $database,
-            []
+            [],
+            $actionsInfo
         );
+
         foreach ($storages as $entityName => $expectedClass) {
             $this->assertInstanceOf($expectedClass, $factory->getStorage($entityName));
         }
-
     }
 }

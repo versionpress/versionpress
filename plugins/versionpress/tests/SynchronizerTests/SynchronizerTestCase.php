@@ -7,6 +7,7 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesInfo;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Database\VpidRepository;
+use VersionPress\Git\ActionsInfo;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\DBAsserter;
@@ -46,6 +47,7 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
 
         $schemaReflection = new \ReflectionClass(DbSchemaInfo::class);
         $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.yml';
+        $actionsFile = self::$wpAutomation->getPluginsDir() . '/versionpress/.versionpress/actions.yml';
         $shortcodeFile = dirname($schemaReflection->getFileName()) . '/wordpress-shortcodes.yml';
 
         /** @var $wp_db_version */
@@ -56,14 +58,7 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
         }
 
         self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
-
-        foreach (self::$schemaInfo->getAllEntityNames() as $entityName) {
-            $entityInfo = self::$schemaInfo->getEntityInfo($entityName);
-            if (isset($entityInfo->changeInfoFactoryFn)) {
-                $entityInfo->changeInfoFactoryFn = function () {
-                };
-            }
-        }
+        $actionsInfo = new ActionsInfo([$actionsFile]);
 
         $dbHost = self::$testConfig->testSite->dbHost;
         $dbUser = self::$testConfig->testSite->dbUser;
@@ -78,7 +73,7 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
         self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, self::$vpidRepository);
 
         $vpdbPath = self::$wpAutomation->getVpdbDir();
-        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$database, []);
+        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$database, [], $actionsInfo);
         self::$urlReplacer = new AbsoluteUrlReplacer(self::$testConfig->testSite->url);
     }
 

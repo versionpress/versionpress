@@ -10,6 +10,8 @@ use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\ChangeInfoMatcher;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\Commit;
 
 /**
@@ -49,6 +51,10 @@ class CommitAsserter
     private $whichCommitParameter;
 
     private $pathPlaceholders;
+    /** @var DbSchemaInfo */
+    private $dbSchema;
+    /** @var ActionsInfo */
+    private $actionsInfo;
 
     /**
      * Create CommitAsserter to start tracking the git repo for future asserts. Should generally
@@ -56,12 +62,17 @@ class CommitAsserter
      * after it.
      *
      * @param \VersionPress\Git\GitRepository $gitRepository
+     * @param DbSchemaInfo $dbSchema
+     * @param ActionsInfo $actionsInfo
      * @param string[] $pathPlaceholders
      */
-    public function __construct($gitRepository, $pathPlaceholders = [])
+    public function __construct($gitRepository, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo, $pathPlaceholders = [])
     {
         $this->gitRepository = $gitRepository;
         $this->pathPlaceholders = $pathPlaceholders;
+        $this->dbSchema = $dbSchema;
+        $this->actionsInfo = $actionsInfo;
+
         if ($gitRepository->isVersioned()) {
             $this->startCommit = $gitRepository->getCommit($gitRepository->getLastCommitHash());
         }
@@ -387,7 +398,7 @@ class CommitAsserter
      */
     protected function getChangeInfo($commit)
     {
-        return ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
+        return ChangeInfoEnvelope::buildFromCommitMessage($commit->getMessage(), $this->dbSchema, $this->actionsInfo);
     }
 
 
