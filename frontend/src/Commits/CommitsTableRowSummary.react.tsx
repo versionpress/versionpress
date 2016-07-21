@@ -20,6 +20,38 @@ interface CommitsTableRowSummaryProps extends React.Props<JSX.Element> {
 
 export default class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps, {}> {
 
+  onCheckboxClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!this.props.enableActions) {
+      return;
+    }
+
+    const target = e.target as HTMLInputElement;
+    let checked;
+
+    if (target.tagName === 'INPUT') {
+      checked = target.checked;
+    } else {
+      const checkbox = target.getElementsByTagName('input')[0] as HTMLInputElement;
+      checked = !checkbox.checked;
+    }
+    this.props.onCommitSelect([this.props.commit], checked, e.shiftKey);
+  }
+
+  onDetailsLevelClick = (e: React.MouseEvent, detailsLevel: string) => {
+    e.stopPropagation();
+
+    this.props.onDetailsLevelChanged(detailsLevel);
+  }
+
+  onRowClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (this.props.commit.isEnabled) {
+      this.props.onDetailsLevelChanged(this.props.detailsLevel === 'none' ? 'overview' : 'none');
+    }
+  }
+
   render() {
     const { commit, enableActions, isSelected, detailsLevel } = this.props;
 
@@ -43,7 +75,7 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
     return (
       <tr
         className={rowClassName}
-        onClick={() => this.toggleDetails()}
+        onClick={this.onRowClick}
       >
         <td className='column-environment'>
           {commit.environment === '?'
@@ -52,10 +84,17 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
           }
         </td>
         {commit.canUndo
-          ? <td className='column-cb' onClick={this.onCheckboxClick.bind(this)}><input type='checkbox'
-                                                                                       checked={isSelected}
-                                                                                       disabled={!enableActions}
-                                                                                       readOnly={true}/></td>
+          ? <td
+              className='column-cb'
+              onClick={this.onCheckboxClick}
+            >
+              <input
+                type='checkbox'
+                checked={isSelected}
+                disabled={!enableActions}
+                readOnly={true}
+              />
+            </td>
           : <td className='column-cb' />
         }
         <td className='column-date' title={moment(commit.date).format('LLL')}>{moment(commit.date).fromNow()}</td>
@@ -79,12 +118,12 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
                 <button
                   className='button'
                   disabled={detailsLevel === 'overview'}
-                  onClick={(e) => { this.changeDetailsLevel('overview'); e.stopPropagation(); }}
+                  onClick={e => this.onDetailsLevelClick(e, 'overview')}
                 >Overview</button>
                 <button
                   className='button'
                   disabled={detailsLevel === 'full-diff'}
-                  onClick={(e) => { this.changeDetailsLevel('full-diff'); e.stopPropagation(); }}
+                  onClick={e => this.onDetailsLevelClick(e, 'full-diff')}
                 >Full diff</button>
               </div>
             : null
@@ -164,34 +203,6 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
     return author.name + ' <' + author.email + '>';
   }
 
-  private toggleDetails() {
-    if (this.props.commit.isEnabled) {
-      this.props.onDetailsLevelChanged(this.props.detailsLevel === 'none' ? 'overview' : 'none');
-    }
-  }
-
-  private onCheckboxClick(e: React.MouseEvent) {
-    e.stopPropagation();
-    if (!this.props.enableActions) {
-      return;
-    }
-
-    const target = e.target as HTMLInputElement;
-    let checked;
-
-    if (target.tagName === 'INPUT') {
-      checked = target.checked;
-    } else {
-      const checkbox = target.getElementsByTagName('input')[0] as HTMLInputElement;
-      checked = !checkbox.checked;
-    }
-    this.props.onCommitSelect([this.props.commit], checked, e.shiftKey);
-  }
-
-  private changeDetailsLevel(detailsLevel) {
-    this.props.onDetailsLevelChanged(detailsLevel);
-  }
-
   private renderMessage(message: string) {
     const messageChunks = /(.*)'(.*)'(.*)/.exec(message);
     if (!messageChunks || messageChunks.length < 4) {
@@ -205,4 +216,5 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
       </span>
     );
   }
+
 }
