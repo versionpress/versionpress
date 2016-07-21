@@ -318,3 +318,10 @@ add_filter('vp_entity_change_description_postmeta', function ($message, $action,
 
     return $message;
 }, 10, 4);
+
+add_filter('vp_meta_entity_tags_usermeta', function ($tags, $oldEntity, $newEntity, $action, $oldParent, $newParent) {
+
+    $tags['VP-User-Login'] = isset($newParent['user_login']) ? $newParent['user_login'] : $oldParent['user_login'];
+
+    return $tags;
+}, 10, 6);

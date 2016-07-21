@@ -94,6 +94,7 @@ usermeta:
   tags:
     VP-User-Id: vp_user_id
     VP-UserMeta-Key: meta_key
+    VP-User-Login: /
   parent-id-tag: VP-User-Id
   actions:
     create:
