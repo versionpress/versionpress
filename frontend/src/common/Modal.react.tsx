@@ -13,18 +13,10 @@ interface ModalProps extends React.Props<JSX.Element> {
 
 export default class Modal extends React.Component<ModalProps, any> {
 
-  constructor(props) {
-    super(props);
-
-    this.closeModalHandler = this.closeModalHandler.bind(this);
-    this.backgroundClickHandler = this.backgroundClickHandler.bind(this);
-    this.keyDownHandler = this.keyDownHandler.bind(this);
-  }
-
   static defaultProps = {
     enableBackgroundClickToClose: true,
     showCloseIcon: true,
-  };
+  }
 
   componentDidMount() {
     const content = this.refs['content'] as HTMLElement;
@@ -36,41 +28,19 @@ export default class Modal extends React.Component<ModalProps, any> {
     content.focus();
   }
 
-  getCloseIconMarkup() {
-    return this.props.showCloseIcon
-      ? <a href='#' className='Modal-close' onClick={this.closeModalHandler}>&times;</a>
-      : null;
-  }
-
-  render() {
-    return (
-      <div className='Modal-container' onClick={this.backgroundClickHandler} data-clickcatcher={true}>
-        <div ref='content' className='Modal-content' tabIndex={-1} onKeyDown={this.keyDownHandler}>
-          <div className='Modal-header'>
-            <h3 className='Modal-title'>{this.props.title}</h3>
-            {this.getCloseIconMarkup()}
-          </div>
-          <div className='Modal-body'>
-            {this.props.children}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  keyDownHandler(e) {
+  onKeyDown = (e) => {
     if (e.keyCode === 27 && this.props.showCloseIcon) {
-      this.closeModalHandler(e);
+      this.onCloseModal(e);
     }
   }
 
-  backgroundClickHandler(e) {
+  onBackgroundClick = (e) => {
     if (this.props.enableBackgroundClickToClose && e.target.getAttribute('data-clickcatcher')) {
-      this.closeModalHandler(e);
+      this.onCloseModal(e);
     }
   }
 
-  closeModalHandler(e) {
+  onCloseModal = (e) => {
     e.stopPropagation();
 
     if (typeof this.props.onClose === 'function') {
@@ -79,4 +49,22 @@ export default class Modal extends React.Component<ModalProps, any> {
     portal.closePortal();
   }
 
+  render() {
+    return (
+      <div className='Modal-container' onClick={this.onBackgroundClick} data-clickcatcher={true}>
+        <div ref='content' className='Modal-content' tabIndex={-1} onKeyDown={this.onKeyDown}>
+          <div className='Modal-header'>
+            <h3 className='Modal-title'>{this.props.title}</h3>
+            {this.props.showCloseIcon
+              ? <a href='#' className='Modal-close' onClick={this.onCloseModal}>&times;</a>
+              : null
+            }
+          </div>
+          <div className='Modal-body'>
+            {this.props.children}
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
