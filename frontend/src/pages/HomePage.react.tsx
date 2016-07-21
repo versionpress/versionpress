@@ -280,7 +280,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     });
   }
 
-  onCommitSelect(commits: Commit[], check: boolean, shiftKey: boolean) {
+  onCommitSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean) {
     let { selectedCommits, lastSelectedCommit } = this.state;
     const bulk = commits.length > 1;
 
@@ -290,7 +290,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         let lastIndex = -1;
         const index = indexOf(this.state.commits, commit);
 
-        if (!bulk && shiftKey) {
+        if (!bulk && isShiftKey) {
           const last = this.state.lastSelectedCommit;
           lastIndex = indexOf(this.state.commits, last);
         }
@@ -304,9 +304,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         for (let i = lastIndex; i !== cond; i += step) {
           const currentCommit = this.state.commits[i];
           const index = indexOf(selectedCommits, currentCommit);
-          if (check && index === -1) {
+          if (isChecked && index === -1) {
             selectedCommits = update(selectedCommits, {$push: [currentCommit]});
-          } else if (!check && index !== -1) {
+          } else if (!isChecked && index !== -1) {
             selectedCommits = update(selectedCommits, {$splice: [[index, 1]]});
           }
           lastSelectedCommit = currentCommit;

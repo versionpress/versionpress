@@ -20,7 +20,7 @@ interface CommitsTableProps extends React.Props<JSX.Element> {
   enableActions: boolean;
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
-  onCommitSelect: (commits: Commit[], check: boolean, shiftKey: boolean) => void;
+  onCommitSelect: (commits: Commit[], isChecked: boolean, isShiftKey: boolean) => void;
   diffProvider: {getDiff: (hash: string) => Promise<string>};
 }
 
@@ -34,6 +34,11 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
 
   componentWillUnmount(): void {
     clearInterval(this.refreshInterval);
+  }
+
+  onSelectAllChange = (e: React.MouseEvent) => {
+    const isChecked = (e.target as HTMLInputElement).checked;
+    this.props.onCommitSelect(this.props.commits, isChecked, false);
   }
 
   render() {
@@ -114,15 +119,10 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
           id='CommitsTable-selectAll'
           disabled={!this.props.enableActions}
           checked={this.props.commits.length > 0 && allSelected}
-          onChange={this.onSelectAll.bind(this)}
+          onChange={this.onSelectAllChange}
         />
       </td>
     );
-  }
-
-  onSelectAll(e: React.MouseEvent) {
-    const check = (e.target as HTMLInputElement).checked;
-    this.props.onCommitSelect(this.props.commits, check, false);
   }
 
 }
