@@ -3,6 +3,8 @@
 namespace VersionPress\Git\ChangeInfoPreprocessors;
 
 use VersionPress\ChangeInfos\ChangeInfo;
+use VersionPress\ChangeInfos\ChangeInfoUtils;
+use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\PostChangeInfo;
 
 class PostChangeInfoPreprocessor implements ChangeInfoPreprocessor
@@ -40,7 +42,8 @@ class PostChangeInfoPreprocessor implements ChangeInfoPreprocessor
     {
         $entities = [];
         foreach ($changeInfoList as $key => $changeInfo) {
-            if ($changeInfo instanceof PostChangeInfo && in_array($changeInfo->getAction(), $indicies)) {
+            /** @var EntityChangeInfo $changeInfo */
+            if (ChangeInfoUtils::changeInfoRepresentsEntity($changeInfo, 'post') && in_array($changeInfo->getAction(), $indicies)) {
                 $entities[$changeInfo->getEntityId()][$changeInfo->getAction()][] = $key;
             }
         }

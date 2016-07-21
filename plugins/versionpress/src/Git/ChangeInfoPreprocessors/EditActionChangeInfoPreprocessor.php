@@ -27,23 +27,9 @@ class EditActionChangeInfoPreprocessor implements ChangeInfoPreprocessor
                 /** @var EntityChangeInfo $firstEditChangeInfo */
                 $firstEditChangeInfo = $changeInfoList[$changeInfos["edit"][0]];
                 foreach ($edits as $edit) {
-                    /** @var EntityChangeInfo $editChangeInfo */
-                    $editChangeInfo = $changeInfoList[$edit];
-
-                    // Only PostChangeInfo has this method, and we need to track updated values in Posts.
-                    if (method_exists($editChangeInfo, "getPostUpdatedProperties")) {
-                        $updatedProperties = array_unique(array_merge(
-                            $updatedProperties,
-                            $editChangeInfo->getPostUpdatedProperties()
-                        ));
-                    }
                     unset($changeInfoList[$edit]);
                 }
 
-                // We need to merge values from several PostChangeInfos into one
-                if (method_exists($firstEditChangeInfo, "setPostUpdatedProperties")) {
-                    $firstEditChangeInfo->setPostUpdatedProperties($updatedProperties);
-                }
                 $changeInfoList[] = $firstEditChangeInfo;
             }
         }

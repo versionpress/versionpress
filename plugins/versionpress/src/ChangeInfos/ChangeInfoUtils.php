@@ -18,4 +18,9 @@ class ChangeInfoUtils
 
         return $extractedTags;
     }
+
+    public static function changeInfoRepresentsEntity($changeInfo, $entityName)
+    {
+        return $changeInfo instanceof EntityChangeInfo && $changeInfo->getEntityName() === $entityName;
+    }
 }

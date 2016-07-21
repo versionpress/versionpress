@@ -2,8 +2,7 @@
 
 namespace VersionPress\Git\ChangeInfoPreprocessors;
 
-use VersionPress\ChangeInfos\PostChangeInfo;
-use VersionPress\ChangeInfos\TermChangeInfo;
+use VersionPress\ChangeInfos\ChangeInfoUtils;
 use VersionPress\Utils\ArrayUtils;
 
 class PostTermSplittingPreprocessor implements ChangeInfoPreprocessor
@@ -12,11 +11,15 @@ class PostTermSplittingPreprocessor implements ChangeInfoPreprocessor
     public function process($changeInfoList)
     {
         if ($this->containsPostChangeInfo($changeInfoList) && $this->containsTermChangeInfo($changeInfoList)) {
-            $termChangeInfoList = array_values(array_filter($changeInfoList, function ($changeInfo) {
-                return $changeInfo instanceof TermChangeInfo;
-            }));
-            $restChangeInfoList = array_values(array_filter($changeInfoList, function ($changeInfo) {
-                return !($changeInfo instanceof TermChangeInfo);
+
+            $filterFn = function ($changeInfo) {
+                return ChangeInfoUtils::changeInfoRepresentsEntity($changeInfo, 'term') ||
+                ChangeInfoUtils::changeInfoRepresentsEntity($changeInfo, 'term_taxonomy');
+            };
+
+            $termChangeInfoList = array_values(array_filter($changeInfoList, $filterFn));
+            $restChangeInfoList = array_values(array_filter($changeInfoList, function ($changeInfo) use ($filterFn) {
+                return !$filterFn($changeInfo);
             }));
 
             return [$termChangeInfoList, $restChangeInfoList];
@@ -28,14 +31,14 @@ class PostTermSplittingPreprocessor implements ChangeInfoPreprocessor
     private function containsPostChangeInfo($changeInfoList)
     {
         return ArrayUtils::any($changeInfoList, function ($changeInfo) {
-            return $changeInfo instanceof PostChangeInfo;
+            return ChangeInfoUtils::changeInfoRepresentsEntity($changeInfo, 'post');
         });
     }
 
     private function containsTermChangeInfo($changeInfoList)
     {
         return ArrayUtils::any($changeInfoList, function ($changeInfo) {
-            return $changeInfo instanceof TermChangeInfo;
+            return ChangeInfoUtils::changeInfoRepresentsEntity($changeInfo, 'term');
         });
     }
 }
