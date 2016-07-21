@@ -239,7 +239,7 @@ add_filter('vp_entity_tags_term', function ($tags, $oldEntity, $newEntity, $acti
 
     return $tags;
 
-}, 10, 3);
+}, 10, 4);
 
 add_filter('vp_bulk_change_description_term', function ($description, $action, $count, $tags) {
 
@@ -267,7 +267,7 @@ add_filter('vp_entity_tags_term_taxonomy', function ($tags, $oldEntity, $newEnti
 
     return $tags;
 
-}, 10, 3);
+}, 10, 4);
 
 add_filter('vp_entity_files_term_taxonomy', function ($files, $oldEntity, $newEntity) {
 
@@ -299,7 +299,7 @@ add_filter('vp_meta_entity_tags_postmeta', function ($tags, $oldEntity, $newEnti
     $tags['VP-Post-Title'] = isset($newParent['post_title']) ? $newParent['post_title'] : $oldParent['post_title'];
 
     return $tags;
-}, 10, 5);
+}, 10, 6);
 
 add_filter('vp_entity_change_description_postmeta', function ($message, $action, $vpid, $tags) {
 
