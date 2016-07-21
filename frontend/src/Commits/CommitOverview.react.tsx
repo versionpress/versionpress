@@ -15,9 +15,8 @@ interface CommitOverviewState {
 
 export default class CommitOverview extends React.Component<CommitOverviewProps, CommitOverviewState> {
 
-  constructor(props: CommitOverviewProps, context: any) {
-    super(props, context);
-    this.state = {expandedLists: []};
+  state = {
+    expandedLists: []
   }
 
   private static renderEntityNamesWithDuplicates(changes: Change[]): JSX.Element[] {
@@ -64,11 +63,24 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     return change.name;
   }
 
+  onShowMoreClick = (e: React.MouseEvent, listKey: string) => {
+    e.preventDefault();
+    const { expandedLists } = this.state;
+
+    this.setState({
+      expandedLists: expandedLists.concat([listKey])
+    });
+  }
+
   render() {
+    const { commit } = this.props;
+
     return (
       <ul className='overview-list'>
-        {this.formatChanges(this.props.commit.changes).map((line, i) => <li key={i}>{line}</li>)}
-        {this.renderEnvironment()}
+        {this.formatChanges(commit.changes).map((line, i) => <li key={i}>{line}</li>)}
+        <li className='environment'>
+          <em>Environment: {commit.environment}</em>
+        </li>
       </ul>
     );
   }
@@ -273,7 +285,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
         <ul>
           {entities.slice(0, displayedListLength).map(entity => <li>{entity}</li>)}
           <li>
-            <a onClick={() => this.expandList(listKey)}>
+            <a onClick={e => this.onShowMoreClick(e, listKey)}>
               show {entities.length - displayedListLength} more...
             </a>
           </li>
@@ -289,20 +301,6 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
         {entityList}
       </span>
     );
-  }
-
-  private renderEnvironment() {
-    return (
-      <li className='environment'>
-        <em>Environment: {this.props.commit.environment}</em>
-      </li>
-    );
-  }
-
-  private expandList(listKey) {
-    let expandedLists = this.state.expandedLists;
-    let newExpandedLists = expandedLists.concat([listKey]);
-    this.setState({expandedLists: newExpandedLists});
   }
 
 }
