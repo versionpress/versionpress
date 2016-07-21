@@ -9,7 +9,9 @@ post:
     delete: Deleted %VP-Post-Type% '%VP-Post-Title%'
     draft: Created draft for %VP-Post-Type% '%VP-Post-Title%'
     publish: Published %VP-Post-Type% '%VP-Post-Title%'
-    edit: Edited %VP-Post-Type% '%VP-Post-Title%'
+    edit:
+      message: Edited %VP-Post-Type% '%VP-Post-Title%'
+      priority: 12
     update: Updated %VP-Post-Type% '%VP-Post-Title%'
 
 user:
@@ -17,13 +19,17 @@ user:
     VP-User-Login: user_login
   actions:
     create: Created user '%VP-User-Login%'
-    edit: Edited user '%VP-User-Login%'
+    edit:
+      message: Edited user '%VP-User-Login%'
+      priority: 12
     delete: Deleted user '%VP-User-Login%'
 
 option:
   actions:
     create: Created option '%VPID%'
-    edit: Edited option '%VPID%'
+    edit:
+      message: Edited option '%VPID%'
+      priority: 12
     delete: Deleted option '%VPID%'
 
 comment:
@@ -32,7 +38,9 @@ comment:
     VP-Comment-Author: comment_author
   actions:
     create: New comment for post '%VP-Comment-PostTitle%'
-    edit: Edited comment for post '%VP-Comment-PostTitle%'
+    edit:
+      message: Edited comment for post '%VP-Comment-PostTitle%'
+      priority: 12
     delete: Deleted comment for post '%VP-Comment-PostTitle%
     trash: Comment for post '%VP-Comment-PostTitle%' moved to trash
     untrash: Comment for post '%VP-Comment-PostTitle%' moved from trash
@@ -51,7 +59,9 @@ term:
     create: New %VP-Term-Taxonomy% '%VP-Term-Name%'
     delete: Deleted %VP-Term-Taxonomy% '%VP-Term-Name%'
     rename: %VP-Term-Taxonomy% '%VP-Term-OldName%' renamed to '%VP-Term-Name%'
-    edit: Edited %VP-Term-Taxonomy% '%VP-Term-Name%'
+    edit:
+      message: Edited %VP-Term-Taxonomy% '%VP-Term-Name%'
+      priority: 12
 
 term_taxonomy:
   tags:
@@ -59,7 +69,9 @@ term_taxonomy:
     VP-Term-Name: /
   actions:
     create: New %VP-TermTaxonomy-Taxonomy% '%VP-Term-Name%'
-    edit: Edited %VP-TermTaxonomy-Taxonomy% '%VP-Term-Name%'
+    edit:
+      message: Edited %VP-TermTaxonomy-Taxonomy% '%VP-Term-Name%'
+      priority: 12
     delete: Deleted %VP-TermTaxonomy-Taxonomy% '%VP-Term-Name%'
 
 commentmeta:
@@ -73,7 +85,7 @@ commentmeta:
       priority: 15
     edit:
       message: Edited commentmeta '%VP-CommentMeta-Key%'
-      priority: 15
+      priority: 17
     delete:
       message: Deleted commentmeta '%VP-CommentMeta-Key%'
       priority: 15
@@ -89,7 +101,7 @@ usermeta:
       priority: 15
     edit:
       message: Edited usermeta '%VP-UserMeta-Key%'
-      priority: 15
+      priority: 17
     delete:
       message: Deleted usermeta '%VP-UserMeta-Key%'
       priority: 15
@@ -105,7 +117,7 @@ termmeta:
       priority: 15
     edit:
       message: Edited termmeta '%VP-TermMeta-Key%'
-      priority: 15
+      priority: 17
     delete:
       message: Deleted termmeta '%VP-TermMeta-Key%'
       priority: 15
@@ -123,7 +135,7 @@ postmeta:
       priority: 15
     edit:
       message: Edited postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'
-      priority: 15
+      priority: 17
     delete:
       message: Deleted postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'
       priority: 15
