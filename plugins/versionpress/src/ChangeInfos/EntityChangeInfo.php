@@ -2,8 +2,10 @@
 
 namespace VersionPress\ChangeInfos;
 
+use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\EntityInfo;
 use VersionPress\Git\ActionsInfo;
+use VersionPress\Git\CommitMessage;
 
 /**
  * Base class for entity change infos like PostChangeInfo, CommentChangeInfo etc.
@@ -55,6 +57,7 @@ class EntityChangeInfo extends TrackedChangeInfo
     public function __construct($entityInfo, $actionsInfo, $action, $entityId, $customTags = [], $customFiles = [])
     {
         $this->entityInfo = $entityInfo;
+        $this->actionsInfo = $actionsInfo;
         $this->action = $action;
         $this->entityId = $entityId;
         $this->customTags = $customTags;
@@ -134,6 +137,13 @@ class EntityChangeInfo extends TrackedChangeInfo
      */
     public function getParentId()
     {
+        if ($this->entityInfo->parentReference) {
+            $entityName = $this->entityInfo->entityName;
+            $tagContainingParentId = $this->actionsInfo->getTagContainingParentId($entityName);
+
+            return $this->customTags[$tagContainingParentId];
+        }
+
         return null;
     }
 

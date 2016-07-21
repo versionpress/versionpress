@@ -2,7 +2,11 @@
 namespace VersionPress\ChangeInfos;
 
 use Nette\Utils\Strings;
+use VersionPress\ChangeInfos\Sorting\NumericPrioritySortingStrategy;
 use VersionPress\ChangeInfos\Sorting\SortingStrategy;
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\CommitMessage;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\VersionPress;
@@ -93,9 +97,11 @@ class ChangeInfoEnvelope implements ChangeInfo
      * table is constructed; hooks use the normal constructor.
      *
      * @param CommitMessage $commitMessage
-     * @return ChangeInfo
+     * @param DbSchemaInfo $dbSchema
+     * @param ActionsInfo $actionsInfo
+     * @return ChangeInfoEnvelope
      */
-    public static function buildFromCommitMessage(CommitMessage $commitMessage)
+    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
     {
         $fullBody = $commitMessage->getBody();
         $splittedBodies = explode("\n\n", $fullBody);
@@ -111,14 +117,43 @@ class ChangeInfoEnvelope implements ChangeInfo
         }
 
         if (count($splittedBodies) === 0 || $lastBody === "") {
-            $changeInfoList[] = UntrackedChangeInfo::buildFromCommitMessage($commitMessage);
+            $changeInfoList[] = UntrackedChangeInfo::buildFromCommitMessage($commitMessage, $dbSchema, $actionsInfo);
         }
+
+        $specialTypes = [
+            'composer' => ComposerChangeInfo::class,
+            'theme' => ThemeChangeInfo::class,
+            'plugin' => PluginChangeInfo::class,
+            'translation' => TranslationChangeInfo::class,
+            'wordpress' => WordPressUpdateChangeInfo::class,
+            'versionpress/undo' => RevertChangeInfo::class,
+            'versionpress/rollback' => RevertChangeInfo::class,
+            'versionpress' => VersionPressChangeInfo::class,
+        ];
 
         foreach ($splittedBodies as $body) {
             $partialCommitMessage = new CommitMessage("", $body);
-            /** @var ChangeInfo $matchingChangeInfoType */
 
-            $changeInfoList[] = $matchingChangeInfoType::buildFromCommitMessage($partialCommitMessage);
+            $actionTag = $partialCommitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
+
+            /** @var ChangeInfo $matchingChangeInfoType */
+            $matchingChangeInfoType = null;
+            foreach ($specialTypes as $actionTagPrefix => $class) {
+                if (Strings::startsWith($actionTag, $actionTagPrefix)) {
+                    $matchingChangeInfoType = $class;
+                }
+            }
+
+            if ($matchingChangeInfoType === null) {
+                list($entityName, $action, $id) = explode('/', $actionTag, 3);
+                $entityInfo = $dbSchema->getEntityInfo($entityName);
+                $tags = $commitMessage->getVersionPressTags();
+                unset($tags[TrackedChangeInfo::ACTION_TAG]);
+
+                $changeInfoList[] = new EntityChangeInfo($entityInfo, $actionsInfo, $action, $id, $tags, []);
+            } else {
+                $changeInfoList[] = $matchingChangeInfoType::buildFromCommitMessage($partialCommitMessage, $dbSchema, $actionsInfo);
+            }
         }
 
         return new self($changeInfoList, $version, $environment);
@@ -141,7 +176,7 @@ class ChangeInfoEnvelope implements ChangeInfo
      */
     public function getReorganizedInfoList()
     {
-        return $this->sortingStrategy->sort($this->groupBulkActions($this->changeInfoList));
+        return $this->sortChangeInfoList($this->groupBulkActions($this->changeInfoList));
     }
 
     /**
@@ -157,7 +192,7 @@ class ChangeInfoEnvelope implements ChangeInfo
      */
     private function getSortedChangeInfoList()
     {
-        return $this->sortingStrategy->sort($this->changeInfoList);
+        return $this->sortChangeInfoList($this->changeInfoList);
     }
 
     private static function containsVersion($lastBody)
@@ -169,6 +204,34 @@ class ChangeInfoEnvelope implements ChangeInfo
     {
         $tmpMessage = new CommitMessage("", $lastBody);
         return $tmpMessage->getVersionPressTag($tag);
+    }
+
+    /**
+     * @param TrackedChangeInfo[] $changeInfoList
+     * @return TrackedChangeInfo[]
+     */
+    private function sortChangeInfoList($changeInfoList)
+    {
+        global $versionPressContainer;
+
+        if ($versionPressContainer === null) {
+            return $changeInfoList;
+        }
+
+        /** @var ActionsInfo $actionsInfo */
+        $actionsInfo = $versionPressContainer->resolve(VersionPressServices::ACTIONS_INFO);
+
+        ArrayUtils::stablesort($changeInfoList, function ($changeInfo1, $changeInfo2) use ($actionsInfo) {
+            /** @var TrackedChangeInfo|BulkChangeInfo $changeInfo1 */
+            /** @var TrackedChangeInfo|BulkChangeInfo $changeInfo2 */
+
+            $priority1 = $actionsInfo->getActionPriority($changeInfo1->getEntityName(), $changeInfo1->getAction());
+            $priority2 = $actionsInfo->getActionPriority($changeInfo2->getEntityName(), $changeInfo2->getAction());
+
+            return $priority1 - $priority2;
+        });
+
+        return $changeInfoList;
     }
 
     private function groupBulkActions($changeInfoList)

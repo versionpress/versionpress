@@ -87,7 +87,7 @@ class DBAsserter
         self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, self::$vpidRepository);
 
         $vpdbPath = self::$wpAutomation->getVpdbDir();
-        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$vp_database, $taxonomies);
+        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$vp_database, $taxonomies, null);
 
         require(self::$wpAutomation->getPluginsDir() . '/versionpress/.versionpress/hooks.php');
 

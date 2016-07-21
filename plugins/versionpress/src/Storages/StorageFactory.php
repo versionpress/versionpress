@@ -5,6 +5,7 @@ namespace VersionPress\Storages;
 use Nette\Utils\Strings;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Git\ActionsInfo;
 
 class StorageFactory
 {
@@ -16,19 +17,23 @@ class StorageFactory
     /** @var Database */
     private $database;
     private $taxonomies;
+    /** @var ActionsInfo */
+    private $actionsInfo;
 
     /**
      * @param string $vpdbDir Path to the `wp-content/vpdb` directory
      * @param DbSchemaInfo $dbSchemaInfo Passed to storages
      * @param Database $database
      * @param string[] $taxonomies List of taxonomies used on current site
+     * @param ActionsInfo $actionsInfo
      */
-    public function __construct($vpdbDir, DbSchemaInfo $dbSchemaInfo, $database, $taxonomies)
+    public function __construct($vpdbDir, DbSchemaInfo $dbSchemaInfo, $database, $taxonomies, $actionsInfo)
     {
         $this->vpdbDir = $vpdbDir;
         $this->dbSchemaInfo = $dbSchemaInfo;
         $this->database = $database;
         $this->taxonomies = $taxonomies;
+        $this->actionsInfo = $actionsInfo;
     }
 
     /**
@@ -58,7 +63,7 @@ class StorageFactory
             $parentEntity = $entityInfo->references[$entityInfo->parentReference];
             $parentStorage = $this->getStorage($parentEntity);
 
-            return new $storageClass($parentStorage, $entityInfo, $this->database->prefix);
+            return new $storageClass($parentStorage, $entityInfo, $this->database->prefix, $this->actionsInfo);
         }
 
         if (isset($entityInfo->storageClass)) {
@@ -67,7 +72,7 @@ class StorageFactory
             $storageClass = DirectoryStorage::class;
         }
 
-        return new $storageClass($this->vpdbDir . '/' . $entityInfo->tableName, $entityInfo, $this->database->prefix);
+        return new $storageClass($this->vpdbDir . '/' . $entityInfo->tableName, $entityInfo, $this->database->prefix, $this->actionsInfo);
     }
 
     public function getAllSupportedStorages()

@@ -9,6 +9,7 @@ use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Database\SqlQueryParser;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Database\WpdbMirrorBridge;
+use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\Committer;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
@@ -18,6 +19,7 @@ use VersionPress\Storages\StorageFactory;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Synchronizers\SynchronizerFactory;
 use VersionPress\Utils\AbsoluteUrlReplacer;
+use VersionPress\VersionPress;
 
 class DIContainer
 {
@@ -70,7 +72,8 @@ class DIContainer
                 VP_VPDB_DIR,
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::DATABASE),
-                array_keys((array)$wp_taxonomies)
+                array_keys((array)$wp_taxonomies),
+                $dic->resolve(VersionPressServices::ACTIONS_INFO)
             );
         });
 
@@ -88,6 +91,11 @@ class DIContainer
                 $table_prefix,
                 $wp_db_version
             );
+        });
+
+        $dic->register(VersionPressServices::ACTIONS_INFO, function () {
+            $vpActionsFile = VERSIONPRESS_PLUGIN_DIR . '/.versionpress/actions.yml';
+            return new ActionsInfo([$vpActionsFile]);
         });
 
         $dic->register(VersionPressServices::WPDB_MIRROR_BRIDGE, function () use ($dic) {

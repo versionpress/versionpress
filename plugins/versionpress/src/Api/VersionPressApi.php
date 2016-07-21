@@ -14,7 +14,9 @@ use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
+use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\Commit;
 use VersionPress\Git\CommitMessage;
 use VersionPress\Git\GitLogPaginator;
@@ -41,15 +43,18 @@ class VersionPressApi
     private $synchronizationProcess;
 
     const NAMESPACE_VP = 'versionpress';
+    /** @var DbSchemaInfo */
+    private $dbSchema;
+    /** @var ActionsInfo */
+    private $actionsInfo;
 
-    public function __construct(
-        GitRepository $gitRepository,
-        Reverter $reverter,
-        SynchronizationProcess $synchronizationProcess
-    ) {
+    public function __construct(GitRepository $gitRepository, Reverter $reverter, SynchronizationProcess $synchronizationProcess, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
+    {
         $this->gitRepository = $gitRepository;
         $this->reverter = $reverter;
         $this->synchronizationProcess = $synchronizationProcess;
+        $this->dbSchema = $dbSchema;
+        $this->actionsInfo = $actionsInfo;
     }
 
     /**
@@ -245,7 +250,7 @@ class VersionPressApi
             $canRollbackToThisCommit = !$isFirstCommit &&
                 ($isChildOfInitialCommit || $commit->getHash() === $initialCommitHash);
 
-            $changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
+            $changeInfo = ChangeInfoEnvelope::buildFromCommitMessage($commit->getMessage(), $this->dbSchema, $this->actionsInfo);
             $isEnabled = $isChildOfInitialCommit || $commit->getHash() === $initialCommitHash;
 
             $skipVpdbFiles = $changeInfo->getChangeInfoList()[0] instanceof TrackedChangeInfo;
