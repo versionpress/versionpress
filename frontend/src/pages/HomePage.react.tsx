@@ -57,27 +57,32 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
   private refreshInterval;
 
-  constructor() {
-    super();
-    this.state = {
-      pages: [],
-      query: '',
-      commits: [],
-      selectedCommits: [],
-      lastSelectedCommit: null,
-      message: null,
-      isLoading: true,
-      displayServicePanel: false,
-      displayWelcomePanel: false,
-      displayUpdateNotice: false,
-      isDirtyWorkingDirectory: false,
-    };
+  state = {
+    pages: [],
+    query: '',
+    commits: [],
+    selectedCommits: [],
+    lastSelectedCommit: null,
+    message: null,
+    isLoading: true,
+    displayServicePanel: false,
+    displayWelcomePanel: false,
+    displayUpdateNotice: false,
+    isDirtyWorkingDirectory: false,
+  }
 
-    this.onFilter = this.onFilter.bind(this);
-    this.onUndo = this.onUndo.bind(this);
-    this.onRollback = this.onRollback.bind(this);
-    this.onCommitSelect = this.onCommitSelect.bind(this);
-    this.checkUpdate = this.checkUpdate.bind(this);
+  componentDidMount() {
+    this.fetchWelcomePanel();
+    this.fetchCommits();
+    this.refreshInterval = setInterval(() => this.checkUpdate(), 10 * 1000);
+  }
+
+  componentWillReceiveProps(nextProps: HomePageProps) {
+    this.fetchCommits(nextProps.params);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.refreshInterval);
   }
 
   static getErrorMessage(res: request.Response, err: any) {
@@ -95,20 +100,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     };
   }
 
-  componentDidMount() {
-    this.fetchWelcomePanel();
-    this.fetchCommits();
-    this.refreshInterval = setInterval(() => this.checkUpdate(), 10 * 1000);
-  }
-  componentWillUnmount() {
-    clearInterval(this.refreshInterval);
-  }
-
-  componentWillReceiveProps(nextProps: HomePageProps) {
-    this.fetchCommits(nextProps.params);
-  }
-
-  fetchCommits(params = this.props.params) {
+  fetchCommits = (params = this.props.params) => {
     const router: ReactRouter.Context = (this.context as any).router;
     this.setState({
       isLoading: true
@@ -170,7 +162,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       });
   }
 
-  checkUpdate() {
+  checkUpdate = () => {
     if (!this.state.commits.length || this.state.isLoading) {
       return;
     }
@@ -274,13 +266,13 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     });
   }
 
-  toggleServicePanel() {
+  onServicePanelClick = () => {
     this.setState({
       displayServicePanel: !this.state.displayServicePanel
     });
   }
 
-  onCommitSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean) {
+  onCommitSelect = (commits: Commit[], isChecked: boolean, isShiftKey: boolean) => {
     let { selectedCommits, lastSelectedCommit } = this.state;
     const bulk = commits.length > 1;
 
@@ -319,7 +311,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     });
   }
 
-  onBulkAction(action: string) {
+  onBulkAction = (action: string) => {
     if (action === 'undo') {
       const title = (
         <span>Undo <em>{this.state.selectedCommits.length} {this.state.selectedCommits.length === 1 ? 'change' : 'changes'}</em>?</span>
@@ -330,14 +322,14 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     }
   }
 
-  onClearSelection() {
+  onClearSelection = () => {
     this.setState({
       selectedCommits: [],
       lastSelectedCommit: null,
     });
   }
 
-  onCommit(message: string) {
+  onCommit = (message: string) => {
     const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
 
@@ -366,7 +358,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       });
   }
 
-  onDiscard() {
+  onDiscard = () => {
     const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
 
@@ -391,7 +383,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       });
   }
 
-  onFilter(query: string) {
+  onFilter = (query: string) => {
     this.setState({
       query: query,
     }, () => {
@@ -405,7 +397,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     });
   }
 
-  onUndo(e) {
+  onUndo = (e) => {
     e.preventDefault();
     const hash = e.target.getAttribute('data-hash');
     const message = e.target.getAttribute('data-message');
@@ -416,7 +408,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     revertDialog.revertDialog.call(this, title, () => this.undoCommits([hash]));
   }
 
-  onRollback(e) {
+  onRollback = (e) => {
     e.preventDefault();
     const hash = e.target.getAttribute('data-hash');
     const date = moment(e.target.getAttribute('data-date')).format('LLL');
@@ -427,7 +419,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     revertDialog.revertDialog.call(this, title, () => this.rollbackToCommit(hash));
   }
 
-  onWelcomePanelHide(e) {
+  onWelcomePanelHide = (e) => {
     e.preventDefault();
 
     this.setState({
@@ -451,7 +443,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     return (
       <div className={homePageClassName}>
         <ProgressBar ref='progress' />
-        <ServicePanelButton onClick={this.toggleServicePanel.bind(this)} />
+        <ServicePanelButton onClick={this.onServicePanelClick} />
         <h1 className='vp-header'>VersionPress</h1>
         {this.state.message
           ? <FlashMessage {...this.state.message} />
@@ -462,13 +454,13 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           ? <CommitPanel
               diffProvider={{ getDiff: this.getDiff }}
               gitStatusProvider={{ getGitStatus: this.getGitStatus }}
-              onCommit={this.onCommit.bind(this)}
-              onDiscard={this.onDiscard.bind(this)}
+              onCommit={this.onCommit}
+              onDiscard={this.onDiscard}
             />
           : null
         }
         {this.state.displayWelcomePanel
-          ? <WelcomePanel onHide={this.onWelcomePanelHide.bind(this)} />
+          ? <WelcomePanel onHide={this.onWelcomePanelHide} />
           : null
         }
         {this.state.displayUpdateNotice
@@ -487,8 +479,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           />
           <BulkActionPanel
             enableActions={enableActions}
-            onBulkAction={this.onBulkAction.bind(this)}
-            onClearSelection={this.onClearSelection.bind(this)}
+            onBulkAction={this.onBulkAction}
+            onClearSelection={this.onClearSelection}
             selectedCommits={this.state.selectedCommits}
           />
         </div>
