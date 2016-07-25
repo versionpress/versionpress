@@ -1,6 +1,7 @@
 <?php
 namespace VersionPress\ChangeInfos;
 
+use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\CommitMessage;
 
 /**
@@ -16,31 +17,44 @@ use VersionPress\Git\CommitMessage;
  * @see CommitMessage::getVersionPressTags()
  * @see UntrackedChangeInfo Changes created outside of VersionPress.
  */
-abstract class TrackedChangeInfo implements ChangeInfo
+class TrackedChangeInfo implements ChangeInfo
 {
+
+    /** @var string */
+    private $entityName;
+
+    /** @var string */
+    private $action;
+
+    /** @var string */
+    private $entityId;
+
+    /** @var array */
+    private $customTags;
+
+    /** @var array */
+    private $customFiles;
+
+    /** @var ActionsInfo */
+    private $actionsInfo;
+
+    /** @var string */
+    private $commitMessageSubject;
 
     /**
      * VP tag common to all tracked change infos. It is the only required tag for them.
      */
     const ACTION_TAG = "VP-Action";
 
-    /**
-     * Object type, the first part of the VP-Action tag value.
-     *
-     * For example, when objectType is "post", the VP-Action tag will be something like "post/edit/VPID123".
-     *
-     * @return string
-     */
-    abstract public function getEntityName();
-
-    /**
-     * The action done on the object type, for instance "install" or "activate" if the object was a plugin.
-     * Action is always part of VP-Action tag as the second segment.
-     *
-     * @return string
-     */
-    abstract public function getAction();
-
+    public function __construct($entityName, $actionsInfo, $action, $entityId, $customTags = [], $customFiles = [])
+    {
+        $this->entityName = $entityName;
+        $this->actionsInfo = $actionsInfo;
+        $this->action = $action;
+        $this->entityId = $entityId;
+        $this->customTags = $customTags;
+        $this->customFiles = $customFiles;
+    }
 
     public function getCommitMessage()
     {
@@ -78,13 +92,66 @@ abstract class TrackedChangeInfo implements ChangeInfo
     }
 
     /**
+     * Text displayed in the main VersionPress table (see admin/index.php). Also used
+     * to construct commit message subject (first line) when the commit is first
+     * physically created.
+     *
+     * @return string
+     */
+    public function getChangeDescription()
+    {
+        if (empty($this->commitMessageSubject)) {
+            $this->commitMessageSubject = $this->actionsInfo->createCommitMessage($this->getEntityName(), $this->getAction(), $this->getEntityId(), $this->getCustomTags());
+        }
+
+        return $this->commitMessageSubject;
+    }
+
+    /**
+     * Object type, the first part of the VP-Action tag value.
+     *
+     * For example, when objectType is "post", the VP-Action tag will be something like "post/edit/VPID123".
+     *
+     * @return string
+     */
+    public function getEntityName()
+    {
+        return $this->entityName;
+    }
+
+    /**
+     * The action done on the object type, for instance "install" or "activate" if the object was a plugin.
+     * Action is always part of VP-Action tag as the second segment.
+     *
+     * @return string
+     */
+    public function getAction()
+    {
+        return $this->action;
+    }
+
+    public function getEntityId()
+    {
+        return $this->entityId;
+    }
+
+    /**
      * Used to construct a commit message body, subclasses provide a string for the VP-Action tag value
      * using this method.
      *
      * @see getCommitMessageBody()
      * @return string
      */
-    abstract protected function getActionTagValue();
+    protected function getActionTagValue()
+    {
+        $actionTagValue = "{$this->getEntityName()}/{$this->getAction()}";
+
+        if ($this->entityId) {
+            $actionTagValue .= "/{$this->getEntityId()}";
+        }
+
+        return $actionTagValue;
+    }
 
     /**
      * Used to construct a commit message body, subclasses provide an array of VP tags
@@ -93,7 +160,10 @@ abstract class TrackedChangeInfo implements ChangeInfo
      * @see getCommitMessageBody()
      * @return array
      */
-    abstract public function getCustomTags();
+    public function getCustomTags()
+    {
+        return $this->customTags;
+    }
 
     /**
      * Reports changes in files that relate to this ChangeInfo. Used by {@see Committer::stageRelatedFiles()}.
@@ -112,5 +182,8 @@ abstract class TrackedChangeInfo implements ChangeInfo
      *
      * @return array
      */
-    abstract public function getChangedFiles();
+    public function getChangedFiles()
+    {
+        return $this->customFiles;
+    }
 }

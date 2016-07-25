@@ -27,24 +27,8 @@ class EntityChangeInfo extends TrackedChangeInfo
 
     /** @var EntityInfo */
     private $entityInfo;
-
-    /** @var string */
-    private $action;
-
-    /** @var string */
-    private $entityId;
-
-    /** @var array */
-    private $customTags;
-
-    /** @var array */
-    private $customFiles;
-
     /** @var ActionsInfo */
     private $actionsInfo;
-
-    /** @var string */
-    private $commitMessageSubject;
 
     /**
      * @param EntityInfo $entityInfo
@@ -56,65 +40,14 @@ class EntityChangeInfo extends TrackedChangeInfo
      */
     public function __construct($entityInfo, $actionsInfo, $action, $entityId, $customTags = [], $customFiles = [])
     {
+        parent::__construct($entityInfo->entityName, $actionsInfo, $action, $entityId, $customTags, $customFiles);
         $this->entityInfo = $entityInfo;
         $this->actionsInfo = $actionsInfo;
-        $this->action = $action;
-        $this->entityId = $entityId;
-        $this->customTags = $customTags;
-        $this->customFiles = $customFiles;
     }
 
     public function getEntityName()
     {
         return $this->entityInfo->entityName;
-    }
-
-    /**
-     * Action on the entity, used as the middle segment of the VP-Action tag. Usually
-     * at least the "create", "edit" and "delete" actions are common to all the subclasses
-     * but they may also add their own actions, like e.g. "trash" and "untrash" for posts.
-     *
-     * @return string
-     */
-    public function getAction()
-    {
-        return $this->action;
-    }
-
-    /**
-     * Entity id - used as the last segment of VP-ActionTag. Usually a VPID but can
-     * be also something else, e.g. a unique string in a WP table like in the `options` table.
-     *
-     * @return string
-     */
-    public function getEntityId()
-    {
-        return $this->entityId;
-    }
-
-    public function getChangeDescription()
-    {
-        if (empty($this->commitMessageSubject)) {
-            $this->commitMessageSubject = $this->actionsInfo->createCommitMessage($this->getEntityName(), $this->getAction(), $this->getEntityId(), $this->getCustomTags());
-        }
-
-        return $this->commitMessageSubject;
-    }
-
-    /**
-     * Used to construct a commit message body. This base class implementation is enough for all EntityChangeInfo
-     * subclasses so thay don't override it. What they need to provide is the {@link getCustomTags()} implementation.
-     *
-     * @return string
-     */
-    protected function getActionTagValue()
-    {
-        return "{$this->getEntityName()}/{$this->getAction()}/{$this->getEntityId()}";
-    }
-
-    public function getCustomTags()
-    {
-        return $this->customTags;
     }
 
     public function getChangedFiles()
@@ -126,7 +59,7 @@ class EntityChangeInfo extends TrackedChangeInfo
             "parent-id" => $this->getParentId()
         ];
 
-        return array_merge([$change], $this->customFiles);
+        return array_merge([$change], parent::getChangedFiles());
     }
 
     /**
@@ -141,7 +74,7 @@ class EntityChangeInfo extends TrackedChangeInfo
             $entityName = $this->entityInfo->entityName;
             $tagContainingParentId = $this->actionsInfo->getTagContainingParentId($entityName);
 
-            return $this->customTags[$tagContainingParentId];
+            return $this->getCustomTags()[$tagContainingParentId];
         }
 
         return null;
