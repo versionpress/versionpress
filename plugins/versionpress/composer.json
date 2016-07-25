@@ -33,7 +33,8 @@
       "VersionPress\\": "src/"
     },
     "files": [
-      "versionpress-functions.php"
+      "internal-functions.php",
+      "public-functions.php"
     ]
   },
   "autoload-dev": {
