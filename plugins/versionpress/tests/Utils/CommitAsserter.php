@@ -7,6 +7,7 @@ use Nette\Utils\Strings;
 use PHPUnit_Framework_Assert;
 use VersionPress\ChangeInfos\BulkChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
+use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\ChangeInfos\ChangeInfoMatcher;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
@@ -398,7 +399,8 @@ class CommitAsserter
      */
     protected function getChangeInfo($commit)
     {
-        return ChangeInfoEnvelope::buildFromCommitMessage($commit->getMessage(), $this->dbSchema, $this->actionsInfo);
+        $changeInfoFactory = new ChangeInfoFactory($this->dbSchema, $this->actionsInfo);
+        return $changeInfoFactory->buildChangeInfoEnvelopeFromCommitMessage($commit->getMessage());
     }
 
 

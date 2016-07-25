@@ -2,7 +2,6 @@
 namespace VersionPress\ChangeInfos;
 
 use Nette\Utils\Strings;
-use VersionPress\ChangeInfos\Sorting\NumericPrioritySortingStrategy;
 use VersionPress\ChangeInfos\Sorting\SortingStrategy;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\VersionPressServices;
@@ -19,7 +18,7 @@ class ChangeInfoEnvelope implements ChangeInfo
 
     /**
      * VP meta tag that says the version of VersionPress in which was the commit made.
-     * It's parsed into {@link version} field by the {@link buildFromCommitMessage} method.
+     * It's parsed into {@link version} field.
      */
     const VP_VERSION_TAG = "X-VP-Version";
 
@@ -90,73 +89,6 @@ class ChangeInfoEnvelope implements ChangeInfo
         $changeList = $this->getReorganizedInfoList();
         $firstChangeDescription = $changeList[0]->getChangeDescription();
         return $firstChangeDescription;
-    }
-
-    /**
-     * Factory method - builds a ChangeInfo object from a commit message. Used when VersionPress
-     * table is constructed; hooks use the normal constructor.
-     *
-     * @param CommitMessage $commitMessage
-     * @param DbSchemaInfo $dbSchema
-     * @param ActionsInfo $actionsInfo
-     * @return ChangeInfoEnvelope
-     */
-    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
-    {
-        $fullBody = $commitMessage->getBody();
-        $splittedBodies = explode("\n\n", $fullBody);
-        $lastBody = $splittedBodies[count($splittedBodies) - 1];
-        $changeInfoList = [];
-        $version = null;
-        $environment = null;
-
-        if (self::containsVersion($lastBody)) {
-            $version = self::extractTag(self::VP_VERSION_TAG, $lastBody);
-            $environment = self::extractTag(self::VP_ENVIRONMENT_TAG, $lastBody);
-            array_pop($splittedBodies);
-        }
-
-        if (count($splittedBodies) === 0 || $lastBody === "") {
-            $changeInfoList[] = UntrackedChangeInfo::buildFromCommitMessage($commitMessage, $dbSchema, $actionsInfo);
-        }
-
-        $specialTypes = [
-            'composer' => ComposerChangeInfo::class,
-            'theme' => ThemeChangeInfo::class,
-            'plugin' => PluginChangeInfo::class,
-            'translation' => TranslationChangeInfo::class,
-            'wordpress' => WordPressUpdateChangeInfo::class,
-            'versionpress/undo' => RevertChangeInfo::class,
-            'versionpress/rollback' => RevertChangeInfo::class,
-            'versionpress' => VersionPressChangeInfo::class,
-        ];
-
-        foreach ($splittedBodies as $body) {
-            $partialCommitMessage = new CommitMessage("", $body);
-
-            $actionTag = $partialCommitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
-
-            /** @var ChangeInfo $matchingChangeInfoType */
-            $matchingChangeInfoType = null;
-            foreach ($specialTypes as $actionTagPrefix => $class) {
-                if (Strings::startsWith($actionTag, $actionTagPrefix)) {
-                    $matchingChangeInfoType = $class;
-                }
-            }
-
-            if ($matchingChangeInfoType === null) {
-                list($entityName, $action, $id) = explode('/', $actionTag, 3);
-                $entityInfo = $dbSchema->getEntityInfo($entityName);
-                $tags = $commitMessage->getVersionPressTags();
-                unset($tags[TrackedChangeInfo::ACTION_TAG]);
-
-                $changeInfoList[] = new EntityChangeInfo($entityInfo, $actionsInfo, $action, $id, $tags, []);
-            } else {
-                $changeInfoList[] = $matchingChangeInfoType::buildFromCommitMessage($partialCommitMessage, $dbSchema, $actionsInfo);
-            }
-        }
-
-        return new self($changeInfoList, $version, $environment);
     }
 
     /**

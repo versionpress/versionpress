@@ -50,14 +50,6 @@ class WordPressUpdateChangeInfo extends TrackedChangeInfo
         return $this->newVersion;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
-    {
-        $tags = $commitMessage->getVersionPressTags();
-        $actionTag = $tags[TrackedChangeInfo::ACTION_TAG];
-        list(, , $version) = explode("/", $actionTag, 3);
-        return new self($version);
-    }
-
     public function getChangeDescription()
     {
         return "WordPress updated to version " . $this->getNewVersion();

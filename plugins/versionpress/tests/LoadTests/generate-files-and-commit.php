@@ -38,10 +38,6 @@ class FooChangeInfo extends \VersionPress\ChangeInfos\TrackedChangeInfo
         return join("\n", $this->files);
     }
 
-    public static function buildFromCommitMessage(\VersionPress\Git\CommitMessage $commitMessage)
-    {
-    }
-
     public function getEntityName()
     {
         return "file";

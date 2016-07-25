@@ -6,6 +6,7 @@ require_once ABSPATH . 'wp-admin/includes/file.php';
 
 use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
+use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\ChangeInfos\ChangeInfoMatcher;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\PluginChangeInfo;
@@ -43,18 +44,16 @@ class VersionPressApi
     private $synchronizationProcess;
 
     const NAMESPACE_VP = 'versionpress';
-    /** @var DbSchemaInfo */
-    private $dbSchema;
-    /** @var ActionsInfo */
-    private $actionsInfo;
 
-    public function __construct(GitRepository $gitRepository, Reverter $reverter, SynchronizationProcess $synchronizationProcess, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
+    /** @var ChangeInfoFactory */
+    private $changeInfoFactory;
+
+    public function __construct(GitRepository $gitRepository, Reverter $reverter, SynchronizationProcess $synchronizationProcess, ChangeInfoFactory $changeInfoFactory)
     {
         $this->gitRepository = $gitRepository;
         $this->reverter = $reverter;
         $this->synchronizationProcess = $synchronizationProcess;
-        $this->dbSchema = $dbSchema;
-        $this->actionsInfo = $actionsInfo;
+        $this->changeInfoFactory = $changeInfoFactory;
     }
 
     /**
@@ -250,7 +249,7 @@ class VersionPressApi
             $canRollbackToThisCommit = !$isFirstCommit &&
                 ($isChildOfInitialCommit || $commit->getHash() === $initialCommitHash);
 
-            $changeInfo = ChangeInfoEnvelope::buildFromCommitMessage($commit->getMessage(), $this->dbSchema, $this->actionsInfo);
+            $changeInfo = $this->changeInfoFactory->buildChangeInfoEnvelopeFromCommitMessage($commit->getMessage());
             $isEnabled = $isChildOfInitialCommit || $commit->getHash() === $initialCommitHash;
 
             $skipVpdbFiles = $changeInfo->getChangeInfoList()[0] instanceof TrackedChangeInfo;

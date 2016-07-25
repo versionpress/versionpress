@@ -62,14 +62,6 @@ class ThemeChangeInfo extends TrackedChangeInfo
         return $this->action;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
-    {
-        $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
-        $themeName = $commitMessage->getVersionPressTag(self::THEME_NAME_TAG);
-        list(, $action, $themeId) = explode("/", $actionTag, 3);
-        return new self($themeId, $action, $themeName);
-    }
-
     public function getChangeDescription()
     {
 

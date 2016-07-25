@@ -3,6 +3,7 @@
 namespace VersionPress\Storages;
 
 use Nette\Utils\Strings;
+use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\ChangeInfos\ChangeInfoUtils;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\Database\EntityInfo;
@@ -27,10 +28,11 @@ class MetaEntityStorage extends Storage
 
     /** @var Storage */
     private $parentStorage;
-    /**
-     * @var ActionsInfo
-     */
+    /** @var ActionsInfo */
     private $actionsInfo;
+
+    /** @var ChangeInfoFactory */
+    private $changeInfoFactory;
 
     public function __construct(Storage $parentStorage, EntityInfo $entityInfo, $dbPrefix, $actionsInfo, $keyName = 'meta_key', $valueName = 'meta_value')
     {
@@ -170,21 +172,18 @@ class MetaEntityStorage extends Storage
 
     protected function createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action)
     {
-        $vpidColumnName = $this->entityInfo->vpidColumnName;
-
         $entityName = $this->entityInfo->entityName;
-        $vpid = isset($newEntity[$vpidColumnName]) ? $newEntity[$vpidColumnName] : $oldEntity[$vpidColumnName];
-        $automaticallySavedTags = $this->actionsInfo->getTags($entityName);
-        $tags = ChangeInfoUtils::extractTags($automaticallySavedTags, $oldEntity, $newEntity);
 
-        $changeInfo = new EntityChangeInfo($this->entityInfo, $this->actionsInfo, $action, $vpid, $tags, []);
+        $entity = array_merge($oldEntity, $newEntity);
+
+        $changeInfo = $this->changeInfoFactory->createEntityChangeInfo($entity, $entityName, $action);
         $files = $changeInfo->getChangedFiles();
 
         $action = apply_filters("vp_meta_entity_action_{$entityName}", $action, $oldEntity, $newEntity, $oldParentEntity, $newParentEntity);
         $tags = apply_filters("vp_meta_entity_tags_{$entityName}", $tags, $oldEntity, $newEntity, $action, $oldParentEntity, $newParentEntity);
         $files = apply_filters("vp_meta_entity_files_{$entityName}", $files, $oldEntity, $newEntity, $oldParentEntity, $newParentEntity);
 
-        return new EntityChangeInfo($this->entityInfo, $this->actionsInfo, $action, $vpid, $tags, $files);
+        return $this->changeInfoFactory->createEntityChangeInfo($entity, $entityName, $action, $tags, $files);
     }
 
     private function transformToParentEntityField($values)

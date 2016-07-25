@@ -59,14 +59,6 @@ class PluginChangeInfo extends TrackedChangeInfo
         return $this->action;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
-    {
-        $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
-        $pluginName = $commitMessage->getVersionPressTag(self::PLUGIN_NAME_TAG);
-        list(, $action, $pluginFile) = explode("/", $actionTag, 3);
-        return new self($pluginFile, $action, $pluginName);
-    }
-
     public function getChangeDescription()
     {
         return Strings::capitalize(StringUtils::verbToPastTense($this->action)) . " plugin '{$this->pluginName}'";

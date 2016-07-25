@@ -2,6 +2,7 @@
 
 namespace VersionPress\DI;
 
+use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesInfo;
@@ -96,6 +97,13 @@ class DIContainer
         $dic->register(VersionPressServices::ACTIONS_INFO, function () {
             $vpActionsFile = VERSIONPRESS_PLUGIN_DIR . '/.versionpress/actions.yml';
             return new ActionsInfo([$vpActionsFile]);
+        });
+
+        $dic->register(VersionPressServices::CHANGEINFO_FACTORY, function () use ($dic) {
+            return new ChangeInfoFactory(
+                $dic->resolve(VersionPressServices::DB_SCHEMA),
+                $dic->resolve(VersionPressServices::ACTIONS_INFO)
+            );
         });
 
         $dic->register(VersionPressServices::WPDB_MIRROR_BRIDGE, function () use ($dic) {

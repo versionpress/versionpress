@@ -146,9 +146,4 @@ class EntityChangeInfo extends TrackedChangeInfo
 
         return null;
     }
-
-    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
-    {
-        throw new \Exception('Don\'t build from commit message');
-    }
 }

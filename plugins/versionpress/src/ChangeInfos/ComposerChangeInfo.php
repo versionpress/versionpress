@@ -47,13 +47,6 @@ class ComposerChangeInfo extends TrackedChangeInfo
         return $this->action;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
-    {
-        $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
-        list(, $action, $packageName) = explode("/", $actionTag, 3);
-        return new self($packageName, $action);
-    }
-
     public function getChangeDescription()
     {
         return sprintf(

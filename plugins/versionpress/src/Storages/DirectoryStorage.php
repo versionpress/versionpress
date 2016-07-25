@@ -6,6 +6,7 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use RegexIterator;
+use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\ChangeInfos\ChangeInfoUtils;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\Git\ActionsInfo;
@@ -36,6 +37,9 @@ class DirectoryStorage extends Storage
 
     /** @var ActionsInfo */
     private $actionsInfo;
+
+    /** @var ChangeInfoFactory */
+    private $changeInfoFactory;
 
     /**
      * DirectoryStorage constructor.
@@ -218,21 +222,17 @@ class DirectoryStorage extends Storage
 
     protected function createChangeInfo($oldEntity, $newEntity, $action)
     {
-        $vpidColumnName = $this->entityInfo->vpidColumnName;
         $entityName = $this->entityInfo->entityName;
-        $vpid = isset($newEntity[$vpidColumnName]) ? $newEntity[$vpidColumnName] : $oldEntity[$vpidColumnName];
 
-        $automaticallySavedTags = $this->actionsInfo->getTags($entityName);
-        $tags = ChangeInfoUtils::extractTags($automaticallySavedTags, $oldEntity, $newEntity);
+        $entity = array_merge($oldEntity, $newEntity);
 
-        $files = [];
-        $changeInfo = new EntityChangeInfo($this->entityInfo, $this->actionsInfo, $action, $vpid, $tags, $files);
+        $changeInfo = $this->changeInfoFactory->createEntityChangeInfo($entity, $entityName, $action);
         $files = $changeInfo->getChangedFiles();
 
         $action = apply_filters("vp_entity_action_{$entityName}", $action, $oldEntity, $newEntity);
-        $tags = apply_filters("vp_entity_tags_{$entityName}", $tags, $oldEntity, $newEntity, $action);
+        $tags = apply_filters("vp_entity_tags_{$entityName}", $changeInfo->getCustomTags(), $oldEntity, $newEntity, $action);
         $files = apply_filters("vp_entity_files_{$entityName}", $files, $oldEntity, $newEntity);
 
-        return new EntityChangeInfo($this->entityInfo, $this->actionsInfo, $action, $vpid, $tags, $files);
+        return $this->changeInfoFactory->createEntityChangeInfo($entity, $entityName, $action, $tags, $files);
     }
 }

@@ -28,11 +28,6 @@ class UntrackedChangeInfo implements ChangeInfo
         return $this->commitMessage;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
-    {
-        return new self($commitMessage);
-    }
-
     public function getChangeDescription()
     {
         return $this->commitMessage->getUnprefixedSubject();

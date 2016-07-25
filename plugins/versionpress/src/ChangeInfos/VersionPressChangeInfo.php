@@ -48,13 +48,6 @@ class VersionPressChangeInfo extends TrackedChangeInfo
         return $this->action;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
-    {
-        $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
-        list(, $action, $versionPressVersion) = array_pad(explode("/", $actionTag, 3), 3, "");
-        return new self($action, $versionPressVersion);
-    }
-
     public function getChangeDescription()
     {
 

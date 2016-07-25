@@ -53,13 +53,6 @@ class RevertChangeInfo extends TrackedChangeInfo
         return $this->commitHash;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
-    {
-        $tags = $commitMessage->getVersionPressTags();
-        list(, $action, $commitHash) = explode("/", $tags[TrackedChangeInfo::ACTION_TAG], 3);
-        return new self($action, $commitHash);
-    }
-
     public function getChangeDescription()
     {
         global $versionPressContainer; // temporary solution todo: find better way to pass the dependency

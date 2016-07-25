@@ -26,11 +26,6 @@ class BulkChangeInfo implements ChangeInfo
         $this->count = $this->countUniqueChanges($changeInfos);
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
-    {
-        throw new NotSupportedException("Building bulk changeinfo from commit message is not supported");
-    }
-
     public function getCommitMessage()
     {
         throw new NotSupportedException("Commit message is created in ChangeInfoEnvelope from original objects");

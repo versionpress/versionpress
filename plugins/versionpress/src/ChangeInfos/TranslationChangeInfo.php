@@ -75,17 +75,6 @@ class TranslationChangeInfo extends TrackedChangeInfo
         return $this->languageCode;
     }
 
-    public static function buildFromCommitMessage(CommitMessage $commitMessage, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
-    {
-        $actionTag = $commitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
-        $languageCode = $commitMessage->getVersionPressTag(self::LANGUAGE_CODE_TAG);
-        $languageName = $commitMessage->getVersionPressTag(self::LANGUAGE_NAME_TAG);
-        $type = $commitMessage->getVersionPressTag(self::TRANSLATION_TYPE_TAG);
-        $name = $commitMessage->getVersionPressTag(self::TRANSLATION_NAME_TAG);
-        list(, $action) = explode("/", $actionTag, 2);
-        return new self($action, $languageCode, $languageName, $type, $name);
-    }
-
     public function getChangeDescription()
     {
         if ($this->action === 'activate') {
