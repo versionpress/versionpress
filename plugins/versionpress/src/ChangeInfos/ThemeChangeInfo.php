@@ -52,7 +52,7 @@ class ThemeChangeInfo extends TrackedChangeInfo
         $this->themeName = $themeName;
     }
 
-    public function getEntityName()
+    public function getScope()
     {
         return self::$OBJECT_TYPE;
     }
@@ -86,7 +86,7 @@ class ThemeChangeInfo extends TrackedChangeInfo
 
     protected function getActionTagValue()
     {
-        return "{$this->getEntityName()}/{$this->getAction()}/" . $this->themeId;
+        return "{$this->getScope()}/{$this->getAction()}/" . $this->themeId;
     }
 
     public function getCustomTags()

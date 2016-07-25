@@ -60,7 +60,7 @@ class TranslationChangeInfo extends TrackedChangeInfo
         $this->name = $name;
     }
 
-    public function getEntityName()
+    public function getScope()
     {
         return self::$OBJECT_TYPE;
     }
@@ -87,7 +87,7 @@ class TranslationChangeInfo extends TrackedChangeInfo
 
     protected function getActionTagValue()
     {
-        return "{$this->getEntityName()}/{$this->getAction()}";
+        return "{$this->getScope()}/{$this->getAction()}";
     }
 
     public function getCustomTags()

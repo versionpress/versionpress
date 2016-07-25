@@ -21,6 +21,6 @@ class ChangeInfoUtils
 
     public static function changeInfoRepresentsEntity($changeInfo, $entityName)
     {
-        return $changeInfo instanceof EntityChangeInfo && $changeInfo->getEntityName() === $entityName;
+        return $changeInfo instanceof EntityChangeInfo && $changeInfo->getScope() === $entityName;
     }
 }

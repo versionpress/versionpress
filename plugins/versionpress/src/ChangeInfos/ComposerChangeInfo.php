@@ -37,7 +37,7 @@ class ComposerChangeInfo extends TrackedChangeInfo
         $this->action = $action;
     }
 
-    public function getEntityName()
+    public function getScope()
     {
         return self::$OBJECT_TYPE;
     }
@@ -58,7 +58,7 @@ class ComposerChangeInfo extends TrackedChangeInfo
 
     protected function getActionTagValue()
     {
-        return "{$this->getEntityName()}/{$this->getAction()}/" . $this->packageName;
+        return "{$this->getScope()}/{$this->getAction()}/" . $this->packageName;
     }
 
     public function getChangedFiles()

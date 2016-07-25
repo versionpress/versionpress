@@ -49,7 +49,7 @@ class PluginChangeInfo extends TrackedChangeInfo
         $this->pluginName = $pluginName ? $pluginName : $this->findPluginName();
     }
 
-    public function getEntityName()
+    public function getScope()
     {
         return self::$OBJECT_TYPE;
     }
@@ -66,7 +66,7 @@ class PluginChangeInfo extends TrackedChangeInfo
 
     protected function getActionTagValue()
     {
-        return "{$this->getEntityName()}/{$this->getAction()}/" . $this->pluginFile;
+        return "{$this->getScope()}/{$this->getAction()}/" . $this->pluginFile;
     }
 
     public function getCustomTags()

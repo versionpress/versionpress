@@ -38,7 +38,7 @@ class VersionPressChangeInfo extends TrackedChangeInfo
         $this->versionPressVersion = $versionPressVersion;
     }
 
-    public function getEntityName()
+    public function getScope()
     {
         return "versionpress";
     }

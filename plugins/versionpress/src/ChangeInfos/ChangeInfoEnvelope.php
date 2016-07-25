@@ -157,8 +157,8 @@ class ChangeInfoEnvelope implements ChangeInfo
             /** @var TrackedChangeInfo|BulkChangeInfo $changeInfo1 */
             /** @var TrackedChangeInfo|BulkChangeInfo $changeInfo2 */
 
-            $priority1 = $actionsInfo->getActionPriority($changeInfo1->getEntityName(), $changeInfo1->getAction());
-            $priority2 = $actionsInfo->getActionPriority($changeInfo2->getEntityName(), $changeInfo2->getAction());
+            $priority1 = $actionsInfo->getActionPriority($changeInfo1->getScope(), $changeInfo1->getAction());
+            $priority2 = $actionsInfo->getActionPriority($changeInfo2->getScope(), $changeInfo2->getAction());
 
             return $priority1 - $priority2;
         });
@@ -170,7 +170,7 @@ class ChangeInfoEnvelope implements ChangeInfo
     {
         $groupedChangeInfos = ArrayUtils::mapreduce($changeInfoList, function (ChangeInfo $item, $mapEmit) {
             if ($item instanceof TrackedChangeInfo) {
-                $key = "{$item->getEntityName()}/{$item->getAction()}";
+                $key = "{$item->getScope()}/{$item->getAction()}";
                 $mapEmit($key, $item);
             } else {
                 $mapEmit(spl_object_hash($item), $item);

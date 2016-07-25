@@ -43,7 +43,7 @@ class BulkChangeInfo implements ChangeInfo
 
     public function getChangeDescription()
     {
-        $entityName = $this->getEntityName();
+        $entityName = $this->getScope();
         $action = $this->getAction();
 
         if ($this->count === 1) {
@@ -69,9 +69,9 @@ class BulkChangeInfo implements ChangeInfo
         return $this->changeInfos[0]->getAction();
     }
 
-    public function getEntityName()
+    public function getScope()
     {
-        return $this->changeInfos[0]->getEntityName();
+        return $this->changeInfos[0]->getScope();
     }
 
     /**

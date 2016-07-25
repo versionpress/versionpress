@@ -38,7 +38,7 @@ class FooChangeInfo extends \VersionPress\ChangeInfos\TrackedChangeInfo
         return join("\n", $this->files);
     }
 
-    public function getEntityName()
+    public function getScope()
     {
         return "file";
     }
@@ -50,7 +50,7 @@ class FooChangeInfo extends \VersionPress\ChangeInfos\TrackedChangeInfo
 
     protected function getActionTagValue()
     {
-        return "{$this->getEntityName()}/{$this->getAction()}";
+        return "{$this->getScope()}/{$this->getAction()}";
     }
 
     public function getCustomTags()

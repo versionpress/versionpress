@@ -619,7 +619,7 @@ class VersionPressApi
         $change = [];
 
         if ($changeInfo instanceof TrackedChangeInfo) {
-            $change['type'] = $changeInfo->getEntityName();
+            $change['type'] = $changeInfo->getScope();
             $change['action'] = $changeInfo->getAction();
             $change['tags'] = $changeInfo->getCustomTags();
         }

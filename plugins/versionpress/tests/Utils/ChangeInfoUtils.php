@@ -26,7 +26,7 @@ class ChangeInfoUtils
     public static function getFullAction($changeInfo)
     {
         $actualChangeInfo = self::getTrackedChangeInfo($changeInfo);
-        return sprintf("%s/%s", $actualChangeInfo->getEntityName(), $actualChangeInfo->getAction());
+        return sprintf("%s/%s", $actualChangeInfo->getScope(), $actualChangeInfo->getAction());
     }
 
     /**

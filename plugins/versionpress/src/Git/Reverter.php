@@ -176,7 +176,7 @@ class Reverter
         foreach ($changeInfo->getChangeInfoList() as $subChangeInfo) {
             if ($subChangeInfo instanceof EntityChangeInfo &&
                 !$this->checkEntityReferences(
-                    $subChangeInfo->getEntityName(),
+                    $subChangeInfo->getScope(),
                     $subChangeInfo->getEntityId(),
                     $subChangeInfo->getParentId()
                 )
