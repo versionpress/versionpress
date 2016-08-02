@@ -4,7 +4,6 @@ namespace VersionPress\Git;
 use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
-use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
 use VersionPress\Git\ChangeInfoPreprocessors\ChangeInfoPreprocessor;
 use VersionPress\Git\ChangeInfoPreprocessors\EditActionChangeInfoPreprocessor;
 use VersionPress\Git\ChangeInfoPreprocessors\PostChangeInfoPreprocessor;
@@ -121,7 +120,7 @@ class Committer
 
         $mutex->release();
 
-        if (count($this->forcedChangeInfos) > 0 && $this->forcedChangeInfos[0] instanceof WordPressUpdateChangeInfo) {
+        if (count($this->forcedChangeInfos) > 0 && $this->forcedChangeInfos[0]->getScope() === 'wordpress') {
             FileSystem::remove(ABSPATH . 'versionpress.maintenance');
         }
 

@@ -2,7 +2,7 @@
 namespace VersionPress\Initialization;
 
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
-use VersionPress\ChangeInfos\VersionPressChangeInfo;
+use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesReplacer;
@@ -22,7 +22,6 @@ use VersionPress\Utils\SecurityUtils;
 use VersionPress\Utils\StringUtils;
 use VersionPress\Utils\WordPressMissingFunctions;
 use VersionPress\VersionPress;
-use wpdb;
 
 /**
  * Initializes ("activates" in UI terms) VersionPress - builds its internal repository and starts tracking the changes.
@@ -86,6 +85,11 @@ class Initializer
      * @var ShortcodesReplacer
      */
     private $shortcodesReplacer;
+
+    /**
+     * @var ChangeInfoFactory
+     */
+    private $changeInfoFactory;
     private $idCache = [];
     private $executionStartTime;
 
@@ -97,7 +101,8 @@ class Initializer
         GitRepository $repository,
         AbsoluteUrlReplacer $urlReplacer,
         VpidRepository $vpidRepository,
-        ShortcodesReplacer $shortcodesReplacer
+        ShortcodesReplacer $shortcodesReplacer,
+        ChangeInfoFactory $changeInfoFactory
     ) {
 
         $this->database = $database;
@@ -109,6 +114,7 @@ class Initializer
         $this->vpidRepository = $vpidRepository;
         $this->shortcodesReplacer = $shortcodesReplacer;
         $this->executionStartTime = microtime(true);
+        $this->changeInfoFactory = $changeInfoFactory;
     }
 
     /**
@@ -465,10 +471,10 @@ class Initializer
 
 
         $this->reportProgressChange(InitializerStates::CREATING_INITIAL_COMMIT);
-        $installationChangeInfo = new VersionPressChangeInfo(
-            $isUpdate ? "update" : "activate",
-            VersionPress::getVersion()
-        );
+
+        $action = $isUpdate ? 'update' : 'activate';
+        $committedFiles = [["type" => "path", "path" => "*"]];
+        $changeInfo = $this->changeInfoFactory->createTrackedChangeInfo('versionpress', $action, VersionPress::getVersion(), [], $committedFiles);
 
         $currentUser = wp_get_current_user();
         /** @noinspection PhpUndefinedFieldInspection */
@@ -485,7 +491,7 @@ class Initializer
             $this->adjustGitProcessTimeout();
             $this->repository->stageAll();
             $this->adjustGitProcessTimeout();
-            $this->repository->commit($installationChangeInfo->getCommitMessage(), $authorName, $authorEmail);
+            $this->repository->commit($changeInfo->getCommitMessage(), $authorName, $authorEmail);
         } catch (ProcessTimedOutException $ex) {
             $this->abortInitialization();
         }

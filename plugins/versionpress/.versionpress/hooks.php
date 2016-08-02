@@ -2,6 +2,7 @@
 
 use Nette\Utils\Strings;
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Utils\EntityUtils;
 use VersionPress\Utils\StringUtils;
@@ -325,3 +326,137 @@ add_filter('vp_meta_entity_tags_usermeta', function ($tags, $oldEntity, $newEnti
 
     return $tags;
 }, 10, 6);
+
+
+add_filter('vp_entity_files_composer', function ($files) {
+    $files[] = ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.json'];
+    $files[] = ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.lock'];
+    return $files;
+});
+
+add_action('vp_wordpress_updated', function ($version) {
+    $wpFiles = [
+        // All files from WP root
+        // Git can't add only files from current directory (non-recursively), so we have to add them manually.
+        // It should be OK because the list of files didn't change since at least Jan 2013.
+        ["type" => "path", "path" => "index.php"],
+        ["type" => "path", "path" => "license.txt"],
+        ["type" => "path", "path" => "readme.html"],
+        ["type" => "path", "path" => "wp-activate.php"],
+        ["type" => "path", "path" => "wp-blog-header.php"],
+        ["type" => "path", "path" => "wp-comments-post.php"],
+        ["type" => "path", "path" => "wp-config-sample.php"],
+        ["type" => "path", "path" => "wp-cron.php"],
+        ["type" => "path", "path" => "wp-links-opml.php"],
+        ["type" => "path", "path" => "wp-load.php"],
+        ["type" => "path", "path" => "wp-login.php"],
+        ["type" => "path", "path" => "wp-mail.php"],
+        ["type" => "path", "path" => "wp-settings.php"],
+        ["type" => "path", "path" => "wp-signup.php"],
+        ["type" => "path", "path" => "wp-trackback.php"],
+        ["type" => "path", "path" => "xmlrpc.php"],
+
+        // wp-includes and wp-admin directories
+        ["type" => "path", "path" => ABSPATH . WPINC . '/*'],
+        ["type" => "path", "path" => ABSPATH . 'wp-admin/*'],
+
+        // WP themes - we bet that all WP themes begin with "twenty"
+        ["type" => "path", "path" => WP_CONTENT_DIR . '/themes/twenty*'],
+
+        // Translations
+        ["type" => "path", "path" => WP_CONTENT_DIR . '/languages/*'],
+
+        ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.json'],
+        ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.lock'],
+    ];
+
+    vp_force_action('wordpress', 'update', $version, [], $wpFiles);
+
+    if (!WpdbReplacer::isReplaced()) {
+        WpdbReplacer::replaceMethods();
+    }
+});
+
+add_action('vp_plugin_changed', function ($action, $pluginFile, $pluginName) {
+    $pluginPath = WP_PLUGIN_DIR . "/";
+    if (dirname($pluginFile) === ".") {
+        // single-file plugin like hello.php
+        $pluginPath .= $pluginFile;
+    } else {
+        // multi-file plugin like akismet/...
+        $pluginPath .= dirname($pluginFile) . "/*";
+    }
+
+    $pluginChange = ["type" => "path", "path" => $pluginPath];
+    $vpdbChanges = ["type" => "path", "path" => VP_VPDB_DIR];
+    $composerChanges = [
+        ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.json'],
+        ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.lock'],
+    ];
+
+    $filesToCommit = array_merge([$pluginChange, $vpdbChanges], $composerChanges);
+
+    vp_force_action('plugin', $action, $pluginFile, ['VP-Plugin-Name' => $pluginName], $filesToCommit);
+}, 10, 3);
+
+
+add_action('vp_theme_changed', function ($action, $stylesheet, $themeName) {
+    $themeChange = ["type" => "path", "path" => $path = WP_CONTENT_DIR . "/themes/" . $stylesheet . "/*"];
+    $optionChange = ["type" => "all-storage-files", "entity" => "option"];
+    $composerChanges = [
+        ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.json'],
+        ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.lock'],
+    ];
+
+    $filesToCommit = array_merge([$themeChange, $optionChange], $composerChanges);
+
+    vp_force_action('theme', $action, $stylesheet, ['VP-Theme-Name' => $themeName], $filesToCommit);
+}, 10, 3);
+
+
+add_action('vp_translation_changed', function ($action, $languageCode, $type = 'core', $name = null) {
+    require_once(ABSPATH . 'wp-admin/includes/translation-install.php');
+    $translations = wp_get_available_translations();
+    $languageName = isset($translations[$languageCode]) ? $translations[$languageCode]['native_name'] : 'English (United States)';
+
+    $tags = [
+        'VP-Language-Code' => $languageCode,
+        'VP-Language-Name' => $languageName,
+        'VP-Translation-Type' => $type,
+    ];
+
+    if ($name) {
+        $tags['VP-Translation-Name'] = $name;
+    }
+
+    $path = WP_CONTENT_DIR . "/languages/";
+
+    if ($type === "core") {
+        $path .= "*";
+    } else {
+        $path .= $type . "s/" . $name . "-" . $languageCode . ".*";
+    }
+
+    $filesChange = ["type" => "path", "path" => $path];
+    $optionChange = ["type" => "all-storage-files", "entity" => "option"];
+
+    $files = [$filesChange, $optionChange];
+
+    vp_force_action('translation', $action, null, $tags, $files);
+}, 10, 4);
+
+
+add_action('vp_versionpress_changed', function ($action, $version) {
+    if ($action === 'deactivate') {
+        $files = [
+            ["type" => "path", "path" => VP_VPDB_DIR . "/*"],
+            ["type" => "path", "path" => ABSPATH . WPINC . "/wp-db.php"],
+            ["type" => "path", "path" => ABSPATH . WPINC . "/wp-db.php.original"],
+            ["type" => "path", "path" => ABSPATH . "/.gitattributes"],
+        ];
+    } else {
+        $files = [["type" => "path", "path" => "*"]];
+    }
+
+    vp_force_action('versionpress', $action, $version, [], $files);
+}, 10, 2);

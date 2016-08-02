@@ -175,12 +175,12 @@ class DbSchemaInfo
      * Returns true if given name is an entity (is defined in schema).
      * Useful for prefixing VP tables.
      *
-     * @param $entityOrTableName
+     * @param $entityName
      * @return bool
      */
-    private function isEntity($entityOrTableName)
+    public function isEntity($entityName)
     {
-        return in_array($entityOrTableName, $this->getAllEntityNames());
+        return in_array($entityName, $this->getAllEntityNames());
     }
 
     /**

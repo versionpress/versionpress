@@ -33,6 +33,11 @@ class ChangeInfoFactory
         return new EntityChangeInfo($entityInfo, $this->actionsInfo, $action, $vpid, $tags, $customFiles);
     }
 
+    public function createTrackedChangeInfo($scope, $action, $entityId = null, $tags = [], $files = [])
+    {
+        return new TrackedChangeInfo($scope, $this->actionsInfo, $action, $entityId, $tags, $files);
+    }
+
     public function buildChangeInfoEnvelopeFromCommitMessage(CommitMessage $commitMessage)
     {
         $fullBody = $commitMessage->getBody();
@@ -48,43 +53,24 @@ class ChangeInfoFactory
             array_pop($splittedBodies);
         }
 
-        if (count($splittedBodies) === 0 || $lastBody === "") {
-            $changeInfoList[] = new UntrackedChangeInfo($commitMessage);
+        if (!self::isTrackedChangeInfo($fullBody)) {
+            return new ChangeInfoEnvelope([new UntrackedChangeInfo($commitMessage)], $version, $environment);
         }
-
-        $specialTypes = [
-            'composer' => ComposerChangeInfo::class,
-            'theme' => ThemeChangeInfo::class,
-            'plugin' => PluginChangeInfo::class,
-            'translation' => TranslationChangeInfo::class,
-            'wordpress' => WordPressUpdateChangeInfo::class,
-            'versionpress/undo' => RevertChangeInfo::class,
-            'versionpress/rollback' => RevertChangeInfo::class,
-            'versionpress' => VersionPressChangeInfo::class,
-        ];
 
         foreach ($splittedBodies as $body) {
             $partialCommitMessage = new CommitMessage("", $body);
 
             $actionTag = $partialCommitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
+            list($scope, $action, $id) = explode('/', $actionTag, 3);
 
-            /** @var ChangeInfo $matchingChangeInfoType */
-            $matchingChangeInfoType = null;
-            foreach ($specialTypes as $actionTagPrefix => $class) {
-                if (Strings::startsWith($actionTag, $actionTagPrefix)) {
-                    $matchingChangeInfoType = $class;
-                }
-            }
+            $tags = $commitMessage->getVersionPressTags();
+            unset($tags[TrackedChangeInfo::ACTION_TAG]);
 
-            if ($matchingChangeInfoType === null) {
-                list($entityName, $action, $id) = explode('/', $actionTag, 3);
-                $entityInfo = $this->dbSchema->getEntityInfo($entityName);
-                $tags = $commitMessage->getVersionPressTags();
-                unset($tags[TrackedChangeInfo::ACTION_TAG]);
-
+            if ($this->dbSchema->isEntity($scope)) {
+                $entityInfo = $this->dbSchema->getEntityInfo($scope);
                 $changeInfoList[] = new EntityChangeInfo($entityInfo, $this->actionsInfo, $action, $id, $tags, []);
             } else {
-                $changeInfoList[] = $matchingChangeInfoType::buildFromCommitMessage($partialCommitMessage, $this->dbSchema, $this->actionsInfo);
+                $changeInfoList[] = new TrackedChangeInfo($scope, $this->actionsInfo, $action, $id, $tags, []);
             }
         }
 
@@ -100,5 +86,10 @@ class ChangeInfoFactory
     {
         $tmpMessage = new CommitMessage("", $commitMessageBody);
         return $tmpMessage->getVersionPressTag($tag);
+    }
+
+    private static function isTrackedChangeInfo($body)
+    {
+        return Strings::startsWith($body, TrackedChangeInfo::ACTION_TAG);
     }
 }

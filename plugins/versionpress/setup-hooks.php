@@ -1,16 +1,7 @@
 <?php
 
-use Nette\Utils\Strings;
 use VersionPress\Api\VersionPressApi;
 use VersionPress\ChangeInfos\EntityChangeInfo;
-use VersionPress\ChangeInfos\PluginChangeInfo;
-use VersionPress\ChangeInfos\PostChangeInfo;
-use VersionPress\ChangeInfos\TermChangeInfo;
-use VersionPress\ChangeInfos\ThemeChangeInfo;
-use VersionPress\ChangeInfos\TranslationChangeInfo;
-use VersionPress\ChangeInfos\VersionPressChangeInfo;
-use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
-use VersionPress\Cli\VPCommand;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Database\WpdbMirrorBridge;
@@ -138,43 +129,36 @@ function vp_register_hooks()
     add_filter('update_feedback', function () {
         touch(ABSPATH . 'versionpress.maintenance');
     });
-    add_action('_core_updated_successfully', function () use ($committer, $mirror) {
-        require(ABSPATH . WPINC . '/version.php'); // load constants (like $wp_version)
-        /** @var string $wp_version */
-        $changeInfo = new WordPressUpdateChangeInfo($wp_version);
-        $committer->forceChangeInfo($changeInfo);
 
-        // We have to re-save the option because WP upgrader uses $wpdb->query()
-        $mirror->save('option', ['option_name' => 'db_version', 'option_value' => get_option('db_version')]);
+    WordPressMissingFunctions::pipeAction('_core_updated_successfully', 'vp_wordpress_updated');
 
-        if (!WpdbReplacer::isReplaced()) {
-            WpdbReplacer::replaceMethods();
-        }
+    add_action('activated_plugin', function ($pluginFile) {
+        $plugins = get_plugins();
+        $pluginName = $plugins[$pluginFile]['Name'];
+        do_action('vp_plugin_changed', 'activate', $pluginFile, $pluginName);
     });
 
-    add_action('activated_plugin', function ($pluginName) use ($committer) {
-        $committer->forceChangeInfo(new PluginChangeInfo($pluginName, 'activate'));
+    add_action('deactivated_plugin', function ($pluginFile) {
+        $plugins = get_plugins();
+        $pluginName = $plugins[$pluginFile]['Name'];
+        do_action('vp_plugin_changed', 'deactivate', $pluginFile, $pluginName);
     });
 
-    add_action('deactivated_plugin', function ($pluginName) use ($committer) {
-        $committer->forceChangeInfo(new PluginChangeInfo($pluginName, 'deactivate'));
-    });
-
-    add_action('upgrader_process_complete', function ($upgrader, $hook_extra) use ($committer) {
+    add_action('upgrader_process_complete', function ($upgrader, $hook_extra) {
         if ($hook_extra['type'] === 'theme') {
             $themes = (isset($hook_extra['bulk']) && $hook_extra['bulk'] === true)
                 ? $hook_extra['themes']
                 : [$upgrader->result['destination_name']];
 
-            foreach ($themes as $theme) {
-                $themeName = wp_get_theme($theme)->get('Name');
-                if ($themeName === $theme && isset($upgrader->skin->api, $upgrader->skin->api->name)) {
+            foreach ($themes as $stylesheet) {
+                $themeName = wp_get_theme($stylesheet)->get('Name');
+                if ($themeName === $stylesheet && isset($upgrader->skin->api, $upgrader->skin->api->name)) {
                     $themeName = $upgrader->skin->api->name;
                 }
 
                 // action can be "install" or "update", see WP_Upgrader and search for `'hook_extra' =>`
                 $action = $hook_extra['action'];
-                $committer->forceChangeInfo(new ThemeChangeInfo($theme, $action, $themeName));
+                do_action('vp_theme_changed', $action, $stylesheet, $themeName);
             }
         }
 
@@ -183,17 +167,20 @@ function vp_register_hooks()
         }
 
         if (isset($hook_extra['bulk']) && $hook_extra['bulk'] === true) {
-            $plugins = $hook_extra['plugins'];
+            $pluginFiles = $hook_extra['plugins'];
         } else {
-            $plugins = [$hook_extra['plugin']];
+            $pluginFiles = [$hook_extra['plugin']];
         }
 
-        foreach ($plugins as $plugin) {
-            $committer->forceChangeInfo(new PluginChangeInfo($plugin, 'update'));
+        $plugins = get_plugins();
+
+        foreach ($pluginFiles as $pluginFile) {
+            $pluginName = $plugins[$pluginFile]['Name'];
+            do_action('vp_plugin_changed', 'update', $pluginFile, $pluginName);
         }
     }, 10, 2);
 
-    add_filter('upgrader_pre_install', function ($_, $hook_extra) use ($committer) {
+    add_filter('upgrader_pre_install', function ($_, $hook_extra) {
         if (!(isset($hook_extra['type']) && $hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'install')) {
             return;
         }
@@ -206,10 +193,12 @@ function vp_register_hooks()
 
             wp_cache_delete('plugins', 'plugins');
             $pluginsAfterInstallation = get_plugins();
-            $installedPlugin = array_diff_key($pluginsAfterInstallation, $pluginsBeforeInstallation);
-            reset($installedPlugin);
-            $pluginName = key($installedPlugin);
-            $committer->forceChangeInfo(new PluginChangeInfo($pluginName, 'install'));
+            $installedPlugins = array_diff_key($pluginsAfterInstallation, $pluginsBeforeInstallation);
+
+            foreach ($installedPlugins as $pluginFile => $plugin) {
+                do_action('vp_plugin_changed', 'install', $pluginFile, $plugin['Name']);
+            }
+
             remove_filter('upgrader_post_install', $postInstallHook);
         };
 
@@ -224,24 +213,17 @@ function vp_register_hooks()
         $languages = get_available_languages();
 
         $postInstallHook = function ($_, $hook_extra) use ($committer, $languages, &$postInstallHook) {
-            require_once(ABSPATH . 'wp-admin/includes/translation-install.php');
-
             if (!isset($hook_extra['language_update_type'])) {
                 return;
             }
 
-            $translations = wp_get_available_translations();
-
             $type = $hook_extra['language_update_type'];
             $languageCode = $hook_extra['language_update']->language;
-            $languageName = isset($translations[$languageCode])
-                ? $translations[$languageCode]['native_name']
-                : 'English (United States)';
-
             $name = $type === "core" ? null : $hook_extra['language_update']->slug;
-
             $action = in_array($languageCode, $languages) ? "update" : "install";
-            $committer->forceChangeInfo(new TranslationChangeInfo($action, $languageCode, $languageName, $type, $name));
+
+            do_action('vp_translation_changed', $action, $languageCode, $type, $name);
+
             remove_filter('upgrader_post_install', $postInstallHook);
         };
 
@@ -262,7 +244,7 @@ function vp_register_hooks()
         $stylesheet = $theme->get_stylesheet();
         $themeName = $theme->get('Name');
 
-        $committer->forceChangeInfo(new ThemeChangeInfo($stylesheet, 'switch', $themeName));
+        do_action('vp_theme_changed', 'switch', $stylesheet, $themeName);
     });
 
 
@@ -288,13 +270,11 @@ function vp_register_hooks()
             return; // It's just submitted settings form without changing language
         }
 
-        $languageName = _vp_get_language_name_by_code($value);
-        $committer->forceChangeInfo(new TranslationChangeInfo("activate", $value, $languageName));
+        do_action('vp_translation_changed', 'activate', $value);
     }, 10, 2);
 
     add_action('update_option_WPLANG', function ($oldValue, $newValue) use ($committer) {
-        $languageName = _vp_get_language_name_by_code($newValue);
-        $committer->forceChangeInfo(new TranslationChangeInfo("activate", $newValue, $languageName));
+        do_action('vp_translation_changed', 'activate', $newValue);
     }, 10, 2);
 
     add_action('wp_update_nav_menu_item', function ($menu_id, $menu_item_db_id) use ($committer) {
@@ -459,32 +439,31 @@ function vp_register_hooks()
 
     if ($requestDetector->isThemeDeleteRequest()) {
         $themeIds = $requestDetector->getThemeStylesheets();
-        foreach ($themeIds as $themeId) {
-            $committer->forceChangeInfo(new ThemeChangeInfo($themeId, 'delete'));
+        foreach ($themeIds as $stylesheet) {
+            $themeName = wp_get_theme($stylesheet)->get('Name');
+            do_action('vp_theme_changed', 'delete', $stylesheet, $themeName);
         }
     }
 
     if ($requestDetector->isPluginDeleteRequest()) {
-        $plugins = $requestDetector->getPluginNames();
-        foreach ($plugins as $plugin) {
-            $committer->forceChangeInfo(new PluginChangeInfo($plugin, 'delete'));
+        $pluginNames = $requestDetector->getPluginNames();
+        $plugins = get_plugins();
+
+        foreach ($pluginNames as $plugin) {
+            do_action('vp_plugin_changed', 'delete', $plugin, $plugins[$plugin]['Name']);
         }
     }
 
     if ($requestDetector->isCoreLanguageUninstallRequest()) {
         $languageCode = $requestDetector->getLanguageCode();
-        $translations = wp_get_available_translations();
-        $languageName = isset($translations[$languageCode])
-            ? $translations[$languageCode]['native_name']
-            : 'English (United States)';
-
-        $committer->forceChangeInfo(new TranslationChangeInfo('uninstall', $languageCode, $languageName, 'core'));
+        do_action('vp_translation_changed', 'uninstall', $languageCode);
     }
 
-    if (basename($_SERVER['PHP_SELF']) === 'theme-editor.php' &&
-        isset($_GET['updated']) &&
-        $_GET['updated'] === 'true') {
-        $committer->forceChangeInfo(new ThemeChangeInfo($_GET['theme'], 'edit'));
+    if (basename($_SERVER['PHP_SELF']) === 'theme-editor.php' && isset($_GET['updated']) && $_GET['updated'] === 'true') {
+        $stylesheet = $_GET['theme'];
+        $themeName = wp_get_theme($stylesheet)->get('Name');
+
+        do_action('vp_theme_changed', 'edit', $stylesheet, $themeName);
     }
 
     if (basename($_SERVER['PHP_SELF']) === 'plugin-editor.php' &&
@@ -501,11 +480,12 @@ function vp_register_hooks()
 
         $editedFile = $_GET['file'];
         $editedFilePathParts = preg_split("~[/\\\\]~", $editedFile);
-        $plugins = array_keys(get_plugins());
+        $plugins = get_plugins();
+        $pluginNames = array_keys($plugins);
         $bestRank = 0;
         $bestMatch = "";
 
-        foreach ($plugins as $plugin) {
+        foreach ($pluginNames as $plugin) {
             $rank = 0;
             $pluginPathParts = preg_split("~[/\\\\]~", $plugin);
             $maxEqualParts = min(count($editedFilePathParts), count($pluginPathParts));
@@ -523,7 +503,7 @@ function vp_register_hooks()
             }
         }
 
-        $committer->forceChangeInfo(new PluginChangeInfo($bestMatch, 'edit'));
+        do_action('vp_plugin_changed', 'edit', $bestMatch, $plugins[$bestMatch]['Name']);
     }
 
     add_filter('cron_schedules', function ($schedules) use ($dbSchemaInfo) {
@@ -717,10 +697,14 @@ function vp_admin_post_confirm_deactivation()
         FileSystem::remove(VERSIONPRESS_ACTIVATION_FILE);
     }
 
-    global $versionPressContainer;
-    /** @var Committer $committer */
-    $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
-    $committer->forceChangeInfo(new VersionPressChangeInfo("deactivate"));
+    $filesChangedByDeactivation = [
+        ["type" => "path", "path" => VP_VPDB_DIR . "/*"],
+        ["type" => "path", "path" => ABSPATH . WPINC . "/wp-db.php"],
+        ["type" => "path", "path" => ABSPATH . WPINC . "/wp-db.php.original"],
+        ["type" => "path", "path" => ABSPATH . "/.gitattributes"],
+    ];
+
+    vp_force_action('versionpress', 'deactivate', null, [], $filesChangedByDeactivation);
 
     MergeDriverInstaller::uninstallMergeDriver(VP_PROJECT_ROOT, VERSIONPRESS_PLUGIN_DIR, VP_VPDB_DIR);
 
