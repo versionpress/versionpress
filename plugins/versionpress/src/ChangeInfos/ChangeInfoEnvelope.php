@@ -137,23 +137,11 @@ class ChangeInfoEnvelope implements ChangeInfo
      */
     private function sortChangeInfoList($changeInfoList)
     {
-        global $versionPressContainer;
-
-        if ($versionPressContainer === null) {
-            return $changeInfoList;
-        }
-
-        /** @var ActionsInfo $actionsInfo */
-        $actionsInfo = $versionPressContainer->resolve(VersionPressServices::ACTIONS_INFO);
-
-        ArrayUtils::stablesort($changeInfoList, function ($changeInfo1, $changeInfo2) use ($actionsInfo) {
+        ArrayUtils::stablesort($changeInfoList, function ($changeInfo1, $changeInfo2) {
             /** @var TrackedChangeInfo|BulkChangeInfo $changeInfo1 */
             /** @var TrackedChangeInfo|BulkChangeInfo $changeInfo2 */
 
-            $priority1 = $actionsInfo->getActionPriority($changeInfo1->getScope(), $changeInfo1->getAction());
-            $priority2 = $actionsInfo->getActionPriority($changeInfo2->getScope(), $changeInfo2->getAction());
-
-            return $priority1 - $priority2;
+            return  $changeInfo1->getPriority() -  $changeInfo2->getPriority();
         });
 
         return $changeInfoList;
@@ -189,5 +177,10 @@ class ChangeInfoEnvelope implements ChangeInfo
         }
 
         return $changeInfos;
+    }
+
+    public function getPriority()
+    {
+        return 0;
     }
 }

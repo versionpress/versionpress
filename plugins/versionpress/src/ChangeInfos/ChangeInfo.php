@@ -36,4 +36,6 @@ interface ChangeInfo
      * @return string
      */
     public function getChangeDescription();
+
+    public function getPriority();
 }

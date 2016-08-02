@@ -7,6 +7,7 @@ use VersionPress\ChangeInfos\BulkChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\EntityChangeInfo;
+use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\Database\EntityInfo;
 use VersionPress\Git\ActionsInfo;
 
@@ -44,7 +45,7 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
         $changeInfoEnvelope = new ChangeInfoEnvelope($input, "1.0");
         $sortedByChangeInfoEnvelope = $changeInfoEnvelope->getReorganizedInfoList();
 
-        $this->assertEquals($sortedByChangeInfoEnvelope, $expectedSorted);
+        $this->assertEquals($expectedSorted, $sortedByChangeInfoEnvelope);
     }
 
     /** @test */
@@ -95,11 +96,11 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
         $entityInfoMock = $this->createEntityInfoMock($entityName);
         $actionsInfoMock = $this->createActionsInfoMock(10);
 
-        $wordpressUpdateChangeInfo1 = new WordPressUpdateChangeInfo("4.0");
-        $wordPressUpdateChangeInfo2 = new WordPressUpdateChangeInfo("4.1");
+        $wordpressUpdateChangeInfo1 = new TrackedChangeInfo('wordpress', $actionsInfoMock, 'update', '4.0');
+        $wordPressUpdateChangeInfo2 = new TrackedChangeInfo('wordpress', $actionsInfoMock, 'update', '4.1');
 
         $normalPriorityPostChangeInfo1 = new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'edit', 'vpid');
-        $normalPriorityPostChangeInfo2 = new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'edit', 'vpid');
+        $normalPriorityPostChangeInfo2 = new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'edit', 'another vpid');
 
         return [
             [

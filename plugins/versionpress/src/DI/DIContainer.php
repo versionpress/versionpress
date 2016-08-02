@@ -74,7 +74,8 @@ class DIContainer
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::DATABASE),
                 array_keys((array)$wp_taxonomies),
-                $dic->resolve(VersionPressServices::ACTIONS_INFO)
+                $dic->resolve(VersionPressServices::ACTIONS_INFO),
+                $dic->resolve(VersionPressServices::CHANGEINFO_FACTORY)
             );
         });
 

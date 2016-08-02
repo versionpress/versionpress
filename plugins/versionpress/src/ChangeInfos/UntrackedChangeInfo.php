@@ -30,4 +30,9 @@ class UntrackedChangeInfo implements ChangeInfo
     {
         return $this->commitMessage->getUnprefixedSubject();
     }
+
+    public function getPriority()
+    {
+        return 0;
+    }
 }

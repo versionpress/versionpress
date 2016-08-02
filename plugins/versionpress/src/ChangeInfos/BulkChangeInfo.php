@@ -71,6 +71,11 @@ class BulkChangeInfo implements ChangeInfo
         return $this->changeInfos[0]->getScope();
     }
 
+    public function getPriority()
+    {
+        return $this->changeInfos[0]->getPriority();
+    }
+
     /**
      * @param TrackedChangeInfo[] $changeInfos
      * @return int

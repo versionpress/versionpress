@@ -135,6 +135,11 @@ class TrackedChangeInfo implements ChangeInfo
         return $this->id;
     }
 
+    public function getPriority()
+    {
+        return $this->actionsInfo->getActionPriority($this->getScope(), $this->getAction());
+    }
+
     /**
      * Used to construct a commit message body, subclasses provide a string for the VP-Action tag value
      * using this method.

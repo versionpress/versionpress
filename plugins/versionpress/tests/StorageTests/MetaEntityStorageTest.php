@@ -82,8 +82,11 @@ class MetaEntityStorageTest extends StorageTestCase
         }
 
         mkdir($storageDir);
-        $this->parentStorage = new DirectoryStorage($storageDir, $entityInfo, 'prefix_', $actionsInfo);
-        $this->storage = new MetaEntityStorage($this->parentStorage, $metaEntityInfo, 'prefix_', $actionsInfo);
+
+        $changeInfoFactory = $this->createChangeInfoFactoryMock();
+
+        $this->parentStorage = new DirectoryStorage($storageDir, $entityInfo, 'prefix_', $actionsInfo, $changeInfoFactory);
+        $this->storage = new MetaEntityStorage($this->parentStorage, $metaEntityInfo, 'prefix_', $actionsInfo, $changeInfoFactory);
     }
 
     protected function tearDown()

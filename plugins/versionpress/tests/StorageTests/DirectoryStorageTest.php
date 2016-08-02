@@ -144,8 +144,9 @@ class DirectoryStorageTest extends StorageTestCase
             'getIgnoredColumns' => [],
         ]);
         $actionsInfo = $this->createActionsInfoMock();
+        $changeInfoFactory = $this->createChangeInfoFactoryMock();
 
-        $storage = new DirectoryStorage(__DIR__ . '/entities', $entityInfo, 'prefix_', $actionsInfo);
+        $storage = new DirectoryStorage(__DIR__ . '/entities', $entityInfo, 'prefix_', $actionsInfo, $changeInfoFactory);
 
         $storage->save($entity);
         $loadedEntity = $storage->loadEntity($id);
@@ -202,15 +203,16 @@ class DirectoryStorageTest extends StorageTestCase
         ], [
             'getIgnoredColumns' => ['ignored_column' => null],
         ]);
-        $actionsInfo = $this->createActionsInfoMock();
 
 
         if (file_exists($storageDir)) {
             FileSystem::remove($storageDir);
         }
-
         mkdir($storageDir);
-        $this->storage = new DirectoryStorage($storageDir, $entityInfo, 'prefix_', $actionsInfo);
+
+        $actionsInfo = $this->createActionsInfoMock();
+        $changeInfoFactory = $this->createChangeInfoFactoryMock();
+        $this->storage = new DirectoryStorage($storageDir, $entityInfo, 'prefix_', $actionsInfo, $changeInfoFactory);
     }
 
     protected function tearDown()

@@ -47,13 +47,15 @@ class DirectoryStorage extends Storage
      * @param \VersionPress\Database\EntityInfo $entityInfo
      * @param string $dbPrefix
      * @param ActionsInfo $actionsInfo
+     * @param ChangeInfoFactory $changeInfoFactory
      */
-    public function __construct($directory, $entityInfo, $dbPrefix, $actionsInfo)
+    public function __construct($directory, $entityInfo, $dbPrefix, $actionsInfo, $changeInfoFactory)
     {
         parent::__construct($entityInfo, $dbPrefix);
         $this->directory = $directory;
         $this->entityInfo = $entityInfo;
         $this->actionsInfo = $actionsInfo;
+        $this->changeInfoFactory = $changeInfoFactory;
     }
 
     public function save($data)

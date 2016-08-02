@@ -2,6 +2,7 @@
 
 namespace VersionPress\Tests\StorageTests;
 
+use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Git\ActionsInfo;
@@ -37,6 +38,7 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase
 
         $database = new Database($wpdbStub);
         $actionsInfo = $this->getMockBuilder(ActionsInfo::class)->disableOriginalConstructor()->getMock();
+        $changeInfoFactory = $this->getMockBuilder(ChangeInfoFactory::class)->disableOriginalConstructor()->getMock();
 
         $factory = new StorageFactory(
             __DIR__ . '/vpdb',
@@ -47,7 +49,8 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase
             ),
             $database,
             [],
-            $actionsInfo
+            $actionsInfo,
+            $changeInfoFactory
         );
 
         foreach ($storages as $entityName => $expectedClass) {

@@ -2,6 +2,8 @@
 
 namespace VersionPress\Tests\StorageTests;
 
+use VersionPress\ChangeInfos\ChangeInfoFactory;
+use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\Database\EntityInfo;
 use VersionPress\Git\ActionsInfo;
 use VersionPress\Tests\Utils\HookMock;
@@ -48,5 +50,18 @@ class StorageTestCase extends \PHPUnit_Framework_TestCase
 
 
         return $actionsInfo;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|ChangeInfoFactory
+     */
+    protected function createChangeInfoFactoryMock()
+    {
+        $entityChangeInfo = $this->getMockBuilder(EntityChangeInfo::class)->disableOriginalConstructor()->getMock();
+
+        $changeInfoFactory = $this->getMockBuilder(ChangeInfoFactory::class)->disableOriginalConstructor()->getMock();
+        $changeInfoFactory->expects($this->any())->method('createEntityChangeInfo')->will($this->returnValue($entityChangeInfo));
+
+        return $changeInfoFactory;
     }
 }
