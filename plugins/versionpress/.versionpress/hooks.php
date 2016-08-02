@@ -1,7 +1,9 @@
 <?php
 
 use Nette\Utils\Strings;
+use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\DI\VersionPressServices;
+use VersionPress\Git\GitRepository;
 use VersionPress\Initialization\WpdbReplacer;
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Utils\EntityUtils;
@@ -302,7 +304,7 @@ add_filter('vp_meta_entity_tags_postmeta', function ($tags, $oldEntity, $newEnti
     return $tags;
 }, 10, 6);
 
-add_filter('vp_entity_change_description_postmeta', function ($message, $action, $vpid, $tags) {
+add_filter('vp_action_description_postmeta', function ($message, $action, $vpid, $tags) {
 
     if ($tags['VP-PostMeta-Key'] === "_thumbnail_id") { // featured image
 
@@ -460,3 +462,27 @@ add_action('vp_versionpress_changed', function ($action, $version) {
 
     vp_force_action('versionpress', $action, $version, [], $files);
 }, 10, 2);
+
+
+add_filter('vp_action_description_versionpress', function ($message, $action, $commitHash) {
+    if ($action !== 'undo' && $action !== 'rollback') {
+        return $message;
+    }
+
+    global $versionPressContainer; // temporary solution todo: find better way to pass the dependency
+    /** @var GitRepository $gitRepository */
+    $gitRepository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+    /** @var ChangeInfoFactory $changeInfoFactory */
+    $changeInfoFactory = $versionPressContainer->resolve(VersionPressServices::CHANGEINFO_FACTORY);
+
+    $revertedCommit = $gitRepository->getCommit($commitHash);
+
+    if ($action === 'undo') {
+        $changeInfo = $changeInfoFactory->buildChangeInfoEnvelopeFromCommitMessage($revertedCommit->getMessage());
+        $message = str_replace('%/commit-message/%', $changeInfo->getChangeDescription(), $message);
+    } elseif ($action === 'rollback') {
+        $message = str_replace('%/commit-date/%', $revertedCommit->getDate()->format('d-M-y H:i:s'), $message);
+    }
+
+    return $message;
+});

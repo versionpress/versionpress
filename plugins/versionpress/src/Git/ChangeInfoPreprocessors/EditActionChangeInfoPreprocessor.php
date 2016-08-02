@@ -47,7 +47,7 @@ class EditActionChangeInfoPreprocessor implements ChangeInfoPreprocessor
         $entities = [];
         foreach ($changeInfoList as $key => $changeInfo) {
             if ($changeInfo instanceof EntityChangeInfo && in_array($changeInfo->getAction(), $indicies)) {
-                $entities[$changeInfo->getEntityId()][$changeInfo->getAction()][] = $key;
+                $entities[$changeInfo->getId()][$changeInfo->getAction()][] = $key;
             }
         }
         return $entities;

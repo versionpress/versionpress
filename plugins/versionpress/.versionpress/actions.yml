@@ -149,7 +149,7 @@ composer:
 
 plugin:
   tags:
-    VP-Plugin-Name:
+    VP-Plugin-Name: /
   actions:
     install: Installed plugin '%VP-Plugin-Name%'
     activate: Activated plugin '%VP-Plugin-Name%'
@@ -160,7 +160,7 @@ plugin:
 
 theme:
   tags:
-    VP-Theme-Name:
+    VP-Theme-Name: /
   actions:
     install: Installed theme '%VP-Theme-Name%'
     update: Updated theme '%VP-Theme-Name%'

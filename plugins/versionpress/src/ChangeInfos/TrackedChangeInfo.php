@@ -27,7 +27,7 @@ class TrackedChangeInfo implements ChangeInfo
     private $action;
 
     /** @var string */
-    private $entityId;
+    private $id;
 
     /** @var array */
     private $customTags;
@@ -46,12 +46,12 @@ class TrackedChangeInfo implements ChangeInfo
      */
     const ACTION_TAG = "VP-Action";
 
-    public function __construct($scope, $actionsInfo, $action, $entityId, $customTags = [], $customFiles = [])
+    public function __construct($scope, $actionsInfo, $action, $id, $customTags = [], $customFiles = [])
     {
         $this->scope = $scope;
         $this->actionsInfo = $actionsInfo;
         $this->action = $action;
-        $this->entityId = $entityId;
+        $this->id = $id;
         $this->customTags = $customTags;
         $this->customFiles = $customFiles;
     }
@@ -101,7 +101,7 @@ class TrackedChangeInfo implements ChangeInfo
     public function getChangeDescription()
     {
         if (empty($this->commitMessageSubject)) {
-            $this->commitMessageSubject = $this->actionsInfo->createCommitMessage($this->getScope(), $this->getAction(), $this->getEntityId(), $this->getCustomTags());
+            $this->commitMessageSubject = $this->actionsInfo->createCommitMessage($this->getScope(), $this->getAction(), $this->getId(), $this->getCustomTags());
         }
 
         return $this->commitMessageSubject;
@@ -130,9 +130,9 @@ class TrackedChangeInfo implements ChangeInfo
         return $this->action;
     }
 
-    public function getEntityId()
+    public function getId()
     {
-        return $this->entityId;
+        return $this->id;
     }
 
     /**
@@ -146,8 +146,8 @@ class TrackedChangeInfo implements ChangeInfo
     {
         $actionTagValue = "{$this->getScope()}/{$this->getAction()}";
 
-        if ($this->entityId) {
-            $actionTagValue .= "/{$this->getEntityId()}";
+        if ($this->id) {
+            $actionTagValue .= "/{$this->getId()}";
         }
 
         return $actionTagValue;

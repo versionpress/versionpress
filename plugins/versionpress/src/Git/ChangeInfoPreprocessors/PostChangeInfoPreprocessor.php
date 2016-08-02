@@ -44,7 +44,7 @@ class PostChangeInfoPreprocessor implements ChangeInfoPreprocessor
         foreach ($changeInfoList as $key => $changeInfo) {
             /** @var EntityChangeInfo $changeInfo */
             if (ChangeInfoUtils::changeInfoRepresentsEntity($changeInfo, 'post') && in_array($changeInfo->getAction(), $indicies)) {
-                $entities[$changeInfo->getEntityId()][$changeInfo->getAction()][] = $key;
+                $entities[$changeInfo->getId()][$changeInfo->getAction()][] = $key;
             }
         }
         return $entities;

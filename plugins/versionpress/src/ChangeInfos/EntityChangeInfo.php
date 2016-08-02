@@ -55,7 +55,7 @@ class EntityChangeInfo extends TrackedChangeInfo
         $change = [
             "type" => "storage-file",
             "entity" => $this->getScope(),
-            "id" => $this->getEntityId(),
+            "id" => $this->getId(),
             "parent-id" => $this->getParentId()
         ];
 

@@ -3,9 +3,7 @@
 namespace VersionPress\Git;
 
 use Nette\Utils\Strings;
-use VersionPress\ChangeInfos\ChangeInfoMatcher;
 use VersionPress\ChangeInfos\EntityChangeInfo;
-use VersionPress\ChangeInfos\RevertChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
@@ -102,17 +100,15 @@ class Reverter
 
             if ($method === "undo") {
                 $status = $this->revertOneCommit($commitHash);
-                $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_UNDO, $commitHash);
             } else {
                 $status = $this->revertToCommit($commitHash);
-                $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_ROLLBACK, $commitHash);
             }
 
             if ($status !== RevertStatus::OK) {
                 return $status;
             }
 
-            $this->committer->forceChangeInfo($changeInfo);
+            vp_force_action('versionpress', $method, $commitHash, [], [["type" => "path", "path" => "*"]]);
         }
 
         if (!$this->repository->willCommit()) {
@@ -177,7 +173,7 @@ class Reverter
             if ($subChangeInfo instanceof EntityChangeInfo &&
                 !$this->checkEntityReferences(
                     $subChangeInfo->getScope(),
-                    $subChangeInfo->getEntityId(),
+                    $subChangeInfo->getId(),
                     $subChangeInfo->getParentId()
                 )
             ) {

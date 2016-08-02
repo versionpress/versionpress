@@ -18,7 +18,7 @@ class ActionsInfo
             $this->actionMap = Yaml::parse($content);
         }
 
-        foreach ($this->actionMap as $entityName => &$tagsAndActions) {
+        foreach ($this->actionMap as $scope => &$tagsAndActions) {
             foreach ($tagsAndActions['actions'] as &$action) {
                 if (is_string($action)) {
                     $action = ['message' => $action, 'priority' => self::DEFAULT_PRIORITY];
@@ -31,14 +31,14 @@ class ActionsInfo
         }
     }
 
-    public function getTags($entityName)
+    public function getTags($scope)
     {
-        return @$this->actionMap[$entityName]['tags'] ?: [];
+        return @$this->actionMap[$scope]['tags'] ?: [];
     }
 
-    public function createCommitMessage($entityName, $action, $vpid, $tags)
+    public function createCommitMessage($scope, $action, $vpid, $tags)
     {
-        $message = @$this->actionMap[$entityName]['actions'][$action]['message'] ?: '';
+        $message = @$this->actionMap[$scope]['actions'][$action]['message'] ?: '';
 
         foreach ($tags as $tag => $value) {
             $message = str_replace("%{$tag}%", $value, $message);
@@ -46,12 +46,12 @@ class ActionsInfo
 
         $message = str_replace('%VPID%', $vpid, $message);
 
-        return apply_filters("vp_entity_change_description_{$entityName}", $message, $action, $vpid, $tags);
+        return apply_filters("vp_action_description_{$scope}", $message, $action, $vpid, $tags);
     }
 
-    public function getActionPriority($entityName, $action)
+    public function getActionPriority($scope, $action)
     {
-        return @$this->actionMap[$entityName]['actions'][$action]['priority'] ?: self::DEFAULT_PRIORITY;
+        return @$this->actionMap[$scope]['actions'][$action]['priority'] ?: self::DEFAULT_PRIORITY;
     }
 
     public function getTagContainingParentId($entityName)

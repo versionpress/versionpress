@@ -89,9 +89,9 @@ class BulkChangeInfo implements ChangeInfo
         $uniqueEntities = [];
 
         foreach ($changeInfos as $changeInfo) {
-            if (!in_array($changeInfo->getEntityId(), $uniqueEntities)) {
+            if (!in_array($changeInfo->getId(), $uniqueEntities)) {
                 $numberOfUniqueChanges += 1;
-                $uniqueEntities[] = $changeInfo->getEntityId();
+                $uniqueEntities[] = $changeInfo->getId();
             }
         }
 

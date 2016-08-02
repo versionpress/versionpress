@@ -8,7 +8,6 @@ use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\ChangeInfos\EntityChangeInfo;
-use VersionPress\ChangeInfos\RevertChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\DI\VersionPressServices;
@@ -235,10 +234,7 @@ class VersionPressApi
 
         $result = [];
         foreach ($commits as $commit) {
-            $isChildOfInitialCommit = $isChildOfInitialCommit && $this->gitRepository->wasCreatedAfter(
-                $commit->getHash(),
-                $initialCommitHash
-            );
+            $isChildOfInitialCommit = $isChildOfInitialCommit && $this->gitRepository->wasCreatedAfter($commit->getHash(), $initialCommitHash);
             $canUndoCommit = $isChildOfInitialCommit && !$commit->isMerge();
             $canRollbackToThisCommit = !$isFirstCommit &&
                 ($isChildOfInitialCommit || $commit->getHash() === $initialCommitHash);
@@ -610,36 +606,40 @@ class VersionPressApi
 
     private function convertChangeInfo($changeInfo)
     {
-        $change = [];
-
-        if ($changeInfo instanceof TrackedChangeInfo) {
-            $change['type'] = $changeInfo->getScope();
-            $change['action'] = $changeInfo->getAction();
-            $change['tags'] = $changeInfo->getCustomTags();
+        if ($changeInfo instanceof UntrackedChangeInfo) {
+            return null;
         }
+
+        /** @var TrackedChangeInfo $changeInfo */
+
+        $change = [
+            'type' => $changeInfo->getScope(),
+            'action' => $changeInfo->getAction(),
+            'tags' => $changeInfo->getCustomTags(),
+        ];
 
         if ($changeInfo instanceof EntityChangeInfo) {
-            $change['name'] = $changeInfo->getEntityId();
+            $change['name'] = $changeInfo->getId();
         }
 
-        if ($changeInfo instanceof PluginChangeInfo) {
+        if ($changeInfo->getScope() === 'plugin') {
             $pluginTags = $changeInfo->getCustomTags();
-            $pluginName = $pluginTags[PluginChangeInfo::PLUGIN_NAME_TAG];
+            $pluginName = $pluginTags['VP-Plugin-Name'];
             $change['name'] = $pluginName;
         }
 
-        if ($changeInfo instanceof ThemeChangeInfo) {
+        if ($changeInfo->getScope() === 'theme') {
             $themeTags = $changeInfo->getCustomTags();
-            $themeName = $themeTags[ThemeChangeInfo::THEME_NAME_TAG];
+            $themeName = $themeTags['VP-Theme-Name'];
             $change['name'] = $themeName;
         }
 
-        if ($changeInfo instanceof WordPressUpdateChangeInfo) {
-            $change['name'] = $changeInfo->getNewVersion();
+        if ($changeInfo->getScope() === 'wordpress') {
+            $change['name'] = $changeInfo->getId();
         }
 
-        if ($changeInfo instanceof RevertChangeInfo) {
-            $commit = $this->gitRepository->getCommit($changeInfo->getCommitHash());
+        if ($changeInfo->getScope() === 'versionpress' &&  ($changeInfo->getAction() === 'undo' || $changeInfo->getAction() === 'rollback')) {
+            $commit = $this->gitRepository->getCommit($changeInfo->getId());
             $change['tags']['VP-Commit-Details'] = [
                 'message' => $commit->getMessage()->getUnprefixedSubject(),
                 'date' => $commit->getDate()->format(\DateTime::ISO8601)
