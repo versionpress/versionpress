@@ -2,8 +2,6 @@
 namespace VersionPress\ChangeInfos;
 
 use Nette\Utils\Strings;
-use VersionPress\ChangeInfos\Sorting\SortingStrategy;
-use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\CommitMessage;
@@ -33,9 +31,6 @@ class ChangeInfoEnvelope implements ChangeInfo
 
     private $version;
 
-    /** @var SortingStrategy */
-    private $sortingStrategy;
-
     /**
      * @var null|string
      */
@@ -45,14 +40,12 @@ class ChangeInfoEnvelope implements ChangeInfo
      * @param TrackedChangeInfo[] $changeInfoList
      * @param string|null $version
      * @param string|null $environment
-     * @param SortingStrategy $sortingStrategy
      */
-    public function __construct($changeInfoList, $version = null, $environment = null, $sortingStrategy = null)
+    public function __construct($changeInfoList, $version = null, $environment = null)
     {
         $this->changeInfoList = $changeInfoList;
         $this->version = $version === null ? VersionPress::getVersion() : $version;
         $this->environment = $environment ?: VersionPress::getEnvironment();
-        $this->sortingStrategy = $sortingStrategy === null ? new SortingStrategy() : $sortingStrategy;
     }
 
     /**

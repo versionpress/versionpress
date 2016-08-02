@@ -2,8 +2,6 @@
 
 namespace VersionPress\ChangeInfos;
 
-use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\CommitMessage;
 
 /**

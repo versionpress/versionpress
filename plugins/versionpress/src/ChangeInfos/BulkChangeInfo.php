@@ -4,9 +4,6 @@ namespace VersionPress\ChangeInfos;
 
 use Nette\NotSupportedException;
 use Nette\Utils\Strings;
-use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Git\ActionsInfo;
-use VersionPress\Git\CommitMessage;
 use VersionPress\Utils\StringUtils;
 
 class BulkChangeInfo implements ChangeInfo

@@ -14,7 +14,6 @@ use VersionPress\Utils\Comparators;
 use VersionPress\Utils\Cursor;
 use VersionPress\Utils\IdUtil;
 use VersionPress\Utils\ReferenceUtils;
-use wpdb;
 
 class Reverter
 {
