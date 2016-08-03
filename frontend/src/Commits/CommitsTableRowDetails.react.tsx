@@ -15,28 +15,18 @@ interface CommitsTableRowDetailsProps extends React.Props<JSX.Element> {
 
 export default class CommitsTableRowDetails extends React.Component<CommitsTableRowDetailsProps, {}> {
 
-  render() {
-    const { commit, detailsLevel, isLoading, diff } = this.props;
+  private renderOverviewRow(className: string) {
+    const { commit, isLoading } = this.props;
 
-    if (commit === null || detailsLevel === 'none') {
-      return <tr />;
-    }
-
-    const rowClassName = classNames({
-      'details-row': true,
-      'disabled': !commit.isEnabled,
-      'loading': isLoading
-    });
-
-    const overviewRow = (
-      <tr className={rowClassName}>
+    return (
+      <tr className={className}>
         <td />
         <td />
         <td />
         <td />
         <td>
           {isLoading
-            ? <div className='details-row-loader'/>
+            ? <div className='details-row-loader' />
             : null
           }
           <div className='details'>
@@ -46,9 +36,13 @@ export default class CommitsTableRowDetails extends React.Component<CommitsTable
         <td />
       </tr>
     );
+  }
 
-    const fullDiffRow = (
-      <tr className={rowClassName}>
+  private renderFullDiffRow(className: string) {
+    const { diff } = this.props;
+
+    return (
+      <tr className={className}>
         <td colSpan={6}>
           <div className='details'>
             <DiffPanel diff={diff} />
@@ -56,8 +50,24 @@ export default class CommitsTableRowDetails extends React.Component<CommitsTable
         </td>
       </tr>
     );
+  }
 
-    return detailsLevel === 'overview' ? overviewRow : fullDiffRow;
+  render() {
+    const { commit, detailsLevel, isLoading } = this.props;
+
+    if (commit === null || detailsLevel === 'none') {
+      return <tr />;
+    }
+
+    const rowClassName = classNames({
+      'details-row': true,
+      'disabled': !commit.isEnabled,
+      'loading': isLoading,
+    });
+
+    return detailsLevel === 'overview'
+      ? this.renderOverviewRow(rowClassName)
+      : this.renderFullDiffRow(rowClassName);
   }
 
 }
