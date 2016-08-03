@@ -56,8 +56,6 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     router: React.PropTypes.func.isRequired,
   };
 
-  private refreshInterval;
-
   state = {
     pages: [],
     query: '',
@@ -72,19 +70,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     isDirtyWorkingDirectory: false,
   }
 
-  componentDidMount() {
-    this.fetchWelcomePanel();
-    this.fetchCommits();
-    this.refreshInterval = setInterval(() => this.checkUpdate(), 10 * 1000);
-  }
-
-  componentWillReceiveProps(nextProps: HomePageProps) {
-    this.fetchCommits(nextProps.params);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.refreshInterval);
-  }
+  private refreshInterval;
 
   static getErrorMessage(res: request.Response, err: any) {
     if (res) {
@@ -99,6 +85,20 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       message: 'VersionPress is not able to connect to WordPress site. Please try refreshing the page.',
       details: err,
     };
+  }
+
+  componentDidMount() {
+    this.fetchWelcomePanel();
+    this.fetchCommits();
+    this.refreshInterval = setInterval(() => this.checkUpdate(), 10 * 1000);
+  }
+
+  componentWillReceiveProps(nextProps: HomePageProps) {
+    this.fetchCommits(nextProps.params);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.refreshInterval);
   }
 
   fetchCommits = (params = this.props.params) => {
@@ -233,38 +233,6 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           document.location.reload();
         }
       });
-  }
-
-  getGitStatus() {
-    return new Promise(function(resolve, reject) {
-      WpApi
-        .get('git-status')
-        .end((err, res: request.Response) => {
-          const data = res.body.data as VpApi.GetGitStatusResponse;
-          if (err) {
-            reject(HomePage.getErrorMessage(res, err));
-          } else {
-            resolve(data);
-          }
-        });
-    });
-  }
-
-  getDiff(hash: string) {
-    const query = hash === '' ? null : {commit: hash};
-    return new Promise(function(resolve, reject) {
-      WpApi
-        .get('diff')
-        .query(query)
-        .end((err, res: request.Response) => {
-          const data = res.body.data as VpApi.GetDiffResponse;
-          if (err) {
-            reject(HomePage.getErrorMessage(res, err));
-          } else {
-            resolve(data.diff);
-          }
-        });
-    });
   }
 
   onServicePanelClick = () => {
@@ -433,6 +401,39 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         this.fetchCommits();
       });
   }
+
+  getGitStatus = () => {
+    return new Promise(function(resolve, reject) {
+      WpApi
+        .get('git-status')
+        .end((err, res: request.Response) => {
+          const data = res.body.data as VpApi.GetGitStatusResponse;
+          if (err) {
+            reject(HomePage.getErrorMessage(res, err));
+          } else {
+            resolve(data);
+          }
+        });
+    });
+  };
+
+  getDiff = (hash: string) => {
+    const query = hash === '' ? null : {commit: hash};
+
+    return new Promise(function(resolve, reject) {
+      WpApi
+        .get('diff')
+        .query(query)
+        .end((err, res: request.Response) => {
+          const data = res.body.data as VpApi.GetDiffResponse;
+          if (err) {
+            reject(HomePage.getErrorMessage(res, err));
+          } else {
+            resolve(data.diff);
+          }
+        });
+    });
+  };
 
   render() {
     const enableActions = !this.state.isDirtyWorkingDirectory;

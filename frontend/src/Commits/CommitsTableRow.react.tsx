@@ -59,6 +59,14 @@ export default class CommitsTableRow extends React.Component<CommitsTableRowProp
         isLoading: false
       });
     }
+  };
+
+  renderError() {
+    return (
+      <tr className='details-row error'>
+        <td colSpan={6}>{this.state.error}</td>
+      </tr>
+    );
   }
 
   render() {
@@ -84,14 +92,6 @@ export default class CommitsTableRow extends React.Component<CommitsTableRowProp
             />
         }
       </tbody>
-    );
-  }
-
-  renderError() {
-    return (
-      <tr className='details-row error'>
-        <td colSpan={6}>{this.state.error}</td>
-      </tr>
     );
   }
 

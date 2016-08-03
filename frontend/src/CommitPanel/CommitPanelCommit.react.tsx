@@ -51,12 +51,6 @@ export default class CommitPanelCommit extends React.Component<CommitPanelCommit
     });
   }
 
-  render() {
-    return this.state.isFormVisible
-      ? this.renderForm()
-      : this.renderButtons();
-  }
-
   private renderButtons() {
     return (
       <div className='CommitPanel-commit'>
@@ -96,6 +90,12 @@ export default class CommitPanelCommit extends React.Component<CommitPanelCommit
         </form>
       </div>
     );
+  }
+
+  render() {
+    return this.state.isFormVisible
+      ? this.renderForm()
+      : this.renderButtons();
   }
 
 }

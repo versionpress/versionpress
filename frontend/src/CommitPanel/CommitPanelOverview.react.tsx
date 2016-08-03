@@ -16,6 +16,14 @@ export default class CommitPanelOverview extends React.Component<CommitPanelOver
 
   private displayedListLength: number = 5;
 
+  onShowMoreClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    this.setState({
+      isExpanded: true,
+    });
+  };
+
   private getActionVerb(action: string) {
     if (action === 'M') {
       return 'Modified';
@@ -24,14 +32,6 @@ export default class CommitPanelOverview extends React.Component<CommitPanelOver
     } else if (action === 'D') {
       return 'Deleted';
     }
-  }
-
-  onShowMoreClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    this.setState({
-      isExpanded: true
-    });
   }
 
   render() {

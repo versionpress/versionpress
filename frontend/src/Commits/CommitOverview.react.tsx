@@ -19,6 +19,15 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
   state = {
     expandedLists: []
   }
+  onShowMoreClick = (e: React.MouseEvent, listKey: string) => {
+    e.preventDefault();
+    const { expandedLists } = this.state;
+
+    this.setState({
+      expandedLists: expandedLists.concat([listKey]),
+    });
+  };
+
 
   private formatChanges(changes: Change[]) {
     if (changes.length === 0) {
@@ -220,28 +229,6 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     return change.name;
   }
 
-  onShowMoreClick = (e: React.MouseEvent, listKey: string) => {
-    e.preventDefault();
-    const { expandedLists } = this.state;
-
-    this.setState({
-      expandedLists: expandedLists.concat([listKey])
-    });
-  }
-
-  render() {
-    const { commit } = this.props;
-
-    return (
-      <ul className='overview-list'>
-        {this.formatChanges(commit.changes).map((line, i) => <li key={i}>{line}</li>)}
-        <li className='environment'>
-          <em>Environment: {commit.environment}</em>
-        </li>
-      </ul>
-    );
-  }
-
   private renderOverviewLine(type: string, action: string, entities: any[], suffix: any = null) {
     let capitalizedVerb = StringUtils.capitalize(StringUtils.verbToPastTense(action));
 
@@ -302,6 +289,19 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
         </span>
       );
     });
+  }
+
+  render() {
+    const { commit } = this.props;
+
+    return (
+      <ul className='overview-list'>
+        {this.getFormattedChanges(commit.changes).map((line, i) => <li key={i}>{line}</li>)}
+        <li className='environment'>
+          <em>Environment: {commit.environment}</em>
+        </li>
+      </ul>
+    );
   }
 
 }

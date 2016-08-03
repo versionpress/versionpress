@@ -21,17 +21,6 @@ interface CommitsTableRowSummaryProps extends React.Props<JSX.Element> {
 
 export default class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps, {}> {
 
-  private getAuthorTooltip(commit: Commit) {
-    const author = commit.author;
-    if (author.name === 'Non-admin action') {
-      return 'This action is not associated with any user, e.g., it was a public comment';
-    } else if (author.name === 'WP-CLI') {
-      return 'This action was done via WP-CLI';
-    }
-
-    return author.name + ' <' + author.email + '>';
-  }
-
   onCheckboxClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!this.props.enableActions) {
@@ -62,6 +51,49 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
     if (this.props.commit.isEnabled) {
       this.props.onDetailsLevelChanged(this.props.detailsLevel === 'none' ? 'overview' : 'none');
     }
+
+  private getAuthorTooltip(commit: Commit) {
+    const author = commit.author;
+    if (author.name === 'Non-admin action') {
+      return 'This action is not associated with any user, e.g., it was a public comment';
+    } else if (author.name === 'WP-CLI') {
+      return 'This action was done via WP-CLI';
+    }
+
+    return author.name + ' <' + author.email + '>';
+  }
+
+  private renderUndoMergeDialog() {
+    const body = (
+      <p>
+        Merge commit is a special type of commit that cannot be undone. {' '}
+        <a
+          href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback#merge-commits'
+          target='_blank'
+        >Learn more</a>
+      </p>
+    );
+    portal.alertDialog('This is a merge commit', body);
+  }
+
+  private renderDisabledDialog() {
+    const title = <span>Undo <em>{this.props.commit.message}</em>?</span>;
+    const body = <UndoDisabledDialog />;
+    portal.alertDialog(title, body);
+  }
+
+  private renderMessage(message: string) {
+    const messageChunks = /(.*)'(.*)'(.*)/.exec(message);
+    if (!messageChunks || messageChunks.length < 4) {
+      return <span>{message}</span>;
+    }
+    return (
+      <span>
+        {messageChunks[1] !== '' ? this.renderMessage(messageChunks[1]) : null}
+        {messageChunks[2] !== '' ? <span className='identifier'>{messageChunks[2]}</span> : null}
+        {messageChunks[3] !== '' ? this.renderMessage(messageChunks[3]) : null}
+      </span>
+    );
   }
 
   render() {
@@ -182,39 +214,6 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
           }
         </td>
       </tr>
-    );
-  }
-
-  private renderUndoMergeDialog() {
-    const body = (
-      <p>
-        Merge commit is a special type of commit that cannot be undone. {' '}
-        <a
-          href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback#merge-commits'
-          target='_blank'
-        >Learn more</a>
-      </p>
-    );
-    portal.alertDialog('This is a merge commit', body);
-  }
-
-  private renderDisabledDialog() {
-    const title = <span>Undo <em>{this.props.commit.message}</em>?</span>;
-    const body = <UndoDisabledDialog />;
-    portal.alertDialog(title, body);
-  }
-
-  private renderMessage(message: string) {
-    const messageChunks = /(.*)'(.*)'(.*)/.exec(message);
-    if (!messageChunks || messageChunks.length < 4) {
-      return <span>{message}</span>;
-    }
-    return (
-      <span>
-        {messageChunks[1] !== '' ? this.renderMessage(messageChunks[1]) : null}
-        {messageChunks[2] !== '' ? <span className='identifier'>{messageChunks[2]}</span> : null}
-        {messageChunks[3] !== '' ? this.renderMessage(messageChunks[3]) : null}
-      </span>
     );
   }
 

@@ -81,34 +81,6 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
     }
   }
 
-  render() {
-    const { detailsLevel } = this.state;
-
-    const noticeClassName = classNames({
-      'CommitPanel-notice': true,
-      'CommitPanel-notice--expanded': detailsLevel !== 'none'
-    });
-
-    return (
-      <div className='CommitPanel'>
-        <div className={noticeClassName}>
-          <CommitPanelNotice
-            onDetailsLevelChange={this.onChangeDetailsLevel}
-            detailsLevel={detailsLevel}
-          />
-          {detailsLevel !== 'none'
-            ? <CommitPanelCommit
-                onCommit={this.props.onCommit}
-                onDiscard={this.props.onDiscard}
-              />
-            : null
-          }
-        </div>
-        {this.renderDetails()}
-      </div>
-    );
-  }
-
   private renderError() {
     return (
       <div className='CommitPanel-error'>
@@ -162,6 +134,34 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
           disabled={this.state.detailsLevel === 'full-diff'}
           onClick={() => this.onChangeDetailsLevel('full-diff')}
         >Full diff</button>
+      </div>
+    );
+  }
+
+  render() {
+    const { detailsLevel } = this.state;
+
+    const noticeClassName = classNames({
+      'CommitPanel-notice': true,
+      'CommitPanel-notice--expanded': detailsLevel !== 'none',
+    });
+
+    return (
+      <div className='CommitPanel'>
+        <div className={noticeClassName}>
+          <CommitPanelNotice
+            onDetailsLevelChange={this.onChangeDetailsLevel}
+            detailsLevel={detailsLevel}
+          />
+          {detailsLevel !== 'none'
+            ? <CommitPanelCommit
+                onCommit={this.props.onCommit}
+                onDiscard={this.props.onDiscard}
+              />
+            : null
+          }
+        </div>
+        {this.renderDetails()}
       </div>
     );
   }
