@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import * as Promise from 'core-js/es6/promise';
 import * as classNames from 'classnames';
 import update = require('react-addons-update');
+
 import BulkActionPanel from '../BulkActionPanel/BulkActionPanel.react';
 import CommitPanel from '../CommitPanel/CommitPanel.react';
 import CommitsTable from '../Commits/CommitsTable.react';
@@ -27,7 +28,7 @@ const routes = config.routes;
 
 interface HomePageProps extends React.Props<JSX.Element> {
   params: {
-    page?: string
+    page?: string,
   };
 }
 
@@ -40,7 +41,7 @@ interface HomePageState {
   message?: {
     code: string,
     message: string,
-    details?: string
+    details?: string,
   };
   isLoading?: boolean;
   displayServicePanel?: boolean;
@@ -55,30 +56,21 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     router: React.PropTypes.func.isRequired,
   };
 
+  state = {
+    pages: [],
+    query: '',
+    commits: [],
+    selectedCommits: [],
+    lastSelectedCommit: null,
+    message: null,
+    isLoading: true,
+    displayServicePanel: false,
+    displayWelcomePanel: false,
+    displayUpdateNotice: false,
+    isDirtyWorkingDirectory: false,
+  };
+
   private refreshInterval;
-
-  constructor() {
-    super();
-    this.state = {
-      pages: [],
-      query: '',
-      commits: [],
-      selectedCommits: [],
-      lastSelectedCommit: null,
-      message: null,
-      isLoading: true,
-      displayServicePanel: false,
-      displayWelcomePanel: false,
-      displayUpdateNotice: false,
-      isDirtyWorkingDirectory: false,
-    };
-
-    this.onFilter = this.onFilter.bind(this);
-    this.onUndo = this.onUndo.bind(this);
-    this.onRollback = this.onRollback.bind(this);
-    this.onCommitSelect = this.onCommitSelect.bind(this);
-    this.checkUpdate = this.checkUpdate.bind(this);
-  }
 
   static getErrorMessage(res: request.Response, err: any) {
     if (res) {
@@ -100,18 +92,19 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     this.fetchCommits();
     this.refreshInterval = setInterval(() => this.checkUpdate(), 10 * 1000);
   }
-  componentWillUnmount() {
-    clearInterval(this.refreshInterval);
-  }
 
   componentWillReceiveProps(nextProps: HomePageProps) {
     this.fetchCommits(nextProps.params);
   }
 
-  fetchCommits(params = this.props.params) {
+  componentWillUnmount() {
+    clearInterval(this.refreshInterval);
+  }
+
+  fetchCommits = (params = this.props.params) => {
     const router: ReactRouter.Context = (this.context as any).router;
     this.setState({
-      isLoading: true
+      isLoading: true,
     });
     const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
@@ -147,9 +140,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           this.checkUpdate();
         }
       });
-  }
+  };
 
-  fetchWelcomePanel() {
+  fetchWelcomePanel = () => {
     WpApi
       .get('display-welcome-panel')
       .end((err: any, res: request.Response) => {
@@ -160,20 +153,21 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
         if (data === true) {
           this.setState({
-            displayWelcomePanel: true
+            displayWelcomePanel: true,
           });
         } else {
           this.setState({
-            displayWelcomePanel: false
+            displayWelcomePanel: false,
           });
         }
       });
-  }
+  };
 
-  checkUpdate() {
+  checkUpdate = () => {
     if (!this.state.commits.length || this.state.isLoading) {
       return;
     }
+
     WpApi
       .get('should-update')
       .query({query: encodeURIComponent(this.state.query), latestCommit: this.state.commits[0].hash})
@@ -192,14 +186,15 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           });
         }
       });
-  }
+  };
 
-  undoCommits(commits: string[]) {
+  undoCommits = (commits: string[]) => {
     const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
     this.setState({
-      isLoading: true
+      isLoading: true,
     });
+
     WpApi
       .get('undo')
       .query({commits: commits})
@@ -208,7 +203,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         if (err) {
           this.setState({
             message: HomePage.getErrorMessage(res, err),
-            isLoading: false
+            isLoading: false,
           });
         } else {
           const router: ReactRouter.Context = (this.context as any).router;
@@ -216,14 +211,15 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           document.location.reload();
         }
       });
-  }
+  };
 
-  rollbackToCommit(hash: string) {
+  rollbackToCommit = (hash: string) => {
     const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
     this.setState({
-      isLoading: true
+      isLoading: true,
     });
+
     WpApi
       .get('rollback')
       .query({commit: hash})
@@ -232,7 +228,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         if (err) {
           this.setState({
             message: HomePage.getErrorMessage(res, err),
-            isLoading: false
+            isLoading: false,
           });
         } else {
           const router: ReactRouter.Context = (this.context as any).router;
@@ -240,47 +236,15 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           document.location.reload();
         }
       });
-  }
+  };
 
-  getGitStatus() {
-    return new Promise(function(resolve, reject) {
-      WpApi
-        .get('git-status')
-        .end((err, res: request.Response) => {
-          const data = res.body.data as VpApi.GetGitStatusResponse;
-          if (err) {
-            reject(HomePage.getErrorMessage(res, err));
-          } else {
-            resolve(data);
-          }
-        });
-    });
-  }
-
-  getDiff(hash: string) {
-    const query = hash === '' ? null : {commit: hash};
-    return new Promise(function(resolve, reject) {
-      WpApi
-        .get('diff')
-        .query(query)
-        .end((err, res: request.Response) => {
-          const data = res.body.data as VpApi.GetDiffResponse;
-          if (err) {
-            reject(HomePage.getErrorMessage(res, err));
-          } else {
-            resolve(data.diff);
-          }
-        });
-    });
-  }
-
-  toggleServicePanel() {
+  onServicePanelClick = () => {
     this.setState({
-      displayServicePanel: !this.state.displayServicePanel
+      displayServicePanel: !this.state.displayServicePanel,
     });
-  }
+  };
 
-  onCommitSelect(commits: Commit[], check: boolean, shiftKey: boolean) {
+  onCommitSelect = (commits: Commit[], isChecked: boolean, isShiftKey: boolean) => {
     let { selectedCommits, lastSelectedCommit } = this.state;
     const bulk = commits.length > 1;
 
@@ -290,7 +254,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         let lastIndex = -1;
         const index = indexOf(this.state.commits, commit);
 
-        if (!bulk && shiftKey) {
+        if (!bulk && isShiftKey) {
           const last = this.state.lastSelectedCommit;
           lastIndex = indexOf(this.state.commits, last);
         }
@@ -304,9 +268,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         for (let i = lastIndex; i !== cond; i += step) {
           const currentCommit = this.state.commits[i];
           const index = indexOf(selectedCommits, currentCommit);
-          if (check && index === -1) {
+          if (isChecked && index === -1) {
             selectedCommits = update(selectedCommits, {$push: [currentCommit]});
-          } else if (!check && index !== -1) {
+          } else if (!isChecked && index !== -1) {
             selectedCommits = update(selectedCommits, {$splice: [[index, 1]]});
           }
           lastSelectedCommit = currentCommit;
@@ -317,27 +281,30 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       selectedCommits: selectedCommits,
       lastSelectedCommit: (bulk ? null : lastSelectedCommit),
     });
-  }
+  };
 
-  onBulkAction(action: string) {
+  onBulkAction = (action: string) => {
     if (action === 'undo') {
+      const { selectedCommits } = this.state;
+      const count = selectedCommits.length;
+
       const title = (
-        <span>Undo <em>{this.state.selectedCommits.length} {this.state.selectedCommits.length === 1 ? 'change' : 'changes'}</em>?</span>
+        <span>Undo <em>{count} {count === 1 ? 'change' : 'changes'}</em>?</span>
       );
-      const hashes = this.state.selectedCommits.map((commit: Commit) => commit.hash);
+      const hashes = selectedCommits.map((commit: Commit) => commit.hash);
 
       revertDialog.revertDialog.call(this, title, () => this.undoCommits(hashes));
     }
-  }
+  };
 
-  onClearSelection() {
+  onClearSelection = () => {
     this.setState({
       selectedCommits: [],
       lastSelectedCommit: null,
     });
-  }
+  };
 
-  onCommit(message: string) {
+  onCommit = (message: string) => {
     const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
 
@@ -350,7 +317,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
-            message: HomePage.getErrorMessage(res, err)
+            message: HomePage.getErrorMessage(res, err),
           });
         } else {
           this.setState({
@@ -364,9 +331,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         }
         return !err;
       });
-  }
+  };
 
-  onDiscard() {
+  onDiscard = () => {
     const progressBar = this.refs['progress'] as ProgressBar;
     progressBar.progress(0);
 
@@ -376,7 +343,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
-            message: HomePage.getErrorMessage(res, err)
+            message: HomePage.getErrorMessage(res, err),
           });
         } else {
           this.setState({
@@ -389,9 +356,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         }
         return !err;
       });
-  }
+  };
 
-  onFilter(query: string) {
+  onFilter = (query: string) => {
     this.setState({
       query: query,
     }, () => {
@@ -403,9 +370,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         this.fetchCommits();
       }
     });
-  }
+  };
 
-  onUndo(e) {
+  onUndo = (e) => {
     e.preventDefault();
     const hash = e.target.getAttribute('data-hash');
     const message = e.target.getAttribute('data-message');
@@ -414,9 +381,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     );
 
     revertDialog.revertDialog.call(this, title, () => this.undoCommits([hash]));
-  }
+  };
 
-  onRollback(e) {
+  onRollback = (e) => {
     e.preventDefault();
     const hash = e.target.getAttribute('data-hash');
     const date = moment(e.target.getAttribute('data-date')).format('LLL');
@@ -425,13 +392,13 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     );
 
     revertDialog.revertDialog.call(this, title, () => this.rollbackToCommit(hash));
-  }
+  };
 
-  onWelcomePanelHide(e) {
+  onWelcomePanelHide = (e) => {
     e.preventDefault();
 
     this.setState({
-      displayWelcomePanel: false
+      displayWelcomePanel: false,
     });
 
     WpApi
@@ -439,19 +406,52 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .end((err: any, res: request.Response) => {
         this.fetchCommits();
       });
-  }
+  };
+
+  getGitStatus = () => {
+    return new Promise(function(resolve, reject) {
+      WpApi
+        .get('git-status')
+        .end((err, res: request.Response) => {
+          const data = res.body.data as VpApi.GetGitStatusResponse;
+          if (err) {
+            reject(HomePage.getErrorMessage(res, err));
+          } else {
+            resolve(data);
+          }
+        });
+    });
+  };
+
+  getDiff = (hash: string) => {
+    const query = hash === '' ? null : {commit: hash};
+
+    return new Promise(function(resolve, reject) {
+      WpApi
+        .get('diff')
+        .query(query)
+        .end((err, res: request.Response) => {
+          const data = res.body.data as VpApi.GetDiffResponse;
+          if (err) {
+            reject(HomePage.getErrorMessage(res, err));
+          } else {
+            resolve(data.diff);
+          }
+        });
+    });
+  };
 
   render() {
     const enableActions = !this.state.isDirtyWorkingDirectory;
 
     const homePageClassName = classNames({
-      'loading': this.state.isLoading
+      'loading': this.state.isLoading,
     });
 
     return (
       <div className={homePageClassName}>
         <ProgressBar ref='progress' />
-        <ServicePanelButton onClick={this.toggleServicePanel.bind(this)} />
+        <ServicePanelButton onClick={this.onServicePanelClick} />
         <h1 className='vp-header'>VersionPress</h1>
         {this.state.message
           ? <FlashMessage {...this.state.message} />
@@ -462,13 +462,13 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           ? <CommitPanel
               diffProvider={{ getDiff: this.getDiff }}
               gitStatusProvider={{ getGitStatus: this.getGitStatus }}
-              onCommit={this.onCommit.bind(this)}
-              onDiscard={this.onDiscard.bind(this)}
+              onCommit={this.onCommit}
+              onDiscard={this.onDiscard}
             />
           : null
         }
         {this.state.displayWelcomePanel
-          ? <WelcomePanel onHide={this.onWelcomePanelHide.bind(this)} />
+          ? <WelcomePanel onHide={this.onWelcomePanelHide} />
           : null
         }
         {this.state.displayUpdateNotice
@@ -487,8 +487,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           />
           <BulkActionPanel
             enableActions={enableActions}
-            onBulkAction={this.onBulkAction.bind(this)}
-            onClearSelection={this.onClearSelection.bind(this)}
+            onBulkAction={this.onBulkAction}
+            onClearSelection={this.onClearSelection}
             selectedCommits={this.state.selectedCommits}
           />
         </div>

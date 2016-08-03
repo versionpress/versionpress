@@ -10,21 +10,40 @@ interface CommitPanelOverviewState {
 
 export default class CommitPanelOverview extends React.Component<CommitPanelOverviewProps, CommitPanelOverviewState> {
 
-  displayedListLength = 5;
+  state = {
+    isExpanded: false,
+  };
 
-  constructor() {
-    super();
-    this.state = {
-      isExpanded: false
-    };
+  private displayedListLength: number = 5;
+
+  onShowMoreClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    this.setState({
+      isExpanded: true,
+    });
+  };
+
+  private getActionVerb(action: string) {
+    if (action === 'M') {
+      return 'Modified';
+    } else if (action === '??' || action === 'A' || action === 'AM') {
+      return 'Added';
+    } else if (action === 'D') {
+      return 'Deleted';
+    }
   }
 
   render() {
+    const { gitStatus } = this.props;
+    const { isExpanded } = this.state;
+    const displayedListLength = this.displayedListLength;
+
     let lines = [];
-    if (this.state.isExpanded) {
-      lines = this.props.gitStatus;
+    if (isExpanded) {
+      lines = gitStatus;
     } else {
-      lines = this.props.gitStatus.slice(0, this.displayedListLength);
+      lines = gitStatus.slice(0, displayedListLength);
     }
 
     return (
@@ -38,11 +57,11 @@ export default class CommitPanelOverview extends React.Component<CommitPanelOver
               </li>
             );
           })}
-          {this.props.gitStatus.length > this.displayedListLength && !this.state.isExpanded
+          {gitStatus.length > displayedListLength && !isExpanded
             ? (
               <li>
-                <a onClick={() => this.expand()}>
-                  show {this.props.gitStatus.length - this.displayedListLength} more...
+                <a onClick={this.onShowMoreClick}>
+                  show {gitStatus.length - displayedListLength} more...
                 </a>
               </li>
             ) : null
@@ -50,22 +69,6 @@ export default class CommitPanelOverview extends React.Component<CommitPanelOver
         </ul>
       </div>
     );
-  }
-
-  private expand() {
-    this.setState({
-      isExpanded: true
-    });
-  }
-
-  private getActionVerb(action: string) {
-    if (action === 'M') {
-      return 'Modified';
-    } else if (action === '??' || action === 'A' || action === 'AM') {
-      return 'Added';
-    } else if (action === 'D') {
-      return 'Deleted';
-    }
   }
 
 }

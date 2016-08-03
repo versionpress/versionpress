@@ -15,12 +15,17 @@ interface FlashMessageState {
 
 export default class FlashMessage extends React.Component<FlashMessageProps, FlashMessageState> {
 
-  constructor() {
-    super();
-    this.state = {
-      showDetails: false
-    };
-  }
+  state = {
+    showDetails: false,
+  };
+
+  onDetailsClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    this.setState({
+      showDetails: !this.state.showDetails,
+    });
+  };
 
   render() {
     const { code, message, details } = this.props;
@@ -32,7 +37,7 @@ export default class FlashMessage extends React.Component<FlashMessageProps, Fla
 
     const linkClassName = classNames({
       'FlashMessage-detailsLink-displayed': showDetails,
-      'FlashMessage-detailsLink-hidden': !showDetails
+      'FlashMessage-detailsLink-hidden': !showDetails,
     });
 
     return (
@@ -43,7 +48,7 @@ export default class FlashMessage extends React.Component<FlashMessageProps, Fla
             ? <a
                 className={linkClassName}
                 href='#'
-                onClick={this.toggleDetails.bind(this)}
+                onClick={this.onDetailsClick}
               >Details </a>
             : null}
         </p>
@@ -52,13 +57,6 @@ export default class FlashMessage extends React.Component<FlashMessageProps, Fla
           : null}
       </div>
     );
-  }
-
-  toggleDetails(e: React.MouseEvent) {
-    e.preventDefault();
-    this.setState({
-      showDetails: !this.state.showDetails
-    });
   }
 
 }

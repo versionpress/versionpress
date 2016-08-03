@@ -10,17 +10,14 @@ interface ProgressBarState {
 
 export default class ProgressBar extends React.Component<React.Props<JSX.Element>, ProgressBarState> {
 
-  constructor() {
-    super();
-    this.state = {
-      isVisible: false,
-      progress: 0,
-    };
-  }
+  state = {
+    isVisible: false,
+    progress: 0,
+  };
 
   progress(progress: number) {
     this.setState({
-      progress: progress,
+      progress,
       isVisible: progress < 100,
     });
   }
@@ -35,7 +32,7 @@ export default class ProgressBar extends React.Component<React.Props<JSX.Element
 
     const spinnerClassName = classNames({
       'ProgressBar-spinner': true,
-      'hide': !isVisible
+      'hide': !isVisible,
     });
 
     return (

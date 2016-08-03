@@ -25,41 +25,59 @@ interface CommitPanelState {
 
 export default class CommitPanel extends React.Component<CommitPanelProps, CommitPanelState> {
 
-  constructor() {
-    super();
-    this.state = {
-      detailsLevel: 'none',
-      isLoading: false
-    };
-  }
+  state = {
+    detailsLevel: 'none',
+    diff: null,
+    gitStatus: null,
+    error: null,
+    isLoading: false,
+  };
 
-  render() {
-    const { detailsLevel } = this.state;
+  onChangeDetailsLevel = (detailsLevel: string) => {
+    if (detailsLevel === 'overview' && !this.state.gitStatus) {
+      this.setState({
+        isLoading: true,
+      });
 
-    const noticeClassName = classNames({
-      'CommitPanel-notice': true,
-      'CommitPanel-notice--expanded': detailsLevel !== 'none'
-    });
+      this.props.gitStatusProvider.getGitStatus()
+        .then(gitStatus => this.setState({
+            detailsLevel: detailsLevel,
+            gitStatus: gitStatus,
+            error: null,
+            isLoading: false,
+          })
+        ).catch(err => this.setState({
+            detailsLevel: detailsLevel,
+            error: err.message,
+            isLoading: false,
+          })
+        );
+    } else if (detailsLevel === 'full-diff' && !this.state.diff) {
+      this.setState({
+        isLoading: true,
+      });
 
-    return (
-      <div className='CommitPanel'>
-        <div className={noticeClassName}>
-          <CommitPanelNotice
-            onDetailsLevelChanged={newDetailsLevel => this.changeDetailsLevel(newDetailsLevel)}
-            detailsLevel={detailsLevel}
-          />
-          {detailsLevel !== 'none'
-            ? <CommitPanelCommit
-                onCommit={this.props.onCommit}
-                onDiscard={this.props.onDiscard}
-              />
-            : null
-          }
-        </div>
-        {this.renderDetails()}
-      </div>
-    );
-  }
+      this.props.diffProvider.getDiff('')
+        .then(diff => this.setState({
+            detailsLevel: detailsLevel,
+            diff: diff,
+            error: null,
+            isLoading: false,
+          })
+        ).catch(err => this.setState({
+            detailsLevel: detailsLevel,
+            error: err.message,
+            isLoading: false,
+          })
+        );
+    } else {
+      this.setState({
+        detailsLevel: detailsLevel,
+        error: null,
+        isLoading: false,
+      });
+    }
+  };
 
   private renderError() {
     return (
@@ -74,22 +92,24 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
       return null;
     }
 
+    const { detailsLevel, diff, gitStatus, error, isLoading } = this.state;
+
     const detailsClassName = classNames({
       'CommitPanel-details': true,
-      'loading': this.state.isLoading
+      'loading': isLoading,
     });
-    const content = this.state.detailsLevel === 'overview'
-      ? <CommitPanelOverview gitStatus={this.state.gitStatus} />
-      : <CommitPanelDetails diff={this.state.diff} />;
+    const content = detailsLevel === 'overview'
+      ? <CommitPanelOverview gitStatus={gitStatus} />
+      : <CommitPanelDetails diff={diff} />;
 
     return (
       <div className={detailsClassName}>
         {this.renderToggle()}
-        {this.state.isLoading
+        {isLoading
           ? <div className='CommitPanel-details-loader'></div>
           : null
         }
-        {this.state.error
+        {error
           ? this.renderError()
           : content
         }
@@ -107,63 +127,43 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
         <button
           className='button'
           disabled={this.state.detailsLevel === 'overview'}
-          onClick={() => this.changeDetailsLevel('overview')}
+          onClick={() => this.onChangeDetailsLevel('overview')}
         >Overview</button>
         <button
           className='button'
           disabled={this.state.detailsLevel === 'full-diff'}
-          onClick={() => this.changeDetailsLevel('full-diff')}
+          onClick={() => this.onChangeDetailsLevel('full-diff')}
         >Full diff</button>
       </div>
     );
   }
 
-  private changeDetailsLevel(detailsLevel: string) {
-    if (detailsLevel === 'overview' && !this.state.gitStatus) {
-      this.setState({
-        isLoading: true
-      });
+  render() {
+    const { detailsLevel } = this.state;
 
-      this.props.gitStatusProvider.getGitStatus()
-        .then(gitStatus => this.setState({
-            detailsLevel: detailsLevel,
-            gitStatus: gitStatus,
-            error: null,
-            isLoading: false,
-          })
-        ).catch(err => {
-          this.setState({
-            detailsLevel: detailsLevel,
-            error: err.message,
-            isLoading: false
-          });
-        });
-    } else if (detailsLevel === 'full-diff' && !this.state.diff) {
-      this.setState({
-        isLoading: true
-      });
+    const noticeClassName = classNames({
+      'CommitPanel-notice': true,
+      'CommitPanel-notice--expanded': detailsLevel !== 'none',
+    });
 
-      this.props.diffProvider.getDiff('')
-        .then(diff => this.setState({
-            detailsLevel: detailsLevel,
-            diff: diff,
-            error: null,
-            isLoading: false,
-          })
-        ).catch(err => {
-          this.setState({
-            detailsLevel: detailsLevel,
-            error: err.message,
-            isLoading: false
-          });
-        });
-    } else {
-      this.setState({
-        detailsLevel: detailsLevel,
-        error: null,
-        isLoading: false
-      });
-    }
+    return (
+      <div className='CommitPanel'>
+        <div className={noticeClassName}>
+          <CommitPanelNotice
+            onDetailsLevelChange={this.onChangeDetailsLevel}
+            detailsLevel={detailsLevel}
+          />
+          {detailsLevel !== 'none'
+            ? <CommitPanelCommit
+                onCommit={this.props.onCommit}
+                onDiscard={this.props.onDiscard}
+              />
+            : null
+          }
+        </div>
+        {this.renderDetails()}
+      </div>
+    );
   }
 
 }

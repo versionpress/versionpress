@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import * as moment from 'moment';
+
 import * as ArrayUtils from '../common/ArrayUtils';
 import * as StringUtils from '../common/StringUtils';
 
@@ -15,67 +16,24 @@ interface CommitOverviewState {
 
 export default class CommitOverview extends React.Component<CommitOverviewProps, CommitOverviewState> {
 
-  constructor(props: CommitOverviewProps, context: any) {
-    super(props, context);
-    this.state = {expandedLists: []};
-  }
+  state = {
+    expandedLists: [],
+  };
 
-  private static renderEntityNamesWithDuplicates(changes: Change[]): JSX.Element[] {
-    let filteredChanges = ArrayUtils.filterDuplicates<Change>(changes, change => change.type + '|||' + change.action + '|||' + change.name);
-    let countOfDuplicates = ArrayUtils.countDuplicates(changes, change => [change.type, change.action, change.name]);
+  onShowMoreClick = (e: React.MouseEvent, listKey: string) => {
+    e.preventDefault();
+    const { expandedLists } = this.state;
 
-    return filteredChanges.map((change: Change) => {
-      let duplicatesOfChange = countOfDuplicates[change.type][change.action][change.name];
-      let duplicatesSuffix = duplicatesOfChange > 1 ? (' (' + duplicatesOfChange + '×)') : '';
-      return (
-        <span>
-          <span className='identifier'>{CommitOverview.getUserFriendlyName(change)}</span>
-          {duplicatesSuffix}
-        </span>
-      );
+    this.setState({
+      expandedLists: expandedLists.concat([listKey]),
     });
-  }
+  };
 
-  private static getUserFriendlyName(change: Change) {
-    if (change.type === 'user') {
-      return change.tags['VP-User-Login'];
-    }
+  private getFormattedChanges(changes: Change[]) {
+    const { commit } = this.props;
 
-    if (change.type === 'usermeta') {
-      return change.tags['VP-UserMeta-Key'];
-    }
-
-    if (change.type === 'postmeta') {
-      return change.tags['VP-PostMeta-Key'];
-    }
-
-    if (change.type === 'commentmeta') {
-      return change.tags['VP-CommentMeta-Key'];
-    }
-
-    if (change.type === 'post') {
-      return change.tags['VP-Post-Title'];
-    }
-
-    if (change.type === 'term') {
-      return change.tags['VP-Term-Name'];
-    }
-
-    return change.name;
-  }
-
-  render() {
-    return (
-      <ul className='overview-list'>
-        {this.formatChanges(this.props.commit.changes).map((line, i) => <li key={i}>{line}</li>)}
-        {this.renderEnvironment()}
-      </ul>
-    );
-  }
-
-  private formatChanges(changes: Change[]) {
     if (changes.length === 0) {
-      if (this.props.commit.isMerge) {
+      if (commit.isMerge) {
         return [<em>This is a merge commit. No files were changed in this commit.</em>];
       }
       return [<em>No files were changed in this commit.</em>];
@@ -123,7 +81,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
 
   private getLinesForComments(changedComments: Change[], action: string) {
     let lines = [];
-    let commentsByPosts = ArrayUtils.groupBy(changedComments, c => c.tags['VP-Comment-PostTitle']);
+    let commentsByPosts = ArrayUtils.groupBy<Change>(changedComments, c => c.tags['VP-Comment-PostTitle']);
 
     for (let postTitle in commentsByPosts) {
       let capitalizedVerb = StringUtils.capitalize(StringUtils.verbToPastTense(action));
@@ -168,7 +126,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     let changedPostsByType = ArrayUtils.groupBy(changedPosts, post => post.tags['VP-Post-Type']);
 
     for (let postType in changedPostsByType) {
-      let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changedPostsByType[postType]);
+      let changedEntities = this.renderEntityNamesWithDuplicates(changedPostsByType[postType]);
       let suffix = null;
 
       if (action === 'trash' || action === 'untrash') {
@@ -188,7 +146,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     let metaByTag = ArrayUtils.groupBy(changedMeta, c => c.tags[groupByTag]);
 
     for (let tagValue in metaByTag) {
-      let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(metaByTag[tagValue]);
+      let changedEntities = this.renderEntityNamesWithDuplicates(metaByTag[tagValue]);
 
       let lineSuffix = [
         ' for ',
@@ -240,12 +198,42 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
   }
 
   private getLinesForOtherChanges(changes: Change[], type, action) {
-    let changedEntities = CommitOverview.renderEntityNamesWithDuplicates(changes);
+    let changedEntities = this.renderEntityNamesWithDuplicates(changes);
     let line = this.renderOverviewLine(type, action, changedEntities);
     return [line];
   }
 
+  private getUserFriendlyName(change: Change) {
+    if (change.type === 'user') {
+      return change.tags['VP-User-Login'];
+    }
+
+    if (change.type === 'usermeta') {
+      return change.tags['VP-UserMeta-Key'];
+    }
+
+    if (change.type === 'postmeta') {
+      return change.tags['VP-PostMeta-Key'];
+    }
+
+    if (change.type === 'commentmeta') {
+      return change.tags['VP-CommentMeta-Key'];
+    }
+
+    if (change.type === 'post') {
+      return change.tags['VP-Post-Title'];
+    }
+
+    if (change.type === 'term') {
+      return change.tags['VP-Term-Name'];
+    }
+
+    return change.name;
+  }
+
   private renderOverviewLine(type: string, action: string, entities: any[], suffix: any = null) {
+    const { expandedLists } = this.state;
+
     let capitalizedVerb = StringUtils.capitalize(StringUtils.verbToPastTense(action));
 
     if (entities.length < 5) {
@@ -261,7 +249,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
 
     let listKey = `${type}|||${action}|||${suffix}`;
     let entityList;
-    if (this.state.expandedLists.indexOf(listKey) > -1) {
+    if (expandedLists.indexOf(listKey) > -1) {
       entityList = (
         <ul>
           {entities.map(entity => <li>{entity}</li>)}
@@ -273,7 +261,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
         <ul>
           {entities.slice(0, displayedListLength).map(entity => <li>{entity}</li>)}
           <li>
-            <a onClick={() => this.expandList(listKey)}>
+            <a onClick={e => this.onShowMoreClick(e, listKey)}>
               show {entities.length - displayedListLength} more...
             </a>
           </li>
@@ -291,18 +279,33 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     );
   }
 
-  private renderEnvironment() {
-    return (
-      <li className='environment'>
-        <em>Environment: {this.props.commit.environment}</em>
-      </li>
-    );
+  private renderEntityNamesWithDuplicates(changes: Change[]): JSX.Element[] {
+    let filteredChanges = ArrayUtils.filterDuplicates<Change>(changes, change => change.type + '|||' + change.action + '|||' + change.name);
+    let countOfDuplicates = ArrayUtils.countDuplicates<Change>(changes, change => [change.type, change.action, change.name]);
+
+    return filteredChanges.map((change: Change) => {
+      let duplicatesOfChange = countOfDuplicates[change.type][change.action][change.name];
+      let duplicatesSuffix = duplicatesOfChange > 1 ? (' (' + duplicatesOfChange + '×)') : '';
+      return (
+        <span>
+          <span className='identifier'>{this.getUserFriendlyName(change)}</span>
+          {duplicatesSuffix}
+        </span>
+      );
+    });
   }
 
-  private expandList(listKey) {
-    let expandedLists = this.state.expandedLists;
-    let newExpandedLists = expandedLists.concat([listKey]);
-    this.setState({expandedLists: newExpandedLists});
+  render() {
+    const { commit } = this.props;
+
+    return (
+      <ul className='overview-list'>
+        {this.getFormattedChanges(commit.changes).map((line, i) => <li key={i}>{line}</li>)}
+        <li className='environment'>
+          <em>Environment: {commit.environment}</em>
+        </li>
+      </ul>
+    );
   }
 
 }

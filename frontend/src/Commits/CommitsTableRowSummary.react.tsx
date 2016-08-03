@@ -3,6 +3,7 @@
 import * as React from 'react';
 import * as moment from 'moment';
 import * as classNames from 'classnames';
+
 import * as portal from '../common/portal';
 import {UndoDisabledDialog} from '../Commits/revertDialog';
 import {getGitBranchColor} from '../services/GitBranchColorProvider';
@@ -20,6 +21,82 @@ interface CommitsTableRowSummaryProps extends React.Props<JSX.Element> {
 
 export default class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps, {}> {
 
+  onCheckboxClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!this.props.enableActions) {
+      return;
+    }
+
+    const target = e.target as HTMLInputElement;
+    let checked;
+
+    if (target.tagName === 'INPUT') {
+      checked = target.checked;
+    } else {
+      const checkbox = target.getElementsByTagName('input')[0] as HTMLInputElement;
+      checked = !checkbox.checked;
+    }
+    this.props.onCommitSelect([this.props.commit], checked, e.shiftKey);
+  };
+
+  onDetailsLevelClick = (e: React.MouseEvent, detailsLevel: string) => {
+    e.stopPropagation();
+
+    this.props.onDetailsLevelChanged(detailsLevel);
+  };
+
+  onRowClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (this.props.commit.isEnabled) {
+      this.props.onDetailsLevelChanged(this.props.detailsLevel === 'none' ? 'overview' : 'none');
+    }
+  };
+
+  private getAuthorTooltip(commit: Commit) {
+    const author = commit.author;
+    if (author.name === 'Non-admin action') {
+      return 'This action is not associated with any user, e.g., it was a public comment';
+    } else if (author.name === 'WP-CLI') {
+      return 'This action was done via WP-CLI';
+    }
+
+    return author.name + ' <' + author.email + '>';
+  }
+
+  private renderUndoMergeDialog() {
+    const body = (
+      <p>
+        Merge commit is a special type of commit that cannot be undone. {' '}
+        <a
+          href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback#merge-commits'
+          target='_blank'
+        >Learn more</a>
+      </p>
+    );
+    portal.alertDialog('This is a merge commit', body);
+  }
+
+  private renderDisabledDialog() {
+    const title = <span>Undo <em>{this.props.commit.message}</em>?</span>;
+    const body = <UndoDisabledDialog />;
+    portal.alertDialog(title, body);
+  }
+
+  private renderMessage(message: string) {
+    const messageChunks = /(.*)'(.*)'(.*)/.exec(message);
+    if (!messageChunks || messageChunks.length < 4) {
+      return <span>{message}</span>;
+    }
+    return (
+      <span>
+        {messageChunks[1] !== '' ? this.renderMessage(messageChunks[1]) : null}
+        {messageChunks[2] !== '' ? <span className='identifier'>{messageChunks[2]}</span> : null}
+        {messageChunks[3] !== '' ? this.renderMessage(messageChunks[3]) : null}
+      </span>
+    );
+  }
+
   render() {
     const { commit, enableActions, isSelected, detailsLevel } = this.props;
 
@@ -29,22 +106,19 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
 
     const rowClassName = classNames({
       'disabled': !commit.isEnabled,
-      'displayed-details': detailsLevel !== 'none'
+      'displayed-details': detailsLevel !== 'none',
     });
     const undoClassName = classNames({
       'vp-table-undo': true,
-      'disabled': commit.isMerge || !enableActions
+      'disabled': commit.isMerge || !enableActions,
     });
     const rollbackClassName = classNames({
       'vp-table-rollback': true,
-      'disabled': !enableActions
+      'disabled': !enableActions,
     });
 
     return (
-      <tr
-        className={rowClassName}
-        onClick={() => this.toggleDetails()}
-      >
+      <tr className={rowClassName} onClick={this.onRowClick}>
         <td className='column-environment'>
           {commit.environment === '?'
             ? null
@@ -52,10 +126,14 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
           }
         </td>
         {commit.canUndo
-          ? <td className='column-cb' onClick={this.onCheckboxClick.bind(this)}><input type='checkbox'
-                                                                                       checked={isSelected}
-                                                                                       disabled={!enableActions}
-                                                                                       readOnly={true}/></td>
+          ? <td className='column-cb' onClick={this.onCheckboxClick}>
+              <input
+                type='checkbox'
+                checked={isSelected}
+                disabled={!enableActions}
+                readOnly={true}
+              />
+            </td>
           : <td className='column-cb' />
         }
         <td className='column-date' title={moment(commit.date).format('LLL')}>{moment(commit.date).fromNow()}</td>
@@ -79,12 +157,12 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
                 <button
                   className='button'
                   disabled={detailsLevel === 'overview'}
-                  onClick={(e) => { this.changeDetailsLevel('overview'); e.stopPropagation(); }}
+                  onClick={e => this.onDetailsLevelClick(e, 'overview')}
                 >Overview</button>
                 <button
                   className='button'
                   disabled={detailsLevel === 'full-diff'}
-                  onClick={(e) => { this.changeDetailsLevel('full-diff'); e.stopPropagation(); }}
+                  onClick={e => this.onDetailsLevelClick(e, 'full-diff')}
                 >Full diff</button>
               </div>
             : null
@@ -134,75 +212,4 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
     );
   }
 
-  private renderUndoMergeDialog() {
-    const body = (
-      <p>
-        Merge commit is a special type of commit that cannot be undone. {' '}
-        <a
-          href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback#merge-commits'
-          target='_blank'
-        >Learn more</a>
-      </p>
-    );
-    portal.alertDialog('This is a merge commit', body);
-  }
-
-  private renderDisabledDialog() {
-    const title = <span>Undo <em>{this.props.commit.message}</em>?</span>;
-    const body = <UndoDisabledDialog />;
-    portal.alertDialog(title, body);
-  }
-
-  private getAuthorTooltip(commit: Commit) {
-    const author = commit.author;
-    if (author.name === 'Non-admin action') {
-      return 'This action is not associated with any user, e.g., it was a public comment';
-    } else if (author.name === 'WP-CLI') {
-      return 'This action was done via WP-CLI';
-    }
-
-    return author.name + ' <' + author.email + '>';
-  }
-
-  private toggleDetails() {
-    if (this.props.commit.isEnabled) {
-      this.props.onDetailsLevelChanged(this.props.detailsLevel === 'none' ? 'overview' : 'none');
-    }
-  }
-
-  private onCheckboxClick(e: React.MouseEvent) {
-    e.stopPropagation();
-    if (!this.props.enableActions) {
-      return;
-    }
-
-    const target = e.target as HTMLInputElement;
-    let checked;
-
-    if (target.tagName === 'INPUT') {
-      checked = target.checked;
-    } else {
-      const checkbox = target.getElementsByTagName('input')[0] as HTMLInputElement;
-      checked = !checkbox.checked;
-    }
-    this.props.onCommitSelect([this.props.commit], checked, e.shiftKey);
-  }
-
-  private changeDetailsLevel(detailsLevel) {
-    this.props.onDetailsLevelChanged(detailsLevel);
-  }
-
-  private renderMessage(message: string) {
-    const messageChunks = /(.*)'(.*)'(.*)/.exec(message);
-    if (!messageChunks || messageChunks.length < 4) {
-      return <span>{message}</span>;
-    }
-    return (
-      <span>
-        {messageChunks[1] !== '' ? this.renderMessage(messageChunks[1]) : null}
-        {messageChunks[2] !== '' ? <span className='identifier'>{messageChunks[2]}</span> : null}
-        {messageChunks[3] !== '' ? this.renderMessage(messageChunks[3]) : null}
-      </span>
-    );
-  }
 }

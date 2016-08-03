@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import * as portal from './portal';
 
 import './ConfirmDialog.less';
@@ -16,13 +17,6 @@ interface ConfirmDialogProps extends React.Props<JSX.Element> {
 
 export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {}> {
 
-  constructor(props) {
-    super(props);
-
-    this.handleOkClick = this.handleOkClick.bind(this);
-    this.handleCancelClick = this.handleCancelClick.bind(this);
-  }
-
   static defaultProps = {
     okButtonText: 'OK',
     cancelButtonText: 'Cancel',
@@ -31,17 +25,17 @@ export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {
     isLoading: false,
   };
 
-  handleOkClick() {
+  onOkClick = () => {
     if (this.props.okButtonClickHandler() !== false) {
       portal.closePortal();
     }
-  }
+  };
 
-  handleCancelClick() {
+  onCancelClick = () => {
     if (this.props.cancelButtonClickHandler() !== false) {
       portal.closePortal();
     }
-  }
+  };
 
   render() {
     const okButtonClasses = 'ConfirmDialog-button button button-primary ' + this.props.okButtonClasses;
@@ -51,14 +45,15 @@ export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {
       ? <div className='ConfirmDialog'>
           <div className='ConfirmDialog-message'>{this.props.message}</div>
           <div className='ConfirmDialog-buttons'>
-            <button className={okButtonClasses} onClick={this.handleOkClick}>
+            <button className={okButtonClasses} onClick={this.onOkClick}>
               {this.props.okButtonText}
             </button>
-            <button className={cancelButtonClasses} onClick={this.handleCancelClick}>
+            <button className={cancelButtonClasses} onClick={this.onCancelClick}>
               {this.props.cancelButtonText}
             </button>
           </div>
         </div>
       : <div className='ConfirmDialog-spinner' />;
   }
+
 }

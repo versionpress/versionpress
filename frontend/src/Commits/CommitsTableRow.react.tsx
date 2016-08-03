@@ -1,6 +1,7 @@
 /// <reference path='./Commits.d.ts' />
 
 import * as React from 'react';
+
 import CommitsTableRowSummary from './CommitsTableRowSummary.react';
 import CommitsTableRowDetails from './CommitsTableRowDetails.react';
 
@@ -23,11 +24,47 @@ interface CommitsTableRowState {
 
 export default class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTableRowState> {
 
-  constructor() {
-    super();
-    this.state = {
-      detailsLevel: 'none'
-    };
+  state = {
+    detailsLevel: 'none',
+    diff: null,
+    error: null,
+    isLoading: false,
+  };
+
+  onDetailsLevelChange = (detailsLevel: string) => {
+    if (detailsLevel === 'full-diff' && !this.state.diff) {
+      this.setState({
+        isLoading: true,
+      });
+
+      this.props.diffProvider.getDiff(this.props.commit.hash)
+        .then(diff => this.setState({
+            detailsLevel: detailsLevel,
+            diff: diff,
+            error: null,
+            isLoading: false,
+          })
+        ).catch(err => this.setState({
+            detailsLevel: detailsLevel,
+            error: err.message,
+            isLoading: false,
+          })
+        );
+    } else {
+      this.setState({
+        detailsLevel: detailsLevel,
+        error: null,
+        isLoading: false,
+      });
+    }
+  };
+
+  renderError() {
+    return (
+      <tr className='details-row error'>
+        <td colSpan={6}>{this.state.error}</td>
+      </tr>
+    );
   }
 
   render() {
@@ -40,7 +77,7 @@ export default class CommitsTableRow extends React.Component<CommitsTableRowProp
           onUndo={this.props.onUndo}
           onRollback={this.props.onRollback}
           onCommitSelect={this.props.onCommitSelect}
-          onDetailsLevelChanged={detailsLevel => this.changeDetailsLevel(detailsLevel)}
+          onDetailsLevelChanged={this.onDetailsLevelChange}
           detailsLevel={this.state.detailsLevel}
         />
         {this.state.error
@@ -56,41 +93,4 @@ export default class CommitsTableRow extends React.Component<CommitsTableRowProp
     );
   }
 
-  renderError() {
-    return (
-      <tr className='details-row error'>
-        <td colSpan={6}>{this.state.error}</td>
-      </tr>
-    );
-  }
-
-  private changeDetailsLevel(detailsLevel: string) {
-    if (detailsLevel === 'full-diff' && !this.state.diff) {
-      this.setState({
-        isLoading: true
-      });
-
-      this.props.diffProvider.getDiff(this.props.commit.hash)
-        .then(diff => this.setState(
-          {
-            detailsLevel: detailsLevel,
-            diff: diff,
-            error: null,
-            isLoading: false,
-          })
-        ).catch(err => {
-          this.setState({
-            detailsLevel: detailsLevel,
-            error: err.message,
-            isLoading: false
-          });
-        });
-    } else {
-      this.setState({
-        detailsLevel: detailsLevel,
-        error: null,
-        isLoading: false
-      });
-    }
-  }
 }

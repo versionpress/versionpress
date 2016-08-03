@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import * as portal from './portal';
 
 import './Modal.less';
@@ -12,14 +13,6 @@ interface ModalProps extends React.Props<JSX.Element> {
 }
 
 export default class Modal extends React.Component<ModalProps, any> {
-
-  constructor(props) {
-    super(props);
-
-    this.closeModalHandler = this.closeModalHandler.bind(this);
-    this.backgroundClickHandler = this.backgroundClickHandler.bind(this);
-    this.keyDownHandler = this.keyDownHandler.bind(this);
-  }
 
   static defaultProps = {
     enableBackgroundClickToClose: true,
@@ -36,19 +29,37 @@ export default class Modal extends React.Component<ModalProps, any> {
     content.focus();
   }
 
-  getCloseIconMarkup() {
-    return this.props.showCloseIcon
-      ? <a href='#' className='Modal-close' onClick={this.closeModalHandler}>&times;</a>
-      : null;
-  }
+  onKeyDown = (e) => {
+    if (e.keyCode === 27 && this.props.showCloseIcon) {
+      this.onCloseModal(e);
+    }
+  };
+
+  onBackgroundClick = (e) => {
+    if (this.props.enableBackgroundClickToClose && e.target.getAttribute('data-clickcatcher')) {
+      this.onCloseModal(e);
+    }
+  };
+
+  onCloseModal = (e) => {
+    e.stopPropagation();
+
+    if (typeof this.props.onClose === 'function') {
+      this.props.onClose();
+    }
+    portal.closePortal();
+  };
 
   render() {
     return (
-      <div className='Modal-container' onClick={this.backgroundClickHandler} data-clickcatcher={true}>
-        <div ref='content' className='Modal-content' tabIndex={-1} onKeyDown={this.keyDownHandler}>
+      <div className='Modal-container' onClick={this.onBackgroundClick} data-clickcatcher={true}>
+        <div ref='content' className='Modal-content' tabIndex={-1} onKeyDown={this.onKeyDown}>
           <div className='Modal-header'>
             <h3 className='Modal-title'>{this.props.title}</h3>
-            {this.getCloseIconMarkup()}
+            {this.props.showCloseIcon
+              ? <a href='#' className='Modal-close' onClick={this.onCloseModal}>&times;</a>
+              : null
+            }
           </div>
           <div className='Modal-body'>
             {this.props.children}
@@ -57,26 +68,4 @@ export default class Modal extends React.Component<ModalProps, any> {
       </div>
     );
   }
-
-  keyDownHandler(e) {
-    if (e.keyCode === 27 && this.props.showCloseIcon) {
-      this.closeModalHandler(e);
-    }
-  }
-
-  backgroundClickHandler(e) {
-    if (this.props.enableBackgroundClickToClose && e.target.getAttribute('data-clickcatcher')) {
-      this.closeModalHandler(e);
-    }
-  }
-
-  closeModalHandler(e) {
-    e.stopPropagation();
-
-    if (typeof this.props.onClose === 'function') {
-      this.props.onClose();
-    }
-    portal.closePortal();
-  }
-
 }
