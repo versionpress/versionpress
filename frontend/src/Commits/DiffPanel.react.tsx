@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import * as JsDiff from 'diff';
+
 import DiffParser from '../common/DiffParser';
 
 import './DiffPanel.less';

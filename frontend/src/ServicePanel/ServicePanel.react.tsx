@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
+
 import config from '../config';
 
 import './ServicePanel.less';

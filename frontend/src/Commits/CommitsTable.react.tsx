@@ -3,6 +3,7 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 import {Link} from 'react-router';
+
 import CommitsTableRow from './CommitsTableRow.react';
 import CommitsTableNote from './CommitsTableNote.react';
 import {indexOf} from '../Commits/CommitUtils';

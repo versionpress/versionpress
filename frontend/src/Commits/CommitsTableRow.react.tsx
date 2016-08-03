@@ -1,6 +1,7 @@
 /// <reference path='./Commits.d.ts' />
 
 import * as React from 'react';
+
 import CommitsTableRowSummary from './CommitsTableRowSummary.react';
 import CommitsTableRowDetails from './CommitsTableRowDetails.react';
 

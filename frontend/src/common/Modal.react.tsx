@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import * as portal from './portal';
 
 import './Modal.less';

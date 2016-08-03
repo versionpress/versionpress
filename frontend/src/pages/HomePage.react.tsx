@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import * as Promise from 'core-js/es6/promise';
 import * as classNames from 'classnames';
 import update = require('react-addons-update');
+
 import BulkActionPanel from '../BulkActionPanel/BulkActionPanel.react';
 import CommitPanel from '../CommitPanel/CommitPanel.react';
 import CommitsTable from '../Commits/CommitsTable.react';

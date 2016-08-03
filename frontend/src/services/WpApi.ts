@@ -1,6 +1,7 @@
 /// <reference path='./VpApi.d.ts' />
 
 import * as request from 'superagent';
+
 import config from '../config';
 import {getValidVPJSON} from '../common/StringUtils';
 

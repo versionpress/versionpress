@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as DOM from 'react-dom';
+
 import ConfirmDialog from './ConfirmDialog.react';
 import Modal from './Modal.react';
 
