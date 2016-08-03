@@ -111,6 +111,7 @@ gulp.task('prepare-src-definition', false, function () {
     srcDef.push('!' + vpDir + '/.gitignore'); // this .gitignore is valid for a project, not for deployed VP
     srcDef.push('!' + vpDir + '/.editorconfig');
     srcDef.push('!' + vpDir + '/.gitattributes');
+    srcDef.push('!' + vpDir + '/ruleset.xml');
     srcDef.push('!' + vpDir + '/tests{,/**}'); // tests might be useful for `test-deploy` but we don't currently need them
     srcDef.push('!' + vpDir + '/log/**/!(.gitignore)'); // keep just the .gitignore inside `log` folder
     srcDef.push('!' + vpDir + '/**/*.md'); // all Markdown files are considered documentation
