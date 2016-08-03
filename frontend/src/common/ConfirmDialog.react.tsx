@@ -29,13 +29,13 @@ export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {
     if (this.props.okButtonClickHandler() !== false) {
       portal.closePortal();
     }
-  }
+  };
 
   onCancelClick = () => {
     if (this.props.cancelButtonClickHandler() !== false) {
       portal.closePortal();
     }
-  }
+  };
 
   render() {
     const okButtonClasses = 'ConfirmDialog-button button button-primary ' + this.props.okButtonClasses;
@@ -55,4 +55,5 @@ export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {
         </div>
       : <div className='ConfirmDialog-spinner' />;
   }
+
 }

@@ -28,35 +28,33 @@ export default class CommitsTableRow extends React.Component<CommitsTableRowProp
     detailsLevel: 'none',
     diff: null,
     error: null,
-    isLoading: false
-  }
+    isLoading: false,
+  };
 
   onDetailsLevelChange = (detailsLevel: string) => {
     if (detailsLevel === 'full-diff' && !this.state.diff) {
       this.setState({
-        isLoading: true
+        isLoading: true,
       });
 
       this.props.diffProvider.getDiff(this.props.commit.hash)
-        .then(diff => this.setState(
-          {
+        .then(diff => this.setState({
             detailsLevel: detailsLevel,
             diff: diff,
             error: null,
             isLoading: false,
           })
-        ).catch(err => {
-        this.setState({
-          detailsLevel: detailsLevel,
-          error: err.message,
-          isLoading: false
-        });
-      });
+        ).catch(err => this.setState({
+            detailsLevel: detailsLevel,
+            error: err.message,
+            isLoading: false,
+          })
+        );
     } else {
       this.setState({
         detailsLevel: detailsLevel,
         error: null,
-        isLoading: false
+        isLoading: false,
       });
     }
   };

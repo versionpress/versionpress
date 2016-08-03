@@ -75,6 +75,8 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
   }
 
   render() {
+    const { pages, commits } = this.props;
+
     let noteDisplayed = false;
 
     return (
@@ -89,7 +91,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
             <th className='column-actions' />
           </tr>
         </thead>
-        {this.props.commits.map((commit: Commit, index: number) => {
+        {commits.map((commit: Commit, index: number) => {
           const row = <CommitsTableRow
                         key={commit.hash}
                         commit={commit}
@@ -101,7 +103,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
                         diffProvider={this.props.diffProvider}
                       />;
 
-          if (!noteDisplayed && !commit.isEnabled && index < this.props.commits.length - 1) {
+          if (!noteDisplayed && !commit.isEnabled && index < commits.length - 1) {
             noteDisplayed = true;
             return [
               this.renderNote(),
@@ -113,7 +115,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
         <tfoot>
           <tr>
             <td className='vp-table-pagination' colSpan={6}>
-              {this.props.pages.map((page: number) => {
+              {pages.map((page: number) => {
                 return <Link
                           activeClassName='active'
                           key={page}

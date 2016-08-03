@@ -11,8 +11,8 @@ interface CommitPanelOverviewState {
 export default class CommitPanelOverview extends React.Component<CommitPanelOverviewProps, CommitPanelOverviewState> {
 
   state = {
-    isExpanded: false
-  }
+    isExpanded: false,
+  };
 
   private displayedListLength: number = 5;
 

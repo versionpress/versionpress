@@ -37,13 +37,13 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
       checked = !checkbox.checked;
     }
     this.props.onCommitSelect([this.props.commit], checked, e.shiftKey);
-  }
+  };
 
   onDetailsLevelClick = (e: React.MouseEvent, detailsLevel: string) => {
     e.stopPropagation();
 
     this.props.onDetailsLevelChanged(detailsLevel);
-  }
+  };
 
   onRowClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -51,6 +51,7 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
     if (this.props.commit.isEnabled) {
       this.props.onDetailsLevelChanged(this.props.detailsLevel === 'none' ? 'overview' : 'none');
     }
+  };
 
   private getAuthorTooltip(commit: Commit) {
     const author = commit.author;
@@ -105,22 +106,19 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
 
     const rowClassName = classNames({
       'disabled': !commit.isEnabled,
-      'displayed-details': detailsLevel !== 'none'
+      'displayed-details': detailsLevel !== 'none',
     });
     const undoClassName = classNames({
       'vp-table-undo': true,
-      'disabled': commit.isMerge || !enableActions
+      'disabled': commit.isMerge || !enableActions,
     });
     const rollbackClassName = classNames({
       'vp-table-rollback': true,
-      'disabled': !enableActions
+      'disabled': !enableActions,
     });
 
     return (
-      <tr
-        className={rowClassName}
-        onClick={this.onRowClick}
-      >
+      <tr className={rowClassName} onClick={this.onRowClick}>
         <td className='column-environment'>
           {commit.environment === '?'
             ? null
@@ -128,10 +126,7 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
           }
         </td>
         {commit.canUndo
-          ? <td
-              className='column-cb'
-              onClick={this.onCheckboxClick}
-            >
+          ? <td className='column-cb' onClick={this.onCheckboxClick}>
               <input
                 type='checkbox'
                 checked={isSelected}

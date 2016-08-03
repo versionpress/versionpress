@@ -22,19 +22,19 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
     }
 
     this.props.onBulkAction(value);
-  }
+  };
 
   onClearSelection = (e: React.MouseEvent) => {
     e.preventDefault();
     this.props.onClearSelection();
-  }
+  };
 
   render() {
     const { selectedCommits, enableActions } = this.props;
 
     const noteClassName = classNames({
       'BulkActionPanel-note': true,
-      'hide': selectedCommits.length === 0
+      'hide': selectedCommits.length === 0,
     });
 
     return (

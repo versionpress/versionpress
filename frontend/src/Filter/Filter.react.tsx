@@ -29,7 +29,7 @@ export default class Filter extends React.Component<FilterProps, {}> {
     const query = e.target['s'].value;
 
     this.props.onSubmit(query);
-  }
+  };
 
   onSearch(e: Event) {
     const input = (e.target as HTMLInputElement);

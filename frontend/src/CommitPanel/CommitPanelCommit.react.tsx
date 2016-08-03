@@ -14,8 +14,8 @@ interface CommitPanelCommitState {
 export default class CommitPanelCommit extends React.Component<CommitPanelCommitProps, CommitPanelCommitState> {
 
   state = {
-    isFormVisible: false
-  }
+    isFormVisible: false,
+  };
 
   onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +25,7 @@ export default class CommitPanelCommit extends React.Component<CommitPanelCommit
     if (this.props.onCommit(message)) {
       e.target['message'].value = '';
     }
-  }
+  };
 
   onDiscard = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -33,23 +33,23 @@ export default class CommitPanelCommit extends React.Component<CommitPanelCommit
     const options = { okButtonText: 'Proceed' };
 
     portal.confirmDialog('Warning', body, this.props.onDiscard, () => {}, options);
-  }
+  };
 
   onCommitClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
     this.setState({
-      isFormVisible: true
+      isFormVisible: true,
     });
-  }
+  };
 
   onCancelCommitClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
     this.setState({
-      isFormVisible: false
+      isFormVisible: false,
     });
-  }
+  };
 
   private renderButtons() {
     return (

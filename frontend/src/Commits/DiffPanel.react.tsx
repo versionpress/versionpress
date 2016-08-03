@@ -178,7 +178,7 @@ export default class DiffPanel extends React.Component<DiffPanelProps, any> {
     if (this.props.diff === null) {
       return <div />;
     }
-    let diffs = DiffParser.parse(this.props.diff);
+    const diffs = DiffParser.parse(this.props.diff);
 
     return (
       <div>
@@ -194,4 +194,5 @@ export default class DiffPanel extends React.Component<DiffPanelProps, any> {
       </div>
     );
   }
+
 }

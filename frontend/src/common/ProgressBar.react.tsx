@@ -13,7 +13,7 @@ export default class ProgressBar extends React.Component<React.Props<JSX.Element
   state = {
     isVisible: false,
     progress: 0,
-  }
+  };
 
   progress(progress: number) {
     this.setState({
@@ -32,7 +32,7 @@ export default class ProgressBar extends React.Component<React.Props<JSX.Element
 
     const spinnerClassName = classNames({
       'ProgressBar-spinner': true,
-      'hide': !isVisible
+      'hide': !isVisible,
     });
 
     return (

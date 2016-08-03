@@ -17,7 +17,7 @@ export default class Modal extends React.Component<ModalProps, any> {
   static defaultProps = {
     enableBackgroundClickToClose: true,
     showCloseIcon: true,
-  }
+  };
 
   componentDidMount() {
     const content = this.refs['content'] as HTMLElement;
@@ -33,13 +33,13 @@ export default class Modal extends React.Component<ModalProps, any> {
     if (e.keyCode === 27 && this.props.showCloseIcon) {
       this.onCloseModal(e);
     }
-  }
+  };
 
   onBackgroundClick = (e) => {
     if (this.props.enableBackgroundClickToClose && e.target.getAttribute('data-clickcatcher')) {
       this.onCloseModal(e);
     }
-  }
+  };
 
   onCloseModal = (e) => {
     e.stopPropagation();
@@ -48,7 +48,7 @@ export default class Modal extends React.Component<ModalProps, any> {
       this.props.onClose();
     }
     portal.closePortal();
-  }
+  };
 
   render() {
     return (

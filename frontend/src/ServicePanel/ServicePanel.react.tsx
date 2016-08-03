@@ -12,11 +12,11 @@ interface ServicePanelProps extends React.Props<JSX.Element> {
 export default class ServicePanel extends React.Component<ServicePanelProps, {}> {
 
   render() {
+    const systemInfoUrl = config.api.adminUrl + '/admin.php?page=versionpress/admin/system-info.php';
     const wrapperClassName = classNames({
       'ServicePanel-wrapper': true,
-      'ServicePanel-wrapper--hide': !this.props.isVisible
+      'ServicePanel-wrapper--hide': !this.props.isVisible,
     });
-    const systemInfoUrl = config.api.adminUrl + '/admin.php?page=versionpress/admin/system-info.php';
 
     return (
       <div className={wrapperClassName}>

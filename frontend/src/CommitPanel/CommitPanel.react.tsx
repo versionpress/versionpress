@@ -30,13 +30,13 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
     diff: null,
     gitStatus: null,
     error: null,
-    isLoading: false
-  }
+    isLoading: false,
+  };
 
   onChangeDetailsLevel = (detailsLevel: string) => {
     if (detailsLevel === 'overview' && !this.state.gitStatus) {
       this.setState({
-        isLoading: true
+        isLoading: true,
       });
 
       this.props.gitStatusProvider.getGitStatus()
@@ -46,16 +46,15 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
             error: null,
             isLoading: false,
           })
-        ).catch(err => {
-        this.setState({
-          detailsLevel: detailsLevel,
-          error: err.message,
-          isLoading: false
-        });
-      });
+        ).catch(err => this.setState({
+            detailsLevel: detailsLevel,
+            error: err.message,
+            isLoading: false,
+          })
+        );
     } else if (detailsLevel === 'full-diff' && !this.state.diff) {
       this.setState({
-        isLoading: true
+        isLoading: true,
       });
 
       this.props.diffProvider.getDiff('')
@@ -65,21 +64,20 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
             error: null,
             isLoading: false,
           })
-        ).catch(err => {
-        this.setState({
-          detailsLevel: detailsLevel,
-          error: err.message,
-          isLoading: false
-        });
-      });
+        ).catch(err => this.setState({
+            detailsLevel: detailsLevel,
+            error: err.message,
+            isLoading: false,
+          })
+        );
     } else {
       this.setState({
         detailsLevel: detailsLevel,
         error: null,
-        isLoading: false
+        isLoading: false,
       });
     }
-  }
+  };
 
   private renderError() {
     return (
@@ -94,22 +92,24 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
       return null;
     }
 
+    const { detailsLevel, diff, gitStatus, error, isLoading } = this.state;
+
     const detailsClassName = classNames({
       'CommitPanel-details': true,
-      'loading': this.state.isLoading
+      'loading': isLoading,
     });
-    const content = this.state.detailsLevel === 'overview'
-      ? <CommitPanelOverview gitStatus={this.state.gitStatus} />
-      : <CommitPanelDetails diff={this.state.diff} />;
+    const content = detailsLevel === 'overview'
+      ? <CommitPanelOverview gitStatus={gitStatus} />
+      : <CommitPanelDetails diff={diff} />;
 
     return (
       <div className={detailsClassName}>
         {this.renderToggle()}
-        {this.state.isLoading
+        {isLoading
           ? <div className='CommitPanel-details-loader'></div>
           : null
         }
-        {this.state.error
+        {error
           ? this.renderError()
           : content
         }
