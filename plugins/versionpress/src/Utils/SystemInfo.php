@@ -46,7 +46,7 @@ class SystemInfo
         $process->run();
 
         $info['git-binary-as-configured'] = $gitBinary;
-        $info['git-available'] = $process->getErrorOutput() === null;
+        $info['git-available'] = $process->getErrorOutput() === null || !strlen($process->getErrorOutput());
 
         if ($info['git-available'] === false) {
             $info['output'] = [
