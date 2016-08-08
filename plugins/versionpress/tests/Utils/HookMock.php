@@ -64,15 +64,12 @@ class HookMock
         }
 
         if (self::$type === HookMock::TRUE_HOOKS) {
-            $relatedFilters = isset(self::$hooks[$tag]) ? self::$hooks[$tag] : [];
-
-            ArrayUtils::stablesort($relatedFilters, function ($filter1, $filter2) {
-                return $filter1['priority'] - $filter2['priority'];
-            });
+            $relatedFilters = self::getRelatedHooks($tag, 'filters');
 
             foreach ($relatedFilters as $filter) {
                 $fn = $filter['fn'];
                 $acceptedArgs = $filter['args'];
+                $args[0] = $value;
 
                 $value = call_user_func_array($fn, array_slice($args, 0, $acceptedArgs));
             }
@@ -88,7 +85,51 @@ class HookMock
         }
 
         if (self::$type === HookMock::TRUE_HOOKS) {
-            self::$hooks[$tag][] = ['fn' => $fn, 'priority' => $priority, 'args' => $acceptedArgs];
+            self::$hooks['filters'][$tag][] = ['fn' => $fn, 'priority' => $priority, 'args' => $acceptedArgs];
         }
+    }
+
+    public static function doAction($tag, $value)
+    {
+        $args = func_get_args();
+        $args = array_slice($args, 1);
+        $args[0] = $value;
+
+        if (self::$type === HookMock::WP_MOCK) {
+            \WP_Mock::onAction($tag)->react($args);
+        }
+
+        if (self::$type === HookMock::TRUE_HOOKS) {
+            $relatedFilters = self::getRelatedHooks($tag, 'actions');
+
+            foreach ($relatedFilters as $filter) {
+                $fn = $filter['fn'];
+                $acceptedArgs = $filter['args'];
+
+                call_user_func_array($fn, array_slice($args, 0, $acceptedArgs));
+            }
+        }
+    }
+
+    public static function addAction($tag, $fn, $priority = 10, $acceptedArgs = 1)
+    {
+        if (self::$type === HookMock::WP_MOCK) {
+            \WP_Mock::onActionAdded($tag)->react($fn, (int)$priority, (int)$acceptedArgs);
+        }
+
+        if (self::$type === HookMock::TRUE_HOOKS) {
+            self::$hooks['actions'][$tag][] = ['fn' => $fn, 'priority' => $priority, 'args' => $acceptedArgs];
+        }
+    }
+
+    private static function getRelatedHooks($tag, $hookType)
+    {
+        $relatedHooks = isset(self::$hooks[$hookType][$tag]) ? self::$hooks[$hookType][$tag] : [];
+
+        ArrayUtils::stablesort($relatedHooks, function ($hook1, $hook2) {
+            return $hook1['priority'] - $hook2['priority'];
+        });
+
+        return $relatedHooks;
     }
 }
