@@ -8,7 +8,6 @@ use PHPUnit_Framework_Assert;
 use VersionPress\ChangeInfos\BulkChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
-use VersionPress\ChangeInfos\ChangeInfoMatcher;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\Database\DbSchemaInfo;

@@ -37,5 +37,4 @@ class WordPressMissingFunctions
             return call_user_func_array('do_action', $args);
         });
     }
-
 }

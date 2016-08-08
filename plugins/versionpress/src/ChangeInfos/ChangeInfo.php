@@ -11,7 +11,7 @@ use VersionPress\Git\CommitMessage;
  * {@link VersionPress\ChangeInfos\EntityChangeInfo}s the initiator is usually some
  * {@link VersionPress\Storages\Storage}). The ChangeInfo is then persisted to a commit message by {@link Committer}
  * and later reconstructed from it again when the main VersionPress table is being displayed (see admin/index.php
- * and {@link VersionPress\ChangeInfos\ChangeInfoMatcher}).
+ * and {@link VersionPress\ChangeInfos\ChangeInfoFactory}).
  *
  * There are two main classes of ChangeInfo objects: tracked and untracked ones, and the tracked change infos
  * further have many specific types to represent various actions (for instance, post changes display different
