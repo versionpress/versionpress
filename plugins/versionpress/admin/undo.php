@@ -1,5 +1,5 @@
 <?php
-use VersionPress\ChangeInfos\ChangeInfoMatcher;
+use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
@@ -13,10 +13,12 @@ global $versionPressContainer;
 $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
 /** @var Reverter $reverter */
 $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
+/** @var ChangeInfoFactory $changeInfoFactory */
+$changeInfoFactory = $versionPressContainer->resolve(VersionPressServices::CHANGEINFO_FACTORY);
 
 $canRevert = $reverter->canRevert();
 $commit = $repository->getCommit($_GET['commit']);
-$changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
+$changeInfo = $changeInfoFactory->buildChangeInfoEnvelopeFromCommitMessage($commit->getMessage());
 
 $method = $_GET['method'];
 
