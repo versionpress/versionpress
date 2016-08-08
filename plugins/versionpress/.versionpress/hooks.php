@@ -485,4 +485,4 @@ add_filter('vp_action_description_versionpress', function ($message, $action, $c
     }
 
     return $message;
-});
+}, 10, 3);

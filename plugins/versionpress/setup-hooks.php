@@ -49,8 +49,7 @@ if (!VersionPress::isActive() && is_file(VERSIONPRESS_PLUGIN_DIR . '/.abort-init
 
 
 if (VersionPress::isActive()) {
-    vp_register_hooks();
-
+    add_action('init', 'vp_register_hooks');
 
 //----------------------------------
 // Replacing wpdb
@@ -103,21 +102,19 @@ function vp_register_hooks()
 
 
 
-    add_action('init', function () {
-        if (!function_exists('get_plugins')) {
-            require_once ABSPATH . 'wp-admin/includes/plugin.php';
-        }
+    if (!function_exists('get_plugins')) {
+        require_once ABSPATH . 'wp-admin/includes/plugin.php';
+    }
 
-        $plugins = wp_get_active_and_valid_plugins();
+    $plugins = wp_get_active_and_valid_plugins();
 
-        foreach ($plugins as $pluginFile) {
-            $pluginDir = dirname($pluginFile);
-            $hooksFile = $pluginDir . '/.versionpress/hooks.php';
-            if (file_exists($hooksFile)) {
-                require_once $hooksFile;
-            }
+    foreach ($plugins as $pluginFile) {
+        $pluginDir = dirname($pluginFile);
+        $hooksFile = $pluginDir . '/.versionpress/hooks.php';
+        if (file_exists($hooksFile)) {
+            require_once $hooksFile;
         }
-    });
+    }
 
     /**
      *  Hook for saving taxonomies into files
@@ -186,7 +183,7 @@ function vp_register_hooks()
         }
 
         $pluginsBeforeInstallation = get_plugins();
-        $postInstallHook = function ($_, $hook_extra) use ($pluginsBeforeInstallation, $committer, &$postInstallHook) {
+        $postInstallHook = function ($_, $hook_extra) use ($pluginsBeforeInstallation, &$postInstallHook) {
             if (!($hook_extra['type'] === 'plugin' && $hook_extra['action'] === 'install')) {
                 return;
             }
@@ -546,20 +543,6 @@ function vp_register_hooks()
     if (!function_exists('get_plugins')) {
         require_once ABSPATH . 'wp-admin/includes/plugin.php';
     }
-
-    foreach (get_plugins() as $pluginFile => $plugin) {
-        $pluginDir = dirname($pluginFile);
-        if ($pluginDir === '') {
-            continue;
-        }
-
-        $hooksPath = WP_PLUGIN_DIR . '/' . $pluginDir . '/.versionpress/hooks.php';
-
-        if (file_exists($hooksPath)) {
-            require_once $hooksPath;
-        }
-    }
-
 
     register_shutdown_function([$committer, 'commit']);
 }
