@@ -234,7 +234,14 @@ class PostsSynchronizerTest extends SynchronizerTestCase
     {
         $this->createPostWithShortcode();
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
-        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+
+        $synchronizationTasks = [Synchronizer::SYNCHRONIZE_EVERYTHING];
+        while (count($synchronizationTasks)) {
+            $task = array_shift($synchronizationTasks);
+            $remainingTasks = $this->synchronizer->synchronize($task);
+            $synchronizationTasks = array_merge($synchronizationTasks, $remainingTasks);
+        }
+
         DBAsserter::assertFilesEqualDatabase();
 
         $this->deletePost();

@@ -3,6 +3,8 @@
 namespace VersionPress\Tests\GitRepositoryTests;
 
 use VersionPress\Cli\VPCommandUtils;
+use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\GitRepository;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Utils\FileSystem;
@@ -50,7 +52,7 @@ class RevertTest extends \PHPUnit_Framework_TestCase
         $this->commitFile('some-file', 'Some commit');
         $hash = self::$repository->getLastCommitHash();
 
-        $commitAsserter = new CommitAsserter(self::$repository);
+        $commitAsserter = $this->createCommitAsserter();
 
         $revertResult = self::$repository->revert($hash);
         $this->commit('Revert');
@@ -72,7 +74,7 @@ class RevertTest extends \PHPUnit_Framework_TestCase
         $this->commitFile('other-file', 'Other commit');
 
 
-        $commitAsserter = new CommitAsserter(self::$repository);
+        $commitAsserter = $this->createCommitAsserter();
 
         $revertResult = self::$repository->revert($hash);
         $this->commit('Revert');
@@ -94,7 +96,7 @@ class RevertTest extends \PHPUnit_Framework_TestCase
         $this->commitFile('some-file', 'Other commit', 'Other content');
 
 
-        $commitAsserter = new CommitAsserter(self::$repository);
+        $commitAsserter = $this->createCommitAsserter();
 
         $revertResult = self::$repository->revert($hash);
         $this->commit('Revert');
@@ -114,7 +116,7 @@ class RevertTest extends \PHPUnit_Framework_TestCase
         $this->commitFile('other-file', 'Other commit');
 
 
-        $commitAsserter = new CommitAsserter(self::$repository);
+        $commitAsserter = $this->createCommitAsserter();
 
         self::$repository->revertAll($hash);
         $this->commit('Revert all');
@@ -140,7 +142,7 @@ class RevertTest extends \PHPUnit_Framework_TestCase
         VPCommandUtils::exec('git merge test', self::$repositoryPath);
 
 
-        $commitAsserter = new CommitAsserter(self::$repository);
+        $commitAsserter = $this->createCommitAsserter();
 
         self::$repository->revertAll($hash);
         $this->commit('Revert all');
@@ -166,7 +168,7 @@ class RevertTest extends \PHPUnit_Framework_TestCase
         VPCommandUtils::exec('git merge test', self::$repositoryPath);
 
 
-        $commitAsserter = new CommitAsserter(self::$repository);
+        $commitAsserter = $this->createCommitAsserter();
 
         self::$repository->revertAll($hash);
         $this->commit('Revert all');
@@ -188,4 +190,11 @@ class RevertTest extends \PHPUnit_Framework_TestCase
         self::$repository->stageAll();
         $this->commit($commitMessage);
     }
-}
+
+    private function createCommitAsserter()
+    {
+        $dbSchemaInfo = $this->getMockBuilder(DbSchemaInfo::class)->disableOriginalConstructor()->getMock();
+        $actionsInfo = $this->getMockBuilder(ActionsInfo::class)->disableOriginalConstructor()->getMock();
+        return new CommitAsserter(self::$repository, $dbSchemaInfo, $actionsInfo);
+    }
+ }
