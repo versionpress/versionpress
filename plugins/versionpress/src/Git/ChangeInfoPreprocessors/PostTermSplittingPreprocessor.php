@@ -2,11 +2,16 @@
 
 namespace VersionPress\Git\ChangeInfoPreprocessors;
 
+use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\ChangeInfos\ChangeInfoUtils;
 use VersionPress\Utils\ArrayUtils;
 
 class PostTermSplittingPreprocessor implements ChangeInfoPreprocessor
 {
+
+    public function __construct(ChangeInfoFactory $changeInfoFactory)
+    {
+    }
 
     public function process($changeInfoList)
     {

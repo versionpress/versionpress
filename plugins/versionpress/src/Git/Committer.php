@@ -4,6 +4,7 @@ namespace VersionPress\Git;
 use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
+use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\ChangeInfoPreprocessors\ChangeInfoPreprocessor;
 use VersionPress\Git\ChangeInfoPreprocessors\EditActionChangeInfoPreprocessor;
 use VersionPress\Git\ChangeInfoPreprocessors\PostChangeInfoPreprocessor;
@@ -135,6 +136,8 @@ class Committer
      */
     private function preprocessChangeInfoList($changeInfoList)
     {
+        global $versionPressContainer;
+
         $preprocessors = [
             EditActionChangeInfoPreprocessor::class,
             PostChangeInfoPreprocessor::class,
@@ -144,7 +147,7 @@ class Committer
         $changeInfoLists = [$changeInfoList];
         foreach ($preprocessors as $preprocessorClass) {
             /** @var ChangeInfoPreprocessor $preprocessor */
-            $preprocessor = new $preprocessorClass();
+            $preprocessor = new $preprocessorClass($versionPressContainer->resolve(VersionPressServices::CHANGEINFO_FACTORY));
             $processedLists = [];
             foreach ($changeInfoLists as $changeInfoList) {
                 $processedLists = array_merge($processedLists, $preprocessor->process($changeInfoList));

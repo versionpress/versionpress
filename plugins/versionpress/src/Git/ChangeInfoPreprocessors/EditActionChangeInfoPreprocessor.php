@@ -2,10 +2,15 @@
 namespace VersionPress\Git\ChangeInfoPreprocessors;
 
 use VersionPress\ChangeInfos\ChangeInfo;
+use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 
 class EditActionChangeInfoPreprocessor implements ChangeInfoPreprocessor
 {
+
+    public function __construct(ChangeInfoFactory $changeInfoFactory)
+    {
+    }
 
     /**
      * More actions '* /edit' for same entity are replaced with one '* /edit' action.
