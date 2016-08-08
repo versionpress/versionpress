@@ -3,6 +3,7 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
 
+import Title from './Title';
 import './BulkActionPanel.less';
 
 interface BulkActionPanelProps extends React.Props<JSX.Element> {
@@ -40,7 +41,7 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
     return (
       <div className='BulkActionPanel'>
         <div className='alignleft actions bulkactions'>
-          <label htmlFor='BulkActionPanel-selector-top' className='screen-reader-text'>Select bulk action</label>
+          <Title htmlFor="BulkActionPanel-selector-top" />
           <select ref='action' name='action' id='BulkActionPanel-selector-top'>
             <option value='-1'>Bulk Actions</option>
             <option value='undo'>Undo</option>
