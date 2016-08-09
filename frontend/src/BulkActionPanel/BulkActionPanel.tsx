@@ -3,14 +3,14 @@
 
 import * as React from 'react';
 
-import './BulkActionPanel.less';
-
 import Title from './Title';
 import Options from './options/Options';
 import Submit from './Submit';
 import ClearSelection from './ClearSelection';
 
-interface BulkActionPanelProps extends React.Props<JSX.Element> {
+import './BulkActionPanel.less';
+
+interface BulkActionPanelProps {
   selectedCommits: Commit[];
   enableActions: boolean;
   onBulkAction(action: string): void;
@@ -28,14 +28,14 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
       {
         title: 'Bulk Actions',
         value: '-1',
-        isSelected: true
+        isSelected: true,
       },
       {
         title: 'Undo',
         value: 'undo',
-        isSelected: false
-      }
-    ]
+        isSelected: false,
+      },
+    ],
   };
 
   onSelectedValueChange = (newValue: string) => {
@@ -43,12 +43,12 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
       return {
         title: option.title,
         value: option.value,
-        isSelected: option.value === newValue
-      }
+        isSelected: option.value === newValue,
+      };
     });
 
     this.setState({
-      options: newOptions
+      options: newOptions,
     });
   };
 
@@ -77,10 +77,10 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
     return (
       <div className='BulkActionPanel'>
         <div className='alignleft actions bulkactions'>
-          <Title htmlFor="BulkActionPanel-selector-top" />
+          <Title htmlFor='BulkActionPanel-selector-top' />
           <Options
             options={options}
-            id="BulkActionPanel-selector-top"
+            id='BulkActionPanel-selector-top'
             onChange={this.onSelectedValueChange}
           />
           <Submit

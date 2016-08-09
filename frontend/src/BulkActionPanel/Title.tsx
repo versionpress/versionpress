@@ -7,7 +7,7 @@ interface TitleProps {
 const Title: React.StatelessComponent<TitleProps> = ({ htmlFor }) => (
   <label
     htmlFor={htmlFor}
-    className="screen-reader-text"
+    className='screen-reader-text'
   >
     Select bulk action
   </label>

@@ -9,7 +9,7 @@ interface ClearSelectionProps {
 const ClearSelection: React.StatelessComponent<ClearSelectionProps> = ({ changes, onClick }) => {
   const noteClassName = classNames({
     'BulkActionPanel-note': true,
-    'hide': changes === 0
+    'hide': changes === 0,
   });
 
   return (
@@ -25,6 +25,6 @@ const ClearSelection: React.StatelessComponent<ClearSelectionProps> = ({ changes
       {')'}
     </div>
   );
-}
+};
 
 export default ClearSelection;

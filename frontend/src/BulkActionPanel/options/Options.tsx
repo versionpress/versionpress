@@ -19,7 +19,7 @@ export default class Options extends React.Component<OptionsProps, {}> {
 
     return (
       <select
-        name="action"
+        name='action'
         id={id}
         onChange={this.onChange}
       >
