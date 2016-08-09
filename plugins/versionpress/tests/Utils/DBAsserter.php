@@ -71,7 +71,7 @@ class DBAsserter
             'list',
             ['format' => 'json', 'fields' => 'name']
         );
-        $taxonomies = ArrayUtils::column(json_decode($rawTaxonomies, true), 'name');
+        $taxonomies = array_column(json_decode($rawTaxonomies, true), 'name');
 
         $dbHost = self::$testConfig->testSite->dbHost;
         $dbUser = self::$testConfig->testSite->dbUser;
@@ -354,7 +354,7 @@ class DBAsserter
             'list',
             ['format' => 'json', 'fields' => 'name']
         );
-        $taxonomies = ArrayUtils::column(json_decode($rawTaxonomies, true), 'name');
+        $taxonomies = array_column(json_decode($rawTaxonomies, true), 'name');
         $wp_taxonomies = array_combine($taxonomies, $taxonomies);
     }
 

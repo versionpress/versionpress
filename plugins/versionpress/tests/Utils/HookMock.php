@@ -100,11 +100,11 @@ class HookMock
         }
 
         if (self::$type === HookMock::TRUE_HOOKS) {
-            $relatedFilters = self::getRelatedHooks($tag, 'actions');
+            $relatedHooks = self::getRelatedHooks($tag, 'actions');
 
-            foreach ($relatedFilters as $filter) {
-                $fn = $filter['fn'];
-                $acceptedArgs = $filter['args'];
+            foreach ($relatedHooks as $hook) {
+                $fn = $hook['fn'];
+                $acceptedArgs = $hook['args'];
 
                 call_user_func_array($fn, array_slice($args, 0, $acceptedArgs));
             }

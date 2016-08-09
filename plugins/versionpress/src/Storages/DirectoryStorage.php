@@ -185,7 +185,7 @@ class DirectoryStorage extends Storage
                 return $item !== false;
             })
         );
-        $vpIds = ArrayUtils::column($entities, $this->entityInfo->vpidColumnName);
+        $vpIds = array_column($entities, $this->entityInfo->vpidColumnName);
         return array_combine($vpIds, $entities);
     }
 

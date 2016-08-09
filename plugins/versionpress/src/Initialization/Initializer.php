@@ -231,7 +231,7 @@ class Initializer
         $chunks = array_chunk($entities, 1000);
 
         foreach ($chunks as $entitiesInChunk) {
-            $wordpressIds = ArrayUtils::column($entitiesInChunk, $idColumnName);
+            $wordpressIds = array_column($entitiesInChunk, $idColumnName);
             $idPairs = [];
 
             foreach ($wordpressIds as $id) {

@@ -97,14 +97,14 @@ class OptionsSynchronizer implements Synchronizer
         $deleteSql = "DELETE FROM {$this->tableName} WHERE NOT ($restriction)";
 
         if (count($options) > 0) {
-            $updatedOptionNames = ArrayUtils::column($options, 'option_name');
+            $updatedOptionNames = array_column($options, 'option_name');
             $restrictionForUpdatedOptions = "\"" . join('", "', $updatedOptionNames) . "\"";
 
             $deleteSql .= " AND option_name NOT IN ($restrictionForUpdatedOptions)";
         }
 
         if ($entitiesToSynchronize) {
-            $synchronizedOptions = ArrayUtils::column($entitiesToSynchronize, 'vp_id');
+            $synchronizedOptions = array_column($entitiesToSynchronize, 'vp_id');
             $restrictionForBasicSet = "\"" . join('", "', $synchronizedOptions) . "\"";
             $deleteSql .= " AND option_name IN ($restrictionForBasicSet)";
         }

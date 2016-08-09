@@ -552,7 +552,7 @@ abstract class SynchronizerBase implements Synchronizer
             ARRAY_N
         );
         $result[] = [0, 0];
-        return array_combine(ArrayUtils::column($result, 0), ArrayUtils::column($result, 1));
+        return array_combine(array_column($result, 0), array_column($result, 1));
     }
 
     //--------------------------------------

@@ -486,19 +486,17 @@ class GitRepository
      *
      * @param string $command E.g., 'git log' or 'git add %s' (path will be shell-escaped) or just 'log'
      *   (the "git " part is optional).
-     * @param string $args Will be shell-escaped and replace sprintf markers in $command
+     * @param string[] $args Will be shell-escaped and replace sprintf markers in $command
      * @return array array('stdout' => , 'stderr' => )
      */
-    private function runShellCommand($command, $args = '')
+    private function runShellCommand($command, ...$args)
     {
 
         // replace (optional) "git " with the configured git binary
         $command = Strings::startsWith($command, "git ") ? substr($command, 4) : $command;
         $command = escapeshellarg($this->gitBinary) . " " . $command;
 
-        $functionArgs = func_get_args();
-        array_shift($functionArgs); // Remove $command
-        $escapedArgs = @array_map("escapeshellarg", $functionArgs);
+        $escapedArgs = @array_map("escapeshellarg", $args);
         $commandWithArguments = vsprintf($command, $escapedArgs);
 
         $result = $this->runProcess($commandWithArguments);
