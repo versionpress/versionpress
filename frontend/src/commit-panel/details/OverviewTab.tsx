@@ -1,14 +1,14 @@
 import * as React from 'react';
 
-interface CommitPanelOverviewProps extends React.Props<JSX.Element> {
+interface OverviewTabProps {
   gitStatus: VpApi.GetGitStatusResponse;
 }
 
-interface CommitPanelOverviewState {
+interface OverviewTabState {
   isExpanded: boolean;
 }
 
-export default class Overview extends React.Component<CommitPanelOverviewProps, CommitPanelOverviewState> {
+export default class OverviewTab extends React.Component<OverviewTabProps, OverviewTabState> {
 
   state = {
     isExpanded: false,

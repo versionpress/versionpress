@@ -3,8 +3,8 @@ import * as classNames from 'classnames';
 
 import { DetailsLevel } from '../../enums/enums';
 
-import Diff from './Diff';
-import Overview from './Overview';
+import DiffTab from './DiffTab';
+import OverviewTab from './OverviewTab';
 import Loader from './Loader';
 import Error from './Error';
 
@@ -64,8 +64,8 @@ export default class Details extends React.Component<DetailsProps, {}> {
         {error
           ? <Error error={error} />
           : detailsLevel === DetailsLevel.Overview
-            ? <Overview gitStatus={gitStatus} />
-            : <Diff diff={diff} />
+            ? <OverviewTab gitStatus={gitStatus} />
+            : <DiffTab diff={diff} />
         }
       </div>
     );
