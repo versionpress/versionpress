@@ -8,7 +8,7 @@ interface CommitPanelOverviewState {
   isExpanded: boolean;
 }
 
-export default class CommitPanelOverview extends React.Component<CommitPanelOverviewProps, CommitPanelOverviewState> {
+export default class Overview extends React.Component<CommitPanelOverviewProps, CommitPanelOverviewState> {
 
   state = {
     isExpanded: false,
