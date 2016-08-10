@@ -1,8 +1,10 @@
 import * as React from 'react';
 
-interface CommitPanelNoticeProps extends React.Props<JSX.Element> {
-  onDetailsLevelChange: (detailsLevel: string) => any;
-  detailsLevel: string;
+import { DetailsLevel } from '../enums/enums';
+
+interface CommitPanelNoticeProps {
+  onDetailsLevelChange(detailsLevel: DetailsLevel): void;
+  detailsLevel: DetailsLevel;
 }
 
 export default class CommitPanelNotice extends React.Component<CommitPanelNoticeProps, {}> {
@@ -11,10 +13,12 @@ export default class CommitPanelNotice extends React.Component<CommitPanelNotice
     e.preventDefault();
 
     const { detailsLevel, onDetailsLevelChange } = this.props;
-    onDetailsLevelChange(detailsLevel === 'none' ? 'overview' : 'none');
+    onDetailsLevelChange(detailsLevel === DetailsLevel.None ? DetailsLevel.Overview : DetailsLevel.None);
   };
 
   render() {
+    const { detailsLevel } = this.props;
+
     return (
       <p>
         You have {' '}
@@ -23,7 +27,7 @@ export default class CommitPanelNotice extends React.Component<CommitPanelNotice
         >uncommitted changes</a>
         {' '} in your WordPress directory. {' '}
         <a className='CommitPanel-notice-toggle' onClick={this.onDetailsClick}>
-          Click here to {this.props.detailsLevel === 'none' ? 'show' : 'hide'} changes.
+          Click here to {detailsLevel === DetailsLevel.None ? 'show' : 'hide'} changes.
         </a>
       </p>
     );
