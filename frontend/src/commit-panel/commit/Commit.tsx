@@ -1,17 +1,17 @@
 import * as React from 'react';
 
-import * as portal from '../common/portal';
+import * as portal from '../../common/portal';
 
-interface CommitPanelCommitProps extends React.Props<JSX.Element> {
+interface CommitProps {
   onCommit: (message: string) => any;
   onDiscard: () => any;
 }
 
-interface CommitPanelCommitState {
+interface CommitState {
   isFormVisible: boolean;
 }
 
-export default class CommitPanelCommit extends React.Component<CommitPanelCommitProps, CommitPanelCommitState> {
+export default class Commit extends React.Component<CommitProps, CommitState> {
 
   state = {
     isFormVisible: false,

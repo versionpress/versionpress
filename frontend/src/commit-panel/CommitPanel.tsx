@@ -3,7 +3,7 @@ import * as classNames from 'classnames';
 
 import { DetailsLevel } from '../enums/enums';
 
-import CommitPanelCommit from './CommitPanelCommit.react';
+import Commit from './commit/Commit';
 import Notice from './Notice';
 import Details from './details/Details';
 
@@ -81,6 +81,7 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
   };
 
   render() {
+    const { onCommit, onDiscard } = this.props;
     const { detailsLevel } = this.state;
 
     const noticeClassName = classNames({
@@ -96,9 +97,9 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
             detailsLevel={detailsLevel}
           />
           {detailsLevel !== DetailsLevel.None
-            ? <CommitPanelCommit
-                onCommit={this.props.onCommit}
-                onDiscard={this.props.onDiscard}
+            ? <Commit
+                onCommit={onCommit}
+                onDiscard={onDiscard}
               />
             : null
           }

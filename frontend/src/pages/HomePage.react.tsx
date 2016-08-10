@@ -9,7 +9,7 @@ import * as classNames from 'classnames';
 import update = require('react-addons-update');
 
 import BulkActionPanel from '../BulkActionPanel/BulkActionPanel.react';
-import CommitPanel from '../CommitPanel/CommitPanel.react';
+import CommitPanel from '../commit-panel/CommitPanel';
 import CommitsTable from '../Commits/CommitsTable.react';
 import Filter from '../Filter/Filter.react';
 import FlashMessage from '../common/FlashMessage.react';
