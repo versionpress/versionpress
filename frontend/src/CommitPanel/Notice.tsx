@@ -7,7 +7,7 @@ interface CommitPanelNoticeProps {
   detailsLevel: DetailsLevel;
 }
 
-export default class CommitPanelNotice extends React.Component<CommitPanelNoticeProps, {}> {
+export default class Notice extends React.Component<CommitPanelNoticeProps, {}> {
 
   onDetailsClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -21,13 +21,19 @@ export default class CommitPanelNotice extends React.Component<CommitPanelNotice
 
     return (
       <p>
-        You have {' '}
+        {`You have `}
         <a
-          href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback#uncommitted-files' target='_blank'
-        >uncommitted changes</a>
-        {' '} in your WordPress directory. {' '}
-        <a className='CommitPanel-notice-toggle' onClick={this.onDetailsClick}>
-          Click here to {detailsLevel === DetailsLevel.None ? 'show' : 'hide'} changes.
+          href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback#uncommitted-files'
+          target='_blank'
+        >
+          uncommitted changes
+        </a>
+        {` in your WordPress directory. `}
+        <a
+          className='CommitPanel-notice-toggle'
+          onClick={this.onDetailsClick}
+        >
+          {`Click here to ${detailsLevel === DetailsLevel.None ? 'show' : 'hide'} changes.`}
         </a>
       </p>
     );

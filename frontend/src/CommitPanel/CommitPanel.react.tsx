@@ -4,7 +4,7 @@ import * as classNames from 'classnames';
 import { DetailsLevel } from '../enums/enums';
 
 import CommitPanelCommit from './CommitPanelCommit.react';
-import CommitPanelNotice from './CommitPanelNotice.react';
+import Notice from './Notice';
 import CommitPanelDetails from './CommitPanelDetails.react';
 import CommitPanelOverview from './CommitPanelOverview.react';
 
@@ -153,7 +153,7 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
     return (
       <div className='CommitPanel'>
         <div className={noticeClassName}>
-          <CommitPanelNotice
+          <Notice
             onDetailsLevelChange={this.onChangeDetailsLevel}
             detailsLevel={detailsLevel}
           />
