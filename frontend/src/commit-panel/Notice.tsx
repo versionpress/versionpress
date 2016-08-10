@@ -3,8 +3,8 @@ import * as React from 'react';
 import { DetailsLevel } from '../enums/enums';
 
 interface CommitPanelNoticeProps {
-  onDetailsLevelChange(detailsLevel: DetailsLevel): void;
   detailsLevel: DetailsLevel;
+  onDetailsLevelChange(detailsLevel: DetailsLevel): void;
 }
 
 export default class Notice extends React.Component<CommitPanelNoticeProps, {}> {

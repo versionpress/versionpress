@@ -5,6 +5,8 @@ import { DetailsLevel } from '../../enums/enums';
 
 import Diff from './Diff';
 import Overview from './Overview';
+import Loader from './Loader';
+import Error from './Error';
 
 interface DetailsProps {
   detailsLevel: DetailsLevel;
@@ -16,14 +18,6 @@ interface DetailsProps {
 }
 
 export default class Details extends React.Component<DetailsProps, {}> {
-
-  private renderError() {
-    return (
-      <div className='CommitPanel-error'>
-        <p>{this.props.error}</p>
-      </div>
-    );
-  }
 
   private renderToggle() {
     const { detailsLevel, onDetailsLevelChange } = this.props;
@@ -59,20 +53,19 @@ export default class Details extends React.Component<DetailsProps, {}> {
       'CommitPanel-details': true,
       'loading': isLoading,
     });
-    const content = detailsLevel === DetailsLevel.Overview
-      ? <Overview gitStatus={gitStatus} />
-      : <Diff diff={diff} />;
 
     return (
       <div className={detailsClassName}>
         {this.renderToggle()}
         {isLoading
-          ? <div className='CommitPanel-details-loader'></div>
+          ? <Loader />
           : null
         }
         {error
-          ? this.renderError()
-          : content
+          ? <Error error={error} />
+          : detailsLevel === DetailsLevel.Overview
+            ? <Overview gitStatus={gitStatus} />
+            : <Diff diff={diff} />
         }
       </div>
     );
