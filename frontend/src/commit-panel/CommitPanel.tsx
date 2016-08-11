@@ -19,7 +19,7 @@ interface CommitPanelProps {
 interface CommitPanelState {
   detailsLevel?: DetailsLevel;
   diff?: string;
-  gitStatus?: string[][];
+  gitStatus?: VpApi.GetGitStatusResponse;
   error?: string;
   isLoading?: boolean;
 }

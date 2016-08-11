@@ -1,5 +1,8 @@
 import * as React from 'react';
 
+import OverviewLine from './OverviewLine';
+import OverviewShowMore from './OverviewShowMore';
+
 interface OverviewTabProps {
   gitStatus: VpApi.GetGitStatusResponse;
 }
@@ -24,16 +27,6 @@ export default class OverviewTab extends React.Component<OverviewTabProps, Overv
     });
   };
 
-  private getActionVerb(action: string) {
-    if (action === 'M') {
-      return 'Modified';
-    } else if (action === '??' || action === 'A' || action === 'AM') {
-      return 'Added';
-    } else if (action === 'D') {
-      return 'Deleted';
-    }
-  }
-
   render() {
     const { gitStatus } = this.props;
     const { isExpanded } = this.state;
@@ -49,22 +42,20 @@ export default class OverviewTab extends React.Component<OverviewTabProps, Overv
     return (
       <div className='CommitPanel-overview'>
         <ul>
-          {lines.map(line => {
+          {lines.map((line, i) => {
             return (
-              <li>
-                <strong>{this.getActionVerb(line[0])}</strong>
-                <span>{line[1]}</span>
-              </li>
+              <OverviewLine
+                actionShortcut={line[0]}
+                info={line[1]}
+                key={i}
+              />
             );
           })}
-          {gitStatus.length > displayedListLength && !isExpanded
-            ? (
-              <li>
-                <a onClick={this.onShowMoreClick}>
-                  show {gitStatus.length - displayedListLength} more...
-                </a>
-              </li>
-            ) : null
+          {(gitStatus.length > displayedListLength && !isExpanded) &&
+            <OverviewShowMore
+              displayNumber={gitStatus.length - displayedListLength}
+              onClick={this.onShowMoreClick}
+            />
           }
         </ul>
       </div>

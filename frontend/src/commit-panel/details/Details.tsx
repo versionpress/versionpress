@@ -12,7 +12,7 @@ import Error from './Error';
 interface DetailsProps {
   detailsLevel: DetailsLevel;
   diff: string;
-  gitStatus: string[][];
+  gitStatus: VpApi.GetGitStatusResponse;
   error: string;
   isLoading: boolean;
   onDetailsLevelChange(detailsLevel: DetailsLevel): void;
