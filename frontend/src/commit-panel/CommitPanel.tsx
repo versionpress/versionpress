@@ -96,12 +96,11 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
             onDetailsLevelChange={this.onDetailsLevelChange}
             detailsLevel={detailsLevel}
           />
-          {detailsLevel !== DetailsLevel.None
-            ? <Commit
-                onCommit={onCommit}
-                onDiscard={onDiscard}
-              />
-            : null
+          {detailsLevel !== DetailsLevel.None &&
+            <Commit
+              onCommit={onCommit}
+              onDiscard={onDiscard}
+            />
           }
         </div>
         <Details

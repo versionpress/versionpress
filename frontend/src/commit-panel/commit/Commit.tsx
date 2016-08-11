@@ -56,10 +56,13 @@ export default class Commit extends React.Component<CommitProps, CommitState> {
   onDiscardClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    const body = <div>This action cannot be undone, are you sure?</div>;
-    const options = { okButtonText: 'Proceed' };
-
-    portal.confirmDialog('Warning', body, this.props.onDiscard, () => {}, options);
+    portal.confirmDialog(
+      'Warning',
+      <div>This action cannot be undone, are you sure?</div>,
+      this.props.onDiscard,
+      () => {},
+      { okButtonText: 'Proceed' }
+    );
   };
 
   render() {
