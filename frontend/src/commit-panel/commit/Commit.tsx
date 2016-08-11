@@ -1,10 +1,11 @@
 import * as React from 'react';
 
 import * as portal from '../../common/portal';
+import Buttons from './Buttons';
 
 interface CommitProps {
-  onCommit: (message: string) => any;
-  onDiscard: () => any;
+  onCommit(message: string): void;
+  onDiscard(): void;
 }
 
 interface CommitState {
@@ -27,20 +28,21 @@ export default class Commit extends React.Component<CommitProps, CommitState> {
     }
   };
 
-  onDiscard = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const body = <div>This action cannot be undone, are you sure?</div>;
-    const options = { okButtonText: 'Proceed' };
-
-    portal.confirmDialog('Warning', body, this.props.onDiscard, () => {}, options);
-  };
-
   onCommitClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
     this.setState({
       isFormVisible: true,
     });
+  };
+
+  onDiscardClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    const body = <div>This action cannot be undone, are you sure?</div>;
+    const options = { okButtonText: 'Proceed' };
+
+    portal.confirmDialog('Warning', body, this.props.onDiscard, () => {}, options);
   };
 
   onCancelCommitClick = (e: React.MouseEvent) => {
@@ -50,21 +52,6 @@ export default class Commit extends React.Component<CommitProps, CommitState> {
       isFormVisible: false,
     });
   };
-
-  private renderButtons() {
-    return (
-      <div className='CommitPanel-commit'>
-        <a
-          className='button button-primary CommitPanel-commit-button'
-          onClick={this.onCommitClick}
-        >Commit changes</a>
-        <a
-          className='button CommitPanel-commit-button'
-          onClick={this.onDiscard}
-        >Discard changes</a>
-      </div>
-    );
-  }
 
   private renderForm() {
     return (
@@ -95,7 +82,10 @@ export default class Commit extends React.Component<CommitProps, CommitState> {
   render() {
     return this.state.isFormVisible
       ? this.renderForm()
-      : this.renderButtons();
+      : <Buttons
+          onCommitClick={this.onCommitClick}
+          onDiscardClick={this.onDiscardClick}
+        />;
   }
 
 }
