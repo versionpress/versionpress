@@ -3,6 +3,7 @@ import * as classNames from 'classnames';
 
 import { DetailsLevel } from '../../enums/enums';
 
+import ToggleButtons from './ToggleButtons';
 import DiffTab from './DiffTab';
 import OverviewTab from './OverviewTab';
 import Loader from './Loader';
@@ -19,31 +20,15 @@ interface DetailsProps {
 
 export default class Details extends React.Component<DetailsProps, {}> {
 
-  private renderToggle() {
-    const { detailsLevel, onDetailsLevelChange } = this.props;
-
-    if (detailsLevel === DetailsLevel.None) {
-      return null;
-    }
-
-    return (
-      <div className='CommitPanel-details-buttons'>
-        <button
-          className='button'
-          disabled={detailsLevel === DetailsLevel.Overview}
-          onClick={() => onDetailsLevelChange(DetailsLevel.Overview)}
-        >Overview</button>
-        <button
-          className='button'
-          disabled={detailsLevel === DetailsLevel.FullDiff}
-          onClick={() => onDetailsLevelChange(DetailsLevel.FullDiff)}
-        >Full diff</button>
-      </div>
-    );
-  }
-
   render() {
-    const { detailsLevel, diff, gitStatus, error, isLoading } = this.props;
+    const {
+      detailsLevel,
+      diff,
+      gitStatus,
+      error,
+      isLoading,
+      onDetailsLevelChange,
+    } = this.props;
 
     if (!error && detailsLevel === DetailsLevel.None) {
       return null;
@@ -56,11 +41,11 @@ export default class Details extends React.Component<DetailsProps, {}> {
 
     return (
       <div className={detailsClassName}>
-        {this.renderToggle()}
-        {isLoading
-          ? <Loader />
-          : null
-        }
+        <ToggleButtons
+          detailsLevel={detailsLevel}
+          onDetailsLevelChange={onDetailsLevelChange}
+        />
+        {isLoading && <Loader />}
         {error
           ? <Error error={error} />
           : detailsLevel === DetailsLevel.Overview
