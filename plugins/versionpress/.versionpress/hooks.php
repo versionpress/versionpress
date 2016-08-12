@@ -304,6 +304,21 @@ add_filter('vp_meta_entity_tags_postmeta', function ($tags, $oldEntity, $newEnti
     return $tags;
 }, 10, 6);
 
+add_filter('vp_meta_entity_files_postmeta', function ($files, $oldEntity, $newEntity, $oldParentEntity, $newParentEntity) {
+
+    $postType = isset($newParentEntity['post_type']) ? $newParentEntity['post_type'] : $oldParentEntity['post_type'];
+
+    if ($postType !== "attachment") {
+        return $files;
+    }
+
+    $uploadDir = wp_upload_dir();
+    $files[] = ["type" => "path", "path" => path_join($uploadDir['basedir'], '*')];
+
+    return $files;
+}, 10, 5);
+
+
 add_filter('vp_action_description_postmeta', function ($message, $action, $vpid, $tags) {
 
     if ($tags['VP-PostMeta-Key'] === "_thumbnail_id") { // featured image
