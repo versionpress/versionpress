@@ -56,7 +56,9 @@ term:
     VP-Term-OldName: /
     VP-Term-Taxonomy: /
   actions:
-    create: New %VP-Term-Taxonomy% '%VP-Term-Name%'
+    create:
+      message: New %VP-Term-Taxonomy% '%VP-Term-Name%'
+      priority: 9
     delete: Deleted %VP-Term-Taxonomy% '%VP-Term-Name%'
     rename: %VP-Term-Taxonomy% '%VP-Term-OldName%' renamed to '%VP-Term-Name%'
     edit:
