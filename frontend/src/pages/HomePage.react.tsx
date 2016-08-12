@@ -16,7 +16,7 @@ import FlashMessage from '../common/FlashMessage.react';
 import ProgressBar from '../common/ProgressBar.react';
 import ServicePanel from '../ServicePanel/ServicePanel.react';
 import ServicePanelButton from '../ServicePanel/ServicePanelButton.react';
-import WelcomePanel from '../WelcomePanel/WelcomePanel.react';
+import WelcomePanel from '../welcome-panel/WelcomePanel';
 import * as revertDialog from '../Commits/revertDialog';
 import * as WpApi from '../services/WpApi';
 import {indexOf} from '../Commits/CommitUtils';
@@ -394,7 +394,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     revertDialog.revertDialog.call(this, title, () => this.rollbackToCommit(hash));
   };
 
-  onWelcomePanelHide = (e) => {
+  onWelcomePanelHide = (e: React.MouseEvent) => {
     e.preventDefault();
 
     this.setState({
@@ -467,9 +467,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             />
           : null
         }
-        {this.state.displayWelcomePanel
-          ? <WelcomePanel onHide={this.onWelcomePanelHide} />
-          : null
+        {this.state.displayWelcomePanel &&
+          <WelcomePanel onHide={this.onWelcomePanelHide} />
         }
         {this.state.displayUpdateNotice
           ? <div className='updateNotice'>
