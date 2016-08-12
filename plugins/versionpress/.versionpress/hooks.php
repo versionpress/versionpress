@@ -469,7 +469,7 @@ add_filter('vp_action_description_versionpress', function ($message, $action, $c
         return $message;
     }
 
-    global $versionPressContainer; // temporary solution todo: find better way to pass the dependency
+    global $versionPressContainer;
     /** @var GitRepository $gitRepository */
     $gitRepository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
     /** @var ChangeInfoFactory $changeInfoFactory */

@@ -168,11 +168,6 @@ theme:
     switch: Theme switched to '%VP-Theme-Name%'
     delete: Deleted theme '%VP-Theme-Name%'
 
-revert:
-  actions:
-    undo: Reverted change "%/commit-message/%"
-    rollback: Rollback to the same state as of %/commit-date/%
-
 wordpress:
   actions:
     update: WordPress updated to version %VPID%
@@ -194,3 +189,5 @@ versionpress:
     activate: Activated VersionPress %VPID%
     update: Updated to VersionPress %VPID%
     deactivate: Deactivated VersionPress
+    undo: Reverted change "%/commit-message/%"
+    rollback: Rollback to the same state as of %/commit-date/%
