@@ -39,6 +39,11 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
     public function prepare_createComment()
     {
         $this->loginIfNecessary();
+        if (!$this->testPostId) {
+            $allPostIds = json_decode(self::$wpAutomation->runWpCliCommand('post', 'list', ['fields' => 'ID', 'format' => 'json']));
+
+            $this->testPostId = end($allPostIds)->ID;
+        }
     }
 
     public function createComment()
@@ -98,6 +103,7 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
     private function createNewComment()
     {
         $this->url('?p=' . $this->testPostId);
+        $this->byId('comment')->click();
         $this->byCssSelector('#comment')->value("Comment by admin");
         $this->byCssSelector('#submit')->click();
         $this->waitAfterRedirect();

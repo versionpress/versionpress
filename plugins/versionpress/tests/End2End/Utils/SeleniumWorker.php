@@ -141,6 +141,8 @@ class SeleniumWorker implements ITestWorker
 
     protected function loginIfNecessary()
     {
+        $this->session->currentWindow()->maximize();
+
         if ($this->elementExists('#wpadminbar')) {
             return;
         }
