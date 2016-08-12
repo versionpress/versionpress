@@ -14,8 +14,7 @@ import CommitsTable from '../Commits/CommitsTable.react';
 import Filter from '../Filter/Filter.react';
 import FlashMessage from '../common/FlashMessage.react';
 import ProgressBar from '../common/ProgressBar.react';
-import ServicePanel from '../ServicePanel/ServicePanel.react';
-import ServicePanelButton from '../ServicePanel/ServicePanelButton.react';
+import ServicePanel from '../service-panel/ServicePanel';
 import WelcomePanel from '../welcome-panel/WelcomePanel';
 import * as revertDialog from '../Commits/revertDialog';
 import * as WpApi from '../services/WpApi';
@@ -451,13 +450,14 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     return (
       <div className={homePageClassName}>
         <ProgressBar ref='progress' />
-        <ServicePanelButton onClick={this.onServicePanelClick} />
-        <h1 className='vp-header'>VersionPress</h1>
+        <ServicePanel
+          isVisible={this.state.displayServicePanel}
+          onButtonClick={this.onServicePanelClick}
+        />
         {this.state.message
           ? <FlashMessage {...this.state.message} />
           : null
         }
-        <ServicePanel isVisible={this.state.displayServicePanel} />
         {this.state.isDirtyWorkingDirectory
           ? <CommitPanel
               diffProvider={{ getDiff: this.getDiff }}
