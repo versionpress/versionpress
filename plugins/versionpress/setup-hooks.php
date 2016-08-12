@@ -244,13 +244,6 @@ function vp_register_hooks()
         do_action('vp_theme_changed', 'switch', $stylesheet, $themeName);
     });
 
-
-    add_action('wp_ajax_save-widget', function () use ($committer) {
-        if (defined('DOING_AJAX') && DOING_AJAX && isset($_POST['delete_widget']) && $_POST['delete_widget']) {
-            $committer->postponeCommit('widgets');
-        }
-    }, 0); // zero because the default WP action with priority 1 calls wp_die()
-
     function _vp_get_language_name_by_code($code)
     {
         require_once(ABSPATH . 'wp-admin/includes/translation-install.php');
@@ -429,10 +422,6 @@ function vp_register_hooks()
     //----------------------------------------
 
     $requestDetector = new \VersionPress\Utils\RequestDetector();
-
-    if (defined('DOING_AJAX') && DOING_AJAX && isset($_REQUEST['action']) && $_REQUEST['action'] === 'widgets-order') {
-        $committer->usePostponedChangeInfos('widgets');
-    }
 
     if ($requestDetector->isThemeDeleteRequest()) {
         $themeIds = $requestDetector->getThemeStylesheets();
