@@ -181,7 +181,9 @@ translation:
     VP-Translation-Type: /
     VP-Translation-Name: /
   actions:
-    activate: Site language switched to '%VP-Language-Name%'
+    activate:
+      message: Site language switched to '%VP-Language-Name%'
+      priority: 9
     install: Installed translation '%VP-Language-Name%'
     update: Updated translation '%VP-Language-Name%'
     uninstall: Uninstalled translation '%VP-Language-Name%'
