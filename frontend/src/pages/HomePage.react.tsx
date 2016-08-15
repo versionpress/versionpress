@@ -11,7 +11,7 @@ import update = require('react-addons-update');
 import BulkActionPanel from '../BulkActionPanel/BulkActionPanel.react';
 import CommitPanel from '../CommitPanel/CommitPanel.react';
 import CommitsTable from '../Commits/CommitsTable.react';
-import Filter from '../Filter/Filter.react';
+import Filter from '../filter/Filter';
 import FlashMessage from '../common/FlashMessage.react';
 import ProgressBar from '../common/ProgressBar.react';
 import ServicePanel from '../ServicePanel/ServicePanel.react';
@@ -358,18 +358,20 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       });
   };
 
-  onFilter = (query: string) => {
+  onFilterQueryChange = (query: string) => {
     this.setState({
       query: query,
-    }, () => {
-      const page = (parseInt(this.props.params.page, 10) - 1) || 0;
-      if (page > 0) {
-        const router: ReactRouter.Context = (this.context as any).router;
-        router.transitionTo(routes.home);
-      } else {
-        this.fetchCommits();
-      }
     });
+  };
+
+  onFilter = () => {
+    const page = (parseInt(this.props.params.page, 10) - 1) || 0;
+    if (page > 0) {
+      const router: ReactRouter.Context = (this.context as any).router;
+      router.transitionTo(routes.home);
+    } else {
+      this.fetchCommits();
+    }
   };
 
   onUndo = (e) => {
@@ -483,7 +485,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         }
         <div className='tablenav top'>
           <Filter
-            onSubmit={this.onFilter}
+            query={this.state.query}
+            onQueryChange={this.onFilterQueryChange}
+            onFilter={this.onFilter}
           />
           <BulkActionPanel
             enableActions={enableActions}
