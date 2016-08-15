@@ -1,14 +1,14 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
 
-interface OkButtonProps {
+interface ButtonProps {
   text: string;
   extraClassName: string;
   isPrimary: boolean;
   onClick(): void;
 }
 
-const OkButton: React.StatelessComponent<OkButtonProps> = ({
+const Button: React.StatelessComponent<ButtonProps> = ({
   text, extraClassName, isPrimary, onClick
 }) => {
   const buttonClassName = classNames({
@@ -28,4 +28,4 @@ const OkButton: React.StatelessComponent<OkButtonProps> = ({
   );
 };
 
-export default OkButton;
+export default Button;
