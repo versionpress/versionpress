@@ -36,7 +36,7 @@ class ActionsInfo
         return @$this->actionMap[$scope]['tags'] ?: [];
     }
 
-    public function createCommitMessage($scope, $action, $vpid, $tags)
+    public function getDescription($scope, $action, $vpid, $tags)
     {
         $message = @$this->actionMap[$scope]['actions'][$action]['message'] ?: '';
 

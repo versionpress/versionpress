@@ -101,7 +101,7 @@ class TrackedChangeInfo implements ChangeInfo
     public function getChangeDescription()
     {
         if (empty($this->commitMessageSubject)) {
-            $this->commitMessageSubject = $this->actionsInfo->createCommitMessage($this->getScope(), $this->getAction(), $this->getId(), $this->getCustomTags());
+            $this->commitMessageSubject = $this->actionsInfo->getDescription($this->getScope(), $this->getAction(), $this->getId(), $this->getCustomTags());
         }
 
         return $this->commitMessageSubject;
