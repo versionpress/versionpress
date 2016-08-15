@@ -3,13 +3,13 @@ import * as classNames from 'classnames';
 
 interface ButtonProps {
   text: string;
-  extraClassName: string;
   isPrimary: boolean;
+  extraClassName: string;
   onClick(): void;
 }
 
 const Button: React.StatelessComponent<ButtonProps> = ({
-  text, extraClassName, isPrimary, onClick
+  text, isPrimary, extraClassName, onClick,
 }) => {
   const buttonClassName = classNames({
     'ConfirmDialog-button': true,

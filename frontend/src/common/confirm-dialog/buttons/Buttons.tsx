@@ -17,14 +17,14 @@ const Buttons: React.StatelessComponent<ButtonsProps> = ({
   <div className='ConfirmDialog-buttons'>
     <Button
       text={okButtonText}
-      extraClassName={okButtonClassName}
       isPrimary={true}
+      extraClassName={okButtonClassName}
       onClick={onOkClick}
     />
     <Button
       text={cancelButtonText}
-      extraClassName={cancelButtonClassName}
       isPrimary={false}
+      extraClassName={cancelButtonClassName}
       onClick={onCancelClick}
     />
   </div>
