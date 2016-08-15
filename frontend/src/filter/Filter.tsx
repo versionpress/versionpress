@@ -1,5 +1,8 @@
 import * as React from 'react';
 
+import QueryInput from './QueryInput';
+import Submit from './Submit';
+
 import './Filter.less';
 
 interface FilterProps {
@@ -33,17 +36,11 @@ export default class Filter extends React.Component<FilterProps, {}> {
           onSubmit={this.onSubmit}
         >
           <p className='search-box'>
-            <input
-              type='search'
-              className='Filter-query'
-              value={query}
+            <QueryInput
+              query={query}
               onChange={this.onInputChange}
             />
-            <input
-              type='submit'
-              className='button'
-              value='Search'
-            />
+            <Submit />
           </p>
         </form>
       </div>
