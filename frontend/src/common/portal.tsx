@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as DOM from 'react-dom';
 
-import ConfirmDialog from './ConfirmDialog.react';
+import ConfirmDialog from './confirm-dialog/ConfirmDialog';
 import Modal from './Modal.react';
 
 var portalNode;

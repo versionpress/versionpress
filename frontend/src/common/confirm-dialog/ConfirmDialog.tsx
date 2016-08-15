@@ -1,6 +1,9 @@
 import * as React from 'react';
 
-import * as portal from './portal';
+import * as portal from '../portal';
+import Message from './Message';
+import Buttons from './buttons/Buttons';
+import Spinner from './Spinner';
 
 import './ConfirmDialog.less';
 
@@ -38,22 +41,28 @@ export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {
   };
 
   render() {
-    const okButtonClasses = 'ConfirmDialog-button button button-primary ' + this.props.okButtonClasses;
-    const cancelButtonClasses = 'ConfirmDialog-button button ' + this.props.cancelButtonClasses;
+    const {
+      message,
+      okButtonText,
+      cancelButtonText,
+      okButtonClasses,
+      cancelButtonClasses,
+      isLoading,
+    } = this.props;
 
-    return !this.props.isLoading
+    return !isLoading
       ? <div className='ConfirmDialog'>
-          <div className='ConfirmDialog-message'>{this.props.message}</div>
-          <div className='ConfirmDialog-buttons'>
-            <button className={okButtonClasses} onClick={this.onOkClick}>
-              {this.props.okButtonText}
-            </button>
-            <button className={cancelButtonClasses} onClick={this.onCancelClick}>
-              {this.props.cancelButtonText}
-            </button>
-          </div>
+          <Message message={message} />
+          <Buttons
+            okButtonText={okButtonText}
+            cancelButtonText={cancelButtonText}
+            okButtonClassName={okButtonClasses}
+            cancelButtonClassName={cancelButtonClasses}
+            onOkClick={this.onOkClick}
+            onCancelClick={this.onCancelClick}
+          />
         </div>
-      : <div className='ConfirmDialog-spinner' />;
+      : <Spinner />;
   }
 
 }
