@@ -9,13 +9,13 @@ class ActionsInfo
     const DEFAULT_PRIORITY = 10;
 
     /** @var array */
-    private $actionMap;
+    private $actionMap = [];
 
     public function __construct($actionFiles = [])
     {
         foreach ($actionFiles as $file) {
             $content = file_get_contents($file);
-            $this->actionMap = Yaml::parse($content);
+            $this->actionMap = array_merge_recursive($this->actionMap, Yaml::parse($content));
         }
 
         foreach ($this->actionMap as $scope => &$tagsAndActions) {
