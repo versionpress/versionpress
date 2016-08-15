@@ -1,7 +1,6 @@
 import * as React from 'react';
 
-import OkButton from './OkButton';
-import CancelButton from './CancelButton';
+import Button from './Button';
 
 interface ButtonsProps {
   okButtonText: string;
@@ -16,14 +15,16 @@ const Buttons: React.StatelessComponent<ButtonsProps> = ({
   okButtonText, cancelButtonText, okButtonClassName, cancelButtonClassName, onOkClick, onCancelClick,
 }) => (
   <div className='ConfirmDialog-buttons'>
-    <OkButton
+    <Button
       text={okButtonText}
       extraClassName={okButtonClassName}
+      isPrimary={true}
       onClick={onOkClick}
     />
-    <CancelButton
+    <Button
       text={cancelButtonText}
       extraClassName={cancelButtonClassName}
+      isPrimary={false}
       onClick={onCancelClick}
     />
   </div>
