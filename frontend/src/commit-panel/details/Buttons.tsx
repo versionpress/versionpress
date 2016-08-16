@@ -2,12 +2,12 @@ import * as React from 'react';
 
 import { DetailsLevel } from '../../enums/enums';
 
-interface ToggleButtonsProps {
+interface ButtonsProps {
   detailsLevel: DetailsLevel;
   onDetailsLevelChange(detailsLevel: DetailsLevel): void;
 }
 
-const ToggleButtons: React.StatelessComponent<ToggleButtonsProps> = ({ detailsLevel, onDetailsLevelChange }) => {
+const Buttons: React.StatelessComponent<ButtonsProps> = ({ detailsLevel, onDetailsLevelChange }) => {
   if (detailsLevel === DetailsLevel.None) {
     return null;
   }
@@ -32,4 +32,4 @@ const ToggleButtons: React.StatelessComponent<ToggleButtonsProps> = ({ detailsLe
   );
 };
 
-export default ToggleButtons;
+export default Buttons;

@@ -1,11 +1,11 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
 
-import DiffTab from './DiffTab';
+import Buttons from './Buttons';
+import Diff from '../diff/Diff';
 import Error from './Error';
 import Loader from './Loader';
-import OverviewTab from './OverviewTab';
-import ToggleButtons from './ToggleButtons';
+import Overview from '../overview/Overview';
 import { DetailsLevel } from '../../enums/enums';
 
 interface DetailsProps {
@@ -17,42 +17,40 @@ interface DetailsProps {
   onDetailsLevelChange(detailsLevel: DetailsLevel): void;
 }
 
-export default class Details extends React.Component<DetailsProps, {}> {
+const Details: React.StatelessComponent<DetailsProps> = (props) => {
+  const {
+    detailsLevel,
+    diff,
+    gitStatus,
+    error,
+    isLoading,
+    onDetailsLevelChange,
+  } = props;
 
-  render() {
-    const {
-      detailsLevel,
-      diff,
-      gitStatus,
-      error,
-      isLoading,
-      onDetailsLevelChange,
-    } = this.props;
-
-    if (!error && detailsLevel === DetailsLevel.None) {
-      return null;
-    }
-
-    const detailsClassName = classNames({
-      'CommitPanel-details': true,
-      'loading': isLoading,
-    });
-
-    return (
-      <div className={detailsClassName}>
-        <ToggleButtons
-          detailsLevel={detailsLevel}
-          onDetailsLevelChange={onDetailsLevelChange}
-        />
-        {isLoading && <Loader />}
-        {error
-          ? <Error error={error} />
-          : detailsLevel === DetailsLevel.Overview
-            ? <OverviewTab gitStatus={gitStatus} />
-            : <DiffTab diff={diff} />
-        }
-      </div>
-    );
+  if (!error && detailsLevel === DetailsLevel.None) {
+    return null;
   }
 
-}
+  const detailsClassName = classNames({
+    'CommitPanel-details': true,
+    'loading': isLoading,
+  });
+
+  return (
+    <div className={detailsClassName}>
+      <Buttons
+        detailsLevel={detailsLevel}
+        onDetailsLevelChange={onDetailsLevelChange}
+      />
+      {isLoading && <Loader />}
+      {error
+        ? <Error error={error} />
+        : detailsLevel === DetailsLevel.Overview
+          ? <Overview gitStatus={gitStatus} />
+          : <Diff diff={diff} />
+      }
+    </div>
+  );
+};
+
+export default Details;

@@ -2,12 +2,12 @@ import * as React from 'react';
 
 import DiffPanel from '../../Commits/DiffPanel.react';
 
-interface DiffTabProps {
+interface DiffProps {
   diff: string;
 }
 
-const DiffTab: React.StatelessComponent<DiffTabProps> = ({ diff }) => (
+const Diff: React.StatelessComponent<DiffProps> = ({ diff }) => (
   <DiffPanel diff={diff} />
 );
 
-export default DiffTab;
+export default Diff;

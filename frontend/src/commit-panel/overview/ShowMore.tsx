@@ -1,11 +1,11 @@
 import * as React from 'react';
 
-interface OverviewShowMoreProps {
+interface ShowMoreProps {
   displayNumber: number;
   onClick(e: React.MouseEvent): void;
 }
 
-const OverviewShowMore: React.StatelessComponent<OverviewShowMoreProps> = ({ displayNumber, onClick }) => (
+const ShowMore: React.StatelessComponent<ShowMoreProps> = ({ displayNumber, onClick }) => (
   <li>
     <a onClick={onClick}>
       show {displayNumber} more...
@@ -13,4 +13,4 @@ const OverviewShowMore: React.StatelessComponent<OverviewShowMoreProps> = ({ dis
   </li>
 );
 
-export default OverviewShowMore;
+export default ShowMore;

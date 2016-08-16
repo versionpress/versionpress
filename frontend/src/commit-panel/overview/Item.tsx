@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-interface OverviewLineProps {
+interface ItemProps {
   actionShortcut: string;
   info: string;
 }
@@ -15,7 +15,7 @@ const getActionVerb = (actionShortcut: string) => {
   }
 };
 
-const OverviewLine: React.StatelessComponent<OverviewLineProps> = ({ actionShortcut, info }) => {
+const Item: React.StatelessComponent<ItemProps> = ({ actionShortcut, info }) => {
   return (
     <li>
       <strong>{getActionVerb(actionShortcut)}</strong>
@@ -24,4 +24,4 @@ const OverviewLine: React.StatelessComponent<OverviewLineProps> = ({ actionShort
   );
 };
 
-export default OverviewLine;
+export default Item;
