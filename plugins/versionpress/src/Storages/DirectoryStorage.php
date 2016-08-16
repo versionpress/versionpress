@@ -32,9 +32,6 @@ class DirectoryStorage extends Storage
     /** @var bool[] */
     private $existenceCache = [];
 
-    /** @var ActionsInfo */
-    private $actionsInfo;
-
     /** @var ChangeInfoFactory */
     private $changeInfoFactory;
 
@@ -43,15 +40,13 @@ class DirectoryStorage extends Storage
      * @param string $directory
      * @param \VersionPress\Database\EntityInfo $entityInfo
      * @param string $dbPrefix
-     * @param ActionsInfo $actionsInfo
      * @param ChangeInfoFactory $changeInfoFactory
      */
-    public function __construct($directory, $entityInfo, $dbPrefix, $actionsInfo, $changeInfoFactory)
+    public function __construct($directory, $entityInfo, $dbPrefix, $changeInfoFactory)
     {
         parent::__construct($entityInfo, $dbPrefix);
         $this->directory = $directory;
         $this->entityInfo = $entityInfo;
-        $this->actionsInfo = $actionsInfo;
         $this->changeInfoFactory = $changeInfoFactory;
     }
 

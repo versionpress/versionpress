@@ -26,17 +26,14 @@ class MetaEntityStorage extends Storage
 
     /** @var Storage */
     private $parentStorage;
-    /** @var ActionsInfo */
-    private $actionsInfo;
 
     /** @var ChangeInfoFactory */
     private $changeInfoFactory;
 
-    public function __construct(Storage $parentStorage, EntityInfo $entityInfo, $dbPrefix, $actionsInfo, $changeInfoFactory, $keyName = 'meta_key', $valueName = 'meta_value')
+    public function __construct(Storage $parentStorage, EntityInfo $entityInfo, $dbPrefix, $changeInfoFactory, $keyName = 'meta_key', $valueName = 'meta_value')
     {
         parent::__construct($entityInfo, $dbPrefix);
         $this->parentStorage = $parentStorage;
-        $this->actionsInfo = $actionsInfo;
         $this->changeInfoFactory = $changeInfoFactory;
         $this->keyName = $keyName;
         $this->valueName = $valueName;

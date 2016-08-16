@@ -41,18 +41,6 @@ class StorageTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ActionsInfo
-     */
-    protected function createActionsInfoMock()
-    {
-        $actionsInfo = $this->getMockBuilder(ActionsInfo::class)->disableOriginalConstructor()->getMock();
-        $actionsInfo->expects($this->any())->method('getTags')->will($this->returnValue([]));
-
-
-        return $actionsInfo;
-    }
-
-    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|ChangeInfoFactory
      */
     protected function createChangeInfoFactoryMock()

@@ -101,7 +101,7 @@ class TrackedChangeInfo implements ChangeInfo
     public function getChangeDescription()
     {
         if (empty($this->commitMessageSubject)) {
-            $this->commitMessageSubject = $this->actionsInfo->getDescription($this->getScope(), $this->getAction(), $this->getId(), $this->getCustomTags());
+            $this->commitMessageSubject = $this->actionsInfo->getDescription($this->getAction(), $this->getId(), $this->getCustomTags());
         }
 
         return $this->commitMessageSubject;
@@ -137,7 +137,7 @@ class TrackedChangeInfo implements ChangeInfo
 
     public function getPriority()
     {
-        return $this->actionsInfo->getActionPriority($this->getScope(), $this->getAction());
+        return $this->actionsInfo->getActionPriority($this->getAction());
     }
 
     /**

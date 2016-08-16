@@ -74,9 +74,6 @@ class MetaEntityStorageTest extends StorageTestCase
             'getIgnoredColumns' => [],
         ]);
 
-        $actionsInfo = $this->createActionsInfoMock();
-
-
         if (file_exists($storageDir)) {
             FileSystem::remove($storageDir);
         }
@@ -85,8 +82,8 @@ class MetaEntityStorageTest extends StorageTestCase
 
         $changeInfoFactory = $this->createChangeInfoFactoryMock();
 
-        $this->parentStorage = new DirectoryStorage($storageDir, $entityInfo, 'prefix_', $actionsInfo, $changeInfoFactory);
-        $this->storage = new MetaEntityStorage($this->parentStorage, $metaEntityInfo, 'prefix_', $actionsInfo, $changeInfoFactory);
+        $this->parentStorage = new DirectoryStorage($storageDir, $entityInfo, 'prefix_', $changeInfoFactory);
+        $this->storage = new MetaEntityStorage($this->parentStorage, $metaEntityInfo, 'prefix_', $changeInfoFactory);
     }
 
     protected function tearDown()

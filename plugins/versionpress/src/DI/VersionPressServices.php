@@ -21,7 +21,7 @@ final class VersionPressServices
     const SHORTCODES_REPLACER = 'shortcode-replacer';
     const SHORTCODES_INFO = 'shortcodes-info';
     const SQL_QUERY_PARSER = 'sql-query-parser';
-    const ACTIONS_INFO = 'actions-info';
+    const ACTIONSINFO_PROVIDER = 'actionsinfo-provider';
     const CHANGEINFO_FACTORY = 'changeinfo-factory';
 
     private function __construct()

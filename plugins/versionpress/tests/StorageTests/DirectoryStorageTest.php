@@ -143,10 +143,10 @@ class DirectoryStorageTest extends StorageTestCase
         ], [
             'getIgnoredColumns' => [],
         ]);
-        $actionsInfo = $this->createActionsInfoMock();
+
         $changeInfoFactory = $this->createChangeInfoFactoryMock();
 
-        $storage = new DirectoryStorage(__DIR__ . '/entities', $entityInfo, 'prefix_', $actionsInfo, $changeInfoFactory);
+        $storage = new DirectoryStorage(__DIR__ . '/entities', $entityInfo, 'prefix_', $changeInfoFactory);
 
         $storage->save($entity);
         $loadedEntity = $storage->loadEntity($id);
@@ -210,9 +210,8 @@ class DirectoryStorageTest extends StorageTestCase
         }
         mkdir($storageDir);
 
-        $actionsInfo = $this->createActionsInfoMock();
         $changeInfoFactory = $this->createChangeInfoFactoryMock();
-        $this->storage = new DirectoryStorage($storageDir, $entityInfo, 'prefix_', $actionsInfo, $changeInfoFactory);
+        $this->storage = new DirectoryStorage($storageDir, $entityInfo, 'prefix_', $changeInfoFactory);
     }
 
     protected function tearDown()

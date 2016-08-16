@@ -2,7 +2,7 @@
 
 namespace VersionPress\Storages;
 
-use VersionPress\Actions\ActionsInfo;
+use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
@@ -17,8 +17,6 @@ class StorageFactory
     /** @var Database */
     private $database;
     private $taxonomies;
-    /** @var ActionsInfo */
-    private $actionsInfo;
     /** @var ChangeInfoFactory */
     private $changeInfoFactory;
 
@@ -27,16 +25,14 @@ class StorageFactory
      * @param DbSchemaInfo $dbSchemaInfo Passed to storages
      * @param Database $database
      * @param string[] $taxonomies List of taxonomies used on current site
-     * @param ActionsInfo $actionsInfo
      * @param ChangeInfoFactory $changeInfoFactory
      */
-    public function __construct($vpdbDir, DbSchemaInfo $dbSchemaInfo, $database, $taxonomies, $actionsInfo, $changeInfoFactory)
+    public function __construct($vpdbDir, DbSchemaInfo $dbSchemaInfo, $database, $taxonomies, $changeInfoFactory)
     {
         $this->vpdbDir = $vpdbDir;
         $this->dbSchemaInfo = $dbSchemaInfo;
         $this->database = $database;
         $this->taxonomies = $taxonomies;
-        $this->actionsInfo = $actionsInfo;
         $this->changeInfoFactory = $changeInfoFactory;
     }
 
@@ -67,7 +63,7 @@ class StorageFactory
             $parentEntity = $entityInfo->references[$entityInfo->parentReference];
             $parentStorage = $this->getStorage($parentEntity);
 
-            return new $storageClass($parentStorage, $entityInfo, $this->database->prefix, $this->actionsInfo, $this->changeInfoFactory);
+            return new $storageClass($parentStorage, $entityInfo, $this->database->prefix, $this->changeInfoFactory);
         }
 
         if (isset($entityInfo->storageClass)) {
@@ -76,7 +72,7 @@ class StorageFactory
             $storageClass = DirectoryStorage::class;
         }
 
-        return new $storageClass($this->vpdbDir . '/' . $entityInfo->tableName, $entityInfo, $this->database->prefix, $this->actionsInfo, $this->changeInfoFactory);
+        return new $storageClass($this->vpdbDir . '/' . $entityInfo->tableName, $entityInfo, $this->database->prefix, $this->changeInfoFactory);
     }
 
     public function getAllSupportedStorages()

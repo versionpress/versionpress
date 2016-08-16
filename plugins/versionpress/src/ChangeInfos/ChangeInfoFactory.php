@@ -4,6 +4,7 @@ namespace VersionPress\ChangeInfos;
 
 use Nette\Utils\Strings;
 use VersionPress\Actions\ActionsInfo;
+use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Git\CommitMessage;
 
@@ -11,13 +12,13 @@ class ChangeInfoFactory
 {
     /** @var DbSchemaInfo */
     private $dbSchema;
-    /** @var ActionsInfo */
-    private $actionsInfo;
+    /** @var ActionsInfoProvider */
+    private $actionsInfoProvider;
 
-    public function __construct(DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo)
+    public function __construct(DbSchemaInfo $dbSchema, ActionsInfoProvider $actionsInfoProvider)
     {
         $this->dbSchema = $dbSchema;
-        $this->actionsInfo = $actionsInfo;
+        $this->actionsInfoProvider = $actionsInfoProvider;
     }
 
     public function createEntityChangeInfo($entity, $entityName, $action, $customTags = [], $customFiles = [])
@@ -25,17 +26,18 @@ class ChangeInfoFactory
         $entityInfo = $this->dbSchema->getEntityInfo($entityName);
         $vpid = $entity[$entityInfo->vpidColumnName];
 
-        $automaticallySavedTags = $this->actionsInfo->getTags($entityName);
-        $tags = ChangeInfoUtils::extractTags($automaticallySavedTags, $entity, $entity);
+        $actionsInfo = $this->actionsInfoProvider->getActionsInfo($entityName);
 
+        $automaticallySavedTags = $actionsInfo->getTags();
+        $tags = ChangeInfoUtils::extractTags($automaticallySavedTags, $entity, $entity);
         $tags = array_merge($tags, $customTags);
 
-        return new EntityChangeInfo($entityInfo, $this->actionsInfo, $action, $vpid, $tags, $customFiles);
+        return new EntityChangeInfo($entityInfo, $actionsInfo, $action, $vpid, $tags, $customFiles);
     }
 
     public function createTrackedChangeInfo($scope, $action, $entityId = null, $tags = [], $files = [])
     {
-        return new TrackedChangeInfo($scope, $this->actionsInfo, $action, $entityId, $tags, $files);
+        return new TrackedChangeInfo($scope, $this->actionsInfoProvider->getActionsInfo($scope), $action, $entityId, $tags, $files);
     }
 
     public function buildChangeInfoEnvelopeFromCommitMessage(CommitMessage $commitMessage)
@@ -66,11 +68,13 @@ class ChangeInfoFactory
             $tags = $commitMessage->getVersionPressTags();
             unset($tags[TrackedChangeInfo::ACTION_TAG]);
 
+            $actionsInfo = $this->actionsInfoProvider->getActionsInfo($scope);
+
             if ($this->dbSchema->isEntity($scope)) {
                 $entityInfo = $this->dbSchema->getEntityInfo($scope);
-                $changeInfoList[] = new EntityChangeInfo($entityInfo, $this->actionsInfo, $action, $id, $tags, []);
+                $changeInfoList[] = new EntityChangeInfo($entityInfo, $actionsInfo, $action, $id, $tags, []);
             } else {
-                $changeInfoList[] = new TrackedChangeInfo($scope, $this->actionsInfo, $action, $id, $tags, []);
+                $changeInfoList[] = new TrackedChangeInfo($scope, $actionsInfo, $action, $id, $tags, []);
             }
         }
 

@@ -1,6 +1,6 @@
 <?php
 
-use VersionPress\Actions\ActionsInfo;
+use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\Api\VersionPressApi;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\Database\DbSchemaInfo;
@@ -97,8 +97,8 @@ function vp_register_hooks()
     $wpdbMirrorBridge = $versionPressContainer->resolve(VersionPressServices::WPDB_MIRROR_BRIDGE);
     /** @var \VersionPress\Database\Database $database */
     $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
-    /** @var ActionsInfo $actionsInfo */
-    $actionsInfo = $versionPressContainer->resolve(VersionPressServices::ACTIONS_INFO);
+    /** @var ActionsInfoProvider $actionsInfoProvider */
+    $actionsInfoProvider = $versionPressContainer->resolve(VersionPressServices::ACTIONSINFO_PROVIDER);
 
 
 
@@ -285,19 +285,23 @@ function vp_register_hooks()
         }
     }, 10, 2);
 
-    add_action('pre_delete_term', function ($termId, $taxonomy) use ($committer, $vpidRepository, $dbSchemaInfo, $actionsInfo) {
+    add_action('pre_delete_term', function ($termId, $taxonomy) use ($committer, $vpidRepository, $dbSchemaInfo, $actionsInfoProvider) {
         $termVpid = $vpidRepository->getVpidForEntity('term', $termId);
         $term = get_term($termId, $taxonomy);
         $termEntityInfo = $dbSchemaInfo->getEntityInfo('term');
+        $actionsInfo = $actionsInfoProvider->getActionsInfo('term');
+
         $changeInfo = new EntityChangeInfo($termEntityInfo, $actionsInfo, 'delete', $termVpid, ['VP-Term-Name' => $term->name, 'VP-Term-Taxonomy' => $taxonomy]);
         $committer->forceChangeInfo($changeInfo);
     }, 10, 2);
 
     add_action('set_object_terms', vp_create_update_post_terms_hook($mirror, $vpidRepository));
 
-    add_filter('wp_save_image_editor_file', function ($saved, $filename, $image, $mime_type, $post_id) use ($vpidRepository, $committer, $dbSchemaInfo, $actionsInfo) {
+    add_filter('wp_save_image_editor_file', function ($saved, $filename, $image, $mime_type, $post_id) use ($vpidRepository, $committer, $dbSchemaInfo, $actionsInfoProvider) {
         $vpid = $vpidRepository->getVpidForEntity('post', $post_id);
         $post = get_post($post_id);
+        $actionsInfo = $actionsInfoProvider->getActionsInfo('post');
+
         $changeInfo = new EntityChangeInfo($dbSchemaInfo->getEntityInfo('post'), $actionsInfo, 'edit', $vpid, ['VP-Post-Type' => $post->post_type, 'VP-Post-Title' => $post->post_title]);
         $committer->forceChangeInfo($changeInfo);
     }, 10, 5);

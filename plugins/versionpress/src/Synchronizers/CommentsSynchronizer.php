@@ -19,6 +19,6 @@ class CommentsSynchronizer extends SynchronizerBase
     private function clearCache()
     {
         WordPressCacheUtils::clearCommentCache(array_column($this->entities, 'vp_id'), $this->database);
-        WordPressCacheUtils::clearPOSTCache(array_column($this->entities, 'vp_post_id'), $this->database);
+        WordPressCacheUtils::clearPostCache(array_column($this->entities, 'vp_post_id'), $this->database);
     }
 }

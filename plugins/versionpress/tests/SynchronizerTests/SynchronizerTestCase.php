@@ -3,6 +3,7 @@
 namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Actions\ActionsInfo;
+use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
@@ -59,9 +60,9 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
         }
 
         self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
-        $actionsInfo = new ActionsInfo([$actionsFile]);
+        $actionsInfoProvider = new ActionsInfoProvider([$actionsFile]);
 
-        $changeInfoFactory = new ChangeInfoFactory(self::$schemaInfo, $actionsInfo);
+        $changeInfoFactory = new ChangeInfoFactory(self::$schemaInfo, $actionsInfoProvider);
 
         $dbHost = self::$testConfig->testSite->dbHost;
         $dbUser = self::$testConfig->testSite->dbUser;
@@ -76,7 +77,7 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
         self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, self::$vpidRepository);
 
         $vpdbPath = self::$wpAutomation->getVpdbDir();
-        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$database, [], $actionsInfo, $changeInfoFactory);
+        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$database, [], $changeInfoFactory);
         self::$urlReplacer = new AbsoluteUrlReplacer(self::$testConfig->testSite->url);
     }
 

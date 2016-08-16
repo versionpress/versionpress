@@ -2,43 +2,30 @@
 
 namespace VersionPress\Actions;
 
-use Symfony\Component\Yaml\Yaml;
-
 class ActionsInfo
 {
-    const DEFAULT_PRIORITY = 10;
+    private $scope;
+    private $actions;
+    private $tags;
+    private $parentIdTag;
 
-    /** @var array */
-    private $actionMap = [];
-
-    public function __construct($actionFiles = [])
+    public function __construct($scope, $actions, $tags = [], $parentIdTag = null)
     {
-        foreach ($actionFiles as $file) {
-            $content = file_get_contents($file);
-            $this->actionMap = array_merge_recursive($this->actionMap, Yaml::parse($content));
-        }
-
-        foreach ($this->actionMap as $scope => &$tagsAndActions) {
-            foreach ($tagsAndActions['actions'] as &$action) {
-                if (is_string($action)) {
-                    $action = ['message' => $action, 'priority' => self::DEFAULT_PRIORITY];
-                }
-
-                if (!isset($action['priority'])) {
-                    $action['priority'] = self::DEFAULT_PRIORITY;
-                }
-            }
-        }
+        $this->scope = $scope;
+        $this->actions = $actions;
+        $this->tags = $tags;
+        $this->parentIdTag = $parentIdTag;
     }
 
-    public function getTags($scope)
+
+    public function getTags()
     {
-        return @$this->actionMap[$scope]['tags'] ?: [];
+        return $this->tags;
     }
 
-    public function getDescription($scope, $action, $vpid, $tags)
+    public function getDescription($action, $vpid, $tags)
     {
-        $message = @$this->actionMap[$scope]['actions'][$action]['message'] ?: '';
+        $message = $this->actions[$action]['message'];
 
         foreach ($tags as $tag => $value) {
             $message = str_replace("%{$tag}%", $value, $message);
@@ -46,16 +33,16 @@ class ActionsInfo
 
         $message = str_replace('%VPID%', $vpid, $message);
 
-        return apply_filters("vp_action_description_{$scope}", $message, $action, $vpid, $tags);
+        return apply_filters("vp_action_description_{$this->scope}", $message, $action, $vpid, $tags);
     }
 
-    public function getActionPriority($scope, $action)
+    public function getActionPriority($action)
     {
-        return @$this->actionMap[$scope]['actions'][$action]['priority'] ?: self::DEFAULT_PRIORITY;
+        return $this->actions[$action]['priority'];
     }
 
-    public function getTagContainingParentId($entityName)
+    public function getTagContainingParentId()
     {
-        return @$this->actionMap[$entityName]['parent-id-tag'] ?: null;
+        return $this->parentIdTag;
     }
 }

@@ -69,8 +69,7 @@ class EntityChangeInfo extends TrackedChangeInfo
     public function getParentId()
     {
         if ($this->entityInfo->parentReference) {
-            $entityName = $this->entityInfo->entityName;
-            $tagContainingParentId = $this->actionsInfo->getTagContainingParentId($entityName);
+            $tagContainingParentId = $this->actionsInfo->getTagContainingParentId();
 
             return $this->getCustomTags()[$tagContainingParentId];
         }

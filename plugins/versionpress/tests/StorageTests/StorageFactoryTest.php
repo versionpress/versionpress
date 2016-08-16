@@ -37,7 +37,6 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase
         $wpdbStub->prefix = 'prefix_';
 
         $database = new Database($wpdbStub);
-        $actionsInfo = $this->getMockBuilder(ActionsInfo::class)->disableOriginalConstructor()->getMock();
         $changeInfoFactory = $this->getMockBuilder(ChangeInfoFactory::class)->disableOriginalConstructor()->getMock();
 
         $factory = new StorageFactory(
@@ -49,7 +48,6 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase
             ),
             $database,
             [],
-            $actionsInfo,
             $changeInfoFactory
         );
 

@@ -3,6 +3,7 @@
 namespace VersionPress\DI;
 
 use VersionPress\Actions\ActionsInfo;
+use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
@@ -73,7 +74,6 @@ class DIContainer
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::DATABASE),
                 array_keys((array)$wp_taxonomies),
-                $dic->resolve(VersionPressServices::ACTIONS_INFO),
                 $dic->resolve(VersionPressServices::CHANGEINFO_FACTORY)
             );
         });
@@ -94,15 +94,15 @@ class DIContainer
             );
         });
 
-        $dic->register(VersionPressServices::ACTIONS_INFO, function () {
+        $dic->register(VersionPressServices::ACTIONSINFO_PROVIDER, function () {
             $vpActionsFile = VERSIONPRESS_PLUGIN_DIR . '/.versionpress/actions.yml';
-            return new ActionsInfo([$vpActionsFile]);
+            return new ActionsInfoProvider([$vpActionsFile]);
         });
 
         $dic->register(VersionPressServices::CHANGEINFO_FACTORY, function () use ($dic) {
             return new ChangeInfoFactory(
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
-                $dic->resolve(VersionPressServices::ACTIONS_INFO)
+                $dic->resolve(VersionPressServices::ACTIONSINFO_PROVIDER)
             );
         });
 
