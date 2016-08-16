@@ -2,10 +2,10 @@
 
 namespace VersionPress\Tests\StorageTests;
 
+use VersionPress\Actions\ActionsInfo;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\Database\EntityInfo;
-use VersionPress\Git\ActionsInfo;
 use VersionPress\Tests\Utils\HookMock;
 
 class StorageTestCase extends \PHPUnit_Framework_TestCase

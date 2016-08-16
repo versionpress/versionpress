@@ -1,8 +1,8 @@
 <?php
 
+use VersionPress\Actions\ActionsInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\DI\VersionPressServices;
-use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\Committer;
 
 function vp_force_action($scope, $action, $id = '', $tags = [], $files = [])

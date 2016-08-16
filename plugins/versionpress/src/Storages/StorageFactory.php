@@ -2,11 +2,10 @@
 
 namespace VersionPress\Storages;
 
-use Nette\Utils\Strings;
+use VersionPress\Actions\ActionsInfo;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Git\ActionsInfo;
 
 class StorageFactory
 {

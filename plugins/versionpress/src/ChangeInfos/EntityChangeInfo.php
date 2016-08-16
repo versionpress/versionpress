@@ -2,8 +2,8 @@
 
 namespace VersionPress\ChangeInfos;
 
+use VersionPress\Actions\ActionsInfo;
 use VersionPress\Database\EntityInfo;
-use VersionPress\Git\ActionsInfo;
 
 /**
  * Base class for entity change infos like PostChangeInfo, CommentChangeInfo etc.

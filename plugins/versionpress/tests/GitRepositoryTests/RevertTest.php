@@ -2,9 +2,9 @@
 
 namespace VersionPress\Tests\GitRepositoryTests;
 
+use VersionPress\Actions\ActionsInfo;
 use VersionPress\Cli\VPCommandUtils;
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\GitRepository;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Utils\FileSystem;

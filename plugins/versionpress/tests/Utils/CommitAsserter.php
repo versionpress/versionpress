@@ -5,13 +5,13 @@ namespace VersionPress\Tests\Utils;
 use Exception;
 use Nette\Utils\Strings;
 use PHPUnit_Framework_Assert;
+use VersionPress\Actions\ActionsInfo;
 use VersionPress\ChangeInfos\BulkChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\Commit;
 
 /**

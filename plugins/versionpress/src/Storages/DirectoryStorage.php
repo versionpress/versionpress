@@ -6,11 +6,8 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use RegexIterator;
+use VersionPress\Actions\ActionsInfo;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
-use VersionPress\ChangeInfos\ChangeInfoUtils;
-use VersionPress\ChangeInfos\EntityChangeInfo;
-use VersionPress\Git\ActionsInfo;
-use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\EntityUtils;
 use VersionPress\Utils\FileSystem;
 

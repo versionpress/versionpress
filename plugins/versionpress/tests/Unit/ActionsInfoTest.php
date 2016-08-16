@@ -4,7 +4,7 @@ namespace VersionPress\Tests\Unit;
 
 use org\bovigo\vfs\vfsStream;
 use Symfony\Component\Yaml\Yaml;
-use VersionPress\Git\ActionsInfo;
+use VersionPress\Actions\ActionsInfo;
 use VersionPress\Tests\Utils\HookMock;
 
 class ActionsInfoTest extends \PHPUnit_Framework_TestCase

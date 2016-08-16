@@ -2,6 +2,7 @@
 
 namespace VersionPress\DI;
 
+use VersionPress\Actions\ActionsInfo;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
@@ -10,7 +11,6 @@ use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Database\SqlQueryParser;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Database\WpdbMirrorBridge;
-use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\Committer;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
@@ -20,7 +20,6 @@ use VersionPress\Storages\StorageFactory;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Synchronizers\SynchronizerFactory;
 use VersionPress\Utils\AbsoluteUrlReplacer;
-use VersionPress\VersionPress;
 
 class DIContainer
 {

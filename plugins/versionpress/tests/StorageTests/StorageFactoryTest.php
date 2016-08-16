@@ -2,10 +2,10 @@
 
 namespace VersionPress\Tests\StorageTests;
 
+use VersionPress\Actions\ActionsInfo;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Git\ActionsInfo;
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Storages\StorageFactory;

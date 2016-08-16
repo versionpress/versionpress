@@ -1,12 +1,12 @@
 <?php
 
+use VersionPress\Actions\ActionsInfo;
 use VersionPress\Api\VersionPressApi;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Database\WpdbMirrorBridge;
 use VersionPress\DI\VersionPressServices;
-use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\Committer;
 use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Git\Reverter;

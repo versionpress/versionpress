@@ -3,11 +3,9 @@
 namespace VersionPress\Storages;
 
 use Nette\Utils\Strings;
+use VersionPress\Actions\ActionsInfo;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
-use VersionPress\ChangeInfos\ChangeInfoUtils;
-use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\Database\EntityInfo;
-use VersionPress\Git\ActionsInfo;
 
 /**
  * Stores meta entities like postmeta and usermeta. It means that the meta entities are stored together

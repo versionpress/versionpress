@@ -1,7 +1,7 @@
 <?php
 namespace VersionPress\ChangeInfos;
 
-use VersionPress\Git\ActionsInfo;
+use VersionPress\Actions\ActionsInfo;
 use VersionPress\Git\CommitMessage;
 
 /**

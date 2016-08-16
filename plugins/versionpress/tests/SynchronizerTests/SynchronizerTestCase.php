@@ -2,13 +2,13 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
+use VersionPress\Actions\ActionsInfo;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesInfo;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Database\VpidRepository;
-use VersionPress\Git\ActionsInfo;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\DBAsserter;

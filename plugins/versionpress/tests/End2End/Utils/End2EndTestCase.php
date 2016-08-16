@@ -3,8 +3,8 @@
 namespace VersionPress\Tests\End2End\Utils;
 
 use PHPUnit_Framework_TestCase;
+use VersionPress\Actions\ActionsInfo;
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\GitRepository;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\CommitAsserter;

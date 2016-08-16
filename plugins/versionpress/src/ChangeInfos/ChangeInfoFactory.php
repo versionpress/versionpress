@@ -3,8 +3,8 @@
 namespace VersionPress\ChangeInfos;
 
 use Nette\Utils\Strings;
+use VersionPress\Actions\ActionsInfo;
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\CommitMessage;
 
 class ChangeInfoFactory

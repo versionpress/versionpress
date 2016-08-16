@@ -2,8 +2,6 @@
 namespace VersionPress\ChangeInfos;
 
 use Nette\Utils\Strings;
-use VersionPress\DI\VersionPressServices;
-use VersionPress\Git\ActionsInfo;
 use VersionPress\Git\CommitMessage;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\VersionPress;

@@ -1,6 +1,6 @@
 <?php
 
-namespace VersionPress\Git;
+namespace VersionPress\Actions;
 
 use Symfony\Component\Yaml\Yaml;
 

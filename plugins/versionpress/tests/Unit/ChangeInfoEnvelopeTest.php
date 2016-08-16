@@ -3,13 +3,13 @@
 namespace VersionPress\Tests\Unit;
 
 use PHPUnit_Framework_TestCase;
+use VersionPress\Actions\ActionsInfo;
 use VersionPress\ChangeInfos\BulkChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\Database\EntityInfo;
-use VersionPress\Git\ActionsInfo;
 
 class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
 {
