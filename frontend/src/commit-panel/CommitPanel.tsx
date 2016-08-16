@@ -34,12 +34,15 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
   };
 
   onDetailsLevelChange = (detailsLevel: DetailsLevel) => {
-    if (detailsLevel === DetailsLevel.Overview && !this.state.gitStatus) {
+    const { gitStatusProvider } = this.props;
+    const { gitStatus, diff } = this.state;
+
+    if (detailsLevel === DetailsLevel.Overview && !gitStatus) {
       this.setState({
         isLoading: true,
       });
 
-      this.props.gitStatusProvider.getGitStatus()
+      gitStatusProvider.getGitStatus()
         .then(gitStatus => this.setState({
             detailsLevel: detailsLevel,
             gitStatus: gitStatus,
@@ -52,7 +55,7 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
             isLoading: false,
           })
         );
-    } else if (detailsLevel === DetailsLevel.FullDiff && !this.state.diff) {
+    } else if (detailsLevel === DetailsLevel.FullDiff && !diff) {
       this.setState({
         isLoading: true,
       });
