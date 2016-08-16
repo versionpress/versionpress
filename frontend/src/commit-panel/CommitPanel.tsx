@@ -34,7 +34,7 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
   };
 
   onDetailsLevelChange = (detailsLevel: DetailsLevel) => {
-    const { gitStatusProvider } = this.props;
+    const { diffProvider, gitStatusProvider } = this.props;
     const { gitStatus, diff } = this.state;
 
     if (detailsLevel === DetailsLevel.Overview && !gitStatus) {
@@ -47,7 +47,7 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
 
     if (detailsLevel === DetailsLevel.FullDiff && !diff) {
       this.setLoading();
-      this.props.diffProvider.getDiff('')
+      diffProvider.getDiff('')
         .then(this.handleSuccess(detailsLevel))
         .catch(this.handleError(detailsLevel));
       return;
@@ -60,11 +60,13 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
     });
   };
 
-  private setLoading = () => this.setState({
-    isLoading: true,
-  });
+  private setLoading = () => {
+    this.setState({
+      isLoading: true,
+    });
+  };
 
-  private handleSuccess = detailsLevel => {
+  private handleSuccess = (detailsLevel: DetailsLevel) => {
     if (detailsLevel === DetailsLevel.Overview) {
       return gitStatus => this.setState({
         detailsLevel: detailsLevel,
@@ -72,7 +74,7 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
         error: null,
         isLoading: false,
       });
-    } else {
+    } else if (detailsLevel === DetailsLevel.FullDiff) {
       return diff => this.setState({
         detailsLevel: detailsLevel,
         diff: diff,
@@ -80,15 +82,15 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
         isLoading: false,
       });
     }
-  }
+  };
 
-  private handleError = detailsLevel => {
+  private handleError = (detailsLevel: DetailsLevel) => {
     return err => this.setState({
       detailsLevel: detailsLevel,
       error: err.message,
       isLoading: false,
     });
-  }
+  };
 
   render() {
     const { onCommit, onDiscard } = this.props;
