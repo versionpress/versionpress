@@ -5,7 +5,7 @@ import Support from './Support';
 import Warning from './Warning';
 
 interface PanelProps {
-    isVisible: boolean;
+  isVisible: boolean;
 }
 
 const Panel: React.StatelessComponent<PanelProps> = ({ isVisible }) => {
