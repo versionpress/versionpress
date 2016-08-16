@@ -7,8 +7,9 @@ interface FormProps {
   onCancelCommitClick(e: React.MouseEvent): void;
 }
 
-const Form: React.StatelessComponent<FormProps> = (
-  { commitMessage, onCommitMessageChange, onSubmit, onCancelCommitClick }) => (
+const Form: React.StatelessComponent<FormProps> = ({
+  commitMessage, onCommitMessageChange, onSubmit, onCancelCommitClick,
+}) => (
   <div className='CommitPanel-commit'>
     <form onSubmit={onSubmit}>
       <textarea

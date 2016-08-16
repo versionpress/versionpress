@@ -1,13 +1,12 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
 
-import { DetailsLevel } from '../../enums/enums';
-
-import ToggleButtons from './ToggleButtons';
 import DiffTab from './DiffTab';
-import OverviewTab from './OverviewTab';
-import Loader from './Loader';
 import Error from './Error';
+import Loader from './Loader';
+import OverviewTab from './OverviewTab';
+import ToggleButtons from './ToggleButtons';
+import { DetailsLevel } from '../../enums/enums';
 
 interface DetailsProps {
   detailsLevel: DetailsLevel;

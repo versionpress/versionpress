@@ -1,11 +1,10 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
 
-import { DetailsLevel } from '../enums/enums';
-
 import Commit from './commit/Commit';
-import Notice from './Notice';
 import Details from './details/Details';
+import Notice from './Notice';
+import { DetailsLevel } from '../enums/enums';
 
 import './CommitPanel.less';
 

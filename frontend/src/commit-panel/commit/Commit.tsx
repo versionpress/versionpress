@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-import * as portal from '../../common/portal';
 import Buttons from './Buttons';
 import Form from './Form';
+import * as portal from '../../common/portal';
 
 interface CommitProps {
   onCommit(message: string): void;
@@ -41,7 +41,7 @@ export default class Commit extends React.Component<CommitProps, CommitState> {
 
   onCommitMessageChange = (e: React.FormEvent) => {
     this.setState({
-      commitMessage: (e.target as any).value,
+      commitMessage: (e.target as HTMLTextAreaElement).value,
     });
   };
 
