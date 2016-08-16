@@ -38,49 +38,57 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
     const { gitStatus, diff } = this.state;
 
     if (detailsLevel === DetailsLevel.Overview && !gitStatus) {
-      this.setState({
-        isLoading: true,
-      });
-
+      this.setLoading();
       gitStatusProvider.getGitStatus()
-        .then(gitStatus => this.setState({
-            detailsLevel: detailsLevel,
-            gitStatus: gitStatus,
-            error: null,
-            isLoading: false,
-          })
-        ).catch(err => this.setState({
-            detailsLevel: detailsLevel,
-            error: err.message,
-            isLoading: false,
-          })
-        );
-    } else if (detailsLevel === DetailsLevel.FullDiff && !diff) {
-      this.setState({
-        isLoading: true,
-      });
+        .then(this.handleSuccess(detailsLevel))
+        .catch(this.handleError(detailsLevel));
+      return;
+    }
 
+    if (detailsLevel === DetailsLevel.FullDiff && !diff) {
+      this.setLoading();
       this.props.diffProvider.getDiff('')
-        .then(diff => this.setState({
-            detailsLevel: detailsLevel,
-            diff: diff,
-            error: null,
-            isLoading: false,
-          })
-        ).catch(err => this.setState({
-            detailsLevel: detailsLevel,
-            error: err.message,
-            isLoading: false,
-          })
-        );
-    } else {
-      this.setState({
+        .then(this.handleSuccess(detailsLevel))
+        .catch(this.handleError(detailsLevel));
+      return;
+    }
+
+    this.setState({
+      detailsLevel: detailsLevel,
+      error: null,
+      isLoading: false,
+    });
+  };
+
+  private setLoading = () => this.setState({
+    isLoading: true,
+  });
+
+  private handleSuccess = detailsLevel => {
+    if (detailsLevel === DetailsLevel.Overview) {
+      return gitStatus => this.setState({
         detailsLevel: detailsLevel,
+        gitStatus: gitStatus,
+        error: null,
+        isLoading: false,
+      });
+    } else {
+      return diff => this.setState({
+        detailsLevel: detailsLevel,
+        diff: diff,
         error: null,
         isLoading: false,
       });
     }
-  };
+  }
+
+  private handleError = detailsLevel => {
+    return err => this.setState({
+      detailsLevel: detailsLevel,
+      error: err.message,
+      isLoading: false,
+    });
+  }
 
   render() {
     const { onCommit, onDiscard } = this.props;
