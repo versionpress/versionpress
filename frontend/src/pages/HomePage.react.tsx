@@ -16,6 +16,7 @@ import FlashMessage from '../common/FlashMessage.react';
 import ProgressBar from '../common/ProgressBar.react';
 import ServicePanel from '../service-panel/ServicePanel';
 import WelcomePanel from '../welcome-panel/WelcomePanel';
+import VpTitle from '../vp-title/VpTitle';
 import * as revertDialog from '../Commits/revertDialog';
 import * as WpApi from '../services/WpApi';
 import {indexOf} from '../Commits/CommitUtils';
@@ -453,7 +454,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         <ServicePanel
           isVisible={this.state.displayServicePanel}
           onButtonClick={this.onServicePanelClick}
-        />
+        >
+          <VpTitle />
+        </ServicePanel>
         {this.state.message
           ? <FlashMessage {...this.state.message} />
           : null
