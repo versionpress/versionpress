@@ -1,8 +1,9 @@
 import * as React from 'react';
 
 import Button from './Button';
+import Panel from './panel/Panel';
 import VpTitle from './VpTitle';
-import VpInfo from './VpInfo';
+
 import './ServicePanel.less';
 
 interface ServicePanelProps {
@@ -14,7 +15,7 @@ const ServicePanel: React.StatelessComponent<ServicePanelProps> = ({ isVisible, 
   <div>
     <Button onClick={onButtonClick} />
     <VpTitle />
-    <VpInfo isVisible={isVisible} />
+    <Panel isVisible={isVisible} />
   </div>
 );
 
