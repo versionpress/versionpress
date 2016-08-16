@@ -23,14 +23,12 @@ export default class Options extends React.Component<OptionsProps, {}> {
         id={id}
         onChange={this.onChange}
       >
-        {options.map(option => {
-          return (
-            <Option
-              option={option}
-              key={option.value}
-            />
-          );
-        })}
+        {options.map(option => (
+          <Option
+            option={option}
+            key={option.value}
+          />
+        ))}
       </select>
     );
   }
