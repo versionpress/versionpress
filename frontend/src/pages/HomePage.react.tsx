@@ -12,7 +12,7 @@ import BulkActionPanel from '../BulkActionPanel/BulkActionPanel.react';
 import CommitPanel from '../CommitPanel/CommitPanel.react';
 import CommitsTable from '../Commits/CommitsTable.react';
 import Filter from '../filter/Filter';
-import FlashMessage from '../common/FlashMessage.react';
+import FlashMessage from '../common/flash-message/FlashMessage';
 import ProgressBar from '../common/ProgressBar.react';
 import ServicePanel from '../ServicePanel/ServicePanel.react';
 import ServicePanelButton from '../ServicePanel/ServicePanelButton.react';
