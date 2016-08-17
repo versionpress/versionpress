@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as moment from 'moment';
 import * as classNames from 'classnames';
 
-import * as portal from '../common/portal';
+import * as portal from '../common/portal/portal';
 import {UndoDisabledDialog} from '../Commits/revertDialog';
 import {getGitBranchColor} from '../services/GitBranchColorProvider';
 

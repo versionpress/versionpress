@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import * as portal from '../common/portal';
+import * as portal from '../common/portal/portal';
 
 interface CommitPanelCommitProps extends React.Props<JSX.Element> {
   onCommit: (message: string) => any;

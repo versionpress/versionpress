@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import Body from './Body';
 import Header from './header/Header';
-import * as portal from '../portal';
+import * as portal from '../portal/portal';
 
 import './Modal.less';
 

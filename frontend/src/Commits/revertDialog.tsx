@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as request from 'superagent';
 
-import * as portal from '../common/portal';
+import * as portal from '../common/portal/portal';
 import * as WpApi from '../services/WpApi';
 
 const UndoEnabledDialog: React.StatelessComponent<{}> = () => {
@@ -35,7 +35,7 @@ export const UndoDisabledDialog: React.StatelessComponent<{}> = () => (
   </div>
 );
 
-export function revertDialog(title: React.ReactNode, okHandler: Function) {
+export function revertDialog(title: React.ReactNode, okHandler: () => void | boolean) {
   const req = WpApi
     .get('can-revert')
     .end((err: any, res: request.Response) => {

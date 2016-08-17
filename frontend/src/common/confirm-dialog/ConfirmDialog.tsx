@@ -3,7 +3,7 @@ import * as React from 'react';
 import Buttons from './buttons/Buttons';
 import Message from './Message';
 import Spinner from './Spinner';
-import * as portal from '../portal';
+import * as portal from '../portal/portal';
 
 import './ConfirmDialog.less';
 
@@ -14,8 +14,8 @@ interface ConfirmDialogProps {
   okButtonClasses?: string;
   cancelButtonClasses?: string;
   isLoading?: boolean;
-  okButtonClickHandler?(): void | boolean;
-  cancelButtonClickHandler?(): void | boolean;
+  onOkButtonClick?(): void | boolean;
+  onCancelButtonClick?(): void | boolean;
 }
 
 export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {}> {
@@ -23,19 +23,19 @@ export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {
   static defaultProps = {
     okButtonText: 'OK',
     cancelButtonText: 'Cancel',
-    okButtonClickHandler: function() {},
-    cancelButtonClickHandler: function() {},
     isLoading: false,
+    onOkButtonClick: function() {},
+    onCancelButtonClick: function() {},
   };
 
   onOkClick = () => {
-    if (this.props.okButtonClickHandler() !== false) {
+    if (this.props.onOkButtonClick() !== false) {
       portal.closePortal();
     }
   };
 
   onCancelClick = () => {
-    if (this.props.cancelButtonClickHandler() !== false) {
+    if (this.props.onCancelButtonClick() !== false) {
       portal.closePortal();
     }
   };
