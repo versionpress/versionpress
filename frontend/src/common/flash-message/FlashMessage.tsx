@@ -1,12 +1,12 @@
 import * as React from 'react';
-import * as classNames from 'classnames';
+
+import Details from './Details';
+import ShowDetails from './ShowDetails';
 
 import './FlashMessage.less';
 
-interface FlashMessageProps extends React.Props<JSX.Element> {
-  code: string;
-  message: string;
-  details?: string;
+interface FlashMessageProps {
+  message: InfoMessage;
 }
 
 interface FlashMessageState {
@@ -28,33 +28,27 @@ export default class FlashMessage extends React.Component<FlashMessageProps, Fla
   };
 
   render() {
-    const { code, message, details } = this.props;
+    const { code, message, details } = this.props.message;
     const { showDetails } = this.state;
 
     if (code === null) {
       return null;
     }
 
-    const linkClassName = classNames({
-      'FlashMessage-detailsLink-displayed': showDetails,
-      'FlashMessage-detailsLink-hidden': !showDetails,
-    });
-
     return (
       <div className={code}>
         <p>
-          {message} {' '}
-          {details
-            ? <a
-                className={linkClassName}
-                href='#'
-                onClick={this.onDetailsClick}
-              >Details </a>
-            : null}
+          {`${message} `}
+          {details &&
+            <ShowDetails
+              isActive={showDetails}
+              onClick={this.onDetailsClick}
+            />
+          }
         </p>
-        {details && showDetails
-          ? <p className='FlashMessage-details'>{details.toString()}</p>
-          : null}
+        {(details && showDetails) &&
+          <Details text={details} />
+        }
       </div>
     );
   }

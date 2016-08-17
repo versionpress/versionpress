@@ -1,4 +1,5 @@
 /// <reference path='../Commits/Commits.d.ts' />
+/// <reference path='../interfaces/State.d.ts' />
 
 import * as React from 'react';
 import * as ReactRouter from 'react-router';
@@ -38,11 +39,7 @@ interface HomePageState {
   commits?: Commit[];
   selectedCommits?: Commit[];
   lastSelectedCommit?: Commit;
-  message?: {
-    code: string,
-    message: string,
-    details?: string,
-  };
+  message?: InfoMessage;
   isLoading?: boolean;
   displayServicePanel?: boolean;
   displayWelcomePanel?: boolean;
@@ -455,9 +452,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         <ProgressBar ref='progress' />
         <ServicePanelButton onClick={this.onServicePanelClick} />
         <h1 className='vp-header'>VersionPress</h1>
-        {this.state.message
-          ? <FlashMessage {...this.state.message} />
-          : null
+        {this.state.message &&
+          <FlashMessage message={this.state.message} />
         }
         <ServicePanel isVisible={this.state.displayServicePanel} />
         {this.state.isDirtyWorkingDirectory
