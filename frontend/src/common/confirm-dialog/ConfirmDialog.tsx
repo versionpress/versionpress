@@ -1,21 +1,21 @@
 import * as React from 'react';
 
-import * as portal from '../portal';
-import Message from './Message';
 import Buttons from './buttons/Buttons';
+import Message from './Message';
 import Spinner from './Spinner';
+import * as portal from '../portal';
 
 import './ConfirmDialog.less';
 
-interface ConfirmDialogProps extends React.Props<JSX.Element> {
+interface ConfirmDialogProps {
   message?: React.ReactNode;
   okButtonText?: string;
   cancelButtonText?: string;
-  okButtonClickHandler?: Function;
-  cancelButtonClickHandler?: Function;
   okButtonClasses?: string;
   cancelButtonClasses?: string;
   isLoading?: boolean;
+  okButtonClickHandler?(): void | boolean;
+  cancelButtonClickHandler?(): void | boolean;
 }
 
 export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {}> {

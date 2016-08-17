@@ -22,7 +22,7 @@ export default class Filter extends React.Component<FilterProps, {}> {
   onInputChange = (e: React.FormEvent) => {
     e.preventDefault();
 
-    this.props.onQueryChange((e.target as any).value);
+    this.props.onQueryChange((e.target as HTMLTextAreaElement).value);
   };
 
   render() {

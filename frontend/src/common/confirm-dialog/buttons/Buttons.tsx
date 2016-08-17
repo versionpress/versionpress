@@ -11,23 +11,32 @@ interface ButtonsProps {
   onCancelClick(): void;
 }
 
-const Buttons: React.StatelessComponent<ButtonsProps> = ({
-  okButtonText, cancelButtonText, okButtonClassName, cancelButtonClassName, onOkClick, onCancelClick,
-}) => (
-  <div className='ConfirmDialog-buttons'>
-    <Button
-      text={okButtonText}
-      isPrimary={true}
-      extraClassName={okButtonClassName}
-      onClick={onOkClick}
-    />
-    <Button
-      text={cancelButtonText}
-      isPrimary={false}
-      extraClassName={cancelButtonClassName}
-      onClick={onCancelClick}
-    />
-  </div>
-);
+const Buttons: React.StatelessComponent<ButtonsProps> = (props) => {
+  const {
+    okButtonText,
+    cancelButtonText,
+    okButtonClassName,
+    cancelButtonClassName,
+    onOkClick,
+    onCancelClick,
+  } = props;
+
+  return (
+    <div className='ConfirmDialog-buttons'>
+      <Button
+        text={okButtonText}
+        isPrimary={true}
+        extraClassName={okButtonClassName}
+        onClick={onOkClick}
+      />
+      <Button
+        text={cancelButtonText}
+        isPrimary={false}
+        extraClassName={cancelButtonClassName}
+        onClick={onCancelClick}
+      />
+    </div>
+  );
+};
 
 export default Buttons;

@@ -8,9 +8,13 @@ interface ButtonProps {
   onClick(): void;
 }
 
-const Button: React.StatelessComponent<ButtonProps> = ({
-  text, isPrimary, extraClassName, onClick,
-}) => {
+const Button: React.StatelessComponent<ButtonProps> = (props) => {
+  const {
+    text,
+    isPrimary,
+    extraClassName,
+    onClick,
+  } = props;
   const buttonClassName = classNames({
     'ConfirmDialog-button': true,
     'button': true,
