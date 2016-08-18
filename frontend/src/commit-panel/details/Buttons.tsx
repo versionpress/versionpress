@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { DetailsLevel } from '../../enums/DetailsLevel';
+import DetailsLevel from '../../enums/DetailsLevel';
 
 interface ButtonsProps {
   detailsLevel: DetailsLevel;

@@ -4,4 +4,4 @@ enum DetailsLevel {
   FullDiff,
 }
 
-export { DetailsLevel };
+export default DetailsLevel;
