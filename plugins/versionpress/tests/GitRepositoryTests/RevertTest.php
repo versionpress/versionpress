@@ -2,7 +2,7 @@
 
 namespace VersionPress\Tests\GitRepositoryTests;
 
-use VersionPress\Actions\ActionsInfo;
+use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\Cli\VPCommandUtils;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Git\GitRepository;
@@ -194,7 +194,7 @@ class RevertTest extends \PHPUnit_Framework_TestCase
     private function createCommitAsserter()
     {
         $dbSchemaInfo = $this->getMockBuilder(DbSchemaInfo::class)->disableOriginalConstructor()->getMock();
-        $actionsInfo = $this->getMockBuilder(ActionsInfo::class)->disableOriginalConstructor()->getMock();
-        return new CommitAsserter(self::$repository, $dbSchemaInfo, $actionsInfo);
+        $actionsInfoProvider = $this->getMockBuilder(ActionsInfoProvider::class)->disableOriginalConstructor()->getMock();
+        return new CommitAsserter(self::$repository, $dbSchemaInfo, $actionsInfoProvider);
     }
  }

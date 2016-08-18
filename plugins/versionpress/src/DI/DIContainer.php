@@ -4,7 +4,11 @@ namespace VersionPress\DI;
 
 use VersionPress\Actions\ActionsInfo;
 use VersionPress\Actions\ActionsInfoProvider;
+use VersionPress\Actions\ActionsDefinitionRepository;
+use VersionPress\Actions\ActivePluginsActionsFilesIterator;
+use VersionPress\Actions\ActionsDefinitionIterator;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
+use VersionPress\ChangeInfos\CommitMessageParser;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesInfo;
@@ -94,15 +98,29 @@ class DIContainer
             );
         });
 
-        $dic->register(VersionPressServices::ACTIONSINFO_PROVIDER, function () {
-            $vpActionsFile = VERSIONPRESS_PLUGIN_DIR . '/.versionpress/actions.yml';
-            return new ActionsInfoProvider([$vpActionsFile]);
+        $dic->register(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY, function () use ($dic) {
+            return new ActionsDefinitionRepository($dic->resolve(VersionPressServices::GIT_REPOSITORY));
+        });
+
+        $dic->register(VersionPressServices::ACTIONSINFO_PROVIDER_ALL_PLUGINS, function () use ($dic) {
+            return new ActionsInfoProvider(new ActionsDefinitionIterator($dic->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY)));
+        });
+
+        $dic->register(VersionPressServices::ACTIONSINFO_PROVIDER_ACTIVE_PLUGINS, function () {
+            return new ActionsInfoProvider(new ActivePluginsActionsFilesIterator());
         });
 
         $dic->register(VersionPressServices::CHANGEINFO_FACTORY, function () use ($dic) {
             return new ChangeInfoFactory(
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
-                $dic->resolve(VersionPressServices::ACTIONSINFO_PROVIDER)
+                $dic->resolve(VersionPressServices::ACTIONSINFO_PROVIDER_ACTIVE_PLUGINS)
+            );
+        });
+
+        $dic->register(VersionPressServices::COMMIT_MESSAGE_PARSER, function () use ($dic) {
+            return new CommitMessageParser(
+                $dic->resolve(VersionPressServices::DB_SCHEMA),
+                $dic->resolve(VersionPressServices::ACTIONSINFO_PROVIDER_ALL_PLUGINS)
             );
         });
 
@@ -119,7 +137,7 @@ class DIContainer
         $dic->register(VersionPressServices::COMMITTER, function () use ($dic) {
             return new Committer(
                 $dic->resolve(VersionPressServices::MIRROR),
-                $dic->resolve(VersionPressServices::REPOSITORY),
+                $dic->resolve(VersionPressServices::GIT_REPOSITORY),
                 $dic->resolve(VersionPressServices::STORAGE_FACTORY)
             );
         });
@@ -130,11 +148,12 @@ class DIContainer
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::STORAGE_FACTORY),
                 $dic->resolve(VersionPressServices::SYNCHRONIZER_FACTORY),
-                $dic->resolve(VersionPressServices::REPOSITORY),
+                $dic->resolve(VersionPressServices::GIT_REPOSITORY),
                 $dic->resolve(VersionPressServices::URL_REPLACER),
                 $dic->resolve(VersionPressServices::VPID_REPOSITORY),
                 $dic->resolve(VersionPressServices::SHORTCODES_REPLACER),
-                $dic->resolve(VersionPressServices::CHANGEINFO_FACTORY)
+                $dic->resolve(VersionPressServices::CHANGEINFO_FACTORY),
+                $dic->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY)
             );
         });
 
@@ -158,14 +177,14 @@ class DIContainer
                 $dic->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS),
                 $dic->resolve(VersionPressServices::DATABASE),
                 $dic->resolve(VersionPressServices::COMMITTER),
-                $dic->resolve(VersionPressServices::REPOSITORY),
+                $dic->resolve(VersionPressServices::GIT_REPOSITORY),
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::STORAGE_FACTORY),
-                $dic->resolve(VersionPressServices::CHANGEINFO_FACTORY)
+                $dic->resolve(VersionPressServices::COMMIT_MESSAGE_PARSER)
             );
         });
 
-        $dic->register(VersionPressServices::REPOSITORY, function () {
+        $dic->register(VersionPressServices::GIT_REPOSITORY, function () {
             return new GitRepository(VP_PROJECT_ROOT, VERSIONPRESS_TEMP_DIR, VERSIONPRESS_COMMIT_MESSAGE_PREFIX, VP_GIT_BINARY);
         });
 

@@ -1,7 +1,7 @@
 <?php
 namespace VersionPress\Utils;
 
-use VersionPress\ChangeInfos\ChangeInfoFactory;
+use VersionPress\ChangeInfos\CommitMessageParser;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitRepository;
 
@@ -22,17 +22,17 @@ class UninstallationUtil
     {
         global $versionPressContainer;
         /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+        $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
         $initialCommit = $repository->getInitialCommit();
 
         if (!$initialCommit) {
             return false;
         }
 
-        /** @var ChangeInfoFactory $changeInfoFactory */
-        $changeInfoFactory = $versionPressContainer->resolve(VersionPressServices::CHANGEINFO_FACTORY);
+        /** @var CommitMessageParser $commitMessageParser */
+        $commitMessageParser = $versionPressContainer->resolve(VersionPressServices::COMMIT_MESSAGE_PARSER);
 
-        $changeInfoEnvelope = $changeInfoFactory->buildChangeInfoEnvelopeFromCommitMessage($initialCommit->getMessage());
+        $changeInfoEnvelope = $commitMessageParser->parse($initialCommit->getMessage());
 
         $changeInfoList = $changeInfoEnvelope->getChangeInfoList();
         $firstChangeInfo = $changeInfoList[0];

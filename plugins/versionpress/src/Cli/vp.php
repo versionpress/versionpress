@@ -878,7 +878,7 @@ class VPCommand extends WP_CLI_Command
         /** @var Reverter $reverter */
         $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
         /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+        $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
 
         $initialCommitHash = $this->getInitialCommitHash($repository);
 
@@ -959,7 +959,7 @@ class VPCommand extends WP_CLI_Command
         /** @var Reverter $reverter */
         $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
         /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+        $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
 
         $initialCommitHash = $this->getInitialCommitHash($repository);
 

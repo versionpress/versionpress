@@ -11,7 +11,7 @@ function vp_force_action($scope, $action, $id = '', $tags = [], $files = [])
     /** @var Committer $committer */
     $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
     /** @var ActionsInfoProvider $actionsInfoProvider */
-    $actionsInfoProvider = $versionPressContainer->resolve(VersionPressServices::ACTIONSINFO_PROVIDER);
+    $actionsInfoProvider = $versionPressContainer->resolve(VersionPressServices::ACTIONSINFO_PROVIDER_ACTIVE_PLUGINS);
     $actionsInfo = $actionsInfoProvider->getActionsInfo($scope);
 
     $changeInfo = new TrackedChangeInfo($scope, $actionsInfo, $action, $id, $tags, $files);

@@ -1,5 +1,5 @@
 <?php
-use VersionPress\ChangeInfos\ChangeInfoFactory;
+use VersionPress\ChangeInfos\CommitMessageParser;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitLogPaginator;
 use VersionPress\Git\GitRepository;
@@ -99,9 +99,9 @@ if ($showWelcomePanel === "") {
     <?php
     global $versionPressContainer;
     /** @var GitRepository $repository */
-    $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
-    /** @var ChangeInfoFactory $changeInfoFactory */
-    $changeInfoFactory = $versionPressContainer->resolve(VersionPressServices::CHANGEINFO_FACTORY);
+    $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
+    /** @var CommitMessageParser $commitMessageParser */
+    $commitMessageParser = $versionPressContainer->resolve(VersionPressServices::COMMIT_MESSAGE_PARSER);
 
     $preActivationHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
     if (empty($preActivationHash)) {
@@ -136,7 +136,7 @@ if ($showWelcomePanel === "") {
             && ($isChildOfInitialCommit || $commit->getHash() === $initialCommitHash);
         $commitDate = $commit->getDate()->format('d-M-y H:i:s');
 
-        $changeInfo = $changeInfoFactory->buildChangeInfoEnvelopeFromCommitMessage($commit->getMessage());
+        $changeInfo = $commitMessageParser->parse($commit->getMessage());
         $undoSnippet = "<a " .
             "href='" .
                 admin_url('admin.php?action=vp_show_undo_confirm&method=undo&commit=' . $commit->getHash()) . "' " .

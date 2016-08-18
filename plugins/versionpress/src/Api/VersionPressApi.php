@@ -7,6 +7,7 @@ require_once ABSPATH . 'wp-admin/includes/file.php';
 use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
+use VersionPress\ChangeInfos\CommitMessageParser;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
@@ -38,15 +39,15 @@ class VersionPressApi
 
     const NAMESPACE_VP = 'versionpress';
 
-    /** @var ChangeInfoFactory */
-    private $changeInfoFactory;
+    /** @var CommitMessageParser */
+    private $commitMessageParser;
 
-    public function __construct(GitRepository $gitRepository, Reverter $reverter, SynchronizationProcess $synchronizationProcess, ChangeInfoFactory $changeInfoFactory)
+    public function __construct(GitRepository $gitRepository, Reverter $reverter, SynchronizationProcess $synchronizationProcess, CommitMessageParser $commitMessageParser)
     {
         $this->gitRepository = $gitRepository;
         $this->reverter = $reverter;
         $this->synchronizationProcess = $synchronizationProcess;
-        $this->changeInfoFactory = $changeInfoFactory;
+        $this->commitMessageParser = $commitMessageParser;
     }
 
     /**
@@ -239,7 +240,7 @@ class VersionPressApi
             $canRollbackToThisCommit = !$isFirstCommit &&
                 ($isChildOfInitialCommit || $commit->getHash() === $initialCommitHash);
 
-            $changeInfo = $this->changeInfoFactory->buildChangeInfoEnvelopeFromCommitMessage($commit->getMessage());
+            $changeInfo = $this->commitMessageParser->parse($commit->getMessage());
             $isEnabled = $isChildOfInitialCommit || $commit->getHash() === $initialCommitHash;
 
             $skipVpdbFiles = $changeInfo->getChangeInfoList()[0] instanceof TrackedChangeInfo;
@@ -415,7 +416,7 @@ class VersionPressApi
     {
         global $versionPressContainer;
         /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+        $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
 
         $latestCommit = $request['latestCommit'];
 
@@ -453,7 +454,7 @@ class VersionPressApi
     {
         global $versionPressContainer;
         /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+        $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
 
         return new WP_REST_Response($repository->getStatus(true));
     }
@@ -539,7 +540,7 @@ class VersionPressApi
     {
         global $versionPressContainer;
         /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+        $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
 
         $result = $repository->clearWorkingDirectory();
 

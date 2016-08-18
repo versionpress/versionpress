@@ -24,9 +24,7 @@ class ActionsInfoProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function actionsInfoProviderCreatesActionInfo($scopeDefinition, $description, $tags, $priority, $parentIdTag)
     {
-        $actionsFilePath = $this->createActionsFile($scopeDefinition);
-
-        $actionsInfoProvider = new ActionsInfoProvider([$actionsFilePath]);
+        $actionsInfoProvider = new ActionsInfoProvider([$scopeDefinition]);
         $actionsInfo = $actionsInfoProvider->getActionsInfo('some-scope');
 
         $this->assertInstanceOf(ActionsInfo::class, $actionsInfo);
@@ -81,10 +79,7 @@ class ActionsInfoProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $actionsFilePath1 = $this->createActionsFile($scopeDefinition1);
-        $actionsFilePath2 = $this->createActionsFile($scopeDefinition2);
-
-        $actionsInfoProvider = new ActionsInfoProvider([$actionsFilePath1, $actionsFilePath2]);
+        $actionsInfoProvider = new ActionsInfoProvider([$scopeDefinition1, $scopeDefinition2]);
         $actionInfo1 = $actionsInfoProvider->getActionsInfo('some-scope-1');
         $actionInfo2 = $actionsInfoProvider->getActionsInfo('some-scope-2');
 
@@ -117,10 +112,7 @@ class ActionsInfoProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $actionsFilePath1 = $this->createActionsFile($scopeDefinition1);
-        $actionsFilePath2 = $this->createActionsFile($scopeDefinition2);
-
-        $actionsInfoProvider = new ActionsInfoProvider([$actionsFilePath1, $actionsFilePath2]);
+        $actionsInfoProvider = new ActionsInfoProvider([$scopeDefinition1, $scopeDefinition2]);
         $actionsInfo = $actionsInfoProvider->getActionsInfo('some-scope');
 
         $generatedDescription = $actionsInfo->getDescription('some-action-1', 'some-id', ['action-1-tag' => 'tag 1']);
@@ -152,10 +144,7 @@ class ActionsInfoProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $actionsFilePath1 = $this->createActionsFile($scopeDefinition1);
-        $actionsFilePath2 = $this->createActionsFile($scopeDefinition2);
-
-        $actionsInfoProvider = new ActionsInfoProvider([$actionsFilePath1, $actionsFilePath2]);
+        $actionsInfoProvider = new ActionsInfoProvider([$scopeDefinition1, $scopeDefinition2]);
         $actionsInfo = $actionsInfoProvider->getActionsInfo('some-scope');
 
         $generatedDescription = $actionsInfo->getDescription('some-action-1', 'some-id', ['some-tag' => 'tag 1']);
@@ -177,26 +166,7 @@ class ActionsInfoProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $actionsFilePath = $this->createActionsFile($scopeDefinition);
-
-        $actionsInfoProvider = new ActionsInfoProvider(new \ArrayIterator([$actionsFilePath]));
+        $actionsInfoProvider = new ActionsInfoProvider(new \ArrayIterator([$scopeDefinition]));
         $this->assertInstanceOf(ActionsInfo::class, $actionsInfoProvider->getActionsInfo('some-scope'));
-    }
-
-    /**
-     * Creates a virtual file containg YAML created from $scopesDefinition and returns its path.
-     *
-     * @param array $scopesDefinition
-     * @return string
-     */
-    private function createActionsFile($scopesDefinition)
-    {
-        static $fileNumber = 0;
-
-        $fileName = 'actions-' . ($fileNumber++) . '.yml';
-        $actionFile = vfsStream::newFile($fileName)->at($this->root);
-
-        file_put_contents($actionFile->url(), Yaml::dump($scopesDefinition));
-        return $actionFile->url();
     }
 }

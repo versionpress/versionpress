@@ -1,5 +1,6 @@
 <?php
 
+use VersionPress\Actions\ActionsDefinitionRepository;
 use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\Api\VersionPressApi;
 use VersionPress\ChangeInfos\EntityChangeInfo;
@@ -98,7 +99,9 @@ function vp_register_hooks()
     /** @var \VersionPress\Database\Database $database */
     $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
     /** @var ActionsInfoProvider $actionsInfoProvider */
-    $actionsInfoProvider = $versionPressContainer->resolve(VersionPressServices::ACTIONSINFO_PROVIDER);
+    $actionsInfoProvider = $versionPressContainer->resolve(VersionPressServices::ACTIONSINFO_PROVIDER_ACTIVE_PLUGINS);
+    /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
+    $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
 
 
 
@@ -129,9 +132,10 @@ function vp_register_hooks()
 
     WordPressMissingFunctions::pipeAction('_core_updated_successfully', 'vp_wordpress_updated');
 
-    add_action('activated_plugin', function ($pluginFile) {
+    add_action('activated_plugin', function ($pluginFile) use ($actionsDefinitionRepository) {
         $plugins = get_plugins();
         $pluginName = $plugins[$pluginFile]['Name'];
+        $actionsDefinitionRepository->saveDefinitionForPlugin($pluginFile);
         do_action('vp_plugin_changed', 'activate', $pluginFile, $pluginName);
     });
 
@@ -979,11 +983,11 @@ add_action('rest_api_init', 'versionpress_api_init');
 function versionpress_api_init()
 {
     global $versionPressContainer;
-    $gitRepository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+    $gitRepository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
     $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
     $synchronizationProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
-    $changeInfoFactory = $versionPressContainer->resolve(VersionPressServices::CHANGEINFO_FACTORY);
+    $commitMessageParser = $versionPressContainer->resolve(VersionPressServices::COMMIT_MESSAGE_PARSER);
 
-    $vpApi = new VersionPressApi($gitRepository, $reverter, $synchronizationProcess, $changeInfoFactory);
+    $vpApi = new VersionPressApi($gitRepository, $reverter, $synchronizationProcess, $commitMessageParser);
     $vpApi->registerRoutes();
 }

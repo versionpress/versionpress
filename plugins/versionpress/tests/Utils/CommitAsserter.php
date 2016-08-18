@@ -5,10 +5,10 @@ namespace VersionPress\Tests\Utils;
 use Exception;
 use Nette\Utils\Strings;
 use PHPUnit_Framework_Assert;
-use VersionPress\Actions\ActionsInfo;
+use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\ChangeInfos\BulkChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
-use VersionPress\ChangeInfos\ChangeInfoFactory;
+use VersionPress\ChangeInfos\CommitMessageParser;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\Database\DbSchemaInfo;
@@ -53,8 +53,8 @@ class CommitAsserter
     private $pathPlaceholders;
     /** @var DbSchemaInfo */
     private $dbSchema;
-    /** @var ActionsInfo */
-    private $actionsInfo;
+    /** @var ActionsInfoProvider */
+    private $actionsInfoProvider;
 
     /**
      * Create CommitAsserter to start tracking the git repo for future asserts. Should generally
@@ -63,15 +63,15 @@ class CommitAsserter
      *
      * @param \VersionPress\Git\GitRepository $gitRepository
      * @param DbSchemaInfo $dbSchema
-     * @param ActionsInfo $actionsInfo
+     * @param ActionsInfoProvider $actionsInfoProvider
      * @param string[] $pathPlaceholders
      */
-    public function __construct($gitRepository, DbSchemaInfo $dbSchema, ActionsInfo $actionsInfo, $pathPlaceholders = [])
+    public function __construct($gitRepository, DbSchemaInfo $dbSchema, ActionsInfoProvider $actionsInfoProvider, $pathPlaceholders = [])
     {
         $this->gitRepository = $gitRepository;
         $this->pathPlaceholders = $pathPlaceholders;
         $this->dbSchema = $dbSchema;
-        $this->actionsInfo = $actionsInfo;
+        $this->actionsInfoProvider = $actionsInfoProvider;
 
         if ($gitRepository->isVersioned()) {
             $this->startCommit = $gitRepository->getCommit($gitRepository->getLastCommitHash());
@@ -398,8 +398,8 @@ class CommitAsserter
      */
     protected function getChangeInfo($commit)
     {
-        $changeInfoFactory = new ChangeInfoFactory($this->dbSchema, $this->actionsInfo);
-        return $changeInfoFactory->buildChangeInfoEnvelopeFromCommitMessage($commit->getMessage());
+        $commitMessageParser = new CommitMessageParser($this->dbSchema, $this->actionsInfoProvider);
+        return $commitMessageParser->parse($commit->getMessage());
     }
 
 

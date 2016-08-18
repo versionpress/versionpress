@@ -1,7 +1,7 @@
 <?php
 
 use Nette\Utils\Strings;
-use VersionPress\ChangeInfos\ChangeInfoFactory;
+use VersionPress\ChangeInfos\CommitMessageParser;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitRepository;
 use VersionPress\Initialization\WpdbReplacer;
@@ -486,14 +486,14 @@ add_filter('vp_action_description_versionpress', function ($message, $action, $c
 
     global $versionPressContainer;
     /** @var GitRepository $gitRepository */
-    $gitRepository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
-    /** @var ChangeInfoFactory $changeInfoFactory */
-    $changeInfoFactory = $versionPressContainer->resolve(VersionPressServices::CHANGEINFO_FACTORY);
+    $gitRepository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
+    /** @var CommitMessageParser $commitMessageParser */
+    $commitMessageParser = $versionPressContainer->resolve(VersionPressServices::COMMIT_MESSAGE_PARSER);
 
     $revertedCommit = $gitRepository->getCommit($commitHash);
 
     if ($action === 'undo') {
-        $changeInfo = $changeInfoFactory->buildChangeInfoEnvelopeFromCommitMessage($revertedCommit->getMessage());
+        $changeInfo = $commitMessageParser->parse($revertedCommit->getMessage());
         $message = str_replace('%/commit-message/%', $changeInfo->getChangeDescription(), $message);
     } elseif ($action === 'rollback') {
         $message = str_replace('%/commit-date/%', $revertedCommit->getDate()->format('d-M-y H:i:s'), $message);

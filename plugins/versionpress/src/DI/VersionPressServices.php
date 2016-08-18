@@ -13,7 +13,7 @@ final class VersionPressServices
     const SYNCHRONIZATION_PROCESS = 'synchronization-process';
     const SYNCHRONIZER_FACTORY = 'synchronizer-factory';
     const REVERTER = 'reverter';
-    const REPOSITORY = 'repository';
+    const GIT_REPOSITORY = 'git-repository';
     const WPDB = 'wpdb';
     const DATABASE = 'database';
     const VPID_REPOSITORY = 'vpid-repository';
@@ -21,8 +21,11 @@ final class VersionPressServices
     const SHORTCODES_REPLACER = 'shortcode-replacer';
     const SHORTCODES_INFO = 'shortcodes-info';
     const SQL_QUERY_PARSER = 'sql-query-parser';
-    const ACTIONSINFO_PROVIDER = 'actionsinfo-provider';
+    const ACTIONSINFO_PROVIDER_ACTIVE_PLUGINS = 'actionsinfo-provider-active-plugins';
     const CHANGEINFO_FACTORY = 'changeinfo-factory';
+    const ACTIONSINFO_PROVIDER_ALL_PLUGINS = 'actionsinfo-provider-all-plugins';
+    const ACTIONS_DEFINITION_REPOSITORY = 'actions-definition-repository';
+    const COMMIT_MESSAGE_PARSER = 'commit-message-parser';
 
     private function __construct()
     {

@@ -3,7 +3,7 @@
 namespace VersionPress\Git;
 
 use Nette\Utils\Strings;
-use VersionPress\ChangeInfos\ChangeInfoFactory;
+use VersionPress\ChangeInfos\CommitMessageParser;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\Database\Database;
@@ -37,8 +37,8 @@ class Reverter
     /** @var StorageFactory */
     private $storageFactory;
 
-    /** @var ChangeInfoFactory */
-    private $changeInfoFactory;
+    /** @var CommitMessageParser */
+    private $commitMessageParser;
 
     /** @var int */
     const DELETE_ORPHANED_POSTS_SECONDS = 60;
@@ -50,7 +50,7 @@ class Reverter
         GitRepository $repository,
         DbSchemaInfo $dbSchemaInfo,
         StorageFactory $storageFactory,
-        ChangeInfoFactory $changeInfoFactory
+        CommitMessageParser $commitMessageParser
     ) {
         $this->synchronizationProcess = $synchronizationProcess;
         $this->database = $database;
@@ -58,7 +58,7 @@ class Reverter
         $this->repository = $repository;
         $this->dbSchemaInfo = $dbSchemaInfo;
         $this->storageFactory = $storageFactory;
-        $this->changeInfoFactory = $changeInfoFactory;
+        $this->commitMessageParser = $commitMessageParser;
     }
 
     public function undo($commits)
@@ -168,7 +168,7 @@ class Reverter
 
     private function checkReferencesForRevertedCommit(Commit $revertedCommit)
     {
-        $changeInfo = $this->changeInfoFactory->buildChangeInfoEnvelopeFromCommitMessage($revertedCommit->getMessage());
+        $changeInfo = $this->commitMessageParser->parse($revertedCommit->getMessage());
 
         if ($changeInfo instanceof UntrackedChangeInfo) {
             return true;

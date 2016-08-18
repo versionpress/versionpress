@@ -2,6 +2,8 @@
 namespace VersionPress\Initialization;
 
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Symfony\Component\Yaml\Yaml;
+use VersionPress\Actions\ActionsDefinitionRepository;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
@@ -90,6 +92,12 @@ class Initializer
      * @var ChangeInfoFactory
      */
     private $changeInfoFactory;
+
+    /**
+     * @var ActionsDefinitionRepository
+     */
+    private $actionsDefinitionRepository;
+
     private $idCache = [];
     private $executionStartTime;
 
@@ -102,7 +110,8 @@ class Initializer
         AbsoluteUrlReplacer $urlReplacer,
         VpidRepository $vpidRepository,
         ShortcodesReplacer $shortcodesReplacer,
-        ChangeInfoFactory $changeInfoFactory
+        ChangeInfoFactory $changeInfoFactory,
+        ActionsDefinitionRepository $actionsDefinitionRepository
     ) {
 
         $this->database = $database;
@@ -115,6 +124,7 @@ class Initializer
         $this->shortcodesReplacer = $shortcodesReplacer;
         $this->executionStartTime = microtime(true);
         $this->changeInfoFactory = $changeInfoFactory;
+        $this->actionsDefinitionRepository = $actionsDefinitionRepository;
     }
 
     /**
@@ -139,6 +149,7 @@ class Initializer
             $this->createCommonConfig();
             $this->installComposerScripts();
             $this->doInitializationCommit($isUpdate);
+            $this->persistActionsDefinition();
             vp_disable_maintenance();
             $this->reportProgressChange(InitializerStates::FINISHED);
         } catch (InitializationAbortedException $ex) {
@@ -665,5 +676,10 @@ class Initializer
 
             file_put_contents($composerJsonPath, json_encode($composerJson, JSON_PRETTY_PRINT));
         }
+    }
+
+    private function persistActionsDefinition()
+    {
+        $this->actionsDefinitionRepository->saveDefinitionForPlugin('versionpress/versionpress.php');
     }
 }

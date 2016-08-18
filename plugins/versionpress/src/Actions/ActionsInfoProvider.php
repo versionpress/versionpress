@@ -12,14 +12,13 @@ class ActionsInfoProvider
     private $actionsInfoMap = [];
 
     /**
-     * @param array|\Traversable $actionFiles
+     * @param array|\Traversable $definitions
      */
-    public function __construct($actionFiles = [])
+    public function __construct($definitions = [])
     {
         $actionMap = [];
-        foreach ($actionFiles as $file) {
-            $content = file_get_contents($file);
-            $actionMap = array_merge_recursive($actionMap, Yaml::parse($content));
+        foreach ($definitions as $scopes) {
+            $actionMap = array_merge_recursive($actionMap, $scopes);
         }
 
         foreach ($actionMap as $scope => &$scopeDefinition) {
