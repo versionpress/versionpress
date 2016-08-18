@@ -45,6 +45,7 @@ interface HomePageState {
   displayWelcomePanel?: boolean;
   displayUpdateNotice?: boolean;
   isDirtyWorkingDirectory?: boolean;
+  progress?: number;
 }
 
 export default class HomePage extends React.Component<HomePageProps, HomePageState> {
@@ -65,6 +66,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     displayWelcomePanel: false,
     displayUpdateNotice: false,
     isDirtyWorkingDirectory: false,
+    progress: 100,
   };
 
   private refreshInterval;
@@ -84,6 +86,12 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     };
   }
 
+  private updateProgress = (e: {percent: number}) => {
+    this.setState({
+      progress: e.percent,
+    });
+  };
+
   componentDidMount() {
     this.fetchWelcomePanel();
     this.fetchCommits();
@@ -102,9 +110,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     const router: ReactRouter.Context = (this.context as any).router;
     this.setState({
       isLoading: true,
+      progress: 0,
     });
-    const progressBar = this.refs['progress'] as ProgressBar;
-    progressBar.progress(0);
 
     const page = (parseInt(params.page, 10) - 1) || 0;
 
@@ -115,7 +122,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     WpApi
       .get('commits')
       .query({page: page, query: encodeURIComponent(this.state.query)})
-      .on('progress', (e) => progressBar.progress(e.percent))
+      .on('progress', this.updateProgress)
       .end((err: any, res: request.Response) => {
         const data = res.body.data as VpApi.GetCommitsResponse;
         if (err) {
@@ -186,16 +193,15 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   };
 
   undoCommits = (commits: string[]) => {
-    const progressBar = this.refs['progress'] as ProgressBar;
-    progressBar.progress(0);
     this.setState({
       isLoading: true,
+      progress: 0,
     });
 
     WpApi
       .get('undo')
       .query({commits: commits})
-      .on('progress', (e) => progressBar.progress(e.percent))
+      .on('progress', this.updateProgress)
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
@@ -211,16 +217,15 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   };
 
   rollbackToCommit = (hash: string) => {
-    const progressBar = this.refs['progress'] as ProgressBar;
-    progressBar.progress(0);
     this.setState({
       isLoading: true,
+      progress: 0,
     });
 
     WpApi
       .get('rollback')
       .query({commit: hash})
-      .on('progress', (e) => progressBar.progress(e.percent))
+      .on('progress', this.updateProgress)
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
@@ -302,15 +307,16 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   };
 
   onCommit = (message: string) => {
-    const progressBar = this.refs['progress'] as ProgressBar;
-    progressBar.progress(0);
+    this.setState({
+      progress: 0,
+    });
 
     const values = { 'commit-message': message };
 
     WpApi
       .post('commit')
       .send(values)
-      .on('progress', (e) => progressBar.progress(e.percent))
+      .on('progress', this.updateProgress)
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
@@ -331,12 +337,13 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   };
 
   onDiscard = () => {
-    const progressBar = this.refs['progress'] as ProgressBar;
-    progressBar.progress(0);
+    this.setState({
+      progress: 0,
+    });
 
     WpApi
       .post('discard-changes')
-      .on('progress', (e: {percent: number}) => progressBar.progress(e.percent))
+      .on('progress', this.updateProgress)
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
@@ -449,7 +456,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
     return (
       <div className={homePageClassName}>
-        <ProgressBar ref='progress' />
+        <ProgressBar progress={this.state.progress} />
         <ServicePanelButton onClick={this.onServicePanelClick} />
         <h1 className='vp-header'>VersionPress</h1>
         {this.state.message &&

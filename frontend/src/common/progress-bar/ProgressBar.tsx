@@ -5,44 +5,29 @@ import SpinnerIcon from './SpinnerIcon';
 
 import './ProgressBar.less';
 
-interface ProgressBarState {
-  isVisible?: boolean;
-  progress?: number;
+interface ProgressBarProps {
+  progress: number;
 }
 
-export default class ProgressBar extends React.Component<React.Props<JSX.Element>, ProgressBarState> {
+const ProgressBar: React.StatelessComponent<ProgressBarProps> = ({ progress }) => {
+  const isVisible = progress < 100;
 
-  state = {
-    isVisible: false,
-    progress: 0,
+  const barStyles = {
+    transform: `translate3d(${progress - 100}%,0px,0px)`,
+    display: (isVisible ? 'inline-block' : 'none'),
   };
 
-  progress(progress: number) {
-    this.setState({
-      progress,
-      isVisible: progress < 100,
-    });
-  }
-
-  render() {
-    const { isVisible, progress } = this.state;
-
-    const barStyles = {
-      transform: `translate3d(${progress - 100}%,0px,0px)`,
-      display: (isVisible ? 'inline-block' : 'none'),
-    };
-
-    return (
-      <div className='ProgressBar'>
-        <div
-          className='ProgressBar-bar'
-          style={barStyles}
-        >
-          <Spinner isVisible={isVisible} />
-          <SpinnerIcon />
-        </div>
+  return (
+    <div className='ProgressBar'>
+      <div
+        className='ProgressBar-bar'
+        style={barStyles}
+      >
+        <Spinner isVisible={isVisible} />
+        <SpinnerIcon />
       </div>
-    );
-  }
+    </div>
+  );
+};
 
-}
+export default ProgressBar;
