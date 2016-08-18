@@ -24,7 +24,7 @@ export default class ProgressBar extends React.Component<React.Props<JSX.Element
 
   render() {
     const { isVisible, progress } = this.state;
-
+    
     const styles = {
       transform: `translate3d(${progress - 100}%,0px,0px)`,
       display: (isVisible ? 'inline-block' : 'none'),
