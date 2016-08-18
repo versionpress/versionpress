@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { DetailsLevel } from '../enums/enums';
+import { DetailsLevel } from '../enums/DetailsLevel';
 
 interface CommitPanelNoticeProps {
   detailsLevel: DetailsLevel;

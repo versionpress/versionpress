@@ -6,7 +6,7 @@ import Diff from '../diff/Diff';
 import Error from './Error';
 import Loader from './Loader';
 import Overview from '../overview/Overview';
-import { DetailsLevel } from '../../enums/enums';
+import { DetailsLevel } from '../../enums/DetailsLevel';
 
 interface DetailsProps {
   detailsLevel: DetailsLevel;

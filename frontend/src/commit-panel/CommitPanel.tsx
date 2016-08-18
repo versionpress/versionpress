@@ -4,7 +4,7 @@ import * as classNames from 'classnames';
 import Commit from './commit/Commit';
 import Details from './details/Details';
 import Notice from './Notice';
-import { DetailsLevel } from '../enums/enums';
+import { DetailsLevel } from '../enums/DetailsLevel';
 
 import './CommitPanel.less';
 
