@@ -8,10 +8,6 @@ interface ButtonsProps {
 }
 
 const Buttons: React.StatelessComponent<ButtonsProps> = ({ detailsLevel, onDetailsLevelChange }) => {
-  if (detailsLevel === DetailsLevel.None) {
-    return null;
-  }
-
   return (
     <div className='CommitPanel-details-buttons'>
       <button

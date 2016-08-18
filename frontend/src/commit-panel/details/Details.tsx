@@ -28,7 +28,7 @@ const Details: React.StatelessComponent<DetailsProps> = (props) => {
   } = props;
 
   if (!error && detailsLevel === DetailsLevel.None) {
-    return null;
+    return <div />;
   }
 
   const detailsClassName = classNames({
@@ -38,10 +38,12 @@ const Details: React.StatelessComponent<DetailsProps> = (props) => {
 
   return (
     <div className={detailsClassName}>
-      <Buttons
-        detailsLevel={detailsLevel}
-        onDetailsLevelChange={onDetailsLevelChange}
-      />
+      {detailsLevel !== DetailsLevel.None &&
+        <Buttons
+          detailsLevel={detailsLevel}
+          onDetailsLevelChange={onDetailsLevelChange}
+        />
+      }
       {isLoading && <Loader />}
       {error
         ? <Error error={error} />
