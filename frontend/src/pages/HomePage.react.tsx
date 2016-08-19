@@ -8,7 +8,7 @@ import * as Promise from 'core-js/es6/promise';
 import * as classNames from 'classnames';
 import update = require('react-addons-update');
 
-import BulkActionPanel from '../BulkActionPanel/BulkActionPanel.react';
+import BulkActionPanel from '../bulk-action-panel/BulkActionPanel';
 import CommitPanel from '../CommitPanel/CommitPanel.react';
 import CommitsTable from '../Commits/CommitsTable.react';
 import Filter from '../Filter/Filter.react';
