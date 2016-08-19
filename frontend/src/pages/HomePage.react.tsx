@@ -9,14 +9,14 @@ import * as classNames from 'classnames';
 import update = require('react-addons-update');
 
 import BulkActionPanel from '../bulk-action-panel/BulkActionPanel';
-import CommitPanel from '../CommitPanel/CommitPanel.react';
+import CommitPanel from '../commit-panel/CommitPanel';
 import CommitsTable from '../Commits/CommitsTable.react';
 import Filter from '../Filter/Filter.react';
 import FlashMessage from '../common/FlashMessage.react';
 import ProgressBar from '../common/ProgressBar.react';
 import ServicePanel from '../service-panel/ServicePanel';
-import WelcomePanel from '../welcome-panel/WelcomePanel';
 import VpTitle from '../vp-title/VpTitle';
+import WelcomePanel from '../welcome-panel/WelcomePanel';
 import * as revertDialog from '../Commits/revertDialog';
 import * as WpApi from '../services/WpApi';
 import {indexOf} from '../Commits/CommitUtils';
