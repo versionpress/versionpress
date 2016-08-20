@@ -1,12 +1,12 @@
-/// <reference path='./Commits.d.ts' />
+/// <reference path='../../common/Commits.d.ts' />
 
 import * as React from 'react';
 import * as moment from 'moment';
 import * as classNames from 'classnames';
 
-import * as portal from '../common/portal';
-import {UndoDisabledDialog} from '../Commits/revertDialog';
-import {getGitBranchColor} from '../services/GitBranchColorProvider';
+import * as portal from '../../common/portal';
+import { UndoDisabledDialog } from '../../common/revert-dialog/revertDialog';
+import {getGitBranchColor} from '../../services/GitBranchColorProvider';
 
 interface CommitsTableRowSummaryProps extends React.Props<JSX.Element> {
   commit: Commit;

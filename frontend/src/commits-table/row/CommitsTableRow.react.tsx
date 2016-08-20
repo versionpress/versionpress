@@ -1,9 +1,9 @@
-/// <reference path='./Commits.d.ts' />
+/// <reference path='../../common/Commits.d.ts' />
 
 import * as React from 'react';
 
-import CommitsTableRowSummary from './CommitsTableRowSummary.react';
-import CommitsTableRowDetails from './CommitsTableRowDetails.react';
+import CommitsTableRowSummary from '../row-summary/CommitsTableRowSummary.react';
+import CommitsTableRowDetails from '../row-details/CommitsTableRowDetails.react';
 
 interface CommitsTableRowProps extends React.Props<JSX.Element> {
   commit: Commit;

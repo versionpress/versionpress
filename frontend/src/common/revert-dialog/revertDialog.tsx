@@ -1,8 +1,8 @@
 import * as React from 'react';
 import * as request from 'superagent';
 
-import * as portal from '../common/portal';
-import * as WpApi from '../services/WpApi';
+import * as portal from '../portal';
+import * as WpApi from '../../services/WpApi';
 
 const UndoEnabledDialog: React.StatelessComponent<{}> = () => {
   return (

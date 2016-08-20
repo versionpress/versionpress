@@ -1,10 +1,10 @@
-/// <reference path='./Commits.d.ts' />
+/// <reference path='../../common/Commits.d.ts' />
 
 import * as React from 'react';
 import * as classNames from 'classnames';
 
-import CommitOverview from './CommitOverview.react';
-import DiffPanel from './DiffPanel.react';
+import CommitOverview from '../overview/CommitOverview.react';
+import DiffPanel from '../../common/diff-panel/DiffPanel.react';
 
 interface CommitsTableRowDetailsProps extends React.Props<JSX.Element> {
   commit: Commit;

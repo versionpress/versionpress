@@ -1,10 +1,10 @@
-/// <reference path='./Commits.d.ts' />
+/// <reference path='../../common/Commits.d.ts' />
 
 import * as React from 'react';
 import * as moment from 'moment';
 
-import * as ArrayUtils from '../common/ArrayUtils';
-import * as StringUtils from '../common/StringUtils';
+import * as ArrayUtils from '../../common/ArrayUtils';
+import * as StringUtils from '../../common/StringUtils';
 
 interface CommitOverviewProps extends React.Props<JSX.Element> {
   commit: Commit;

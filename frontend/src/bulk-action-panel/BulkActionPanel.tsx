@@ -1,4 +1,4 @@
-/// <reference path='../Commits/Commits.d.ts' />
+/// <reference path='../common/Commits.d.ts' />
 /// <reference path='../interfaces/State.d.ts' />
 
 import * as React from 'react';

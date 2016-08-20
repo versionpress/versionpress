@@ -1,12 +1,12 @@
-/// <reference path='./Commits.d.ts' />
+/// <reference path='../common/Commits.d.ts' />
 
 import * as React from 'react';
 import * as _ from 'lodash';
 import {Link} from 'react-router';
 
-import CommitsTableRow from './CommitsTableRow.react';
+import CommitsTableRow from './row/CommitsTableRow.react';
 import CommitsTableNote from './CommitsTableNote.react';
-import {indexOf} from '../Commits/CommitUtils';
+import { indexOf } from '../utils/CommitUtils';
 import config from '../config';
 
 import './CommitsTable.less';

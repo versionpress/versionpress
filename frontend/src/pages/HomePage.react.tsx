@@ -1,4 +1,4 @@
-/// <reference path='../Commits/Commits.d.ts' />
+/// <reference path='../common/Commits.d.ts' />
 
 import * as React from 'react';
 import * as ReactRouter from 'react-router';
@@ -10,16 +10,16 @@ import update = require('react-addons-update');
 
 import BulkActionPanel from '../bulk-action-panel/BulkActionPanel';
 import CommitPanel from '../commit-panel/CommitPanel';
-import CommitsTable from '../Commits/CommitsTable.react';
+import CommitsTable from '../commits-table/CommitsTable.react';
 import Filter from '../Filter/Filter.react';
 import FlashMessage from '../common/FlashMessage.react';
 import ProgressBar from '../common/ProgressBar.react';
 import ServicePanel from '../service-panel/ServicePanel';
 import VpTitle from '../vp-title/VpTitle';
 import WelcomePanel from '../welcome-panel/WelcomePanel';
-import * as revertDialog from '../Commits/revertDialog';
+import * as revertDialog from '../common/revert-dialog/revertDialog';
 import * as WpApi from '../services/WpApi';
-import {indexOf} from '../Commits/CommitUtils';
+import { indexOf } from '../utils/CommitUtils';
 import config from '../config';
 
 import './HomePage.less';
