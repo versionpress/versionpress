@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import {Link} from 'react-router';
 
 import CommitsTableRow from './row/CommitsTableRow.react';
-import CommitsTableNote from './CommitsTableNote.react';
+import Note from './Note';
 import { indexOf } from '../utils/CommitUtils';
 import config from '../config';
 
@@ -41,13 +41,6 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
     const isChecked = (e.target as HTMLInputElement).checked;
     this.props.onCommitSelect(this.props.commits, isChecked, false);
   };
-
-  private renderNote() {
-    return <CommitsTableNote
-      key='note'
-      message='VersionPress is not able to undo changes made before it has been activated.'
-    />;
-  }
 
   private renderSelectAll() {
     const { commits, enableActions, selectedCommits } = this.props;
@@ -106,7 +99,10 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
           if (!noteDisplayed && !commit.isEnabled && index < commits.length - 1) {
             noteDisplayed = true;
             return [
-              this.renderNote(),
+              <Note
+                key='note'
+                message='VersionPress is not able to undo changes made before it has been activated.'
+              />,
               row,
             ];
           }
