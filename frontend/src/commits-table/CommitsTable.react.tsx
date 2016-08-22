@@ -2,10 +2,10 @@
 
 import * as React from 'react';
 
+import Body from './body/Body';
 import Footer from './footer/Footer';
 import Header from './header/Header';
-import CommitsTableRow from './row/CommitsTableRow.react';
-import Note from './Note';
+import NotAbleNote from './not-able-note/NotAbleNote';
 import { indexOf } from '../utils/CommitUtils';
 
 import './CommitsTable.less';
@@ -46,7 +46,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
       enableActions,
     } = this.props;
 
-    let noteDisplayed = false;
+    let isNotAbleNoteDisplayed = false;
 
     return (
       <table className='vp-table widefat fixed'>
@@ -57,28 +57,29 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
           onSelectAllChange={this.onSelectAllChange}
         />
         {commits.map((commit: Commit, index: number) => {
-          const row = <CommitsTableRow
-                        key={commit.hash}
-                        commit={commit}
-                        enableActions={this.props.enableActions}
-                        isSelected={indexOf(this.props.selectedCommits, commit) !== -1}
-                        onUndo={this.props.onUndo}
-                        onRollback={this.props.onRollback}
-                        onCommitSelect={this.props.onCommitsSelect}
-                        diffProvider={this.props.diffProvider}
-                      />;
+          const body = (
+            <Body
+              commit={commit}
+              enableActions={this.props.enableActions}
+              isSelected={indexOf(this.props.selectedCommits, commit) !== -1}
+              onUndo={this.props.onUndo}
+              onRollback={this.props.onRollback}
+              onCommitSelect={this.props.onCommitsSelect}
+              diffProvider={this.props.diffProvider}
+              key={commit.hash}
+            />
+          );
 
-          if (!noteDisplayed && !commit.isEnabled && index < commits.length - 1) {
-            noteDisplayed = true;
+          if (!isNotAbleNoteDisplayed && !commit.isEnabled && index < commits.length - 1) {
+            isNotAbleNoteDisplayed = true;
+
             return [
-              <Note
-                key='note'
-                message='VersionPress is not able to undo changes made before it has been activated.'
-              />,
-              row,
+              <NotAbleNote key='note' />,
+              body,
             ];
           }
-          return row;
+
+          return body;
         })}
         <Footer pages={pages} />
       </table>
