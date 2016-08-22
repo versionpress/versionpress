@@ -41,9 +41,9 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase
         $uploadsDir = self::$wpAutomation->getUploadsDir();
         $relativePathToUploads = PathUtils::getRelativePath(self::$testConfig->testSite->path, $uploadsDir);
 
-        $dbSchema = new DbSchemaInfo(self::$wpAutomation->getPluginsDir() . '/versionpress/src/Database/wordpress-schema.yml', self::$testConfig->testSite->dbTablePrefix, PHP_INT_MAX);
+        $dbSchema = new DbSchemaInfo([self::$wpAutomation->getPluginsDir() . '/versionpress/.versionpress/schema.yml'], self::$testConfig->testSite->dbTablePrefix, PHP_INT_MAX);
 
-        $actionsInfoProvider = new ActionsInfoProvider([Yaml::parse(self::$wpAutomation->getPluginsDir() . '/versionpress/.versionpress/actions.yml')]);
+        $actionsInfoProvider = new ActionsInfoProvider([self::$wpAutomation->getPluginsDir() . '/versionpress/.versionpress/actions.yml']);
 
         $this->commitAsserter = new CommitAsserter($this->gitRepository, $dbSchema, $actionsInfoProvider, ['vpdb' => $relativePathToVpdb, 'uploads' => $relativePathToUploads]);
     }

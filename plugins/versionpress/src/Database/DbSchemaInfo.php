@@ -38,7 +38,7 @@ class DbSchemaInfo
     private $dbVersion;
 
     /**
-     * @param string[] $schemaFiles Paths to a schema.yml files to read from disk
+     * @param string[]|\Traversable<string> $schemaFiles Paths to a schema.yml files to read from disk
      * @param string $prefix
      * @param int $dbVersion WordPress DB version (global variable $wp_db_version)
      */

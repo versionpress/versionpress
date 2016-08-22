@@ -14,7 +14,7 @@ class ParsedQueryData
 
 
     /**
-     * VersionPress entity name resolved from `wordpress-schema.neon` and $table
+     * VersionPress entity name resolved from `schema.yml` and $table
      *
      * @var string
      */
@@ -49,7 +49,7 @@ class ParsedQueryData
     public $sqlQuery;
 
     /**
-     * Id column name resolved from `wordpress-schema.neon` and $table
+     * Id column name resolved from `schema.yml` and $table
      * @var string
      */
     public $idColumnName;

@@ -42,7 +42,7 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase
         $factory = new StorageFactory(
             __DIR__ . '/vpdb',
             new DbSchemaInfo(
-                __DIR__ . '/../../src/Database/wordpress-schema.yml',
+                [__DIR__ . '/../../.versionpress/schema.yml'],
                 'wp_',
                 PHP_INT_MAX
             ),

@@ -53,8 +53,9 @@ class DBAsserter
         self::$testConfig = TestConfig::createDefaultConfig();
         self::$wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
 
+        $yamlDir = self::$wpAutomation->getPluginsDir() . '/versionpress/.versionpress';
         $schemaReflection = new \ReflectionClass(DbSchemaInfo::class);
-        $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.yml';
+        $schemaFile = $yamlDir . '/schema.yml';
         $shortcodeFile = dirname($schemaReflection->getFileName()) . '/wordpress-shortcodes.yml';
 
         /** @var $wp_db_version */
@@ -64,7 +65,7 @@ class DBAsserter
             require_once(self::$wpAutomation->getAbspath() . '/wp-includes/shortcodes.php');
         }
 
-        self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
+        self::$schemaInfo = new DbSchemaInfo([$schemaFile], self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
 
         $rawTaxonomies = self::$wpAutomation->runWpCliCommand(
             'taxonomy',

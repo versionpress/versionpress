@@ -29,7 +29,7 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase
     {
         HookMock::setUp(HookMock::WP_MOCK);
         self::$DbSchemaInfo = new DbSchemaInfo(
-            __DIR__ . '/../../src/Database/wordpress-schema.yml',
+            [__DIR__ . '/../../.versionpress/schema.yml'],
             'wp_',
             PHP_INT_MAX
         );

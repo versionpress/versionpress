@@ -169,7 +169,7 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase
 
         /**
          * This postmeta has a value reference to another post.
-         * @see wordpress-schema.yml
+         * @see schema.yml
          * @var array
          */
         $postmeta = EntityUtils::preparePostMeta(null, self::$postVpId, '_thumbnail_id', self::$post2VpId);
