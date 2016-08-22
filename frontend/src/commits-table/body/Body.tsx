@@ -5,24 +5,24 @@ import * as React from 'react';
 import CommitsTableRowSummary from '../row-summary/CommitsTableRowSummary.react';
 import CommitsTableRowDetails from '../row-details/CommitsTableRowDetails.react';
 
-interface CommitsTableRowProps extends React.Props<JSX.Element> {
+interface BodyProps extends React.Props<JSX.Element> {
   commit: Commit;
   enableActions: boolean;
   isSelected: boolean;
+  diffProvider: {getDiff(hash: string): Promise<string>};
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
   onCommitSelect: (commits: Commit[], check: boolean, shiftKey: boolean) => void;
-  diffProvider: {getDiff: (hash: string) => Promise<string>};
 }
 
-interface CommitsTableRowState {
+interface BodyState {
   detailsLevel?: string;
   diff?: string;
   error?: string;
   isLoading?: boolean;
 }
 
-export default class CommitsTableRow extends React.Component<CommitsTableRowProps, CommitsTableRowState> {
+export default class Body extends React.Component<BodyProps, BodyState> {
 
   state = {
     detailsLevel: 'none',

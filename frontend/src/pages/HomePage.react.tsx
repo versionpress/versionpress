@@ -10,7 +10,7 @@ import update = require('react-addons-update');
 
 import BulkActionPanel from '../bulk-action-panel/BulkActionPanel';
 import CommitPanel from '../commit-panel/CommitPanel';
-import CommitsTable from '../commits-table/CommitsTable.react';
+import CommitsTable from '../commits-table/CommitsTable';
 import Filter from '../Filter/Filter.react';
 import FlashMessage from '../common/FlashMessage.react';
 import ProgressBar from '../common/ProgressBar.react';
@@ -495,15 +495,14 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           />
         </div>
         <CommitsTable
-          currentPage={parseInt(this.props.params.page, 10) || 1}
           pages={this.state.pages}
           commits={this.state.commits}
           selectedCommits={this.state.selectedCommits}
           enableActions={enableActions}
-          onCommitsSelect={this.onCommitsSelect}
+          diffProvider={{ getDiff: this.getDiff }}
           onUndo={this.onUndo}
           onRollback={this.onRollback}
-          diffProvider={{ getDiff: this.getDiff }}
+          onCommitsSelect={this.onCommitsSelect}
         />
       </div>
     );

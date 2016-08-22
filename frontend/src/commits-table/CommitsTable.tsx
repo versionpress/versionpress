@@ -10,15 +10,14 @@ import { indexOf } from '../utils/CommitUtils';
 
 import './CommitsTable.less';
 
-interface CommitsTableProps extends React.Props<JSX.Element> {
-  currentPage: number;
+interface CommitsTableProps {
   pages: number[];
   commits: Commit[];
   selectedCommits: Commit[];
   enableActions: boolean;
-  onUndo: React.MouseEventHandler;
-  onRollback: React.MouseEventHandler;
   diffProvider: {getDiff(hash: string): Promise<string>};
+  onUndo(e): void;
+  onRollback(e): void;
   onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
 }
 
@@ -26,16 +25,18 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
 
   private refreshInterval;
 
-  componentDidMount(): void {
+  componentDidMount() {
     this.refreshInterval = setInterval(() => this.forceUpdate(), 60 * 1000);
   }
 
-  componentWillUnmount(): void {
+  componentWillUnmount() {
     clearInterval(this.refreshInterval);
   }
 
   onSelectAllChange = (isChecked: boolean) => {
-    this.props.onCommitsSelect(this.props.commits, isChecked, false);
+    const { commits, onCommitsSelect } = this.props;
+
+    onCommitsSelect(commits, isChecked, false);
   };
 
   render() {
@@ -44,6 +45,10 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
       commits,
       selectedCommits,
       enableActions,
+      diffProvider,
+      onUndo,
+      onRollback,
+      onCommitsSelect,
     } = this.props;
 
     let isNotAbleNoteDisplayed = false;
@@ -60,12 +65,12 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
           const body = (
             <Body
               commit={commit}
-              enableActions={this.props.enableActions}
-              isSelected={indexOf(this.props.selectedCommits, commit) !== -1}
-              onUndo={this.props.onUndo}
-              onRollback={this.props.onRollback}
-              onCommitSelect={this.props.onCommitsSelect}
-              diffProvider={this.props.diffProvider}
+              enableActions={enableActions}
+              isSelected={indexOf(selectedCommits, commit) !== -1}
+              onUndo={onUndo}
+              onRollback={onRollback}
+              onCommitSelect={onCommitsSelect}
+              diffProvider={diffProvider}
               key={commit.hash}
             />
           );
