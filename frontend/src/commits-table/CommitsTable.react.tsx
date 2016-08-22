@@ -1,9 +1,9 @@
 /// <reference path='../common/Commits.d.ts' />
 
 import * as React from 'react';
-import * as _ from 'lodash';
 import {Link} from 'react-router';
 
+import Header from './header/Header';
 import CommitsTableRow from './row/CommitsTableRow.react';
 import Note from './Note';
 import { indexOf } from '../utils/CommitUtils';
@@ -21,8 +21,8 @@ interface CommitsTableProps extends React.Props<JSX.Element> {
   enableActions: boolean;
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
-  onCommitSelect: (commits: Commit[], isChecked: boolean, isShiftKey: boolean) => void;
-  diffProvider: {getDiff: (hash: string) => Promise<string>};
+  diffProvider: {getDiff(hash: string): Promise<string>};
+  onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
 }
 
 export default class CommitsTable extends React.Component<CommitsTableProps, {}>  {
@@ -37,53 +37,28 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
     clearInterval(this.refreshInterval);
   }
 
-  onSelectAllChange = (e: React.MouseEvent) => {
-    const isChecked = (e.target as HTMLInputElement).checked;
-    this.props.onCommitSelect(this.props.commits, isChecked, false);
+  onSelectAllChange = (isChecked: boolean) => {
+    this.props.onCommitsSelect(this.props.commits, isChecked, false);
   };
 
-  private renderSelectAll() {
-    const { commits, enableActions, selectedCommits } = this.props;
-
-    const selectableCommits = commits.filter((commit: Commit) => commit.canUndo);
-    const displaySelectAll = commits.some((commit: Commit) => commit.canUndo);
-
-    if (!displaySelectAll) {
-      return <td className='column-cb' />;
-    }
-
-    const allSelected = !_.differenceBy(selectableCommits, selectedCommits, ((value: Commit) => value.hash)).length;
-    return (
-      <td className='column-cb manage-column check-column'>
-        <label className='screen-reader-text' htmlFor='CommitsTable-selectAll'>Select All</label>
-        <input
-          type='checkbox'
-          id='CommitsTable-selectAll'
-          disabled={!enableActions}
-          checked={commits.length > 0 && allSelected}
-          onChange={this.onSelectAllChange}
-        />
-      </td>
-    );
-  }
-
   render() {
-    const { pages, commits } = this.props;
+    const {
+      pages,
+      commits,
+      selectedCommits,
+      enableActions,
+    } = this.props;
 
     let noteDisplayed = false;
 
     return (
       <table className='vp-table widefat fixed'>
-        <thead>
-          <tr>
-            <th className='column-environment' />
-            {this.renderSelectAll()}
-            <th className='column-date'>Date</th>
-            <th className='column-author' />
-            <th className='column-message'>Message</th>
-            <th className='column-actions' />
-          </tr>
-        </thead>
+        <Header
+          commits={commits}
+          selectedCommits={selectedCommits}
+          enableActions={enableActions}
+          onSelectAllChange={this.onSelectAllChange}
+        />
         {commits.map((commit: Commit, index: number) => {
           const row = <CommitsTableRow
                         key={commit.hash}
@@ -92,7 +67,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
                         isSelected={indexOf(this.props.selectedCommits, commit) !== -1}
                         onUndo={this.props.onUndo}
                         onRollback={this.props.onRollback}
-                        onCommitSelect={this.props.onCommitSelect}
+                        onCommitSelect={this.props.onCommitsSelect}
                         diffProvider={this.props.diffProvider}
                       />;
 

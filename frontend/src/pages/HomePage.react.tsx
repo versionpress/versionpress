@@ -244,7 +244,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     });
   };
 
-  onCommitSelect = (commits: Commit[], isChecked: boolean, isShiftKey: boolean) => {
+  onCommitsSelect = (commits: Commit[], isChecked: boolean, isShiftKey: boolean) => {
     let { selectedCommits, lastSelectedCommit } = this.state;
     const bulk = commits.length > 1;
 
@@ -500,7 +500,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           commits={this.state.commits}
           selectedCommits={this.state.selectedCommits}
           enableActions={enableActions}
-          onCommitSelect={this.onCommitSelect}
+          onCommitsSelect={this.onCommitsSelect}
           onUndo={this.onUndo}
           onRollback={this.onRollback}
           diffProvider={{ getDiff: this.getDiff }}
