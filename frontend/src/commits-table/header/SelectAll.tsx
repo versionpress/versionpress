@@ -17,9 +17,8 @@ const SelectAll: React.StatelessComponent<SelectAllProps> = (props) => {
   } = props;
 
   const selectableCommits = commits.filter((commit: Commit) => commit.canUndo);
-  const displaySelectAll = commits.some((commit: Commit) => commit.canUndo);
 
-  if (!displaySelectAll) {
+  if (selectableCommits.length === 0) {
     return <th className='column-cb' />;
   }
 
