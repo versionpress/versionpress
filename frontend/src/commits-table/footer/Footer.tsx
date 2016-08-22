@@ -17,7 +17,7 @@ const Footer: React.StatelessComponent<FooterProps> = ({ pages }) => (
           <Link
             activeClassName='active'
             to={page === 1 ? routes.home : routes.page}
-            params={page === 1 ? null : { page: page }}
+            params={page === 1 ? null : { page }}
             key={page}
           >
             {page}
