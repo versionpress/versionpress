@@ -4,21 +4,21 @@ namespace VersionPress\Actions;
 
 use Symfony\Component\Yaml\Yaml;
 use VersionPress\Git\GitRepository;
+use VersionPress\Utils\FileSystem;
 
 class ActionsDefinitionRepository
 {
-    /** @var GitRepository */
-    private $gitRepository;
+    /** @var string */
+    private $directory;
 
-    public function __construct(GitRepository $gitRepository)
+    public function __construct($directory)
     {
-        $this->gitRepository = $gitRepository;
+        $this->directory = $directory;
     }
 
-    public function getAllDefinitions()
+    public function getAllDefinitionFiles()
     {
-        $actionsNote = $this->gitRepository->getNote($this->getInitialCommitHash());
-        return Yaml::parse($actionsNote);
+        return new \GlobIterator($this->directory . '/*-actions.yml', \FilesystemIterator::CURRENT_AS_PATHNAME);
     }
 
     public function saveDefinitionForPlugin($plugin)
@@ -29,17 +29,7 @@ class ActionsDefinitionRepository
             return;
         }
 
-        $pluginActionsDefinition = Yaml::parse(file_get_contents($actionsFile));
-
-        $actionsDefinitions = $this->getAllDefinitions();
-        $actionsDefinitions[$plugin] = $pluginActionsDefinition;
-
-        $yaml = Yaml::dump($actionsDefinitions);
-        $this->gitRepository->saveNote($this->getInitialCommitHash(), $yaml);
-    }
-
-    private function getInitialCommitHash()
-    {
-        return $this->gitRepository->getInitialCommit()->getHash();
+        $targetFile = $this->directory . '/' . $plugin . '-actions.yml';
+        FileSystem::copy($actionsFile, $targetFile);
     }
 }

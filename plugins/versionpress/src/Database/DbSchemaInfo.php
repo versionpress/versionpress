@@ -38,16 +38,24 @@ class DbSchemaInfo
     private $dbVersion;
 
     /**
-     * @param string $schemaFile Path to a *.yml file to read from disk
+     * @param string[] $schemaFiles Paths to a schema.yml files to read from disk
      * @param string $prefix
      * @param int $dbVersion WordPress DB version (global variable $wp_db_version)
      */
-    public function __construct($schemaFile, $prefix, $dbVersion)
+    public function __construct($schemaFiles, $prefix, $dbVersion)
     {
-        $yamlSchema = file_get_contents($schemaFile);
+        $schema = [];
+
+        foreach ($schemaFiles as $schemaFile) {
+            $pluginSchema = Yaml::parse($schemaFile);
+            $pluginSchema = $this->useSchemaForCurrentVersion($pluginSchema);
+
+            $schema = array_merge_recursive($schema, $pluginSchema);
+        }
+
         $this->dbVersion = $dbVersion;
         $this->prefix = $prefix;
-        $this->schema = $this->useSchemaForCurrentVersion(Yaml::parse($yamlSchema));
+        $this->schema = $this->useSchemaForCurrentVersion($schema);
     }
 
     /**

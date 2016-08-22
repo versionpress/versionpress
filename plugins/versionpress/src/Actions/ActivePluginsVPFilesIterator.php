@@ -2,10 +2,15 @@
 
 namespace VersionPress\Actions;
 
-use Symfony\Component\Yaml\Yaml;
-
-class ActivePluginsActionsFilesIterator implements \IteratorAggregate
+class ActivePluginsVPFilesIterator implements \IteratorAggregate
 {
+    private $iteratedFiles;
+
+    public function __construct($iteratedFiles)
+    {
+        $this->iteratedFiles = $iteratedFiles;
+    }
+
     public function getIterator()
     {
         if (!function_exists('get_plugins')) {
@@ -16,9 +21,9 @@ class ActivePluginsActionsFilesIterator implements \IteratorAggregate
 
         foreach ($plugins as $pluginFile) {
             $pluginDir = dirname($pluginFile);
-            $actionsFile = $pluginDir . '/.versionpress/actions.yml';
-            if (file_exists($actionsFile)) {
-                yield Yaml::parse($actionsFile);
+            $path = $pluginDir . '/.versionpress/' . $this->iteratedFiles;
+            if (file_exists($path)) {
+                yield $path;
             }
         }
     }
