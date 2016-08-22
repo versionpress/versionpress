@@ -1,17 +1,14 @@
 /// <reference path='../common/Commits.d.ts' />
 
 import * as React from 'react';
-import {Link} from 'react-router';
 
+import Footer from './footer/Footer';
 import Header from './header/Header';
 import CommitsTableRow from './row/CommitsTableRow.react';
 import Note from './Note';
 import { indexOf } from '../utils/CommitUtils';
-import config from '../config';
 
 import './CommitsTable.less';
-
-const routes = config.routes;
 
 interface CommitsTableProps extends React.Props<JSX.Element> {
   currentPage: number;
@@ -83,20 +80,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
           }
           return row;
         })}
-        <tfoot>
-          <tr>
-            <td className='vp-table-pagination' colSpan={6}>
-              {pages.map((page: number) => {
-                return <Link
-                          activeClassName='active'
-                          key={page}
-                          to={page === 1 ? routes.home : routes.page}
-                          params={page === 1 ? null : { page: page }}
-                        >{page}</Link>;
-              })}
-            </td>
-          </tr>
-        </tfoot>
+        <Footer pages={pages} />
       </table>
     );
   }
