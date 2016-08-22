@@ -10,9 +10,9 @@ interface BodyProps extends React.Props<JSX.Element> {
   enableActions: boolean;
   isSelected: boolean;
   diffProvider: {getDiff(hash: string): Promise<string>};
-  onUndo: React.MouseEventHandler;
-  onRollback: React.MouseEventHandler;
-  onCommitSelect: (commits: Commit[], check: boolean, shiftKey: boolean) => void;
+  onUndo(e): void;
+  onRollback(e): void;
+  onCommitSelect(commits: Commit[], isChecked: boolean, shiftKey: boolean): void;
 }
 
 interface BodyState {
