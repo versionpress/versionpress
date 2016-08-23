@@ -3,6 +3,7 @@
 import * as React from 'react';
 import * as moment from 'moment';
 
+import EntityNameDuplicates from './EntityNameDuplicates';
 import Environment from './Environment';
 import * as ArrayUtils from '../../common/ArrayUtils';
 import * as StringUtils from '../../common/StringUtils';
@@ -204,34 +205,6 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     return [line];
   }
 
-  private getUserFriendlyName(change: Change) {
-    if (change.type === 'user') {
-      return change.tags['VP-User-Login'];
-    }
-
-    if (change.type === 'usermeta') {
-      return change.tags['VP-UserMeta-Key'];
-    }
-
-    if (change.type === 'postmeta') {
-      return change.tags['VP-PostMeta-Key'];
-    }
-
-    if (change.type === 'commentmeta') {
-      return change.tags['VP-CommentMeta-Key'];
-    }
-
-    if (change.type === 'post') {
-      return change.tags['VP-Post-Title'];
-    }
-
-    if (change.type === 'term') {
-      return change.tags['VP-Term-Name'];
-    }
-
-    return change.name;
-  }
-
   private renderOverviewLine(type: string, action: string, entities: any[], suffix: any = null) {
     const { expandedLists } = this.state;
 
@@ -281,19 +254,22 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
   }
 
   private renderEntityNamesWithDuplicates(changes: Change[]): JSX.Element[] {
-    let filteredChanges = ArrayUtils.filterDuplicates<Change>(changes, change => change.type + '|||' + change.action + '|||' + change.name);
-    let countOfDuplicates = ArrayUtils.countDuplicates<Change>(changes, change => [change.type, change.action, change.name]);
+    const filteredChanges = ArrayUtils.filterDuplicates<Change>(
+      changes,
+      change => change.type + '|||' + change.action + '|||' + change.name
+    );
+    const countOfDuplicates = ArrayUtils.countDuplicates<Change>(
+      changes,
+      change => [change.type, change.action, change.name]
+    );
 
-    return filteredChanges.map((change: Change) => {
-      let duplicatesOfChange = countOfDuplicates[change.type][change.action][change.name];
-      let duplicatesSuffix = duplicatesOfChange > 1 ? (' (' + duplicatesOfChange + '×)') : '';
-      return (
-        <span>
-          <span className='identifier'>{this.getUserFriendlyName(change)}</span>
-          {duplicatesSuffix}
-        </span>
-      );
-    });
+    return filteredChanges.map((change: Change) => (
+      <EntityNameDuplicates
+        change={change}
+        countOfDuplicates={countOfDuplicates}
+        key={change.name}
+      />
+    ));
   }
 
   render() {
