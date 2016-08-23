@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import CommitOverview from '../commit-overview/CommitOverview.react';
+import CommitOverview from '../commit-overview/CommitOverview';
 
 interface OverviewProps {
   commit: Commit;

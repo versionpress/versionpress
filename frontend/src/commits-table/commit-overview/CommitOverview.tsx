@@ -3,10 +3,11 @@
 import * as React from 'react';
 import * as moment from 'moment';
 
+import Environment from './Environment';
 import * as ArrayUtils from '../../common/ArrayUtils';
 import * as StringUtils from '../../common/StringUtils';
 
-interface CommitOverviewProps extends React.Props<JSX.Element> {
+interface CommitOverviewProps {
   commit: Commit;
 }
 
@@ -301,9 +302,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     return (
       <ul className='overview-list'>
         {this.getFormattedChanges(commit.changes).map((line, i) => <li key={i}>{line}</li>)}
-        <li className='environment'>
-          <em>Environment: {commit.environment}</em>
-        </li>
+        <Environment environment={commit.environment} />
       </ul>
     );
   }
