@@ -5,7 +5,7 @@ import * as React from 'react';
 import CommitsTableRowSummary from '../row-summary/CommitsTableRowSummary.react';
 import CommitsTableRowDetails from '../row-details/CommitsTableRowDetails.react';
 
-interface BodyProps extends React.Props<JSX.Element> {
+interface CommitInfoProps extends React.Props<JSX.Element> {
   commit: Commit;
   enableActions: boolean;
   isSelected: boolean;
@@ -15,14 +15,14 @@ interface BodyProps extends React.Props<JSX.Element> {
   onCommitSelect(commits: Commit[], isChecked: boolean, shiftKey: boolean): void;
 }
 
-interface BodyState {
+interface CommitInfoState {
   detailsLevel?: string;
   diff?: string;
   error?: string;
   isLoading?: boolean;
 }
 
-export default class Body extends React.Component<BodyProps, BodyState> {
+export default class CommitInfo extends React.Component<CommitInfoProps, CommitInfoState> {
 
   state = {
     detailsLevel: 'none',

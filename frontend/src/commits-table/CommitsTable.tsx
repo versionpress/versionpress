@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import Body from './body/Body';
+import CommitInfo from './commit-info/CommitInfo';
 import Footer from './footer/Footer';
 import Header from './header/Header';
 import NotAbleNote from './not-able-note/NotAbleNote';
@@ -63,7 +63,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
         />
         {commits.map((commit: Commit, index: number) => {
           const body = (
-            <Body
+            <CommitInfo
               commit={commit}
               enableActions={enableActions}
               isSelected={indexOf(selectedCommits, commit) !== -1}
