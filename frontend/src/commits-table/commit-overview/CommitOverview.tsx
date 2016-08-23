@@ -127,11 +127,11 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
   }
 
   private getLinesForPosts(changedPosts: Change[], action: string) {
+    const changedPostsByType = ArrayUtils.groupBy(changedPosts, post => post.tags['VP-Post-Type']);
     let lines = [];
-    let changedPostsByType = ArrayUtils.groupBy(changedPosts, post => post.tags['VP-Post-Type']);
 
-    for (let postType in changedPostsByType) {
-      let changedEntities = this.renderEntityNamesWithDuplicates(changedPostsByType[postType]);
+    for (const postType in changedPostsByType) {
+      const changedEntities = this.renderEntityNamesWithDuplicates(changedPostsByType[postType]);
       let suffix = null;
 
       if (action === 'trash' || action === 'untrash') {
@@ -139,28 +139,30 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
         action = 'move';
       }
 
-      let line = this.renderOverviewLine(postType, action, changedEntities, suffix);
-      lines.push(line);
+      lines.push(
+        this.renderOverviewLine(postType, action, changedEntities, suffix)
+      );
     }
 
     return lines;
   }
 
   private getLinesForMeta(entityName, parentEntity, groupByTag, changedMeta: Change[], action: string) {
+    const metaByTag = ArrayUtils.groupBy(changedMeta, c => c.tags[groupByTag]);
     let lines = [];
-    let metaByTag = ArrayUtils.groupBy(changedMeta, c => c.tags[groupByTag]);
 
-    for (let tagValue in metaByTag) {
-      let changedEntities = this.renderEntityNamesWithDuplicates(metaByTag[tagValue]);
-
-      let lineSuffix = [
+    for (const tagValue in metaByTag) {
+      const changedEntities = this.renderEntityNamesWithDuplicates(metaByTag[tagValue]);
+      const lineSuffix = [
         ' for ',
         <span className='type'>{parentEntity}</span>,
         ' ',
         <span className='identifier'>{tagValue}</span>,
       ];
-      let line = this.renderOverviewLine(entityName, action, changedEntities, lineSuffix);
-      lines.push(line);
+
+      lines.push(
+        this.renderOverviewLine(entityName, action, changedEntities, lineSuffix)
+      );
     }
 
     return lines;
@@ -168,13 +170,12 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
 
   private getLinesForRevert(changes: Change[], action) {
     if (action === 'rollback') {
-      let change = changes[0]; // Rollback is always only 1 change.
-      let commitDetails = change.tags['VP-Commit-Details'];
+      const commitDetails = changes[0].tags['VP-Commit-Details']; // Rollback is always only 1 change.
       return [`The state is same as it was in "${commitDetails['message']}"`];
     } else {
       return changes.map((change: Change) => {
-        let commitDetails = change.tags['VP-Commit-Details'];
-        let date = commitDetails['date'];
+        const commitDetails = change.tags['VP-Commit-Details'];
+        const date = change.tags['VP-Commit-Details']['date'];
         return `Reverted change "${commitDetails['message']}" was made ${moment(date).fromNow()} (${moment(date).format('LLL')})`;
       });
     }
