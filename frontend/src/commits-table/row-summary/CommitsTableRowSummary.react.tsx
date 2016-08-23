@@ -1,22 +1,23 @@
 /// <reference path='../../common/Commits.d.ts' />
 
 import * as React from 'react';
-import * as moment from 'moment';
 import * as classNames from 'classnames';
+import * as moment from 'moment';
 
+import DetailsLevel from '../../enums/DetailsLevel';
 import * as portal from '../../common/portal';
 import { UndoDisabledDialog } from '../../common/revert-dialog/revertDialog';
-import {getGitBranchColor} from '../../services/GitBranchColorProvider';
+import { getGitBranchColor } from '../../services/GitBranchColorProvider';
 
-interface CommitsTableRowSummaryProps extends React.Props<JSX.Element> {
+interface CommitsTableRowSummaryProps {
   commit: Commit;
   enableActions: boolean;
   isSelected: boolean;
-  onUndo: React.MouseEventHandler;
-  onRollback: React.MouseEventHandler;
-  onCommitsSelect: (commits: Commit[], check: boolean, shiftKey: boolean) => void;
-  onDetailsLevelChanged: (detailsLevel) => any;
-  detailsLevel: string;
+  detailsLevel: DetailsLevel;
+  onUndo(e): void;
+  onRollback(e): void;
+  onCommitsSelect(commits: Commit[], isChecked: boolean, shiftKey: boolean): void;
+  onDetailsLevelChange(detailsLevel: DetailsLevel): void;
 }
 
 export default class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps, {}> {
@@ -39,17 +40,19 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
     this.props.onCommitsSelect([this.props.commit], checked, e.shiftKey);
   };
 
-  onDetailsLevelClick = (e: React.MouseEvent, detailsLevel: string) => {
+  onDetailsLevelClick = (e: React.MouseEvent, detailsLevel: DetailsLevel) => {
     e.stopPropagation();
 
-    this.props.onDetailsLevelChanged(detailsLevel);
+    this.props.onDetailsLevelChange(detailsLevel);
   };
 
   onRowClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    if (this.props.commit.isEnabled) {
-      this.props.onDetailsLevelChanged(this.props.detailsLevel === 'none' ? 'overview' : 'none');
+    const { commit, detailsLevel, onDetailsLevelChange } = this.props;
+
+    if (commit.isEnabled) {
+      onDetailsLevelChange(detailsLevel === DetailsLevel.None ? DetailsLevel.Overview : DetailsLevel.None);
     }
   };
 
@@ -106,7 +109,7 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
 
     const rowClassName = classNames({
       'disabled': !commit.isEnabled,
-      'displayed-details': detailsLevel !== 'none',
+      'displayed-details': detailsLevel !== DetailsLevel.None,
     });
     const undoClassName = classNames({
       'vp-table-undo': true,
@@ -152,17 +155,17 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
             : null
           }
           {this.renderMessage(commit.message)}
-          {detailsLevel !== 'none'
+          {detailsLevel !== DetailsLevel.None
             ? <div className='detail-buttons'>
                 <button
                   className='button'
-                  disabled={detailsLevel === 'overview'}
-                  onClick={e => this.onDetailsLevelClick(e, 'overview')}
+                  disabled={detailsLevel === DetailsLevel.Overview}
+                  onClick={e => this.onDetailsLevelClick(e, DetailsLevel.Overview)}
                 >Overview</button>
                 <button
                   className='button'
-                  disabled={detailsLevel === 'full-diff'}
-                  onClick={e => this.onDetailsLevelClick(e, 'full-diff')}
+                  disabled={detailsLevel === DetailsLevel.FullDiff}
+                  onClick={e => this.onDetailsLevelClick(e, DetailsLevel.FullDiff)}
                 >Full diff</button>
               </div>
             : null

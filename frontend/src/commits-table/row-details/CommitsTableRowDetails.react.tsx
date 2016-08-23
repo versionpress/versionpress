@@ -5,10 +5,11 @@ import * as classNames from 'classnames';
 
 import CommitOverview from '../overview/CommitOverview.react';
 import DiffPanel from '../../common/diff-panel/DiffPanel.react';
+import DetailsLevel from '../../enums/DetailsLevel';
 
-interface CommitsTableRowDetailsProps extends React.Props<JSX.Element> {
+interface CommitsTableRowDetailsProps {
   commit: Commit;
-  detailsLevel: string;
+  detailsLevel: DetailsLevel;
   diff?: string;
   isLoading?: boolean;
 }
@@ -55,7 +56,7 @@ export default class CommitsTableRowDetails extends React.Component<CommitsTable
   render() {
     const { commit, detailsLevel, isLoading } = this.props;
 
-    if (commit === null || detailsLevel === 'none') {
+    if (commit === null || detailsLevel === DetailsLevel.None) {
       return <tr />;
     }
 
@@ -65,7 +66,7 @@ export default class CommitsTableRowDetails extends React.Component<CommitsTable
       'loading': isLoading,
     });
 
-    return detailsLevel === 'overview'
+    return detailsLevel === DetailsLevel.Overview
       ? this.renderOverviewRow(rowClassName)
       : this.renderFullDiffRow(rowClassName);
   }

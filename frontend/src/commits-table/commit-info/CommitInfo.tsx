@@ -5,8 +5,9 @@ import * as React from 'react';
 import Error from './Error';
 import CommitsTableRowSummary from '../row-summary/CommitsTableRowSummary.react';
 import CommitsTableRowDetails from '../row-details/CommitsTableRowDetails.react';
+import DetailsLevel from '../../enums/DetailsLevel';
 
-interface CommitInfoProps extends React.Props<JSX.Element> {
+interface CommitInfoProps {
   commit: Commit;
   enableActions: boolean;
   isSelected: boolean;
@@ -17,7 +18,7 @@ interface CommitInfoProps extends React.Props<JSX.Element> {
 }
 
 interface CommitInfoState {
-  detailsLevel?: string;
+  detailsLevel?: DetailsLevel;
   diff?: string;
   error?: string;
   isLoading?: boolean;
@@ -26,17 +27,17 @@ interface CommitInfoState {
 export default class CommitInfo extends React.Component<CommitInfoProps, CommitInfoState> {
 
   state = {
-    detailsLevel: 'none',
+    detailsLevel: DetailsLevel.None,
     diff: null,
     error: null,
     isLoading: false,
   };
 
-  onDetailsLevelChange = (detailsLevel: string) => {
+  onDetailsLevelChange = (detailsLevel: DetailsLevel) => {
     const { diffProvider, commit } = this.props;
     const { diff } = this.state;
 
-    if (detailsLevel === 'full-diff' && !diff) {
+    if (detailsLevel === DetailsLevel.FullDiff && !diff) {
       this.setState({
         isLoading: true,
       });
@@ -85,11 +86,11 @@ export default class CommitInfo extends React.Component<CommitInfoProps, CommitI
           commit={commit}
           enableActions={enableActions}
           isSelected={isSelected}
+          detailsLevel={detailsLevel}
           onUndo={onUndo}
           onRollback={onRollback}
           onCommitsSelect={onCommitsSelect}
-          onDetailsLevelChanged={this.onDetailsLevelChange}
-          detailsLevel={detailsLevel}
+          onDetailsLevelChange={this.onDetailsLevelChange}
         />
         {error
           ? <Error message={error} />
