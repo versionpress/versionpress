@@ -6,6 +6,8 @@ import * as moment from 'moment';
 import EntityNameDuplicates from './EntityNameDuplicates';
 import Environment from './Environment';
 import OverviewLine from './OverviewLine';
+import VersionPressLine from './VersionPressLine';
+import WordPressUpdateLine from './WordPressUpdateLine';
 import * as ArrayUtils from '../../common/ArrayUtils';
 import * as StringUtils from '../../common/StringUtils';
 
@@ -179,31 +181,23 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
   }
 
   private getLinesForVersionPress(changes: Change[], action) {
-    let line = (
-      <span>
-        {StringUtils.capitalize(StringUtils.verbToPastTense(action))}
-        {' '}
-        <span className='identifier'>VersionPress</span>
-      </span>
-    );
-    return [line];
+    return [
+      <VersionPressLine action={action} />,
+    ];
   }
 
   private getLinesForWordPressUpdate(changes: Change[]) {
-    let change = changes[0];
-    let line = (
-      <span>
-        Updated <span className='identifier'>WordPress</span>
-        {' '} to version <span className='identifier'>{change.name}</span>
-      </span>
-    );
-    return [line];
+    return [
+      <WordPressUpdateLine version={changes[0].name} />,
+    ];
   }
 
   private getLinesForOtherChanges(changes: Change[], type, action) {
-    let changedEntities = this.renderEntityNamesWithDuplicates(changes);
-    let line = this.renderOverviewLine(type, action, changedEntities);
-    return [line];
+    const changedEntities = this.renderEntityNamesWithDuplicates(changes);
+
+    return [
+      this.renderOverviewLine(type, action, changedEntities),
+    ];
   }
 
   private renderOverviewLine(type: string, action: string, entities: any[], suffix: any = null) {

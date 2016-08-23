@@ -39,11 +39,11 @@ const EntityNameDuplicates: React.StatelessComponent<EntityNameDuplicatesProps> 
     <span>
       <span className='identifier'>
         {getUserFriendlyName(change)}
-        </span>
-        {duplicatesOfChange > 1
-          ? ` (${duplicatesOfChange}×)`
-          : ''
-        }
+      </span>
+      {duplicatesOfChange > 1
+        ? ` (${duplicatesOfChange}×)`
+        : ''
+      }
     </span>
   );
 };
