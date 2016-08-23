@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 
+import Error from './Error';
 import CommitsTableRowSummary from '../row-summary/CommitsTableRowSummary.react';
 import CommitsTableRowDetails from '../row-details/CommitsTableRowDetails.react';
 
@@ -12,7 +13,7 @@ interface CommitInfoProps extends React.Props<JSX.Element> {
   diffProvider: {getDiff(hash: string): Promise<string>};
   onUndo(e): void;
   onRollback(e): void;
-  onCommitSelect(commits: Commit[], isChecked: boolean, shiftKey: boolean): void;
+  onCommitsSelect(commits: Commit[], isChecked: boolean, shiftKey: boolean): void;
 }
 
 interface CommitInfoState {
@@ -32,19 +33,22 @@ export default class CommitInfo extends React.Component<CommitInfoProps, CommitI
   };
 
   onDetailsLevelChange = (detailsLevel: string) => {
-    if (detailsLevel === 'full-diff' && !this.state.diff) {
+    const { diffProvider, commit } = this.props;
+    const { diff } = this.state;
+
+    if (detailsLevel === 'full-diff' && !diff) {
       this.setState({
         isLoading: true,
       });
 
-      this.props.diffProvider.getDiff(this.props.commit.hash)
+      diffProvider.getDiff(commit.hash)
         .then(diff => this.setState({
             detailsLevel: detailsLevel,
             diff: diff,
             error: null,
             isLoading: false,
-          })
-        ).catch(err => this.setState({
+          }))
+        .catch(err => this.setState({
             detailsLevel: detailsLevel,
             error: err.message,
             isLoading: false,
@@ -59,34 +63,41 @@ export default class CommitInfo extends React.Component<CommitInfoProps, CommitI
     }
   };
 
-  renderError() {
-    return (
-      <tr className='details-row error'>
-        <td colSpan={6}>{this.state.error}</td>
-      </tr>
-    );
-  }
-
   render() {
+    const {
+      commit,
+      enableActions,
+      isSelected,
+      onUndo,
+      onRollback,
+      onCommitsSelect,
+    } = this.props;
+    const {
+      detailsLevel,
+      diff,
+      error,
+      isLoading,
+    } = this.state;
+
     return (
       <tbody>
         <CommitsTableRowSummary
-          commit={this.props.commit}
-          enableActions={this.props.enableActions}
-          isSelected={this.props.isSelected}
-          onUndo={this.props.onUndo}
-          onRollback={this.props.onRollback}
-          onCommitSelect={this.props.onCommitSelect}
+          commit={commit}
+          enableActions={enableActions}
+          isSelected={isSelected}
+          onUndo={onUndo}
+          onRollback={onRollback}
+          onCommitsSelect={onCommitsSelect}
           onDetailsLevelChanged={this.onDetailsLevelChange}
-          detailsLevel={this.state.detailsLevel}
+          detailsLevel={detailsLevel}
         />
-        {this.state.error
-          ? this.renderError()
+        {error
+          ? <Error message={error} />
           : <CommitsTableRowDetails
-              commit={this.props.commit}
-              detailsLevel={this.state.detailsLevel}
-              diff={this.state.diff}
-              isLoading={this.state.isLoading}
+              commit={commit}
+              detailsLevel={detailsLevel}
+              diff={diff}
+              isLoading={isLoading}
             />
         }
       </tbody>

@@ -14,7 +14,7 @@ interface CommitsTableRowSummaryProps extends React.Props<JSX.Element> {
   isSelected: boolean;
   onUndo: React.MouseEventHandler;
   onRollback: React.MouseEventHandler;
-  onCommitSelect: (commits: Commit[], check: boolean, shiftKey: boolean) => void;
+  onCommitsSelect: (commits: Commit[], check: boolean, shiftKey: boolean) => void;
   onDetailsLevelChanged: (detailsLevel) => any;
   detailsLevel: string;
 }
@@ -36,7 +36,7 @@ export default class CommitsTableRowSummary extends React.Component<CommitsTable
       const checkbox = target.getElementsByTagName('input')[0] as HTMLInputElement;
       checked = !checkbox.checked;
     }
-    this.props.onCommitSelect([this.props.commit], checked, e.shiftKey);
+    this.props.onCommitsSelect([this.props.commit], checked, e.shiftKey);
   };
 
   onDetailsLevelClick = (e: React.MouseEvent, detailsLevel: string) => {

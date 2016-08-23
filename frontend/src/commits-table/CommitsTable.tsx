@@ -69,7 +69,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
               isSelected={indexOf(selectedCommits, commit) !== -1}
               onUndo={onUndo}
               onRollback={onRollback}
-              onCommitSelect={onCommitsSelect}
+              onCommitsSelect={onCommitsSelect}
               diffProvider={diffProvider}
               key={commit.hash}
             />
