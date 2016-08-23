@@ -54,9 +54,8 @@ class DBAsserter
         self::$wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
 
         $yamlDir = self::$wpAutomation->getPluginsDir() . '/versionpress/.versionpress';
-        $schemaReflection = new \ReflectionClass(DbSchemaInfo::class);
         $schemaFile = $yamlDir . '/schema.yml';
-        $shortcodeFile = dirname($schemaReflection->getFileName()) . '/wordpress-shortcodes.yml';
+        $shortcodeFile = $yamlDir . '/shortcodes.yml';
 
         /** @var $wp_db_version */
         require(self::$wpAutomation->getAbspath() . '/wp-includes/version.php');
@@ -83,7 +82,7 @@ class DBAsserter
         self::$wpdb = new \wpdb($dbUser, $dbPassword, $dbName, $dbHost);
         self::$wpdb->set_prefix($dbPrefix);
         self::$vp_database = new Database(self::$wpdb);
-        $shortcodesInfo = new ShortcodesInfo($shortcodeFile);
+        $shortcodesInfo = new ShortcodesInfo([$shortcodeFile]);
         self::$vpidRepository = new VpidRepository(self::$vp_database, self::$schemaInfo);
         self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, self::$vpidRepository);
 

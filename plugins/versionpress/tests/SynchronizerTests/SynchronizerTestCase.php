@@ -48,10 +48,9 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
         DBAsserter::assertFilesEqualDatabase();
 
         $yamlDir = self::$wpAutomation->getPluginsDir() . '/versionpress/.versionpress';
-        $schemaReflection = new \ReflectionClass(DbSchemaInfo::class);
         $schemaFile = $yamlDir . '/schema.yml';
         $actionsFile = $yamlDir . '/actions.yml';
-        $shortcodeFile = dirname($schemaReflection->getFileName()) . '/wordpress-shortcodes.yml';
+        $shortcodeFile = $yamlDir . '/shortcodes.yml';
 
         /** @var $wp_db_version */
         require(self::$wpAutomation->getAbspath() . '/wp-includes/version.php');
@@ -73,7 +72,7 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
         $wpdb->set_prefix(self::$testConfig->testSite->dbTablePrefix);
         self::$database = new Database($wpdb);
 
-        $shortcodesInfo = new ShortcodesInfo($shortcodeFile);
+        $shortcodesInfo = new ShortcodesInfo([$shortcodeFile]);
         self::$vpidRepository = new VpidRepository(self::$database, self::$schemaInfo);
         self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, self::$vpidRepository);
 

@@ -205,7 +205,7 @@ class DIContainer
         });
 
         $dic->register(VersionPressServices::SHORTCODES_INFO, function () {
-            return new ShortcodesInfo(VERSIONPRESS_PLUGIN_DIR . '/src/Database/wordpress-shortcodes.yml');
+            return new ShortcodesInfo(new ActivePluginsVPFilesIterator('shortcodes.yml'));
         });
 
         $dic->register(VersionPressServices::SQL_QUERY_PARSER, function () use ($dic) {
