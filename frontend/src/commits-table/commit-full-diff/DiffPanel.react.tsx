@@ -1,9 +1,9 @@
-/// <reference path='../Diff.d.ts' />
+/// <reference path='../../common/Diff.d.ts' />
 
 import * as React from 'react';
 import * as JsDiff from 'diff';
 
-import DiffParser from '../DiffParser';
+import DiffParser from '../../common/DiffParser';
 
 import './DiffPanel.less';
 

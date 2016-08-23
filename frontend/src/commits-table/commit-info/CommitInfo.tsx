@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 
-import Error from './Error';
+import CommitDetails from '../commit-details/CommitDetails';
 import CommitsTableRowSummary from '../row-summary/CommitsTableRowSummary.react';
-import CommitsTableRowDetails from '../row-details/CommitsTableRowDetails.react';
+import Error from './Error';
 import DetailsLevel from '../../enums/DetailsLevel';
 
 interface CommitInfoProps {
@@ -94,7 +94,7 @@ export default class CommitInfo extends React.Component<CommitInfoProps, CommitI
         />
         {error
           ? <Error message={error} />
-          : <CommitsTableRowDetails
+          : <CommitDetails
               commit={commit}
               detailsLevel={detailsLevel}
               diff={diff}
