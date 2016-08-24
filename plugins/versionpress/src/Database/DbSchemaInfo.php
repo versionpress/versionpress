@@ -20,7 +20,7 @@ class DbSchemaInfo
      *
      * @var array|int|mixed|DateTime|null|string
      */
-    private $schema;
+    private $schema = [];
 
     /**
      * Database tables prefix, e.g. "wp_"
@@ -44,18 +44,15 @@ class DbSchemaInfo
      */
     public function __construct($schemaFiles, $prefix, $dbVersion)
     {
-        $schema = [];
+        $this->dbVersion = $dbVersion;
+        $this->prefix = $prefix;
 
         foreach ($schemaFiles as $schemaFile) {
             $pluginSchema = Yaml::parse($schemaFile);
             $pluginSchema = $this->useSchemaForCurrentVersion($pluginSchema);
 
-            $schema = array_merge_recursive($schema, $pluginSchema);
+            $this->schema = array_merge_recursive($this->schema, $pluginSchema);
         }
-
-        $this->dbVersion = $dbVersion;
-        $this->prefix = $prefix;
-        $this->schema = $this->useSchemaForCurrentVersion($schema);
     }
 
     /**
