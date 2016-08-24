@@ -147,7 +147,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     return lines;
   }
 
-  private getLinesForMeta(entityName, parentEntity, groupByTag, changedMeta: Change[], action: string) {
+  private getLinesForMeta(entityName: string, parentEntity: string, groupByTag: string, changedMeta: Change[], action: string) {
     const metaByTag = ArrayUtils.groupBy(changedMeta, c => c.tags[groupByTag]);
     let lines = [];
 
@@ -168,7 +168,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     return lines;
   }
 
-  private getLinesForRevert(changes: Change[], action) {
+  private getLinesForRevert(changes: Change[], action: string) {
     if (action === 'rollback') {
       const commitDetails = changes[0].tags['VP-Commit-Details']; // Rollback is always only 1 change.
       return [`The state is same as it was in "${commitDetails['message']}"`];
@@ -181,7 +181,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     }
   }
 
-  private getLinesForVersionPress(changes: Change[], action) {
+  private getLinesForVersionPress(changes: Change[], action: string) {
     return [
       <VersionPressLine action={action} />,
     ];
@@ -193,7 +193,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     ];
   }
 
-  private getLinesForOtherChanges(changes: Change[], type, action) {
+  private getLinesForOtherChanges(changes: Change[], type: string, action: string) {
     const changedEntities = this.renderEntityNamesWithDuplicates(changes);
 
     return [
@@ -215,7 +215,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     );
   }
 
-  private renderEntityNamesWithDuplicates(changes: Change[]): JSX.Element[] {
+  private renderEntityNamesWithDuplicates(changes: Change[]) {
     const filteredChanges = ArrayUtils.filterDuplicates<Change>(
       changes,
       change => change.type + '|||' + change.action + '|||' + change.name
