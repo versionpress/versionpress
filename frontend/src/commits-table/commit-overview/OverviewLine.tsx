@@ -9,6 +9,7 @@ interface OverviewLineProps {
   action: string;
   entities: any[];
   suffix: any;
+  onShowMoreClick(e: React.MouseEvent, listKey: string): void;
 }
 
 const OverviewLine: React.StatelessComponent<OverviewLineProps> = (props) => {
@@ -18,6 +19,7 @@ const OverviewLine: React.StatelessComponent<OverviewLineProps> = (props) => {
     action,
     entities,
     suffix = null,
+    onShowMoreClick,
   } = props;
 
   const capitalizedVerb = StringUtils.capitalize(StringUtils.verbToPastTense(action));
@@ -47,7 +49,7 @@ const OverviewLine: React.StatelessComponent<OverviewLineProps> = (props) => {
       <ul>
         {entities.slice(0, displayedListLength).map(entity => <li>{entity}</li>)}
         <li>
-          <a onClick={e => this.onShowMoreClick(e, listKey)}>
+          <a onClick={e => onShowMoreClick(e, listKey)}>
             show {entities.length - displayedListLength} more...
           </a>
         </li>

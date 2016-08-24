@@ -3,13 +3,13 @@
 import * as React from 'react';
 import * as moment from 'moment';
 
+import CommentLine from './CommentLine';
 import EntityNameDuplicates from './EntityNameDuplicates';
 import Environment from './Environment';
 import OverviewLine from './OverviewLine';
 import VersionPressLine from './VersionPressLine';
 import WordPressUpdateLine from './WordPressUpdateLine';
 import * as ArrayUtils from '../../common/ArrayUtils';
-import * as StringUtils from '../../common/StringUtils';
 
 interface CommitOverviewProps {
   commit: Commit;
@@ -85,42 +85,18 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
   }
 
   private getLinesForComments(changedComments: Change[], action: string) {
+    const commentsByPosts = ArrayUtils.groupBy<Change>(changedComments, c => c.tags['VP-Comment-PostTitle']);
     let lines = [];
-    let commentsByPosts = ArrayUtils.groupBy<Change>(changedComments, c => c.tags['VP-Comment-PostTitle']);
 
     for (let postTitle in commentsByPosts) {
-      let capitalizedVerb = StringUtils.capitalize(StringUtils.verbToPastTense(action));
-      let numberOfComments = commentsByPosts[postTitle].length;
-      let authors = ArrayUtils.filterDuplicates(commentsByPosts[postTitle].map(change => change.tags['VP-Comment-Author']));
-      let authorsString = StringUtils.join(authors);
-      let suffix = '';
-
-      if (action === 'spam' || action === 'unspam') {
-        capitalizedVerb = 'Marked';
-        suffix = action === 'spam' ? ' as spam' : ' as not spam';
-      }
-
-      if (action === 'trash' || action === 'untrash') {
-        capitalizedVerb = 'Moved';
-        suffix = action === 'trash' ? ' to trash' : ' from trash';
-      }
-
-      if (action === 'create-pending') {
-        capitalizedVerb = 'Created';
-      }
-
-      let line = (
-        <span>
-          {capitalizedVerb}
-          {' '}
-          {numberOfComments === 1 ? '' : (numberOfComments + ' ')}
-          <span className='type'>{numberOfComments === 1 ? 'comment' : 'comments'}</span>
-          {' '} by <span className='type'>user</span> <span className='identifier'>{authorsString}</span>
-          {' '} for <span className='type'>post</span> <span className='identifier'>{postTitle}</span>
-          {suffix}
-        </span>
+      lines.push(
+        <CommentLine
+          commentsByPosts={commentsByPosts}
+          postTitle={postTitle}
+          action={action}
+          key={postTitle}
+        />
       );
-      lines.push(line);
     }
 
     return lines;
@@ -211,6 +187,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
         action={action}
         entities={entities}
         suffix={suffix}
+        onShowMoreClick={this.onShowMoreClick}
       />
     );
   }
