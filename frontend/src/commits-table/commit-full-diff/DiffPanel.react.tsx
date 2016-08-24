@@ -7,16 +7,16 @@ import DiffParser from '../../common/DiffParser';
 
 import './DiffPanel.less';
 
-interface DiffPanelProps extends React.Props<JSX.Element> {
+interface DiffPanelProps {
   diff: string;
 }
 
-export default class DiffPanel extends React.Component<DiffPanelProps, any> {
+export default class DiffPanel extends React.Component<DiffPanelProps, {}> {
 
   private static createTableFromChunk(chunk: Chunk, i: number) {
-    let [left, right] = DiffPanel.divideToLeftAndRightColumn(chunk);
+    const [left, right] = DiffPanel.divideToLeftAndRightColumn(chunk);
 
-    let mapTwoArrays = function<T, U>(a1: T[], a2: U[], fn: (a: T, b: U, i: number) => any) {
+    const mapTwoArrays = function<T, U>(a1: T[], a2: U[], fn: (a: T, b: U, i: number) => any) {
       let result = [];
       for (let i = 0; i < a1.length; i++) {
         result.push(fn(a1[i], a2[i], i));
@@ -48,8 +48,8 @@ export default class DiffPanel extends React.Component<DiffPanelProps, any> {
     );
   }
 
-  private static highlightInlineDiff(leftContent, rightContent) {
-    let highlightLine = (diffPart: JsDiff.IDiffResult, shouldBeHighlighted: () => boolean, color: string) => {
+  private static highlightInlineDiff(leftContent: string, rightContent: string) {
+    const highlightLine = (diffPart: JsDiff.IDiffResult, shouldBeHighlighted: () => boolean, color: string) => {
       if (shouldBeHighlighted()) {
         return <span style={{backgroundColor: color}}>{diffPart.value}</span>;
       } else if (!diffPart.added && !diffPart.removed) {
@@ -59,21 +59,21 @@ export default class DiffPanel extends React.Component<DiffPanelProps, any> {
       return <span />;
     };
 
-    let lineDiff = JsDiff.diffWordsWithSpace(leftContent, rightContent);
+    const lineDiff = JsDiff.diffWordsWithSpace(leftContent, rightContent);
 
-    leftContent = lineDiff.map(diffPart => highlightLine(diffPart, () => !!diffPart.removed, '#f8cbcb'));
-    rightContent = lineDiff.map(diffPart => highlightLine(diffPart, () => !!diffPart.added, '#a6f3a6'));
-
-    return [leftContent, rightContent];
+    return [
+      lineDiff.map(diffPart => highlightLine(diffPart, () => !!diffPart.removed, '#f8cbcb')),
+      lineDiff.map(diffPart => highlightLine(diffPart, () => !!diffPart.added, '#a6f3a6')),
+    ];
   }
 
   private static divideToLeftAndRightColumn(chunk: Chunk): [Line[], Line[]] {
-    let lines = chunk.lines;
+    const { lines } = chunk;
     let left: Line[] = [];
     let right: Line[] = [];
 
     for (let i = 0; i < lines.length; i++) {
-      let line = lines[i];
+      const line = lines[i];
       if (line.type === 'unchanged') {
         [left, right] = DiffPanel.balanceLeftAndRightColumn(left, right);
 
@@ -93,20 +93,28 @@ export default class DiffPanel extends React.Component<DiffPanelProps, any> {
     return [left, right];
   }
 
-  private static balanceLeftAndRightColumn(left, right) {
-    let missingLines = left.length - right.length;
+  private static balanceLeftAndRightColumn(left: Line[], right: Line[]): [Line[], Line[]] {
+    const missingLines = left.length - right.length;
+
     for (let j = 0; j < missingLines; j++) {
-      right.push({type: 'empty', content: ''});
+      right.push({
+        type: 'empty',
+        content: '',
+      });
     }
+
     for (let j = 0; j < -missingLines; j++) {
-      left.push({type: 'empty', content: ''});
+      left.push({
+        type: 'empty',
+        content: '',
+      });
     }
 
     return [left, right];
   }
 
-  private static formatInfoForPlainFileDiff(diff) {
-    let chunks = diff.chunks;
+  private static formatInfoForPlainFileDiff(diff: Diff) {
+    const { chunks } = diff;
     let result = [];
 
     if (chunks.length === 0) {
@@ -121,8 +129,8 @@ export default class DiffPanel extends React.Component<DiffPanelProps, any> {
       return result;
     }
 
-    let chunkTables = chunks.map((chunk, i) =>
-        DiffPanel.createTableFromChunk(chunk, i)
+    const chunkTables = chunks.map((chunk, i) =>
+      DiffPanel.createTableFromChunk(chunk, i)
     );
 
     for (let i = 0; i < chunkTables.length; i++) {
@@ -151,17 +159,17 @@ export default class DiffPanel extends React.Component<DiffPanelProps, any> {
   }
 
   private static replaceLeadingSpacesWithHardSpaces(content: string): string {
-    let match = content.match(/^( +)/); // All leading spaces
+    const match = content.match(/^( +)/); // All leading spaces
     if (!match) {
       return content;
     }
 
-    let numberOfSpaces = match[1].length;
+    const numberOfSpaces = match[1].length;
     return '\u00a0'.repeat(numberOfSpaces) + content.substr(numberOfSpaces);
   }
 
-  private static formatInfoForBinaryFileDiff(diff) {
-    var message;
+  private static formatInfoForBinaryFileDiff(diff: Diff) {
+    let message;
 
     if (diff.from === '/dev/null') {
       message = 'Added binary file';
@@ -175,14 +183,17 @@ export default class DiffPanel extends React.Component<DiffPanelProps, any> {
   }
 
   render() {
-    if (this.props.diff === null) {
+    const { diff } = this.props;
+
+    if (diff === null) {
       return <div />;
     }
-    const diffs = DiffParser.parse(this.props.diff);
+
+    const diffs = DiffParser.parse(diff);
 
     return (
       <div>
-        {diffs.map((diff, i) =>
+        {diffs.map((diff: Diff, i) =>
           <div className='DiffPanel' key={i}>
             <h4 className='heading'>{(diff.from === '/dev/null' ? diff.to : diff.from).substr(2)}</h4>
             {diff.type === 'plain'
