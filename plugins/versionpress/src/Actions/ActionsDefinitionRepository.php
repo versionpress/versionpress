@@ -29,7 +29,12 @@ class ActionsDefinitionRepository
             return;
         }
 
-        $targetFile = $this->directory . '/' . $plugin . '-actions.yml';
+        $targetFile = $this->directory . '/' . $this->sanitizePluginName($plugin) . '-actions.yml';
         FileSystem::copy($actionsFile, $targetFile);
+    }
+
+    private function sanitizePluginName($pluginName)
+    {
+        return str_replace('/', '---', $pluginName);
     }
 }
