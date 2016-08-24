@@ -3,6 +3,8 @@
 import * as React from 'react';
 import * as JsDiff from 'diff';
 
+import BinaryFileDiff from './BinaryFileDiff';
+
 import DiffParser from '../../common/DiffParser';
 
 import './DiffPanel.less';
@@ -168,20 +170,6 @@ export default class DiffPanel extends React.Component<DiffPanelProps, {}> {
     return '\u00a0'.repeat(numberOfSpaces) + content.substr(numberOfSpaces);
   }
 
-  private static formatInfoForBinaryFileDiff(diff: Diff) {
-    let message;
-
-    if (diff.from === '/dev/null') {
-      message = 'Added binary file';
-    } else if (diff.to === '/dev/null') {
-      message = 'Deleted binary file';
-    } else {
-      message = 'Changed binary file';
-    }
-
-    return <div className='binary-file-info'>{message}</div>;
-  }
-
   render() {
     const { diff } = this.props;
 
@@ -198,7 +186,7 @@ export default class DiffPanel extends React.Component<DiffPanelProps, {}> {
             <h4 className='heading'>{(diff.from === '/dev/null' ? diff.to : diff.from).substr(2)}</h4>
             {diff.type === 'plain'
               ? DiffPanel.formatInfoForPlainFileDiff(diff)
-              : DiffPanel.formatInfoForBinaryFileDiff(diff)
+              : <BinaryFileDiff diff={diff} />
             }
           </div>
         )}
