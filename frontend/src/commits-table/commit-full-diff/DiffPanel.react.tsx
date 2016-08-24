@@ -25,7 +25,7 @@ export default class DiffPanel extends React.Component<DiffPanelProps, {}> {
       result.push(
         <BinaryFileInfo
           diff={diff}
-          key="binary-file-info"
+          key='binary-file-info'
         />
       );
 

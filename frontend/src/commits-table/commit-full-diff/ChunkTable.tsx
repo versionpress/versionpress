@@ -7,6 +7,26 @@ interface ChunkTableProps {
   chunk: Chunk;
 }
 
+const balanceLeftAndRightColumn = (left: Line[], right: Line[]): [Line[], Line[]] => {
+  const missingLines = left.length - right.length;
+
+  for (let i = 0; i < missingLines; i++) {
+    right.push({
+      type: 'empty',
+      content: '',
+    });
+  }
+
+  for (let i = 0; i < -missingLines; i++) {
+    left.push({
+      type: 'empty',
+      content: '',
+    });
+  }
+
+  return [left, right];
+};
+
 const divideToLeftAndRightColumn = (chunk: Chunk): [Line[], Line[]] => {
   const { lines } = chunk;
   let left: Line[] = [];
@@ -33,26 +53,6 @@ const divideToLeftAndRightColumn = (chunk: Chunk): [Line[], Line[]] => {
   return [left, right];
 };
 
-const balanceLeftAndRightColumn = (left: Line[], right: Line[]): [Line[], Line[]] => {
-  const missingLines = left.length - right.length;
-
-  for (let i = 0; i < missingLines; i++) {
-    right.push({
-      type: 'empty',
-      content: '',
-    });
-  }
-
-  for (let i = 0; i < -missingLines; i++) {
-    left.push({
-      type: 'empty',
-      content: '',
-    });
-  }
-
-  return [left, right];
-};
-
 const mapTwoArrays = function<T, U>(a1: T[], a2: U[], fn: (a: T, b: U, i: number) => any): any[] {
   let result = [];
   for (let i = 0; i < a1.length; i++) {
@@ -72,21 +72,28 @@ const replaceLeadingSpacesWithHardSpaces = (content: string): string => {
 };
 
 const highlightInlineDiff = (leftContent: string, rightContent: string): [JSX.Element[], JSX.Element[]] => {
-  const highlightLine = (diffPart: JsDiff.IDiffResult, shouldBeHighlighted: () => boolean, color: string) => {
+  const highlightLine = (diffPart: JsDiff.IDiffResult, shouldBeHighlighted: () => boolean, color: string, index: number) => {
     if (shouldBeHighlighted()) {
-      return <span style={{backgroundColor: color}}>{diffPart.value}</span>;
+      return (
+        <span
+          style={{backgroundColor: color}}
+          key={index}
+        >
+          {diffPart.value}
+        </span>
+      );
     } else if (!diffPart.added && !diffPart.removed) {
-      return <span>{diffPart.value}</span>;
+      return <span key={index}>{diffPart.value}</span>;
     }
 
-    return <span />;
+    return <span key={index} />;
   };
 
   const lineDiff = JsDiff.diffWordsWithSpace(leftContent, rightContent);
 
   return [
-    lineDiff.map(diffPart => highlightLine(diffPart, () => !!diffPart.removed, '#f8cbcb')),
-    lineDiff.map(diffPart => highlightLine(diffPart, () => !!diffPart.added, '#a6f3a6')),
+    lineDiff.map((diffPart, i) => highlightLine(diffPart, () => !!diffPart.removed, '#f8cbcb', i)),
+    lineDiff.map((diffPart, i) => highlightLine(diffPart, () => !!diffPart.added, '#a6f3a6', i)),
   ];
 };
 
@@ -116,7 +123,6 @@ const ChunkTable: React.StatelessComponent<ChunkTableProps> = ({ chunk }) => {
       })}
       </tbody>
     </table>
-
   );
 };
 
