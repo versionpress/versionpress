@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import DiffPanel from '../commit-full-diff/DiffPanel.react';
+import DiffPanel from '../commit-full-diff/DiffPanel';
 
 interface FullDiffProps {
   diff: string;
