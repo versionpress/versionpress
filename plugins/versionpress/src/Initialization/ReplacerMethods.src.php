@@ -103,6 +103,10 @@ class ReplacerMethods
             return $this->__wp_query($query);
         }
 
+        if (strpos(strtolower($query), 'select') === 0) {
+            return $this->__wp_query($query);
+        }
+
         $r = null;
 
         /** @var \VersionPress\Database\SqlQueryParser $sqlQueryParser */
