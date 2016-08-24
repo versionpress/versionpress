@@ -34,22 +34,24 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     });
   };
 
-  private getFormattedChanges(changes: Change[]) {
+  private getFormattedChanges() {
     const { commit } = this.props;
+    const { changes } = commit;
 
     if (changes.length === 0) {
       if (commit.isMerge) {
         return [<em>This is a merge commit. No files were changed in this commit.</em>];
       }
+
       return [<em>No files were changed in this commit.</em>];
     }
 
+    const changesByTypeAndAction = ArrayUtils.groupBy(changes, change => [change.type, change.action]);
     let displayedLines = [];
-    let changesByTypeAndAction = ArrayUtils.groupBy(changes, change => [change.type, change.action]);
 
-    for (let type in changesByTypeAndAction) {
-      for (let action in changesByTypeAndAction[type]) {
-        let lines: any[];
+    for (const type in changesByTypeAndAction) {
+      for (const action in changesByTypeAndAction[type]) {
+        let lines = [];
 
         if (type === 'usermeta') {
           lines = this.getLinesForUsermeta(changesByTypeAndAction[type][action], action);
@@ -88,7 +90,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
     const commentsByPosts = ArrayUtils.groupBy<Change>(changedComments, c => c.tags['VP-Comment-PostTitle']);
     let lines = [];
 
-    for (let postTitle in commentsByPosts) {
+    for (const postTitle in commentsByPosts) {
       lines.push(
         <CommentLine
           commentsByPosts={commentsByPosts}
@@ -216,7 +218,7 @@ export default class CommitOverview extends React.Component<CommitOverviewProps,
 
     return (
       <ul className='overview-list'>
-        {this.getFormattedChanges(commit.changes).map((line, i) => <li key={i}>{line}</li>)}
+        {this.getFormattedChanges().map((line, i) => <li key={i}>{line}</li>)}
         <Environment environment={commit.environment} />
       </ul>
     );
