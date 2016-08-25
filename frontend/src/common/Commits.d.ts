@@ -9,11 +9,7 @@ interface Commit {
   isMerge: boolean;
   environment: string;
   changes: Change[];
-  author: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
+  author: Author;
 }
 
 interface Change {
@@ -21,4 +17,10 @@ interface Change {
   action: string;
   name: string;
   tags: any;
+}
+
+interface Author {
+  name: string;
+  email: string;
+  avatar: string;
 }

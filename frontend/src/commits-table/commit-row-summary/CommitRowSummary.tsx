@@ -3,6 +3,7 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
 
+import Author from './Author';
 import Checkbox from './Checkbox';
 import CreateDate from './CreateDate';
 import Environment from './Environment';
@@ -46,17 +47,6 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
       onDetailsLevelChange(detailsLevel === DetailsLevel.None ? DetailsLevel.Overview : DetailsLevel.None);
     }
   };
-
-  private getAuthorTooltip(commit: Commit) {
-    const author = commit.author;
-    if (author.name === 'Non-admin action') {
-      return 'This action is not associated with any user, e.g., it was a public comment';
-    } else if (author.name === 'WP-CLI') {
-      return 'This action was done via WP-CLI';
-    }
-
-    return author.name + ' <' + author.email + '>';
-  }
 
   private renderUndoMergeDialog() {
     const body = (
@@ -121,15 +111,7 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
           onClick={this.onCheckboxClick}
         />
         <CreateDate date={commit.date} />
-        <td className='column-author'>
-          <img
-            className='avatar'
-            src={commit.author.avatar}
-            title={this.getAuthorTooltip(commit)}
-            width={20}
-            height={20}
-          />
-        </td>
+        <Author author={commit.author} />
         <td className='column-message'>
           {commit.isMerge
             ? <span className='merge-icon' title='Merge commit'>M</span>
