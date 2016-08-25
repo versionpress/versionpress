@@ -4,10 +4,10 @@ import * as React from 'react';
 import * as classNames from 'classnames';
 import * as moment from 'moment';
 
+import Environment from './Environment';
 import DetailsLevel from '../../enums/DetailsLevel';
 import * as portal from '../../common/portal';
 import { UndoDisabledDialog } from '../../common/revert-dialog/revertDialog';
-import { getGitBranchColor } from '../../services/GitBranchColorProvider';
 
 interface CommitRowSummaryProps {
   commit: Commit;
@@ -122,12 +122,7 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
 
     return (
       <tr className={rowClassName} onClick={this.onRowClick}>
-        <td className='column-environment'>
-          {commit.environment === '?'
-            ? null
-            : <div style={{backgroundColor: getGitBranchColor(commit.environment)}}>{commit.environment}</div>
-          }
-        </td>
+        <Environment environment={commit.environment} />
         {commit.canUndo
           ? <td className='column-cb' onClick={this.onCheckboxClick}>
               <input
