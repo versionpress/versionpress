@@ -14,7 +14,9 @@ post:
     #  - Updating draft via AJAX
     #  - Any changes saved by clicking "Preview"
   ignored-columns:
-    - comment_count: '@\VersionPress\Synchronizers\PostsSynchronizer::fixCommentCounts'
+    - comment_count: '@vp_fix_comments_count'
+  clean-cache:
+    - post: id
 
 
 postmeta:
@@ -32,6 +34,8 @@ postmeta:
     - 'meta_key: _edit_last'
     - 'meta_key: _pingme'
     - 'meta_key: _encloseme'
+  clean-cache:
+    - post: post_id
 
 comment:
   table: comments
@@ -42,6 +46,9 @@ comment:
     comment_parent: comment
   ignored-entities:
     - 'comment_approved: spam'
+  clean-cache:
+    - comment: id
+    - post: comment_post_ID
 
 commentmeta:
   table: commentmeta
@@ -49,6 +56,8 @@ commentmeta:
   parent-reference: comment_id
   references:
     comment_id: comment
+  clean-cache:
+    - comment: comment_id
 
 
 user:
@@ -56,6 +65,8 @@ user:
   id: ID
   ignored-columns:
     - user_activation_key
+  clean-cache:
+    - user: id
 
 term:
   table: terms
@@ -67,6 +78,8 @@ termmeta:
   parent-reference: term_id
   references:
     term_id: term
+  clean-cache:
+    term: term_id
 
 term_taxonomy:
   id: term_taxonomy_id
@@ -88,6 +101,8 @@ usermeta:
     - 'meta_key: nav_menu_recently_edited'
     - 'meta_key: wporg_favorites'
     - 'meta_key: *dashboard_quick_press_last_post_id'
+  clean-cache:
+    - user: user_id
 
 option:
   table: options

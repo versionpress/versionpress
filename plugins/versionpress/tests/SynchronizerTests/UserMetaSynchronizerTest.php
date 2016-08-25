@@ -5,8 +5,7 @@ namespace VersionPress\Tests\SynchronizerTests;
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Synchronizers\Synchronizer;
-use VersionPress\Synchronizers\UserMetaSynchronizer;
-use VersionPress\Synchronizers\UsersSynchronizer;
+use VersionPress\Synchronizers\SynchronizerBase;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -17,9 +16,9 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase
     private $storage;
     /** @var DirectoryStorage */
     private $userStorage;
-    /** @var UserMetaSynchronizer */
+    /** @var SynchronizerBase */
     private $synchronizer;
-    /** @var UsersSynchronizer */
+    /** @var SynchronizerBase */
     private $usersSynchronizer;
     private static $vpId;
     private static $userVpId;
@@ -29,7 +28,7 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('usermeta');
         $this->userStorage = self::$storageFactory->getStorage('user');
-        $this->synchronizer = new UserMetaSynchronizer(
+        $this->synchronizer = new SynchronizerBase(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('usermeta'),
@@ -38,7 +37,7 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase
             self::$urlReplacer,
             self::$shortcodesReplacer
         );
-        $this->usersSynchronizer = new UsersSynchronizer(
+        $this->usersSynchronizer = new SynchronizerBase(
             $this->userStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('user'),

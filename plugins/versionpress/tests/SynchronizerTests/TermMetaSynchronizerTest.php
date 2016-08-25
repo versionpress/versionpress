@@ -5,7 +5,7 @@ namespace VersionPress\Tests\SynchronizerTests;
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Synchronizers\Synchronizer;
-use VersionPress\Synchronizers\TermMetaSynchronizer;
+use VersionPress\Synchronizers\SynchronizerBase;
 use VersionPress\Synchronizers\TermsSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
@@ -17,7 +17,7 @@ class TermMetaSynchronizerTest extends SynchronizerTestCase
     private $storage;
     /** @var DirectoryStorage */
     private $termStorage;
-    /** @var TermMetaSynchronizer */
+    /** @var SynchronizerBase */
     private $synchronizer;
     /** @var TermsSynchronizer */
     private $termsSynchronizer;
@@ -33,7 +33,7 @@ class TermMetaSynchronizerTest extends SynchronizerTestCase
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('termmeta');
         $this->termStorage = self::$storageFactory->getStorage('term');
-        $this->synchronizer = new TermMetaSynchronizer(
+        $this->synchronizer = new SynchronizerBase(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('termmeta'),

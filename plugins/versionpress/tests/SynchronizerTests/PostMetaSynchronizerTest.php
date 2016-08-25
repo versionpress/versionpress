@@ -4,10 +4,8 @@ namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\MetaEntityStorage;
-use VersionPress\Synchronizers\PostMetaSynchronizer;
-use VersionPress\Synchronizers\PostsSynchronizer;
 use VersionPress\Synchronizers\Synchronizer;
-use VersionPress\Synchronizers\UsersSynchronizer;
+use VersionPress\Synchronizers\SynchronizerBase;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -20,11 +18,11 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase
     private $postStorage;
     /** @var DirectoryStorage */
     private $userStorage;
-    /** @var PostMetaSynchronizer */
+    /** @var SynchronizerBase */
     private $synchronizer;
-    /** @var PostsSynchronizer */
+    /** @var SynchronizerBase */
     private $postsSynchronizer;
-    /** @var UsersSynchronizer */
+    /** @var SynchronizerBase */
     private $usersSynchronizer;
     private static $authorVpId;
     private static $postVpId;
@@ -37,7 +35,7 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase
         $this->storage = self::$storageFactory->getStorage('postmeta');
         $this->postStorage = self::$storageFactory->getStorage('post');
         $this->userStorage = self::$storageFactory->getStorage('user');
-        $this->synchronizer = new PostMetaSynchronizer(
+        $this->synchronizer = new SynchronizerBase(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('postmeta'),
@@ -46,7 +44,7 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase
             self::$urlReplacer,
             self::$shortcodesReplacer
         );
-        $this->postsSynchronizer = new PostsSynchronizer(
+        $this->postsSynchronizer = new SynchronizerBase(
             $this->postStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('post'),
@@ -55,7 +53,7 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase
             self::$urlReplacer,
             self::$shortcodesReplacer
         );
-        $this->usersSynchronizer = new UsersSynchronizer(
+        $this->usersSynchronizer = new SynchronizerBase(
             $this->userStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('user'),

@@ -11,6 +11,7 @@ use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\ReferenceUtils;
+use VersionPress\Utils\WordPressCacheUtils;
 use wpdb;
 
 /**
@@ -18,7 +19,7 @@ use wpdb;
  *
  * TODO this needs a better name
  */
-abstract class SynchronizerBase implements Synchronizer
+class SynchronizerBase implements Synchronizer
 {
 
     const SYNCHRONIZE_MN_REFERENCES = 'mn-references';
@@ -560,19 +561,33 @@ abstract class SynchronizerBase implements Synchronizer
     //--------------------------------------
 
     /**
-     * Specific Synchronizers might do entity-specific actions, for example, PostsSynchronizer
-     * updates comment count in the database (something we don't track in the storage).
+     * Specific Synchronizers might do entity-specific actions, for example, clean cache.
      *
      * @return bool If false, the method will be called again in a second pass.
      */
     protected function doEntitySpecificActions()
     {
+        $cleanCache = $this->entityInfo->cleanCache;
+        foreach ($cleanCache as $cacheType => $idColumn) {
+
+            if (is_array($idColumn)) {
+                $cacheType = key($idColumn);
+                $idColumn = $idColumn[$cacheType];
+            }
+
+            if ($idColumn === 'id' || $idColumn === 'vpid') {
+                $ids = array_column($this->entities, $this->entityInfo->vpidColumnName);
+            } else {
+                $ids = array_column($this->entities, "vp_{$idColumn}");
+            }
+
+            WordPressCacheUtils::cleanCache($cacheType, $ids, $this->database);
+        }
         return true;
     }
 
     /**
-     * Specific Entities might contain ignored colums, which values should be computed on synchronizing process
-     * for example, VersionPress\Synchronizers\PostsSynchronizer
+     * Specific Entities might contain ignored colums, which values should be computed on synchronizing process e.g. posts.
      */
     protected function computeColumnValues()
     {

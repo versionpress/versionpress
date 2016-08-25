@@ -142,6 +142,8 @@ class EntityInfo
 
     private $ignoredColumns = [];
 
+    public $cleanCache = [];
+
     /**
      * Does the parsing and sets all properties
      *
@@ -232,6 +234,10 @@ class EntityInfo
 
         if (isset($schemaInfo['storage'])) {
             $this->storageClass = $schemaInfo['storage'];
+        }
+
+        if (isset($schemaInfo['clean-cache'])) {
+            $this->cleanCache = $schemaInfo['clean-cache'];
         }
 
     }

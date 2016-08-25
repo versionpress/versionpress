@@ -35,15 +35,15 @@ class SynchronizerFactory
     private $shortcodesReplacer;
 
     private $synchronizerClasses = [
-        'post' => PostsSynchronizer::class,
-        'postmeta' => PostMetaSynchronizer::class,
-        'comment' => CommentsSynchronizer::class,
-        'commentmeta' => CommentMetaSynchronizer::class,
+        'post' => SynchronizerBase::class,
+        'postmeta' => SynchronizerBase::class,
+        'comment' => SynchronizerBase::class,
+        'commentmeta' => SynchronizerBase::class,
         'option' => OptionsSynchronizer::class,
-        'user' => UsersSynchronizer::class,
-        'usermeta' => UserMetaSynchronizer::class,
+        'user' => SynchronizerBase::class,
+        'usermeta' => SynchronizerBase::class,
         'term' => TermsSynchronizer::class,
-        'termmeta' => TermMetaSynchronizer::class,
+        'termmeta' => SynchronizerBase::class,
         'term_taxonomy' => TermTaxonomiesSynchronizer::class,
     ];
     private $synchronizationSequence = [

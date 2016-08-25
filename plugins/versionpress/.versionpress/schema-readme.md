@@ -19,7 +19,9 @@ post:
     - 'post_type: revision'
     - 'post_status: auto-draft'
   ignored-columns:
-    - comment_count: '@\VersionPress\Synchronizers\PostsSynchronizer::fixCommentCounts'
+    - comment_count: '@vp_fix_comments_count'
+  clean-cache:
+    - post: id
 ```
 
 
@@ -242,3 +244,30 @@ entity:
 ```
 
 The function is called whenever VersionPress does its INI files => DB synchronization. The function will get an instance of `VersionPress\Database\Database` as an argument and is expected to update the database appropriately.
+
+### Cache invalidation
+
+WordPress uses cache for posts, comments, users, terms, etc. This cache needs to be invalidated when VersionPress updates database (on undo, rollback, pull, etc.). It is possible to tell VersionPress which cache has to be invalidated and where it finds related IDs. For example, when some post is deleted using *undo*, it is necessary to call `clean_post_cache(<post-id>)`. VersionPress will do it automatically based on following configuration:
+
+```
+post:
+  table: posts
+  id: ID
+  clean-cache:
+    - post: id
+```
+
+It tells VersionPress to delete the post cache (VP resolves the function name as `clean_<cache-type>_cache`). You can use `id` as the source of IDs for invalidation or a reference. For example like this:
+
+```
+post:
+  table: posts
+  id: ID
+  references:
+      post_author: user
+      post_parent: post
+  clean-cache:
+    - post: id
+    - user: post_author
+    - post: post_parent
+```

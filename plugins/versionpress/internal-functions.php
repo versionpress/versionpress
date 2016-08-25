@@ -143,3 +143,16 @@ function vp_disable_output_buffering()
     ob_flush();
     flush();
 }
+
+/**
+ * @param Database $database
+ */
+function vp_fix_comments_count($database)
+{
+    $sql = "update {$database->prefix}posts set comment_count =
+     (select count(*) from {$database->prefix}comments
+      where comment_post_ID = {$database->prefix}posts.ID and comment_approved = 1
+     );";
+
+    $database->query($sql);
+}

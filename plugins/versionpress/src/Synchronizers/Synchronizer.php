@@ -12,7 +12,7 @@ namespace VersionPress\Synchronizers;
  * synchronizers operate over all entities and completely overwrite the whole db table
  * (with the exception of untracked or ignored rows, see below). Synchronizers also sometimes
  * execute additional SQL queries to get the database to a fully working state - for example,
- * the VersionPress\Synchronizers\PostsSynchronizer counts comments and updates the `comment_count` field.
+ * the synchronizer for posts counts comments and updates the `comment_count` field.
  *
  * Synchronizers are run by the {@link VersionPress\Synchronizers\SynchronizationProcess}.
  */

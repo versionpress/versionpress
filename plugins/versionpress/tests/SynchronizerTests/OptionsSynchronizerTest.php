@@ -4,8 +4,8 @@ namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Synchronizers\OptionsSynchronizer;
-use VersionPress\Synchronizers\PostsSynchronizer;
 use VersionPress\Synchronizers\Synchronizer;
+use VersionPress\Synchronizers\SynchronizerBase;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -19,7 +19,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
     private $postStorage;
     /** @var OptionsSynchronizer */
     private $synchronizer;
-    /** @var PostsSynchronizer */
+    /** @var SynchronizerBase */
     private $postsSynchronizer;
 
     private $entitiesForSelectiveSynchronization = [['vp_id' => 'foo', 'parent' => null]];
@@ -38,7 +38,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
             self::$urlReplacer,
             self::$shortcodesReplacer
         );
-        $this->postsSynchronizer = new PostsSynchronizer(
+        $this->postsSynchronizer = new SynchronizerBase(
             $this->postStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('post'),
@@ -177,7 +177,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
             self::$urlReplacer,
             self::$shortcodesReplacer
         );
-        $this->postsSynchronizer = new PostsSynchronizer(
+        $this->postsSynchronizer = new SynchronizerBase(
             $this->postStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('post'),

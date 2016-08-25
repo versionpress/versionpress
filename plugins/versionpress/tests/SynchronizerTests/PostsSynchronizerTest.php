@@ -3,11 +3,10 @@
 namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Storages\DirectoryStorage;
-use VersionPress\Synchronizers\PostsSynchronizer;
 use VersionPress\Synchronizers\Synchronizer;
+use VersionPress\Synchronizers\SynchronizerBase;
 use VersionPress\Synchronizers\TermsSynchronizer;
 use VersionPress\Synchronizers\TermTaxonomiesSynchronizer;
-use VersionPress\Synchronizers\UsersSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -24,9 +23,9 @@ class PostsSynchronizerTest extends SynchronizerTestCase
     /** @var DirectoryStorage */
     private $termTaxonomyStorage;
 
-    /** @var PostsSynchronizer */
+    /** @var SynchronizerBase */
     private $synchronizer;
-    /** @var UsersSynchronizer */
+    /** @var SynchronizerBase */
     private $usersSynchronizer;
     /** @var TermsSynchronizer */
     private $termsSynchronizer;
@@ -46,7 +45,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
         $this->termStorage = self::$storageFactory->getStorage('term');
         $this->termTaxonomyStorage = self::$storageFactory->getStorage('term_taxonomy');
 
-        $this->synchronizer = new PostsSynchronizer(
+        $this->synchronizer = new SynchronizerBase(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('post'),
@@ -55,7 +54,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
             self::$urlReplacer,
             self::$shortcodesReplacer
         );
-        $this->usersSynchronizer = new UsersSynchronizer(
+        $this->usersSynchronizer = new SynchronizerBase(
             $this->userStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('user'),
@@ -246,7 +245,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
 
         $this->deletePost();
 
-        $this->synchronizer = new PostsSynchronizer(
+        $this->synchronizer = new SynchronizerBase(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('post'),
@@ -255,7 +254,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
             self::$urlReplacer,
             self::$shortcodesReplacer
         );
-        $this->usersSynchronizer = new UsersSynchronizer(
+        $this->usersSynchronizer = new SynchronizerBase(
             $this->userStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('user'),
