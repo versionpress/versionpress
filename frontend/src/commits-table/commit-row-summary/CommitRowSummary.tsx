@@ -4,6 +4,7 @@ import * as React from 'react';
 import * as classNames from 'classnames';
 import * as moment from 'moment';
 
+import Checkbox from './Checkbox';
 import Environment from './Environment';
 import DetailsLevel from '../../enums/DetailsLevel';
 import * as portal from '../../common/portal';
@@ -123,17 +124,12 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
     return (
       <tr className={rowClassName} onClick={this.onRowClick}>
         <Environment environment={commit.environment} />
-        {commit.canUndo
-          ? <td className='column-cb' onClick={this.onCheckboxClick}>
-              <input
-                type='checkbox'
-                checked={isSelected}
-                disabled={!enableActions}
-                readOnly={true}
-              />
-            </td>
-          : <td className='column-cb' />
-        }
+        <Checkbox
+          canUndo={commit.canUndo}
+          isChecked={isSelected}
+          isDisabled={!enableActions}
+          onClick={this.onCheckboxClick}
+        />
         <td className='column-date' title={moment(commit.date).format('LLL')}>{moment(commit.date).fromNow()}</td>
         <td className='column-author'>
           <img
