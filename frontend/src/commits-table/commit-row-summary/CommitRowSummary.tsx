@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 import * as classNames from 'classnames';
-import * as moment from 'moment';
 
 import Checkbox from './Checkbox';
+import CreateDate from './CreateDate';
 import Environment from './Environment';
 import DetailsLevel from '../../enums/DetailsLevel';
 import * as portal from '../../common/portal';
@@ -120,7 +120,7 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
           isDisabled={!enableActions}
           onClick={this.onCheckboxClick}
         />
-        <td className='column-date' title={moment(commit.date).format('LLL')}>{moment(commit.date).fromNow()}</td>
+        <CreateDate date={commit.date} />
         <td className='column-author'>
           <img
             className='avatar'
