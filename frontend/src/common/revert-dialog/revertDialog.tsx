@@ -12,7 +12,8 @@ const UndoEnabledDialog: React.StatelessComponent<{}> = () => {
         <a
           href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback'
           target='_blank'
-        >Learn more about reverts.
+        >
+          Learn more about reverts.
         </a>
       </p>
     </div>
@@ -31,6 +32,20 @@ export const UndoDisabledDialog: React.StatelessComponent<{}> = () => (
       in your WordPress directory. {' '}
       <br />
       Please commit them before doing a revert.
+    </p>
+  </div>
+);
+
+export const UndoMergeDialog: React.StatelessComponent<{}> = () => (
+  <div>
+    <p>
+      Merge commit is a special type of commit that cannot be undone. {' '}
+      <a
+        href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback#merge-commits'
+        target='_blank'
+      >
+        Learn more
+      </a>
     </p>
   </div>
 );

@@ -10,7 +10,7 @@ import Environment from './Environment';
 import Message from './Message';
 import DetailsLevel from '../../enums/DetailsLevel';
 import * as portal from '../../common/portal';
-import { UndoDisabledDialog } from '../../common/revert-dialog/revertDialog';
+import { UndoDisabledDialog, UndoMergeDialog } from '../../common/revert-dialog/revertDialog';
 
 interface CommitRowSummaryProps {
   commit: Commit;
@@ -50,22 +50,17 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
   };
 
   private renderUndoMergeDialog() {
-    const body = (
-      <p>
-        Merge commit is a special type of commit that cannot be undone. {' '}
-        <a
-          href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback#merge-commits'
-          target='_blank'
-        >Learn more</a>
-      </p>
+    portal.alertDialog(
+      'This is a merge commit',
+      <UndoMergeDialog />
     );
-    portal.alertDialog('This is a merge commit', body);
   }
 
   private renderDisabledDialog() {
-    const title = <span>Undo <em>{this.props.commit.message}</em>?</span>;
-    const body = <UndoDisabledDialog />;
-    portal.alertDialog(title, body);
+    portal.alertDialog(
+      <span>Undo <em>{this.props.commit.message}</em>?</span>,
+      <UndoDisabledDialog />
+    );
   }
 
   render() {
