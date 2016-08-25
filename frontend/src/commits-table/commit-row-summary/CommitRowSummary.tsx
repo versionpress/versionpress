@@ -9,7 +9,7 @@ import * as portal from '../../common/portal';
 import { UndoDisabledDialog } from '../../common/revert-dialog/revertDialog';
 import { getGitBranchColor } from '../../services/GitBranchColorProvider';
 
-interface CommitsTableRowSummaryProps {
+interface CommitRowSummaryProps {
   commit: Commit;
   enableActions: boolean;
   isSelected: boolean;
@@ -20,7 +20,7 @@ interface CommitsTableRowSummaryProps {
   onDetailsLevelChange(detailsLevel: DetailsLevel): void;
 }
 
-export default class CommitsTableRowSummary extends React.Component<CommitsTableRowSummaryProps, {}> {
+export default class CommitRowSummary extends React.Component<CommitRowSummaryProps, {}> {
 
   onCheckboxClick = (e: React.MouseEvent) => {
     e.stopPropagation();

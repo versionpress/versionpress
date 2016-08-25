@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 import CommitDetails from '../commit-details/CommitDetails';
-import CommitsTableRowSummary from '../row-summary/CommitsTableRowSummary.react';
+import CommitRowSummary from '../commit-row-summary/CommitRowSummary';
 import Error from './Error';
 import DetailsLevel from '../../enums/DetailsLevel';
 
@@ -82,7 +82,7 @@ export default class CommitInfo extends React.Component<CommitInfoProps, CommitI
 
     return (
       <tbody>
-        <CommitsTableRowSummary
+        <CommitRowSummary
           commit={commit}
           enableActions={enableActions}
           isSelected={isSelected}
