@@ -14,7 +14,7 @@ interface CommitInfoProps {
   diffProvider: {getDiff(hash: string): Promise<string>};
   onUndo(e): void;
   onRollback(e): void;
-  onCommitsSelect(commits: Commit[], isChecked: boolean, shiftKey: boolean): void;
+  onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
 }
 
 interface CommitInfoState {

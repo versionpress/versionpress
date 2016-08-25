@@ -17,7 +17,7 @@ interface CommitRowSummaryProps {
   detailsLevel: DetailsLevel;
   onUndo(e): void;
   onRollback(e): void;
-  onCommitsSelect(commits: Commit[], isChecked: boolean, shiftKey: boolean): void;
+  onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
   onDetailsLevelChange(detailsLevel: DetailsLevel): void;
 }
 
@@ -25,20 +25,10 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
 
   onCheckboxClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!this.props.enableActions) {
-      return;
-    }
 
-    const target = e.target as HTMLInputElement;
-    let checked;
+    const { commit, isSelected, onCommitsSelect } = this.props;
 
-    if (target.tagName === 'INPUT') {
-      checked = target.checked;
-    } else {
-      const checkbox = target.getElementsByTagName('input')[0] as HTMLInputElement;
-      checked = !checkbox.checked;
-    }
-    this.props.onCommitsSelect([this.props.commit], checked, e.shiftKey);
+    onCommitsSelect([commit], !isSelected, e.shiftKey);
   };
 
   onDetailsLevelClick = (e: React.MouseEvent, detailsLevel: DetailsLevel) => {
@@ -125,7 +115,7 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
       <tr className={rowClassName} onClick={this.onRowClick}>
         <Environment environment={commit.environment} />
         <Checkbox
-          canUndo={commit.canUndo}
+          isVisible={commit.canUndo}
           isChecked={isSelected}
           isDisabled={!enableActions}
           onClick={this.onCheckboxClick}

@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 interface CheckboxProps {
-  canUndo: boolean;
+  isVisible: boolean;
   isChecked: boolean;
   isDisabled: boolean;
   onClick(e: React.MouseEvent): void;
@@ -9,13 +9,13 @@ interface CheckboxProps {
 
 const Checkbox: React.StatelessComponent<CheckboxProps> = (props) => {
   const {
-    canUndo,
+    isVisible,
     isChecked,
     isDisabled,
     onClick,
   } = props;
 
-  return canUndo
+  return isVisible
     ? <td className='column-cb' onClick={onClick}>
         <input
           type='checkbox'
