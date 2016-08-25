@@ -7,6 +7,7 @@ import Author from './Author';
 import Checkbox from './Checkbox';
 import CreateDate from './CreateDate';
 import Environment from './Environment';
+import Message from './Message';
 import DetailsLevel from '../../enums/DetailsLevel';
 import * as portal from '../../common/portal';
 import { UndoDisabledDialog } from '../../common/revert-dialog/revertDialog';
@@ -24,6 +25,16 @@ interface CommitRowSummaryProps {
 
 export default class CommitRowSummary extends React.Component<CommitRowSummaryProps, {}> {
 
+  onRowClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    const { commit, detailsLevel, onDetailsLevelChange } = this.props;
+
+    if (commit.isEnabled) {
+      onDetailsLevelChange(detailsLevel === DetailsLevel.None ? DetailsLevel.Overview : DetailsLevel.None);
+    }
+  };
+
   onCheckboxClick = (e: React.MouseEvent) => {
     e.stopPropagation();
 
@@ -36,16 +47,6 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
     e.stopPropagation();
 
     this.props.onDetailsLevelChange(detailsLevel);
-  };
-
-  onRowClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    const { commit, detailsLevel, onDetailsLevelChange } = this.props;
-
-    if (commit.isEnabled) {
-      onDetailsLevelChange(detailsLevel === DetailsLevel.None ? DetailsLevel.Overview : DetailsLevel.None);
-    }
   };
 
   private renderUndoMergeDialog() {
@@ -65,20 +66,6 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
     const title = <span>Undo <em>{this.props.commit.message}</em>?</span>;
     const body = <UndoDisabledDialog />;
     portal.alertDialog(title, body);
-  }
-
-  private renderMessage(message: string) {
-    const messageChunks = /(.*)'(.*)'(.*)/.exec(message);
-    if (!messageChunks || messageChunks.length < 4) {
-      return <span>{message}</span>;
-    }
-    return (
-      <span>
-        {messageChunks[1] !== '' ? this.renderMessage(messageChunks[1]) : null}
-        {messageChunks[2] !== '' ? <span className='identifier'>{messageChunks[2]}</span> : null}
-        {messageChunks[3] !== '' ? this.renderMessage(messageChunks[3]) : null}
-      </span>
-    );
   }
 
   render() {
@@ -112,28 +99,11 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
         />
         <CreateDate date={commit.date} />
         <Author author={commit.author} />
-        <td className='column-message'>
-          {commit.isMerge
-            ? <span className='merge-icon' title='Merge commit'>M</span>
-            : null
-          }
-          {this.renderMessage(commit.message)}
-          {detailsLevel !== DetailsLevel.None
-            ? <div className='detail-buttons'>
-                <button
-                  className='button'
-                  disabled={detailsLevel === DetailsLevel.Overview}
-                  onClick={e => this.onDetailsLevelClick(e, DetailsLevel.Overview)}
-                >Overview</button>
-                <button
-                  className='button'
-                  disabled={detailsLevel === DetailsLevel.FullDiff}
-                  onClick={e => this.onDetailsLevelClick(e, DetailsLevel.FullDiff)}
-                >Full diff</button>
-              </div>
-            : null
-          }
-        </td>
+        <Message
+          commit={commit}
+          detailsLevel={detailsLevel}
+          onDetailsLevelClick={this.onDetailsLevelClick}
+        />
         <td className='column-actions'>
           {(commit.canUndo || commit.isMerge) && commit.isEnabled
             ? <a
