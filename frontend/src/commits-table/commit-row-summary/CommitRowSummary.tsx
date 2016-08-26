@@ -3,6 +3,7 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
 
+import Actions from './Actions';
 import Author from './Author';
 import Checkbox from './Checkbox';
 import CreateDate from './CreateDate';
@@ -61,7 +62,7 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
     }
 
     if (enableActions) {
-      onUndo(commit.hash, commit.message)
+      onUndo(commit.hash, commit.message);
     } else {
       this.renderDisabledDialog();
     }
@@ -74,12 +75,11 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
     const { commit, enableActions, onRollback } = this.props;
 
     if (enableActions) {
-      onRollback(commit.hash, commit.date)
+      onRollback(commit.hash, commit.date);
     } else {
       this.renderDisabledDialog();
     }
   };
-
 
   private renderUndoMergeDialog() {
     portal.alertDialog(
@@ -106,14 +106,6 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
       'disabled': !commit.isEnabled,
       'displayed-details': detailsLevel !== DetailsLevel.None,
     });
-    const undoClassName = classNames({
-      'vp-table-undo': true,
-      'disabled': commit.isMerge || !enableActions,
-    });
-    const rollbackClassName = classNames({
-      'vp-table-rollback': true,
-      'disabled': !enableActions,
-    });
 
     return (
       <tr className={rowClassName} onClick={this.onRowClick}>
@@ -131,34 +123,12 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
           detailsLevel={detailsLevel}
           onDetailsLevelClick={this.onDetailsLevelClick}
         />
-        <td className='column-actions'>
-          {(commit.canUndo || commit.isMerge) && commit.isEnabled
-            ? <a
-                className={undoClassName}
-                href='#'
-                onClick={this.onUndoClick}
-                title={commit.isMerge
-                        ? 'Merge commit cannot be undone.'
-                        : !enableActions
-                          ? 'You have uncommitted changes in your WordPress directory.'
-                          : null
-                      }
-              >Undo this</a>
-            : null
-          }
-          {commit.canRollback && commit.isEnabled
-            ? <a
-                className={rollbackClassName}
-                href='#'
-                onClick={this.onRollbackClick}
-                title={!enableActions
-                        ? 'You have uncommitted changes in your WordPress directory.'
-                        : null
-                      }
-              >Roll back to this</a>
-            : ''
-          }
-        </td>
+        <Actions
+          commit={commit}
+          enableActions={enableActions}
+          onUndoClick={this.onUndoClick}
+          onRollbackClick={this.onRollbackClick}
+        />
       </tr>
     );
   }
