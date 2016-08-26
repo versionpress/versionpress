@@ -372,10 +372,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     });
   };
 
-  onUndo = (e) => {
-    e.preventDefault();
-    const hash = e.target.getAttribute('data-hash');
-    const message = e.target.getAttribute('data-message');
+  onUndo = (hash: string, message: string) => {
     const title = (
       <span>Undo <em>{message}</em>?</span>
     );
@@ -383,12 +380,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     revertDialog.revertDialog.call(this, title, () => this.undoCommits([hash]));
   };
 
-  onRollback = (e) => {
-    e.preventDefault();
-    const hash = e.target.getAttribute('data-hash');
-    const date = moment(e.target.getAttribute('data-date')).format('LLL');
+  onRollback = (hash: string, date: string) => {
     const title = (
-      <span>Roll back to <em>{date}</em>?</span>
+      <span>Roll back to <em>{moment(date).format('LLL')}</em>?</span>
     );
 
     revertDialog.revertDialog.call(this, title, () => this.rollbackToCommit(hash));

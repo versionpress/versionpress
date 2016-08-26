@@ -16,8 +16,8 @@ interface CommitsTableProps {
   selectedCommits: Commit[];
   enableActions: boolean;
   diffProvider: {getDiff(hash: string): Promise<string>};
-  onUndo(e): void;
-  onRollback(e): void;
+  onUndo(hash: string, message: string): void;
+  onRollback(hash: string, date: string): void;
   onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
 }
 

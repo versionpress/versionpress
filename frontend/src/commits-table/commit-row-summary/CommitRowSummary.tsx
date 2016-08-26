@@ -17,8 +17,8 @@ interface CommitRowSummaryProps {
   enableActions: boolean;
   isSelected: boolean;
   detailsLevel: DetailsLevel;
-  onUndo(e): void;
-  onRollback(e): void;
+  onUndo(hash: string, message: string): void;
+  onRollback(hash: string, date: string): void;
   onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
   onDetailsLevelChange(detailsLevel: DetailsLevel): void;
 }
@@ -107,7 +107,7 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
                 onClick={commit.isMerge
                           ? (e) => { this.renderUndoMergeDialog(); e.stopPropagation(); }
                           : enableActions
-                            ? (e) => { this.props.onUndo(e); e.stopPropagation(); }
+                            ? (e) => { e.stopPropagation(); e.preventDefault(); this.props.onUndo(commit.hash, commit.message); }
                             : (e) => { this.renderDisabledDialog(); e.stopPropagation(); }
                         }
                 title={commit.isMerge
@@ -116,8 +116,6 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
                           ? 'You have uncommitted changes in your WordPress directory.'
                           : null
                       }
-                data-hash={commit.hash}
-                data-message={commit.message}
               >Undo this</a>
             : null
           }
@@ -126,15 +124,13 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
                 className={rollbackClassName}
                 href='#'
                 onClick={enableActions
-                          ? (e) => { this.props.onRollback(e); e.stopPropagation(); }
+                          ? (e) => { e.stopPropagation(); e.preventDefault(); this.props.onRollback(commit.hash, commit.date); }
                           : (e) => { this.renderDisabledDialog(); e.stopPropagation(); }
                         }
                 title={!enableActions
                         ? 'You have uncommitted changes in your WordPress directory.'
                         : null
                       }
-                data-hash={commit.hash}
-                data-date={commit.date}
               >Roll back to this</a>
             : ''
           }
