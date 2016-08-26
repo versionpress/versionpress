@@ -42,9 +42,9 @@ class SynchronizerFactory
         'option' => OptionsSynchronizer::class,
         'user' => SynchronizerBase::class,
         'usermeta' => SynchronizerBase::class,
-        'term' => TermsSynchronizer::class,
+        'term' => SynchronizerBase::class,
         'termmeta' => SynchronizerBase::class,
-        'term_taxonomy' => TermTaxonomiesSynchronizer::class,
+        'term_taxonomy' => SynchronizerBase::class,
     ];
     private $synchronizationSequence = [
         'user',

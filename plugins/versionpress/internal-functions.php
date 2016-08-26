@@ -156,3 +156,13 @@ function vp_fix_comments_count($database)
 
     $database->query($sql);
 }
+
+/**
+* @param Database $database
+*/
+function vp_fix_posts_count($database)
+{
+    $sql = "update {$database->term_taxonomy} tt set tt.count =
+          (select count(*) from {$database->term_relationships} tr where tr.term_taxonomy_id = tt.term_taxonomy_id);";
+    $database->query($sql);
+}

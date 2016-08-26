@@ -71,6 +71,8 @@ user:
 term:
   table: terms
   id: term_id
+  clean-cache:
+    - term: id
 
 termmeta:
   since: 35329
@@ -89,7 +91,9 @@ term_taxonomy:
   mn-references:
     ~term_relationships.object_id: post
   ignored-columns:
-    - count: '@\VersionPress\Synchronizers\TermTaxonomiesSynchronizer::fixPostsCount'
+    - count: '@vp_fix_posts_count'
+  clean-cache:
+    - term: term_id
 
 usermeta:
   id: umeta_id

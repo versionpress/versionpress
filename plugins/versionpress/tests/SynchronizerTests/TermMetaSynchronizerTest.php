@@ -6,7 +6,6 @@ use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Synchronizers\SynchronizerBase;
-use VersionPress\Synchronizers\TermsSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -19,7 +18,7 @@ class TermMetaSynchronizerTest extends SynchronizerTestCase
     private $termStorage;
     /** @var SynchronizerBase */
     private $synchronizer;
-    /** @var TermsSynchronizer */
+    /** @var SynchronizerBase */
     private $termsSynchronizer;
     private static $vpId;
     private static $termVpId;
@@ -42,7 +41,7 @@ class TermMetaSynchronizerTest extends SynchronizerTestCase
             self::$urlReplacer,
             self::$shortcodesReplacer
         );
-        $this->termsSynchronizer = new TermsSynchronizer(
+        $this->termsSynchronizer = new SynchronizerBase(
             $this->termStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('term'),

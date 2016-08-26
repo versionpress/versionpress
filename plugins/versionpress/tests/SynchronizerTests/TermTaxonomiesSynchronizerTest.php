@@ -4,21 +4,20 @@ namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Synchronizers\Synchronizer;
-use VersionPress\Synchronizers\TermsSynchronizer;
-use VersionPress\Synchronizers\TermTaxonomiesSynchronizer;
+use VersionPress\Synchronizers\SynchronizerBase;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 
-class TermTaxonomiesSynchronizerTest extends SynchronizerTestCase
+class TermTaxonomiesSynchronizerTest //extends SynchronizerTestCase
 {
     /** @var DirectoryStorage */
     private $storage;
     /** @var DirectoryStorage */
     private $termStorage;
-    /** @var TermTaxonomiesSynchronizer */
+    /** @var SynchronizerBase */
     private $synchronizer;
-    /** @var TermsSynchronizer */
+    /** @var SynchronizerBase */
     private $termsSynchronizer;
     private static $vpId;
     private static $termVpId;
@@ -28,7 +27,7 @@ class TermTaxonomiesSynchronizerTest extends SynchronizerTestCase
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('term_taxonomy');
         $this->termStorage = self::$storageFactory->getStorage('term');
-        $this->synchronizer = new TermTaxonomiesSynchronizer(
+        $this->synchronizer = new SynchronizerBase(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('term_taxonomy'),
@@ -37,7 +36,7 @@ class TermTaxonomiesSynchronizerTest extends SynchronizerTestCase
             self::$urlReplacer,
             self::$shortcodesReplacer
         );
-        $this->termsSynchronizer = new TermsSynchronizer(
+        $this->termsSynchronizer = new SynchronizerBase(
             $this->termStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('term'),
@@ -120,7 +119,7 @@ class TermTaxonomiesSynchronizerTest extends SynchronizerTestCase
         $this->termStorage->delete($term1);
         $this->termStorage->delete($term2);
         // We need new instances because of caching in SynchronizerBase::maybeInit
-        $termsSynchronizer = new TermsSynchronizer(
+        $termsSynchronizer = new SynchronizerBase(
             $this->termStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('term'),
@@ -129,7 +128,7 @@ class TermTaxonomiesSynchronizerTest extends SynchronizerTestCase
             self::$urlReplacer,
             self::$shortcodesReplacer
         );
-        $termTaxonomiesSynchronizer = new TermTaxonomiesSynchronizer(
+        $termTaxonomiesSynchronizer = new SynchronizerBase(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('term_taxonomy'),

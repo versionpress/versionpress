@@ -2,6 +2,7 @@
 
 use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\CommitMessageParser;
+use VersionPress\Database\Database;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitRepository;
 use VersionPress\Initialization\WpdbReplacer;
@@ -193,7 +194,7 @@ add_filter('vp_entity_tags_comment', function ($tags, $oldEntity, $newEntity) {
 
     global $versionPressContainer;
 
-    /** @var \VersionPress\Database\Database $database */
+    /** @var Database $database */
     $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
 
     $postId = isset($newEntity['vp_comment_post_ID']) ? $newEntity['vp_comment_post_ID'] : $oldEntity['vp_comment_post_ID'];
@@ -501,3 +502,19 @@ add_filter('vp_action_description_versionpress', function ($message, $action, $c
 
     return $message;
 }, 10, 3);
+
+add_action('vp_before_synchronization_term_taxonomy', function () {
+    global $versionPressContainer;
+
+    /** @var Database $database */
+    $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
+    $database->query("drop index term_id_taxonomy on {$database->term_taxonomy}");
+});
+
+add_action('vp_after_synchronization_term_taxonomy', function () {
+    global $versionPressContainer;
+
+    /** @var Database $database */
+    $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
+    $database->query("create unique index term_id_taxonomy on {$database->term_taxonomy}(term_id, taxonomy)");
+});

@@ -89,11 +89,10 @@ class HookMock
         }
     }
 
-    public static function doAction($tag, $value)
+    public static function doAction($tag, $arg = '')
     {
         $args = func_get_args();
         $args = array_slice($args, 1);
-        $args[0] = $value;
 
         if (self::$type === HookMock::WP_MOCK) {
             \WP_Mock::onAction($tag)->react($args);

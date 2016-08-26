@@ -5,8 +5,6 @@ namespace VersionPress\Tests\SynchronizerTests;
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Synchronizers\SynchronizerBase;
-use VersionPress\Synchronizers\TermsSynchronizer;
-use VersionPress\Synchronizers\TermTaxonomiesSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -27,9 +25,9 @@ class PostsSynchronizerTest extends SynchronizerTestCase
     private $synchronizer;
     /** @var SynchronizerBase */
     private $usersSynchronizer;
-    /** @var TermsSynchronizer */
+    /** @var SynchronizerBase */
     private $termsSynchronizer;
-    /** @var TermTaxonomiesSynchronizer */
+    /** @var SynchronizerBase */
     private $termTaxonomiesSynchronizer;
 
     private static $authorVpId;
@@ -63,7 +61,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
             self::$urlReplacer,
             self::$shortcodesReplacer
         );
-        $this->termsSynchronizer = new TermsSynchronizer(
+        $this->termsSynchronizer = new SynchronizerBase(
             $this->termStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('term'),
@@ -72,7 +70,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
             self::$urlReplacer,
             self::$shortcodesReplacer
         );
-        $this->termTaxonomiesSynchronizer = new TermTaxonomiesSynchronizer(
+        $this->termTaxonomiesSynchronizer = new SynchronizerBase(
             $this->termTaxonomyStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('term_taxonomy'),
