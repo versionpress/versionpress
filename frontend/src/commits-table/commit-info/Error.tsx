@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 interface ErrorProps {
-  message: any;
+  message: string;
 }
 
 const Error: React.StatelessComponent<ErrorProps> = ({ message }) => (

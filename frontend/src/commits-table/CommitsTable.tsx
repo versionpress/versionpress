@@ -23,16 +23,6 @@ interface CommitsTableProps {
 
 export default class CommitsTable extends React.Component<CommitsTableProps, {}>  {
 
-  private refreshInterval;
-
-  componentDidMount() {
-    this.refreshInterval = setInterval(() => this.forceUpdate(), 60 * 1000);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.refreshInterval);
-  }
-
   onSelectAllChange = (isChecked: boolean) => {
     const { commits, onCommitsSelect } = this.props;
 

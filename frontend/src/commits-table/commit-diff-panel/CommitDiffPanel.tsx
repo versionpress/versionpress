@@ -7,11 +7,11 @@ import DiffParser from '../../common/DiffParser';
 
 import './DiffPanel.less';
 
-interface DiffPanelProps {
+interface CommitDiffPanelProps {
   diff: string;
 }
 
-const DiffPanel: React.StatelessComponent<DiffPanelProps> = ({ diff }) => {
+const CommitDiffPanel: React.StatelessComponent<CommitDiffPanelProps> = ({ diff }) => {
   if (diff === null) {
     return <div />;
   }
@@ -30,4 +30,4 @@ const DiffPanel: React.StatelessComponent<DiffPanelProps> = ({ diff }) => {
   );
 };
 
-export default DiffPanel;
+export default CommitDiffPanel;
