@@ -49,6 +49,38 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
     this.props.onDetailsLevelChange(detailsLevel);
   };
 
+  onUndoClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const { commit, enableActions, onUndo } = this.props;
+
+    if (commit.isMerge) {
+      this.renderUndoMergeDialog();
+      return;
+    }
+
+    if (enableActions) {
+      onUndo(commit.hash, commit.message)
+    } else {
+      this.renderDisabledDialog();
+    }
+  };
+
+  onRollbackClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const { commit, enableActions, onRollback } = this.props;
+
+    if (enableActions) {
+      onRollback(commit.hash, commit.date)
+    } else {
+      this.renderDisabledDialog();
+    }
+  };
+
+
   private renderUndoMergeDialog() {
     portal.alertDialog(
       'This is a merge commit',
@@ -104,12 +136,7 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
             ? <a
                 className={undoClassName}
                 href='#'
-                onClick={commit.isMerge
-                          ? (e) => { this.renderUndoMergeDialog(); e.stopPropagation(); }
-                          : enableActions
-                            ? (e) => { e.stopPropagation(); e.preventDefault(); this.props.onUndo(commit.hash, commit.message); }
-                            : (e) => { this.renderDisabledDialog(); e.stopPropagation(); }
-                        }
+                onClick={this.onUndoClick}
                 title={commit.isMerge
                         ? 'Merge commit cannot be undone.'
                         : !enableActions
@@ -123,10 +150,7 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
             ? <a
                 className={rollbackClassName}
                 href='#'
-                onClick={enableActions
-                          ? (e) => { e.stopPropagation(); e.preventDefault(); this.props.onRollback(commit.hash, commit.date); }
-                          : (e) => { this.renderDisabledDialog(); e.stopPropagation(); }
-                        }
+                onClick={this.onRollbackClick}
                 title={!enableActions
                         ? 'You have uncommitted changes in your WordPress directory.'
                         : null
