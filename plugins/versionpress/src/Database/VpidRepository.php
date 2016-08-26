@@ -108,6 +108,20 @@ class VpidRepository
     {
         $entityInfo = $this->schemaInfo->getEntityInfo($entityName);
 
+        foreach ($entityInfo->references as $referenceName => $targetEntity) {
+            $referenceField = "vp_{$referenceName}";
+            if (isset($entity[$referenceField])) {
+                if ($this->isNullReference($entity[$referenceField])) {
+                    $referencedId = 0;
+                } else {
+                    $referencedId = $this->restoreIdsInString($entity[$referenceField]);
+                }
+
+                $entity[$referenceName] = $referencedId;
+                unset($entity[$referenceField]);
+            }
+        }
+
         foreach ($entityInfo->valueReferences as $referenceName => $targetEntity) {
             list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) =
                 array_values(ReferenceUtils::getValueReferenceDetails($referenceName));

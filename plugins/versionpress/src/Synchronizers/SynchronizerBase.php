@@ -63,6 +63,10 @@ class SynchronizerBase implements Synchronizer
     private $selectiveSynchronization;
     private $entitiesToSynchronize;
     private $deletedIds;
+    /**
+     * @var VpidRepository
+     */
+    private $vpidRepository;
 
     /**
      * @param Storage $storage Specific Synchronizers will use specific storage types, see SynchronizerFactory
@@ -86,6 +90,7 @@ class SynchronizerBase implements Synchronizer
         $this->database = $database;
         $this->entityInfo = $entityInfo;
         $this->dbSchema = $dbSchemaInfo;
+        $this->vpidRepository = $vpidRepository;
         $this->urlReplacer = $urlReplacer;
         $this->entityName = $entityInfo->entityName;
         $this->shortcodesReplacer = $shortcodesReplacer;
@@ -96,6 +101,8 @@ class SynchronizerBase implements Synchronizer
 
     public function synchronize($task, $entitiesToSynchronize = null)
     {
+        $entityName = $this->entityName;
+
         $this->passNumber += 1;
         $this->selectiveSynchronization = is_array($entitiesToSynchronize);
         $this->entitiesToSynchronize = $entitiesToSynchronize;
@@ -104,9 +111,11 @@ class SynchronizerBase implements Synchronizer
         $entities = $this->entities;
         $remainingTasks = [];
 
+        do_action("vp_before_synchronization_{$entityName}");
+
         if ($task === Synchronizer::SYNCHRONIZE_EVERYTHING) {
             $this->updateDatabase($entities);
-            $this->fixSimpleReferences($entities);
+
             $fixedMnReferences = $this->fixMnReferences($entities);
             $doneEntitySpecificActions = $this->doEntitySpecificActions();
 
@@ -118,7 +127,7 @@ class SynchronizerBase implements Synchronizer
                 $remainingTasks[] = self::SYNCHRONIZE_MN_REFERENCES;
             }
 
-            if ($this->shortcodesReplacer->entityCanContainShortcodes($this->entityName)) {
+            if ($this->shortcodesReplacer->entityCanContainShortcodes($entityName)) {
                 $remainingTasks[] = self::REPLACE_SHORTCODES;
             }
 
@@ -141,6 +150,8 @@ class SynchronizerBase implements Synchronizer
             $this->restoreShortcodesInAllEntities();
         }
 
+        do_action("vp_after_synchronization_{$entityName}");
+
         return $remainingTasks;
     }
 
@@ -150,7 +161,12 @@ class SynchronizerBase implements Synchronizer
             return;
         }
 
-        $this->entities = $this->loadEntitiesFromStorage($entitiesToSynchronize);
+        $entities = $this->loadEntitiesFromStorage($entitiesToSynchronize);
+        $entities = array_map(function ($entity) {
+            return $this->vpidRepository->restoreForeignKeys($this->entityName, $entity);
+        }, $entities);
+
+        $this->entities = $entities;
     }
 
     //--------------------------------------
@@ -174,27 +190,22 @@ class SynchronizerBase implements Synchronizer
                         $entityToSynchronize['vp_id'],
                         $entityToSynchronize['parent']
                     );
-                } else {
-                    if ($this->storage->exists($entityToSynchronize['vp_id'], null)) {
-                        $entities[] = $this->storage->loadEntity($entityToSynchronize['vp_id'], null);
-                    }
                 }
             }
         } else {
             $entities = $this->storage->loadAll();
         }
-        $entities = $this->transformEntities($entities);
+        $entities = $this->maybeStripMetaEntities($entities);
         return $entities;
     }
 
     /**
-     * Called after entities have been loaded from storage to give the subclasses
-     * a chance to modify the array. By default removes meta-entities.
+     * Strips meta entities from their parents. Called after entities have been loaded from storage.
      *
      * @param array $entities Entities as loaded from the storage
-     * @return array Entities as transformed (if at all) by this synchronizer
+     * @return array Entities without meta entities
      */
-    protected function transformEntities($entities)
+    private function maybeStripMetaEntities($entities)
     {
         foreach ($entities as &$entity) {
             foreach ($entity as $field => $value) {
@@ -235,20 +246,17 @@ class SynchronizerBase implements Synchronizer
      */
     protected function filterEntities($entities)
     {
-        $urlReplacer = $this->urlReplacer;
-        return array_map(function ($entity) use ($urlReplacer) {
-            return $urlReplacer->restore($entity);
+        return array_map(function ($entity) {
+            return $this->urlReplacer->restore($entity);
         }, $entities);
     }
-
 
     private function addOrUpdateEntities($entities)
     {
         foreach ($entities as $entity) {
-            $vpId = $entity['vp_id'];
-            $isExistingEntity = $this->isExistingEntity($vpId);
+            $vpId = $entity[$this->entityInfo->vpidColumnName];
 
-            if ($isExistingEntity) {
+            if ($this->existsInDatabase($vpId)) {
                 $this->updateEntityInDatabase($entity);
             } else {
                 $this->createEntityInDatabase($entity);
@@ -266,9 +274,11 @@ class SynchronizerBase implements Synchronizer
     {
         $createQuery = $this->buildCreateQuery($entity);
         $this->executeQuery($createQuery);
-        $id = $this->database->insert_id;
-        $this->createIdentifierRecord($entity['vp_id'], $id);
-        return $id;
+
+        if ($this->entityInfo->usesGeneratedVpids) {
+            $id = $this->database->insert_id;
+            $this->createIdentifierRecord($entity['vp_id'], $id);
+        }
     }
 
     /**
@@ -277,25 +287,42 @@ class SynchronizerBase implements Synchronizer
      * @param string $vpid
      * @return bool
      */
-    private function isExistingEntity($vpid)
+    private function existsInDatabase($vpid)
     {
-        return (bool)$this->getId($vpid);
-    }
+        if ($this->entityInfo->hasNaturalVpid) {
+            $vpidColumnName = $this->entityInfo->vpidColumnName;
+            $query = $this->database->prepare("SELECT `$vpidColumnName` FROM `{$this->prefixedTableName}` WHERE `{$vpidColumnName}` = %s", $vpid);
+        } else {
+            $query = "SELECT id FROM {$this->database->vp_id} WHERE `table` = \"{$this->tableName}\" AND vp_id = UNHEX('$vpid')";
+        }
 
-    /**
-     * Returns a WordPress ID based on the `vp_id` by querying the database
-     *
-     * @param $vpid
-     * @return null|string Null if no mapping for a given `vp_id` is found
-     */
-    private function getId($vpid)
-    {
-        return $this->database->get_var(
-            "SELECT id FROM {$this->database->vp_id} WHERE `table` = \"{$this->tableName}\" AND vp_id = UNHEX('$vpid')"
-        );
+        return (bool)$this->database->get_var($query);
     }
 
     private function buildUpdateQuery($updateData)
+    {
+
+        return $this->entityInfo->hasNaturalVpid
+            ? $this->buildUpdateQueryForEntityWithNaturalVpid($updateData)
+            : $this->buildUpdateQueryForEntityWithGeneratedVpid($updateData);
+    }
+
+    private function buildUpdateQueryForEntityWithNaturalVpid($updateData)
+    {
+        $vpid = $updateData[$this->idColumnName];
+
+        $query = "UPDATE {$this->prefixedTableName} SET";
+        foreach ($updateData as $key => $value) {
+            $query .= $this->database->prepare("`{$key}` = %s,", $value);
+        }
+
+        $query[strlen($query) - 1] = ' '; // strip the last comma
+
+        $query .= $this->database->prepare(" WHERE `{$this->idColumnName}` = %s", $vpid);
+        return $query;
+    }
+
+    private function buildUpdateQueryForEntityWithGeneratedVpid($updateData)
     {
         $id = $updateData['vp_id'];
         $query = "UPDATE {$this->prefixedTableName}
@@ -317,7 +344,10 @@ class SynchronizerBase implements Synchronizer
 
     protected function buildCreateQuery($entity)
     {
-        unset($entity[$this->idColumnName]);
+        if ($this->entityInfo->usesGeneratedVpids) {
+            unset($entity[$this->idColumnName]);
+        }
+
         $columns = array_keys($entity);
         $columns = array_filter($columns, function ($column) {
             return !Strings::startsWith($column, 'vp_');
@@ -339,37 +369,44 @@ class SynchronizerBase implements Synchronizer
         return $query;
     }
 
-    private function createIdentifierRecord($vp_id, $id)
+    private function createIdentifierRecord($vpid, $id)
     {
         $query = "INSERT INTO {$this->database->vp_id} (`table`, vp_id, id)
-            VALUES (\"{$this->tableName}\", UNHEX('$vp_id'), $id)";
+            VALUES (\"{$this->tableName}\", UNHEX('$vpid'), $id)";
         $this->executeQuery($query);
     }
 
     private function deleteEntitiesWhichAreNotInStorage($entities)
     {
         if ($this->selectiveSynchronization) {
-            $savedVpIds = array_map(function ($entity) {
-                return $entity['vp_id'];
-            }, $entities);
-            $vpIdsToSynchronize = array_map(function ($entity) {
-                return $entity['vp_id'];
-            }, $this->entitiesToSynchronize);
+            $savedVpIds = array_column($entities, $this->entityInfo->vpidColumnName);
+            $vpIdsToSynchronize = array_column($this->entitiesToSynchronize, 'vp_id');
 
-            $sql = sprintf('SELECT id FROM %s WHERE `table` = "%s" ', $this->database->vp_id, $this->tableName);
-            $sql .= sprintf('AND HEX(vp_id) IN ("%s") ', join('", "', $vpIdsToSynchronize));
-            $sql .= sprintf('AND HEX(vp_id) NOT IN ("%s")', join('", "', $savedVpIds));
+            if ($this->entityInfo->hasNaturalVpid) {
+                $sql = "SELECT `{$this->idColumnName}` FROM {$this->prefixedTableName} ";
+                $sql .= sprintf("WHERE {$this->idColumnName} IN (\"%s\") ", join('", "', $vpIdsToSynchronize));
+                $sql .= sprintf("AND {$this->idColumnName} NOT IN (\"%s\")", join('", "', $savedVpIds));
+            } else {
+                $sql = sprintf('SELECT id FROM %s WHERE `table` = "%s" ', $this->database->vp_id, $this->tableName);
+                $sql .= sprintf('AND HEX(vp_id) IN ("%s") ', join('", "', $vpIdsToSynchronize));
+                $sql .= sprintf('AND HEX(vp_id) NOT IN ("%s")', join('", "', $savedVpIds));
+            }
 
             $ids = $this->database->get_col($sql);
         } else {
-            $vpIdsUnhexed = array_map(function ($entity) {
-                return 'UNHEX("' . $entity['vp_id'] . '")';
-            }, $entities);
+            $allVpids = array_column($entities, $this->entityInfo->vpidColumnName);
 
-            $ids = $this->database->get_col(
-                "SELECT id FROM {$this->database->vp_id} WHERE `table` = \"{$this->tableName}\"" .
-                (count($vpIdsUnhexed) > 0 ? "AND vp_id NOT IN (" . join(",", $vpIdsUnhexed) . ")" : "")
-            );
+            if ($this->entityInfo->hasNaturalVpid) {
+                $sql = "SELECT `{$this->idColumnName}` FROM {$this->prefixedTableName}";
+                if (count($allVpids) > 0) {
+                    $sql .= " WHERE `{$this->idColumnName}` NOT IN (\"" . join('", "', $allVpids) . "\")";
+                }
+            } else {
+                $sql = "SELECT id FROM {$this->database->vp_id} WHERE `table` = \"{$this->tableName}\"" .
+                    (count($allVpids) > 0 ? "AND HEX(vp_id) NOT IN (\"" . join('", "', $allVpids) . "\")" : "");
+            }
+
+            $ids = $this->database->get_col($sql);
         }
 
         $this->deletedIds = $ids;
@@ -378,12 +415,10 @@ class SynchronizerBase implements Synchronizer
             return;
         }
 
-        $idsString = join(',', $ids);
+        $idsString = join("', '", $ids);
 
-        $this->executeQuery("DELETE FROM {$this->prefixedTableName} WHERE {$this->idColumnName} IN ({$idsString})");
-        $this->executeQuery(
-            "DELETE FROM {$this->database->vp_id} WHERE `table` = \"{$this->tableName}\" AND id IN ({$idsString})"
-        );
+        $this->executeQuery("DELETE FROM {$this->prefixedTableName} WHERE {$this->idColumnName} IN ('{$idsString}')");
+        $this->executeQuery("DELETE FROM {$this->database->vp_id} WHERE `table` = \"{$this->tableName}\" AND id IN ('{$idsString}')");
     }
 
 
@@ -391,95 +426,6 @@ class SynchronizerBase implements Synchronizer
     //--------------------------------------
     // Step 3 - Fixing references
     //--------------------------------------
-
-    private function fixSimpleReferences($entities)
-    {
-        if (!$this->entityInfo->hasReferences) {
-            return;
-        }
-
-        foreach ($entities as $entity) {
-            $this->fixSimpleReferencesOfOneEntity($entity);
-            $this->fixValueReferencesOfOneEntity($entity);
-        }
-    }
-
-    /**
-     * Fixes 1:N references
-     *
-     * @param $entity
-     */
-    private function fixSimpleReferencesOfOneEntity($entity)
-    {
-        $references = $this->entityInfo->references;
-
-        $referencesToUpdate = [];
-        foreach ($references as $reference => $referencedEntity) {
-            $vpReference = "vp_$reference";
-            if (isset($entity[$vpReference])) {
-                $referencesToUpdate[$reference] = $entity[$vpReference];
-            }
-        }
-
-        if (count($referencesToUpdate) === 0) {
-            return;
-        }
-
-        $idMap = $this->getIdsForVpIds($referencesToUpdate);
-
-        $vpIdTable = $this->getPrefixedTableName('vp_id');
-        $idColumnName = $this->entityInfo->idColumnName;
-
-        $updateSql = "UPDATE {$this->prefixedTableName} SET ";
-
-        $newReferences = array_map(function ($vpId) use ($idMap) {
-            return $idMap[$vpId];
-        }, $referencesToUpdate);
-        $updateSql .= join(", ", ArrayUtils::parametrize($newReferences));
-
-        $updateSql .= " WHERE $idColumnName=(SELECT id FROM $vpIdTable WHERE vp_id=UNHEX(\"$entity[vp_id]\"))";
-        $this->database->query($updateSql);
-    }
-
-    /**
-     * Fixes value references
-     *
-     * @param $entity
-     */
-    private function fixValueReferencesOfOneEntity($entity)
-    {
-        $references = $this->entityInfo->valueReferences;
-
-        $referencesToUpdate = [];
-        foreach ($references as $reference => $referencedEntity) {
-            list($sourceColumn, $sourceValue, $valueColumn) =
-                array_values(ReferenceUtils::getValueReferenceDetails($reference));
-
-            if (isset($entity[$sourceColumn]) && $entity[$sourceColumn] == $sourceValue
-                && isset($entity[$valueColumn])) {
-                $referencesToUpdate[$valueColumn] = $entity[$valueColumn];
-            }
-        }
-
-        if (count($referencesToUpdate) === 0) {
-            return;
-        }
-
-        $idMap = $this->getIdsForVpIds($referencesToUpdate);
-
-        $vpIdTable = $this->getPrefixedTableName('vp_id');
-        $idColumnName = $this->entityInfo->idColumnName;
-
-        $updateSql = "UPDATE {$this->prefixedTableName} SET ";
-
-        $newReferences = array_map(function ($vpId) use ($idMap) {
-            return $idMap[$vpId];
-        }, $referencesToUpdate);
-        $updateSql .= join(", ", ArrayUtils::parametrize($newReferences));
-
-        $updateSql .= " WHERE $idColumnName=(SELECT id FROM $vpIdTable WHERE vp_id=UNHEX(\"$entity[vp_id]\"))";
-        $this->database->query($updateSql);
-    }
 
     private function fixMnReferences($entities)
     {

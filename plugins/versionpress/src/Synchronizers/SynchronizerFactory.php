@@ -39,7 +39,7 @@ class SynchronizerFactory
         'postmeta' => SynchronizerBase::class,
         'comment' => SynchronizerBase::class,
         'commentmeta' => SynchronizerBase::class,
-        'option' => OptionsSynchronizer::class,
+        'option' => SynchronizerBase::class,
         'user' => SynchronizerBase::class,
         'usermeta' => SynchronizerBase::class,
         'term' => SynchronizerBase::class,

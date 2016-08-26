@@ -3,7 +3,6 @@
 namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Storages\DirectoryStorage;
-use VersionPress\Synchronizers\OptionsSynchronizer;
 use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Synchronizers\SynchronizerBase;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
@@ -17,7 +16,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
     private $storage;
     /** @var DirectoryStorage */
     private $postStorage;
-    /** @var OptionsSynchronizer */
+    /** @var SynchronizerBase */
     private $synchronizer;
     /** @var SynchronizerBase */
     private $postsSynchronizer;
@@ -29,7 +28,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('option');
         $this->postStorage = self::$storageFactory->getStorage('post');
-        $this->synchronizer = new OptionsSynchronizer(
+        $this->synchronizer = new SynchronizerBase(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('option'),
@@ -168,7 +167,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
         $this->postStorage->delete($post);
 
         // We need new instances because of caching in SynchronizerBase::maybeInit
-        $this->synchronizer = new OptionsSynchronizer(
+        $this->synchronizer = new SynchronizerBase(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('option'),
