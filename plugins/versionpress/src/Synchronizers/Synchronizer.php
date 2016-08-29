@@ -9,6 +9,7 @@ use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
+use VersionPress\Utils\QueryLanguageUtils;
 use VersionPress\Utils\ReferenceUtils;
 use VersionPress\Utils\WordPressCacheUtils;
 
@@ -418,9 +419,16 @@ class Synchronizer
             $allVpids = array_column($entities, $this->entityInfo->vpidColumnName);
 
             if ($this->entityInfo->hasNaturalVpid) {
-                $sql = "SELECT `{$this->idColumnName}` FROM {$this->prefixedTableName}";
+                $rules = $this->entityInfo->getRulesForIgnoredEntities();
+                $restrictionForIgnoredEntities = join(' OR ', array_map(function ($rule) {
+                    $restrictionPart = QueryLanguageUtils::createSqlRestrictionFromRule($rule);
+                    return "($restrictionPart)";
+                }, $rules));
+
+
+                $sql = "SELECT `{$this->idColumnName}` FROM {$this->prefixedTableName} WHERE NOT ($restrictionForIgnoredEntities)";
                 if (count($allVpids) > 0) {
-                    $sql .= " WHERE `{$this->idColumnName}` NOT IN (\"" . join('", "', $allVpids) . "\")";
+                    $sql .= " AND `{$this->idColumnName}` NOT IN (\"" . join('", "', $allVpids) . "\")";
                 }
             } else {
                 $sql = "SELECT id FROM {$this->database->vp_id} WHERE `table` = \"{$this->tableName}\"" .

@@ -60,6 +60,30 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
 
     /**
      * @test
+     * @testdox Synchronizer does not delete ignored options
+     */
+    public function synchronizerDoesNotDeleteIgnoredOptions()
+    {
+        $optionTable = self::$database->options;
+
+        $ignoredEntities = self::$schemaInfo->getEntityInfo('option')->getRulesForIgnoredEntities();
+        $sql = "INSERT IGNORE INTO {$optionTable} (option_name) VALUES ";
+
+        $sql .= join(', ', array_map(function ($ignoredEntity) {
+            return "('{$ignoredEntity['option_name'][0]}')";
+        }, $ignoredEntities));
+
+        self::$database->query($sql);
+        $optionsBeforeSync = self::$database->get_results("SELECT * FROM {$optionTable}");
+
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+
+        $optionsAfterSync = self::$database->get_results("SELECT * FROM {$optionTable}");
+        $this->assertEquals($optionsBeforeSync, $optionsAfterSync);
+    }
+
+    /**
+     * @test
      * @testdox Synchronizer updates changed option in the database
      */
     public function synchronizerUpdatesChangedOptionInDatabase()
