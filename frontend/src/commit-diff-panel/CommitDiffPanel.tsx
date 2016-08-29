@@ -1,11 +1,11 @@
-/// <reference path='../../common/Diff.d.ts' />
+/// <reference path='../common/Diff.d.ts' />
 
 import * as React from 'react';
 
-import Panel from './Panel';
-import DiffParser from '../../common/DiffParser';
+import Diff from './diff/Diff';
+import DiffParser from '../common/DiffParser';
 
-import './DiffPanel.less';
+import './CommitDiffPanel.less';
 
 interface CommitDiffPanelProps {
   diff: string;
@@ -20,12 +20,7 @@ const CommitDiffPanel: React.StatelessComponent<CommitDiffPanelProps> = ({ diff 
 
   return (
     <div>
-      {diffs.map((diff: Diff, i) => (
-        <Panel
-          diff={diff}
-          key={i}
-        />
-      ))}
+      {diffs.map((diff: Diff, i) => <Diff diff={diff} key={i} />)}
     </div>
   );
 };
