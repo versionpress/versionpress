@@ -3,3 +3,9 @@ interface InfoMessage {
   message: string;
   details?: string;
 }
+
+interface BulkActionPanelOption {
+  title: string;
+  value: string;
+  isSelected: boolean;
+}

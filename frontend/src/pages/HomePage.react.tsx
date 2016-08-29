@@ -9,15 +9,15 @@ import * as Promise from 'core-js/es6/promise';
 import * as classNames from 'classnames';
 import update = require('react-addons-update');
 
-import BulkActionPanel from '../BulkActionPanel/BulkActionPanel.react';
-import CommitPanel from '../CommitPanel/CommitPanel.react';
+import BulkActionPanel from '../bulk-action-panel/BulkActionPanel';
+import CommitPanel from '../commit-panel/CommitPanel';
 import CommitsTable from '../Commits/CommitsTable.react';
 import Filter from '../filter/Filter';
 import FlashMessage from '../common/flash-message/FlashMessage';
 import ProgressBar from '../common/progress-bar/ProgressBar';
-import ServicePanel from '../ServicePanel/ServicePanel.react';
-import ServicePanelButton from '../ServicePanel/ServicePanelButton.react';
-import WelcomePanel from '../WelcomePanel/WelcomePanel.react';
+import ServicePanel from '../service-panel/ServicePanel';
+import VpTitle from '../vp-title/VpTitle';
+import WelcomePanel from '../welcome-panel/WelcomePanel';
 import * as revertDialog from '../Commits/revertDialog';
 import * as WpApi from '../services/WpApi';
 import {indexOf} from '../Commits/CommitUtils';
@@ -400,7 +400,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     revertDialog.revertDialog.call(this, title, () => this.rollbackToCommit(hash));
   };
 
-  onWelcomePanelHide = (e) => {
+  onWelcomePanelHide = (e: React.MouseEvent) => {
     e.preventDefault();
 
     this.setState({
@@ -457,12 +457,15 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     return (
       <div className={homePageClassName}>
         <ProgressBar progress={this.state.progress} />
-        <ServicePanelButton onClick={this.onServicePanelClick} />
-        <h1 className='vp-header'>VersionPress</h1>
         {this.state.message &&
           <FlashMessage message={this.state.message} />
         }
-        <ServicePanel isVisible={this.state.displayServicePanel} />
+        <ServicePanel
+          isVisible={this.state.displayServicePanel}
+          onButtonClick={this.onServicePanelClick}
+        >
+          <VpTitle />
+        </ServicePanel>
         {this.state.isDirtyWorkingDirectory
           ? <CommitPanel
               diffProvider={{ getDiff: this.getDiff }}
@@ -472,9 +475,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             />
           : null
         }
-        {this.state.displayWelcomePanel
-          ? <WelcomePanel onHide={this.onWelcomePanelHide} />
-          : null
+        {this.state.displayWelcomePanel &&
+          <WelcomePanel onHide={this.onWelcomePanelHide} />
         }
         {this.state.displayUpdateNotice
           ? <div className='updateNotice'>
