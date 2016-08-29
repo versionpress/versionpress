@@ -3,11 +3,11 @@
 import * as React from 'react';
 
 import CommitDetails from '../commit-details/CommitDetails';
-import CommitRowSummary from '../commit-row-summary/CommitRowSummary';
+import CommitSummary from '../commit-summary/CommitSummary';
 import Error from './Error';
 import DetailsLevel from '../../enums/DetailsLevel';
 
-interface CommitInfoProps {
+interface RowProps {
   commit: Commit;
   enableActions: boolean;
   isSelected: boolean;
@@ -17,14 +17,14 @@ interface CommitInfoProps {
   onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
 }
 
-interface CommitInfoState {
+interface RowState {
   detailsLevel?: DetailsLevel;
   diff?: string;
   error?: string;
   isLoading?: boolean;
 }
 
-export default class CommitInfo extends React.Component<CommitInfoProps, CommitInfoState> {
+export default class Row extends React.Component<RowProps, RowState> {
 
   state = {
     detailsLevel: DetailsLevel.None,
@@ -38,59 +38,56 @@ export default class CommitInfo extends React.Component<CommitInfoProps, CommitI
     const { diff } = this.state;
 
     if (detailsLevel === DetailsLevel.FullDiff && !diff) {
-      this.setState({
-        isLoading: true,
-      });
+      this.setLoading();
 
       diffProvider.getDiff(commit.hash)
-        .then(diff => this.setState({
-            detailsLevel: detailsLevel,
-            diff: diff,
-            error: null,
-            isLoading: false,
-          }))
-        .catch(err => this.setState({
-            detailsLevel: detailsLevel,
-            error: err.message,
-            isLoading: false,
-          })
-        );
-    } else {
-      this.setState({
+        .then(this.handleSuccess(detailsLevel))
+        .catch(this.handleError(detailsLevel));
+      return;
+    }
+
+    this.setState({
+      detailsLevel: detailsLevel,
+      error: null,
+      isLoading: false,
+    });
+  };
+
+  private setLoading = () => {
+    this.setState({
+      isLoading: true,
+    });
+  };
+
+  private handleSuccess = (detailsLevel: DetailsLevel) => {
+    if (detailsLevel === DetailsLevel.FullDiff) {
+      return diff => this.setState({
         detailsLevel: detailsLevel,
+        diff: diff,
         error: null,
         isLoading: false,
       });
     }
   };
 
+  private handleError = (detailsLevel: DetailsLevel) => {
+    return err => this.setState({
+      detailsLevel: detailsLevel,
+      error: err.message,
+      isLoading: false,
+    });
+  };
+
   render() {
-    const {
-      commit,
-      enableActions,
-      isSelected,
-      onUndo,
-      onRollback,
-      onCommitsSelect,
-    } = this.props;
-    const {
-      detailsLevel,
-      diff,
-      error,
-      isLoading,
-    } = this.state;
+    const { commit } = this.props;
+    const { detailsLevel, diff, error, isLoading } = this.state;
 
     return (
       <tbody>
-        <CommitRowSummary
-          commit={commit}
-          enableActions={enableActions}
-          isSelected={isSelected}
+        <CommitSummary
           detailsLevel={detailsLevel}
-          onUndo={onUndo}
-          onRollback={onRollback}
-          onCommitsSelect={onCommitsSelect}
           onDetailsLevelChange={this.onDetailsLevelChange}
+          {...this.props}
         />
         {error
           ? <Error message={error} />

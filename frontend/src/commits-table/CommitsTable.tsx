@@ -2,11 +2,11 @@
 
 import * as React from 'react';
 
-import CommitInfo from './commit-info/CommitInfo';
+import Row from './row/Row';
 import Footer from './footer/Footer';
 import Header from './header/Header';
-import NotAbleNote from './not-able-note/NotAbleNote';
-import { indexOf } from '../utils/CommitUtils';
+import Note from './note/Note';
+import { indexOf } from '../utils/commitUtils';
 
 import './CommitsTable.less';
 
@@ -29,7 +29,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
     onCommitsSelect(commits, isChecked, false);
   };
 
-  renderCommitInfo(commit: Commit, index: number, displayNotAbleNote: boolean) {
+  renderRow(commit: Commit, index: number, displayNotAbleNote: boolean) {
     const {
       selectedCommits,
       enableActions,
@@ -39,8 +39,8 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
       onCommitsSelect,
     } = this.props;
 
-    const body = (
-      <CommitInfo
+    const row = (
+      <Row
         commit={commit}
         enableActions={enableActions}
         isSelected={indexOf(selectedCommits, commit) !== -1}
@@ -54,12 +54,14 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
 
     if (displayNotAbleNote) {
       return [
-        <NotAbleNote key='note' />,
-        body,
+        <Note key='note'>
+          VersionPress is not able to undo changes made before it has been activated.
+        </Note>,
+        row,
       ];
     }
 
-    return body;
+    return row;
   }
 
   render() {
@@ -83,7 +85,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
           onSelectAllChange={this.onSelectAllChange}
         />
         {commits.map((commit: Commit, index: number) => (
-          this.renderCommitInfo(commit, index, index === notAbleNoteIndex)
+          this.renderRow(commit, index, index === notAbleNoteIndex)
         ))}
         <Footer pages={pages} />
       </table>
