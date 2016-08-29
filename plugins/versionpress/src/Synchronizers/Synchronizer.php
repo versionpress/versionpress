@@ -26,6 +26,7 @@ class Synchronizer
 {
 
     const SYNCHRONIZE_EVERYTHING = 'everything';
+    const FIX_REFERENCES = 'fix-references';
     const SYNCHRONIZE_MN_REFERENCES = 'mn-references';
     const COMPUTE_COLUMN_VALUES = 'compute-column-values';
     const REPLACE_SHORTCODES = 'replace-shortcodes';
@@ -136,6 +137,8 @@ class Synchronizer
             $fixedMnReferences = $this->fixMnReferences();
             $this->cleanCache();
 
+            $remainingTasks[] = self::FIX_REFERENCES;
+
             if (!$fixedMnReferences) {
                 $remainingTasks[] = self::SYNCHRONIZE_MN_REFERENCES;
             }
@@ -147,6 +150,10 @@ class Synchronizer
             if ($this->entityContainsComputedValues()) {
                 $remainingTasks[] = self::COMPUTE_COLUMN_VALUES;
             }
+        }
+
+        if ($task === self::FIX_REFERENCES) {
+            $this->fixReferences();
         }
 
         if ($task === self::SYNCHRONIZE_MN_REFERENCES) {
@@ -435,6 +442,21 @@ class Synchronizer
     //--------------------------------------
     // Step 3 - Fixing references
     //--------------------------------------
+
+    private function fixReferences()
+    {
+        $fixedEntities = [];
+        foreach ($this->entities as $entity) {
+            $fixedEntity = $this->vpidRepository->restoreForeignKeys($this->entityName, $entity);
+            $fixedEntities[] = $fixedEntity;
+
+            if ($fixedEntity !== $entity) {
+                $this->updateEntityInDatabase($fixedEntity);
+            }
+        }
+
+        $this->entities = $fixedEntities;
+    }
 
     private function fixMnReferences()
     {

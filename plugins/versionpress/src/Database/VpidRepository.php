@@ -2,6 +2,7 @@
 
 namespace VersionPress\Database;
 
+use Nette\Utils\Strings;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Utils\Cursor;
 use VersionPress\Utils\IdUtil;
@@ -10,6 +11,8 @@ use wpdb;
 
 class VpidRepository
 {
+    const UNKNOWN_VPID_MARK = '<unknown-vpid>';
+
     /** @var Database */
     private $database;
     /** @var DbSchemaInfo */
@@ -117,8 +120,10 @@ class VpidRepository
                     $referencedId = $this->restoreIdsInString($entity[$referenceField]);
                 }
 
-                $entity[$referenceName] = $referencedId;
-                unset($entity[$referenceField]);
+                if (!Strings::contains($referencedId, self::UNKNOWN_VPID_MARK)) {
+                    $entity[$referenceName] = $referencedId;
+                    unset($entity[$referenceField]);
+                }
             }
         }
 
@@ -214,7 +219,7 @@ class VpidRepository
     private function restoreIdsInString($stringWithVpids)
     {
         $stringWithIds = preg_replace_callback(IdUtil::getRegexMatchingId(), function ($match) {
-            return $this->getIdForVpid($match[0]) ?: $match[0];
+            return $this->getIdForVpid($match[0]) ?: self::UNKNOWN_VPID_MARK;
         }, $stringWithVpids);
 
         return is_numeric($stringWithIds) ? intval($stringWithIds) : $stringWithIds;

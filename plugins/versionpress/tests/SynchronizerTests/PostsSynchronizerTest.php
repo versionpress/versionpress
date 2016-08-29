@@ -130,6 +130,42 @@ class PostsSynchronizerTest extends SynchronizerTestCase
 
     /**
      * @test
+     * @testdox Synchronizer handles circular dependencies
+     */
+    public function synchronizerHandlesCircularDependencies()
+    {
+        $author = EntityUtils::prepareUser();
+        $this->userStorage->save($author);
+
+        $post1 = EntityUtils::preparePost(null, $author['vp_id']);
+        $post2 = EntityUtils::preparePost(null, $author['vp_id']);
+
+        $post1['vp_post_parent'] = $post2['vp_id'];
+        $post2['vp_post_parent'] = $post1['vp_id'];
+
+        $this->storage->save($post1);
+        $this->storage->save($post2);
+
+        $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->synchronizer->synchronize(Synchronizer::FIX_REFERENCES);
+
+        try {
+            DBAsserter::assertFilesEqualDatabase();
+        } finally {
+            $this->storage->delete($post1);
+            $this->storage->delete($post2);
+            $this->userStorage->delete($author);
+
+            $this->synchronizer->reset();
+            $this->usersSynchronizer->reset();
+            $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+            $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        }
+    }
+
+    /**
+     * @test
      * @testdox Synchronizer adds new post to the database (selective synchronization)
      */
     public function synchronizerAddsNewPostToDatabase_selective()
