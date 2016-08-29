@@ -5,7 +5,6 @@ namespace VersionPress\Tests\SynchronizerTests;
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Synchronizers\Synchronizer;
-use VersionPress\Synchronizers\SynchronizerBase;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -16,9 +15,9 @@ class TermMetaSynchronizerTest extends SynchronizerTestCase
     private $storage;
     /** @var DirectoryStorage */
     private $termStorage;
-    /** @var SynchronizerBase */
+    /** @var Synchronizer */
     private $synchronizer;
-    /** @var SynchronizerBase */
+    /** @var Synchronizer */
     private $termsSynchronizer;
     private static $vpId;
     private static $termVpId;
@@ -32,7 +31,7 @@ class TermMetaSynchronizerTest extends SynchronizerTestCase
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('termmeta');
         $this->termStorage = self::$storageFactory->getStorage('term');
-        $this->synchronizer = new SynchronizerBase(
+        $this->synchronizer = new Synchronizer(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('termmeta'),
@@ -41,7 +40,7 @@ class TermMetaSynchronizerTest extends SynchronizerTestCase
             self::$urlReplacer,
             self::$shortcodesReplacer
         );
-        $this->termsSynchronizer = new SynchronizerBase(
+        $this->termsSynchronizer = new Synchronizer(
             $this->termStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('term'),

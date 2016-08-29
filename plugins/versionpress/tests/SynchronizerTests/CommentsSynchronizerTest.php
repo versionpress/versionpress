@@ -4,7 +4,6 @@ namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Synchronizers\Synchronizer;
-use VersionPress\Synchronizers\SynchronizerBase;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -17,11 +16,11 @@ class CommentsSynchronizerTest extends SynchronizerTestCase
     private $postStorage;
     /** @var DirectoryStorage */
     private $userStorage;
-    /** @var SynchronizerBase */
+    /** @var Synchronizer */
     private $synchronizer;
-    /** @var SynchronizerBase */
+    /** @var Synchronizer */
     private $postsSynchronizer;
-    /** @var SynchronizerBase */
+    /** @var Synchronizer */
     private $usersSynchronizer;
     private static $authorVpId;
     private static $postVpId;
@@ -33,7 +32,7 @@ class CommentsSynchronizerTest extends SynchronizerTestCase
         $this->storage = self::$storageFactory->getStorage('comment');
         $this->postStorage = self::$storageFactory->getStorage('post');
         $this->userStorage = self::$storageFactory->getStorage('user');
-        $this->synchronizer = new SynchronizerBase(
+        $this->synchronizer = new Synchronizer(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('comment'),
@@ -42,7 +41,7 @@ class CommentsSynchronizerTest extends SynchronizerTestCase
             self::$urlReplacer,
             self::$shortcodesReplacer
         );
-        $this->postsSynchronizer = new SynchronizerBase(
+        $this->postsSynchronizer = new Synchronizer(
             $this->postStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('post'),
@@ -51,7 +50,7 @@ class CommentsSynchronizerTest extends SynchronizerTestCase
             self::$urlReplacer,
             self::$shortcodesReplacer
         );
-        $this->usersSynchronizer = new SynchronizerBase(
+        $this->usersSynchronizer = new Synchronizer(
             $this->userStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('user'),

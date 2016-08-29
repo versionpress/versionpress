@@ -4,7 +4,6 @@ namespace VersionPress\Tests\SynchronizerTests;
 
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Synchronizers\Synchronizer;
-use VersionPress\Synchronizers\SynchronizerBase;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -16,9 +15,9 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
     private $storage;
     /** @var DirectoryStorage */
     private $postStorage;
-    /** @var SynchronizerBase */
+    /** @var Synchronizer */
     private $synchronizer;
-    /** @var SynchronizerBase */
+    /** @var Synchronizer */
     private $postsSynchronizer;
 
     private $entitiesForSelectiveSynchronization = [['vp_id' => 'foo', 'parent' => null]];
@@ -28,7 +27,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('option');
         $this->postStorage = self::$storageFactory->getStorage('post');
-        $this->synchronizer = new SynchronizerBase(
+        $this->synchronizer = new Synchronizer(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('option'),
@@ -37,7 +36,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
             self::$urlReplacer,
             self::$shortcodesReplacer
         );
-        $this->postsSynchronizer = new SynchronizerBase(
+        $this->postsSynchronizer = new Synchronizer(
             $this->postStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('post'),
@@ -166,8 +165,8 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
 
         $this->postStorage->delete($post);
 
-        // We need new instances because of caching in SynchronizerBase::maybeInit
-        $this->synchronizer = new SynchronizerBase(
+        // We need new instances because of caching in Synchronizer::maybeInit
+        $this->synchronizer = new Synchronizer(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('option'),
@@ -176,7 +175,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
             self::$urlReplacer,
             self::$shortcodesReplacer
         );
-        $this->postsSynchronizer = new SynchronizerBase(
+        $this->postsSynchronizer = new Synchronizer(
             $this->postStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('post'),
