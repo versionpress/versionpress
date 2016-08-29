@@ -117,27 +117,12 @@ class TermTaxonomiesSynchronizerTest //extends SynchronizerTestCase
         $this->storage->delete($termTaxonomy2);
         $this->termStorage->delete($term1);
         $this->termStorage->delete($term2);
-        // We need new instances because of caching in Synchronizer::maybeInit
-        $termsSynchronizer = new Synchronizer(
-            $this->termStorage,
-            self::$database,
-            self::$schemaInfo->getEntityInfo('term'),
-            self::$schemaInfo,
-            self::$vpidRepository,
-            self::$urlReplacer,
-            self::$shortcodesReplacer
-        );
-        $termTaxonomiesSynchronizer = new Synchronizer(
-            $this->storage,
-            self::$database,
-            self::$schemaInfo->getEntityInfo('term_taxonomy'),
-            self::$schemaInfo,
-            self::$vpidRepository,
-            self::$urlReplacer,
-            self::$shortcodesReplacer
-        );
-        $termTaxonomiesSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
-        $termsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+
+        $this->termsSynchronizer->reset();
+        $this->synchronizer->reset();
+
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->termsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
     }
 
     private function createTermTaxonomy()

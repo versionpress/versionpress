@@ -189,25 +189,8 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
 
         $this->postStorage->delete($post);
 
-        // We need new instances because of caching in Synchronizer::maybeInit
-        $this->synchronizer = new Synchronizer(
-            $this->storage,
-            self::$database,
-            self::$schemaInfo->getEntityInfo('option'),
-            self::$schemaInfo,
-            self::$vpidRepository,
-            self::$urlReplacer,
-            self::$shortcodesReplacer
-        );
-        $this->postsSynchronizer = new Synchronizer(
-            $this->postStorage,
-            self::$database,
-            self::$schemaInfo->getEntityInfo('post'),
-            self::$schemaInfo,
-            self::$vpidRepository,
-            self::$urlReplacer,
-            self::$shortcodesReplacer
-        );
+        $this->synchronizer->reset();
+        $this->postsSynchronizer->reset();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $optionToSynchronize);
         $this->postsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $postToSynchronize);
     }

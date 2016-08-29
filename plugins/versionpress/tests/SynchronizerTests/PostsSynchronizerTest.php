@@ -242,24 +242,9 @@ class PostsSynchronizerTest extends SynchronizerTestCase
 
         $this->deletePost();
 
-        $this->synchronizer = new Synchronizer(
-            $this->storage,
-            self::$database,
-            self::$schemaInfo->getEntityInfo('post'),
-            self::$schemaInfo,
-            self::$vpidRepository,
-            self::$urlReplacer,
-            self::$shortcodesReplacer
-        );
-        $this->usersSynchronizer = new Synchronizer(
-            $this->userStorage,
-            self::$database,
-            self::$schemaInfo->getEntityInfo('user'),
-            self::$schemaInfo,
-            self::$vpidRepository,
-            self::$urlReplacer,
-            self::$shortcodesReplacer
-        );
+        $this->synchronizer->reset();
+        $this->usersSynchronizer->reset();
+
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
