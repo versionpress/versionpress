@@ -21,7 +21,7 @@ interface CommitsTableProps {
   onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
 }
 
-export default class CommitsTable extends React.Component<CommitsTableProps, {}>  {
+export default class CommitsTable extends React.Component<CommitsTableProps, {}> {
 
   onSelectAllChange = (isChecked: boolean) => {
     const { commits, onCommitsSelect } = this.props;
@@ -29,10 +29,8 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
     onCommitsSelect(commits, isChecked, false);
   };
 
-  render() {
+  renderCommitInfo(commit: Commit, index: number, displayNotAbleNote: boolean) {
     const {
-      pages,
-      commits,
       selectedCommits,
       enableActions,
       diffProvider,
@@ -41,7 +39,40 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
       onCommitsSelect,
     } = this.props;
 
-    let isNotAbleNoteDisplayed = false;
+    const body = (
+      <CommitInfo
+        commit={commit}
+        enableActions={enableActions}
+        isSelected={indexOf(selectedCommits, commit) !== -1}
+        onUndo={onUndo}
+        onRollback={onRollback}
+        onCommitsSelect={onCommitsSelect}
+        diffProvider={diffProvider}
+        key={commit.hash}
+      />
+    );
+
+    if (displayNotAbleNote) {
+      return [
+        <NotAbleNote key='note' />,
+        body,
+      ];
+    }
+
+    return body;
+  }
+
+  render() {
+    const {
+      pages,
+      commits,
+      selectedCommits,
+      enableActions,
+    } = this.props;
+
+    const notAbleNoteIndex = commits.findIndex((commit: Commit, index: number) => (
+      !commit.isEnabled && index < commits.length - 1)
+    );
 
     return (
       <table className='vp-table widefat fixed'>
@@ -51,31 +82,9 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
           enableActions={enableActions}
           onSelectAllChange={this.onSelectAllChange}
         />
-        {commits.map((commit: Commit, index: number) => {
-          const body = (
-            <CommitInfo
-              commit={commit}
-              enableActions={enableActions}
-              isSelected={indexOf(selectedCommits, commit) !== -1}
-              onUndo={onUndo}
-              onRollback={onRollback}
-              onCommitsSelect={onCommitsSelect}
-              diffProvider={diffProvider}
-              key={commit.hash}
-            />
-          );
-
-          if (!isNotAbleNoteDisplayed && !commit.isEnabled && index < commits.length - 1) {
-            isNotAbleNoteDisplayed = true;
-
-            return [
-              <NotAbleNote key='note' />,
-              body,
-            ];
-          }
-
-          return body;
-        })}
+        {commits.map((commit: Commit, index: number) => (
+          this.renderCommitInfo(commit, index, index === notAbleNoteIndex)
+        ))}
         <Footer pages={pages} />
       </table>
     );
