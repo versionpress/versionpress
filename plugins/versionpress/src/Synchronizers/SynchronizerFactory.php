@@ -34,18 +34,6 @@ class SynchronizerFactory
     /** @var ShortcodesReplacer */
     private $shortcodesReplacer;
 
-    private $synchronizerClasses = [
-        'post' => Synchronizer::class,
-        'postmeta' => Synchronizer::class,
-        'comment' => Synchronizer::class,
-        'commentmeta' => Synchronizer::class,
-        'option' => Synchronizer::class,
-        'user' => Synchronizer::class,
-        'usermeta' => Synchronizer::class,
-        'term' => Synchronizer::class,
-        'termmeta' => Synchronizer::class,
-        'term_taxonomy' => Synchronizer::class,
-    ];
     private $synchronizationSequence = [
         'user',
         'usermeta',
@@ -77,15 +65,20 @@ class SynchronizerFactory
     }
 
     /**
-     * @param $synchronizerName
+     * @param $entityName
      * @return Synchronizer
      */
-    public function createSynchronizer($synchronizerName)
+    public function createSynchronizer($entityName)
     {
-        $synchronizerClass = $this->synchronizerClasses[$synchronizerName];
-        return new $synchronizerClass($this->getStorage($synchronizerName), $this->database,
-            $this->dbSchema->getEntityInfo($synchronizerName), $this->dbSchema, $this->vpidRepository,
-            $this->urlReplacer, $this->shortcodesReplacer);
+        return new Synchronizer(
+            $this->getStorage($entityName),
+            $this->database,
+            $this->dbSchema->getEntityInfo($entityName),
+            $this->dbSchema,
+            $this->vpidRepository,
+            $this->urlReplacer,
+            $this->shortcodesReplacer
+        );
     }
 
     public function getSynchronizationSequence()
