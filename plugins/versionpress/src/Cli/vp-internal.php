@@ -13,7 +13,6 @@ use VersionPress\Utils\WordPressMissingFunctions;
 use VersionPress\Utils\WpConfigEditor;
 use WP_CLI;
 use WP_CLI_Command;
-use wpdb;
 
 /**
  * Internal VersionPress commands.
@@ -34,12 +33,6 @@ class VPInternalCommand extends WP_CLI_Command
     /**
      * Finishes clone operation
      *
-     * ## OPTIONS
-     *
-     * [--truncate-options]
-     * : By default, options table is not truncated. This flag changes the behavior.
-     *
-     *
      * @subcommand finish-init-clone
      *
      */
@@ -53,11 +46,9 @@ class VPInternalCommand extends WP_CLI_Command
         $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
         $tables = $database->tables();
 
-        if (!isset($assoc_args["truncate-options"])) {
-            $tables = array_filter($tables, function ($table) use ($database) {
-                return $table !== $database->options;
-            });
-        }
+        $tables = array_filter($tables, function ($table) use ($database) {
+            return $table !== $database->options;
+        });
 
         foreach ($tables as $table) {
             $truncateCmd = "TRUNCATE TABLE `$table`";

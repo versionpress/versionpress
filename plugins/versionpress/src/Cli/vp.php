@@ -9,7 +9,6 @@ namespace VersionPress\Cli;
 
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
-use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Committer;
 use VersionPress\Git\GitConfig;
@@ -19,6 +18,7 @@ use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\Initializer;
 use VersionPress\Initialization\WpConfigSplitter;
 use VersionPress\Initialization\WpdbReplacer;
+use VersionPress\Storages\Serialization\IniSerializer;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\PathUtils;
@@ -238,7 +238,6 @@ class VPCommand extends WP_CLI_Command
             );
         }
 
-        $this->dropTables();
         $url = $assoc_args['siteurl'];
 
         // Update URLs in wp-config.php
@@ -247,11 +246,12 @@ class VPCommand extends WP_CLI_Command
         $this->setConfigUrl('WP_PLUGIN_URL', 'WP_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins', $url);
         $this->setConfigUrl('WP_HOME', 'VP_INDEX_DIR', VP_PROJECT_ROOT, $url);
 
+        defined('WP_PLUGIN_DIR') || define('WP_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins');
+
         WpConfigSplitter::ensureCommonConfigInclude($wpConfigPath);
 
         // Create or empty database
         $this->prepareDatabase($assoc_args);
-
 
         // Disable VersionPress tracking for a while
         WpdbReplacer::restoreOriginal();
@@ -293,6 +293,15 @@ class VPCommand extends WP_CLI_Command
         if (!WpdbReplacer::isReplaced()) {
             WpdbReplacer::replaceMethods();
         }
+
+        /* We need correct value in the `active_plugins` option before the synchronization run.
+         * Without this option VersionPress doesn't know which schema.yml files it should load and consequently which
+         * DB entities it should synchronize.
+         */
+        $activePluginsOption = IniSerializer::deserialize(file_get_contents(VP_VPDB_DIR . '/options/ac/active_plugins.ini'));
+        $activePlugins = json_encode(unserialize($activePluginsOption['active_plugins']['option_value']));
+
+        VPCommandUtils::runWpCliCommand('option', 'update', ['active_plugins', $activePlugins, 'autoload' => 'yes', 'format' => 'json']);
 
         // The next couple of the steps need to be done after WP is fully loaded; we use `finish-init-clone` for that
         // The main reason for this is that we need properly set WP_CONTENT_DIR constant for reading from storages
@@ -998,7 +1007,6 @@ class VPCommand extends WP_CLI_Command
 
     private function dropTables()
     {
-        global $versionPressContainer;
         $tables = [
             'users',
             'usermeta',
@@ -1014,9 +1022,11 @@ class VPCommand extends WP_CLI_Command
             'commentmeta',
             'vp_id',
         ];
-        /** @var DbSchemaInfo $schema */
-        $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
-        $tables = array_map([$schema, 'getPrefixedTableName'], $tables);
+
+        $tables = array_map(function ($table) {
+            global $table_prefix;
+            return $table_prefix . $table;
+        }, $tables);
 
         foreach ($tables as $table) {
             VPCommandUtils::runWpCliCommand('db', 'query', ["DROP TABLE IF EXISTS `$table`"]);
@@ -1243,9 +1253,8 @@ class VPCommand extends WP_CLI_Command
         global $versionPressContainer;
 
         $database = $versionPressContainer->resolve(VersionPressServices::WPDB);
-        $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
 
-        $requirementsChecker = new RequirementsChecker($database, $schema, $requirementsScope);
+        $requirementsChecker = new RequirementsChecker($database, null, $requirementsScope);
 
         $report = $requirementsChecker->getRequirements();
 

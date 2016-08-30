@@ -50,7 +50,7 @@ class RequirementsChecker
      * Default value is RequirementsChecker::SITE which means that all requirements need to be matched.
      * RequirementsChecker::ENVIRONMENT checks only requirements related to "runtime" environment.
      */
-    public function __construct($database, DbSchemaInfo $schema, $checkScope = RequirementsChecker::SITE)
+    public function __construct($database, $schema, $checkScope = RequirementsChecker::SITE)
     {
 
         $this->database = $database;

@@ -17,10 +17,10 @@ class ActivePluginsVPFilesIterator implements \IteratorAggregate
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
         }
 
-        $plugins = wp_get_active_and_valid_plugins();
+        $plugins = get_option('active_plugins');
 
         foreach ($plugins as $pluginFile) {
-            $pluginDir = dirname($pluginFile);
+            $pluginDir = WP_PLUGIN_DIR . '/' . dirname($pluginFile);
             $path = $pluginDir . '/.versionpress/' . $this->iteratedFiles;
             if (file_exists($path)) {
                 yield $path;
