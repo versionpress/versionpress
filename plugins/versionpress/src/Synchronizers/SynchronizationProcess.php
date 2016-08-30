@@ -45,15 +45,14 @@ class SynchronizationProcess
      */
     public function synchronizeAll()
     {
-        $synchronizerFactory = $this->synchronizerFactory;
-        $synchronizationTasks = array_map(function ($synchronizerName) use ($synchronizerFactory) {
-            $synchronizer = $synchronizerFactory->createSynchronizer($synchronizerName);
+        $synchronizationTasks = array_map(function ($synchronizerName) {
+            $synchronizer = $this->synchronizerFactory->createSynchronizer($synchronizerName);
             return [
                 'synchronizer' => $synchronizer,
                 'task' => Synchronizer::SYNCHRONIZE_EVERYTHING,
                 'entities' => null
             ];
-        }, $synchronizerFactory->getSynchronizationSequence());
+        }, $this->synchronizerFactory->getSynchronizationSequence());
 
         $this->runSynchronizationTasks($synchronizationTasks);
     }

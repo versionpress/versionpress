@@ -189,6 +189,20 @@ class DbSchemaInfo
     }
 
     /**
+     * Returns a map where key is a name of an entity and value is a list of names of referenced entities.
+     *
+     * @return array
+     */
+    public function getAllReferences()
+    {
+        $references = [];
+        foreach ($this->getAllEntityNames() as $entity) {
+            $references[$entity] = $this->getEntityInfo($entity)->getReferencedEntities();
+        }
+        return $references;
+    }
+
+    /**
      * Returns valid schema for current version of WP.
      * For example in WP < 4.4-beta1 removes the `termmeta` entity.
      *

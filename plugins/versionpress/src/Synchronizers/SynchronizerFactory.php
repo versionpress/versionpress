@@ -34,18 +34,7 @@ class SynchronizerFactory
     /** @var ShortcodesReplacer */
     private $shortcodesReplacer;
 
-    private $synchronizationSequence = [
-        'user',
-        'usermeta',
-        'term',
-        'termmeta',
-        'term_taxonomy',
-        'post',
-        'postmeta',
-        'comment',
-        'commentmeta',
-        'option'
-    ];
+    private $synchronizationSequence = [];
 
     public function __construct(
         StorageFactory $storageFactory,
@@ -61,7 +50,7 @@ class SynchronizerFactory
         $this->vpidRepository = $vpidRepository;
         $this->urlReplacer = $urlReplacer;
         $this->shortcodesReplacer = $shortcodesReplacer;
-        $this->adjustSynchronizationSequenceToDbVersion();
+        $this->synchronizationSequence = $this->resolveSynchronizationSequence();
     }
 
     /**
@@ -91,9 +80,55 @@ class SynchronizerFactory
         return $this->storageFactory->getStorage($synchronizerName);
     }
 
-    private function adjustSynchronizationSequenceToDbVersion()
+    /**
+     * Determines sequence in which entities should be synchronized.
+     * It's based on their dependencies on other entities.
+     *
+     * @return array
+     */
+    private function resolveSynchronizationSequence()
     {
-        $allSupportedEntities = $this->dbSchema->getAllEntityNames();
-        $this->synchronizationSequence = array_intersect($this->synchronizationSequence, $allSupportedEntities);
+        $unresolved = $this->dbSchema->getAllReferences();
+        $sequence = [];
+        $triedRemovingSelfReferences = false;
+
+
+        while (count($unresolved) > 0) {
+            $resolvedInThisStep = [];
+
+            // 1st step - move all entities with resolved dependencies to $sequence
+            foreach ($unresolved as $entity => $deps) {
+                if (count($deps) === 0) {
+                    unset($unresolved[$entity]);
+                    $sequence[] = $entity;
+                    $resolvedInThisStep[] = $entity;
+                }
+            }
+
+            // 2nd step - update unresolved dependencies of remaining entities
+            foreach ($resolvedInThisStep as $resolvedEntity) {
+                foreach ($unresolved as $unresolvedEntity => $deps) {
+                    $unresolved[$unresolvedEntity] = array_diff($deps, [$resolvedEntity]);
+                }
+            }
+
+            // Nothing changed - circular dependency
+            if (count($resolvedInThisStep) === 0) {
+                if (!$triedRemovingSelfReferences) {
+                    // At first try to remove all self-references as they have to run in 2-pass sync anyway
+                    $triedRemovingSelfReferences = true;
+                    foreach ($unresolved as $unresolvedEntity => $deps) {
+                        $unresolved[$unresolvedEntity] = array_diff($deps, [$unresolvedEntity]);
+                    }
+                } else {
+                    // Simply eliminate dependencies one by one until it is resolvable
+                    reset($unresolved);
+                    $firstEntity = key($unresolved);
+                    array_pop($unresolved[$firstEntity]);
+                }
+            }
+        }
+
+        return $sequence;
     }
 }

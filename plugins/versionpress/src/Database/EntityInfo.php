@@ -290,4 +290,21 @@ class EntityInfo
     {
         return QueryLanguageUtils::createRulesFromQueries($this->ignoredEntities);
     }
+
+    /**
+     * Returns list of referenced entities.
+     *
+     * @return array
+     */
+    public function getReferencedEntities()
+    {
+        $references = array_values($this->references);
+        $references += array_values($this->valueReferences);
+        $references += array_values($this->mnReferences);
+        $references = array_filter($references, function ($entity) {
+            return !Strings::startsWith($entity, '@');
+        });
+
+        return array_values(array_unique($references));
+    }
 }
