@@ -54,25 +54,13 @@ class StorageFactory
         }
 
         if ($this->dbSchemaInfo->isChildEntity($entityName)) {
-            if (isset($entityInfo->storageClass)) {
-                $storageClass = $entityInfo->storageClass;
-            } else {
-                $storageClass = MetaEntityStorage::class;
-            }
-
             $parentEntity = $entityInfo->references[$entityInfo->parentReference];
             $parentStorage = $this->getStorage($parentEntity);
 
-            return new $storageClass($parentStorage, $entityInfo, $this->database->prefix, $this->changeInfoFactory);
+            return new MetaEntityStorage($parentStorage, $entityInfo, $this->database->prefix, $this->changeInfoFactory);
         }
 
-        if (isset($entityInfo->storageClass)) {
-            $storageClass = $entityInfo->storageClass;
-        } else {
-            $storageClass = DirectoryStorage::class;
-        }
-
-        return new $storageClass($this->vpdbDir . '/' . $entityInfo->tableName, $entityInfo, $this->database->prefix, $this->changeInfoFactory);
+        return new DirectoryStorage($this->vpdbDir . '/' . $entityInfo->tableName, $entityInfo, $this->database->prefix, $this->changeInfoFactory);
     }
 
     public function getAllSupportedStorages()
