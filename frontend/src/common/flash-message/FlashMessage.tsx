@@ -38,7 +38,7 @@ export default class FlashMessage extends React.Component<FlashMessageProps, Fla
     return (
       <div className={code}>
         <p>
-          {`${message} `}
+          {message} {' '}
           {details &&
             <ShowDetails
               isActive={showDetails}

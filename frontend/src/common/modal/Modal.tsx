@@ -22,14 +22,14 @@ export default class Modal extends React.Component<ModalProps, {}> {
     onClose: () => {},
   };
 
+  contentNode: HTMLDivElement = null;
+
   componentDidMount() {
-    const content = this.refs['content'] as HTMLElement;
-    content.focus();
+    this.contentNode.focus();
   }
 
   componentDidUpdate() {
-    const content = this.refs['content'] as HTMLElement;
-    content.focus();
+    this.contentNode.focus();
   }
 
   onBackgroundClick = (e: React.MouseEvent) => {
@@ -61,12 +61,9 @@ export default class Modal extends React.Component<ModalProps, {}> {
     const { children, showCloseIcon, title } = this.props;
 
     return (
-      <div
-        className='Modal-container'
-        onClick={this.onBackgroundClick}
-      >
+      <div className='Modal-container' onClick={this.onBackgroundClick}>
         <div
-          ref='content'
+          ref={node => this.contentNode = node}
           className='Modal-content'
           tabIndex={-1}
           onKeyDown={this.onContentKeyDown}

@@ -26,13 +26,13 @@ const Buttons: React.StatelessComponent<ButtonsProps> = (props) => {
       <Button
         text={okButtonText}
         isPrimary={true}
-        extraClassName={okButtonClassName}
+        className={okButtonClassName}
         onClick={onOkClick}
       />
       <Button
         text={cancelButtonText}
         isPrimary={false}
-        extraClassName={cancelButtonClassName}
+        className={cancelButtonClassName}
         onClick={onCancelClick}
       />
     </div>

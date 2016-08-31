@@ -19,10 +19,7 @@ const ProgressBar: React.StatelessComponent<ProgressBarProps> = ({ progress }) =
 
   return (
     <div className='ProgressBar'>
-      <div
-        className='ProgressBar-bar'
-        style={barStyles}
-      >
+      <div className='ProgressBar-bar' style={barStyles}>
         <Spinner isVisible={isVisible} />
         <SpinnerIcon />
       </div>

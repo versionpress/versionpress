@@ -12,7 +12,7 @@ const Spinner: React.StatelessComponent<SpinnerProps> = ({ isVisible }) => {
   });
 
   return (
-    <div className={spinnerClassName}></div>
+    <div className={spinnerClassName} />
   );
 };
 
