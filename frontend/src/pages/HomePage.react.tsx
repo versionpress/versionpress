@@ -457,14 +457,14 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     return (
       <div className={homePageClassName}>
         <ProgressBar progress={this.state.progress} />
-        {this.state.message &&
-          <FlashMessage message={this.state.message} />
-        }
         <ServicePanel
           isVisible={this.state.displayServicePanel}
           onButtonClick={this.onServicePanelClick}
         >
           <VpTitle />
+          {this.state.message &&
+            <FlashMessage message={this.state.message} />
+          }
         </ServicePanel>
         {this.state.isDirtyWorkingDirectory
           ? <CommitPanel
