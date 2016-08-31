@@ -17,9 +17,9 @@ import ProgressBar from '../common/ProgressBar.react';
 import ServicePanel from '../service-panel/ServicePanel';
 import VpTitle from '../vp-title/VpTitle';
 import WelcomePanel from '../welcome-panel/WelcomePanel';
-import * as revertDialog from '../common/revert-dialog/revertDialog';
+import {revertDialog} from '../modal/portal';
 import * as WpApi from '../services/WpApi';
-import { indexOf } from '../utils/CommitUtils';
+import {indexOf} from '../utils/CommitUtils';
 import config from '../config';
 
 import './HomePage.less';
@@ -293,7 +293,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       );
       const hashes = selectedCommits.map((commit: Commit) => commit.hash);
 
-      revertDialog.revertDialog.call(this, title, () => this.undoCommits(hashes));
+      revertDialog.call(this, title, () => this.undoCommits(hashes));
     }
   };
 
@@ -377,7 +377,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       <span>Undo <em>{message}</em>?</span>
     );
 
-    revertDialog.revertDialog.call(this, title, () => this.undoCommits([hash]));
+    revertDialog.call(this, title, () => this.undoCommits([hash]));
   };
 
   onRollback = (hash: string, date: string) => {
@@ -385,7 +385,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       <span>Roll back to <em>{moment(date).format('LLL')}</em>?</span>
     );
 
-    revertDialog.revertDialog.call(this, title, () => this.rollbackToCommit(hash));
+    revertDialog.call(this, title, () => this.rollbackToCommit(hash));
   };
 
   onWelcomePanelHide = (e: React.MouseEvent) => {
