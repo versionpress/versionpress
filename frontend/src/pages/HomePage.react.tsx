@@ -1,4 +1,5 @@
 /// <reference path='../Commits/Commits.d.ts' />
+/// <reference path='../interfaces/State.d.ts' />
 
 import * as React from 'react';
 import * as ReactRouter from 'react-router';
@@ -11,9 +12,9 @@ import update = require('react-addons-update');
 import BulkActionPanel from '../bulk-action-panel/BulkActionPanel';
 import CommitPanel from '../commit-panel/CommitPanel';
 import CommitsTable from '../Commits/CommitsTable.react';
-import Filter from '../Filter/Filter.react';
-import FlashMessage from '../common/FlashMessage.react';
-import ProgressBar from '../common/ProgressBar.react';
+import Filter from '../filter/Filter';
+import FlashMessage from '../common/flash-message/FlashMessage';
+import ProgressBar from '../common/progress-bar/ProgressBar';
 import ServicePanel from '../service-panel/ServicePanel';
 import VpTitle from '../vp-title/VpTitle';
 import WelcomePanel from '../welcome-panel/WelcomePanel';
@@ -38,16 +39,13 @@ interface HomePageState {
   commits?: Commit[];
   selectedCommits?: Commit[];
   lastSelectedCommit?: Commit;
-  message?: {
-    code: string,
-    message: string,
-    details?: string,
-  };
+  message?: InfoMessage;
   isLoading?: boolean;
   displayServicePanel?: boolean;
   displayWelcomePanel?: boolean;
   displayUpdateNotice?: boolean;
   isDirtyWorkingDirectory?: boolean;
+  progress?: number;
 }
 
 export default class HomePage extends React.Component<HomePageProps, HomePageState> {
@@ -68,6 +66,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     displayWelcomePanel: false,
     displayUpdateNotice: false,
     isDirtyWorkingDirectory: false,
+    progress: 100,
   };
 
   private refreshInterval;
@@ -87,6 +86,12 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     };
   }
 
+  private updateProgress = (e: {percent: number}) => {
+    this.setState({
+      progress: e.percent,
+    });
+  };
+
   componentDidMount() {
     this.fetchWelcomePanel();
     this.fetchCommits();
@@ -105,9 +110,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     const router: ReactRouter.Context = (this.context as any).router;
     this.setState({
       isLoading: true,
+      progress: 0,
     });
-    const progressBar = this.refs['progress'] as ProgressBar;
-    progressBar.progress(0);
 
     const page = (parseInt(params.page, 10) - 1) || 0;
 
@@ -118,7 +122,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     WpApi
       .get('commits')
       .query({page: page, query: encodeURIComponent(this.state.query)})
-      .on('progress', (e) => progressBar.progress(e.percent))
+      .on('progress', this.updateProgress)
       .end((err: any, res: request.Response) => {
         const data = res.body.data as VpApi.GetCommitsResponse;
         if (err) {
@@ -189,16 +193,15 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   };
 
   undoCommits = (commits: string[]) => {
-    const progressBar = this.refs['progress'] as ProgressBar;
-    progressBar.progress(0);
     this.setState({
       isLoading: true,
+      progress: 0,
     });
 
     WpApi
       .get('undo')
       .query({commits: commits})
-      .on('progress', (e) => progressBar.progress(e.percent))
+      .on('progress', this.updateProgress)
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
@@ -214,16 +217,15 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   };
 
   rollbackToCommit = (hash: string) => {
-    const progressBar = this.refs['progress'] as ProgressBar;
-    progressBar.progress(0);
     this.setState({
       isLoading: true,
+      progress: 0,
     });
 
     WpApi
       .get('rollback')
       .query({commit: hash})
-      .on('progress', (e) => progressBar.progress(e.percent))
+      .on('progress', this.updateProgress)
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
@@ -305,15 +307,16 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   };
 
   onCommit = (message: string) => {
-    const progressBar = this.refs['progress'] as ProgressBar;
-    progressBar.progress(0);
+    this.setState({
+      progress: 0,
+    });
 
     const values = { 'commit-message': message };
 
     WpApi
       .post('commit')
       .send(values)
-      .on('progress', (e) => progressBar.progress(e.percent))
+      .on('progress', this.updateProgress)
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
@@ -334,12 +337,13 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   };
 
   onDiscard = () => {
-    const progressBar = this.refs['progress'] as ProgressBar;
-    progressBar.progress(0);
+    this.setState({
+      progress: 0,
+    });
 
     WpApi
       .post('discard-changes')
-      .on('progress', (e: {percent: number}) => progressBar.progress(e.percent))
+      .on('progress', this.updateProgress)
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
@@ -358,18 +362,20 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       });
   };
 
-  onFilter = (query: string) => {
+  onFilterQueryChange = (query: string) => {
     this.setState({
       query: query,
-    }, () => {
-      const page = (parseInt(this.props.params.page, 10) - 1) || 0;
-      if (page > 0) {
-        const router: ReactRouter.Context = (this.context as any).router;
-        router.transitionTo(routes.home);
-      } else {
-        this.fetchCommits();
-      }
     });
+  };
+
+  onFilter = () => {
+    const page = (parseInt(this.props.params.page, 10) - 1) || 0;
+    if (page > 0) {
+      const router: ReactRouter.Context = (this.context as any).router;
+      router.transitionTo(routes.home);
+    } else {
+      this.fetchCommits();
+    }
   };
 
   onUndo = (e) => {
@@ -450,17 +456,16 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
     return (
       <div className={homePageClassName}>
-        <ProgressBar ref='progress' />
+        <ProgressBar progress={this.state.progress} />
         <ServicePanel
           isVisible={this.state.displayServicePanel}
           onButtonClick={this.onServicePanelClick}
         >
           <VpTitle />
+          {this.state.message &&
+            <FlashMessage message={this.state.message} />
+          }
         </ServicePanel>
-        {this.state.message
-          ? <FlashMessage {...this.state.message} />
-          : null
-        }
         {this.state.isDirtyWorkingDirectory
           ? <CommitPanel
               diffProvider={{ getDiff: this.getDiff }}
@@ -485,7 +490,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         }
         <div className='tablenav top'>
           <Filter
-            onSubmit={this.onFilter}
+            query={this.state.query}
+            onQueryChange={this.onFilterQueryChange}
+            onFilter={this.onFilter}
           />
           <BulkActionPanel
             enableActions={enableActions}

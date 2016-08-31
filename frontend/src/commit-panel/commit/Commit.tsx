@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import Buttons from './Buttons';
 import Form from './Form';
-import * as portal from '../../common/portal';
+import * as portal from '../../common/portal/portal';
 
 interface CommitProps {
   onCommit(message: string): void;

@@ -1,10 +1,10 @@
 import * as React from 'react';
 import * as DOM from 'react-dom';
 
-import ConfirmDialog from './ConfirmDialog.react';
-import Modal from './Modal.react';
+import ConfirmDialog from '../confirm-dialog/ConfirmDialog';
+import Modal from '../modal/Modal';
 
-var portalNode;
+let portalNode;
 
 export function alertDialog(title: React.ReactNode, body: React.ReactNode) {
   closePortal();
@@ -15,23 +15,36 @@ export function alertDialog(title: React.ReactNode, body: React.ReactNode) {
   );
 }
 
-export function confirmDialog(title: React.ReactNode, body: React.ReactNode, okHandler, cancelHandler, options) {
-  options = options || {};
-  if (okHandler) {
-    options.okButtonClickHandler = okHandler;
+export function confirmDialog(
+  title: React.ReactNode,
+  body: React.ReactNode,
+  onOkClick: () => void | boolean,
+  onCancelClick: () => void | boolean,
+  options: any = {}
+  ) {
+  if (onOkClick) {
+    options.onOkButtonClick = onOkClick;
   }
-  if (cancelHandler) {
-    options.cancelButtonClickHandler = cancelHandler;
+
+  if (onCancelClick) {
+    options.onCancelButtonClick = onCancelClick;
   }
+
   closePortal();
   openPortal(
-    <Modal title={title} onClose={cancelHandler}>
-      <ConfirmDialog message={body} {...options} />
+    <Modal
+      title={title}
+      onClose={onCancelClick}
+    >
+      <ConfirmDialog
+        message={body}
+        {...options}
+      />
     </Modal>
   );
 }
 
-export function openPortal(children) {
+export function openPortal(children: React.ReactElement<any>) {
   portalNode = document.createElement('div');
   document.body.appendChild(portalNode);
   DOM.render(children, portalNode);
