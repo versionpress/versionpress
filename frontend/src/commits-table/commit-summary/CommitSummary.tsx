@@ -6,14 +6,15 @@ import * as classNames from 'classnames';
 import Actions from './Actions';
 import Author from './Author';
 import Checkbox from './Checkbox';
-import CreateDate from './CreateDate';
+import Date from './Date';
 import Environment from './Environment';
 import Message from './Message';
+import UndoDisabledDialog from '../../modal/dialogs/UndoDisabledDialog';
+import UndoMergeDialog from '../../modal/dialogs/UndoDisabledDialog';
 import DetailsLevel from '../../enums/DetailsLevel';
-import * as portal from '../../common/portal';
-import { UndoDisabledDialog, UndoMergeDialog } from '../../common/revert-dialog/revertDialog';
+import * as portal from '../../modal/portal';
 
-interface CommitRowSummaryProps {
+interface CommitSummaryProps {
   commit: Commit;
   enableActions: boolean;
   isSelected: boolean;
@@ -24,7 +25,7 @@ interface CommitRowSummaryProps {
   onDetailsLevelChange(detailsLevel: DetailsLevel): void;
 }
 
-export default class CommitRowSummary extends React.Component<CommitRowSummaryProps, {}> {
+export default class CommitSummary extends React.Component<CommitSummaryProps, {}> {
 
   onRowClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -57,14 +58,14 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
     const { commit, enableActions, onUndo } = this.props;
 
     if (commit.isMerge) {
-      this.renderUndoMergeDialog();
+      this.displayUndoMergeDialog();
       return;
     }
 
     if (enableActions) {
       onUndo(commit.hash, commit.message);
     } else {
-      this.renderDisabledDialog();
+      this.displayDisabledDialog();
     }
   };
 
@@ -77,18 +78,18 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
     if (enableActions) {
       onRollback(commit.hash, commit.date);
     } else {
-      this.renderDisabledDialog();
+      this.displayDisabledDialog();
     }
   };
 
-  private renderUndoMergeDialog() {
+  private displayUndoMergeDialog() {
     portal.alertDialog(
       'This is a merge commit',
       <UndoMergeDialog />
     );
   }
 
-  private renderDisabledDialog() {
+  private displayDisabledDialog() {
     portal.alertDialog(
       <span>Undo <em>{this.props.commit.message}</em>?</span>,
       <UndoDisabledDialog />
@@ -116,7 +117,7 @@ export default class CommitRowSummary extends React.Component<CommitRowSummaryPr
           isDisabled={!enableActions}
           onClick={this.onCheckboxClick}
         />
-        <CreateDate date={commit.date} />
+        <Date date={commit.date} />
         <Author author={commit.author} />
         <Message
           commit={commit}

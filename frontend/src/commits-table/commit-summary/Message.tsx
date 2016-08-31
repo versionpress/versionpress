@@ -10,22 +10,6 @@ interface MessageProps {
   onDetailsLevelClick(e: React.MouseEvent, detailsLevel: DetailsLevel): void;
 }
 
-const renderMessage = (message: string) => {
-  const messageChunks = /(.*)'(.*)'(.*)/.exec(message);
-
-  if (!messageChunks || messageChunks.length < 4) {
-    return <span>{message}</span>;
-  }
-
-  return (
-    <span>
-      {messageChunks[1] !== '' && renderMessage(messageChunks[1])}
-      {messageChunks[2] !== '' && <span className='identifier'>{messageChunks[2]}</span>}
-      {messageChunks[3] !== '' && renderMessage(messageChunks[3])}
-    </span>
-  );
-};
-
 const Message: React.StatelessComponent<MessageProps> = ({ commit, detailsLevel, onDetailsLevelClick }) => (
   <td className='column-message'>
     {commit.isMerge &&
@@ -40,5 +24,21 @@ const Message: React.StatelessComponent<MessageProps> = ({ commit, detailsLevel,
     }
   </td>
 );
+
+function renderMessage(message: string) {
+  const messageChunks = /(.*)'(.*)'(.*)/.exec(message);
+
+  if (!messageChunks || messageChunks.length < 4) {
+    return <span>{message}</span>;
+  }
+
+  return (
+    <span>
+      {messageChunks[1] !== '' && renderMessage(messageChunks[1])}
+      {messageChunks[2] !== '' && <span className='identifier'>{messageChunks[2]}</span>}
+      {messageChunks[3] !== '' && renderMessage(messageChunks[3])}
+    </span>
+  );
+};
 
 export default Message;

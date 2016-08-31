@@ -18,16 +18,20 @@ const Actions: React.StatelessComponent<ActionsProps> = (props) => {
     onRollbackClick,
   } = props;
 
+  if (!commit.isEnabled) {
+    return <td className='column-actions' />;
+  }
+
   return (
     <td className='column-actions'>
-      {((commit.canUndo || commit.isMerge) && commit.isEnabled) &&
+      {(commit.canUndo || commit.isMerge) &&
         <Undo
           commit={commit}
           enableActions={enableActions}
           onClick={onUndoClick}
         />
       }
-      {(commit.canRollback && commit.isEnabled) &&
+      {commit.canRollback &&
         <Rollback
           enableActions={enableActions}
           onClick={onRollbackClick}
