@@ -30,16 +30,9 @@ export default class Filter extends React.Component<FilterProps, {}> {
 
     return (
       <div className='Filter'>
-        <form
-          action=''
-          method='post'
-          onSubmit={this.onSubmit}
-        >
+        <form action='' method='post' onSubmit={this.onSubmit}>
           <p className='search-box'>
-            <QueryInput
-              query={query}
-              onChange={this.onInputChange}
-            />
+            <QueryInput query={query} onChange={this.onInputChange} />
             <Submit />
           </p>
         </form>
