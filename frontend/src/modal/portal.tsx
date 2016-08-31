@@ -2,11 +2,11 @@ import * as React from 'react';
 import * as DOM from 'react-dom';
 import * as request from 'superagent';
 
-import UndoEnabledDialog from './UndoEnabledDialog';
-import UndoDisabledDialog from './UndoDisabledDialog';
 import ConfirmDialog from './dialogs/ConfirmDialog.react';
+import UndoEnabledDialog from './dialogs/UndoEnabledDialog';
+import UndoDisabledDialog from './dialogs/UndoDisabledDialog';
 import Modal from './Modal.react';
-import * as WpApi from '../../services/WpApi';
+import * as WpApi from '../services/WpApi';
 
 var portalNode;
 
@@ -42,15 +42,15 @@ export function revertDialog(title: React.ReactNode, okHandler: Function) {
       const data = res.body.data as VpApi.CanRevertResponse;
       if (data === true) {
         const body = <UndoEnabledDialog />;
-        portal.confirmDialog(title, body, okHandler, () => {}, {});
+        confirmDialog(title, body, okHandler, () => {}, {});
       } else {
         const body = <UndoDisabledDialog />;
-        portal.confirmDialog(title, body, () => {}, () => {}, {okButtonClasses: 'disabled'});
+        confirmDialog(title, body, () => {}, () => {}, {okButtonClasses: 'disabled'});
       }
     });
 
   const cancelHandler = () => { req.abort(); };
-  portal.confirmDialog(title, '', () => {}, cancelHandler, {isLoading: true});
+  confirmDialog(title, '', () => {}, cancelHandler, {isLoading: true});
 }
 
 export function openPortal(children) {
