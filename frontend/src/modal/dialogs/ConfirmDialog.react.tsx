@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import * as portal from './portal';
+import * as portal from '../portal';
 
 import './ConfirmDialog.less';
 
