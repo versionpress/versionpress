@@ -8,7 +8,7 @@ interface NamesListProps {
   filteredChanges: Change[];
   countOfDuplicates: CountOfDuplicateChanges;
   expandedLists: string[];
-  onShowMoreClick: (e, listKey) => void;
+  onShowMoreClick(e: React.MouseEvent, listKey): void;
 }
 
 const displayedListLength = 3;
