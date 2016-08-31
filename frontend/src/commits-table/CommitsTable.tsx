@@ -6,7 +6,8 @@ import Row from './row/Row';
 import Footer from './footer/Footer';
 import Header from './header/Header';
 import Note from './note/Note';
-import { indexOf } from '../utils/commitUtils';
+import { indexOf } from '../utils/CommitUtils';
+import { findIndex } from '../utils/ArrayUtils';
 
 import './CommitsTable.less';
 
@@ -61,7 +62,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
       ];
     }
 
-    return row;
+    return [row];
   }
 
   render() {
@@ -72,9 +73,9 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
       enableActions,
     } = this.props;
 
-    const notAbleNoteIndex = commits.findIndex((commit: Commit, index: number) => (
-      !commit.isEnabled && index < commits.length - 1)
-    );
+    const notAbleNoteIndex = findIndex(commits, (commit: Commit, index: number) => (
+      !commit.isEnabled && index < commits.length - 1
+    ));
 
     return (
       <table className='vp-table widefat fixed'>
