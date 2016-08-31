@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import CommitOverview from '../commit-overview/CommitOverview';
+import CommitOverviewPanel from '../../commit-overview-panel/CommitOverviewPanel';
 
 interface OverviewProps {
   commit: Commit;
@@ -16,7 +16,7 @@ const Overview: React.StatelessComponent<OverviewProps> = ({ commit, className, 
         <div className='details-row-loader' />
       }
       <div className='details'>
-        <CommitOverview commit={commit} />
+        <CommitOverviewPanel commit={commit} />
       </div>
     </td>
   </tr>

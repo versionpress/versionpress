@@ -1,14 +1,14 @@
 import * as React from 'react';
 
-interface WordPressUpdateLineProps {
+interface WordPressUpdateProps {
   version: string;
 }
 
-const WordPressUpdateLine: React.StatelessComponent<WordPressUpdateLineProps> = ({ version }) => (
+const WordPressUpdate: React.StatelessComponent<WordPressUpdateProps> = ({ version }) => (
   <span>
     Updated <span className='identifier'>WordPress</span>
     {' '} to version <span className='identifier'>{version}</span>
   </span>
 );
 
-export default WordPressUpdateLine;
+export default WordPressUpdate;
