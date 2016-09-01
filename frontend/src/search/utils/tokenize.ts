@@ -33,22 +33,22 @@ export function createToken(text: string, config: SearchConfig = {}) {
       modifier: '',
       value: ' ',
       type: 'space',
+      length: 1,
     };
   }
 
   const modifier = getModifier(text, config);
-  const value = modifier
-    ? text.substr(modifier.length)
-    : text;
-  const type = modifier
-    ? config[modifier].type
-    : config['_default'].type;
+
+  const value = modifier ? text.substr(modifier.length) : text;
+  const type = modifier ? config[modifier].type : config['_default'].type;
+  const length = modifier ? modifier.length + value.length : value.length;
 
   return {
     key: 'token-' + counter++,
     modifier: modifier,
     value: value,
     type: type,
+    length: length,
   };
 }
 

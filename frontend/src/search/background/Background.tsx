@@ -11,7 +11,8 @@ import './Background.less';
 interface BackgroundProps {
   ref?: React.Ref<HTMLDivElement>;
   tokens: Token[];
-  hint: any;
+  isLastTokenSelected: boolean;
+  activeToken: Token;
   getAdapter(token: Token): Adapter;
 }
 
@@ -20,7 +21,8 @@ const Background: React.StatelessComponent<BackgroundProps> = (props) => {
     ref = null,
     tokens,
     getAdapter,
-    hint,
+    isLastTokenSelected,
+    activeToken,
   } = props;
 
   return (
@@ -32,7 +34,12 @@ const Background: React.StatelessComponent<BackgroundProps> = (props) => {
           token={token}
         />
       ))}
-      <Hint hint={hint} />
+      {isLastTokenSelected &&
+        <Hint
+          adapter={getAdapter(activeToken)}
+          token={activeToken}
+        />
+      }
     </div>
   );
 

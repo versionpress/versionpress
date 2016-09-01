@@ -22,4 +22,5 @@ interface Token {
   modifier: string;
   value: string;
   type: string;
+  length: number;
 }
