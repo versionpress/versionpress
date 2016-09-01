@@ -5,6 +5,7 @@ import * as React from 'react';
 import Input from './input/Input';
 import Background from './background/Background';
 import {tokenize, prepareConfig} from './utils/';
+import getAdapter from './modifiers/getAdapter';
 
 import './Search.less';
 
@@ -45,6 +46,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
   }
 
   render() {
+    const { config } = this.props;
     const tokens = this.getTokens();
     const hint = null;
 
@@ -57,6 +59,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
         <Background
           ref={node => this.backgroundNode = node}
           tokens={tokens}
+          getAdapter={getAdapter(config)}
           hint={hint}
         />
       </div>
