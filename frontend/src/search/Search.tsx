@@ -147,7 +147,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     return (
       <div className='Search'>
         <Input
-          ref={node => this.inputNode = node}
+          nodeRef={node => this.inputNode = node}
           onBlur={this.onBlur}
           onClick={this.onClick}
           onCut={this.onCut}
@@ -156,7 +156,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
           onKeyUp={this.onKeyUp}
         />
         <Background
-          ref={node => this.backgroundNode = node}
+          nodeRef={node => this.backgroundNode = node}
           tokens={tokens}
           getAdapter={getAdapter(config)}
           isLastTokenSelected={isLastTokenSelected}

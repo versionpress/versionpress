@@ -5,7 +5,7 @@ import * as React from 'react';
 import './Input.less';
 
 interface InputProps {
-  ref?: React.Ref<HTMLInputElement>;
+  nodeRef?: React.Ref<HTMLInputElement>;
   maxLength?: number;
   placeholder?: string;
   value?: string;
@@ -21,7 +21,7 @@ interface InputProps {
 
 const Input: React.StatelessComponent<InputProps> = (props) => {
   const {
-    ref = null,
+    nodeRef = null,
     maxLength = 250,
     placeholder = 'Search...',
     value = '',
@@ -52,7 +52,7 @@ const Input: React.StatelessComponent<InputProps> = (props) => {
       onPaste={onPaste}
       onKeyDown={onKeyDown}
       onKeyUp={onKeyUp}
-      ref={ref}
+      ref={nodeRef}
     />
   );
 

@@ -9,7 +9,7 @@ import Hint from './Hint';
 import './Background.less';
 
 interface BackgroundProps {
-  ref?: React.Ref<HTMLDivElement>;
+  nodeRef?: React.Ref<HTMLDivElement>;
   tokens: Token[];
   isLastTokenSelected: boolean;
   activeToken: Token;
@@ -18,7 +18,7 @@ interface BackgroundProps {
 
 const Background: React.StatelessComponent<BackgroundProps> = (props) => {
   const {
-    ref = null,
+    nodeRef = null,
     tokens,
     getAdapter,
     isLastTokenSelected,
@@ -26,7 +26,7 @@ const Background: React.StatelessComponent<BackgroundProps> = (props) => {
   } = props;
 
   return (
-    <div className='Search-Background' ref={ref}>
+    <div className='Search-Background' ref={nodeRef}>
       {tokens.map(token => (
         <Token
           key={token.key}
