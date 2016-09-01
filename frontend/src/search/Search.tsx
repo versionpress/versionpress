@@ -28,48 +28,73 @@ export default class Search extends React.Component<SearchProps, SearchState> {
   inputNode: HTMLInputElement = null;
   backgroundNode: HTMLDivElement = null;
 
+  componentDidUpdate = () => {
+    this.scrollBackground();
+  };
+
   onBlur = () => {
-    this.setState({
-      cursorLocation: -1,
-    });
+    this.setCursorLocation(-1);
   };
 
   onClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLInputElement;
-    this.setState({
-      cursorLocation: target.selectionStart,
-    });
+
+    this.setCursorLocation(target.selectionStart);
   };
 
   onCut = (e: React.ClipboardEvent) => {
     const target = e.target as HTMLInputElement;
+
+    this.setCursorLocation(target.selectionStart);
     this.setState({
-      cursorLocation: target.selectionStart,
       inputValue: target.value,
     });
   };
 
   onPaste = (e: React.ClipboardEvent) => {
     const target = e.target as HTMLInputElement;
+
+    this.setCursorLocation(target.selectionStart);
     this.setState({
-      cursorLocation: target.selectionStart,
       inputValue: target.value,
     });
   };
 
-  onKeyUp = (e: React.KeyboardEvent) => {
+  onKeyDown = (e: React.KeyboardEvent) => {
     const target = e.target as HTMLInputElement;
 
+    this.setCursorLocation(target.selectionStart);
     if (target.value !== this.state.inputValue) {
       this.setState({
         inputValue: target.value,
       });
     }
+  }
 
-    this.setState({
-      cursorLocation: target.selectionStart,
-    });
+  onKeyUp = (e: React.KeyboardEvent) => {
+    const target = e.target as HTMLInputElement;
+
+    this.setCursorLocation(target.selectionStart);
+    if (target.value !== this.state.inputValue) {
+      this.setState({
+        inputValue: target.value,
+      });
+    }
   };
+
+  setCursorLocation(location: number) {
+    this.scrollBackground();
+    this.setState({
+      cursorLocation: location,
+    });
+  }
+
+  scrollBackground() {
+    if (this.backgroundNode
+        && this.backgroundNode.scrollLeft !== this.inputNode.scrollLeft) {
+      this.backgroundNode.scrollLeft = this.inputNode.scrollLeft;
+    }
+  }
 
   isLastTokenSelected() {
     const tokensCount = this.getTokens().length;
@@ -127,6 +152,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
           onClick={this.onClick}
           onCut={this.onCut}
           onPaste={this.onPaste}
+          onKeyDown={this.onKeyDown}
           onKeyUp={this.onKeyUp}
         />
         <Background
