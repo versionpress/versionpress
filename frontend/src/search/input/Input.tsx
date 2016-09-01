@@ -13,8 +13,8 @@ interface InputProps {
   onBlur?: React.FocusEventHandler;
   onFocus?: React.FocusEventHandler;
   onClick?: React.MouseEventHandler;
-  onCut?: React.KeyboardEventHandler;
-  onPaste?: React.KeyboardEventHandler;
+  onCut?: React.ClipboardEventHandler;
+  onPaste?: React.ClipboardEventHandler;
   onKeyDown?: React.KeyboardEventHandler;
   onKeyUp?: React.KeyboardEventHandler;
 }

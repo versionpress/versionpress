@@ -14,7 +14,7 @@ interface SearchProps {
 }
 
 interface SearchState {
-  inputValue: string;
+  inputValue?: string;
 }
 
 export default class Search extends React.Component<SearchProps, SearchState> {
@@ -25,6 +25,20 @@ export default class Search extends React.Component<SearchProps, SearchState> {
 
   inputNode: HTMLInputElement = null;
   backgroundNode: HTMLDivElement = null;
+
+  onCut = (e: React.ClipboardEvent) => {
+    const target = e.target as HTMLInputElement;
+    this.setState({
+      inputValue: target.value,
+    });
+  };
+
+  onPaste = (e: React.ClipboardEvent) => {
+    const target = e.target as HTMLInputElement;
+    this.setState({
+      inputValue: target.value,
+    });
+  };
 
   onKeyUp = (e: React.KeyboardEvent) => {
     const target = e.target as HTMLInputElement;
@@ -54,6 +68,8 @@ export default class Search extends React.Component<SearchProps, SearchState> {
       <div className='Search'>
         <Input
           ref={node => this.inputNode = node}
+          onCut={this.onCut}
+          onPaste={this.onPaste}
           onKeyUp={this.onKeyUp}
         />
         <Background
