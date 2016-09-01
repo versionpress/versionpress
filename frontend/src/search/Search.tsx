@@ -2,8 +2,9 @@
 
 import * as React from 'react';
 
-import Input from './input/Input';
 import Background from './background/Background';
+import Input from './input/Input';
+import Popup from './popup/Popup';
 import {tokenize, prepareConfig} from './utils/';
 import getAdapter from './modifiers/getAdapter';
 
@@ -140,6 +141,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
 
   render() {
     const { config } = this.props;
+
     const tokens = this.getTokens();
     const isLastTokenSelected = this.isLastTokenSelected();
     const activeToken = this.getActiveToken();
@@ -160,6 +162,9 @@ export default class Search extends React.Component<SearchProps, SearchState> {
           tokens={tokens}
           getAdapter={getAdapter(config)}
           isLastTokenSelected={isLastTokenSelected}
+          activeToken={activeToken}
+        />
+        <Popup
           activeToken={activeToken}
         />
       </div>
