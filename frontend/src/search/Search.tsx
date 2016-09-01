@@ -15,20 +15,36 @@ interface SearchProps {
 
 interface SearchState {
   inputValue?: string;
+  cursorLocation?: number;
 }
 
 export default class Search extends React.Component<SearchProps, SearchState> {
 
   state = {
     inputValue: '',
+    cursorLocation: -1,
   };
 
   inputNode: HTMLInputElement = null;
   backgroundNode: HTMLDivElement = null;
 
+  onBlur = () => {
+    this.setState({
+      cursorLocation: -1,
+    });
+  };
+
+  onClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLInputElement;
+    this.setState({
+      cursorLocation: target.selectionStart,
+    });
+  };
+
   onCut = (e: React.ClipboardEvent) => {
     const target = e.target as HTMLInputElement;
     this.setState({
+      cursorLocation: target.selectionStart,
       inputValue: target.value,
     });
   };
@@ -36,6 +52,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
   onPaste = (e: React.ClipboardEvent) => {
     const target = e.target as HTMLInputElement;
     this.setState({
+      cursorLocation: target.selectionStart,
       inputValue: target.value,
     });
   };
@@ -48,6 +65,10 @@ export default class Search extends React.Component<SearchProps, SearchState> {
         inputValue: target.value,
       });
     }
+
+    this.setState({
+      cursorLocation: target.selectionStart,
+    });
   }
 
   getTokens() {
@@ -68,6 +89,8 @@ export default class Search extends React.Component<SearchProps, SearchState> {
       <div className='Search'>
         <Input
           ref={node => this.inputNode = node}
+          onBlur={this.onBlur}
+          onClick={this.onClick}
           onCut={this.onCut}
           onPaste={this.onPaste}
           onKeyUp={this.onKeyUp}
