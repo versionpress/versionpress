@@ -15,7 +15,7 @@ const Revert: React.StatelessComponent<LineProps> = ({ changes }) => {
   if (action === 'rollback') {
     return (
       <span>
-        The state is same as it was in "{message}"
+        {`The state is same as it was in "${message}"`}
       </span>
     );
   } else {
@@ -25,7 +25,7 @@ const Revert: React.StatelessComponent<LineProps> = ({ changes }) => {
 
     return (
       <span>
-        Reverted change "{message}" was made {dateRel} ({dateAbs})
+        {`Reverted change "${message}" was made ${dateRel} (${dateAbs})`}
       </span>
     );
   }

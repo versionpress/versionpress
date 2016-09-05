@@ -7,24 +7,7 @@ interface NameProps {
   countOfDuplicates: any;
 }
 
-const Name: React.StatelessComponent<NameProps> = ({ change, countOfDuplicates }) => {
-  const { type, action, name } = change;
-
-  const count = countOfDuplicates[type][action][name];
-
-  return (
-    <span>
-      <span className='identifier'>
-        {getUserFriendlyName(change)}
-      </span>
-      {count > 1 &&
-        ` (${count}×)`
-      }
-    </span>
-  );
-};
-
-function getUserFriendlyName({ type, name, tags }: Change) {
+const getUserFriendlyName = ({ type, name, tags }) => {
   switch (type) {
     case 'user':
       return tags['VP-User-Login'];
@@ -41,6 +24,23 @@ function getUserFriendlyName({ type, name, tags }: Change) {
     default:
       return name;
   }
+};
+
+const Name: React.StatelessComponent<NameProps> = ({ change, countOfDuplicates }) => {
+  const { type, action, name } = change;
+
+  const count = countOfDuplicates[type][action][name];
+
+  return (
+    <span>
+      <span className='identifier'>
+        {getUserFriendlyName(change)}
+      </span>
+      {count > 1 &&
+        ` (${count}×)`
+      }
+    </span>
+  );
 };
 
 export default Name;

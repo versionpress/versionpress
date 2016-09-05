@@ -32,7 +32,7 @@ export default class CommitOverviewPanel extends React.Component<CommitOverviewP
     });
   };
 
-  renderLines(lines: PreprocessedLine[]) {
+  renderLines = (lines: PreprocessedLine[]) => {
     const { commit } = this.props;
     const { expandedLists } = this.state;
 
@@ -52,7 +52,7 @@ export default class CommitOverviewPanel extends React.Component<CommitOverviewP
         />
       </li>
     ));
-  }
+  };
 
   render() {
     const { commit } = this.props;

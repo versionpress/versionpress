@@ -5,7 +5,7 @@ import * as React from 'react';
 
 import Name from './Name';
 
-export default function renderNames(filteredChanges: Change[], countOfDuplicates: CountOfDuplicateChanges) {
+export default (filteredChanges: Change[], countOfDuplicates: CountOfDuplicateChanges) => {
   return filteredChanges.map((change: Change) => (
     <Name
       change={change}

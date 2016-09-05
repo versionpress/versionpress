@@ -30,14 +30,14 @@ const NamesList: React.StatelessComponent<NamesListProps> = (props) => {
   if (expandedLists.indexOf(listKey) > -1) {
     return (
       <ul>
-        {names.map(name => <li>{name}</li>)}
+        {names.map((name, i) => <li key={i}>{name}</li>)}
       </ul>
     );
   }
 
   return (
     <ul>
-      {names.slice(0, displayedListLength).map(name => <li>{name}</li>)}
+      {names.slice(0, displayedListLength).map((name, i) => <li key={i}>{name}</li>)}
       <li>
         <a onClick={e => onShowMoreClick(e, listKey)}>
           show {names.length - displayedListLength} more...

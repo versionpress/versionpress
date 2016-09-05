@@ -3,22 +3,18 @@
 
 import * as ArrayUtils from '../utils/ArrayUtils';
 
-export default function preprocessLines(changes: Change[]): PreprocessedLine[] {
-  const changesByTypeAndAction = ArrayUtils.groupBy(changes, change => [change.type, change.action]) as ChangesByTypeAndAction;
-  let preprocessedLines = [];
+const groupByTag = (changes: Change[], tag: string): PreprocessedLine[] => {
+  const metaByTag = ArrayUtils.groupBy(changes, c => c.tags[tag]);
+  return Object.keys(metaByTag).map(tagValue => {
+    const { type, action } = changes[0];
+    return {
+      key: type + '-' + action + '-' + tagValue,
+      changes: metaByTag[tagValue],
+    };
+  });
+};
 
-  for (const type in changesByTypeAndAction) {
-    for (const action in changesByTypeAndAction[type]) {
-      const changes = changesByTypeAndAction[type][action];
-      const lines = preprocessLinesByTypeAndAction(changes, type, action);
-      preprocessedLines = preprocessedLines.concat(lines);
-    }
-  }
-
-  return preprocessedLines;
-}
-
-function preprocessLinesByTypeAndAction(changes: Change[], type: string, action: string): PreprocessedLine[] {
+const preprocessLinesByTypeAndAction = (changes: Change[], type: string, action: string): PreprocessedLine[] => {
   if (type === 'usermeta') {
     return groupByTag(changes, 'VP-User-Login');
   }
@@ -41,16 +37,20 @@ function preprocessLinesByTypeAndAction(changes: Change[], type: string, action:
     key: type + '-' + action,
     changes: changes,
   }];
-}
+};
 
-function groupByTag(changes: Change[], tag: string): PreprocessedLine[] {
-  const metaByTag = ArrayUtils.groupBy(changes, c => c.tags[tag]);
-  return Object.keys(metaByTag).map(tagValue => {
-    const { type, action } = changes[0];
-    return {
-      key: type + '-' + action + '-' + tagValue,
-      changes: metaByTag[tagValue],
-    };
-  });
+export default (changes: Change[]): PreprocessedLine[] => {
+  const changesByTypeAndAction = ArrayUtils.groupBy(changes, change => [change.type, change.action]) as ChangesByTypeAndAction;
+  let preprocessedLines = [];
+
+  for (const type in changesByTypeAndAction) {
+    for (const action in changesByTypeAndAction[type]) {
+      const changes = changesByTypeAndAction[type][action];
+      const lines = preprocessLinesByTypeAndAction(changes, type, action);
+      preprocessedLines = preprocessedLines.concat(lines);
+    }
+  }
+
+  return preprocessedLines;
 }
 

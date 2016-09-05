@@ -7,6 +7,35 @@ import * as StringUtils from '../../utils/StringUtils';
 
 import {LineProps} from './Line';
 
+const getActionVerb = (action: string) => {
+  if (action === 'spam' || action === 'unspam') {
+    return 'Marked';
+  }
+  if (action === 'trash' || action === 'untrash') {
+    return 'Moved';
+  }
+  if (action === 'create-pending') {
+    return 'Created';
+  }
+  return StringUtils.capitalize(StringUtils.verbToPastTense(action));
+};
+
+const getSuffix = (action: string) => {
+  if (action === 'spam') {
+    return ' as spam';
+  }
+  if (action === 'unspam') {
+    return ' as not spam';
+  }
+  if (action === 'trash') {
+    return ' to trash';
+  }
+  if (action === 'untrash') {
+    return ' from trash';
+  }
+  return '';
+};
+
 const Comment: React.StatelessComponent<LineProps> = ({ changes }) => {
   const action = changes[0].action;
   const postTitle = changes[0].tags['VP-Comment-PostTitle'];
@@ -32,34 +61,5 @@ const Comment: React.StatelessComponent<LineProps> = ({ changes }) => {
     </span>
   );
 };
-
-function getActionVerb(action: string) {
-  if (action === 'spam' || action === 'unspam') {
-    return 'Marked';
-  }
-  if (action === 'trash' || action === 'untrash') {
-    return 'Moved';
-  }
-  if (action === 'create-pending') {
-    return 'Created';
-  }
-  return StringUtils.capitalize(StringUtils.verbToPastTense(action));
-}
-
-function getSuffix(action: string) {
-  if (action === 'spam') {
-    return ' as spam';
-  }
-  if (action === 'unspam') {
-    return ' as not spam';
-  }
-  if (action === 'trash') {
-    return ' to trash';
-  }
-  if (action === 'untrash') {
-    return ' from trash';
-  }
-  return '';
-}
 
 export default Comment;
