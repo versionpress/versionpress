@@ -9,10 +9,10 @@ import Checkbox from './Checkbox';
 import Date from './Date';
 import Environment from './Environment';
 import Message from './Message';
-import UndoDisabledDialog from '../../modal/dialogs/UndoDisabledDialog';
-import UndoMergeDialog from '../../modal/dialogs/UndoDisabledDialog';
+import UndoDisabledDialog from '../../dialogs/UndoDisabledDialog';
+import UndoMergeDialog from '../../dialogs/UndoMergeDialog';
 import DetailsLevel from '../../enums/DetailsLevel';
-import * as portal from '../../modal/portal';
+import * as portal from '../../portal/portal';
 
 interface CommitSummaryProps {
   commit: Commit;

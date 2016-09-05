@@ -2,10 +2,10 @@ import * as React from 'react';
 import * as DOM from 'react-dom';
 import * as request from 'superagent';
 
-import ConfirmDialog from './dialogs/ConfirmDialog.react';
-import UndoEnabledDialog from './dialogs/UndoEnabledDialog';
-import UndoDisabledDialog from './dialogs/UndoDisabledDialog';
-import Modal from './Modal.react';
+import ConfirmDialog, {ConfirmDialogProps} from '../dialogs/ConfirmDialog';
+import UndoEnabledDialog from '../dialogs/UndoEnabledDialog';
+import UndoDisabledDialog from '../dialogs/UndoDisabledDialog';
+import Modal from '../modal/Modal';
 import * as WpApi from '../services/WpApi';
 
 var portalNode;
@@ -19,14 +19,8 @@ export function alertDialog(title: React.ReactNode, body: React.ReactNode) {
   );
 }
 
-export function confirmDialog(title: React.ReactNode, body: React.ReactNode, okHandler, cancelHandler, options) {
-  options = options || {};
-  if (okHandler) {
-    options.okButtonClickHandler = okHandler;
-  }
-  if (cancelHandler) {
-    options.cancelButtonClickHandler = cancelHandler;
-  }
+export function confirmDialog(title: React.ReactNode, body: React.ReactNode, options: ConfirmDialogProps = {}) {
+  const cancelHandler = options.onCancelButtonClick;
   closePortal();
   openPortal(
     <Modal title={title} onClose={cancelHandler}>
@@ -40,17 +34,24 @@ export function revertDialog(title: React.ReactNode, okHandler: Function) {
     .get('can-revert')
     .end((err: any, res: request.Response) => {
       const data = res.body.data as VpApi.CanRevertResponse;
+      let body, options;
+
       if (data === true) {
-        const body = <UndoEnabledDialog />;
-        confirmDialog(title, body, okHandler, () => {}, {});
+        body = <UndoEnabledDialog />;
+        options = { onOkButtonClick: okHandler };
       } else {
-        const body = <UndoDisabledDialog />;
-        confirmDialog(title, body, () => {}, () => {}, {okButtonClasses: 'disabled'});
+        body = <UndoDisabledDialog />;
+        options = { okButtonClasses: 'disabled' };
       }
+
+      confirmDialog(title, body, options);
     });
 
-  const cancelHandler = () => { req.abort(); };
-  confirmDialog(title, '', () => {}, cancelHandler, {isLoading: true});
+  const options = {
+    isLoading: true,
+    cancelHandler: () => { req.abort(); },
+  };
+  confirmDialog(title, '', options);
 }
 
 export function openPortal(children) {
