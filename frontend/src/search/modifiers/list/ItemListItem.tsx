@@ -18,10 +18,16 @@ const ItemListItem: React.StatelessComponent<ItemListItemProps> = (props) => {
       onMouseDown={() => onSelectItem(item.index)}
       className={className}
     >
-      <span>
-        <b>{item.label}</b>
-        <span className='modifier-value'>{item.value}</span>
-      </span>
+      {item.modifier
+        ? <span>
+            <b>{item.value}</b>
+            <span className='modifier-value'>{item.label}</span>
+          </span>
+        : <span>
+            <b>{item.label}</b>
+            <span className='modifier-value'>{item.value}</span>
+          </span>
+      }
     </li>
   );
 };
