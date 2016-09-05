@@ -6,7 +6,7 @@ interface BinaryFileDiffProps {
   diff: Diff;
 }
 
-function getMessage(diff: Diff) {
+const getMessage = (diff: Diff) => {
   if (diff.from === '/dev/null') {
     return 'Added binary file';
   } else if (diff.to === '/dev/null') {
@@ -14,16 +14,12 @@ function getMessage(diff: Diff) {
   } else {
     return 'Changed binary file';
   }
-}
-
-const BinaryFileDiff: React.StatelessComponent<BinaryFileDiffProps> = ({ diff }) => {
-  const message = getMessage(diff);
-
-  return (
-    <div className='binary-file-info'>
-      {message}
-    </div>
-  );
 };
+
+const BinaryFileDiff: React.StatelessComponent<BinaryFileDiffProps> = ({ diff }) => (
+  <div className='binary-file-info'>
+    {getMessage(diff)}
+  </div>
+);
 
 export default BinaryFileDiff;

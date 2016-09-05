@@ -3,8 +3,8 @@
 import * as React from 'react';
 
 import BinaryFileInfo from './BinaryFileInfo';
-import ChunkTable from '../chunk-table/ChunkTable';
 import ChunkSeparator from './ChunkSeparator';
+import ChunkTable from '../chunk-table/ChunkTable';
 
 interface PlainFileDiffProps {
   diff: Diff;
@@ -14,7 +14,7 @@ const PlainFileDiff: React.StatelessComponent<PlainFileDiffProps> = ({ diff }) =
   const { chunks } = diff;
 
   if (chunks.length === 0) {
-    return <BinaryFileInfo diff={diff} key='binary-file-info' />;
+    return <BinaryFileInfo diff={diff} />;
   }
 
   const chunkTables = chunks.map((chunk: Chunk, i) => (
