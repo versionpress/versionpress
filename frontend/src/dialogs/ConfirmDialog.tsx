@@ -21,9 +21,9 @@ export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {
   static defaultProps = {
     okButtonText: 'OK',
     cancelButtonText: 'Cancel',
-    okButtonClickHandler: () => {},
-    cancelButtonClickHandler: () => {},
     isLoading: false,
+    onOkButtonClick: () => {},
+    onCancelButtonClick: () => {},
   };
 
   onOkClick = () => {

@@ -30,7 +30,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
     onCommitsSelect(commits, isChecked, false);
   };
 
-  renderRow(commit: Commit, index: number, displayNotAbleNote: boolean) {
+  renderRow = (commit: Commit, displayNotAbleNote: boolean) => {
     const {
       selectedCommits,
       enableActions,
@@ -63,7 +63,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
     }
 
     return [row];
-  }
+  };
 
   render() {
     const {
@@ -86,7 +86,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
           onSelectAllChange={this.onSelectAllChange}
         />
         {commits.map((commit: Commit, index: number) => (
-          this.renderRow(commit, index, index === notAbleNoteIndex)
+          this.renderRow(commit, index === notAbleNoteIndex)
         ))}
         <Footer pages={pages} />
       </table>

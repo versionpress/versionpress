@@ -107,7 +107,7 @@ export function countDuplicates<T>(array: T[], fn: (T) => any|any[]) {
 }
 
 /**
- * Returns an index in the array, if an element in the array satisfies the provided testing function. 
+ * Returns an index in the array, if an element in the array satisfies the provided testing function.
  * Otherwise -1 is returned.
  */
 export function findIndex<T>(list: T[], predicate: (element?: T, index?: number, array?: T[]) => boolean) {
@@ -119,14 +119,14 @@ export function findIndex<T>(list: T[], predicate: (element?: T, index?: number,
     throw new TypeError('predicate must be a function');
   }
   /* tslint:disable:no-bitwise */
-  var length = list.length >>> 0;
-  var value;
+  let length = list.length >>> 0;
+  let value;
 
-  for (var i = 0; i < length; i++) {
+  for (let i = 0; i < length; i++) {
     value = list[i];
     if (predicate.call(undefined, value, i, list)) {
       return i;
     }
   }
   return -1;
-};
+}
