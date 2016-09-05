@@ -31,7 +31,7 @@ const renderRow = (left: Line, right: Line, index: number) => {
       key={index}
     />
   );
-}
+};
 
 const ChunkTable: React.StatelessComponent<ChunkTableProps> = ({ chunk }) => {
   const [left, right] = divideToLeftAndRightColumn(chunk);

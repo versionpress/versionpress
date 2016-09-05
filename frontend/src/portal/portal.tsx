@@ -19,7 +19,7 @@ export function alertDialog(title: React.ReactNode, body: React.ReactNode) {
   );
 }
 
-export function confirmDialog(title: React.ReactNode, body: React.ReactNode, options: ConfirmDialogProps = {}) {
+export function confirmDialog(title: React.ReactNode, body: React.ReactNode, options: any | ConfirmDialogProps = {}) {
   const cancelHandler = options.onCancelButtonClick;
   closePortal();
   openPortal(

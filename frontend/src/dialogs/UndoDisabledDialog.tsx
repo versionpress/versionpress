@@ -10,7 +10,7 @@ const UndoDisabledDialog: React.StatelessComponent<{}> = () => (
         target='_blank'
       >
         uncommitted changes
-      </a> 
+      </a>
       {' '} in your WordPress directory.
       <br />
       Please commit them before doing a revert.

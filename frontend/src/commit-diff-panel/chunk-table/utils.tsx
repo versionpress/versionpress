@@ -27,7 +27,7 @@ export function divideToLeftAndRightColumn (chunk: Chunk): [Line[], Line[]] {
   [left, right] = balanceLeftAndRightColumn(left, right);
 
   return [left, right];
-};
+}
 
 export function mapTwoArrays<T, U>(a1: T[], a2: U[], fn: (a: T, b: U, i: number) => any): any[] {
   let result = [];
@@ -35,7 +35,7 @@ export function mapTwoArrays<T, U>(a1: T[], a2: U[], fn: (a: T, b: U, i: number)
     result.push(fn(a1[i], a2[i], i));
   }
   return result;
-};
+}
 
 export function replaceLeadingSpacesWithHardSpaces(content: string): string {
   const match = content.match(/^( +)/); // All leading spaces
@@ -45,7 +45,7 @@ export function replaceLeadingSpacesWithHardSpaces(content: string): string {
 
   const numberOfSpaces = match[1].length;
   return '\u00a0'.repeat(numberOfSpaces) + content.substr(numberOfSpaces);
-};
+}
 
 export function highlightInlineDiff(leftContent: string, rightContent: string) {
   const lineDiff = JsDiff.diffWordsWithSpace(leftContent, rightContent);
@@ -54,7 +54,7 @@ export function highlightInlineDiff(leftContent: string, rightContent: string) {
     lineDiff.map((diffPart, i) => highlightLine(diffPart, !!diffPart.removed, '#f8cbcb', i)),
     lineDiff.map((diffPart, i) => highlightLine(diffPart, !!diffPart.added, '#a6f3a6', i)),
   ];
-};
+}
 
 function balanceLeftAndRightColumn(left: Line[], right: Line[]): [Line[], Line[]] {
   const missingLines = left.length - right.length;
@@ -72,7 +72,7 @@ function balanceLeftAndRightColumn(left: Line[], right: Line[]): [Line[], Line[]
   }
 
   return [left, right];
-};
+}
 
 function highlightLine(diffPart: JsDiff.IDiffResult, shouldBeHighlighted: boolean, color: string, index: number) {
   if (shouldBeHighlighted) {

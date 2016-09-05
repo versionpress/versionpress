@@ -49,16 +49,16 @@ function getActionVerb(action: string) {
 function getSuffix(action: string) {
   if (action === 'spam') {
     return ' as spam';
-  } 
+  }
   if (action === 'unspam') {
     return ' as not spam';
-  } 
+  }
   if (action === 'trash') {
     return ' to trash';
   }
   if (action === 'untrash') {
     return ' from trash';
-  };
+  }
   return '';
 }
 

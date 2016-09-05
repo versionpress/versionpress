@@ -6,7 +6,7 @@ import * as portal from '../portal/portal';
 
 import './Modal.less';
 
-interface ModalProps extends React.Props<JSX.Element> {
+interface ModalProps {
   enableBackgroundClickToClose?: boolean;
   showCloseIcon?: boolean;
   title?: React.ReactNode;

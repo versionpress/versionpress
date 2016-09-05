@@ -7,7 +7,7 @@ type ChangesByTypeAndAction = {
 };
 
 type PreprocessedLine = {
-  key: string; 
+  key: string;
   changes: Change[];
 };
 
