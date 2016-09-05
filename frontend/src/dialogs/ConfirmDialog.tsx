@@ -5,7 +5,7 @@ import * as portal from '../portal/portal';
 
 import './ConfirmDialog.less';
 
-export interface ConfirmDialogProps extends React.Props<JSX.Element> {
+export interface ConfirmDialogProps {
   message?: React.ReactNode;
   okButtonText?: string;
   cancelButtonText?: string;
