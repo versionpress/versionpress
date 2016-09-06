@@ -16,20 +16,6 @@ interface OverviewLineProps {
   onShowMoreClick(e: React.MouseEvent, listKey: string): void;
 }
 
-const getFilteredChanges = (changes: Change[]): Change[] => {
-  return ArrayUtils.filterDuplicates(
-    changes,
-    change => change.type + '|||' + change.action + '|||' + change.name
-  ) as Change[];
-};
-
-const getCountOfDuplicates = (changes: Change[]): CountOfDuplicateChanges => {
-  return ArrayUtils.countDuplicates(
-    changes,
-    change => [change.type, change.action, change.name]
-  ) as CountOfDuplicateChanges;
-};
-
 const OverviewLine: React.StatelessComponent<OverviewLineProps> = (props) => {
   const {
     expandedLists,
@@ -72,5 +58,19 @@ const OverviewLine: React.StatelessComponent<OverviewLineProps> = (props) => {
     </span>
   );
 };
+
+function getFilteredChanges(changes: Change[]): Change[] {
+  return ArrayUtils.filterDuplicates(
+    changes,
+    change => change.type + '|||' + change.action + '|||' + change.name
+  ) as Change[];
+}
+
+function getCountOfDuplicates(changes: Change[]): CountOfDuplicateChanges {
+  return ArrayUtils.countDuplicates(
+    changes,
+    change => [change.type, change.action, change.name]
+  ) as CountOfDuplicateChanges;
+}
 
 export default OverviewLine;

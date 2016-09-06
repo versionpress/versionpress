@@ -4,16 +4,6 @@ interface AuthorProps {
   author: Author;
 }
 
-const getTitle = (author: Author) => {
-  if (author.name === 'Non-admin action') {
-    return 'This action is not associated with any user, e.g., it was a public comment';
-  }
-  if (author.name === 'WP-CLI') {
-    return 'This action was done via WP-CLI';
-  }
-  return `${author.name} <${author.email}>`;
-};
-
 const Author: React.StatelessComponent<AuthorProps> = ({ author }) => (
   <td className='column-author'>
     <img
@@ -25,5 +15,15 @@ const Author: React.StatelessComponent<AuthorProps> = ({ author }) => (
     />
   </td>
 );
+
+function getTitle(author: Author) {
+  if (author.name === 'Non-admin action') {
+    return 'This action is not associated with any user, e.g., it was a public comment';
+  }
+  if (author.name === 'WP-CLI') {
+    return 'This action was done via WP-CLI';
+  }
+  return `${author.name} <${author.email}>`;
+}
 
 export default Author;

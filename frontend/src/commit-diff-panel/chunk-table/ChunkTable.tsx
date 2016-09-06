@@ -14,7 +14,19 @@ interface ChunkTableProps {
   chunk: Chunk;
 }
 
-const renderRow = (left: Line, right: Line, index: number) => {
+const ChunkTable: React.StatelessComponent<ChunkTableProps> = ({ chunk }) => {
+  const [left, right] = divideToLeftAndRightColumn(chunk);
+
+  return (
+    <table className='chunk'>
+      <tbody>
+        {mapTwoArrays(left, right, renderRow)}
+      </tbody>
+    </table>
+  );
+};
+
+function renderRow(left: Line, right: Line, index: number) {
   let leftContent: any = replaceLeadingSpacesWithHardSpaces(left.content);
   let rightContent: any = replaceLeadingSpacesWithHardSpaces(right.content);
 
@@ -31,18 +43,6 @@ const renderRow = (left: Line, right: Line, index: number) => {
       key={index}
     />
   );
-};
-
-const ChunkTable: React.StatelessComponent<ChunkTableProps> = ({ chunk }) => {
-  const [left, right] = divideToLeftAndRightColumn(chunk);
-
-  return (
-    <table className='chunk'>
-      <tbody>
-        {mapTwoArrays(left, right, renderRow)}
-      </tbody>
-    </table>
-  );
-};
+}
 
 export default ChunkTable;

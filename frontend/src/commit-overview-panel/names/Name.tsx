@@ -7,25 +7,6 @@ interface NameProps {
   countOfDuplicates: any;
 }
 
-const getUserFriendlyName = ({ type, name, tags }) => {
-  switch (type) {
-    case 'user':
-      return tags['VP-User-Login'];
-    case 'usermeta':
-      return tags['VP-UserMeta-Key'];
-    case 'postmeta':
-      return tags['VP-PostMeta-Key'];
-    case 'commentmeta':
-      return tags['VP-CommentMeta-Key'];
-    case 'post':
-      return tags['VP-Post-Title'];
-    case 'term':
-      return tags['VP-Term-Name'];
-    default:
-      return name;
-  }
-};
-
 const Name: React.StatelessComponent<NameProps> = ({ change, countOfDuplicates }) => {
   const { type, action, name } = change;
 
@@ -42,5 +23,24 @@ const Name: React.StatelessComponent<NameProps> = ({ change, countOfDuplicates }
     </span>
   );
 };
+
+function getUserFriendlyName({ type, name, tags }) {
+  switch (type) {
+    case 'user':
+      return tags['VP-User-Login'];
+    case 'usermeta':
+      return tags['VP-UserMeta-Key'];
+    case 'postmeta':
+      return tags['VP-PostMeta-Key'];
+    case 'commentmeta':
+      return tags['VP-CommentMeta-Key'];
+    case 'post':
+      return tags['VP-Post-Title'];
+    case 'term':
+      return tags['VP-Term-Name'];
+    default:
+      return name;
+  }
+}
 
 export default Name;
