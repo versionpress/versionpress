@@ -19,11 +19,9 @@ export default function getAdapter(config: SearchConfig) {
 }
 
 function getConfigItem(token: Token, config: SearchConfig): SearchConfigItem {
-  const { modifier, value } = token;
-  if (modifier) {
-    return config[modifier];
-  }
-  if (value && (value !== ' ')) {
+  if (!token || !token.modifier) {
     return config['_default'];
   }
+
+  return config[token.modifier];
 }

@@ -121,10 +121,17 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     const { config } = this.props;
     const tokens = this.getTokens();
 
-    const token = updateToken(tokens[tokenIndex], model, config);
-    tokens[tokenIndex] = token;
+    let token, index = tokenIndex;
 
-    const isLastTokenSelected = tokenIndex === this.getActiveTokenIndex();
+    if (tokenIndex === -1 || tokens[tokenIndex].type === 'space') {
+      token = updateToken(createToken(null), model, config);
+      index = tokens.length;
+      tokens.push(token);
+    } else {
+      token = updateToken(tokens[tokenIndex], model, config);
+    }
+
+    const isLastTokenSelected = index === this.getActiveTokenIndex(tokens);
 
     let cursorLocation = this.state.cursorLocation;
 
@@ -132,7 +139,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
       if (!model.modifier && isLastTokenSelected) {
         tokens.push(createToken(' '));
       }
-      cursorLocation = this.getTokenEndCursorPos(tokens, tokenIndex) + (model.modifier ? 0 : 1);
+      cursorLocation = this.getTokenEndCursorPos(tokens, index) + (model.modifier ? 0 : 1);
     }
 
     const tokensString = this.getTokensString(tokens);
@@ -177,9 +184,20 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     }
   }
 
-  isLastTokenSelected() {
-    const tokensCount = this.getTokens().length;
-    return tokensCount && (tokensCount - 1) === this.getActiveTokenIndex();
+  displayPopup(tokens: Token[]) {
+    const { cursorLocation } = this.state;
+    const activeToken = this.getActiveToken(tokens);
+    const isLastTokenSelected = this.isLastTokenSelected(tokens);
+
+    return cursorLocation !== -1
+           && (!this.state.inputValue
+               || isLastTokenSelected
+               || (activeToken && activeToken.type !== 'space'));
+  }
+
+  isLastTokenSelected(tokens: Token[]) {
+    const tokensCount = tokens.length;
+    return tokensCount && (tokensCount - 1) === this.getActiveTokenIndex(tokens);
   }
 
   getTokenEndCursorPos(tokens: Token[], tokenIndex: number) {
@@ -193,9 +211,8 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     return sum;
   }
 
-  getActiveTokenIndex() {
+  getActiveTokenIndex(tokens: Token[]) {
     const { cursorLocation } = this.state;
-    const tokens = this.getTokens();
 
     let token: Token;
     let prev = 0;
@@ -216,9 +233,8 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     return -1;
   }
 
-  getActiveToken() {
-    const tokens = this.getTokens();
-    return tokens[this.getActiveTokenIndex()];
+  getActiveToken(tokens: Token[]) {
+    return tokens[this.getActiveTokenIndex(tokens)];
   }
 
   getTokens() {
@@ -239,9 +255,10 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     const { config } = this.props;
 
     const tokens = this.getTokens();
-    const isLastTokenSelected = this.isLastTokenSelected();
-    const activeToken = this.getActiveToken();
-    const activeTokenIndex = this.getActiveTokenIndex();
+    const isLastTokenSelected = this.isLastTokenSelected(tokens);
+    const activeToken = this.getActiveToken(tokens);
+    const activeTokenIndex = this.getActiveTokenIndex(tokens);
+    const displayPopup = this.displayPopup(tokens);
 
     return (
       <div className='Search'>
@@ -261,13 +278,15 @@ export default class Search extends React.Component<SearchProps, SearchState> {
           isLastTokenSelected={isLastTokenSelected}
           activeToken={activeToken}
         />
-        <Popup
-          nodeRef={node => this.popupComponentNode = node}
-          activeTokenIndex={activeTokenIndex}
-          activeToken={activeToken}
-          getAdapter={getAdapter(config)}
-          onChangeTokenModel={this.onChangeTokenModel}
-        />
+        {displayPopup &&
+          <Popup
+            nodeRef={node => this.popupComponentNode = node}
+            activeTokenIndex={activeTokenIndex}
+            token={activeToken}
+            adapter={getAdapter(config)(activeToken)}
+            onChangeTokenModel={this.onChangeTokenModel}
+          />
+        }
       </div>
     );
   }

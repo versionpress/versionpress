@@ -5,6 +5,7 @@
 import * as React from 'react';
 
 import ModifierComponent from '../ModifierComponent';
+import {PopupProps} from '../../popup/Popup';
 import Item from './Item';
 
 interface ListComponentState {
@@ -16,6 +17,14 @@ export default class ListComponent extends ModifierComponent {
   state = {
     currentIndex: -1,
   };
+
+  componentWillReceiveProps(nextProps: PopupProps) {
+    if (this.props.token && nextProps.token && this.props.token.key !== nextProps.token.key) {
+      this.setState({
+        currentIndex: -1,
+      });
+    }
+  }
 
   onUpClicked = () => {
     const len = this.getFlatList().length;
@@ -29,8 +38,6 @@ export default class ListComponent extends ModifierComponent {
         ? len - 1
         : currentIndex - 1,
     });
-
-    // this.props.onFocus();
   };
 
   onDownClicked = () => {
@@ -45,8 +52,6 @@ export default class ListComponent extends ModifierComponent {
         ? 0
         : currentIndex + 1,
     });
-
-    // this.props.onFocus();
   };
 
   onSelect = () => {
@@ -64,8 +69,7 @@ export default class ListComponent extends ModifierComponent {
   onSelectItem = (index: number) => {
     this.setState({
       currentIndex: index,
-    });
-    this.onSelect();
+    }, this.onSelect);
   }
 
   groupItemsBySection(hints: SearchConfigItemContent[]): GroupedItem[] {
@@ -92,7 +96,7 @@ export default class ListComponent extends ModifierComponent {
 
   getGroupedList() {
     const { token, adapter } = this.props;
-    const hints = adapter.getHints(token.value);
+    const hints = adapter.getHints(token);
     const items = this.groupItemsBySection(hints);
 
     let t = 0;
@@ -124,16 +128,20 @@ export default class ListComponent extends ModifierComponent {
     }
 
     return (
-      <div className='Search-hintMenu'>
-        {groupedList.map((item, i) => (
-          <Item
-            key={item.section}
-            currentIndex={currentIndex}
-            item={item}
-            token={token}
-            onSelectItem={this.onSelectItem}
-          />
-        ))}
+      <div className='Search-hintMenu-container'>
+        <span className='Search-hintMenu-arrow' />
+        <span className='Search-hintMenu-arrowBorder' />
+        <div className='Search-hintMenu'>
+          {groupedList.map((item, i) => (
+            <Item
+              key={item.section}
+              currentIndex={currentIndex}
+              item={item}
+              token={token}
+              onSelectItem={this.onSelectItem}
+            />
+          ))}
+        </div>
       </div>
     );
   }

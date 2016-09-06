@@ -7,7 +7,7 @@ export function updateToken(token: Token, model: SearchConfigItemContent, config
   const adapter = getAdapter(config)(token);
   const val = adapter.serialize(model);
 
-  if (model.fullText || model.modifier) {
+  if (model.modifier) {
     const modifier = getModifier(val, config);
     const value = modifier ? val.substr(modifier.length) : val;
 

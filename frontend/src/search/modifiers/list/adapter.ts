@@ -12,22 +12,25 @@ const ListAdapter = (config: SearchConfigItem): Adapter => ({
       : '';
   },
 
-  getHints: function(value: string) {
+  getHints: function(token: Token) {
     const list = config && config.content;
 
     if (list && list.length) {
-      const labelMatches = getMatch(value, list, 'label');
-      const valueMatches = getMatch(value, list, 'value');
+      if (token && token.type !== 'space') {
+        const { value } = token;
+        const labelMatches = getMatch(value, list, 'label');
+        const valueMatches = getMatch(value, list, 'value');
 
-      const matches = labelMatches
-        .concat(valueMatches)
-        .filter((value, index, self) => self.indexOf(value) === index)
-        .filter(item => item.value !== value)
-        .sort((a, b) => a.value.length - b.value.length );
-
-      if (matches.length) {
-        return matches;
+        return labelMatches
+          .concat(valueMatches)
+          .filter((value, index, self) => self.indexOf(value) === index)
+          .filter(item => item.value !== value)
+          .sort((a, b) => a.value.length - b.value.length);
       }
+
+      return list
+        .filter(item => item.modifier)
+        .sort((a, b) => a.value.length - b.value.length);
     }
 
     return [];

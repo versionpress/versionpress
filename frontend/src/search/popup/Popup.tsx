@@ -3,41 +3,26 @@
 
 import * as React from 'react';
 
-import PopupComponent from './PopupComponent';
+import getComponent from '../modifiers/getComponent';
 import ModifierComponent from '../modifiers/ModifierComponent';
 
-interface PopupProps {
-  nodeRef?: React.Ref<ModifierComponent>;
+import './Popup.less';
+
+export interface PopupProps {
+  nodeRef: __React.Ref<ModifierComponent>;
   activeTokenIndex: number;
-  activeToken: Token;
-  getAdapter(token: Token): Adapter;
+  token: Token;
+  adapter: Adapter;
   onChangeTokenModel(tokenIndex: number, model: SearchConfigItemContent, shouldMoveCursor: boolean): void;
 }
 
 const Popup: React.StatelessComponent<PopupProps> = (props) => {
-  const {
-    nodeRef,
-    activeTokenIndex,
-    activeToken,
-    getAdapter,
-    onChangeTokenModel,
-  } = props;
+  const { nodeRef, token } = props;
+  const childProps: PopupProps = Object.assign({}, props, { ref: nodeRef });
 
-  const displayPopupComponent = activeToken && activeToken.type && activeToken.type !== 'space';
+  const popupComponent = getComponent(token);
 
-  return (
-    <div>
-      {displayPopupComponent &&
-        <PopupComponent
-          nodeRef={nodeRef}
-          activeTokenIndex={activeTokenIndex}
-          token={activeToken}
-          adapter={getAdapter(activeToken)}
-          onChangeTokenModel={onChangeTokenModel}
-        />
-      }
-    </div>
-  );
+  return React.createElement(popupComponent, childProps);
 };
 
 export default Popup;

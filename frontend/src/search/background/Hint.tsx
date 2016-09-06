@@ -23,7 +23,7 @@ const Hint: React.StatelessComponent<HintProps> = ({ token, adapter }) => {
 function getSubHint(token: Token, adapter: Adapter): string {
   const { value } = token;
 
-  const hints = adapter.getHints(value);
+  const hints = adapter.getHints(token);
   const hint = adapter.serialize(hints[0]);
 
   if (value.length && hint && hint.indexOf(value) === 0) {
