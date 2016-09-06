@@ -119,13 +119,6 @@ function vp_register_hooks()
         }
     }
 
-    /**
-     *  Hook for saving taxonomies into files
-     *  WordPress creates plain INSERT query and executes it using wpdb::query method instead of wpdb::insert.
-     *  It's too difficult to parse every INSERT query, that's why the WordPress hook is used.
-     */
-    add_action('save_post', vp_create_update_post_terms_hook($mirror, $vpidRepository));
-
     add_filter('update_feedback', function () {
         touch(ABSPATH . 'versionpress.maintenance');
     });
@@ -279,14 +272,6 @@ function vp_register_hooks()
         } elseif (isset($_POST['action']) && $_POST['action'] === 'update') {
             $committer->usePostponedChangeInfos($key);
         }
-        if (!defined('DOING_AJAX')) {
-            global $versionPressContainer;
-            /** @var Mirror $mirror */
-            $mirror = $versionPressContainer->resolve(VersionPressServices::MIRROR);
-            $vpidRepository = $versionPressContainer->resolve(VersionPressServices::VPID_REPOSITORY);
-            $func = vp_create_update_post_terms_hook($mirror, $vpidRepository);
-            $func($menu_item_db_id);
-        }
     }, 10, 2);
 
     add_action('pre_delete_term', function ($termId, $taxonomy) use ($committer, $vpidRepository, $dbSchemaInfo, $actionsInfoProvider) {
@@ -298,8 +283,6 @@ function vp_register_hooks()
         $changeInfo = new EntityChangeInfo($termEntityInfo, $actionsInfo, 'delete', $termVpid, ['VP-Term-Name' => $term->name, 'VP-Term-Taxonomy' => $taxonomy]);
         $committer->forceChangeInfo($changeInfo);
     }, 10, 2);
-
-    add_action('set_object_terms', vp_create_update_post_terms_hook($mirror, $vpidRepository));
 
     add_filter('wp_save_image_editor_file', function ($saved, $filename, $image, $mime_type, $post_id) use ($vpidRepository, $committer, $dbSchemaInfo, $actionsInfoProvider) {
         $vpid = $vpidRepository->getVpidForEntity('post', $post_id);
@@ -543,42 +526,6 @@ function vp_register_hooks()
 
     register_shutdown_function([$committer, 'commit']);
 }
-
-function vp_create_update_post_terms_hook(Mirror $mirror, VpidRepository $vpidRepository)
-{
-
-    return function ($postId) use ($mirror, $vpidRepository) {
-        /** @var array $post */
-        $post = get_post($postId, ARRAY_A);
-
-        if (!$mirror->shouldBeSaved('post', $post)) {
-            return;
-        }
-
-        $postType = $post['post_type'];
-        $taxonomies = get_object_taxonomies($postType);
-
-        $postVpId = $vpidRepository->getVpidForEntity('post', $postId);
-
-        $postUpdateData = ['vp_id' => $postVpId, 'vp_term_taxonomy' => []];
-        $postRelatedTerms = [];
-        foreach ($taxonomies as $taxonomy) {
-            $terms = get_the_terms($postId, $taxonomy);
-            if ($terms) {
-                $referencedTaxonomies = array_map(function ($term) use ($vpidRepository) {
-                    return $vpidRepository->getVpidForEntity('term_taxonomy', $term->term_taxonomy_id);
-                }, $terms);
-                $postRelatedTerms[] = $terms;
-                // @codingStandardsIgnoreLine
-                $postUpdateData['vp_term_taxonomy'] = array_merge($postUpdateData['vp_term_taxonomy'], $referencedTaxonomies);
-            }
-        }
-        if (count($taxonomies) > 0 && count($postRelatedTerms) > 0) {
-            $mirror->save("post", $postUpdateData);
-        }
-    };
-}
-
 
 //----------------------------------
 // Activation and deactivation

@@ -2,7 +2,10 @@
 namespace VersionPress\Database;
 
 use DateTime;
+use Nette\Utils\Strings;
 use Symfony\Component\Yaml\Yaml;
+use VersionPress\Utils\ArrayUtils;
+use VersionPress\Utils\ReferenceUtils;
 
 /**
  * Describes parts of the DB schema, specifically telling how to identify entities
@@ -63,6 +66,10 @@ class DbSchemaInfo
      */
     public function getEntityInfo($entityName)
     {
+        if (!$this->isEntity($entityName)) {
+            return null;
+        }
+
         if (!isset($this->entityInfoRegistry[$entityName])) {
             $this->entityInfoRegistry[$entityName] = new EntityInfo([$entityName => $this->schema[$entityName]]);
         }
@@ -130,7 +137,7 @@ class DbSchemaInfo
      */
     public function getEntityInfoByPrefixedTableName($tableName)
     {
-        $tableName = substr($tableName, strlen($this->prefix));
+        $tableName = $this->trimPrefix($tableName);
         return $this->getEntityInfoByTableName($tableName);
     }
 
@@ -219,5 +226,24 @@ class DbSchemaInfo
 
             return $entitySchema['since'] <= $currentDbVersion;
         });
+    }
+
+    public function getMnReferenceDetails($junctionEntity)
+    {
+        foreach ($this->getAllEntityNames() as $entityName) {
+            $entityInfo = $this->getEntityInfo($entityName);
+            foreach ($entityInfo->mnReferences as $reference => $targetEntity) {
+                $referenceDetails = ReferenceUtils::getMnReferenceDetails($this, $entityName, $reference);
+                if ($referenceDetails['junction-table'] === $junctionEntity) {
+                    return $referenceDetails;
+                }
+            }
+        }
+        return null;
+    }
+
+    public function trimPrefix($tableName)
+    {
+        return substr($tableName, strlen($this->prefix));
     }
 }

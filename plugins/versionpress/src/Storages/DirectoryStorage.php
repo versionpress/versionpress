@@ -214,7 +214,7 @@ class DirectoryStorage extends Storage
         return $this->existenceCache[$id];
     }
 
-    protected function createChangeInfo($oldEntity, $newEntity, $action)
+    private function createChangeInfo($oldEntity, $newEntity, $action)
     {
         $entityName = $this->entityInfo->entityName;
 

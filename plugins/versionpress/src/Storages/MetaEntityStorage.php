@@ -153,19 +153,6 @@ class MetaEntityStorage extends Storage
         return $this->extractEntityFromParentByName($parent, $name);
     }
 
-    protected function createChangeInfo($oldParentEntity, $newParentEntity, $action)
-    {
-        $oldEntity = $this->extractEntityFromParentByVpId($oldParentEntity, $this->lastVpId);
-        $newEntity = $this->extractEntityFromParentByVpId($newParentEntity, $this->lastVpId);
-        return $this->createChangeInfoWithParentEntity(
-            $oldEntity,
-            $newEntity,
-            $oldParentEntity,
-            $newParentEntity,
-            $action
-        );
-    }
-
     protected function createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action)
     {
         $entityName = $this->entityInfo->entityName;

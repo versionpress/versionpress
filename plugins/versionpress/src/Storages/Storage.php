@@ -116,24 +116,6 @@ abstract class Storage
     abstract public function getPathCommonToAllEntities();
 
     /**
-     * Internal method to create a ChangeInfo. Though it is mostly an implementation
-     * detail of the `save()` and `delete()` methods, most storages create ChangeInfos
-     * in similar ways so the method has been extracted here, at least for the sake
-     * of consistency and documentation.
-     *
-     * @param array $oldEntity The entity as it was stored last time. Note that the previous state
-     *   is not always known or some storages might not want to provide this to the function so it sometimes
-     *   is null.
-     * @param array $newEntity The updated entity. Always contains the full data, never null.
-     * @param string $action Code that calls this method (save() and delete() methods)
-     *   provides typically a basic action (create / edit / delete). More specific action can be
-     *   determined from the $oldEntity / $newEntity in implementation of this method.
-     *
-     * @return ChangeInfo Eventually used as the return value of the `save()` or the `delete()` method
-     */
-    abstract protected function createChangeInfo($oldEntity, $newEntity, $action);
-
-    /**
      * Returns true if the entity exists.
      *
      * @param string $id VPID

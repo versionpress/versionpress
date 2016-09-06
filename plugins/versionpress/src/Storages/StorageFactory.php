@@ -6,6 +6,8 @@ use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Database\EntityInfo;
+use VersionPress\Utils\ReferenceUtils;
 
 class StorageFactory
 {
@@ -48,10 +50,26 @@ class StorageFactory
             return $this->storages[$entityName];
         }
 
-        $entityInfo = $this->dbSchemaInfo->getEntityInfo($entityName);
-        if (!$entityInfo) {
-            return null;
+        if ($this->dbSchemaInfo->isEntity($entityName)) {
+            return $this->resolveStorageForEntity($entityName);
         }
+
+        $mnReferenceDetails = $this->dbSchemaInfo->getMnReferenceDetails($entityName);
+        if ($mnReferenceDetails !== null) {
+            return $this->resolveStorageForMnReference($mnReferenceDetails);
+        }
+
+        return null;
+    }
+
+    public function getAllSupportedStorages()
+    {
+        return $this->dbSchemaInfo->getAllEntityNames();
+    }
+
+    private function resolveStorageForEntity($entityName)
+    {
+        $entityInfo = $this->dbSchemaInfo->getEntityInfo($entityName);
 
         if ($this->dbSchemaInfo->isChildEntity($entityName)) {
             $parentEntity = $entityInfo->references[$entityInfo->parentReference];
@@ -63,8 +81,9 @@ class StorageFactory
         return new DirectoryStorage($this->vpdbDir . '/' . $entityInfo->tableName, $entityInfo, $this->database->prefix, $this->changeInfoFactory);
     }
 
-    public function getAllSupportedStorages()
+    private function resolveStorageForMnReference($referenceDetails)
     {
-        return $this->dbSchemaInfo->getAllEntityNames();
+        $parentStorage = $this->resolveStorageForEntity($referenceDetails['source-entity']);
+        return new MnReferenceStorage($parentStorage, $referenceDetails);
     }
 }
