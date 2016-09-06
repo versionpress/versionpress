@@ -1,4 +1,4 @@
-/// <reference path='../Commits/Commits.d.ts' />
+/// <reference path='../common/Commits.d.ts' />
 /// <reference path='../interfaces/State.d.ts' />
 
 import * as React from 'react';
@@ -11,16 +11,16 @@ import update = require('react-addons-update');
 
 import BulkActionPanel from '../bulk-action-panel/BulkActionPanel';
 import CommitPanel from '../commit-panel/CommitPanel';
-import CommitsTable from '../Commits/CommitsTable.react';
+import CommitsTable from '../commits-table/CommitsTable';
 import Filter from '../filter/Filter';
 import FlashMessage from '../common/flash-message/FlashMessage';
 import ProgressBar from '../common/progress-bar/ProgressBar';
 import ServicePanel from '../service-panel/ServicePanel';
 import VpTitle from '../vp-title/VpTitle';
 import WelcomePanel from '../welcome-panel/WelcomePanel';
-import * as revertDialog from '../Commits/revertDialog';
+import {revertDialog} from '../portal/portal';
 import * as WpApi from '../services/WpApi';
-import {indexOf} from '../Commits/CommitUtils';
+import {indexOf} from '../utils/CommitUtils';
 import config from '../config';
 
 import './HomePage.less';
@@ -246,7 +246,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     });
   };
 
-  onCommitSelect = (commits: Commit[], isChecked: boolean, isShiftKey: boolean) => {
+  onCommitsSelect = (commits: Commit[], isChecked: boolean, isShiftKey: boolean) => {
     let { selectedCommits, lastSelectedCommit } = this.state;
     const bulk = commits.length > 1;
 
@@ -295,7 +295,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       );
       const hashes = selectedCommits.map((commit: Commit) => commit.hash);
 
-      revertDialog.revertDialog.call(this, title, () => this.undoCommits(hashes));
+      revertDialog.call(this, title, () => this.undoCommits(hashes));
     }
   };
 
@@ -378,26 +378,20 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     }
   };
 
-  onUndo = (e) => {
-    e.preventDefault();
-    const hash = e.target.getAttribute('data-hash');
-    const message = e.target.getAttribute('data-message');
+  onUndo = (hash: string, message: string) => {
     const title = (
       <span>Undo <em>{message}</em>?</span>
     );
 
-    revertDialog.revertDialog.call(this, title, () => this.undoCommits([hash]));
+    revertDialog.call(this, title, () => this.undoCommits([hash]));
   };
 
-  onRollback = (e) => {
-    e.preventDefault();
-    const hash = e.target.getAttribute('data-hash');
-    const date = moment(e.target.getAttribute('data-date')).format('LLL');
+  onRollback = (hash: string, date: string) => {
     const title = (
-      <span>Roll back to <em>{date}</em>?</span>
+      <span>Roll back to <em>{moment(date).format('LLL')}</em>?</span>
     );
 
-    revertDialog.revertDialog.call(this, title, () => this.rollbackToCommit(hash));
+    revertDialog.call(this, title, () => this.rollbackToCommit(hash));
   };
 
   onWelcomePanelHide = (e: React.MouseEvent) => {
@@ -502,15 +496,14 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           />
         </div>
         <CommitsTable
-          currentPage={parseInt(this.props.params.page, 10) || 1}
           pages={this.state.pages}
           commits={this.state.commits}
           selectedCommits={this.state.selectedCommits}
           enableActions={enableActions}
-          onCommitSelect={this.onCommitSelect}
+          diffProvider={{ getDiff: this.getDiff }}
           onUndo={this.onUndo}
           onRollback={this.onRollback}
-          diffProvider={{ getDiff: this.getDiff }}
+          onCommitsSelect={this.onCommitsSelect}
         />
       </div>
     );

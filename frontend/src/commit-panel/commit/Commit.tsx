@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import Buttons from './Buttons';
 import Form from './Form';
-import * as portal from '../../common/portal/portal';
+import * as portal from '../../portal/portal';
 
 interface CommitProps {
   onCommit(message: string): void;
@@ -56,13 +56,13 @@ export default class Commit extends React.Component<CommitProps, CommitState> {
   onDiscardClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    portal.confirmDialog(
-      'Warning',
-      <div>This action cannot be undone, are you sure?</div>,
-      this.props.onDiscard,
-      () => {},
-      { okButtonText: 'Proceed' }
-    );
+    const body = <div>This action cannot be undone, are you sure?</div>;
+    const options = {
+      okButtonText: 'Proceed',
+      onOkButtonClick: this.props.onDiscard,
+    };
+
+    portal.confirmDialog('Warning', body, options);
   };
 
   render() {

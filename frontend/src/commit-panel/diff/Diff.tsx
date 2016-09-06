@@ -1,13 +1,13 @@
 import * as React from 'react';
 
-import DiffPanel from '../../Commits/DiffPanel.react';
+import CommitDiffPanel from '../../commit-diff-panel/CommitDiffPanel';
 
 interface DiffProps {
   diff: string;
 }
 
 const Diff: React.StatelessComponent<DiffProps> = ({ diff }) => (
-  <DiffPanel diff={diff} />
+  <CommitDiffPanel diff={diff} />
 );
 
 export default Diff;
