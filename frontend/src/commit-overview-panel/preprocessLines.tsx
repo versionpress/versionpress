@@ -39,7 +39,7 @@ const preprocessLinesByTypeAndAction = (changes: Change[], type: string, action:
   }];
 };
 
-export default (changes: Change[]): PreprocessedLine[] => {
+const preprocessLines = (changes: Change[]): PreprocessedLine[] => {
   const changesByTypeAndAction = ArrayUtils.groupBy(changes, change => [change.type, change.action]) as ChangesByTypeAndAction;
   let preprocessedLines = [];
 
@@ -52,5 +52,7 @@ export default (changes: Change[]): PreprocessedLine[] => {
   }
 
   return preprocessedLines;
-}
+};
+
+export default preprocessLines;
 

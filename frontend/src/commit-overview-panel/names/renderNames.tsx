@@ -5,7 +5,7 @@ import * as React from 'react';
 
 import Name from './Name';
 
-export default (filteredChanges: Change[], countOfDuplicates: CountOfDuplicateChanges) => {
+const renderNames = (filteredChanges: Change[], countOfDuplicates: CountOfDuplicateChanges) => {
   return filteredChanges.map((change: Change) => (
     <Name
       change={change}
@@ -13,4 +13,6 @@ export default (filteredChanges: Change[], countOfDuplicates: CountOfDuplicateCh
       key={change.name}
     />
   ));
-}
+};
+
+export default renderNames;
