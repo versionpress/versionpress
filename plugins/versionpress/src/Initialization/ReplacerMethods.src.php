@@ -104,6 +104,7 @@ class ReplacerMethods
         }
 
         if (strpos(strtolower($query), 'select') === 0) {
+            // VP does not need to track SELECT queries
             return $this->__wp_query($query);
         }
 

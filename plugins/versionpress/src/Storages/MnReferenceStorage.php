@@ -2,6 +2,10 @@
 
 namespace VersionPress\Storages;
 
+/**
+ * Special storage for M:N references. It's only a temporary hack until VP will support composite PKs.
+ * It supports only saving and deleting. Other methods are not supported as the storage doesn't really work with entities.
+ */
 class MnReferenceStorage extends Storage
 {
     private $parentStorage;

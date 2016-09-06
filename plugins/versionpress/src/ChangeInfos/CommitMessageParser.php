@@ -7,6 +7,9 @@ use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Git\CommitMessage;
 
+/**
+ * Parses ChangeInfoEnvelope from a commit message.
+ */
 class CommitMessageParser
 {
     /** @var DbSchemaInfo */

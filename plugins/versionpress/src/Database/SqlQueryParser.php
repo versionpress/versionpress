@@ -304,6 +304,7 @@ class SqlQueryParser
             return [$entity->idColumnName];
         }
 
+        // Temporary hack for M:N references until VP will support composite PKs
         $referenceDetails = $schema->getMnReferenceDetails($schema->trimPrefix($table));
 
         if ($referenceDetails) {

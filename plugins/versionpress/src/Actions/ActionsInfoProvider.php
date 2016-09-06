@@ -4,6 +4,9 @@ namespace VersionPress\Actions;
 
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Class that takes list of `action.yml` files and then returns ActionInfo objects for requested scopes.
+ */
 class ActionsInfoProvider
 {
     const DEFAULT_PRIORITY = 10;

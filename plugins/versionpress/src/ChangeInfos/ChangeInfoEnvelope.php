@@ -179,6 +179,7 @@ class ChangeInfoEnvelope implements ChangeInfo
 
     public function getPriority()
     {
+        // There are never envelopes inside an envelope; therefore, the priority is irrelevant.
         return 0;
     }
 }

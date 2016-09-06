@@ -6,6 +6,10 @@ use Symfony\Component\Yaml\Yaml;
 use VersionPress\Git\GitRepository;
 use VersionPress\Utils\FileSystem;
 
+/**
+ * This class is useful for persisting `actions.yml`. It saves them into a specified directory (not tracked by git);
+ * therefore, VersionPress can display changes even for actions caused by plugins that are no longer installed.
+ */
 class ActionsDefinitionRepository
 {
     /** @var string */

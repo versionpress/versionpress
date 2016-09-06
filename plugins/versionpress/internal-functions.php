@@ -145,6 +145,8 @@ function vp_disable_output_buffering()
 }
 
 /**
+ * Function used by Synchronizer - see `schema.yml`. It restores the `wp_posts.comment_count` column after sync.
+ *
  * @param Database $database
  */
 function vp_fix_comments_count($database)
@@ -158,8 +160,10 @@ function vp_fix_comments_count($database)
 }
 
 /**
-* @param Database $database
-*/
+ * Function used by Synchronizer - see `schema.yml`. It restores the `wp_term_taxonomy.count` column after sync.
+ *
+ * @param Database $database
+ */
 function vp_fix_posts_count($database)
 {
     $sql = "update {$database->term_taxonomy} tt set tt.count =

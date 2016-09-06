@@ -61,8 +61,8 @@ class EntityChangeInfo extends TrackedChangeInfo
     }
 
     /**
-     * Used by meta-entity storages as performance optimalization.
-     * For example PostMetaChangeInfo returns VPID of related post.
+     * Used by meta-entity storages as a performance optimalization.
+     * For example EntityChangeInfo representing change in postmeta returns VPID of the related post.
      *
      * @return string|null
      */

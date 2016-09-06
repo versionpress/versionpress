@@ -2,6 +2,11 @@
 
 namespace VersionPress\Actions;
 
+/**
+ * Iterator useful for getting VP-related files from all active plugins.
+ * It takes name of the desired files (e.g. `schema.yml`, `actions.yml`) and then iterates only files with this name.
+ *
+ */
 class ActivePluginsVPFilesIterator implements \IteratorAggregate
 {
     private $iteratedFiles;

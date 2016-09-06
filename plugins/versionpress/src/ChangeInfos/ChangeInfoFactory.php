@@ -8,6 +8,11 @@ use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Git\CommitMessage;
 
+/**
+ * It creates new instances of TrackedChangeInfo and EntityChangeInfo classes. It is used especially from storages.
+ * The main reason for introducing this class was to remove the dependency of storages on DbSchemaInfo and ActionsInfoProvider
+ * which are on a different level of abstraction.
+ */
 class ChangeInfoFactory
 {
     /** @var DbSchemaInfo */
