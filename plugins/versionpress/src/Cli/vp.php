@@ -1253,8 +1253,9 @@ class VPCommand extends WP_CLI_Command
         global $versionPressContainer;
 
         $database = $versionPressContainer->resolve(VersionPressServices::WPDB);
+        $schema = $requirementsScope === RequirementsChecker::ENVIRONMENT ? null : $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
 
-        $requirementsChecker = new RequirementsChecker($database, null, $requirementsScope);
+        $requirementsChecker = new RequirementsChecker($database, $schema, $requirementsScope);
 
         $report = $requirementsChecker->getRequirements();
 
