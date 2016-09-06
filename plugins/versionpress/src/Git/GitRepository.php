@@ -442,21 +442,6 @@ class GitRepository
         return $this->isCleanWorkingDirectory();
     }
 
-    public function getNote($commitHash)
-    {
-        return $this->runShellCommandWithStandardOutput('git notes show %s', $commitHash);
-    }
-
-    public function saveNote($commitHash, $note)
-    {
-        $this->runShellCommand('git notes remove --ignore-missing %s', $commitHash);
-
-        $tempNoteFile = $this->tempDirectory . '/' . sha1(rand());
-        file_put_contents($tempNoteFile, $note);
-
-        $this->runShellCommand('git notes add -F %s %s', $tempNoteFile, $commitHash);
-    }
-
     /**
      * Invokes {@see runShellCommand()} and returns its stdout output. The params are the same,
      * only the return type is string instead of an array.

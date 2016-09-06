@@ -22,16 +22,6 @@ class WordPressCacheUtils
 
     }
 
-    public static function clearTermCache($vpids, $database)
-    {
-        if (count($vpids) === 0 || !function_exists('clean_term_cache')) {
-            return;
-        }
-
-        $termIds = self::getIdsForVpids($vpids, $database);
-        clean_term_cache($termIds);
-    }
-
     /**
      * @param $vpids
      * @param Database $database
