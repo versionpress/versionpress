@@ -50,9 +50,9 @@ class ParsedQueryData
 
     /**
      * Id column name resolved from `schema.yml` and $table
-     * @var string
+     * @var string[]
      */
-    public $idColumnName;
+    public $idColumnsNames;
 
     /**
      * @var string Internal enumeration of queries which are currently supoorted by SqlQueryParser

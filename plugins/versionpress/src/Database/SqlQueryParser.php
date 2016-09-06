@@ -68,21 +68,21 @@ class SqlQueryParser
         /** @var UpdateStatement $sqlStatement */
         $sqlStatement = $parser->statements[0];
         $table = $sqlStatement->tables[0]->table;
-        $idColumn = $this->resolveIdColumn($schema, $table);
-        if ($idColumn == null) {
+        $idColumns = $this->resolveIdColumns($schema, $table);
+        if ($idColumns == null) {
             return null;
         }
         $parsedQueryData = new ParsedQueryData(ParsedQueryData::UPDATE_QUERY);
         $parsedQueryData->table = $table;
-        $parsedQueryData->idColumnName = $idColumn;
+        $parsedQueryData->idColumnsNames = $idColumns;
         $parsedQueryData->entityName = $this->resolveEntityName($schema, $table);
-        $selectSql = $this->getSelectQuery($parser, $idColumn);
+        $selectSql = $this->getSelectQuery($parser, $idColumns);
         $where = $this->getWhereFragments($parser, $query, $sqlStatement);
         if (isset($where)) {
             $selectSql .= " WHERE " . join(' ', $where);
         }
         $parsedQueryData->sqlQuery = $selectSql;
-        $parsedQueryData->ids = $database->get_col($selectSql);
+        $parsedQueryData->ids = $database->get_results($selectSql, ARRAY_N);
         $parsedQueryData->data = $this->getColumnDataToSet($sqlStatement);
         return $parsedQueryData;
     }
@@ -101,8 +101,8 @@ class SqlQueryParser
         $sqlStatement = $parser->statements[0];
         $queryType = ParsedQueryData::INSERT_QUERY;
         $table = $sqlStatement->into->dest->table;
-        $idColumn = $this->resolveIdColumn($schema, $table);
-        if ($idColumn == null) {
+        $idColumns = $this->resolveIdColumns($schema, $table);
+        if ($idColumns == null) {
             return null;
         }
         if (count($sqlStatement->options->options) > 0) {
@@ -119,9 +119,9 @@ class SqlQueryParser
         $parsedQueryData = new ParsedQueryData($queryType);
         $parsedQueryData->data = $this->getColumnDataToSet($sqlStatement);
         $parsedQueryData->table = $table;
-        $parsedQueryData->idColumnName = $idColumn;
+        $parsedQueryData->idColumnsNames = $idColumns;
         $parsedQueryData->entityName = $this->resolveEntityName($schema, $table);
-        $selectSql = $this->getSelectQuery($parser, $idColumn);
+        $selectSql = $this->getSelectQuery($parser, $idColumns);
         $parsedQueryData->sqlQuery = $selectSql;
         return $parsedQueryData;
     }
@@ -140,21 +140,21 @@ class SqlQueryParser
         /** @var DeleteStatement $sqlStatement */
         $sqlStatement = $parser->statements[0];
         $table = $sqlStatement->from[0]->table;
-        $idColumn = $this->resolveIdColumn($schema, $table);
-        if ($idColumn == null) {
+        $idColumns = $this->resolveIdColumns($schema, $table);
+        if ($idColumns == null) {
             return null;
         }
         $parsedQueryData = new ParsedQueryData(ParsedQueryData::DELETE_QUERY);
-        $parsedQueryData->idColumnName = $idColumn;
+        $parsedQueryData->idColumnsNames = $idColumns;
         $parsedQueryData->entityName = $this->resolveEntityName($schema, $table);
         $parsedQueryData->table = $table;
-        $selectSql = $this->getSelectQuery($parser, $idColumn);
+        $selectSql = $this->getSelectQuery($parser, $idColumns);
         $where = $this->getWhereFragments($parser, $query, $sqlStatement);
         if (isset($where)) {
             $selectSql .= " WHERE " . join(' ', $where);
         }
         $parsedQueryData->sqlQuery = $selectSql;
-        $parsedQueryData->ids = $database->get_col($selectSql);
+        $parsedQueryData->ids = $database->get_results($selectSql, ARRAY_N);
 
         return $parsedQueryData;
     }
@@ -231,12 +231,14 @@ class SqlQueryParser
      * Creates Select SQL query from query in Parser
      *
      * @param Parser $parser
-     * @param string $idColumn
+     * @param string[] $idColumns
      * @return string
      */
-    private function getSelectQuery($parser, $idColumn)
+    private function getSelectQuery($parser, $idColumns)
     {
-        $selectQuery = "SELECT $idColumn FROM ";
+        $columnsSql = join(', ', $idColumns);
+
+        $selectQuery = "SELECT $columnsSql FROM ";
         $sqlStatement = $parser->statements[0];
         if ($sqlStatement instanceof InsertStatement) {
             $selectQuery = "SELECT * FROM " . $sqlStatement->into->dest . " WHERE ";
@@ -292,13 +294,23 @@ class SqlQueryParser
      *
      * @param DbSchemaInfo $schema
      * @param string $table
-     * @return mixed
+     * @return string[]|null
      */
-    private function resolveIdColumn($schema, $table)
+    private function resolveIdColumns($schema, $table)
     {
-
         $entity = $schema->getEntityInfoByPrefixedTableName($table);
-        return $entity == null ? null : $entity->idColumnName;
+
+        if ($entity) {
+            return [$entity->idColumnName];
+        }
+
+        $referenceDetails = $schema->getMnReferenceDetails($schema->trimPrefix($table));
+
+        if ($referenceDetails) {
+            return [$referenceDetails['source-column'], $referenceDetails['target-column']];
+        }
+
+        return null;
     }
 
     /**
@@ -312,7 +324,7 @@ class SqlQueryParser
     {
 
         $entity = $schema->getEntityInfoByPrefixedTableName($table);
-        return $entity == null ? null : $entity->entityName;
+        return $entity == null ? $schema->trimPrefix($table) : $entity->entityName;
     }
 
     /**

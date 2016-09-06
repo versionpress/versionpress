@@ -350,7 +350,8 @@ class WpdbMirrorBridge
     private function processUpdateQuery($parsedQueryData)
     {
 
-        foreach ($parsedQueryData->ids as $id) {
+        foreach ($parsedQueryData->ids as $ids) {
+            $id = $ids[0]; // Update supports only simple PKs (in one column)
             $this->updateEntity([], $parsedQueryData->entityName, $id);
         }
     }
@@ -372,7 +373,9 @@ class WpdbMirrorBridge
             }
             return;
         }
-        foreach ($parsedQueryData->ids as $id) {
+
+        foreach ($parsedQueryData->ids as $ids) {
+            $id = $ids[0]; // Composite primary key is not yet supported.
             $where['vp_id'] = $this->vpidRepository->getVpidForEntity($parsedQueryData->entityName, $id);
             if (!$where['vp_id']) {
                 continue; // already deleted - deleting postmeta is sometimes called twice
@@ -440,7 +443,7 @@ class WpdbMirrorBridge
             $this->mirror->save($parsedQueryData->entityName, $data);
         } else {
             $data = $this->database->get_results($parsedQueryData->sqlQuery, ARRAY_A)[0];
-            $this->updateEntity($data, $parsedQueryData->entityName, $data[$parsedQueryData->idColumnName]);
+            $this->updateEntity($data, $parsedQueryData->entityName, $data[$parsedQueryData->idColumnsNames]);
         }
 
     }

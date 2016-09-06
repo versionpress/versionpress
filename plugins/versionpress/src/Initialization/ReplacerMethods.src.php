@@ -120,7 +120,7 @@ class ReplacerMethods
         }
 
         if ($parsedQueryData != null && $parsedQueryData->queryType == \VersionPress\Database\ParsedQueryData::INSERT_UPDATE_QUERY) {
-            $parsedQueryData->ids = $this->insert_id;
+            $parsedQueryData->ids = [$this->insert_id];
         }
 
         if ($parsedQueryData == null) {
