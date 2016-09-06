@@ -10,22 +10,7 @@ interface MessageProps {
   onDetailsLevelClick(e: React.MouseEvent, detailsLevel: DetailsLevel): void;
 }
 
-const Message: React.StatelessComponent<MessageProps> = ({ commit, detailsLevel, onDetailsLevelClick }) => (
-  <td className='column-message'>
-    {commit.isMerge &&
-      <MergeIcon />
-    }
-    {renderMessage(commit.message)}
-    {detailsLevel !== DetailsLevel.None &&
-      <DetailsLevelButtons
-        detailsLevel={detailsLevel}
-        onButtonClick={onDetailsLevelClick}
-      />
-    }
-  </td>
-);
-
-function renderMessage(message: string) {
+const renderMessage = (message: string) => {
   const messageChunks = /(.*)'(.*)'(.*)/.exec(message);
 
   if (!messageChunks || messageChunks.length < 4) {
@@ -40,5 +25,20 @@ function renderMessage(message: string) {
     </span>
   );
 };
+
+const Message: React.StatelessComponent<MessageProps> = ({ commit, detailsLevel, onDetailsLevelClick }) => (
+  <td className='column-message'>
+    {commit.isMerge &&
+      <MergeIcon />
+    }
+    {renderMessage(commit.message)}
+    {detailsLevel !== DetailsLevel.None &&
+      <DetailsLevelButtons
+        detailsLevel={detailsLevel}
+        onButtonClick={onDetailsLevelClick}
+      />
+    }
+  </td>
+);
 
 export default Message;
