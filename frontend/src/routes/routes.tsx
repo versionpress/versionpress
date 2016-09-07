@@ -3,7 +3,7 @@ import {Route, DefaultRoute, NotFoundRoute } from 'react-router';
 
 import App from '../app/App.react';
 import HomePage from '../components/home/HomePage.react';
-import NotFoundPage from '../components/not-found/NotFoundPage.react';
+import NotFoundPage from '../components/not-found/NotFoundPage';
 import config from '../config';
 
 export const routes = config.routes;
