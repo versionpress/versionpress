@@ -15,6 +15,7 @@ import Filter from '../filter/Filter';
 import FlashMessage from '../common/flash-message/FlashMessage';
 import ProgressBar from '../common/progress-bar/ProgressBar';
 import ServicePanel from '../service-panel/ServicePanel';
+import UpdateNotice from './update-notice/UpdateNotice';
 import VpTitle from './vp-title/VpTitle';
 import WelcomePanel from '../welcome-panel/WelcomePanel';
 import {revertDialog} from '../portal/portal';
@@ -407,6 +408,12 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       });
   };
 
+  onUpdateNoticeClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    this.fetchCommits();
+  };
+
   getGitStatus = () => {
     return new Promise(function(resolve, reject) {
       WpApi
@@ -470,15 +477,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         {this.state.displayWelcomePanel &&
           <WelcomePanel onHide={this.onWelcomePanelHide} />
         }
-        {this.state.displayUpdateNotice
-          ? <div className='updateNotice'>
-              <span>There are newer changes available.</span>
-              <a
-                href='#'
-                onClick={(e) => { e.preventDefault(); this.fetchCommits(); }}
-              >Refresh now.</a>
-            </div>
-          : null
+        {this.state.displayUpdateNotice &&
+          <UpdateNotice onClick={this.onUpdateNoticeClick} />
         }
         <div className='tablenav top'>
           <Filter
