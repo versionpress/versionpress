@@ -21,7 +21,7 @@ import WelcomePanel from '../welcome-panel/WelcomePanel';
 import {revertDialog} from '../portal/portal';
 import * as WpApi from '../../services/WpApi';
 import {indexOf} from '../../utils/CommitUtils';
-import config from '../../config';
+import config from '../../config/config';
 
 import './HomePage.less';
 

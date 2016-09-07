@@ -2,7 +2,7 @@
 
 import * as request from 'superagent';
 
-import config from '../config';
+import config from '../config/config';
 import {getValidVPJSON} from '../utils/StringUtils';
 
 request.parse['application/json'] = function(str: string) {

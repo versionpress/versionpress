@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import config from '../../../config';
+import config from '../../../config/config';
 
 const Support: React.StatelessComponent<{}> = () => (
   <div>
