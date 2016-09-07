@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Route, DefaultRoute, NotFoundRoute } from 'react-router';
 
 import App from '../components/app/App';
-import HomePage from '../components/home/HomePage.react';
+import HomePage from '../components/home/HomePage';
 import NotFoundPage from '../components/not-found/NotFoundPage';
 import config from '../config/config';
 

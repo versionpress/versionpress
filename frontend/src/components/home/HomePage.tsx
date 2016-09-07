@@ -7,7 +7,6 @@ import * as request from 'superagent';
 import * as moment from 'moment';
 import * as Promise from 'core-js/es6/promise';
 import * as classNames from 'classnames';
-import update = require('react-addons-update');
 
 import BulkActionPanel from '../bulk-action-panel/BulkActionPanel';
 import CommitPanel from '../commit-panel/CommitPanel';
@@ -16,7 +15,7 @@ import Filter from '../filter/Filter';
 import FlashMessage from '../common/flash-message/FlashMessage';
 import ProgressBar from '../common/progress-bar/ProgressBar';
 import ServicePanel from '../service-panel/ServicePanel';
-import VpTitle from '../vp-title/VpTitle';
+import VpTitle from './vp-title/VpTitle';
 import WelcomePanel from '../welcome-panel/WelcomePanel';
 import {revertDialog} from '../portal/portal';
 import * as WpApi from '../../services/WpApi';
@@ -27,7 +26,7 @@ import './HomePage.less';
 
 const routes = config.routes;
 
-interface HomePageProps extends React.Props<JSX.Element> {
+interface HomePageProps {
   params: {
     page?: string,
   };
@@ -271,9 +270,9 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           const currentCommit = this.state.commits[i];
           const index = indexOf(selectedCommits, currentCommit);
           if (isChecked && index === -1) {
-            selectedCommits = update(selectedCommits, {$push: [currentCommit]});
+            selectedCommits.push(currentCommit);
           } else if (!isChecked && index !== -1) {
-            selectedCommits = update(selectedCommits, {$splice: [[index, 1]]});
+            selectedCommits.splice(index, 1);
           }
           lastSelectedCommit = currentCommit;
         }
@@ -460,14 +459,13 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             <FlashMessage message={this.state.message} />
           }
         </ServicePanel>
-        {this.state.isDirtyWorkingDirectory
-          ? <CommitPanel
-              diffProvider={{ getDiff: this.getDiff }}
-              gitStatusProvider={{ getGitStatus: this.getGitStatus }}
-              onCommit={this.onCommit}
-              onDiscard={this.onDiscard}
-            />
-          : null
+        {this.state.isDirtyWorkingDirectory &&
+          <CommitPanel
+            diffProvider={{ getDiff: this.getDiff }}
+            gitStatusProvider={{ getGitStatus: this.getGitStatus }}
+            onCommit={this.onCommit}
+            onDiscard={this.onDiscard}
+          />
         }
         {this.state.displayWelcomePanel &&
           <WelcomePanel onHide={this.onWelcomePanelHide} />
