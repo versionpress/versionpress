@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Route, DefaultRoute, NotFoundRoute } from 'react-router';
 
-import App from '../app/App.react';
+import App from '../components/app/App';
 import HomePage from '../components/home/HomePage.react';
 import NotFoundPage from '../components/not-found/NotFoundPage';
 import config from '../config';
