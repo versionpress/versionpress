@@ -1,4 +1,3 @@
-import * as React from 'react';
 import * as request from 'superagent';
 
 export function getErrorMessage(res: request.Response, err: any) {
@@ -14,4 +13,8 @@ export function getErrorMessage(res: request.Response, err: any) {
     message: 'VersionPress is not able to connect to WordPress site. Please try refreshing the page.',
     details: err,
   };
+}
+
+export function getPage(page: string) {
+  return (parseInt(page, 10) - 1) || 0;
 }

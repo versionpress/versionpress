@@ -20,7 +20,7 @@ import VpTitle from './vp-title/VpTitle';
 import WelcomePanel from '../welcome-panel/WelcomePanel';
 import config from '../../config/config';
 import * as WpApi from '../../services/WpApi';
-import { getErrorMessage } from './utils';
+import { getPage, getErrorMessage } from './utils';
 import { indexOf } from '../../utils/CommitUtils';
 import { revertDialog } from '../portal/portal';
 
@@ -104,7 +104,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       progress: 0,
     });
 
-    const page = (parseInt(params.page, 10) - 1) || 0;
+    const page = getPage(params.page);
 
     if (page < 1) {
       this.context.router.transitionTo(routes.home);
@@ -358,8 +358,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   };
 
   onFilter = () => {
-    const page = (parseInt(this.props.params.page, 10) - 1) || 0;
-    if (page > 0) {
+    if (getPage(this.props.params.page) > 0) {
       this.context.router.transitionTo(routes.home);
     } else {
       this.fetchCommits();
