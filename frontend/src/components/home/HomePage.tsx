@@ -448,25 +448,38 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   };
 
   render() {
-    const enableActions = !this.state.isDirtyWorkingDirectory;
+    const {
+      pages,
+      query,
+      commits,
+      selectedCommits,
+      message,
+      isLoading,
+      displayServicePanel,
+      displayWelcomePanel,
+      displayUpdateNotice,
+      isDirtyWorkingDirectory,
+      progress,
+    } = this.state;
+    const enableActions = !isDirtyWorkingDirectory;
 
     const homePageClassName = classNames({
-      'loading': this.state.isLoading,
+      'loading': isLoading,
     });
 
     return (
       <div className={homePageClassName}>
-        <ProgressBar progress={this.state.progress} />
+        <ProgressBar progress={progress} />
         <ServicePanel
-          isVisible={this.state.displayServicePanel}
+          isVisible={displayServicePanel}
           onButtonClick={this.onServicePanelClick}
         >
           <VpTitle />
-          {this.state.message &&
-            <FlashMessage message={this.state.message} />
+          {message &&
+            <FlashMessage message={message} />
           }
         </ServicePanel>
-        {this.state.isDirtyWorkingDirectory &&
+        {isDirtyWorkingDirectory &&
           <CommitPanel
             diffProvider={{ getDiff: this.getDiff }}
             gitStatusProvider={{ getGitStatus: this.getGitStatus }}
@@ -474,15 +487,15 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             onDiscard={this.onDiscard}
           />
         }
-        {this.state.displayWelcomePanel &&
+        {displayWelcomePanel &&
           <WelcomePanel onHide={this.onWelcomePanelHide} />
         }
-        {this.state.displayUpdateNotice &&
+        {displayUpdateNotice &&
           <UpdateNotice onClick={this.onUpdateNoticeClick} />
         }
         <div className='tablenav top'>
           <Filter
-            query={this.state.query}
+            query={query}
             onQueryChange={this.onFilterQueryChange}
             onFilter={this.onFilter}
           />
@@ -490,13 +503,13 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             enableActions={enableActions}
             onBulkAction={this.onBulkAction}
             onClearSelection={this.onClearSelection}
-            selectedCommits={this.state.selectedCommits}
+            selectedCommits={selectedCommits}
           />
         </div>
         <CommitsTable
-          pages={this.state.pages}
-          commits={this.state.commits}
-          selectedCommits={this.state.selectedCommits}
+          pages={pages}
+          commits={commits}
+          selectedCommits={selectedCommits}
           enableActions={enableActions}
           diffProvider={{ getDiff: this.getDiff }}
           onUndo={this.onUndo}
