@@ -149,16 +149,10 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         if (err) {
           return;
         }
-
-        if (data === true) {
-          this.setState({
-            displayWelcomePanel: true,
-          });
-        } else {
-          this.setState({
-            displayWelcomePanel: false,
-          });
-        }
+        
+        this.setState({
+          displayWelcomePanel: data === true,
+        });
       });
   };
 
