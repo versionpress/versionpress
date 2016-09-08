@@ -48,11 +48,17 @@ interface HomePageState {
   progress?: number;
 }
 
+interface HomePageContext {
+  router: ReactRouter.Context;
+}
+
 export default class HomePage extends React.Component<HomePageProps, HomePageState> {
 
   static contextTypes: React.ValidationMap<any> = {
     router: React.PropTypes.func.isRequired,
   };
+
+  context: HomePageContext;
 
   state = {
     pages: [],
@@ -107,7 +113,6 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   }
 
   fetchCommits = (params = this.props.params) => {
-    const router: ReactRouter.Context = (this.context as any).router;
     this.setState({
       isLoading: true,
       progress: 0,
@@ -116,7 +121,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     const page = (parseInt(params.page, 10) - 1) || 0;
 
     if (page < 1) {
-      router.transitionTo(routes.home);
+      this.context.router.transitionTo(routes.home);
     }
 
     WpApi
@@ -209,8 +214,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             isLoading: false,
           });
         } else {
-          const router: ReactRouter.Context = (this.context as any).router;
-          router.transitionTo(routes.home);
+          this.context.router.transitionTo(routes.home);
           document.location.reload();
         }
       });
@@ -233,8 +237,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             isLoading: false,
           });
         } else {
-          const router: ReactRouter.Context = (this.context as any).router;
-          router.transitionTo(routes.home);
+          this.context.router.transitionTo(routes.home);
           document.location.reload();
         }
       });
@@ -371,8 +374,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   onFilter = () => {
     const page = (parseInt(this.props.params.page, 10) - 1) || 0;
     if (page > 0) {
-      const router: ReactRouter.Context = (this.context as any).router;
-      router.transitionTo(routes.home);
+      this.context.router.transitionTo(routes.home);
     } else {
       this.fetchCommits();
     }
