@@ -109,7 +109,6 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     this.setLoading();
 
     const page = getPage(params.page);
-
     if (page < 1) {
       this.context.router.transitionTo(routes.home);
     }
@@ -120,6 +119,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .on('progress', this.updateProgress)
       .end((err: any, res: request.Response) => {
         const data = res.body.data as VpApi.GetCommitsResponse;
+
         if (err) {
           this.setState({
             pages: [],
@@ -136,7 +136,6 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             isLoading: false,
             displayUpdateNotice: false,
           });
-          this.checkUpdate();
         }
       });
   };
@@ -149,7 +148,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         if (err) {
           return;
         }
-        
+
         this.setState({
           displayWelcomePanel: data === true,
         });
@@ -157,13 +156,19 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   };
 
   checkUpdate = () => {
-    if (!this.state.commits.length || this.state.isLoading) {
+    const {
+      query,
+      commits,
+      isLoading,
+    } = this.state;
+
+    if (!commits.length || isLoading) {
       return;
     }
 
     WpApi
       .get('should-update')
-      .query({query: encodeURIComponent(this.state.query), latestCommit: this.state.commits[0].hash})
+      .query({query: encodeURIComponent(query), latestCommit: commits[0].hash})
       .end((err: any, res: request.Response) => {
         const data = res.body.data as VpApi.ShouldUpdateResponse;
         if (err) {
