@@ -91,6 +91,26 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     });
   };
 
+  private wpUndoRollback = (name: string, query: any) => {
+    this.setLoading();
+
+    WpApi
+      .get(name)
+      .query(query)
+      .on('progress', this.updateProgress)
+      .end((err: any, res: request.Response) => {
+        if (err) {
+          this.setState({
+            message: getErrorMessage(res, err),
+            isLoading: false,
+          });
+        } else {
+          this.context.router.transitionTo(routes.home);
+          document.location.reload();
+        }
+      });
+  };
+
   componentDidMount() {
     this.fetchWelcomePanel();
     this.fetchCommits();
@@ -187,43 +207,11 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   };
 
   undoCommits = (commits: string[]) => {
-    this.setLoading();
-
-    WpApi
-      .get('undo')
-      .query({commits: commits})
-      .on('progress', this.updateProgress)
-      .end((err: any, res: request.Response) => {
-        if (err) {
-          this.setState({
-            message: getErrorMessage(res, err),
-            isLoading: false,
-          });
-        } else {
-          this.context.router.transitionTo(routes.home);
-          document.location.reload();
-        }
-      });
+    this.wpUndoRollback('undo', { commits: commits });
   };
 
   rollbackToCommit = (hash: string) => {
-    this.setLoading();
-
-    WpApi
-      .get('rollback')
-      .query({commit: hash})
-      .on('progress', this.updateProgress)
-      .end((err: any, res: request.Response) => {
-        if (err) {
-          this.setState({
-            message: getErrorMessage(res, err),
-            isLoading: false,
-          });
-        } else {
-          this.context.router.transitionTo(routes.home);
-          document.location.reload();
-        }
-      });
+    this.wpUndoRollback('rollback', { commit: hash });
   };
 
   onServicePanelClick = () => {
