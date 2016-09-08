@@ -84,6 +84,13 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     });
   };
 
+  private setLoading = () => {
+    this.setState({
+      isLoading: true,
+      progress: 0,
+    });
+  };
+
   componentDidMount() {
     this.fetchWelcomePanel();
     this.fetchCommits();
@@ -99,10 +106,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   }
 
   fetchCommits = (params = this.props.params) => {
-    this.setState({
-      isLoading: true,
-      progress: 0,
-    });
+    this.setLoading();
 
     const page = getPage(params.page);
 
@@ -184,10 +188,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   };
 
   undoCommits = (commits: string[]) => {
-    this.setState({
-      isLoading: true,
-      progress: 0,
-    });
+    this.setLoading();
 
     WpApi
       .get('undo')
@@ -207,10 +208,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   };
 
   rollbackToCommit = (hash: string) => {
-    this.setState({
-      isLoading: true,
-      progress: 0,
-    });
+    this.setLoading();
 
     WpApi
       .get('rollback')
