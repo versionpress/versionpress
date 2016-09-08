@@ -111,6 +111,26 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       });
   };
 
+  private wpCommitDiscardEnd = (successMessage: string) => {
+    return (err: any, res: request.Response) => {
+      if (err) {
+        this.setState({
+          message: getErrorMessage(res, err),
+        });
+      } else {
+        this.setState({
+          isDirtyWorkingDirectory: false,
+          message: {
+            code: 'updated',
+            message: successMessage,
+          },
+        });
+        this.fetchCommits();
+      }
+      return !err;
+    };
+  };
+
   componentDidMount() {
     this.fetchWelcomePanel();
     this.fetchCommits();
@@ -281,59 +301,22 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   };
 
   onCommit = (message: string) => {
-    this.setState({
-      progress: 0,
-    });
-
-    const values = { 'commit-message': message };
+    this.updateProgress({ percent: 0 });
 
     WpApi
       .post('commit')
-      .send(values)
+      .send({ 'commit-message': message })
       .on('progress', this.updateProgress)
-      .end((err: any, res: request.Response) => {
-        if (err) {
-          this.setState({
-            message: getErrorMessage(res, err),
-          });
-        } else {
-          this.setState({
-            isDirtyWorkingDirectory: false,
-            message: {
-              code: 'updated',
-              message: 'Changes have been committed.',
-            },
-          });
-          this.fetchCommits();
-        }
-        return !err;
-      });
+      .end(this.wpCommitDiscardEnd('Changes have been committed.'));
   };
 
   onDiscard = () => {
-    this.setState({
-      progress: 0,
-    });
+    this.updateProgress({ percent: 0 });
 
     WpApi
       .post('discard-changes')
       .on('progress', this.updateProgress)
-      .end((err: any, res: request.Response) => {
-        if (err) {
-          this.setState({
-            message: getErrorMessage(res, err),
-          });
-        } else {
-          this.setState({
-            isDirtyWorkingDirectory: false,
-            message: {
-              code: 'updated',
-              message: 'Changes have been discarded.',
-            },
-          });
-        }
-        return !err;
-      });
+      .end(this.wpCommitDiscardEnd('Changes have been discarded.'));
   };
 
   onFilterQueryChange = (query: string) => {
