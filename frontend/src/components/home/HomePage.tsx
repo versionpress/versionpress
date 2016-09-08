@@ -18,10 +18,11 @@ import ServicePanel from '../service-panel/ServicePanel';
 import UpdateNotice from './update-notice/UpdateNotice';
 import VpTitle from './vp-title/VpTitle';
 import WelcomePanel from '../welcome-panel/WelcomePanel';
-import {revertDialog} from '../portal/portal';
-import * as WpApi from '../../services/WpApi';
-import {indexOf} from '../../utils/CommitUtils';
 import config from '../../config/config';
+import * as WpApi from '../../services/WpApi';
+import { getErrorMessage } from './utils';
+import { indexOf } from '../../utils/CommitUtils';
+import { revertDialog } from '../portal/portal';
 
 import './HomePage.less';
 
@@ -77,21 +78,6 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
   private refreshInterval;
 
-  static getErrorMessage(res: request.Response, err: any) {
-    if (res) {
-      const body = res.body;
-      if ('code' in body && 'message' in body) {
-        return body;
-      }
-    }
-    console.error(err);
-    return {
-      code: 'error',
-      message: 'VersionPress is not able to connect to WordPress site. Please try refreshing the page.',
-      details: err,
-    };
-  }
-
   private updateProgress = (e: {percent: number}) => {
     this.setState({
       progress: e.percent,
@@ -134,7 +120,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           this.setState({
             pages: [],
             commits: [],
-            message: HomePage.getErrorMessage(res, err),
+            message: getErrorMessage(res, err),
             isLoading: false,
             displayUpdateNotice: false,
           });
@@ -210,7 +196,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
-            message: HomePage.getErrorMessage(res, err),
+            message: getErrorMessage(res, err),
             isLoading: false,
           });
         } else {
@@ -233,7 +219,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
-            message: HomePage.getErrorMessage(res, err),
+            message: getErrorMessage(res, err),
             isLoading: false,
           });
         } else {
@@ -323,7 +309,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
-            message: HomePage.getErrorMessage(res, err),
+            message: getErrorMessage(res, err),
           });
         } else {
           this.setState({
@@ -350,7 +336,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .end((err: any, res: request.Response) => {
         if (err) {
           this.setState({
-            message: HomePage.getErrorMessage(res, err),
+            message: getErrorMessage(res, err),
           });
         } else {
           this.setState({
@@ -423,7 +409,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         .end((err, res: request.Response) => {
           const data = res.body.data as VpApi.GetGitStatusResponse;
           if (err) {
-            reject(HomePage.getErrorMessage(res, err));
+            reject(getErrorMessage(res, err));
           } else {
             resolve(data);
           }
@@ -441,7 +427,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         .end((err, res: request.Response) => {
           const data = res.body.data as VpApi.GetDiffResponse;
           if (err) {
-            reject(HomePage.getErrorMessage(res, err));
+            reject(getErrorMessage(res, err));
           } else {
             resolve(data.diff);
           }
