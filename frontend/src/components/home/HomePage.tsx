@@ -244,42 +244,42 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     });
   };
 
-  onCommitsSelect = (commits: Commit[], isChecked: boolean, isShiftKey: boolean) => {
+  onCommitsSelect = (commitsToSelect: Commit[], isChecked: boolean, isShiftKey: boolean) => {
+    const { commits } = this.state;
     let { selectedCommits, lastSelectedCommit } = this.state;
-    const bulk = commits.length > 1;
+    const isBulk = commitsToSelect.length > 1;
 
-    commits
-      .filter((commit: Commit) => commit.canUndo)
-      .forEach((commit: Commit) => {
+    commitsToSelect
+      .filter(commit => commit.canUndo)
+      .forEach(commit => {
         let lastIndex = -1;
-        const index = indexOf(this.state.commits, commit);
+        const index = indexOf(commits, commit);
 
-        if (!bulk && isShiftKey) {
-          const last = this.state.lastSelectedCommit;
-          lastIndex = indexOf(this.state.commits, last);
+        if (!isBulk && isShiftKey) {
+          lastIndex = indexOf(commits, lastSelectedCommit);
         }
 
-        if (lastIndex === -1) {
-          lastIndex = index;
-        }
+        lastIndex = lastIndex === -1 ? index : lastIndex;
 
-        const step = (index < lastIndex ? -1 : 1);
+        const step = index < lastIndex ? -1 : 1;
         const cond = index + step;
         for (let i = lastIndex; i !== cond; i += step) {
-          const currentCommit = this.state.commits[i];
-          const index = indexOf(selectedCommits, currentCommit);
-          if (isChecked && index === -1) {
+          const currentCommit = commits[i];
+          const currentIndex = indexOf(selectedCommits, currentCommit);
+
+          if (isChecked && currentIndex === -1) {
             selectedCommits.push(currentCommit);
-          } else if (!isChecked && index !== -1) {
-            selectedCommits.splice(index, 1);
+          } else if (!isChecked && currentIndex !== -1) {
+            selectedCommits.splice(currentIndex, 1);
           }
+
           lastSelectedCommit = currentCommit;
         }
       });
 
     this.setState({
       selectedCommits: selectedCommits,
-      lastSelectedCommit: (bulk ? null : lastSelectedCommit),
+      lastSelectedCommit: isBulk ? null : lastSelectedCommit,
     });
   };
 
