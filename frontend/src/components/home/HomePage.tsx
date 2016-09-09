@@ -5,7 +5,6 @@ import * as React from 'react';
 import * as ReactRouter from 'react-router';
 import * as request from 'superagent';
 import * as moment from 'moment';
-import * as Promise from 'core-js/es6/promise';
 import * as classNames from 'classnames';
 
 import BulkActionPanel from '../bulk-action-panel/BulkActionPanel';
@@ -20,9 +19,14 @@ import VpTitle from './vp-title/VpTitle';
 import WelcomePanel from '../welcome-panel/WelcomePanel';
 import config from '../../config/config';
 import * as WpApi from '../../services/WpApi';
-import { getPage, getErrorMessage } from './utils';
 import { indexOf } from '../../utils/CommitUtils';
 import { revertDialog } from '../portal/portal';
+import {
+  getErrorMessage,
+  getDiff,
+  getGitStatus,
+  getPage,
+} from './utils';
 
 import './HomePage.less';
 
@@ -369,39 +373,6 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
     this.fetchCommits();
   };
 
-  getGitStatus = () => {
-    return new Promise(function(resolve, reject) {
-      WpApi
-        .get('git-status')
-        .end((err, res: request.Response) => {
-          const data = res.body.data as VpApi.GetGitStatusResponse;
-          if (err) {
-            reject(getErrorMessage(res, err));
-          } else {
-            resolve(data);
-          }
-        });
-    });
-  };
-
-  getDiff = (hash: string) => {
-    const query = hash === '' ? null : {commit: hash};
-
-    return new Promise(function(resolve, reject) {
-      WpApi
-        .get('diff')
-        .query(query)
-        .end((err, res: request.Response) => {
-          const data = res.body.data as VpApi.GetDiffResponse;
-          if (err) {
-            reject(getErrorMessage(res, err));
-          } else {
-            resolve(data.diff);
-          }
-        });
-    });
-  };
-
   render() {
     const {
       pages,
@@ -416,7 +387,6 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       isDirtyWorkingDirectory,
       progress,
     } = this.state;
-    const enableActions = !isDirtyWorkingDirectory;
 
     const homePageClassName = classNames({
       'loading': isLoading,
@@ -436,8 +406,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
         </ServicePanel>
         {isDirtyWorkingDirectory &&
           <CommitPanel
-            diffProvider={{ getDiff: this.getDiff }}
-            gitStatusProvider={{ getGitStatus: this.getGitStatus }}
+            diffProvider={{ getDiff: getDiff }}
+            gitStatusProvider={{ getGitStatus: getGitStatus }}
             onCommit={this.onCommit}
             onDiscard={this.onDiscard}
           />
@@ -455,7 +425,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             onFilter={this.onFilter}
           />
           <BulkActionPanel
-            enableActions={enableActions}
+            enableActions={!isDirtyWorkingDirectory}
             onBulkAction={this.onBulkAction}
             onClearSelection={this.onClearSelection}
             selectedCommits={selectedCommits}
@@ -465,8 +435,8 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
           pages={pages}
           commits={commits}
           selectedCommits={selectedCommits}
-          enableActions={enableActions}
-          diffProvider={{ getDiff: this.getDiff }}
+          enableActions={!isDirtyWorkingDirectory}
+          diffProvider={{ getDiff: getDiff }}
           onUndo={this.onUndo}
           onRollback={this.onRollback}
           onCommitsSelect={this.onCommitsSelect}
