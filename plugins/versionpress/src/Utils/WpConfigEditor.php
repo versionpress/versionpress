@@ -85,7 +85,7 @@ class WpConfigEditor
         $configContainsDefinition = preg_match($replaceRegex, $wpConfigContent);
 
         if ($configContainsDefinition) {
-            $wpConfigContent = preg_replace($replaceRegex, "\${1}$phpizedValue\${2}", $wpConfigContent);
+            $wpConfigContent = preg_replace(preg_quote($replaceRegex), "\${1}$phpizedValue\${2}", $wpConfigContent);
         } else {
             $originalContent = $wpConfigContent;
             $endOfEditableSection = $this->isCommonConfig ?
