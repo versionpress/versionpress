@@ -293,7 +293,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       );
       const hashes = selectedCommits.map((commit: Commit) => commit.hash);
 
-      revertDialog.call(this, title, () => this.undoCommits(hashes));
+      revertDialog(title, () => this.undoCommits(hashes));
     }
   };
 
@@ -342,7 +342,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       <span>Undo <em>{message}</em>?</span>
     );
 
-    revertDialog.call(this, title, () => this.undoCommits([hash]));
+    revertDialog(title, () => this.undoCommits([hash]));
   };
 
   onRollback = (hash: string, date: string) => {
@@ -350,7 +350,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       <span>Roll back to <em>{moment(date).format('LLL')}</em>?</span>
     );
 
-    revertDialog.call(this, title, () => this.rollbackToCommit(hash));
+    revertDialog(title, () => this.rollbackToCommit(hash));
   };
 
   onWelcomePanelHide = (e: React.MouseEvent) => {
