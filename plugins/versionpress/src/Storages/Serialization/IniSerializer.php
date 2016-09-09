@@ -159,16 +159,15 @@ class IniSerializer
     public static function deserialize($string)
     {
 //        $string = self::eolWorkaround_addPlaceholders($string);
-//        $string = self::sanitizeSectionsAndKeys_addPlaceholders($string);
+
         $string = self::preserveNumbers($string);
         $string = self::preserveNULLs($string);
         $deserialized = [];
 
-        $lines = explode(PHP_EOL, $string);
-        $actualSection = false;
+        $lines = explode("\r\n", $string);
+        $actualSection = "";
 
         foreach ($lines as $line) {
-            $line = trim($line);
 
             if ($line[0] == "[" && $endIdx = strpos($line, "]")) {
                 $actualSection = substr($line, 1, $endIdx - 1);
@@ -176,51 +175,47 @@ class IniSerializer
                 continue;
             }
 
+            if (Strings::length($line) == 0) {
+                continue;
+            }
+
             if (!strpos($line, '=')) {
                 continue;
             }
 
-            $splitRow = explode("=", $line, 2);
+            $splitRow = explode(" = ", $line, 2);
 
-            $key = rtrim($splitRow[0]);
-            $value = ltrim($splitRow[1]);
-            if ($actualSection) {
-                $value = Strings::replace($value, "/\"/", "");
-                $value = self::restoreTypesOfValue($value);
-
-
-                if(Strings::contains($key,"[")) {
-                    $keyAtSection = StringUtils::substringFromTo($key,0,strpos($key,'['));
-                    $ketAtSub  = StringUtils::substringFromTo($key,strpos($key,"[")+1,strpos($key,']'));
-                    $deserialized[$actualSection][$keyAtSection][$ketAtSub] = $value;
-                }else{
-                    $deserialized[$actualSection][$key] = $value;
-                }
-
-            } else {
-                $deserialized[$key] = $value;
+            $key = $splitRow[0];
+            $value = $splitRow[1];
+            $value = self::sanitizeSectionsAndKeys_addPlaceholders($value);
+            if (Strings::startsWith($value, "\"")) {
+                $value = StringUtils::substringFromTo($value, 1, Strings::length($value));
+            }
+            if (Strings::endsWith($value, "\"")) {
+                $value = StringUtils::substringFromTo($value, 0, Strings::length($value) - 1);
             }
 
+            $value = self::restoreTypesOfValue($value);
 
-//            $row = $rows[$i];
-//            if (Strings::length($row) == 0) {
-//                continue;
-//            }
-//            $split = explode(' = ', $row);
-//            $key = $split[0];
-//            $value = $split[1];
-//            $value = self::restoreTypesOfValues($value);
-//
-//            $sectionValues[$key] = $value;
+
+            if (Strings::contains($key, "[")) {
+                $keyAtSection = StringUtils::substringFromTo($key, 0, strpos($key, '['));
+                $ketAtSub = StringUtils::substringFromTo($key, strpos($key, "[") + 1, strpos($key, ']'));
+                $deserialized[$actualSection][$keyAtSection][$ketAtSub] = $value;
+            } else {
+                unset($ketAtSub, $keyAtSection);
+                $deserialized[$actualSection][$key] = $value;
+            }
+
         }
         print_r($deserialized);
 
 //
 //        $deserialized = parse_ini_string($string, true, INI_SCANNER_RAW);
-//        $deserialized = self::sanitizeSectionsAndKeys_removePlaceholders($deserialized);
+        $deserialized = self::sanitizeSectionsAndKeys_removePlaceholders($deserialized);
 //        $deserialized = self::eolWorkaround_removePlaceholders($deserialized);
-//        $deserialized = self::restorePhpSerializedData($deserialized);
-//        $deserialized = self::expandArrays($deserialized);
+        $deserialized = self::restorePhpSerializedData($deserialized);
+        $deserialized = self::expandArrays($deserialized);
 //        return $deserialized;
 
         return $deserialized;
