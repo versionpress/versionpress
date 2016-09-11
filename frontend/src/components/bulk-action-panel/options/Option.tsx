@@ -1,3 +1,5 @@
+/// <reference path='../../../interfaces/State.d.ts' />
+
 import * as React from 'react';
 
 interface OptionProps {
