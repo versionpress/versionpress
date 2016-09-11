@@ -6,7 +6,7 @@ import Panel from './panel/Panel';
 import './ServicePanel.less';
 
 interface ServicePanelProps {
-  children?: React.ReactElement<any>;
+  children?: React.ReactNode;
   isVisible: boolean;
   onButtonClick(e: React.MouseEvent): void;
 }

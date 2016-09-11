@@ -1,9 +1,9 @@
 import * as React from 'react';
 
 interface ChunkTableRowProps {
-  leftLineContent: any;
+  leftLineContent: React.ReactNode;
   leftLineType: string;
-  rightLineContent: any;
+  rightLineContent: React.ReactNode;
   rightLineType: string;
 }
 

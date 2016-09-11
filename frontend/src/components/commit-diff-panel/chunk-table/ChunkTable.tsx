@@ -27,11 +27,11 @@ const ChunkTable: React.StatelessComponent<ChunkTableProps> = ({ chunk }) => {
 };
 
 function renderRow(left: Line, right: Line, index: number) {
-  let leftContent: any = replaceLeadingSpacesWithHardSpaces(left.content);
-  let rightContent: any = replaceLeadingSpacesWithHardSpaces(right.content);
+  let leftContent: string|JSX.Element[] = replaceLeadingSpacesWithHardSpaces(left.content);
+  let rightContent: string|JSX.Element[] = replaceLeadingSpacesWithHardSpaces(right.content);
 
   if (left.type === 'removed' && right.type === 'added') {
-    [leftContent, rightContent] = highlightInlineDiff(leftContent, rightContent);
+    [leftContent, rightContent] = highlightInlineDiff(leftContent as string, rightContent as string);
   }
 
   return (

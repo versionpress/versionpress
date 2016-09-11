@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 interface NoteProps {
-  children?: React.ReactElement<any>;
+  children?: React.ReactNode;
 }
 
 const Note: React.StatelessComponent<NoteProps> = ({ children }) => (

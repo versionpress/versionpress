@@ -29,7 +29,7 @@ export function divideToLeftAndRightColumn (chunk: Chunk): [Line[], Line[]] {
   return [left, right];
 }
 
-export function mapTwoArrays<T, U>(a1: T[], a2: U[], fn: (a: T, b: U, i: number) => any): any[] {
+export function mapTwoArrays<T, U, V>(a1: T[], a2: U[], fn: (a: T, b: U, i: number) => V): V[] {
   let result = [];
   for (let i = 0; i < a1.length; i++) {
     result.push(fn(a1[i], a2[i], i));
@@ -47,7 +47,7 @@ export function replaceLeadingSpacesWithHardSpaces(content: string): string {
   return '\u00a0'.repeat(numberOfSpaces) + content.substr(numberOfSpaces);
 }
 
-export function highlightInlineDiff(leftContent: string, rightContent: string) {
+export function highlightInlineDiff(leftContent: string, rightContent: string): JSX.Element[][] {
   const lineDiff = JsDiff.diffWordsWithSpace(leftContent, rightContent);
 
   return [
@@ -74,7 +74,7 @@ function balanceLeftAndRightColumn(left: Line[], right: Line[]): [Line[], Line[]
   return [left, right];
 }
 
-function highlightLine(diffPart: JsDiff.IDiffResult, shouldBeHighlighted: boolean, color: string, index: number) {
+function highlightLine(diffPart: JsDiff.IDiffResult, shouldBeHighlighted: boolean, color: string, index: number): JSX.Element {
   if (shouldBeHighlighted) {
     return (
       <span style={{backgroundColor: color}} key={index}>

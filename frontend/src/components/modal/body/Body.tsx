@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 interface BodyProps {
-  children?: React.ReactElement<any>;
+  children?: React.ReactNode;
 }
 
 const Body: React.StatelessComponent<BodyProps> = ({ children }) => (

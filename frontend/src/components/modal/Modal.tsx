@@ -10,7 +10,7 @@ interface ModalProps {
   enableBackgroundClickToClose?: boolean;
   showCloseIcon?: boolean;
   title?: React.ReactNode;
-  children?: React.ReactElement<any>;
+  children?: React.ReactNode;
   onClose?(): void;
 }
 

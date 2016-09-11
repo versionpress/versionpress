@@ -12,7 +12,7 @@ interface OverviewLineProps {
   changes: Change[];
   type?: string;
   action?: string;
-  suffix?: React.ReactElement<any>;
+  suffix?: React.ReactNode;
   onShowMoreClick(e: React.MouseEvent, listKey: string): void;
 }
 
