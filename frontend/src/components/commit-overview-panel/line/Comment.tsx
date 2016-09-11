@@ -5,7 +5,7 @@ import * as React from 'react';
 import * as ArrayUtils from '../../../utils/ArrayUtils';
 import * as StringUtils from '../../../utils/StringUtils';
 
-import {LineProps} from './Line';
+import { LineProps } from './Line';
 
 const Comment: React.StatelessComponent<LineProps> = ({ changes }) => {
   const action = changes[0].action;

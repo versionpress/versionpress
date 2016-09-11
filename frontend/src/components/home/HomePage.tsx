@@ -21,12 +21,7 @@ import config from '../../config/config';
 import * as WpApi from '../../services/WpApi';
 import { indexOf } from '../../utils/CommitUtils';
 import { revertDialog } from '../portal/portal';
-import {
-  getErrorMessage,
-  getDiff,
-  getGitStatus,
-  getPage,
-} from './utils';
+import { getErrorMessage, getDiff, getGitStatus, getPage } from './utils';
 
 import './HomePage.less';
 
@@ -159,7 +154,10 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
     WpApi
       .get('commits')
-      .query({page: page, query: encodeURIComponent(this.state.query)})
+      .query({
+        page: page,
+        query: encodeURIComponent(this.state.query),
+      })
       .on('progress', this.updateProgress)
       .end((err: any, res: request.Response) => {
         const data = res.body.data as VpApi.GetCommitsResponse;
@@ -189,6 +187,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
       .get('display-welcome-panel')
       .end((err: any, res: request.Response) => {
         const data = res.body.data as VpApi.DisplayWelcomePanelResponse;
+
         if (err) {
           return;
         }
@@ -200,11 +199,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   };
 
   checkUpdate = () => {
-    const {
-      query,
-      commits,
-      isLoading,
-    } = this.state;
+    const { query, commits, isLoading } = this.state;
 
     if (!commits.length || isLoading) {
       return;
@@ -212,9 +207,13 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
 
     WpApi
       .get('should-update')
-      .query({query: encodeURIComponent(query), latestCommit: commits[0].hash})
+      .query({
+        query: encodeURIComponent(query),
+        latestCommit: commits[0].hash,
+      })
       .end((err: any, res: request.Response) => {
         const data = res.body.data as VpApi.ShouldUpdateResponse;
+
         if (err) {
           this.setState({
             displayUpdateNotice: false,

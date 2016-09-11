@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 import Meta from './Meta';
-import {LineProps} from './Line';
+import { LineProps } from './Line';
 
 const PostMeta: React.StatelessComponent<LineProps> = (props) => (
   <Meta

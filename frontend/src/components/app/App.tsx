@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {RouteHandler} from 'react-router';
+import { RouteHandler } from 'react-router';
 
 import './App.less';
 

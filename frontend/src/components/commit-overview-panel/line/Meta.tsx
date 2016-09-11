@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 import OverviewLine from './OverviewLine';
-import {LineProps} from './Line';
+import { LineProps } from './Line';
 
 interface MetaProps extends LineProps {
   parentEntity: string;

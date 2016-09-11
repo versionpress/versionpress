@@ -3,7 +3,7 @@
 import * as React from 'react';
 import * as moment from 'moment';
 
-import {LineProps} from './Line';
+import { LineProps } from './Line';
 
 const Revert: React.StatelessComponent<LineProps> = ({ changes }) => {
   const change = changes[0];
