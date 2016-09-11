@@ -133,7 +133,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   componentDidMount() {
     this.fetchWelcomePanel();
     this.fetchCommits();
-    this.refreshInterval = setInterval(() => this.checkUpdate(), 10 * 1000);
+    this.refreshInterval = setInterval(this.checkUpdate, 10 * 1000);
   }
 
   componentWillReceiveProps(nextProps: HomePageProps) {
