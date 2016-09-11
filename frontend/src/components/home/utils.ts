@@ -17,7 +17,7 @@ export function getErrorMessage(res: request.Response, err: any) {
   };
 }
 
-export function getPage(page: string) {
+export function parsePageNumber(page: string) {
   return (parseInt(page, 10) - 1) || 0;
 }
 

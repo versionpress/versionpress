@@ -21,7 +21,7 @@ import config from '../../config/config';
 import * as WpApi from '../../services/WpApi';
 import { indexOf } from '../../utils/CommitUtils';
 import { revertDialog } from '../portal/portal';
-import { getErrorMessage, getDiff, getGitStatus, getPage } from './utils';
+import { getErrorMessage, getDiff, getGitStatus, parsePageNumber } from './utils';
 
 import './HomePage.less';
 
@@ -147,7 +147,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   fetchCommits = (params = this.props.params) => {
     this.setLoading();
 
-    const page = getPage(params.page);
+    const page = parsePageNumber(params.page);
     if (page < 1) {
       this.context.router.transitionTo(routes.home);
     }
@@ -329,7 +329,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
   };
 
   onFilter = () => {
-    if (getPage(this.props.params.page) > 0) {
+    if (parsePageNumber(this.props.params.page) > 0) {
       this.context.router.transitionTo(routes.home);
     } else {
       this.fetchCommits();
