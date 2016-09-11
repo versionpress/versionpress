@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import * as JsDiff from 'diff';
+import { repeat } from 'lodash';
 
 export function divideToLeftAndRightColumn (chunk: Chunk): [Line[], Line[]] {
   const { lines } = chunk;
@@ -44,7 +45,7 @@ export function replaceLeadingSpacesWithHardSpaces(content: string): string {
   }
 
   const numberOfSpaces = match[1].length;
-  return '\u00a0'.repeat(numberOfSpaces) + content.substr(numberOfSpaces);
+  return repeat('\u00a0', numberOfSpaces) + content.substr(numberOfSpaces);
 }
 
 export function highlightInlineDiff(leftContent: string, rightContent: string): JSX.Element[][] {
