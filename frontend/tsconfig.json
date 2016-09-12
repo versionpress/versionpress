@@ -3,7 +3,8 @@
     "module": "commonjs",
     "sourceMap": true,
     "target": "es5",
-    "jsx": "react"
+    "jsx": "react",
+    "experimentalDecorators": true
   },
   "filesGlob": [
     "src/**/*.ts",
