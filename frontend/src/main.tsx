@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as DOM from 'react-dom';
 import * as ReactRouter from 'react-router';
 
-import { appRoute } from './routes';
+import { appRoute } from './routes/routes';
 
 import 'core-js';
 

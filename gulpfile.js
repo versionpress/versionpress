@@ -277,7 +277,7 @@ gulp.task('init-tests', false, shell.task([
  * Inits the frontend project.
  */
 gulp.task('init-frontend', false, function () {
-    var configPath = frontendDir + '/src/config.local.sample.ts';
+    var configPath = frontendDir + '/src/config/config.local.sample.ts';
     var targetName = configPath.replace('.sample', '');
     if (fs.existsSync(targetName)) {
         targetName = configPath;

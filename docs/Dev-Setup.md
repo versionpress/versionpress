@@ -146,7 +146,7 @@ Create new deployment and set it up like this:
 
 For pure frontend development, it's more convenient to run it outside of the WordPress administration. To do that:
 
-1. Copy `frontend/src/config.local.sample.ts` to `frontend/src/config.local.ts` and enter your local values.
+1. Copy `frontend/src/config/config.local.sample.ts` to `frontend/src/config/config.local.ts` and enter your local values.
 2. Find the `plugins/versionpress/bootstrap.php` file inside the live WordPress / VersionPress installation and redefine the `VERSIONPRESS_REQUIRE_API_AUTH` constant to `false`.
 3. Run `npm run dev` in the `frontend` directory. This launches [webpack dev server](http://webpack.github.io/docs/webpack-dev-server.html) on the default URL http://localhost:8888. Changed files are automatically reflected in the browser.
 
