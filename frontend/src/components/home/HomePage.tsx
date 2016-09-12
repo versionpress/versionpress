@@ -178,6 +178,7 @@ export default class HomePage extends React.Component<HomePageProps, HomePageSta
             isLoading: false,
             displayUpdateNotice: false,
           });
+          this.checkUpdate();
         }
       });
   };
