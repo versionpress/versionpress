@@ -8,24 +8,24 @@ import * as request from 'superagent';
 import config from '../config/config';
 import * as WpApi from '../services/WpApi';
 import { indexOf } from '../utils/CommitUtils';
-import { getErrorMessage, getDiff, getGitStatus, parsePageNumber } from './utils';
+import { getErrorMessage } from './utils';
 
 const routes = config.routes;
 
-class AppState {
+class AppStore {
   @observable page: number;
-  @observable pages: number[];
-  @observable query: string;
-  @observable commits: Commit[];
-  @observable selectedCommits: Commit[];
-  @observable lastSelectedCommit: Commit;
-  @observable message: InfoMessage;
-  @observable isLoading: boolean;
-  @observable displayServicePanel: boolean;
-  @observable displayWelcomePanel: boolean;
-  @observable displayUpdateNotice: boolean;
-  @observable isDirtyWorkingDirectory: boolean;
-  @observable progress: number;
+  @observable pages: number[] = [];
+  @observable query: string = '';
+  @observable commits: Commit[] = [];
+  @observable selectedCommits: Commit[] = [];
+  @observable lastSelectedCommit: Commit = null;
+  @observable message: InfoMessage = null;
+  @observable isLoading: boolean = true;
+  @observable displayServicePanel: boolean = false;
+  @observable displayWelcomePanel: boolean = false;
+  @observable displayUpdateNotice: boolean = false;
+  @observable isDirtyWorkingDirectory: boolean = false;
+  @observable progress: number = 100;
 
   private refreshInterval;
   private router: ReactRouter.Context;
@@ -275,6 +275,6 @@ class AppState {
   };
 }
 
-const appState = new AppState();
+const appStore = new AppStore();
 
-export default appState;
+export default appStore;
