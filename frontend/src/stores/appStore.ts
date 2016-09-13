@@ -1,14 +1,14 @@
 /// <reference path='../components/common/Commits.d.ts' />
 /// <reference path='../interfaces/State.d.ts' />
 
-import { action, observable } from 'mobx';
+import { action, observable, runInAction } from 'mobx';
 import * as ReactRouter from 'react-router';
 import * as request from 'superagent';
 
 import config from '../config/config';
 import * as WpApi from '../services/WpApi';
 import { indexOf } from '../utils/CommitUtils';
-import { getErrorMessage } from './utils';
+import { getErrorMessage, parsePageNumber } from './utils';
 
 const routes = config.routes;
 
@@ -35,6 +35,14 @@ class AppStore {
   }
 
   @action
+  init = (page: string, router: ReactRouter.Context) => {
+    this.updatePage(page);
+    this.setRouter(router);
+    this.fetchWelcomePanel();
+    this.fetchCommits();
+  };
+
+  @action
   private updateProgress = (e: {percent: number}) => {
     this.progress = e.percent;
   };
@@ -55,8 +63,10 @@ class AppStore {
       .on('progress', this.updateProgress)
       .end((err: any, res: request.Response) => {
         if (err) {
-          this.message = getErrorMessage(res, err);
-          this.isLoading = false;
+          runInAction(() => {
+            this.message = getErrorMessage(res, err);
+            this.isLoading = false;
+          });
         } else {
           this.router.transitionTo(routes.home);
           document.location.reload();
@@ -67,23 +77,26 @@ class AppStore {
   @action
   private wpCommitDiscardEnd = (successMessage: string) => {
     return (err: any, res: request.Response) => {
-      if (err) {
-        this.message = getErrorMessage(res, err);
-      } else {
-        this.isDirtyWorkingDirectory = false;
-        this.message = {
-          code: 'updated',
-          message: successMessage,
-        };
-        this.fetchCommits();
-      }
+      runInAction(() => {
+        if (err) {
+          this.message = getErrorMessage(res, err);
+        } else {
+          this.isDirtyWorkingDirectory = false;
+          this.message = {
+            code: 'updated',
+            message: successMessage,
+          };
+          this.fetchCommits();
+        }
+      });
+
       return !err;
     };
   };
 
   @action
   updatePage = (page: string) => {
-    this.page = (parseInt(page, 10) - 1) || 0;
+    this.page = parsePageNumber(page);
   };
 
   @action
@@ -109,20 +122,23 @@ class AppStore {
       .end((err: any, res: request.Response) => {
         const data = res.body.data as VpApi.GetCommitsResponse;
 
-        if (err) {
-          this.pages = [];
-          this.commits = [];
-          this.message = getErrorMessage(res, err);
-          this.isLoading = false;
-          this.displayUpdateNotice = false;
-        } else {
-          this.pages = data.pages.map(c => c + 1);
-          this.commits = data.commits;
-          this.message = null;
-          this.isLoading = false;
-          this.displayUpdateNotice = false;
-          this.checkUpdate();
-        }
+        runInAction(() => {
+          if (err) {
+            this.pages = [];
+            this.commits = [];
+            this.message = getErrorMessage(res, err);
+            this.isLoading = false;
+            this.displayUpdateNotice = false;
+          } else {
+            this.pages = data.pages.map(c => c + 1);
+            this.commits = data.commits;
+            this.message = null;
+            this.isLoading = false;
+            this.displayUpdateNotice = false;
+
+            this.checkUpdate();
+          }
+        });
       });
   };
 
@@ -158,14 +174,16 @@ class AppStore {
       .end((err: any, res: request.Response) => {
         const data = res.body.data as VpApi.ShouldUpdateResponse;
 
-        if (err) {
-          this.displayUpdateNotice = false;
-          this.isDirtyWorkingDirectory = false;
-          clearInterval(this.refreshInterval);
-        } else {
-          this.displayUpdateNotice = !page && data.update === true;
-          this.isDirtyWorkingDirectory = data.cleanWorkingDirectory !== true;
-        }
+        runInAction(() => {
+          if (err) {
+            this.displayUpdateNotice = false;
+            this.isDirtyWorkingDirectory = false;
+            clearInterval(this.refreshInterval);
+          } else {
+            this.displayUpdateNotice = !page && data.update === true;
+            this.isDirtyWorkingDirectory = data.cleanWorkingDirectory !== true;
+          }
+        });
       });
   };
 

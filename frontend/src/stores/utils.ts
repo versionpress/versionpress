@@ -14,3 +14,7 @@ export function getErrorMessage(res: request.Response, err: any) {
     details: err,
   };
 }
+
+export function parsePageNumber(page: string) {
+  return (parseInt(page, 10) - 1) || 0;
+}

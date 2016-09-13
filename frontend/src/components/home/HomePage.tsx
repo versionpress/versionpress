@@ -44,10 +44,7 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
   context: HomePageContext;
 
   componentDidMount() {
-    appStore.updatePage(this.props.params.page);
-    appStore.setRouter(this.context.router);
-    appStore.fetchWelcomePanel();
-    appStore.fetchCommits();
+    appStore.init(this.props.params.page, this.context.router);
   }
 
   componentWillReceiveProps(nextProps: HomePageProps) {
