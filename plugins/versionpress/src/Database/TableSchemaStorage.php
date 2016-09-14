@@ -62,4 +62,9 @@ class TableSchemaStorage
         $schemaFile = sprintf('%s/%s.sql', $this->directory, $tableWithoutPrefix);
         return $schemaFile;
     }
+
+    public function deleteAll()
+    {
+        FileSystem::removeContent($this->directory);
+    }
 }

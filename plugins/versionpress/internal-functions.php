@@ -4,6 +4,7 @@
 
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Database\TableSchemaStorage;
 use VersionPress\Database\WpdbMirrorBridge;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Committer;
@@ -169,4 +170,21 @@ function vp_fix_posts_count($database)
     $sql = "update {$database->term_taxonomy} tt set tt.count =
           (select count(*) from {$database->term_relationships} tr where tr.term_taxonomy_id = tt.term_taxonomy_id);";
     $database->query($sql);
+}
+
+function vp_update_table_ddl_scripts(DbSchemaInfo $dbSchemaInfo, TableSchemaStorage $tableSchemaStorage)
+{
+    $tableSchemaStorage->deleteAll();
+
+    $entityNames = $dbSchemaInfo->getAllEntityNames();
+    foreach ($entityNames as $entityName) {
+        $table = $dbSchemaInfo->getPrefixedTableName($entityName);
+        $tableSchemaStorage->saveSchema($table);
+    }
+
+    $referenceDetails = $dbSchemaInfo->getAllMnReferences();
+    foreach ($referenceDetails as $referenceDetail) {
+        $table = $dbSchemaInfo->getPrefixedTableName($referenceDetail['junction-table']);
+        $tableSchemaStorage->saveSchema($table);
+    }
 }

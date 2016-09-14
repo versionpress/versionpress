@@ -242,6 +242,23 @@ class DbSchemaInfo
         return null;
     }
 
+    public function getAllMnReferences()
+    {
+        foreach ($this->getAllEntityNames() as $entityName) {
+            $entityInfo = $this->getEntityInfo($entityName);
+            if (!$entityInfo->mnReferences) {
+                continue;
+            }
+
+            foreach ($entityInfo->mnReferences as $reference => $targetEntity) {
+                if ($entityInfo->isVirtualReference($reference)) {
+                    continue;
+                }
+                yield ReferenceUtils::getMnReferenceDetails($this, $entityName, $reference);
+            }
+        }
+    }
+
     public function trimPrefix($tableName)
     {
         return substr($tableName, strlen($this->prefix));

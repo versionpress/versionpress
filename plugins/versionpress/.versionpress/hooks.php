@@ -353,6 +353,8 @@ add_filter('vp_entity_files_composer', function ($files) {
 });
 
 add_action('vp_wordpress_updated', function ($version) {
+    global $versionPressContainer;
+
     $wpFiles = [
         // All files from WP root
         // Git can't add only files from current directory (non-recursively), so we have to add them manually.
@@ -392,6 +394,12 @@ add_action('vp_wordpress_updated', function ($version) {
         ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.lock'],
     ];
 
+
+    $dbSchema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
+    $tableSchemaStorage = $versionPressContainer->resolve(VersionPressServices::TABLE_SCHEMA_STORAGE);
+
+    vp_update_table_ddl_scripts($dbSchema, $tableSchemaStorage);
+
     vp_force_action('wordpress', 'update', $version, [], $wpFiles);
 
     if (!WpdbReplacer::isReplaced()) {
@@ -400,6 +408,13 @@ add_action('vp_wordpress_updated', function ($version) {
 });
 
 add_action('vp_plugin_changed', function ($action, $pluginFile, $pluginName) {
+    global $versionPressContainer;
+
+    $dbSchema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
+    $tableSchemaStorage = $versionPressContainer->resolve(VersionPressServices::TABLE_SCHEMA_STORAGE);
+
+    vp_update_table_ddl_scripts($dbSchema, $tableSchemaStorage);
+
     $pluginPath = WP_PLUGIN_DIR . "/";
     if (dirname($pluginFile) === ".") {
         // single-file plugin like hello.php
@@ -423,6 +438,8 @@ add_action('vp_plugin_changed', function ($action, $pluginFile, $pluginName) {
 
 
 add_action('vp_theme_changed', function ($action, $stylesheet, $themeName) {
+    global $versionPressContainer;
+
     $themeChange = ["type" => "path", "path" => $path = WP_CONTENT_DIR . "/themes/" . $stylesheet . "/*"];
     $optionChange = ["type" => "all-storage-files", "entity" => "option"];
     $composerChanges = [
@@ -431,6 +448,11 @@ add_action('vp_theme_changed', function ($action, $stylesheet, $themeName) {
     ];
 
     $filesToCommit = array_merge([$themeChange, $optionChange], $composerChanges);
+
+    $dbSchema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
+    $tableSchemaStorage = $versionPressContainer->resolve(VersionPressServices::TABLE_SCHEMA_STORAGE);
+
+    vp_update_table_ddl_scripts($dbSchema, $tableSchemaStorage);
 
     vp_force_action('theme', $action, $stylesheet, ['VP-Theme-Name' => $themeName], $filesToCommit);
 }, 10, 3);
