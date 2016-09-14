@@ -149,7 +149,7 @@ class DbSchemaInfo
      */
     public function isChildEntity($entityName)
     {
-        return $this->getEntityInfo($entityName)->parentReference !== null;
+        return $this->isEntity($entityName) && $this->getEntityInfo($entityName)->parentReference !== null;
     }
 
     /**

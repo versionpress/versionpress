@@ -280,6 +280,12 @@ class Initializer
             $this->createVpidsForEntitiesOfType($entityName);
             $this->saveEntitiesOfTypeToStorage($entityName);
         }
+
+        $mnReferenceDetails = $this->dbSchema->getAllMnReferences();
+
+        foreach ($mnReferenceDetails as $referenceDetail) {
+            $this->saveMnReferences($referenceDetail);
+        }
     }
 
     /**
@@ -305,7 +311,6 @@ class Initializer
         $entities = array_map(function ($entity) use ($urlReplacer) {
             return $urlReplacer->replace($entity);
         }, $entities);
-        $entities = $this->doEntitySpecificActions($entityName, $entities);
         $storage->prepareStorage();
 
         if (!$this->dbSchema->isChildEntity($entityName)) {
@@ -377,53 +382,26 @@ class Initializer
         return $entities;
     }
 
-    private function doEntitySpecificActions($entityName, $entities)
+    private function saveMnReferences($referenceDetails)
     {
-        if ($entityName === 'post') {
-            return array_map([$this, 'extendPostWithTaxonomies'], $entities);
+        $junctionTable = $referenceDetails['junction-table'];
+        $sourceEntity = $referenceDetails['source-entity'];
+        $targetEntity = $referenceDetails['target-entity'];
+        $sourceColumn = $referenceDetails['source-column'];
+        $targetColumn = $referenceDetails['target-column'];
+
+        $storage = $this->storageFactory->getStorage($junctionTable);
+
+        $dbRows = $this->getEntitiesFromDatabase($junctionTable);
+
+        foreach ($dbRows as $row) {
+            $reference = [
+                "vp_$sourceEntity" => $this->idCache[$sourceEntity][intval($row[$sourceColumn])],
+                "vp_$targetEntity" => $this->idCache[$targetEntity][intval($row[$targetColumn])],
+            ];
+
+            $storage->save($reference);
         }
-        if ($entityName === 'usermeta') {
-            return array_map([$this, 'restoreUserIdInUsermeta'], $entities);
-        }
-        return $entities;
-    }
-
-    public function extendPostWithTaxonomies($post)
-    {
-        $idColumnName = $this->dbSchema->getEntityInfo('post')->idColumnName;
-        $id = $post[$idColumnName];
-
-        $postType = $post['post_type'];
-        $taxonomies = get_object_taxonomies($postType);
-
-
-        foreach ($taxonomies as $taxonomy) {
-            $terms = get_the_terms($id, $taxonomy);
-            if ($terms) {
-                $idCache = $this->idCache;
-                $referencedTaxonomies = array_map(function ($term) use ($idCache) {
-                    return $idCache['term_taxonomy'][$term->term_taxonomy_id];
-                }, $terms);
-
-                $currentTaxonomies = isset($post['vp_term_taxonomy']) ? $post['vp_term_taxonomy'] : [];
-                $post['vp_term_taxonomy'] = array_merge($currentTaxonomies, $referencedTaxonomies);
-            }
-        }
-
-        return $post;
-    }
-
-    private function restoreUserIdInUsermeta($usermeta)
-    {
-        $userIds = $this->idCache['user'];
-        foreach ($userIds as $userId => $vpId) {
-            if (strval($vpId) === strval($usermeta['vp_user_id'])) {
-                $usermeta['user_id'] = $userId;
-                return $usermeta;
-            }
-        }
-
-        return $usermeta;
     }
 
     /**
@@ -525,19 +503,6 @@ class Initializer
     }
 
     /**
-     * Could as well be a call to $dbSchema->getPrefixedTableName(). However, constructing
-     * prefixed table name is found in multiple locations in the project currently so
-     * hopefully this will be refactored at once some time in the future.
-     *
-     * @param $entityName
-     * @return string
-     */
-    private function getTableName($entityName)
-    {
-        return $this->dbSchema->getPrefixedTableName($entityName);
-    }
-
-    /**
      * Copies the .htaccess and web.config files into the vpdb directory.
      */
     private function copyAccessRulesFiles()
@@ -545,7 +510,6 @@ class Initializer
         SecurityUtils::protectDirectory(VP_PROJECT_ROOT . "/.git");
         SecurityUtils::protectDirectory(VP_VPDB_DIR);
     }
-
 
     /**
      * Installs Gitignore to the repository root, or does nothing if the file already exists.
@@ -647,12 +611,12 @@ class Initializer
             $parentReference = $entityInfo->parentReference;
 
             return $this->database->get_results(
-                "SELECT * FROM {$this->getTableName($entityName)} ORDER BY {$parentReference}",
+                "SELECT * FROM {$this->dbSchema->getPrefixedTableName($entityName)} ORDER BY {$parentReference}",
                 ARRAY_A
             );
         }
 
-        return $this->database->get_results("SELECT * FROM {$this->getTableName($entityName)}", ARRAY_A);
+        return $this->database->get_results("SELECT * FROM {$this->dbSchema->getPrefixedTableName($entityName)}", ARRAY_A);
     }
 
     private function installComposerScripts()
