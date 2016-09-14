@@ -181,7 +181,7 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase
             ],
             [
                 "INSERT INTO `wp_terms` (term_id, date) VALUES (10, NOW())",
-                [["term_id" => "10", "date" => "NOW"]],
+                [["term_id" => "10", "date" => "NOW()"]],
                 ParsedQueryData::INSERT_QUERY
             ],
             [
@@ -213,14 +213,14 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase
                 "UPDATE `wp_options` SET option_value=REPLACE(option_value, 'wp-links/links-images/', " .
                 "'wp-images/links/') WHERE option_name LIKE '%_' AND option_value LIKE '%s'",
                 "SELECT option_name FROM `wp_options` WHERE option_name LIKE '%_' AND option_value LIKE '%s'",
-                ["option_value" => ""],
+                ["option_value" => "REPLACE(option_value, 'wp-links/links-images/', 'wp-images/links/')"],
                 $testIds
             ],
             [
                 "UPDATE `wp_options` SET option_value=REPLACE(option_value, 'wp-links/links-images/', " .
                 "'wp-images/links/'), option_abc = 'def' WHERE option_name LIKE '%A' AND option_value LIKE '%s'",
                 "SELECT option_name FROM `wp_options` WHERE option_name LIKE '%A' AND option_value LIKE '%s'",
-                ["option_value" => ""],
+                ["option_value" => "REPLACE(option_value, 'wp-links/links-images/', 'wp-images/links/')", 'option_abc' => "'def'"],
                 $testIds
             ],
             [
@@ -232,8 +232,8 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase
             ],
             [
                 "UPDATE `wp_posts` SET post_date_gmt = DATE_ADD(post_date, INTERVAL '01:20' HOUR_MINUTE)",
-                "SELECT ID FROM `wp_posts` WHERE 1=1",
-                ["post_date_gmt" => "DATE_ADD(post_date"],
+                "SELECT ID FROM `wp_posts`",
+                ["post_date_gmt" => "DATE_ADD(post_date, INTERVAL '01:20' HOUR_MINUTE)"],
                 $testIds
             ],
             [
