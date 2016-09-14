@@ -430,12 +430,15 @@ add_action('vp_plugin_changed', function ($action, $pluginFile, $pluginName) {
 
     $pluginChange = ["type" => "path", "path" => $pluginPath];
     $vpdbChanges = ["type" => "path", "path" => VP_VPDB_DIR];
+
+    $uploadsChanges = ["type" => "path", "path" => path_join(wp_upload_dir()['basedir'], '*')];
+
     $composerChanges = [
         ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.json'],
         ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.lock'],
     ];
 
-    $filesToCommit = array_merge([$pluginChange, $vpdbChanges], $composerChanges);
+    $filesToCommit = array_merge([$pluginChange, $vpdbChanges, $uploadsChanges], $composerChanges);
 
     vp_force_action('plugin', $action, $pluginFile, ['VP-Plugin-Name' => $pluginName], $filesToCommit);
 }, 10, 3);
