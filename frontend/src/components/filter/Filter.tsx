@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import QueryInput from './QueryInput';
 import Submit from './Submit';
@@ -11,6 +12,7 @@ interface FilterProps {
   onFilter(): void;
 }
 
+@observer
 export default class Filter extends React.Component<FilterProps, {}> {
 
   onSubmit = (e: React.FormEvent) => {
