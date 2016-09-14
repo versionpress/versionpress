@@ -13,7 +13,7 @@ import { getErrorMessage, parsePageNumber } from './utils';
 const routes = config.routes;
 
 class AppStore {
-  @observable page: number;
+  @observable page: number = 0;
   @observable pages: number[] = [];
   @observable query: string = '';
   @observable commits: Commit[] = [];
@@ -36,8 +36,8 @@ class AppStore {
 
   @action
   init = (page: string, router: ReactRouter.Context) => {
-    this.updatePage(page);
-    this.setRouter(router);
+    this.page = parsePageNumber(page);
+    this.router = router;
     this.fetchWelcomePanel();
     this.fetchCommits();
   };
@@ -95,18 +95,10 @@ class AppStore {
   };
 
   @action
-  updatePage = (page: string) => {
-    this.page = parsePageNumber(page);
-  };
-
-  @action
-  setRouter = (router: ReactRouter.Context) => {
-    this.router = router;
-  };
-
-  @action
-  fetchCommits = (page = this.page) => {
+  fetchCommits = (page: number | string = this.page) => {
     this.setLoading();
+
+    page = parsePageNumber(page);
 
     if (page < 1) {
       this.router.transitionTo(routes.home);
@@ -123,18 +115,17 @@ class AppStore {
         const data = res.body.data as VpApi.GetCommitsResponse;
 
         runInAction(() => {
+          this.isLoading = false;
+          this.displayUpdateNotice = false;
+
           if (err) {
             this.pages = [];
             this.commits = [];
             this.message = getErrorMessage(res, err);
-            this.isLoading = false;
-            this.displayUpdateNotice = false;
           } else {
             this.pages = data.pages.map(c => c + 1);
             this.commits = data.commits;
             this.message = null;
-            this.isLoading = false;
-            this.displayUpdateNotice = false;
 
             this.checkUpdate();
           }
@@ -203,7 +194,7 @@ class AppStore {
   };
 
   @action
-  onCommitsSelect = (commitsToSelect: Commit[], isChecked: boolean, isShiftKey: boolean) => {
+  selectCommits = (commitsToSelect: Commit[], isChecked: boolean, isShiftKey: boolean) => {
     const { commits } = this;
     let { selectedCommits, lastSelectedCommit } = this;
     const isBulk = commitsToSelect.length > 1;
@@ -247,7 +238,7 @@ class AppStore {
   };
 
   @action
-  onCommit = (message: string) => {
+  commit = (message: string) => {
     this.updateProgress({ percent: 0 });
 
     WpApi
@@ -258,7 +249,7 @@ class AppStore {
   };
 
   @action
-  onDiscard = () => {
+  discard = () => {
     this.updateProgress({ percent: 0 });
 
     WpApi
@@ -268,12 +259,12 @@ class AppStore {
   };
 
   @action
-  onFilterQueryChange = (query: string) => {
+  changeFilterQuery = (query: string) => {
     this.query = query;
   };
 
   @action
-  onFilter = () => {
+  filter = () => {
     if (this.page > 0) {
       this.router.transitionTo(routes.home);
     } else {
@@ -282,7 +273,7 @@ class AppStore {
   };
 
   @action
-  onWelcomePanelHide = () => {
+  hideWelcomePanel = () => {
     this.displayWelcomePanel = false;
 
     WpApi

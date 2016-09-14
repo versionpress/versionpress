@@ -48,13 +48,8 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
   }
 
   componentWillReceiveProps(nextProps: HomePageProps) {
-    appStore.updatePage(nextProps.params.page);
-    appStore.fetchCommits();
+    appStore.fetchCommits(nextProps.params.page);
   }
-
-  fetchCommits = () => {
-    appStore.fetchCommits()
-  };
 
   undoCommits = (commits: string[]) => {
     appStore.undoCommits(commits);
@@ -69,7 +64,7 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
   };
 
   onCommitsSelect = (commitsToSelect: Commit[], isChecked: boolean, isShiftKey: boolean) => {
-    appStore.onCommitsSelect(commitsToSelect, isChecked, isShiftKey);
+    appStore.selectCommits(commitsToSelect, isChecked, isShiftKey);
   };
 
   onBulkAction = (action: string) => {
@@ -91,19 +86,19 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
   };
 
   onCommit = (message: string) => {
-    appStore.onCommit(message);
+    appStore.commit(message);
   };
 
   onDiscard = () => {
-    appStore.onDiscard();
+    appStore.discard();
   };
 
   onFilterQueryChange = (query: string) => {
-    appStore.onFilterQueryChange(query);
+    appStore.changeFilterQuery(query);
   };
 
   onFilter = () => {
-    appStore.onFilter();
+    appStore.filter();
   };
 
   onUndo = (hash: string, message: string) => {
@@ -125,7 +120,7 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
   onWelcomePanelHide = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    appStore.onWelcomePanelHide();
+    appStore.hideWelcomePanel();
   };
 
   onUpdateNoticeClick = (e: React.MouseEvent) => {
