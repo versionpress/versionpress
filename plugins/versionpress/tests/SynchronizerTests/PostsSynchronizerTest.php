@@ -49,7 +49,8 @@ class PostsSynchronizerTest extends SynchronizerTestCase
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
         $this->usersSynchronizer = new Synchronizer(
             $this->userStorage,
@@ -58,7 +59,8 @@ class PostsSynchronizerTest extends SynchronizerTestCase
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
         $this->termsSynchronizer = new Synchronizer(
             $this->termStorage,
@@ -67,7 +69,8 @@ class PostsSynchronizerTest extends SynchronizerTestCase
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
         $this->termTaxonomiesSynchronizer = new Synchronizer(
             $this->termTaxonomyStorage,
@@ -76,7 +79,8 @@ class PostsSynchronizerTest extends SynchronizerTestCase
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
     }
 

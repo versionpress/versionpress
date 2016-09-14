@@ -2,12 +2,10 @@
 
 namespace VersionPress\Storages;
 
-use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Database\EntityInfo;
-use VersionPress\Utils\ReferenceUtils;
+use VersionPress\Database\TableSchemaStorage;
 
 class StorageFactory
 {
@@ -21,6 +19,8 @@ class StorageFactory
     private $taxonomies;
     /** @var ChangeInfoFactory */
     private $changeInfoFactory;
+    /** @var TableSchemaStorage */
+    private $tableSchemaStorage;
 
     /**
      * @param string $vpdbDir Path to the `wp-content/vpdb` directory
@@ -28,14 +28,16 @@ class StorageFactory
      * @param Database $database
      * @param string[] $taxonomies List of taxonomies used on current site
      * @param ChangeInfoFactory $changeInfoFactory
+     * @param TableSchemaStorage $tableSchemaStorage
      */
-    public function __construct($vpdbDir, DbSchemaInfo $dbSchemaInfo, $database, $taxonomies, $changeInfoFactory)
+    public function __construct($vpdbDir, DbSchemaInfo $dbSchemaInfo, $database, $taxonomies, $changeInfoFactory, $tableSchemaStorage)
     {
         $this->vpdbDir = $vpdbDir;
         $this->dbSchemaInfo = $dbSchemaInfo;
         $this->database = $database;
         $this->taxonomies = $taxonomies;
         $this->changeInfoFactory = $changeInfoFactory;
+        $this->tableSchemaStorage = $tableSchemaStorage;
     }
 
     /**
@@ -71,6 +73,12 @@ class StorageFactory
     {
         $entityInfo = $this->dbSchemaInfo->getEntityInfo($entityName);
 
+        $prefixedTableName = $this->dbSchemaInfo->getPrefixedTableName($entityName);
+
+        if (!$this->tableSchemaStorage->containsSchema($prefixedTableName)) {
+            $this->tableSchemaStorage->saveSchema($prefixedTableName);
+        }
+
         if ($this->dbSchemaInfo->isChildEntity($entityName)) {
             $parentEntity = $entityInfo->references[$entityInfo->parentReference];
             $parentStorage = $this->getStorage($parentEntity);
@@ -83,6 +91,12 @@ class StorageFactory
 
     private function resolveStorageForMnReference($referenceDetails)
     {
+        $prefixedTableName = $this->dbSchemaInfo->getPrefixedTableName($referenceDetails['junction-table']);
+
+        if (!$this->tableSchemaStorage->containsSchema($prefixedTableName)) {
+            $this->tableSchemaStorage->saveSchema($prefixedTableName);
+        }
+
         $parentStorage = $this->resolveStorageForEntity($referenceDetails['source-entity']);
         return new MnReferenceStorage($parentStorage, $referenceDetails);
     }

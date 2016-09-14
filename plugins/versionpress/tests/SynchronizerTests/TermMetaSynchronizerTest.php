@@ -38,7 +38,8 @@ class TermMetaSynchronizerTest extends SynchronizerTestCase
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
         $this->termsSynchronizer = new Synchronizer(
             $this->termStorage,
@@ -47,7 +48,8 @@ class TermMetaSynchronizerTest extends SynchronizerTestCase
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
     }
 

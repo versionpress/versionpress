@@ -27,7 +27,8 @@ class TermsSynchronizerTest extends SynchronizerTestCase
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
     }
 

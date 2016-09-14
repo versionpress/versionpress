@@ -34,7 +34,8 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
         $this->usersSynchronizer = new Synchronizer(
             $this->userStorage,
@@ -43,7 +44,8 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
     }
 

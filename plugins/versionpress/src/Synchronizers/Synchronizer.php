@@ -6,6 +6,7 @@ use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\EntityInfo;
 use VersionPress\Database\ShortcodesReplacer;
+use VersionPress\Database\TableSchemaStorage;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Storages\Storage;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -69,6 +70,10 @@ class Synchronizer
      * @var VpidRepository
      */
     private $vpidRepository;
+    /**
+     * @var TableSchemaStorage
+     */
+    private $tableSchemaStorage;
 
     /**
      * @param Storage $storage Specific Synchronizers will use specific storage types, see SynchronizerFactory
@@ -78,6 +83,7 @@ class Synchronizer
      * @param VpidRepository $vpidRepository
      * @param AbsoluteUrlReplacer $urlReplacer
      * @param ShortcodesReplacer $shortcodesReplacer
+     * @param TableSchemaStorage $tableSchemaStorage
      */
     public function __construct(
         Storage $storage,
@@ -86,7 +92,8 @@ class Synchronizer
         DbSchemaInfo $dbSchemaInfo,
         VpidRepository $vpidRepository,
         AbsoluteUrlReplacer $urlReplacer,
-        ShortcodesReplacer $shortcodesReplacer
+        ShortcodesReplacer $shortcodesReplacer,
+        TableSchemaStorage $tableSchemaStorage
     ) {
         $this->storage = $storage;
         $this->database = $database;
@@ -99,6 +106,7 @@ class Synchronizer
         $this->idColumnName = $this->entityInfo->idColumnName;
         $this->tableName = $this->entityInfo->tableName;
         $this->prefixedTableName = $this->database->prefix . $this->tableName;
+        $this->tableSchemaStorage = $tableSchemaStorage;
     }
 
     /**
@@ -132,6 +140,7 @@ class Synchronizer
         do_action("vp_before_synchronization_{$entityName}");
 
         if ($task === Synchronizer::SYNCHRONIZE_EVERYTHING) {
+            $this->createTable();
             $this->updateDatabase();
 
             $fixedMnReferences = $this->fixMnReferences();
@@ -256,6 +265,12 @@ class Synchronizer
     //--------------------------------------
     // Step 2 - store entities to db
     //--------------------------------------
+
+    private function createTable()
+    {
+        $tableDDL = $this->tableSchemaStorage->getSchema($this->entityInfo->tableName);
+        $this->database->query($tableDDL);
+    }
 
     /**
      * Adds, updates and deletes rows in the database

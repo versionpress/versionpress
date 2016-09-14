@@ -5,6 +5,7 @@ namespace VersionPress\Synchronizers;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesReplacer;
+use VersionPress\Database\TableSchemaStorage;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -36,13 +37,17 @@ class SynchronizerFactory
 
     private $synchronizationSequence = [];
 
+    /** @var TableSchemaStorage */
+    private $tableSchemaStorage;
+
     public function __construct(
         StorageFactory $storageFactory,
         Database $database,
         DbSchemaInfo $dbSchema,
         VpidRepository $vpidRepository,
         AbsoluteUrlReplacer $urlReplacer,
-        ShortcodesReplacer $shortcodesReplacer
+        ShortcodesReplacer $shortcodesReplacer,
+        TableSchemaStorage $tableSchemaStorage
     ) {
         $this->storageFactory = $storageFactory;
         $this->database = $database;
@@ -51,6 +56,7 @@ class SynchronizerFactory
         $this->urlReplacer = $urlReplacer;
         $this->shortcodesReplacer = $shortcodesReplacer;
         $this->synchronizationSequence = $this->resolveSynchronizationSequence();
+        $this->tableSchemaStorage = $tableSchemaStorage;
     }
 
     /**
@@ -66,7 +72,8 @@ class SynchronizerFactory
             $this->dbSchema,
             $this->vpidRepository,
             $this->urlReplacer,
-            $this->shortcodesReplacer
+            $this->shortcodesReplacer,
+            $this->tableSchemaStorage
         );
     }
 

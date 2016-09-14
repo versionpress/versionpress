@@ -2,6 +2,7 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
+use PHPUnit_Framework_MockObject_Generator;
 use VersionPress\Actions\ActionsInfo;
 use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
@@ -9,6 +10,7 @@ use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesInfo;
 use VersionPress\Database\ShortcodesReplacer;
+use VersionPress\Database\TableSchemaStorage;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Tests\Automation\WpAutomation;
@@ -35,6 +37,8 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
     protected static $shortcodesReplacer;
     /** @var VpidRepository */
     protected static $vpidRepository;
+    /** @var TableSchemaStorage */
+    protected static $tableSchemaRepository;
     /** @var WpAutomation */
     private static $wpAutomation;
 
@@ -77,8 +81,10 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
         self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, self::$vpidRepository);
 
         $vpdbPath = self::$wpAutomation->getVpdbDir();
-        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$database, [], $changeInfoFactory);
+        self::$tableSchemaRepository = new TableSchemaStorage(self::$database, $vpdbPath . '/.schema');
+        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$database, [], $changeInfoFactory, self::$tableSchemaRepository);
         self::$urlReplacer = new AbsoluteUrlReplacer(self::$testConfig->testSite->url);
+
     }
 
     private static function setUpSite()

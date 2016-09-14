@@ -6,6 +6,7 @@ use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesInfo;
 use VersionPress\Database\ShortcodesReplacer;
+use VersionPress\Database\TableSchemaStorage;
 use VersionPress\Database\VpidRepository;
 use VersionPress\DI\DIContainer;
 use VersionPress\Storages\StorageFactory;
@@ -87,7 +88,8 @@ class DBAsserter
         self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, self::$vpidRepository);
 
         $vpdbPath = self::$wpAutomation->getVpdbDir();
-        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$vp_database, $taxonomies, null);
+        $tableSchemaRepository = new TableSchemaStorage(self::$vp_database, $vpdbPath . '/.schema');
+        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$vp_database, $taxonomies, null, $tableSchemaRepository);
 
         require(self::$wpAutomation->getPluginsDir() . '/versionpress/.versionpress/hooks.php');
 
@@ -238,6 +240,10 @@ class DBAsserter
     private static function fetchAll($query, $resultType = MYSQLI_ASSOC)
     {
         $res = self::$database->query($query);
+        if (!$res) {
+            return [];
+        }
+
         return $res->fetch_all($resultType);
     }
 

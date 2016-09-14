@@ -12,6 +12,7 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesInfo;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Database\SqlQueryParser;
+use VersionPress\Database\TableSchemaStorage;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Database\WpdbMirrorBridge;
 use VersionPress\Git\Committer;
@@ -76,7 +77,8 @@ class DIContainer
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::DATABASE),
                 array_keys((array)$wp_taxonomies),
-                $dic->resolve(VersionPressServices::CHANGEINFO_FACTORY)
+                $dic->resolve(VersionPressServices::CHANGEINFO_FACTORY),
+                $dic->resolve(VersionPressServices::TABLE_SCHEMA_STORAGE)
             );
         });
 
@@ -162,7 +164,8 @@ class DIContainer
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::VPID_REPOSITORY),
                 $dic->resolve(VersionPressServices::URL_REPLACER),
-                $dic->resolve(VersionPressServices::SHORTCODES_REPLACER)
+                $dic->resolve(VersionPressServices::SHORTCODES_REPLACER),
+                $dic->resolve(VersionPressServices::TABLE_SCHEMA_STORAGE)
             );
         });
 
@@ -213,6 +216,10 @@ class DIContainer
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::DATABASE)
             );
+        });
+
+        $dic->register(VersionPressServices::TABLE_SCHEMA_STORAGE, function () use ($dic) {
+            return new TableSchemaStorage($dic->resolve(VersionPressServices::DATABASE), VP_VPDB_DIR . '/.schema');
         });
 
         return self::$instance;

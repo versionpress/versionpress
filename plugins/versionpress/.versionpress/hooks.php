@@ -247,7 +247,7 @@ add_filter('vp_entity_tags_term', function ($tags, $oldEntity, $newEntity, $acti
 
 add_filter('vp_bulk_change_description_term', function ($description, $action, $count, $tags) {
 
-    if ($this->getAction() === "delete") {
+    if ($action === "delete") {
         $taxonomy = str_replace("_", " ", $tags[0]['VP-Term-Taxonomy']);
         $taxonomies = StringUtils::pluralize($taxonomy);
         return "Deleted $count $taxonomies";
@@ -384,6 +384,10 @@ add_action('vp_wordpress_updated', function ($version) {
         // Translations
         ["type" => "path", "path" => WP_CONTENT_DIR . '/languages/*'],
 
+        // Database Schema
+        ["type" => "path", "path" => VP_VPDB_DIR . '/.schema/*'],
+
+        // Composer files
         ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.json'],
         ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.lock'],
     ];

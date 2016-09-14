@@ -26,6 +26,7 @@ final class VersionPressServices
     const ACTIONSINFO_PROVIDER_ALL_PLUGINS = 'actionsinfo-provider-all-plugins';
     const ACTIONS_DEFINITION_REPOSITORY = 'actions-definition-repository';
     const COMMIT_MESSAGE_PARSER = 'commit-message-parser';
+    const TABLE_SCHEMA_STORAGE = 'table-schema-storage';
 
     private function __construct()
     {

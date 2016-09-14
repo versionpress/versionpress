@@ -6,6 +6,7 @@ use VersionPress\Actions\ActionsInfo;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Database\TableSchemaStorage;
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Storages\StorageFactory;
@@ -38,6 +39,7 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase
 
         $database = new Database($wpdbStub);
         $changeInfoFactory = $this->getMockBuilder(ChangeInfoFactory::class)->disableOriginalConstructor()->getMock();
+        $tableSchemaStorage = $this->getMockBuilder(TableSchemaStorage::class)->disableOriginalConstructor()->getMock();
 
         $factory = new StorageFactory(
             __DIR__ . '/vpdb',
@@ -48,7 +50,8 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase
             ),
             $database,
             [],
-            $changeInfoFactory
+            $changeInfoFactory,
+            $tableSchemaStorage
         );
 
         foreach ($storages as $entityName => $expectedClass) {

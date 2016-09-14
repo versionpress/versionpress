@@ -34,7 +34,8 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
         $this->postsSynchronizer = new Synchronizer(
             $this->postStorage,
@@ -43,7 +44,8 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
     }
 
