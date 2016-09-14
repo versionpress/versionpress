@@ -2,6 +2,7 @@
 /// <reference path='../../interfaces/State.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import Title from './Title';
 import Options from './options/Options';
@@ -21,6 +22,7 @@ interface BulkActionPanelState {
   options: BulkActionPanelOption[];
 }
 
+@observer
 export default class BulkActionPanel extends React.Component<BulkActionPanelProps, BulkActionPanelState> {
 
   state = {

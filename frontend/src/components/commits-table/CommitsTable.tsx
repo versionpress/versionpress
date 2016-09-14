@@ -1,6 +1,7 @@
 /// <reference path='../common/Commits.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import Row from './row/Row';
 import Footer from './footer/Footer';
@@ -22,6 +23,7 @@ interface CommitsTableProps {
   onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
 }
 
+@observer
 export default class CommitsTable extends React.Component<CommitsTableProps, {}> {
 
   onSelectAllChange = (isChecked: boolean) => {
