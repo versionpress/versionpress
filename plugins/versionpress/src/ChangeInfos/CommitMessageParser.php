@@ -52,7 +52,7 @@ class CommitMessageParser
             $actionTag = $partialCommitMessage->getVersionPressTag(TrackedChangeInfo::ACTION_TAG);
             list($scope, $action, $id) = array_pad(explode('/', $actionTag, 3), 3, null);
 
-            $tags = $commitMessage->getVersionPressTags();
+            $tags = $partialCommitMessage->getVersionPressTags();
             unset($tags[TrackedChangeInfo::ACTION_TAG]);
 
             $actionsInfo = $this->actionsInfoProvider->getActionsInfo($scope);
