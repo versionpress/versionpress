@@ -67,20 +67,6 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
     appStore.selectCommits(commitsToSelect, isChecked, isShiftKey);
   };
 
-  onBulkAction = (action: string) => {
-    if (action === 'undo') {
-      const { selectedCommits } = appStore;
-      const count = selectedCommits.length;
-
-      const title = (
-        <span>Undo <em>{count} {count === 1 ? 'change' : 'changes'}</em>?</span>
-      );
-      const hashes = selectedCommits.map((commit: Commit) => commit.hash);
-
-      revertDialog(title, () => this.undoCommits(hashes));
-    }
-  };
-
   onClearSelection = () => {
     appStore.clearSelection();
   };
@@ -101,6 +87,32 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
     appStore.filter();
   };
 
+  onWelcomePanelHide = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    appStore.hideWelcomePanel();
+  };
+
+  onUpdateNoticeClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    appStore.fetchCommits();
+  };
+
+  onBulkAction = (action: string) => {
+    if (action === 'undo') {
+      const { selectedCommits } = appStore;
+      const count = selectedCommits.length;
+
+      const title = (
+        <span>Undo <em>{count} {count === 1 ? 'change' : 'changes'}</em>?</span>
+      );
+      const hashes = selectedCommits.map((commit: Commit) => commit.hash);
+
+      revertDialog(title, () => this.undoCommits(hashes));
+    }
+  };
+
   onUndo = (hash: string, message: string) => {
     const title = (
       <span>Undo <em>{message}</em>?</span>
@@ -115,18 +127,6 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
     );
 
     revertDialog(title, () => this.rollbackToCommit(hash));
-  };
-
-  onWelcomePanelHide = (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    appStore.hideWelcomePanel();
-  };
-
-  onUpdateNoticeClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    appStore.fetchCommits();
   };
 
   render() {
