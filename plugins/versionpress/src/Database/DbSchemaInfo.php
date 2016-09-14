@@ -50,6 +50,14 @@ class DbSchemaInfo
         $this->dbVersion = $dbVersion;
         $this->prefix = $prefix;
 
+        $this->refreshDbSchema($schemaFiles);
+    }
+
+    public function refreshDbSchema($schemaFiles)
+    {
+        $this->schema = [];
+        $this->entityInfoRegistry = [];
+
         foreach ($schemaFiles as $schemaFile) {
             $pluginSchema = Yaml::parse($schemaFile);
             $pluginSchema = $this->useSchemaForCurrentVersion($pluginSchema);

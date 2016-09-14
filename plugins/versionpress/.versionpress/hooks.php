@@ -1,8 +1,10 @@
 <?php
 
 use Nette\Utils\Strings;
+use VersionPress\Actions\ActivePluginsVPFilesIterator;
 use VersionPress\ChangeInfos\CommitMessageParser;
 use VersionPress\Database\Database;
+use VersionPress\Database\DbSchemaInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitRepository;
 use VersionPress\Initialization\WpdbReplacer;
@@ -410,8 +412,10 @@ add_action('vp_wordpress_updated', function ($version) {
 add_action('vp_plugin_changed', function ($action, $pluginFile, $pluginName) {
     global $versionPressContainer;
 
+    /** @var DbSchemaInfo $dbSchema */
     $dbSchema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
     $tableSchemaStorage = $versionPressContainer->resolve(VersionPressServices::TABLE_SCHEMA_STORAGE);
+    $dbSchema->refreshDbSchema(new ActivePluginsVPFilesIterator('schema.yml'));
 
     vp_update_table_ddl_scripts($dbSchema, $tableSchemaStorage);
 
@@ -451,6 +455,7 @@ add_action('vp_theme_changed', function ($action, $stylesheet, $themeName) {
 
     $dbSchema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
     $tableSchemaStorage = $versionPressContainer->resolve(VersionPressServices::TABLE_SCHEMA_STORAGE);
+    $dbSchema->refreshDbSchema(new ActivePluginsVPFilesIterator('schema.yml'));
 
     vp_update_table_ddl_scripts($dbSchema, $tableSchemaStorage);
 
