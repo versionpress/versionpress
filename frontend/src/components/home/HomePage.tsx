@@ -11,14 +11,13 @@ import BulkActionPanel from '../bulk-action-panel/BulkActionPanel';
 import CommitPanel from '../commit-panel/CommitPanel';
 import CommitsTable from '../commits-table/CommitsTable';
 import Filter from '../filter/Filter';
-import FlashMessage from '../common/flash-message/FlashMessage';
 import ProgressBar from '../common/progress-bar/ProgressBar';
 import ServicePanel from '../service-panel/ServicePanel';
 import UpdateNotice from './update-notice/UpdateNotice';
 import VpTitle from './vp-title/VpTitle';
 import WelcomePanel from '../welcome-panel/WelcomePanel';
 import { revertDialog } from '../portal/portal';
-import { getDiff, getGitStatus } from './utils';
+import { getDiff } from './utils';
 
 import appStore from '../../stores/appStore';
 
@@ -145,12 +144,10 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
         <ProgressBar progress={progress} />
         <ServicePanel
           isVisible={displayServicePanel}
+          message={message}
           onButtonClick={this.onServicePanelClick}
         >
           <VpTitle />
-          {message &&
-            <FlashMessage message={message} />
-          }
         </ServicePanel>
         {isDirtyWorkingDirectory &&
           <CommitPanel />
