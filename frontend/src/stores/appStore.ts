@@ -11,6 +11,7 @@ import { indexOf } from '../utils/CommitUtils';
 import { getErrorMessage, parsePageNumber } from './utils';
 
 import navigationStore from './navigationStore';
+import servicePanelStore from './servicePanelStore';
 
 const routes = config.routes;
 
@@ -20,9 +21,7 @@ class AppStore {
   @observable commits: Commit[] = [];
   @observable selectedCommits: Commit[] = [];
   @observable lastSelectedCommit: Commit = null;
-  @observable message: InfoMessage = null;
   @observable isLoading: boolean = true;
-  @observable displayServicePanel: boolean = false;
   @observable displayWelcomePanel: boolean = false;
   @observable displayUpdateNotice: boolean = false;
   @observable isDirtyWorkingDirectory: boolean = false;
@@ -52,7 +51,7 @@ class AppStore {
       .end((err: any, res: request.Response) => {
         if (err) {
           runInAction(() => {
-            this.message = getErrorMessage(res, err);
+            servicePanelStore.changeMessage(getErrorMessage(res, err))
             this.isLoading = false;
           });
         } else {
@@ -102,11 +101,11 @@ class AppStore {
           if (err) {
             this.pages = [];
             this.commits = [];
-            this.message = getErrorMessage(res, err);
+            servicePanelStore.changeMessage(getErrorMessage(res, err))
           } else {
             this.pages = data.pages.map(c => c + 1);
             this.commits = data.commits;
-            this.message = null;
+            servicePanelStore.changeMessage(null);
 
             this.checkUpdate();
           }
@@ -167,11 +166,6 @@ class AppStore {
   @action
   rollbackToCommit = (hash: string) => {
     this.wpUndoRollback('rollback', { commit: hash });
-  };
-
-  @action
-  changeDisplayServicePanel = () => {
-    this.displayServicePanel = !this.displayServicePanel;
   };
 
   @action

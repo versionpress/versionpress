@@ -6,7 +6,8 @@ import * as WpApi from '../services/WpApi';
 import { getDiff, getGitStatus } from './utils';
 import { getErrorMessage } from './utils';
 
-import AppStore from './appStore';
+import appStore from './appStore';
+import servicePanelStore from './servicePanelStore';
 
 class CommitPanelStore {
   @observable detailsLevel: DetailsLevel = DetailsLevel.None;
@@ -48,14 +49,14 @@ class CommitPanelStore {
     return (err: any, res: request.Response) => {
       runInAction(() => {
         if (err) {
-          AppStore.message = getErrorMessage(res, err);
+          servicePanelStore.changeMessage(getErrorMessage(res, err));
         } else {
-          AppStore.isDirtyWorkingDirectory = false;
-          AppStore.message = {
+          appStore.isDirtyWorkingDirectory = false;
+          servicePanelStore.changeMessage({
             code: 'updated',
             message: successMessage,
-          };
-          AppStore.fetchCommits();
+          });
+          appStore.fetchCommits();
         }
       });
 
@@ -88,22 +89,22 @@ class CommitPanelStore {
 
   @action
   commit = (message: string) => {
-    AppStore.updateProgress({ percent: 0 });
+    appStore.updateProgress({ percent: 0 });
 
     WpApi
       .post('commit')
       .send({ 'commit-message': message })
-      .on('progress', AppStore.updateProgress)
+      .on('progress', appStore.updateProgress)
       .end(this.wpCommitDiscardEnd('Changes have been committed.'));
   };
 
   @action
   discard = () => {
-    AppStore.updateProgress({ percent: 0 });
+    appStore.updateProgress({ percent: 0 });
 
     WpApi
       .post('discard-changes')
-      .on('progress', AppStore.updateProgress)
+      .on('progress', appStore.updateProgress)
       .end(this.wpCommitDiscardEnd('Changes have been discarded.'));
   };
 }

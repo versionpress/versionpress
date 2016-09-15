@@ -57,10 +57,6 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
     appStore.rollbackToCommit(hash);
   };
 
-  onServicePanelClick = () => {
-    appStore.changeDisplayServicePanel();
-  };
-
   onCommitsSelect = (commitsToSelect: Commit[], isChecked: boolean, isShiftKey: boolean) => {
     appStore.selectCommits(commitsToSelect, isChecked, isShiftKey);
   };
@@ -98,9 +94,7 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
       pages,
       commits,
       selectedCommits,
-      message,
       isLoading,
-      displayServicePanel,
       displayWelcomePanel,
       displayUpdateNotice,
       isDirtyWorkingDirectory,
@@ -114,11 +108,7 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
     return (
       <div className={homePageClassName}>
         <ProgressBar progress={progress} />
-        <ServicePanel
-          isVisible={displayServicePanel}
-          message={message}
-          onButtonClick={this.onServicePanelClick}
-        >
+        <ServicePanel>
           <VpTitle />
         </ServicePanel>
         {isDirtyWorkingDirectory &&
