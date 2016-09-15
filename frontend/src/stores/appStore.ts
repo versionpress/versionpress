@@ -35,19 +35,6 @@ class AppStore {
   }
 
   @action
-  init = (page: string, router: ReactRouter.Context) => {
-    this.page = parsePageNumber(page);
-    this.router = router;
-    this.fetchWelcomePanel();
-    this.fetchCommits();
-  };
-
-  @action
-  private updateProgress = (e: {percent: number}) => {
-    this.progress = e.percent;
-  };
-
-  @action
   private setLoading = () => {
     this.isLoading = true;
     this.progress = 0;
@@ -75,23 +62,16 @@ class AppStore {
   };
 
   @action
-  private wpCommitDiscardEnd = (successMessage: string) => {
-    return (err: any, res: request.Response) => {
-      runInAction(() => {
-        if (err) {
-          this.message = getErrorMessage(res, err);
-        } else {
-          this.isDirtyWorkingDirectory = false;
-          this.message = {
-            code: 'updated',
-            message: successMessage,
-          };
-          this.fetchCommits();
-        }
-      });
+  init = (page: string, router: ReactRouter.Context) => {
+    this.page = parsePageNumber(page);
+    this.router = router;
+    this.fetchWelcomePanel();
+    this.fetchCommits();
+  };
 
-      return !err;
-    };
+  @action
+  updateProgress = (e: {percent: number}) => {
+    this.progress = e.percent;
   };
 
   @action
@@ -235,27 +215,6 @@ class AppStore {
   clearSelection = () => {
     this.selectedCommits = [];
     this.lastSelectedCommit = null;
-  };
-
-  @action
-  commit = (message: string) => {
-    this.updateProgress({ percent: 0 });
-
-    WpApi
-      .post('commit')
-      .send({ 'commit-message': message })
-      .on('progress', this.updateProgress)
-      .end(this.wpCommitDiscardEnd('Changes have been committed.'));
-  };
-
-  @action
-  discard = () => {
-    this.updateProgress({ percent: 0 });
-
-    WpApi
-      .post('discard-changes')
-      .on('progress', this.updateProgress)
-      .end(this.wpCommitDiscardEnd('Changes have been discarded.'));
   };
 
   @action

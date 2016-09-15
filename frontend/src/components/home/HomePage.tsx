@@ -71,14 +71,6 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
     appStore.clearSelection();
   };
 
-  onCommit = (message: string) => {
-    appStore.commit(message);
-  };
-
-  onDiscard = () => {
-    appStore.discard();
-  };
-
   onFilterQueryChange = (query: string) => {
     appStore.changeFilterQuery(query);
   };
@@ -161,12 +153,7 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
           }
         </ServicePanel>
         {isDirtyWorkingDirectory &&
-          <CommitPanel
-            diffProvider={{ getDiff: getDiff }}
-            gitStatusProvider={{ getGitStatus: getGitStatus }}
-            onCommit={this.onCommit}
-            onDiscard={this.onDiscard}
-          />
+          <CommitPanel />
         }
         {displayWelcomePanel &&
           <WelcomePanel onHide={this.onWelcomePanelHide} />
