@@ -10,12 +10,13 @@ import * as WpApi from '../services/WpApi';
 import { indexOf } from '../utils/CommitUtils';
 import { getErrorMessage, parsePageNumber } from './utils';
 
+import navigationStore from './navigationStore';
+
 const routes = config.routes;
 
 class AppStore {
   @observable page: number = 0;
   @observable pages: number[] = [];
-  @observable query: string = '';
   @observable commits: Commit[] = [];
   @observable selectedCommits: Commit[] = [];
   @observable lastSelectedCommit: Commit = null;
@@ -88,7 +89,7 @@ class AppStore {
       .get('commits')
       .query({
         page: page,
-        query: encodeURIComponent(this.query),
+        query: encodeURIComponent(navigationStore.query),
       })
       .on('progress', this.updateProgress)
       .end((err: any, res: request.Response) => {
@@ -130,7 +131,7 @@ class AppStore {
 
   @action
   checkUpdate = () => {
-    const { query, commits, isLoading, page } = this;
+    const { commits, isLoading, page } = this;
 
     if (!commits.length || isLoading) {
       return;
@@ -139,7 +140,7 @@ class AppStore {
     WpApi
       .get('should-update')
       .query({
-        query: encodeURIComponent(query),
+        query: encodeURIComponent(navigationStore.query),
         latestCommit: commits[0].hash,
       })
       .end((err: any, res: request.Response) => {
@@ -215,11 +216,6 @@ class AppStore {
   clearSelection = () => {
     this.selectedCommits = [];
     this.lastSelectedCommit = null;
-  };
-
-  @action
-  changeFilterQuery = (query: string) => {
-    this.query = query;
   };
 
   @action

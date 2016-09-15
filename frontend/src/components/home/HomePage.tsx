@@ -7,10 +7,9 @@ import * as moment from 'moment';
 import * as classNames from 'classnames';
 import { observer } from 'mobx-react';
 
-import BulkActionPanel from '../bulk-action-panel/BulkActionPanel';
 import CommitPanel from '../commit-panel/CommitPanel';
 import CommitsTable from '../commits-table/CommitsTable';
-import Filter from '../filter/Filter';
+import Navigation from '../navigation/Navigation';
 import ProgressBar from '../common/progress-bar/ProgressBar';
 import ServicePanel from '../service-panel/ServicePanel';
 import UpdateNotice from './update-notice/UpdateNotice';
@@ -66,18 +65,6 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
     appStore.selectCommits(commitsToSelect, isChecked, isShiftKey);
   };
 
-  onClearSelection = () => {
-    appStore.clearSelection();
-  };
-
-  onFilterQueryChange = (query: string) => {
-    appStore.changeFilterQuery(query);
-  };
-
-  onFilter = () => {
-    appStore.filter();
-  };
-
   onWelcomePanelHide = (e: React.MouseEvent) => {
     e.preventDefault();
 
@@ -88,20 +75,6 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
     e.preventDefault();
 
     appStore.fetchCommits();
-  };
-
-  onBulkAction = (action: string) => {
-    if (action === 'undo') {
-      const { selectedCommits } = appStore;
-      const count = selectedCommits.length;
-
-      const title = (
-        <span>Undo <em>{count} {count === 1 ? 'change' : 'changes'}</em>?</span>
-      );
-      const hashes = selectedCommits.map((commit: Commit) => commit.hash);
-
-      revertDialog(title, () => this.undoCommits(hashes));
-    }
   };
 
   onUndo = (hash: string, message: string) => {
@@ -123,7 +96,6 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
   render() {
     const {
       pages,
-      query,
       commits,
       selectedCommits,
       message,
@@ -158,19 +130,7 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
         {displayUpdateNotice &&
           <UpdateNotice onClick={this.onUpdateNoticeClick} />
         }
-        <div className='tablenav top'>
-          <Filter
-            query={query}
-            onQueryChange={this.onFilterQueryChange}
-            onFilter={this.onFilter}
-          />
-          <BulkActionPanel
-            enableActions={!isDirtyWorkingDirectory}
-            onBulkAction={this.onBulkAction}
-            onClearSelection={this.onClearSelection}
-            selectedCommits={selectedCommits}
-          />
-        </div>
+        <Navigation />
         <CommitsTable
           pages={pages}
           commits={commits}

@@ -1,4 +1,3 @@
-/// <reference path='../common/Commits.d.ts' />
 /// <reference path='../../interfaces/State.d.ts' />
 
 import * as React from 'react';
@@ -12,7 +11,7 @@ import ClearSelection from './ClearSelection';
 import './BulkActionPanel.less';
 
 interface BulkActionPanelProps {
-  selectedCommits: Commit[];
+  changes: number;
   enableActions: boolean;
   onBulkAction(action: string): void;
   onClearSelection(): void;
@@ -73,7 +72,7 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
   };
 
   render() {
-    const { selectedCommits, enableActions } = this.props;
+    const { changes, enableActions } = this.props;
     const { options } = this.state;
 
     return (
@@ -87,10 +86,10 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
           />
           <Submit
             onClick={this.onSubmitClick}
-            isDisabled={!enableActions || selectedCommits.length === 0}
+            isDisabled={!enableActions || changes === 0}
           />
           <ClearSelection
-            changes={selectedCommits.length}
+            changes={changes}
             onClick={this.onClearSelectionClick}
           />
         </div>
