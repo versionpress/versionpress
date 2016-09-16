@@ -17,8 +17,9 @@ class CommitRow {
     return !appStore.isDirtyWorkingDirectory;
   }
 
-  constructor(commit: Commit) {
+  constructor(commit: Commit, isSelected?: boolean = false) {
     this.commit = commit;
+    this.isSelected = isSelected;
   }
 
   private handleSuccess = (detailsLevel: DetailsLevel) => {
