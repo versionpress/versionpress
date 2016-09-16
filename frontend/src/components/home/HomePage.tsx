@@ -49,14 +49,6 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
     appStore.fetchCommits(nextProps.params.page);
   }
 
-  undoCommits = (commits: string[]) => {
-    appStore.undoCommits(commits);
-  };
-
-  rollbackToCommit = (hash: string) => {
-    appStore.rollbackToCommit(hash);
-  };
-
   onCommitsSelect = (commitsToSelect: Commit[], isChecked: boolean, isShiftKey: boolean) => {
     appStore.selectCommits(commitsToSelect, isChecked, isShiftKey);
   };
@@ -78,7 +70,7 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
       <span>Undo <em>{message}</em>?</span>
     );
 
-    revertDialog(title, () => this.undoCommits([hash]));
+    revertDialog(title, () => appStore.undoCommits([hash]));
   };
 
   onRollback = (hash: string, date: string) => {
@@ -86,7 +78,7 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
       <span>Roll back to <em>{moment(date).format('LLL')}</em>?</span>
     );
 
-    revertDialog(title, () => this.rollbackToCommit(hash));
+    revertDialog(title, () => appStore.rollbackToCommit(hash));
   };
 
   render() {
