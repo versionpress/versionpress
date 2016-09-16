@@ -1,9 +1,7 @@
-import { action, computed, observable, runInAction } from 'mobx';
+import { action, observable, runInAction } from 'mobx';
 
 import DetailsLevel from '../enums/DetailsLevel';
 import { getDiff } from './utils';
-
-import appStore from './appStore';
 
 class CommitRow {
   @observable commit: Commit = null;
@@ -12,10 +10,6 @@ class CommitRow {
   @observable diff: string = null;
   @observable error: string = null;
   @observable isLoading: boolean = false;
-
-  @computed get enableActions() {
-    return !appStore.isDirtyWorkingDirectory;
-  }
 
   constructor(commit: Commit, isSelected?: boolean = false) {
     this.commit = commit;
@@ -56,23 +50,6 @@ class CommitRow {
     this.error = null;
     this.isLoading = false;
   };
-
-  @action
-  undo = () => {
-    appStore.undoCommits([this.commit.hash])
-  };
-
-  @action
-  rollback = () => {
-    appStore.rollbackToCommit(this.commit.hash)
-  };
-
-  @action
-  selectCommit = (isShiftKey: boolean) => {
-    this.isSelected = !this.isSelected;
-
-    appStore.selectCommits([this.commit], this.isSelected, isShiftKey);
-  }
 }
 
 export default CommitRow;
