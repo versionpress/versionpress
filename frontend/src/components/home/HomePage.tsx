@@ -3,7 +3,6 @@
 
 import * as React from 'react';
 import * as ReactRouter from 'react-router';
-import * as moment from 'moment';
 import * as classNames from 'classnames';
 import { observer } from 'mobx-react';
 
@@ -15,8 +14,6 @@ import ServicePanel from '../service-panel/ServicePanel';
 import UpdateNotice from './update-notice/UpdateNotice';
 import VpTitle from './vp-title/VpTitle';
 import WelcomePanel from '../welcome-panel/WelcomePanel';
-import { revertDialog } from '../portal/portal';
-import { getDiff } from './utils';
 
 import appStore from '../../stores/appStore';
 
@@ -49,10 +46,6 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
     appStore.fetchCommits(nextProps.params.page);
   }
 
-  onCommitsSelect = (commitsToSelect: Commit[], isChecked: boolean, isShiftKey: boolean) => {
-    appStore.selectCommits(commitsToSelect, isChecked, isShiftKey);
-  };
-
   onWelcomePanelHide = (e: React.MouseEvent) => {
     e.preventDefault();
 
@@ -65,27 +58,8 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
     appStore.fetchCommits();
   };
 
-  onUndo = (hash: string, message: string) => {
-    const title = (
-      <span>Undo <em>{message}</em>?</span>
-    );
-
-    revertDialog(title, () => appStore.undoCommits([hash]));
-  };
-
-  onRollback = (hash: string, date: string) => {
-    const title = (
-      <span>Roll back to <em>{moment(date).format('LLL')}</em>?</span>
-    );
-
-    revertDialog(title, () => appStore.rollbackToCommit(hash));
-  };
-
   render() {
     const {
-      pages,
-      commits,
-      selectedCommits,
       isLoading,
       displayWelcomePanel,
       displayUpdateNotice,
@@ -113,16 +87,7 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
           <UpdateNotice onClick={this.onUpdateNoticeClick} />
         }
         <Navigation />
-        <CommitsTable
-          pages={pages}
-          commits={commits}
-          selectedCommits={selectedCommits}
-          enableActions={!isDirtyWorkingDirectory}
-          diffProvider={{ getDiff: getDiff }}
-          onUndo={this.onUndo}
-          onRollback={this.onRollback}
-          onCommitsSelect={this.onCommitsSelect}
-        />
+        <CommitsTable />
       </div>
     );
   }

@@ -3,18 +3,18 @@ import * as React from 'react';
 import SelectAll from './SelectAll';
 
 interface HeaderProps {
-  commits: Commit[];
-  selectedCommits: Commit[];
+  areAllCommitsSelected: boolean;
   enableActions: boolean;
+  selectableCommitsCount: number;
   onSelectAllChange(isChecked: boolean): void;
 }
 
 const Header: React.StatelessComponent<HeaderProps> = (props) => {
   const {
-    commits,
-    selectedCommits,
+    areAllCommitsSelected,
     enableActions,
     onSelectAllChange,
+    selectableCommitsCount,
   } = props;
 
   return (
@@ -22,8 +22,8 @@ const Header: React.StatelessComponent<HeaderProps> = (props) => {
       <tr>
         <th className='column-environment'/>
         <SelectAll
-          commits={commits}
-          selectedCommits={selectedCommits}
+          isSelected={areAllCommitsSelected}
+          selectableCommitsCount={selectableCommitsCount}
           enableActions={enableActions}
           onChange={onSelectAllChange}
         />

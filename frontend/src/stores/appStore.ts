@@ -6,10 +6,12 @@ import * as ReactRouter from 'react-router';
 import * as request from 'superagent';
 
 import config from '../config/config';
+import CommitRow from './commitRow';
 import * as WpApi from '../services/WpApi';
 import { indexOf } from '../utils/CommitUtils';
 import { getErrorMessage, parsePageNumber } from './utils';
 
+import commitsTableStore from './commitsTableStore';
 import navigationStore from './navigationStore';
 import servicePanelStore from './servicePanelStore';
 
@@ -99,12 +101,14 @@ class AppStore {
           this.displayUpdateNotice = false;
 
           if (err) {
-            this.pages = [];
-            this.commits = [];
+            commitsTableStore.changePages([]);
+            commitsTableStore.changeCommitRows([]);
             servicePanelStore.changeMessage(getErrorMessage(res, err))
           } else {
-            this.pages = data.pages.map(c => c + 1);
-            this.commits = data.commits;
+            commitsTableStore.changePages(data.pages.map(c => c + 1));
+            commitsTableStore.changeCommitRows(data.commits.map(commit => (
+              new CommitRow(commit, indexOf(this.selectedCommits, commit) !== -1))
+            ));
             servicePanelStore.changeMessage(null);
 
             this.checkUpdate();
@@ -130,7 +134,8 @@ class AppStore {
 
   @action
   checkUpdate = () => {
-    const { commits, isLoading, page } = this;
+    const { commits } = commitsTableStore;
+    const { isLoading, page } = this;
 
     if (!commits.length || isLoading) {
       return;
@@ -170,7 +175,7 @@ class AppStore {
 
   @action
   selectCommits = (commitsToSelect: Commit[], isChecked: boolean, isShiftKey: boolean) => {
-    const { commits } = this;
+    const { commits } = commitsTableStore;
     let { selectedCommits, lastSelectedCommit } = this;
     const isBulk = commitsToSelect.length > 1;
 
@@ -204,12 +209,14 @@ class AppStore {
 
     this.selectedCommits = selectedCommits;
     this.lastSelectedCommit = isBulk ? null : lastSelectedCommit;
+    commitsTableStore.updateSelectedCommits(this.selectedCommits);
   };
 
   @action
   clearSelection = () => {
     this.selectedCommits = [];
     this.lastSelectedCommit = null;
+    commitsTableStore.deselectAllCommits();
   };
 
   @action

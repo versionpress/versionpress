@@ -11,7 +11,7 @@ class CommitRow {
   @observable error: string = null;
   @observable isLoading: boolean = false;
 
-  constructor(commit: Commit, isSelected?: boolean = false) {
+  constructor(commit: Commit, isSelected: boolean = false) {
     this.commit = commit;
     this.isSelected = isSelected;
   }

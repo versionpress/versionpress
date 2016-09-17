@@ -1,57 +1,57 @@
 /// <reference path='../common/Commits.d.ts' />
 
 import * as React from 'react';
+import * as moment from 'moment';
 import { observer } from 'mobx-react';
 
 import Row from './row/Row';
 import Footer from './footer/Footer';
 import Header from './header/Header';
 import Note from './note/Note';
-import { indexOf } from '../../utils/CommitUtils';
+import { revertDialog } from '../portal/portal';
 import { findIndex } from '../../utils/ArrayUtils';
+
+import CommitRow from '../../stores/commitRow';
+import store from '../../stores/commitsTableStore';
 
 import './CommitsTable.less';
 
-interface CommitsTableProps {
-  pages: number[];
-  commits: Commit[];
-  selectedCommits: Commit[];
-  enableActions: boolean;
-  diffProvider: {getDiff(hash: string): Promise<string>};
-  onUndo(hash: string, message: string): void;
-  onRollback(hash: string, date: string): void;
-  onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
-}
-
 @observer
-export default class CommitsTable extends React.Component<CommitsTableProps, {}> {
+export default class CommitsTable extends React.Component<{}, {}> {
 
   onSelectAllChange = (isChecked: boolean) => {
-    const { commits, onCommitsSelect } = this.props;
-
-    onCommitsSelect(commits, isChecked, false);
+    this.onCommitsSelect(store.commits, isChecked, false);
   };
 
-  renderRow = (commit: Commit, displayNotAbleNote: boolean) => {
-    const {
-      selectedCommits,
-      enableActions,
-      diffProvider,
-      onUndo,
-      onRollback,
-      onCommitsSelect,
-    } = this.props;
+  onUndo = (hash: string, message: string) => {
+    const title = (
+      <span>Undo <em>{message}</em>?</span>
+    );
 
+    revertDialog(title, () => store.undoCommits([hash]));
+  };
+
+  onRollback = (hash: string, date: string) => {
+    const title = (
+      <span>Roll back to <em>{moment(date).format('LLL')}</em>?</span>
+    );
+
+    revertDialog(title, () => store.rollbackToCommit(hash));
+  };
+
+  onCommitsSelect = (commitsToSelect: Commit[], isChecked: boolean, isShiftKey: boolean) => {
+    store.selectCommits(commitsToSelect, isChecked, isShiftKey);
+  };
+
+  renderRow = (commitRow: CommitRow, displayNotAbleNote: boolean) => {
     const row = (
       <Row
-        commit={commit}
-        enableActions={enableActions}
-        isSelected={indexOf(selectedCommits, commit) !== -1}
-        onUndo={onUndo}
-        onRollback={onRollback}
-        onCommitsSelect={onCommitsSelect}
-        diffProvider={diffProvider}
-        key={commit.hash}
+        commitRow={commitRow}
+        enableActions={store.enableActions}
+        onUndo={this.onUndo}
+        onRollback={this.onRollback}
+        onCommitsSelect={this.onCommitsSelect}
+        key={commitRow.commit.hash}
       />
     );
 
@@ -71,9 +71,11 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
     const {
       pages,
       commits,
-      selectedCommits,
+      commitRows,
       enableActions,
-    } = this.props;
+      selectableCommits,
+      areAllCommitsSelected,
+    } = store;
 
     const notAbleNoteIndex = findIndex(commits, (commit: Commit, index: number) => (
       !commit.isEnabled && index < commits.length - 1
@@ -82,13 +84,13 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
     return (
       <table className='vp-table widefat fixed'>
         <Header
-          commits={commits}
-          selectedCommits={selectedCommits}
+          areAllCommitsSelected={areAllCommitsSelected}
+          selectableCommitsCount={selectableCommits.length}
           enableActions={enableActions}
           onSelectAllChange={this.onSelectAllChange}
         />
-        {commits.map((commit: Commit, index: number) => (
-          this.renderRow(commit, index === notAbleNoteIndex)
+        {commitRows.map((commitRow: CommitRow, index: number) => (
+          this.renderRow(commitRow, index === notAbleNoteIndex)
         ))}
         <Footer pages={pages} />
       </table>
