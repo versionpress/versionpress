@@ -3,6 +3,7 @@ import { action, computed, observable } from 'mobx';
 import CommitRow from './commitRow';
 
 import appStore from './appStore';
+import { indexOf } from "../utils/CommitUtils";
 
 class CommitsTableStore {
   @observable commitRows: CommitRow[] = [];
@@ -24,6 +25,13 @@ class CommitsTableStore {
   @action
   changePages = (pages: number[]) => {
     this.pages = pages;
+  };
+
+  @action
+  updateSelectedCommits = (selectedCommits: Commit[]) => {
+    this.commitRows.forEach(commitRow => {
+      commitRow.isSelected = indexOf(selectedCommits, commitRow.commit) !== -1;
+    });
   };
 
   @action
