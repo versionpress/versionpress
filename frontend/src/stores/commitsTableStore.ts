@@ -13,6 +13,16 @@ class CommitsTableStore {
   }
 
   @action
+  changeCommitRows = (commitRows: CommitRow[]) => {
+    this.commitRows = commitRows;
+  };
+
+  @action
+  changePages = (pages: number[]) => {
+    this.pages = pages;
+  };
+
+  @action
   undoCommits = (commits: string[]) => {
     appStore.undoCommits(commits);
   };
