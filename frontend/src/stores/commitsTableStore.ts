@@ -12,6 +12,10 @@ class CommitsTableStore {
     return !appStore.isDirtyWorkingDirectory;
   }
 
+  @computed get commits() {
+    return this.commitRows.map(row => row.commit);
+  }
+
   @action
   changeCommitRows = (commitRows: CommitRow[]) => {
     this.commitRows = commitRows;
