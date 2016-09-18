@@ -11,7 +11,7 @@ import Note from './note/Note';
 import { revertDialog } from '../portal/portal';
 import { findIndex } from '../../utils/ArrayUtils';
 
-import CommitRow from '../../stores/commitRow';
+import CommitRow from '../../stores/CommitRow';
 import store from '../../stores/commitsTableStore';
 
 import './CommitsTable.less';

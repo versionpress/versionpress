@@ -8,7 +8,7 @@ import CommitSummary from '../commit-summary/CommitSummary';
 import Error from './Error';
 import DetailsLevel from '../../../enums/DetailsLevel';
 
-import CommitRow from "../../../stores/commitRow";
+import CommitRow from "../../../stores/CommitRow";
 
 interface RowProps {
   commitRow: CommitRow;

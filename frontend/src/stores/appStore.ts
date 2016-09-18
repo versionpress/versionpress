@@ -6,7 +6,7 @@ import * as ReactRouter from 'react-router';
 import * as request from 'superagent';
 
 import config from '../config/config';
-import CommitRow from './commitRow';
+import CommitRow from './CommitRow';
 import * as WpApi from '../services/WpApi';
 import { indexOf } from '../utils/CommitUtils';
 import { getErrorMessage, parsePageNumber } from './utils';
@@ -19,8 +19,6 @@ const routes = config.routes;
 
 class AppStore {
   @observable page: number = 0;
-  @observable pages: number[] = [];
-  @observable commits: Commit[] = [];
   @observable selectedCommits: Commit[] = [];
   @observable lastSelectedCommit: Commit = null;
   @observable isLoading: boolean = true;

@@ -3,8 +3,7 @@ import * as request from 'superagent';
 
 import DetailsLevel from '../enums/DetailsLevel';
 import * as WpApi from '../services/WpApi';
-import { getDiff, getGitStatus } from './utils';
-import { getErrorMessage } from './utils';
+import { getDiff, getGitStatus, getErrorMessage } from './utils';
 
 import appStore from './appStore';
 import servicePanelStore from './servicePanelStore';

@@ -1,6 +1,6 @@
 import { action, computed, observable } from 'mobx';
 import * as _ from 'lodash';
-import CommitRow from './commitRow';
+import CommitRow from './CommitRow';
 
 import appStore from './appStore';
 import { indexOf } from "../utils/CommitUtils";
