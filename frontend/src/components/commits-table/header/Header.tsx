@@ -4,17 +4,17 @@ import SelectAll from './SelectAll';
 
 interface HeaderProps {
   areAllCommitsSelected: boolean;
-  enableActions: boolean;
   selectableCommitsCount: number;
+  enableActions: boolean;
   onSelectAllChange(isChecked: boolean): void;
 }
 
 const Header: React.StatelessComponent<HeaderProps> = (props) => {
   const {
     areAllCommitsSelected,
+    selectableCommitsCount,
     enableActions,
     onSelectAllChange,
-    selectableCommitsCount,
   } = props;
 
   return (
