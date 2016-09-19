@@ -396,9 +396,10 @@ add_action('vp_wordpress_updated', function ($version) {
         ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.lock'],
     ];
 
-
+    /** @var DbSchemaInfo $dbSchema */
     $dbSchema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
     $tableSchemaStorage = $versionPressContainer->resolve(VersionPressServices::TABLE_SCHEMA_STORAGE);
+    $dbSchema->refreshDbSchema(new ActivePluginsVPFilesIterator('schema.yml'));
 
     vp_update_table_ddl_scripts($dbSchema, $tableSchemaStorage);
 
