@@ -19,7 +19,7 @@ Here are a couple of hosts that we or our users confirmed work fine with Version
  - [Elbia Hosting (SK)](http://www.elbiahosting.sk/) – Slovak hosting company
  - [SiteGround](https://www.siteground.com/) – VersionPress can be installed but [some issues have been reported](https://github.com/versionpress/support/issues/46)
  - [WebHostFace](https://www.webhostface.com/) – SSD-powered hosting with Free SSLs & 24/7 Expert WordPress Support
-
+ - [45AIR](https://www.45air.com/) – Low Cost WordPress Hosting - Git 2.10+, full shell access, and VersionPress pre-installed.
 <div class="note">
   <p><strong>Help us improve this list</strong></p>
   <p>If you know of a host that supports VersionPress please <a href="https://github.com/versionpress/docs/blob/master/content/en/07-integrations/04-hosts.md">send a pull request</a>.</p>
