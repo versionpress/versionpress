@@ -8,6 +8,7 @@ import { indexOf } from '../utils/CommitUtils';
 class CommitsTableStore {
   @observable commitRows: CommitRow[] = [];
   @observable pages: number[] = [];
+  @observable isLoading: boolean = true;
 
   @computed get enableActions() {
     return !appStore.isDirtyWorkingDirectory;

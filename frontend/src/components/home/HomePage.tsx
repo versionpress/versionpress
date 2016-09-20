@@ -3,13 +3,12 @@
 
 import * as React from 'react';
 import * as ReactRouter from 'react-router';
-import * as classNames from 'classnames';
 import { observer } from 'mobx-react';
 
 import CommitPanel from '../commit-panel/CommitPanel';
 import CommitsTable from '../commits-table/CommitsTable';
 import Navigation from '../navigation/Navigation';
-import ProgressBar from '../common/progress-bar/ProgressBar';
+import ProgressBar from '../progress-bar/ProgressBar';
 import ServicePanel from '../service-panel/ServicePanel';
 import UpdateNotice from './update-notice/UpdateNotice';
 import VpTitle from './vp-title/VpTitle';
@@ -60,19 +59,14 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
 
   render() {
     const {
-      isLoading,
       displayWelcomePanel,
       displayUpdateNotice,
       isDirtyWorkingDirectory,
       progress,
     } = appStore;
 
-    const homePageClassName = classNames({
-      'loading': isLoading,
-    });
-
     return (
-      <div className={homePageClassName}>
+      <div>
         <ProgressBar progress={progress} />
         <ServicePanel>
           <VpTitle />

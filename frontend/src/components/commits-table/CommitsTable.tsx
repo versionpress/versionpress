@@ -1,6 +1,7 @@
 /// <reference path='../common/Commits.d.ts' />
 
 import * as React from 'react';
+import * as classNames from 'classnames';
 import * as moment from 'moment';
 import { observer } from 'mobx-react';
 
@@ -75,14 +76,22 @@ export default class CommitsTable extends React.Component<{}, {}> {
       enableActions,
       selectableCommits,
       areAllCommitsSelected,
+      isLoading,
     } = store;
+
+    const commitsTableClassName = classNames({
+      'vp-table': true,
+      'widefat': true,
+      'fixed': true,
+      'loading': isLoading,
+    });
 
     const notAbleNoteIndex = findIndex(commits, (commit: Commit, index: number) => (
       !commit.isEnabled && index < commits.length - 1
     ));
 
     return (
-      <table className='vp-table widefat fixed'>
+      <table className={commitsTableClassName}>
         <Header
           areAllCommitsSelected={areAllCommitsSelected}
           selectableCommitsCount={selectableCommits.length}

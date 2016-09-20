@@ -47,6 +47,8 @@ class CommitPanelStore {
   private wpCommitDiscardEnd = (successMessage: string) => {
     return (err: any, res: request.Response) => {
       runInAction(() => {
+        appStore.updateProgress(100);
+
         if (err) {
           servicePanelStore.changeMessage(getErrorMessage(res, err));
         } else {
@@ -88,7 +90,7 @@ class CommitPanelStore {
 
   @action
   commit = (message: string) => {
-    appStore.updateProgress({ percent: 0 });
+    appStore.updateProgress(0);
 
     WpApi
       .post('commit')
@@ -99,7 +101,7 @@ class CommitPanelStore {
 
   @action
   discard = () => {
-    appStore.updateProgress({ percent: 0 });
+    appStore.updateProgress(0);
 
     WpApi
       .post('discard-changes')

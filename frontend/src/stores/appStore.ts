@@ -21,7 +21,6 @@ class AppStore {
   @observable page: number = 0;
   @observable selectedCommits: Commit[] = [];
   @observable lastSelectedCommit: Commit = null;
-  @observable isLoading: boolean = true;
   @observable displayWelcomePanel: boolean = false;
   @observable displayUpdateNotice: boolean = false;
   @observable isDirtyWorkingDirectory: boolean = false;
@@ -35,14 +34,14 @@ class AppStore {
   }
 
   @action
-  private setLoading = () => {
-    this.isLoading = true;
-    this.progress = 0;
+  private setLoading = (isLoading: boolean) => {
+    commitsTableStore.isLoading = isLoading;
+    this.progress = isLoading ? 0 : 100;
   };
 
   @action
   private wpUndoRollback = (name: string, query: any) => {
-    this.setLoading();
+    this.setLoading(true);
 
     WpApi
       .get(name)
@@ -51,8 +50,8 @@ class AppStore {
       .end((err: any, res: request.Response) => {
         if (err) {
           runInAction(() => {
+            this.setLoading(false);
             servicePanelStore.changeMessage(getErrorMessage(res, err));
-            this.isLoading = false;
           });
         } else {
           this.router.transitionTo(routes.home);
@@ -70,13 +69,17 @@ class AppStore {
   };
 
   @action
-  updateProgress = (e: {percent: number}) => {
-    this.progress = e.percent;
+  updateProgress = (progress: ProgressEvent | number) => {
+    if (typeof progress === 'number') {
+      this.progress = progress;
+    } else if (progress.total > 0) {
+      this.progress = progress.loaded / progress.total * 100;
+    }
   };
 
   @action
   fetchCommits = (page: number | string = this.page) => {
-    this.setLoading();
+    this.setLoading(true);
 
     page = parsePageNumber(page);
 
@@ -95,7 +98,7 @@ class AppStore {
         const data = res.body.data as VpApi.GetCommitsResponse;
 
         runInAction(() => {
-          this.isLoading = false;
+          this.setLoading(false);
           this.displayUpdateNotice = false;
 
           if (err) {
@@ -132,8 +135,7 @@ class AppStore {
 
   @action
   checkUpdate = () => {
-    const { commits } = commitsTableStore;
-    const { isLoading, page } = this;
+    const { commits, isLoading } = commitsTableStore;
 
     if (!commits.length || isLoading) {
       return;
@@ -154,7 +156,7 @@ class AppStore {
             this.isDirtyWorkingDirectory = false;
             clearInterval(this.refreshInterval);
           } else {
-            this.displayUpdateNotice = !page && data.update === true;
+            this.displayUpdateNotice = !this.page && data.update === true;
             this.isDirtyWorkingDirectory = data.cleanWorkingDirectory !== true;
           }
         });
