@@ -1,4 +1,4 @@
-import { action, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 
 import commitsTableStore from './commitsTableStore';
 
@@ -9,6 +9,17 @@ class ServicePanelStore {
 
   get commits() {
     return commitsTableStore.commits;
+  }
+
+  @computed get environments() {
+    let environments = [];
+    this.commits.forEach(commit => {
+      if (environments.indexOf(commit.environment) === -1) {
+        environments.push(commit.environment);
+      }
+    });
+
+    return environments;
   }
 
   @action

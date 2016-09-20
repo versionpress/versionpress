@@ -35,6 +35,7 @@ export default class ServicePanel extends React.Component<ServicePanelProps, {}>
         <VisualizationPanel
           isVisible={isVisualizationVisible}
           commits={commits}
+          environments={store.environments}
         />
       </div>
     );
