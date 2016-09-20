@@ -252,6 +252,8 @@ class DbSchemaInfo
 
     public function getAllMnReferences()
     {
+        $mnReferences = [];
+
         foreach ($this->getAllEntityNames() as $entityName) {
             $entityInfo = $this->getEntityInfo($entityName);
             if (!$entityInfo->mnReferences) {
@@ -262,9 +264,11 @@ class DbSchemaInfo
                 if ($entityInfo->isVirtualReference($reference)) {
                     continue;
                 }
-                yield ReferenceUtils::getMnReferenceDetails($this, $entityName, $reference);
+                $mnReferences[] = ReferenceUtils::getMnReferenceDetails($this, $entityName, $reference);
             }
         }
+
+        return $mnReferences;
     }
 
     public function trimPrefix($tableName)

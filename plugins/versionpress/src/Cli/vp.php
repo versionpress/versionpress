@@ -250,12 +250,12 @@ class VPCommand extends WP_CLI_Command
 
         WpConfigSplitter::ensureCommonConfigInclude($wpConfigPath);
 
-        // Create or empty database
-        $this->prepareDatabase($assoc_args);
-
         // Disable VersionPress tracking for a while
         WpdbReplacer::restoreOriginal();
         unlink(VERSIONPRESS_ACTIVATION_FILE);
+
+        // Create or empty database
+        $this->prepareDatabase($assoc_args);
 
 
         // Create WP tables.
@@ -301,11 +301,11 @@ class VPCommand extends WP_CLI_Command
         $activePluginsOption = IniSerializer::deserialize(file_get_contents(VP_VPDB_DIR . '/options/ac/active_plugins.ini'));
         $activePlugins = json_encode(unserialize($activePluginsOption['active_plugins']['option_value']));
 
-        VPCommandUtils::runWpCliCommand('option', 'update', ['active_plugins', $activePlugins, 'autoload' => 'yes', 'format' => 'json']);
+        VPCommandUtils::runWpCliCommand('option', 'update', ['active_plugins', $activePlugins, 'autoload' => 'yes', 'format' => 'json', 'skip-plugins' => null]);
 
-        // The next couple of the steps need to be done after WP is fully loaded; we use `finish-init-clone` for that
+        // The next couple of the steps need to be done after WP is fully loaded; we use `finish-restore-site` for that
         // The main reason for this is that we need properly set WP_CONTENT_DIR constant for reading from storages
-        $process = $this->runVPInternalCommand('finish-init-clone');
+        $process = $this->runVPInternalCommand('finish-restore-site');
         WP_CLI::log($process->getConsoleOutput());
         if (!$process->isSuccessful()) {
             WP_CLI::error("Could not finish site restore");

@@ -3,7 +3,9 @@
 namespace VersionPress\Cli;
 
 use VersionPress\Database\Database;
+use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\VpidRepository;
+use VersionPress\DI\DIContainer;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Initialization\Initializer;
@@ -33,18 +35,40 @@ class VPInternalCommand extends WP_CLI_Command
     /**
      * Finishes clone operation
      *
-     * @subcommand finish-init-clone
+     * @subcommand finish-restore-site
+     *
+     * @when before_wp_load
      *
      */
-    public function finishInitClone($args, $assoc_args)
+    public function finishRestore($args, $assoc_args)
     {
-        global $versionPressContainer;
+        define('SHORTINIT', true);
+
+        $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
+        require_once $wpConfigPath;
+
+        require ABSPATH . WPINC . '/formatting.php';
+        require ABSPATH . WPINC . '/link-template.php';
+        require ABSPATH . WPINC . '/shortcodes.php';
+        require ABSPATH . WPINC . '/taxonomy.php';
+
+        wp_plugin_directory_constants();
+
+        require_once WP_PLUGIN_DIR . '/versionpress/bootstrap.php';
+
+        $versionPressContainer = DIContainer::getConfiguredInstance();
 
         // Truncate tables
 
         /** @var Database $database */
         $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
-        $tables = $database->tables();
+        /** @var DbSchemaInfo $dbSchema */
+        $dbSchema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
+
+        $tables = array_map(function ($entityName) use ($dbSchema) {
+            return $dbSchema->getPrefixedTableName($entityName);
+        }, array_merge($dbSchema->getAllEntityNames(), array_map(function ($referenceDetails) { return $referenceDetails['junction-table']; }, $dbSchema->getAllMnReferences())));
+
 
         $tables = array_filter($tables, function ($table) use ($database) {
             return $table !== $database->options;
@@ -52,12 +76,10 @@ class VPInternalCommand extends WP_CLI_Command
 
         foreach ($tables as $table) {
             $truncateCmd = "TRUNCATE TABLE `$table`";
-            $database->query($truncateCmd);
+            @$database->query($truncateCmd); // Intentional @ - not existing table is ok for us but TRUNCATE ends with error
         }
 
-
         // Create VersionPress tables
-
         /** @var \VersionPress\Initialization\Initializer $initializer */
         $initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);
         $initializer->createVersionPressTables();
@@ -76,10 +98,18 @@ class VPInternalCommand extends WP_CLI_Command
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
         $syncProcess->synchronizeAll();
-        vp_flush_regenerable_options();
-        $this->flushRewriteRules();
         WP_CLI::success("Database synchronized");
 
+        VPCommandUtils::runWpCliCommand('vp-internal', 'flush-regenerable-values', ['require' => __FILE__]);
+    }
+
+    /**
+     * @subcommand flush-regenerable-values
+     */
+    public function flushRegenerableValues()
+    {
+        vp_flush_regenerable_options();
+        $this->flushRewriteRules();
     }
 
     /**
