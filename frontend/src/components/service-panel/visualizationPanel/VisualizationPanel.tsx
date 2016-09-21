@@ -2,20 +2,24 @@ import * as React from 'react';
 import * as classNames from 'classnames';
 
 import { getGitBranchColor } from '../../../services/GitBranchColorProvider';
+import BranchCommit from "../../../stores/BranchCommit";
 
 interface VisualizationPanelProps {
   isVisible: boolean;
   commits: Commit[];
   environments: string[];
+  visualization: BranchCommit[][];
 }
 
 const VisualizationPanel: React.StatelessComponent<VisualizationPanelProps> = ({
-  isVisible, commits, environments
+  isVisible, commits, environments, visualization
 }) => {
   const wrapperClassName = classNames({
     'ServicePanel-wrapper': true,
     'ServicePanel-wrapper--hide': !isVisible,
   });
+
+  console.log(visualization);
 
   return (
     <div className={wrapperClassName}>
@@ -34,12 +38,20 @@ const VisualizationPanel: React.StatelessComponent<VisualizationPanelProps> = ({
                 {environments[0] !== commit.environment && <td colSpan={3} /> }
                 <td
                   width={10}
-                  style={{ backgroundColor: getGitBranchColor(getGitBranchColor(commit.environment))}}
+                  style={{
+                    backgroundColor: getGitBranchColor(getGitBranchColor(commit.environment)),
+                    border: 0
+                  }}
                 />
-                <td colSpan={2}>
-                  {`${commit.message.slice(0, 15)}${commit.message.length > 15 ? '...' : ''}`}
+                <td
+                  colSpan={2}
+                  style={{ paddingLeft: 10}}
+                >
+                  {`${commit.message.slice(0, 8)}${commit.message.length > 8 ? '...' : ''}`}
                 </td>
                 {environments[0] === commit.environment && <td colSpan={3} /> }
+                {commit.isMerge && console.log("merge", commit)}
+                {commit.isInitial && console.log("init", commit)}
               </tr>
             ))}
             </tbody>

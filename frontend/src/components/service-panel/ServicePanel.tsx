@@ -31,11 +31,12 @@ export default class ServicePanel extends React.Component<ServicePanelProps, {}>
         {message &&
           <FlashMessage message={message} />
         }
-        <Panel isVisible={isVisible} />
+        <Panel isVisible={false} />
         <VisualizationPanel
           isVisible={isVisualizationVisible}
           commits={commits}
           environments={store.environments}
+          visualization={store.visualization}
         />
       </div>
     );
