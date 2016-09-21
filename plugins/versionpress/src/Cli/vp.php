@@ -9,6 +9,7 @@ namespace VersionPress\Cli;
 
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
+use VersionPress\Actions\ActionsDefinitionRepository;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Committer;
 use VersionPress\Git\GitConfig;
@@ -734,6 +735,10 @@ class VPCommand extends WP_CLI_Command
             }
         }
 
+        /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
+        $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
+        $actionsDefinitionRepository->restoreAllDefinitionFilesFromHistory();
+
         // Run synchronization
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
@@ -769,6 +774,10 @@ class VPCommand extends WP_CLI_Command
         global $versionPressContainer;
 
         $this->switchMaintenance('on');
+
+        /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
+        $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
+        $actionsDefinitionRepository->restoreAllDefinitionFilesFromHistory();
 
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);

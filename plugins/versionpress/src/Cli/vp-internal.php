@@ -2,6 +2,7 @@
 
 namespace VersionPress\Cli;
 
+use VersionPress\Actions\ActionsDefinitionRepository;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\VpidRepository;
@@ -58,8 +59,11 @@ class VPInternalCommand extends WP_CLI_Command
 
         $versionPressContainer = DIContainer::getConfiguredInstance();
 
-        // Truncate tables
+        /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
+        $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
+        $actionsDefinitionRepository->restoreAllDefinitionFilesFromHistory();
 
+        // Truncate tables
         /** @var Database $database */
         $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
         /** @var DbSchemaInfo $dbSchema */
@@ -123,6 +127,10 @@ class VPInternalCommand extends WP_CLI_Command
         activate_plugins("versionpress/versionpress.php");
         WP_CLI::success('Re-activated VersionPress');
 
+        /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
+        $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
+        $actionsDefinitionRepository->restoreAllDefinitionFilesFromHistory();
+
         /** @var Initializer $initializer */
         $initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);
         $initializer->initializeVersionPress(true);
@@ -175,6 +183,10 @@ class VPInternalCommand extends WP_CLI_Command
                 WP_CLI::error('Composer dependencies could not be restored.');
             }
         }
+
+        /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
+        $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
+        $actionsDefinitionRepository->restoreAllDefinitionFilesFromHistory();
 
         // Run synchronization
         /** @var SynchronizationProcess $syncProcess */
