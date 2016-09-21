@@ -34,7 +34,8 @@ class ServicePanelStore {
     return commitsTableStore.commits;
   }
 
-  @computed get environments() {
+  @computed get environments(): string[] {
+    /*
     let environments = [];
     this.commits.forEach(commit => {
       if (environments.indexOf(commit.environment) === -1) {
@@ -43,11 +44,11 @@ class ServicePanelStore {
     });
 
     return environments;
+     */
+    return ['master', 'staging'];
   }
 
-  @computed get visualization() {
-    this.commits.forEach(commit => commit.environment);
-
+  @computed get visualization(): BranchCommit[][] {
     return [
       [
         new BranchCommit(getRndCom(1, false, 'master')),
