@@ -4,7 +4,7 @@ import * as moment from 'moment';
 import BranchCommit from './BranchCommit';
 import commitsTableStore from './commitsTableStore';
 
-function getRandomCommit(id: number, isMerge: boolean, environment: string): Commit {
+function getRndCom(id: number, isMerge: boolean, environment: string): Commit {
   const rnd = Math.random();
   return {
     message: isMerge ? 'Merged some changes' : rnd > .7 ? `Reverted ${id}` : `Made some changes ${id}`,
@@ -49,18 +49,38 @@ class ServicePanelStore {
     this.commits.forEach(commit => commit.environment);
 
     return [
-      [new BranchCommit(getRandomCommit(1, false, 'master')), null],
-      [new BranchCommit(getRandomCommit(2, true, 'master')), null],
-      [new BranchCommit(null, true, 'master'),
-        new BranchCommit(getRandomCommit(3, false, 'staging'), false, null, false, false, true)],
-      [new BranchCommit(getRandomCommit(4, false, 'master')),
-        new BranchCommit(null, true, 'staging')],
-      [new BranchCommit(null, true, 'master'),
-        new BranchCommit(getRandomCommit(5, false, 'staging'))],
-      [new BranchCommit(null, true, 'master'),
-        new BranchCommit(getRandomCommit(6, false, 'staging'), false, null, true)],
-      [new BranchCommit(getRandomCommit(7, false, 'master'), false, null, false, true), null],
-      [new BranchCommit(getRandomCommit(8, false, 'master')), null]
+      [
+        new BranchCommit(getRndCom(1, false, 'master')),
+        null
+      ],
+      [
+        new BranchCommit(getRndCom(2, true, 'master'), { mergeParents: ['staging'] }),
+        null
+      ],
+      [
+        new BranchCommit(null, { environment: 'master' }),
+        new BranchCommit(getRndCom(3, false, 'staging'), { mergeTo: ['master'], isEnd: true })
+      ],
+      [
+        new BranchCommit(getRndCom(4, false, 'master')),
+        new BranchCommit(null, { environment: 'staging' })
+      ],
+      [
+        new BranchCommit(null, { environment: 'master' }),
+        new BranchCommit(getRndCom(5, false, 'staging'))
+      ],
+      [
+        new BranchCommit(null, { environment: 'master' }),
+        new BranchCommit(getRndCom(6, false, 'staging'), { checkoutFrom: 'master' })
+      ],
+      [
+        new BranchCommit(getRndCom(7, false, 'master'), { checkoutChildren: ['staging'] }),
+        null
+      ],
+      [
+        new BranchCommit(getRndCom(8, false, 'master')),
+        null
+      ]
     ];
   }
 
