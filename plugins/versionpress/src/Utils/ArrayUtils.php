@@ -170,4 +170,20 @@ class ArrayUtils
             return $mapFn($array[$key], $key);
         }, array_keys($array));
     }
+
+    /**
+     * Removes duplicate values from an array.
+     * Uses custom function to map the values to a comparable value.
+     * It preserves keys.
+     *
+     * @param array $array
+     * @param callable|null $fn
+     * @return array
+     */
+    public static function unique($array, $fn = null)
+    {
+        $mapped = $fn ? array_map($fn, $array) : $array;
+        $uniqueMapped = array_unique($mapped, SORT_REGULAR);
+        return array_intersect_key($array, $uniqueMapped);
+    }
 }

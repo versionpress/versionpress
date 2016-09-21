@@ -4,6 +4,7 @@ namespace VersionPress\Actions;
 
 use Symfony\Component\Yaml\Yaml;
 use VersionPress\Git\GitRepository;
+use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\FileSystem;
 
 /**
@@ -14,10 +15,13 @@ class ActionsDefinitionRepository
 {
     /** @var string */
     private $directory;
+    /** @var GitRepository */
+    private $gitRepository;
 
-    public function __construct($directory)
+    public function __construct($directory, $gitRepository)
     {
         $this->directory = $directory;
+        $this->gitRepository = $gitRepository;
     }
 
     public function getAllDefinitionFiles()
@@ -33,12 +37,36 @@ class ActionsDefinitionRepository
             return;
         }
 
-        $targetFile = $this->directory . '/' . $this->sanitizePluginName($plugin) . '-actions.yml';
+        $targetFile = $this->getDefinitionFileName($plugin);
         FileSystem::copy($actionsFile, $targetFile);
+    }
+
+    public function restoreAllDefinitionFilesFromHistory()
+    {
+        FileSystem::removeContent($this->directory);
+
+        $definitionFilesWildcard = WP_PLUGIN_DIR . '/*/.versionpress/actions.yml';
+        $modifications = $this->gitRepository->getFileModifications($definitionFilesWildcard);
+
+        $modifications = array_filter($modifications, function ($modification) { return $modification['status'] !== 'D'; });
+        $lastModifications = ArrayUtils::unique($modifications, function ($modification) { return $modification['path']; });
+
+        foreach ($lastModifications as $modification) {
+            $fileContent = $this->gitRepository->getFileInRevision($modification['path'], $modification['commit']);
+            $plugin = basename(dirname(dirname($modification['path'])));
+
+            $targetFile = $this->getDefinitionFileName($plugin);
+            file_put_contents($targetFile, $fileContent);
+        }
     }
 
     private function sanitizePluginName($pluginName)
     {
         return str_replace('/', '---', $pluginName);
+    }
+
+    private function getDefinitionFileName($plugin)
+    {
+        return $this->directory . '/' . $this->sanitizePluginName($plugin) . '-actions.yml';
     }
 }

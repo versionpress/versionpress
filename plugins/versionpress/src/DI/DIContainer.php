@@ -99,7 +99,7 @@ class DIContainer
         });
 
         $dic->register(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY, function () use ($dic) {
-            return new ActionsDefinitionRepository(VERSIONPRESS_TEMP_DIR . '/actions');
+            return new ActionsDefinitionRepository(VERSIONPRESS_TEMP_DIR . '/actions', $dic->resolve(VersionPressServices::GIT_REPOSITORY));
         });
 
         $dic->register(VersionPressServices::ACTIONSINFO_PROVIDER_ALL_PLUGINS, function () use ($dic) {

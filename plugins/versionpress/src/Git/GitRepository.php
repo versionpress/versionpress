@@ -552,4 +552,39 @@ class GitRepository
     {
         $this->gitProcessTimeout = $gitProcessTimeout;
     }
+
+    public function getFileModifications($file)
+    {
+        $cmd = "git log --format=format:%%H --name-status -- %s";
+        $log = $this->runShellCommandWithStandardOutput($cmd, $file);
+
+        if (!$log) {
+            return [];
+        }
+
+        $commits = explode("\n\n", $log);
+
+        $modificationsGroupedByCommit = array_map(function ($commit) {
+            $lines = explode("\n", $commit);
+
+            $hash = $lines[0];
+            $modifications = array_slice($lines, 1);
+
+            return array_map(function ($statusAndPath) use ($hash) {
+                list($status, $path) = explode("\t", $statusAndPath, 2);
+                return [
+                    'status' => $status,
+                    'path' => $path,
+                    'commit' => $hash
+                ];
+            }, $modifications);
+        }, $commits);
+
+        return call_user_func_array('array_merge', $modificationsGroupedByCommit);
+    }
+
+    public function getFileInRevision($path, $commitHash)
+    {
+        return $this->runShellCommandWithStandardOutput('git show %s:%s', $commitHash, $path);
+    }
 }
