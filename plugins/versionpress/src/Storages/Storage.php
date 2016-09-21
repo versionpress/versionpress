@@ -170,7 +170,7 @@ abstract class Storage
         return $flatEntity;
     }
 
-    private function maybeReplacePrefixWithPlaceholder($key)
+    protected function maybeReplacePrefixWithPlaceholder($key)
     {
         if (Strings::startsWith($key, $this->dbPrefix)) {
             return self::PREFIX_PLACEHOLDER . Strings::substring($key, Strings::length($this->dbPrefix));
@@ -178,7 +178,7 @@ abstract class Storage
         return $key;
     }
 
-    private function maybeReplacePlaceholderWithPrefix($key)
+    protected function maybeReplacePlaceholderWithPrefix($key)
     {
         if (Strings::startsWith($key, self::PREFIX_PLACEHOLDER)) {
             return $this->dbPrefix . Strings::substring($key, Strings::length(self::PREFIX_PLACEHOLDER));

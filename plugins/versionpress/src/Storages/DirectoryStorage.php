@@ -143,7 +143,7 @@ class DirectoryStorage extends Storage
 
     public function getEntityFilename($id, $parentId = null)
     {
-        $sanitizedEntityId = urlencode($id);
+        $sanitizedEntityId = urlencode($this->maybeReplacePrefixWithPlaceholder($id));
         $sanitizedEntityId = str_replace('.', '%2E', $sanitizedEntityId);
 
         $vpidPath = Strings::substring($sanitizedEntityId, 0, 2) . '/' . $sanitizedEntityId;

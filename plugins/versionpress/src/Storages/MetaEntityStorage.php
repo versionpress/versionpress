@@ -172,7 +172,7 @@ class MetaEntityStorage extends Storage
 
     private function transformToParentEntityField($values)
     {
-        $joinedKey = $this->createJoinedKey($values[$this->keyName], $values['vp_id']);
+        $joinedKey = $this->createJoinedKey($this->maybeReplacePrefixWithPlaceholder($values[$this->keyName]), $values['vp_id']);
 
         $data = [
             'vp_id' => $values[$this->parentReferenceName],
@@ -287,7 +287,7 @@ class MetaEntityStorage extends Storage
     {
         $splittedKey = $this->splitJoinedKey($joinedKey);
         $entity = [
-            $this->keyName => $splittedKey[$this->keyName],
+            $this->keyName => $this->maybeReplacePlaceholderWithPrefix($splittedKey[$this->keyName]),
             $this->valueName => $parentEntity[$joinedKey],
             'vp_id' => $splittedKey['vp_id'],
             $this->parentReferenceName => $parentEntity['vp_id'],
