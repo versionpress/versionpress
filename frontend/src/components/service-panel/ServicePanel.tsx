@@ -22,7 +22,7 @@ export default class ServicePanel extends React.Component<ServicePanelProps, {}>
 
   render() {
     const { children } = this.props;
-    const { message, isVisible, isVisualizationVisible, commits } = store;
+    const { message, isVisible, isVisualizationVisible } = store;
 
     return (
       <div>
@@ -34,7 +34,6 @@ export default class ServicePanel extends React.Component<ServicePanelProps, {}>
         <Panel isVisible={false} />
         <VisualizationPanel
           isVisible={isVisualizationVisible}
-          commits={commits}
           environments={store.environments}
           visualization={store.visualization}
         />
