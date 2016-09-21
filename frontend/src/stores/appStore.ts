@@ -51,7 +51,7 @@ class AppStore {
       .end((err: any, res: request.Response) => {
         if (err) {
           runInAction(() => {
-            servicePanelStore.changeMessage(getErrorMessage(res, err))
+            servicePanelStore.changeMessage(getErrorMessage(res, err));
             this.isLoading = false;
           });
         } else {
@@ -101,7 +101,7 @@ class AppStore {
           if (err) {
             commitsTableStore.changePages([]);
             commitsTableStore.changeCommitRows([]);
-            servicePanelStore.changeMessage(getErrorMessage(res, err))
+            servicePanelStore.changeMessage(getErrorMessage(res, err));
           } else {
             commitsTableStore.changePages(data.pages.map(c => c + 1));
             commitsTableStore.changeCommitRows(data.commits.map(commit => (

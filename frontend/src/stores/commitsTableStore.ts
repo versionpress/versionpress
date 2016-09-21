@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import CommitRow from './CommitRow';
 
 import appStore from './appStore';
-import { indexOf } from "../utils/CommitUtils";
+import { indexOf } from '../utils/CommitUtils';
 
 class CommitsTableStore {
   @observable commitRows: CommitRow[] = [];
@@ -57,7 +57,7 @@ class CommitsTableStore {
 
   @action
   rollbackToCommit = (hash: string) => {
-    appStore.rollbackToCommit(hash)
+    appStore.rollbackToCommit(hash);
   };
 
   @action
