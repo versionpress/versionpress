@@ -149,7 +149,7 @@ class Initializer
             $this->createCommonConfig();
             $this->installComposerScripts();
             $this->doInitializationCommit($isUpdate);
-            $this->persistActionsDefinition();
+            $this->persistActionsDefinitions();
             vp_disable_maintenance();
             $this->reportProgressChange(InitializerStates::FINISHED);
         } catch (InitializationAbortedException $ex) {
@@ -642,8 +642,12 @@ class Initializer
         }
     }
 
-    private function persistActionsDefinition()
+    private function persistActionsDefinitions()
     {
-        $this->actionsDefinitionRepository->saveDefinitionForPlugin('versionpress/versionpress.php');
+        $this->actionsDefinitionRepository->restoreAllDefinitionFilesFromHistory();
+
+        foreach (get_option('active_plugins') as $plugin) {
+            $this->actionsDefinitionRepository->saveDefinitionForPlugin($plugin);
+        }
     }
 }

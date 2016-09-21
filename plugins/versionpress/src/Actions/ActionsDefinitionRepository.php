@@ -29,15 +29,16 @@ class ActionsDefinitionRepository
         return new \GlobIterator($this->directory . '/*-actions.yml', \FilesystemIterator::CURRENT_AS_PATHNAME);
     }
 
-    public function saveDefinitionForPlugin($plugin)
+    public function saveDefinitionForPlugin($pluginFile)
     {
-        $actionsFile = dirname(WP_PLUGIN_DIR . '/' . $plugin) . '/.versionpress/actions.yml';
+        $pluginSlug = basename(dirname($pluginFile));
+        $actionsFile = WP_PLUGIN_DIR . '/' . $pluginSlug . '/.versionpress/actions.yml';
 
         if (!is_file($actionsFile)) {
             return;
         }
 
-        $targetFile = $this->getDefinitionFileName($plugin);
+        $targetFile = $this->getDefinitionFileName($pluginSlug);
         FileSystem::copy($actionsFile, $targetFile);
     }
 
@@ -58,6 +59,8 @@ class ActionsDefinitionRepository
             $targetFile = $this->getDefinitionFileName($plugin);
             file_put_contents($targetFile, $fileContent);
         }
+
+        $this->saveDefinitionForPlugin('versionpress/versionpress.php');
     }
 
     private function sanitizePluginName($pluginName)
