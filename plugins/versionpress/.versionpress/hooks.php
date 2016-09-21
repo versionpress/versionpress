@@ -1,6 +1,7 @@
 <?php
 
 use Nette\Utils\Strings;
+use VersionPress\Actions\ActionsDefinitionRepository;
 use VersionPress\Actions\ActivePluginsVPFilesIterator;
 use VersionPress\ChangeInfos\CommitMessageParser;
 use VersionPress\Database\Database;
@@ -419,6 +420,12 @@ add_action('vp_plugin_changed', function ($action, $pluginFile, $pluginName) {
     $dbSchema->refreshDbSchema(new ActivePluginsVPFilesIterator('schema.yml'));
 
     vp_update_table_ddl_scripts($dbSchema, $tableSchemaStorage);
+
+    if ($action !== 'delete') {
+        /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
+        $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
+        $actionsDefinitionRepository->saveDefinitionForPlugin($pluginFile);
+    }
 
     $pluginPath = WP_PLUGIN_DIR . "/";
     if (dirname($pluginFile) === ".") {

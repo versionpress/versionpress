@@ -1,6 +1,5 @@
 <?php
 
-use VersionPress\Actions\ActionsDefinitionRepository;
 use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\Api\VersionPressApi;
 use VersionPress\ChangeInfos\EntityChangeInfo;
@@ -100,8 +99,6 @@ function vp_register_hooks()
     $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
     /** @var ActionsInfoProvider $actionsInfoProvider */
     $actionsInfoProvider = $versionPressContainer->resolve(VersionPressServices::ACTIONSINFO_PROVIDER_ACTIVE_PLUGINS);
-    /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
-    $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
 
 
 
@@ -125,10 +122,9 @@ function vp_register_hooks()
 
     WordPressMissingFunctions::pipeAction('_core_updated_successfully', 'vp_wordpress_updated');
 
-    add_action('activated_plugin', function ($pluginFile) use ($actionsDefinitionRepository) {
+    add_action('activated_plugin', function ($pluginFile) {
         $plugins = get_plugins();
         $pluginName = $plugins[$pluginFile]['Name'];
-        $actionsDefinitionRepository->saveDefinitionForPlugin($pluginFile);
         do_action('vp_plugin_changed', 'activate', $pluginFile, $pluginName);
     });
 
