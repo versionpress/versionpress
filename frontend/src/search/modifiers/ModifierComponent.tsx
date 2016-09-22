@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { PopupProps } from '../popup/Popup';
 
-export default class ModifierComponent extends React.Component<PopupProps, {}> {
+export default class ModifierComponent<T> extends React.Component<PopupProps, T> {
 
   onUpClicked = () => {};
 

@@ -9,7 +9,7 @@ import ModifierComponent from '../modifiers/ModifierComponent';
 import './Popup.less';
 
 export interface PopupProps {
-  nodeRef: __React.Ref<ModifierComponent>;
+  nodeRef: __React.Ref<ModifierComponent<any>>;
   activeTokenIndex: number;
   token: Token;
   adapter: Adapter;

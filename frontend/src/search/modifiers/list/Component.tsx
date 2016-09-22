@@ -12,7 +12,7 @@ interface ListComponentState {
   currentIndex?: number;
 }
 
-export default class ListComponent extends ModifierComponent {
+export default class ListComponent extends ModifierComponent<ListComponentState> {
 
   state = {
     currentIndex: -1,
