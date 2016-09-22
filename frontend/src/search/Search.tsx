@@ -96,6 +96,23 @@ export default class Search extends React.Component<SearchProps, SearchState> {
           this.popupComponentNode.onDownClicked();
         }
         break;
+      case KEYS.TAB:
+        e.preventDefault();
+        const { config } = this.props;
+
+        const tokens = this.getTokens();
+        const activeToken = this.getActiveToken(tokens);
+        const activeTokenIndex = this.getActiveTokenIndex(tokens);
+
+        const adapter = getAdapter(config)(activeToken);
+        const newValue = adapter.autoComplete(activeToken);
+
+        if (newValue) {
+          this.onChangeTokenModel(activeTokenIndex, newValue, true);
+        } else if (activeToken.type !== 'date') {
+          this.popupComponentNode.onDownClicked();
+        }
+        break;
       default:
         this.setCursorLocation(target.selectionStart);
         if (target.value !== this.state.inputValue) {

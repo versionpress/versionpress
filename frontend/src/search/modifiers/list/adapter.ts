@@ -6,6 +6,20 @@ import * as ArrayUtils from '../../../common/ArrayUtils';
 
 const ListAdapter = (config: SearchConfigItem): Adapter => ({
 
+  autoComplete: function(token: Token) {
+    const { value } = token;
+
+    const hints = this.getHints(token);
+    const hint = hints[0];
+    const hintValue = this.serialize(hint);
+
+    if (value.length && hintValue && hintValue.indexOf(value) === 0) {
+      return hint;
+    }
+
+    return null;
+  },
+
   getDefaultHint: function() {
     return config
       ? config.defaultHint
