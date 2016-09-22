@@ -2,7 +2,6 @@
 
 namespace VersionPress\Actions;
 
-use Symfony\Component\Yaml\Yaml;
 use VersionPress\Git\GitRepository;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\FileSystem;
@@ -49,8 +48,12 @@ class ActionsDefinitionRepository
         $definitionFilesWildcard = WP_PLUGIN_DIR . '/*/.versionpress/actions.yml';
         $modifications = $this->gitRepository->getFileModifications($definitionFilesWildcard);
 
-        $modifications = array_filter($modifications, function ($modification) { return $modification['status'] !== 'D'; });
-        $lastModifications = ArrayUtils::unique($modifications, function ($modification) { return $modification['path']; });
+        $modifications = array_filter($modifications, function ($modification) {
+            return $modification['status'] !== 'D';
+        });
+        $lastModifications = ArrayUtils::unique($modifications, function ($modification) {
+            return $modification['path'];
+        });
 
         foreach ($lastModifications as $modification) {
             $fileContent = $this->gitRepository->getFileInRevision($modification['path'], $modification['commit']);

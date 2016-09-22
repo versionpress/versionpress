@@ -16,6 +16,7 @@ use VersionPress\Utils\WordPressMissingFunctions;
 use VersionPress\Utils\WpConfigEditor;
 use WP_CLI;
 use WP_CLI_Command;
+use wpdb;
 
 /**
  * Internal VersionPress commands.
@@ -71,7 +72,9 @@ class VPInternalCommand extends WP_CLI_Command
 
         $tables = array_map(function ($entityName) use ($dbSchema) {
             return $dbSchema->getPrefixedTableName($entityName);
-        }, array_merge($dbSchema->getAllEntityNames(), array_map(function ($referenceDetails) { return $referenceDetails['junction-table']; }, $dbSchema->getAllMnReferences())));
+        }, array_merge($dbSchema->getAllEntityNames(), array_map(function ($referenceDetails) {
+            return $referenceDetails['junction-table'];
+        }, $dbSchema->getAllMnReferences())));
 
 
         $tables = array_filter($tables, function ($table) use ($database) {
