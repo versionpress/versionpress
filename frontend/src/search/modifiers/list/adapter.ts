@@ -16,7 +16,7 @@ const ListAdapter = (config: SearchConfigItem): Adapter => ({
     const list = config && config.content;
 
     if (list && list.length) {
-      if (token && token.type !== 'space') {
+      if (token && token.type !== 'space' && (token.modifier.length || token.value.length)) {
         const value = token.value.trim();
         const labelMatches = getMatch(value, list, 'label');
         const valueMatches = getMatch(value, list, 'value');

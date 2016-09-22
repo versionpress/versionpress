@@ -24,4 +24,5 @@ interface Token {
   value: string;
   type: string;
   length: number;
+  negative: boolean;
 }

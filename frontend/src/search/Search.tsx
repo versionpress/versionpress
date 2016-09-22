@@ -248,7 +248,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
 
   getTokensString(tokens: Token[]) {
     return tokens
-      .reduce((sum, token) => (sum + token.modifier + token.value), '');
+      .reduce((sum, token) => (sum + (token.negative ? '-' : '') + token.modifier + token.value), '');
   }
 
   render() {

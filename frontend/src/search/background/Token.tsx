@@ -13,14 +13,14 @@ const Token: React.StatelessComponent<TokenProps> = ({ token, adapter }) => {
     if (adapter.isValueValid(token.value)) {
       return (
         <span className='Search-Background-modifier'>
-          {token.modifier}{token.value}
+          {token.negative ? '-' : ''}{token.modifier}{token.value}
         </span>
       );
     }
     return (
       <span>
         <span className='Search-Background-modifier is-incomplete'>
-          {token.modifier}
+          {token.negative ? '-' : ''}{token.modifier}
         </span>
         {token.value}
       </span>

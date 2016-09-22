@@ -9,15 +9,15 @@ export function updateToken(token: Token, model: SearchConfigItemContent, config
 
   if (model.modifier) {
     const modifier = getModifier(val, config);
-    const value = modifier ? val.substr(modifier.length) : val;
+    const value = modifier.length ? val.substr(modifier.length) : val;
 
     token.modifier = modifier;
     token.value = value;
     token.type = modifier ? config[modifier].type : config['_default'].type;
-    token.length = modifier ? modifier.length + value.length : value.length;
+    token.length = modifier.length + value.length + (token.negative ? 1 : 0);
   } else {
     token.value = val;
-    token.length = token.modifier ? token.modifier.length + val.length : val.length;
+    token.length = token.modifier.length + val.length + (token.negative ? 1 : 0);
   }
 
   return token;

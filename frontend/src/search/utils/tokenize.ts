@@ -38,21 +38,29 @@ export function createToken(text: string, config: SearchConfig = {}) {
       modifier: '',
       value: ' ',
       type: 'space',
+      negative: false,
       length: 1,
     };
   }
 
+  let negative = false;
+  if (text[0] === '-') {
+    text = text.substr(1);
+    negative = true;
+  }
+
   const modifier = getModifier(text, config);
 
-  const value = modifier ? text.substr(modifier.length) : text;
-  const type = modifier ? config[modifier].type : config['_default'].type;
-  const length = modifier ? modifier.length + value.length : value.length;
+  const value = modifier.length ? text.substr(modifier.length) : text;
+  const type = modifier.length ? config[modifier].type : config['_default'].type;
+  const length = modifier.length + value.length + (negative ? 1 : 0);
 
   return {
     key: 'token-' + counter++,
     modifier: modifier,
     value: value,
     type: type,
+    negative: negative,
     length: length,
   };
 }
@@ -68,5 +76,5 @@ export function getModifier(text: string, config: SearchConfig) {
     }
   }
 
-  return null;
+  return '';
 }
