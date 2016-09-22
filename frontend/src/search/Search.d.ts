@@ -24,5 +24,4 @@ interface Token {
   value: string;
   type: string;
   length: number;
-  sectionTitle?: string;
 }

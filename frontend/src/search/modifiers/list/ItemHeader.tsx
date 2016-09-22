@@ -9,7 +9,7 @@ interface ItemHeaderProps {
 }
 
 const ItemHeader: React.StatelessComponent<ItemHeaderProps> = ({ item, token }) => {
-  const sectionTitle = item.section || token.sectionTitle;
+  const sectionTitle = item.section;
 
   if (!sectionTitle) {
     return <div />;
