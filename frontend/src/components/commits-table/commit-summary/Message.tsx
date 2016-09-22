@@ -28,7 +28,7 @@ const Message: React.StatelessComponent<MessageProps> = ({ commit, detailsLevel,
 function renderMessage(message: string) {
   const messageChunks = /(.*)'(.*)'(.*)/.exec(message);
 
-  if (!messageChunks || messageChunks.length < 4) {
+  if (!messageChunks || messageChunks.length !== 4) {
     return <span>{message}</span>;
   }
 

@@ -1,21 +1,19 @@
 {
   "name": "frontend",
-  "env": "browser",
-  "version": false,
-  "ambientDependencies": {
+  "dependencies": {
+    "chai": "registry:npm/chai#3.5.0+20160723033700",
+    "moment": "file:node_modules/moment/moment.d.ts"
+  },
+  "globalDependencies": {
     "classnames": "registry:dt/classnames#0.0.0+20160316155526",
-    "core-js": "registry:dt/core-js#0.0.0+20160317120654",
-    "diff": "registry:dt/diff#0.0.0+20160318080727",
-    "moment": "registry:dt/moment#2.8.0+20160316155526",
-    "moment-node": "registry:dt/moment-node#2.11.1+20160417135035",
-    "node": "registry:dt/node#4.0.0+20160501135006",
-    "react": "registry:dt/react#0.14.0+20160423065914",
-    "react-addons-update": "registry:dt/react-addons-update#0.14.0+20160316155526",
+    "core-js": "registry:dt/core-js#0.0.0+20160914114559",
+    "diff": "registry:dt/diff#0.0.0+20160809232139",
+    "lodash": "registry:dt/lodash#4.14.0+20160919145112",
+    "mocha": "registry:dt/mocha#2.2.5+20160720003353",
+    "node": "registry:env/node#6.0.0+20160918225031",
+    "react": "registry:dt/react#0.14.0+20160920055104",
     "react-dom": "registry:dt/react-dom#0.14.0+20160412154040",
     "react-router": "registry:dt/react-router#0.13.3+20160317120654",
-    "superagent": "registry:dt/superagent#1.4.0+20160317120654"
-  },
-  "dependencies": {
-    "lodash": "registry:npm/lodash#4.0.0+20160416211519"
+    "superagent": "registry:dt/superagent#2.0.0+20160906143408"
   }
 }

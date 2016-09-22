@@ -6,14 +6,11 @@
     "jsx": "react",
     "experimentalDecorators": true
   },
-  "filesGlob": [
+  "include": [
     "src/**/*.ts",
-    "src/**/*.tsx",
-    "typings/browser.d.ts",
-    "!./node_modules/**/*.ts",
-    "!./node_modules/**/*.tsx"
+    "src/**/*.tsx"
   ],
   "files": [
-    "typings/browser.d.ts"
+    "typings/index.d.ts"
   ]
 }
