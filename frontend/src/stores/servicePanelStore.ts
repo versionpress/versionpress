@@ -45,41 +45,64 @@ class ServicePanelStore {
 
     return environments;
      */
-    return ['master', 'staging'];
+    return ['master', 'staging', 'beta'];
   }
 
   @computed get visualization(): BranchCommit[][] {
     return [
       [
         new BranchCommit(getRndCom(1, false, 'master')),
+        null,
         null
+      ],
+      [
+        new BranchCommit(getRndCom(9, true, 'master'), { mergeParents: ['beta'] }),
+        null,
+        null
+      ],
+      [
+        new BranchCommit(null, { environment: 'master' }),
+        null,
+        new BranchCommit(getRndCom(30, false, 'beta'), { mergeTo: ['master'], isEnd: true })
       ],
       [
         new BranchCommit(getRndCom(2, true, 'master'), { mergeParents: ['staging'] }),
+        null,
+        new BranchCommit(null, { environment: 'beta' })
+      ],
+      [
+        new BranchCommit(null, { environment: 'master' }),
+        new BranchCommit(getRndCom(3, false, 'staging'), { mergeTo: ['master'], isEnd: true }),
+        new BranchCommit(null, { environment: 'beta' })
+      ],
+      [
+        new BranchCommit(null, { environment: 'master' }),
+        new BranchCommit(null, { environment: 'staging' }),
+        new BranchCommit(getRndCom(20, false, 'beta'), { checkoutFrom: 'master' })
+      ],
+      [
+        new BranchCommit(getRndCom(4, false, 'master'), { checkoutChildren: ['beta'] }),
+        new BranchCommit(null, { environment: 'staging' }),
         null
       ],
       [
         new BranchCommit(null, { environment: 'master' }),
-        new BranchCommit(getRndCom(3, false, 'staging'), { mergeTo: ['master'], isEnd: true })
-      ],
-      [
-        new BranchCommit(getRndCom(4, false, 'master')),
-        new BranchCommit(null, { environment: 'staging' })
+        new BranchCommit(getRndCom(5, false, 'staging')),
+        null
       ],
       [
         new BranchCommit(null, { environment: 'master' }),
-        new BranchCommit(getRndCom(5, false, 'staging'))
-      ],
-      [
-        new BranchCommit(null, { environment: 'master' }),
-        new BranchCommit(getRndCom(6, false, 'staging'), { checkoutFrom: 'master' })
+        new BranchCommit(getRndCom(6, false, 'staging'), { checkoutFrom: 'master' }),
+        null
       ],
       [
         new BranchCommit(getRndCom(7, false, 'master'), { checkoutChildren: ['staging'] }),
+        null,
         null
       ],
       [
         new BranchCommit(getRndCom(8, false, 'master')),
+        null,
         null
       ]
     ];

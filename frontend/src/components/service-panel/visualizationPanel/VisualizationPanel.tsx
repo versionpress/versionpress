@@ -16,7 +16,7 @@ export default class VisualizationPanel extends React.Component<VisualizationPan
     const { visualization } = this.props;
 
     return visualization.map((branchCommits: BranchCommit[], index) => {
-      const activeBranchCommit = branchCommits.find(commit => commit.commit !== null);
+      const activeBranchCommit = branchCommits.find(commit => commit ? commit.commit !== null : false);
 
       return (
         <tr key={activeBranchCommit.commit.hash}>
@@ -84,7 +84,7 @@ export default class VisualizationPanel extends React.Component<VisualizationPan
     });
 
     return (
-      <div className={wrapperClassName}>
+      <div className={wrapperClassName} style={{ maxHeight: '100%'}}>
         <div className='ServicePanel welcome-panel'>
           <div className='ServicePanel-inner'>
             <h1>{`Environments: ${environments.length}`}</h1>
