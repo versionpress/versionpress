@@ -44,7 +44,7 @@ const Input: React.StatelessComponent<InputProps> = (props) => {
       defaultValue={value}
       disabled={disabled}
       spellCheck={false}
-      autoComplete={false}
+      autoComplete={null}
       onBlur={onBlur}
       onFocus={onFocus}
       onClick={onClick}
