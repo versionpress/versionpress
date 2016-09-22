@@ -422,7 +422,7 @@ class WpdbMirrorBridge
             $this->mirror->save($parsedQueryData->entityName, $data);
         } else {
             $data = $this->database->get_results($parsedQueryData->sqlQuery, ARRAY_A)[0];
-            $this->updateEntity($data, $parsedQueryData->entityName, $data[$parsedQueryData->idColumnsNames]);
+            $this->updateEntity($data, $parsedQueryData->entityName, $data[$parsedQueryData->idColumnsNames[0]]);
         }
 
     }
