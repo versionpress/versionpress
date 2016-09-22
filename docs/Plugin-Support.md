@@ -96,6 +96,41 @@ Feel free to use custom `.gitignore` for files in the plugin directory. You can 
 TODO
 
 
+## Public API – Hooks and functions
+
+### Filters
+
+ - `vp_entity_action_{$entityName}`
+   - `apply_filters("vp_entity_action_{$entityName}", $action, $oldEntity, $newEntity)`
+ - `vp_meta_entity_action_{$entityName}`
+   - `apply_filters("vp_meta_entity_action_{$entityName}", $action, $oldEntity, $newEntity, $oldParentEntity, $newParentEntity)`
+ - `vp_entity_tags_{$entityName}`
+   - `apply_filters("vp_entity_tags_{$entityName}", $tags, $oldEntity, $newEntity, $action)`
+ - `vp_meta_entity_tags_{$entityName}`
+   - `apply_filters("vp_meta_entity_tags_{$entityName}", $tags, $oldEntity, $newEntity, $action, $oldParentEntity, $newParentEntity)`
+ - `vp_entity_files_{$entityName}`
+   - `apply_filters("vp_entity_files_{$entityName}", $files, $oldEntity, $newEntity)`
+ - `vp_meta_entity_files_{$entityName}`
+   - `apply_filters("vp_meta_entity_files_{$entityName}", $files, $oldEntity, $newEntity, $oldParentEntity, $newParentEntity)`
+ - `vp_entity_should_be_saved_{$entityName}`
+   - `apply_filters("vp_entity_should_be_saved_{$entityName}", $shouldBeSaved, $data, $storage)`
+ - `vp_bulk_change_description_{$entityName}`
+   - `apply_filters("vp_bulk_change_description_{$entityName}", $description, $action, $count, $tags)`
+ - `vp_action_description_{$scope}`
+   - `apply_filters("vp_action_description_{$scope}", $message, $action, $vpid, $tags)`
+
+### Actions
+
+ - `vp_before_synchronization_{$entityName}`
+   - `do_action("vp_before_synchronization_{$entityName}")`
+ - `vp_after_synchronization_{$entityName}`
+   - `do_action("vp_after_synchronization_{$entityName}")`
+
+### Functions
+
+ - `vp_force_action`
+   - `vp_force_action($scope, $action, $id = '', $tags = [], $files = [])`
+
 ## References
 
 - Issue [#1036](https://github.com/versionpress/versionpress/issues/1036) – everything was discussed there.
