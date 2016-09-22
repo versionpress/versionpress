@@ -22,6 +22,11 @@ export function tokenize(text: string, config: SearchConfig): Token[] {
     } else if (character !== ' ') {
       mem += character;
     }
+
+    if (character === ':' && text[i + 1] === ' ') {
+      mem += ' ';
+      i += 1;
+    }
   }
   return tokens;
 }

@@ -17,7 +17,7 @@ const ListAdapter = (config: SearchConfigItem): Adapter => ({
 
     if (list && list.length) {
       if (token && token.type !== 'space') {
-        const { value } = token;
+        const value = token.value.trim();
         const labelMatches = getMatch(value, list, 'label');
         const valueMatches = getMatch(value, list, 'value');
 
@@ -40,7 +40,7 @@ const ListAdapter = (config: SearchConfigItem): Adapter => ({
     const list = config && config.content;
 
     if (list) {
-      return list.some(item => this.serialize(item) === value);
+      return list.some(item => this.serialize(item) === value.trim());
     }
     return !!value;
   },
