@@ -80,6 +80,7 @@ export default class CommitsTable extends React.Component<{}, {}> {
     const notAbleNoteIndex = findIndex(commits, (commit: Commit, index: number) => (
       !commit.isEnabled && index < commits.length - 1
     ));
+    const bla = store.visualizationData;
 
     return (
       <table className='vp-table widefat fixed'>

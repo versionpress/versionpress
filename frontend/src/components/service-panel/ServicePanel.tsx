@@ -4,7 +4,6 @@ import { observer } from 'mobx-react';
 import Button from './Button';
 import FlashMessage from './flash-message/FlashMessage';
 import Panel from './panel/Panel';
-import VisualizationPanel from './visualizationPanel/VisualizationPanel';
 
 import store from '../../stores/servicePanelStore';
 
@@ -22,7 +21,7 @@ export default class ServicePanel extends React.Component<ServicePanelProps, {}>
 
   render() {
     const { children } = this.props;
-    const { message, isVisible, isVisualizationVisible } = store;
+    const { message, isVisible } = store;
 
     return (
       <div>
@@ -31,12 +30,7 @@ export default class ServicePanel extends React.Component<ServicePanelProps, {}>
         {message &&
           <FlashMessage message={message} />
         }
-        <Panel isVisible={false} />
-        <VisualizationPanel
-          isVisible={isVisualizationVisible}
-          environments={store.environments}
-          visualization={store.visualization}
-        />
+        <Panel isVisible={isVisible} />
       </div>
     );
   }

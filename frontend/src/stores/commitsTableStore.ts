@@ -4,6 +4,7 @@ import CommitRow from './CommitRow';
 
 import appStore from './appStore';
 import { indexOf } from "../utils/CommitUtils";
+import { generateGraphData } from "./utils";
 
 class CommitsTableStore {
   @observable commitRows: CommitRow[] = [];
@@ -24,6 +25,64 @@ class CommitsTableStore {
   @computed get areAllCommitsSelected() {
     return this.commits.length > 0 &&
       !_.differenceBy(this.selectableCommits, appStore.selectedCommits, ((value: Commit) => value.hash)).length;
+  }
+
+  @computed get visualizationData() {
+    console.log(this.commits.length);
+    const visualization = generateGraphData([
+      {
+        sha: '9',
+        parents: ['10']
+      },
+      {
+        sha: '10',
+        parents: ['11', '30']
+      },
+      {
+        sha: '11',
+        parents: ['12']
+      },
+      {
+        sha: '12',
+        parents: ['13', '20']
+      },
+      {
+        sha: '20',
+        parents: ['21']
+      },
+      {
+        sha: '30',
+        parents: ['31']
+      },
+      {
+        sha: '21',
+        parents: ['22']
+      },
+      {
+        sha: '31',
+        parents: ['13']
+      },
+      {
+        sha: '13',
+        parents: ['14']
+      },
+      {
+        sha: '22',
+        parents: ['14']
+      },
+      {
+        sha: '14',
+        parents: ['15']
+      },
+      {
+        sha: '15',
+        parents: []
+      }
+    ]);
+
+    console.log(visualization);
+
+    return this.commits.length;
   }
 
   @action

@@ -28,7 +28,6 @@ function getRndCom(id: number, isMerge: boolean, environment: string): Commit {
 class ServicePanelStore {
   @observable message: InfoMessage = null;
   @observable isVisible: boolean = false;
-  @observable isVisualizationVisible: boolean = false;
 
   get commits() {
     return commitsTableStore.commits;
@@ -116,14 +115,6 @@ class ServicePanelStore {
   @action
   changeVisibility = (isVisible?: boolean) => {
     this.isVisible = typeof isVisible === 'boolean' ? isVisible : !this.isVisible;
-    this.changeVisualizationVisibility();
-  };
-
-  @action
-  changeVisualizationVisibility = (isVisible?: boolean) => {
-    this.isVisualizationVisible = typeof isVisible === 'boolean'
-      ? isVisible
-      : !this.isVisualizationVisible;
   };
 }
 
