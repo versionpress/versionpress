@@ -32,51 +32,63 @@ class CommitsTableStore {
     const visualization = generateGraphData([
       {
         sha: '9',
-        parents: ['10']
+        parents: ['10'],
+        environment: 'master'
       },
       {
         sha: '10',
-        parents: ['11', '30']
+        parents: ['11', '30'],
+        environment: 'master'
       },
       {
         sha: '11',
-        parents: ['12']
+        parents: ['12'],
+        environment: 'master'
       },
       {
         sha: '12',
-        parents: ['13', '20']
+        parents: ['13', '20'],
+        environment: 'master'
       },
       {
         sha: '20',
-        parents: ['21']
+        parents: ['21'],
+        environment: 'staging'
       },
       {
         sha: '30',
-        parents: ['31']
+        parents: ['31'],
+        environment: 'beta-test'
       },
       {
         sha: '21',
-        parents: ['22']
+        parents: ['22'],
+        environment: 'staging'
       },
       {
         sha: '31',
-        parents: ['13']
+        parents: ['13'],
+        environment: 'beta-test'
       },
       {
         sha: '13',
-        parents: ['14']
+        parents: ['14'],
+        environment: 'master'
       },
       {
         sha: '22',
-        parents: ['14']
+        parents: ['14'],
+        environment: 'staging'
       },
       {
         sha: '14',
-        parents: ['15']
+        parents: ['15'],
+        environment: 'master'
       },
       {
         sha: '15',
-        parents: []
+        parents: [],
+        environment: 'master'
       }
     ]);
 

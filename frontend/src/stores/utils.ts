@@ -56,7 +56,23 @@ export function getDiff(hash: string) {
 
 interface CommitGraph {
   sha: string;
+  environment: string;
   parents: string[];
+}
+
+interface CommitBranchRoute {
+  branch: number;
+  environment: string;
+  from: number;
+  to: number;
+}
+
+interface CommitNode {
+  branch: number;
+  environment: string;
+  offset: number;
+  routes: CommitBranchRoute[];
+  sha: string;
 }
 
 /*
@@ -75,24 +91,26 @@ interface CommitGraph {
    ]  // routes
  ],  // node
  */
-export function generateGraphData(commits: CommitGraph[]) {
+export function generateGraphData(commits: CommitGraph[]): CommitNode[] {
   let
     nodes = [],
-    branchIndex = [0],
+    branchIndex = 0,
     reserve = [],
-    branches = {};
+    branches = {},
+    environments = {};
 
   const remove = (list, item) => {
     list.splice(list.indexOf(item), 1);
     return list;
   };
 
-  const getBranch = (sha) => {
+  const getBranch = (sha: string) => {
     if (branches[sha] == null) {
-      branches[sha] = branchIndex[0];
-      reserve.push(branchIndex[0]);
-      branchIndex[0]++;
+      branches[sha] = branchIndex;
+      reserve.push(branchIndex);
+      branchIndex++;
     }
+
     return branches[sha];
   };
 
@@ -106,14 +124,18 @@ export function generateGraphData(commits: CommitGraph[]) {
       routes.push({
         from: from,
         to: to,
-        branch: branch
+        branch: branch,
+        environment: environments[branch]
       });
     };
+
+    if (environments[branch] == null) {
+      environments[branch] = commit.environment;
+    }
 
     if (parentsCount === 1) {
       if (branches[commit.parents[0]] != null) {
         // Create branch
-
         let temp = reserve.slice(offset + 1);
         for (let i = 0; i < temp.length; i++) {
           insertToRoutes(i + offset + 1, i + offset + 1 - 1, temp[i]);
@@ -128,7 +150,6 @@ export function generateGraphData(commits: CommitGraph[]) {
         insertToRoutes(offset, reserve.indexOf(branches[commit.parents[0]]), branch);
       } else {
         // Straight branch
-
         for (let i = 0; i < reserve.length; i++) {
           insertToRoutes(i, i, reserve[i]);
         }
@@ -148,10 +169,17 @@ export function generateGraphData(commits: CommitGraph[]) {
     }
 
     nodes.push({
-      sha: commit.sha,
-      offset: offset,
       branch: branch,
-      routes: routes
+      environment: commit.environment,
+      offset: offset,
+      routes: routes,
+      sha: commit.sha
+    });
+  });
+
+  nodes.forEach(node => {
+    node.routes.forEach(route => {
+      route.environment = environments[route.branch];
     });
   });
 
