@@ -28,8 +28,30 @@ class CommitsTableStore {
   }
 
   @computed get visualizationData() {
-    console.log(this.commits.length);
-    const visualization = generateGraphData([
+    let graphStructure = [];
+    for (let i = 0; i < this.commits.length; i++) {
+      const commit = this.commits[i];
+      let parents = [];
+
+      if (commit.hash === "8f3c2d0a7161f1aa51b60eee06ce9c32644a9417") {
+        parents = ["cf9d842a5fe9a6f5878d4505ed301f28bbd2db77"];
+      } else if (commit.hash === "202c87ebc6468ee2c272c488687bcb9315f88729") {
+        parents = ["b8adb93da34462f3016d81636d86cd97d6dbf791", "5e6ca8ab6303bf02b3cd26a74a499fea4584e945"];
+      } else if (i === this.commits.length - 1) {
+        parents = [];
+      } else {
+        parents = [this.commits[i + 1].hash];
+      }
+
+      graphStructure.push({
+        sha: commit.hash,
+        parents: parents,
+        environment: commit.environment
+      });
+    }
+
+    const visualization = generateGraphData(graphStructure);
+    /*const visualization = generateGraphData([
       {
         sha: '9',
         parents: ['10'],
@@ -91,7 +113,7 @@ class CommitsTableStore {
         environment: 'master'
       }
     ]);
-
+*/
     console.log(visualization);
 
     return this.commits.length;
