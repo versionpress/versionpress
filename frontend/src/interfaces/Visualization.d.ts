@@ -20,6 +20,9 @@ interface CommitNode {
 }
 
 interface Visualization {
-  upper: CommitNode;
-  lower: CommitNode;
+  upperRoutes: CommitBranchRoute[];
+  lowerRoutes: CommitBranchRoute[];
+  branch: number;
+  environment: string;
+  offset: number;
 }

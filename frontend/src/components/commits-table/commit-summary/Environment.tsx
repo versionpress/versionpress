@@ -4,23 +4,46 @@ import { getGitBranchColor } from '../../../services/GitBranchColorProvider';
 
 interface EnvironmentProps {
   environment: string;
+  showVisualization: boolean;
   visualization: Visualization;
 }
 
-const Environment: React.StatelessComponent<EnvironmentProps> = ({ environment, visualization }) => (
-  <td className='column-environment'>
-    {(!visualization && environment !== '?') &&
-      <div style={{ backgroundColor: getGitBranchColor(environment) }}>
-        {environment}
-      </div>
-    }
-    {console.log("upper")}
-    {visualization.upper ? visualization.upper.routes.forEach(route => console.log(route.from, route.to)) : "vrch"}
+export default class Environment extends React.Component<EnvironmentProps, {}> {
 
-    {console.log("lower")}
-    {visualization.lower? visualization.lower.routes.forEach(route => console.log(route.from, route.to)) : "spodek"}
-    {console.log("=====")}
-    </td>
-);
+  private tdDom;
 
-export default Environment;
+  componentDidMount() {
+    this.forceUpdate();
+  }
+
+  render() {
+    const { environment, showVisualization, visualization } = this.props;
+
+    return (
+      <td
+        className='column-environment'
+        ref={tdDom => this.tdDom = tdDom}
+      >
+        {(!showVisualization && environment !== '?') &&
+        <div style={{ backgroundColor: getGitBranchColor(environment) }}>
+          {environment}
+        </div>
+        }
+        {showVisualization &&
+          <svg
+            width={!this.tdDom ? 50 : this.tdDom.getBoundingClientRect().width}
+            height={!this.tdDom ? 20 : this.tdDom.getBoundingClientRect().height}
+          >
+            <circle
+              cx={10 + visualization.offset * 10}
+              cy="50%"
+              r="4"
+              fill={getGitBranchColor(visualization.environment)}
+            />
+          </svg>
+        }
+      </td>
+    );
+  }
+
+};

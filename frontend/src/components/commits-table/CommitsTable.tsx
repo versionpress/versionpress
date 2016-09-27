@@ -48,6 +48,7 @@ export default class CommitsTable extends React.Component<{}, {}> {
       <Row
         commitRow={commitRow}
         enableActions={store.enableActions}
+        showVisualization={store.showVisualization}
         onUndo={this.onUndo}
         onRollback={this.onRollback}
         onCommitsSelect={this.onCommitsSelect}
@@ -73,6 +74,7 @@ export default class CommitsTable extends React.Component<{}, {}> {
       commits,
       commitRows,
       enableActions,
+      showVisualization,
       selectableCommits,
       areAllCommitsSelected,
     } = store;
@@ -87,6 +89,7 @@ export default class CommitsTable extends React.Component<{}, {}> {
           areAllCommitsSelected={areAllCommitsSelected}
           selectableCommitsCount={selectableCommits.length}
           enableActions={enableActions}
+          showVisualization={showVisualization}
           onSelectAllChange={this.onSelectAllChange}
         />
         {commitRows.map((commitRow: CommitRow, index: number) => (

@@ -13,6 +13,7 @@ import CommitRow from "../../../stores/CommitRow";
 interface RowProps {
   commitRow: CommitRow;
   enableActions: boolean;
+  showVisualization: boolean;
   onUndo(hash: string, message: string): void;
   onRollback(hash: string, date: string): void;
   onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
@@ -26,7 +27,7 @@ export default class Row extends React.Component<RowProps, {}> {
   };
 
   render() {
-    const { commitRow, enableActions, onUndo, onRollback, onCommitsSelect } = this.props;
+    const { commitRow, enableActions, onUndo, onRollback, onCommitsSelect, showVisualization } = this.props;
     const { commit, isSelected, detailsLevel, diff, error, isLoading, visualization } = commitRow;
 
     return (
@@ -36,6 +37,7 @@ export default class Row extends React.Component<RowProps, {}> {
           enableActions={enableActions}
           isSelected={isSelected}
           detailsLevel={detailsLevel}
+          showVisualization={showVisualization}
           visualization={visualization}
           onUndo={onUndo}
           onRollback={onRollback}

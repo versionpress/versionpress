@@ -11,6 +11,7 @@ import { generateGraphData } from "./utils";
 class CommitsTableStore {
   @observable commitRows: CommitRow[] = [];
   @observable pages: number[] = [];
+  @observable showVisualization: boolean = true;
 
   @computed get enableActions() {
     return !appStore.isDirtyWorkingDirectory;
@@ -159,8 +160,11 @@ class CommitsTableStore {
         : visualization[i - 1];
 
       commitRow.visualization = {
-        upper: upper,
-        lower: lower
+        upperRoutes: upper ? upper.routes : null,
+        lowerRoutes: lower ? lower.routes : null,
+        environment: visualization[i].environment,
+        branch: visualization[i].branch,
+        offset: visualization[i].offset
       };
     });
   };
