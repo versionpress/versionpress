@@ -10,6 +10,7 @@ class CommitRow {
   @observable diff: string = null;
   @observable error: string = null;
   @observable isLoading: boolean = false;
+  @observable visualization: Visualization = null;
 
   constructor(commit: Commit, isSelected: boolean = false) {
     this.commit = commit;

@@ -20,7 +20,7 @@ const Header: React.StatelessComponent<HeaderProps> = (props) => {
   return (
     <thead>
       <tr>
-        <th className='column-environment'/>
+        <th className='column-environment' style={{ width: 50}}/>
         <SelectAll
           isSelected={areAllCommitsSelected}
           selectableCommitsCount={selectableCommitsCount}

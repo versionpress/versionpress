@@ -19,6 +19,7 @@ interface CommitSummaryProps {
   enableActions: boolean;
   isSelected: boolean;
   detailsLevel: DetailsLevel;
+  visualization: Visualization;
   onUndo(hash: string, message: string): void;
   onRollback(hash: string, date: string): void;
   onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
@@ -97,7 +98,7 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
   }
 
   render() {
-    const { commit, enableActions, isSelected, detailsLevel } = this.props;
+    const { commit, enableActions, isSelected, detailsLevel, visualization } = this.props;
 
     if (commit === null) {
       return null;
@@ -110,7 +111,10 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
 
     return (
       <tr className={rowClassName} onClick={this.onRowClick}>
-        <Environment environment={commit.environment} />
+        <Environment
+          environment={commit.environment}
+          visualization={visualization}
+        />
         <Checkbox
           isVisible={commit.canUndo}
           isChecked={isSelected}

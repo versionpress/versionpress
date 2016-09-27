@@ -27,7 +27,7 @@ export default class Row extends React.Component<RowProps, {}> {
 
   render() {
     const { commitRow, enableActions, onUndo, onRollback, onCommitsSelect } = this.props;
-    const { commit, isSelected, detailsLevel, diff, error, isLoading } = commitRow;
+    const { commit, isSelected, detailsLevel, diff, error, isLoading, visualization } = commitRow;
 
     return (
       <tbody>
@@ -36,6 +36,7 @@ export default class Row extends React.Component<RowProps, {}> {
           enableActions={enableActions}
           isSelected={isSelected}
           detailsLevel={detailsLevel}
+          visualization={visualization}
           onUndo={onUndo}
           onRollback={onRollback}
           onCommitsSelect={onCommitsSelect}

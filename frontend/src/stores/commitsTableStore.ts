@@ -1,3 +1,5 @@
+/// <reference path='../interfaces/Visualization.d.ts' />
+
 import { action, computed, observable } from 'mobx';
 import * as _ from 'lodash';
 import CommitRow from './CommitRow';
@@ -26,7 +28,7 @@ class CommitsTableStore {
     return this.commits.length > 0 &&
       !_.differenceBy(this.selectableCommits, appStore.selectedCommits, ((value: Commit) => value.hash)).length;
   }
-
+/*
   @computed get visualizationData() {
     let graphStructure = [];
     for (let i = 0; i < this.commits.length; i++) {
@@ -50,8 +52,7 @@ class CommitsTableStore {
       });
     }
 
-    const visualization = generateGraphData(graphStructure);
-    /*const visualization = generateGraphData([
+    const visualization = generateGraphData([
       {
         sha: '9',
         parents: ['10'],
@@ -113,15 +114,55 @@ class CommitsTableStore {
         environment: 'master'
       }
     ]);
-*/
-    console.log(visualization);
 
-    return this.commits.length;
+
+    return generateGraphData(graphStructure);
   }
-
+ */
   @action
   changeCommitRows = (commitRows: CommitRow[]) => {
     this.commitRows = commitRows;
+
+    let graphStructure = [];
+    for (let i = 0; i < this.commits.length; i++) {
+      const commit = this.commits[i];
+      let parents = [];
+
+      if (commit.hash === "8f3c2d0a7161f1aa51b60eee06ce9c32644a9417") {
+        parents = ["cf9d842a5fe9a6f5878d4505ed301f28bbd2db77"];
+      } else if (commit.hash === "202c87ebc6468ee2c272c488687bcb9315f88729") {
+        parents = ["b8adb93da34462f3016d81636d86cd97d6dbf791", "5e6ca8ab6303bf02b3cd26a74a499fea4584e945"];
+      } else if (i === this.commits.length - 1) {
+        parents = [];
+      } else {
+        parents = [this.commits[i + 1].hash];
+      }
+
+      graphStructure.push({
+        sha: commit.hash,
+        parents: parents,
+        environment: commit.environment
+      });
+    }
+
+    const visualization = generateGraphData(graphStructure);
+
+    this.commitRows.forEach((commitRow, i) => {
+      let upper, lower;
+
+      lower = i === this.commitRows.length - 1
+        ? null
+        : visualization[i];
+
+      upper = i === 0
+        ? null
+        : visualization[i - 1];
+
+      commitRow.visualization = {
+        upper: upper,
+        lower: lower
+      };
+    });
   };
 
   @action
