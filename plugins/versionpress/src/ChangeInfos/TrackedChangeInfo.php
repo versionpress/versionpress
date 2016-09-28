@@ -178,12 +178,13 @@ class TrackedChangeInfo implements ChangeInfo
      *
      * An example:
      *
-     *     array(
-     *         array("type" => "storage-file", "entity" => "post", "id" => VPID, "parent-id" => null),
-     *         array("type" => "storage-file", "entity" => "usermeta", "id" => VPID, "parent-id" => user-VPID),
-     *         array("type" => "path", "path" => "c:/wp/example.txt"),
-     *         array("type" => "path", "path" => "c:/wp/folder/*")
-     *     );
+     *     [
+     *         ['type' => 'storage-file', 'entity' => 'post', 'id' => VPID, 'parent-id' => null],
+     *         ['type' => 'storage-file', 'entity' => 'usermeta', 'id' => VPID, 'parent-id' => user-VPID],
+     *         ['type' => 'all-storage-files', 'entity' => 'option'],
+     *         ['type' => 'path', 'path' => '/var/www/wp/example.txt'],
+     *         ['type' => 'path', 'path' => '/var/www/wp/folder/*']
+     *     ]
      *
      * @return array
      */
