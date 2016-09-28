@@ -7,6 +7,7 @@ interface HeaderProps {
   selectableCommitsCount: number;
   enableActions: boolean;
   showVisualization: boolean;
+  branches: number;
   onSelectAllChange(isChecked: boolean): void;
 }
 
@@ -17,12 +18,16 @@ const Header: React.StatelessComponent<HeaderProps> = (props) => {
     enableActions,
     showVisualization,
     onSelectAllChange,
+    branches,
   } = props;
 
   return (
     <thead>
       <tr>
-        <th className='column-environment' style={{ width: showVisualization ? 50 : 12 }}/>
+        <th
+          className='column-environment'
+          style={{ width: showVisualization ? branches * 20 : 12 }}
+        />
         <SelectAll
           isSelected={areAllCommitsSelected}
           selectableCommitsCount={selectableCommitsCount}

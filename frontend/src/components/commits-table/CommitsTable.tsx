@@ -77,6 +77,7 @@ export default class CommitsTable extends React.Component<{}, {}> {
       showVisualization,
       selectableCommits,
       areAllCommitsSelected,
+      branches
     } = store;
 
     const notAbleNoteIndex = findIndex(commits, (commit: Commit, index: number) => (
@@ -90,6 +91,7 @@ export default class CommitsTable extends React.Component<{}, {}> {
           selectableCommitsCount={selectableCommits.length}
           enableActions={enableActions}
           showVisualization={showVisualization}
+          branches={branches}
           onSelectAllChange={this.onSelectAllChange}
         />
         {commitRows.map((commitRow: CommitRow, index: number) => (

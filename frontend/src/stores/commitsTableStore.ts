@@ -29,6 +29,20 @@ class CommitsTableStore {
     return this.commits.length > 0 &&
       !_.differenceBy(this.selectableCommits, appStore.selectedCommits, ((value: Commit) => value.hash)).length;
   }
+
+  @computed get branches() {
+    let branches = [];
+
+    this.commitRows.forEach(commitRow => {
+      const { branch } = commitRow.visualization;
+      if (branches.indexOf(branch) === -1) {
+        branches.push(branch);
+      }
+    });
+
+    return branches.length;
+  }
+
 /*
   @computed get visualizationData() {
     let graphStructure = [];
