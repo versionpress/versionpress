@@ -1,90 +1,186 @@
 # Plugin Support
 
-> :construction: UNDER CONSTRUCTION. This page gathers ideas, examples and technical details about how VersionPress is going to support 3rd-party plugins and themes. **It's not stable or fully implemented as long as this warning is here**.
+> :construction: The plugin support is **not stable or fully implemented as long as this warning is here**.
 
-VersionPress needs to understand plugins' data and actions in order to provide version control for them. This page details the interface that VersionPress provides to 3rd-party plugin authors to integrate with it.
+VersionPress needs to understand plugins' data, actions, shortcodes and other things to automatically provide version control for them. If you're a plugin developer, this document is for you.
 
-> Note: *Themes* are technically similar but less often create custom data structures so this page only describes plugins to keep things simpler.  
-
-
-## Motivation
-
-For a WordPress site, VersionPress provides these three basic things when it come to versioning:
-
-1. It tracks its **actions**.
-2. It **describes those actions** in a user-friendly way – something like *"Created post xyz"* rather than *"Inserted DB row"*.
-3. It **understands database schema** – especially, what identifies entities, what are the references between them, which entities should be ignored, etc.
-
-Plus, there are a couple of other things like shortcodes etc. But the above is core and VersionPress generally needs to understand plugins similarly well. One of the trickiest problems is database entities and references between them. Even something simple like a plugin storing an option with a value of `123` is challenging: is that a price of something? A reference to a post ID `123`? Some other entity? VersionPress needs to know in order to update these numbers when merging between environments, among other things.
+> Note that *themes* are technically similar and will be supported in pretty much the same way, however, we focus on plugins first.
 
 
-## Plugin descriptions
+## Plugin descriptors
 
-To be fully supported, plugins must be described for VersionPress. This includes:
+Plugins are described to VersionPress by a set of files stored in the `.versionpress` folder in the plugin root. (Other discovery options are described in a separate section below.) Those files describe:
 
-- Actions (see `actions.yml`)
-- Data model (see `schema.yml`)
-- Shortcodes (see `shortcodes.yml`)
-- Ignored folders
+- Actions in `actions.yml`
+- Database schema in `schema.yml`
+- Shortcodes in `shortcodes.yml`
+- Hooks are defined in `hooks.php`
 
-### Data model (schema)
+All files are optional so for example, if a plugin doesn't define any new shortcodes it can omit the `shortcodes.yml` file. Simple plugins like _Hello Dolly_ might even omit everything; they just need to have the `.versionpress` folder so that VersionPress knows the plugin is supported.
 
-To make VersionPress work properly it needs to understand the database schema of the plugin. It needs to know what tables the plugin uses, which column contains the primary key and what relations are between the tables.
-
-To define the data model you have to create a "schema file" and provide it with your plugin (see section [Discovery mechanism](#discovery-mechanism) for more). You can find more about the schema file in the [schema readme](../plugins/versionpress/.versionpress/schema-readme.md).
+By the way, WordPress itself is described to VersionPress as a set of these files (yes, it is treated as a plugin to itself; how meta!). You can take a look at the source files to draw inspiration from there.
 
 
 ### Actions
 
-Every logical change of an entity / plugin / theme etc. is represented by an action. When you change a site title the action will be `option/edit/blogname`. This action defines which message will be used for a commit message.
+Actions describe what the plugin does. For example, WooCommerce might have actions like "product updated", "invoice created" etc. Actions are described in the `actions.yml` file and eventually correspond with the commits that VersionPress automatically creates.
 
-To define the actions you have to create an "action file" and provide it with your plugin.
+#### Brief excurse into VersionPress' automatic change tracking
 
-Example of action file:
+Actions are at the core of VersionPress' [automatic change tracking](https://docs.versionpress.net/en/feature-focus/change-tracking#automatic-change-tracking). They represent the smallest atomic changes in a WordPress site, like:
 
-    post:
-      tags:
-        post-title: post_title
-        post-type: post_type
-        another-tag: /
-      actions:
-        create: Created %post-type% '%post-title%'
-        edit: Edited %post-type% '%post-title%'
-        trash:
-          message: %post-type% '%post-title%' moved to trash
-          priority: 7
+- publishing a post
+- updating an option
+- installing a plugin
+- etc.
 
-There are groups of actions – scopes (e.g. `post`). Every scope has typically two sections: `tags` and `actions`. Tags are values saved within the commit. You can use them in the messages. The `actions` section contains all actions related to the scope and messages that will be displayed for them. Optionally, you can specify the priority. Default value is 10 (it works like filters / hooks). Meta entities contain also `parent-id-tag` with name of a tag containing ID of a parent entity.
+Actions are stored in Git commit messages like this:
 
-> Note: We also consider relative priorities like `post/trash` has higher priority than `post/edit` etc. but it's far more difficult.
+```
+Edited option 'blogname'
 
-VersionPress detects only three basic actions – `create`, `edit` and `delete`. For more specific action you can use a filter `vp_entity_action_{$entityName}` which has three parameters (original action, entity in a state before the action and entity in a state after the action) for standard entities or a filter `vp_meta_entity_action_{$entityName}` with five parameters (the extra two are parent entity in a state before the action and in a state after the action) for meta entities.
+VP-Action: option/edit/blogname
+# other VP tags here...
+```
 
-The tags are automatically extracted from the entity. The action file contains pairs of tag's name and the corresponding field. The new state has a higher priority than the old one. Also, you can alter the tags in a filter `vp_entity_tags_{$entityName}` which takes four parameters (original tags, entity in a state before the action, entity in a state after the action and the action) for standard entities or `vp_meta_entity_tags_{$entityName}` with two extra parameters representing parent entity (like actions).
+In fact, a commit can contain more actions, for example, if you update two options at once, the commit message may look like this:
 
-To every action relates a possible modification of files. For example when you edit a post, an action `post/edit` will occur. This action also says that an INI file containing this post should be committed. If the post represents an uploaded file, it also says that some files in uploads directory could change and should be committed as well.
+```
+Edited 2 options
 
-Similarly to the action and tags, you can modify also the list of committed files using a filter `vp_entity_files_{$entityName}` or `vp_meta_entity_files_{$entityName}`. The callback takes a list of possibly changed files, the entity in a state before the action, the entity in a state after the action and in case of meta entity also parent entity in a state before and after the action.
+VP-Action: option/edit/blogdescription
 
-The list of "files" can contain three different types of items:
+VP-Action: option/edit/blogname
+```
 
-1) Single file corresponding an entity
- - `[ 'type' => 'storage-file', 'entity' => 'entity name',
-    'id' => 'VPID', 'parent-id' => 'VPID of parent (for meta entities)']`
+This brief excurse will help you understand a couple of things about the `actions.yml` format.
 
-2) All files in a specific repository
- - `[ 'type' => 'all-storage-files', 'entity' => 'entity name']`
+#### `actions.yml` format
 
-3) Path on the filesystem
-- `[ 'type' => 'path', 'path' => 'some/path/with/wildcards/*']`
+An example from the core WordPress descriptor:
 
----
+```yaml
+post:
+  tags:
+    VP-Post-Title: post_title
+    VP-Post-Type: post_type
+  actions:
+    create: Created %VP-Post-Type% '%VP-Post-Title%'
+    edit:
+      message: Edited %VP-Post-Type% '%VP-Post-Title%'
+      priority: 12
 
-For actions that are not related to DB entities (e.g. manipulating with plugins / themes) you can also use a filter (TODO).
+postmeta:
+  tags:
+    VP-Post-Id: vp_post_id
+    VP-Post-Title: /
+  parent-id-tag: VP-Post-Id
+  actions:
+    ...
+
+theme:
+  tags:
+    VP-Theme-Name: /
+  actions:
+    install: Installed theme '%VP-Theme-Name%'
+    update: Updated theme '%VP-Theme-Name%'
+```
+
+- The top-level elements define **scopes** that group the actions. For example, actions related to WordPress posts are in the `post` scope, theme actions are in the `theme` scope. Note: some scopes are database entities, e.g., `post`, but some are not which is why the more generic term "scope" is used.
+- Every scope has typically **two sections: `tags` and `actions`**. Only the `actions` one is required.
+- **Tags** are values saved in the commit and can be used in messages to make them more human-readable. For example, _Created post 'Hello World'_ is more helpful than _Created post ID 123_.
+- **The `actions` section** contains all actions related to the scope and messages that will be displayed for them. The combination of scope and action, i.e., something like `post/create` or `theme/install`, are the "full action" that can be searched for in the UI.
+- An action can have a **priority** which is an integer similar to WordPress filters & hooks (the default value is 10, lower value means higher priority). A more important action beats the less important one if both appear in the same commit, for example, `theme/switch` beats `option/edit`. In practice, this leads to more useful messages for the users. 
+- **Meta entities** also contain **`parent-id-tag`** with the name of a tag containing ID of the parent entity.
+
+
+#### Action detection
+
+You might be asking how VersionPress assigns these actions to real changes (say, to a database) in a WordPress site. It works like this:
+
+VersionPress **automatically** detects **three basic actions** – `create`, `edit` and `delete`, based on the SQL query issued to the database. You don't need to do anything if you need just these three basic actions.
+
+For more **specific actions**, e.g., `post/trash` or `comment/approve`, filters are used.
+
+- For standard entities, use the `vp_entity_action_{$entityName}` filter which has three parameters: original action, entity in a state before the action and the same entity in a state after the action.
+- For meta entities, use the `vp_meta_entity_action_{$entityName}` filter with five parameters: the extra two are parent entity in a state before and after the action.
+
+**Tags** are automatically extracted from the entity. For example, this snippet:
+
+```yaml
+  tags:
+    VP-Post-Title: post_title
+```
+
+makes sure that the `VP-Post-Title` tag contains the value from the `post_title` database field.
+
+Also, you can alter the tags in a filter `vp_entity_tags_{$entityName}` which takes four parameters: the original tags, entity in a state before the action, entity in a state after the action and the action. Similarly to before, use `vp_meta_entity_tags_{$entityName}` for meta entities with two extra parameters representing parent entity and its states.
+
+#### Files to commit with an action
+
+So far we've only talked about action descriptions that are stored in commit _messages_ but what about the actual content?
+
+For database changes, VersionPress automatically commits the corresponding INI file. For example, for a `post/edit` action, a post's INI file is committed.
+
+This behavior is sufficient most of the time, however, some changes should commit more files. For example, when the post is an `attachment`, the corresponding uploaded file should also be committed. For this, the list of files to commit can be filtered using the `vp_entity_files_{$entityName}` or `vp_meta_entity_files_{$entityName}` filter. The callback takes a list of possibly changed files, the entity in a state before the action, the entity in a state after the action and in case of meta entity, also the parent entity in states before and after the action.
+
+The array of files to commit can contain three different types of items:
+
+1. Single file corresponding to an entity:
+
+    ```php
+    [
+      'type' => 'storage-file',
+      'entity' => 'entity name, e.g., post',
+      'id' => 'VPID',
+      'parent-id' => 'VPID of parent (for meta entities)'
+    ]
+    ```
+    
+    VersionPress automatically calculates the right path to the file.
+
+2. All files of an entity type:
+    
+    ```php
+    [
+      'type' => 'all-storage-files',
+      'entity' => 'entity name, e.g., option'
+    ]    
+    ```
+
+3. Path on the filesystem:
+    
+    ```php
+    [
+      'type' => 'path',
+      'path' => 'some/path/with/wildcards/*'
+    ]    
+    ```
+
+The full example might look something like this:
+
+```php
+[
+  ['type' => 'storage-file', 'entity' => 'post', 'id' => VPID, 'parent-id' => null],
+  ['type' => 'storage-file', 'entity' => 'usermeta', 'id' => VPID, 'parent-id' => user-VPID],
+  ['type' => 'all-storage-files', 'entity' => 'option'],
+  ['type' => 'path', 'path' => '/var/www/wp/example.txt'],
+  ['type' => 'path', 'path' => '/var/www/wp/folder/*']
+]
+```
+
+For non-database actions, e.g., manipulating with plugins / themes, you can also use filters. TODO.
+
+
+### Database schema
+
+TODO: inline [schema readme](../plugins/versionpress/.versionpress/schema-readme.md) here.
+
+
 
 ### Shortcodes
 
-VersionPress also needs to know your shortcodes if they reference DB entities. Similar to the data model, you have to provide a file containing definitions of shortcodes. You can find more about the file in the [shortcodes readme](../plugins/versionpress/.versionpress/shortcodes-readme.md).
+TODO: inline [shortcodes readme](../plugins/versionpress/.versionpress/shortcodes-readme.md) here.
 
 ### Ignored folders
 
