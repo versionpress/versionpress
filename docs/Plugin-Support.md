@@ -7,7 +7,7 @@ VersionPress needs to understand plugins' data, actions, shortcodes and other th
 > Note that *themes* are technically similar and will be supported in pretty much the same way, however, we focus on plugins first.
 
 
-## Plugin descriptors
+## Introduction
 
 Plugins are described to VersionPress by a set of files stored in the `.versionpress` folder in the plugin root. (Other discovery options are described in a separate section below.) Those files describe:
 
@@ -21,11 +21,11 @@ All files are optional so for example, if a plugin doesn't define any new shortc
 By the way, WordPress itself is described to VersionPress as a set of these files (yes, it is treated as a plugin to itself; how meta!). You can take a look at the source files to draw inspiration from there.
 
 
-### Actions
+## Actions
 
 Actions describe what the plugin does. For example, WooCommerce might have actions like "product updated", "invoice created" etc. Actions are described in the `actions.yml` file and eventually correspond with the commits that VersionPress automatically creates.
 
-#### Brief excurse into VersionPress' automatic change tracking
+### Brief excurse into VersionPress' automatic change tracking
 
 Actions are at the core of VersionPress' [automatic change tracking](https://docs.versionpress.net/en/feature-focus/change-tracking#automatic-change-tracking). They represent the smallest atomic changes in a WordPress site, like:
 
@@ -55,7 +55,7 @@ VP-Action: option/edit/blogname
 
 This brief excurse will help you understand a couple of things about the `actions.yml` format.
 
-#### `actions.yml` format
+### `actions.yml` format
 
 An example from the core WordPress descriptor:
 
@@ -94,7 +94,7 @@ theme:
 - **Meta entities** also contain **`parent-id-tag`** with the name of a tag containing ID of the parent entity.
 
 
-#### Action detection
+### Action detection
 
 You might be asking how VersionPress assigns these actions to real changes (say, to a database) in a WordPress site. It works like this:
 
@@ -116,7 +116,7 @@ makes sure that the `VP-Post-Title` tag contains the value from the `post_title`
 
 Also, you can alter the tags in a filter `vp_entity_tags_{$entityName}` which takes four parameters: the original tags, entity in a state before the action, entity in a state after the action and the action. Similarly to before, use `vp_meta_entity_tags_{$entityName}` for meta entities with two extra parameters representing parent entity and its states.
 
-#### Files to commit with an action
+### Files to commit with an action
 
 So far we've only talked about action descriptions that are stored in commit _messages_ but what about the actual content?
 
@@ -172,17 +172,17 @@ The full example might look something like this:
 For non-database actions, e.g., manipulating with plugins / themes, you can also use filters. TODO.
 
 
-### Database schema
+## Database schema
 
 TODO: inline [schema readme](../plugins/versionpress/.versionpress/schema-readme.md) here.
 
 
 
-### Shortcodes
+## Shortcodes
 
 TODO: inline [shortcodes readme](../plugins/versionpress/.versionpress/shortcodes-readme.md) here.
 
-### Ignored folders
+## Ignored folders
 
 Feel free to use custom `.gitignore` for files in the plugin directory. You can also ignore files / directories outside the plugin directory. There is a filter to let VersionPress know which files / directories you want to ignore (TODO).
 
@@ -227,6 +227,6 @@ TODO
  - `vp_force_action`
    - `vp_force_action($scope, $action, $id = '', $tags = [], $files = [])`
 
-## References
+## Resources
 
 - Issue [#1036](https://github.com/versionpress/versionpress/issues/1036) – everything was discussed there.
