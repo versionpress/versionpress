@@ -176,7 +176,7 @@ For non-database actions, e.g., manipulating with plugins / themes, you can also
 
 If the plugin adds custom data into the database it must provide a `schema.yml` file describing the database model. For example, this is how WordPress posts are described:
 
-```
+```yaml
 post:
   table: posts
   id: ID
@@ -197,22 +197,22 @@ post:
 
 ### Defining entities
 
-The top-level keys in YAML files define entity names such as `post`, `comment`, `user`, `option` or `postmeta`. Entity names use a singular form.
+The top-level keys define entities such as `post`, `comment`, `option` or `postmeta`. Entity names use a singular form.
 
-By default, the entity names match database table names without the `wp_` (or custom) prefix. It is possible to specify a different table name using the `table` property:
+By default, entity names match database table names without the `wp_` (or custom) prefix. It is possible to specify a different table using the `table` property:
 
-```
+```yaml
 post:
   table: posts
   ...
 ```
 
-Again, this is prefix-less; something like `wp_` will be added automatically.
+Again, this is prefix-less; `wp_` or another prefix will be added automatically.
 
 
 ### Identifying entities
 
-VersionPress needs to know how to identify entities. There are two approaches and they are represented by either using `id` or `vpid` in the schema:
+VersionPress needs to know how to identify entities. There are two approaches and they are represented by either using a `id` or `vpid` property in the schema:
 
  * **`id`** points to a standard WordPress auto-increment primary key. **VersionPress will generate VPIDs** (globally unique IDs) for such entities. Most entities are of this type – posts, comments, users etc.
 
@@ -220,7 +220,7 @@ VersionPress needs to know how to identify entities. There are two approaches an
 
 Examples:
 
-```
+```yaml
 post:
   table: posts
   id: ID
@@ -235,44 +235,24 @@ option:
 
 VersionPress needs to understands relationships between entities so that it can update their IDs between environments. There are several types of references, each using a slightly different notation in the schema file.
 
-
 #### Basic references
 
-The most basic references are "foreign key" ones:
+The most basic references are "foreign keys". For example:
 
-```
-references:
-  <my_column_name>: <foreign_entity_name>
-```
-
-For example, this is what post references look like:
-
-```
+```yaml
 post:
   references:
     post_author: user
     post_parent: post
 ```
 
+This says that the `post_author` field points to a user while the `post_parent` references another post.
 
 #### Value references
 
-Value references are used when a reference to an entity depends on another column value. For example, options might point to posts, terms or users and it will depend on which option it is.
+Value references are used when a reference to an entity depends on another column value. For example, options might point to posts, terms or users and it will depend on which option it is. This is how it's encoded:
 
-The syntax is:
-
-```
-value-references:
-  <source_column_name>@<value_column_name>:
-    <source_column_value>: <foreign_entity_name | @mapping_function>
-    <source_column_value>["path-in-serialized-objects"][/\d+/][0]: <foreign_entity_name | @mapping_function>
-    <columns_with_prefix_*>: <foreign_entity_name | @mapping_function>
-```
-
-As you can see, there are quite a few options. The simplest are static values which are used e.g. by options:
-
-
-```
+```yaml
 option:
   value-references:
     option_name@option_value:
@@ -281,9 +261,11 @@ option:
       ...
 ```
 
-If the entity type needs to be determined dynamically it can reference a PHP function:
+This is the simplest case but it can also get more fancy:
 
-```
+If the entity type needs to be **determined dynamically** it can reference a PHP function:
+
+```yaml
 postmeta:
   value-references:
     meta_key@meta_value:
@@ -292,9 +274,9 @@ postmeta:
 
 Note that there are no parenthesis at the end of this (it's a method reference, not a call) and that it is prefixed with `@`. The function gets the entity as a parameter and returns a target entity name. For example, for `_menu_item_object_id`, the function looks for a related DB row with `_menu_item_type` and returns its value.
  
-If the ID is in a serialized object, you can specify the path by a suffix of the source column. It looks like array access but also supports regular expressions, for example:
+If the **ID is in a serialized object**, you can specify the path by a suffix of the source column. It looks like an array access but also supports regular expressions, for example:
 
-```
+```yaml
 option:
   value-references:
     option_name@option_value:
@@ -303,7 +285,7 @@ option:
 
 To visualize this, the `widget_pages` option contains a value like `a:2:{i:2;a:3:{s:5:"title";s:0:"";s:7:"exclude";s:7:"1, 2, 3";...}...}` which, unserialized, looks like this:
 
-```
+```php
 [
   2 => [
     "title" => "",
@@ -314,11 +296,11 @@ To visualize this, the `widget_pages` option contains a value like `a:2:{i:2;a:3
 ]
 ```
 
-The schema says that the numbers in the "exclude" key point to posts.
+The schema says that the numbers in the "exclude" key reference posts.
 
-Value references also support wildcards in the name of the source column. It's useful e.g. for options named `theme_mods_<name of theme>`. An example that mixes this with the serialized data syntax is:
+Value references also support **wildcards** in the name of the source column. It's useful e.g. for options named `theme_mods_<name of theme>`. An example that mixes this with the serialized data syntax is:
 
-```
+```yaml
 option:
   value-references:
     option_name@option_value:
@@ -327,41 +309,58 @@ option:
       theme_mods_*["custom_logo"]: post
 ```
 
+It probably won't surprise you that this is a real example used in WordPress' `schema.yml`. :stuck_out_tongue_winking_eye:
+
+The complete syntax is:
+
+```yaml
+value-references:
+  <source_column_name>@<value_column_name>:
+    <source_column_value>: <foreign_entity_name | @mapping_function>
+    <source_column_value>["path-in-serialized-objects"][/\d+/][0]: <foreign_entity_name | @mapping_function>
+    <columns_with_prefix_*>: <foreign_entity_name | @mapping_function>
+```
 
 #### M:N references
 
-Some entities are in an M:N relationship like posts and term_taxonomies. The format to capture this is:
+Some entities are in an M:N relationship like posts and term_taxonomies. This is how it's written:
 
-```
-mn-references:
-  <junction_table_name_without_prefix>.<column_name>: <foreign_entity_name>
-```
-
-This is a concrete example from the post entity:
-
-```
+```yaml
 post:
   mn-references:
     term_relationships.term_taxonomy_id: term_taxonomy
 ```
 
-One entity is considered "master" which is kind of arbitrary (technically, they are equal) but here, we decided that posts will store tags and categories, not the other way around. INI files of posts will store the references.
+One entity is considered the main one which is kind of arbitrary as technically, VersionPress treats them equally. Here, we decided that posts will store tags and categories in them, not the other way around.
 
-References can also be prefixed with a tilde (`~`) which makes them virtual:
+The syntax is:
 
+```yaml
+mn-references:
+  <junction_table_name_without_prefix>.<column_name>: <foreign_entity_name>
 ```
+
+References can also be prefixed with a tilde (`~`) which makes them **"virtual"**:
+
+```yaml
 mn-references:
   ~<junction_table_name_without_prefix>.<column_name>: <foreign_entity_name>
 ```
 
-Virtual references are not stored in INI files but the relationships are checked during reverts. For example, when a revert would delete a category (revert of `term_taxonomy/create`) and there is some post referencing it, the operation would fail.
+A virtual reference is not stored in the INI file but the relationships are still checked during reverts. For example, when a revert would delete a category (revert of `term_taxonomy/create`) and there is some post referencing it, the operation would fail. This is ensured by:
+
+```yaml
+term_taxonomy:
+  mn-references:
+    ~term_relationships.object_id: post
+```
 
 
 #### Parent references
 
 Some entities are stored within other entities, for example, postmeta are stored in the same INI file as their parent post. This is captured using a `parent-reference` property:
 
-```
+```yaml
 postmeta:
   parent-reference: post_id
   references:
@@ -369,14 +368,14 @@ postmeta:
 
 ```
 
-This references one of the basic reference column names, not the final entity. The notation above reads "postmeta stores a parent reference in the `post_id` column and that points to the `post` entity".
+This references one of the basic reference column names, not the final entity. The notation above reads "postmeta stores a parent reference in the `post_id` column, and that points to the `post` entity".
 
 
 ### Frequently written entities
 
 Some entities are changed very often, e.g., view counters, Akismet spam count, etc. VersionPress only saves them once in a while and the `frequently-written` section influences this:
 
-```
+```yaml
 entity:
   frequently-written:
     - 'column_name: value'
@@ -384,14 +383,17 @@ entity:
       interval: 5min
 ```
 
-The values in the `frequently-written` array can either be strings which are then interpreted as queries, or objects with `query` and `interval` keys. Queries use the same syntax as search / filtering in the UI, with some small differences like that the date range operator cannot be used but overall, the syntax is pretty intuitive. The interval is parsed by the `strtotime()` PHP function and the default value is one hour.
+The values in the `frequently-written` array can either be strings which are then interpreted as queries, or objects with `query` and `interval` keys.
+
+- **Queries** use the same syntax as search / filtering in the UI, with some small differences like that the date range operator cannot be used but overall, the syntax is pretty intuitive. _TODO add link_
+- The **interval** is parsed by the `strtotime()` function and the default value is one hour.
 
 
 ### Ignoring entities
 
-Some entities should be ignored, i.e., not tracked at all, like transient options, environment-specific things etc. This is an example from the `option` entity:
+Some entities should be ignored (not tracked at all) like transient options, environment-specific options, etc. This is an example from the `option` entity:
 
-```
+```yaml
   ignored-entities:
     - 'option_name: _transient_*'
     - 'option_name: _site_transient_*'
@@ -403,9 +405,9 @@ Again, queries are used. Wildcards are supported.
 
 #### Ignoring columns
 
-It is possible to ignore just parts of entities – their columns. The columns might either be ignored entirely or computed dynamically using a PHP function:
+It is possible to ignore just parts of entities. The columns might either be ignored entirely or computed dynamically using a PHP function:
 
-```
+```yaml
 entity:
   ignored-columns:
     - column_name_1
@@ -413,13 +415,15 @@ entity:
     - computed_column_name: '@functionReference'
 ```
 
-The function is called whenever VersionPress does its INI files => DB synchronization. The function will get an instance of `VersionPress\Database\Database` as an argument and is expected to update the database appropriately.
+The function is called whenever VersionPress does its INI files => DB synchronization. The function will get an instance of `VersionPress\Database\Database` as an argument and is expected to update the database appropriately. _(TODO @JanVoracek is this still valid?)_
 
 #### Cache invalidation
 
-WordPress uses cache for posts, comments, users, terms, etc. This cache needs to be invalidated when VersionPress updates database (on undo, rollback, pull, etc.). It is possible to tell VersionPress which cache has to be invalidated and where it finds related IDs. For example, when some post is deleted using *undo*, it is necessary to call `clean_post_cache(<post-id>)`. VersionPress will do it automatically based on following configuration:
+WordPress uses cache for posts, comments, users, terms, etc. This cache needs to be invalidated when VersionPress updates database (on undo, rollback, pull, etc.). It is possible to tell VersionPress which cache to invalidate and where to find the related IDs.
 
-```
+For example, when some post is deleted using the Undo functionality, it is necessary to call `clean_post_cache(<post-id>)`. VersionPress will do it automatically based on following piece of schema:
+
+```yaml
 post:
   table: posts
   id: ID
@@ -431,8 +435,6 @@ It tells VersionPress to delete the post cache (VP resolves the function name as
 
 ```
 post:
-  table: posts
-  id: ID
   references:
       post_author: user
       post_parent: post
@@ -441,8 +443,6 @@ post:
     - user: post_author
     - post: post_parent
 ```
-
-
 
 
 ## Shortcodes
