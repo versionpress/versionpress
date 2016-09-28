@@ -447,67 +447,63 @@ post:
 
 ## Shortcodes
 
-Similarly to DB schema, VersionPress needs to understand shortcodes – what DB entities they reference, in which attributes and what contexts are valid for them. The `shortcodes.yml` file is used for this.
+Similarly to database schema, VersionPress needs to understand shortcodes as they can also contain entity references. `shortcodes.yml` describes this, here is an example:
 
-Here is a full example:
+```yaml
+shortcode-locations:
+  post:
+    - post_content
 
-    shortcode-locations:
-        post:
-            - post_content
+shortcodes:
+  gallery:
+    id: post
+    ids: post
+    include:
+    exclude: post
+  playlist:
+    id: post
+    ids: post
+    include: post
+    exclude: post
+```
 
-    shortcodes:
-        gallery:
-            id: post
-            ids: post
-            include:
-            exclude: post
-        playlist:
-            id: post
-            ids: post
-            include: post
-            exclude: post
+The **`shortcode-locations`** array describes where the shortcodes can appear. By default, WordPress only allows shortcodes in post content but here's another example of how it could look if it also supported them in post titles and comments:
 
-
-There are two top-level arrays, `shortcode-locations` and `shortcodes`.
-
-
-### shortcode-locations
-
-This array describes where the shortcodes can appear. By default, WordPress only allows shortcodes in post content but here's another example of how it could look like if it also supported post title and comments:
-
-    shortcode-locations:
-        post:
-            - post_content
-            - post_title
-        comment:
-            - comment_content
+```yaml
+shortcode-locations:
+  post:
+    - post_content
+    - post_title
+  comment:
+    - comment_content
+```
 
 Note that WordPress doesn't restrict shortcode *type* for various locations, so if some shortcode is supported in e.g. `comment_content`, all shortcodes are.
 
+The `shortcodes` array holds the actual shortcodes, but only those that contain references to other entities (so things like `[embed]` or `[audio]` are not present). Here's the example from above again:
 
-### shortcodes
-
-This is a list of the actual shortcodes, but only those that contain references to other entities (so things like `[embed]` or `[audio]` are not present). Here's the example again:
-
-    shortcodes:
-        gallery:
-            id: post
-            ids: post
-            include: post
-            exclude: post
-        playlist:
-            id: post
-            ids: post
-            include: post
-            exclude: post
+```yaml
+shortcodes:
+  gallery:
+    id: post
+    ids: post
+    include:
+    exclude: post
+  playlist:
+    id: post
+    ids: post
+    include: post
+    exclude: post
+```
 
 For example the `[gallery]` shortcode has four attributes that can contain references, and they all point to the `post` entity (it's an entity, not a table; the table will eventually be something like `wp_posts`).
 
-Note that you don't have to worry about the attribute type, whether it contains a single ID or a list. VersionPress handles both the cases correctly:
+Note that you don't have to worry about the attribute type, whether it contains a single ID or a list of IDs. VersionPress handles both cases transparently:
 
-    [gallery id="1"]
-    [gallery id="1,2,3,6,11,20"]
-
+```
+[gallery id="1"]
+[gallery id="1,2,3,6,11,20"]
+```
 
 
 ## Ignored folders
