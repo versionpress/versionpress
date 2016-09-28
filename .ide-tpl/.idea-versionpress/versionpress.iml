@@ -5,6 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" packagePrefix="VersionPress" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" packagePrefix="VersionPress\Tests" />
       <sourceFolder url="file://$MODULE_DIR$/admin" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/.versionpress" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/log" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
       <excludeFolder url="file://$MODULE_DIR$/tests/node_modules" />
