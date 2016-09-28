@@ -8,6 +8,9 @@ interface EnvironmentProps {
   visualization: Visualization;
 }
 
+const LEFT = 10;
+const SPACE = 15;
+
 export default class Environment extends React.Component<EnvironmentProps, {}> {
 
   private tdDom;
@@ -34,8 +37,36 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
             width={!this.tdDom ? 50 : this.tdDom.getBoundingClientRect().width}
             height={!this.tdDom ? 20 : this.tdDom.getBoundingClientRect().height}
           >
+            {visualization.upperRoutes && visualization.upperRoutes.map(route => {
+              const { from, to } = route;
+              const areSame = from === to;
+
+              return (
+                <line
+                  x1={LEFT + from * SPACE * (areSame? 1 : .5) + ((!areSame && from === 0) ? SPACE * .5 : 0)} y1="0%"
+                  x2={LEFT + to * SPACE} y2="50%"
+                  strokeWidth="2"
+                  stroke={getGitBranchColor(route.environment)}
+                  key={`upper${route.branch}`}
+                />
+              );
+            })}
+            {visualization.lowerRoutes && visualization.lowerRoutes.map(route => {
+              const { from, to } = route;
+              const areSame = from === to;
+
+              return (
+                <line
+                  x1={LEFT + from * SPACE} y1="50%"
+                  x2={LEFT + to * SPACE * (areSame ? 1 : .5) + ((!areSame && to === 0) ? SPACE * .5 : 0)} y2="100%"
+                  strokeWidth="2"
+                  stroke={getGitBranchColor(route.environment)}
+                  key={`lower${route.branch}`}
+                />
+              );
+            })}
             <circle
-              cx={10 + visualization.offset * 10}
+              cx={LEFT + visualization.offset * SPACE}
               cy="50%"
               r="4"
               fill={getGitBranchColor(visualization.environment)}
