@@ -26,6 +26,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
       <td
         className='column-environment'
         ref={tdDom => this.tdDom = tdDom}
+        style={{ borderBottom: 0, borderRight: '1px solid #ccc' }}
       >
         {(!showVisualization && environment !== '?') &&
         <div style={{ backgroundColor: getGitBranchColor(environment) }}>
