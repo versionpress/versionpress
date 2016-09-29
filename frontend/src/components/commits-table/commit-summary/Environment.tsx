@@ -26,7 +26,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
       <td
         className='column-environment'
         ref={tdDom => this.tdDom = tdDom}
-        style={{ borderBottom: 0, borderRight: '1px solid #ccc' }}
+        style={{ borderBottom: 0, borderRight: '1px solid #ccc', position: 'relative' }}
       >
         {(!showVisualization && environment !== '?') &&
         <div style={{ backgroundColor: getGitBranchColor(environment) }}>
@@ -37,6 +37,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
           <svg
             width={!this.tdDom ? 50 : this.tdDom.getBoundingClientRect().width}
             height={!this.tdDom ? 20 : this.tdDom.getBoundingClientRect().height}
+            style={{ position: 'absolute', top: 0 }}
           >
             {visualization.upperRoutes && visualization.upperRoutes.map(route => {
               const { from, to } = route;
