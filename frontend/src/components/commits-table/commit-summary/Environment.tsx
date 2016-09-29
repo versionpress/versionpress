@@ -49,7 +49,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
                   x2={LEFT + to * SPACE} y2="50%"
                   strokeWidth="2"
                   stroke={getGitBranchColor(route.environment)}
-                  key={`upper${route.branch}`}
+                  key={`upper-${from}-${to}`}
                 />
               );
             })}
@@ -63,7 +63,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
                   x2={LEFT + to * SPACE * (areSame ? 1 : .5) + ((!areSame && to === 0) ? SPACE * .5 : 0)} y2="100%"
                   strokeWidth="2"
                   stroke={getGitBranchColor(route.environment)}
-                  key={`lower${route.branch}`}
+                  key={`lower-${from}-${to}`}
                 />
               );
             })}
