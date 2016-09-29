@@ -505,6 +505,12 @@ Note that you don't have to worry about the attribute type, whether it contains 
 [gallery id="1,2,3,6,11,20"]
 ```
 
+## Hooks
+
+If something cannot be described statically, VersionPress offers several filters, actions and functions to define behavior through code. Implement them in the `hooks.php` file.
+
+Most of the filters have already been described in the text above, the full API reference is at the end of this document.
+
 
 ## Ignored folders
 
@@ -526,7 +532,13 @@ Option **(2)** is good if the plugin author wants to support VersionPress direct
 Option **(3)** is a fallback method but a good one: anyone can create a definition files for their favorite plugins and share them via an online repository. We're still working on the details of this.
 
 
-## Public API – Hooks and functions
+## Resources
+
+- Issue [#1036](https://github.com/versionpress/versionpress/issues/1036) – everything was discussed there.
+
+## API reference
+
+TODO this will be auto-generated from code.
 
 ### Filters
 
@@ -561,6 +573,3 @@ Option **(3)** is a fallback method but a good one: anyone can create a definiti
  - `vp_force_action`
    - `vp_force_action($scope, $action, $id = '', $tags = [], $files = [])`
 
-## Resources
-
-- Issue [#1036](https://github.com/versionpress/versionpress/issues/1036) – everything was discussed there.
