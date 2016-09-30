@@ -94,6 +94,7 @@ export default class CommitsTable extends React.Component<{}, {}> {
           showVisualization={showVisualization}
           branches={branches}
           onSelectAllChange={this.onSelectAllChange}
+          onChangeShowVisualization={store.changeShowVisualization}
         />
         {commitRows.map((commitRow: CommitRow, index: number) => (
           this.renderRow(commitRow, index === notAbleNoteIndex)

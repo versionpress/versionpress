@@ -18,6 +18,8 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
 
   componentDidMount() {
     this.forceUpdate();
+
+    window.addEventListener('resize', () => this.forceUpdate());
   }
 
   onChangeShowVisualization = (e: React.MouseEvent) => {
