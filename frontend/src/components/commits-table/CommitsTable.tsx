@@ -52,6 +52,7 @@ export default class CommitsTable extends React.Component<{}, {}> {
         onUndo={this.onUndo}
         onRollback={this.onRollback}
         onCommitsSelect={this.onCommitsSelect}
+        onChangeShowVisualization={store.changeShowVisualization}
         key={commitRow.commit.hash}
       />
     );

@@ -11,7 +11,9 @@ import { generateGraphData } from "./utils";
 class CommitsTableStore {
   @observable commitRows: CommitRow[] = [];
   @observable pages: number[] = [];
-  @observable showVisualization: boolean = true;
+  @observable showVisualization: boolean = localStorage
+    ? !!localStorage.getItem('showVisualization')
+    : false;
 
   @computed get enableActions() {
     return !appStore.isDirtyWorkingDirectory;
@@ -42,6 +44,14 @@ class CommitsTableStore {
 
     return branches.length;
   }
+
+  @action changeShowVisualization = () => {
+    this.showVisualization = !this.showVisualization;
+
+    if (localStorage) {
+      localStorage.setItem('showVisualization', this.showVisualization ? "true" : "");
+    }
+  };
 
 /*
   @computed get visualizationData() {

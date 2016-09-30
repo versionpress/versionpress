@@ -17,6 +17,7 @@ interface RowProps {
   onUndo(hash: string, message: string): void;
   onRollback(hash: string, date: string): void;
   onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
+  onChangeShowVisualization(): void;
 }
 
 @observer
@@ -43,6 +44,7 @@ export default class Row extends React.Component<RowProps, {}> {
           onRollback={onRollback}
           onCommitsSelect={onCommitsSelect}
           onDetailsLevelChange={this.onDetailsLevelChange}
+          onChangeShowVisualization={this.props.onChangeShowVisualization}
         />
         {error
           ? <Error message={error} />

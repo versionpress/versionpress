@@ -6,6 +6,7 @@ interface EnvironmentProps {
   environment: string;
   showVisualization: boolean;
   visualization: Visualization;
+  onChangeShowVisualization(): void;
 }
 
 const LEFT = 10;
@@ -19,17 +20,33 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
     this.forceUpdate();
   }
 
+  onChangeShowVisualization = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    this.props.onChangeShowVisualization();
+  };
+
   render() {
     const { environment, showVisualization, visualization } = this.props;
+
+    let style = {};
+    if (showVisualization) {
+      style = {
+        borderBottom: 0,
+        borderRight: '1px solid #ccc',
+        position: 'relative'
+      }
+    }
 
     return (
       <td
         className='column-environment'
         ref={tdDom => this.tdDom = tdDom}
-        style={{ borderBottom: 0, borderRight: '1px solid #ccc', position: 'relative' }}
+        style={style}
       >
         {(!showVisualization && environment !== '?') &&
-        <div style={{ backgroundColor: getGitBranchColor(environment) }}>
+        <div style={{ backgroundColor: getGitBranchColor(environment) }} onClick={this.onChangeShowVisualization}>
           {environment}
         </div>
         }
@@ -38,6 +55,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
             width={!this.tdDom ? 50 : this.tdDom.getBoundingClientRect().width}
             height={!this.tdDom ? 20 : this.tdDom.getBoundingClientRect().height}
             style={{ position: 'absolute', top: 0 }}
+            onClick={this.onChangeShowVisualization}
           >
             {visualization.upperRoutes && visualization.upperRoutes.map(route => {
               const { from, to } = route;
