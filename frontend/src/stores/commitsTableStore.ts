@@ -162,7 +162,7 @@ class CommitsTableStore {
         parents = ["7214375088f22d111c8efe54d3a9d949b8b24f15", "e5e557d04a0b1ee18d5269d187a814c9cb60eeb8"];
       } else if (commit.hash === "bfbd729934794e435c3f276e97a9c6c6b3faf0fd") {
         parents = ["db872709db982dfdb13e7bf02c0bdb3de6968b8e", "208ba26f16dc668a56f925c39bd5083bcdddc8c9"];
-      
+
       } else if (i === this.commits.length - 1) {
         parents = [];
       } else {

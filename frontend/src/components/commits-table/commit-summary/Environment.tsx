@@ -42,10 +42,11 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
             {visualization.upperRoutes && visualization.upperRoutes.map(route => {
               const { from, to } = route;
               const areSame = from === to;
+              const isToBigger = to > from;
 
               return (
                 <line
-                  x1={LEFT + from * SPACE * (areSame? 1 : .5) + ((!areSame && from === 0) ? SPACE * .5 : 0)} y1="0%"
+                  x1={LEFT + from * SPACE * (areSame? 1 : (isToBigger ? 1.5 : .5)) + ((!areSame && (from === 0 || !isToBigger)) ? SPACE * to * .5 : 0)} y1="0%"
                   x2={LEFT + to * SPACE} y2="50%"
                   strokeWidth="2"
                   stroke={getGitBranchColor(route.environment)}
@@ -56,11 +57,12 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
             {visualization.lowerRoutes && visualization.lowerRoutes.map(route => {
               const { from, to } = route;
               const areSame = from === to;
+              const isFromBigger = from > to;
 
               return (
                 <line
                   x1={LEFT + from * SPACE} y1="50%"
-                  x2={LEFT + to * SPACE * (areSame ? 1 : .5) + ((!areSame && to === 0) ? SPACE * .5 : 0)} y2="100%"
+                  x2={LEFT + to * SPACE * (areSame ? 1 : (isFromBigger ? 1.5 : .5)) + ((!areSame && to === 0) ? SPACE * .5 : 0)} y2="100%"
                   strokeWidth="2"
                   stroke={getGitBranchColor(route.environment)}
                   key={`lower-${from}-${to}`}
