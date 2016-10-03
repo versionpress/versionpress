@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "67645e34edab5008d67f712466e949b8",
-    "content-hash": "333b4cd65acac0e8cfb8823253c05a22",
+    "hash": "0847e3dc9b96535a4942f9aead1e0076",
+    "content-hash": "0482561f31e16822fb6e086c1ce960db",
     "packages": [
         {
             "name": "composer/composer",
@@ -420,6 +420,59 @@
             "description": "Nette Utility Classes",
             "homepage": "https://nette.org",
             "time": "2015-12-03 01:32:27"
+        },
+        {
+            "name": "phpmyadmin/sql-parser",
+            "version": "v3.4.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpmyadmin/sql-parser.git",
+                "reference": "a0d8069906d464de75bea761acb9fdde0aa2ee72"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpmyadmin/sql-parser/zipball/a0d8069906d464de75bea761acb9fdde0aa2ee72",
+                "reference": "a0d8069906d464de75bea761acb9fdde0aa2ee72",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/php-code-coverage": "~2.0 || ~3.0",
+                "phpunit/phpunit": "~4.8 || ~5.1"
+            },
+            "bin": [
+                "bin/highlight-query",
+                "bin/lint-query"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SqlParser\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "The phpMyAdmin Team",
+                    "email": "developers@phpmyadmin.net",
+                    "homepage": "https://www.phpmyadmin.net/team/"
+                }
+            ],
+            "description": "A validating SQL lexer and parser with a focus on MySQL dialect.",
+            "homepage": "https://github.com/phpmyadmin/sql-parser",
+            "keywords": [
+                "analysis",
+                "lexer",
+                "parser",
+                "sql"
+            ],
+            "time": "2016-09-13 14:03:19"
         },
         {
             "name": "seld/cli-prompt",
@@ -867,53 +920,6 @@
                 "nette"
             ],
             "time": "2015-12-03 00:19:21"
-        },
-        {
-            "name": "udan11/sql-parser",
-            "version": "v3.0.7",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpmyadmin/sql-parser.git",
-                "reference": "5621792c48cc6756508379ba941cb8c271df24bd"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpmyadmin/sql-parser/zipball/5621792c48cc6756508379ba941cb8c271df24bd",
-                "reference": "5621792c48cc6756508379ba941cb8c271df24bd",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "phpunit/php-code-coverage": "~2.0",
-                "phpunit/phpunit": "~4.0|~5.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "SqlParser\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0+"
-            ],
-            "authors": [
-                {
-                    "name": "Dan Ungureanu",
-                    "email": "udan1107@gmail.com"
-                }
-            ],
-            "description": "A validating SQL lexer and parser with a focus on MySQL dialect.",
-            "homepage": "https://github.com/udan11/sql-parser",
-            "keywords": [
-                "analysis",
-                "lexer",
-                "parser",
-                "sql"
-            ],
-            "time": "2015-11-17 20:24:09"
         }
     ],
     "packages-dev": [

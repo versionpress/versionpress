@@ -62,7 +62,7 @@
           <root url="file://$MODULE_DIR$/vendor/symfony/process" />
           <root url="file://$MODULE_DIR$/vendor/symfony/yaml" />
           <root url="file://$MODULE_DIR$/vendor/tracy/tracy" />
-          <root url="file://$MODULE_DIR$/vendor/udan11/sql-parser" />
+          <root url="file://$MODULE_DIR$/vendor/phpmyadmin/sql-parser" />
         </CLASSES>
         <SOURCES>
           <root url="file://$MODULE_DIR$/../../ext-libs/vendor" />
@@ -97,7 +97,7 @@
           <root url="file://$MODULE_DIR$/vendor/symfony/process" />
           <root url="file://$MODULE_DIR$/vendor/symfony/yaml" />
           <root url="file://$MODULE_DIR$/vendor/tracy/tracy" />
-          <root url="file://$MODULE_DIR$/vendor/udan11/sql-parser" />
+          <root url="file://$MODULE_DIR$/vendor/phpmyadmin/sql-parser" />
         </SOURCES>
       </library>
     </orderEntry>
