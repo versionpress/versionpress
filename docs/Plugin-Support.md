@@ -525,7 +525,7 @@ Most of the filters have already been discussed in the text above, you can find 
 
 ## Ignored folders
 
-Feel free to use custom `.gitignore` for files in the plugin directory. You can also ignore files / directories outside the plugin directory. There is a filter to let VersionPress know which files / directories you want to ignore (TODO).
+Feel free to use custom `.gitignore` for files in the plugin directory. You can also ignore files / directories outside the plugin directory. There will be a filter to let VersionPress know which files / directories you want to ignore.
 
 
 ## Discovery mechanism
