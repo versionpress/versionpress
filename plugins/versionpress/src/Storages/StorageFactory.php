@@ -53,12 +53,12 @@ class StorageFactory
         }
 
         if ($this->dbSchemaInfo->isEntity($entityName)) {
-            return $this->resolveStorageForEntity($entityName);
+            return $this->storages[$entityName] = $this->resolveStorageForEntity($entityName);
         }
 
         $mnReferenceDetails = $this->dbSchemaInfo->getMnReferenceDetails($entityName);
         if ($mnReferenceDetails !== null) {
-            return $this->resolveStorageForMnReference($mnReferenceDetails);
+            return $this->storages[$entityName] = $this->resolveStorageForMnReference($mnReferenceDetails);
         }
 
         return null;
@@ -97,7 +97,7 @@ class StorageFactory
             $this->tableSchemaStorage->saveSchema($prefixedTableName);
         }
 
-        $parentStorage = $this->resolveStorageForEntity($referenceDetails['source-entity']);
+        $parentStorage = $this->getStorage($referenceDetails['source-entity']);
         return new MnReferenceStorage($parentStorage, $referenceDetails);
     }
 }

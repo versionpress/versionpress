@@ -225,37 +225,19 @@ class WpdbMirrorBridge
             return;
         }
 
-        // the post exists in DB for a while but until now it wasn't tracked, so we have to save its postmeta
-        $savePostmeta = !$vpId && $entityName === 'post';
 
-        if (!$vpId) {
+        // For example, the post exists in DB for a while but until now it wasn't tracked, so we have to save its postmeta and related term_taxonomies
+        $entityWasNotTrackedYet = !$vpId;
+
+        if ($entityWasNotTrackedYet) {
             $data = $this->vpidRepository->identifyEntity($entityName, $data, $id);
         }
 
         $data = $this->shortcodesReplacer->replaceShortcodesInEntity($entityName, $data);
         $this->mirror->save($entityName, $data);
 
-        if (!$savePostmeta) {
-            return;
-        }
-
-        $postmeta = $this->database->get_results(
-            "SELECT meta_id, meta_key, meta_value FROM {$this->database->postmeta} WHERE post_id = {$id}",
-            ARRAY_A
-        );
-
-        foreach ($postmeta as $meta) {
-            $meta['vp_post_id'] = $data['vp_id'];
-
-            $meta = $this->vpidRepository->replaceForeignKeysWithReferences('postmeta', $meta);
-            if (!$this->mirror->shouldBeSaved('postmeta', $meta)) {
-                continue;
-            }
-
-            $meta = $this->vpidRepository->identifyEntity('postmeta', $meta, $meta['meta_id']);
-
-            $meta = $this->shortcodesReplacer->replaceShortcodesInEntity('postmeta', $meta);
-            $this->mirror->save('postmeta', $meta);
+        if ($entityWasNotTrackedYet) {
+            $this->storeRelatedEntities($data, $entityName);
         }
     }
 
@@ -515,5 +497,61 @@ class WpdbMirrorBridge
         ];
 
         $this->mirror->delete($referenceDetails['junction-table'], $reference);
+    }
+
+    /**
+     * Saves all already existing meta and M:N references for an entity that wasn't tracked yet
+     *
+     * @param array $data
+     * @param string $entityName
+     */
+    private function storeRelatedEntities($data, $entityName)
+    {
+        $id = $data[$this->dbSchemaInfo->getEntityInfo($entityName)->idColumnName];
+
+        foreach ($this->dbSchemaInfo->getAllEntityNames() as $referencedEntityName) {
+            $entityInfo = $this->dbSchemaInfo->getEntityInfo($referencedEntityName);
+            if ($this->dbSchemaInfo->isChildEntity($referencedEntityName) && $entityInfo->references[$entityInfo->parentReference] === $entityName) {
+                $childEntities = $this->database->get_results(
+                    "SELECT * FROM {$this->dbSchemaInfo->getPrefixedTableName($referencedEntityName)} WHERE `{$entityInfo->parentReference}` = '{$id}'",
+                    ARRAY_A
+                );
+
+                foreach ($childEntities as $childEntity) {
+                    $childEntity = $this->vpidRepository->replaceForeignKeysWithReferences($referencedEntityName, $childEntity);
+
+                    if (!$this->mirror->shouldBeSaved($referencedEntityName, $childEntity)) {
+                        continue;
+                    }
+
+                    $id = $childEntity[$entityInfo->idColumnName];
+                    $vpid = $this->vpidRepository->getVpidForEntity($referencedEntityName, $id);
+
+                    if ($vpid) {
+                        $childEntity[$entityInfo->vpidColumnName] = $vpid;
+                    } else {
+                        $childEntity = $this->vpidRepository->identifyEntity($referencedEntityName, $childEntity, $childEntity[$entityInfo->idColumnName]);
+                    }
+
+                    $childEntity = $this->shortcodesReplacer->replaceShortcodesInEntity($referencedEntityName, $childEntity);
+                    $this->mirror->save($referencedEntityName, $childEntity);
+                }
+            }
+        }
+
+        foreach ($this->dbSchemaInfo->getAllMnReferences() as $mnReferenceDetails) {
+            if ($mnReferenceDetails['source-entity'] === $entityName) {
+                $junctionTable = $mnReferenceDetails['junction-table'];
+                $prefixedJunctionTable = $this->dbSchemaInfo->getPrefixedTableName($junctionTable);
+                $sourceColumn = $mnReferenceDetails['source-column'];
+
+                $references = $this->database->get_results("SELECT * FROM `{$prefixedJunctionTable}` WHERE `{$sourceColumn}` = '{$id}'", ARRAY_A);
+
+                foreach ($references as $reference) {
+                    $reference = $this->vpidRepository->replaceForeignKeysWithReferences($junctionTable, $reference);
+                    $this->mirror->save($junctionTable, $reference);
+                }
+            }
+        }
     }
 }
