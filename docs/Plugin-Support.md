@@ -1,6 +1,6 @@
 # Plugin Support
 
-> :construction: The plugin support is **not stable or fully implemented as long as this warning is here**.
+> :construction: The plugin support is **not stable or fully implemented** as long as this warning is here.
 
 VersionPress needs to understand plugins' data, actions, shortcodes and other things to automatically provide version control for them. If you're a plugin developer or enthusiast, this document is for you.
 
@@ -23,41 +23,16 @@ By the way, WordPress itself is described to VersionPress as a set of these file
 
 ## Actions
 
-Actions represent what the plugin does. For example, WooCommerce might have actions like "update product", "create invoice" etc. Actions are described in the `actions.yml` file and eventually stored in commit messages to describe to users what happened in their site.
+Actions represent what the plugin does. For example, WordPress core has actions like "update option", "publish post" and many others. They are the smallest atomic changes in a WordPress site, stored in Git commits by VersionPress.
 
-### Brief excurse into VersionPress' automatic change tracking
+An action is identified by a string like `option/edit` or `post/publish`, commits some file(s) with it and has a human-readable message like "Updated option blogname", "Published post Hello World", etc.
 
-Actions are at the core of VersionPress' [automatic change tracking](https://docs.versionpress.net/en/feature-focus/change-tracking#automatic-change-tracking). They represent the smallest atomic changes in a WordPress site, like:
+Actions are described in the `actions.yml` file.
 
-- publishing a post
-- updating an option
-- installing a plugin
-- etc.
 
-Actions are stored in Git commit messages like this:
+### `actions.yml`
 
-```
-Edited option 'blogname'
-
-VP-Action: option/edit/blogname
-# other VP tags here...
-```
-
-A commit can even contain more actions, for example, if two options are updated together, the commit may look like this:
-
-```
-Edited 2 options
-
-VP-Action: option/edit/blogdescription
-
-VP-Action: option/edit/blogname
-```
-
-This brief excurse will help you understand a couple of things about the `actions.yml` format.
-
-### `actions.yml` format
-
-An example from describing the core WordPress actions:
+Here's an example from the core WordPress definition:
 
 ```yaml
 post:
@@ -89,44 +64,54 @@ theme:
 You can see these elements in action:
 
 - The top-level elements define **scopes** that basically group the actions. For example, actions related to WordPress posts are in the `post` scope, theme actions are in the `theme` scope, etc. 
-- **Tags** are values saved in the commit message and are typically used to make the eventual UI messages more useful. For example, it's better to display _Created post 'Hello World'_ than _Created post ID 123_.
-- **The `actions` section** contains all actions under the scope. A combination of scope and action like `post/create` or `theme/install` is a "full action" that can be searched for in the UI and generally uniquely identifies the action.
+- **Tags** are values saved in the commit message and are typically used to make the user-facing messages more useful. For example, it's better to display _Created post 'Hello World'_ than _Created post 123_.
+- Tags are either mapped to database fields as with the `post` scope example, or use the `/` character to indicate that the value is provided by a filter (see below).
+- **The `actions` section** contains all actions in the scope. A combination of scope and action like `post/create` or `theme/install` uniquely identifies the action and can be [searched for in the UI](https://docs.versionpress.net/en/feature-focus/searching-history).
 - An action has a **message** (usually in past tense) and a **priority**. If priority is not present, the default value of 10 is used.
-    - Priorities behave like those on WordPress filters and actions: the lower the number, the higher the priority. A more important action beats the less important one if both appear in the same commit. For example, `theme/switch` beats `option/edit` which means that the user will see a message about changing themes, not updating some internal option.
+    - Priorities behave like on WordPress filters and actions: the lower the number, the higher the priority. A more important action beats the less important one if both appear in the same commit. For example, `theme/switch` beats `option/edit` which means that the user will see a message about changing themes, not updating some internal option.
 - **Meta entities** also contain **`parent-id-tag`** with the name of a tag containing ID of the parent entity.
 
 
 ### Action detection
 
-You might be asking how VersionPress assigns these actions to real changes in a WordPress site. It works like this:
+There are generally two types of actions:
 
-VersionPress **automatically** detects **three basic actions** – `create`, `edit` and `delete`, based on the SQL query issued. You don't need to do anything if you need just these three basic actions.
+- **Database actions** like manipulating posts, options, users, etc.
+- **Non-database actions** like updating WordPress, deleting themes, etc.
 
-For more **specific actions** like `post/trash` or `comment/approve`, filters are used:
+**Database actions** are more common (at least in WordPress core) and get a pretty convenient treatment by default. Based on the SQL query issued, a `create`, `edit` or `delete` action is created automatically.
 
-- For standard entities, use the `vp_entity_action_{$entityName}` filter which has three parameters: original action, entity in a state before the action and the same entity in a state after the action.
-- For meta entities, use the `vp_meta_entity_action_{$entityName}` filter with five parameters: the two extra are parent entity in a state before and after the action.
+If you need more specific actions like `post/trash` or `comment/approve`, filters are used: `vp_entity_action_{$entityName}` for standard entities and `vp_meta_entity_action_{$entityName}` for meta entities.
 
-**Tags** are automatically extracted from the entity. For example, this snippet:
+Tags are automatically extracted from the database entity. For example,
 
 ```yaml
   tags:
     VP-Post-Title: post_title
 ```
 
-makes sure that the `VP-Post-Title` tag contains the value from the `post_title` database field.
+makes sure that `VP-Post-Title` contains the post title.
 
-You can alter tags in a filter `vp_entity_tags_{$entityName}` which takes four parameters: the original tags, entity in a state before the action, entity in a state after the action and the action. Similarly to before, use `vp_meta_entity_tags_{$entityName}` for meta entities with two extra parameters representing parent entity and its states.
+Tags can be altered (or created entirely if the YAML only uses `/` as a tag value) by filters `vp_entity_tags_{$entityName}` and `vp_meta_entity_tags_{$entityName}`.
+
+**Non-database actions** are tracked manually by calling a global `vp_force_action()`. This overwrites all other actions VersionPress might have collected during the request. For example, this is how `wordpress/update` action is tracked:
+
+```
+vp_force_action('wordpress', 'update', $version, [], $wpFiles);
+```
+
+> :construction: We're planning to change this for the final VersionPress 4.0 release. Some filter will probably be used instead.
+
 
 ### Files to commit with an action
 
-So far we've only talked about action descriptions that are stored in commit _messages_ but what about the actual content?
+Every action has a message and some content. It's this content that is undone when the user clicks the Undo button in the UI.
 
-For database changes, VersionPress automatically commits the corresponding INI file. For example, for a `post/edit` action, a post's INI file is committed.
+For **database actions**, VersionPress automatically commits the corresponding INI file. For example, for a `post/edit` action, a post's INI file is committed.
 
 > Side note: VersionPress stores database entities in the `wp-content/vpdb` folder as a set of INI files.
 
-This behavior is sufficient most of the time, however, some changes should commit more files. For example, when the post is an attachment, the uploaded file should also be committed. For this, the list of files to commit can be filtered using `vp_entity_files_{$entityName}` or `vp_meta_entity_files_{$entityName}`. The callback takes a list of possibly changed files, the entity in a state before the action, the entity in a state after the action and in case of meta entity, also the parent entity in states before and after the action.
+This behavior is sufficient most of the time, however, some changes should commit more files. For example, when the post is an attachment, the uploaded file should also be committed. For this, the list of files to commit can be filtered using the `vp_entity_files_{$entityName}` or `vp_meta_entity_files_{$entityName}` filters.
 
 The array of files to commit can contain three different types of items:
 
@@ -173,15 +158,9 @@ The full example might look something like this:
 ]
 ```
 
-### Non-database actions
+For **non-database actions**, this list is one of the arguments of the `vp_force_action()` function.
 
-Some actions are not directly related to the database entities, e.g. plugin installation, WP update, etc. VersionPress provides function `vp_force_action` for these actions. VersionPress will use only action specified by parameters of this function and ignore all automatically catched. For example:
-
-```
-vp_force_action('wordpress', 'update', $version, [], $wpFiles);
-```
-
-> Warning: This function is only a temporary solution and will be removed in 4.0.
+> As noted above, we'll be getting rid of this approach so this is temporary info.
 
 ## Database schema
 
