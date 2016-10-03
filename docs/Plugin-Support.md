@@ -18,7 +18,7 @@ Plugins are described to VersionPress by a set of files stored in the `.versionp
 
 All files are optional so for example, if a plugin doesn't define any new shortcodes it can omit the `shortcodes.yml` file. Simple plugins like _Hello Dolly_ might even omit everything; they just need to have the `.versionpress` folder so that VersionPress knows the plugin is supported.
 
-By the way, WordPress itself is described to VersionPress as a set of these files (it's the ultimate test of the format because WordPress sometimes does crazy things!). You can take a look at the source files (TODO add link) to draw inspiration from there.
+By the way, WordPress itself is described to VersionPress as a set of these files (it's the ultimate test of the format because WordPress sometimes does crazy things!). You can take a look at [the source files](../plugins/versionpress/.versionpress) to draw inspiration from there.
 
 
 ## Actions
