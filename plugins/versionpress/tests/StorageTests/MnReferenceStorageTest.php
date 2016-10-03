@@ -119,4 +119,10 @@ class MnReferenceStorageTest extends StorageTestCase
         $this->parentStorage = new DirectoryStorage($storageDir, $entityInfo, 'prefix_', $changeInfoFactory);
         $this->storage = new MnReferenceStorage($this->parentStorage, $referenceDetails);
     }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+        FileSystem::remove(__DIR__ . '/entities');
+    }
 }

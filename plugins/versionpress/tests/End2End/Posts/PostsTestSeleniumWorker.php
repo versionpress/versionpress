@@ -24,7 +24,11 @@ class PostsTestSeleniumWorker extends PostTypeTestSeleniumWorker
     {
         $this->byCssSelector('#new-tag-post_tag')->value(Random::generate());
         $this->jsClickAndWait('#post_tag .tagadd');
-        $this->byCssSelector('form#post #publish')->click();
+        if ($this->elementExists('#save-post')) {
+            $this->jsClickAndWait('#save-post');
+        } else {
+            $this->jsClickAndWait('form#post #publish');
+        }
         $this->waitAfterRedirect();
     }
 
@@ -39,8 +43,8 @@ class PostsTestSeleniumWorker extends PostTypeTestSeleniumWorker
 
     public function changePostFormat()
     {
-        $this->byCssSelector('input[type=radio]#post-format-quote')->click();
-        $this->byCssSelector('form#post #publish')->click();
+        $this->jsClick('input[type=radio]#post-format-quote');
+        $this->jsClickAndWait('form#post #publish');
         $this->waitAfterRedirect();
     }
 
