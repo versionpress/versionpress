@@ -532,15 +532,12 @@ Feel free to use custom `.gitignore` for files in the plugin directory. You can 
 
 VersionPress looks for plugin descriptors in these locations, in this order:
 
-1. VersionPress installation folder
-2. `.versionpress` folder in plugin root
-3. Online repository
+1. `.versionpress` folder in plugin root
+2. Online repository (soon)
 
-We only plan to use **(1)** for WordPress core, plugins will typically use **(2)** or **(3)**.
+Option **(1)** is good if the plugin authors want to support VersionPress directly (and hopefully more and more will).
 
-Option **(2)** is good if the plugin authors want to support VersionPress directly (and hopefully more and more will).
-
-Option **(3)** is a fallback method but a good one: anyone can create a definition files for their favorite plugins and share them via an online repository. We're working on it.
+Option **(2)** is a fallback method but a good one: anyone can create a definition files for their favorite plugins and share them via an online repository. We're working on it.
 
 
 ## Resources
