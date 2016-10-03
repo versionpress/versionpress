@@ -426,7 +426,7 @@ entity:
     - computed_column_name: '@functionReference'
 ```
 
-The function is called whenever VersionPress does its INI files => DB synchronization. The function will get an instance of `VersionPress\Database\Database` as an argument and is expected to update the database appropriately. _(TODO @JanVoracek is this still valid?)_
+The function is called whenever VersionPress does its INI files => DB synchronization. The function will get an instance of `VersionPress\Database\Database` as an argument and is expected to update the database appropriately. The `Database` class has the same methods as `wpdb` but the changes it make are not tracked by VersionPress itself.
 
 #### Cache invalidation
 
