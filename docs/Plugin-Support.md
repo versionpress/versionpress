@@ -173,8 +173,15 @@ The full example might look something like this:
 ]
 ```
 
-For non-database actions, e.g., manipulating plugins / themes, you can also use filters. TODO.
+### Non-database actions
 
+Some actions are not directly related to the database entities, e.g. plugin installation, WP update, etc. VersionPress provides function `vp_force_action` for these actions. VersionPress will use only action specified by parameters of this function and ignore all automatically catched. For example:
+
+```
+vp_force_action('wordpress', 'update', $version, [], $wpFiles);
+```
+
+> Warning: This function is only a temporary solution and will be removed in 4.0.
 
 ## Database schema
 
