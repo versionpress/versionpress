@@ -188,6 +188,7 @@ class CommitsTableStore {
 
     const visualization = generateGraphData(graphStructure);
 
+    let environments = {};
     this.commitRows.forEach((commitRow, i) => {
       let upper, lower;
 
@@ -204,8 +205,13 @@ class CommitsTableStore {
         lowerRoutes: lower ? lower.routes : null,
         environment: visualization[i].environment,
         branch: visualization[i].branch,
-        offset: visualization[i].offset
+        offset: visualization[i].offset,
+        isLastEnvCommit: !environments[visualization[i].environment]
       };
+
+      if (!environments[visualization[i].environment]) {
+        environments[visualization[i].environment] = true;
+      }
     });
   };
 

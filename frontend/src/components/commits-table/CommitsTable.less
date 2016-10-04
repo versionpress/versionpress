@@ -113,10 +113,24 @@
       transition: max-width,padding 0.3s;
     }
 
+    text {
+      position: absolute;
+      visibility: hidden;
+      overflow: hidden;
+      max-width: 6px;
+      z-index: 3;
+    }
+
     &:hover {
       div {
         max-width: 200px;
         padding: 8px 10px 8px 20px;
+      }
+
+      text {
+        visibility: visible;
+        max-width: 200px;
+        z-index: 3;
       }
     }
   }

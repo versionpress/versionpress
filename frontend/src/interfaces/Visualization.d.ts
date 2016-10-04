@@ -25,4 +25,5 @@ interface Visualization {
   branch: number;
   environment: string;
   offset: number;
+  isLastEnvCommit: boolean;
 }

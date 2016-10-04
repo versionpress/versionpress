@@ -97,6 +97,22 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
             />
           </svg>
         }
+        {
+          showVisualization &&
+          <svg
+            width={!this.tdDom ? 50 : this.tdDom.getBoundingClientRect().width + visualization.offset * 40}
+            height={!this.tdDom ? 20 : this.tdDom.getBoundingClientRect().height}
+            style={{ position: 'absolute', top: 0 }}
+          >
+            <text
+              x={LEFT + visualization.offset * SPACE + SPACE * .5}
+              y="65%"
+              fill={getGitBranchColor(visualization.environment)}
+            >
+              {environment}
+            </text>
+          </svg>
+        }
       </td>
     );
   }
