@@ -193,7 +193,6 @@ class RequirementsChecker
         $this->isEverythingFulfilled = array_reduce($this->requirements, function ($carry, $requirement) {
             return $carry && $requirement['fulfilled'];
         }, true);
-
     }
 
     /**
@@ -310,7 +309,6 @@ class RequirementsChecker
     {
         $minimumRequiredVersion = $minimumRequiredVersion ?: self::GIT_MINIMUM_REQUIRED_VERSION;
         return version_compare($gitVersion, $minimumRequiredVersion, ">=");
-
     }
 
     private function countEntities()

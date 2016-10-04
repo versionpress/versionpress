@@ -257,7 +257,6 @@ class IniSerializer
         }
 
         return $deserializedArray;
-
     }
 
     private static function getReplacedEolString($str, $direction)
@@ -272,7 +271,6 @@ class IniSerializer
         $to = ($direction == "charsToPlaceholders") ? array_values($replacement) : array_keys($replacement);
 
         return str_replace($from, $to, $str);
-
     }
 
 

@@ -46,7 +46,7 @@ class SystemInfo
         $process->run();
 
         $info['git-binary-as-configured'] = $gitBinary;
-        $info['git-available'] = $process->getErrorOutput() === null;
+        $info['git-available'] = $process->getErrorOutput() === null || !strlen($process->getErrorOutput());
 
         if ($info['git-available'] === false) {
             $info['output'] = [
@@ -85,7 +85,6 @@ class SystemInfo
         $info['matches-min-required-version'] = RequirementsChecker::gitMatchesMinimumRequiredVersion($version);
 
         return $info;
-
     }
 
     /**
@@ -128,7 +127,6 @@ class SystemInfo
 
             // add info whether the plugin is active or not
             $pluginInfo['__IsActive'] = is_plugin_active($pluginFile);
-
         });
         $info['installed-plugins'] = $installedPlugins;
         $info['installed-themes'] = array_keys(wp_get_themes());

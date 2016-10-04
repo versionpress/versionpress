@@ -184,11 +184,11 @@ class VersionPressApi
             $data = ($response instanceof WP_Error)
                 ? $response->get_error_data()
                 : $response->get_data();
-            if (!is_array($data)) {
-                $data = [$data];
-            }
 
-            $data['__VP__'] = true;
+            $responseArr = [
+                '__VP__' => true,
+                'data' => $data
+            ];
 
             if (ob_get_length() > 0) {
                 $bufferContents = ob_get_clean();
@@ -196,9 +196,9 @@ class VersionPressApi
             }
 
             if ($response instanceof WP_Error) {
-                $response->add_data($data);
+                $response->add_data($responseArr);
             } else {
-                $response->set_data($data);
+                $response->set_data($responseArr);
             }
 
             return $response;

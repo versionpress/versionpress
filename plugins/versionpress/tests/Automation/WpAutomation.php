@@ -564,12 +564,15 @@ class WpAutomation
     private function ensureCleanInstallationIsAvailable()
     {
 
-        if (!is_dir($this->getCleanInstallationPath())) {
-            $downloadPath = $this->getCleanInstallationPath();
-            FileSystem::mkdir($downloadPath);
+        $cleanInstallationPath = $this->getCleanInstallationPath();
+
+        if (!$this->isCorrectlyDownloaded($cleanInstallationPath)) {
+            FileSystem::remove($cleanInstallationPath);
+            FileSystem::mkdir($cleanInstallationPath);
+
             $wpVersion = $this->siteConfig->wpVersion;
             $wpLocale = $this->siteConfig->wpLocale;
-            $downloadCommand = "wp core download --path=\"$downloadPath\" --version=\"$wpVersion\"";
+            $downloadCommand = "wp core download --path=\"$cleanInstallationPath\" --version=\"$wpVersion\"";
             if ($wpLocale) {
                 $downloadCommand .= " --locale=$wpLocale";
             }
@@ -577,6 +580,19 @@ class WpAutomation
             $this->exec($downloadCommand, null);
         }
     }
+
+    /**
+     * Checks that clean WP installation is available and downloaded correctly. (Simple implementation
+     * for now, just checking some basic paths.)
+     *
+     * @param string $cleanInstallationPath
+     * @return bool
+     */
+    private function isCorrectlyDownloaded($cleanInstallationPath)
+    {
+        return is_dir($cleanInstallationPath) && is_file($cleanInstallationPath . '/wp-settings.php');
+    }
+
 
     /**
      * Returns a path where a clean installation of the configured WP version is stored and cached.

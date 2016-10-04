@@ -9,7 +9,7 @@
     "michelf/php-markdown": "1.4.*",
     "symfony/filesystem": "~2.5",
     "imnotjames/curlfile-compat": "0.0.1",
-    "udan11/sql-parser": "^3.0",
+    "phpmyadmin/sql-parser": "^3.0",
     "composer/composer": "^1.0"
   },
   "config": {

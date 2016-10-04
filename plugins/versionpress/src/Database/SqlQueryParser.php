@@ -51,7 +51,6 @@ class SqlQueryParser
             return $this->parseDeleteQuery($parser, $query, $this->schema, $this->database);
         }
         return null;
-
     }
 
     /**
@@ -224,7 +223,6 @@ class SqlQueryParser
             }
             return $dataToSet;
         }
-
     }
 
     /**

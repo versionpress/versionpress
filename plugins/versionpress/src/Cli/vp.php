@@ -344,7 +344,6 @@ class VPCommand extends WP_CLI_Command
         }
 
         $this->dropTables();
-
     }
 
     /**
@@ -719,7 +718,6 @@ class VPCommand extends WP_CLI_Command
         }
 
         $this->finishPull();
-
     }
 
     private function finishPull()
@@ -750,7 +748,6 @@ class VPCommand extends WP_CLI_Command
         $this->flushRewriteRules();
 
         WP_CLI::success("All done");
-
     }
 
     /**
@@ -788,8 +785,6 @@ class VPCommand extends WP_CLI_Command
         $this->flushRewriteRules();
 
         WP_CLI::success("All done");
-
-
     }
 
     /**
@@ -867,7 +862,6 @@ class VPCommand extends WP_CLI_Command
         }
         $this->switchMaintenance('off', $remoteName);
         WP_CLI::success("All done");
-
     }
 
     /**

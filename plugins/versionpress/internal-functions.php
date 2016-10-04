@@ -39,7 +39,6 @@ function vp_commit_all_frequently_written_entities()
     vp_save_frequently_written_entities($rules);
 
     $committer->commit();
-
 }
 
 function vp_save_frequently_written_entities($rules)

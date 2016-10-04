@@ -36,7 +36,6 @@ add_filter('vp_entity_should_be_saved_post', function ($shouldBeSaved, $data, $s
     }
 
     return $shouldBeSaved;
-
 }, 10, 3);
 
 add_filter('vp_entity_should_be_saved_comment', function ($shouldBeSaved, $data, $storage) {
@@ -93,7 +92,6 @@ add_filter('vp_entity_action_post', function ($action, $oldEntity, $newEntity) {
     }
 
     return $action;
-
 }, 10, 3);
 
 add_filter('vp_entity_files_post', function ($files, $oldEntity, $newEntity) {
@@ -129,7 +127,6 @@ add_filter('vp_bulk_change_description_post', function ($description, $action, $
     }
 
     return $description;
-
 }, 10, 4);
 
 add_filter('vp_entity_files_option', function ($files, $oldEntity, $newEntity) {
@@ -190,7 +187,6 @@ add_filter('vp_entity_action_comment', function ($action, $oldEntity, $newEntity
     }
 
     return $action;
-
 }, 10, 3);
 
 add_filter('vp_entity_tags_comment', function ($tags, $oldEntity, $newEntity) {
@@ -209,7 +205,6 @@ add_filter('vp_entity_tags_comment', function ($tags, $oldEntity, $newEntity) {
     $tags['VP-Comment-PostTitle'] = $result->post_title;
 
     return $tags;
-
 }, 10, 3);
 
 add_filter('vp_bulk_change_description_comment', function ($description, $action, $count) {
@@ -235,7 +230,6 @@ add_filter('vp_entity_action_term', function ($action, $oldEntity, $newEntity) {
     }
 
     return $action;
-
 }, 10, 3);
 
 add_filter('vp_entity_tags_term', function ($tags, $oldEntity, $newEntity, $action) {
@@ -245,7 +239,6 @@ add_filter('vp_entity_tags_term', function ($tags, $oldEntity, $newEntity, $acti
     }
 
     return $tags;
-
 }, 10, 4);
 
 add_filter('vp_bulk_change_description_term', function ($description, $action, $count, $tags) {
@@ -273,7 +266,6 @@ add_filter('vp_entity_tags_term_taxonomy', function ($tags, $oldEntity, $newEnti
     $tags['VP-Term-Name'] = $term['name'];
 
     return $tags;
-
 }, 10, 4);
 
 add_filter('vp_entity_files_term_taxonomy', function ($files, $oldEntity, $newEntity) {

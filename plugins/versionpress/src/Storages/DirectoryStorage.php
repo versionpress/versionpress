@@ -92,7 +92,6 @@ class DirectoryStorage extends Storage
         } else {
             return null;
         }
-
     }
 
     public function delete($restriction)

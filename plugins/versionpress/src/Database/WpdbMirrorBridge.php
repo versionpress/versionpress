@@ -114,7 +114,6 @@ class WpdbMirrorBridge
         if ($referenceDetails) {
             $this->deleteReference($referenceDetails, $where);
         }
-
     }
 
     /**
@@ -141,7 +140,6 @@ class WpdbMirrorBridge
             $parentIds[$id] = $this->fillParentId($entityInfo->entityName, $entityInfo, $id);
         }
         return $parentIds;
-
     }
 
 
@@ -168,8 +166,6 @@ class WpdbMirrorBridge
                 $this->processInsertUpdateQuery($parsedQueryData);
                 break;
         }
-
-
     }
 
     /**
@@ -406,7 +402,6 @@ class WpdbMirrorBridge
             $data = $this->database->get_results($parsedQueryData->sqlQuery, ARRAY_A)[0];
             $this->updateEntity($data, $parsedQueryData->entityName, $data[$parsedQueryData->idColumnsNames[0]]);
         }
-
     }
 
     /**

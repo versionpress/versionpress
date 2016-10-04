@@ -235,7 +235,6 @@ class EntityInfo
         if (isset($schemaInfo['clean-cache'])) {
             $this->cleanCache = $schemaInfo['clean-cache'];
         }
-
     }
 
     public function getIgnoredColumns()

@@ -25,7 +25,6 @@ class ProcessUtils
         } else {
             return self::escapeshellargLinux($arg);
         }
-
     }
 
     /**

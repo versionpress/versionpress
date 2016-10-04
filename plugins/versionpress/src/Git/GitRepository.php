@@ -195,7 +195,6 @@ class GitRepository
             list($rawCommit, $rawStatus) = explode($statusDelimiter, $rawCommitAndStatus);
             return Commit::buildFromString(trim($rawCommit), trim($rawStatus));
         }, $commits);
-
     }
 
     /**
@@ -230,7 +229,6 @@ class GitRepository
         }
 
         return $result;
-
     }
 
     /**
@@ -399,11 +397,11 @@ class GitRepository
                 return $file[0] === '??'; // unstaged
             }));
 
-        if (count($filesToReset) > 0) {
-            $this->runShellCommand(
-                sprintf("git reset HEAD %s", join(" ", array_map('escapeshellarg', $filesToReset)))
-            );
-        }
+            if (count($filesToReset) > 0) {
+                $this->runShellCommand(
+                    sprintf("git reset HEAD %s", join(" ", array_map('escapeshellarg', $filesToReset)))
+                );
+            }
 
             return $diff;
         }

@@ -223,7 +223,6 @@ class VpidRepository
         }, $stringWithVpids);
 
         return is_numeric($stringWithIds) ? intval($stringWithIds) : $stringWithIds;
-
     }
 
     /**

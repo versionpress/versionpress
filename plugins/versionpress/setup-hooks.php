@@ -637,7 +637,6 @@ function vp_admin_post_confirm_deactivation()
         wp_safe_redirect(admin_url("plugins.php"));
         exit();
     }
-
 }
 
 function vp_send_headers()
@@ -669,7 +668,6 @@ function vp_activation_nag()
 
     // @codingStandardsIgnoreLine
     echo "<div class='update-nag vp-activation-nag'>VersionPress is installed but not yet tracking this site. <a href='" . menu_page_url('versionpress', false) . "'>Please finish the activation.</a></div>";
-
 }
 
 add_action("after_plugin_row_versionpress/versionpress.php", 'vp_display_activation_notice', 10, 2);
@@ -750,7 +748,6 @@ function vp_admin_menu()
         $hookname = get_plugin_page_hookname($menu_slug, '');
         $_registered_pages[$hookname] = true;
     }
-
 }
 
 function versionpress_page()
@@ -920,8 +917,6 @@ function vp_enqueue_admin_styles_and_scripts()
 //---------------------------------
 // API
 //---------------------------------
-require(__DIR__ . "/src/Api/BundledWpApi/rest-api.php");
-
 add_action('rest_api_init', 'versionpress_api_init');
 function versionpress_api_init()
 {

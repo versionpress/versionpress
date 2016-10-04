@@ -19,7 +19,6 @@ class WordPressCacheUtils
         foreach ($ids as $id) {
             $cleanFunction($id);
         }
-
     }
 
     /**
