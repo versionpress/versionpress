@@ -48,7 +48,11 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
         style={style}
       >
         {(!showVisualization && environment !== '?') &&
-        <div style={{ backgroundColor: getGitBranchColor(environment) }} onClick={this.onChangeShowVisualization}>
+        <div
+          className="environment-info"
+          style={{ backgroundColor: getGitBranchColor(environment) }}
+          onClick={this.onChangeShowVisualization}
+        >
           {environment}
         </div>
         }
@@ -99,19 +103,17 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
         }
         {
           showVisualization &&
-          <svg
+          <div
+            className="environment-detail"
             width={!this.tdDom ? 50 : this.tdDom.getBoundingClientRect().width + visualization.offset * 40}
             height={!this.tdDom ? 20 : this.tdDom.getBoundingClientRect().height}
-            style={{ position: 'absolute', top: 0 }}
+            style={{
+              left: LEFT + visualization.offset * SPACE + SPACE * .5,
+              backgroundColor: getGitBranchColor(visualization.environment)
+            }}
           >
-            <text
-              x={LEFT + visualization.offset * SPACE + SPACE * .5}
-              y="65%"
-              fill={getGitBranchColor(visualization.environment)}
-            >
-              {environment}
-            </text>
-          </svg>
+            {environment}
+          </div>
         }
       </td>
     );

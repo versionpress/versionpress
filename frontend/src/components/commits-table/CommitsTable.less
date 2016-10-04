@@ -102,7 +102,7 @@
     //width: 12px;
     z-index: 2;
 
-    div {
+    .environment-info {
       position: absolute;
       white-space: nowrap;
       overflow: hidden;
@@ -113,24 +113,23 @@
       transition: max-width,padding 0.3s;
     }
 
-    text {
+    .environment-detail {
       position: absolute;
+      top: 0;
+      border-radius: 6px;
+      padding: 3px 6px 3px 6px;
       visibility: hidden;
-      overflow: hidden;
-      max-width: 6px;
-      z-index: 3;
+      color: #fff;
     }
 
     &:hover {
-      div {
+      .environment-info {
         max-width: 200px;
         padding: 8px 10px 8px 20px;
       }
 
-      text {
+      .environment-detail {
         visibility: visible;
-        max-width: 200px;
-        z-index: 3;
       }
     }
   }
