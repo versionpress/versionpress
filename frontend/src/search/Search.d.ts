@@ -15,6 +15,7 @@ interface SearchConfigItemContent {
   fullText?: boolean;
   modifier?: boolean;
   section?: string;
+  index?: number;
 }
 
 interface Token {
@@ -23,4 +24,5 @@ interface Token {
   value: string;
   type: string;
   length: number;
+  sectionTitle?: string;
 }

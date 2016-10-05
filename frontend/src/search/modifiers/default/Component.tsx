@@ -1,11 +1,19 @@
 /// <reference path='../PopupComponent.d.ts' />
 
+import ListComponent from '../list/Component';
+
+export default ListComponent;
+
+/*
 import * as React from 'react';
 
-export default class DefaultComponent extends React.Component<PopupComponentProps, {}> {
+import ModifierComponent from '../ModifierComponent';
+
+export default class DefaultComponent extends ModifierComponent {
 
   render() {
     return <div>Default Component</div>;
   }
 
 };
+*/
