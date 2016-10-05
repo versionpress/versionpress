@@ -3,10 +3,23 @@
 namespace VersionPress\Git\ChangeInfoPreprocessors;
 
 use VersionPress\ChangeInfos\ChangeInfo;
+use VersionPress\ChangeInfos\ChangeInfoFactory;
+use VersionPress\ChangeInfos\ChangeInfoUtils;
+use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\PostChangeInfo;
 
 class PostChangeInfoPreprocessor implements ChangeInfoPreprocessor
 {
+
+    /**
+     * @var ChangeInfoFactory
+     */
+    private $changeInfoFactory;
+
+    public function __construct(ChangeInfoFactory $changeInfoFactory)
+    {
+        $this->changeInfoFactory = $changeInfoFactory;
+    }
 
     /**
      * If both 'post/draft' and 'post/publish' actions exist for the same entity,
@@ -40,8 +53,9 @@ class PostChangeInfoPreprocessor implements ChangeInfoPreprocessor
     {
         $entities = [];
         foreach ($changeInfoList as $key => $changeInfo) {
-            if ($changeInfo instanceof PostChangeInfo && in_array($changeInfo->getAction(), $indicies)) {
-                $entities[$changeInfo->getEntityId()][$changeInfo->getAction()][] = $key;
+            /** @var EntityChangeInfo $changeInfo */
+            if (ChangeInfoUtils::changeInfoRepresentsEntity($changeInfo, 'post') && in_array($changeInfo->getAction(), $indicies)) {
+                $entities[$changeInfo->getId()][$changeInfo->getAction()][] = $key;
             }
         }
         return $entities;
@@ -71,15 +85,13 @@ class PostChangeInfoPreprocessor implements ChangeInfoPreprocessor
         $entities = $this->getChangeInfosByIndicies($changeInfoList, $indicies);
         foreach ($entities as $entityId => $changeInfos) {
             if (count($changeInfos) == 2) {
-                /** @var PostChangeInfo $sourceChangeInfo */
+                /** @var EntityChangeInfo $sourceChangeInfo */
                 $sourceChangeInfo = $changeInfoList[$changeInfos[$indicies[0]][0]];
                 $this->removeChangeInfos($changeInfoList, $changeInfos);
-                $changeInfoList[] = new PostChangeInfo(
-                    $resultAction,
-                    $sourceChangeInfo->getEntityId(),
-                    $sourceChangeInfo->getPostType(),
-                    $sourceChangeInfo->getPostTitle()
-                );
+
+                $fakeEntity = ['vp_id' => $sourceChangeInfo->getId()];
+
+                $changeInfoList[] = $this->changeInfoFactory->createEntityChangeInfo($fakeEntity, 'post', $resultAction, $sourceChangeInfo->getCustomTags(), $sourceChangeInfo->getChangedFiles());
             }
         }
     }

@@ -2,7 +2,6 @@
 namespace VersionPress\ChangeInfos;
 
 use Nette\Utils\Strings;
-use VersionPress\ChangeInfos\Sorting\SortingStrategy;
 use VersionPress\Git\CommitMessage;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\VersionPress;
@@ -15,7 +14,7 @@ class ChangeInfoEnvelope implements ChangeInfo
 
     /**
      * VP meta tag that says the version of VersionPress in which was the commit made.
-     * It's parsed into {@link version} field by the {@link buildFromCommitMessage} method.
+     * It's parsed into {@link version} field.
      */
     const VP_VERSION_TAG = "X-VP-Version";
 
@@ -30,25 +29,6 @@ class ChangeInfoEnvelope implements ChangeInfo
 
     private $version;
 
-    /** @var SortingStrategy */
-    private $sortingStrategy;
-
-    private $bulkChangeInfoClasses = [
-        "comment" => BulkCommentChangeInfo::class,
-        "option" => BulkOptionChangeInfo::class,
-        "plugin" => BulkPluginChangeInfo::class,
-        "post" => BulkPostChangeInfo::class,
-        "postmeta" => BulkPostMetaChangeInfo::class,
-        "term" => BulkTermChangeInfo::class,
-        "termmeta" => BulkTermMetaChangeInfo::class,
-        "theme" => BulkThemeChangeInfo::class,
-        "translation" => BulkTranslationChangeInfo::class,
-        "user" => BulkUserChangeInfo::class,
-        "usermeta" => BulkUserMetaChangeInfo::class,
-        "versionpress" => BulkRevertChangeInfo::class,
-        "composer" => ComposerChangeInfo::class,
-    ];
-
     /**
      * @var null|string
      */
@@ -58,14 +38,12 @@ class ChangeInfoEnvelope implements ChangeInfo
      * @param TrackedChangeInfo[] $changeInfoList
      * @param string|null $version
      * @param string|null $environment
-     * @param SortingStrategy $sortingStrategy
      */
-    public function __construct($changeInfoList, $version = null, $environment = null, $sortingStrategy = null)
+    public function __construct($changeInfoList, $version = null, $environment = null)
     {
         $this->changeInfoList = $changeInfoList;
         $this->version = $version === null ? VersionPress::getVersion() : $version;
         $this->environment = $environment ?: VersionPress::getEnvironment();
-        $this->sortingStrategy = $sortingStrategy === null ? new SortingStrategy() : $sortingStrategy;
     }
 
     /**
@@ -105,42 +83,6 @@ class ChangeInfoEnvelope implements ChangeInfo
     }
 
     /**
-     * Factory method - builds a ChangeInfo object from a commit message. Used when VersionPress
-     * table is constructed; hooks use the normal constructor.
-     *
-     * @param CommitMessage $commitMessage
-     * @return ChangeInfo
-     */
-    public static function buildFromCommitMessage(CommitMessage $commitMessage)
-    {
-        $fullBody = $commitMessage->getBody();
-        $splittedBodies = explode("\n\n", $fullBody);
-        $lastBody = $splittedBodies[count($splittedBodies) - 1];
-        $changeInfoList = [];
-        $version = null;
-        $environment = null;
-
-        if (self::containsVersion($lastBody)) {
-            $version = self::extractTag(self::VP_VERSION_TAG, $lastBody);
-            $environment = self::extractTag(self::VP_ENVIRONMENT_TAG, $lastBody);
-            array_pop($splittedBodies);
-        }
-
-        if (count($splittedBodies) === 0 || $lastBody === "") {
-            $changeInfoList[] = UntrackedChangeInfo::buildFromCommitMessage($commitMessage);
-        }
-
-        foreach ($splittedBodies as $body) {
-            $partialCommitMessage = new CommitMessage("", $body);
-            /** @var ChangeInfo $matchingChangeInfoType */
-            $matchingChangeInfoType = ChangeInfoMatcher::findMatchingChangeInfo($partialCommitMessage);
-            $changeInfoList[] = $matchingChangeInfoType::buildFromCommitMessage($partialCommitMessage);
-        }
-
-        return new self($changeInfoList, $version, $environment);
-    }
-
-    /**
      * Returns all ChangeInfo objects encapsulated in ChangeInfoEnvelope.
      *
      * @return TrackedChangeInfo[]
@@ -157,7 +99,7 @@ class ChangeInfoEnvelope implements ChangeInfo
      */
     public function getReorganizedInfoList()
     {
-        return $this->sortingStrategy->sort($this->groupBulkActions($this->changeInfoList));
+        return $this->sortChangeInfoList($this->groupBulkActions($this->changeInfoList));
     }
 
     /**
@@ -173,7 +115,7 @@ class ChangeInfoEnvelope implements ChangeInfo
      */
     private function getSortedChangeInfoList()
     {
-        return $this->sortingStrategy->sort($this->changeInfoList);
+        return $this->sortChangeInfoList($this->changeInfoList);
     }
 
     private static function containsVersion($lastBody)
@@ -187,26 +129,35 @@ class ChangeInfoEnvelope implements ChangeInfo
         return $tmpMessage->getVersionPressTag($tag);
     }
 
+    /**
+     * @param TrackedChangeInfo[] $changeInfoList
+     * @return TrackedChangeInfo[]
+     */
+    private function sortChangeInfoList($changeInfoList)
+    {
+        ArrayUtils::stablesort($changeInfoList, function ($changeInfo1, $changeInfo2) {
+            /** @var TrackedChangeInfo|BulkChangeInfo $changeInfo1 */
+            /** @var TrackedChangeInfo|BulkChangeInfo $changeInfo2 */
+
+            return  $changeInfo1->getPriority() -  $changeInfo2->getPriority();
+        });
+
+        return $changeInfoList;
+    }
+
     private function groupBulkActions($changeInfoList)
     {
-        $bulkChangeInfoClasses = $this->bulkChangeInfoClasses;
-
         $groupedChangeInfos = ArrayUtils::mapreduce($changeInfoList, function (ChangeInfo $item, $mapEmit) {
             if ($item instanceof TrackedChangeInfo) {
-                $key = "{$item->getEntityName()}/{$item->getAction()}";
+                $key = "{$item->getScope()}/{$item->getAction()}";
                 $mapEmit($key, $item);
             } else {
                 $mapEmit(spl_object_hash($item), $item);
             }
-        }, function ($key, $items, $reduceEmit) use ($bulkChangeInfoClasses) {
+        }, function ($key, $items, $reduceEmit) {
             /** @var TrackedChangeInfo[] $items */
             if (count($items) > 1) {
-                $entityName = $items[0]->getEntityName();
-                if (isset($bulkChangeInfoClasses[$entityName])) {
-                    $reduceEmit(new $bulkChangeInfoClasses[$entityName]($items));
-                } else {
-                    $reduceEmit($items);
-                }
+                $reduceEmit(new BulkChangeInfo($items));
             } else {
                 $reduceEmit($items[0]);
             }
@@ -224,5 +175,11 @@ class ChangeInfoEnvelope implements ChangeInfo
         }
 
         return $changeInfos;
+    }
+
+    public function getPriority()
+    {
+        // There are never envelopes inside an envelope; therefore, the priority is irrelevant.
+        return 0;
     }
 }

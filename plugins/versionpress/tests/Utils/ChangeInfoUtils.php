@@ -26,7 +26,7 @@ class ChangeInfoUtils
     public static function getFullAction($changeInfo)
     {
         $actualChangeInfo = self::getTrackedChangeInfo($changeInfo);
-        return sprintf("%s/%s", $actualChangeInfo->getEntityName(), $actualChangeInfo->getAction());
+        return sprintf("%s/%s", $actualChangeInfo->getScope(), $actualChangeInfo->getAction());
     }
 
     /**
@@ -50,7 +50,7 @@ class ChangeInfoUtils
     {
         $actualChangeInfo = self::getTrackedChangeInfo($changeInfo);
         if ($actualChangeInfo instanceof EntityChangeInfo) {
-            return $actualChangeInfo->getEntityId();
+            return $actualChangeInfo->getId();
         } else {
             throw new \Exception("This method only work on EntityChangeInfo");
         }
@@ -87,7 +87,7 @@ class ChangeInfoUtils
             /** @var EntityChangeInfo $changeInfo1 */
             /** @var EntityChangeInfo $changeInfo2 */
 
-            if ($changeInfo1->getEntityId() !== $changeInfo2->getEntityId()) {
+            if ($changeInfo1->getId() !== $changeInfo2->getId()) {
                 return false;
             }
         }

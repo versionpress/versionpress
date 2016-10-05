@@ -2,24 +2,22 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
-use VersionPress\Storages\TermMetaStorage;
-use VersionPress\Storages\TermStorage;
+use VersionPress\Storages\DirectoryStorage;
+use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Synchronizers\Synchronizer;
-use VersionPress\Synchronizers\TermMetaSynchronizer;
-use VersionPress\Synchronizers\TermsSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class TermMetaSynchronizerTest extends SynchronizerTestCase
 {
-    /** @var TermMetaStorage */
+    /** @var MetaEntityStorage */
     private $storage;
-    /** @var TermStorage */
+    /** @var DirectoryStorage */
     private $termStorage;
-    /** @var TermMetaSynchronizer */
+    /** @var Synchronizer */
     private $synchronizer;
-    /** @var TermsSynchronizer */
+    /** @var Synchronizer */
     private $termsSynchronizer;
     private static $vpId;
     private static $termVpId;
@@ -33,23 +31,25 @@ class TermMetaSynchronizerTest extends SynchronizerTestCase
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('termmeta');
         $this->termStorage = self::$storageFactory->getStorage('term');
-        $this->synchronizer = new TermMetaSynchronizer(
+        $this->synchronizer = new Synchronizer(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('termmeta'),
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
-        $this->termsSynchronizer = new TermsSynchronizer(
+        $this->termsSynchronizer = new Synchronizer(
             $this->termStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('term'),
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
     }
 

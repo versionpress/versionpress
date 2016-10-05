@@ -124,6 +124,8 @@ class EntityInfo
      */
     public $hasReferences = false;
 
+    public $storageClass = null;
+
     /**
      * If entity is child entity (meta, term_taxonomy etc.), this contains name of reference
      * to its parent.
@@ -139,6 +141,8 @@ class EntityInfo
     private $ignoredEntities = [];
 
     private $ignoredColumns = [];
+
+    public $cleanCache = [];
 
     /**
      * Does the parsing and sets all properties
@@ -228,6 +232,9 @@ class EntityInfo
             }
         }
 
+        if (isset($schemaInfo['clean-cache'])) {
+            $this->cleanCache = $schemaInfo['clean-cache'];
+        }
     }
 
     public function getIgnoredColumns()
@@ -277,5 +284,22 @@ class EntityInfo
     public function getRulesForIgnoredEntities()
     {
         return QueryLanguageUtils::createRulesFromQueries($this->ignoredEntities);
+    }
+
+    /**
+     * Returns list of referenced entities.
+     *
+     * @return array
+     */
+    public function getReferencedEntities()
+    {
+        $references = array_values($this->references);
+        $references += array_values($this->valueReferences);
+        $references += array_values($this->mnReferences);
+        $references = array_filter($references, function ($entity) {
+            return !Strings::startsWith($entity, '@');
+        });
+
+        return array_values(array_unique($references));
     }
 }

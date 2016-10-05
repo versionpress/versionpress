@@ -2,30 +2,26 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
-use VersionPress\Storages\PostMetaStorage;
-use VersionPress\Storages\PostStorage;
-use VersionPress\Storages\UserStorage;
-use VersionPress\Synchronizers\PostMetaSynchronizer;
-use VersionPress\Synchronizers\PostsSynchronizer;
+use VersionPress\Storages\DirectoryStorage;
+use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Synchronizers\Synchronizer;
-use VersionPress\Synchronizers\UsersSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class PostMetaSynchronizerTest extends SynchronizerTestCase
 {
-    /** @var PostMetaStorage */
+    /** @var MetaEntityStorage */
     private $storage;
-    /** @var PostStorage */
+    /** @var DirectoryStorage */
     private $postStorage;
-    /** @var UserStorage */
+    /** @var DirectoryStorage */
     private $userStorage;
-    /** @var PostMetaSynchronizer */
+    /** @var Synchronizer */
     private $synchronizer;
-    /** @var PostsSynchronizer */
+    /** @var Synchronizer */
     private $postsSynchronizer;
-    /** @var UsersSynchronizer */
+    /** @var Synchronizer */
     private $usersSynchronizer;
     private static $authorVpId;
     private static $postVpId;
@@ -38,32 +34,35 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase
         $this->storage = self::$storageFactory->getStorage('postmeta');
         $this->postStorage = self::$storageFactory->getStorage('post');
         $this->userStorage = self::$storageFactory->getStorage('user');
-        $this->synchronizer = new PostMetaSynchronizer(
+        $this->synchronizer = new Synchronizer(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('postmeta'),
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
-        $this->postsSynchronizer = new PostsSynchronizer(
+        $this->postsSynchronizer = new Synchronizer(
             $this->postStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('post'),
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
-        $this->usersSynchronizer = new UsersSynchronizer(
+        $this->usersSynchronizer = new Synchronizer(
             $this->userStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('user'),
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
     }
 
@@ -170,7 +169,7 @@ class PostMetaSynchronizerTest extends SynchronizerTestCase
 
         /**
          * This postmeta has a value reference to another post.
-         * @see wordpress-schema.yml
+         * @see schema.yml
          * @var array
          */
         $postmeta = EntityUtils::preparePostMeta(null, self::$postVpId, '_thumbnail_id', self::$post2VpId);

@@ -9,6 +9,7 @@ use PHPUnit_Framework_TestCase;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ParsedQueryData;
 use VersionPress\Database\SqlQueryParser;
+use VersionPress\Tests\Utils\HookMock;
 
 class SqlQueryParserTest extends PHPUnit_Framework_TestCase
 {
@@ -16,7 +17,7 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase
     /**
      * @var DbSchemaInfo
      */
-    private static $DbSchemaInfo;
+    private static $dbSchemaInfo;
 
     /** @var \wpdb|PHPUnit_Framework_MockObject_MockObject */
     private $database;
@@ -26,17 +27,23 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        self::$DbSchemaInfo = new DbSchemaInfo(
-            __DIR__ . '/../../src/Database/wordpress-schema.yml',
+        HookMock::setUp(HookMock::WP_MOCK);
+        self::$dbSchemaInfo = new DbSchemaInfo(
+            [__DIR__ . '/../../.versionpress/schema.yml'],
             'wp_',
             PHP_INT_MAX
         );
     }
 
+    public static function tearDownAfterClass()
+    {
+        HookMock::tearDown();
+    }
+
     public function setup()
     {
         $this->database = $this->getMockBuilder('\wpdb')->disableOriginalConstructor()->getMock();
-        $this->sqlParser = new SqlQueryParser(self::$DbSchemaInfo, $this->database);
+        $this->sqlParser = new SqlQueryParser(self::$dbSchemaInfo, $this->database);
     }
 
     /**
@@ -49,7 +56,7 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase
     public function dataToSetFromUpdate($query, $expectedSelect, $expectedData)
     {
 
-        $this->database->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col");
+        $this->database->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_results");
         $parsedQueryData = $this->sqlParser->parseQuery($query);
 
         $this->assertEquals($expectedData, $parsedQueryData->data);
@@ -107,12 +114,11 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase
      * @dataProvider deleteQueryParseTestDataProvider
      * @param $query
      * @param $expectedSelectQuery
-     * @param $testIds
      */
-    public function selectQueryFromDelete($query, $expectedSelectQuery, $testIds)
+    public function selectQueryFromDelete($query, $expectedSelectQuery)
     {
-        $this->database->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_col")
-            ->with($expectedSelectQuery)->will(new PHPUnit_Framework_MockObject_Stub_Return($testIds));
+        $this->database->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)->method("get_results")
+            ->with($expectedSelectQuery)->will(new PHPUnit_Framework_MockObject_Stub_Return([]));
         $parsedQueryData = $this->sqlParser->parseQuery($query);
 
         $this->assertEquals($expectedSelectQuery, $parsedQueryData->sqlQuery);
@@ -120,31 +126,30 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase
 
     public function deleteQueryParseTestDataProvider()
     {
-        $testIds = [1, 3, 15];
         return [
             [
                 "DELETE o1 FROM `wp_options` AS o1 JOIN `wp_options` AS o2 ON o1.option_name=o2.option_name " .
                 "WHERE o2.option_id > o1.option_id",
                 "SELECT option_name FROM `wp_options` AS o1 JOIN `wp_options` AS o2 ON o1.option_name=o2.option_name " .
                 "WHERE o2.option_id > o1.option_id",
-                $testIds
             ],
             [
                 "DELETE o1 FROM `wp_options` AS o1 JOIN `wp_options` AS o2 USING (`option_name`) " .
                 "WHERE o2.option_id > o1.option_id",
                 "SELECT option_name FROM `wp_options` AS o1 JOIN `wp_options` AS o2 ON o1.option_name=o2.option_name " .
                 "WHERE o2.option_id > o1.option_id",
-                $testIds
             ],
             [
                 "DELETE FROM `wp_usermeta` WHERE meta_key IN ('key1', 'key2')",
                 "SELECT umeta_id FROM `wp_usermeta` WHERE meta_key IN ('key1', 'key2')",
-                $testIds
             ],
             [
                 "DELETE FROM `wp_usermeta` WHERE meta_key = 'key1'",
                 "SELECT umeta_id FROM `wp_usermeta` WHERE meta_key = 'key1'",
-                $testIds
+            ],
+            [
+                "DELETE FROM `wp_term_relationships` WHERE object_id = 2 AND term_taxonomy_id IN ('2')",
+                "SELECT object_id, term_taxonomy_id FROM `wp_term_relationships` WHERE object_id = 2 AND term_taxonomy_id IN ('2')",
             ]
         ];
     }

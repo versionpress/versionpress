@@ -2,11 +2,17 @@
 
 namespace VersionPress\DI;
 
+use VersionPress\Actions\ActionsInfoProvider;
+use VersionPress\Actions\ActionsDefinitionRepository;
+use VersionPress\Actions\ActivePluginsVPFilesIterator;
+use VersionPress\ChangeInfos\ChangeInfoFactory;
+use VersionPress\ChangeInfos\CommitMessageParser;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesInfo;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Database\SqlQueryParser;
+use VersionPress\Database\TableSchemaStorage;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Database\WpdbMirrorBridge;
 use VersionPress\Git\Committer;
@@ -70,7 +76,9 @@ class DIContainer
                 VP_VPDB_DIR,
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::DATABASE),
-                array_keys((array)$wp_taxonomies)
+                array_keys((array)$wp_taxonomies),
+                $dic->resolve(VersionPressServices::CHANGEINFO_FACTORY),
+                $dic->resolve(VersionPressServices::TABLE_SCHEMA_STORAGE)
             );
         });
 
@@ -84,9 +92,35 @@ class DIContainer
         $dic->register(VersionPressServices::DB_SCHEMA, function () {
             global $table_prefix, $wp_db_version;
             return new DbSchemaInfo(
-                VERSIONPRESS_PLUGIN_DIR . '/src/Database/wordpress-schema.yml',
+                new ActivePluginsVPFilesIterator('schema.yml'),
                 $table_prefix,
                 $wp_db_version
+            );
+        });
+
+        $dic->register(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY, function () use ($dic) {
+            return new ActionsDefinitionRepository(VERSIONPRESS_TEMP_DIR . '/actions', $dic->resolve(VersionPressServices::GIT_REPOSITORY));
+        });
+
+        $dic->register(VersionPressServices::ACTIONSINFO_PROVIDER_ALL_PLUGINS, function () use ($dic) {
+            return new ActionsInfoProvider($dic->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY)->getAllDefinitionFiles());
+        });
+
+        $dic->register(VersionPressServices::ACTIONSINFO_PROVIDER_ACTIVE_PLUGINS, function () {
+            return new ActionsInfoProvider(new ActivePluginsVPFilesIterator('actions.yml'));
+        });
+
+        $dic->register(VersionPressServices::CHANGEINFO_FACTORY, function () use ($dic) {
+            return new ChangeInfoFactory(
+                $dic->resolve(VersionPressServices::DB_SCHEMA),
+                $dic->resolve(VersionPressServices::ACTIONSINFO_PROVIDER_ACTIVE_PLUGINS)
+            );
+        });
+
+        $dic->register(VersionPressServices::COMMIT_MESSAGE_PARSER, function () use ($dic) {
+            return new CommitMessageParser(
+                $dic->resolve(VersionPressServices::DB_SCHEMA),
+                $dic->resolve(VersionPressServices::ACTIONSINFO_PROVIDER_ALL_PLUGINS)
             );
         });
 
@@ -103,7 +137,7 @@ class DIContainer
         $dic->register(VersionPressServices::COMMITTER, function () use ($dic) {
             return new Committer(
                 $dic->resolve(VersionPressServices::MIRROR),
-                $dic->resolve(VersionPressServices::REPOSITORY),
+                $dic->resolve(VersionPressServices::GIT_REPOSITORY),
                 $dic->resolve(VersionPressServices::STORAGE_FACTORY)
             );
         });
@@ -114,10 +148,12 @@ class DIContainer
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::STORAGE_FACTORY),
                 $dic->resolve(VersionPressServices::SYNCHRONIZER_FACTORY),
-                $dic->resolve(VersionPressServices::REPOSITORY),
+                $dic->resolve(VersionPressServices::GIT_REPOSITORY),
                 $dic->resolve(VersionPressServices::URL_REPLACER),
                 $dic->resolve(VersionPressServices::VPID_REPOSITORY),
-                $dic->resolve(VersionPressServices::SHORTCODES_REPLACER)
+                $dic->resolve(VersionPressServices::SHORTCODES_REPLACER),
+                $dic->resolve(VersionPressServices::CHANGEINFO_FACTORY),
+                $dic->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY)
             );
         });
 
@@ -128,7 +164,8 @@ class DIContainer
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::VPID_REPOSITORY),
                 $dic->resolve(VersionPressServices::URL_REPLACER),
-                $dic->resolve(VersionPressServices::SHORTCODES_REPLACER)
+                $dic->resolve(VersionPressServices::SHORTCODES_REPLACER),
+                $dic->resolve(VersionPressServices::TABLE_SCHEMA_STORAGE)
             );
         });
 
@@ -141,19 +178,15 @@ class DIContainer
                 $dic->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS),
                 $dic->resolve(VersionPressServices::DATABASE),
                 $dic->resolve(VersionPressServices::COMMITTER),
-                $dic->resolve(VersionPressServices::REPOSITORY),
+                $dic->resolve(VersionPressServices::GIT_REPOSITORY),
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
-                $dic->resolve(VersionPressServices::STORAGE_FACTORY)
+                $dic->resolve(VersionPressServices::STORAGE_FACTORY),
+                $dic->resolve(VersionPressServices::COMMIT_MESSAGE_PARSER)
             );
         });
 
-        $dic->register(VersionPressServices::REPOSITORY, function () {
-            return new GitRepository(
-                VP_PROJECT_ROOT,
-                VERSIONPRESS_TEMP_DIR,
-                VERSIONPRESS_COMMIT_MESSAGE_PREFIX,
-                VP_GIT_BINARY
-            );
+        $dic->register(VersionPressServices::GIT_REPOSITORY, function () {
+            return new GitRepository(VP_PROJECT_ROOT, VERSIONPRESS_TEMP_DIR, VERSIONPRESS_COMMIT_MESSAGE_PREFIX, VP_GIT_BINARY);
         });
 
         $dic->register(VersionPressServices::VPID_REPOSITORY, function () use ($dic) {
@@ -175,7 +208,7 @@ class DIContainer
         });
 
         $dic->register(VersionPressServices::SHORTCODES_INFO, function () {
-            return new ShortcodesInfo(VERSIONPRESS_PLUGIN_DIR . '/src/Database/wordpress-shortcodes.yml');
+            return new ShortcodesInfo(new ActivePluginsVPFilesIterator('shortcodes.yml'));
         });
 
         $dic->register(VersionPressServices::SQL_QUERY_PARSER, function () use ($dic) {
@@ -183,6 +216,10 @@ class DIContainer
                 $dic->resolve(VersionPressServices::DB_SCHEMA),
                 $dic->resolve(VersionPressServices::DATABASE)
             );
+        });
+
+        $dic->register(VersionPressServices::TABLE_SCHEMA_STORAGE, function () use ($dic) {
+            return new TableSchemaStorage($dic->resolve(VersionPressServices::DATABASE), VP_VPDB_DIR . '/.schema');
         });
 
         return self::$instance;

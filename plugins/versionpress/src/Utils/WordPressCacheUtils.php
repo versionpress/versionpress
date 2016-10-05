@@ -6,50 +6,19 @@ use VersionPress\Database\Database;
 
 class WordPressCacheUtils
 {
-    public static function clearPostCache($vpids, $database)
+    public static function cleanCache($cacheType, $vpids, $database)
     {
-        if (count($vpids) === 0 || !function_exists('clean_post_cache')) {
+        $cleanFunction = "clean_{$cacheType}_cache";
+
+        if (count($vpids) === 0 || !function_exists($cleanFunction)) {
             return;
         }
 
-        $postIds = self::getIdsForVpids($vpids, $database);
+        $ids = self::getIdsForVpids($vpids, $database);
 
-        foreach ($postIds as $id) {
-            clean_post_cache($id);
+        foreach ($ids as $id) {
+            $cleanFunction($id);
         }
-    }
-
-    public static function clearTermCache($vpids, $database)
-    {
-        if (count($vpids) === 0 || !function_exists('clean_term_cache')) {
-            return;
-        }
-
-        $termIds = self::getIdsForVpids($vpids, $database);
-        clean_term_cache($termIds);
-    }
-
-    public static function clearUserCache($vpids, $database)
-    {
-        if (count($vpids) === 0 || !function_exists('clean_user_cache')) {
-            return;
-        }
-
-        $userIds = self::getIdsForVpids($vpids, $database);
-
-        foreach ($userIds as $id) {
-            clean_user_cache($id);
-        }
-    }
-
-    public static function clearCommentCache($vpids, $database)
-    {
-        if (count($vpids) === 0 || !function_exists('clean_comment_cache')) {
-            return;
-        }
-
-        $commentsIds = self::getIdsForVpids($vpids, $database);
-        clean_comment_cache($commentsIds);
     }
 
     /**

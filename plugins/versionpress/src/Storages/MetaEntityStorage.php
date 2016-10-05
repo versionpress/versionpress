@@ -3,6 +3,8 @@
 namespace VersionPress\Storages;
 
 use Nette\Utils\Strings;
+use VersionPress\Actions\ActionsInfo;
+use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\EntityInfo;
 
 /**
@@ -14,9 +16,8 @@ use VersionPress\Database\EntityInfo;
  * The MetaEntityStorage typically transforms the entity to the format metioned above and then saves it using
  * parent storage as a field of the parent entity.
  */
-abstract class MetaEntityStorage extends Storage
+class MetaEntityStorage extends Storage
 {
-
     private $lastVpId;
 
     protected $keyName;
@@ -26,10 +27,14 @@ abstract class MetaEntityStorage extends Storage
     /** @var Storage */
     private $parentStorage;
 
-    public function __construct(Storage $parentStorage, EntityInfo $entityInfo, $keyName, $valueName)
+    /** @var ChangeInfoFactory */
+    private $changeInfoFactory;
+
+    public function __construct(Storage $parentStorage, EntityInfo $entityInfo, $dbPrefix, $changeInfoFactory, $keyName = 'meta_key', $valueName = 'meta_value')
     {
-        parent::__construct($entityInfo);
+        parent::__construct($entityInfo, $dbPrefix);
         $this->parentStorage = $parentStorage;
+        $this->changeInfoFactory = $changeInfoFactory;
         $this->keyName = $keyName;
         $this->valueName = $valueName;
         $this->parentReferenceName = "vp_$entityInfo->parentReference";
@@ -148,30 +153,26 @@ abstract class MetaEntityStorage extends Storage
         return $this->extractEntityFromParentByName($parent, $name);
     }
 
-    protected function createChangeInfo($oldParentEntity, $newParentEntity, $action)
+    protected function createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action)
     {
-        $oldEntity = $this->extractEntityFromParentByVpId($oldParentEntity, $this->lastVpId);
-        $newEntity = $this->extractEntityFromParentByVpId($newParentEntity, $this->lastVpId);
-        return $this->createChangeInfoWithParentEntity(
-            $oldEntity,
-            $newEntity,
-            $oldParentEntity,
-            $newParentEntity,
-            $action
-        );
-    }
+        $entityName = $this->entityInfo->entityName;
 
-    abstract protected function createChangeInfoWithParentEntity(
-        $oldEntity,
-        $newEntity,
-        $oldParentEntity,
-        $newParentEntity,
-        $action
-    );
+        $entity = array_merge($oldEntity, $newEntity);
+
+        $changeInfo = $this->changeInfoFactory->createEntityChangeInfo($entity, $entityName, $action);
+        $files = $changeInfo->getChangedFiles();
+        $tags = $changeInfo->getCustomTags();
+
+        $action = apply_filters("vp_meta_entity_action_{$entityName}", $action, $oldEntity, $newEntity, $oldParentEntity, $newParentEntity);
+        $tags = apply_filters("vp_meta_entity_tags_{$entityName}", $tags, $oldEntity, $newEntity, $action, $oldParentEntity, $newParentEntity);
+        $files = apply_filters("vp_meta_entity_files_{$entityName}", $files, $oldEntity, $newEntity, $oldParentEntity, $newParentEntity);
+
+        return $this->changeInfoFactory->createEntityChangeInfo($entity, $entityName, $action, $tags, $files);
+    }
 
     private function transformToParentEntityField($values)
     {
-        $joinedKey = $this->createJoinedKey($values[$this->keyName], $values['vp_id']);
+        $joinedKey = $this->createJoinedKey($this->maybeReplacePrefixWithPlaceholder($values[$this->keyName]), $values['vp_id']);
 
         $data = [
             'vp_id' => $values[$this->parentReferenceName],
@@ -255,13 +256,13 @@ abstract class MetaEntityStorage extends Storage
     protected function extractEntityFromParentByVpId($parentEntity, $vpId)
     {
         if (!$parentEntity) {
-            return null;
+            return [];
         }
 
         $joinedKey = $this->getJoinedKeyByVpId($parentEntity, $vpId);
 
         if (!$joinedKey) {
-            return null;
+            return [];
         }
 
         return $this->extractEntityFromParent($parentEntity, $joinedKey);
@@ -286,7 +287,7 @@ abstract class MetaEntityStorage extends Storage
     {
         $splittedKey = $this->splitJoinedKey($joinedKey);
         $entity = [
-            $this->keyName => $splittedKey[$this->keyName],
+            $this->keyName => $this->maybeReplacePlaceholderWithPrefix($splittedKey[$this->keyName]),
             $this->valueName => $parentEntity[$joinedKey],
             'vp_id' => $splittedKey['vp_id'],
             $this->parentReferenceName => $parentEntity['vp_id'],

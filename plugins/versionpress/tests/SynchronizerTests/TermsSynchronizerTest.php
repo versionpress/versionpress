@@ -2,18 +2,17 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
-use VersionPress\Storages\TermStorage;
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Synchronizers\Synchronizer;
-use VersionPress\Synchronizers\TermsSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class TermsSynchronizerTest extends SynchronizerTestCase
 {
-    /** @var TermStorage */
+    /** @var DirectoryStorage */
     private $storage;
-    /** @var TermsSynchronizer */
+    /** @var Synchronizer */
     private $synchronizer;
     private static $vpId;
 
@@ -21,14 +20,15 @@ class TermsSynchronizerTest extends SynchronizerTestCase
     {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('term');
-        $this->synchronizer = new TermsSynchronizer(
+        $this->synchronizer = new Synchronizer(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('term'),
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
     }
 

@@ -119,7 +119,6 @@ class MergeDriverInstaller
 
         $gitconfigContents = StringUtils::fillTemplateString($gitconfigVariables, $gitconfigContents);
         file_put_contents($gitconfigPath, $gitconfigContents, FILE_APPEND);
-
     }
 
     /**

@@ -6,14 +6,11 @@ require_once ABSPATH . 'wp-admin/includes/file.php';
 
 use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
-use VersionPress\ChangeInfos\ChangeInfoMatcher;
+use VersionPress\ChangeInfos\ChangeInfoFactory;
+use VersionPress\ChangeInfos\CommitMessageParser;
 use VersionPress\ChangeInfos\EntityChangeInfo;
-use VersionPress\ChangeInfos\PluginChangeInfo;
-use VersionPress\ChangeInfos\RevertChangeInfo;
-use VersionPress\ChangeInfos\ThemeChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
-use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Commit;
 use VersionPress\Git\CommitMessage;
@@ -42,14 +39,15 @@ class VersionPressApi
 
     const NAMESPACE_VP = 'versionpress';
 
-    public function __construct(
-        GitRepository $gitRepository,
-        Reverter $reverter,
-        SynchronizationProcess $synchronizationProcess
-    ) {
+    /** @var CommitMessageParser */
+    private $commitMessageParser;
+
+    public function __construct(GitRepository $gitRepository, Reverter $reverter, SynchronizationProcess $synchronizationProcess, CommitMessageParser $commitMessageParser)
+    {
         $this->gitRepository = $gitRepository;
         $this->reverter = $reverter;
         $this->synchronizationProcess = $synchronizationProcess;
+        $this->commitMessageParser = $commitMessageParser;
     }
 
     /**
@@ -237,15 +235,12 @@ class VersionPressApi
 
         $result = [];
         foreach ($commits as $commit) {
-            $isChildOfInitialCommit = $isChildOfInitialCommit && $this->gitRepository->wasCreatedAfter(
-                $commit->getHash(),
-                $initialCommitHash
-            );
+            $isChildOfInitialCommit = $isChildOfInitialCommit && $this->gitRepository->wasCreatedAfter($commit->getHash(), $initialCommitHash);
             $canUndoCommit = $isChildOfInitialCommit && !$commit->isMerge();
             $canRollbackToThisCommit = !$isFirstCommit &&
                 ($isChildOfInitialCommit || $commit->getHash() === $initialCommitHash);
 
-            $changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
+            $changeInfo = $this->commitMessageParser->parse($commit->getMessage());
             $isEnabled = $isChildOfInitialCommit || $commit->getHash() === $initialCommitHash;
 
             $skipVpdbFiles = $changeInfo->getChangeInfoList()[0] instanceof TrackedChangeInfo;
@@ -421,7 +416,7 @@ class VersionPressApi
     {
         global $versionPressContainer;
         /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+        $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
 
         $latestCommit = $request['latestCommit'];
 
@@ -459,7 +454,7 @@ class VersionPressApi
     {
         global $versionPressContainer;
         /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+        $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
 
         return new WP_REST_Response($repository->getStatus(true));
     }
@@ -545,7 +540,7 @@ class VersionPressApi
     {
         global $versionPressContainer;
         /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+        $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
 
         $result = $repository->clearWorkingDirectory();
 
@@ -612,36 +607,40 @@ class VersionPressApi
 
     private function convertChangeInfo($changeInfo)
     {
-        $change = [];
-
-        if ($changeInfo instanceof TrackedChangeInfo) {
-            $change['type'] = $changeInfo->getEntityName();
-            $change['action'] = $changeInfo->getAction();
-            $change['tags'] = $changeInfo->getCustomTags();
+        if ($changeInfo instanceof UntrackedChangeInfo) {
+            return null;
         }
+
+        /** @var TrackedChangeInfo $changeInfo */
+
+        $change = [
+            'type' => $changeInfo->getScope(),
+            'action' => $changeInfo->getAction(),
+            'tags' => $changeInfo->getCustomTags(),
+        ];
 
         if ($changeInfo instanceof EntityChangeInfo) {
-            $change['name'] = $changeInfo->getEntityId();
+            $change['name'] = $changeInfo->getId();
         }
 
-        if ($changeInfo instanceof PluginChangeInfo) {
+        if ($changeInfo->getScope() === 'plugin') {
             $pluginTags = $changeInfo->getCustomTags();
-            $pluginName = $pluginTags[PluginChangeInfo::PLUGIN_NAME_TAG];
+            $pluginName = $pluginTags['VP-Plugin-Name'];
             $change['name'] = $pluginName;
         }
 
-        if ($changeInfo instanceof ThemeChangeInfo) {
+        if ($changeInfo->getScope() === 'theme') {
             $themeTags = $changeInfo->getCustomTags();
-            $themeName = $themeTags[ThemeChangeInfo::THEME_NAME_TAG];
+            $themeName = $themeTags['VP-Theme-Name'];
             $change['name'] = $themeName;
         }
 
-        if ($changeInfo instanceof WordPressUpdateChangeInfo) {
-            $change['name'] = $changeInfo->getNewVersion();
+        if ($changeInfo->getScope() === 'wordpress') {
+            $change['name'] = $changeInfo->getId();
         }
 
-        if ($changeInfo instanceof RevertChangeInfo) {
-            $commit = $this->gitRepository->getCommit($changeInfo->getCommitHash());
+        if ($changeInfo->getScope() === 'versionpress' &&  ($changeInfo->getAction() === 'undo' || $changeInfo->getAction() === 'rollback')) {
+            $commit = $this->gitRepository->getCommit($changeInfo->getId());
             $change['tags']['VP-Commit-Details'] = [
                 'message' => $commit->getMessage()->getUnprefixedSubject(),
                 'date' => $commit->getDate()->format(\DateTime::ISO8601)

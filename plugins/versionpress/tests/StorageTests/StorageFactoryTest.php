@@ -2,18 +2,14 @@
 
 namespace VersionPress\Tests\StorageTests;
 
+use VersionPress\Actions\ActionsInfo;
+use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
-use VersionPress\Storages\CommentStorage;
-use VersionPress\Storages\OptionStorage;
-use VersionPress\Storages\PostMetaStorage;
-use VersionPress\Storages\PostStorage;
+use VersionPress\Database\TableSchemaStorage;
+use VersionPress\Storages\DirectoryStorage;
+use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Storages\StorageFactory;
-use VersionPress\Storages\TermMetaStorage;
-use VersionPress\Storages\TermStorage;
-use VersionPress\Storages\TermTaxonomyStorage;
-use VersionPress\Storages\UserMetaStorage;
-use VersionPress\Storages\UserStorage;
 
 class StorageFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,35 +21,41 @@ class StorageFactoryTest extends \PHPUnit_Framework_TestCase
     public function factoryCreatesRightStorages()
     {
         $storages = [
-            'post' => PostStorage::class,
-            'comment' => CommentStorage::class,
-            'option' => OptionStorage::class,
-            'term' => TermStorage::class,
-            'termmeta' => TermMetaStorage::class,
-            'term_taxonomy' => TermTaxonomyStorage::class,
-            'user' => UserStorage::class,
-            'usermeta' => UserMetaStorage::class,
-            'postmeta' => PostMetaStorage::class,
+            'post' => DirectoryStorage::class,
+            'comment' => DirectoryStorage::class,
+            'option' => DirectoryStorage::class,
+            'term' => DirectoryStorage::class,
+            'termmeta' => MetaEntityStorage::class,
+            'term_taxonomy' => DirectoryStorage::class,
+            'user' => DirectoryStorage::class,
+            'usermeta' => MetaEntityStorage::class,
+            'postmeta' => MetaEntityStorage::class,
         ];
 
         /** @var \wpdb $wpdbStub */
-        $wpdbStub = $this->getMockBuilder('\wpdb')->disableOriginalConstructor()->getMock();
+
+        $wpdbStub = new \stdClass();
+        $wpdbStub->prefix = 'prefix_';
 
         $database = new Database($wpdbStub);
+        $changeInfoFactory = $this->getMockBuilder(ChangeInfoFactory::class)->disableOriginalConstructor()->getMock();
+        $tableSchemaStorage = $this->getMockBuilder(TableSchemaStorage::class)->disableOriginalConstructor()->getMock();
 
         $factory = new StorageFactory(
             __DIR__ . '/vpdb',
             new DbSchemaInfo(
-                __DIR__ . '/../../src/Database/wordpress-schema.yml',
+                [__DIR__ . '/../../.versionpress/schema.yml'],
                 'wp_',
                 PHP_INT_MAX
             ),
             $database,
-            []
+            [],
+            $changeInfoFactory,
+            $tableSchemaStorage
         );
+
         foreach ($storages as $entityName => $expectedClass) {
             $this->assertInstanceOf($expectedClass, $factory->getStorage($entityName));
         }
-
     }
 }
