@@ -5,8 +5,10 @@ import { appStore, commitsTableStore } from '../stores';
 
 export function selectCommits(commitsToSelect: Commit[], isChecked: boolean, isShiftKey: boolean) {
   const { commits } = commitsTableStore;
-  let { selectedCommits, lastSelectedCommit } = appStore;
+  let { lastSelectedCommit } = appStore;
   const isBulk = commitsToSelect.length > 1;
+
+  let selectedCommits = appStore.selectedCommits.slice(0);
 
   commitsToSelect
     .filter(commit => commit.canUndo)
