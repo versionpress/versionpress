@@ -1,18 +1,16 @@
+/// <reference path='../components/common/Commits.d.ts' />
+
 import { action, computed, observable } from 'mobx';
 import * as _ from 'lodash';
-import CommitRow from './CommitRow';
 
 import appStore from './appStore';
+import CommitRow from '../entities/CommitRow';
 import { indexOf } from '../utils/CommitUtils';
 
 class CommitsTableStore {
+
   @observable commitRows: CommitRow[] = [];
   @observable pages: number[] = [];
-  @observable isLoading: boolean = true;
-
-  @computed get enableActions() {
-    return !appStore.isDirtyWorkingDirectory;
-  }
 
   @computed get commits() {
     return this.commitRows.map(row => row.commit);
@@ -27,44 +25,25 @@ class CommitsTableStore {
       !_.differenceBy(this.selectableCommits, appStore.selectedCommits, ((value: Commit) => value.hash)).length;
   }
 
-  @action
-  changeCommitRows = (commitRows: CommitRow[]) => {
+  @action setCommitRows = (commitRows: CommitRow[]) => {
     this.commitRows = commitRows;
   };
 
-  @action
-  changePages = (pages: number[]) => {
+  @action setPages = (pages: number[]) => {
     this.pages = pages;
   };
 
-  @action
-  updateSelectedCommits = (selectedCommits: Commit[]) => {
+  @action setSelectedCommits = (selectedCommits: Commit[]) => {
     this.commitRows.forEach(commitRow => {
       commitRow.isSelected = indexOf(selectedCommits, commitRow.commit) !== -1;
     });
   };
 
-  @action
-  deselectAllCommits = () => {
-    this.commitRows.forEach(commitRow => {
-      commitRow.isSelected = false;
-    });
-  };
+  @action reset = () => {
+    this.commitRows = [];
+    this.pages = [];
+  }
 
-  @action
-  undoCommits = (commits: string[]) => {
-    appStore.undoCommits(commits);
-  };
-
-  @action
-  rollbackToCommit = (hash: string) => {
-    appStore.rollbackToCommit(hash);
-  };
-
-  @action
-  selectCommits = (commitsToSelect: Commit[], isChecked: boolean, isShiftKey: boolean) => {
-    appStore.selectCommits(commitsToSelect, isChecked, isShiftKey);
-  };
 }
 
 const commitsTableStore = new CommitsTableStore();

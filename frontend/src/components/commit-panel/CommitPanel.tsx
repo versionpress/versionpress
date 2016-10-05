@@ -7,6 +7,7 @@ import Details from './details/Details';
 import Notice from './Notice';
 import DetailsLevel from '../../enums/DetailsLevel';
 
+import { changeDetailsLevel, commit, discard } from '../../actions';
 import { CommitPanelStore } from '../../stores/commitPanelStore';
 
 import './CommitPanel.less';
@@ -20,17 +21,15 @@ export default class CommitPanel extends React.Component<CommitPanelProps, {}> {
 
   onDetailsLevelChange = (detailsLevel: DetailsLevel) => {
     const { commitPanelStore } = this.props;
-    commitPanelStore.changeDetailsLevel(detailsLevel);
+    changeDetailsLevel(detailsLevel, commitPanelStore);
   };
 
   onCommit = (message: string) => {
-    const { commitPanelStore } = this.props;
-    commitPanelStore.commit(message);
+    commit(message);
   };
 
   onDiscard = () => {
-    const { commitPanelStore } = this.props;
-    commitPanelStore.discard();
+    discard();
   };
 
   render() {

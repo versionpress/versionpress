@@ -13,7 +13,9 @@ import UpdateNotice from './update-notice/UpdateNotice';
 import VpTitle from './vp-title/VpTitle';
 import WelcomePanel from '../welcome-panel/WelcomePanel';
 
+import { fetchCommits, fetchWelcomePanel, hideWelcomePanel } from '../../actions';
 import { AppStore } from '../../stores/appStore';
+import { UiStore } from '../../stores/uiStore';
 
 import './HomePage.less';
 
@@ -22,44 +24,46 @@ interface HomePageProps {
   params: {
     page?: string,
   };
+  uiStore?: UiStore;
 }
 
-@observer(['appStore'])
+@observer(['appStore', 'uiStore'])
 export default class HomePage extends React.Component<HomePageProps, {}> {
 
   componentDidMount() {
-    const { appStore } = this.props;
-    appStore.init(this.props.params.page);
+    const { appStore, params } = this.props;
+
+    appStore.setPage(params.page);
+    fetchWelcomePanel();
+    fetchCommits();
   }
 
   componentWillReceiveProps(nextProps: HomePageProps) {
-    const { appStore } = this.props;
     const page = nextProps.params.page || 0;
 
-    appStore.fetchCommits(page);
+    fetchCommits(page);
   }
 
   onWelcomePanelHide = (e: React.MouseEvent) => {
     e.preventDefault();
-    const { appStore } = this.props;
 
-    appStore.hideWelcomePanel();
+    hideWelcomePanel();
   };
 
   onUpdateNoticeClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    const { appStore } = this.props;
 
-    appStore.fetchCommits();
+    fetchCommits();
   };
 
   render() {
+    const { appStore, uiStore } = this.props;
     const {
       displayWelcomePanel,
       displayUpdateNotice,
       isDirtyWorkingDirectory,
-      progress,
-    } = this.props.appStore;
+    } = appStore;
+    const { progress } = uiStore;
 
     return (
       <div>

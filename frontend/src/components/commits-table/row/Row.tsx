@@ -8,7 +8,8 @@ import CommitSummary from '../commit-summary/CommitSummary';
 import Error from './Error';
 import DetailsLevel from '../../../enums/DetailsLevel';
 
-import CommitRow from '../../../stores/CommitRow';
+import { changeDetailsLevel } from '../../../actions';
+import CommitRow from '../../../entities/CommitRow';
 
 interface RowProps {
   commitRow: CommitRow;
@@ -22,7 +23,8 @@ interface RowProps {
 export default class Row extends React.Component<RowProps, {}> {
 
   onDetailsLevelChange = (detailsLevel: DetailsLevel) => {
-    this.props.commitRow.changeDetailsLevel(detailsLevel);
+    const { commitRow } = this.props;
+    changeDetailsLevel(detailsLevel, commitRow);
   };
 
   render() {

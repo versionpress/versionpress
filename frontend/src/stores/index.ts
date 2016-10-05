@@ -3,6 +3,7 @@ import commitPanelStore from './commitPanelStore';
 import commitsTableStore from './commitsTableStore';
 import navigationStore from './navigationStore';
 import servicePanelStore from './servicePanelStore';
+import uiStore from './uiStore';
 
 export {
   appStore,
@@ -10,4 +11,5 @@ export {
   commitsTableStore,
   navigationStore,
   servicePanelStore,
+  uiStore,
 };

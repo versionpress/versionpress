@@ -1,15 +1,14 @@
+/// <reference path='../components/common/Commits.d.ts' />
+
 import { action, computed, observable } from 'mobx';
 
 import appStore from './appStore';
 
 class NavigationStore {
+
   @observable query: string = '';
 
-  @computed get enableActions() {
-    return !appStore.isDirtyWorkingDirectory;
-  }
-
-  @computed get changes() {
+  @computed get changesCount() {
     return appStore.selectedCommits.length;
   }
 
@@ -17,25 +16,10 @@ class NavigationStore {
     return appStore.selectedCommits.map((commit: Commit) => commit.hash);
   }
 
-  @action
-  changeFilterQuery = (query: string) => {
+  @action changeFilterQuery = (query: string) => {
     this.query = query;
   };
 
-  @action
-  filter = () => {
-    appStore.filter();
-  };
-
-  @action
-  clearSelection = () => {
-    appStore.clearSelection();
-  };
-
-  @action
-  undoCommits = (commits: string[]) => {
-    appStore.undoCommits(commits);
-  };
 }
 
 const navigationStore = new NavigationStore();

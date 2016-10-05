@@ -12,7 +12,7 @@ import ClearSelection from './ClearSelection';
 import './BulkActionPanel.less';
 
 interface BulkActionPanelProps {
-  changes: number;
+  changesCount: number;
   enableActions: boolean;
   onBulkAction(action: string): void;
   onClearSelection(): void;
@@ -65,7 +65,7 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
   };
 
   render() {
-    const { changes, enableActions } = this.props;
+    const { changesCount, enableActions } = this.props;
 
     return (
       <div className='BulkActionPanel'>
@@ -78,10 +78,10 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
           />
           <Submit
             onClick={this.onSubmitClick}
-            isDisabled={!enableActions || changes === 0}
+            isDisabled={!enableActions || changesCount === 0}
           />
           <ClearSelection
-            changes={changes}
+            changesCount={changesCount}
             onClick={this.onClearSelectionClick}
           />
         </div>

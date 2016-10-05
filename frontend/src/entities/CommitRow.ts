@@ -1,19 +1,23 @@
-/// <reference path='../services/VpApi.d.ts' />
-
-import { action, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 
 import DetailsLevel from '../enums/DetailsLevel';
 
-class CommitPanelStore {
+class CommitRow {
 
+  @observable commit: Commit = null;
+  @observable isSelected: boolean = false;
   @observable detailsLevel: DetailsLevel = DetailsLevel.None;
   @observable diff: string = null;
-  @observable gitStatus: VpApi.GetGitStatusResponse = null;
   @observable error: string = null;
   @observable isLoading: boolean = false;
 
-  get hash() {
-    return '';
+  constructor(commit: Commit, isSelected: boolean = false) {
+    this.commit = commit;
+    this.isSelected = isSelected;
+  }
+
+  @computed get hash() {
+    return this.commit.hash;
   }
 
   @action setDetailsLevel = (detailsLevel: DetailsLevel) => {
@@ -28,17 +32,10 @@ class CommitPanelStore {
     this.isLoading = isLoading;
   }
 
-  @action setGitStatus(gitStatus: VpApi.GetGitStatusResponse) {
-    this.gitStatus = gitStatus;
-  }
-
-  @action setDiff(diff: string) {
+  @action setDiff = (diff: string) => {
     this.diff = diff;
   }
 
 }
 
-const commitPanelStore = new CommitPanelStore();
-
-export { CommitPanelStore };
-export default commitPanelStore;
+export default CommitRow;

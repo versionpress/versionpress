@@ -5,6 +5,7 @@ import * as classNames from 'classnames';
 import * as moment from 'moment';
 import { observer } from 'mobx-react';
 
+import { undoCommits, rollbackToCommit, selectCommits } from '../../actions';
 import Row from './row/Row';
 import Footer from './footer/Footer';
 import Header from './header/Header';
@@ -12,18 +13,20 @@ import Note from './note/Note';
 import { revertDialog } from '../portal/portal';
 import { findIndex } from '../../utils/ArrayUtils';
 
-import CommitRow from '../../stores/CommitRow';
+import CommitRow from '../../entities/CommitRow';
 import { AppStore } from '../../stores/appStore';
 import { CommitsTableStore } from '../../stores/commitsTableStore';
+import { UiStore } from '../../stores/uiStore';
 
 import './CommitsTable.less';
 
 interface CommitsTableProps {
   appStore?: AppStore;
   commitsTableStore?: CommitsTableStore;
+  uiStore?: UiStore;
 }
 
-@observer(['appStore', 'commitsTableStore'])
+@observer(['appStore', 'commitsTableStore', 'uiStore'])
 export default class CommitsTable extends React.Component<CommitsTableProps, {}> {
 
   onSelectAllChange = (isChecked: boolean) => {
@@ -33,34 +36,32 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
   };
 
   onUndo = (hash: string, message: string) => {
-    const { commitsTableStore } = this.props;
     const title = (
       <span>Undo <em>{message}</em>?</span>
     );
 
-    revertDialog(title, () => commitsTableStore.undoCommits([hash]));
+    revertDialog(title, () => undoCommits([hash]));
   };
 
   onRollback = (hash: string, date: string) => {
-    const { commitsTableStore } = this.props;
     const title = (
       <span>Roll back to <em>{moment(date).format('LLL')}</em>?</span>
     );
 
-    revertDialog(title, () => commitsTableStore.rollbackToCommit(hash));
+    revertDialog(title, () => rollbackToCommit(hash));
   };
 
   onCommitsSelect = (commitsToSelect: Commit[], isChecked: boolean, isShiftKey: boolean) => {
-    const { commitsTableStore } = this.props;
-    commitsTableStore.selectCommits(commitsToSelect, isChecked, isShiftKey);
+    selectCommits(commitsToSelect, isChecked, isShiftKey);
   };
 
   renderRow = (commitRow: CommitRow, displayNotAbleNote: boolean) => {
-    const { commitsTableStore } = this.props;
+    const { appStore } = this.props;
+
     const row = (
       <Row
         commitRow={commitRow}
-        enableActions={commitsTableStore.enableActions}
+        enableActions={appStore.enableActions}
         onUndo={this.onUndo}
         onRollback={this.onRollback}
         onCommitsSelect={this.onCommitsSelect}
@@ -81,16 +82,16 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
   };
 
   render() {
-    const { commitsTableStore } = this.props;
+    const { appStore, commitsTableStore, uiStore } = this.props;
+    const { enableActions } = appStore;
     const {
       pages,
       commits,
       commitRows,
-      enableActions,
       selectableCommits,
       areAllCommitsSelected,
-      isLoading,
     } = commitsTableStore;
+    const { isLoading } = uiStore;
 
     const commitsTableClassName = classNames({
       'vp-table': true,

@@ -18,7 +18,7 @@ interface ServicePanelProps {
 export default class ServicePanel extends React.Component<ServicePanelProps, {}> {
   onButtonClick = () => {
     const { servicePanelStore } = this.props;
-    servicePanelStore.changeVisibility();
+    servicePanelStore.toggleVisibility();
   };
 
   render() {
