@@ -1,6 +1,7 @@
 /// <reference path='../../common/Commits.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import * as ArrayUtils from '../../../utils/ArrayUtils';
 import * as StringUtils from '../../../utils/StringUtils';
@@ -62,4 +63,4 @@ function getSuffix(action: string) {
   return '';
 }
 
-export default Comment;
+export default observer(Comment);

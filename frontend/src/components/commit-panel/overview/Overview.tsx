@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
+import { observable } from 'mobx';
 
 import Item from './Item';
 import ShowMore from './ShowMore';
@@ -7,32 +9,24 @@ interface OverviewProps {
   gitStatus: VpApi.GetGitStatusResponse;
 }
 
-interface OverviewState {
-  isExpanded: boolean;
-}
-
-export default class Overview extends React.Component<OverviewProps, OverviewState> {
+@observer
+export default class Overview extends React.Component<OverviewProps, {}> {
 
   private static displayedListLength: number = 5;
 
-  state = {
-    isExpanded: false,
-  };
+  @observable isExpanded: boolean = false;
 
   onShowMoreClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    this.setState({
-      isExpanded: true,
-    });
+    this.isExpanded = true;
   };
 
   render() {
     const { gitStatus } = this.props;
-    const { isExpanded } = this.state;
 
     const displayedListLength = Overview.displayedListLength;
-    const lines = isExpanded
+    const lines = this.isExpanded
       ? gitStatus
       : gitStatus.slice(0, displayedListLength);
 
@@ -46,7 +40,7 @@ export default class Overview extends React.Component<OverviewProps, OverviewSta
               key={i}
             />
           ))}
-          {(gitStatus.length > displayedListLength && !isExpanded) &&
+          {(gitStatus.length > displayedListLength && !this.isExpanded) &&
             <ShowMore
               displayNumber={gitStatus.length - displayedListLength}
               onClick={this.onShowMoreClick}

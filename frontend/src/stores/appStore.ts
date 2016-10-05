@@ -240,4 +240,5 @@ class AppStore {
 
 const appStore = new AppStore();
 
+export { AppStore };
 export default appStore;

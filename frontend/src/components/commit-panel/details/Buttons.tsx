@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import DetailsLevel from '../../../enums/DetailsLevel';
 
@@ -28,4 +29,4 @@ const Buttons: React.StatelessComponent<ButtonsProps> = ({ detailsLevel, onDetai
   );
 };
 
-export default Buttons;
+export default observer(Buttons);

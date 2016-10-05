@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 interface DetailsProps {
   text: string;
@@ -10,4 +11,4 @@ const Details: React.StatelessComponent<DetailsProps> = ({ text }) => (
   </p>
 );
 
-export default Details;
+export default observer(Details);

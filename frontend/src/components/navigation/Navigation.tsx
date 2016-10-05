@@ -5,30 +5,38 @@ import BulkActionPanel from '../bulk-action-panel/BulkActionPanel';
 import Filter from '../filter/Filter';
 import { revertDialog } from '../portal/portal';
 
-import store from '../../stores/navigationStore';
+import { NavigationStore } from '../../stores/navigationStore';
 
-@observer
-export default class Navigation extends React.Component<{}, {}> {
+interface NavigationProps {
+  navigationStore?: NavigationStore;
+}
+
+@observer(['navigationStore'])
+export default class Navigation extends React.Component<NavigationProps, {}> {
 
   undoCommits = (commits: string[]) => {
-    store.undoCommits(commits);
+    const { navigationStore } = this.props;
+    navigationStore.undoCommits(commits);
   };
 
   onFilterQueryChange = (query: string) => {
-    store.changeFilterQuery(query);
+    const { navigationStore } = this.props;
+    navigationStore.changeFilterQuery(query);
   };
 
   onFilter = () => {
-    store.filter();
+    const { navigationStore } = this.props;
+    navigationStore.filter();
   };
 
   onClearSelection = () => {
-    store.clearSelection();
+    const { navigationStore } = this.props;
+    navigationStore.clearSelection();
   };
 
   onBulkAction = (action: string) => {
     if (action === 'undo') {
-      const { changes, hashes } = store;
+      const { changes, hashes } = this.props.navigationStore;
 
       const title = (
         <span>Undo <em>{changes} {changes === 1 ? 'change' : 'changes'}</em>?</span>
@@ -39,7 +47,7 @@ export default class Navigation extends React.Component<{}, {}> {
   };
 
   render() {
-    const { query, enableActions, changes } = store;
+    const { query, enableActions, changes } = this.props.navigationStore;
 
     return (
       <div className='tablenav top'>

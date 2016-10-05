@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 interface SelectAllProps {
   isSelected: boolean;
@@ -38,4 +39,4 @@ const SelectAll: React.StatelessComponent<SelectAllProps> = (props) => {
   );
 };
 
-export default SelectAll;
+export default observer(SelectAll);

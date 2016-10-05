@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import Body from './body/Body';
 import Header from './header/Header';
@@ -14,6 +15,7 @@ interface ModalProps {
   onClose?(): void;
 }
 
+@observer
 export default class Modal extends React.Component<ModalProps, {}> {
 
   static defaultProps = {

@@ -1,6 +1,7 @@
 /// <reference path='../common/Diff.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import Diff from './diff/Diff';
 import DiffParser from '../common/DiffParser';
@@ -21,4 +22,4 @@ const CommitDiffPanel: React.StatelessComponent<CommitDiffPanelProps> = ({ diff 
   </div>
 );
 
-export default CommitDiffPanel;
+export default observer(CommitDiffPanel);

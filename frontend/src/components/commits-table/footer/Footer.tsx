@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 import { IndexLink, Link } from 'react-router';
 
 import config from '../../../config/config';
@@ -31,4 +32,4 @@ const Footer: React.StatelessComponent<FooterProps> = ({ pages }) => (
   </tfoot>
 );
 
-export default Footer;
+export default observer(Footer);

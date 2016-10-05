@@ -1,6 +1,7 @@
 /// <reference path='../../common/Commits.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import OverviewLine from './OverviewLine';
 import { LineProps } from './Line';
@@ -39,4 +40,4 @@ const Meta: React.StatelessComponent<MetaProps> = (props) => {
   );
 };
 
-export default Meta;
+export default observer(Meta);

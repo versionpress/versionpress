@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
+import { observer } from 'mobx-react';
 
 import Support from './Support';
 import Warning from './Warning';
@@ -26,4 +27,4 @@ const Panel: React.StatelessComponent<PanelProps> = ({ isVisible }) => {
   );
 };
 
-export default Panel;
+export default observer(Panel);

@@ -1,6 +1,7 @@
 /// <reference path='../../interfaces/State.d.ts' />
 
 import * as React from 'react';
+import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 
 import Title from './Title';
@@ -17,30 +18,24 @@ interface BulkActionPanelProps {
   onClearSelection(): void;
 }
 
-interface BulkActionPanelState {
-  options: BulkActionPanelOption[];
-}
-
 @observer
-export default class BulkActionPanel extends React.Component<BulkActionPanelProps, BulkActionPanelState> {
+export default class BulkActionPanel extends React.Component<BulkActionPanelProps, {}> {
 
-  state = {
-    options: [
-      {
-        title: 'Bulk Actions',
-        value: '-1',
-        isSelected: true,
-      },
-      {
-        title: 'Undo',
-        value: 'undo',
-        isSelected: false,
-      },
-    ],
-  };
+  @observable options: BulkActionPanelOption[] = [
+    {
+      title: 'Bulk Actions',
+      value: '-1',
+      isSelected: true,
+    },
+    {
+      title: 'Undo',
+      value: 'undo',
+      isSelected: false,
+    },
+  ];
 
   onSelectedValueChange = (newValue: string) => {
-    const newOptions = this.state.options.map(option => {
+    const newOptions = this.options.map(option => {
       return {
         title: option.title,
         value: option.value,
@@ -48,15 +43,13 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
       };
     });
 
-    this.setState({
-      options: newOptions,
-    });
+    this.options = newOptions;
   };
 
   onSubmitClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    const selectedOption = this.state.options.find(option => option.isSelected);
+    const selectedOption = this.options.find(option => option.isSelected);
 
     if (selectedOption.value === '-1') {
       return;
@@ -73,14 +66,13 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
 
   render() {
     const { changes, enableActions } = this.props;
-    const { options } = this.state;
 
     return (
       <div className='BulkActionPanel'>
         <div className='alignleft actions bulkactions'>
           <Title htmlFor='BulkActionPanel-selector-top' />
           <Options
-            options={options}
+            options={this.options}
             id='BulkActionPanel-selector-top'
             onChange={this.onSelectedValueChange}
           />

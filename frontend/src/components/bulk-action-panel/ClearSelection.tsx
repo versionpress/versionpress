@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 import * as classNames from 'classnames';
 
 interface ClearSelectionProps {
@@ -27,4 +28,4 @@ const ClearSelection: React.StatelessComponent<ClearSelectionProps> = ({ changes
   );
 };
 
-export default ClearSelection;
+export default observer(ClearSelection);

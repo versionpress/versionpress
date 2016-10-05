@@ -1,6 +1,7 @@
 /// <reference path='../../common/Commits.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import NamesString from '../names/NamesString';
 import NamesList from '../names/NamesList';
@@ -73,4 +74,4 @@ function getCountOfDuplicates(changes: Change[]): CountOfDuplicateChanges {
   ) as CountOfDuplicateChanges;
 }
 
-export default OverviewLine;
+export default observer(OverviewLine);

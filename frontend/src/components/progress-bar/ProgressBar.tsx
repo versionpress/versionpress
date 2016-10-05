@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import Spinner from './Spinner';
 
@@ -26,4 +27,4 @@ const ProgressBar: React.StatelessComponent<ProgressBarProps> = ({ progress }) =
   );
 };
 
-export default ProgressBar;
+export default observer(ProgressBar);

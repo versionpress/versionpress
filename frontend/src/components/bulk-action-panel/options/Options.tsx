@@ -1,6 +1,7 @@
 /// <reference path='../../../interfaces/State.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import Option from './Option';
 
@@ -10,6 +11,7 @@ interface OptionsProps {
   onChange(newValue: string): void;
 }
 
+@observer
 export default class Options extends React.Component<OptionsProps, {}> {
 
   onChange = (e) => {

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 interface WordPressUpdateProps {
   version: string;
@@ -11,4 +12,4 @@ const WordPressUpdate: React.StatelessComponent<WordPressUpdateProps> = ({ versi
   </span>
 );
 
-export default WordPressUpdate;
+export default observer(WordPressUpdate);

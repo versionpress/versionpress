@@ -1,6 +1,7 @@
 /// <reference path='../../common/Commits.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 interface NameProps {
   change: Change;
@@ -43,4 +44,4 @@ function getUserFriendlyName({ type, name, tags }) {
   }
 }
 
-export default Name;
+export default observer(Name);

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import DetailsLevelButtons from './DetailsLevelButtons';
 import MergeIcon from './MergeIcon';
@@ -41,4 +42,4 @@ function renderMessage(message: string) {
   );
 }
 
-export default Message;
+export default observer(Message);

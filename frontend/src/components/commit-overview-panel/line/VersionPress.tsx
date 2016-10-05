@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import * as StringUtils from '../../../utils/StringUtils';
 
@@ -14,4 +15,4 @@ const VersionPress: React.StatelessComponent<VersionPressProps> = ({ action }) =
   </span>
 );
 
-export default VersionPress;
+export default observer(VersionPress);

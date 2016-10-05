@@ -1,6 +1,7 @@
 /// <reference path='../../common/Commits.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import UserMeta from './UserMeta';
 import PostMeta from './PostMeta';
@@ -47,4 +48,4 @@ const Line: React.StatelessComponent<LineProps> = (props) => {
   return <OverviewLine {...props} />;
 };
 
-export default Line;
+export default observer(Line);

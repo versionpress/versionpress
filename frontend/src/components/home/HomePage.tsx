@@ -13,35 +13,42 @@ import UpdateNotice from './update-notice/UpdateNotice';
 import VpTitle from './vp-title/VpTitle';
 import WelcomePanel from '../welcome-panel/WelcomePanel';
 
-import appStore from '../../stores/appStore';
+import { AppStore } from '../../stores/appStore';
 
 import './HomePage.less';
 
 interface HomePageProps {
+  appStore?: AppStore;
   params: {
     page?: string,
   };
 }
 
-@observer
+@observer(['appStore'])
 export default class HomePage extends React.Component<HomePageProps, {}> {
 
   componentDidMount() {
+    const { appStore } = this.props;
     appStore.init(this.props.params.page);
   }
 
   componentWillReceiveProps(nextProps: HomePageProps) {
-    appStore.fetchCommits(nextProps.params.page);
+    const { appStore } = this.props;
+    const page = nextProps.params.page || 0;
+
+    appStore.fetchCommits(page);
   }
 
   onWelcomePanelHide = (e: React.MouseEvent) => {
     e.preventDefault();
+    const { appStore } = this.props;
 
     appStore.hideWelcomePanel();
   };
 
   onUpdateNoticeClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    const { appStore } = this.props;
 
     appStore.fetchCommits();
   };
@@ -52,7 +59,7 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
       displayUpdateNotice,
       isDirtyWorkingDirectory,
       progress,
-    } = appStore;
+    } = this.props.appStore;
 
     return (
       <div>

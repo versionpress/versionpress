@@ -2,6 +2,8 @@
 /// <reference path='./CommitOverviewPanel.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
+import { observable } from 'mobx';
 
 import preprocessLines from './preprocessLines';
 import Line from './line/Line';
@@ -13,28 +15,19 @@ interface CommitOverviewPanelProps {
   commit: Commit;
 }
 
-interface CommitOverviewPanelState {
-  expandedLists: string[];
-}
+@observer
+export default class CommitOverviewPanel extends React.Component<CommitOverviewPanelProps, {}> {
 
-export default class CommitOverviewPanel extends React.Component<CommitOverviewPanelProps, CommitOverviewPanelState> {
-
-  state = {
-    expandedLists: [],
-  };
+  @observable expandedLists: string[] = [];
 
   onShowMoreClick = (e: React.MouseEvent, listKey: string) => {
     e.preventDefault();
-    const { expandedLists } = this.state;
 
-    this.setState({
-      expandedLists: expandedLists.concat([listKey]),
-    });
+    this.expandedLists = this.expandedLists.concat([listKey]);
   };
 
   renderLines = (lines: PreprocessedLine[]) => {
     const { commit } = this.props;
-    const { expandedLists } = this.state;
 
     if (commit.isMerge) {
       return [<Merge />];
@@ -47,7 +40,7 @@ export default class CommitOverviewPanel extends React.Component<CommitOverviewP
       <li key={key}>
         <Line
           changes={changes}
-          expandedLists={expandedLists}
+          expandedLists={this.expandedLists}
           onShowMoreClick={this.onShowMoreClick}
         />
       </li>
@@ -56,9 +49,8 @@ export default class CommitOverviewPanel extends React.Component<CommitOverviewP
 
   render() {
     const { commit } = this.props;
-    const { changes } = commit;
 
-    const lines = preprocessLines(changes);
+    const lines = preprocessLines(commit.changes);
 
     return (
       <ul className='overview-list'>

@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
+import { observable } from 'mobx';
 
 import Buttons from './Buttons';
 import Form from './Form';
@@ -9,48 +11,34 @@ interface CommitProps {
   onDiscard(): void;
 }
 
-interface CommitState {
-  isFormVisible?: boolean;
-  commitMessage?: string;
-}
+@observer
+export default class Commit extends React.Component<CommitProps, {}> {
 
-export default class Commit extends React.Component<CommitProps, CommitState> {
-
-  state = {
-    isFormVisible: false,
-    commitMessage: '',
-  };
+  @observable isFormVisible: boolean = false;
+  @observable commitMessage: string = '';
 
   onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    this.props.onCommit(this.state.commitMessage);
+    this.props.onCommit(this.commitMessage);
 
-    this.setState({
-      commitMessage: '',
-    });
+    this.commitMessage = '';
   };
 
   onCommitClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    this.setState({
-      isFormVisible: true,
-    });
+    this.isFormVisible = true;
   };
 
   onCommitMessageChange = (e: React.FormEvent) => {
-    this.setState({
-      commitMessage: (e.target as HTMLTextAreaElement).value,
-    });
+    this.commitMessage = (e.target as HTMLTextAreaElement).value;
   };
 
   onCancelCommitClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    this.setState({
-      isFormVisible: false,
-    });
+    this.isFormVisible = false;
   };
 
   onDiscardClick = (e: React.MouseEvent) => {
@@ -66,11 +54,9 @@ export default class Commit extends React.Component<CommitProps, CommitState> {
   };
 
   render() {
-    const { isFormVisible, commitMessage} = this.state;
-
-    return isFormVisible
+    return this.isFormVisible
       ? <Form
-          commitMessage={commitMessage}
+          commitMessage={this.commitMessage}
           onCommitMessageChange={this.onCommitMessageChange}
           onSubmit={this.onSubmit}
           onCancelCommitClick={this.onCancelCommitClick}
