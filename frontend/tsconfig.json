@@ -9,10 +9,12 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "typings/browser.d.ts",
+    "custom_typings/index.d.ts",
     "!./node_modules/**/*.ts",
     "!./node_modules/**/*.tsx"
   ],
   "files": [
-    "typings/browser.d.ts"
+    "typings/browser.d.ts",
+    "custom_typings/index.d.ts"
   ]
 }

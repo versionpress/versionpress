@@ -6,7 +6,7 @@ interface SearchConfigItem {
   type: string;
   defaultHint?: string;
   sectionTitle?: string;
-  content: SearchConfigItemContent[];
+  content?: SearchConfigItemContent[];
 }
 
 interface SearchConfigItemContent {

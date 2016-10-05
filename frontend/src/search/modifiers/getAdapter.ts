@@ -2,17 +2,16 @@
 /// <reference path='./Adapter.d.ts' />
 
 import ListAdapter from './list/adapter';
+import DateAdapter from './date/adapter';
 
 export default function getAdapter(config: SearchConfig) {
   return (token: Token): Adapter => {
     const configItem = getConfigItem(token, config);
+    const type = token && token.type;
 
-    /*
-    const { type } = token;
     if (type === 'date') {
-      return DateAdapter;
+      return DateAdapter(configItem);
     }
-    */
 
     return ListAdapter(configItem);
   };

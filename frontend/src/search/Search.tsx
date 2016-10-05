@@ -42,8 +42,12 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     this.scrollBackground();
   };
 
-  onBlur = () => {
-    this.setCursorLocation(-1);
+  onBlur = (e: React.FocusEvent) => {
+    if (this.displayPopup(this.getTokens())) {
+      e.preventDefault();
+    } else {
+      this.setCursorLocation(-1);
+    }
   };
 
   onClick = (e: React.MouseEvent) => {

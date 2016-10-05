@@ -15,6 +15,7 @@
     "superagent": "registry:dt/superagent#1.4.0+20160317120654"
   },
   "dependencies": {
-    "lodash": "registry:npm/lodash#4.0.0+20160416211519"
+    "lodash": "registry:npm/lodash#4.0.0+20160416211519",
+    "react-day-picker": "registry:dt/react-day-picker#1.2.0+20160713062231"
   }
 }
