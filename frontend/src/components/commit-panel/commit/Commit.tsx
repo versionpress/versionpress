@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
-import { observable } from 'mobx';
 
 import Buttons from './Buttons';
 import Form from './Form';
@@ -11,34 +10,49 @@ interface CommitProps {
   onDiscard(): void;
 }
 
-@observer
-export default class Commit extends React.Component<CommitProps, {}> {
+interface CommitState {
+  isFormVisible?: boolean;
+  commitMessage?: string;
+}
 
-  @observable isFormVisible: boolean = false;
-  @observable commitMessage: string = '';
+@observer
+export default class Commit extends React.Component<CommitProps, CommitState> {
+
+  state = {
+    isFormVisible: false,
+    commitMessage: '',
+  };
 
   onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    this.props.onCommit(this.commitMessage);
+    this.props.onCommit(this.state.commitMessage);
 
-    this.commitMessage = '';
+    this.setState({
+      commitMessage: '',
+    });
   };
 
   onCommitClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    this.isFormVisible = true;
+    this.setState({
+      isFormVisible: true,
+    });
   };
 
   onCommitMessageChange = (e: React.FormEvent) => {
-    this.commitMessage = (e.target as HTMLTextAreaElement).value;
+    this.setState({
+      commitMessage: (e.target as HTMLTextAreaElement).value,
+    });
   };
 
   onCancelCommitClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    this.isFormVisible = false;
+    this.setState({
+      isFormVisible: false,
+    });
   };
 
   onDiscardClick = (e: React.MouseEvent) => {
@@ -54,9 +68,11 @@ export default class Commit extends React.Component<CommitProps, {}> {
   };
 
   render() {
-    return this.isFormVisible
+    const { isFormVisible, commitMessage} = this.state;
+
+    return isFormVisible
       ? <Form
-          commitMessage={this.commitMessage}
+          commitMessage={commitMessage}
           onCommitMessageChange={this.onCommitMessageChange}
           onSubmit={this.onSubmit}
           onCancelCommitClick={this.onCancelCommitClick}

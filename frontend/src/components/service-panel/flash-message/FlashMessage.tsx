@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
-import { observable } from 'mobx';
 
 import Details from './Details';
 import ShowDetails from './ShowDetails';
@@ -11,19 +10,28 @@ interface FlashMessageProps {
   message: InfoMessage;
 }
 
-@observer
-export default class FlashMessage extends React.Component<FlashMessageProps, {}> {
+interface FlashMessageState {
+  showDetails: boolean;
+}
 
-  @observable showDetails: boolean = false;
+@observer
+export default class FlashMessage extends React.Component<FlashMessageProps, FlashMessageState> {
+
+  state = {
+    showDetails: false,
+  };
 
   onDetailsClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    this.showDetails = !this.showDetails;
+    this.setState((prevState, props) => ({
+      showDetails: !prevState.showDetails,
+    }));
   };
 
   render() {
     const { code, message, details } = this.props.message;
+    const { showDetails } = this.state;
 
     if (code === null) {
       return null;
@@ -35,12 +43,12 @@ export default class FlashMessage extends React.Component<FlashMessageProps, {}>
           {message} {' '}
           {details &&
             <ShowDetails
-              isActive={this.showDetails}
+              isActive={showDetails}
               onClick={this.onDetailsClick}
             />
           }
         </p>
-        {(details && this.showDetails) &&
+        {(details && showDetails) &&
           <Details text={details} />
         }
       </div>
