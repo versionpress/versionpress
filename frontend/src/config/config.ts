@@ -14,8 +14,7 @@ const defaultConfig: VersionPressConfig = {
   },
   routes: {
     page: 'page',
-    home: 'home',
-    notFound: 'not-found',
+    home: '/',
   },
 };
 

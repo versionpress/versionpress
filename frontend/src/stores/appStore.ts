@@ -2,7 +2,7 @@
 /// <reference path='../interfaces/State.d.ts' />
 
 import { action, observable, runInAction } from 'mobx';
-import * as ReactRouter from 'react-router';
+import { appHistory } from '../routes';
 import * as request from 'superagent';
 
 import config from '../config/config';
@@ -27,7 +27,6 @@ class AppStore {
   @observable progress: number = 100;
 
   private refreshInterval;
-  private router: ReactRouter.Context;
 
   constructor() {
     this.refreshInterval = setInterval(this.checkUpdate, 10 * 1000);
@@ -54,16 +53,15 @@ class AppStore {
             servicePanelStore.changeMessage(getErrorMessage(res, err));
           });
         } else {
-          this.router.transitionTo(routes.home);
+          appHistory.push(routes.home);
           document.location.reload();
         }
       });
   };
 
   @action
-  init = (page: string, router: ReactRouter.Context) => {
+  init = (page: number | string = 0) => {
     this.page = parsePageNumber(page);
-    this.router = router;
     this.fetchWelcomePanel();
     this.fetchCommits();
   };
@@ -81,16 +79,16 @@ class AppStore {
   fetchCommits = (page: number | string = this.page) => {
     this.setLoading(true);
 
-    page = parsePageNumber(page);
-
-    if (page < 1) {
-      this.router.transitionTo(routes.home);
+    if (typeof page === 'string' && parsePageNumber(page) < 1) {
+      appHistory.replace(routes.home);
     }
+
+    this.page = parsePageNumber(page);
 
     WpApi
       .get('commits')
       .query({
-        page: page,
+        page: this.page,
         query: encodeURIComponent(navigationStore.query),
       })
       .on('progress', this.updateProgress)
@@ -222,10 +220,10 @@ class AppStore {
   @action
   filter = () => {
     if (this.page > 0) {
-      this.router.transitionTo(routes.home);
-    } else {
-      this.fetchCommits();
+      this.page = 0;
+      appHistory.push(routes.home);
     }
+    this.fetchCommits();
   };
 
   @action

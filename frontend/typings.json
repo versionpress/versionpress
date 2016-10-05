@@ -13,7 +13,8 @@
     "node": "registry:env/node#6.0.0+20160918225031",
     "react": "registry:dt/react#0.14.0+20160920055104",
     "react-dom": "registry:dt/react-dom#0.14.0+20160412154040",
-    "react-router": "registry:dt/react-router#0.13.3+20160317120654",
+    "react-router": "registry:dt/react-router#2.0.0+20160920184447",
+    "react-router/history": "registry:dt/react-router/history#2.0.0+20160830150755",
     "superagent": "registry:dt/superagent#2.0.0+20160906143408"
   }
 }

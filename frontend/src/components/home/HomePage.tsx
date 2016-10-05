@@ -2,7 +2,6 @@
 /// <reference path='../../interfaces/State.d.ts' />
 
 import * as React from 'react';
-import * as ReactRouter from 'react-router';
 import { observer } from 'mobx-react';
 
 import CommitPanel from '../commit-panel/CommitPanel';
@@ -24,21 +23,11 @@ interface HomePageProps {
   };
 }
 
-interface HomePageContext {
-  router: ReactRouter.Context;
-}
-
 @observer
 export default class HomePage extends React.Component<HomePageProps, {}> {
 
-  static contextTypes: React.ValidationMap<any> = {
-    router: React.PropTypes.func.isRequired,
-  };
-
-  context: HomePageContext;
-
   componentDidMount() {
-    appStore.init(this.props.params.page, this.context.router);
+    appStore.init(this.props.params.page);
   }
 
   componentWillReceiveProps(nextProps: HomePageProps) {

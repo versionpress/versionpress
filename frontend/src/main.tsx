@@ -1,13 +1,14 @@
 import * as React from 'react';
 import * as DOM from 'react-dom';
-import * as ReactRouter from 'react-router';
-
-import { appRoute } from './routes/routes';
+import { Router } from 'react-router';
 
 import 'core-js';
 
+import { appHistory, routes } from './routes';
 const app = document.getElementById('vp');
 
-ReactRouter.run(appRoute, ReactRouter.HashLocation, (Handler) => {
-  DOM.render(<Handler />, app);
-});
+DOM.render(
+    <Router history={appHistory}>
+      {routes}
+    </Router>
+, app);
