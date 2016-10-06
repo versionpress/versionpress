@@ -3,7 +3,7 @@ import * as React from 'react';
 const Submit: React.StatelessComponent<{}> = () => (
   <input
     type='submit'
-    className='button'
+    className='button Filter-submit'
     value='Search'
   />
 );
