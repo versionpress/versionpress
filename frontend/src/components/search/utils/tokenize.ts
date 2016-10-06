@@ -19,11 +19,21 @@ export function tokenize(text: string, config: SearchConfig): Token[] {
         tokens.push(createToken(null, config));
       }
       mem = '';
+    } else if (character === '\'' || character === '"') {
+      mem += character;
+      while (text.length > i + 1 && text[i + 1] !== character) {
+        i += 1;
+        mem += text[i];
+      }
+      if (text.length > i + 1 && text[i + 1] === character) {
+        i += 1;
+        mem += character;
+      }
     } else if (character !== ' ') {
       mem += character;
     }
 
-    if (character === ':' && text[i + 1] === ' ') {
+    if (character === ':' && text.length > i + 1 && text[i + 1] === ' ') {
       mem += ' ';
       i += 1;
     }

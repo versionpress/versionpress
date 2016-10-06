@@ -4,3 +4,4 @@ export * from './prepareConfig';
 export * from './tokenize';
 export * from './updateToken';
 export * from './setCursor';
+export * from './trim';

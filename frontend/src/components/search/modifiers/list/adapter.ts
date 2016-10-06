@@ -1,8 +1,8 @@
 /// <reference path='../../Search.d.ts' />
 /// <reference path='../Adapter.d.ts' />
 
-import { getMatch } from '../../utils/';
-import * as ArrayUtils from '../../../common/ArrayUtils';
+import { getMatch, trim, IN_QUOTES_REGEXP } from '../../utils/';
+import * as ArrayUtils from '../../../../utils/ArrayUtils';
 
 const ListAdapter = (config: SearchConfigItem): Adapter => ({
 
@@ -31,7 +31,8 @@ const ListAdapter = (config: SearchConfigItem): Adapter => ({
 
     if (list && list.length) {
       if (token && token.type !== 'space' && (token.modifier.length || token.value.length)) {
-        const value = token.value.trim();
+        const value = trim(token.value);
+
         const labelMatches = getMatch(value, list, 'label');
         const valueMatches = getMatch(value, list, 'value');
 
@@ -54,13 +55,19 @@ const ListAdapter = (config: SearchConfigItem): Adapter => ({
     const list = config && config.content;
 
     if (list) {
-      return list.some(item => this.serialize(item) === value.trim());
+      return list.some(item => trim(this.serialize(item)) === trim(value));
     }
     return !!value;
   },
 
   serialize: function(item: SearchConfigItemContent) {
-    return item && item.value;
+    if (!item) {
+      return null;
+    }
+    if (IN_QUOTES_REGEXP.test(item.value) || item.value.indexOf(' ') === -1) {
+      return item.value;
+    }
+    return '"' + item.value + '"';
   },
 
   deserialize: function(value: string) {
