@@ -1,4 +1,4 @@
-/// <reference path='../interfaces/Visualization.d.ts' />
+/// <reference path='../interfaces/Visualisation.d.ts' />
 /// <reference path='../components/common/Commits.d.ts' />
 
 import { action, computed, observable } from 'mobx';
@@ -13,7 +13,7 @@ class CommitsTableStore {
 
   @observable commitRows: CommitRow[] = [];
   @observable pages: number[] = [];
-  @observable showVisualization: boolean = localStorage
+  @observable showVisualisation: boolean = localStorage
     ? !!localStorage.getItem('showVisualization')
     : false;
 
@@ -34,7 +34,7 @@ class CommitsTableStore {
     let branches = [];
 
     this.commitRows.forEach(commitRow => {
-      const { branch } = commitRow.visualization;
+      const { branch } = commitRow.visualisation;
       if (branches.indexOf(branch) === -1) {
         branches.push(branch);
       }
@@ -43,11 +43,11 @@ class CommitsTableStore {
     return branches.length;
   }
 
-  @action changeShowVisualization = () => {
-    this.showVisualization = !this.showVisualization;
+  @action changeShowVisualisation = () => {
+    this.showVisualisation = !this.showVisualisation;
 
     if (localStorage) {
-      localStorage.setItem('showVisualization', this.showVisualization ? 'true' : '');
+      localStorage.setItem('showVisualization', this.showVisualisation ? 'true' : '');
     }
   };
 
@@ -77,14 +77,14 @@ class CommitsTableStore {
         ? null
         : visualization[i - 1];
 
-      commitRow.visualization = {
+      commitRow.setVisualisation({
         upperRoutes: upper ? upper.routes : null,
         lowerRoutes: lower ? lower.routes : null,
         environment: visualization[i].environment,
         branch: visualization[i].branch,
         offset: visualization[i].offset,
         isLastEnvCommit: !environments[visualization[i].environment],
-      };
+      });
 
       if (!environments[visualization[i].environment]) {
         environments[visualization[i].environment] = true;

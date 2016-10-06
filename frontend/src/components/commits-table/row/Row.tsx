@@ -14,11 +14,11 @@ import CommitRow from '../../../entities/CommitRow';
 interface RowProps {
   commitRow: CommitRow;
   enableActions: boolean;
-  showVisualization: boolean;
+  showVisualisation: boolean;
   onUndo(hash: string, message: string): void;
   onRollback(hash: string, date: string): void;
   onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
-  onChangeShowVisualization(): void;
+  onChangeShowVisualisation(): void;
 }
 
 @observer
@@ -30,8 +30,16 @@ export default class Row extends React.Component<RowProps, {}> {
   };
 
   render() {
-    const { commitRow, enableActions, onUndo, onRollback, onCommitsSelect, showVisualization } = this.props;
-    const { commit, isSelected, detailsLevel, diff, error, isLoading, visualization } = commitRow;
+    const {
+      commitRow,
+      enableActions,
+      onUndo,
+      onRollback,
+      onCommitsSelect,
+      showVisualisation,
+      onChangeShowVisualisation
+    } = this.props;
+    const { commit, isSelected, detailsLevel, diff, error, isLoading, visualisation } = commitRow;
 
     return (
       <tbody>
@@ -40,13 +48,13 @@ export default class Row extends React.Component<RowProps, {}> {
           enableActions={enableActions}
           isSelected={isSelected}
           detailsLevel={detailsLevel}
-          showVisualization={showVisualization}
-          visualization={visualization}
+          showVisualisation={showVisualisation}
+          visualisation={visualisation}
           onUndo={onUndo}
           onRollback={onRollback}
           onCommitsSelect={onCommitsSelect}
           onDetailsLevelChange={this.onDetailsLevelChange}
-          onChangeShowVisualization={this.props.onChangeShowVisualization}
+          onChangeShowVisualisation={onChangeShowVisualisation}
         />
         {error
           ? <Error message={error} />

@@ -19,7 +19,7 @@ interface CommitNode {
   sha: string;
 }
 
-interface Visualization {
+interface Visualisation {
   upperRoutes: CommitBranchRoute[];
   lowerRoutes: CommitBranchRoute[];
   branch: number;
