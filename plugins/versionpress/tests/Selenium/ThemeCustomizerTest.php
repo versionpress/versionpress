@@ -18,13 +18,11 @@ class ThemeCustomizerTest extends SeleniumTestCase
         $this->byId('save')->click();
         $this->waitForAjax();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
         $this->setValue('#customize-control-blogname input', 'Blogname from customizer');
         $this->byId('save')->click();
         $this->waitForAjax();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction('option/edit');
-        $commitAsserter->assertCleanWorkingDirectory();
+        $lastCommit = $this->gitRepository->getCommit($this->gitRepository->getLastCommitHash());
+        $this->assertContains('option/edit', $lastCommit->getMessage()->getBody());
     }
 }

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 interface ErrorProps {
   error: string;
@@ -10,4 +11,4 @@ const Error: React.StatelessComponent<ErrorProps> = ({ error }) => (
   </div>
 );
 
-export default Error;
+export default observer(Error);

@@ -1,6 +1,7 @@
 /// <reference path='../../common/Commits.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import renderNames from './renderNames';
 
@@ -47,4 +48,4 @@ const NamesList: React.StatelessComponent<NamesListProps> = (props) => {
   );
 };
 
-export default NamesList;
+export default observer(NamesList);

@@ -1,6 +1,7 @@
 /// <reference path='../../common/Diff.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 interface BinaryFileDiffProps {
   diff: Diff;
@@ -22,4 +23,4 @@ function getMessage(diff: Diff) {
   }
 }
 
-export default BinaryFileDiff;
+export default observer(BinaryFileDiff);

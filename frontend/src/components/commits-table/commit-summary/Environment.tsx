@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import { getGitBranchColor } from '../../../services/GitBranchColorProvider';
 
@@ -12,6 +13,7 @@ interface EnvironmentProps {
 const LEFT = 10;
 const SPACE = 15;
 
+@observer
 export default class Environment extends React.Component<EnvironmentProps, {}> {
 
   private tdDom;

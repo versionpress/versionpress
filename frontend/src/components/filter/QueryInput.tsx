@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 interface QueryInputProps {
   query: string;
@@ -14,4 +15,4 @@ const QueryInput: React.StatelessComponent<QueryInputProps> = ({ query, onChange
   />
 );
 
-export default QueryInput;
+export default observer(QueryInput);

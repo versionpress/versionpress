@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import * as classNames from 'classnames';
+import { observer } from 'mobx-react';
 
 import Actions from './Actions';
 import Author from './Author';
@@ -28,6 +29,7 @@ interface CommitSummaryProps {
   onChangeShowVisualization(): void;
 }
 
+@observer
 export default class CommitSummary extends React.Component<CommitSummaryProps, {}> {
 
   onRowClick = (e: React.MouseEvent) => {

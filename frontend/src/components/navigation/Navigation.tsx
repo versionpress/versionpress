@@ -1,45 +1,51 @@
 import * as React from 'react';
 import { observer } from 'mobx-react';
 
+import { clearSelection, filter, undoCommits } from '../../actions';
 import BulkActionPanel from '../bulk-action-panel/BulkActionPanel';
 import Filter from '../filter/Filter';
 import { revertDialog } from '../portal/portal';
 
-import store from '../../stores/navigationStore';
+import { AppStore } from '../../stores/appStore';
+import { NavigationStore } from '../../stores/navigationStore';
 
-@observer
-export default class Navigation extends React.Component<{}, {}> {
+interface NavigationProps {
+  appStore?: AppStore;
+  navigationStore?: NavigationStore;
+}
 
-  undoCommits = (commits: string[]) => {
-    store.undoCommits(commits);
-  };
+@observer(['appStore', 'navigationStore'])
+export default class Navigation extends React.Component<NavigationProps, {}> {
 
   onFilterQueryChange = (query: string) => {
-    store.changeFilterQuery(query);
+    const { navigationStore } = this.props;
+    navigationStore.changeFilterQuery(query);
   };
 
   onFilter = () => {
-    store.filter();
+    filter();
   };
 
   onClearSelection = () => {
-    store.clearSelection();
+    clearSelection();
   };
 
   onBulkAction = (action: string) => {
     if (action === 'undo') {
-      const { changes, hashes } = store;
+      const { changesCount, hashes } = this.props.navigationStore;
 
       const title = (
-        <span>Undo <em>{changes} {changes === 1 ? 'change' : 'changes'}</em>?</span>
+        <span>Undo <em>{changesCount} {changesCount === 1 ? 'change' : 'changes'}</em>?</span>
       );
 
-      revertDialog(title, () => this.undoCommits(hashes));
+      revertDialog(title, () => undoCommits(hashes));
     }
   };
 
   render() {
-    const { query, enableActions, changes } = store;
+    const { appStore, navigationStore } = this.props;
+    const { enableActions } = appStore;
+    const { query, changesCount } = navigationStore;
 
     return (
       <div className='tablenav top'>
@@ -52,7 +58,7 @@ export default class Navigation extends React.Component<{}, {}> {
           enableActions={enableActions}
           onBulkAction={this.onBulkAction}
           onClearSelection={this.onClearSelection}
-          changes={changes}
+          changesCount={changesCount}
         />
       </div>
     );

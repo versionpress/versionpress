@@ -85,7 +85,6 @@ class SystemInfo
         $info['matches-min-required-version'] = RequirementsChecker::gitMatchesMinimumRequiredVersion($version);
 
         return $info;
-
     }
 
     /**
@@ -128,7 +127,6 @@ class SystemInfo
 
             // add info whether the plugin is active or not
             $pluginInfo['__IsActive'] = is_plugin_active($pluginFile);
-
         });
         $info['installed-plugins'] = $installedPlugins;
         $info['installed-themes'] = array_keys(wp_get_themes());

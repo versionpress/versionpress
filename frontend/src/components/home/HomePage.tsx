@@ -2,77 +2,71 @@
 /// <reference path='../../interfaces/State.d.ts' />
 
 import * as React from 'react';
-import * as ReactRouter from 'react-router';
-import * as classNames from 'classnames';
 import { observer } from 'mobx-react';
 
 import CommitPanel from '../commit-panel/CommitPanel';
 import CommitsTable from '../commits-table/CommitsTable';
 import Navigation from '../navigation/Navigation';
-import ProgressBar from '../common/progress-bar/ProgressBar';
+import ProgressBar from '../progress-bar/ProgressBar';
 import ServicePanel from '../service-panel/ServicePanel';
 import UpdateNotice from './update-notice/UpdateNotice';
 import VpTitle from './vp-title/VpTitle';
 import WelcomePanel from '../welcome-panel/WelcomePanel';
 
-import appStore from '../../stores/appStore';
+import { fetchCommits, fetchWelcomePanel, hideWelcomePanel } from '../../actions';
+import { AppStore } from '../../stores/appStore';
+import { LoadingStore } from '../../stores/loadingStore';
 
 import './HomePage.less';
 
 interface HomePageProps {
+  appStore?: AppStore;
   params: {
     page?: string,
   };
+  loadingStore?: LoadingStore;
 }
 
-interface HomePageContext {
-  router: ReactRouter.Context;
-}
-
-@observer
+@observer(['appStore', 'loadingStore'])
 export default class HomePage extends React.Component<HomePageProps, {}> {
 
-  static contextTypes: React.ValidationMap<any> = {
-    router: React.PropTypes.func.isRequired,
-  };
-
-  context: HomePageContext;
-
   componentDidMount() {
-    appStore.init(this.props.params.page, this.context.router);
+    const { appStore, params } = this.props;
+
+    appStore.setPage(params.page);
+    fetchWelcomePanel();
+    fetchCommits();
   }
 
   componentWillReceiveProps(nextProps: HomePageProps) {
-    appStore.fetchCommits(nextProps.params.page);
+    const page = nextProps.params.page || 0;
+
+    fetchCommits(page);
   }
 
   onWelcomePanelHide = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    appStore.hideWelcomePanel();
+    hideWelcomePanel();
   };
 
   onUpdateNoticeClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    appStore.fetchCommits();
+    fetchCommits();
   };
 
   render() {
+    const { appStore, loadingStore } = this.props;
     const {
-      isLoading,
       displayWelcomePanel,
       displayUpdateNotice,
       isDirtyWorkingDirectory,
-      progress,
     } = appStore;
-
-    const homePageClassName = classNames({
-      'loading': isLoading,
-    });
+    const { progress } = loadingStore;
 
     return (
-      <div className={homePageClassName}>
+      <div>
         <ProgressBar progress={progress} />
         <ServicePanel>
           <VpTitle />

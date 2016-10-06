@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import SelectAll from './SelectAll';
 
@@ -54,4 +55,4 @@ const Header: React.StatelessComponent<HeaderProps> = (props) => {
   );
 };
 
-export default Header;
+export default observer(Header);

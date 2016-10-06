@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 interface SubmitProps {
   isDisabled: boolean;
@@ -16,4 +17,4 @@ const Submit: React.StatelessComponent<SubmitProps> = ({ isDisabled, onClick }) 
   />
 );
 
-export default Submit;
+export default observer(Submit);

@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Link } from 'react-router';
+import { observer } from 'mobx-react';
+import { IndexLink, Link } from 'react-router';
 
 import config from '../../../config/config';
 
@@ -13,19 +14,22 @@ const Footer: React.StatelessComponent<FooterProps> = ({ pages }) => (
   <tfoot>
     <tr>
       <td className='vp-table-pagination' colSpan={6}>
-        {pages.map((page: number) => (
-          <Link
-            activeClassName='active'
-            to={page === 1 ? routes.home : routes.page}
-            params={page === 1 ? null : { page }}
-            key={page}
-          >
-            {page}
-          </Link>
-        ))}
+        {pages.map((page: number) => {
+          return page === 1
+            ? <IndexLink
+                activeClassName='active'
+                to={routes.home}
+                key={page}
+              >{page}</IndexLink>
+            : <Link
+                activeClassName='active'
+                to={`/${routes.page}/${page}`}
+                key={page}
+              >{page}</Link>;
+          })}
       </td>
     </tr>
   </tfoot>
 );
 
-export default Footer;
+export default observer(Footer);

@@ -27,4 +27,13 @@ class WordPressMissingFunctions
 
         return sprintf('[%s %s]', $shortcodeTag, join(' ', $renderedAttributes));
     }
+
+    public static function pipeAction($source, $destination, $priority = 10, $acceptedArgs = 1)
+    {
+        return add_action($source, function (...$args) use ($destination) {
+            array_unshift($args, $destination);
+
+            return call_user_func_array('do_action', $args);
+        }, $priority, $acceptedArgs);
+    }
 }

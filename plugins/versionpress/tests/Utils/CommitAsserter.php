@@ -5,11 +5,13 @@ namespace VersionPress\Tests\Utils;
 use Exception;
 use Nette\Utils\Strings;
 use PHPUnit_Framework_Assert;
+use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\ChangeInfos\BulkChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
-use VersionPress\ChangeInfos\ChangeInfoMatcher;
+use VersionPress\ChangeInfos\CommitMessageParser;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
+use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Git\Commit;
 
 /**
@@ -49,6 +51,10 @@ class CommitAsserter
     private $whichCommitParameter;
 
     private $pathPlaceholders;
+    /** @var DbSchemaInfo */
+    private $dbSchema;
+    /** @var ActionsInfoProvider */
+    private $actionsInfoProvider;
 
     /**
      * Create CommitAsserter to start tracking the git repo for future asserts. Should generally
@@ -56,12 +62,17 @@ class CommitAsserter
      * after it.
      *
      * @param \VersionPress\Git\GitRepository $gitRepository
+     * @param DbSchemaInfo $dbSchema
+     * @param ActionsInfoProvider $actionsInfoProvider
      * @param string[] $pathPlaceholders
      */
-    public function __construct($gitRepository, $pathPlaceholders = [])
+    public function __construct($gitRepository, DbSchemaInfo $dbSchema, ActionsInfoProvider $actionsInfoProvider, $pathPlaceholders = [])
     {
         $this->gitRepository = $gitRepository;
         $this->pathPlaceholders = $pathPlaceholders;
+        $this->dbSchema = $dbSchema;
+        $this->actionsInfoProvider = $actionsInfoProvider;
+
         if ($gitRepository->isVersioned()) {
             $this->startCommit = $gitRepository->getCommit($gitRepository->getLastCommitHash());
         }
@@ -387,7 +398,8 @@ class CommitAsserter
      */
     protected function getChangeInfo($commit)
     {
-        return ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
+        $commitMessageParser = new CommitMessageParser($this->dbSchema, $this->actionsInfoProvider);
+        return $commitMessageParser->parse($commit->getMessage());
     }
 
 

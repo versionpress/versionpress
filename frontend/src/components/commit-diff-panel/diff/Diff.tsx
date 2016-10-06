@@ -1,6 +1,7 @@
 /// <reference path='../../common/Diff.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import BinaryFileDiff from './BinaryFileDiff';
 import PlainFileDiff from './PlainFileDiff';
@@ -21,4 +22,4 @@ const Diff: React.StatelessComponent<DiffProps> = ({ diff }) => (
   </div>
 );
 
-export default Diff;
+export default observer(Diff);

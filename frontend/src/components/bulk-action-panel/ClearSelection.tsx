@@ -1,20 +1,21 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 import * as classNames from 'classnames';
 
 interface ClearSelectionProps {
-  changes: number;
+  changesCount: number;
   onClick(e: React.MouseEvent): void;
 }
 
-const ClearSelection: React.StatelessComponent<ClearSelectionProps> = ({ changes, onClick }) => {
+const ClearSelection: React.StatelessComponent<ClearSelectionProps> = ({ changesCount, onClick }) => {
   const noteClassName = classNames({
     'BulkActionPanel-note': true,
-    'hide': changes === 0,
+    'hide': changesCount === 0,
   });
 
   return (
     <div className={noteClassName}>
-      {`(${changes} ${changes === 1 ? 'change' : 'changes'} selected; `}
+      {`(${changesCount} ${changesCount === 1 ? 'change' : 'changes'} selected; `}
       <a
         className='BulkActionPanel-clear'
         href='#'
@@ -27,4 +28,4 @@ const ClearSelection: React.StatelessComponent<ClearSelectionProps> = ({ changes
   );
 };
 
-export default ClearSelection;
+export default observer(ClearSelection);

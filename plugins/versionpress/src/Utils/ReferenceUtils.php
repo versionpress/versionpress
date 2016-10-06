@@ -166,10 +166,8 @@ class ReferenceUtils
             }
 
             return preg_quote($match['string'], '/');
-
         }, $valueWithWildcards);
 
         return preg_match("/^{$regex}$/", $value);
-
     }
 }

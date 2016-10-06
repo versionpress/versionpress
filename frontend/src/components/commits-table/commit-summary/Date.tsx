@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 import * as moment from 'moment';
 
 interface DateProps {
@@ -11,4 +12,4 @@ const Date: React.StatelessComponent<DateProps> = ({ date }) => (
   </td>
 );
 
-export default Date;
+export default observer(Date);

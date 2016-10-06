@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import Buttons from './Buttons';
 import Form from './Form';
@@ -14,6 +15,7 @@ interface CommitState {
   commitMessage?: string;
 }
 
+@observer
 export default class Commit extends React.Component<CommitProps, CommitState> {
 
   state = {

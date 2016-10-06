@@ -7,12 +7,6 @@
 
 namespace VersionPress\Cli;
 
-use VersionPress\ChangeInfos\ComposerChangeInfo;
-use VersionPress\ChangeInfos\PluginChangeInfo;
-use VersionPress\ChangeInfos\ThemeChangeInfo;
-use VersionPress\ChangeInfos\WordPressUpdateChangeInfo;
-use VersionPress\DI\VersionPressServices;
-use VersionPress\Git\Committer;
 use VersionPress\Utils\Process;
 use VersionPress\VersionPress;
 use WP_CLI;
@@ -41,8 +35,6 @@ class VPComposerCommand extends WP_CLI_Command
      */
     public function commitComposerChanges($args, $assoc_args)
     {
-        global $versionPressContainer;
-
         if (!VersionPress::isActive()) {
             WP_CLI::error('VersionPress is not active. Changes will be not committed.');
         }
@@ -54,24 +46,14 @@ class VPComposerCommand extends WP_CLI_Command
         $plugins = array_merge($pluginsAndThemesBeforeUpdate['plugins'], $currentPluginsAndThemes['plugins']);
         $themes = array_merge($pluginsAndThemesBeforeUpdate['themes'], $currentPluginsAndThemes['themes']);
 
-        /** @var Committer $committer */
-        $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
         $changes = $this->detectChanges();
         $installedPackages = $changes['installed'];
         $removedPackages = $changes['removed'];
         $updatedPackages = $changes['updated'];
 
-        $changeInfos = array_values(array_filter(array_merge(
-            array_map($this->createPackageToChangeInfoMapFunction('install', $plugins, $themes), $installedPackages),
-            array_map($this->createPackageToChangeInfoMapFunction('delete', $plugins, $themes), $removedPackages),
-            array_map($this->createPackageToChangeInfoMapFunction('update', $plugins, $themes), $updatedPackages)
-        )));
-
-        foreach ($changeInfos as $changeInfo) {
-            $committer->forceChangeInfo($changeInfo);
-        }
-
-        $committer->commit();
+        $this->forceRelatedActions('install', $installedPackages, $plugins, $themes);
+        $this->forceRelatedActions('delete', $removedPackages, $plugins, $themes);
+        $this->forceRelatedActions('update', $updatedPackages, $plugins, $themes);
     }
 
     private function detectChanges()
@@ -124,7 +106,7 @@ class VPComposerCommand extends WP_CLI_Command
         return ['plugins' => get_plugins(), 'themes' => wp_get_themes()];
     }
 
-    private function createPluginChangeInfo($action, $fullPackageName, $plugins)
+    private function getPluginFileAndName($fullPackageName, $plugins)
     {
         list($vendor, $packageName) = explode('/', $fullPackageName);
 
@@ -132,45 +114,53 @@ class VPComposerCommand extends WP_CLI_Command
             list($pluginDirectory) = explode('/', $pluginFile, 2);
 
             if ($packageName === $pluginDirectory) {
-                return new PluginChangeInfo($pluginFile, $action, $plugin['Name']);
+                return ['plugin-file' => $pluginFile, 'name' => $plugin['Name']];
             }
         }
 
         return null;
     }
 
-    private function createThemeChangeInfo($action, $fullPackageName, $themes)
+    private function getThemeStylesheetAndName($fullPackageName, $themes)
     {
         list($vendor, $packageName) = explode('/', $fullPackageName);
 
         foreach ($themes as $themeName => $theme) {
             /** @var $theme \WP_Theme */
             if ($packageName === $themeName) {
-                return new ThemeChangeInfo($theme->get_template(), $action, $theme->get('Name'));
+                return ['stylesheet' => $theme->get_stylesheet(), 'name' => $theme->get('Name')];
             }
         }
 
         return null;
     }
 
-    private function createPackageToChangeInfoMapFunction($action, $plugins, $themes)
+    /**
+     * @param string $action install or delete or update
+     * @param array $packages
+     * @param array $plugins
+     * @param array $themes
+     */
+    private function forceRelatedActions($action, $packages, $plugins, $themes)
     {
-        return function ($package) use ($action, $plugins, $themes) {
-
+        foreach ($packages as $package) {
             if ($package['type'] === 'wordpress-plugin') {
-                return $this->createPluginChangeInfo($action, $package['name'], $plugins);
-            }
+                $fileAndName = $this->getPluginFileAndName($package['name'], $plugins);
+                do_action('vp_plugin_changed', $action, $fileAndName['plugin-file'], $fileAndName['name']);
+            } elseif ($package['type'] === 'wordpress-theme') {
+                $stylesheetAndName = $this->getThemeStylesheetAndName($package['name'], $themes);
+                do_action('vp_theme_changed', $stylesheetAndName['stylesheet'], $stylesheetAndName['name']);
+            } elseif ($package['type'] === 'wordpress-core') {
+                do_action('vp_wordpress_updated', $package['version']);
+            } else {
+                $composerFiles = [
+                    ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.json'],
+                    ["type" => "path", "path" => VP_PROJECT_ROOT . '/composer.lock']
+                ];
 
-            if ($package['type'] === 'wordpress-theme') {
-                return $this->createThemeChangeInfo($action, $package['name'], $themes);
+                vp_force_action('composer', $action, $package['name'], [], $composerFiles);
             }
-
-            if ($package['type'] === 'wordpress-core') {
-                return new WordPressUpdateChangeInfo($package['version']);
-            }
-
-            return new ComposerChangeInfo($package['name'], $action);
-        };
+        }
     }
 }
 

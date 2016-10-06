@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 interface ItemProps {
   actionShortcut: string;
@@ -24,4 +25,4 @@ const Item: React.StatelessComponent<ItemProps> = ({ actionShortcut, info }) => 
   );
 };
 
-export default Item;
+export default observer(Item);

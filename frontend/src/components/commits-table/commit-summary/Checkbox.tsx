@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 interface CheckboxProps {
   isVisible: boolean;
@@ -27,4 +28,4 @@ const Checkbox: React.StatelessComponent<CheckboxProps> = (props) => {
     : <td className='column-cb' />;
 };
 
-export default Checkbox;
+export default observer(Checkbox);

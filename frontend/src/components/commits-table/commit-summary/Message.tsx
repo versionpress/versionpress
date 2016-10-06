@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import DetailsLevelButtons from './DetailsLevelButtons';
 import MergeIcon from './MergeIcon';
@@ -28,7 +29,7 @@ const Message: React.StatelessComponent<MessageProps> = ({ commit, detailsLevel,
 function renderMessage(message: string) {
   const messageChunks = /(.*)'(.*)'(.*)/.exec(message);
 
-  if (!messageChunks || messageChunks.length < 4) {
+  if (!messageChunks || messageChunks.length !== 4) {
     return <span>{message}</span>;
   }
 
@@ -41,4 +42,4 @@ function renderMessage(message: string) {
   );
 }
 
-export default Message;
+export default observer(Message);

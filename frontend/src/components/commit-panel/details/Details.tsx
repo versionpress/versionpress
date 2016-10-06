@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 import * as classNames from 'classnames';
 
 import Buttons from './Buttons';
@@ -55,4 +56,4 @@ const Details: React.StatelessComponent<DetailsProps> = (props) => {
   );
 };
 
-export default Details;
+export default observer(Details);

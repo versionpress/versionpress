@@ -1,6 +1,7 @@
 /// <reference path='../../common/Commits.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 import * as classNames from 'classnames';
 
 import FullDiff from './FullDiff';
@@ -44,4 +45,4 @@ const CommitDetails: React.StatelessComponent<CommitDetailsProps> = (props) => {
       />;
 };
 
-export default CommitDetails;
+export default observer(CommitDetails);

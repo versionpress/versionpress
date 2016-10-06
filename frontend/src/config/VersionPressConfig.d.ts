@@ -12,7 +12,6 @@ interface VersionPressConfig {
   routes?: {
     page?: string;
     home?: string;
-    notFound?: string;
   };
 
 }

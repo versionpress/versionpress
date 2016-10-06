@@ -1,111 +1,41 @@
-import { action, observable, runInAction } from 'mobx';
-import * as request from 'superagent';
+/// <reference path='../services/VpApi.d.ts' />
+
+import { action, observable } from 'mobx';
 
 import DetailsLevel from '../enums/DetailsLevel';
-import * as WpApi from '../services/WpApi';
-import { getDiff, getGitStatus, getErrorMessage } from './utils';
-
-import appStore from './appStore';
-import servicePanelStore from './servicePanelStore';
 
 class CommitPanelStore {
+
   @observable detailsLevel: DetailsLevel = DetailsLevel.None;
   @observable diff: string = null;
   @observable gitStatus: VpApi.GetGitStatusResponse = null;
   @observable error: string = null;
   @observable isLoading: boolean = false;
 
-  @action
-  private handleSuccess = (detailsLevel: DetailsLevel) => {
-    if (detailsLevel === DetailsLevel.Overview) {
-      return gitStatus => runInAction(() => {
-        this.detailsLevel = detailsLevel;
-        this.gitStatus = gitStatus;
-        this.error = null;
-        this.isLoading = false;
-      });
-    } else if (detailsLevel === DetailsLevel.FullDiff) {
-      return diff => runInAction(() => {
-        this.detailsLevel = detailsLevel;
-        this.diff = diff;
-        this.error = null;
-        this.isLoading = false;
-      });
-    }
-  };
+  get hash() {
+    return '';
+  }
 
-  @action
-  private handleError = (detailsLevel: DetailsLevel) => {
-    return err => runInAction(() => {
-      this.detailsLevel = detailsLevel;
-      this.error = err.message;
-      this.isLoading = false;
-    });
-  };
-
-  @action
-  private wpCommitDiscardEnd = (successMessage: string) => {
-    return (err: any, res: request.Response) => {
-      runInAction(() => {
-        if (err) {
-          servicePanelStore.changeMessage(getErrorMessage(res, err));
-        } else {
-          appStore.isDirtyWorkingDirectory = false;
-          servicePanelStore.changeMessage({
-            code: 'updated',
-            message: successMessage,
-          });
-          appStore.fetchCommits();
-        }
-      });
-
-      return !err;
-    };
-  };
-
-  @action
-  changeDetailsLevel = (detailsLevel: DetailsLevel) => {
-    if (detailsLevel === DetailsLevel.Overview && !this.gitStatus) {
-      this.isLoading = true;
-      getGitStatus()
-        .then(this.handleSuccess(detailsLevel))
-        .catch(this.handleError(detailsLevel));
-      return;
-    }
-
-    if (detailsLevel === DetailsLevel.FullDiff && !this.diff) {
-      this.isLoading = true;
-      getDiff('')
-        .then(this.handleSuccess(detailsLevel))
-        .catch(this.handleError(detailsLevel));
-      return;
-    }
-
+  @action setDetailsLevel = (detailsLevel: DetailsLevel) => {
     this.detailsLevel = detailsLevel;
-    this.error = null;
-    this.isLoading = false;
-  };
+  }
 
-  @action
-  commit = (message: string) => {
-    appStore.updateProgress({ percent: 0 });
+  @action setError = (error: string) => {
+    this.error = error;
+  }
 
-    WpApi
-      .post('commit')
-      .send({ 'commit-message': message })
-      .on('progress', appStore.updateProgress)
-      .end(this.wpCommitDiscardEnd('Changes have been committed.'));
-  };
+  @action setLoading = (isLoading: boolean) => {
+    this.isLoading = isLoading;
+  }
 
-  @action
-  discard = () => {
-    appStore.updateProgress({ percent: 0 });
+  @action setGitStatus(gitStatus: VpApi.GetGitStatusResponse) {
+    this.gitStatus = gitStatus;
+  }
 
-    WpApi
-      .post('discard-changes')
-      .on('progress', appStore.updateProgress)
-      .end(this.wpCommitDiscardEnd('Changes have been discarded.'));
-  };
+  @action setDiff(diff: string) {
+    this.diff = diff;
+  }
+
 }
 
 const commitPanelStore = new CommitPanelStore();

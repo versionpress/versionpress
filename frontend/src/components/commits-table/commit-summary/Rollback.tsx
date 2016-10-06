@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
+import { observer } from 'mobx-react';
 
 interface RollbackProps {
   enableActions: boolean;
@@ -28,4 +29,4 @@ const Rollback: React.StatelessComponent<RollbackProps> = ({ enableActions, onCl
   );
 };
 
-export default Rollback;
+export default observer(Rollback);

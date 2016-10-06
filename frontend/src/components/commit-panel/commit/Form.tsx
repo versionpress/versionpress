@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 interface FormProps {
   commitMessage: string;
@@ -41,4 +42,4 @@ const Form: React.StatelessComponent<FormProps> = (props) => {
   );
 };
 
-export default Form;
+export default observer(Form);

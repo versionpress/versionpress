@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import CloseIcon from './CloseIcon';
 import Title from './Title';
@@ -18,4 +19,4 @@ const Header: React.StatelessComponent<HeaderProps> = ({ title, showCloseIcon, o
   </div>
 );
 
-export default Header;
+export default observer(Header);

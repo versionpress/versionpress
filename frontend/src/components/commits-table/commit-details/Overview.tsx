@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import CommitOverviewPanel from '../../commit-overview-panel/CommitOverviewPanel';
 
@@ -22,4 +23,4 @@ const Overview: React.StatelessComponent<OverviewProps> = ({ commit, className, 
   </tr>
 );
 
-export default Overview;
+export default observer(Overview);

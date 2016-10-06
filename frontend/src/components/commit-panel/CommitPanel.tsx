@@ -7,27 +7,34 @@ import Details from './details/Details';
 import Notice from './Notice';
 import DetailsLevel from '../../enums/DetailsLevel';
 
-import store from '../../stores/commitPanelStore';
+import { changeDetailsLevel, commit, discard } from '../../actions';
+import { CommitPanelStore } from '../../stores/commitPanelStore';
 
 import './CommitPanel.less';
 
-@observer
-export default class CommitPanel extends React.Component<{}, {}> {
+interface CommitPanelProps {
+  commitPanelStore?: CommitPanelStore;
+}
+
+@observer(['commitPanelStore'])
+export default class CommitPanel extends React.Component<CommitPanelProps, {}> {
 
   onDetailsLevelChange = (detailsLevel: DetailsLevel) => {
-    store.changeDetailsLevel(detailsLevel);
+    const { commitPanelStore } = this.props;
+    changeDetailsLevel(detailsLevel, commitPanelStore);
   };
 
   onCommit = (message: string) => {
-    store.commit(message);
+    commit(message);
   };
 
   onDiscard = () => {
-    store.discard();
+    discard();
   };
 
   render() {
-    const { detailsLevel } = store;
+    const { commitPanelStore } = this.props;
+    const { detailsLevel } = commitPanelStore;
 
     const noticeClassName = classNames({
       'CommitPanel-notice': true,
@@ -49,7 +56,7 @@ export default class CommitPanel extends React.Component<{}, {}> {
           }
         </div>
         <Details
-          {...store}
+          {...commitPanelStore}
           onDetailsLevelChange={this.onDetailsLevelChange}
         />
       </div>

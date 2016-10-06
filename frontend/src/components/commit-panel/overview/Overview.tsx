@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import Item from './Item';
 import ShowMore from './ShowMore';
@@ -11,6 +12,7 @@ interface OverviewState {
   isExpanded: boolean;
 }
 
+@observer
 export default class Overview extends React.Component<OverviewProps, OverviewState> {
 
   private static displayedListLength: number = 5;

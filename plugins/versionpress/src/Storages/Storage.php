@@ -1,8 +1,10 @@
 <?php
 namespace VersionPress\Storages;
 
+use Nette\Utils\Strings;
 use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\Database\EntityInfo;
+use VersionPress\Storages\Serialization\IniSerializer;
 
 /**
  * Stores an entity to a file that can be versioned by Git. Storages are chosen by {@link VersionPress\Storages\Mirror},
@@ -11,6 +13,8 @@ use VersionPress\Database\EntityInfo;
  */
 abstract class Storage
 {
+
+    const PREFIX_PLACEHOLDER = "<<table-prefix>>";
 
     /** @var bool */
     protected $isTransaction;
@@ -21,9 +25,13 @@ abstract class Storage
     /** @var EntityInfo */
     protected $entityInfo;
 
-    public function __construct(EntityInfo $entityInfo)
+    /** @var string */
+    private $dbPrefix;
+
+    public function __construct(EntityInfo $entityInfo, $dbPrefix)
     {
         $this->entityInfo = $entityInfo;
+        $this->dbPrefix = $dbPrefix;
     }
 
     /**
@@ -73,15 +81,19 @@ abstract class Storage
      */
     public function shouldBeSaved($data)
     {
+        $shouldBeSaved = true;
+
         if ($this->entityInfo->isIgnoredEntity($data)) {
-            return false;
+            $shouldBeSaved = false;
         }
 
-        if (!$this->ignoreFrequentlyWrittenEntities) {
-            return true;
+        if ($this->ignoreFrequentlyWrittenEntities) {
+            $isFrequentlyWrittenEntity = $this->entityInfo->isFrequentlyWrittenEntity($data);
+            $shouldBeSaved = $shouldBeSaved && !$isFrequentlyWrittenEntity;
         }
 
-        return !$this->entityInfo->isFrequentlyWrittenEntity($data);
+        $entityName = $this->entityInfo->entityName;
+        return apply_filters("vp_entity_should_be_saved_$entityName", $shouldBeSaved, $data, $this);
     }
 
     /**
@@ -104,24 +116,6 @@ abstract class Storage
     abstract public function getPathCommonToAllEntities();
 
     /**
-     * Internal method to create a ChangeInfo. Though it is mostly an implementation
-     * detail of the `save()` and `delete()` methods, most storages create ChangeInfos
-     * in similar ways so the method has been extracted here, at least for the sake
-     * of consistency and documentation.
-     *
-     * @param array $oldEntity The entity as it was stored last time. Note that the previous state
-     *   is not always known or some storages might not want to provide this to the function so it sometimes
-     *   is null.
-     * @param array $newEntity The updated entity. Always contains the full data, never null.
-     * @param string $action Code that calls this method (save() and delete() methods)
-     *   provides typically a basic action (create / edit / delete). More specific action can be
-     *   determined from the $oldEntity / $newEntity in implementation of this method.
-     *
-     * @return ChangeInfo Eventually used as the return value of the `save()` or the `delete()` method
-     */
-    abstract protected function createChangeInfo($oldEntity, $newEntity, $action);
-
-    /**
      * Returns true if the entity exists.
      *
      * @param string $id VPID
@@ -141,4 +135,54 @@ abstract class Storage
      * Transfers data from memory (saved by Storage::saveLater()) to the files.
      */
     abstract public function commit();
+
+    protected function deserializeEntity($serializedEntity)
+    {
+        if ($serializedEntity === '') {
+            return [];
+        }
+
+        $entity = IniSerializer::deserialize($serializedEntity);
+        $entity = $this->flattenEntity($entity);
+        $entity[$this->entityInfo->vpidColumnName] = $this->maybeReplacePlaceholderWithPrefix($entity[$this->entityInfo->vpidColumnName]);
+        return $entity;
+    }
+
+    protected function serializeEntity($vpid, $entity)
+    {
+        $vpid = $this->maybeReplacePrefixWithPlaceholder($vpid);
+
+        unset($entity[$this->entityInfo->vpidColumnName]);
+        return IniSerializer::serialize([$vpid => $entity]);
+    }
+
+    private function flattenEntity($entity)
+    {
+        if (count($entity) === 0) {
+            return $entity;
+        }
+
+        reset($entity);
+        $vpid = key($entity);
+        $flatEntity = $entity[$vpid];
+        $flatEntity[$this->entityInfo->vpidColumnName] = $vpid;
+
+        return $flatEntity;
+    }
+
+    protected function maybeReplacePrefixWithPlaceholder($key)
+    {
+        if (Strings::startsWith($key, $this->dbPrefix)) {
+            return self::PREFIX_PLACEHOLDER . Strings::substring($key, Strings::length($this->dbPrefix));
+        }
+        return $key;
+    }
+
+    protected function maybeReplacePlaceholderWithPrefix($key)
+    {
+        if (Strings::startsWith($key, self::PREFIX_PLACEHOLDER)) {
+            return $this->dbPrefix . Strings::substring($key, Strings::length(self::PREFIX_PLACEHOLDER));
+        }
+        return $key;
+    }
 }
