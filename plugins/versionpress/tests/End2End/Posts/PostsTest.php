@@ -132,7 +132,6 @@ class PostsTest extends PostTypeTestCase
         $this->commitAsserter->assertCommitAction('post/edit');
         $this->commitAsserter->assertCommitAction('term/create', 1);
         $this->commitAsserter->assertCommitTag("VP-Post-Type", self::$worker->getPostType());
-        $this->commitAsserter->assertCommitTag("VP-Post-UpdatedProperties", "vp_term_taxonomy");
         $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -170,10 +169,6 @@ class PostsTest extends PostTypeTestCase
         $this->commitAsserter->ignoreCommits('term/create');
         $this->commitAsserter->assertNumCommits(1);
         $this->commitAsserter->assertCommitAction('post/edit');
-        $this->commitAsserter->assertCommitTag(
-            'VP-Post-UpdatedProperties',
-            'vp_term_taxonomy,post_modified,post_modified_gmt'
-        );
         $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }

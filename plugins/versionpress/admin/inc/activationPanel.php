@@ -44,7 +44,7 @@ jQuery(document).ready(function($) {
                     <?php
                     global $versionPressContainer;
                     /** @var GitRepository $repository */
-                    $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+                    $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
                     $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
                     $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
 

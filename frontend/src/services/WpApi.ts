@@ -1,6 +1,9 @@
+/// <reference path='./VpApi.d.ts' />
+
 import * as request from 'superagent';
-import config from '../config';
-import {getValidVPJSON} from '../common/StringUtils';
+
+import config from '../config/config';
+import {getValidVPJSON} from '../utils/StringUtils';
 
 request.parse['application/json'] = function(str: string) {
   let parsedJSON;

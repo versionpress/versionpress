@@ -7,14 +7,18 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Describes shortcodes and their references to DB entities.
  *
- * The information is loaded from a *-shortcodes.yml file.
+ * The information is loaded from a shortcodes.yml files.
  */
 class ShortcodesInfo
 {
 
-    public function __construct($shortcodeFile)
+    private $shortcodeSchema = [];
+
+    public function __construct($shortcodeFiles)
     {
-        $this->shortcodeSchema = Yaml::parse(file_get_contents($shortcodeFile));
+        foreach ($shortcodeFiles as $shortcodeFile) {
+            $this->shortcodeSchema = array_merge_recursive($this->shortcodeSchema, Yaml::parse(file_get_contents($shortcodeFile)));
+        }
     }
 
     /**

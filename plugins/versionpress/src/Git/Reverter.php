@@ -3,9 +3,8 @@
 namespace VersionPress\Git;
 
 use Nette\Utils\Strings;
-use VersionPress\ChangeInfos\ChangeInfoMatcher;
+use VersionPress\ChangeInfos\CommitMessageParser;
 use VersionPress\ChangeInfos\EntityChangeInfo;
-use VersionPress\ChangeInfos\RevertChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
@@ -16,7 +15,6 @@ use VersionPress\Utils\Comparators;
 use VersionPress\Utils\Cursor;
 use VersionPress\Utils\IdUtil;
 use VersionPress\Utils\ReferenceUtils;
-use wpdb;
 
 class Reverter
 {
@@ -39,6 +37,9 @@ class Reverter
     /** @var StorageFactory */
     private $storageFactory;
 
+    /** @var CommitMessageParser */
+    private $commitMessageParser;
+
     /** @var int */
     const DELETE_ORPHANED_POSTS_SECONDS = 60;
 
@@ -48,7 +49,8 @@ class Reverter
         Committer $committer,
         GitRepository $repository,
         DbSchemaInfo $dbSchemaInfo,
-        StorageFactory $storageFactory
+        StorageFactory $storageFactory,
+        CommitMessageParser $commitMessageParser
     ) {
         $this->synchronizationProcess = $synchronizationProcess;
         $this->database = $database;
@@ -56,6 +58,7 @@ class Reverter
         $this->repository = $repository;
         $this->dbSchemaInfo = $dbSchemaInfo;
         $this->storageFactory = $storageFactory;
+        $this->commitMessageParser = $commitMessageParser;
     }
 
     public function undo($commits)
@@ -102,17 +105,15 @@ class Reverter
 
             if ($method === "undo") {
                 $status = $this->revertOneCommit($commitHash);
-                $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_UNDO, $commitHash);
             } else {
                 $status = $this->revertToCommit($commitHash);
-                $changeInfo = new RevertChangeInfo(RevertChangeInfo::ACTION_ROLLBACK, $commitHash);
             }
 
             if ($status !== RevertStatus::OK) {
                 return $status;
             }
 
-            $this->committer->forceChangeInfo($changeInfo);
+            vp_force_action('versionpress', $method, $commitHash, [], [["type" => "path", "path" => "*"]]);
         }
 
         if (!$this->repository->willCommit()) {
@@ -167,7 +168,7 @@ class Reverter
 
     private function checkReferencesForRevertedCommit(Commit $revertedCommit)
     {
-        $changeInfo = ChangeInfoMatcher::buildChangeInfo($revertedCommit->getMessage());
+        $changeInfo = $this->commitMessageParser->parse($revertedCommit->getMessage());
 
         if ($changeInfo instanceof UntrackedChangeInfo) {
             return true;
@@ -176,8 +177,8 @@ class Reverter
         foreach ($changeInfo->getChangeInfoList() as $subChangeInfo) {
             if ($subChangeInfo instanceof EntityChangeInfo &&
                 !$this->checkEntityReferences(
-                    $subChangeInfo->getEntityName(),
-                    $subChangeInfo->getEntityId(),
+                    $subChangeInfo->getScope(),
+                    $subChangeInfo->getId(),
                     $subChangeInfo->getParentId()
                 )
             ) {

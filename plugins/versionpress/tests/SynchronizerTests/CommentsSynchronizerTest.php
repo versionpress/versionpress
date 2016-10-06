@@ -2,30 +2,25 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
-use VersionPress\Storages\CommentStorage;
-use VersionPress\Storages\PostStorage;
-use VersionPress\Storages\UserStorage;
-use VersionPress\Synchronizers\CommentsSynchronizer;
-use VersionPress\Synchronizers\PostsSynchronizer;
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Synchronizers\Synchronizer;
-use VersionPress\Synchronizers\UsersSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class CommentsSynchronizerTest extends SynchronizerTestCase
 {
-    /** @var CommentStorage */
+    /** @var DirectoryStorage */
     private $storage;
-    /** @var PostStorage */
+    /** @var DirectoryStorage */
     private $postStorage;
-    /** @var UserStorage */
+    /** @var DirectoryStorage */
     private $userStorage;
-    /** @var CommentsSynchronizer */
+    /** @var Synchronizer */
     private $synchronizer;
-    /** @var PostsSynchronizer */
+    /** @var Synchronizer */
     private $postsSynchronizer;
-    /** @var UsersSynchronizer */
+    /** @var Synchronizer */
     private $usersSynchronizer;
     private static $authorVpId;
     private static $postVpId;
@@ -37,32 +32,35 @@ class CommentsSynchronizerTest extends SynchronizerTestCase
         $this->storage = self::$storageFactory->getStorage('comment');
         $this->postStorage = self::$storageFactory->getStorage('post');
         $this->userStorage = self::$storageFactory->getStorage('user');
-        $this->synchronizer = new CommentsSynchronizer(
+        $this->synchronizer = new Synchronizer(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('comment'),
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
-        $this->postsSynchronizer = new PostsSynchronizer(
+        $this->postsSynchronizer = new Synchronizer(
             $this->postStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('post'),
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
-        $this->usersSynchronizer = new UsersSynchronizer(
+        $this->usersSynchronizer = new Synchronizer(
             $this->userStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('user'),
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
     }
 

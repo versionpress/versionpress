@@ -52,10 +52,6 @@ class PublicWebTest extends SeleniumTestCase
      */
     public function commentCanBeAdded()
     {
-        $vpdbPath = self::$wpAutomation->getVpdbDir();
-        $relativePathToVpdb = PathUtils::getRelativePath(self::$testConfig->testSite->path, $vpdbPath);
-        $commitAsserter = new CommitAsserter($this->gitRepository, ['vpdb' => $relativePathToVpdb]);
-
         $this->url('?p=' . self::$testPostId);
 
         $this->setValue('#author', "John Tester");
@@ -65,9 +61,8 @@ class PublicWebTest extends SeleniumTestCase
         $this->byCssSelector('#submit')->click();
         $this->waitAfterRedirect();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("comment/create-pending");
-        $commitAsserter->assertCommitPath("A", "%vpdb%/comments/%VPID%.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $lastCommit = $this->gitRepository->getCommit($this->gitRepository->getLastCommitHash());
+        $this->assertContains('comment/create', $lastCommit->getMessage()->getBody());
+
     }
 }

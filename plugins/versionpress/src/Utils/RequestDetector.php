@@ -104,7 +104,7 @@ class RequestDetector
     public function getLanguageCode()
     {
         if (!$this->isWpCli) {
-            return null;
+            return null; // Translation cannot be uninstalled using administration
         }
 
         return $this->wpCliArguments[3]; // core language uninstall <language>

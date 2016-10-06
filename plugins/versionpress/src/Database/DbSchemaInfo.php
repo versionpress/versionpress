@@ -2,7 +2,10 @@
 namespace VersionPress\Database;
 
 use DateTime;
+use Nette\Utils\Strings;
 use Symfony\Component\Yaml\Yaml;
+use VersionPress\Utils\ArrayUtils;
+use VersionPress\Utils\ReferenceUtils;
 
 /**
  * Describes parts of the DB schema, specifically telling how to identify entities
@@ -20,7 +23,7 @@ class DbSchemaInfo
      *
      * @var array|int|mixed|DateTime|null|string
      */
-    private $schema;
+    private $schema = [];
 
     /**
      * Database tables prefix, e.g. "wp_"
@@ -38,16 +41,29 @@ class DbSchemaInfo
     private $dbVersion;
 
     /**
-     * @param string $schemaFile Path to a *.yml file to read from disk
+     * @param string[]|\Traversable<string> $schemaFiles Paths to a schema.yml files to read from disk
      * @param string $prefix
      * @param int $dbVersion WordPress DB version (global variable $wp_db_version)
      */
-    public function __construct($schemaFile, $prefix, $dbVersion)
+    public function __construct($schemaFiles, $prefix, $dbVersion)
     {
-        $yamlSchema = file_get_contents($schemaFile);
         $this->dbVersion = $dbVersion;
         $this->prefix = $prefix;
-        $this->schema = $this->useSchemaForCurrentVersion(Yaml::parse($yamlSchema));
+
+        $this->refreshDbSchema($schemaFiles);
+    }
+
+    public function refreshDbSchema($schemaFiles)
+    {
+        $this->schema = [];
+        $this->entityInfoRegistry = [];
+
+        foreach ($schemaFiles as $schemaFile) {
+            $pluginSchema = Yaml::parse($schemaFile);
+            $pluginSchema = $this->useSchemaForCurrentVersion($pluginSchema);
+
+            $this->schema = array_merge_recursive($this->schema, $pluginSchema);
+        }
     }
 
     /**
@@ -58,6 +74,10 @@ class DbSchemaInfo
      */
     public function getEntityInfo($entityName)
     {
+        if (!$this->isEntity($entityName)) {
+            return null;
+        }
+
         if (!isset($this->entityInfoRegistry[$entityName])) {
             $this->entityInfoRegistry[$entityName] = new EntityInfo([$entityName => $this->schema[$entityName]]);
         }
@@ -125,7 +145,7 @@ class DbSchemaInfo
      */
     public function getEntityInfoByPrefixedTableName($tableName)
     {
-        $tableName = substr($tableName, strlen($this->prefix));
+        $tableName = $this->trimPrefix($tableName);
         return $this->getEntityInfoByTableName($tableName);
     }
 
@@ -137,7 +157,7 @@ class DbSchemaInfo
      */
     public function isChildEntity($entityName)
     {
-        return $this->getEntityInfo($entityName)->parentReference !== null;
+        return $this->isEntity($entityName) && $this->getEntityInfo($entityName)->parentReference !== null;
     }
 
     /**
@@ -175,12 +195,26 @@ class DbSchemaInfo
      * Returns true if given name is an entity (is defined in schema).
      * Useful for prefixing VP tables.
      *
-     * @param $entityOrTableName
+     * @param $entityName
      * @return bool
      */
-    private function isEntity($entityOrTableName)
+    public function isEntity($entityName)
     {
-        return in_array($entityOrTableName, $this->getAllEntityNames());
+        return in_array($entityName, $this->getAllEntityNames());
+    }
+
+    /**
+     * Returns a map where key is a name of an entity and value is a list of names of referenced entities.
+     *
+     * @return array
+     */
+    public function getAllReferences()
+    {
+        $references = [];
+        foreach ($this->getAllEntityNames() as $entity) {
+            $references[$entity] = $this->getEntityInfo($entity)->getReferencedEntities();
+        }
+        return $references;
     }
 
     /**
@@ -200,5 +234,45 @@ class DbSchemaInfo
 
             return $entitySchema['since'] <= $currentDbVersion;
         });
+    }
+
+    public function getMnReferenceDetails($junctionEntity)
+    {
+        foreach ($this->getAllEntityNames() as $entityName) {
+            $entityInfo = $this->getEntityInfo($entityName);
+            foreach ($entityInfo->mnReferences as $reference => $targetEntity) {
+                $referenceDetails = ReferenceUtils::getMnReferenceDetails($this, $entityName, $reference);
+                if ($referenceDetails['junction-table'] === $junctionEntity) {
+                    return $referenceDetails;
+                }
+            }
+        }
+        return null;
+    }
+
+    public function getAllMnReferences()
+    {
+        $mnReferences = [];
+
+        foreach ($this->getAllEntityNames() as $entityName) {
+            $entityInfo = $this->getEntityInfo($entityName);
+            if (!$entityInfo->mnReferences) {
+                continue;
+            }
+
+            foreach ($entityInfo->mnReferences as $reference => $targetEntity) {
+                if ($entityInfo->isVirtualReference($reference)) {
+                    continue;
+                }
+                $mnReferences[] = ReferenceUtils::getMnReferenceDetails($this, $entityName, $reference);
+            }
+        }
+
+        return $mnReferences;
+    }
+
+    public function trimPrefix($tableName)
+    {
+        return substr($tableName, strlen($this->prefix));
     }
 }

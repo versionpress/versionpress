@@ -1,4 +1,3 @@
-/// <reference path='../PopupComponent.d.ts' />
 /// <reference path='../../Search.d.ts' />
 /// <reference path='./List.d.ts' />
 

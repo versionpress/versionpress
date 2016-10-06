@@ -5,6 +5,7 @@ namespace VersionPress\Synchronizers;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesReplacer;
+use VersionPress\Database\TableSchemaStorage;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -34,30 +35,10 @@ class SynchronizerFactory
     /** @var ShortcodesReplacer */
     private $shortcodesReplacer;
 
-    private $synchronizerClasses = [
-        'post' => PostsSynchronizer::class,
-        'postmeta' => PostMetaSynchronizer::class,
-        'comment' => CommentsSynchronizer::class,
-        'commentmeta' => CommentMetaSynchronizer::class,
-        'option' => OptionsSynchronizer::class,
-        'user' => UsersSynchronizer::class,
-        'usermeta' => UserMetaSynchronizer::class,
-        'term' => TermsSynchronizer::class,
-        'termmeta' => TermMetaSynchronizer::class,
-        'term_taxonomy' => TermTaxonomiesSynchronizer::class,
-    ];
-    private $synchronizationSequence = [
-        'user',
-        'usermeta',
-        'term',
-        'termmeta',
-        'term_taxonomy',
-        'post',
-        'postmeta',
-        'comment',
-        'commentmeta',
-        'option'
-    ];
+    private $synchronizationSequence = [];
+
+    /** @var TableSchemaStorage */
+    private $tableSchemaStorage;
 
     public function __construct(
         StorageFactory $storageFactory,
@@ -65,7 +46,8 @@ class SynchronizerFactory
         DbSchemaInfo $dbSchema,
         VpidRepository $vpidRepository,
         AbsoluteUrlReplacer $urlReplacer,
-        ShortcodesReplacer $shortcodesReplacer
+        ShortcodesReplacer $shortcodesReplacer,
+        TableSchemaStorage $tableSchemaStorage
     ) {
         $this->storageFactory = $storageFactory;
         $this->database = $database;
@@ -73,19 +55,26 @@ class SynchronizerFactory
         $this->vpidRepository = $vpidRepository;
         $this->urlReplacer = $urlReplacer;
         $this->shortcodesReplacer = $shortcodesReplacer;
-        $this->adjustSynchronizationSequenceToDbVersion();
+        $this->synchronizationSequence = $this->resolveSynchronizationSequence();
+        $this->tableSchemaStorage = $tableSchemaStorage;
     }
 
     /**
-     * @param $synchronizerName
+     * @param $entityName
      * @return Synchronizer
      */
-    public function createSynchronizer($synchronizerName)
+    public function createSynchronizer($entityName)
     {
-        $synchronizerClass = $this->synchronizerClasses[$synchronizerName];
-        return new $synchronizerClass($this->getStorage($synchronizerName), $this->database,
-            $this->dbSchema->getEntityInfo($synchronizerName), $this->dbSchema, $this->vpidRepository,
-            $this->urlReplacer, $this->shortcodesReplacer);
+        return new Synchronizer(
+            $this->getStorage($entityName),
+            $this->database,
+            $this->dbSchema->getEntityInfo($entityName),
+            $this->dbSchema,
+            $this->vpidRepository,
+            $this->urlReplacer,
+            $this->shortcodesReplacer,
+            $this->tableSchemaStorage
+        );
     }
 
     public function getSynchronizationSequence()
@@ -98,9 +87,55 @@ class SynchronizerFactory
         return $this->storageFactory->getStorage($synchronizerName);
     }
 
-    private function adjustSynchronizationSequenceToDbVersion()
+    /**
+     * Determines sequence in which entities should be synchronized.
+     * It's based on their dependencies on other entities.
+     *
+     * @return array
+     */
+    private function resolveSynchronizationSequence()
     {
-        $allSupportedEntities = $this->dbSchema->getAllEntityNames();
-        $this->synchronizationSequence = array_intersect($this->synchronizationSequence, $allSupportedEntities);
+        $unresolved = $this->dbSchema->getAllReferences();
+        $sequence = [];
+        $triedRemovingSelfReferences = false;
+
+
+        while (count($unresolved) > 0) {
+            $resolvedInThisStep = [];
+
+            // 1st step - move all entities with resolved dependencies to $sequence
+            foreach ($unresolved as $entity => $deps) {
+                if (count($deps) === 0) {
+                    unset($unresolved[$entity]);
+                    $sequence[] = $entity;
+                    $resolvedInThisStep[] = $entity;
+                }
+            }
+
+            // 2nd step - update unresolved dependencies of remaining entities
+            foreach ($resolvedInThisStep as $resolvedEntity) {
+                foreach ($unresolved as $unresolvedEntity => $deps) {
+                    $unresolved[$unresolvedEntity] = array_diff($deps, [$resolvedEntity]);
+                }
+            }
+
+            // Nothing changed - circular dependency
+            if (count($resolvedInThisStep) === 0) {
+                if (!$triedRemovingSelfReferences) {
+                    // At first try to remove all self-references as they have to run in 2-pass sync anyway
+                    $triedRemovingSelfReferences = true;
+                    foreach ($unresolved as $unresolvedEntity => $deps) {
+                        $unresolved[$unresolvedEntity] = array_diff($deps, [$unresolvedEntity]);
+                    }
+                } else {
+                    // Simply eliminate dependencies one by one until it is resolvable
+                    reset($unresolved);
+                    $firstEntity = key($unresolved);
+                    array_pop($unresolved[$firstEntity]);
+                }
+            }
+        }
+
+        return $sequence;
     }
 }

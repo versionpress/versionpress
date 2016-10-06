@@ -2,10 +2,15 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
+use PHPUnit_Framework_MockObject_Generator;
+use VersionPress\Actions\ActionsInfo;
+use VersionPress\Actions\ActionsInfoProvider;
+use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\ShortcodesInfo;
 use VersionPress\Database\ShortcodesReplacer;
+use VersionPress\Database\TableSchemaStorage;
 use VersionPress\Database\VpidRepository;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Tests\Automation\WpAutomation;
@@ -32,6 +37,8 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
     protected static $shortcodesReplacer;
     /** @var VpidRepository */
     protected static $vpidRepository;
+    /** @var TableSchemaStorage */
+    protected static $tableSchemaRepository;
     /** @var WpAutomation */
     private static $wpAutomation;
 
@@ -44,9 +51,10 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
         self::setUpSite();
         DBAsserter::assertFilesEqualDatabase();
 
-        $schemaReflection = new \ReflectionClass(DbSchemaInfo::class);
-        $schemaFile = dirname($schemaReflection->getFileName()) . '/wordpress-schema.yml';
-        $shortcodeFile = dirname($schemaReflection->getFileName()) . '/wordpress-shortcodes.yml';
+        $yamlDir = self::$wpAutomation->getPluginsDir() . '/versionpress/.versionpress';
+        $schemaFile = $yamlDir . '/schema.yml';
+        $actionsFile = $yamlDir . '/actions.yml';
+        $shortcodeFile = $yamlDir . '/shortcodes.yml';
 
         /** @var $wp_db_version */
         require(self::$wpAutomation->getAbspath() . '/wp-includes/version.php');
@@ -55,7 +63,10 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
             require_once(self::$wpAutomation->getAbspath() . '/wp-includes/shortcodes.php');
         }
 
-        self::$schemaInfo = new DbSchemaInfo($schemaFile, self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
+        self::$schemaInfo = new DbSchemaInfo([$schemaFile], self::$testConfig->testSite->dbTablePrefix, $wp_db_version);
+        $actionsInfoProvider = new ActionsInfoProvider([$actionsFile]);
+
+        $changeInfoFactory = new ChangeInfoFactory(self::$schemaInfo, $actionsInfoProvider);
 
         $dbHost = self::$testConfig->testSite->dbHost;
         $dbUser = self::$testConfig->testSite->dbUser;
@@ -65,13 +76,15 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
         $wpdb->set_prefix(self::$testConfig->testSite->dbTablePrefix);
         self::$database = new Database($wpdb);
 
-        $shortcodesInfo = new ShortcodesInfo($shortcodeFile);
+        $shortcodesInfo = new ShortcodesInfo([$shortcodeFile]);
         self::$vpidRepository = new VpidRepository(self::$database, self::$schemaInfo);
         self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, self::$vpidRepository);
 
         $vpdbPath = self::$wpAutomation->getVpdbDir();
-        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$database, []);
+        self::$tableSchemaRepository = new TableSchemaStorage(self::$database, $vpdbPath . '/.schema');
+        self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$database, [], $changeInfoFactory, self::$tableSchemaRepository);
         self::$urlReplacer = new AbsoluteUrlReplacer(self::$testConfig->testSite->url);
+
     }
 
     private static function setUpSite()

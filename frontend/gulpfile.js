@@ -5,8 +5,8 @@ var tslint = require('gulp-tslint');
 
 gulp.task('tslint', function() {
   return gulp.src('src/**/*.ts{,x}')
-    .pipe(tslint())
-    .pipe(tslint.report('verbose'), {
-      emitError: false
-    });
+    .pipe(tslint({
+      formatter: "verbose"
+    }))
+    .pipe(tslint.report());
 });

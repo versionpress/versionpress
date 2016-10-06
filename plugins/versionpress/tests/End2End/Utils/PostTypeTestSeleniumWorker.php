@@ -142,6 +142,7 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
         $this->closeWindow();
         $this->window('');
         $this->url($this->getPostTypeScreenUrl());
+        $this->acceptAlert();
     }
 
     public function prepare_setFeaturedImageForUnsavedPost()
@@ -183,6 +184,7 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
     {
         $this->byCssSelector('form#post input#title')->value('Test ' . $this->getPostType() . ' with featured image');
         $this->keys(\PHPUnit_Extensions_Selenium2TestCase_Keys::TAB);
+        $this->setTinyMCEContent("Test content");
         $this->waitForElement('#sample-permalink');
         $this->waitForAjax();
         $this->url($this->getPostTypeScreenUrl());

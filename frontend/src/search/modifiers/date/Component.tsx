@@ -1,6 +1,3 @@
-/// <reference path='../../../../typings/browser.d.ts' />
-/// <reference path='../../../../custom_typings/index.d.ts' />
-
 import * as React from 'react';
 import * as DayPicker from 'react-day-picker';
 

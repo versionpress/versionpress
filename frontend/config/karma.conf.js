@@ -7,7 +7,7 @@ module.exports = function(config) {
 
 		browsers: ['Chrome'],
 
-		frameworks: ['mocha', 'chai-sinon'],
+		frameworks: ['mocha'],
 
 		singleRun: false,
 
@@ -34,7 +34,6 @@ module.exports = function(config) {
 		plugins: [
 			require('karma-webpack'),
 			'karma-mocha',
-			'karma-chai-sinon',
 			'karma-chrome-launcher',
 			'karma-sourcemap-loader'
 		]
