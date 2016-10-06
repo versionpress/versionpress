@@ -54,22 +54,7 @@ export function getDiff(hash: string) {
   });
 }
 
-/*
- Generate graph data.
-
- :param commits: a list of commit, which should have
- `sha`, `parents` properties.
- :returns: data nodes, a json list of
- [
-   sha,
-   [offset, branch], //dot
-   [
-     [from, to, branch],  // route 1
-     [from, to, branch],  // route 2
-     [from, to, branch],
-   ]  // routes
- ],  // node
- */
+// Inspiration from https://github.com/jsdf/react-commits-graph/blob/170ab272020e1dc8b960ca6110f23c91524013f3/src/generate-graph-data.coffee
 export function generateGraphData(commits: CommitGraph[]): CommitNode[] {
   let
     nodes = [],

@@ -79,4 +79,3 @@ const RowVisualisation: React.StatelessComponent<RowVisualisationProps> = (props
   );
 };
 export default RowVisualisation;
-

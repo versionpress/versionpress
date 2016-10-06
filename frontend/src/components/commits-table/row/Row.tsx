@@ -37,7 +37,7 @@ export default class Row extends React.Component<RowProps, {}> {
       onRollback,
       onCommitsSelect,
       showVisualisation,
-      onChangeShowVisualisation
+      onChangeShowVisualisation,
     } = this.props;
     const { commit, isSelected, detailsLevel, diff, error, isLoading, visualisation } = commitRow;
 

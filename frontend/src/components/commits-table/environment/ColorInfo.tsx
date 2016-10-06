@@ -18,4 +18,3 @@ const ColorInfo: React.StatelessComponent<ColorInfoProps> = ({ environment, onCl
   </div>
 );
 export default observer(ColorInfo);
-

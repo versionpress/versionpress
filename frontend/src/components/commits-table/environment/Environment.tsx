@@ -41,7 +41,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
 
     const environmentClassName = classNames({
       'column-environment': true,
-      'visualisation': showVisualisation
+      'visualisation': showVisualisation,
     });
 
     return (

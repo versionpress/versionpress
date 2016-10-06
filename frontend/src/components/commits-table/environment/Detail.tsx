@@ -22,4 +22,3 @@ const Detail: React.StatelessComponent<DetailProps> = ({ environment, left, spac
   </div>
 );
 export default observer(Detail);
-
