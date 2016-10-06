@@ -99,8 +99,17 @@
     position: relative;
     padding: 0 !important;
     overflow: visible !important;
-    //width: 12px;
     z-index: 2;
+
+    &.visualisation {
+      border-right: 1px solid #ccc;
+      border-bottom: 0;
+    }
+
+    svg {
+      position: absolute;
+      top: 0;
+    }
 
     .environment-info {
       position: absolute;

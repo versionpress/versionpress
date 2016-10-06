@@ -55,15 +55,13 @@ class CommitsTableStore {
     this.commitRows = commitRows;
 
     let graphStructure = [];
-    for (let i = 0; i < this.commits.length; i++) {
-      const commit = this.commits[i];
-
+    this.commits.forEach(commit => {
       graphStructure.push({
         sha: commit.hash,
         parents: commit.parentHashes,
         environment: commit.environment,
       });
-    }
+    });
 
     const visualization = generateGraphData(graphStructure);
 
