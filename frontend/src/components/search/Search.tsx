@@ -43,11 +43,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
   };
 
   onBlur = (e: React.FocusEvent) => {
-    if (this.displayPopup(this.getTokens())) {
-      e.preventDefault();
-    } else {
-      this.setCursorLocation(-1);
-    }
+    this.setCursorLocation(-1);
   };
 
   onClick = (e: React.MouseEvent) => {
@@ -138,7 +134,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     }
   };
 
-  onChangeTokenModel = (tokenIndex: number, model: SearchConfigItemContent, shouldMoveCursor: boolean) => {
+  onChangeTokenModel = (tokenIndex: number, model: any, shouldMoveCursor: boolean) => {
     const { config } = this.props;
     const tokens = this.getTokens();
 
@@ -254,6 +250,19 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     return -1;
   }
 
+  getActiveTokenCursor(tokens: Token[]) {
+    const { cursorLocation } = this.state;
+
+    const activeTokenIndex = this.getActiveTokenIndex(tokens);
+    const activeToken = tokens[activeTokenIndex];
+
+    if (activeTokenIndex > -1) {
+      const tokenCursorEnd = this.getTokenEndCursorPos(tokens, activeTokenIndex);
+      return cursorLocation - (tokenCursorEnd - activeToken.length);
+    }
+    return -1;
+  }
+
   getActiveToken(tokens: Token[]) {
     return tokens[this.getActiveTokenIndex(tokens)];
   }
@@ -279,6 +288,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     const isLastTokenSelected = this.isLastTokenSelected(tokens);
     const activeToken = this.getActiveToken(tokens);
     const activeTokenIndex = this.getActiveTokenIndex(tokens);
+    const activeTokenCursor = this.getActiveTokenCursor(tokens);
     const displayPopup = this.displayPopup(tokens);
 
     return (
@@ -303,6 +313,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
           <Popup
             nodeRef={node => this.popupComponentNode = node}
             activeTokenIndex={activeTokenIndex}
+            cursor={activeTokenCursor}
             token={activeToken}
             adapter={getAdapter(config)(activeToken)}
             onChangeTokenModel={this.onChangeTokenModel}

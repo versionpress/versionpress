@@ -12,8 +12,9 @@ export interface PopupProps {
   nodeRef: __React.Ref<ModifierComponent<any>>;
   activeTokenIndex: number;
   token: Token;
+  cursor: number;
   adapter: Adapter;
-  onChangeTokenModel(tokenIndex: number, model: SearchConfigItemContent, shouldMoveCursor: boolean): void;
+  onChangeTokenModel(tokenIndex: number, model: any, shouldMoveCursor: boolean): void;
 }
 
 const Popup: React.StatelessComponent<PopupProps> = (props) => {

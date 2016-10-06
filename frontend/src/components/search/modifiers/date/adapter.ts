@@ -4,28 +4,43 @@
 import * as moment from 'moment';
 
 import { getMatch } from '../../utils/';
-import * as ArrayUtils from '../../../common/ArrayUtils';
+
+const DATE_FORMAT = 'YYYY-MM-DD';
+const DATE_FORMAT_REGEXP = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$/;
 
 const DateAdapter = (config: SearchConfigItem): Adapter => ({
 
   autoComplete: function(token: Token) {
-    return null;
+    const { value } = token;
+
+    const hints = this.getHints(token);
+
+    if (hints.length && hints[0].indexOf(value) === 0) {
+      return hints[0];
+    }
   },
 
   getDefaultHint: function() {
-    return null;
+    return moment().format(DATE_FORMAT);
   },
 
   getHints: function(token: Token) {
-    return null;
+    if (token) {
+      const possibleValues = [moment().format(DATE_FORMAT)];
+      return getMatch(token.value, possibleValues);
+    }
+    return [];
   },
 
   isValueValid: function(value: string) {
-    return null;
+    return DATE_FORMAT_REGEXP.test(value) && moment(value, DATE_FORMAT).isValid();
   },
 
-  serialize: function(item: SearchConfigItemContent) {
-    return null;
+  serialize: function(date: string) {
+    if (!date) {
+      return null;
+    }
+    return moment(date).format(DATE_FORMAT);
   },
 
   deserialize: function(value: string) {

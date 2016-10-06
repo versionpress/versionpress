@@ -5,6 +5,6 @@ interface Adapter {
   getDefaultHint(): string;
   getHints(token: Token): SearchConfigItemContent[];
   isValueValid(value: string): boolean;
-  serialize(item: SearchConfigItemContent): string;
+  serialize(item: any): string;
   deserialize(value: string): SearchConfigItemContent | string;
 }

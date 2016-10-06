@@ -3,7 +3,7 @@
 import getAdapter from '../modifiers/getAdapter';
 import { getModifier } from './tokenize';
 
-export function updateToken(token: Token, model: SearchConfigItemContent, config: SearchConfig) {
+export function updateToken(token: Token, model: any, config: SearchConfig) {
   const adapter = getAdapter(config)(token);
   const val = adapter.serialize(model);
 

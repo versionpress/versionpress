@@ -1,4 +1,5 @@
 /// <reference path='../Search.d.ts' />
+import * as moment from 'moment';
 
 export function prepareConfig(config: SearchConfig): SearchConfig {
   const modifiers: SearchConfigItemContent[] = getAllModifiers(config);
@@ -17,10 +18,10 @@ function getAllModifiers(config: SearchConfig): SearchConfigItemContent[] {
     }
 
     const configItem = config[key];
-    const section = configItem.type === 'date' ? 'time' : 'others';
+    const section = configItem.type === 'date' ? 'time' : 'modifiers';
     modifiers.push({
       value: key,
-      label: configItem.defaultHint,
+      label: configItem.type === 'date' ? moment().format('YYYY-MM-DD') : configItem.defaultHint,
       modifier: true,
       section: section,
     });
@@ -46,9 +47,5 @@ function getDefaultContent(config: SearchConfig, modifiersList: SearchConfigItem
       allList = allList.concat(list);
     }
   }
-  const modifiers = modifiersList.map(item => {
-    item.section = 'modifiers';
-    return item;
-  });
-  return allList.concat(modifiers);
+  return allList.concat(modifiersList);
 }

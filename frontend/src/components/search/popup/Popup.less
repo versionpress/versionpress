@@ -31,8 +31,16 @@
   }
 
   &-container {
-    position: relative;
-    left: -6px;
+    position: absolute;
+    left: -1px;
+    border: 1px solid #ccc;
+    border-top: none;
+    width: 100%;
+    background: #fff;
+
+    #vp & {
+      box-sizing: content-box;
+    }
   }
 
   &-arrow {
