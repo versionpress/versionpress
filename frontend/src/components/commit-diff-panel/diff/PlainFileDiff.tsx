@@ -1,6 +1,7 @@
 /// <reference path='../../common/Diff.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import BinaryFileInfo from './BinaryFileInfo';
 import ChunkSeparator from './ChunkSeparator';
@@ -37,4 +38,4 @@ const PlainFileDiff: React.StatelessComponent<PlainFileDiffProps> = ({ diff }) =
   );
 };
 
-export default PlainFileDiff;
+export default observer(PlainFileDiff);

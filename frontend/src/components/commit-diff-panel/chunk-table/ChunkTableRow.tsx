@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 interface ChunkTableRowProps {
   leftLineContent: React.ReactNode;
@@ -28,4 +29,4 @@ const ChunkTableRow: React.StatelessComponent<ChunkTableRowProps> = (props) => {
   );
 };
 
-export default ChunkTableRow;
+export default observer(ChunkTableRow);

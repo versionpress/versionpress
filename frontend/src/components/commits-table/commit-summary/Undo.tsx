@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
+import { observer } from 'mobx-react';
 
 interface UndoProps {
   commit: Commit;
@@ -31,4 +32,4 @@ const Undo: React.StatelessComponent<UndoProps> = ({ commit, enableActions, onCl
   );
 };
 
-export default Undo;
+export default observer(Undo);

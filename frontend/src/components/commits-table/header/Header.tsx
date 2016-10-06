@@ -1,18 +1,19 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import SelectAll from './SelectAll';
 
 interface HeaderProps {
-  commits: Commit[];
-  selectedCommits: Commit[];
+  areAllCommitsSelected: boolean;
+  selectableCommitsCount: number;
   enableActions: boolean;
   onSelectAllChange(isChecked: boolean): void;
 }
 
 const Header: React.StatelessComponent<HeaderProps> = (props) => {
   const {
-    commits,
-    selectedCommits,
+    areAllCommitsSelected,
+    selectableCommitsCount,
     enableActions,
     onSelectAllChange,
   } = props;
@@ -22,8 +23,8 @@ const Header: React.StatelessComponent<HeaderProps> = (props) => {
       <tr>
         <th className='column-environment'/>
         <SelectAll
-          commits={commits}
-          selectedCommits={selectedCommits}
+          isSelected={areAllCommitsSelected}
+          selectableCommitsCount={selectableCommitsCount}
           enableActions={enableActions}
           onChange={onSelectAllChange}
         />
@@ -40,4 +41,4 @@ const Header: React.StatelessComponent<HeaderProps> = (props) => {
   );
 };
 
-export default Header;
+export default observer(Header);

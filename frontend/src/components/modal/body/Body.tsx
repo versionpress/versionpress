@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 interface BodyProps {
   children?: React.ReactNode;
@@ -10,4 +11,4 @@ const Body: React.StatelessComponent<BodyProps> = ({ children }) => (
   </div>
 );
 
-export default Body;
+export default observer(Body);

@@ -1,6 +1,6 @@
 import * as request from 'superagent';
 import * as Promise from 'core-js/es6/promise';
-import * as WpApi from '../../services/WpApi';
+import * as WpApi from '../services/WpApi';
 
 export function getErrorMessage(res: request.Response, err: any) {
   if (res) {
@@ -17,8 +17,10 @@ export function getErrorMessage(res: request.Response, err: any) {
   };
 }
 
-export function parsePageNumber(page: string) {
-  return (parseInt(page, 10) - 1) || 0;
+export function parsePageNumber(page: string | number) {
+  return typeof page === 'number'
+    ? page
+    : (parseInt(page, 10) - 1) || 0;
 }
 
 export function getGitStatus() {

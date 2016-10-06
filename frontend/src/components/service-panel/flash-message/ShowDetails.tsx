@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
+import { observer } from 'mobx-react';
 
 interface ShowDetailsProps {
   isActive: boolean;
@@ -23,4 +24,4 @@ const ShowDetails: React.StatelessComponent<ShowDetailsProps> = ({ isActive, onC
   );
 };
 
-export default ShowDetails;
+export default observer(ShowDetails);

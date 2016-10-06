@@ -1,100 +1,40 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
+import { observer } from 'mobx-react';
 
 import Commit from './commit/Commit';
 import Details from './details/Details';
 import Notice from './Notice';
 import DetailsLevel from '../../enums/DetailsLevel';
 
+import { changeDetailsLevel, commit, discard } from '../../actions';
+import { CommitPanelStore } from '../../stores/commitPanelStore';
+
 import './CommitPanel.less';
 
 interface CommitPanelProps {
-  diffProvider: { getDiff(hash: string): Promise<string> };
-  gitStatusProvider: { getGitStatus(): Promise<string[][]> };
-  onCommit(message: string): void;
-  onDiscard(): void;
+  commitPanelStore?: CommitPanelStore;
 }
 
-interface CommitPanelState {
-  detailsLevel?: DetailsLevel;
-  diff?: string;
-  gitStatus?: VpApi.GetGitStatusResponse;
-  error?: string;
-  isLoading?: boolean;
-}
-
-export default class CommitPanel extends React.Component<CommitPanelProps, CommitPanelState> {
-
-  state = {
-    detailsLevel: DetailsLevel.None,
-    diff: null,
-    gitStatus: null,
-    error: null,
-    isLoading: false,
-  };
+@observer(['commitPanelStore'])
+export default class CommitPanel extends React.Component<CommitPanelProps, {}> {
 
   onDetailsLevelChange = (detailsLevel: DetailsLevel) => {
-    const { diffProvider, gitStatusProvider } = this.props;
-    const { gitStatus, diff } = this.state;
-
-    if (detailsLevel === DetailsLevel.Overview && !gitStatus) {
-      this.setLoading();
-      gitStatusProvider.getGitStatus()
-        .then(this.handleSuccess(detailsLevel))
-        .catch(this.handleError(detailsLevel));
-      return;
-    }
-
-    if (detailsLevel === DetailsLevel.FullDiff && !diff) {
-      this.setLoading();
-      diffProvider.getDiff('')
-        .then(this.handleSuccess(detailsLevel))
-        .catch(this.handleError(detailsLevel));
-      return;
-    }
-
-    this.setState({
-      detailsLevel: detailsLevel,
-      error: null,
-      isLoading: false,
-    });
+    const { commitPanelStore } = this.props;
+    changeDetailsLevel(detailsLevel, commitPanelStore);
   };
 
-  private setLoading = () => {
-    this.setState({
-      isLoading: true,
-    });
+  onCommit = (message: string) => {
+    commit(message);
   };
 
-  private handleSuccess = (detailsLevel: DetailsLevel) => {
-    if (detailsLevel === DetailsLevel.Overview) {
-      return gitStatus => this.setState({
-        detailsLevel: detailsLevel,
-        gitStatus: gitStatus,
-        error: null,
-        isLoading: false,
-      });
-    } else if (detailsLevel === DetailsLevel.FullDiff) {
-      return diff => this.setState({
-        detailsLevel: detailsLevel,
-        diff: diff,
-        error: null,
-        isLoading: false,
-      });
-    }
-  };
-
-  private handleError = (detailsLevel: DetailsLevel) => {
-    return err => this.setState({
-      detailsLevel: detailsLevel,
-      error: err.message,
-      isLoading: false,
-    });
+  onDiscard = () => {
+    discard();
   };
 
   render() {
-    const { onCommit, onDiscard } = this.props;
-    const { detailsLevel } = this.state;
+    const { commitPanelStore } = this.props;
+    const { detailsLevel } = commitPanelStore;
 
     const noticeClassName = classNames({
       'CommitPanel-notice': true,
@@ -110,13 +50,13 @@ export default class CommitPanel extends React.Component<CommitPanelProps, Commi
           />
           {detailsLevel !== DetailsLevel.None &&
             <Commit
-              onCommit={onCommit}
-              onDiscard={onDiscard}
+              onCommit={this.onCommit}
+              onDiscard={this.onDiscard}
             />
           }
         </div>
         <Details
-          {...this.state}
+          {...commitPanelStore}
           onDetailsLevelChange={this.onDetailsLevelChange}
         />
       </div>

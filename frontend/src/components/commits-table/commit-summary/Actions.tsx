@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import Rollback from './Rollback';
 import Undo from './Undo';
@@ -42,4 +43,4 @@ const Actions: React.StatelessComponent<ActionsProps> = (props) => {
   );
 };
 
-export default Actions;
+export default observer(Actions);

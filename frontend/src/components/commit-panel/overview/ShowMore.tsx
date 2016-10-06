@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 interface ShowMoreProps {
   displayNumber: number;
@@ -13,4 +14,4 @@ const ShowMore: React.StatelessComponent<ShowMoreProps> = ({ displayNumber, onCl
   </li>
 );
 
-export default ShowMore;
+export default observer(ShowMore);

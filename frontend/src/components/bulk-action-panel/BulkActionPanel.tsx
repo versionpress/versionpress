@@ -1,7 +1,7 @@
-/// <reference path='../common/Commits.d.ts' />
 /// <reference path='../../interfaces/State.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import Title from './Title';
 import Options from './options/Options';
@@ -11,7 +11,7 @@ import ClearSelection from './ClearSelection';
 import './BulkActionPanel.less';
 
 interface BulkActionPanelProps {
-  selectedCommits: Commit[];
+  changesCount: number;
   enableActions: boolean;
   onBulkAction(action: string): void;
   onClearSelection(): void;
@@ -21,6 +21,7 @@ interface BulkActionPanelState {
   options: BulkActionPanelOption[];
 }
 
+@observer
 export default class BulkActionPanel extends React.Component<BulkActionPanelProps, BulkActionPanelState> {
 
   state = {
@@ -71,7 +72,7 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
   };
 
   render() {
-    const { selectedCommits, enableActions } = this.props;
+    const { changesCount, enableActions } = this.props;
     const { options } = this.state;
 
     return (
@@ -85,10 +86,10 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
           />
           <Submit
             onClick={this.onSubmitClick}
-            isDisabled={!enableActions || selectedCommits.length === 0}
+            isDisabled={!enableActions || changesCount === 0}
           />
           <ClearSelection
-            changes={selectedCommits.length}
+            changesCount={changesCount}
             onClick={this.onClearSelectionClick}
           />
         </div>

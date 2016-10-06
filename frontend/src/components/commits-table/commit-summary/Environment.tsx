@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import { getGitBranchColor } from '../../../services/GitBranchColorProvider';
 
@@ -16,4 +17,4 @@ const Environment: React.StatelessComponent<EnvironmentProps> = ({ environment }
   </td>
 );
 
-export default Environment;
+export default observer(Environment);

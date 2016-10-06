@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 interface AuthorProps {
   author: Author;
@@ -26,4 +27,4 @@ function getTitle(author: Author) {
   return `${author.name} <${author.email}>`;
 }
 
-export default Author;
+export default observer(Author);

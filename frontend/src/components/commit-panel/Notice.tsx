@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import DetailsLevel from '../../enums/DetailsLevel';
 
@@ -7,6 +8,7 @@ interface CommitPanelNoticeProps {
   onDetailsLevelChange(detailsLevel: DetailsLevel): void;
 }
 
+@observer
 export default class Notice extends React.Component<CommitPanelNoticeProps, {}> {
 
   onDetailsClick = (e: React.MouseEvent) => {

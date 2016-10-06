@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import CommitDiffPanel from '../../commit-diff-panel/CommitDiffPanel';
 
@@ -17,4 +18,4 @@ const FullDiff: React.StatelessComponent<FullDiffProps> = ({ diff, className }) 
   </tr>
 );
 
-export default FullDiff;
+export default observer(FullDiff);

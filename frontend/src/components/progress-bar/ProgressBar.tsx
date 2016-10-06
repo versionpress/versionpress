@@ -1,7 +1,7 @@
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import Spinner from './Spinner';
-import SpinnerIcon from './SpinnerIcon';
 
 import './ProgressBar.less';
 
@@ -19,12 +19,12 @@ const ProgressBar: React.StatelessComponent<ProgressBarProps> = ({ progress }) =
 
   return (
     <div className='ProgressBar'>
-      <div className='ProgressBar-bar' style={barStyles}>
-        <Spinner isVisible={isVisible} />
-        <SpinnerIcon />
-      </div>
+      <div className='ProgressBar-bar' style={barStyles} />
+      {isVisible &&
+        <Spinner />
+      }
     </div>
   );
 };
 
-export default ProgressBar;
+export default observer(ProgressBar);

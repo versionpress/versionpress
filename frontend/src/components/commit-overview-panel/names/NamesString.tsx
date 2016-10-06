@@ -2,6 +2,7 @@
 /// <reference path='../CommitOverviewPanel.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import renderNames from './renderNames';
 import * as ArrayUtils from '../../../utils/ArrayUtils';
@@ -21,4 +22,4 @@ const NamesString: React.StatelessComponent<NamesStringProps> = ({ filteredChang
   );
 };
 
-export default NamesString;
+export default observer(NamesString);

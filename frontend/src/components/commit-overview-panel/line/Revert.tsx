@@ -1,6 +1,7 @@
 /// <reference path='../../common/Commits.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 import * as moment from 'moment';
 
 import { LineProps } from './Line';
@@ -31,4 +32,4 @@ const Revert: React.StatelessComponent<LineProps> = ({ changes }) => {
   }
 };
 
-export default Revert;
+export default observer(Revert);

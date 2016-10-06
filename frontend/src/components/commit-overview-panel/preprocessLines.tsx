@@ -55,4 +55,3 @@ function preprocessLinesByTypeAndAction(changes: Change[], type: string, action:
 }
 
 export default preprocessLines;
-

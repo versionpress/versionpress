@@ -1,55 +1,71 @@
 /// <reference path='../common/Commits.d.ts' />
 
 import * as React from 'react';
+import * as classNames from 'classnames';
+import * as moment from 'moment';
+import { observer } from 'mobx-react';
 
+import { undoCommits, rollbackToCommit, selectCommits } from '../../actions';
 import Row from './row/Row';
 import Footer from './footer/Footer';
 import Header from './header/Header';
 import Note from './note/Note';
-import { indexOf } from '../../utils/CommitUtils';
+import { revertDialog } from '../portal/portal';
 import { findIndex } from '../../utils/ArrayUtils';
+
+import CommitRow from '../../entities/CommitRow';
+import { AppStore } from '../../stores/appStore';
+import { CommitsTableStore } from '../../stores/commitsTableStore';
+import { LoadingStore } from '../../stores/loadingStore';
 
 import './CommitsTable.less';
 
 interface CommitsTableProps {
-  pages: number[];
-  commits: Commit[];
-  selectedCommits: Commit[];
-  enableActions: boolean;
-  diffProvider: {getDiff(hash: string): Promise<string>};
-  onUndo(hash: string, message: string): void;
-  onRollback(hash: string, date: string): void;
-  onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
+  appStore?: AppStore;
+  commitsTableStore?: CommitsTableStore;
+  loadingStore?: LoadingStore;
 }
 
+@observer(['appStore', 'commitsTableStore', 'loadingStore'])
 export default class CommitsTable extends React.Component<CommitsTableProps, {}> {
 
   onSelectAllChange = (isChecked: boolean) => {
-    const { commits, onCommitsSelect } = this.props;
+    const { commitsTableStore } = this.props;
 
-    onCommitsSelect(commits, isChecked, false);
+    this.onCommitsSelect(commitsTableStore.commits, isChecked, false);
   };
 
-  renderRow = (commit: Commit, displayNotAbleNote: boolean) => {
-    const {
-      selectedCommits,
-      enableActions,
-      diffProvider,
-      onUndo,
-      onRollback,
-      onCommitsSelect,
-    } = this.props;
+  onUndo = (hash: string, message: string) => {
+    const title = (
+      <span>Undo <em>{message}</em>?</span>
+    );
+
+    revertDialog(title, () => undoCommits([hash]));
+  };
+
+  onRollback = (hash: string, date: string) => {
+    const title = (
+      <span>Roll back to <em>{moment(date).format('LLL')}</em>?</span>
+    );
+
+    revertDialog(title, () => rollbackToCommit(hash));
+  };
+
+  onCommitsSelect = (commitsToSelect: Commit[], isChecked: boolean, isShiftKey: boolean) => {
+    selectCommits(commitsToSelect, isChecked, isShiftKey);
+  };
+
+  renderRow = (commitRow: CommitRow, displayNotAbleNote: boolean) => {
+    const { appStore } = this.props;
 
     const row = (
       <Row
-        commit={commit}
-        enableActions={enableActions}
-        isSelected={indexOf(selectedCommits, commit) !== -1}
-        onUndo={onUndo}
-        onRollback={onRollback}
-        onCommitsSelect={onCommitsSelect}
-        diffProvider={diffProvider}
-        key={commit.hash}
+        commitRow={commitRow}
+        enableActions={appStore.enableActions}
+        onUndo={this.onUndo}
+        onRollback={this.onRollback}
+        onCommitsSelect={this.onCommitsSelect}
+        key={commitRow.commit.hash}
       />
     );
 
@@ -66,27 +82,38 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
   };
 
   render() {
+    const { appStore, commitsTableStore, loadingStore } = this.props;
+    const { enableActions } = appStore;
     const {
       pages,
       commits,
-      selectedCommits,
-      enableActions,
-    } = this.props;
+      commitRows,
+      selectableCommits,
+      areAllCommitsSelected,
+    } = commitsTableStore;
+    const { isLoading } = loadingStore;
+
+    const commitsTableClassName = classNames({
+      'vp-table': true,
+      'widefat': true,
+      'fixed': true,
+      'loading': isLoading,
+    });
 
     const notAbleNoteIndex = findIndex(commits, (commit: Commit, index: number) => (
       !commit.isEnabled && index < commits.length - 1
     ));
 
     return (
-      <table className='vp-table widefat fixed'>
+      <table className={commitsTableClassName}>
         <Header
-          commits={commits}
-          selectedCommits={selectedCommits}
+          areAllCommitsSelected={areAllCommitsSelected}
+          selectableCommitsCount={selectableCommits.length}
           enableActions={enableActions}
           onSelectAllChange={this.onSelectAllChange}
         />
-        {commits.map((commit: Commit, index: number) => (
-          this.renderRow(commit, index === notAbleNoteIndex)
+        {commitRows.map((commitRow: CommitRow, index: number) => (
+          this.renderRow(commitRow, index === notAbleNoteIndex)
         ))}
         <Footer pages={pages} />
       </table>

@@ -1,6 +1,7 @@
 /// <reference path='../../common/Diff.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import ChunkTableRow from './ChunkTableRow';
 import {
@@ -45,4 +46,4 @@ function renderRow(left: Line, right: Line, index: number) {
   );
 }
 
-export default ChunkTable;
+export default observer(ChunkTable);
