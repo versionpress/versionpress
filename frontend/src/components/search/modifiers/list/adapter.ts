@@ -7,11 +7,10 @@ import * as ArrayUtils from '../../../../utils/ArrayUtils';
 const ListAdapter = (config: SearchConfigItem): Adapter => ({
 
   autoComplete: function(token: Token) {
-    const { value } = token;
-
+    const value = trim(token.value, true);
     const hints = this.getHints(token);
     const hint = hints[0];
-    const hintValue = this.serialize(hint);
+    const hintValue = trim(this.serialize(hint));
 
     if (value.length && hintValue && hintValue.indexOf(value) === 0) {
       return hint;
@@ -31,7 +30,7 @@ const ListAdapter = (config: SearchConfigItem): Adapter => ({
 
     if (list && list.length) {
       if (token && token.type !== 'space' && (token.modifier.length || token.value.length)) {
-        const value = trim(token.value);
+        const value = trim(token.value, true);
 
         const labelMatches = getMatch(value, list, 'label');
         const valueMatches = getMatch(value, list, 'value');

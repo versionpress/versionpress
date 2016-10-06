@@ -3,13 +3,15 @@
 
 import * as React from 'react';
 
+import { trim } from '../utils';
+
 interface HintProps {
   token: Token;
   adapter: Adapter;
 }
 
 const Hint: React.StatelessComponent<HintProps> = ({ token, adapter }) => {
-  const { value } = token;
+  const value = trim(token.value, true);
 
   const hint = value.length
     ? getSubHint(token, adapter)
@@ -21,10 +23,9 @@ const Hint: React.StatelessComponent<HintProps> = ({ token, adapter }) => {
 };
 
 function getSubHint(token: Token, adapter: Adapter): string {
-  const { value } = token;
-
+  const value = trim(token.value, true);
   const hints = adapter.getHints(token);
-  const hint = adapter.serialize(hints[0]);
+  const hint = trim(adapter.serialize(hints[0]));
 
   if (value.length && hint && hint.indexOf(value) === 0) {
     return hint.substr(value.length);
