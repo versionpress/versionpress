@@ -100,7 +100,7 @@ export default class ListComponent extends ModifierComponent<ListComponentState>
 
     let t = 0;
     return items
-      .sort((a, b) => a.section < b.section ? -1 : 1)
+      .sort((a, b) => a.section < b.section ? 1 : -1)
       .reverse()
       .map(item => {
         item.list = item.list.map(content => {
