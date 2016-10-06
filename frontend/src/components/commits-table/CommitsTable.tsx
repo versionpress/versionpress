@@ -94,7 +94,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
       selectableCommits,
       areAllCommitsSelected,
       branches,
-      changeShowVisualization
+      changeShowVisualization,
     } = commitsTableStore;
     const { isLoading } = loadingStore;
 

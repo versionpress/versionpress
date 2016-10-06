@@ -21,7 +21,7 @@ const Header: React.StatelessComponent<HeaderProps> = (props) => {
     showVisualization,
     onSelectAllChange,
     branches,
-    onChangeShowVisualization
+    onChangeShowVisualization,
   } = props;
 
   return (

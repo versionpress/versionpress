@@ -39,8 +39,8 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
       style = {
         borderBottom: 0,
         borderRight: '1px solid #ccc',
-        position: 'relative'
-      }
+        position: 'relative',
+      };
     }
 
     return (
@@ -51,7 +51,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
       >
         {(!showVisualization && environment !== '?') &&
         <div
-          className="environment-info"
+          className='environment-info'
           style={{ backgroundColor: getGitBranchColor(environment) }}
           onClick={this.onChangeShowVisualization}
         >
@@ -72,9 +72,13 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
 
               return (
                 <line
-                  x1={LEFT + from * SPACE * (areSame? 1 : (isToBigger ? 1.5 : .5)) + ((!areSame && (from === 0 || !isToBigger)) ? SPACE * to * .5 : 0)} y1="0%"
-                  x2={LEFT + to * SPACE} y2="50%"
-                  strokeWidth="2"
+                  x1={LEFT + from * SPACE * (areSame ? 1 : (isToBigger ? 1.5 : .5)) + (
+                    (!areSame && (from === 0 || !isToBigger)) ? SPACE * to * .5 : 0)
+                  }
+                  y1='0%'
+                  x2={LEFT + to * SPACE}
+                  y2='50%'
+                  strokeWidth='2'
                   stroke={getGitBranchColor(route.environment)}
                   key={`upper-${from}-${to}`}
                 />
@@ -87,9 +91,13 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
 
               return (
                 <line
-                  x1={LEFT + from * SPACE} y1="50%"
-                  x2={LEFT + to * SPACE * (areSame ? 1 : (isFromBigger ? 1.5 : .5)) + ((!areSame && to === 0) ? SPACE * .5 : 0)} y2="100%"
-                  strokeWidth="2"
+                  x1={LEFT + from * SPACE}
+                  y1='50%'
+                  x2={LEFT + to * SPACE * (areSame ? 1 : (isFromBigger ? 1.5 : .5)) + (
+                    (!areSame && to === 0) ? SPACE * .5 : 0)
+                  }
+                  y2='100%'
+                  strokeWidth='2'
                   stroke={getGitBranchColor(route.environment)}
                   key={`lower-${from}-${to}`}
                 />
@@ -97,8 +105,8 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
             })}
             <circle
               cx={LEFT + visualization.offset * SPACE}
-              cy="50%"
-              r="4"
+              cy='50%'
+              r='4'
               fill={getGitBranchColor(visualization.environment)}
             />
           </svg>
@@ -106,12 +114,12 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
         {
           showVisualization &&
           <div
-            className="environment-detail"
+            className='environment-detail'
             width={!this.tdDom ? 50 : this.tdDom.getBoundingClientRect().width + visualization.offset * 40}
             height={!this.tdDom ? 20 : this.tdDom.getBoundingClientRect().height}
             style={{
               left: LEFT + visualization.offset * SPACE + SPACE * .5,
-              backgroundColor: getGitBranchColor(visualization.environment)
+              backgroundColor: getGitBranchColor(visualization.environment),
             }}
           >
             {environment}

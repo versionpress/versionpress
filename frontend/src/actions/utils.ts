@@ -104,7 +104,7 @@ export function generateGraphData(commits: CommitGraph[]): CommitNode[] {
         from: from,
         to: to,
         branch: branch,
-        environment: environments[branch]
+        environment: environments[branch],
       });
     };
 
@@ -152,7 +152,7 @@ export function generateGraphData(commits: CommitGraph[]): CommitNode[] {
       environment: commit.environment,
       offset: offset,
       routes: routes,
-      sha: commit.sha
+      sha: commit.sha,
     });
   });
 
