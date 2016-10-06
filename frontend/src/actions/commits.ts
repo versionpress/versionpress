@@ -13,13 +13,13 @@ import {
   commitsTableStore,
   navigationStore,
   servicePanelStore,
-  uiStore,
+  loadingStore,
 } from '../stores';
 
 const routes = config.routes;
 
 export function fetchCommits (page: number | string = appStore.page) {
-  uiStore.setLoading(true);
+  loadingStore.setLoading(true);
 
   if (typeof page === 'string' && parsePageNumber(page) < 1) {
     page = 0;
@@ -34,12 +34,12 @@ export function fetchCommits (page: number | string = appStore.page) {
       page: appStore.page,
       query: encodeURIComponent(navigationStore.query),
     })
-    .on('progress', uiStore.setProgress)
+    .on('progress', loadingStore.setProgress)
     .end((err: any, res: request.Response) => {
       const data = res.body.data as VpApi.GetCommitsResponse;
 
       runInAction(() => {
-        uiStore.setLoading(false);
+        loadingStore.setLoading(false);
         appStore.setDisplayUpdateNotice(false);
 
         if (err) {
@@ -67,16 +67,16 @@ export function rollbackToCommit(hash: string) {
 };
 
 function wpUndoRollback(name: string, query: any) {
-  uiStore.setLoading(true);
+  loadingStore.setLoading(true);
 
   WpApi
     .get(name)
     .query(query)
-    .on('progress', uiStore.setProgress)
+    .on('progress', loadingStore.setProgress)
     .end((err: any, res: request.Response) => {
       if (err) {
         runInAction(() => {
-          uiStore.setLoading(false);
+          loadingStore.setLoading(false);
           servicePanelStore.setMessage(getErrorMessage(res, err));
         });
       } else {

@@ -15,7 +15,7 @@ import WelcomePanel from '../welcome-panel/WelcomePanel';
 
 import { fetchCommits, fetchWelcomePanel, hideWelcomePanel } from '../../actions';
 import { AppStore } from '../../stores/appStore';
-import { UiStore } from '../../stores/uiStore';
+import { LoadingStore } from '../../stores/loadingStore';
 
 import './HomePage.less';
 
@@ -24,10 +24,10 @@ interface HomePageProps {
   params: {
     page?: string,
   };
-  uiStore?: UiStore;
+  loadingStore?: LoadingStore;
 }
 
-@observer(['appStore', 'uiStore'])
+@observer(['appStore', 'loadingStore'])
 export default class HomePage extends React.Component<HomePageProps, {}> {
 
   componentDidMount() {
@@ -57,13 +57,13 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
   };
 
   render() {
-    const { appStore, uiStore } = this.props;
+    const { appStore, loadingStore } = this.props;
     const {
       displayWelcomePanel,
       displayUpdateNotice,
       isDirtyWorkingDirectory,
     } = appStore;
-    const { progress } = uiStore;
+    const { progress } = loadingStore;
 
     return (
       <div>

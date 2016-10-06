@@ -2,10 +2,10 @@ import { runInAction } from 'mobx';
 import * as request from 'superagent';
 
 import * as WpApi from '../services/WpApi';
-import { appStore, commitsTableStore, navigationStore, uiStore } from '../stores';
+import { appStore, commitsTableStore, navigationStore, loadingStore } from '../stores';
 
 export function checkUpdate() {
-  const { isLoading } = uiStore;
+  const { isLoading } = loadingStore;
   const { commits } = commitsTableStore;
 
   if (!commits.length || isLoading) {

@@ -16,17 +16,17 @@ import { findIndex } from '../../utils/ArrayUtils';
 import CommitRow from '../../entities/CommitRow';
 import { AppStore } from '../../stores/appStore';
 import { CommitsTableStore } from '../../stores/commitsTableStore';
-import { UiStore } from '../../stores/uiStore';
+import { LoadingStore } from '../../stores/loadingStore';
 
 import './CommitsTable.less';
 
 interface CommitsTableProps {
   appStore?: AppStore;
   commitsTableStore?: CommitsTableStore;
-  uiStore?: UiStore;
+  loadingStore?: LoadingStore;
 }
 
-@observer(['appStore', 'commitsTableStore', 'uiStore'])
+@observer(['appStore', 'commitsTableStore', 'loadingStore'])
 export default class CommitsTable extends React.Component<CommitsTableProps, {}> {
 
   onSelectAllChange = (isChecked: boolean) => {
@@ -82,7 +82,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
   };
 
   render() {
-    const { appStore, commitsTableStore, uiStore } = this.props;
+    const { appStore, commitsTableStore, loadingStore } = this.props;
     const { enableActions } = appStore;
     const {
       pages,
@@ -91,7 +91,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
       selectableCommits,
       areAllCommitsSelected,
     } = commitsTableStore;
-    const { isLoading } = uiStore;
+    const { isLoading } = loadingStore;
 
     const commitsTableClassName = classNames({
       'vp-table': true,

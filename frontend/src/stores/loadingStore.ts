@@ -1,6 +1,6 @@
 import { action, computed, observable } from 'mobx';
 
-class UiStore {
+class LoadingStore {
 
   @observable progress: number = 100;
 
@@ -22,7 +22,7 @@ class UiStore {
 
 }
 
-const uiStore = new UiStore();
+const loadingStore = new LoadingStore();
 
-export { UiStore };
-export default uiStore;
+export { LoadingStore };
+export default loadingStore;
