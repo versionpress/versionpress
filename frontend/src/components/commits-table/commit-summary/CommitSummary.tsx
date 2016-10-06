@@ -8,7 +8,7 @@ import Actions from './Actions';
 import Author from './Author';
 import Checkbox from './Checkbox';
 import Date from './Date';
-import Environment from './Environment';
+import Environment from '../environment/Environment';
 import Message from './Message';
 import UndoDisabledDialog from '../../dialogs/UndoDisabledDialog';
 import UndoMergeDialog from '../../dialogs/UndoMergeDialog';

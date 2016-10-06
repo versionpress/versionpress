@@ -2,6 +2,8 @@ import * as React from 'react';
 import * as classNames from 'classnames';
 import { observer } from 'mobx-react';
 
+import ColorInfo from './ColorInfo';
+
 import { getGitBranchColor } from '../../../services/GitBranchColorProvider';
 
 interface EnvironmentProps {
@@ -48,13 +50,10 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
         ref={tdDom => this.tdDom = tdDom}
       >
         {(!showVisualization && environment !== '?') &&
-        <div
-          className='environment-info'
-          style={{ backgroundColor: getGitBranchColor(environment) }}
-          onClick={this.onChangeShowVisualization}
-        >
-          {environment}
-        </div>
+          <ColorInfo
+            environment={environment}
+            onClick={this.onChangeShowVisualization}
+          />
         }
         {showVisualization &&
           <svg
