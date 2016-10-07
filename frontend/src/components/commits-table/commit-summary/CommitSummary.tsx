@@ -26,7 +26,7 @@ interface CommitSummaryProps {
   onRollback(hash: string, date: string): void;
   onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
   onDetailsLevelChange(detailsLevel: DetailsLevel): void;
-  onChangeShowVisualisation(): void;
+  onToggleShowVisualisation(): void;
 }
 
 @observer
@@ -109,7 +109,7 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
       detailsLevel,
       showVisualisation,
       visualisation,
-      onChangeShowVisualisation,
+      onToggleShowVisualisation,
     } = this.props;
 
     if (commit === null) {
@@ -127,7 +127,7 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
           environment={commit.environment}
           showVisualisation={showVisualisation}
           visualisation={visualisation}
-          onChangeShowVisualisation={onChangeShowVisualisation}
+          onToggleShowVisualisation={onToggleShowVisualisation}
         />
         <Checkbox
           isVisible={commit.canUndo}

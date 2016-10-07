@@ -16,6 +16,7 @@ import { findIndex } from '../../utils/ArrayUtils';
 import CommitRow from '../../entities/CommitRow';
 import { AppStore } from '../../stores/appStore';
 import { CommitsTableStore } from '../../stores/commitsTableStore';
+import { NavigationStore } from '../../stores/navigationStore';
 import { LoadingStore } from '../../stores/loadingStore';
 
 import './CommitsTable.less';
@@ -23,10 +24,11 @@ import './CommitsTable.less';
 interface CommitsTableProps {
   appStore?: AppStore;
   commitsTableStore?: CommitsTableStore;
+  navigationStore?: NavigationStore;
   loadingStore?: LoadingStore;
 }
 
-@observer(['appStore', 'commitsTableStore', 'loadingStore'])
+@observer(['appStore', 'commitsTableStore', 'navigationStore', 'loadingStore'])
 export default class CommitsTable extends React.Component<CommitsTableProps, {}> {
 
   onSelectAllChange = (isChecked: boolean) => {
@@ -66,7 +68,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
         onUndo={this.onUndo}
         onRollback={this.onRollback}
         onCommitsSelect={this.onCommitsSelect}
-        onChangeShowVisualisation={commitsTableStore.changeShowVisualisation}
+        onToggleShowVisualisation={commitsTableStore.toggleShowVisualisation}
         key={commitRow.commit.hash}
       />
     );
@@ -84,7 +86,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
   };
 
   render() {
-    const { appStore, commitsTableStore, loadingStore } = this.props;
+    const { appStore, commitsTableStore, navigationStore, loadingStore } = this.props;
     const { enableActions } = appStore;
     const {
       pages,
@@ -94,7 +96,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
       selectableCommits,
       areAllCommitsSelected,
       branches,
-      changeShowVisualisation,
+      toggleShowVisualisation,
     } = commitsTableStore;
     const { isLoading } = loadingStore;
 
@@ -115,10 +117,11 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
           areAllCommitsSelected={areAllCommitsSelected}
           selectableCommitsCount={selectableCommits.length}
           enableActions={enableActions}
+          canToggleVisualisation={navigationStore.activeQuery === ''}
           showVisualisation={showVisualisation}
           branches={branches}
           onSelectAllChange={this.onSelectAllChange}
-          onChangeShowVisualisation={changeShowVisualisation}
+          onToggleShowVisualisation={toggleShowVisualisation}
         />
         {commitRows.map((commitRow: CommitRow, index: number) => (
           this.renderRow(commitRow, index === notAbleNoteIndex)
