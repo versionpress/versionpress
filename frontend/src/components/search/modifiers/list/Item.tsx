@@ -9,18 +9,16 @@ import ItemList from './ItemList';
 interface ItemProps {
   currentIndex: number;
   item: GroupedItem;
-  token: Token;
   onSelectItem(index: number): void;
 }
 
 const Item: React.StatelessComponent<ItemProps> = (props) => {
-  const { currentIndex, item, token, onSelectItem } = props;
+  const { currentIndex, item, onSelectItem } = props;
 
   return (
     <div>
       <ItemHeader
         item={item}
-        token={token}
       />
 
       {item.list &&

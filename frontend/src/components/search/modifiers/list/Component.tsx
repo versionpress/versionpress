@@ -139,7 +139,6 @@ export default class ListComponent extends ModifierComponent<ListComponentState>
   }
 
   render() {
-    const { token } = this.props;
     const { currentIndex } = this.state;
 
     const groupedList = this.getGroupedList();
@@ -158,7 +157,6 @@ export default class ListComponent extends ModifierComponent<ListComponentState>
               key={item.section}
               currentIndex={currentIndex}
               item={item}
-              token={token}
               onSelectItem={this.onSelectItem}
             />
           ))}

@@ -15,7 +15,7 @@ export function checkUpdate() {
   WpApi
     .get('should-update')
     .query({
-      query: encodeURIComponent(navigationStore.query),
+      query: encodeURIComponent(navigationStore.activeQuery),
       latestCommit: commits[0].hash,
     })
     .end((err: any, res: request.Response) => {

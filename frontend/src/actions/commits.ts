@@ -46,6 +46,10 @@ export function fetchCommits (page: number | string = appStore.page) {
           commitsTableStore.reset();
           servicePanelStore.setMessage(getErrorMessage(res, err));
         } else {
+          navigationStore.activeQuery = navigationStore.query;
+          if (navigationStore.activeQuery !== '' && commitsTableStore.showVisualisation) {
+            commitsTableStore.toggleShowVisualisation(false);
+          }
           commitsTableStore.setPages(data.pages.map(c => c + 1));
           commitsTableStore.setCommitRows(data.commits.map(commit => (
             new CommitRow(commit, indexOf(appStore.selectedCommits, commit) !== -1))

@@ -10,7 +10,7 @@ interface EnvironmentProps {
   environment: string;
   showVisualisation: boolean;
   visualisation: Visualisation;
-  onChangeShowVisualisation(): void;
+  onToggleShowVisualisation(): void;
 }
 
 const LEFT = 10;
@@ -29,11 +29,11 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
     window.addEventListener('resize', () => this.forceUpdate());
   }
 
-  onChangeShowVisualisation = (e: React.MouseEvent) => {
+  onToggleShowVisualisation = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    this.props.onChangeShowVisualisation();
+    this.props.onToggleShowVisualisation();
   };
 
   render() {
@@ -52,7 +52,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
         {(!showVisualisation && environment !== '?') &&
           <ColorInfo
             environment={environment}
-            onClick={this.onChangeShowVisualisation}
+            onClick={this.onToggleShowVisualisation}
           />
         }
         {showVisualisation &&
@@ -64,7 +64,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
             strokeWidth={STROKE_WIDTH}
             dotRadius={DOT_RADIUS}
             visualisation={visualisation}
-            onClick={this.onChangeShowVisualisation}
+            onClick={this.onToggleShowVisualisation}
           />
         }
         {showVisualisation &&

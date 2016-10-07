@@ -5,10 +5,9 @@ import * as React from 'react';
 
 interface ItemHeaderProps {
   item: GroupedItem;
-  token: Token;
 }
 
-const ItemHeader: React.StatelessComponent<ItemHeaderProps> = ({ item, token }) => {
+const ItemHeader: React.StatelessComponent<ItemHeaderProps> = ({ item }) => {
   const sectionTitle = item.section;
 
   if (!sectionTitle) {

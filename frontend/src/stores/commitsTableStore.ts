@@ -9,6 +9,8 @@ import { indexOf } from '../utils/CommitUtils';
 import { generateGraphData } from '../actions/utils';
 import CommitRow from '../entities/CommitRow';
 
+import navigationStore from './navigationStore';
+
 class CommitsTableStore {
 
   @observable commitRows: CommitRow[] = [];
@@ -43,8 +45,13 @@ class CommitsTableStore {
     return branches.length;
   }
 
-  @action changeShowVisualisation = () => {
-    this.showVisualisation = !this.showVisualisation;
+  @action toggleShowVisualisation = (showVisualisation?: boolean) => {
+    if (typeof showVisualisation !== 'boolean' && navigationStore.activeQuery !== '') {
+      return;
+    }
+    this.showVisualisation = typeof showVisualisation === 'boolean'
+      ? showVisualisation
+      : !this.showVisualisation;
 
     if (localStorage) {
       localStorage.setItem('showVisualization', this.showVisualisation ? 'true' : '');

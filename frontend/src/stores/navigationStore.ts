@@ -6,6 +6,7 @@ import appStore from './appStore';
 
 class NavigationStore {
 
+  @observable activeQuery: string = '';
   @observable query: string = '';
 
   @computed get changesCount() {
@@ -19,6 +20,10 @@ class NavigationStore {
   @action changeFilterQuery = (query: string) => {
     this.query = query;
   };
+
+  @action changeActiveQuery = (activeQuery: string) => {
+    this.activeQuery = activeQuery;
+  }
 
 }
 
