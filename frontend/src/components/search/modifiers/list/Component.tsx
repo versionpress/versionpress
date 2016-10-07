@@ -59,10 +59,13 @@ export default class ListComponent extends ModifierComponent<ListComponentState>
 
     const list = this.getFlatList();
 
-    if (currentIndex !== -1) {
-      const model = list[currentIndex];
-      onChangeTokenModel(activeTokenIndex, model, true);
+    if (currentIndex === -1) {
+      return false;
     }
+
+    const model = list[currentIndex];
+    onChangeTokenModel(activeTokenIndex, model, true);
+    return true;
   };
 
   onSelectItem = (index: number) => {

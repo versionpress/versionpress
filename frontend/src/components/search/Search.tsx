@@ -76,8 +76,9 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     switch (e.keyCode) {
       case KEYS.ENTER:
         if (this.popupComponentNode) {
-          e.preventDefault();
-          this.popupComponentNode.onSelect();
+          if (this.popupComponentNode.onSelect()) {
+            e.preventDefault();
+          }
         }
         break;
       case KEYS.ESC:

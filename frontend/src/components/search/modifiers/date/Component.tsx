@@ -37,10 +37,11 @@ export default class DateComponent extends ModifierComponent<{}> {
     const { value } = token;
 
     if (!value) {
-      return;
+      return false;
     }
 
     onChangeTokenModel(activeTokenIndex, value, true);
+    return true;
   };
 
   onMouseDown = (e: React.MouseEvent) => {
