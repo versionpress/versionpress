@@ -39,7 +39,7 @@ const Input: React.StatelessComponent<InputProps> = (props) => {
 
   return (
     <input
-      type='search'
+      type='text'
       maxLength={maxLength}
       placeholder={placeholder}
       className='Search-Input'
