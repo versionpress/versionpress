@@ -174,6 +174,18 @@ class QueryLanguageUtils
             }
         }
 
+        if (!empty($rule['before'])) {
+            foreach ($rule['before'] as $value) {
+                $query .= ' --before=' . date('Y-m-d', strtotime($value));
+            }
+        }
+
+        if (!empty($rule['after'])) {
+            foreach ($rule['after'] as $value) {
+                $query .= ' --after=' . date('Y-m-d', strtotime($value));
+            }
+        }
+
         if (!empty($rule['action']) || !empty($rule['vp-action'])) {
             $vpAction = [];
             if (!empty($rule['action'])) {
@@ -204,7 +216,7 @@ class QueryLanguageUtils
         }
 
         foreach ($rule as $key => $values) {
-            if (in_array($key, ['author', 'date', 'entity', 'vp-action', 'action', 'vpid', 'text'])) {
+            if (in_array($key, ['author', 'date', 'before', 'after', 'entity', 'vp-action', 'action', 'vpid', 'text'])) {
                 continue;
             }
 
