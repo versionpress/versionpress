@@ -134,6 +134,8 @@ export default class Search extends React.Component<SearchProps, SearchState> {
         inputValue: target.value,
       });
     }
+
+    this.props.onChange(e);
   };
 
   onChange = (e: React.FormEvent) => {
