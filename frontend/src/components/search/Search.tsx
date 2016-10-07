@@ -136,6 +136,18 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     }
   };
 
+  onChange = (e: React.FormEvent) => {
+    const target = e.target as HTMLInputElement;
+
+    if (target.value !== this.state.inputValue) {
+      this.setState({
+        inputValue: target.value,
+      });
+    }
+
+    this.props.onChange(e);
+  }
+
   onChangeTokenModel = (tokenIndex: number, model: any, shouldMoveCursor: boolean) => {
     const { config } = this.props;
     const tokens = this.getTokens();
@@ -284,7 +296,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
   }
 
   render() {
-    const { config, onChange } = this.props;
+    const { config } = this.props;
 
     const tokens = this.getTokens();
     const isLastTokenSelected = this.isLastTokenSelected(tokens);
@@ -303,7 +315,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
           onPaste={this.onPaste}
           onKeyDown={this.onKeyDown}
           onKeyUp={this.onKeyUp}
-          onChange={onChange}
+          onChange={this.onChange}
         />
         <Background
           nodeRef={node => this.backgroundNode = node}
