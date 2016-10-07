@@ -2,5 +2,6 @@
 
 type GroupedItem = {
   section: string;
+  priority: number;
   list: SearchConfigItemContent[];
 };

@@ -93,12 +93,19 @@ export default class ListComponent extends ModifierComponent<ListComponentState>
     const groupsCount = Object.keys(groupedObject).length;
     return Object.keys(groupedObject).map(key => {
       const section = key === 'untitled' ? '' : key;
+
+      const priority =
+        section === '' ? 1
+        : section === 'modifiers' ? 2
+          : section === 'time' ? 20
+            : 10;
       const list = groupsCount > 1
         ? groupedObject[key].slice(0, ITEMS_COUNT)
         : groupedObject[key].slice(0, MAX_ITEMS_COUNT);
 
       return {
         section: section,
+        priority: priority,
         list: list,
       };
     });
@@ -111,7 +118,11 @@ export default class ListComponent extends ModifierComponent<ListComponentState>
 
     let t = 0;
     return items
-      .sort((a, b) => a.section < b.section ? 1 : -1)
+      .sort((a, b) => (
+        a.priority === b.priority
+          ? a.section < b.section ? 1 : -1
+          : b.priority - a.priority
+      ))
       .reverse()
       .map(item => {
         item.list = item.list.map(content => {
