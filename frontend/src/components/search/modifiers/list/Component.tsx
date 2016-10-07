@@ -7,6 +7,9 @@ import ModifierComponent from '../ModifierComponent';
 import {PopupProps} from '../../popup/Popup';
 import Item from './Item';
 
+const ITEMS_COUNT = 6;
+const MAX_ITEMS_COUNT = 10;
+
 interface ListComponentState {
   currentIndex?: number;
 }
@@ -87,11 +90,16 @@ export default class ListComponent extends ModifierComponent<ListComponentState>
         return sum;
       }, {} as {[section: string]: SearchConfigItemContent[]});
 
+    const groupsCount = Object.keys(groupedObject).length;
     return Object.keys(groupedObject).map(key => {
       const section = key === 'untitled' ? '' : key;
+      const list = groupsCount > 1
+        ? groupedObject[key].slice(0, ITEMS_COUNT)
+        : groupedObject[key].slice(0, MAX_ITEMS_COUNT);
+
       return {
         section: section,
-        list: groupedObject[key],
+        list: list,
       };
     });
   }
