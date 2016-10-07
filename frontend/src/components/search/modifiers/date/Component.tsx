@@ -64,15 +64,22 @@ export default class DateComponent extends ModifierComponent<{}> {
 
   render() {
     const { token } = this.props;
-    const selectedDay = token.value ? new Date(token.value) : new Date();
+    const selectedDay = new Date(token.value);
+    const isValid = Object.prototype.toString.call(selectedDay) === '[object Date]'
+                    && !isNaN(selectedDay.getTime());
 
     return (
       <div onMouseDown={this.onMouseDown} className='Search-hintMenu-container'>
-        <DayPicker
-          initialMonth={selectedDay}
-          onDayClick={this.onDayClick}
-          selectedDays={day => DayPicker.DateUtils.isSameDay(selectedDay, day)}
-        />
+        {isValid
+          ? <DayPicker
+              initialMonth={selectedDay}
+              onDayClick={this.onDayClick}
+              selectedDays={day => DayPicker.DateUtils.isSameDay(selectedDay, day)}
+            />
+          : <DayPicker
+              onDayClick={this.onDayClick}
+            />
+        }
       </div>
     );
   }
