@@ -202,7 +202,10 @@ class QueryLanguageUtils
             }
         }
 
-        $scope = array_merge($rule['entity'], $rule['scope']);
+        $scope = array_merge(
+            !empty($rule['entity']) ? $rule['entity'] : [],
+            !empty($rule['scope']) ? $rule['scope'] : []
+        );
         if (!empty($scope) || !empty($action) || !empty($rule['vpid'])) {
             $query .= ' --grep="^VP-Action: ' .
                 (empty($scope) ? '.*' : '\(' . implode('\|', $scope) . '\)') . '/' .
