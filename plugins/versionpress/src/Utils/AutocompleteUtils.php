@@ -2,6 +2,7 @@
 
 namespace VersionPress\Utils;
 
+use Nette\Utils\Strings;
 use VersionPress\Actions\ActionsInfoProvider;
 
 class AutocompleteUtils
@@ -37,7 +38,7 @@ class AutocompleteUtils
         foreach($actionsInfoProvider->getAllActionsInfo() as $scope => $actionsInfo) {
             foreach ($actionsInfo->getActions() as $action => $actionInfo) {
                 $actions[] = [
-                    'label' => $scope . '/' . $action,
+                    'label' => Strings::capitalize($action) . ' ' . $scope,
                     'value' => $scope . '/' . $action,
                 ];
             }
@@ -60,7 +61,7 @@ class AutocompleteUtils
         $scopes = [];
         foreach($actionsInfoProvider->getAllActionsInfo() as $scope => $actionsInfo) {
             $scopes[] = [
-                'label' => $scope,
+                'label' => Strings::capitalize($scope),
                 'value' => $scope,
             ];
         }
