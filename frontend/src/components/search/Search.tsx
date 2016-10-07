@@ -20,6 +20,7 @@ import './Search.less';
 
 interface SearchProps {
   config: SearchConfig;
+  onChange?(e: React.FormEvent): void;
 }
 
 interface SearchState {
@@ -283,7 +284,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
   }
 
   render() {
-    const { config } = this.props;
+    const { config, onChange } = this.props;
 
     const tokens = this.getTokens();
     const isLastTokenSelected = this.isLastTokenSelected(tokens);
@@ -302,6 +303,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
           onPaste={this.onPaste}
           onKeyDown={this.onKeyDown}
           onKeyUp={this.onKeyUp}
+          onChange={onChange}
         />
         <Background
           nodeRef={node => this.backgroundNode = node}

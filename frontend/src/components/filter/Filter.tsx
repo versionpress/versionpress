@@ -40,7 +40,7 @@ export default class Filter extends React.Component<FilterProps, {}> {
         <form action='' method='post' onSubmit={this.onSubmit}>
           <div className='search-box'>
             {config &&
-              <Search config={config} />
+              <Search config={config} onChange={this.onInputChange} />
             }
             {!config &&
               <QueryInput query={query} onChange={this.onInputChange} />

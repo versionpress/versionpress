@@ -17,6 +17,7 @@ interface InputProps {
   onPaste?: React.ClipboardEventHandler;
   onKeyDown?: React.KeyboardEventHandler;
   onKeyUp?: React.KeyboardEventHandler;
+  onChange?(e: React.FormEvent): void;
 }
 
 const Input: React.StatelessComponent<InputProps> = (props) => {
@@ -32,6 +33,7 @@ const Input: React.StatelessComponent<InputProps> = (props) => {
     onPaste = () => {},
     onKeyDown = () => {},
     onKeyUp = () => {},
+    onChange = () => {},
     disabled = false,
   } = props;
 
@@ -52,6 +54,7 @@ const Input: React.StatelessComponent<InputProps> = (props) => {
       onPaste={onPaste}
       onKeyDown={onKeyDown}
       onKeyUp={onKeyUp}
+      onChange={onChange}
       ref={nodeRef}
     />
   );
