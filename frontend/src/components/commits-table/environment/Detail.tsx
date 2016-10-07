@@ -14,8 +14,11 @@ const Detail: React.StatelessComponent<DetailProps> = ({ environment, left, spac
   <div
     className='environment-detail'
     style={{
+      top: '50%',
       left: left + offset * space + space * .5,
       backgroundColor: getGitBranchColor(environment),
+      transform: 'translate(0, -50%)',
+      marginTop: -1,
     }}
   >
     {environment}
