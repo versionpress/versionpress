@@ -35,7 +35,7 @@ class AutocompleteUtils
     private static function getActionsConfig($actionsInfoProvider)
     {
         $actions = [];
-        foreach($actionsInfoProvider->getAllActionsInfo() as $scope => $actionsInfo) {
+        foreach ($actionsInfoProvider->getAllActionsInfo() as $scope => $actionsInfo) {
             foreach ($actionsInfo->getActions() as $action => $actionInfo) {
                 $actions[] = [
                     'label' => Strings::capitalize($action) . ' ' . $scope,
@@ -59,7 +59,7 @@ class AutocompleteUtils
     private static function getScopesConfig($actionsInfoProvider)
     {
         $scopes = [];
-        foreach($actionsInfoProvider->getAllActionsInfo() as $scope => $actionsInfo) {
+        foreach ($actionsInfoProvider->getAllActionsInfo() as $scope => $actionsInfo) {
             $scopes[] = [
                 'label' => Strings::capitalize($scope),
                 'value' => $scope,
@@ -102,5 +102,4 @@ class AutocompleteUtils
             'type' => 'date'
         ];
     }
-
 }
