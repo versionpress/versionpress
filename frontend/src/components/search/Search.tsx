@@ -164,7 +164,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
       token = updateToken(tokens[tokenIndex], model, config);
     }
 
-    const isLastTokenSelected = index === this.getActiveTokenIndex(tokens);
+    const isLastTokenSelected = index === this.getActiveTokenIndex(tokens) && tokens.length - 1 === index;
 
     let cursorLocation = this.state.cursorLocation;
 
