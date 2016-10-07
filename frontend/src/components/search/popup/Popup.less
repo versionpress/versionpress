@@ -3,8 +3,8 @@
   background-color: white;
   top: 11px;
   left: 0;
-  min-width: 300px;
-  padding: 10px 14px;
+  width: 340px;
+  padding: 10px 14px 10px 8px;
   box-shadow: 0 0 5px 0 #eee;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -84,12 +84,15 @@
   list-style-type: none;
   position: relative;
   max-height: 220px;
+  max-width: 340px;
+  overflow: hidden;
 
   li {
     margin: 0;
     padding: 2px 8px;
     border-radius: 3px;
     cursor: pointer;
+    white-space: nowrap;
 
     .Search-modifier-value {
       color: #aaa;
