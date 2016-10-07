@@ -36,11 +36,17 @@ const DateAdapter = (config: SearchConfigItem): Adapter => ({
     return DATE_FORMAT_REGEXP.test(value) && moment(value, DATE_FORMAT).isValid();
   },
 
-  serialize: function(date: string) {
+  serialize: function(date: any) {
     if (!date) {
-      return null;
+      return '';
     }
-    return moment(date).format(DATE_FORMAT);
+    if (typeof date === 'string') {
+      if (this.isValueValid(new Date(date))) {
+        return moment(date).format(DATE_FORMAT);
+      }
+      return date;
+    }
+    return (date as moment.Moment).format(DATE_FORMAT);
   },
 
   deserialize: function(value: string) {

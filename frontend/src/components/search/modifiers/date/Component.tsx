@@ -9,24 +9,24 @@ import 'react-day-picker/lib/style.css';
 export default class DateComponent extends ModifierComponent<{}> {
 
   onUpClicked = () => {
-    const { activeTokenIndex, token, onChangeTokenModel } = this.props;
+    const { activeTokenIndex, adapter, token, onChangeTokenModel } = this.props;
 
     const date = token.value;
     const cursorLocationType = this.getCursorLocationType();
 
-    if (date && cursorLocationType) {
+    if (adapter.isValueValid(date) && date && cursorLocationType) {
       const newDate = moment(date).add(1, cursorLocationType);
       onChangeTokenModel(activeTokenIndex, newDate, false);
     }
   };
 
   onDownClicked = () => {
-    const { activeTokenIndex, token, onChangeTokenModel } = this.props;
+    const { activeTokenIndex, adapter, token, onChangeTokenModel } = this.props;
 
     const date = token.value;
     const cursorLocationType = this.getCursorLocationType();
 
-    if (date && cursorLocationType) {
+    if (adapter.isValueValid(date) && date && cursorLocationType) {
       const newDate = moment(date).subtract(1, cursorLocationType);
       onChangeTokenModel(activeTokenIndex, newDate, false);
     }
@@ -34,8 +34,13 @@ export default class DateComponent extends ModifierComponent<{}> {
 
   onSelect = () => {
     const { activeTokenIndex, token, onChangeTokenModel } = this.props;
-    const date = token.value ? moment(token.value) : moment();
-    onChangeTokenModel(activeTokenIndex, date, true);
+    const { value } = token;
+
+    if (!value) {
+      return;
+    }
+
+    onChangeTokenModel(activeTokenIndex, value, true);
   };
 
   onMouseDown = (e: React.MouseEvent) => {
@@ -44,7 +49,7 @@ export default class DateComponent extends ModifierComponent<{}> {
 
   onDayClick = (e: React.SyntheticEvent, day: any) => {
     const { activeTokenIndex, onChangeTokenModel } = this.props;
-    onChangeTokenModel(activeTokenIndex, day, true);
+    onChangeTokenModel(activeTokenIndex, moment(day), true);
   };
 
   getCursorLocationType = (): moment.UnitOfTime => {
@@ -62,11 +67,15 @@ export default class DateComponent extends ModifierComponent<{}> {
     }
   }
 
+  isDateValid(date: Date) {
+    return Object.prototype.toString.call(date) === '[object Date]'
+           && !isNaN(date.getTime());
+  }
+
   render() {
     const { token } = this.props;
     const selectedDay = new Date(token.value);
-    const isValid = Object.prototype.toString.call(selectedDay) === '[object Date]'
-                    && !isNaN(selectedDay.getTime());
+    const isValid = this.isDateValid(selectedDay);
 
     return (
       <div onMouseDown={this.onMouseDown} className='Search-hintMenu-container'>
