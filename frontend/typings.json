@@ -12,6 +12,7 @@
     "mocha": "registry:dt/mocha#2.2.5+20160720003353",
     "node": "registry:env/node#6.0.0+20160918225031",
     "react": "registry:dt/react#0.14.0+20160920055104",
+    "react-day-picker": "registry:dt/react-day-picker#1.2.0+20160713062231",
     "react-dom": "registry:dt/react-dom#0.14.0+20160412154040",
     "react-router": "registry:dt/react-router#2.0.0+20160920184447",
     "react-router/history": "registry:dt/react-router/history#2.0.0+20160830150755",

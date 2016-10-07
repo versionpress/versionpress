@@ -3,16 +3,20 @@ import { observer } from 'mobx-react';
 
 import QueryInput from './QueryInput';
 import Submit from './Submit';
+import Search from '../search/Search';
+
+import { SearchStore } from '../../stores/searchStore';
 
 import './Filter.less';
 
 interface FilterProps {
   query: string;
+  searchStore?: SearchStore;
   onQueryChange(query: string): void;
   onFilter(): void;
 }
 
-@observer
+@observer(['searchStore'])
 export default class Filter extends React.Component<FilterProps, {}> {
 
   onSubmit = (e: React.FormEvent) => {
@@ -28,15 +32,21 @@ export default class Filter extends React.Component<FilterProps, {}> {
   };
 
   render() {
-    const { query } = this.props;
+    const { query, searchStore } = this.props;
+    const { config } = searchStore;
 
     return (
       <div className='Filter'>
         <form action='' method='post' onSubmit={this.onSubmit}>
-          <p className='search-box'>
-            <QueryInput query={query} onChange={this.onInputChange} />
+          <div className='search-box'>
+            {config &&
+              <Search config={config} onChange={this.onInputChange} />
+            }
+            {!config &&
+              <QueryInput query={query} onChange={this.onInputChange} />
+            }
             <Submit />
-          </p>
+          </div>
         </form>
       </div>
     );

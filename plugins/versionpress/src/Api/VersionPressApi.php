@@ -5,6 +5,7 @@ namespace VersionPress\Api;
 require_once ABSPATH . 'wp-admin/includes/file.php';
 
 use Nette\Utils\Strings;
+use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\ChangeInfos\CommitMessageParser;
@@ -21,6 +22,7 @@ use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\VersionPressOptions;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\ArrayUtils;
+use VersionPress\Utils\AutocompleteUtils;
 use VersionPress\Utils\QueryLanguageUtils;
 use WP_Error;
 use WP_REST_Request;
@@ -136,6 +138,11 @@ class VersionPressApi
         $this->registerRestRoute('/discard-changes', [
             'methods' => WP_REST_Server::CREATABLE,
             'callback' => $this->handleAsAdminSectionRoute('discardChanges')
+        ]);
+
+        $this->registerRestRoute('/autocomplete-config', [
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => $this->handleAsAdminSectionRoute('getAutocompleteConfig')
         ]);
     }
 
@@ -546,6 +553,21 @@ class VersionPressApi
         $result = $repository->clearWorkingDirectory();
 
         return new WP_REST_Response($result);
+    }
+
+    /**
+     * Returns current WP configuration for autocomplete component.
+     * @return WP_REST_Response
+     */
+    public function getAutocompleteConfig()
+    {
+        global $versionPressContainer;
+        /** @var ActionsInfoProvider $actionsInfoProvider */
+        $actionsInfoProvider = $versionPressContainer->resolve(VersionPressServices::ACTIONSINFO_PROVIDER_ACTIVE_PLUGINS);
+
+        $config = AutocompleteUtils::createAutocompleteConfig($actionsInfoProvider);
+
+        return new WP_REST_Response($config);
     }
 
     /**

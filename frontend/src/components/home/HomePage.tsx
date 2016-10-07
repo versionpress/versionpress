@@ -13,7 +13,7 @@ import UpdateNotice from './update-notice/UpdateNotice';
 import VpTitle from './vp-title/VpTitle';
 import WelcomePanel from '../welcome-panel/WelcomePanel';
 
-import { fetchCommits, fetchWelcomePanel, hideWelcomePanel } from '../../actions';
+import { fetchCommits, fetchWelcomePanel, fetchSearchConfig, hideWelcomePanel } from '../../actions';
 import { AppStore } from '../../stores/appStore';
 import { LoadingStore } from '../../stores/loadingStore';
 
@@ -36,6 +36,7 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
     appStore.setPage(params.page);
     fetchWelcomePanel();
     fetchCommits();
+    fetchSearchConfig();
   }
 
   componentWillReceiveProps(nextProps: HomePageProps) {

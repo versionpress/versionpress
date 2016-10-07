@@ -88,4 +88,9 @@ class ActionsInfo
     {
         return $this->parentIdTag;
     }
+
+    public function getActions()
+    {
+        return $this->actions;
+    }
 }

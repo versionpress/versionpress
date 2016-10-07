@@ -174,6 +174,18 @@ class QueryLanguageUtils
             }
         }
 
+        if (!empty($rule['before'])) {
+            foreach ($rule['before'] as $value) {
+                $query .= ' --before=' . date('Y-m-d', strtotime($value));
+            }
+        }
+
+        if (!empty($rule['after'])) {
+            foreach ($rule['after'] as $value) {
+                $query .= ' --after=' . date('Y-m-d', strtotime($value));
+            }
+        }
+
         if (!empty($rule['action']) || !empty($rule['vp-action'])) {
             $vpAction = [];
             if (!empty($rule['action'])) {
@@ -190,9 +202,10 @@ class QueryLanguageUtils
             }
         }
 
-        if (!empty($rule['entity']) || !empty($action) || !empty($rule['vpid'])) {
+        $scope = array_merge($rule['entity'], $rule['scope']);
+        if (!empty($scope) || !empty($action) || !empty($rule['vpid'])) {
             $query .= ' --grep="^VP-Action: ' .
-                (empty($rule['entity']) ? '.*' : '\(' . implode('\|', $rule['entity']) . '\)') . '/' .
+                (empty($scope) ? '.*' : '\(' . implode('\|', $scope) . '\)') . '/' .
                 (empty($action) ? '.*' : '\(' . implode('\|', $action) . '\)') .
                 (empty($rule['vpid']) ? '\(/.*\)\?' : '/\(' . implode('\|', $rule['vpid']) . '\)') . '$"';
         }
@@ -204,7 +217,7 @@ class QueryLanguageUtils
         }
 
         foreach ($rule as $key => $values) {
-            if (in_array($key, ['author', 'date', 'entity', 'vp-action', 'action', 'vpid', 'text'])) {
+            if (in_array($key, ['author', 'date', 'before', 'after', 'entity', 'scope', 'vp-action', 'action', 'vpid', 'text'])) {
                 continue;
             }
 

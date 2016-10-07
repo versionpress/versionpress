@@ -48,4 +48,9 @@ class ActionsInfoProvider
     {
         return $this->actionsInfoMap[$scope];
     }
+
+    public function getAllActionsInfo()
+    {
+        return $this->actionsInfoMap;
+    }
 }
