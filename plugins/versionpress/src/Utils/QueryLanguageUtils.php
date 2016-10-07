@@ -202,9 +202,10 @@ class QueryLanguageUtils
             }
         }
 
-        if (!empty($rule['entity']) || !empty($action) || !empty($rule['vpid'])) {
+        $scope = array_merge($rule['entity'], $rule['scope']);
+        if (!empty($scope) || !empty($action) || !empty($rule['vpid'])) {
             $query .= ' --grep="^VP-Action: ' .
-                (empty($rule['entity']) ? '.*' : '\(' . implode('\|', $rule['entity']) . '\)') . '/' .
+                (empty($scope) ? '.*' : '\(' . implode('\|', $scope) . '\)') . '/' .
                 (empty($action) ? '.*' : '\(' . implode('\|', $action) . '\)') .
                 (empty($rule['vpid']) ? '\(/.*\)\?' : '/\(' . implode('\|', $rule['vpid']) . '\)') . '$"';
         }
@@ -216,7 +217,7 @@ class QueryLanguageUtils
         }
 
         foreach ($rule as $key => $values) {
-            if (in_array($key, ['author', 'date', 'before', 'after', 'entity', 'vp-action', 'action', 'vpid', 'text'])) {
+            if (in_array($key, ['author', 'date', 'before', 'after', 'entity', 'scope', 'vp-action', 'action', 'vpid', 'text'])) {
                 continue;
             }
 
