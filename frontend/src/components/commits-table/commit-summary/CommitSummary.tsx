@@ -8,7 +8,7 @@ import Actions from './Actions';
 import Author from './Author';
 import Checkbox from './Checkbox';
 import Date from './Date';
-import Environment from './Environment';
+import Environment from '../environment/Environment';
 import Message from './Message';
 import UndoDisabledDialog from '../../dialogs/UndoDisabledDialog';
 import UndoMergeDialog from '../../dialogs/UndoMergeDialog';
@@ -20,10 +20,13 @@ interface CommitSummaryProps {
   enableActions: boolean;
   isSelected: boolean;
   detailsLevel: DetailsLevel;
+  showVisualisation: boolean;
+  visualisation: Visualisation;
   onUndo(hash: string, message: string): void;
   onRollback(hash: string, date: string): void;
   onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
   onDetailsLevelChange(detailsLevel: DetailsLevel): void;
+  onChangeShowVisualisation(): void;
 }
 
 @observer
@@ -99,7 +102,15 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
   }
 
   render() {
-    const { commit, enableActions, isSelected, detailsLevel } = this.props;
+    const {
+      commit,
+      enableActions,
+      isSelected,
+      detailsLevel,
+      showVisualisation,
+      visualisation,
+      onChangeShowVisualisation,
+    } = this.props;
 
     if (commit === null) {
       return null;
@@ -112,7 +123,12 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
 
     return (
       <tr className={rowClassName} onClick={this.onRowClick}>
-        <Environment environment={commit.environment} />
+        <Environment
+          environment={commit.environment}
+          showVisualisation={showVisualisation}
+          visualisation={visualisation}
+          onChangeShowVisualisation={onChangeShowVisualisation}
+        />
         <Checkbox
           isVisible={commit.canUndo}
           isChecked={isSelected}

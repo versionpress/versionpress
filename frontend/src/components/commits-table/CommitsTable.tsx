@@ -56,15 +56,17 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
   };
 
   renderRow = (commitRow: CommitRow, displayNotAbleNote: boolean) => {
-    const { appStore } = this.props;
+    const { appStore, commitsTableStore } = this.props;
 
     const row = (
       <Row
         commitRow={commitRow}
         enableActions={appStore.enableActions}
+        showVisualisation={commitsTableStore.showVisualisation}
         onUndo={this.onUndo}
         onRollback={this.onRollback}
         onCommitsSelect={this.onCommitsSelect}
+        onChangeShowVisualisation={commitsTableStore.changeShowVisualisation}
         key={commitRow.commit.hash}
       />
     );
@@ -88,8 +90,11 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
       pages,
       commits,
       commitRows,
+      showVisualisation,
       selectableCommits,
       areAllCommitsSelected,
+      branches,
+      changeShowVisualisation,
     } = commitsTableStore;
     const { isLoading } = loadingStore;
 
@@ -110,7 +115,10 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
           areAllCommitsSelected={areAllCommitsSelected}
           selectableCommitsCount={selectableCommits.length}
           enableActions={enableActions}
+          showVisualisation={showVisualisation}
+          branches={branches}
           onSelectAllChange={this.onSelectAllChange}
+          onChangeShowVisualisation={changeShowVisualisation}
         />
         {commitRows.map((commitRow: CommitRow, index: number) => (
           this.renderRow(commitRow, index === notAbleNoteIndex)

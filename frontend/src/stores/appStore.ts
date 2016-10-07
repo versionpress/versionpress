@@ -17,7 +17,7 @@ class AppStore {
   refreshInterval;
 
   constructor() {
-    this.refreshInterval = setInterval(checkUpdate, 10 * 1000);
+    this.refreshInterval = setInterval(() => checkUpdate(), 10 * 1000);
   }
 
   @computed get enableActions() {

@@ -16,6 +16,7 @@ interface ServicePanelProps {
 
 @observer(['servicePanelStore'])
 export default class ServicePanel extends React.Component<ServicePanelProps, {}> {
+
   onButtonClick = () => {
     const { servicePanelStore } = this.props;
     servicePanelStore.toggleVisibility();
@@ -36,4 +37,5 @@ export default class ServicePanel extends React.Component<ServicePanelProps, {}>
       </div>
     );
   }
+
 }

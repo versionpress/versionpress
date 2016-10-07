@@ -13,7 +13,7 @@ class ServicePanelStore {
 
   @action toggleVisibility = (isVisible?: boolean) => {
     this.isVisible = typeof isVisible === 'boolean' ? isVisible : !this.isVisible;
-  }
+  };
 
 }
 

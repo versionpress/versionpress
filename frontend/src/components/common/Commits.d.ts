@@ -2,6 +2,7 @@ interface Commit {
   message: string;
   date: string;
   hash: string;
+  parentHashes: string[];
   canUndo: boolean;
   canRollback: boolean;
   isEnabled: boolean;

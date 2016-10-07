@@ -253,6 +253,7 @@ class VersionPressApi
                 "hash" => $commit->getHash(),
                 "date" => $commit->getDate()->format('c'),
                 "message" => $changeInfo->getChangeDescription(),
+                "parentHashes" => $commit->getParentHashes(),
                 "canUndo" => $canUndoCommit,
                 "canRollback" => $canRollbackToThisCommit,
                 "isEnabled" => $isEnabled,

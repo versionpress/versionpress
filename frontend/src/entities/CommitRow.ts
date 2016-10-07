@@ -10,6 +10,7 @@ class CommitRow {
   @observable diff: string = null;
   @observable error: string = null;
   @observable isLoading: boolean = false;
+  @observable visualisation: Visualisation = null;
 
   constructor(commit: Commit, isSelected: boolean = false) {
     this.commit = commit;
@@ -34,6 +35,10 @@ class CommitRow {
 
   @action setDiff = (diff: string) => {
     this.diff = diff;
+  }
+
+  @action setVisualisation = (visualisation: Visualisation) => {
+    this.visualisation = visualisation;
   }
 
 }

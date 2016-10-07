@@ -14,9 +14,11 @@ import CommitRow from '../../../entities/CommitRow';
 interface RowProps {
   commitRow: CommitRow;
   enableActions: boolean;
+  showVisualisation: boolean;
   onUndo(hash: string, message: string): void;
   onRollback(hash: string, date: string): void;
   onCommitsSelect(commits: Commit[], isChecked: boolean, isShiftKey: boolean): void;
+  onChangeShowVisualisation(): void;
 }
 
 @observer
@@ -28,8 +30,16 @@ export default class Row extends React.Component<RowProps, {}> {
   };
 
   render() {
-    const { commitRow, enableActions, onUndo, onRollback, onCommitsSelect } = this.props;
-    const { commit, isSelected, detailsLevel, diff, error, isLoading } = commitRow;
+    const {
+      commitRow,
+      enableActions,
+      onUndo,
+      onRollback,
+      onCommitsSelect,
+      showVisualisation,
+      onChangeShowVisualisation,
+    } = this.props;
+    const { commit, isSelected, detailsLevel, diff, error, isLoading, visualisation } = commitRow;
 
     return (
       <tbody>
@@ -38,10 +48,13 @@ export default class Row extends React.Component<RowProps, {}> {
           enableActions={enableActions}
           isSelected={isSelected}
           detailsLevel={detailsLevel}
+          showVisualisation={showVisualisation}
+          visualisation={visualisation}
           onUndo={onUndo}
           onRollback={onRollback}
           onCommitsSelect={onCommitsSelect}
           onDetailsLevelChange={this.onDetailsLevelChange}
+          onChangeShowVisualisation={onChangeShowVisualisation}
         />
         {error
           ? <Error message={error} />

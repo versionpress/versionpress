@@ -22,6 +22,9 @@ class Commit
     /** @var string */
     private $authorEmail;
 
+    /** @var string[] */
+    private $parentHashes;
+
     /** @var CommitMessage */
     private $message;
 
@@ -33,7 +36,7 @@ class Commit
 
     /**
      * Creates instance from string matching pattern:
-     * <hash><div><date><div><relative-date><div><author-name><div><author-email><div><message-head><div><message-body>
+     * <hash><div><date><div><relative-date><div><author-name><div><author-email><div><parent-hashes><div><message-head><div><message-body>
      * where <div> is record separator character (ascii ordinary number 30)
      * @param $rawCommit string
      * @param $rawStatus string
@@ -51,6 +54,7 @@ class Commit
         $commit->authorName = $authorName;
         $commit->authorEmail = $authorEmail;
         $commit->isMerge = strpos($parentHashes, ' ') !== false;
+        $commit->parentHashes = empty($parentHashes) ? [] : explode(' ', $parentHashes);
         $commit->message = new CommitMessage($messageHead, $messageBody);
 
         if ($rawStatus === "") {
@@ -113,6 +117,14 @@ class Commit
     public function getAuthorEmail()
     {
         return $this->authorEmail;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getParentHashes()
+    {
+        return $this->parentHashes;
     }
 
     /**
