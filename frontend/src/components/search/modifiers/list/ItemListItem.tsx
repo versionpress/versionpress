@@ -21,11 +21,11 @@ const ItemListItem: React.StatelessComponent<ItemListItemProps> = (props) => {
       {item.modifier
         ? <span>
             <b>{item.value}</b>
-            <span className='modifier-value'>{item.label}</span>
+            <span className='Search-modifier-value'>{item.label}</span>
           </span>
         : <span>
             <b>{item.label}</b>
-            <span className='modifier-value'>{item.value}</span>
+            <span className='Search-modifier-value'>{item.value}</span>
           </span>
       }
     </li>
