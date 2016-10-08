@@ -6,6 +6,7 @@ use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\Process;
+use VersionPress\Utils\ProcessUtils;
 
 class PluginsTest extends End2EndTestCase
 {
@@ -65,7 +66,7 @@ class PluginsTest extends End2EndTestCase
         }
 
         $process = new Process(
-            "git add -A && git commit -m " . escapeshellarg("Plugin setup"),
+            "git add -A && git commit -m " . ProcessUtils::escapeshellarg("Plugin setup"),
             self::$testConfig->testSite->path
         );
         $process->run();

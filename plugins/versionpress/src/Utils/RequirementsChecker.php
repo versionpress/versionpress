@@ -258,7 +258,7 @@ class RequirementsChecker
             FileSystem::remove($filePath);
 
             // Trying to create file from process (issue #522)
-            $process = new Process(sprintf("echo test > %s", escapeshellarg($filePath)));
+            $process = new Process(sprintf("echo test > %s", ProcessUtils::escapeshellarg($filePath)));
             $process->run();
             $writable &= is_file($filePath);
 

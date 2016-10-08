@@ -42,7 +42,7 @@ class SystemInfo
 
         $info = [];
 
-        $process = new Process(escapeshellarg($gitBinary) . " --version");
+        $process = new Process(ProcessUtils::escapeshellarg($gitBinary) . " --version");
         $process->run();
 
         $info['git-binary-as-configured'] = $gitBinary;
@@ -268,7 +268,7 @@ class SystemInfo
             $processInfo['php-can-delete'][$target] = !is_file($filePath);
 
             $filePath = $directory . '/' . '.vp-try-write-process';
-            $process = new Process(sprintf("echo test > %s", escapeshellarg($filePath)));
+            $process = new Process(sprintf("echo test > %s", ProcessUtils::escapeshellarg($filePath)));
             $process->run();
             $processInfo['process-can-write'][$target] = is_file($filePath);
             try {

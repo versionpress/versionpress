@@ -4,6 +4,7 @@ namespace VersionPress\Cli;
 
 use cli\Colors;
 use VersionPress\Utils\Process;
+use VersionPress\Utils\ProcessUtils;
 use WP_CLI;
 
 class VPCommandUtils
@@ -24,9 +25,9 @@ class VPCommandUtils
 
         foreach ($args as $name => $value) {
             if (is_int($name)) { // positional argument
-                $cliCommand .= " " . escapeshellarg($value);
+                $cliCommand .= " " . ProcessUtils::escapeshellarg($value);
             } elseif ($value !== null) {
-                $cliCommand .= " --$name=" . escapeshellarg($value);
+                $cliCommand .= " --$name=" . ProcessUtils::escapeshellarg($value);
             } else {
                 $cliCommand .= " --$name";
             }

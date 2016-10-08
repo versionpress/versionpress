@@ -5,6 +5,7 @@ namespace VersionPress\Git;
 use Nette\Utils\Strings;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\Process;
+use VersionPress\Utils\ProcessUtils;
 
 /**
  * Manipulates the Git repository.
@@ -177,7 +178,7 @@ class GitRepository
 
         $logCommand .= " " . $options;
         if (!empty($gitrevisions)) {
-            $logCommand .= " " . escapeshellarg($gitrevisions);
+            $logCommand .= " " . ProcessUtils::escapeshellarg($gitrevisions);
         }
 
         $logCommand = str_replace("|begin|", $commitDelimiter, $logCommand);
@@ -399,7 +400,7 @@ class GitRepository
 
             if (count($filesToReset) > 0) {
                 $this->runShellCommand(
-                    sprintf("git reset HEAD %s", join(" ", array_map('escapeshellarg', $filesToReset)))
+                    sprintf("git reset HEAD %s", join(" ", array_map(['VersionPress\Utils\ProcessUtils', 'escapeshellarg'], $filesToReset)))
                 );
             }
 
@@ -411,7 +412,7 @@ class GitRepository
             $emptyTreeHash = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
             $gitCmd = "git diff-tree -p $emptyTreeHash $hash";
         } else {
-            $escapedHash = escapeshellarg($hash);
+            $escapedHash = ProcessUtils::escapeshellarg($hash);
             $gitCmd = "git diff $escapedHash~1 $escapedHash";
         }
 
@@ -492,9 +493,9 @@ class GitRepository
 
         // replace (optional) "git " with the configured git binary
         $command = Strings::startsWith($command, "git ") ? substr($command, 4) : $command;
-        $command = escapeshellarg($this->gitBinary) . " " . $command;
+        $command = ProcessUtils::escapeshellarg($this->gitBinary) . " " . $command;
 
-        $escapedArgs = @array_map("escapeshellarg", $args);
+        $escapedArgs = @array_map(['VersionPress\Utils\ProcessUtils', 'escapeshellarg'], $args);
         $commandWithArguments = vsprintf($command, $escapedArgs);
 
         $result = $this->runProcess($commandWithArguments);
