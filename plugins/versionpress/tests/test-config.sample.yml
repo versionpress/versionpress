@@ -1,48 +1,53 @@
-# Test configuration, see TestConfig
+#
+# Test configuration, used by tests and WpAutomation, parsed into a `TestConfig` instance.
+# See https://github.com/versionpress/versionpress/blob/master/docs/Testing.md
+#
 
+# Worker type to run the tests, 'selenium' or 'wp-cli'
+end2end-test-type: selenium
+
+# WP-CLI version used, e.g., '0.24.1' or 'latest-stable'
+wp-cli-version: latest-stable
+
+# Selenium configuration
 selenium:
+  # on Windows, the value is something like 'C:/Path/To/FirefoxPortable/App/Firefox/firefox.exe'
   firefox-binary: /Users/johndoe/Path/To/Firefox.app/Contents/MacOS/firefox
   post-commit-wait-time: 500
 
-# Default values for all sites, may be overwritten by a specific site
+# Default values for all sites, may be overridden by a specific site
 common-site-config:
   db:
     table-prefix: wp_
   wp-site:
     admin-name: admin
-    admin-email: versionpress@example.com
+    admin-email: admin@example.com
     admin-pass: admin
-    wp-version: 4.5
+    wp-version: 4.6.1
     wp-locale: en_US
     wp-autoupdate: false
 
-# One of the sites below, used as the current one
+# One of the sites below, used as the active one
 test-site: vp01
 
-# Type of workers that will run the tests (selenium / wp-cli)
-end2end-test-type: selenium
-
-# Version of WP-CLI that will be used (e.g. 0.23.0 / latest-stable)
-wp-cli-version: 0.23.0
-
-# Configured sites
+# Test sites
 sites:
 
-  # Standard site
   vp01:
     host: localhost
     installation-type: standard
     db:
-      # Database should be created. VersionPress does not create it
+      # Database should already exist, VersionPress doesn't create it
       host: 127.0.0.1
       dbname: vp01
       user: vp01
       password: vp01
     wp-site:
+      # on Windows, the path is like c:/wamp/www/vp01
       path: /Users/johdoe/Sites/vp01
       url: http://localhost/vp01
       wp-admin-path: wp-admin
-      title: "VersionPress test @ localhost"
+      title: "VersionPress Test"
 
   vp01-composer:
     host: localhost
@@ -53,7 +58,7 @@ sites:
       user: vp01
       password: vp01
     wp-site:
-      path: /Users/johdoe/Sites/vp01
+      path: /Users/johndoe/Sites/vp01
       url: http://localhost/vp01/web # Note that the site runs from subdirectory
       wp-admin-path: wp/wp-admin
       title: "VersionPress test @ localhost"
