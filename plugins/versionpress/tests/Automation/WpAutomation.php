@@ -757,7 +757,7 @@ class WpAutomation
 
         $command = substr($command, 3); // strip "wp " prefix
 
-        $command = "php " . escapeshellarg($this->getWpCli()) . " $command";
+        $command = "php " . ProcessUtils::escapeshellarg($this->getWpCli()) . " $command";
 
         return $command;
 

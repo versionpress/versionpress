@@ -24,6 +24,7 @@ use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\PathUtils;
 use VersionPress\Utils\Process;
+use VersionPress\Utils\ProcessUtils;
 use VersionPress\Utils\RequirementsChecker;
 use VersionPress\Utils\WorkflowUtils;
 use VersionPress\VersionPress;
@@ -481,7 +482,7 @@ class VPCommand extends WP_CLI_Command
         vp_commit_all_frequently_written_entities();
 
         // Clone the site
-        $cloneCommand = sprintf("git clone %s %s", escapeshellarg($currentWpPath), escapeshellarg($clonePath));
+        $cloneCommand = sprintf("git clone %s %s", ProcessUtils::escapeshellarg($currentWpPath), ProcessUtils::escapeshellarg($clonePath));
 
         $process = VPCommandUtils::exec($cloneCommand, $currentWpPath);
 
@@ -494,7 +495,7 @@ class VPCommand extends WP_CLI_Command
 
         // Adding the clone as a remote for the convenience of the `vp pull` command - its `--from`
         // parameter can then be just the name of the clone, not a path to it
-        $addRemoteCommand = sprintf("git remote add %s %s", escapeshellarg($name), escapeshellarg($clonePath));
+        $addRemoteCommand = sprintf("git remote add %s %s", ProcessUtils::escapeshellarg($name), ProcessUtils::escapeshellarg($clonePath));
         $process = VPCommandUtils::exec($addRemoteCommand, $currentWpPath);
 
         if (!$process->isSuccessful()) {
@@ -659,7 +660,7 @@ class VPCommand extends WP_CLI_Command
 
         $remote = isset($assoc_args['from']) ? $assoc_args['from'] : 'origin';
 
-        $process = VPCommandUtils::exec("git config --get remote." . escapeshellarg($remote) . ".url");
+        $process = VPCommandUtils::exec("git config --get remote." . ProcessUtils::escapeshellarg($remote) . ".url");
         $remoteUrl = $process->getConsoleOutput();
 
         if (is_dir($remoteUrl)) {
@@ -671,7 +672,7 @@ class VPCommand extends WP_CLI_Command
         $this->switchMaintenance('on');
 
         $branchToPullFrom = 'master'; // hardcoded until we support custom branches
-        $pullCommand = 'git pull ' . escapeshellarg($remote) . ' ' . $branchToPullFrom;
+        $pullCommand = 'git pull ' . ProcessUtils::escapeshellarg($remote) . ' ' . $branchToPullFrom;
         $process = VPCommandUtils::exec($pullCommand);
 
         if ($process->isSuccessful()) {

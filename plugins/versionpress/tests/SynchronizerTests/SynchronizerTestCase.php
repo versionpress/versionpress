@@ -18,6 +18,7 @@ use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Tests\Utils\TestConfig;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\Process;
+use VersionPress\Utils\ProcessUtils;
 use wpdb;
 
 class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
@@ -101,7 +102,7 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
     public static function tearDownAfterClass()
     {
         $process = new Process(
-            "git add -A && git commit -m " . escapeshellarg("Commited changes made by " . get_called_class()),
+            "git add -A && git commit -m " . ProcessUtils::escapeshellarg("Commited changes made by " . get_called_class()),
             self::$testConfig->testSite->path
         );
         $process->run();
