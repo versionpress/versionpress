@@ -38,7 +38,7 @@ class AutocompleteUtils
         foreach ($actionsInfoProvider->getAllActionsInfo() as $scope => $actionsInfo) {
             foreach ($actionsInfo->getActions() as $action => $actionInfo) {
                 $actions[] = [
-                    'label' => Strings::capitalize($action) . ' ' . $scope,
+                    'label' => self::capitalize($action . ' ' . $scope),
                     'value' => $scope . '/' . $action,
                 ];
             }
@@ -61,7 +61,7 @@ class AutocompleteUtils
         $scopes = [];
         foreach ($actionsInfoProvider->getAllActionsInfo() as $scope => $actionsInfo) {
             $scopes[] = [
-                'label' => Strings::capitalize($scope),
+                'label' => self::capitalize($scope),
                 'value' => $scope,
             ];
         }
@@ -101,5 +101,19 @@ class AutocompleteUtils
         return [
             'type' => 'date'
         ];
+    }
+
+    /**
+     * @param $string
+     * @return string
+     */
+    private function capitalize($string)
+    {
+        $capitalizedString = Strings::firstUpper($string);
+        return str_replace(
+            ['Wordpress', 'wordpress', 'Versionpress', 'versionpress'],
+            ['WordPress', 'WordPress', 'VersionPress', 'VersionPress'],
+            $capitalizedString
+        );
     }
 }
