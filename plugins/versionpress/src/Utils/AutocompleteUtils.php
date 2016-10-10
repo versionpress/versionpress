@@ -104,15 +104,18 @@ class AutocompleteUtils
     }
 
     /**
+     * Capitalize the first word of a string.
+     * Also fix the capitalization of WordPress and VersionPress.
+     *
      * @param $string
      * @return string
      */
     private function capitalize($string)
     {
         $capitalizedString = Strings::firstUpper($string);
-        return str_replace(
-            ['Wordpress', 'wordpress', 'Versionpress', 'versionpress'],
-            ['WordPress', 'WordPress', 'VersionPress', 'VersionPress'],
+        return str_ireplace(
+            ['wordpress', 'versionpress'],
+            ['WordPress', 'VersionPress'],
             $capitalizedString
         );
     }
