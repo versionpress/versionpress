@@ -882,7 +882,7 @@ function vp_enqueue_styles_and_scripts()
         wp_enqueue_script(
             'versionpress_popover_script',
             plugins_url('admin/public/js/jquery.webui-popover.min.js', VERSIONPRESS_PLUGIN_FILE),
-            'jquery',
+            array('jquery'),
             $vpVersion
         );
     }
