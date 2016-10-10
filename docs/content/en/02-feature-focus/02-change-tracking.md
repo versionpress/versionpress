@@ -30,9 +30,9 @@ Most tracked changes involve database entities which are described below but som
  - **Media** uploads
  - **Translations**
 
-When any such action happens, VersionPress commits both the database change and a related file(s) change. For example, when installing a plugin, VersionPress will take not that the list of installed plugins has been changed in the database and commit the corresponding plugin files as well.
+When any such action happens, VersionPress commits both the database change and a related file(s) change. For example, when installing a plugin, VersionPress will take note that the list of installed plugins has been changed in the database and commit the corresponding plugin files as well.
 
-Note that not all files are versioned because you e.g. don't want to commit cache files, large backup ZIPs etc. Please refer to the [What's not tracked](#whats-not-tracked) section for more.  
+Note that not all files are versioned because you e.g. don't want to commit cache files, large backup ZIPs etc. Please refer to the [What's not tracked](#what-s-not-tracked) section for more.  
  
 
 
