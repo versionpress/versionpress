@@ -378,45 +378,45 @@ function isRelative(sitePath) {
  * Inspiration from https://github.com/sindresorhus/gulp-tar/blob/cbe4e1df44fdc477a3a9743cfb62ccb999748c16/index.js
  */
 function compress(filename) {
-	if (!filename) {
-		return;
-	}
+    if (!filename) {
+        return;
+    }
 
-	var firstFile;
-	var archive = archiver('zip');
+    var firstFile;
+    var archive = archiver('zip');
 
-	return through.obj(function (file, enc, cb) {
-		if (file.relative === '') {
-			cb();
-			return;
-		}
+    return through.obj(function (file, enc, cb) {
+        if (file.relative === '') {
+            cb();
+            return;
+        }
 
-		if (firstFile === undefined) {
-			firstFile = file;
-		}
+        if (firstFile === undefined) {
+            firstFile = file;
+        }
 
-		archive.append(file.contents, {
-			name: file.relative.replace(/\\/g, '/') + (file.isNull() ? '/' : ''),
-			mode: file.stat && file.stat.mode,
-			date: file.stat && file.stat.mtime ? file.stat.mtime : null
-		});
+        archive.append(file.contents, {
+            name: file.relative.replace(/\\/g, '/') + (file.isNull() ? '/' : ''),
+            mode: file.stat && file.stat.mode,
+            date: file.stat && file.stat.mtime ? file.stat.mtime : null
+        });
 
-		cb();
-	}, function (cb) {
-		if (firstFile === undefined) {
-			cb();
-			return;
-		}
+        cb();
+    }, function (cb) {
+        if (firstFile === undefined) {
+            cb();
+            return;
+        }
 
-		archive.finalize();
+        archive.finalize();
 
-		this.push(new gutil.File({
-			cwd: firstFile.cwd,
-			base: firstFile.base,
-			path: path.join(firstFile.base, filename),
-			contents: archive
-		}));
+        this.push(new gutil.File({
+            cwd: firstFile.cwd,
+            base: firstFile.base,
+            path: path.join(firstFile.base, filename),
+            contents: archive
+        }));
 
-		cb();
-	});
+        cb();
+    });
 }
