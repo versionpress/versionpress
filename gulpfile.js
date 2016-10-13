@@ -7,7 +7,6 @@ var del = require('del');
 var shell = require('gulp-shell');
 var shelljs = require('shelljs/global');
 var rename = require('gulp-rename');
-var zip = require('gulp-zip');
 var replace = require('gulp-replace');
 var fs = require('fs');
 var path = require('path');
@@ -19,7 +18,9 @@ var git = require('gulp-git');
 var merge = require('merge-stream');
 var runSequence = require('run-sequence');
 var execSync = require('child_process').execSync;
-
+var gutil = require('gulp-util');
+var through = require('through2');
+var archiver = require('archiver');
 
 /**
  * Version to be displayed both in WordPress administration and used as a suffix of the generated ZIP file
@@ -241,7 +242,7 @@ gulp.task('zip', false, ['copy', 'disable-debugger', 'remove-composer-files', 'f
         pipe(rename(function (path) {
             path.dirname = 'versionpress/' + path.dirname;
         })).
-        pipe(zip('versionpress-' + packageVersion + '.zip')).
+        pipe(compress('versionpress-' + packageVersion + '.zip')).
         pipe(gulp.dest(distDir));
 });
 
@@ -370,4 +371,52 @@ gulp.task('idea', 'Setup project files for IDEA / PhpStorm', function () {
 
 function isRelative(sitePath) {
     return path.normalize(sitePath) != path.resolve(sitePath);
+}
+
+/**
+ * Compress the build into a zip file.
+ * Inspiration from https://github.com/sindresorhus/gulp-tar/blob/cbe4e1df44fdc477a3a9743cfb62ccb999748c16/index.js
+ */
+function compress(filename) {
+	if (!filename) {
+		return;
+	}
+
+	var firstFile;
+	var archive = archiver('zip');
+
+	return through.obj(function (file, enc, cb) {
+		if (file.relative === '') {
+			cb();
+			return;
+		}
+
+		if (firstFile === undefined) {
+			firstFile = file;
+		}
+
+		archive.append(file.contents, {
+			name: file.relative.replace(/\\/g, '/') + (file.isNull() ? '/' : ''),
+			mode: file.stat && file.stat.mode,
+			date: file.stat && file.stat.mtime ? file.stat.mtime : null
+		});
+
+		cb();
+	}, function (cb) {
+		if (firstFile === undefined) {
+			cb();
+			return;
+		}
+
+		archive.finalize();
+
+		this.push(new gutil.File({
+			cwd: firstFile.cwd,
+			base: firstFile.base,
+			path: path.join(firstFile.base, filename),
+			contents: archive
+		}));
+
+		cb();
+	});
 }
