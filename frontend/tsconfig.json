@@ -10,7 +10,7 @@
     "src/**/*.ts",
     "src/**/*.tsx"
   ],
-  "files": [
-    "typings/index.d.ts"
+  "exclude": [
+    "src/**/__tests__/*.ts"
   ]
 }

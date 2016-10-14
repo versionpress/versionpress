@@ -48,6 +48,7 @@
     "@types/classnames": "0.0.31",
     "@types/core-js": "~0.9.34",
     "@types/diff": "0.0.31",
+    "@types/history": "~2.0.39",
     "@types/lodash": "~4.14.37",
     "@types/mocha": "~2.2.32",
     "@types/moment": "~2.13.0",
