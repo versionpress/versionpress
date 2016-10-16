@@ -1,10 +1,9 @@
-This page is about getting you ready for VersionPress _development_.
+This page is about getting you ready for VersionPress _development_. For instructions on using VersionPress, see [these docs](https://docs.versionpress.net/en).
 
-ToC:
+Table of contents:
 
 - [Prerequisites](#prerequisites)
-- [Project checkout](#project-checkout)
-- [ZIP builds](#zip-builds)
+- [Checkout & build](#checkout--build)
 - [IDE / editor setup](#ide--editor-setup)
 - [Running & debugging](#running--debugging)
 - [Testing](#testing)
@@ -24,13 +23,11 @@ Make sure these tools are installed on your computer:
 - [Gulp](http://gulpjs.com/) (globally)
 
 
-## Project checkout
+## Checkout & build
 
-1. Clone [the repo](https://github.com/versionpress/versionpress) into some **project folder**, e.g., `/Users/you/Projects/versionpress`.
-    - This is NOT under `wp-content` of some WordPress installation. Test site lives separately and you'll set it up later.
-2. Run `npm install` in the project root.
-
-This will download all sorts of dev dependencies and build the project. At this point, the `plugins/versionpress` can be copied to a WP site for testing (more on that later).
+1. **Clone the repo** to a project folder like `/Users/you/Projects/versionpress`. Note that this is _not_ under `wp-content` of a WordPress site; you'll set up a test site later.
+2. **Run `npm install`** in the project root. This downloads dev dependencies and builds the project.
+3. If impatient, you can now **copy the `plugins/versionpress` folder to some WordPress site** for testing. There are better ways though, see below.
 
 The sources contain two main parts:
 
@@ -39,24 +36,25 @@ The sources contain two main parts:
 
 The front-end requires building (transpiling the code to JavaScript, bundling it and copying to the WordPress plugin). `npm install` made it automatically, you can also invoke `gulp frontend-build-and-deploy` manually but there are easier workflows, see below.
 
-## ZIP builds
+### ZIP builds
 
-To build a ZIP file to distribute VersionPress:
+To build a ZIP file to distribute VersionPress (supports both stable releases, alphas, betas etc.):
 
-1. Run **`gulp build`**
-2. Watch the magic happen
+1. Run **`gulp build`**.
+2. Watch the magic happen.
 
-A file like `dist/versionpress-3.0.2.zip` will be produced. The file name is based on the nearest Git tag, for example:
+A file like `dist/versionpress-3.0.2.zip` is produced. The file name is based on the nearest Git tag, for example:
 
 ```
 versionpress-3.0.2.zip
 # built from commit tagged 3.0.2
 
 versionpress-3.0.2-27-g0e1ce7f.zip
-# built from 0e1ce7f which is based on 3.0.2 but with 27 new commits
+# built from 0e1ce7f which is based on 3.0.2 with 27 new commits
 ```
 
-See [`git describe --tags`](https://git-scm.com/docs/git-describe#_examples) for more.
+See [`git describe --tags`](https://git-scm.com/docs/git-describe#_examples) for more examples.
+
 
 ## IDE / editor setup
 
