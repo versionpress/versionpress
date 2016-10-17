@@ -36,7 +36,7 @@ $message = "
 
 $errors = (!$canRevert ? "
         <p class='undo-warning'>
-            <span class='icon icon-warning'></span>
+            <span class='icon vp-icon-warning'></span>
             You have <a href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback#uncommitted-files' target='_blank'>uncommitted changes</a> in your WordPress directory.<br>Please commit them before doing a revert.
         </p>" : "");
 
