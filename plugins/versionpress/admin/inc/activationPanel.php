@@ -11,6 +11,11 @@ use VersionPress\Utils\RequirementsChecker;
 
 jQuery(document).ready(function($) {
     $('#activate-versionpress-btn').click(function (e) {
+        if ($(this).attr('href') === '#') {
+            // Environment doesn't match requirements, button is disabled
+            return false;
+        }
+
         var envname = $('#envname').val();
 
         // Quick and dirty validation; the canonical regexp is in WorkflowUtils::isCloneNameValid().
