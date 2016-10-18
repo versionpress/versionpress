@@ -71,7 +71,7 @@ export default class Modal extends React.Component<ModalProps, {}> {
             onCloseClick={this.closeModal}
           />
           <Body>
-          {children}
+            {children}
           </Body>
         </div>
       </div>
