@@ -21,7 +21,7 @@ const DOT_RADIUS = 4;
 @observer
 export default class Environment extends React.Component<EnvironmentProps, {}> {
 
-  private tdDom;
+  tableCellNode: HTMLTableCellElement = null;
 
   componentDidMount() {
     this.forceUpdate();
@@ -45,7 +45,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
     return (
       <td
         className={environmentClassName}
-        ref={tdDom => this.tdDom = tdDom}
+        ref={node => this.tableCellNode = node}
       >
         {(!showVisualisation && environment !== '?') &&
           <ColorInfo
@@ -55,8 +55,8 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
         }
         {showVisualisation &&
           <RowVisualisation
-            width={!this.tdDom ? 50 : this.tdDom.getBoundingClientRect().width}
-            height={!this.tdDom ? 20 : this.tdDom.getBoundingClientRect().height}
+            width={!this.tableCellNode ? 50 : this.tableCellNode.getBoundingClientRect().width}
+            height={!this.tableCellNode ? 20 : this.tableCellNode.getBoundingClientRect().height}
             left={LEFT}
             space={SPACE}
             strokeWidth={STROKE_WIDTH}
