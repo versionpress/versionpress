@@ -21,9 +21,7 @@ export default class FlashMessage extends React.Component<FlashMessageProps, Fla
     showDetails: false,
   };
 
-  onDetailsClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-
+  onDetailsClick = () => {
     this.setState((prevState, props) => ({
       showDetails: !prevState.showDetails,
     }));

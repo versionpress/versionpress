@@ -3,9 +3,9 @@ import { observer } from 'mobx-react';
 
 interface FormProps {
   commitMessage: string;
-  onCommitMessageChange(e: React.FormEvent): void;
-  onSubmit(e: React.FormEvent): void;
-  onCancelCommitClick(e: React.MouseEvent): void;
+  onCommitMessageChange(value: string): void;
+  onSubmit(): void;
+  onCancelCommitClick(): void;
 }
 
 const Form: React.StatelessComponent<FormProps> = (props) => {
@@ -18,13 +18,13 @@ const Form: React.StatelessComponent<FormProps> = (props) => {
 
   return (
     <div className='CommitPanel-commit'>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={e => { e.preventDefault(); onSubmit(); }}>
         <textarea
           autoFocus={true}
           className='CommitPanel-commit-input'
           value={commitMessage}
           placeholder='Commit message...'
-          onChange={onCommitMessageChange}
+          onChange={e => onCommitMessageChange(e.currentTarget.value)}
         />
         <input
           className='button button-primary CommitPanel-commit-button'
@@ -33,7 +33,7 @@ const Form: React.StatelessComponent<FormProps> = (props) => {
         />
         <input
           className='button CommitPanel-commit-button'
-          onClick={onCancelCommitClick}
+          onClick={e => { e.preventDefault(); onCancelCommitClick(); }}
           type='button'
           value='Cancel'
         />

@@ -1,14 +1,14 @@
 import * as React from 'react';
 
 interface CloseIconProps {
-  onClick(e: React.MouseEvent): void;
+  onClick(): void;
 }
 
 const CloseIcon: React.StatelessComponent<CloseIconProps> = ({ onClick }) => (
   <a
     href='#'
     className='Modal-close'
-    onClick={onClick}
+    onClick={e => { e.stopPropagation(); e.preventDefault(); onClick(); }}
   >
     &times;
   </a>

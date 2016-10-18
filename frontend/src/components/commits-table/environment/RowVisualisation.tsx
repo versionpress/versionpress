@@ -10,7 +10,7 @@ interface RowVisualisationProps {
   strokeWidth: number;
   dotRadius: number;
   visualisation: Visualisation;
-  onClick(e: React.MouseEvent): void;
+  onToggleShowVisualisation(): void;
 }
 
 const RowVisualisation: React.StatelessComponent<RowVisualisationProps> = (props) => {
@@ -22,14 +22,14 @@ const RowVisualisation: React.StatelessComponent<RowVisualisationProps> = (props
     strokeWidth,
     dotRadius,
     visualisation,
-    onClick,
+    onToggleShowVisualisation,
   } = props;
 
   return (
     <svg
       width={width}
       height={height}
-      onClick={onClick}
+      onClick={e => { e.stopPropagation(); onToggleShowVisualisation(); }}
     >
       {visualisation.upperRoutes && visualisation.upperRoutes.map(route => {
         const { from, to } = route;

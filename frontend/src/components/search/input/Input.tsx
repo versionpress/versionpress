@@ -10,14 +10,14 @@ interface InputProps {
   placeholder?: string;
   value?: string;
   disabled?: boolean;
-  onBlur?: React.FocusEventHandler;
-  onFocus?: React.FocusEventHandler;
-  onClick?: React.MouseEventHandler;
-  onCut?: React.ClipboardEventHandler;
-  onPaste?: React.ClipboardEventHandler;
-  onKeyDown?: React.KeyboardEventHandler;
-  onKeyUp?: React.KeyboardEventHandler;
-  onChange?(e: React.FormEvent): void;
+  onBlur?: React.FocusEventHandler<HTMLInputElement>;
+  onFocus?: React.FocusEventHandler<HTMLInputElement>;
+  onClick?: React.MouseEventHandler<HTMLInputElement>;
+  onCut?: React.ClipboardEventHandler<HTMLInputElement>;
+  onPaste?: React.ClipboardEventHandler<HTMLInputElement>;
+  onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
+  onKeyUp?: React.KeyboardEventHandler<HTMLInputElement>;
+  onChange?(e: React.FormEvent<HTMLInputElement>): void;
 }
 
 const Input: React.StatelessComponent<InputProps> = (props) => {

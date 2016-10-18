@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 
 interface RollbackProps {
   enableActions: boolean;
-  onClick(e: React.MouseEvent): void;
+  onClick(): void;
 }
 
 const Rollback: React.StatelessComponent<RollbackProps> = ({ enableActions, onClick }) => {
@@ -21,7 +21,7 @@ const Rollback: React.StatelessComponent<RollbackProps> = ({ enableActions, onCl
     <a
       className={rollbackClassName}
       href='#'
-      onClick={onClick}
+      onClick={e => { e.stopPropagation(); e.preventDefault(); onClick(); }}
       title={title}
     >
       Roll back to this

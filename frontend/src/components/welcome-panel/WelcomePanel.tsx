@@ -3,7 +3,7 @@ import * as React from 'react';
 import './WelcomePanel.less';
 
 interface WelcomePanelProps {
-  onHide(e: React.MouseEvent): void;
+  onHide(): void;
 }
 
 const WelcomePanel: React.StatelessComponent<WelcomePanelProps> = ({ onHide }) => (
@@ -11,7 +11,7 @@ const WelcomePanel: React.StatelessComponent<WelcomePanelProps> = ({ onHide }) =
     <a
       className='welcome-panel-close'
       href='#'
-      onClick={onHide}
+      onClick={e => { e.preventDefault(); onHide(); }}
     >
       Dismiss
     </a>

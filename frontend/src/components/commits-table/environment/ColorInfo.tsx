@@ -5,14 +5,14 @@ import { getGitBranchColor } from '../../../services/GitBranchColorProvider';
 
 interface ColorInfoProps {
   environment: string;
-  onClick(e: React.MouseEvent): void;
+  onToggleShowVisualisation(): void;
 }
 
-const ColorInfo: React.StatelessComponent<ColorInfoProps> = ({ environment, onClick }) => (
+const ColorInfo: React.StatelessComponent<ColorInfoProps> = ({ environment, onToggleShowVisualisation }) => (
   <div
     className='environment-info'
     style={{ backgroundColor: getGitBranchColor(environment) }}
-    onClick={onClick}
+    onClick={e => { e.preventDefault(); e.stopPropagation(); onToggleShowVisualisation(); }}
   >
     {environment}
   </div>

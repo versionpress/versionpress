@@ -20,7 +20,7 @@ import './Search.less';
 
 interface SearchProps {
   config: SearchConfig;
-  onChange?(e: React.FormEvent): void;
+  onChange?(query: string): void;
 }
 
 interface SearchState {
@@ -43,37 +43,29 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     this.scrollBackground();
   };
 
-  onBlur = (e: React.FocusEvent) => {
+  onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     this.setCursorLocation(-1);
   };
 
-  onClick = (e: React.MouseEvent) => {
-    const target = e.target as HTMLInputElement;
-
-    this.setCursorLocation(target.selectionStart);
+  onClick = (e: React.MouseEvent<HTMLInputElement>) => {
+    this.setCursorLocation(e.currentTarget.selectionStart);
   };
 
-  onCut = (e: React.ClipboardEvent) => {
-    const target = e.target as HTMLInputElement;
-
-    this.setCursorLocation(target.selectionStart);
+  onCut = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    this.setCursorLocation(e.currentTarget.selectionStart);
     this.setState({
-      inputValue: target.value,
+      inputValue: e.currentTarget.value,
     });
   };
 
-  onPaste = (e: React.ClipboardEvent) => {
-    const target = e.target as HTMLInputElement;
-
-    this.setCursorLocation(target.selectionStart);
+  onPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    this.setCursorLocation(e.currentTarget.selectionStart);
     this.setState({
-      inputValue: target.value,
+      inputValue: e.currentTarget.value,
     });
   };
 
-  onKeyDown = (e: React.KeyboardEvent) => {
-    const target = e.target as HTMLInputElement;
-
+  onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     switch (e.keyCode) {
       case KEYS.ENTER:
         if (this.popupComponentNode) {
@@ -116,38 +108,34 @@ export default class Search extends React.Component<SearchProps, SearchState> {
         }
         break;
       default:
-        this.setCursorLocation(target.selectionStart);
-        if (target.value !== this.state.inputValue) {
+        this.setCursorLocation(e.currentTarget.selectionStart);
+        if (e.currentTarget.value !== this.state.inputValue) {
           this.setState({
-            inputValue: target.value,
+            inputValue: e.currentTarget.value,
           });
         }
     }
   }
 
-  onKeyUp = (e: React.KeyboardEvent) => {
-    const target = e.target as HTMLInputElement;
-
-    this.setCursorLocation(target.selectionStart);
-    if (target.value !== this.state.inputValue) {
+  onKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    this.setCursorLocation(e.currentTarget.selectionStart);
+    if (e.currentTarget.value !== this.state.inputValue) {
       this.setState({
-        inputValue: target.value,
+        inputValue: e.currentTarget.value,
       });
     }
 
-    this.props.onChange(e);
+    this.props.onChange(e.currentTarget.value);
   };
 
-  onChange = (e: React.FormEvent) => {
-    const target = e.target as HTMLInputElement;
-
-    if (target.value !== this.state.inputValue) {
+  onChange = (e: React.FormEvent<HTMLInputElement>) => {
+    if (e.currentTarget.value !== this.state.inputValue) {
       this.setState({
-        inputValue: target.value,
+        inputValue: e.currentTarget.value,
       });
     }
 
-    this.props.onChange(e);
+    this.props.onChange(e.currentTarget.value);
   }
 
   onChangeTokenModel = (tokenIndex: number, model: any, shouldMoveCursor: boolean) => {

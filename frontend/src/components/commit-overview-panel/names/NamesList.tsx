@@ -9,7 +9,7 @@ interface NamesListProps {
   filteredChanges: Change[];
   countOfDuplicates: CountOfDuplicateChanges;
   expandedLists: string[];
-  onShowMoreClick(e: React.MouseEvent, listKey): void;
+  onShowMoreClick(listKey): void;
 }
 
 const displayedListLength = 3;
@@ -40,7 +40,7 @@ const NamesList: React.StatelessComponent<NamesListProps> = (props) => {
     <ul>
       {names.slice(0, displayedListLength).map((name, i) => <li key={i}>{name}</li>)}
       <li>
-        <a onClick={e => onShowMoreClick(e, listKey)}>
+        <a onClick={e => { e.preventDefault(); onShowMoreClick(listKey); }}>
           show {names.length - displayedListLength} more...
         </a>
       </li>

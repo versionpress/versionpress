@@ -22,14 +22,6 @@ export default class Navigation extends React.Component<NavigationProps, {}> {
     navigationStore.changeFilterQuery(query);
   };
 
-  onFilter = () => {
-    filter();
-  };
-
-  onClearSelection = () => {
-    clearSelection();
-  };
-
   onBulkAction = (action: string) => {
     if (action === 'undo') {
       const { changesCount, hashes } = this.props.navigationStore;
@@ -52,12 +44,12 @@ export default class Navigation extends React.Component<NavigationProps, {}> {
         <Filter
           query={query}
           onQueryChange={this.onFilterQueryChange}
-          onFilter={this.onFilter}
+          onFilter={filter}
         />
         <BulkActionPanel
           enableActions={enableActions}
           onBulkAction={this.onBulkAction}
-          onClearSelection={this.onClearSelection}
+          onClearSelection={clearSelection}
           changesCount={changesCount}
         />
       </div>

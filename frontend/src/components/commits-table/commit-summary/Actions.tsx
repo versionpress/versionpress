@@ -7,8 +7,8 @@ import Undo from './Undo';
 interface ActionsProps {
   commit: Commit;
   enableActions: boolean;
-  onUndoClick(e: React.MouseEvent): void;
-  onRollbackClick(e: React.MouseEvent): void;
+  onUndoClick(): void;
+  onRollbackClick(): void;
 }
 
 const Actions: React.StatelessComponent<ActionsProps> = (props) => {

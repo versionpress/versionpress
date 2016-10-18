@@ -25,9 +25,7 @@ export default class CommitOverviewPanel extends React.Component<CommitOverviewP
     expandedLists: [],
   };
 
-  onShowMoreClick = (e: React.MouseEvent, listKey: string) => {
-    e.preventDefault();
-
+  onShowMoreClick = (listKey: string) => {
     this.setState((prevState, props) => ({
       expandedLists: prevState.expandedLists.concat([listKey]),
     }));

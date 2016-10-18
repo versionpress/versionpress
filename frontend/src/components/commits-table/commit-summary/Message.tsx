@@ -8,10 +8,10 @@ import DetailsLevel from '../../../enums/DetailsLevel';
 interface MessageProps {
   commit: Commit;
   detailsLevel: DetailsLevel;
-  onDetailsLevelClick(e: React.MouseEvent, detailsLevel: DetailsLevel): void;
+  onDetailsLevelChange(detailsLevel: DetailsLevel): void;
 }
 
-const Message: React.StatelessComponent<MessageProps> = ({ commit, detailsLevel, onDetailsLevelClick }) => (
+const Message: React.StatelessComponent<MessageProps> = ({ commit, detailsLevel, onDetailsLevelChange }) => (
   <td className='column-message'>
     {commit.isMerge &&
       <MergeIcon />
@@ -20,7 +20,7 @@ const Message: React.StatelessComponent<MessageProps> = ({ commit, detailsLevel,
     {detailsLevel !== DetailsLevel.None &&
       <DetailsLevelButtons
         detailsLevel={detailsLevel}
-        onButtonClick={onDetailsLevelClick}
+        onDetailsLevelChange={onDetailsLevelChange}
       />
     }
   </td>

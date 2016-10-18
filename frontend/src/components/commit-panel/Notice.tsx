@@ -11,7 +11,7 @@ interface CommitPanelNoticeProps {
 @observer
 export default class Notice extends React.Component<CommitPanelNoticeProps, {}> {
 
-  onDetailsClick = (e: React.MouseEvent) => {
+  onDetailsClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
 
     const { detailsLevel, onDetailsLevelChange } = this.props;

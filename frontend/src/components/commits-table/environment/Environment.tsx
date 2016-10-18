@@ -29,15 +29,13 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
     window.addEventListener('resize', () => this.forceUpdate());
   }
 
-  onToggleShowVisualisation = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    this.props.onToggleShowVisualisation();
-  };
-
   render() {
-    const { environment, showVisualisation, visualisation } = this.props;
+    const {
+      environment,
+      showVisualisation,
+      visualisation,
+      onToggleShowVisualisation,
+    } = this.props;
 
     const environmentClassName = classNames({
       'column-environment': true,
@@ -52,7 +50,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
         {(!showVisualisation && environment !== '?') &&
           <ColorInfo
             environment={environment}
-            onClick={this.onToggleShowVisualisation}
+            onToggleShowVisualisation={onToggleShowVisualisation}
           />
         }
         {showVisualisation &&
@@ -64,7 +62,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
             strokeWidth={STROKE_WIDTH}
             dotRadius={DOT_RADIUS}
             visualisation={visualisation}
-            onClick={this.onToggleShowVisualisation}
+            onToggleShowVisualisation={onToggleShowVisualisation}
           />
         }
         {showVisualisation &&

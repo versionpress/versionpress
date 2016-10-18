@@ -21,9 +21,7 @@ export default class Overview extends React.Component<OverviewProps, OverviewSta
     isExpanded: false,
   };
 
-  onShowMoreClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-
+  onShowMoreClick = () => {
     this.setState({
       isExpanded: true,
     });

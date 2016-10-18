@@ -23,9 +23,7 @@ export default class Commit extends React.Component<CommitProps, CommitState> {
     commitMessage: '',
   };
 
-  onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
+  onSubmit = () => {
     this.props.onCommit(this.state.commitMessage);
 
     this.setState({
@@ -33,31 +31,25 @@ export default class Commit extends React.Component<CommitProps, CommitState> {
     });
   };
 
-  onCommitClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-
+  onCommitClick = () => {
     this.setState({
       isFormVisible: true,
     });
   };
 
-  onCommitMessageChange = (e: React.FormEvent) => {
+  onCommitMessageChange = (value: string) => {
     this.setState({
-      commitMessage: (e.target as HTMLTextAreaElement).value,
+      commitMessage: value,
     });
   };
 
-  onCancelCommitClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-
+  onCancelCommitClick = () => {
     this.setState({
       isFormVisible: false,
     });
   };
 
-  onDiscardClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-
+  onDiscardClick = () => {
     const body = <div>This action cannot be undone, are you sure?</div>;
     const options = {
       okButtonText: 'Proceed',

@@ -53,9 +53,7 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
     });
   };
 
-  onSubmitClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-
+  onSubmit = () => {
     const selectedOption = this.state.options.find(option => option.isSelected);
 
     if (selectedOption.value === '-1') {
@@ -65,14 +63,8 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
     this.props.onBulkAction(selectedOption.value);
   };
 
-  onClearSelectionClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    this.props.onClearSelection();
-  };
-
   render() {
-    const { changesCount, enableActions } = this.props;
+    const { changesCount, enableActions, onClearSelection } = this.props;
     const { options } = this.state;
 
     return (
@@ -85,12 +77,12 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
             onChange={this.onSelectedValueChange}
           />
           <Submit
-            onClick={this.onSubmitClick}
+            onSubmit={this.onSubmit}
             isDisabled={!enableActions || changesCount === 0}
           />
           <ClearSelection
             changesCount={changesCount}
-            onClick={this.onClearSelectionClick}
+            onClearSelection={onClearSelection}
           />
         </div>
       </div>

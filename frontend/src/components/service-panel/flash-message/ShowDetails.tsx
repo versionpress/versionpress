@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 
 interface ShowDetailsProps {
   isActive: boolean;
-  onClick(e: React.MouseEvent): void;
+  onClick(): void;
 }
 
 const ShowDetails: React.StatelessComponent<ShowDetailsProps> = ({ isActive, onClick }) => {
@@ -17,7 +17,7 @@ const ShowDetails: React.StatelessComponent<ShowDetailsProps> = ({ isActive, onC
     <a
       className={showDetailsClassName}
       href='#'
-      onClick={onClick}
+      onClick={e => { e.preventDefault(); onClick(); }}
     >
       Details
     </a>

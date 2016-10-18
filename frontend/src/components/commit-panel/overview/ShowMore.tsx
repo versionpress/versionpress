@@ -3,12 +3,12 @@ import { observer } from 'mobx-react';
 
 interface ShowMoreProps {
   displayNumber: number;
-  onClick(e: React.MouseEvent): void;
+  onClick(): void;
 }
 
 const ShowMore: React.StatelessComponent<ShowMoreProps> = ({ displayNumber, onClick }) => (
   <li>
-    <a onClick={onClick}>
+    <a onClick={e => { e.preventDefault(); onClick(); }}>
       show {displayNumber} more...
     </a>
   </li>

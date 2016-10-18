@@ -7,7 +7,7 @@ import Title from './Title';
 interface HeaderProps {
   title?: React.ReactNode;
   showCloseIcon: boolean;
-  onCloseClick(e: React.MouseEvent): void;
+  onCloseClick(): void;
 }
 
 const Header: React.StatelessComponent<HeaderProps> = ({ title, showCloseIcon, onCloseClick }) => (

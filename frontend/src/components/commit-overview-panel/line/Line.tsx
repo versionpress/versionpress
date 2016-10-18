@@ -12,12 +12,10 @@ import Comment from './Comment';
 import Post from './Post';
 import OverviewLine from './OverviewLine';
 
-type OnShowMoreClick = (e: React.MouseEvent, listKey: string) => void;
-
 export interface LineProps {
   changes: Change[];
   expandedLists: string[];
-  onShowMoreClick: OnShowMoreClick;
+  onShowMoreClick(listKey: string): void;
 }
 
 const Line: React.StatelessComponent<LineProps> = (props) => {

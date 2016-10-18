@@ -45,18 +45,6 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
     fetchCommits(page);
   }
 
-  onWelcomePanelHide = (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    hideWelcomePanel();
-  };
-
-  onUpdateNoticeClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    fetchCommits();
-  };
-
   render() {
     const { appStore, loadingStore } = this.props;
     const {
@@ -76,10 +64,10 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
           <CommitPanel />
         }
         {displayWelcomePanel &&
-          <WelcomePanel onHide={this.onWelcomePanelHide} />
+          <WelcomePanel onHide={hideWelcomePanel} />
         }
         {displayUpdateNotice &&
-          <UpdateNotice onClick={this.onUpdateNoticeClick} />
+          <UpdateNotice onClick={fetchCommits} />
         }
         <Navigation />
         <CommitsTable />

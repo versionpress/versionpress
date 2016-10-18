@@ -34,7 +34,7 @@ export default class Modal extends React.Component<ModalProps, {}> {
     this.contentNode.focus();
   }
 
-  onBackgroundClick = (e: React.MouseEvent) => {
+  onBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
 
     if (this.props.enableBackgroundClickToClose) {
@@ -42,16 +42,10 @@ export default class Modal extends React.Component<ModalProps, {}> {
     }
   };
 
-  onContentKeyDown = (e: React.KeyboardEvent) => {
+  onContentKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.keyCode === 27 && this.props.showCloseIcon) {
       this.closeModal();
     }
-  };
-
-  onCloseHeaderClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    this.closeModal();
   };
 
   private closeModal = () => {
@@ -74,7 +68,7 @@ export default class Modal extends React.Component<ModalProps, {}> {
           <Header
             title={title}
             showCloseIcon={showCloseIcon}
-            onCloseClick={this.onCloseHeaderClick}
+            onCloseClick={this.closeModal}
           />
           <Body>
           {children}

@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 
 interface QueryInputProps {
   query: string;
-  onChange(e: React.FormEvent): void;
+  onChange(query: string): void;
 }
 
 const QueryInput: React.StatelessComponent<QueryInputProps> = ({ query, onChange }) => (
@@ -11,7 +11,7 @@ const QueryInput: React.StatelessComponent<QueryInputProps> = ({ query, onChange
     type='search'
     className='Filter-query'
     value={query}
-    onChange={onChange}
+    onChange={e => onChange(e.currentTarget.value)}
   />
 );
 
