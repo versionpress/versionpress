@@ -9,7 +9,7 @@ interface NamesListProps {
   filteredChanges: Change[];
   countOfDuplicates: CountOfDuplicateChanges;
   expandedLists: string[];
-  onShowMoreClick(listKey): void;
+  onShowMoreClick(listKey: string): void;
 }
 
 const displayedListLength = 3;
