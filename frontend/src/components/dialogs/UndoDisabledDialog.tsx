@@ -3,7 +3,7 @@ import * as React from 'react';
 const UndoDisabledDialog: React.StatelessComponent<{}> = () => (
   <div>
     <p className='undo-warning'>
-      <span className='icon icon-warning' />
+      <span className='icon vp-icon-warning' />
       You have {' '}
       <a
         href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback#uncommitted-files'

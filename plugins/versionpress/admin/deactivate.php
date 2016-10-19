@@ -37,18 +37,18 @@ function _vp_button($label, $action, $type = "delete", $cssClass = "")
         <ul>
 
             <li>
-                <span class="icon icon-notification warning-color"></span>
+                <span class="icon vp-icon-notification warning-color"></span>
                 <span class="vp-highlight-text">Later installations of VersionPress <strong>will not be able to undo or rollback changes</strong> done by this installation.</span> The changes are still technically in the repository if you want to inspect them using e.g. the command line tools etc.
             </li>
 
 
             <li>
-                <span class="icon icon-checkmark ok-color"></span>
+                <span class="icon vp-icon-checkmark ok-color"></span>
                 Deactivation <strong>keeps the Git repository on the server</strong>. You can e.g. download the repository for local inspection.
             </li>
 
             <li>
-                <span class="icon icon-checkmark ok-color"></span>
+                <span class="icon vp-icon-checkmark ok-color"></span>
                 You <strong>can reactivate VersionPress again</strong> and the current Git repository will not cause any trouble. The new VersionPress installation will just not be able to undo the old changes as stated above.
             </li>
 
@@ -57,7 +57,7 @@ function _vp_button($label, $action, $type = "delete", $cssClass = "")
                 ?>
 
                 <li>
-                    <span class="icon icon-notification warning-color"></span>
+                    <span class="icon vp-icon-notification warning-color"></span>
                     If you <strong>uninstall</strong> VersionPress later (by clicking the Delete button on the Plugins page) the Git repository will be moved to the <code>wp-content/vpbackups</code> folder. The site will appear unversioned but you can always restore the repository from there should you need to.
                 </li>
 
