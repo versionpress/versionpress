@@ -4,10 +4,10 @@ import * as classNames from 'classnames';
 
 interface ClearSelectionProps {
   changesCount: number;
-  onClick(e: React.MouseEvent): void;
+  onClearSelection(): void;
 }
 
-const ClearSelection: React.StatelessComponent<ClearSelectionProps> = ({ changesCount, onClick }) => {
+const ClearSelection: React.StatelessComponent<ClearSelectionProps> = ({ changesCount, onClearSelection }) => {
   const noteClassName = classNames({
     'BulkActionPanel-note': true,
     'hide': changesCount === 0,
@@ -19,7 +19,7 @@ const ClearSelection: React.StatelessComponent<ClearSelectionProps> = ({ changes
       <a
         className='BulkActionPanel-clear'
         href='#'
-        onClick={onClick}
+        onClick={e => { e.preventDefault(); onClearSelection(); }}
       >
         clear selection
       </a>

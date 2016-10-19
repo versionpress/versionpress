@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 interface UndoProps {
   commit: Commit;
   enableActions: boolean;
-  onClick(e: React.MouseEvent): void;
+  onClick(): void;
 }
 
 const Undo: React.StatelessComponent<UndoProps> = ({ commit, enableActions, onClick }) => {
@@ -24,7 +24,7 @@ const Undo: React.StatelessComponent<UndoProps> = ({ commit, enableActions, onCl
     <a
       className={undoClassName}
       href='#'
-      onClick={onClick}
+      onClick={e => { e.stopPropagation(); e.preventDefault(); onClick(); }}
       title={title}
     >
       Undo this

@@ -3,7 +3,7 @@ import * as React from 'react';
 import './Button.less';
 
 interface ButtonProps {
-  onClick(e: React.MouseEvent): void;
+  onClick(): void;
 }
 
 const Button: React.StatelessComponent<ButtonProps> = ({ onClick }) => (

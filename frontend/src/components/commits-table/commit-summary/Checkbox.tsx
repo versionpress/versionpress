@@ -5,7 +5,7 @@ interface CheckboxProps {
   isVisible: boolean;
   isChecked: boolean;
   isDisabled: boolean;
-  onClick(e: React.MouseEvent): void;
+  onClick(shiftKey: boolean): void;
 }
 
 const Checkbox: React.StatelessComponent<CheckboxProps> = (props) => {
@@ -17,7 +17,7 @@ const Checkbox: React.StatelessComponent<CheckboxProps> = (props) => {
   } = props;
 
   return isVisible
-    ? <td className='column-cb' onClick={onClick}>
+    ? <td className='column-cb' onClick={e => { e.preventDefault(); onClick(e.shiftKey); }}>
         <input
           type='checkbox'
           checked={isChecked}

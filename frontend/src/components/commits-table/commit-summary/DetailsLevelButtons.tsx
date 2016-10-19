@@ -5,22 +5,22 @@ import DetailsLevel from '../../../enums/DetailsLevel';
 
 interface DetailsLevelButtonsProps {
   detailsLevel: DetailsLevel;
-  onButtonClick(e: React.MouseEvent, detailsLevel: DetailsLevel): void;
+  onDetailsLevelChange(detailsLevel: DetailsLevel): void;
 }
 
-const DetailsLevelButtons: React.StatelessComponent<DetailsLevelButtonsProps> = ({ detailsLevel, onButtonClick }) => (
+const DetailsLevelButtons: React.StatelessComponent<DetailsLevelButtonsProps> = ({ detailsLevel, onDetailsLevelChange }) => (
   <div className='detail-buttons'>
     <button
       className='button'
       disabled={detailsLevel === DetailsLevel.Overview}
-      onClick={e => onButtonClick(e, DetailsLevel.Overview)}
+      onClick={e => { e.stopPropagation(); onDetailsLevelChange(DetailsLevel.Overview); }}
     >
       Overview
     </button>
     <button
       className='button'
       disabled={detailsLevel === DetailsLevel.FullDiff}
-      onClick={e => onButtonClick(e, DetailsLevel.FullDiff)}
+      onClick={e => { e.stopPropagation(); onDetailsLevelChange(DetailsLevel.FullDiff); }}
     >
       Full diff
     </button>

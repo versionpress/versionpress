@@ -32,7 +32,7 @@ interface CommitSummaryProps {
 @observer
 export default class CommitSummary extends React.Component<CommitSummaryProps, {}> {
 
-  onRowClick = (e: React.MouseEvent) => {
+  onRowClick = (e: React.MouseEvent<HTMLTableRowElement>) => {
     e.preventDefault();
 
     const { commit, detailsLevel, onDetailsLevelChange } = this.props;
@@ -42,24 +42,13 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
     }
   };
 
-  onCheckboxClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-
+  onCheckboxClick = (shiftKey: boolean) => {
     const { commit, isSelected, onCommitsSelect } = this.props;
 
-    onCommitsSelect([commit], !isSelected, e.shiftKey);
+    onCommitsSelect([commit], !isSelected, shiftKey);
   };
 
-  onDetailsLevelClick = (e: React.MouseEvent, detailsLevel: DetailsLevel) => {
-    e.stopPropagation();
-
-    this.props.onDetailsLevelChange(detailsLevel);
-  };
-
-  onUndoClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-
+  onUndoClick = () => {
     const { commit, enableActions, onUndo } = this.props;
 
     if (commit.isMerge) {
@@ -74,10 +63,7 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
     }
   };
 
-  onRollbackClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-
+  onRollbackClick = () => {
     const { commit, enableActions, onRollback } = this.props;
 
     if (enableActions) {
@@ -109,6 +95,7 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
       detailsLevel,
       showVisualisation,
       visualisation,
+      onDetailsLevelChange,
       onToggleShowVisualisation,
     } = this.props;
 
@@ -140,7 +127,7 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
         <Message
           commit={commit}
           detailsLevel={detailsLevel}
-          onDetailsLevelClick={this.onDetailsLevelClick}
+          onDetailsLevelChange={onDetailsLevelChange}
         />
         <Actions
           commit={commit}

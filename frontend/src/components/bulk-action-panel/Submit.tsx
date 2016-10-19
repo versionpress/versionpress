@@ -3,16 +3,16 @@ import { observer } from 'mobx-react';
 
 interface SubmitProps {
   isDisabled: boolean;
-  onClick(e: React.MouseEvent): void;
+  onSubmit(): void;
 }
 
-const Submit: React.StatelessComponent<SubmitProps> = ({ isDisabled, onClick }) => (
+const Submit: React.StatelessComponent<SubmitProps> = ({ isDisabled, onSubmit }) => (
   <input
     type='submit'
     id='BulkActionPanel-doaction'
     className='button action'
     value='Apply'
-    onClick={onClick}
+    onClick={e => { e.preventDefault(); onSubmit(); }}
     disabled={isDisabled}
   />
 );

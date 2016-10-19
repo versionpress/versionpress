@@ -44,11 +44,7 @@ export default class DateComponent extends ModifierComponent<{}> {
     return true;
   };
 
-  onMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-  }
-
-  onDayClick = (e: React.SyntheticEvent, day: any) => {
+  onDayClick = (e: any, day: any) => {
     const { activeTokenIndex, onChangeTokenModel } = this.props;
     onChangeTokenModel(activeTokenIndex, moment(day), true);
   };
@@ -79,7 +75,7 @@ export default class DateComponent extends ModifierComponent<{}> {
     const isValid = this.isDateValid(selectedDay);
 
     return (
-      <div onMouseDown={this.onMouseDown} className='Search-hintMenu-container'>
+      <div onMouseDown={e => e.preventDefault()} className='Search-hintMenu-container'>
         {isValid
           ? <DayPicker
               initialMonth={selectedDay}

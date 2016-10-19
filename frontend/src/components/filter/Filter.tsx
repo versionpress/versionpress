@@ -19,31 +19,19 @@ interface FilterProps {
 @observer(['searchStore'])
 export default class Filter extends React.Component<FilterProps, {}> {
 
-  onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    this.props.onFilter();
-  };
-
-  onInputChange = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    this.props.onQueryChange((e.target as HTMLTextAreaElement).value);
-  };
-
   render() {
-    const { query, searchStore } = this.props;
+    const { query, searchStore, onQueryChange, onFilter } = this.props;
     const { config } = searchStore;
 
     return (
       <div className='Filter'>
-        <form action='' method='post' onSubmit={this.onSubmit}>
+        <form action='' method='post' onSubmit={e => { e.preventDefault(); onFilter(); }}>
           <div className='search-box'>
             {config &&
-              <Search config={config} onChange={this.onInputChange} />
+              <Search config={config} onChange={onQueryChange} />
             }
             {!config &&
-              <QueryInput query={query} onChange={this.onInputChange} />
+              <QueryInput query={query} onChange={onQueryChange} />
             }
             <Submit />
           </div>

@@ -14,7 +14,7 @@ interface OverviewLineProps {
   type?: string;
   action?: string;
   suffix?: React.ReactNode;
-  onShowMoreClick(e: React.MouseEvent, listKey: string): void;
+  onShowMoreClick(listKey: string): void;
 }
 
 const OverviewLine: React.StatelessComponent<OverviewLineProps> = (props) => {
