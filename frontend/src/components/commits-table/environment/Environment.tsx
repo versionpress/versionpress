@@ -21,7 +21,7 @@ const DOT_RADIUS = 4;
 @observer
 export default class Environment extends React.Component<EnvironmentProps, {}> {
 
-  tableCellNode: HTMLTableCellElement = null;
+  tableCellNode: HTMLDivElement = null;
 
   componentDidMount() {
     this.forceUpdate();
@@ -43,7 +43,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
     });
 
     return (
-      <td
+      <div
         className={environmentClassName}
         ref={node => this.tableCellNode = node}
       >
@@ -73,7 +73,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
             offset={visualisation.offset}
           />
         }
-      </td>
+      </div>
     );
   }
 

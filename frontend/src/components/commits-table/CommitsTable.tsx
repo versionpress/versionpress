@@ -112,7 +112,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
     ));
 
     return (
-      <table className={commitsTableClassName}>
+      <div className={commitsTableClassName} style={{ flex: '1 0 100%', display: 'flex', flexFlow: 'row wrap' }}>
         <Header
           areAllCommitsSelected={areAllCommitsSelected}
           selectableCommitsCount={selectableCommits.length}
@@ -127,7 +127,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
           this.renderRow(commitRow, index === notAbleNoteIndex)
         ))}
         <Footer pages={pages} />
-      </table>
+      </div>
     );
   }
 

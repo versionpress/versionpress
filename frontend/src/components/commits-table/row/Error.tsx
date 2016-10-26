@@ -6,9 +6,9 @@ interface ErrorProps {
 }
 
 const Error: React.StatelessComponent<ErrorProps> = ({ message }) => (
-  <tr className='details-row error'>
-    <td colSpan={6}>{message}</td>
-  </tr>
+  <div className='details-row error'>
+    {message}
+  </div>
 );
 
 export default observer(Error);

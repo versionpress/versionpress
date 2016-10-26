@@ -17,15 +17,15 @@ const Checkbox: React.StatelessComponent<CheckboxProps> = (props) => {
   } = props;
 
   return isVisible
-    ? <td className='column-cb' onClick={e => { e.stopPropagation(); onClick(e.shiftKey); }}>
+    ? <div className='column-cb' onClick={e => { e.stopPropagation(); onClick(e.shiftKey); }}>
         <input
           type='checkbox'
           checked={isChecked}
           disabled={isDisabled}
           readOnly={true}
         />
-      </td>
-    : <td className='column-cb' />;
+      </div>
+    : <div className='column-cb' />;
 };
 
 export default observer(Checkbox);

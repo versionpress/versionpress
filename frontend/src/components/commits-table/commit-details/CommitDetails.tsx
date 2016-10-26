@@ -24,7 +24,7 @@ const CommitDetails: React.StatelessComponent<CommitDetailsProps> = (props) => {
   } = props;
 
   if (commit === null || detailsLevel === DetailsLevel.None) {
-    return <tr />;
+    return <div />;
   }
 
   const rowClassName = classNames({
@@ -33,16 +33,28 @@ const CommitDetails: React.StatelessComponent<CommitDetailsProps> = (props) => {
     'loading': isLoading,
   });
 
-  return detailsLevel === DetailsLevel.Overview
-    ? <Overview
-        commit={commit}
-        className={rowClassName}
-        isLoading={isLoading}
-      />
-    : <FullDiff
-        diff={diff}
-        className={rowClassName}
-      />;
+  const detailsClassName = classNames({
+    'details': true,
+    'overview-detail': detailsLevel === DetailsLevel.Overview
+  });
+
+  return (
+    <div style={{ flex: '1 100%', display: 'flex', flexFlow: 'row wrap'}}>
+      <div className={rowClassName}>
+        {isLoading &&
+          <div className="details-loader-wrap" style={{ flex: '100%', display: 'flex'}}>
+            <div style={{ margin: 'auto' }} className='details-row-loader' />
+          </div>
+        }
+        <div className={detailsClassName}>
+          {detailsLevel === DetailsLevel.Overview
+            ? <Overview commit={commit} />
+            : <FullDiff diff={diff} />
+          }
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default observer(CommitDetails);

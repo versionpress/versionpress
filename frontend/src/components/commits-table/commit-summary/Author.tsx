@@ -6,7 +6,7 @@ interface AuthorProps {
 }
 
 const Author: React.StatelessComponent<AuthorProps> = ({ author }) => (
-  <td className='column-author'>
+  <div className='column-author'>
     <img
       className='avatar'
       src={author.avatar}
@@ -14,7 +14,7 @@ const Author: React.StatelessComponent<AuthorProps> = ({ author }) => (
       width={20}
       height={20}
     />
-  </td>
+  </div>
 );
 
 function getTitle(author: Author) {

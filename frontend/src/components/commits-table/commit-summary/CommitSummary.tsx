@@ -32,7 +32,7 @@ interface CommitSummaryProps {
 @observer
 export default class CommitSummary extends React.Component<CommitSummaryProps, {}> {
 
-  onRowClick = (e: React.MouseEvent<HTMLTableRowElement>) => {
+  onRowClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
 
     const { commit, detailsLevel, onDetailsLevelChange } = this.props;
@@ -109,7 +109,7 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
     });
 
     return (
-      <tr className={rowClassName} onClick={this.onRowClick}>
+      <div className={rowClassName} onClick={this.onRowClick} style={{ flex: '1 0 100%', display: 'flex', alignItems: 'center' }}>
         <Environment
           environment={commit.environment}
           showVisualisation={showVisualisation}
@@ -135,7 +135,7 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
           onUndoClick={this.onUndoClick}
           onRollbackClick={this.onRollbackClick}
         />
-      </tr>
+      </div>
     );
   }
 

@@ -40,7 +40,7 @@ export default class Navigation extends React.Component<NavigationProps, {}> {
     const { query, changesCount } = navigationStore;
 
     return (
-      <div className='tablenav top' style={{ flex: '1 0 100%', justifyContent: 'space-between', alignItems: 'center'}}>
+      <div className='tablenav top' style={{ flex: '1 0 100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px'}}>
         <Filter
           query={query}
           onQueryChange={this.onFilterQueryChange}

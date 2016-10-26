@@ -42,7 +42,7 @@ export default class Row extends React.Component<RowProps, {}> {
     const { commit, isSelected, detailsLevel, diff, error, isLoading, visualisation } = commitRow;
 
     return (
-      <tbody>
+      <div className="vp-table-row" style={{ flex: '1 0 100%', display: 'flex', flexFlow: 'row wrap'}}>
         <CommitSummary
           commit={commit}
           enableActions={enableActions}
@@ -65,7 +65,7 @@ export default class Row extends React.Component<RowProps, {}> {
               isLoading={isLoading}
             />
         }
-      </tbody>
+      </div>
     );
   }
 

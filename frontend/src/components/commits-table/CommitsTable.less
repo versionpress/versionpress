@@ -6,17 +6,10 @@
     .loading;
   }
 
-  td,
-  th {
-    border-bottom: 1px solid #ccc;
-  }
-
-  & > tbody > tr > td {
+  & > div {
     cursor: pointer;
-  }
-
-  tbody tr {
     background-color: #f9f9f9;
+    border-bottom: 1px solid #ccc;
   }
 
   input[type=checkbox] {
@@ -42,8 +35,6 @@
   }
 
   .detail-buttons {
-    float: right;
-
     .button {
       line-height: 18px;
       height: 20px;
@@ -75,19 +66,15 @@
     }
   }
 
-  .displayed-details td {
+  .displayed-details {
     border-bottom: 0;
   }
 
   .column-cb {
     cursor: pointer;
-    width: 38px !important;
+    flex: 38px;
+    max-width: 38px;
     padding: 8px 10px 8px 10px !important;
-
-    input[type=checkbox] {
-      vertical-align: middle;
-      margin: -4px 0 0 0 !important;
-    }
 
     &:hover input[type=checkbox]:not([disabled]) {
       border: 1px solid #5b9dd9;
@@ -96,6 +83,9 @@
   }
 
   .column-environment {
+    flex: 0 0 20px;
+    align-self: stretch;
+    max-width: 20px;
     position: relative;
     padding: 0 !important;
     overflow: visible !important;
@@ -144,22 +134,30 @@
   }
 
   .column-date {
-    width: 135px;
+    flex: 0 0 135px;
+    max-width: 135px;
   }
 
   .column-author {
-    padding: 7px 0 8px 10px !important;
-    width: 30px;
+    display: flex;
+    flex: 0 0 30px;
+    max-width: 30px;
     height: 36px;
 
     .avatar {
-      display: block;
+      margin: auto;
       border-radius: 4px;
     }
   }
 
+  .column-message {
+    flex: auto;
+  }
+
   .column-actions {
-    width: 200px;
+    flex: 0 0 200px;
+    padding-right: 10px;
+    max-width: 200px;
     text-align: right;
 
     a {
@@ -177,11 +175,11 @@
     }
   }
 
-  tr {
+  div {
     &.disabled {
       opacity: 0.5;
 
-      td {
+      ul {
         cursor: default;
       }
     }
@@ -220,7 +218,7 @@
   }
 
   .details-row {
-    position: relative;
+    flex: 100%;
 
     &.error {
       text-align: center;
@@ -228,12 +226,11 @@
     }
 
     &.loading {
-      td * {
-        display: none;
-      }
+      display: flex;
+      justify-content: center;
 
-      td .details-row-loader {
-        display: block;
+      div:not(.details-loader-wrap) * {
+        display: none;
       }
     }
 
@@ -242,12 +239,12 @@
       margin: 10px auto;
     }
 
-    td {
+    div {
       border-top: 0;
       padding-top: 0;
     }
 
-    & > td {
+    & > div {
       cursor: inherit;
       padding-top: 10px;
       padding-bottom: 10px;
@@ -259,6 +256,11 @@
       a {
         cursor: pointer;
       }
+    }
+
+    .overview-detail {
+      display: flex;
+      justify-content: center;
     }
 
     .overview-list {

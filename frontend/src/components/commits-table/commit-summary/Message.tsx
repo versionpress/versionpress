@@ -12,7 +12,7 @@ interface MessageProps {
 }
 
 const Message: React.StatelessComponent<MessageProps> = ({ commit, detailsLevel, onDetailsLevelChange }) => (
-  <td className='column-message'>
+  <div className='column-message' style={{ display: 'flex', flexFlow: 'row wrap', justifyContent: 'space-between' }}>
     {commit.isMerge &&
       <MergeIcon />
     }
@@ -23,7 +23,7 @@ const Message: React.StatelessComponent<MessageProps> = ({ commit, detailsLevel,
         onDetailsLevelChange={onDetailsLevelChange}
       />
     }
-  </td>
+  </div>
 );
 
 function renderMessage(message: string) {

@@ -27,35 +27,33 @@ const Header: React.StatelessComponent<HeaderProps> = (props) => {
   } = props;
 
   return (
-    <thead>
-      <tr>
-        <th
-          className='column-environment'
-          onClick={onToggleShowVisualisation}
-          style={{ width: showVisualisation ? branches * 20 : 20, cursor: 'pointer' }}
-        >
-          {canToggleVisualisation &&
-            <span style={{ paddingLeft: 5, fontSize: '100%', fontWeight: 'bold' }}>
-              {showVisualisation ? '<' : '>'}
-            </span>
-          }
-        </th>
-        <SelectAll
-          isSelected={areAllCommitsSelected}
-          selectableCommitsCount={selectableCommitsCount}
-          enableActions={enableActions}
-          onChange={onSelectAllChange}
-        />
-        <th className='column-date'>
-          Date
-        </th>
-        <th className='column-author'/>
-        <th className='column-message'>
-          Message
-        </th>
-        <th className='column-actions'/>
-      </tr>
-    </thead>
+    <div className="vp-table-header" style={{ flex: '1 0 100%', display: 'flex', flexFlow: 'row nowrap', alignItems: 'center' }}>
+      <div
+        className='column-environment'
+        onClick={onToggleShowVisualisation}
+        style={{ flex: `1 0 ${showVisualisation ? branches * 20 : 20}`, cursor: 'pointer', display: 'flex' }}
+      >
+        {canToggleVisualisation &&
+          <span style={{ paddingLeft: 5, fontSize: '100%', fontWeight: 'bold', margin: 'auto' }}>
+            {showVisualisation ? '<' : '>'}
+          </span>
+        }
+      </div>
+      <SelectAll
+        isSelected={areAllCommitsSelected}
+        selectableCommitsCount={selectableCommitsCount}
+        enableActions={enableActions}
+        onChange={onSelectAllChange}
+      />
+      <div className='column-date'>
+        Date
+      </div>
+      <div className='column-author'/>
+      <div className='column-message'>
+        Message
+      </div>
+      <div className='column-actions'/>
+    </div>
   );
 };
 

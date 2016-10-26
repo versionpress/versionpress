@@ -7,9 +7,9 @@ interface DateProps {
 }
 
 const Date: React.StatelessComponent<DateProps> = ({ date }) => (
-  <td className='column-date' title={moment(date).format('LLL')}>
+  <div className='column-date' title={moment(date).format('LLL')}>
     {moment(date).fromNow()}
-  </td>
+  </div>
 );
 
 export default observer(Date);

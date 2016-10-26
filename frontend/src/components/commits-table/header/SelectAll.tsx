@@ -17,11 +17,11 @@ const SelectAll: React.StatelessComponent<SelectAllProps> = (props) => {
   } = props;
 
   if (selectableCommitsCount === 0) {
-    return <th className='column-cb' />;
+    return <div className='column-cb' />;
   }
 
   return (
-    <th className='column-cb manage-column check-column'>
+    <div className='column-cb manage-column check-column'>
       <label
         className='screen-reader-text'
         htmlFor='CommitsTable-selectAll'
@@ -35,7 +35,7 @@ const SelectAll: React.StatelessComponent<SelectAllProps> = (props) => {
         checked={isSelected}
         onChange={() => onChange(!isSelected)}
       />
-    </th>
+    </div>
   );
 };
 

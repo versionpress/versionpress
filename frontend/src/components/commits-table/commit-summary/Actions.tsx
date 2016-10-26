@@ -24,7 +24,7 @@ const Actions: React.StatelessComponent<ActionsProps> = (props) => {
   }
 
   return (
-    <td className='column-actions'>
+    <div className='column-actions'>
       {(commit.canUndo || commit.isMerge) &&
         <Undo
           commit={commit}
@@ -38,8 +38,7 @@ const Actions: React.StatelessComponent<ActionsProps> = (props) => {
           onClick={onRollbackClick}
         />
       }
-    </td>
-
+    </div>
   );
 };
 
