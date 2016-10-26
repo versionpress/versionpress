@@ -42,7 +42,7 @@ export default class CommitPanel extends React.Component<CommitPanelProps, {}> {
     });
 
     return (
-      <div className='CommitPanel'>
+      <div className='CommitPanel' style={{ flex: '1 0 100%'}}>
         <div className={noticeClassName}>
           <Notice
             onDetailsLevelChange={this.onDetailsLevelChange}

@@ -7,7 +7,7 @@ interface WelcomePanelProps {
 }
 
 const WelcomePanel: React.StatelessComponent<WelcomePanelProps> = ({ onHide }) => (
-  <div className='WelcomePanel welcome-panel'>
+  <div className='WelcomePanel welcome-panel' style={{ flex: '1 0 100%'}}>
     <a
       className='welcome-panel-close'
       href='#'

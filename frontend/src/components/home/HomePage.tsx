@@ -55,7 +55,7 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
     const { progress } = loadingStore;
 
     return (
-      <div>
+      <div className="vp-wrapper" style={{ display: 'flex', flexFlow: 'row wrap' }}>
         <ProgressBar progress={progress} />
         <ServicePanel>
           <VpTitle />

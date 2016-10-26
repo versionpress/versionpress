@@ -27,7 +27,13 @@ export default class ServicePanel extends React.Component<ServicePanelProps, {}>
     const { message, isVisible } = servicePanelStore;
 
     return (
-      <div>
+      <div className="vp-header" style={{
+        flex: '1 0 100%',
+        display: 'flex',
+        flexFlow: 'row wrap',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
         <Button onClick={this.onButtonClick} />
         {children}
         {message &&

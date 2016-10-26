@@ -16,7 +16,7 @@ const Panel: React.StatelessComponent<PanelProps> = ({ isVisible }) => {
   });
 
   return (
-    <div className={wrapperClassName}>
+    <div className={wrapperClassName} style={{ flex: '1 0 100%', order: 3 }}>
       <div className='ServicePanel welcome-panel'>
         <div className='ServicePanel-inner'>
           <Warning />

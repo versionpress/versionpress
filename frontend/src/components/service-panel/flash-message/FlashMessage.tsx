@@ -36,7 +36,7 @@ export default class FlashMessage extends React.Component<FlashMessageProps, Fla
     }
 
     return (
-      <div className={code}>
+      <div className={code} style={{ flex: '1 0 100%', order: 2}}>
         <p>
           {message} {' '}
           {details &&
