@@ -46,9 +46,12 @@ const CommitDetails: React.StatelessComponent<CommitDetailsProps> = (props) => {
             <div style={{ margin: 'auto' }} className='details-row-loader' />
           </div>
         }
-        <div className={detailsClassName}>
+        <div className={detailsClassName} style={{ flex: '100%', display: 'flex'}}>
           {detailsLevel === DetailsLevel.Overview
-            ? <Overview commit={commit} />
+            ? <div style={{ flex: '100%', display: 'flex', flexFlow: 'row nowrap'}}>
+                <div style={{ flex: '0 0 223px'}} />
+                <div style={{ flex: '0 0 auto'}}><Overview commit={commit} /></div>
+              </div>
             : <FullDiff diff={diff} />
           }
         </div>

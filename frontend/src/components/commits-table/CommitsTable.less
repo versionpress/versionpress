@@ -225,6 +225,7 @@
 
   .details-row {
     flex: 100%;
+    display: flex;
 
     &.error {
       text-align: center;
@@ -232,7 +233,6 @@
     }
 
     &.loading {
-      display: flex;
       justify-content: center;
 
       div:not(.details-loader-wrap) * {
