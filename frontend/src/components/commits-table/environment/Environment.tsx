@@ -26,8 +26,16 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
   componentDidMount() {
     this.forceUpdate();
 
-    window.addEventListener('resize', () => this.forceUpdate());
+    window.addEventListener('resize', this.onResize);
   }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onResize)
+  }
+
+  onResize = () => {
+    this.forceUpdate();
+  };
 
   render() {
     const {
