@@ -1,19 +1,21 @@
 @import "../common/mixins";
-@sepWidth: 15px;
+
+@borderBottom: 1px solid #ccc;
 
 .vp-table {
   &.loading {
     .loading;
   }
 
-  & > div {
-    cursor: pointer;
-    background-color: #f9f9f9;
-    border-bottom: 1px solid #ccc;
-  }
-
   .vp-table-header, .vp-table-footer {
     background-color: #fff;
+    border-bottom: @borderBottom;
+  }
+
+  .vp-table-row-commit-summary {
+    cursor: pointer;
+    background-color: #f9f9f9;
+    border-bottom: @borderBottom;
   }
 
   input[type=checkbox] {
@@ -224,6 +226,7 @@
 
   .details-row {
     flex: 100%;
+    flex-flow: row wrap;
     display: flex;
 
     &.error {

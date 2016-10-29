@@ -41,20 +41,20 @@ const CommitDetails: React.StatelessComponent<CommitDetailsProps> = (props) => {
   return (
     <div style={{ flex: '1 100%', display: 'flex', flexFlow: 'row wrap'}}>
       <div className={rowClassName}>
-        {isLoading &&
-          <div className="details-loader-wrap" style={{ flex: '100%', display: 'flex'}}>
-            <div style={{ margin: 'auto' }} className='details-row-loader' />
-          </div>
-        }
-        <div className={detailsClassName} style={{ flex: '100%', display: 'flex'}}>
-          {detailsLevel === DetailsLevel.Overview
-            ? <div style={{ flex: '100%', display: 'flex', flexFlow: 'row nowrap'}}>
-                <div style={{ flex: '0 0 223px'}} />
-                <div style={{ flex: '0 0 auto'}}><Overview commit={commit} /></div>
-              </div>
-            : <FullDiff diff={diff} />
+        {isLoading
+          ? <div className="details-loader-wrap" style={{ flex: '1 0 100%', display: 'flex'}}>
+              <div className='details-row-loader' style={{ margin: 'auto' }} />
+            </div>
+          : <div className={detailsClassName} style={{ flex: '1 0 100%', display: 'flex'}}>
+              {detailsLevel === DetailsLevel.Overview
+                ? <div style={{ flex: '100%', display: 'flex', flexFlow: 'row nowrap'}}>
+                    <div style={{ flex: '0 0 223px'}}/>
+                    <div style={{ flex: '0 0 auto'}}><Overview commit={commit}/></div>
+                  </div>
+                : <FullDiff diff={diff}/>
+              }
+            </div>
           }
-        </div>
       </div>
     </div>
   );

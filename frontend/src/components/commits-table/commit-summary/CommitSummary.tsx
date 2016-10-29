@@ -106,6 +106,7 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
     }
 
     const rowClassName = classNames({
+      'vp-table-row-commit-summary': true,
       'disabled': !commit.isEnabled,
       'displayed-details': detailsLevel !== DetailsLevel.None,
     });
