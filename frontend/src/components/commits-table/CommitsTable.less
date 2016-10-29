@@ -76,7 +76,7 @@
 
   .column-cb {
     cursor: pointer;
-    flex: 38px;
+    flex: 0 0 38px;
     max-width: 38px;
     padding: 8px 10px 8px 10px !important;
 
@@ -87,9 +87,7 @@
   }
 
   .column-environment {
-    flex: 0 0 20px;
     align-self: stretch;
-    max-width: 20px;
     position: relative;
     padding: 0 !important;
     overflow: visible !important;
@@ -97,7 +95,8 @@
 
     &.visualisation {
       border-right: 1px solid #ccc;
-      border-bottom: 0;
+      background-color: #fff;
+      border-bottom: 1px solid #fff;
     }
 
     svg {

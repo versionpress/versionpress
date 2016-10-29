@@ -36,10 +36,10 @@ export default class CommitOverviewPanel extends React.Component<CommitOverviewP
     const { expandedLists } = this.state;
 
     if (commit.isMerge) {
-      return [<Merge />];
+      return [<Merge key='overview-panel-is-merge' />];
     }
     if (lines.length === 0) {
-      return [<NoChanges />];
+      return [<NoChanges key='overview-panel-no-changes' />];
     }
 
     return lines.map(({key, changes}) => (

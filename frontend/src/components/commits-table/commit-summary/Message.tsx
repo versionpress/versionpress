@@ -13,10 +13,12 @@ interface MessageProps {
 
 const Message: React.StatelessComponent<MessageProps> = ({ commit, detailsLevel, onDetailsLevelChange }) => (
   <div className='column-message' style={{ display: 'flex', flexFlow: 'row wrap', justifyContent: 'space-between' }}>
-    {commit.isMerge &&
-      <MergeIcon />
-    }
-    {renderMessage(commit.message)}
+    <div>
+      {commit.isMerge &&
+        <MergeIcon />
+      }
+      {renderMessage(commit.message)}
+    </div>
     {detailsLevel !== DetailsLevel.None &&
       <DetailsLevelButtons
         detailsLevel={detailsLevel}

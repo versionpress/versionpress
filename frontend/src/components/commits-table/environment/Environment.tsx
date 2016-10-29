@@ -8,6 +8,7 @@ import RowVisualisation from './RowVisualisation';
 
 interface EnvironmentProps {
   environment: string;
+  branches: number;
   showVisualisation: boolean;
   visualisation: Visualisation;
   onToggleShowVisualisation(): void;
@@ -40,6 +41,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
   render() {
     const {
       environment,
+      branches,
       showVisualisation,
       visualisation,
       onToggleShowVisualisation,
@@ -53,6 +55,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
     return (
       <div
         className={environmentClassName}
+        style={{ flex: `0 0 ${showVisualisation ? branches * 20 : 20}px` }}
         ref={node => this.tableCellNode = node}
       >
         {(!showVisualisation && environment !== '?') &&
@@ -63,7 +66,7 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
         }
         {showVisualisation &&
           <RowVisualisation
-            width={!this.tableCellNode ? 50 : this.tableCellNode.getBoundingClientRect().width}
+            width={!this.tableCellNode ? 50 : showVisualisation ? branches * 20 : 20}
             height={!this.tableCellNode ? 20 : this.tableCellNode.getBoundingClientRect().height}
             left={LEFT}
             space={SPACE}

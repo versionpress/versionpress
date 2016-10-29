@@ -63,6 +63,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
     const row = (
       <Row
         commitRow={commitRow}
+        branches={commitsTableStore.branches}
         enableActions={appStore.enableActions}
         showVisualisation={commitsTableStore.showVisualisation}
         onUndo={this.onUndo}
@@ -101,9 +102,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
     const { isLoading } = loadingStore;
 
     const commitsTableClassName = classNames({
-      'vp-table': true,
-      'widefat': true,
-      'fixed': true,
+      'vp-table widefat fixed': true,
       'loading': isLoading,
     });
 

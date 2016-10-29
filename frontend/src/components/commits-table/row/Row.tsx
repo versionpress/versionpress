@@ -13,6 +13,7 @@ import CommitRow from '../../../entities/CommitRow';
 
 interface RowProps {
   commitRow: CommitRow;
+  branches: number;
   enableActions: boolean;
   showVisualisation: boolean;
   onUndo(hash: string, message: string): void;
@@ -32,6 +33,7 @@ export default class Row extends React.Component<RowProps, {}> {
   render() {
     const {
       commitRow,
+      branches,
       enableActions,
       onUndo,
       onRollback,
@@ -45,6 +47,7 @@ export default class Row extends React.Component<RowProps, {}> {
       <div className="vp-table-row" style={{ flex: '1 0 100%', display: 'flex', flexFlow: 'row wrap'}}>
         <CommitSummary
           commit={commit}
+          branches={branches}
           enableActions={enableActions}
           isSelected={isSelected}
           detailsLevel={detailsLevel}

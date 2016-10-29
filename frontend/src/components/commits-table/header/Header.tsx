@@ -26,12 +26,14 @@ const Header: React.StatelessComponent<HeaderProps> = (props) => {
     onToggleShowVisualisation,
   } = props;
 
+  const visualisationWidth = showVisualisation ? branches * 20 : 20;
+
   return (
     <div className="vp-table-header" style={{ flex: '1 0 100%', display: 'flex', flexFlow: 'row nowrap', alignItems: 'center' }}>
       <div
         className='column-environment'
         onClick={onToggleShowVisualisation}
-        style={{ flex: `1 0 ${showVisualisation ? branches * 20 : 20}`, cursor: 'pointer', display: 'flex' }}
+        style={{ flex: `${visualisationWidth}px`, cursor: 'pointer', display: 'flex', maxWidth: `${visualisationWidth}px` }}
       >
         {canToggleVisualisation &&
           <span style={{ paddingLeft: 5, fontSize: '100%', fontWeight: 'bold', margin: 'auto' }}>

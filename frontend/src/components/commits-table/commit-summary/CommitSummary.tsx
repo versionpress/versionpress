@@ -17,6 +17,7 @@ import * as portal from '../../portal/portal';
 
 interface CommitSummaryProps {
   commit: Commit;
+  branches: number;
   enableActions: boolean;
   isSelected: boolean;
   detailsLevel: DetailsLevel;
@@ -90,6 +91,7 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
   render() {
     const {
       commit,
+      branches,
       enableActions,
       isSelected,
       detailsLevel,
@@ -112,6 +114,7 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
       <div className={rowClassName} onClick={this.onRowClick} style={{ flex: '1 0 100%', display: 'flex', alignItems: 'center' }}>
         <Environment
           environment={commit.environment}
+          branches={branches}
           showVisualisation={showVisualisation}
           visualisation={visualisation}
           onToggleShowVisualisation={onToggleShowVisualisation}
