@@ -163,6 +163,9 @@
 
   .column-actions {
     flex: 0 0 200px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-end;
     padding-right: 10px;
     max-width: 200px;
     text-align: right;
@@ -177,8 +180,15 @@
       cursor: help;
     }
 
-    a + a {
-      .separator;
+    @media (max-width: 799px) {
+      flex: 0 0 140px;
+      flex-flow: column nowrap;
+    }
+
+    @media (min-width: 800px) {
+      a + a {
+        .separator;
+      }
     }
   }
 
