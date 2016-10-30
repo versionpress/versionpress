@@ -76,18 +76,6 @@
     border-bottom: 0;
   }
 
-  .column-cb {
-    cursor: pointer;
-    flex: 0 0 38px;
-    max-width: 38px;
-    padding: 8px 10px 8px 10px !important;
-
-    &:hover input[type=checkbox]:not([disabled]) {
-      border: 1px solid #5b9dd9;
-      box-shadow: 0 0 2px rgba(30, 140, 190, 0.8);
-    }
-  }
-
   .column-environment {
     align-self: stretch;
     position: relative;
@@ -138,10 +126,37 @@
     }
   }
 
+  .column-cb {
+    cursor: pointer;
+    flex: 0 0 38px;
+    display: flex;
+    max-width: 38px;
+
+    &:hover input[type=checkbox]:not([disabled]) {
+      border: 1px solid #5b9dd9;
+      box-shadow: 0 0 2px rgba(30, 140, 190, 0.8);
+    }
+
+    input[type=checkbox] {
+      margin: auto;
+    }
+
+    @media (max-width: 799px) {
+      flex: 0 0 25px;
+      max-width: 25px;
+    }
+  }
+
   .column-date {
     flex: 0 0 135px;
     max-width: 135px;
     padding-left: 10px;
+
+    @media (max-width: 799px) {
+      flex: 0 0 100px;
+      max-width: 100px;
+      word-break: break-all;
+    }
   }
 
   .column-author {
