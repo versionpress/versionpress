@@ -48,20 +48,20 @@ export default class Search extends React.Component<SearchProps, SearchState> {
   };
 
   onClick = (e: React.MouseEvent<HTMLInputElement>) => {
-    this.setCursorLocation(e.currentTarget.selectionStart);
+    this.setCursorLocation(e.target.selectionStart);
   };
 
   onCut = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    this.setCursorLocation(e.currentTarget.selectionStart);
+    this.setCursorLocation(e.target.selectionStart);
     this.setState({
-      inputValue: e.currentTarget.value,
+      inputValue: e.target.value,
     });
   };
 
   onPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    this.setCursorLocation(e.currentTarget.selectionStart);
+    this.setCursorLocation(e.target.selectionStart);
     this.setState({
-      inputValue: e.currentTarget.value,
+      inputValue: e.target.value,
     });
   };
 
@@ -108,34 +108,34 @@ export default class Search extends React.Component<SearchProps, SearchState> {
         }
         break;
       default:
-        this.setCursorLocation(e.currentTarget.selectionStart);
-        if (e.currentTarget.value !== this.state.inputValue) {
+        this.setCursorLocation(e.target.selectionStart);
+        if (e.target.value !== this.state.inputValue) {
           this.setState({
-            inputValue: e.currentTarget.value,
+            inputValue: e.target.value,
           });
         }
     }
   }
 
   onKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    this.setCursorLocation(e.currentTarget.selectionStart);
-    if (e.currentTarget.value !== this.state.inputValue) {
+    this.setCursorLocation(e.target.selectionStart);
+    if (e.target.value !== this.state.inputValue) {
       this.setState({
-        inputValue: e.currentTarget.value,
+        inputValue: e.target.value,
       });
     }
 
-    this.props.onChange(e.currentTarget.value);
+    this.props.onChange(e.target.value);
   };
 
   onChange = (e: React.FormEvent<HTMLInputElement>) => {
-    if (e.currentTarget.value !== this.state.inputValue) {
+    if (e.target.value !== this.state.inputValue) {
       this.setState({
-        inputValue: e.currentTarget.value,
+        inputValue: e.target.value,
       });
     }
 
-    this.props.onChange(e.currentTarget.value);
+    this.props.onChange(e.target.value);
   }
 
   onChangeTokenModel = (tokenIndex: number, model: any, shouldMoveCursor: boolean) => {

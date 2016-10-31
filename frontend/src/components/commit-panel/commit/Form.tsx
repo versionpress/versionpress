@@ -24,7 +24,7 @@ const Form: React.StatelessComponent<FormProps> = (props) => {
           className='CommitPanel-commit-input'
           value={commitMessage}
           placeholder='Commit message...'
-          onChange={e => onCommitMessageChange(e.currentTarget.value)}
+          onChange={e => onCommitMessageChange(e.target.value)}
         />
         <input
           className='button button-primary CommitPanel-commit-button'

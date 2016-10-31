@@ -11,7 +11,7 @@ const QueryInput: React.StatelessComponent<QueryInputProps> = ({ query, onChange
     type='search'
     className='Filter-query'
     value={query}
-    onChange={e => onChange(e.currentTarget.value)}
+    onChange={e => onChange(e.target.value)}
   />
 );
 
