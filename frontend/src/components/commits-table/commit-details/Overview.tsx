@@ -8,7 +8,9 @@ interface OverviewProps {
 }
 
 const Overview: React.StatelessComponent<OverviewProps> = ({ commit }) => (
-  <CommitOverviewPanel commit={commit} />
+  <div className="overview-wrapper">
+    <CommitOverviewPanel commit={commit} />
+  </div>
 );
 
 export default observer(Overview);
