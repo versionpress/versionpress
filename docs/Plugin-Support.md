@@ -21,16 +21,18 @@ All files are optional so for example, if a plugin doesn't define any new shortc
 
 ## Actions
 
-Actions represent what the plugin does. For example, WordPress core has actions like "update option", "publish post" and many others. They are the smallest atomic changes in a WordPress site, stored in Git commits by VersionPress.
+Actions represent what the plugin does. For example, WordPress core has actions like "update option", "publish post" and many others. They are the smallest changes in a WordPress site and are eventually stored as Git commits by VersionPress.
 
 An action is identified by a string like `option/edit` or `post/publish`, commits some file(s) with it and has a human-readable message like "Updated option blogname", "Published post Hello World", etc.
+
+Some commits may even contain multiple actions. For example, if a user switches to a new theme that also creates some options of its own, a single commit with `theme/switch` and several `option/create` actions will be created. When this operation is undone, it takes back both the theme switching and options creation.
 
 Actions are described in the `actions.yml` file.
 
 
 ### `actions.yml`
 
-Here's an example from the core WordPress definition:
+Here's an example from the [WordPress core `actions.yml` file](../plugins/versionpress/.versionpress/actions.yml):
 
 ```yaml
 post:
@@ -59,13 +61,16 @@ theme:
     update: Updated theme '%VP-Theme-Name%'
 ```
 
-You can see these elements in action:
+These are the main elements:
 
-- The top-level elements define **scopes** that basically group the actions. For example, actions related to WordPress posts are in the `post` scope, theme actions are in the `theme` scope, etc. 
-- **Tags** are values saved in the commit message and are typically used to make the user-facing messages more useful. For example, it's better to display _Created post 'Hello World'_ than _Created post 123_.
-- Tags are either mapped to database fields as with the `post` scope example, or use the `/` character to indicate that the value is provided by a filter (see below).
-- **The `actions` section** contains all actions in the scope. A combination of scope and action like `post/create` or `theme/install` uniquely identifies the action and can be [searched for in the UI](https://docs.versionpress.net/en/feature-focus/searching-history).
-- An action has a **message** (usually in past tense) and a **priority**. If priority is not present, the default value of 10 is used.
+- The top-level elements are **scopes** that basically group related actions together. For example, actions related to posts are in the `post` scope, theme actions are in the `theme` scope, etc. Scopes use a singular form.
+- **Tags** are values saved in commit messages and are typically used to make user-facing messages more useful. For example, it's better to display _Created post 'Hello World'_ than _Created post 123_ and tags make this possible.
+    - Tags are either mapped to database fields as in the `post` example, or use the `/` character to indicate that the value is provided by a filter (see below).
+- **The `actions` section** defines all actions of a scope.
+    - An action has a **message** that can reference tags to make it more user-friendly. Messages use past tense.
+    - Each action has a **priority** – 10 by default. Priorities behave like on WordPress filters and actions: the lower the number, the higher the priority. A more important action beats the less important one if both appear in the same commit. For example, `theme/switch` beats `option/edit` which means that the user will see a message about changing themes, not updating some internal option.
+    - A combination of a scope and an action, e.g., `post/create` or `theme/install`, uniquely identifies the action and can be [searched for in the UI](https://docs.versionpress.net/en/feature-focus/searching-history).
+- An action has a **message**, usually in past tense, and a **priority**. If priority is not set, the default value of 10 is used.
     - Priorities behave like on WordPress filters and actions: the lower the number, the higher the priority. A more important action beats the less important one if both appear in the same commit. For example, `theme/switch` beats `option/edit` which means that the user will see a message about changing themes, not updating some internal option.
 - **Meta entities** also contain **`parent-id-tag`** with the name of a tag containing ID of the parent entity.
 
@@ -79,7 +84,9 @@ There are generally two types of actions:
 
 **Database actions** are more common (at least in WordPress core) and get a pretty convenient treatment by default. Based on the SQL query issued, a `create`, `edit` or `delete` action is created automatically.
 
-If you need more specific actions like `post/trash` or `comment/approve`, filters are used: `vp_entity_action_{$entityName}` for standard entities and `vp_meta_entity_action_{$entityName}` for meta entities.
+If you need more specific actions like `post/trash` or `comment/approve`, filters are used: [`vp_entity_action_{$entityName}`](https://github.com/versionpress/versionpress/blob/0a29069de769841ed545556cecf4d2323a92741b/plugins/versionpress/src/Storages/DirectoryStorage.php#L225-L225) for standard entities and [`vp_meta_entity_action_{$entityName}`](https://github.com/versionpress/versionpress/blob/49fdc0ba737b40560c40129d791e0cf63b1031e0/plugins/versionpress/src/Storages/MetaEntityStorage.php#L166-L16) for meta entities.
+
+> 🚧 Hooks are not properly documented yet, please click through the hook names to at least browse the source codes on GitHub.
 
 Tags are automatically extracted from the database entity. For example,
 
@@ -88,11 +95,11 @@ Tags are automatically extracted from the database entity. For example,
     VP-Post-Title: post_title
 ```
 
-makes sure that `VP-Post-Title` contains the post title.
+makes sure that the message (defined as `Created post '%VP-Post-Title%'`) automatically stores the real post title.
 
-Tags can be altered (or created entirely if the YAML only uses `/` as a tag value) by filters `vp_entity_tags_{$entityName}` and `vp_meta_entity_tags_{$entityName}`.
+Tags can be altered (or created entirely if the YAML only uses `/` as a tag value) by filters [`vp_entity_tags_{$entityName}`](https://github.com/versionpress/versionpress/blob/0a29069de769841ed545556cecf4d2323a92741b/plugins/versionpress/src/Storages/DirectoryStorage.php#L226-L226) and [`vp_meta_entity_tags_{$entityName}`](https://github.com/versionpress/versionpress/blob/49fdc0ba737b40560c40129d791e0cf63b1031e0/plugins/versionpress/src/Storages/MetaEntityStorage.php#L167-L16).
 
-**Non-database actions** are tracked manually by calling a global `vp_force_action()`. This overwrites all other actions VersionPress might have collected during the request. For example, this is how `wordpress/update` action is tracked:
+**Non-database actions** are tracked manually by calling a global [`vp_force_action()`](https://github.com/versionpress/versionpress/blob/3b0b242b11804d39c838b15a21ffbd7a27b404b4/plugins/versionpress/public-functions.php#L18-L18) function. This overwrites all other actions VersionPress might have collected during the request. For example, this is how `wordpress/update` action is tracked:
 
 ```
 vp_force_action('wordpress', 'update', $version, [], $wpFiles);
@@ -158,7 +165,7 @@ The full example might look something like this:
 ]
 ```
 
-For **non-database actions**, this list is one of the arguments of the `vp_force_action()` function.
+For **non-database actions**, this list is one of the arguments of the [`vp_force_action()`](https://github.com/versionpress/versionpress/blob/3b0b242b11804d39c838b15a21ffbd7a27b404b4/plugins/versionpress/public-functions.php#L18-L18) function.
 
 > As noted above, we'll be getting rid of this approach so this is temporary info.
 
