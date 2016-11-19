@@ -7,16 +7,16 @@ VersionPress needs to understand plugin data, actions, shortcodes and other thin
 
 ## Introduction
 
-Plugins are described to VersionPress by a set of files stored in the `.versionpress` folder in the plugin root (other discovery options are described below). They include:
+Plugins are described to VersionPress by a set of files stored in the `.versionpress` folder in the plugin root (with other discovery options available, see below). They include:
 
-- Actions in `actions.yml`
-- Database schema in `schema.yml`
-- Shortcodes in `shortcodes.yml`
-- Hooks are defined in `hooks.php`
+- `actions.yml` – plugin actions, i.e., what the plugin does
+- `schema.yml` – database schema (how the plugin stores data)
+- `shortcodes.yml` – shortcodes
+- `hooks.php` – other hooks
 
-All files are optional so for example, if a plugin doesn't define any new shortcodes it can omit the `shortcodes.yml` file. Simple plugins like _Hello Dolly_ might even omit everything; they just need to have the `.versionpress` folder so that VersionPress knows the plugin is supported.
+All files are optional so for example, if a plugin doesn't define any new shortcodes it can omit the `shortcodes.yml` file. Simple plugins like _Hello Dolly_ might even omit everything.
 
-By the way, WordPress itself is described to VersionPress as a set of these files (it's the ultimate test of the format because WordPress sometimes does crazy things!). You can take a look at [the source files](../plugins/versionpress/.versionpress) to draw inspiration from there.
+> :sparkles: **Tip**: WordPress core is described using the very same format and you can find the definition files in the [`.versionpress`](../plugins/versionpress/.versionpress) folder inside the plugin.
 
 
 ## Actions
