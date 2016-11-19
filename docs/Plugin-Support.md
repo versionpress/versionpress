@@ -113,14 +113,16 @@ This behavior is sufficient most of the time, however, some changes should commi
 
 The array of files to commit can contain three different types of items:
 
-1. Single file corresponding to an entity:
+> Note: Concepts like VPIDs are explained in the "Database schema" section below.
+
+1. Single file corresponding to an entity, for example:
 
     ```php
     [
       'type' => 'storage-file',
-      'entity' => 'entity name, e.g., post',
-      'id' => 'VPID',
-      'parent-id' => 'VPID of parent (for meta entities)'
+      'entity' => 'post',
+      'id' => $vpid,
+      'parent-id' => $parentVpid  // for meta entities
     ]
     ```
     
@@ -131,7 +133,7 @@ The array of files to commit can contain three different types of items:
     ```php
     [
       'type' => 'all-storage-files',
-      'entity' => 'entity name, e.g., option'
+      'entity' => 'option'
     ]    
     ```
 
@@ -140,7 +142,7 @@ The array of files to commit can contain three different types of items:
     ```php
     [
       'type' => 'path',
-      'path' => 'some/path/with/wildcards/*'
+      'path' => 'some/path/supports/wildcards/*'
     ]    
     ```
 
@@ -148,8 +150,8 @@ The full example might look something like this:
 
 ```php
 [
-  ['type' => 'storage-file', 'entity' => 'post', 'id' => VPID, 'parent-id' => null],
-  ['type' => 'storage-file', 'entity' => 'usermeta', 'id' => VPID, 'parent-id' => user-VPID],
+  ['type' => 'storage-file', 'entity' => 'post', 'id' => $vpid, 'parent-id' => null],
+  ['type' => 'storage-file', 'entity' => 'usermeta', 'id' => $vpid, 'parent-id' => $userVpid],
   ['type' => 'all-storage-files', 'entity' => 'option'],
   ['type' => 'path', 'path' => '/var/www/wp/example.txt'],
   ['type' => 'path', 'path' => '/var/www/wp/folder/*']
