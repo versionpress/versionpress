@@ -230,7 +230,7 @@ option:
 
 ### References
 
-VersionPress needs to understands relationships between entities so that it can update their IDs between environments. There are several types of references, each using a slightly different notation in the schema file.
+VersionPress needs to understand relationships between entities so that it can update their IDs between environments. There are several types of references, each using a slightly different notation in the schema file.
 
 #### Basic references
 
