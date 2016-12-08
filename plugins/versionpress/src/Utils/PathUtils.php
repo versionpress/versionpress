@@ -14,8 +14,9 @@ class PathUtils
     public static function getRelativePath($from, $to)
     {
         // Windows FTW!
-        $from = str_replace('\\', '/', $from);
-        $to = str_replace('\\', '/', $to);
+        $from = self::windowsFix($from);
+        $to = self::windowsFix($to);
+
 
         $from = preg_replace('~([^/]*)/+([^/]*)~', '$1/$2', $from);
         $to = preg_replace('~([^/]*)/+([^/]*)~', '$1/$2', $to);
@@ -40,6 +41,22 @@ class PathUtils
         $relPath = array_pad($relPath, $totalLengthOfRelativePath * -1, '..');
 
         return implode('/', $relPath);
+    }
+
+    /**
+     * Converts '\' to '/' and makes disk drive (e.g., C:) case insensitive
+     *
+     * @param string $path
+     * @return string
+     */
+    private static function windowsFix($path)
+    {
+        $path = str_replace('\\', '/', $path);
+        // https://regex101.com/r/RRtZKq/2
+        if (preg_match('/^(\w)(\:.*)/', $path, $matches)) {
+            $path = strtolower($matches[1]) . $matches[2];
+        }
+        return $path;
     }
 
     private static function countCommonDepth($from, $to)
