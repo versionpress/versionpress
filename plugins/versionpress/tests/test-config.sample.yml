@@ -43,7 +43,7 @@ sites:
       user: vp01
       password: vp01
     wp-site:
-      # on Windows, the path is like c:/wamp/www/vp01
+      # on Windows, the path is like C:/wamp/www/vp01
       path: /Users/johdoe/Sites/vp01
       url: http://localhost/vp01
       wp-admin-path: wp-admin
