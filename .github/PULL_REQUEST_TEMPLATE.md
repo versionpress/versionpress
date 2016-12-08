@@ -1,7 +1,3 @@
-Resolves # .
+Resolves #
 
-Description of the proposed changes goes here. Usually a paragraph or two.
-
-Reviewers:
-
-- [ ] @versionpress/core-devs
+Write a paragraph or two about the proposed changes here.
