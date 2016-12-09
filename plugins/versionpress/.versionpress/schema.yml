@@ -125,6 +125,8 @@ option:
       theme_mods_*["nav_menu_locations"][/.*/]: term
       theme_mods_*["header_image_data"]["attachment_id"]: post
       theme_mods_*["custom_logo"]: post
+      theme_mods_*["header_video"]: post
+      theme_mods_*["custom_css_post_id"]: post
   frequently-written:
     - 'option_name: akismet_spam_count'
   ignored-entities:
