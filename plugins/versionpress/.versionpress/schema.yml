@@ -127,6 +127,10 @@ option:
       theme_mods_*["custom_logo"]: post
       theme_mods_*["header_video"]: post
       theme_mods_*["custom_css_post_id"]: post
+      theme_mods_*["panel_1"]: post
+      theme_mods_*["panel_2"]: post
+      theme_mods_*["panel_3"]: post
+      theme_mods_*["panel_4"]: post
   frequently-written:
     - 'option_name: akismet_spam_count'
   ignored-entities:
