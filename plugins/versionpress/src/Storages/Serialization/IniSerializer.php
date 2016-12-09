@@ -281,8 +281,8 @@ class IniSerializer
 
     private static function preserveNumbers($iniString)
     {
-        // https://regex101.com/r/pH5hE9/2
-        $re = "/= \\d+(?:\\.\\d+)?\\r?\\n/m";
+        // https://regex101.com/r/pH5hE9/3
+        $re = "/= -?\\d+(?:\\.\\d+)?\\r?\\n/m";
         return preg_replace_callback($re, function ($m) {
             return str_replace('= ', '= ' . self::$numberMarker, $m[0]);
         }, $iniString);
