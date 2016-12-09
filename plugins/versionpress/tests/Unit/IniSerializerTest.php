@@ -781,6 +781,26 @@ INI
 
     /**
      * @test
+     */
+    public function serializedArrayWithNegativeInteger()
+    {
+        $serializedString = serialize([-1]);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = -1
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
      * @dataProvider specialCharactersInValueProvider
      */
     public function serializedArrayWithSpecialStrings($str)
