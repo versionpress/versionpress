@@ -58,7 +58,7 @@ class MergeDriverInstaller
         $gitattributesContents = file_get_contents($pluginDir . '/src/Initialization/.gitattributes.tpl');
 
         $gitattributesVariables = [
-            'vpdb-dir' => rtrim(ltrim(PathUtils::getRelativePath($rootDir, $vpdbDir), '.'), '/\\')
+            'vpdb-dir' => PathUtils::getRelativePath($rootDir, $vpdbDir),
         ];
         $gitattributesContents = StringUtils::fillTemplateString($gitattributesVariables, $gitattributesContents);
 
@@ -119,7 +119,6 @@ class MergeDriverInstaller
 
         $gitconfigContents = StringUtils::fillTemplateString($gitconfigVariables, $gitconfigContents);
         file_put_contents($gitconfigPath, $gitconfigContents, FILE_APPEND);
-
     }
 
     /**
@@ -138,7 +137,7 @@ class MergeDriverInstaller
         $gitattributesContents = file_get_contents($pluginDir . '/src/Initialization/.gitattributes.tpl');
 
         $gitattributesVariables = [
-            'vpdb-dir' => rtrim(ltrim(PathUtils::getRelativePath($rootDir, $vpdbDir), '.'), '/\\')
+            'vpdb-dir' => PathUtils::getRelativePath($rootDir, $vpdbDir),
         ];
         $gitattributesContents = StringUtils::fillTemplateString($gitattributesVariables, $gitattributesContents);
 

@@ -6,6 +6,7 @@ use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\Process;
+use VersionPress\Utils\ProcessUtils;
 
 class PluginsTest extends End2EndTestCase
 {
@@ -28,6 +29,10 @@ class PluginsTest extends End2EndTestCase
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
+
+        if (self::$testConfig->testSite->installationType !== 'standard') {
+            throw new \PHPUnit_Framework_SkippedTestSuiteError();
+        }
 
         $testDataPath = __DIR__ . '/../test-data';
         self::$pluginInfo = [
@@ -61,7 +66,7 @@ class PluginsTest extends End2EndTestCase
         }
 
         $process = new Process(
-            "git add -A && git commit -m " . escapeshellarg("Plugin setup"),
+            "git add -A && git commit -m " . ProcessUtils::escapeshellarg("Plugin setup"),
             self::$testConfig->testSite->path
         );
         $process->run();
@@ -75,15 +80,15 @@ class PluginsTest extends End2EndTestCase
     {
         self::$worker->prepare_installPlugin();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->installPlugin();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("plugin/install");
-        $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
-        $commitAsserter->assertCommitPath("A", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("plugin/install");
+        $this->commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
+        $this->commitAsserter->assertCommitPath("A", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -96,15 +101,15 @@ class PluginsTest extends End2EndTestCase
     {
         self::$worker->prepare_activatePlugin();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->activatePlugin();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("plugin/activate");
-        $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/options/ac/active_plugins.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("plugin/activate");
+        $this->commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
+        $this->commitAsserter->assertCommitPath("M", "%vpdb%/options/ac/active_plugins.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -117,15 +122,15 @@ class PluginsTest extends End2EndTestCase
     {
         self::$worker->prepare_deactivatePlugin();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->deactivatePlugin();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("plugin/deactivate");
-        $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/options/ac/active_plugins.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("plugin/deactivate");
+        $this->commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
+        $this->commitAsserter->assertCommitPath("M", "%vpdb%/options/ac/active_plugins.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -137,15 +142,15 @@ class PluginsTest extends End2EndTestCase
     public function deletingPluginCreatesPluginDeleteAction()
     {
         self::$worker->prepare_deletePlugin();
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->deletePlugin();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("plugin/delete");
-        $commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
-        $commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("plugin/delete");
+        $this->commitAsserter->assertCommitTag("VP-Plugin-Name", self::$pluginInfo['name']);
+        $this->commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -156,15 +161,15 @@ class PluginsTest extends End2EndTestCase
     public function installingTwoPluginsCreatesBulkAction()
     {
         self::$worker->prepare_installTwoPlugins();
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->installTwoPlugins();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction('plugin/install', 2);
-        $commitAsserter->assertCommitPath("A", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
-        $commitAsserter->assertCommitPath("A", "wp-content/plugins/" . self::$secondPluginInfo['affected-path']);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction('plugin/install', 2);
+        $this->commitAsserter->assertCommitPath("A", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
+        $this->commitAsserter->assertCommitPath("A", "wp-content/plugins/" . self::$secondPluginInfo['affected-path']);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -175,14 +180,14 @@ class PluginsTest extends End2EndTestCase
     public function activatingTwoPluginsCreatesBulkAction()
     {
         self::$worker->prepare_activateTwoPlugins();
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->activateTwoPlugins();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction('plugin/activate', 2);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/options/ac/active_plugins.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction('plugin/activate', 2);
+        $this->commitAsserter->assertCommitPath("M", "%vpdb%/options/ac/active_plugins.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -193,14 +198,14 @@ class PluginsTest extends End2EndTestCase
     public function deactivatingTwoPluginsCreatesBulkAction()
     {
         self::$worker->prepare_deactivateTwoPlugins();
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->deactivateTwoPlugins();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction('plugin/deactivate', 2);
-        $commitAsserter->assertCommitPath("M", "%vpdb%/options/ac/active_plugins.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction('plugin/deactivate', 2);
+        $this->commitAsserter->assertCommitPath("M", "%vpdb%/options/ac/active_plugins.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -211,15 +216,15 @@ class PluginsTest extends End2EndTestCase
     public function uninstallingTwoPluginsCreatesBulkAction()
     {
         self::$worker->prepare_uninstallTwoPlugins();
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->uninstallTwoPlugins();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction('plugin/delete', 2);
-        $commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
-        $commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$secondPluginInfo['affected-path']);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction('plugin/delete', 2);
+        $this->commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
+        $this->commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$secondPluginInfo['affected-path']);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 }

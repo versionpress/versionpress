@@ -5,11 +5,8 @@
 /build
 /node_modules
 
-# TypeScript definition files
-/typings
-
 # Local config files
-/src/config.local.ts
+/src/config/config.local.ts
 
 # Other
 tsd-debug.log

@@ -9,7 +9,7 @@ namespace VersionPress\Cli;
 
 use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
-use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Actions\ActionsDefinitionRepository;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\Committer;
 use VersionPress\Git\GitConfig;
@@ -19,9 +19,12 @@ use VersionPress\Git\RevertStatus;
 use VersionPress\Initialization\Initializer;
 use VersionPress\Initialization\WpConfigSplitter;
 use VersionPress\Initialization\WpdbReplacer;
+use VersionPress\Storages\Serialization\IniSerializer;
 use VersionPress\Synchronizers\SynchronizationProcess;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\PathUtils;
+use VersionPress\Utils\Process;
+use VersionPress\Utils\ProcessUtils;
 use VersionPress\Utils\RequirementsChecker;
 use VersionPress\Utils\WorkflowUtils;
 use VersionPress\VersionPress;
@@ -205,6 +208,14 @@ class VPCommand extends WP_CLI_Command
     public function restoreSite($args, $assoc_args)
     {
 
+        if (file_exists(getcwd() . '/composer.json')) {
+            $proc = proc_open("composer install", [1 => ["pipe","w"], ["pipe","w"]], $_);
+            $result = proc_close($proc);
+            if ($result !== 0) {
+                WP_CLI::error('Composer dependencies could not be restored.');
+            }
+        }
+
         defined('SHORTINIT') or define('SHORTINIT', true);
 
         require_once __DIR__ . '/../Initialization/WpConfigSplitter.php';
@@ -229,22 +240,24 @@ class VPCommand extends WP_CLI_Command
             );
         }
 
-        $this->dropTables();
         $url = $assoc_args['siteurl'];
 
         // Update URLs in wp-config.php
+        define('VP_INDEX_DIR', dirname(\WP_CLI\Utils\locate_wp_config())); // just for the following method
         $this->setConfigUrl('WP_CONTENT_URL', 'WP_CONTENT_DIR', ABSPATH . 'wp-content', $url);
         $this->setConfigUrl('WP_PLUGIN_URL', 'WP_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins', $url);
+        $this->setConfigUrl('WP_HOME', 'VP_INDEX_DIR', VP_PROJECT_ROOT, $url);
+
+        defined('WP_PLUGIN_DIR') || define('WP_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins');
 
         WpConfigSplitter::ensureCommonConfigInclude($wpConfigPath);
-
-        // Create or empty database
-        $this->prepareDatabase($assoc_args);
-
 
         // Disable VersionPress tracking for a while
         WpdbReplacer::restoreOriginal();
         unlink(VERSIONPRESS_ACTIVATION_FILE);
+
+        // Create or empty database
+        $this->prepareDatabase($assoc_args);
 
 
         // Create WP tables.
@@ -278,10 +291,23 @@ class VPCommand extends WP_CLI_Command
             WP_CLI::error($process->getConsoleOutput());
         }
 
+        // Fail-safe for gitignored WordPress
+        if (!WpdbReplacer::isReplaced()) {
+            WpdbReplacer::replaceMethods();
+        }
 
-        // The next couple of the steps need to be done after WP is fully loaded; we use `finish-init-clone` for that
+        /* We need correct value in the `active_plugins` option before the synchronization run.
+         * Without this option VersionPress doesn't know which schema.yml files it should load and consequently which
+         * DB entities it should synchronize.
+         */
+        $activePluginsOption = IniSerializer::deserialize(file_get_contents(VP_VPDB_DIR . '/options/ac/active_plugins.ini'));
+        $activePlugins = json_encode(unserialize($activePluginsOption['active_plugins']['option_value']));
+
+        VPCommandUtils::runWpCliCommand('option', 'update', ['active_plugins', $activePlugins, 'autoload' => 'yes', 'format' => 'json', 'skip-plugins' => null]);
+
+        // The next couple of the steps need to be done after WP is fully loaded; we use `finish-restore-site` for that
         // The main reason for this is that we need properly set WP_CONTENT_DIR constant for reading from storages
-        $process = $this->runVPInternalCommand('finish-init-clone');
+        $process = $this->runVPInternalCommand('finish-restore-site');
         WP_CLI::log($process->getConsoleOutput());
         if (!$process->isSuccessful()) {
             WP_CLI::error("Could not finish site restore");
@@ -319,7 +345,6 @@ class VPCommand extends WP_CLI_Command
         }
 
         $this->dropTables();
-
     }
 
     /**
@@ -461,7 +486,7 @@ class VPCommand extends WP_CLI_Command
         vp_commit_all_frequently_written_entities();
 
         // Clone the site
-        $cloneCommand = sprintf("git clone %s %s", escapeshellarg($currentWpPath), escapeshellarg($clonePath));
+        $cloneCommand = sprintf("git clone %s %s", ProcessUtils::escapeshellarg($currentWpPath), ProcessUtils::escapeshellarg($clonePath));
 
         $process = VPCommandUtils::exec($cloneCommand, $currentWpPath);
 
@@ -474,7 +499,7 @@ class VPCommand extends WP_CLI_Command
 
         // Adding the clone as a remote for the convenience of the `vp pull` command - its `--from`
         // parameter can then be just the name of the clone, not a path to it
-        $addRemoteCommand = sprintf("git remote add %s %s", escapeshellarg($name), escapeshellarg($clonePath));
+        $addRemoteCommand = sprintf("git remote add %s %s", ProcessUtils::escapeshellarg($name), ProcessUtils::escapeshellarg($clonePath));
         $process = VPCommandUtils::exec($addRemoteCommand, $currentWpPath);
 
         if (!$process->isSuccessful()) {
@@ -596,6 +621,9 @@ class VPCommand extends WP_CLI_Command
      * 'clone' command), a path or a URL. Defaults to 'origin' which is
      * automatically set in every clone by the 'clone' command.
      *
+     * [--continue]
+     * : Finishes the pull after solving merge conflicts.
+     *
      * ## EXAMPLES
      *
      * Let's have a site 'wpsite' and a clone 'myclone' created from it. To pull the changes
@@ -613,17 +641,30 @@ class VPCommand extends WP_CLI_Command
      */
     public function pull($args = [], $assoc_args = [])
     {
-        global $versionPressContainer;
-
         if (!VersionPress::isActive()) {
             WP_CLI::error(
                 'This site is not tracked by VersionPress. Please run "wp vp activate" before cloning / merging.'
             );
         }
 
+        if (isset($assoc_args['continue'])) {
+            $process = new Process('git diff --name-only --diff-filter=U', VP_PROJECT_ROOT);
+            $process->run();
+
+            if ($process->getConsoleOutput() !== '') {
+                WP_CLI::error(
+                    'There are still some conflicts. Please resolve them and run `wp vp pull --continue` again.'
+                );
+            }
+
+            $this->finishPull();
+            return;
+        }
+
+
         $remote = isset($assoc_args['from']) ? $assoc_args['from'] : 'origin';
 
-        $process = VPCommandUtils::exec("git config --get remote." . escapeshellarg($remote) . ".url");
+        $process = VPCommandUtils::exec("git config --get remote." . ProcessUtils::escapeshellarg($remote) . ".url");
         $remoteUrl = $process->getConsoleOutput();
 
         if (is_dir($remoteUrl)) {
@@ -635,7 +676,7 @@ class VPCommand extends WP_CLI_Command
         $this->switchMaintenance('on');
 
         $branchToPullFrom = 'master'; // hardcoded until we support custom branches
-        $pullCommand = 'git pull ' . escapeshellarg($remote) . ' ' . $branchToPullFrom;
+        $pullCommand = 'git pull ' . ProcessUtils::escapeshellarg($remote) . ' ' . $branchToPullFrom;
         $process = VPCommandUtils::exec($pullCommand);
 
         if ($process->isSuccessful()) {
@@ -659,7 +700,7 @@ class VPCommand extends WP_CLI_Command
                     WP_CLI::success("");
                     WP_CLI::success(" 1. Resolve the conflicts manually as in a standard Git workflow");
                     WP_CLI::success(" 2. Stage and `git commit` the changes");
-                    WP_CLI::success(" 3. Return here and run `wp vp apply-changes`");
+                    WP_CLI::success(" 3. Return here and run `wp vp pull --continue`");
                     WP_CLI::success("");
                     WP_CLI::success("That last step will turn the maintenance mode off.");
                     WP_CLI::success("You can also abort the merge manually by running `git merge --abort`");
@@ -681,6 +722,26 @@ class VPCommand extends WP_CLI_Command
             }
         }
 
+        $this->finishPull();
+    }
+
+    private function finishPull()
+    {
+        global $versionPressContainer;
+
+        if (file_exists(VP_PROJECT_ROOT . '/composer.json')) {
+            $process = VPCommandUtils::exec('composer install', VP_PROJECT_ROOT);
+            if ($process->isSuccessful()) {
+                WP_CLI::success('Installed Composer dependencies');
+            } else {
+                WP_CLI::error('Composer dependencies could not be restored.');
+            }
+        }
+
+        /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
+        $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
+        $actionsDefinitionRepository->restoreAllDefinitionFilesFromHistory();
+
         // Run synchronization
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
@@ -692,7 +753,6 @@ class VPCommand extends WP_CLI_Command
         $this->flushRewriteRules();
 
         WP_CLI::success("All done");
-
     }
 
     /**
@@ -717,6 +777,10 @@ class VPCommand extends WP_CLI_Command
 
         $this->switchMaintenance('on');
 
+        /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
+        $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
+        $actionsDefinitionRepository->restoreAllDefinitionFilesFromHistory();
+
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
         $syncProcess->synchronizeAll();
@@ -726,8 +790,6 @@ class VPCommand extends WP_CLI_Command
         $this->flushRewriteRules();
 
         WP_CLI::success("All done");
-
-
     }
 
     /**
@@ -805,7 +867,6 @@ class VPCommand extends WP_CLI_Command
         }
         $this->switchMaintenance('off', $remoteName);
         WP_CLI::success("All done");
-
     }
 
     /**
@@ -834,7 +895,7 @@ class VPCommand extends WP_CLI_Command
         /** @var Reverter $reverter */
         $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
         /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+        $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
 
         $initialCommitHash = $this->getInitialCommitHash($repository);
 
@@ -915,7 +976,7 @@ class VPCommand extends WP_CLI_Command
         /** @var Reverter $reverter */
         $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
         /** @var GitRepository $repository */
-        $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+        $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
 
         $initialCommitHash = $this->getInitialCommitHash($repository);
 
@@ -954,7 +1015,6 @@ class VPCommand extends WP_CLI_Command
 
     private function dropTables()
     {
-        global $versionPressContainer;
         $tables = [
             'users',
             'usermeta',
@@ -970,9 +1030,11 @@ class VPCommand extends WP_CLI_Command
             'commentmeta',
             'vp_id',
         ];
-        /** @var DbSchemaInfo $schema */
-        $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
-        $tables = array_map([$schema, 'getPrefixedTableName'], $tables);
+
+        $tables = array_map(function ($table) {
+            global $table_prefix;
+            return $table_prefix . $table;
+        }, $tables);
 
         foreach ($tables as $table) {
             VPCommandUtils::runWpCliCommand('db', 'query', ["DROP TABLE IF EXISTS `$table`"]);
@@ -1086,10 +1148,17 @@ class VPCommand extends WP_CLI_Command
             $environmentConstant => $environment,
         ];
 
-        $this->runVPInternalCommand('update-config', ['table_prefix', $dbPrefix, 'variable' => null], $clonePath);
+        $process = $this->runVPInternalCommand(
+            'update-config',
+            ['table_prefix', $dbPrefix, 'variable' => null],
+            $clonePath
+        );
+
+        echo $process->getConsoleOutput();
 
         foreach ($replacements as $constant => $value) {
-            $this->runVPInternalCommand('update-config', [$constant, $value], $clonePath);
+            $process = $this->runVPInternalCommand('update-config', [$constant, $value], $clonePath);
+            echo $process->getConsoleOutput();
         }
 
         WP_CLI::success("wp-config.php updated");
@@ -1172,9 +1241,9 @@ class VPCommand extends WP_CLI_Command
     private function setConfigUrl($urlConstant, $pathConstant, $defaultPath, $baseUrl)
     {
         if (defined($pathConstant) && constant($pathConstant) !== $defaultPath) {
-            $relativePathToWpContent = str_replace(getcwd(), '', realpath(constant($pathConstant)));
-            $url = $baseUrl . str_replace('//', '/', '/' . $relativePathToWpContent);
-
+            $wpConfigDir = dirname(\WP_CLI\Utils\locate_wp_config());
+            $relativePathToWpContent = str_replace($wpConfigDir, '', realpath(constant($pathConstant)));
+            $url = rtrim(rtrim($baseUrl, '/') . str_replace('//', '/', '/' . $relativePathToWpContent), '/');
             $this->runVPInternalCommand('update-config', [$urlConstant, $url]);
         }
     }
@@ -1192,7 +1261,7 @@ class VPCommand extends WP_CLI_Command
         global $versionPressContainer;
 
         $database = $versionPressContainer->resolve(VersionPressServices::WPDB);
-        $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
+        $schema = $requirementsScope === RequirementsChecker::ENVIRONMENT ? null : $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
 
         $requirementsChecker = new RequirementsChecker($database, $schema, $requirementsScope);
 

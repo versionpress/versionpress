@@ -17,6 +17,28 @@ class RelativePathsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedRelativePath, $relativePath, "Wrong relative path from: '{$from}' to: '{$to}'.");
     }
 
+    /**
+     * @test
+     * @dataProvider specialPathsProvider
+     */
+    public function specialPaths($from, $to, $expected)
+    {
+        $relativePath = PathUtils::getRelativePath($from, $to);
+        $this->assertEquals($expected, $relativePath, "Wrong relative path from: '{$from}' to: '{$to}'.");
+    }
+
+    public function specialPathsProvider()
+    {
+        return [
+            ['/some/path/..', '/some/other/path', 'other/path'],
+            ['/some/path/.', '/some/other/path', '../other/path'],
+            ['/some/path', '/some/other/../path', ''],
+            ['/some/path/..', '/some/./other/./path', 'other/path'],
+            ['/some/long/../path', '/some/other/path', '../other/path'],
+            ['/some/./path', '/some/other/path', '../other/path'],
+        ];
+    }
+
     public function pathProvider()
     {
         $testedRoots = [
@@ -26,9 +48,10 @@ class RelativePathsTest extends \PHPUnit_Framework_TestCase
             '/some/dir/', // non-existing directory with trailing slash
             str_replace('/', '\\', __DIR__), // existing directory with backslashes
             str_replace('/', '\\', __DIR__) . '/', // existing directory with backslashes and trailing slash
-            'c:\\some\\dir', // Windows-like path
-            'c:\\some\\dir\\', // Windows-like path with trailing backslash
-            'c:\\some\\dir/', // Windows-like path with trailing slash
+            'C:\\some\\dir', // Windows-like path
+            'C:\\some\\dir\\', // Windows-like path with trailing backslash
+            'C:\\some\\dir/', // Windows-like path with trailing slash
+            'c:\\some\\dir', // lower-case c:
         ];
 
         // Used instead of dirname() because of testing Windows paths on Unix-like OS
@@ -52,6 +75,9 @@ class RelativePathsTest extends \PHPUnit_Framework_TestCase
             ];
         }, $testedRoots);
 
-        return call_user_func_array('array_merge', $testCasesForRoots);
+        $testCases = call_user_func_array('array_merge', $testCasesForRoots);
+        $testCases[] = ['c:\\path', 'C:\\path', '']; // c: vs. C: shouldn't matter (other than that, path calculation is case sensitive even on Windows)
+
+        return $testCases;
     }
 }

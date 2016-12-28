@@ -3,6 +3,7 @@
 namespace VersionPress\Tests\Selenium;
 
 use VersionPress\Tests\Utils\CommitAsserter;
+use VersionPress\Utils\PathUtils;
 
 class PublicWebTest extends SeleniumTestCase
 {
@@ -51,8 +52,6 @@ class PublicWebTest extends SeleniumTestCase
      */
     public function commentCanBeAdded()
     {
-        $commitAsserter = new CommitAsserter($this->gitRepository);
-
         $this->url('?p=' . self::$testPostId);
 
         $this->setValue('#author', "John Tester");
@@ -62,9 +61,8 @@ class PublicWebTest extends SeleniumTestCase
         $this->byCssSelector('#submit')->click();
         $this->waitAfterRedirect();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("comment/create-pending");
-        $commitAsserter->assertCommitPath("A", "%vpdb%/comments/%VPID%.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $lastCommit = $this->gitRepository->getCommit($this->gitRepository->getLastCommitHash());
+        $this->assertContains('comment/create', $lastCommit->getMessage()->getBody());
+
     }
 }

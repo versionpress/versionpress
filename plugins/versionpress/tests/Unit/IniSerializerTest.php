@@ -781,6 +781,26 @@ INI
 
     /**
      * @test
+     */
+    public function serializedArrayWithNegativeInteger()
+    {
+        $serializedString = serialize([-1]);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = -1
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
      * @dataProvider specialCharactersInValueProvider
      */
     public function serializedArrayWithSpecialStrings($str)
@@ -826,6 +846,52 @@ INI
         $this->assertSame($data, IniSerializer::deserialize($ini));
     }
 
+    /**
+     * @test
+     */
+    public function serializedHTMLString()
+    {
+        $arrayWithHtml = ["meta_key" => "who_is_the_best", "meta_value" => "<p>VersionPress</p>"];
+        $serializedString = serialize($arrayWithHtml);
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data["meta_key"] = "who_is_the_best"
+data["meta_value"] = "<p>VersionPress</p>"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+        
+    }
+
+    /**
+     * @test
+     */
+    public function serializedStringWithNewLines()
+    {
+        $arrayWithNewLines = ["meta_key" => "who_is_the_best", "meta_value" => "VersionPress\r\nis\r\nthe\r\nbest"];
+        $serializedString = serialize($arrayWithNewLines);
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::crlfize(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data["meta_key"] = "who_is_the_best"
+data["meta_value"] = "VersionPress
+is
+the
+best"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+
+    }
     /**
      * @test
      */

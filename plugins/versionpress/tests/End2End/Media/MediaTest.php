@@ -26,17 +26,17 @@ class MediaTest extends End2EndTestCase
     {
         self::$worker->prepare_uploadFile();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->uploadFile();
 
-        $commitAsserter->ignoreCommits(["usermeta/create", "usermeta/edit"]);
+        $this->commitAsserter->ignoreCommits(["usermeta/create", "usermeta/edit"]);
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("post/create");
-        $commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
-        $commitAsserter->assertCommitPath("A", "wp-content/uploads/*");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("post/create");
+        $this->commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
+        $this->commitAsserter->assertCommitPath("A", "%uploads%/*");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -49,14 +49,14 @@ class MediaTest extends End2EndTestCase
     {
         self::$worker->prepare_editFileName();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->editFileName();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("post/edit");
-        $commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("post/edit");
+        $this->commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -69,15 +69,15 @@ class MediaTest extends End2EndTestCase
     {
         self::$worker->prepare_deleteFile();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->deleteFile();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("post/delete");
-        $commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
-        $commitAsserter->assertCommitPath("D", "wp-content/uploads/*");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("post/delete");
+        $this->commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
+        $this->commitAsserter->assertCommitPath("D", "%uploads%/*");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -89,15 +89,15 @@ class MediaTest extends End2EndTestCase
     {
         self::$worker->prepare_editFile();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->editFile();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("post/edit");
-        $commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
-        $commitAsserter->assertCommitPath("A", "wp-content/uploads/*");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("post/edit");
+        $this->commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
+        $this->commitAsserter->assertCommitPath("A", "%uploads%/*");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 }

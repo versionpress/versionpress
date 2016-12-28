@@ -1,5 +1,5 @@
 <?php
-use VersionPress\ChangeInfos\ChangeInfoMatcher;
+use VersionPress\ChangeInfos\CommitMessageParser;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitRepository;
 use VersionPress\Git\Reverter;
@@ -10,13 +10,15 @@ if (!in_array($_GET['method'], ['undo', 'rollback'])) {
 
 global $versionPressContainer;
 /** @var GitRepository $repository */
-$repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+$repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
 /** @var Reverter $reverter */
 $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);
+/** @var CommitMessageParser $commitMessageParser */
+$commitMessageParser = $versionPressContainer->resolve(VersionPressServices::COMMIT_MESSAGE_PARSER);
 
 $canRevert = $reverter->canRevert();
 $commit = $repository->getCommit($_GET['commit']);
-$changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
+$changeInfo = $commitMessageParser->parse($commit->getMessage());
 
 $method = $_GET['method'];
 
@@ -34,7 +36,7 @@ $message = "
 
 $errors = (!$canRevert ? "
         <p class='undo-warning'>
-            <span class='icon icon-warning'></span>
+            <span class='icon vp-icon-warning'></span>
             You have <a href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback#uncommitted-files' target='_blank'>uncommitted changes</a> in your WordPress directory.<br>Please commit them before doing a revert.
         </p>" : "");
 

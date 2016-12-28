@@ -2,6 +2,7 @@
 
 namespace VersionPress\Database;
 
+use Nette\Utils\Strings;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Utils\Cursor;
 use VersionPress\Utils\IdUtil;
@@ -10,6 +11,8 @@ use wpdb;
 
 class VpidRepository
 {
+    const UNKNOWN_VPID_MARK = '<unknown-vpid>';
+
     /** @var Database */
     private $database;
     /** @var DbSchemaInfo */
@@ -108,6 +111,22 @@ class VpidRepository
     {
         $entityInfo = $this->schemaInfo->getEntityInfo($entityName);
 
+        foreach ($entityInfo->references as $referenceName => $targetEntity) {
+            $referenceField = "vp_{$referenceName}";
+            if (isset($entity[$referenceField])) {
+                if ($this->isNullReference($entity[$referenceField])) {
+                    $referencedId = 0;
+                } else {
+                    $referencedId = $this->restoreIdsInString($entity[$referenceField]);
+                }
+
+                if (!Strings::contains($referencedId, self::UNKNOWN_VPID_MARK)) {
+                    $entity[$referenceName] = $referencedId;
+                    unset($entity[$referenceField]);
+                }
+            }
+        }
+
         foreach ($entityInfo->valueReferences as $referenceName => $targetEntity) {
             list($sourceColumn, $sourceValue, $valueColumn, $pathInStructure) =
                 array_values(ReferenceUtils::getValueReferenceDetails($referenceName));
@@ -200,15 +219,14 @@ class VpidRepository
     private function restoreIdsInString($stringWithVpids)
     {
         $stringWithIds = preg_replace_callback(IdUtil::getRegexMatchingId(), function ($match) {
-            return $this->getIdForVpid($match[0]) ?: $match[0];
+            return $this->getIdForVpid($match[0]) ?: self::UNKNOWN_VPID_MARK;
         }, $stringWithVpids);
 
         return is_numeric($stringWithIds) ? intval($stringWithIds) : $stringWithIds;
-
     }
 
     /**
-     * Function used in wordpress-schema.yml.
+     * Function used in schema.yml.
      * Maps menu item with given postmeta (_menu_item_object_id) to target entity (post/category/custom url).
      *
      * @param $postmeta

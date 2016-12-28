@@ -165,9 +165,9 @@ class IniSerializer
         $deserialized = parse_ini_string($string, true, INI_SCANNER_RAW);
         $deserialized = self::restoreTypesOfValues($deserialized);
         $deserialized = self::sanitizeSectionsAndKeys_removePlaceholders($deserialized);
+        $deserialized = self::eolWorkaround_removePlaceholders($deserialized);
         $deserialized = self::restorePhpSerializedData($deserialized);
         $deserialized = self::expandArrays($deserialized);
-        $deserialized = self::eolWorkaround_removePlaceholders($deserialized);
         return $deserialized;
     }
 
@@ -257,7 +257,6 @@ class IniSerializer
         }
 
         return $deserializedArray;
-
     }
 
     private static function getReplacedEolString($str, $direction)
@@ -272,7 +271,6 @@ class IniSerializer
         $to = ($direction == "charsToPlaceholders") ? array_values($replacement) : array_keys($replacement);
 
         return str_replace($from, $to, $str);
-
     }
 
 
@@ -283,8 +281,8 @@ class IniSerializer
 
     private static function preserveNumbers($iniString)
     {
-        // https://regex101.com/r/pH5hE9/2
-        $re = "/= \\d+(?:\\.\\d+)?\\r?\\n/m";
+        // https://regex101.com/r/pH5hE9/3
+        $re = "/= -?\\d+(?:\\.\\d+)?\\r?\\n/m";
         return preg_replace_callback($re, function ($m) {
             return str_replace('= ', '= ' . self::$numberMarker, $m[0]);
         }, $iniString);

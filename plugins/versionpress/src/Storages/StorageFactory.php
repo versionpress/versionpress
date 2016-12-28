@@ -2,9 +2,10 @@
 
 namespace VersionPress\Storages;
 
-use Nette\Utils\Strings;
+use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Database\TableSchemaStorage;
 
 class StorageFactory
 {
@@ -12,27 +13,31 @@ class StorageFactory
     private $vpdbDir;
     private $dbSchemaInfo;
 
-    private $storageClassInfo = [];
-
     private $storages = [];
-    const ENTITY_INFO = '%entityInfo%';
     /** @var Database */
     private $database;
     private $taxonomies;
+    /** @var ChangeInfoFactory */
+    private $changeInfoFactory;
+    /** @var TableSchemaStorage */
+    private $tableSchemaStorage;
 
     /**
      * @param string $vpdbDir Path to the `wp-content/vpdb` directory
      * @param DbSchemaInfo $dbSchemaInfo Passed to storages
      * @param Database $database
      * @param string[] $taxonomies List of taxonomies used on current site
+     * @param ChangeInfoFactory $changeInfoFactory
+     * @param TableSchemaStorage $tableSchemaStorage
      */
-    public function __construct($vpdbDir, DbSchemaInfo $dbSchemaInfo, $database, $taxonomies)
+    public function __construct($vpdbDir, DbSchemaInfo $dbSchemaInfo, $database, $taxonomies, $changeInfoFactory, $tableSchemaStorage)
     {
         $this->vpdbDir = $vpdbDir;
         $this->dbSchemaInfo = $dbSchemaInfo;
         $this->database = $database;
         $this->taxonomies = $taxonomies;
-        $this->initStorageClasses();
+        $this->changeInfoFactory = $changeInfoFactory;
+        $this->tableSchemaStorage = $tableSchemaStorage;
     }
 
     /**
@@ -47,111 +52,52 @@ class StorageFactory
             return $this->storages[$entityName];
         }
 
-        $storageClass = $this->getStorageClass($entityName);
-        if (class_exists($storageClass)) {
-            $rc = new \ReflectionClass($storageClass);
-            $args = $this->getStorageArgs($entityName);
-            $storage = $rc->newInstanceArgs($args);
-            $this->storages[$entityName] = $storage;
-            return $storage;
+        if ($this->dbSchemaInfo->isEntity($entityName)) {
+            return $this->storages[$entityName] = $this->resolveStorageForEntity($entityName);
         }
+
+        $mnReferenceDetails = $this->dbSchemaInfo->getMnReferenceDetails($entityName);
+        if ($mnReferenceDetails !== null) {
+            return $this->storages[$entityName] = $this->resolveStorageForMnReference($mnReferenceDetails);
+        }
+
         return null;
     }
 
     public function getAllSupportedStorages()
     {
-        return array_keys($this->storageClassInfo);
+        return $this->dbSchemaInfo->getAllEntityNames();
     }
 
-    private function initStorageClasses()
+    private function resolveStorageForEntity($entityName)
     {
-        $this->addStorageClassInfo('post', PostStorage::class, '%vpdb%/posts', self::ENTITY_INFO);
-        $this->addStorageClassInfo(
-            'comment',
-            CommentStorage::class,
-            '%vpdb%/comments',
-            self::ENTITY_INFO,
-            '%database%'
-        );
-        $this->addStorageClassInfo(
-            'option',
-            OptionStorage::class,
-            '%vpdb%/options',
-            self::ENTITY_INFO,
-            $this->database->prefix,
-            $this->taxonomies
-        );
-        $this->addStorageClassInfo('term', TermStorage::class, '%vpdb%/terms', self::ENTITY_INFO);
-        $this->addStorageClassInfo(
-            'term_taxonomy',
-            TermTaxonomyStorage::class,
-            '%vpdb%/term_taxonomies',
-            self::ENTITY_INFO,
-            '%storage(term)%'
-        );
-        $this->addStorageClassInfo('user', UserStorage::class, '%vpdb%/users', self::ENTITY_INFO);
-        $this->addStorageClassInfo(
-            'usermeta',
-            UserMetaStorage::class,
-            '%storage(user)%',
-            self::ENTITY_INFO,
-            $this->database->prefix
-        );
-        $this->addStorageClassInfo('postmeta', PostMetaStorage::class, '%storage(post)%', self::ENTITY_INFO);
-        $this->addStorageClassInfo('termmeta', TermMetaStorage::class, '%storage(term)%', self::ENTITY_INFO);
-        $this->addStorageClassInfo('commentmeta', CommentMetaStorage::class, '%storage(comment)%', self::ENTITY_INFO);
-    }
+        $entityInfo = $this->dbSchemaInfo->getEntityInfo($entityName);
 
-    private function addStorageClassInfo($entityName, $className, $args)
-    {
-        $args = func_get_args();
-        array_shift($args); // remove $entityName
-        array_shift($args); // remove $className
+        $prefixedTableName = $this->dbSchemaInfo->getPrefixedTableName($entityName);
 
-        $this->storageClassInfo[$entityName] = [
-            'class' => $className,
-            'args' => $args
-        ];
-    }
-
-    private function getStorageClass($entityName)
-    {
-        if (!isset($this->storageClassInfo[$entityName])) {
-            return null;
+        if (!$this->tableSchemaStorage->containsSchema($prefixedTableName)) {
+            $this->tableSchemaStorage->saveSchema($prefixedTableName);
         }
-        return $this->storageClassInfo[$entityName]['class'];
-    }
 
-    private function getStorageArgs($entityName)
-    {
-        $args = $this->storageClassInfo[$entityName]['args'];
-        return $this->expandArgs($entityName, $args);
-    }
+        if ($this->dbSchemaInfo->isChildEntity($entityName)) {
+            $parentEntity = $entityInfo->references[$entityInfo->parentReference];
+            $parentStorage = $this->getStorage($parentEntity);
 
-    private function expandArgs($entityName, $args)
-    {
-        $expandedArgs = [];
-        foreach ($args as $arg) {
-            if (is_string($arg) && Strings::contains($arg, '%vpdb%')) {
-                $arg = str_replace('%vpdb%', $this->vpdbDir, $arg);
-            }
-
-            if (is_string($arg) && $arg === self::ENTITY_INFO) {
-                $arg = $this->dbSchemaInfo->getEntityInfo($entityName);
-            }
-
-            if (is_string($arg) && Strings::contains($arg, '%storage')) {
-                $matches = Strings::match($arg, '%storage\((.*)\)%');
-                $entity = $matches[1];
-                $arg = $this->getStorage($entity);
-            }
-
-            if (is_string($arg) && $arg === '%database%') {
-                $arg = $this->database;
-            }
-
-            $expandedArgs[] = $arg;
+            return new MetaEntityStorage($parentStorage, $entityInfo, $this->database->prefix, $this->changeInfoFactory);
         }
-        return $expandedArgs;
+
+        return new DirectoryStorage($this->vpdbDir . '/' . $entityInfo->tableName, $entityInfo, $this->database->prefix, $this->changeInfoFactory);
+    }
+
+    private function resolveStorageForMnReference($referenceDetails)
+    {
+        $prefixedTableName = $this->dbSchemaInfo->getPrefixedTableName($referenceDetails['junction-table']);
+
+        if (!$this->tableSchemaStorage->containsSchema($prefixedTableName)) {
+            $this->tableSchemaStorage->saveSchema($prefixedTableName);
+        }
+
+        $parentStorage = $this->getStorage($referenceDetails['source-entity']);
+        return new MnReferenceStorage($parentStorage, $referenceDetails);
     }
 }

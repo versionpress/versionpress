@@ -1,0 +1,59 @@
+@import '../Search.less';
+
+.Search-Background {
+  color: transparent;
+  position: absolute;
+  font-size: @font-size;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 1;
+  line-height: 1.4;
+  outline: rgb(85, 84, 89) none 0;
+  letter-spacing: 0;
+  word-spacing: 0;
+  margin: 3px 8px 0 8px;
+  white-space: pre;
+  overflow: hidden;
+
+  &-hint,
+  &-modifier {
+    vertical-align: middle;
+  }
+
+  &-hint {
+    color: #ccc;
+  }
+
+  &-modifier {
+    position: relative;
+    z-index: 10;
+
+    &:before {
+      content: ' ';
+      position: absolute;
+      top: -1px;
+      left: 0;
+      z-index: -1;
+      right: -1px;
+      bottom: 0;
+      display: block;
+      box-sizing: border-box;
+      border-radius: 5px;
+      border-width: 1px;
+      border-style: solid;
+      border-color: #8cd5b7;
+      background: #e5f4ee;
+      background: linear-gradient(to top, #ccecdf 0%, #e9f6f1 100%);
+    }
+
+    &.is-incomplete:before {
+      right: 0;
+      border-color: #ffdcb1;
+      background: #ffebaa;
+      border-right: none;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+}

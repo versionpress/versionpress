@@ -1,0 +1,197 @@
+post:
+  tags:
+    VP-Post-Title: post_title
+    VP-Post-Type: post_type
+  actions:
+    create: Created %VP-Post-Type% '%VP-Post-Title%'
+    trash: %VP-Post-Type% '%VP-Post-Title%' moved to trash
+    untrash: %VP-Post-Type% '%VP-Post-Title%' moved from trash
+    delete: Deleted %VP-Post-Type% '%VP-Post-Title%'
+    draft: Created draft for %VP-Post-Type% '%VP-Post-Title%'
+    publish: Published %VP-Post-Type% '%VP-Post-Title%'
+    edit:
+      message: Edited %VP-Post-Type% '%VP-Post-Title%'
+      priority: 12
+    update: Updated %VP-Post-Type% '%VP-Post-Title%'
+
+user:
+  tags:
+    VP-User-Login: user_login
+  actions:
+    create: Created user '%VP-User-Login%'
+    edit:
+      message: Edited user '%VP-User-Login%'
+      priority: 12
+    delete: Deleted user '%VP-User-Login%'
+
+option:
+  actions:
+    create: Created option '%VPID%'
+    edit:
+      message: Edited option '%VPID%'
+      priority: 12
+    delete: Deleted option '%VPID%'
+
+comment:
+  tags:
+    VP-Comment-PostTitle: /
+    VP-Comment-Author: comment_author
+  actions:
+    create: New comment for post '%VP-Comment-PostTitle%'
+    edit:
+      message: Edited comment for post '%VP-Comment-PostTitle%'
+      priority: 12
+    delete: Deleted comment for post '%VP-Comment-PostTitle%
+    trash: Comment for post '%VP-Comment-PostTitle%' moved to trash
+    untrash: Comment for post '%VP-Comment-PostTitle%' moved from trash
+    approve: Approved comment for post '%VP-Comment-PostTitle%'
+    unapprove: Unapproved comment for post '%VP-Comment-PostTitle%'
+    spam: Comment for post '%VP-Comment-PostTitle%' marked as spam
+    unspam: Comment for post '%VP-Comment-PostTitle%' marked as not spam
+    create-pending: New comment for post '%VP-Comment-PostTitle%' (pending approval)
+
+term:
+  tags:
+    VP-Term-Name: name
+    VP-Term-OldName: /
+    VP-Term-Taxonomy: /
+  actions:
+    create:
+      message: New %VP-Term-Taxonomy% '%VP-Term-Name%'
+      priority: 9
+    delete: Deleted %VP-Term-Taxonomy% '%VP-Term-Name%'
+    rename: %VP-Term-Taxonomy% '%VP-Term-OldName%' renamed to '%VP-Term-Name%'
+    edit:
+      message: Edited %VP-Term-Taxonomy% '%VP-Term-Name%'
+      priority: 12
+
+term_taxonomy:
+  tags:
+    VP-TermTaxonomy-Taxonomy: taxonomy
+    VP-Term-Name: /
+  actions:
+    create: New %VP-TermTaxonomy-Taxonomy% '%VP-Term-Name%'
+    edit:
+      message: Edited %VP-TermTaxonomy-Taxonomy% '%VP-Term-Name%'
+      priority: 12
+    delete: Deleted %VP-TermTaxonomy-Taxonomy% '%VP-Term-Name%'
+
+commentmeta:
+  tags:
+    VP-Comment-Id: vp_comment_id
+    VP-CommentMeta-Key: meta_key
+  parent-id-tag: VP-Comment-Id
+  actions:
+    create:
+      message: Created commentmeta '%VP-CommentMeta-Key%'
+      priority: 15
+    edit:
+      message: Edited commentmeta '%VP-CommentMeta-Key%'
+      priority: 17
+    delete:
+      message: Deleted commentmeta '%VP-CommentMeta-Key%'
+      priority: 15
+
+usermeta:
+  tags:
+    VP-User-Id: vp_user_id
+    VP-UserMeta-Key: meta_key
+    VP-User-Login: /
+  parent-id-tag: VP-User-Id
+  actions:
+    create:
+      message: Created usermeta '%VP-UserMeta-Key%'
+      priority: 15
+    edit:
+      message: Edited usermeta '%VP-UserMeta-Key%'
+      priority: 17
+    delete:
+      message: Deleted usermeta '%VP-UserMeta-Key%'
+      priority: 15
+
+termmeta:
+  tags:
+    VP-Term-Id: vp_term_id
+    VP-TermMeta-Key: meta_key
+  parent-id-tag: VP-Term-Id
+  actions:
+    create:
+      message: Created termmeta '%VP-TermMeta-Key%'
+      priority: 15
+    edit:
+      message: Edited termmeta '%VP-TermMeta-Key%'
+      priority: 17
+    delete:
+      message: Deleted termmeta '%VP-TermMeta-Key%'
+      priority: 15
+
+postmeta:
+  tags:
+    VP-Post-Id: vp_post_id
+    VP-PostMeta-Key: meta_key
+    VP-Post-Type: /
+    VP-Post-Title: /
+  parent-id-tag: VP-Post-Id
+  actions:
+    create:
+      message: Created postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'
+      priority: 15
+    edit:
+      message: Edited postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'
+      priority: 17
+    delete:
+      message: Deleted postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'
+      priority: 15
+
+composer:
+  actions:
+    install: Installed Composer package '%VPID%'
+    update: Updated Composer package '%VPID%'
+    delete: Deleted Composer package '%VPID%'
+
+plugin:
+  tags:
+    VP-Plugin-Name: /
+  actions:
+    install: Installed plugin '%VP-Plugin-Name%'
+    activate: Activated plugin '%VP-Plugin-Name%'
+    deactivate: Deactivated plugin '%VP-Plugin-Name%'
+    update: Updated plugin '%VP-Plugin-Name%'
+    edit: Edited plugin '%VP-Plugin-Name%'
+    delete: Deleted plugin '%VP-Plugin-Name%'
+
+theme:
+  tags:
+    VP-Theme-Name: /
+  actions:
+    install: Installed theme '%VP-Theme-Name%'
+    update: Updated theme '%VP-Theme-Name%'
+    edit: Edited theme '%VP-Theme-Name%'
+    switch: Theme switched to '%VP-Theme-Name%'
+    delete: Deleted theme '%VP-Theme-Name%'
+
+wordpress:
+  actions:
+    update: WordPress updated to version %VPID%
+
+translation:
+  tags:
+    VP-Language-Code: /
+    VP-Language-Name: /
+    VP-Translation-Type: /
+    VP-Translation-Name: /
+  actions:
+    activate:
+      message: Site language switched to '%VP-Language-Name%'
+      priority: 9
+    install: Installed translation '%VP-Language-Name%'
+    update: Updated translation '%VP-Language-Name%'
+    uninstall: Uninstalled translation '%VP-Language-Name%'
+
+versionpress:
+  actions:
+    activate: Activated VersionPress %VPID%
+    update: Updated to VersionPress %VPID%
+    deactivate: Deactivated VersionPress
+    undo: Reverted change "%/commit-message/%"
+    rollback: Rollback to the same state as of %/commit-date/%

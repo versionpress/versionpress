@@ -23,6 +23,11 @@ class ThemesTest extends End2EndTestCase
     public static function setupBeforeClass()
     {
         parent::setUpBeforeClass();
+
+        if (self::$testConfig->testSite->installationType !== 'standard') {
+            throw new \PHPUnit_Framework_SkippedTestSuiteError();
+        }
+
         $testDataPath = __DIR__ . '/../test-data';
         self::$themeInfo = [
             'zipfile' => realpath($testDataPath . '/test-theme.zip'),
@@ -50,15 +55,15 @@ class ThemesTest extends End2EndTestCase
     {
         self::$worker->prepare_uploadTheme();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->uploadTheme();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("theme/install");
-        $commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
-        $commitAsserter->assertCommitPath("A", "wp-content/themes/" . self::$themeInfo['affected-path']);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("theme/install");
+        $this->commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
+        $this->commitAsserter->assertCommitPath("A", "wp-content/themes/" . self::$themeInfo['affected-path']);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -71,15 +76,15 @@ class ThemesTest extends End2EndTestCase
         self::$worker->prepare_switchTheme();
         $currentTheme = self::$wpAutomation->getCurrentTheme();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->switchTheme();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("theme/switch");
-        $commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
-        $commitAsserter->assertCommitPath(["A", "M"], "%vpdb%/options/cu/current_theme.ini");
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("theme/switch");
+        $this->commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
+        $this->commitAsserter->assertCommitPath(["A", "M"], "%vpdb%/options/cu/current_theme.ini");
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
 
         self::$wpAutomation->switchTheme($currentTheme);
@@ -93,15 +98,15 @@ class ThemesTest extends End2EndTestCase
     {
         self::$worker->prepare_deleteTheme();
 
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->deleteTheme();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertCommitAction("theme/delete");
-        $commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
-        $commitAsserter->assertCommitPath("D", "wp-content/themes/" . self::$themeInfo['affected-path']);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertCommitAction("theme/delete");
+        $this->commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
+        $this->commitAsserter->assertCommitPath("D", "wp-content/themes/" . self::$themeInfo['affected-path']);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -112,15 +117,15 @@ class ThemesTest extends End2EndTestCase
     public function uploadingTwoThemesCreatesBulkAction()
     {
         self::$worker->prepare_uploadTwoThemes();
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->uploadTwoThemes();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction('theme/install', 2);
-        $commitAsserter->assertCommitPath("A", "wp-content/themes/" . self::$themeInfo['affected-path']);
-        $commitAsserter->assertCommitPath("A", "wp-content/themes/" . self::$secondThemeInfo['affected-path']);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction('theme/install', 2);
+        $this->commitAsserter->assertCommitPath("A", "wp-content/themes/" . self::$themeInfo['affected-path']);
+        $this->commitAsserter->assertCommitPath("A", "wp-content/themes/" . self::$secondThemeInfo['affected-path']);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -131,15 +136,15 @@ class ThemesTest extends End2EndTestCase
     public function deletingTwoThemesCreatesBulkAction()
     {
         self::$worker->prepare_deleteTwoThemes();
-        $commitAsserter = new CommitAsserter($this->gitRepository);
+        $this->commitAsserter->reset();
 
         self::$worker->deleteTwoThemes();
 
-        $commitAsserter->assertNumCommits(1);
-        $commitAsserter->assertBulkAction('theme/delete', 2);
-        $commitAsserter->assertCommitPath("D", "wp-content/themes/" . self::$themeInfo['affected-path']);
-        $commitAsserter->assertCommitPath("D", "wp-content/themes/" . self::$secondThemeInfo['affected-path']);
-        $commitAsserter->assertCleanWorkingDirectory();
+        $this->commitAsserter->assertNumCommits(1);
+        $this->commitAsserter->assertBulkAction('theme/delete', 2);
+        $this->commitAsserter->assertCommitPath("D", "wp-content/themes/" . self::$themeInfo['affected-path']);
+        $this->commitAsserter->assertCommitPath("D", "wp-content/themes/" . self::$secondThemeInfo['affected-path']);
+        $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 }

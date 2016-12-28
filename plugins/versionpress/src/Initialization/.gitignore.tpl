@@ -2,7 +2,7 @@
 #  Main ignored items
 #------------------------
 
-/wp-config.php
+{{abspath-parent}}/wp-config.php
 {{abspath}}/wp-config.php
 .maintenance
 versionpress.maintenance

@@ -1,37 +1,64 @@
-This page is about getting your local environment ready for VersionPress **development**. The setup is more like a standard software project because there are external dependencies, we require a build step etc.
+This page is about getting you ready for VersionPress _development_. For instructions on using VersionPress, see [these docs](https://docs.versionpress.net/en).
 
-**Just cloning a repo into the `wp-content/plugins` folder will not work.** 
+Table of contents:
+
+- [Prerequisites](#prerequisites)
+- [Checkout & build](#checkout--build)
+- [IDE / editor setup](#ide--editor-setup)
+- [Running & debugging](#running--debugging)
+- [Testing](#testing)
+- [Windows tips](#windows-tips)
+
+## Prerequisites
+
+Make sure these tools are installed on your computer:
+
+- PHP 5.6 or 7.x and a webserver like [MAMP](https://www.mamp.info/en/) on Mac or [WampServer](http://www.wampserver.com/en/) on Windows
+- [Git](http://git-scm.com/)
+- [Composer](https://getcomposer.org/)
+- [WP-CLI](http://wp-cli.org/)
+    - DB commands expect `mysql` in PATH
+- [Node.js](http://nodejs.org/)
+    - [Python 2.x](https://www.python.org/downloads/) is required to build some NPM modules
+- [Gulp](http://gulpjs.com/) (globally)
 
 
-## System-wide tools / prerequisites
+## Checkout & build
 
-1. [Git](http://git-scm.com/), obviously :)
-2. Until we have a Vagrant / Docker based workflow, install PHP & Apache locally, e.g., using [MAMP](https://www.mamp.info/en/) on Mac or [WampServer 32bit](http://www.wampserver.com/en/) on Windows.
-    - PHP **5.6+** is required for development (5.3+ is enough in runtime; the difference is some development-time tools and libraries).
-3. Install [Composer](https://getcomposer.org/).
-4. Install [WP-CLI](http://wp-cli.org/)
-    - Can be [installed using Composer](https://github.com/wp-cli/wp-cli/wiki/Alternative-Install-Methods).
-    - DB commands expect `mysql` in PATH.
-5. Install [Node.js](http://nodejs.org/).
-    - [Python 2.x](https://www.python.org/downloads/) is required to build some NPM modules.
-    - Install [Gulp](http://gulpjs.com/) globally.
+1. **Clone the repo** to a project folder like `/Users/you/Projects/versionpress`. Note that this is _not_ under `wp-content` of a WordPress site; you'll set up a test site later.
+2. **Run `npm install`** in the project root. This downloads dev dependencies and builds the project.
+3. If impatient, you can now **copy the `plugins/versionpress` folder to some WordPress site** for testing. There are better ways though, see below.
 
+The sources contain two main parts:
 
-## Project checkout
+- **`plugins/versionpress`**: the actual plugin, i.e., PHP code.
+- **`frontend`**: the frontend written in React and TypeScript.
 
-1. Clone [the repo](https://github.com/versionpress/versionpress) into some **project folder**, e.g., `/Users/you/Projects/versionpress`.
-    - This is NOT under `wp-content` of some WordPress installation. Test site lives separately and you'll set it up later.
-3. Run `npm install` in the project root.
+The front-end requires building (transpiling the code to JavaScript, bundling it and copying to the WordPress plugin). `npm install` made it automatically, you can also invoke `gulp frontend-build-and-deploy` manually but there are easier workflows, see below.
 
-This will download all sorts of dev dependencies and build the project. It contains two main parts:
+### ZIP builds
 
-- The **VersionPress core** in **`plugins/versionpress`**. This is mostly the PHP code implementing the core versioning functionality.
-- Its **frontend** in the **`frontend`** folder. The GUI is built as a JavaScript SPA and can run either inside the WordPress administration (which we currently do when we distribute VersionPress) or separately (e.g., for testing or inside some control panel in the future).
+To build a ZIP file to distribute VersionPress (supports both stable releases, alphas, betas etc.):
+
+1. Run **`gulp build`**.
+2. Watch the magic happen.
+
+A file like `dist/versionpress-3.0.2.zip` is produced. The file name is based on the nearest Git tag, for example:
+
+```
+versionpress-3.0.2.zip
+# built from commit tagged 3.0.2
+
+versionpress-3.0.2-27-g0e1ce7f.zip
+# built from 0e1ce7f which is based on 3.0.2 with 27 new commits
+```
+
+See [`git describe --tags`](https://git-scm.com/docs/git-describe#_examples) for more examples.
 
 
 ## IDE / editor setup
 
-PhpStorm is the recommended IDE. If you don't use PhpStorm, you can proceed to [Developing without PhpStorm](#developing-without-phpstorm).
+[PhpStorm](https://www.jetbrains.com/phpstorm/) is the recommended IDE: it understands both PHP and JavaScript / TypeScript code pretty well. If you don't want to use PhpStorm, please proceed to [Developing without PhpStorm](#developing-without-phpstorm).
 
 ### PhpStorm setup
 
@@ -66,7 +93,7 @@ Open the project at `plugins/versionpress` (still in a *project folder*) and the
 
 You'll only need to open this project if you do a frontend (GUI) development.
 
-1. Run `gulp idea` if you haven't done that already. This will create PhpStorm project files.
+1. Run `gulp idea` if you haven't done that already. This will create PhpStorm / WebStorm project files.
 2. Open the `frontend` project in PhpStorm.
 3. Answer "No" to *Compile TypeScript to JavaScript?* prompt.
 
@@ -79,15 +106,15 @@ In the editor of your choice, please install [EditorConfig](http://editorconfig.
 For the 'VersionPress' project:
 
 1. Open `plugins/versionpress` in your IDE / editor.
-2. Add `ext-libs` in include path (if your IDE / editor supports it).
-3. Set the code style to PSR-2 (if your IDE / editor supports it).
+2. Add `ext-libs` in include path if your IDE / editor supports it.
+3. Set the code style to PSR-2 if your IDE / editor supports it.
 
 For the 'frontend' project just open `frontend` and start hacking – it's a TypeScript + React app. See [Run frontend separately](#run-frontend-separately).
 
 
 ## Running & debugging
 
-To simply run VersionPress in your WP site, you can copy `PROJECT_DIR/plugins/versionpress` to `YOUR_WP_SITE/wp-content/plugins`. However, for the full workflow where you'll be editing files and redeploying the project, we recommend setting up `WpAutomation`.
+After the initial setup and build (see above), you can copy `PROJECT_DIR/plugins/versionpress` to `YOUR_WP_SITE/wp-content/plugins`. However, for the full workflow where you'll be editing files and redeploying the project, we recommend setting up `WpAutomation`.
 
 ### WpAutomation setup
 
@@ -146,13 +173,8 @@ Create new deployment and set it up like this:
 
 For pure frontend development, it's more convenient to run it outside of the WordPress administration. To do that:
 
-1. Edit `frontend/src/config.local.ts` and enter your local values
-2. Find the `plugins/versionpress/vpconfig.yml` file inside the live WordPress / VersionPress installation and add this to it:
-
-    ```
-    requireApiAuth: false
-    ```
-
+1. Copy `frontend/src/config/config.local.sample.ts` to `frontend/src/config/config.local.ts` and enter your local values.
+2. Find the `plugins/versionpress/bootstrap.php` file inside the live WordPress / VersionPress installation and redefine the `VERSIONPRESS_REQUIRE_API_AUTH` constant to `false`.
 3. Run `npm run dev` in the `frontend` directory. This launches [webpack dev server](http://webpack.github.io/docs/webpack-dev-server.html) on the default URL http://localhost:8888. Changed files are automatically reflected in the browser.
 
 To deploy the JS app into the WordPress backend, you can use `gulp test-deploy` task in the project root.

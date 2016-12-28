@@ -4,10 +4,9 @@ namespace VersionPress\ChangeInfos;
 
 use Nette\NotSupportedException;
 use Nette\Utils\Strings;
-use VersionPress\Git\CommitMessage;
 use VersionPress\Utils\StringUtils;
 
-abstract class BulkChangeInfo implements ChangeInfo
+class BulkChangeInfo implements ChangeInfo
 {
 
     /** @var TrackedChangeInfo[] */
@@ -22,11 +21,6 @@ abstract class BulkChangeInfo implements ChangeInfo
     {
         $this->changeInfos = $changeInfos;
         $this->count = $this->countUniqueChanges($changeInfos);
-    }
-
-    public static function buildFromCommitMessage(CommitMessage $commitMessage)
-    {
-        throw new NotSupportedException("Building bulk changeinfo from commit message is not supported");
     }
 
     public function getCommitMessage()
@@ -46,16 +40,25 @@ abstract class BulkChangeInfo implements ChangeInfo
 
     public function getChangeDescription()
     {
+        $entityName = $this->getScope();
+        $action = $this->getAction();
+
         if ($this->count === 1) {
-            return $this->changeInfos[0]->getChangeDescription();
+            $defaultDescription = $this->changeInfos[0]->getChangeDescription();
+        } else {
+            $defaultDescription = sprintf(
+                "%s %d %s",
+                Strings::capitalize(StringUtils::verbToPastTense($action)),
+                $this->count,
+                StringUtils::pluralize($entityName)
+            );
         }
 
-        return sprintf(
-            "%s %d %s",
-            Strings::capitalize(StringUtils::verbToPastTense($this->getAction())),
-            $this->count,
-            StringUtils::pluralize($this->getEntityName())
-        );
+        $tags = array_map(function (TrackedChangeInfo $changeInfo) {
+            return $changeInfo->getCustomTags();
+        }, $this->changeInfos);
+
+        return apply_filters("vp_bulk_change_description_{$entityName}", $defaultDescription, $action, $this->count, $tags);
     }
 
     public function getAction()
@@ -63,9 +66,14 @@ abstract class BulkChangeInfo implements ChangeInfo
         return $this->changeInfos[0]->getAction();
     }
 
-    public function getEntityName()
+    public function getScope()
     {
-        return $this->changeInfos[0]->getEntityName();
+        return $this->changeInfos[0]->getScope();
+    }
+
+    public function getPriority()
+    {
+        return $this->changeInfos[0]->getPriority();
     }
 
     /**
@@ -83,9 +91,9 @@ abstract class BulkChangeInfo implements ChangeInfo
         $uniqueEntities = [];
 
         foreach ($changeInfos as $changeInfo) {
-            if (!in_array($changeInfo->getEntityId(), $uniqueEntities)) {
+            if (!in_array($changeInfo->getId(), $uniqueEntities)) {
                 $numberOfUniqueChanges += 1;
-                $uniqueEntities[] = $changeInfo->getEntityId();
+                $uniqueEntities[] = $changeInfo->getId();
             }
         }
 

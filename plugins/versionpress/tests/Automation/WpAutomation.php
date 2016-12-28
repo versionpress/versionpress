@@ -58,10 +58,16 @@ class WpAutomation
      */
     public function setUpSite($entityCounts = [])
     {
-        $this->prepareFiles();
-        $this->createConfigFile();
+        FileSystem::removeContent($this->siteConfig->path);
+
+        if ($this->siteConfig->installationType === 'standard') {
+            $this->prepareStandardWpInstallation();
+        } elseif ($this->siteConfig->installationType === 'composer') {
+            $this->createPedestalBasedSite();
+        }
+
         $this->clearDatabase();
-        $this->installWp();
+        $this->installWordPress();
 
         if (!$this->siteConfig->wpAutoupdate) {
             $this->disableAutoUpdate();
@@ -92,7 +98,8 @@ class WpAutomation
      */
     public function isVersionPressInitialized()
     {
-        return is_file($this->siteConfig->path . '/wp-content/vpdb/.active');
+        $vpdbDir = $this->getVpdbDir();
+        return $vpdbDir !== '' && is_file($vpdbDir . '/.active');
     }
 
     /**
@@ -506,7 +513,7 @@ class WpAutomation
     public function initializeVersionPress()
     {
         $this->runWpCliCommand('plugin', 'activate', ['versionpress']);
-        $this->runWpCliCommand('vp', 'activate');
+        $this->runWpCliCommand('vp', 'activate', ['yes' => null]);
     }
 
     /**
@@ -543,11 +550,11 @@ class WpAutomation
      * Puts WP directory to a default state, as if one manually downloaded the WordPress ZIP
      * and extracted it there. Removes all old files if necessary.
      */
-    private function prepareFiles()
+    private function prepareStandardWpInstallation()
     {
         $this->ensureCleanInstallationIsAvailable();
-        FileSystem::removeContent($this->siteConfig->path);
         FileSystem::copyDir($this->getCleanInstallationPath(), $this->siteConfig->path);
+        $this->createConfigFile();
     }
 
     /**
@@ -557,12 +564,15 @@ class WpAutomation
     private function ensureCleanInstallationIsAvailable()
     {
 
-        if (!is_dir($this->getCleanInstallationPath())) {
-            $downloadPath = $this->getCleanInstallationPath();
-            FileSystem::mkdir($downloadPath);
+        $cleanInstallationPath = $this->getCleanInstallationPath();
+
+        if (!$this->isCorrectlyDownloaded($cleanInstallationPath)) {
+            FileSystem::remove($cleanInstallationPath);
+            FileSystem::mkdir($cleanInstallationPath);
+
             $wpVersion = $this->siteConfig->wpVersion;
             $wpLocale = $this->siteConfig->wpLocale;
-            $downloadCommand = "wp core download --path=\"$downloadPath\" --version=\"$wpVersion\"";
+            $downloadCommand = "wp core download --path=\"$cleanInstallationPath\" --version=\"$wpVersion\"";
             if ($wpLocale) {
                 $downloadCommand .= " --locale=$wpLocale";
             }
@@ -570,6 +580,19 @@ class WpAutomation
             $this->exec($downloadCommand, null);
         }
     }
+
+    /**
+     * Checks that clean WP installation is available and downloaded correctly. (Simple implementation
+     * for now, just checking some basic paths.)
+     *
+     * @param string $cleanInstallationPath
+     * @return bool
+     */
+    private function isCorrectlyDownloaded($cleanInstallationPath)
+    {
+        return is_dir($cleanInstallationPath) && is_file($cleanInstallationPath . '/wp-settings.php');
+    }
+
 
     /**
      * Returns a path where a clean installation of the configured WP version is stored and cached.
@@ -618,7 +641,7 @@ class WpAutomation
      * Installs WordPress. Assumes that files have been prepared on the file system, database is clean
      * and wp-config.php has been created.
      */
-    private function installWp()
+    public function installWordPress()
     {
         $cmdArgs = [
             "url" => $this->siteConfig->url,
@@ -734,7 +757,7 @@ class WpAutomation
 
         $command = substr($command, 3); // strip "wp " prefix
 
-        $command = "php " . escapeshellarg($this->getWpCli()) . " $command";
+        $command = "php " . ProcessUtils::escapeshellarg($this->getWpCli()) . " $command";
 
         return $command;
 
@@ -816,5 +839,91 @@ class WpAutomation
         });
 
         file_put_contents($bootstrapFile, join("\n", $lines));
+    }
+
+    /**
+     * Creates project structure similar to Bedrock.
+     * Pedestal (https://github.com/versionpress/pedestal) is inpired by Bedrock. It only have
+     * a standard wp-config-based configuration system and predefined Composer scripts for VersionPress.
+     */
+    private function createPedestalBasedSite()
+    {
+        $process = new Process('composer create-project -s dev versionpress/pedestal .', $this->siteConfig->path);
+        $process->run();
+
+        $this->updateConfigConstant('DB_NAME', $this->siteConfig->dbName);
+        $this->updateConfigConstant('DB_USER', $this->siteConfig->dbUser);
+        $this->updateConfigConstant('DB_PASSWORD', $this->siteConfig->dbPassword);
+        $this->updateConfigConstant('DB_HOST', $this->siteConfig->dbHost);
+        $this->updateConfigConstant('WP_HOME', $this->siteConfig->url);
+    }
+
+    private function updateConfigConstant($constant, $value, $variable = false)
+    {
+        $vpInternalCommandFile = __DIR__ . '/../../src/Cli/vp-internal.php';
+        $this->runWpCliCommand(
+            'vp-internal',
+            'update-config',
+            [$constant, $value, 'require' => $vpInternalCommandFile]
+        );
+    }
+
+    public function getVpdbDir()
+    {
+        static $vpdbDir = false;
+
+        if ($vpdbDir === false) {
+            $vpdbDir = $this->runWpCliCommand('eval', null, ['defined("VP_VPDB_DIR") && print(VP_VPDB_DIR);']) ?: null;
+        }
+
+        return $vpdbDir;
+    }
+
+    public function getAbspath()
+    {
+        static $abspath = false;
+
+        if ($abspath === false) {
+            $abspath = $this->runWpCliCommand('eval', null, ['print(ABSPATH);']) ?: null;
+        }
+
+        return $abspath;
+    }
+
+    public function getUploadsDir()
+    {
+        static $uploads = false;
+
+        if ($uploads === false) {
+            $uploads = $this->runWpCliCommand('eval', null, ['print(wp_upload_dir()["basedir"]);']) ?: null;
+        }
+
+        return $uploads;
+    }
+
+    public function getPluginsDir()
+    {
+        static $pluginsDir = false;
+
+        if ($pluginsDir === false) {
+            $pluginsDir = $this->runWpCliCommand('eval', null, ['print(WP_PLUGIN_DIR);']) ?: null;
+        }
+
+        return $pluginsDir;
+    }
+
+    public function getWebRoot()
+    {
+        static $pluginsDir = false;
+
+        if ($pluginsDir === false) {
+            $pluginsDir = $this->runWpCliCommand(
+                'eval',
+                null,
+                ['print(dirname(\WP_CLI\Utils\locate_wp_config()));']
+            ) ?: null;
+        }
+
+        return $pluginsDir;
     }
 }

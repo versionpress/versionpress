@@ -11,6 +11,11 @@ use VersionPress\Utils\RequirementsChecker;
 
 jQuery(document).ready(function($) {
     $('#activate-versionpress-btn').click(function (e) {
+        if ($(this).attr('href') === '#') {
+            // Environment doesn't match requirements, button is disabled
+            return false;
+        }
+
         var envname = $('#envname').val();
 
         // Quick and dirty validation; the canonical regexp is in WorkflowUtils::isCloneNameValid().
@@ -44,7 +49,7 @@ jQuery(document).ready(function($) {
                     <?php
                     global $versionPressContainer;
                     /** @var GitRepository $repository */
-                    $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+                    $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
                     $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
                     $schema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
 
@@ -52,7 +57,7 @@ jQuery(document).ready(function($) {
                     $report = $requirementsChecker->getRequirements();
 
                     foreach ($report as $requirement) {
-                        $iconClass = $requirement["fulfilled"] ? "icon-checkmark" : "icon-warning";
+                        $iconClass = $requirement["fulfilled"] ? "vp-icon-checkmark" : "vp-icon-warning";
                         ?>
                         <li>
                             <span class="icon <?php echo esc_attr($iconClass); ?>"></span>
@@ -67,7 +72,7 @@ jQuery(document).ready(function($) {
                     if ($requirementsChecker->isWithoutCriticalErrors() && $repository->isVersioned()) {
                         ?>
                         <li>
-                            <span class="icon icon-warning"></span>
+                            <span class="icon vp-icon-warning"></span>
                             Note: This website is already versioned in Git (the repository is either your custom or has been created by a previous installation of VersionPress). VersionPress will add some rules into `.gitignore` and install a custom merge driver for its own files. It is not a problem for VersionPress, just be sure that you know what you are doing.
                         </li>
                         <?php
@@ -89,15 +94,15 @@ jQuery(document).ready(function($) {
 
                 <ul>
                     <li>
-                        <span class="icon icon-notification"></span>
+                        <span class="icon vp-icon-notification"></span>
                         You are activating an <strong>Early Access version</strong>. If you encounter any issues please let us know <a href="https://github.com/versionpress/support">on GitHub</a>. <a href="http://docs.versionpress.net/en/getting-started/about-eap">Learn more</a>.
                     </li>
                     <li>
-                        <span class="icon icon-notification"></span>
+                        <span class="icon vp-icon-notification"></span>
                         Be careful when using <strong>third-party plugins</strong>. Some of them work fine, some might be problematic in combination with VersionPress. <a href="http://docs.versionpress.net/en/feature-focus/external-plugins">Learn more</a>.
                     </li>
                     <li>
-                        <span class="icon icon-notification"></span>
+                        <span class="icon vp-icon-notification"></span>
                         <strong>Have a backup</strong>. Seriously.
                     </li>
                 </ul>

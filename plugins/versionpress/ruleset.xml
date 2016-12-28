@@ -2,6 +2,15 @@
 <ruleset name="VersionPress Standard">
     <rule ref="PSR2"/>
 
+    <rule ref="Generic.Files.LineLength">
+        <exclude name="Generic.Files.LineLength.TooLong" />
+    </rule>
+
+    <rule ref="Squiz.WhiteSpace.ControlStructureSpacing">
+        <exclude name="Squiz.WhiteSpace.ControlStructureSpacing.SpacingAfterOpen" />
+    </rule>
+
+
     <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
         <exclude-pattern type="relative">*Worker.php</exclude-pattern>
         <exclude-pattern type="relative">*Test.php</exclude-pattern>
@@ -14,13 +23,10 @@
         <exclude-pattern type="relative">bootstrap.php</exclude-pattern>
         <exclude-pattern type="relative">src/Api/VersionPressApi.php</exclude-pattern>
         <exclude-pattern type="relative">src/Cli/vp.php</exclude-pattern>
+        <exclude-pattern type="relative">src/Cli/vp-composer.php</exclude-pattern>
         <exclude-pattern type="relative">src/Cli/vp-internal.php</exclude-pattern>
         <exclude-pattern type="relative">versionpress.php</exclude-pattern>
         <exclude-pattern type="relative">setup-hooks.php</exclude-pattern>
-    </rule>
-
-    <rule ref="Generic.Files.LineLength.TooLong">
-        <exclude-pattern>admin/*</exclude-pattern>
     </rule>
 
     <arg value="swp"/>

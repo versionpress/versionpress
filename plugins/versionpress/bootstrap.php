@@ -62,7 +62,7 @@ if (!defined('VERSIONPRESS_COMMIT_MESSAGE_PREFIX')) {
 }
 
 require_once(VERSIONPRESS_PLUGIN_DIR . '/vendor/autoload.php');
-require_once(VERSIONPRESS_PLUGIN_DIR . '/versionpress-functions.php');
+require_once(VERSIONPRESS_PLUGIN_DIR . '/internal-functions.php');
 
 if (defined('DOING_AJAX')) {
     $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';

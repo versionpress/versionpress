@@ -2,24 +2,22 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
-use VersionPress\Storages\UserMetaStorage;
-use VersionPress\Storages\UserStorage;
+use VersionPress\Storages\DirectoryStorage;
+use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Synchronizers\Synchronizer;
-use VersionPress\Synchronizers\UserMetaSynchronizer;
-use VersionPress\Synchronizers\UsersSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 
 class UserMetaSynchronizerTest extends SynchronizerTestCase
 {
-    /** @var UserMetaStorage */
+    /** @var MetaEntityStorage */
     private $storage;
-    /** @var UserStorage */
+    /** @var DirectoryStorage */
     private $userStorage;
-    /** @var UserMetaSynchronizer */
+    /** @var Synchronizer */
     private $synchronizer;
-    /** @var UsersSynchronizer */
+    /** @var Synchronizer */
     private $usersSynchronizer;
     private static $vpId;
     private static $userVpId;
@@ -29,23 +27,25 @@ class UserMetaSynchronizerTest extends SynchronizerTestCase
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('usermeta');
         $this->userStorage = self::$storageFactory->getStorage('user');
-        $this->synchronizer = new UserMetaSynchronizer(
+        $this->synchronizer = new Synchronizer(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('usermeta'),
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
-        $this->usersSynchronizer = new UsersSynchronizer(
+        $this->usersSynchronizer = new Synchronizer(
             $this->userStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('user'),
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
     }
 

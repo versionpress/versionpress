@@ -6,8 +6,8 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use RegexIterator;
-use VersionPress\Storages\Serialization\IniSerializer;
-use VersionPress\Utils\ArrayUtils;
+use VersionPress\Actions\ActionsInfo;
+use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Utils\EntityUtils;
 use VersionPress\Utils\FileSystem;
 
@@ -21,7 +21,7 @@ use VersionPress\Utils\FileSystem;
  * Note that the same file can be used by multiple entities. For example, both
  * the main post data and postmeta for it are stored in the same INI file.
  */
-abstract class DirectoryStorage extends Storage
+class DirectoryStorage extends Storage
 {
 
     /** @var string */
@@ -32,16 +32,22 @@ abstract class DirectoryStorage extends Storage
     /** @var bool[] */
     private $existenceCache = [];
 
+    /** @var ChangeInfoFactory */
+    private $changeInfoFactory;
+
     /**
      * DirectoryStorage constructor.
      * @param string $directory
      * @param \VersionPress\Database\EntityInfo $entityInfo
+     * @param string $dbPrefix
+     * @param ChangeInfoFactory $changeInfoFactory
      */
-    public function __construct($directory, $entityInfo)
+    public function __construct($directory, $entityInfo, $dbPrefix, $changeInfoFactory)
     {
-        parent::__construct($entityInfo);
+        parent::__construct($entityInfo, $dbPrefix);
         $this->directory = $directory;
         $this->entityInfo = $entityInfo;
+        $this->changeInfoFactory = $changeInfoFactory;
     }
 
     public function save($data)
@@ -86,7 +92,6 @@ abstract class DirectoryStorage extends Storage
         } else {
             return null;
         }
-
     }
 
     public function delete($restriction)
@@ -137,25 +142,16 @@ abstract class DirectoryStorage extends Storage
 
     public function getEntityFilename($id, $parentId = null)
     {
-        $vpidPath = Strings::substring($id, 0, 2) . '/' . $id;
+        $sanitizedEntityId = urlencode($this->maybeReplacePrefixWithPlaceholder($id));
+        $sanitizedEntityId = str_replace('.', '%2E', $sanitizedEntityId);
+
+        $vpidPath = Strings::substring($sanitizedEntityId, 0, 2) . '/' . $sanitizedEntityId;
         return $this->directory . '/' . $vpidPath . '.ini';
     }
 
     public function getPathCommonToAllEntities()
     {
         return $this->directory;
-    }
-
-    protected function deserializeEntity($serializedEntity)
-    {
-        $entity = IniSerializer::deserialize($serializedEntity);
-        return $this->flattenEntity($entity);
-    }
-
-    protected function serializeEntity($vpid, $entity)
-    {
-        unset($entity[$this->entityInfo->vpidColumnName]);
-        return IniSerializer::serialize([$vpid => $entity]);
     }
 
     private function getEntityFiles()
@@ -180,7 +176,7 @@ abstract class DirectoryStorage extends Storage
                 return $item !== false;
             })
         );
-        $vpIds = ArrayUtils::column($entities, $this->entityInfo->vpidColumnName);
+        $vpIds = array_column($entities, $this->entityInfo->vpidColumnName);
         return array_combine($vpIds, $entities);
     }
 
@@ -203,21 +199,7 @@ abstract class DirectoryStorage extends Storage
         return isset($entities[$id]) ? $entities[$id] : false;
     }
 
-    protected function flattenEntity($entity)
-    {
-        if (count($entity) === 0) {
-            return $entity;
-        }
-
-        reset($entity);
-        $vpid = key($entity);
-        $flatEntity = $entity[$vpid];
-        $flatEntity[$this->entityInfo->vpidColumnName] = $vpid;
-
-        return $flatEntity;
-    }
-
-    protected function entityExistedBeforeThisRequest($data)
+    public function entityExistedBeforeThisRequest($data)
     {
         if (!isset($data['vp_id'])) {
             return false;
@@ -229,5 +211,21 @@ abstract class DirectoryStorage extends Storage
         }
 
         return $this->existenceCache[$id];
+    }
+
+    private function createChangeInfo($oldEntity, $newEntity, $action)
+    {
+        $entityName = $this->entityInfo->entityName;
+
+        $entity = array_merge($oldEntity, $newEntity);
+
+        $changeInfo = $this->changeInfoFactory->createEntityChangeInfo($entity, $entityName, $action);
+        $files = $changeInfo->getChangedFiles();
+
+        $action = apply_filters("vp_entity_action_{$entityName}", $action, $oldEntity, $newEntity);
+        $tags = apply_filters("vp_entity_tags_{$entityName}", $changeInfo->getCustomTags(), $oldEntity, $newEntity, $action);
+        $files = apply_filters("vp_entity_files_{$entityName}", $files, $oldEntity, $newEntity);
+
+        return $this->changeInfoFactory->createEntityChangeInfo($entity, $entityName, $action, $tags, $files);
     }
 }

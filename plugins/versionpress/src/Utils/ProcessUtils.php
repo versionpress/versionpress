@@ -6,18 +6,19 @@ class ProcessUtils
 {
 
     /**
-     * Similar to built-in escapeshellarg() but allows to pass OS according to which
-     * the escaping should be done (Linux - quotes, Windows - double quotes).
+     * `escapeshellarg()` reimplementation that is custom-coded for both Linux and Windows. This fixes some
+     * bugs on Windows (quotes not escaped properly) and allows you to force the escaping type
+     * using the `$os` parameter should you need to.
      *
-     * @param $arg
-     * @param string|null $os "windows", "linux" or null to use the OS detection in escapeshellarg()
+     * @param string $arg
+     * @param string|null $os "windows", "linux" or null to auto-detect
      * @return mixed|string
      */
     public static function escapeshellarg($arg, $os = null)
     {
 
         if (!$os) {
-            return escapeshellarg($arg);
+            $os = DIRECTORY_SEPARATOR == '\\' ? "windows" : "linux";
         }
 
         if ($os == "windows") {
@@ -25,7 +26,6 @@ class ProcessUtils
         } else {
             return self::escapeshellargLinux($arg);
         }
-
     }
 
     /**

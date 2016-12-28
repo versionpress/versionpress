@@ -2,13 +2,17 @@
 
 namespace VersionPress\Cli;
 
+use VersionPress\Actions\ActionsDefinitionRepository;
 use VersionPress\Database\Database;
+use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\VpidRepository;
+use VersionPress\DI\DIContainer;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Initialization\Initializer;
 use VersionPress\Initialization\WpConfigSplitter;
 use VersionPress\Synchronizers\SynchronizationProcess;
+use VersionPress\Utils\WordPressMissingFunctions;
 use VersionPress\Utils\WpConfigEditor;
 use WP_CLI;
 use WP_CLI_Command;
@@ -33,39 +37,56 @@ class VPInternalCommand extends WP_CLI_Command
     /**
      * Finishes clone operation
      *
-     * ## OPTIONS
+     * @subcommand finish-restore-site
      *
-     * [--truncate-options]
-     * : By default, options table is not truncated. This flag changes the behavior.
-     *
-     *
-     * @subcommand finish-init-clone
+     * @when before_wp_load
      *
      */
-    public function finishInitClone($args, $assoc_args)
+    public function finishRestore($args, $assoc_args)
     {
-        global $versionPressContainer;
+        define('SHORTINIT', true);
+
+        $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
+        require_once $wpConfigPath;
+
+        require ABSPATH . WPINC . '/formatting.php';
+        require ABSPATH . WPINC . '/link-template.php';
+        require ABSPATH . WPINC . '/shortcodes.php';
+        require ABSPATH . WPINC . '/taxonomy.php';
+
+        wp_plugin_directory_constants();
+
+        require_once WP_PLUGIN_DIR . '/versionpress/bootstrap.php';
+
+        $versionPressContainer = DIContainer::getConfiguredInstance();
+
+        /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
+        $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
+        $actionsDefinitionRepository->restoreAllDefinitionFilesFromHistory();
 
         // Truncate tables
-
         /** @var Database $database */
         $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
-        $tables = $database->tables();
+        /** @var DbSchemaInfo $dbSchema */
+        $dbSchema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
 
-        if (!isset($assoc_args["truncate-options"])) {
-            $tables = array_filter($tables, function ($table) use ($database) {
-                return $table !== $database->options;
-            });
-        }
+        $tables = array_map(function ($entityName) use ($dbSchema) {
+            return $dbSchema->getPrefixedTableName($entityName);
+        }, array_merge($dbSchema->getAllEntityNames(), array_map(function ($referenceDetails) {
+            return $referenceDetails['junction-table'];
+        }, $dbSchema->getAllMnReferences())));
+
+
+        $tables = array_filter($tables, function ($table) use ($database) {
+            return $table !== $database->options;
+        });
 
         foreach ($tables as $table) {
             $truncateCmd = "TRUNCATE TABLE `$table`";
-            $database->query($truncateCmd);
+            @$database->query($truncateCmd); // Intentional @ - not existing table is ok for us but TRUNCATE ends with error
         }
 
-
         // Create VersionPress tables
-
         /** @var \VersionPress\Initialization\Initializer $initializer */
         $initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);
         $initializer->createVersionPressTables();
@@ -84,10 +105,18 @@ class VPInternalCommand extends WP_CLI_Command
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
         $syncProcess->synchronizeAll();
-        vp_flush_regenerable_options();
-        $this->flushRewriteRules();
         WP_CLI::success("Database synchronized");
 
+        VPCommandUtils::runWpCliCommand('vp-internal', 'flush-regenerable-values', ['require' => __FILE__]);
+    }
+
+    /**
+     * @subcommand flush-regenerable-values
+     */
+    public function flushRegenerableValues()
+    {
+        vp_flush_regenerable_options();
+        $this->flushRewriteRules();
     }
 
     /**
@@ -100,6 +129,10 @@ class VPInternalCommand extends WP_CLI_Command
         global $versionPressContainer;
         activate_plugins("versionpress/versionpress.php");
         WP_CLI::success('Re-activated VersionPress');
+
+        /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
+        $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
+        $actionsDefinitionRepository->restoreAllDefinitionFilesFromHistory();
 
         /** @var Initializer $initializer */
         $initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);
@@ -143,6 +176,20 @@ class VPInternalCommand extends WP_CLI_Command
         if (!$process->isSuccessful()) {
             WP_CLI::error("Working directory couldn't be reset");
         }
+
+        // Install current Composer dependencies
+        if (file_exists(VP_PROJECT_ROOT . '/composer.json')) {
+            $process = VPCommandUtils::exec('composer install', VP_PROJECT_ROOT);
+            if ($process->isSuccessful()) {
+                WP_CLI::success('Installed Composer dependencies');
+            } else {
+                WP_CLI::error('Composer dependencies could not be restored.');
+            }
+        }
+
+        /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
+        $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
+        $actionsDefinitionRepository->restoreAllDefinitionFilesFromHistory();
 
         // Run synchronization
         /** @var SynchronizationProcess $syncProcess */
@@ -237,12 +284,13 @@ class VPInternalCommand extends WP_CLI_Command
      */
     public function updateConfig($args = [], $assoc_args = [])
     {
-        $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
-        $updateCommonConfig = isset($assoc_args['common']);
-
         require_once __DIR__ . '/VPCommandUtils.php';
         require_once __DIR__ . '/../Initialization/WpConfigSplitter.php';
         require_once __DIR__ . '/../Utils/WpConfigEditor.php';
+        require_once __DIR__ . '/../Utils/WordPressMissingFunctions.php';
+
+        $wpConfigPath = WordPressMissingFunctions::getWpConfigPath();
+        $updateCommonConfig = isset($assoc_args['common']);
 
         if ($updateCommonConfig) {
             $wpConfigPath = dirname($wpConfigPath) . '/' . WpConfigSplitter::COMMON_CONFIG_NAME;

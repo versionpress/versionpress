@@ -2,15 +2,8 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
-use VersionPress\Storages\PostStorage;
-use VersionPress\Storages\TermStorage;
-use VersionPress\Storages\TermTaxonomyStorage;
-use VersionPress\Storages\UserStorage;
-use VersionPress\Synchronizers\PostsSynchronizer;
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Synchronizers\Synchronizer;
-use VersionPress\Synchronizers\TermsSynchronizer;
-use VersionPress\Synchronizers\TermTaxonomiesSynchronizer;
-use VersionPress\Synchronizers\UsersSynchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
@@ -18,22 +11,22 @@ use VersionPress\Utils\WordPressMissingFunctions;
 
 class PostsSynchronizerTest extends SynchronizerTestCase
 {
-    /** @var PostStorage */
+    /** @var DirectoryStorage */
     private $storage;
-    /** @var UserStorage */
+    /** @var DirectoryStorage */
     private $userStorage;
-    /** @var TermStorage */
+    /** @var DirectoryStorage */
     private $termStorage;
-    /** @var TermTaxonomyStorage */
+    /** @var DirectoryStorage */
     private $termTaxonomyStorage;
 
-    /** @var PostsSynchronizer */
+    /** @var Synchronizer */
     private $synchronizer;
-    /** @var UsersSynchronizer */
+    /** @var Synchronizer */
     private $usersSynchronizer;
-    /** @var TermsSynchronizer */
+    /** @var Synchronizer */
     private $termsSynchronizer;
-    /** @var TermTaxonomiesSynchronizer */
+    /** @var Synchronizer */
     private $termTaxonomiesSynchronizer;
 
     private static $authorVpId;
@@ -49,41 +42,45 @@ class PostsSynchronizerTest extends SynchronizerTestCase
         $this->termStorage = self::$storageFactory->getStorage('term');
         $this->termTaxonomyStorage = self::$storageFactory->getStorage('term_taxonomy');
 
-        $this->synchronizer = new PostsSynchronizer(
+        $this->synchronizer = new Synchronizer(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('post'),
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
-        $this->usersSynchronizer = new UsersSynchronizer(
+        $this->usersSynchronizer = new Synchronizer(
             $this->userStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('user'),
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
-        $this->termsSynchronizer = new TermsSynchronizer(
+        $this->termsSynchronizer = new Synchronizer(
             $this->termStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('term'),
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
-        $this->termTaxonomiesSynchronizer = new TermTaxonomiesSynchronizer(
+        $this->termTaxonomiesSynchronizer = new Synchronizer(
             $this->termTaxonomyStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('term_taxonomy'),
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
     }
 
@@ -133,6 +130,42 @@ class PostsSynchronizerTest extends SynchronizerTestCase
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Synchronizer handles circular dependencies
+     */
+    public function synchronizerHandlesCircularDependencies()
+    {
+        $author = EntityUtils::prepareUser();
+        $this->userStorage->save($author);
+
+        $post1 = EntityUtils::preparePost(null, $author['vp_id']);
+        $post2 = EntityUtils::preparePost(null, $author['vp_id']);
+
+        $post1['vp_post_parent'] = $post2['vp_id'];
+        $post2['vp_post_parent'] = $post1['vp_id'];
+
+        $this->storage->save($post1);
+        $this->storage->save($post2);
+
+        $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        $this->synchronizer->synchronize(Synchronizer::FIX_REFERENCES);
+
+        try {
+            DBAsserter::assertFilesEqualDatabase();
+        } finally {
+            $this->storage->delete($post1);
+            $this->storage->delete($post2);
+            $this->userStorage->delete($author);
+
+            $this->synchronizer->reset();
+            $this->usersSynchronizer->reset();
+            $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+            $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+        }
     }
 
     /**
@@ -237,29 +270,21 @@ class PostsSynchronizerTest extends SynchronizerTestCase
     {
         $this->createPostWithShortcode();
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
-        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+
+        $synchronizationTasks = [Synchronizer::SYNCHRONIZE_EVERYTHING];
+        while (count($synchronizationTasks)) {
+            $task = array_shift($synchronizationTasks);
+            $remainingTasks = $this->synchronizer->synchronize($task);
+            $synchronizationTasks = array_merge($synchronizationTasks, $remainingTasks);
+        }
+
         DBAsserter::assertFilesEqualDatabase();
 
         $this->deletePost();
 
-        $this->synchronizer = new PostsSynchronizer(
-            $this->storage,
-            self::$database,
-            self::$schemaInfo->getEntityInfo('post'),
-            self::$schemaInfo,
-            self::$vpidRepository,
-            self::$urlReplacer,
-            self::$shortcodesReplacer
-        );
-        $this->usersSynchronizer = new UsersSynchronizer(
-            $this->userStorage,
-            self::$database,
-            self::$schemaInfo->getEntityInfo('user'),
-            self::$schemaInfo,
-            self::$vpidRepository,
-            self::$urlReplacer,
-            self::$shortcodesReplacer
-        );
+        $this->synchronizer->reset();
+        $this->usersSynchronizer->reset();
+
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();

@@ -5,6 +5,7 @@ namespace VersionPress\Git;
 use Nette\Utils\Strings;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\Process;
+use VersionPress\Utils\ProcessUtils;
 
 /**
  * Manipulates the Git repository.
@@ -177,7 +178,7 @@ class GitRepository
 
         $logCommand .= " " . $options;
         if (!empty($gitrevisions)) {
-            $logCommand .= " " . escapeshellarg($gitrevisions);
+            $logCommand .= " " . ProcessUtils::escapeshellarg($gitrevisions);
         }
 
         $logCommand = str_replace("|begin|", $commitDelimiter, $logCommand);
@@ -195,7 +196,6 @@ class GitRepository
             list($rawCommit, $rawStatus) = explode($statusDelimiter, $rawCommitAndStatus);
             return Commit::buildFromString(trim($rawCommit), trim($rawStatus));
         }, $commits);
-
     }
 
     /**
@@ -230,7 +230,6 @@ class GitRepository
         }
 
         return $result;
-
     }
 
     /**
@@ -399,11 +398,11 @@ class GitRepository
                 return $file[0] === '??'; // unstaged
             }));
 
-        if (count($filesToReset) > 0) {
-            $this->runShellCommand(
-                sprintf("git reset HEAD %s", join(" ", array_map('escapeshellarg', $filesToReset)))
-            );
-        }
+            if (count($filesToReset) > 0) {
+                $this->runShellCommand(
+                    sprintf("git reset HEAD %s", join(" ", array_map(['VersionPress\Utils\ProcessUtils', 'escapeshellarg'], $filesToReset)))
+                );
+            }
 
             return $diff;
         }
@@ -413,7 +412,7 @@ class GitRepository
             $emptyTreeHash = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
             $gitCmd = "git diff-tree -p $emptyTreeHash $hash";
         } else {
-            $escapedHash = escapeshellarg($hash);
+            $escapedHash = ProcessUtils::escapeshellarg($hash);
             $gitCmd = "git diff $escapedHash~1 $escapedHash";
         }
 
@@ -486,19 +485,17 @@ class GitRepository
      *
      * @param string $command E.g., 'git log' or 'git add %s' (path will be shell-escaped) or just 'log'
      *   (the "git " part is optional).
-     * @param string $args Will be shell-escaped and replace sprintf markers in $command
+     * @param string[] $args Will be shell-escaped and replace sprintf markers in $command
      * @return array array('stdout' => , 'stderr' => )
      */
-    private function runShellCommand($command, $args = '')
+    private function runShellCommand($command, ...$args)
     {
 
         // replace (optional) "git " with the configured git binary
         $command = Strings::startsWith($command, "git ") ? substr($command, 4) : $command;
-        $command = escapeshellarg($this->gitBinary) . " " . $command;
+        $command = ProcessUtils::escapeshellarg($this->gitBinary) . " " . $command;
 
-        $functionArgs = func_get_args();
-        array_shift($functionArgs); // Remove $command
-        $escapedArgs = @array_map("escapeshellarg", $functionArgs);
+        $escapedArgs = @array_map(['VersionPress\Utils\ProcessUtils', 'escapeshellarg'], $args);
         $commandWithArguments = vsprintf($command, $escapedArgs);
 
         $result = $this->runProcess($commandWithArguments);
@@ -553,5 +550,40 @@ class GitRepository
     public function setGitProcessTimeout($gitProcessTimeout)
     {
         $this->gitProcessTimeout = $gitProcessTimeout;
+    }
+
+    public function getFileModifications($file)
+    {
+        $cmd = "git log --format=format:%%H --name-status -- %s";
+        $log = $this->runShellCommandWithStandardOutput($cmd, $file);
+
+        if (!$log) {
+            return [];
+        }
+
+        $commits = explode("\n\n", $log);
+
+        $modificationsGroupedByCommit = array_map(function ($commit) {
+            $lines = explode("\n", $commit);
+
+            $hash = $lines[0];
+            $modifications = array_slice($lines, 1);
+
+            return array_map(function ($statusAndPath) use ($hash) {
+                list($status, $path) = explode("\t", $statusAndPath, 2);
+                return [
+                    'status' => $status,
+                    'path' => $path,
+                    'commit' => $hash
+                ];
+            }, $modifications);
+        }, $commits);
+
+        return call_user_func_array('array_merge', $modificationsGroupedByCommit);
+    }
+
+    public function getFileInRevision($path, $commitHash)
+    {
+        return $this->runShellCommandWithStandardOutput('git show %s:%s', $commitHash, $path);
     }
 }

@@ -42,11 +42,11 @@ class SystemInfo
 
         $info = [];
 
-        $process = new Process(escapeshellarg($gitBinary) . " --version");
+        $process = new Process(ProcessUtils::escapeshellarg($gitBinary) . " --version");
         $process->run();
 
         $info['git-binary-as-configured'] = $gitBinary;
-        $info['git-available'] = $process->getErrorOutput() === null;
+        $info['git-available'] = $process->getErrorOutput() === null || !strlen($process->getErrorOutput());
 
         if ($info['git-available'] === false) {
             $info['output'] = [
@@ -85,7 +85,6 @@ class SystemInfo
         $info['matches-min-required-version'] = RequirementsChecker::gitMatchesMinimumRequiredVersion($version);
 
         return $info;
-
     }
 
     /**
@@ -128,7 +127,6 @@ class SystemInfo
 
             // add info whether the plugin is active or not
             $pluginInfo['__IsActive'] = is_plugin_active($pluginFile);
-
         });
         $info['installed-plugins'] = $installedPlugins;
         $info['installed-themes'] = array_keys(wp_get_themes());
@@ -270,7 +268,7 @@ class SystemInfo
             $processInfo['php-can-delete'][$target] = !is_file($filePath);
 
             $filePath = $directory . '/' . '.vp-try-write-process';
-            $process = new Process(sprintf("echo test > %s", escapeshellarg($filePath)));
+            $process = new Process(sprintf("echo test > %s", ProcessUtils::escapeshellarg($filePath)));
             $process->run();
             $processInfo['process-can-write'][$target] = is_file($filePath);
             try {

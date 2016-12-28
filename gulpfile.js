@@ -18,6 +18,7 @@ var composer = require('gulp-composer');
 var git = require('gulp-git');
 var merge = require('merge-stream');
 var runSequence = require('run-sequence');
+var execSync = require('child_process').execSync;
 
 
 /**
@@ -91,7 +92,7 @@ gulp.task('prepare-test-deploy', false, function () {
     if (isRelative(sitePath)) {
         sitePath = vpDir + '/tests/' + sitePath;
     }
-    buildDir = sitePath + "/wp-content/plugins/versionpress";
+    buildDir = execSync('wp eval "echo WP_PLUGIN_DIR;"', {cwd: sitePath, encoding: 'utf8'}) + '/versionpress';
 
     isTestDeployBuild = true;
 });
@@ -110,6 +111,7 @@ gulp.task('prepare-src-definition', false, function () {
     srcDef.push('!' + vpDir + '/.gitignore'); // this .gitignore is valid for a project, not for deployed VP
     srcDef.push('!' + vpDir + '/.editorconfig');
     srcDef.push('!' + vpDir + '/.gitattributes');
+    srcDef.push('!' + vpDir + '/ruleset.xml');
     srcDef.push('!' + vpDir + '/tests{,/**}'); // tests might be useful for `test-deploy` but we don't currently need them
     srcDef.push('!' + vpDir + '/log/**/!(.gitignore)'); // keep just the .gitignore inside `log` folder
     srcDef.push('!' + vpDir + '/**/*.md'); // all Markdown files are considered documentation
@@ -275,7 +277,7 @@ gulp.task('init-tests', false, shell.task([
  * Inits the frontend project.
  */
 gulp.task('init-frontend', false, function () {
-    var configPath = frontendDir + '/src/config.local.sample.ts';
+    var configPath = frontendDir + '/src/config/config.local.sample.ts';
     var targetName = configPath.replace('.sample', '');
     if (fs.existsSync(targetName)) {
         targetName = configPath;

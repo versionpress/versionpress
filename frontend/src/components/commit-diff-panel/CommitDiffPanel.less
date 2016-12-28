@@ -1,0 +1,107 @@
+.CommitDiffPanel {
+
+  @borderColor: #eee;
+
+  margin-bottom: 40px;
+
+  .heading {
+    background: @borderColor;
+    margin: 0;
+    border: 1px solid @borderColor;
+    border-bottom: 0;
+    padding: 10px;
+  }
+
+  .binary-file-info {
+    font-style: italic;
+    background: #fff;
+    border: 1px solid @borderColor;
+    padding: 10px;
+  }
+
+  .chunk {
+    border-spacing: 0;
+    table-layout: fixed;
+    width: 100%;
+    margin: 0;
+
+    .line {
+      background: white;
+
+      &:first-of-type {
+        .line-left, .line-right, .line-separator {
+          border-top: 1px solid @borderColor;
+        }
+      }
+
+      &-left, &-right, &-separator {
+        border-bottom: 1px solid @borderColor;
+      }
+
+      &-left, &-right {
+        border-left: 1px solid @borderColor;
+        border-right: 1px solid @borderColor;
+        height: 16pt;
+        font-family: monospace;
+        background: #fff;
+        width: 49%;
+        padding: 0 0 0 15px;
+
+        &.added {
+          background: #eaffea;
+        }
+
+        &.removed {
+          background: #feecec;
+        }
+
+        &.empty {
+          background: #f9f9f9;
+        }
+
+        &.unchanged {
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow-x: hidden;
+        }
+      }
+
+      &-separator {
+        width: 2%;
+        background: @borderColor;
+      }
+    }
+
+  }
+
+  .chunk-separator {
+    .chunk;
+
+    .line:first-of-type {
+      .line-left, .line-right, .line-separator {
+        border-top: 0;
+        overflow: visible;
+      }
+    }
+
+    .line:last-of-type {
+      .line-left, .line-right, .line-separator {
+        border-bottom: 0;
+      }
+    }
+
+    .hellip {
+      display: inline-block;
+      background: #f5f5f5;
+      border: 1px solid @borderColor;
+      color: #707070;
+      padding-left: 5px;
+      padding-right: 5px;
+      border-radius: 5px;
+      font-size: 80%;
+      position: relative;
+      top: 50%;
+      z-index: 1;
+    }
+  }
+}

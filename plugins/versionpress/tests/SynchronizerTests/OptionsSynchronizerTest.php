@@ -2,10 +2,7 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
-use VersionPress\Storages\OptionStorage;
-use VersionPress\Storages\PostStorage;
-use VersionPress\Synchronizers\OptionsSynchronizer;
-use VersionPress\Synchronizers\PostsSynchronizer;
+use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Synchronizers\Synchronizer;
 use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
@@ -14,13 +11,13 @@ use VersionPress\Utils\AbsoluteUrlReplacer;
 class OptionsSynchronizerTest extends SynchronizerTestCase
 {
 
-    /** @var OptionStorage */
+    /** @var DirectoryStorage */
     private $storage;
-    /** @var PostStorage */
+    /** @var DirectoryStorage */
     private $postStorage;
-    /** @var OptionsSynchronizer */
+    /** @var Synchronizer */
     private $synchronizer;
-    /** @var PostsSynchronizer */
+    /** @var Synchronizer */
     private $postsSynchronizer;
 
     private $entitiesForSelectiveSynchronization = [['vp_id' => 'foo', 'parent' => null]];
@@ -30,23 +27,25 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('option');
         $this->postStorage = self::$storageFactory->getStorage('post');
-        $this->synchronizer = new OptionsSynchronizer(
+        $this->synchronizer = new Synchronizer(
             $this->storage,
             self::$database,
             self::$schemaInfo->getEntityInfo('option'),
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
-        $this->postsSynchronizer = new PostsSynchronizer(
+        $this->postsSynchronizer = new Synchronizer(
             $this->postStorage,
             self::$database,
             self::$schemaInfo->getEntityInfo('post'),
             self::$schemaInfo,
             self::$vpidRepository,
             self::$urlReplacer,
-            self::$shortcodesReplacer
+            self::$shortcodesReplacer,
+            self::$tableSchemaRepository
         );
     }
 
@@ -59,6 +58,30 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
         $this->storage->save(EntityUtils::prepareOption('foo', 'bar'));
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
+    }
+
+    /**
+     * @test
+     * @testdox Synchronizer does not delete ignored options
+     */
+    public function synchronizerDoesNotDeleteIgnoredOptions()
+    {
+        $optionTable = self::$database->options;
+
+        $ignoredEntities = self::$schemaInfo->getEntityInfo('option')->getRulesForIgnoredEntities();
+        $sql = "INSERT IGNORE INTO {$optionTable} (option_name) VALUES ";
+
+        $sql .= join(', ', array_map(function ($ignoredEntity) {
+            return "('{$ignoredEntity['option_name'][0]}')";
+        }, $ignoredEntities));
+
+        self::$database->query($sql);
+        $optionsBeforeSync = self::$database->get_results("SELECT * FROM {$optionTable}");
+
+        $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
+
+        $optionsAfterSync = self::$database->get_results("SELECT * FROM {$optionTable}");
+        $this->assertEquals($optionsBeforeSync, $optionsAfterSync);
     }
 
     /**
@@ -168,25 +191,8 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
 
         $this->postStorage->delete($post);
 
-        // We need new instances because of caching in SynchronizerBase::maybeInit
-        $this->synchronizer = new OptionsSynchronizer(
-            $this->storage,
-            self::$database,
-            self::$schemaInfo->getEntityInfo('option'),
-            self::$schemaInfo,
-            self::$vpidRepository,
-            self::$urlReplacer,
-            self::$shortcodesReplacer
-        );
-        $this->postsSynchronizer = new PostsSynchronizer(
-            $this->postStorage,
-            self::$database,
-            self::$schemaInfo->getEntityInfo('post'),
-            self::$schemaInfo,
-            self::$vpidRepository,
-            self::$urlReplacer,
-            self::$shortcodesReplacer
-        );
+        $this->synchronizer->reset();
+        $this->postsSynchronizer->reset();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $optionToSynchronize);
         $this->postsSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $postToSynchronize);
     }

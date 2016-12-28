@@ -1,5 +1,5 @@
 <?php
-use VersionPress\ChangeInfos\ChangeInfoMatcher;
+use VersionPress\ChangeInfos\CommitMessageParser;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitLogPaginator;
 use VersionPress\Git\GitRepository;
@@ -35,7 +35,7 @@ if (!empty($error)) {
 }
 ?>
 
-<button id="vp-service-panel-button"><span class="icon icon-cog"></span></button>
+<button id="vp-service-panel-button"><span class="icon vp-icon-cog"></span></button>
 <h2 id="vp-page-header">VersionPress</h2>
 
 <div id="vp-service-panel" class="ServicePanel welcome-panel">
@@ -99,7 +99,9 @@ if ($showWelcomePanel === "") {
     <?php
     global $versionPressContainer;
     /** @var GitRepository $repository */
-    $repository = $versionPressContainer->resolve(VersionPressServices::REPOSITORY);
+    $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
+    /** @var CommitMessageParser $commitMessageParser */
+    $commitMessageParser = $versionPressContainer->resolve(VersionPressServices::COMMIT_MESSAGE_PARSER);
 
     $preActivationHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
     if (empty($preActivationHash)) {
@@ -134,7 +136,7 @@ if ($showWelcomePanel === "") {
             && ($isChildOfInitialCommit || $commit->getHash() === $initialCommitHash);
         $commitDate = $commit->getDate()->format('d-M-y H:i:s');
 
-        $changeInfo = ChangeInfoMatcher::buildChangeInfo($commit->getMessage());
+        $changeInfo = $commitMessageParser->parse($commit->getMessage());
         $undoSnippet = "<a " .
             "href='" .
                 admin_url('admin.php?action=vp_show_undo_confirm&method=undo&commit=' . $commit->getHash()) . "' " .

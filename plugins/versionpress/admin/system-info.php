@@ -30,7 +30,6 @@ function vp_display_system_info_array($array, $outputFormat)
             \Tracy\Debugger::dump($array);
             break;
     }
-
 }
 
 ?>
