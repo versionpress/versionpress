@@ -25,10 +25,13 @@ class ActivePluginsVPFilesIterator implements \IteratorAggregate
         $plugins = get_option('active_plugins');
 
         foreach ($plugins as $pluginFile) {
-            $pluginDir = WP_PLUGIN_DIR . '/' . dirname($pluginFile);
-            $path = $pluginDir . '/.versionpress/' . $this->iteratedFiles;
+            $pluginDir = dirname($pluginFile);
+            $path = WP_PLUGIN_DIR . '/' . $pluginDir . '/.versionpress/' . $this->iteratedFiles;
+            $alt_path = WP_CONTENT_DIR . '/.versionpress/plugins/' . $pluginDir . '/' . $this->iteratedFiles;
             if (file_exists($path)) {
                 yield $path;
+            } elseif (file_exists($alt_path)) {
+                yield $alt_path;
             }
         }
     }
