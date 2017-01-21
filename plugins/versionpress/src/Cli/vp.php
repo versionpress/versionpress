@@ -44,11 +44,12 @@ class VPCommand extends WP_CLI_Command
      *
      * <constant>
      * : The name of the constant to set.
-     *   VP_GIT_BINARY:   Absolute path to the git binary.
-     *   VP_PROJECT_ROOT: Absolute path to the root of your project (typically
-     *                    where is the .git directory)
-     *   VP_VPDB_DIR:     Absolute path to directory where VersionPress saves
-     *                    versioned database data.
+     *   VP_GIT_BINARY:     Absolute path to the git binary.
+     *   VP_WP_CLI_BINARY:  Absolute path to the WP-CLI binary.
+     *   VP_PROJECT_ROOT:   Absolute path to the root of your project (typically
+     *                      where is the .git directory)
+     *   VP_VPDB_DIR:       Absolute path to directory where VersionPress saves
+     *                      versioned database data.
      *
      * [<value>]
      * : The new value. If missing, just prints out current value.
@@ -64,6 +65,10 @@ class VPCommand extends WP_CLI_Command
          */
         $allowedConstants = [
             'VP_GIT_BINARY' => [
+                'common' => false,
+                'type' => 'absolute-path',
+            ],
+            'VP_WP_CLI_BINARY' => [
                 'common' => false,
                 'type' => 'absolute-path',
             ],

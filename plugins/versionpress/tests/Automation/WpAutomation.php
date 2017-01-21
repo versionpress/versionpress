@@ -125,7 +125,7 @@ class WpAutomation
      */
     public function activateVersionPress()
     {
-        $activateCommand = "wp plugin activate versionpress";
+        $activateCommand = VP_WP_CLI_BINARY . " plugin activate versionpress";
         $this->exec($activateCommand);
     }
 
@@ -419,7 +419,7 @@ class WpAutomation
     {
         $widgets = trim(is_array($widgets) ? join(' ', $widgets) : $widgets);
         if (strlen($widgets) > 0) {
-            $this->exec('wp widget delete ' . $widgets);
+            $this->exec(VP_WP_CLI_BINARY . ' widget delete ' . $widgets);
         }
     }
 
@@ -542,7 +542,7 @@ class WpAutomation
             $entityParameters .= "--$entity=$count ";
         }
 
-        $command = "wp --require=\"$vpAutomateFile\" vp-automate generate $entityParameters";
+        $command = VP_WP_CLI_BINARY . " --require=\"$vpAutomateFile\" vp-automate generate $entityParameters";
         $this->exec($command, $this->siteConfig->path);
     }
 
@@ -572,7 +572,7 @@ class WpAutomation
 
             $wpVersion = $this->siteConfig->wpVersion;
             $wpLocale = $this->siteConfig->wpLocale;
-            $downloadCommand = "wp core download --path=\"$cleanInstallationPath\" --version=\"$wpVersion\"";
+            $downloadCommand = VP_WP_CLI_BINARY . " core download --path=\"$cleanInstallationPath\" --version=\"$wpVersion\"";
             if ($wpLocale) {
                 $downloadCommand .= " --locale=$wpLocale";
             }
@@ -718,7 +718,7 @@ class WpAutomation
     public function runWpCliCommand($command, $subcommand, $args = [], $debug = false)
     {
 
-        $cliCommand = "wp $command";
+        $cliCommand = VP_WP_CLI_BINARY . " $command";
 
         if ($subcommand) {
             $cliCommand .= " $subcommand";
@@ -751,11 +751,11 @@ class WpAutomation
     private function rewriteWpCliCommand($command)
     {
 
-        if (!Strings::startsWith($command, "wp ")) {
+        if (!Strings::startsWith($command, VP_WP_CLI_BINARY . " ")) {
             return $command;
         }
 
-        $command = substr($command, 3); // strip "wp " prefix
+        $command = substr($command, strlen(VP_WP_CLI_BINARY . " ")); // strip "wp " prefix
 
         $command = "php " . ProcessUtils::escapeshellarg($this->getWpCli()) . " $command";
 
