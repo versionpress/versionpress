@@ -38,13 +38,6 @@ if (!defined('VP_GIT_BINARY')) {
     define('VP_GIT_BINARY', 'git');
 }
 
-if (!defined('VP_GIT_BINARY')) {
-    /**
-     * Absolute path to the git executable. Useful if it's not in PATH.
-     */
-    define('VP_GIT_BINARY', 'git');
-}
-
 if (!defined('VP_WP_CLI_BINARY')) {
     /**
      * Absolute path to the WP-CLI executable. Useful if it's not in PATH.
