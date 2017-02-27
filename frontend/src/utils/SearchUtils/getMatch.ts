@@ -1,4 +1,4 @@
-/// <reference path='../Search.d.ts' />
+/// <reference path='../../components/search/Search.d.ts' />
 
 export function getMatch(subString: string, array: any[], key: string = null) {
   return array

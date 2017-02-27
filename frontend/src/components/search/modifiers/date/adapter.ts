@@ -1,24 +1,15 @@
 /// <reference path='../../Search.d.ts' />
-/// <reference path='../Adapter.d.ts' />
 
 import * as moment from 'moment';
 
-import { getMatch } from '../../utils/';
+import Adapter from '../Adapter';
+import Token from '../../../../entities/Token';
+import { getMatch } from '../../../../utils/SearchUtils';
 
 const DATE_FORMAT = 'YYYY-MM-DD';
 const DATE_FORMAT_REGEXP = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$/;
 
 const DateAdapter = (config: SearchConfigItem): Adapter => ({
-
-  autoComplete: function(token: Token) {
-    const { value } = token;
-
-    const hints = this.getHints(token);
-
-    if (hints.length && hints[0].indexOf(value) === 0) {
-      return hints[0];
-    }
-  },
 
   getDefaultHint: function() {
     return moment().format(DATE_FORMAT);

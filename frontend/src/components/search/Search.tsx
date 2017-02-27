@@ -1,6 +1,7 @@
 /// <reference path='./Search.d.ts' />
 
 import * as React from 'react';
+import { observer } from 'mobx-react';
 
 import Background from './background/Background';
 import Input from './input/Input';
@@ -8,32 +9,24 @@ import Popup from './popup/Popup';
 import ModifierComponent from './modifiers/ModifierComponent';
 import getAdapter from './modifiers/getAdapter';
 import {
-  createToken,
   KEYS,
-  prepareConfig,
   setCursor,
-  tokenize,
   updateToken,
 } from './utils/';
+
+import Token from '../../entities/Token';
+import { SearchStore } from '../../stores/searchStore';
 
 import './Search.less';
 
 interface SearchProps {
   config: SearchConfig;
+  searchStore?: SearchStore;
   onChange?(query: string): void;
 }
 
-interface SearchState {
-  inputValue?: string;
-  cursorLocation?: number;
-}
-
-export default class Search extends React.Component<SearchProps, SearchState> {
-
-  state = {
-    inputValue: '',
-    cursorLocation: -1,
-  };
+@observer(['searchStore'])
+export default class Search extends React.Component<SearchProps, {}> {
 
   inputNode: HTMLInputElement = null;
   backgroundNode: HTMLDivElement = null;
@@ -51,27 +44,16 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     this.setCursorLocation(e.target.selectionStart);
   };
 
-  onCut = (e: React.ClipboardEvent<HTMLInputElement>) => {
+  onClipboardEvent = (e: React.ClipboardEvent<HTMLInputElement>) => {
     this.setCursorLocation(e.target.selectionStart);
-    this.setState({
-      inputValue: e.target.value,
-    });
-  };
-
-  onPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    this.setCursorLocation(e.target.selectionStart);
-    this.setState({
-      inputValue: e.target.value,
-    });
+    this.props.searchStore.setInputValue(e.target.value);
   };
 
   onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     switch (e.keyCode) {
       case KEYS.ENTER:
-        if (this.popupComponentNode) {
-          if (this.popupComponentNode.onSelect()) {
-            e.preventDefault();
-          }
+        if (this.popupComponentNode && this.popupComponentNode.onSelect()) {
+          e.preventDefault();
         }
         break;
       case KEYS.ESC:
@@ -92,55 +74,47 @@ export default class Search extends React.Component<SearchProps, SearchState> {
         break;
       case KEYS.TAB:
         e.preventDefault();
-        const { config } = this.props;
+        const { config, searchStore } = this.props;
+        const { activeToken } = searchStore;
 
-        const tokens = this.getTokens();
-        const activeToken = this.getActiveToken(tokens);
-        const activeTokenIndex = this.getActiveTokenIndex(tokens);
-
-        const adapter = getAdapter(config)(activeToken);
-        const newValue = adapter.autoComplete(activeToken);
+        const newValue = activeToken.autoComplete();
 
         if (newValue) {
-          this.onChangeTokenModel(activeTokenIndex, newValue, true);
-        } else if (activeToken.type !== 'date') {
+          this.onChangeTokenModel(searchStore.activeTokenIndex, newValue, true);
+        } else if (searchStore.activeToken.type !== 'date') {
           this.popupComponentNode.onDownClicked();
         }
         break;
       default:
         this.setCursorLocation(e.target.selectionStart);
-        if (e.target.value !== this.state.inputValue) {
-          this.setState({
-            inputValue: e.target.value,
-          });
+        if (e.target.value !== searchStore.inputValue) {
+          searchStore.setInputValue(e.target.value);
         }
     }
   }
 
   onKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
     this.setCursorLocation(e.target.selectionStart);
-    if (e.target.value !== this.state.inputValue) {
-      this.setState({
-        inputValue: e.target.value,
-      });
-    }
+    const { searchStore } = this.props;
 
-    this.props.onChange(e.target.value);
+    if (e.target.value !== searchStore.inputValue) {
+      searchStore.setInputValue(e.target.value);
+      this.props.onChange(e.target.value);
+    }
   };
 
   onChange = (e: React.FormEvent<HTMLInputElement>) => {
-    if (e.target.value !== this.state.inputValue) {
-      this.setState({
-        inputValue: e.target.value,
-      });
-    }
+    const { searchStore } = this.props;
 
-    this.props.onChange(e.target.value);
+    if (e.target.value !== searchStore.inputValue) {
+      searchStore.setInputValue(e.target.value);
+      this.props.onChange(e.target.value);
+    }
   }
 
   onChangeTokenModel = (tokenIndex: number, model: any, shouldMoveCursor: boolean) => {
-    const { config } = this.props;
-    const tokens = this.getTokens();
+    const { config, searchStore } = this.props;
+    const { tokens } = searchStore;
 
     let token, index = tokenIndex;
 
@@ -164,8 +138,9 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     }
 
     const tokensString = this.getTokensString(tokens);
-    this.setInputValue(tokensString);
     this.setCursor(cursorLocation);
+    this.inputNode.value = tokensString;
+    searchStore.setInputValue(tokensString);
 
     if (isLastTokenSelected) {
       this.scrollInputAndBackground(Number.MAX_VALUE);
@@ -174,23 +149,15 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     }
   }
 
-  setInputValue(value: string) {
-    this.inputNode.value = value;
-    this.setState({
-      inputValue: value,
-    });
-  }
-
-  setCursor(location: number) {
+  setCursor(location: number, updateDom: boolean = false) {
     this.setCursorLocation(location);
     setCursor(this.inputNode, location);
   }
 
   setCursorLocation(location: number) {
+    const { searchStore } = this.props;
     this.scrollBackground();
-    this.setState({
-      cursorLocation: location,
-    });
+    searchStore.setCursorLocation(location);
   }
 
   scrollInputAndBackground(location: number) {
@@ -205,95 +172,21 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     }
   }
 
-  displayPopup(tokens: Token[]) {
-    const { cursorLocation } = this.state;
-    const activeToken = this.getActiveToken(tokens);
-    const isLastTokenSelected = this.isLastTokenSelected(tokens);
-
-    return cursorLocation !== -1
-           && (!this.state.inputValue
-               || isLastTokenSelected
-               || (activeToken && activeToken.type !== 'space'));
-  }
-
-  isLastTokenSelected(tokens: Token[]) {
-    const tokensCount = tokens.length;
-    return tokensCount && (tokensCount - 1) === this.getActiveTokenIndex(tokens);
-  }
-
-  getTokenEndCursorPos(tokens: Token[], tokenIndex: number) {
-    let sum = 0;
-    for (var i = 0; i < tokens.length; i++) {
-      sum += tokens[i].length;
-      if (i === tokenIndex) {
-        break;
-      }
-    }
-    return sum;
-  }
-
-  getActiveTokenIndex(tokens: Token[]) {
-    const { cursorLocation } = this.state;
-
-    let token: Token;
-    let prev = 0;
-    let start: number;
-    let end: number;
-
-    for (var i = 0; i < tokens.length; i++) {
-      token = tokens[i];
-
-      start = prev;
-      end = token.length + start;
-      prev = end;
-
-      if (start < cursorLocation && cursorLocation <= end) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  getActiveTokenCursor(tokens: Token[]) {
-    const { cursorLocation } = this.state;
-
-    const activeTokenIndex = this.getActiveTokenIndex(tokens);
-    const activeToken = tokens[activeTokenIndex];
-
-    if (activeTokenIndex > -1) {
-      const tokenCursorEnd = this.getTokenEndCursorPos(tokens, activeTokenIndex);
-      return cursorLocation - (tokenCursorEnd - activeToken.length);
-    }
-    return -1;
-  }
-
-  getActiveToken(tokens: Token[]) {
-    return tokens[this.getActiveTokenIndex(tokens)];
-  }
-
-  getTokens() {
-    const { config } = this.props;
-    const { inputValue } = this.state;
-
-    const tokenConfig = prepareConfig(config);
-
-    return tokenize(inputValue, tokenConfig);
-  }
-
   getTokensString(tokens: Token[]) {
     return tokens
       .reduce((sum, token) => (sum + (token.negative ? '-' : '') + token.modifier + token.value), '');
   }
 
   render() {
-    const { config } = this.props;
-
-    const tokens = this.getTokens();
-    const isLastTokenSelected = this.isLastTokenSelected(tokens);
-    const activeToken = this.getActiveToken(tokens);
-    const activeTokenIndex = this.getActiveTokenIndex(tokens);
-    const activeTokenCursor = this.getActiveTokenCursor(tokens);
-    const displayPopup = this.displayPopup(tokens);
+    const { config, searchStore } = this.props;
+    const {
+      activeToken,
+      activeTokenIndex,
+      activeTokenCursor,
+      isLastTokenSelected,
+      isPopupDisplayed,
+      tokens,
+    } = searchStore;
 
     return (
       <div className='Search'>
@@ -301,8 +194,8 @@ export default class Search extends React.Component<SearchProps, SearchState> {
           nodeRef={node => this.inputNode = node}
           onBlur={this.onBlur}
           onClick={this.onClick}
-          onCut={this.onCut}
-          onPaste={this.onPaste}
+          onCut={this.onClipboardEvent}
+          onPaste={this.onClipboardEvent}
           onKeyDown={this.onKeyDown}
           onKeyUp={this.onKeyUp}
           onChange={this.onChange}
@@ -314,7 +207,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
           isLastTokenSelected={isLastTokenSelected}
           activeToken={activeToken}
         />
-        {displayPopup &&
+        {isPopupDisplayed &&
           <Popup
             nodeRef={node => this.popupComponentNode = node}
             activeTokenIndex={activeTokenIndex}

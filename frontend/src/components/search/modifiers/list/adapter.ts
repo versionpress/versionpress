@@ -1,23 +1,11 @@
 /// <reference path='../../Search.d.ts' />
-/// <reference path='../Adapter.d.ts' />
 
-import { getMatch, trim, IN_QUOTES_REGEXP } from '../../utils/';
+import Adapter from '../Adapter';
+import Token from '../../../../entities/Token';
+import { getMatch, trim, IN_QUOTES_REGEXP } from '../../../../utils/SearchUtils';
 import * as ArrayUtils from '../../../../utils/ArrayUtils';
 
 const ListAdapter = (config: SearchConfigItem): Adapter => ({
-
-  autoComplete: function(token: Token) {
-    const value = trim(token.value, true);
-    const hints = this.getHints(token);
-    const hint = hints[0];
-    const hintValue = trim(this.serialize(hint));
-
-    if (value.length && hintValue && hintValue.indexOf(value) === 0) {
-      return hint;
-    }
-
-    return null;
-  },
 
   getDefaultHint: function() {
     return config

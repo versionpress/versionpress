@@ -1,8 +1,8 @@
 /// <reference path='../Search.d.ts' />
-/// <reference path='../modifiers/Adapter.d.ts' />
 
 import * as React from 'react';
 
+import Adapter from '../modifiers/Adapter';
 import Token from './Token';
 import Hint from './Hint';
 

@@ -17,12 +17,3 @@ interface SearchConfigItemContent {
   section?: string;
   index?: number;
 }
-
-interface Token {
-  key: string;
-  modifier: string;
-  value: string;
-  type: string;
-  length: number;
-  negative: boolean;
-}
