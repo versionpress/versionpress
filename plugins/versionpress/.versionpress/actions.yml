@@ -2,17 +2,18 @@ post:
   tags:
     VP-Post-Title: post_title
     VP-Post-Type: post_type
+    VP-Post-Format: /
   actions:
-    create: Created %VP-Post-Type% '%VP-Post-Title%'
-    trash: %VP-Post-Type% '%VP-Post-Title%' moved to trash
-    untrash: %VP-Post-Type% '%VP-Post-Title%' moved from trash
-    delete: Deleted %VP-Post-Type% '%VP-Post-Title%'
-    draft: Created draft for %VP-Post-Type% '%VP-Post-Title%'
-    publish: Published %VP-Post-Type% '%VP-Post-Title%'
+    create: Created %VP-Post-Format% '%VP-Post-Title%'
+    trash: %VP-Post-Format% '%VP-Post-Title%' moved to trash
+    untrash: %VP-Post-Format% '%VP-Post-Title%' moved from trash
+    delete: Deleted %VP-Post-Format% '%VP-Post-Title%'
+    draft: Created draft for %VP-Post-Format% '%VP-Post-Title%'
+    publish: Published %VP-Post-Format% '%VP-Post-Title%'
     edit:
-      message: Edited %VP-Post-Type% '%VP-Post-Title%'
+      message: Edited %VP-Post-Format% '%VP-Post-Title%'
       priority: 12
-    update: Updated %VP-Post-Type% '%VP-Post-Title%'
+    update: Updated %VP-Post-Format% '%VP-Post-Title%'
 
 user:
   tags:
