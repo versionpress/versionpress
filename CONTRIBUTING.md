@@ -60,7 +60,9 @@ The following discusses some of the important details if you want to contribute.
 
 [These **labels**](https://github.com/versionpress/versionpress/wiki/Issues#labels) are used to categorize issues.
 
-[**Milestones**](https://github.com/versionpress/versionpress/milestones) are used to assign issues to major releases like 4.0 or 5.0 (we don't use minor releases like 4.1 or 4.2) for rough release planning, with more granular split between various alpha, beta and final releases done via [**Projects**](https://github.com/versionpress/versionpress/projects). Issues not assigned to any milestone / project are in a backlog – we want to do them one day but there are no immediate plans.
+[**Milestones**](https://github.com/versionpress/versionpress/milestones) are used to assign issues to major releases like 4.0 or 5.0 (we don't use minor releases like 4.1 or 4.2, see our [release versioning](https://docs.versionpress.net/en/release-notes#release-versioning)). [**Projects**](https://github.com/versionpress/versionpress/projects) are then used for more granular planning, e.g., to assign issues to various alpha, beta or final releases.
+
+> Issues not assigned to any milestone are in a backlog – we want to do them one day but there are no immediate plans.
 
 [**Pull requests**](https://github.com/versionpress/versionpress/pulls) implement issues. Commonly, a piece of functionality starts as an issue but quickly transitions into a PR where most of the technical discussion happens. In other words, issues are the original ideas of how to improve or fix something, PR's are how it was actually done. 
 
