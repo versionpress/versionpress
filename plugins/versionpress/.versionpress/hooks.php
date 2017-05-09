@@ -6,6 +6,7 @@ use VersionPress\Actions\ActivePluginsVPFilesIterator;
 use VersionPress\ChangeInfos\CommitMessageParser;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
+use VersionPress\Database\VpidRepository;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitRepository;
 use VersionPress\Initialization\WpdbReplacer;
@@ -128,6 +129,22 @@ add_filter('vp_bulk_change_description_post', function ($description, $action, $
 
     return $description;
 }, 10, 4);
+
+add_filter('vp_entity_tags_post', function ($tags, $oldEntity, $newEntity) {
+
+    global $versionPressContainer;
+
+    /** @var VpidRepository $vpidRepository */
+    $vpidRepository = $versionPressContainer->resolve(VersionPressServices::VPID_REPOSITORY);
+
+    $postVpid = isset($newEntity['vp_id']) ? $newEntity['vp_id'] : $oldEntity['vp_id'];
+    $postId = $vpidRepository->getIdForVpid($postVpid);
+
+    $postFormat = get_post_format($postId);
+    $tags['VP-Post-Format'] = $postFormat ?: $tags['VP-Post-Type'];
+
+    return $tags;
+}, 10, 3);
 
 add_filter('vp_entity_files_option', function ($files, $oldEntity, $newEntity) {
 
