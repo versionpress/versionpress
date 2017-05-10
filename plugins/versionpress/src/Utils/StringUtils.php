@@ -26,17 +26,6 @@ class StringUtils
     }
 
     /**
-     * Converts LF string to CRLF string
-     *
-     * @param string $str LF line endings
-     * @return string CRLF line endings
-     */
-    public static function crlfize($str)
-    {
-        return str_replace("\n", "\r\n", str_replace("\r\n", "\n", $str));
-    }
-
-    /**
      * Converts given noun to plural form.
      * Note: It's very, very simplified!
      *
