@@ -490,6 +490,20 @@ INI
     /**
      * @test
      */
+    public function newLineHandling_SupportsCRLFOnInput() {
+
+        // See smallestPossibleExample()
+        $data = ["Section" => ["key" => ""]];
+        $inputWithCRLF = "[Section]\r\nkey = \"\"\r\n";
+        $outputWithLF = "[Section]\nkey = \"\"\n";
+
+        $this->assertSame($data, IniSerializer::deserialize($inputWithCRLF));
+        $this->assertSame($outputWithLF, IniSerializer::serialize($data));
+    }
+
+    /**
+     * @test
+     */
     public function specialCharactersAreTakenLiterally()
     {
 
