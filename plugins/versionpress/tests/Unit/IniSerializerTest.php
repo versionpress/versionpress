@@ -5,6 +5,7 @@ namespace VersionPress\Tests\Unit;
 use Faker\Provider\Lorem;
 use PHPUnit_Framework_TestCase;
 use VersionPress\Storages\Serialization\IniSerializer;
+use VersionPress\Utils\StringUtils;
 
 /**
  * Tests covering IniSerializer. There are also IniSerializer_Issue* tests which contain
@@ -57,15 +58,18 @@ class IniSerializerTest extends PHPUnit_Framework_TestCase
     {
 
         $data = ["Section" => ["key" => ""]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key = ""
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
+
 
     //--------------------------------
     // Supported types
@@ -79,15 +83,17 @@ INI;
     {
 
         $data = ["Section" => ["key1" => "value1", "key2" => "value2"]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "value1"
 key2 = "value2"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -97,16 +103,18 @@ INI;
     {
 
         $data = ["Section" => ["key1" => 0, "key2" => 1, "key3" => 1.1]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = 0
 key2 = 1
 key3 = 1.1
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -116,16 +124,18 @@ INI;
     {
 
         $data = ["Section" => ["key1" => "0", "key2" => "1", "key3" => "11.1"]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "0"
 key2 = "1"
 key3 = "11.1"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -135,15 +145,17 @@ INI;
     {
 
         $data = ["Section" => ["key" => ["val1", "val2"]]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key[0] = "val1"
 key[1] = "val2"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
 
@@ -165,14 +177,16 @@ INI;
                 "key1" => "My \\ site"
             ]
         ];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "My \\ site"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -186,14 +200,16 @@ INI;
                 "key1" => "My \\\\ site"
             ]
         ];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "My \\\\ site"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -207,14 +223,16 @@ INI;
                 "key1" => "My \\\\\\ site"
             ]
         ];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "My \\\\\\ site"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -229,15 +247,17 @@ INI;
                 "key2" => "Value \\",
             ]
         ];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "Value \\"
 key2 = "Value \\"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -247,14 +267,16 @@ INI;
     {
 
         $data = ["Section" => ["key1" => "\"Hello\""]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "\"Hello\""
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -266,15 +288,17 @@ INI;
     {
 
         $data = ["Section" => ["key1" => "\"\nwhatever\""]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "\"
 whatever\""
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -293,14 +317,16 @@ VAL
             ]
         ];
 
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "\"Hello\""
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -311,22 +337,25 @@ INI;
 
         $data = [
             "Section" => [
-                "key1" => <<<VAL
+                "key1" => StringUtils::ensureLf(<<<VAL
 First line of the value
 # Continued value - should not be treated as comment
 VAL
+                )
             ]
         ];
 
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "First line of the value
 # Continued value - should not be treated as comment"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -336,12 +365,13 @@ INI;
     {
         $data = ["Section" => ["key1" => 'some$value', "key2" => 'another${value']];
 
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "some$value"
 key2 = "another${value"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -355,23 +385,27 @@ INI;
 
         $data = [
             "Section" => [
-                "key1" => <<<VAL
+                "key1" => StringUtils::ensureLf(<<<VAL
 First line of the value
 ; Continued value - should not be treated as comment
 VAL
+                )
             ]
         ];
 
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "First line of the value
 ; Continued value - should not be treated as comment"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
+
 
     /**
      * @test
@@ -384,6 +418,7 @@ INI;
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -397,6 +432,7 @@ INI;
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -410,6 +446,7 @@ INI;
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -423,6 +460,7 @@ INI;
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -430,16 +468,18 @@ INI;
      */
     public function newLineHandling_NewLineAfterStringMark()
     {
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "$
 "
 
-INI;
+INI
+        );
 
         $data = [
             "Section" => [
-                "key1" => "$\n"
+                "key1" => StringUtils::ensureLf("$
+")
             ]
         ];
 
@@ -456,14 +496,16 @@ INI;
         // e.g., "\n" should not have any special meaning
 
         $data = ["Section" => ["key1" => '\n']];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "\\n"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -474,14 +516,16 @@ INI;
     {
 
         $data = ["Sect{$specialCharacter}ion" => ["somekey" => "value"]];
-        $ini = <<<INI
+        $ini = StringUtils::ensureLf(<<<INI
 [Sect{$specialCharacter}ion]
 somekey = "value"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -492,15 +536,18 @@ INI;
     {
 
         $data = ["Section" => ["some{$specialCharacter}key" => "value"]];
-        $ini = <<<INI
+        $ini = StringUtils::ensureLf(<<<INI
 [Section]
 some{$specialCharacter}key = "value"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
+
 
     /**
      * @test
@@ -510,14 +557,16 @@ INI;
     {
 
         $data = ["Section" => ["somekey" => "val{$specialCharacter}ue"]];
-        $ini = <<<INI
+        $ini = StringUtils::ensureLf(<<<INI
 [Section]
 somekey = "val{$specialCharacter}ue"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     public function specialCharactersProvider()
@@ -583,17 +632,19 @@ INI;
     {
 
         $data = ["Section1" => ["key" => "value"], "Section2" => ["key" => "value"]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section1]
 key = "value"
 
 [Section2]
 key = "value"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+
     }
 
     /**
@@ -602,11 +653,12 @@ INI;
     public function sectionWithDotInName()
     {
         $data = ["Section.Name" => ["key" => "value"]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section.Name]
 key = "value"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -620,11 +672,12 @@ INI;
         $serializedString = serialize('some string');
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> "some string"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -638,11 +691,12 @@ INI;
         $serializedString = serialize(777);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> 777
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -656,11 +710,12 @@ INI;
         $serializedString = serialize(1.2);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> 1.2
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -674,11 +729,12 @@ INI;
         $serializedString = serialize(false);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <boolean> false
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -692,11 +748,12 @@ INI;
         $serializedString = serialize([]);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -710,12 +767,13 @@ INI;
         $serializedString = serialize(['some string']);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = "some string"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -729,12 +787,13 @@ INI;
         $serializedString = serialize([-1]);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = -1
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -750,14 +809,15 @@ INI;
 
         $data = ["Section" => ["data" => $serializedString]];
 
-        $ini = <<<INI
+        $ini = StringUtils::ensureLf(<<<INI
 [Section]
 data = <<<serialized>>> <array>
 data[0] = "$str"
 data[1] = "$str"
 data[2] = "$str"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -772,14 +832,15 @@ INI;
 
         $data = ["Section" => ["data" => $serializedString]];
 
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = "\\"
 data[1] = "\""
 data[2] = "\\\""
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -793,16 +854,18 @@ INI;
         $arrayWithHtml = ["meta_key" => "who_is_the_best", "meta_value" => "<p>VersionPress</p>"];
         $serializedString = serialize($arrayWithHtml);
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data["meta_key"] = "who_is_the_best"
 data["meta_value"] = "<p>VersionPress</p>"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
+        
     }
 
     /**
@@ -813,7 +876,7 @@ INI;
         $arrayWithNewLines = ["meta_key" => "who_is_the_best", "meta_value" => "VersionPress\nis\nthe\nbest"];
         $serializedString = serialize($arrayWithNewLines);
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data["meta_key"] = "who_is_the_best"
@@ -822,12 +885,13 @@ is
 the
 best"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
-    }
 
+    }
     /**
      * @test
      */
@@ -839,10 +903,11 @@ INI;
             'array_version' => 3,
         ];
 
+
         $serializedString = serialize($sidebarWidgets);
 
         $data = ["sidebar_widgets" => ["option_value" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [sidebar_widgets]
 option_value = <<<serialized>>> <array>
 option_value["wp_inactive_widgets"] = <array>
@@ -852,7 +917,8 @@ option_value["sidebar-1"][1] = "recent-posts-2"
 option_value["sidebar-1"][2] = "recent-comments-2"
 option_value["array_version"] = 3
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -871,10 +937,11 @@ INI;
             'and bool' => true
         ];
 
+
         $serializedString = serialize($array);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = "numeric index"
@@ -893,7 +960,8 @@ data["even more nested arrays"][0][1][1][0] = "in array"
 data["even more nested arrays"][0][1][1]["with mixed"] = "keys"
 data["and bool"] = <boolean> true
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -907,11 +975,12 @@ INI;
         $serializedString = serialize(new \stdClass());
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <stdClass>
 
-INI;
+INI
+        );
 
         $this->assertSame($data, IniSerializer::deserialize($ini));
         $this->assertSame($ini, IniSerializer::serialize($data));
@@ -928,12 +997,13 @@ INI;
         $serializedString = serialize($object);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <stdClass>
 data["attribute"] = "value"
 
-INI;
+INI
+        );
 
         $this->assertSame($data, IniSerializer::deserialize($ini));
         $this->assertSame($ini, IniSerializer::serialize($data));
@@ -953,7 +1023,7 @@ INI;
         $serializedString = serialize($object);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <stdClass>
 data["stringAttribute"] = "value"
@@ -962,7 +1032,8 @@ data["boolAttribute"] = <boolean> false
 data["arrayAttribute"] = <array>
 data["arrayAttribute"][0] = "array"
 
-INI;
+INI
+        );
 
         $this->assertSame($data, IniSerializer::deserialize($ini));
         $this->assertSame($ini, IniSerializer::serialize($data));
@@ -978,12 +1049,13 @@ INI;
         $serializedString = serialize($object);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <VersionPress\Tests\Unit\IniSerializer_FooPublic>
 data["attribute"] = "value"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -999,12 +1071,13 @@ INI;
         $serializedString = serialize($object);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <VersionPress\Tests\Unit\IniSerializer_FooProtected>
 data["*attribute"] = "value"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -1020,12 +1093,13 @@ INI;
         $serializedString = serialize($object);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <VersionPress\Tests\Unit\IniSerializer_FooPrivate>
 data["-attribute"] = "value"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -1041,12 +1115,13 @@ INI;
         $serializedString = serialize($object);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <VersionPress\Tests\Unit\IniSerializer_FooWithCleanup>
 data["attribute"] = "value"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -1060,11 +1135,12 @@ INI;
         $serializedString = serialize(null);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <null>
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -1080,14 +1156,15 @@ INI;
         $serializedString = serialize([$object, $object, $object]);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = <stdClass>
 data[1] = <*pointer*> 2
 data[2] = <*pointer*> 2
 
-INI;
+INI
+        );
 
         $this->assertSame($data, IniSerializer::deserialize($ini));
         $this->assertSame($ini, IniSerializer::serialize($data));
@@ -1101,14 +1178,15 @@ INI;
         $serializedString = serialize([new \stdClass(), new \stdClass(), new \stdClass()]);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = <stdClass>
 data[1] = <stdClass>
 data[2] = <stdClass>
 
-INI;
+INI
+        );
 
         $this->assertSame($data, IniSerializer::deserialize($ini));
         $this->assertSame($ini, IniSerializer::serialize($data));
@@ -1125,13 +1203,14 @@ INI;
         $serializedString = serialize($array);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data["inception"] = <array>
 data["inception"]["inception"] = <*reference*> 2
 
-INI;
+INI
+        );
 
         $this->assertSame($data, IniSerializer::deserialize($ini));
         $this->assertSame($ini, IniSerializer::serialize($data));
@@ -1149,7 +1228,7 @@ INI;
         $serializedString = serialize([$a, $b]);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = <array>
@@ -1157,7 +1236,8 @@ data[0]["parent"] = <array>
 data[1] = <array>
 data[1]["parent"] = <*reference*> 3
 
-INI;
+INI
+        );
 
         $this->assertSame($data, IniSerializer::deserialize($ini));
         $this->assertSame($ini, IniSerializer::serialize($data));
@@ -1180,7 +1260,7 @@ INI;
         $serializedString = serialize([$a, $b]);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = <array>
@@ -1198,7 +1278,8 @@ data[1]["parent"] = <*reference*> 3
 data[1]["a"] = <*reference*> 4
 data[1]["b"] = <*reference*> 5
 
-INI;
+INI
+        );
 
         $this->assertSame($data, IniSerializer::deserialize($ini));
         $this->assertSame($ini, IniSerializer::serialize($data));
@@ -1215,12 +1296,13 @@ INI;
         $serializedString = serialize($class);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <stdClass>
 data["inception"] = <*reference*> 1
 
-INI;
+INI
+        );
 
         $this->assertSame($data, IniSerializer::deserialize($ini));
         $this->assertSame($ini, IniSerializer::serialize($data));
@@ -1246,7 +1328,7 @@ INI;
         $serializedString = serialize([$a, $b]);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = <stdClass>
@@ -1258,7 +1340,8 @@ data[0]["b"]["a"] = <*reference*> 2
 data[0]["b"]["b"] = <*reference*> 4
 data[1] = <*pointer*> 4
 
-INI;
+INI
+        );
 
         $this->assertSame($data, IniSerializer::deserialize($ini));
         $this->assertSame($ini, IniSerializer::serialize($data));
@@ -1283,7 +1366,7 @@ INI;
         $serializedString = serialize($data);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = 123
@@ -1300,7 +1383,8 @@ data[6][3] = "VP"
 data[6][4] = <null>
 data[6][5] = <stdClass>
 
-INI;
+INI
+        );
 
         $this->assertSame($data, IniSerializer::deserialize($ini));
         $this->assertSame($ini, IniSerializer::serialize($data));
@@ -1311,14 +1395,15 @@ INI;
      */
     public function longString()
     {
-        $loremIpsum = Lorem::text(50000);
+        $loremIpsum = StringUtils::ensureLf(Lorem::text(50000));
 
         $data = ["Section" => ["key" => $loremIpsum]];
-        $ini = <<<INI
+        $ini = StringUtils::ensureLf(<<<INI
 [Section]
 key = "$loremIpsum"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -1332,12 +1417,13 @@ INI;
         $serializedString = serialize(777);
 
         $data = ["Section" => ["data" => $serializedString, "another_data" => "value"]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> 777
 another_data = "value"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -1350,11 +1436,12 @@ INI;
     {
 
         $data = ["Section" => ["data" => "777"]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = "777"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -1368,11 +1455,12 @@ INI;
         $serializedString = serialize("777");
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> "777"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -1386,12 +1474,13 @@ INI;
         $serializedString = serialize(["777"]);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = "777"
 
-INI;
+INI
+        );
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -1403,12 +1492,12 @@ INI;
     public function nullValueSerializesCorrectly()
     {
         $data = ["Section" => ["data" => null]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <null>
 
-INI;
-
+INI
+        );
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
     }
@@ -1419,12 +1508,12 @@ INI;
     public function stringContaingNullPlaceholderIsDeserializedToOriginalString()
     {
         $data = ["Section" => ["data" => "<null>"]];
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = "<null>"
 
-INI;
-
+INI
+        );
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
     }

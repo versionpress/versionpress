@@ -26,6 +26,17 @@ class StringUtils
     }
 
     /**
+     * Ensures LF line endings in a string
+     *
+     * @param string $str LF or CRLF line endings
+     * @return string LF line endings
+     */
+    public static function ensureLf($str)
+    {
+        return str_replace("\\r\\n", "\\n", $str);
+    }
+
+    /**
      * Converts given noun to plural form.
      * Note: It's very, very simplified!
      *

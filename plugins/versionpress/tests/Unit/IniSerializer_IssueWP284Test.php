@@ -5,6 +5,7 @@ namespace VersionPress\Tests\Unit;
 
 use PHPUnit_Framework_TestCase;
 use VersionPress\Storages\Serialization\IniSerializer;
+use VersionPress\Utils\StringUtils;
 
 /**
  * Test cases for reported issue WP-284
@@ -24,24 +25,26 @@ class IniSerializer_IssueWP284Test extends PHPUnit_Framework_TestCase
         $data = [
             "avia_options_enfold" => [
                 "option_name" => "avia_options_enfold",
-                "option_value" => <<<'VAL'
+                "option_value" => StringUtils::ensureLf(<<<'VAL'
 a:1:{s:4:"avia";a:174:{s:21:"default_layout_target";s:5431:"";s:16:"avia_tab_layout1";s:0:"";s:16:"avia_tab_layout5";s:0:"";s:16:"color-body_style";s:9:"stretched";s:15:"header_position";s:10:"header_top";s:20:"layout_align_content";s:20:"content_align_center";s:18:"sidebarmenu_sticky";s:18:"conditional_sticky";s:19:"sidebarmenu_widgets";s:0:"";s:18:"sidebarmenu_social";s:0:"";s:17:"avia_tab5ewwe_end";s:0:"";s:13:"avia_tab5wewe";s:0:"";s:17:"responsive_active";s:7:"enabled";s:15:"responsive_size";s:6:"1310px";s:13:"content_width";s:2:"73";s:14:"combined_width";s:3:"100";s:16:"avia_tab4543_end";s:0:"";s:23:"avia_tab_container_end2";s:0:"";s:21:"theme_settings_export";s:0:"";s:18:"config_file_upload";s:0:"";s:15:"iconfont_upload";s:0:"";s:9:"frontpage";s:0:"";s:8:"blogpage";s:0:"";s:4:"logo";s:0:"";s:7:"favicon";s:0:"";s:15:"websave_windows";s:0:"";s:6:"markup";s:0:"";s:15:"lightbox_active";s:4:"true";s:9:"analytics";s:0:"";s:12:"color_scheme";s:4:"Blue";s:16:"advanced_styling";s:0:"";s:24:"default_slideshow_target";s:4536:"";s:9:"avia_tab1";s:0:"";s:9:"avia_tab2";s:0:"";s:24:"colorset-header_color-bg";s:7:"#ffffff";s:25:"colorset-header_color-bg2";s:7:"#f8f8f8";s:29:"colorset-header_color-primary";s:7:"#719430";s:31:"colorset-header_color-secondary";s:7:"#8bba34";s:27:"colorset-header_color-color";s:7:"#666666";s:28:"colorset-header_color-border";s:7:"#e1e1e1";s:14:"hrheader_color";s:0:"";s:25:"colorset-header_color-img";s:0:"";s:33:"colorset-header_color-customimage";s:0:"";s:25:"colorset-header_color-pos";s:8:"top left";s:28:"colorset-header_color-repeat";s:9:"no-repeat";s:28:"colorset-header_color-attach";s:6:"scroll";s:13:"avia_tab_end2";s:0:"";s:9:"avia_tab3";s:0:"";s:22:"colorset-main_color-bg";s:7:"#ffffff";s:23:"colorset-main_color-bg2";s:7:"#f8f8f8";s:27:"colorset-main_color-primary";s:7:"#719430";s:29:"colorset-main_color-secondary";s:7:"#8bba34";s:25:"colorset-main_color-color";s:7:"#666666";s:26:"colorset-main_color-border";s:7:"#e1e1e1";s:12:"hrmain_color";s:0:"";s:23:"colorset-main_color-img";s:0:"";s:31:"colorset-main_color-customimage";s:0:"";s:23:"colorset-main_color-pos";s:8:"top left";s:26:"colorset-main_color-repeat";s:9:"no-repeat";s:26:"colorset-main_color-attach";s:6:"scroll";s:13:"avia_tab_end3";s:0:"";s:9:"avia_tab4";s:0:"";s:27:"colorset-alternate_color-bg";s:7:"#ffffff";s:28:"colorset-alternate_color-bg2";s:7:"#f8f8f8";s:32:"colorset-alternate_color-primary";s:7:"#719430";s:34:"colorset-alternate_color-secondary";s:7:"#8bba34";s:30:"colorset-alternate_color-color";s:7:"#666666";s:31:"colorset-alternate_color-border";s:7:"#e1e1e1";s:17:"hralternate_color";s:0:"";s:28:"colorset-alternate_color-img";s:0:"";s:36:"colorset-alternate_color-customimage";s:0:"";s:28:"colorset-alternate_color-pos";s:8:"top left";s:31:"colorset-alternate_color-repeat";s:9:"no-repeat";s:31:"colorset-alternate_color-attach";s:6:"scroll";s:13:"avia_tab_end4";s:0:"";s:9:"avia_tab5";s:0:"";s:24:"colorset-footer_color-bg";s:7:"#ffffff";s:25:"colorset-footer_color-bg2";s:7:"#f8f8f8";s:29:"colorset-footer_color-primary";s:7:"#719430";s:31:"colorset-footer_color-secondary";s:7:"#8bba34";s:27:"colorset-footer_color-color";s:7:"#666666";s:28:"colorset-footer_color-border";s:7:"#e1e1e1";s:14:"hrfooter_color";s:0:"";s:25:"colorset-footer_color-img";s:0:"";s:33:"colorset-footer_color-customimage";s:0:"";s:25:"colorset-footer_color-pos";s:8:"top left";s:28:"colorset-footer_color-repeat";s:9:"no-repeat";s:28:"colorset-footer_color-attach";s:6:"scroll";s:13:"avia_tab_end5";s:0:"";s:9:"avia_tab6";s:0:"";s:24:"colorset-socket_color-bg";s:7:"#ffffff";s:25:"colorset-socket_color-bg2";s:7:"#f8f8f8";s:29:"colorset-socket_color-primary";s:7:"#719430";s:31:"colorset-socket_color-secondary";s:7:"#8bba34";s:27:"colorset-socket_color-color";s:7:"#666666";s:28:"colorset-socket_color-border";s:7:"#e1e1e1";s:14:"hrsocket_color";s:0:"";s:25:"colorset-socket_color-img";s:0:"";s:33:"colorset-socket_color-customimage";s:0:"";s:25:"colorset-socket_color-pos";s:8:"top left";s:28:"colorset-socket_color-repeat";s:9:"no-repeat";s:28:"colorset-socket_color-attach";s:6:"scroll";s:13:"avia_tab_end6";s:0:"";s:10:"avia_tab54";s:0:"";s:16:"color-body_color";s:7:"#eeeeee";s:14:"color-body_img";s:0:"";s:22:"color-body_customimage";s:0:"";s:14:"color-body_pos";s:8:"top left";s:17:"color-body_repeat";s:9:"no-repeat";s:17:"color-body_attach";s:6:"scroll";s:13:"avia_tab5_end";s:0:"";s:14:"google_webfont";s:9:"Open Sans";s:12:"default_font";s:32:"Helvetica-Neue,Helvetica-websave";s:15:"avia_tabwe5_end";s:0:"";s:22:"avia_tab_container_end";s:0:"";s:9:"quick_css";s:0:"";s:14:"archive_layout";s:13:"sidebar_right";s:11:"blog_layout";s:13:"sidebar_right";s:13:"single_layout";s:13:"sidebar_right";s:11:"page_layout";s:13:"sidebar_right";s:19:"smartphones_sidebar";s:0:"";s:16:"page_nesting_nav";s:4:"true";s:17:"widgetdescription";s:0:"";s:18:"header_conditional";s:0:"";s:21:"default_header_target";s:5802:"";s:13:"header_layout";s:0:"";s:11:"header_size";s:0:"";s:18:"header_custom_size";s:3:"150";s:16:"header_title_bar";s:20:"title_bar_breadcrumb";s:13:"header_sticky";s:4:"true";s:16:"header_shrinking";s:4:"true";s:14:"header_stretch";s:0:"";s:17:"header_searchicon";s:4:"true";s:10:"hr_header1";s:0:"";s:13:"header_social";s:0:"";s:21:"header_secondary_menu";s:0:"";s:19:"header_phone_active";s:0:"";s:5:"phone";s:0:"";s:24:"transparency_description";s:0:"";s:23:"header_replacement_logo";s:0:"";s:23:"header_replacement_menu";s:0:"";s:24:"header_mobile_activation";s:17:"mobile_menu_phone";s:22:"header_mobile_behavior";s:0:"";s:24:"header_conditional_close";s:0:"";s:17:"socialdescription";s:0:"";i:0;a:1:{s:12:"social_icons";a:0:{}}s:22:"display_widgets_socket";s:3:"all";s:14:"footer_columns";s:1:"4";s:9:"copyright";s:0:"";s:13:"footer_social";s:0:"";s:10:"blog_style";s:12:"single-small";s:22:"avia_share_links_start";s:0:"";s:17:"single_post_style";s:10:"single-big";s:27:"single_post_related_entries";s:24:"av-related-style-tooltip";s:16:"blog-meta-author";s:4:"true";s:18:"blog-meta-comments";s:4:"true";s:18:"blog-meta-category";s:4:"true";s:14:"blog-meta-date";s:4:"true";s:19:"blog-meta-html-info";s:4:"true";s:13:"blog-meta-tag";s:4:"true";s:14:"share_facebook";s:4:"true";s:13:"share_twitter";s:4:"true";s:15:"share_pinterest";s:4:"true";s:11:"share_gplus";s:4:"true";s:12:"share_reddit";s:4:"true";s:14:"share_linkedin";s:4:"true";s:12:"share_tumblr";s:4:"true";s:8:"share_vk";s:4:"true";s:10:"share_mail";s:4:"true";s:20:"avia_share_links_end";s:0:"";s:6:"import";s:0:"";s:16:"updates_username";s:0:"";s:15:"updates_api_key";s:0:"";s:19:"update_notification";s:0:"";s:17:"responsive_layout";s:27:"responsive responsive_large";}}
 VAL
-                ,
+                ),
                 "autoload" => "yes"
             ]
         ];
 
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [avia_options_enfold]
 option_name = "avia_options_enfold"
 option_value = "a:1:{s:4:\"avia\";a:174:{s:21:\"default_layout_target\";s:5431:\"\";s:16:\"avia_tab_layout1\";s:0:\"\";s:16:\"avia_tab_layout5\";s:0:\"\";s:16:\"color-body_style\";s:9:\"stretched\";s:15:\"header_position\";s:10:\"header_top\";s:20:\"layout_align_content\";s:20:\"content_align_center\";s:18:\"sidebarmenu_sticky\";s:18:\"conditional_sticky\";s:19:\"sidebarmenu_widgets\";s:0:\"\";s:18:\"sidebarmenu_social\";s:0:\"\";s:17:\"avia_tab5ewwe_end\";s:0:\"\";s:13:\"avia_tab5wewe\";s:0:\"\";s:17:\"responsive_active\";s:7:\"enabled\";s:15:\"responsive_size\";s:6:\"1310px\";s:13:\"content_width\";s:2:\"73\";s:14:\"combined_width\";s:3:\"100\";s:16:\"avia_tab4543_end\";s:0:\"\";s:23:\"avia_tab_container_end2\";s:0:\"\";s:21:\"theme_settings_export\";s:0:\"\";s:18:\"config_file_upload\";s:0:\"\";s:15:\"iconfont_upload\";s:0:\"\";s:9:\"frontpage\";s:0:\"\";s:8:\"blogpage\";s:0:\"\";s:4:\"logo\";s:0:\"\";s:7:\"favicon\";s:0:\"\";s:15:\"websave_windows\";s:0:\"\";s:6:\"markup\";s:0:\"\";s:15:\"lightbox_active\";s:4:\"true\";s:9:\"analytics\";s:0:\"\";s:12:\"color_scheme\";s:4:\"Blue\";s:16:\"advanced_styling\";s:0:\"\";s:24:\"default_slideshow_target\";s:4536:\"\";s:9:\"avia_tab1\";s:0:\"\";s:9:\"avia_tab2\";s:0:\"\";s:24:\"colorset-header_color-bg\";s:7:\"#ffffff\";s:25:\"colorset-header_color-bg2\";s:7:\"#f8f8f8\";s:29:\"colorset-header_color-primary\";s:7:\"#719430\";s:31:\"colorset-header_color-secondary\";s:7:\"#8bba34\";s:27:\"colorset-header_color-color\";s:7:\"#666666\";s:28:\"colorset-header_color-border\";s:7:\"#e1e1e1\";s:14:\"hrheader_color\";s:0:\"\";s:25:\"colorset-header_color-img\";s:0:\"\";s:33:\"colorset-header_color-customimage\";s:0:\"\";s:25:\"colorset-header_color-pos\";s:8:\"top left\";s:28:\"colorset-header_color-repeat\";s:9:\"no-repeat\";s:28:\"colorset-header_color-attach\";s:6:\"scroll\";s:13:\"avia_tab_end2\";s:0:\"\";s:9:\"avia_tab3\";s:0:\"\";s:22:\"colorset-main_color-bg\";s:7:\"#ffffff\";s:23:\"colorset-main_color-bg2\";s:7:\"#f8f8f8\";s:27:\"colorset-main_color-primary\";s:7:\"#719430\";s:29:\"colorset-main_color-secondary\";s:7:\"#8bba34\";s:25:\"colorset-main_color-color\";s:7:\"#666666\";s:26:\"colorset-main_color-border\";s:7:\"#e1e1e1\";s:12:\"hrmain_color\";s:0:\"\";s:23:\"colorset-main_color-img\";s:0:\"\";s:31:\"colorset-main_color-customimage\";s:0:\"\";s:23:\"colorset-main_color-pos\";s:8:\"top left\";s:26:\"colorset-main_color-repeat\";s:9:\"no-repeat\";s:26:\"colorset-main_color-attach\";s:6:\"scroll\";s:13:\"avia_tab_end3\";s:0:\"\";s:9:\"avia_tab4\";s:0:\"\";s:27:\"colorset-alternate_color-bg\";s:7:\"#ffffff\";s:28:\"colorset-alternate_color-bg2\";s:7:\"#f8f8f8\";s:32:\"colorset-alternate_color-primary\";s:7:\"#719430\";s:34:\"colorset-alternate_color-secondary\";s:7:\"#8bba34\";s:30:\"colorset-alternate_color-color\";s:7:\"#666666\";s:31:\"colorset-alternate_color-border\";s:7:\"#e1e1e1\";s:17:\"hralternate_color\";s:0:\"\";s:28:\"colorset-alternate_color-img\";s:0:\"\";s:36:\"colorset-alternate_color-customimage\";s:0:\"\";s:28:\"colorset-alternate_color-pos\";s:8:\"top left\";s:31:\"colorset-alternate_color-repeat\";s:9:\"no-repeat\";s:31:\"colorset-alternate_color-attach\";s:6:\"scroll\";s:13:\"avia_tab_end4\";s:0:\"\";s:9:\"avia_tab5\";s:0:\"\";s:24:\"colorset-footer_color-bg\";s:7:\"#ffffff\";s:25:\"colorset-footer_color-bg2\";s:7:\"#f8f8f8\";s:29:\"colorset-footer_color-primary\";s:7:\"#719430\";s:31:\"colorset-footer_color-secondary\";s:7:\"#8bba34\";s:27:\"colorset-footer_color-color\";s:7:\"#666666\";s:28:\"colorset-footer_color-border\";s:7:\"#e1e1e1\";s:14:\"hrfooter_color\";s:0:\"\";s:25:\"colorset-footer_color-img\";s:0:\"\";s:33:\"colorset-footer_color-customimage\";s:0:\"\";s:25:\"colorset-footer_color-pos\";s:8:\"top left\";s:28:\"colorset-footer_color-repeat\";s:9:\"no-repeat\";s:28:\"colorset-footer_color-attach\";s:6:\"scroll\";s:13:\"avia_tab_end5\";s:0:\"\";s:9:\"avia_tab6\";s:0:\"\";s:24:\"colorset-socket_color-bg\";s:7:\"#ffffff\";s:25:\"colorset-socket_color-bg2\";s:7:\"#f8f8f8\";s:29:\"colorset-socket_color-primary\";s:7:\"#719430\";s:31:\"colorset-socket_color-secondary\";s:7:\"#8bba34\";s:27:\"colorset-socket_color-color\";s:7:\"#666666\";s:28:\"colorset-socket_color-border\";s:7:\"#e1e1e1\";s:14:\"hrsocket_color\";s:0:\"\";s:25:\"colorset-socket_color-img\";s:0:\"\";s:33:\"colorset-socket_color-customimage\";s:0:\"\";s:25:\"colorset-socket_color-pos\";s:8:\"top left\";s:28:\"colorset-socket_color-repeat\";s:9:\"no-repeat\";s:28:\"colorset-socket_color-attach\";s:6:\"scroll\";s:13:\"avia_tab_end6\";s:0:\"\";s:10:\"avia_tab54\";s:0:\"\";s:16:\"color-body_color\";s:7:\"#eeeeee\";s:14:\"color-body_img\";s:0:\"\";s:22:\"color-body_customimage\";s:0:\"\";s:14:\"color-body_pos\";s:8:\"top left\";s:17:\"color-body_repeat\";s:9:\"no-repeat\";s:17:\"color-body_attach\";s:6:\"scroll\";s:13:\"avia_tab5_end\";s:0:\"\";s:14:\"google_webfont\";s:9:\"Open Sans\";s:12:\"default_font\";s:32:\"Helvetica-Neue,Helvetica-websave\";s:15:\"avia_tabwe5_end\";s:0:\"\";s:22:\"avia_tab_container_end\";s:0:\"\";s:9:\"quick_css\";s:0:\"\";s:14:\"archive_layout\";s:13:\"sidebar_right\";s:11:\"blog_layout\";s:13:\"sidebar_right\";s:13:\"single_layout\";s:13:\"sidebar_right\";s:11:\"page_layout\";s:13:\"sidebar_right\";s:19:\"smartphones_sidebar\";s:0:\"\";s:16:\"page_nesting_nav\";s:4:\"true\";s:17:\"widgetdescription\";s:0:\"\";s:18:\"header_conditional\";s:0:\"\";s:21:\"default_header_target\";s:5802:\"\";s:13:\"header_layout\";s:0:\"\";s:11:\"header_size\";s:0:\"\";s:18:\"header_custom_size\";s:3:\"150\";s:16:\"header_title_bar\";s:20:\"title_bar_breadcrumb\";s:13:\"header_sticky\";s:4:\"true\";s:16:\"header_shrinking\";s:4:\"true\";s:14:\"header_stretch\";s:0:\"\";s:17:\"header_searchicon\";s:4:\"true\";s:10:\"hr_header1\";s:0:\"\";s:13:\"header_social\";s:0:\"\";s:21:\"header_secondary_menu\";s:0:\"\";s:19:\"header_phone_active\";s:0:\"\";s:5:\"phone\";s:0:\"\";s:24:\"transparency_description\";s:0:\"\";s:23:\"header_replacement_logo\";s:0:\"\";s:23:\"header_replacement_menu\";s:0:\"\";s:24:\"header_mobile_activation\";s:17:\"mobile_menu_phone\";s:22:\"header_mobile_behavior\";s:0:\"\";s:24:\"header_conditional_close\";s:0:\"\";s:17:\"socialdescription\";s:0:\"\";i:0;a:1:{s:12:\"social_icons\";a:0:{}}s:22:\"display_widgets_socket\";s:3:\"all\";s:14:\"footer_columns\";s:1:\"4\";s:9:\"copyright\";s:0:\"\";s:13:\"footer_social\";s:0:\"\";s:10:\"blog_style\";s:12:\"single-small\";s:22:\"avia_share_links_start\";s:0:\"\";s:17:\"single_post_style\";s:10:\"single-big\";s:27:\"single_post_related_entries\";s:24:\"av-related-style-tooltip\";s:16:\"blog-meta-author\";s:4:\"true\";s:18:\"blog-meta-comments\";s:4:\"true\";s:18:\"blog-meta-category\";s:4:\"true\";s:14:\"blog-meta-date\";s:4:\"true\";s:19:\"blog-meta-html-info\";s:4:\"true\";s:13:\"blog-meta-tag\";s:4:\"true\";s:14:\"share_facebook\";s:4:\"true\";s:13:\"share_twitter\";s:4:\"true\";s:15:\"share_pinterest\";s:4:\"true\";s:11:\"share_gplus\";s:4:\"true\";s:12:\"share_reddit\";s:4:\"true\";s:14:\"share_linkedin\";s:4:\"true\";s:12:\"share_tumblr\";s:4:\"true\";s:8:\"share_vk\";s:4:\"true\";s:10:\"share_mail\";s:4:\"true\";s:20:\"avia_share_links_end\";s:0:\"\";s:6:\"import\";s:0:\"\";s:16:\"updates_username\";s:0:\"\";s:15:\"updates_api_key\";s:0:\"\";s:19:\"update_notification\";s:0:\"\";s:17:\"responsive_layout\";s:27:\"responsive responsive_large\";}}"
 autoload = "yes"
 
-INI;
+INI
+        );
 
         $this->assertEquals($ini, IniSerializer::serialize($data), "Serialization failed - strings are different");
         $this->assertEquals($data, IniSerializer::deserialize($ini), "Deserialization failed - arrays are different");
+
     }
 
 
@@ -54,7 +57,7 @@ INI;
         $data = [
             "avia_options_enfold" => [
                 "option_name" => "avia_options_enfold",
-                "option_value" => <<<'VAL'
+                "option_value" => StringUtils::ensureLf(<<<'VAL'
 <style type='text/css'>
 						.avprev-layout-container, .avprev-layout-container *{
 							-moz-box-sizing: border-box;
@@ -144,12 +147,12 @@ INI;
 						</div>
 					</div>
 VAL
-                ,
+                ),
                 "autoload" => "yes"
             ]
         ];
 
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [avia_options_enfold]
 option_name = "avia_options_enfold"
 option_value = "<style type='text/css'>
@@ -242,10 +245,12 @@ option_value = "<style type='text/css'>
 					</div>"
 autoload = "yes"
 
-INI;
+INI
+        );
 
         $this->assertEquals($ini, IniSerializer::serialize($data), "Serialization failed - strings are different");
         $this->assertEquals($data, IniSerializer::deserialize($ini), "Deserialization failed - arrays are different");
+
     }
 
 
@@ -258,7 +263,7 @@ INI;
         $data = [
             "avia_options_enfold" => [
                 "option_name" => "avia_options_enfold",
-                "option_value" => <<<'VAL'
+                "option_value" => StringUtils::ensureLf(<<<'VAL'
 <style type='text/css'>
 
 						#boxed .live_bg_wrap{ padding:23px;   border:1px solid #e1e1e1; background-position: top center;}
@@ -359,12 +364,12 @@ INI;
 					</div>
 					</div>
 VAL
-                ,
+                ),
                 "autoload" => "yes"
             ]
         ];
 
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [avia_options_enfold]
 option_name = "avia_options_enfold"
 option_value = "<style type='text/css'>
@@ -468,10 +473,12 @@ option_value = "<style type='text/css'>
 					</div>"
 autoload = "yes"
 
-INI;
+INI
+        );
 
         $this->assertEquals($ini, IniSerializer::serialize($data), "Serialization failed - strings are different");
         $this->assertEquals($data, IniSerializer::deserialize($ini), "Deserialization failed - arrays are different");
+
     }
 
     /**
@@ -483,7 +490,7 @@ INI;
         $data = [
             "avia_options_enfold" => [
                 "option_name" => "avia_options_enfold",
-                "option_value" => <<<'VAL'
+                "option_value" => StringUtils::ensureLf(<<<'VAL'
 <style type='text/css'>
 
 					#avia_options_page #avia_default_header_target{background:#555; border:none; padding:10px 10px; width: 610px;}
@@ -573,12 +580,12 @@ INI;
 						</div>
 					</div>
 VAL
-                ,
+                ),
                 "autoload" => "yes"
             ]
         ];
 
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [avia_options_enfold]
 option_name = "avia_options_enfold"
 option_value = "<style type='text/css'>
@@ -671,10 +678,12 @@ option_value = "<style type='text/css'>
 					</div>"
 autoload = "yes"
 
-INI;
+INI
+        );
 
         $this->assertEquals($ini, IniSerializer::serialize($data), "Serialization failed - strings are different");
         $this->assertEquals($data, IniSerializer::deserialize($ini), "Deserialization failed - arrays are different");
+
     }
 
     /**
@@ -686,26 +695,28 @@ INI;
         $data = [
             "avia_options_enfold" => [
                 "option_name" => "avia_options_enfold",
-                "option_value" => <<<'VAL'
+                "option_value" => StringUtils::ensureLf(<<<'VAL'
 s:123:"
 "
 VAL
-                ,
+                ),
                 "autoload" => "yes"
             ]
         ];
 
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [avia_options_enfold]
 option_name = "avia_options_enfold"
 option_value = "s:123:\"
 \""
 autoload = "yes"
 
-INI;
+INI
+        );
 
         $this->assertEquals($ini, IniSerializer::serialize($data), "Serialization failed - strings are different");
         $this->assertEquals($data, IniSerializer::deserialize($ini), "Deserialization failed - arrays are different");
+
     }
 
     /**
@@ -717,18 +728,18 @@ INI;
         $data = [
             "avia_options_enfold" => [
                 "option_name" => "avia_options_enfold",
-                "option_value" => <<<'VAL'
+                "option_value" => StringUtils::ensureLf(<<<'VAL'
 s:123:"
 <style type='text/css'>
 </style>
 "
 VAL
-                ,
+                ),
                 "autoload" => "yes"
             ]
         ];
 
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [avia_options_enfold]
 option_name = "avia_options_enfold"
 option_value = "s:123:\"
@@ -737,10 +748,12 @@ option_value = "s:123:\"
 \""
 autoload = "yes"
 
-INI;
+INI
+        );
 
         $this->assertEquals($ini, IniSerializer::serialize($data), "Serialization failed - strings are different");
         $this->assertEquals($data, IniSerializer::deserialize($ini), "Deserialization failed - arrays are different");
+
     }
 
     /**
@@ -752,7 +765,7 @@ INI;
         $data = [
             "avia_options_enfold" => [
                 "option_name" => "avia_options_enfold",
-                "option_value" => <<<'VAL'
+                "option_value" => StringUtils::ensureLf(<<<'VAL'
 a:1:{s:4:"avia";a:174:{s:21:"default_layout_target";s:5431:"
 					<style type='text/css'>
 						.avprev-layout-container, .avprev-layout-container *{
@@ -1036,12 +1049,12 @@ a:1:{s:4:"avia";a:174:{s:21:"default_layout_target";s:5431:"
 					</div>
 					";s:13:"header_layout";s:0:"";s:11:"header_size";s:0:"";s:18:"header_custom_size";s:3:"150";s:16:"header_title_bar";s:20:"title_bar_breadcrumb";s:13:"header_sticky";s:4:"true";s:16:"header_shrinking";s:4:"true";s:14:"header_stretch";s:0:"";s:17:"header_searchicon";s:4:"true";s:10:"hr_header1";s:0:"";s:13:"header_social";s:0:"";s:21:"header_secondary_menu";s:0:"";s:19:"header_phone_active";s:0:"";s:5:"phone";s:0:"";s:24:"transparency_description";s:0:"";s:23:"header_replacement_logo";s:0:"";s:23:"header_replacement_menu";s:0:"";s:24:"header_mobile_activation";s:17:"mobile_menu_phone";s:22:"header_mobile_behavior";s:0:"";s:24:"header_conditional_close";s:0:"";s:17:"socialdescription";s:0:"";i:0;a:1:{s:12:"social_icons";a:0:{}}s:22:"display_widgets_socket";s:3:"all";s:14:"footer_columns";s:1:"4";s:9:"copyright";s:0:"";s:13:"footer_social";s:0:"";s:10:"blog_style";s:12:"single-small";s:22:"avia_share_links_start";s:0:"";s:17:"single_post_style";s:10:"single-big";s:27:"single_post_related_entries";s:24:"av-related-style-tooltip";s:16:"blog-meta-author";s:4:"true";s:18:"blog-meta-comments";s:4:"true";s:18:"blog-meta-category";s:4:"true";s:14:"blog-meta-date";s:4:"true";s:19:"blog-meta-html-info";s:4:"true";s:13:"blog-meta-tag";s:4:"true";s:14:"share_facebook";s:4:"true";s:13:"share_twitter";s:4:"true";s:15:"share_pinterest";s:4:"true";s:11:"share_gplus";s:4:"true";s:12:"share_reddit";s:4:"true";s:14:"share_linkedin";s:4:"true";s:12:"share_tumblr";s:4:"true";s:8:"share_vk";s:4:"true";s:10:"share_mail";s:4:"true";s:20:"avia_share_links_end";s:0:"";s:6:"import";s:0:"";s:16:"updates_username";s:0:"";s:15:"updates_api_key";s:0:"";s:19:"update_notification";s:0:"";s:17:"responsive_layout";s:27:"responsive responsive_large";}}
 VAL
-                ,
+                ),
                 "autoload" => "yes"
             ]
         ];
 
-        $ini = <<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [avia_options_enfold]
 option_name = "avia_options_enfold"
 option_value = "a:1:{s:4:\"avia\";a:174:{s:21:\"default_layout_target\";s:5431:\"
@@ -1328,9 +1341,12 @@ option_value = "a:1:{s:4:\"avia\";a:174:{s:21:\"default_layout_target\";s:5431:\
 					\";s:13:\"header_layout\";s:0:\"\";s:11:\"header_size\";s:0:\"\";s:18:\"header_custom_size\";s:3:\"150\";s:16:\"header_title_bar\";s:20:\"title_bar_breadcrumb\";s:13:\"header_sticky\";s:4:\"true\";s:16:\"header_shrinking\";s:4:\"true\";s:14:\"header_stretch\";s:0:\"\";s:17:\"header_searchicon\";s:4:\"true\";s:10:\"hr_header1\";s:0:\"\";s:13:\"header_social\";s:0:\"\";s:21:\"header_secondary_menu\";s:0:\"\";s:19:\"header_phone_active\";s:0:\"\";s:5:\"phone\";s:0:\"\";s:24:\"transparency_description\";s:0:\"\";s:23:\"header_replacement_logo\";s:0:\"\";s:23:\"header_replacement_menu\";s:0:\"\";s:24:\"header_mobile_activation\";s:17:\"mobile_menu_phone\";s:22:\"header_mobile_behavior\";s:0:\"\";s:24:\"header_conditional_close\";s:0:\"\";s:17:\"socialdescription\";s:0:\"\";i:0;a:1:{s:12:\"social_icons\";a:0:{}}s:22:\"display_widgets_socket\";s:3:\"all\";s:14:\"footer_columns\";s:1:\"4\";s:9:\"copyright\";s:0:\"\";s:13:\"footer_social\";s:0:\"\";s:10:\"blog_style\";s:12:\"single-small\";s:22:\"avia_share_links_start\";s:0:\"\";s:17:\"single_post_style\";s:10:\"single-big\";s:27:\"single_post_related_entries\";s:24:\"av-related-style-tooltip\";s:16:\"blog-meta-author\";s:4:\"true\";s:18:\"blog-meta-comments\";s:4:\"true\";s:18:\"blog-meta-category\";s:4:\"true\";s:14:\"blog-meta-date\";s:4:\"true\";s:19:\"blog-meta-html-info\";s:4:\"true\";s:13:\"blog-meta-tag\";s:4:\"true\";s:14:\"share_facebook\";s:4:\"true\";s:13:\"share_twitter\";s:4:\"true\";s:15:\"share_pinterest\";s:4:\"true\";s:11:\"share_gplus\";s:4:\"true\";s:12:\"share_reddit\";s:4:\"true\";s:14:\"share_linkedin\";s:4:\"true\";s:12:\"share_tumblr\";s:4:\"true\";s:8:\"share_vk\";s:4:\"true\";s:10:\"share_mail\";s:4:\"true\";s:20:\"avia_share_links_end\";s:0:\"\";s:6:\"import\";s:0:\"\";s:16:\"updates_username\";s:0:\"\";s:15:\"updates_api_key\";s:0:\"\";s:19:\"update_notification\";s:0:\"\";s:17:\"responsive_layout\";s:27:\"responsive responsive_large\";}}"
 autoload = "yes"
 
-INI;
+INI
+        );
 
         $this->assertEquals($ini, IniSerializer::serialize($data), "Serialization failed - strings are different");
         $this->assertEquals($data, IniSerializer::deserialize($ini), "Deserialization failed - arrays are different");
+
     }
+
 }
