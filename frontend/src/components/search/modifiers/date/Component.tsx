@@ -49,7 +49,7 @@ export default class DateComponent extends ModifierComponent<{}> {
     onChangeTokenModel(activeTokenIndex, moment(day), true);
   };
 
-  getCursorLocationType = (): moment.UnitOfTime => {
+  getCursorLocationType = () => {
     const { cursor, token } = this.props;
     const modifierLength = token.modifier.length;
 

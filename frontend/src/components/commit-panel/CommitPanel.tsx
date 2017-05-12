@@ -56,7 +56,11 @@ export default class CommitPanel extends React.Component<CommitPanelProps, {}> {
           }
         </div>
         <Details
-          {...commitPanelStore}
+          detailsLevel={commitPanelStore.detailsLevel}
+          diff={commitPanelStore.diff}
+          gitStatus={commitPanelStore.gitStatus}
+          error={commitPanelStore.error}
+          isLoading={commitPanelStore.isLoading}
           onDetailsLevelChange={this.onDetailsLevelChange}
         />
       </div>

@@ -1,102 +1,107 @@
 'use strict';
 
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var path = require('path');
-var webpack = require('webpack');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const path = require('path');
+const webpack = require('webpack');
+const autoprefixer = require('autoprefixer');
 
 module.exports = function (isDevelopment) {
-  var entry = {
-    app: isDevelopment ? [
-      'webpack-dev-server/client?http://localhost:8888',
-      'webpack/hot/only-dev-server',
-      './src/main.tsx'
-    ] : [
-      './src/main.tsx'
-    ]
-  };
 
-  var loaders = [
-    {
-      exclude: /node_modules/,
-      loaders: ['react-hot','ts-loader'],
-      test: /\.tsx?$/
+  return {
+    entry: {
+      app: isDevelopment ? [
+        'webpack-dev-server/client?http://localhost:8888',
+        'webpack/hot/only-dev-server',
+        './src/main.tsx'
+      ] : [
+        './src/main.tsx'
+      ]
     },
-    {
-      loader: 'url-loader?limit=32768',
-      test: /\.(gif|jpg|png|woff|woff2|eot|ttf|svg)(\?.*)?$/
-    }
-  ];
+    output: {
+      path: path.join(__dirname, '..', 'build'),
+      filename: '[name].js',
+      publicPath: isDevelopment ? 'http://localhost:8888/' : ''
+    },
 
-  var autoprefixerLoader = 'autoprefixer-loader?' +
-    '{browsers:["Chrome >= 20", "Firefox >= 24", "Explorer >= 8", "Opera >= 12", "Safari >= 6"]}';
-  var cssLoader = 'css-loader!' + autoprefixerLoader;
-  var stylesheetLoaders = {
-    'css': cssLoader,
-    'less': cssLoader + '!less-loader'
-  };
+    cache: isDevelopment,
+    devtool: isDevelopment ? 'source-map' : '',
 
-  var output = isDevelopment ? {
-    path: path.join(__dirname, 'build'),
-    filename: '[name].js',
-    publicPath: 'http://localhost:8888/build/'
-  } : {
-    path: 'build/',
-    filename: '[name].js'
-  };
-
-  var plugins = [
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify(isDevelopment ? 'development' : 'production'),
-        IS_BROWSER: true
-      }
-    }),
-    new webpack.IgnorePlugin(/^\.\/locale$/, [/moment$/]) // http://stackoverflow.com/a/25426019/1243495
-  ];
-  if (isDevelopment) {
-    plugins.push(
-      new webpack.HotModuleReplacementPlugin(),
-      new webpack.NoErrorsPlugin()
-    );
-  } else {
-    plugins.push(
-      new ExtractTextPlugin('app.css', {
-        allChunks: true
+    plugins: [
+      new webpack.NamedModulesPlugin(),
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify(isDevelopment ? 'development' : 'production'),
+          IS_BROWSER: true
+        }
       }),
+      new ExtractTextPlugin({filename: 'app.css', allChunks: true, disable: isDevelopment}),
+      // new webpack.IgnorePlugin(/^\.\/locale$/, [/moment$/]), // http://stackoverflow.com/a/25426019/1243495
+      // new webpack.LoaderOptionsPlugin({
+      //   debug: isDevelopment
+      // }),
+    ].concat(isDevelopment ? [
+      new webpack.HotModuleReplacementPlugin(),
+      new webpack.NoEmitOnErrorsPlugin()
+    ] : [
       new webpack.optimize.DedupePlugin(),
-      new webpack.optimize.OccurenceOrderPlugin(),
+      new webpack.optimize.OccurrenceOrderPlugin(),
       new webpack.optimize.UglifyJsPlugin({
         compress: {
           warnings: false
         }
       })
-    );
-  }
+    ]),
 
-  loaders = loaders.concat(
-    Object.keys(stylesheetLoaders).map(function (ext) {
-      var loader = isDevelopment
-        ? 'style-loader!' + stylesheetLoaders[ext]
-        : ExtractTextPlugin.extract('style-loader', stylesheetLoaders[ext]);
-      return {
-        loader: loader,
-        test: new RegExp('\\.(' + ext + ')$')
-      };
-    })
-  );
-
-  return {
-    cache: isDevelopment,
-    debug: isDevelopment,
-    devtool: isDevelopment ? 'inline-source-map' : false,
-    entry: entry,
     module: {
-      loaders: loaders
+      rules: [
+        // {
+        //   test: /\.tsx?$/,
+        //   enforce: 'pre',
+        //   exclude: /node_modules/,
+        //   use: 'tslint-loader',
+        // },
+        {
+          test: /\.tsx?$/,
+          exclude: /node_modules/,
+          use: isDevelopment
+            ? ['react-hot-loader', 'awesome-typescript-loader']
+            : ['awesome-typescript-loader'],
+        },
+        {
+          test: /\.woff2?$|\.ttf$|\.eot$/,
+          use: [{
+            loader: 'file-loader',
+            options: {
+              name: 'fonts/[name].[ext]',
+            },
+          }],
+        },
+        {
+          test: /\.(gif|jpg|png|svg)$/,
+          use: [{
+            loader: 'file-loader',
+            options: {
+              name: 'images/[name].[ext]',
+            },
+          }],
+        },
+        {
+          test: /\.css$/,
+          use: ['style-loader', 'css-loader'],
+        },
+        {
+          test: /\.less$/,
+          use: ExtractTextPlugin.extract({
+            fallback: "style-loader",
+            use: ["css-loader", "less-loader"]
+          })
+        }
+
+      ]
     },
-    output: output,
-    plugins: plugins,
+
     resolve: {
-      extensions: ['', '.js', '.json', '.ts', '.tsx']
+      extensions: ['.ts', '.tsx', '.js']
     }
   }
 
