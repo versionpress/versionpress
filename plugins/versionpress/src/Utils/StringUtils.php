@@ -33,7 +33,7 @@ class StringUtils
      */
     public static function ensureLf($str)
     {
-        return str_replace("\\r\\n", "\\n", $str);
+        return str_replace("\r\n", "\n", $str);
     }
 
     /**
