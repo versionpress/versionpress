@@ -154,7 +154,7 @@ Some changes cannot be auto-tracked by VersionPress, e.g., manual file edits on 
 You can use any Git client for it or, since VersionPress 2.0, there is a GUI for it:
 
 <figure style="width: 90%;">
-  <img src="../../media/manual-commit.png" alt="Manual commit" /> 
+  <img src="https://cloud.githubusercontent.com/assets/101152/26038403/df254b0e-3907-11e7-8f62-50e31c81a740.png" alt="Manual commit" /> 
 </figure>
  
 

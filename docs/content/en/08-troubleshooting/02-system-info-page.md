@@ -9,7 +9,7 @@ The system info page is available at this URL:
 You can also find a link to this page from the bottom left corner of the initialization page:
 
 <figure style="width: 80%;">
-  <img src="../../media/link-to-system-info-page.png" alt="Link to system info page" />
+  <img src="https://cloud.githubusercontent.com/assets/101152/26038405/04a0dc9a-3908-11e7-93c8-c5f92e5d66ea.png" alt="Link to system info page" />
   <figcaption>Link to system info page from the initialization screen</figcaption>
 </figure>
 

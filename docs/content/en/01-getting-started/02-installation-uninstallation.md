@@ -13,7 +13,7 @@ Both things are important, please read on.
 The server environment must match certain requirements, some of which are checked automatically on VersionPress activation. We also recommend some other setup steps below.
 
 <figure style="width: 80%;">
-  <img src="../../media/requirements-checker.png" alt="Pre-activation check" /> 
+  <img src="https://cloud.githubusercontent.com/assets/101152/26038379/7f8dbaf0-3907-11e7-92f4-3d211ae0d882.png" alt="Pre-activation check" /> 
   <figcaption>Pre-activation check performed by VersionPress</figcaption>
 </figure>
 
@@ -94,7 +94,7 @@ The last step is important, otherwise VersionPress wouldn't be able to track cha
 Upon successful activation, you should see a screen like this:
 
 <figure style="width: 80%;">
-  <img src="../../media/successful-activation.png" alt="VersionPress activated" /> 
+  <img src="https://cloud.githubusercontent.com/assets/101152/26038360/1f325f26-3907-11e7-9993-0e25ff3299d7.png" alt="VersionPress activated" /> 
   <figcaption>VersionPress successfully activated</figcaption>
 </figure>
 

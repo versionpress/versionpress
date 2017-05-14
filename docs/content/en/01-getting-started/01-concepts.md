@@ -8,7 +8,7 @@ VersionPress brings true version control to WordPress. Version control is a fair
 Version control simply means that **historic revisions of some content are stored**. It has many forms, from simple Undo buttons in text editors to advanced systems for managing documents but the basic principle is really that simple.
 
 <figure>
-  <img src="../../media/version-control.png" alt="Version Control" /> 
+  <img src="https://cloud.githubusercontent.com/assets/101152/26038372/5e328700-3907-11e7-8ccd-d24fdca1d26f.png" alt="Version Control" /> 
   <figcaption>© linode from their <a href="https://www.linode.com/docs/applications/development/introduction-to-version-control">very nice intro</a></figcaption>
 </figure>
 

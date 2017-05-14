@@ -13,19 +13,19 @@ You can activate VersionPress and forget it. It will work behind the scenes, aut
 On the VersionPress admin screen, you can inspect the history of changes:
 
 <figure style="width: 90%;">
-  <img src="../../media/history-overview.png" alt="History overview" /> 
+  <img src="https://cloud.githubusercontent.com/assets/101152/26038386/9ea8e4b4-3907-11e7-9eea-5393c6f0a300.png" alt="History overview" /> 
 </figure>
 
 Each row is clickable and will reveal more details about the change:
 
 <figure style="width: 90%;">
-  <img src="../../media/expand-row-to-show-detail.png" alt="Change detail" /> 
+  <img src="https://cloud.githubusercontent.com/assets/101152/26038391/b496372c-3907-11e7-875c-460c4b7fcae3.png" alt="Change detail" /> 
 </figure>
 
 You can also switch to the *Full diff* mode which displays complete contents of the change:
 
 <figure style="width: 90%;">
-  <img src="../../media/full-diff-view.png" alt="Full diff view" /> 
+  <img src="https://cloud.githubusercontent.com/assets/101152/26038396/c7cab840-3907-11e7-84e8-012f15159111.png" alt="Full diff view" /> 
 </figure>
 
 Related:
