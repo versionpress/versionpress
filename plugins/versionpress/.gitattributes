@@ -1,7 +1,0 @@
-# Auto detect text files and perform EOL normalization on checkin
-* text=auto
-
-# For PHP files, we need to force LF even on Windows because WP-CLI help generation
-# expects them. This cannot be done above for the "*" as that would mess with binary
-# files too (current "bug" / strange behavior of Git).
-*.php eol=lf
