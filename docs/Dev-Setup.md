@@ -14,7 +14,7 @@ Table of contents:
 Make sure these tools are installed on your computer:
 
 - PHP 5.6 or 7.x and a webserver like [MAMP](https://www.mamp.info/en/) on Mac or [WampServer](http://www.wampserver.com/en/) on Windows
-- [Git](http://git-scm.com/)
+- [Git](http://git-scm.com/) 2.10+
 - [Composer](https://getcomposer.org/)
 - [WP-CLI](http://wp-cli.org/)
     - DB commands expect `mysql` in PATH

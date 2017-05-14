@@ -1,0 +1,2 @@
+# Force LF on both checkin and checkout. Requires Git 2.10+ to work correctly.
+* text=auto eol=lf
