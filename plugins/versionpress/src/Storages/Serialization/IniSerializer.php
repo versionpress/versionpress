@@ -276,7 +276,7 @@ class IniSerializer
 
     private static function outputToString($output)
     {
-        return implode("\r\n", $output);
+        return implode("\n", $output);
     }
 
     private static function preserveNumbers($iniString)

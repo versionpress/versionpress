@@ -26,14 +26,14 @@ class StringUtils
     }
 
     /**
-     * Converts LF string to CRLF string
+     * Ensures LF line endings in a string
      *
-     * @param string $str LF line endings
-     * @return string CRLF line endings
+     * @param string $str LF or CRLF line endings
+     * @return string LF line endings
      */
-    public static function crlfize($str)
+    public static function ensureLf($str)
     {
-        return str_replace("\n", "\r\n", str_replace("\r\n", "\n", $str));
+        return str_replace("\r\n", "\n", $str);
     }
 
     /**

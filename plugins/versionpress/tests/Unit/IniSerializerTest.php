@@ -58,7 +58,7 @@ class IniSerializerTest extends PHPUnit_Framework_TestCase
     {
 
         $data = ["Section" => ["key" => ""]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key = ""
 
@@ -83,7 +83,7 @@ INI
     {
 
         $data = ["Section" => ["key1" => "value1", "key2" => "value2"]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "value1"
 key2 = "value2"
@@ -103,7 +103,7 @@ INI
     {
 
         $data = ["Section" => ["key1" => 0, "key2" => 1, "key3" => 1.1]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = 0
 key2 = 1
@@ -124,7 +124,7 @@ INI
     {
 
         $data = ["Section" => ["key1" => "0", "key2" => "1", "key3" => "11.1"]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "0"
 key2 = "1"
@@ -145,7 +145,7 @@ INI
     {
 
         $data = ["Section" => ["key" => ["val1", "val2"]]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key[0] = "val1"
 key[1] = "val2"
@@ -177,7 +177,7 @@ INI
                 "key1" => "My \\ site"
             ]
         ];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "My \\ site"
 
@@ -200,7 +200,7 @@ INI
                 "key1" => "My \\\\ site"
             ]
         ];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "My \\\\ site"
 
@@ -223,7 +223,7 @@ INI
                 "key1" => "My \\\\\\ site"
             ]
         ];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "My \\\\\\ site"
 
@@ -247,7 +247,7 @@ INI
                 "key2" => "Value \\",
             ]
         ];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "Value \\"
 key2 = "Value \\"
@@ -267,7 +267,7 @@ INI
     {
 
         $data = ["Section" => ["key1" => "\"Hello\""]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "\"Hello\""
 
@@ -287,8 +287,8 @@ INI
     public function doubleQuoteEscapingAtTheEOL()
     {
 
-        $data = ["Section" => ["key1" => "\"\r\nwhatever\""]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $data = ["Section" => ["key1" => "\"\nwhatever\""]];
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "\"
 whatever\""
@@ -317,7 +317,7 @@ VAL
             ]
         ];
 
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "\"Hello\""
 
@@ -337,7 +337,7 @@ INI
 
         $data = [
             "Section" => [
-                "key1" => StringUtils::crlfize(<<<VAL
+                "key1" => StringUtils::ensureLf(<<<VAL
 First line of the value
 # Continued value - should not be treated as comment
 VAL
@@ -345,7 +345,7 @@ VAL
             ]
         ];
 
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "First line of the value
 # Continued value - should not be treated as comment"
@@ -365,7 +365,7 @@ INI
     {
         $data = ["Section" => ["key1" => 'some$value', "key2" => 'another${value']];
 
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "some$value"
 key2 = "another${value"
@@ -385,7 +385,7 @@ INI
 
         $data = [
             "Section" => [
-                "key1" => StringUtils::crlfize(<<<VAL
+                "key1" => StringUtils::ensureLf(<<<VAL
 First line of the value
 ; Continued value - should not be treated as comment
 VAL
@@ -393,7 +393,7 @@ VAL
             ]
         ];
 
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "First line of the value
 ; Continued value - should not be treated as comment"
@@ -414,7 +414,7 @@ INI
     {
 
         $data = ["Section" => ["key1" => "Hello\nWorld"]];
-        $ini = "[Section]\r\nkey1 = \"Hello\nWorld\"\r\n";
+        $ini = "[Section]\nkey1 = \"Hello\nWorld\"\n";
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -428,7 +428,7 @@ INI
     {
 
         $data = ["Section" => ["key1" => "Hello\rWorld"]];
-        $ini = "[Section]\r\nkey1 = \"Hello\rWorld\"\r\n";
+        $ini = "[Section]\nkey1 = \"Hello\rWorld\"\n";
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -442,7 +442,7 @@ INI
     {
 
         $data = ["Section" => ["key1" => "Hello\r\nWorld"]];
-        $ini = "[Section]\r\nkey1 = \"Hello\r\nWorld\"\r\n";
+        $ini = "[Section]\nkey1 = \"Hello\r\nWorld\"\n";
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -456,7 +456,7 @@ INI
     {
 
         $data = ["Section" => ["key1" => "\r\n"]];
-        $ini = "[Section]\r\nkey1 = \"\r\n\"\r\n";
+        $ini = "[Section]\nkey1 = \"\r\n\"\n";
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
@@ -468,7 +468,7 @@ INI
      */
     public function newLineHandling_NewLineAfterStringMark()
     {
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "$
 "
@@ -478,7 +478,7 @@ INI
 
         $data = [
             "Section" => [
-                "key1" => StringUtils::crlfize("$
+                "key1" => StringUtils::ensureLf("$
 ")
             ]
         ];
@@ -490,13 +490,27 @@ INI
     /**
      * @test
      */
+    public function newLineHandling_SupportsCRLFOnInput() {
+
+        // See smallestPossibleExample()
+        $data = ["Section" => ["key" => ""]];
+        $inputWithCRLF = "[Section]\r\nkey = \"\"\r\n";
+        $outputWithLF = "[Section]\nkey = \"\"\n";
+
+        $this->assertSame($data, IniSerializer::deserialize($inputWithCRLF));
+        $this->assertSame($outputWithLF, IniSerializer::serialize($data));
+    }
+
+    /**
+     * @test
+     */
     public function specialCharactersAreTakenLiterally()
     {
 
         // e.g., "\n" should not have any special meaning
 
         $data = ["Section" => ["key1" => '\n']];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 key1 = "\\n"
 
@@ -516,7 +530,7 @@ INI
     {
 
         $data = ["Sect{$specialCharacter}ion" => ["somekey" => "value"]];
-        $ini = StringUtils::crlfize(<<<INI
+        $ini = StringUtils::ensureLf(<<<INI
 [Sect{$specialCharacter}ion]
 somekey = "value"
 
@@ -536,7 +550,7 @@ INI
     {
 
         $data = ["Section" => ["some{$specialCharacter}key" => "value"]];
-        $ini = StringUtils::crlfize(<<<INI
+        $ini = StringUtils::ensureLf(<<<INI
 [Section]
 some{$specialCharacter}key = "value"
 
@@ -557,7 +571,7 @@ INI
     {
 
         $data = ["Section" => ["somekey" => "val{$specialCharacter}ue"]];
-        $ini = StringUtils::crlfize(<<<INI
+        $ini = StringUtils::ensureLf(<<<INI
 [Section]
 somekey = "val{$specialCharacter}ue"
 
@@ -632,7 +646,7 @@ INI
     {
 
         $data = ["Section1" => ["key" => "value"], "Section2" => ["key" => "value"]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section1]
 key = "value"
 
@@ -653,7 +667,7 @@ INI
     public function sectionWithDotInName()
     {
         $data = ["Section.Name" => ["key" => "value"]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section.Name]
 key = "value"
 
@@ -672,7 +686,7 @@ INI
         $serializedString = serialize('some string');
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> "some string"
 
@@ -691,7 +705,7 @@ INI
         $serializedString = serialize(777);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> 777
 
@@ -710,7 +724,7 @@ INI
         $serializedString = serialize(1.2);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> 1.2
 
@@ -729,7 +743,7 @@ INI
         $serializedString = serialize(false);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <boolean> false
 
@@ -748,7 +762,7 @@ INI
         $serializedString = serialize([]);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 
@@ -767,7 +781,7 @@ INI
         $serializedString = serialize(['some string']);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = "some string"
@@ -787,7 +801,7 @@ INI
         $serializedString = serialize([-1]);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = -1
@@ -809,7 +823,7 @@ INI
 
         $data = ["Section" => ["data" => $serializedString]];
 
-        $ini = StringUtils::crlfize(<<<INI
+        $ini = StringUtils::ensureLf(<<<INI
 [Section]
 data = <<<serialized>>> <array>
 data[0] = "$str"
@@ -832,7 +846,7 @@ INI
 
         $data = ["Section" => ["data" => $serializedString]];
 
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = "\\"
@@ -854,7 +868,7 @@ INI
         $arrayWithHtml = ["meta_key" => "who_is_the_best", "meta_value" => "<p>VersionPress</p>"];
         $serializedString = serialize($arrayWithHtml);
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data["meta_key"] = "who_is_the_best"
@@ -873,10 +887,10 @@ INI
      */
     public function serializedStringWithNewLines()
     {
-        $arrayWithNewLines = ["meta_key" => "who_is_the_best", "meta_value" => "VersionPress\r\nis\r\nthe\r\nbest"];
+        $arrayWithNewLines = ["meta_key" => "who_is_the_best", "meta_value" => "VersionPress\nis\nthe\nbest"];
         $serializedString = serialize($arrayWithNewLines);
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data["meta_key"] = "who_is_the_best"
@@ -907,7 +921,7 @@ INI
         $serializedString = serialize($sidebarWidgets);
 
         $data = ["sidebar_widgets" => ["option_value" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [sidebar_widgets]
 option_value = <<<serialized>>> <array>
 option_value["wp_inactive_widgets"] = <array>
@@ -941,7 +955,7 @@ INI
         $serializedString = serialize($array);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = "numeric index"
@@ -975,7 +989,7 @@ INI
         $serializedString = serialize(new \stdClass());
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <stdClass>
 
@@ -997,7 +1011,7 @@ INI
         $serializedString = serialize($object);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <stdClass>
 data["attribute"] = "value"
@@ -1023,7 +1037,7 @@ INI
         $serializedString = serialize($object);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <stdClass>
 data["stringAttribute"] = "value"
@@ -1049,7 +1063,7 @@ INI
         $serializedString = serialize($object);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <VersionPress\Tests\Unit\IniSerializer_FooPublic>
 data["attribute"] = "value"
@@ -1071,7 +1085,7 @@ INI
         $serializedString = serialize($object);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <VersionPress\Tests\Unit\IniSerializer_FooProtected>
 data["*attribute"] = "value"
@@ -1093,7 +1107,7 @@ INI
         $serializedString = serialize($object);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <VersionPress\Tests\Unit\IniSerializer_FooPrivate>
 data["-attribute"] = "value"
@@ -1115,7 +1129,7 @@ INI
         $serializedString = serialize($object);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <VersionPress\Tests\Unit\IniSerializer_FooWithCleanup>
 data["attribute"] = "value"
@@ -1135,7 +1149,7 @@ INI
         $serializedString = serialize(null);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <null>
 
@@ -1156,7 +1170,7 @@ INI
         $serializedString = serialize([$object, $object, $object]);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = <stdClass>
@@ -1178,7 +1192,7 @@ INI
         $serializedString = serialize([new \stdClass(), new \stdClass(), new \stdClass()]);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = <stdClass>
@@ -1203,7 +1217,7 @@ INI
         $serializedString = serialize($array);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data["inception"] = <array>
@@ -1228,7 +1242,7 @@ INI
         $serializedString = serialize([$a, $b]);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = <array>
@@ -1260,7 +1274,7 @@ INI
         $serializedString = serialize([$a, $b]);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = <array>
@@ -1296,7 +1310,7 @@ INI
         $serializedString = serialize($class);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <stdClass>
 data["inception"] = <*reference*> 1
@@ -1328,7 +1342,7 @@ INI
         $serializedString = serialize([$a, $b]);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = <stdClass>
@@ -1366,7 +1380,7 @@ INI
         $serializedString = serialize($data);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = 123
@@ -1395,10 +1409,10 @@ INI
      */
     public function longString()
     {
-        $loremIpsum = StringUtils::crlfize(Lorem::text(50000));
+        $loremIpsum = StringUtils::ensureLf(Lorem::text(50000));
 
         $data = ["Section" => ["key" => $loremIpsum]];
-        $ini = StringUtils::crlfize(<<<INI
+        $ini = StringUtils::ensureLf(<<<INI
 [Section]
 key = "$loremIpsum"
 
@@ -1417,7 +1431,7 @@ INI
         $serializedString = serialize(777);
 
         $data = ["Section" => ["data" => $serializedString, "another_data" => "value"]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> 777
 another_data = "value"
@@ -1436,7 +1450,7 @@ INI
     {
 
         $data = ["Section" => ["data" => "777"]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = "777"
 
@@ -1455,7 +1469,7 @@ INI
         $serializedString = serialize("777");
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> "777"
 
@@ -1474,7 +1488,7 @@ INI
         $serializedString = serialize(["777"]);
 
         $data = ["Section" => ["data" => $serializedString]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <<<serialized>>> <array>
 data[0] = "777"
@@ -1492,7 +1506,7 @@ INI
     public function nullValueSerializesCorrectly()
     {
         $data = ["Section" => ["data" => null]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = <null>
 
@@ -1508,7 +1522,7 @@ INI
     public function stringContaingNullPlaceholderIsDeserializedToOriginalString()
     {
         $data = ["Section" => ["data" => "<null>"]];
-        $ini = StringUtils::crlfize(<<<'INI'
+        $ini = StringUtils::ensureLf(<<<'INI'
 [Section]
 data = "<null>"
 
