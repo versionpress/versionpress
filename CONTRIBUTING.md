@@ -164,7 +164,7 @@ Feel free to reach the devs in the [Gitter room](https://gitter.im/versionpress/
 
 ## Improving docs
 
-Public docs (docs.versionpress.net) are managed via [versionpress/docs](https://github.com/versionpress/docs). We're happy to accept pull requests with improvements, fixes for spelling errors etc. Thank you!
+Public docs at [docs.versionpress.net](https://docs.versionpress.net/en) are exported from the `docs/content` directory. We're always happy to accept pull requests with clarifications, grammar fixes, etc., more in [docs/README.md](./docs/README.md). Thank you!
 
 
 ---
