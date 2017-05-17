@@ -3,7 +3,7 @@ import * as React from 'react';
 const UndoEnabledDialog: React.StatelessComponent<{}> = () => (
   <div>
     <p>
-      For Early Access releases, please have a backup. {' '}
+      For Developer Preview releases, please have a backup. {' '}
       <a
         href='http://docs.versionpress.net/en/feature-focus/undo-and-rollback'
         target='_blank'
