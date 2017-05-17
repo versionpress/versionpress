@@ -1,26 +1,20 @@
-# Early Access
+# Developer Preview
 
-Currently, VersionPress is in an **Early Access phase**. We increase major version numbers quite rapidly, e.g., VersionPress is at 3.0 at the time of writing this, but **that does not mean it is production-ready.** As long as this Early Access notice is here, you have to be careful.
-
-
-## Recommendations
-
- - **Ideally, use VersionPress for testing / dev purposes only**. Local, throw-away sites and workflows are ideal.
-
- - **If you're going to run VersionPress on a live site, <span style="color:red;">keep backup at all times</span>**. We really mean this. VersionPress manipulates the database during some operations and can break it if it interferes with some other plugin or has a bug in it.
-
- - **Controlled hosting environment** is recommended. VersionPress requires Git on the server and `proc_open()` enabled which only some hosts allow (see [hosting](../integrations/hosts) and [system requirements](./installation-uninstallation)).
- 
- - **Compatibility with 3rd party plugins** and themes is often problematic. Generally, plugins with custom database data need special attention and are a long-term challenge. This is explained on the [external plugins](../feature-focus/external-plugins) page in more detail.
-
- - **Be familiar with WordPress and Git**. VersionPress at the Early Access stage is not suitable for non-technical users.
-
-You can tell whether you are using an Early Access release of VersionPress from the top admin bar where there is a clear warning.
+Currently, VersionPress is a **"Developer Preview"**. It can be tried on simpler sites for development purposes but it's not production-ready yet. 
 
 
+## Considerations
 
-## EAP (discontinued)
+ - A safe bet is to use VersionPress for testing / dev purposes only. Local, throw-away sites and workflows are ideal.
+ - Production deployment is strongly discouraged but if you attempt it despite the warning, at least **<span style="color:red;">keep backup at all times</span>**.
+ - Compatibility with WordPress plugins and themes is often problematic, see [3rd Party Integrations section](../integrations).
+ - Compatibility with hosts is often problematic as Git and `proc_open()` are required on the server. See [Hosting](../integrations/hosts) and [System requirements](./installation-uninstallation).
+ - Be familiar with WordPress and Git.
 
-Between January 2015 and March 2016, VersionPress used to be available through *Early Access Program* (EAP). It was discontinued when VersionPress moved to a fully open development model on GitHub.
+You can tell whether you are using a Developer Preview / Early Access release of VersionPress from the top admin bar.
 
-We're leaving this note here in case you encounter "EAP" somewhere, e.g., in this page's URL :smile:.
+<div class="note">
+  <p><strong>Note on 'Early Access' and 'EAP'</strong></p>
+  <p>Between January 2015 and March 2016, VersionPress used to be available through the <strong>Early Access Program (EAP)</strong>. It was discontinued when VersionPress <a href="https://blog.versionpress.net/2016/04/going-open-source/">moved to a fully open development model</a> in April 2016.</p>
+  <p>Between April 2016 and May 2017, the term "Early Access" was used. We then switched to "Developer Preview" which better indicates the project status. See <a href="https://github.com/versionpress/versionpress/issues/1201">issue #1201</a>.</p>  
+</div>

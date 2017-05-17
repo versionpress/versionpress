@@ -68,7 +68,7 @@ The following discusses some of the important details if you want to contribute.
 
 Regarding **branches**, the current release being worked on is **`master`**. We do our best to keep it in a good shape but it might be unstable at times.
 
-**There's a long-running branch** for every major release named `1.x`, `2.x` etc. in case a fix needs to go there. Merging / cherry picking between `master` and long-running branches is always a bit tricky, see e.g. [this blog post](http://blogs.atlassian.com/2013/11/the-essence-of-branch-based-workflows/); generally, merge from older to newer (`1.x` -> `2.x` -> `master`), never the other way around. At the same time, we generally only want to support the latest and greatest and especially during the Early Access period, we don't care that much about the older releases.
+**There's a long-running branch** for every major release named `1.x`, `2.x` etc. in case a fix needs to go there. Merging / cherry picking between `master` and long-running branches is always a bit tricky, see e.g. [this blog post](http://blogs.atlassian.com/2013/11/the-essence-of-branch-based-workflows/); generally, merge from older to newer (`1.x` -> `2.x` -> `master`), never the other way around. At the same time, we generally only want to support the latest and greatest and especially during the Developer Preview period, we don't care that much about the older releases.
 
 We have quite a large **test suite** and every major feature usually has some tests around it, from small unit tests to large, Selenium-based functional tests. Please see [Testing](./docs/Testing.md) for more info.
 
