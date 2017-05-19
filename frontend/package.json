@@ -6,8 +6,9 @@
     "loglevel": "warn"
   },
   "scripts": {
-    "clean": "rimraf build/*",
+    "clean": "rimraf build/* && git clean -fx -- \"src/**.js\" \"src/**.map\"",
     "build": "webpack -p --config webpack/webpack.prod.js",
+    "tsc": "tsc --noEmit",
     "dev": "node webpack/webpack-dev-server.js --config webpack/webpack.dev.js --env.port 8888",
     "lint": "tslint src/**/*.{ts,tsx}",
     "pretest": "yarn lint",
