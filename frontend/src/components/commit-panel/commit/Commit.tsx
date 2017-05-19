@@ -29,25 +29,25 @@ export default class Commit extends React.Component<CommitProps, CommitState> {
     this.setState({
       commitMessage: '',
     });
-  };
+  }
 
   onCommitClick = () => {
     this.setState({
       isFormVisible: true,
     });
-  };
+  }
 
   onCommitMessageChange = (value: string) => {
     this.setState({
       commitMessage: value,
     });
-  };
+  }
 
   onCancelCommitClick = () => {
     this.setState({
       isFormVisible: false,
     });
-  };
+  }
 
   onDiscardClick = () => {
     const body = <div>This action cannot be undone, are you sure?</div>;
@@ -57,10 +57,10 @@ export default class Commit extends React.Component<CommitProps, CommitState> {
     };
 
     portal.confirmDialog('Warning', body, options);
-  };
+  }
 
   render() {
-    const { isFormVisible, commitMessage} = this.state;
+    const { isFormVisible, commitMessage } = this.state;
 
     return isFormVisible
       ? <Form

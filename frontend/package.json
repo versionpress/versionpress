@@ -38,6 +38,7 @@
     "style-loader": "^0.17.0",
     "superagent": "^3.5.2",
     "ts-loader": "^2.0.3",
+    "tslint-eslint-rules": "^4.0.0",
     "tslint-loader": "^3.5.3",
     "url-loader": "~0.5.7",
     "webpack": "^2.5.1"

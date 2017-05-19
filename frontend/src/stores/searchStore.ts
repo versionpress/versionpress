@@ -8,7 +8,7 @@ class SearchStore {
 
   @action setConfig = (config: SearchConfig) => {
     this.config = config;
-  };
+  }
 
 }
 

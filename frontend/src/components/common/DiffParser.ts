@@ -22,7 +22,7 @@ export default class DiffParser {
           diffs.push(diff);
         }
 
-        diff = {from: lineMatch[1], to: nextLineMatch[1], type: 'plain', chunks: []};
+        diff = { from: lineMatch[1], to: nextLineMatch[1], type: 'plain', chunks: [] };
         collectedLines = [];
         i++; // Skip the +++ line
 
@@ -30,12 +30,12 @@ export default class DiffParser {
         let addedFileMatch = lines[i - 1].match(/^diff --git (.*) (.*)/);
         let addDeleteMatch = line.match(/^(new|deleted) file mode .*/);
         addDeleteMatch[1] === 'new' ? addedFileMatch[1] = '/dev/null' : addedFileMatch[2] = '/dev/null';
-        diffs.push({from: addedFileMatch[1], to: addedFileMatch[2], chunks: [], type: 'plain'});
+        diffs.push({ from: addedFileMatch[1], to: addedFileMatch[2], chunks: [], type: 'plain' });
       } else if (line.match(/^(diff --git|index)/)) {
         // Skip line
       } else if (line.match(/^Binary files .* differ/)) {
         let binaryFilesMatch = line.match(/^Binary files (.*) and (.*) differ/);
-        diffs.push({from: binaryFilesMatch[1], to: binaryFilesMatch[2], chunks: [], type: 'binary'});
+        diffs.push({ from: binaryFilesMatch[1], to: binaryFilesMatch[2], chunks: [], type: 'binary' });
         collectedLines = [];
       } else {
         collectedLines.push(line);
@@ -51,12 +51,12 @@ export default class DiffParser {
 
   private static parseFileDiff(lines: string[]): Chunk[] {
     let chunks: Chunk[] = [];
-    let chunk: Chunk = {lines: []};
+    let chunk: Chunk = { lines: [] };
 
     for (let i = 0; i < lines.length; i++) {
       let line = lines[i];
       if (line.match(/^@@/)) {
-        chunk = {lines: []};
+        chunk = { lines: [] };
         chunks.push(chunk);
       }
 
@@ -69,7 +69,7 @@ export default class DiffParser {
           type = 'removed';
         }
 
-        chunk.lines.push({type: type, content: match[2]});
+        chunk.lines.push({ type, content: match[2] });
       }
 
     }

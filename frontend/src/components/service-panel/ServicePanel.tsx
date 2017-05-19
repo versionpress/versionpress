@@ -20,7 +20,7 @@ export default class ServicePanel extends React.Component<ServicePanelProps, {}>
   onButtonClick = () => {
     const { servicePanelStore } = this.props;
     servicePanelStore.toggleVisibility();
-  };
+  }
 
   render() {
     const { children, servicePanelStore } = this.props;

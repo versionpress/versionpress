@@ -22,15 +22,15 @@ export default class CommitPanel extends React.Component<CommitPanelProps, {}> {
   onDetailsLevelChange = (detailsLevel: DetailsLevel) => {
     const { commitPanelStore } = this.props;
     changeDetailsLevel(detailsLevel, commitPanelStore);
-  };
+  }
 
   onCommit = (message: string) => {
     commit(message);
-  };
+  }
 
   onDiscard = () => {
     discard();
-  };
+  }
 
   render() {
     const { commitPanelStore } = this.props;

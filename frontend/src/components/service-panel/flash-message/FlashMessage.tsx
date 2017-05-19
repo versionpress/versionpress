@@ -25,7 +25,7 @@ export default class FlashMessage extends React.Component<FlashMessageProps, Fla
     this.setState((prevState, props) => ({
       showDetails: !prevState.showDetails,
     }));
-  };
+  }
 
   render() {
     const { code, message, details } = this.props.message;

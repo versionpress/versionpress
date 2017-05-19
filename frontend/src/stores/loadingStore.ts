@@ -10,7 +10,7 @@ class LoadingStore {
 
   @action setLoading = (isLoading: boolean) => {
     this.progress = isLoading ? 0 : 100;
-  };
+  }
 
   @action setProgress = (progress: ProgressEvent | number) => {
     if (typeof progress === 'number') {
@@ -18,7 +18,7 @@ class LoadingStore {
     } else if (progress.total > 0) {
       this.progress = progress.loaded / progress.total * 100;
     }
-  };
+  }
 
 }
 

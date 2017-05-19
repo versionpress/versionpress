@@ -25,7 +25,7 @@ export default class Overview extends React.Component<OverviewProps, OverviewSta
     this.setState({
       isExpanded: true,
     });
-  };
+  }
 
   render() {
     const { gitStatus } = this.props;

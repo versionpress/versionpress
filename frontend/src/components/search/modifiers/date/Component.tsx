@@ -18,7 +18,7 @@ export default class DateComponent extends ModifierComponent<{}> {
       const newDate = moment(date).add(1, cursorLocationType);
       onChangeTokenModel(activeTokenIndex, newDate, false);
     }
-  };
+  }
 
   onDownClicked = () => {
     const { activeTokenIndex, adapter, token, onChangeTokenModel } = this.props;
@@ -30,7 +30,7 @@ export default class DateComponent extends ModifierComponent<{}> {
       const newDate = moment(date).subtract(1, cursorLocationType);
       onChangeTokenModel(activeTokenIndex, newDate, false);
     }
-  };
+  }
 
   onSelect = () => {
     const { activeTokenIndex, token, onChangeTokenModel } = this.props;
@@ -42,12 +42,12 @@ export default class DateComponent extends ModifierComponent<{}> {
 
     onChangeTokenModel(activeTokenIndex, value, true);
     return true;
-  };
+  }
 
   onDayClick = (e: any, day: any) => {
     const { activeTokenIndex, onChangeTokenModel } = this.props;
     onChangeTokenModel(activeTokenIndex, moment(day), true);
-  };
+  }
 
   getCursorLocationType = () => {
     const { cursor, token } = this.props;

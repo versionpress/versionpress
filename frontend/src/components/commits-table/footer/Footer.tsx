@@ -26,7 +26,7 @@ const Footer: React.StatelessComponent<FooterProps> = ({ pages }) => (
                 to={`/${routes.page}/${page}`}
                 key={page}
               >{page}</Link>;
-          })}
+        })}
       </td>
     </tr>
   </tfoot>

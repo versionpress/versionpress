@@ -35,7 +35,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
     const { commitsTableStore } = this.props;
 
     this.onCommitsSelect(commitsTableStore.commits, isChecked, false);
-  };
+  }
 
   onUndo = (hash: string, message: string) => {
     const title = (
@@ -43,7 +43,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
     );
 
     revertDialog(title, () => undoCommits([hash]));
-  };
+  }
 
   onRollback = (hash: string, date: string) => {
     const title = (
@@ -51,11 +51,11 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
     );
 
     revertDialog(title, () => rollbackToCommit(hash));
-  };
+  }
 
   onCommitsSelect = (commitsToSelect: Commit[], isChecked: boolean, isShiftKey: boolean) => {
     selectCommits(commitsToSelect, isChecked, isShiftKey);
-  };
+  }
 
   renderRow = (commitRow: CommitRow, displayNotAbleNote: boolean) => {
     const { appStore, commitsTableStore } = this.props;
@@ -83,7 +83,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
     }
 
     return [row];
-  };
+  }
 
   render() {
     const { appStore, commitsTableStore, navigationStore, loadingStore } = this.props;

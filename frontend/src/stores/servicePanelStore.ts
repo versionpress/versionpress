@@ -9,11 +9,11 @@ class ServicePanelStore {
 
   @action setMessage = (message: InfoMessage) => {
     this.message = message;
-  };
+  }
 
   @action toggleVisibility = (isVisible?: boolean) => {
     this.isVisible = typeof isVisible === 'boolean' ? isVisible : !this.isVisible;
-  };
+  }
 
 }
 

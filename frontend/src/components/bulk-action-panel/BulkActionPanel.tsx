@@ -51,7 +51,7 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
     this.setState({
       options: newOptions,
     });
-  };
+  }
 
   onSubmit = () => {
     const selectedOption = this.state.options.find(option => option.isSelected);
@@ -61,7 +61,7 @@ export default class BulkActionPanel extends React.Component<BulkActionPanelProp
     }
 
     this.props.onBulkAction(selectedOption.value);
-  };
+  }
 
   render() {
     const { changesCount, enableActions, onClearSelection } = this.props;

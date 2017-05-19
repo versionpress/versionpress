@@ -25,7 +25,7 @@
  *
  */
 export function groupBy<T>(array: T[], keyExtractorFn: (T) => string|string[]) {
-  var result = {};
+  let result = {};
   array.forEach(item => {
     let keys: any = keyExtractorFn(item);
     if (typeof(keys) === 'string') {
@@ -107,15 +107,15 @@ export function countDuplicates<T>(array: T[], fn: (T) => any|any[]) {
 }
 
 /**
- * Returns a value in the array, if an element in the array satisfies the provided testing function. 
+ * Returns a value in the array, if an element in the array satisfies the provided testing function.
  * Otherwise undefined is returned.
  */
 export function find<T>(list: T[], predicate: (element?: T, index?: number, array?: T[]) => boolean) {
   /* tslint:disable:no-bitwise */
-  var length = list.length >>> 0;
-  var value;
+  let length = list.length >>> 0;
+  let value;
 
-  for (var i = 0; i < length; i++) {
+  for (let i = 0; i < length; i++) {
     value = list[i];
     if (predicate.call(undefined, value, i, list)) {
       return value;

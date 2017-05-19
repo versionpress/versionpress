@@ -40,13 +40,13 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
     if (commit.isEnabled) {
       onDetailsLevelChange(detailsLevel === DetailsLevel.None ? DetailsLevel.Overview : DetailsLevel.None);
     }
-  };
+  }
 
   onCheckboxClick = (shiftKey: boolean) => {
     const { commit, isSelected, onCommitsSelect } = this.props;
 
     onCommitsSelect([commit], !isSelected, shiftKey);
-  };
+  }
 
   onUndoClick = () => {
     const { commit, enableActions, onUndo } = this.props;
@@ -61,7 +61,7 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
     } else {
       this.displayDisabledDialog();
     }
-  };
+  }
 
   onRollbackClick = () => {
     const { commit, enableActions, onRollback } = this.props;
@@ -71,7 +71,7 @@ export default class CommitSummary extends React.Component<CommitSummaryProps, {
     } else {
       this.displayDisabledDialog();
     }
-  };
+  }
 
   private displayUndoMergeDialog() {
     portal.alertDialog(

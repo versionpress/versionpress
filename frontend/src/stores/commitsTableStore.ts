@@ -56,7 +56,7 @@ class CommitsTableStore {
     if (localStorage) {
       localStorage.setItem('showVisualization', this.showVisualisation ? 'true' : '');
     }
-  };
+  }
 
   @action setCommitRows = (commitRows: CommitRow[]) => {
     this.commitRows = commitRows;
@@ -97,17 +97,17 @@ class CommitsTableStore {
         environments[visualization[i].environment] = true;
       }
     });
-  };
+  }
 
   @action setPages = (pages: number[]) => {
     this.pages = pages;
-  };
+  }
 
   @action setSelectedCommits = (selectedCommits: Commit[]) => {
     this.commitRows.forEach(commitRow => {
       commitRow.isSelected = indexOf(selectedCommits, commitRow.commit) !== -1;
     });
-  };
+  }
 
   @action reset = () => {
     this.commitRows = [];

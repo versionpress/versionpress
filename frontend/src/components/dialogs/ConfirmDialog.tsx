@@ -32,13 +32,13 @@ export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {
     if (this.props.onOkButtonClick() !== false) {
       portal.closePortal();
     }
-  };
+  }
 
   onCancelClick = () => {
     if (this.props.onCancelButtonClick() !== false) {
       portal.closePortal();
     }
-  };
+  }
 
   render() {
     const {

@@ -16,7 +16,7 @@ export default class Notice extends React.Component<CommitPanelNoticeProps, {}> 
 
     const { detailsLevel, onDetailsLevelChange } = this.props;
     onDetailsLevelChange(detailsLevel === DetailsLevel.None ? DetailsLevel.Overview : DetailsLevel.None);
-  };
+  }
 
   render() {
     const { detailsLevel } = this.props;

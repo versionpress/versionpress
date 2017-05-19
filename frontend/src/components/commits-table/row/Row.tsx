@@ -27,7 +27,7 @@ export default class Row extends React.Component<RowProps, {}> {
   onDetailsLevelChange = (detailsLevel: DetailsLevel) => {
     const { commitRow } = this.props;
     changeDetailsLevel(detailsLevel, commitRow);
-  };
+  }
 
   render() {
     const {

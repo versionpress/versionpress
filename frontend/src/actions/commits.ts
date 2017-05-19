@@ -60,15 +60,15 @@ export function fetchCommits (page: number | string = appStore.page) {
         }
       });
     });
-};
+}
 
 export function undoCommits(commits: string[]) {
-  wpUndoRollback('undo', { commits: commits });
-};
+  wpUndoRollback('undo', { commits });
+}
 
 export function rollbackToCommit(hash: string) {
   wpUndoRollback('rollback', { commit: hash });
-};
+}
 
 function wpUndoRollback(name: string, query: any) {
   loadingStore.setLoading(true);

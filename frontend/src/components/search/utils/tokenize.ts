@@ -67,11 +67,11 @@ export function createToken(text: string, config: SearchConfig = {}) {
 
   return {
     key: 'token-' + counter++,
-    modifier: modifier,
-    value: value,
-    type: type,
-    negative: negative,
-    length: length,
+    modifier,
+    value,
+    type,
+    negative,
+    length,
   };
 }
 

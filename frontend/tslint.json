@@ -1,9 +1,59 @@
 {
-    "defaultSeverity": "warning",
-    "extends": [
-        "tslint:recommended"
-    ],
-    "jsRules": {},
-    "rules": {},
-    "rulesDirectory": []
+    "rulesDirectory": ["node_modules/tslint-eslint-rules/dist/rules"],
+    "rules": {
+        "array-bracket-spacing": [
+            true,
+            "never",
+            {
+                "singleValue": false,
+                "objectsInArrays": false,
+                "arraysInArrays": false
+            }
+        ],
+        "block-spacing": [true, "always"],
+        "brace-style": [true, "1tbs", {"allowSingleLine": true}],
+        "class-name": true,
+        "comment-format": [true, "check-space"],
+        "curly": true,
+        "eofline": true,
+        "linebreak-style": [true, "LF"],
+        "no-conditional-assignment": true,
+        "no-consecutive-blank-lines": [true],
+        "no-constant-condition": true,
+        "no-duplicate-variable": true,
+        "no-eval": true,
+        "no-extra-boolean-cast": true,
+        "no-internal-module": true,
+        "no-multi-spaces": [true],
+        "no-trailing-whitespace": true,
+        "no-unused-variable": [false, {"ignore-pattern": "React"}],
+        "no-var-keyword": true,
+        "object-curly-spacing": [true, "always"],
+        "object-literal-shorthand": true,
+        "one-line": [true, "check-open-brace", "check-whitespace"],
+        "quotemark": [true, "single"],
+        "semicolon": [true, "always"],
+        "ter-indent": [true, 2, { "SwitchCase": 1 }],
+        "triple-equals": [true, "allow-null-check"],
+        "trailing-comma": [false, {"multiline": "always", "singleline": "never"}],
+        "typedef-whitespace": [
+            true,
+            {
+                "call-signature": "nospace",
+                "index-signature": "nospace",
+                "parameter": "nospace",
+                "property-declaration": "nospace",
+                "variable-declaration": "nospace"
+            }
+        ],
+        "variable-name": [true, "ban-keywords"],
+        "whitespace": [
+            true,
+            "check-branch",
+            "check-decl",
+            "check-operator",
+            "check-separator",
+            "check-type"
+        ]
+    }
 }

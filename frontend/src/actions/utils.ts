@@ -86,9 +86,9 @@ export function generateGraphData(commits: CommitGraph[]): CommitNode[] {
 
     const insertToRoutes = (from, to, branch) => {
       routes.push({
-        from: from,
-        to: to,
-        branch: branch,
+        from,
+        to,
+        branch,
         environment: environments[branch],
       });
     };
@@ -133,10 +133,10 @@ export function generateGraphData(commits: CommitGraph[]): CommitNode[] {
     }
 
     nodes.push({
-      branch: branch,
+      branch,
       environment: commit.environment,
-      offset: offset,
-      routes: routes,
+      offset,
+      routes,
       sha: commit.sha,
     });
   });
