@@ -51,8 +51,8 @@ export function fetchCommits (page: number | string = appStore.page) {
             commitsTableStore.toggleShowVisualisation(false);
           }
           commitsTableStore.setPages(data.pages.map(c => c + 1));
-          commitsTableStore.setCommitRows(data.commits.map(commit => (
-            new CommitRow(commit, indexOf(appStore.selectedCommits, commit) !== -1))
+          commitsTableStore.setCommitRows(data.commits.map(commit =>
+            new CommitRow(commit, indexOf(appStore.selectedCommits, commit) !== -1)
           ));
           servicePanelStore.setMessage(null);
 

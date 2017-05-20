@@ -35,7 +35,20 @@
         "semicolon": [true, "always"],
         "ter-indent": [true, 2, { "SwitchCase": 1 }],
         "triple-equals": [true, "allow-null-check"],
-        "trailing-comma": [false, {"multiline": "always", "singleline": "never"}],
+        "trailing-comma": [
+          true,
+          {
+            "singleline": "never",
+            "multiline": {
+              "arrays": "always",
+              "objects": "always",
+              "functions": "ignore",
+              "imports": "always",
+              "exports": "always",
+              "typeLiterals": "always"
+            }
+          }
+        ],
         "typedef-whitespace": [
             true,
             {

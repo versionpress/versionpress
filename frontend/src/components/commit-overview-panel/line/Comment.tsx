@@ -13,9 +13,9 @@ const Comment: React.StatelessComponent<LineProps> = ({ changes }) => {
   const postTitle = changes[0].tags['VP-Comment-PostTitle'];
 
   const count = changes.length;
-  const authors = ArrayUtils.filterDuplicates(changes.map((change: Change) => (
+  const authors = ArrayUtils.filterDuplicates(changes.map((change: Change) =>
     change.tags['VP-Comment-Author'])
-  ));
+  );
 
   const authorsString = StringUtils.join(authors);
   const actionVerb = getActionVerb(action);
