@@ -3,7 +3,7 @@
 import * as request from 'superagent';
 
 import config from '../config/config';
-import {getValidVPJSON} from '../utils/StringUtils';
+import { getValidVPJSON } from '../utils/StringUtils';
 
 request.parse['application/json'] = function(str: string) {
   let parsedJSON;
@@ -20,7 +20,7 @@ request.parse['application/json'] = function(str: string) {
 };
 
 const noCache = function (request) {
-  var timestamp = Date.now().toString();
+  let timestamp = Date.now().toString();
   request.query(timestamp);
   return request;
 };

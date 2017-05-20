@@ -4,7 +4,7 @@
 import * as React from 'react';
 
 import ModifierComponent from '../ModifierComponent';
-import {PopupProps} from '../../popup/Popup';
+import { PopupProps } from '../../popup/Popup';
 import Item from './Item';
 
 const ITEMS_COUNT = 6;
@@ -40,7 +40,7 @@ export default class ListComponent extends ModifierComponent<ListComponentState>
         ? len - 1
         : currentIndex - 1,
     });
-  };
+  }
 
   onDownClicked = () => {
     const len = this.getFlatList().length;
@@ -54,7 +54,7 @@ export default class ListComponent extends ModifierComponent<ListComponentState>
         ? 0
         : currentIndex + 1,
     });
-  };
+  }
 
   onSelect = () => {
     const { currentIndex } = this.state;
@@ -69,7 +69,7 @@ export default class ListComponent extends ModifierComponent<ListComponentState>
     const model = list[currentIndex];
     onChangeTokenModel(activeTokenIndex, model, true);
     return true;
-  };
+  }
 
   onSelectItem = (index: number) => {
     this.setState({
@@ -104,9 +104,9 @@ export default class ListComponent extends ModifierComponent<ListComponentState>
         : groupedObject[key].slice(0, MAX_ITEMS_COUNT);
 
       return {
-        section: section,
-        priority: priority,
-        list: list,
+        section,
+        priority,
+        list,
       };
     });
   }
@@ -165,4 +165,4 @@ export default class ListComponent extends ModifierComponent<ListComponentState>
     );
   }
 
-};
+}

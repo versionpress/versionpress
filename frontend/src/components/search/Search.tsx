@@ -41,29 +41,29 @@ export default class Search extends React.Component<SearchProps, SearchState> {
 
   componentDidUpdate = () => {
     this.scrollBackground();
-  };
+  }
 
   onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     this.setCursorLocation(-1);
-  };
+  }
 
   onClick = (e: React.MouseEvent<HTMLInputElement>) => {
     this.setCursorLocation(e.currentTarget.selectionStart);
-  };
+  }
 
   onCut = (e: React.ClipboardEvent<HTMLInputElement>) => {
     this.setCursorLocation(e.currentTarget.selectionStart);
     this.setState({
       inputValue: e.currentTarget.value,
     });
-  };
+  }
 
   onPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     this.setCursorLocation(e.currentTarget.selectionStart);
     this.setState({
       inputValue: e.currentTarget.value,
     });
-  };
+  }
 
   onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     switch (e.keyCode) {
@@ -126,7 +126,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     }
 
     this.props.onChange(e.currentTarget.value);
-  };
+  }
 
   onChange = (e: React.FormEvent<HTMLInputElement>) => {
     if (e.currentTarget.value !== this.state.inputValue) {
@@ -223,7 +223,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
 
   getTokenEndCursorPos(tokens: Token[], tokenIndex: number) {
     let sum = 0;
-    for (var i = 0; i < tokens.length; i++) {
+    for (let i = 0; i < tokens.length; i++) {
       sum += tokens[i].length;
       if (i === tokenIndex) {
         break;
@@ -240,7 +240,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     let start: number;
     let end: number;
 
-    for (var i = 0; i < tokens.length; i++) {
+    for (let i = 0; i < tokens.length; i++) {
       token = tokens[i];
 
       start = prev;

@@ -40,18 +40,18 @@ export default class Modal extends React.Component<ModalProps, {}> {
     if (this.props.enableBackgroundClickToClose) {
       this.closeModal();
     }
-  };
+  }
 
   onContentKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.keyCode === 27 && this.props.showCloseIcon) {
       this.closeModal();
     }
-  };
+  }
 
   private closeModal = () => {
     this.props.onClose();
     portal.closePortal();
-  };
+  }
 
   render() {
     const { children, showCloseIcon, title } = this.props;

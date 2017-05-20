@@ -20,7 +20,7 @@ export default class Navigation extends React.Component<NavigationProps, {}> {
   onFilterQueryChange = (query: string) => {
     const { navigationStore } = this.props;
     navigationStore.changeFilterQuery(query);
-  };
+  }
 
   onBulkAction = (action: string) => {
     if (action === 'undo') {
@@ -32,7 +32,7 @@ export default class Navigation extends React.Component<NavigationProps, {}> {
 
       revertDialog(title, () => undoCommits(hashes));
     }
-  };
+  }
 
   render() {
     const { appStore, navigationStore } = this.props;

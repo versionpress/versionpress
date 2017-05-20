@@ -4,6 +4,7 @@
     "sourceMap": true,
     "target": "es5",
     "jsx": "react",
+    "lib": ["es2016", "dom"],
     "experimentalDecorators": true
   },
   "include": [

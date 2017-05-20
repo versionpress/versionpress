@@ -1,3 +1,3 @@
-# VersionPress GUI #
+# VersionPress frontend
 
-* Development environment setup etc: http://wiki.agilio.cz/versionpress:dokumentace
+The UI of VersionPress is implemented as a React single-page application. See [Dev-Setup](../docs/Dev-Setup.md) for more.

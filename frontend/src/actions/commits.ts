@@ -51,8 +51,8 @@ export function fetchCommits (page: number | string = appStore.page) {
             commitsTableStore.toggleShowVisualisation(false);
           }
           commitsTableStore.setPages(data.pages.map(c => c + 1));
-          commitsTableStore.setCommitRows(data.commits.map(commit => (
-            new CommitRow(commit, indexOf(appStore.selectedCommits, commit) !== -1))
+          commitsTableStore.setCommitRows(data.commits.map(commit =>
+            new CommitRow(commit, indexOf(appStore.selectedCommits, commit) !== -1)
           ));
           servicePanelStore.setMessage(null);
 
@@ -60,15 +60,15 @@ export function fetchCommits (page: number | string = appStore.page) {
         }
       });
     });
-};
+}
 
 export function undoCommits(commits: string[]) {
-  wpUndoRollback('undo', { commits: commits });
-};
+  wpUndoRollback('undo', { commits });
+}
 
 export function rollbackToCommit(hash: string) {
   wpUndoRollback('rollback', { commit: hash });
-};
+}
 
 function wpUndoRollback(name: string, query: any) {
   loadingStore.setLoading(true);

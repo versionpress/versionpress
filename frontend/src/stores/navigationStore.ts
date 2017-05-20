@@ -19,7 +19,7 @@ class NavigationStore {
 
   @action changeFilterQuery = (query: string) => {
     this.query = query;
-  };
+  }
 
   @action changeActiveQuery = (activeQuery: string) => {
     this.activeQuery = activeQuery;

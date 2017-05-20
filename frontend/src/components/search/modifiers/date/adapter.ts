@@ -10,7 +10,7 @@ const DATE_FORMAT_REGEXP = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$/;
 
 const DateAdapter = (config: SearchConfigItem): Adapter => ({
 
-  autoComplete: function(token: Token) {
+  autoComplete: (token: Token) => {
     const { value } = token;
 
     const hints = this.getHints(token);
@@ -20,11 +20,11 @@ const DateAdapter = (config: SearchConfigItem): Adapter => ({
     }
   },
 
-  getDefaultHint: function() {
+  getDefaultHint: () => {
     return moment().format(DATE_FORMAT);
   },
 
-  getHints: function(token: Token) {
+  getHints: (token: Token) => {
     if (token) {
       const possibleValues = [moment().format(DATE_FORMAT)];
       return getMatch(token.value, possibleValues);
@@ -32,11 +32,11 @@ const DateAdapter = (config: SearchConfigItem): Adapter => ({
     return [];
   },
 
-  isValueValid: function(value: string) {
+  isValueValid: (value: string) => {
     return DATE_FORMAT_REGEXP.test(value) && moment(value, DATE_FORMAT).isValid();
   },
 
-  serialize: function(date: any) {
+  serialize: (date: any) => {
     if (!date) {
       return '';
     }
@@ -49,7 +49,7 @@ const DateAdapter = (config: SearchConfigItem): Adapter => ({
     return (date as moment.Moment).format(DATE_FORMAT);
   },
 
-  deserialize: function(value: string) {
+  deserialize: (value: string) => {
     return null;
   },
 

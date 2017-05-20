@@ -50,7 +50,7 @@ function preprocessLinesByTypeAndAction(changes: Change[], type: string, action:
   }
   return [{
     key: type + '-' + action,
-    changes: changes,
+    changes,
   }];
 }
 

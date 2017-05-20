@@ -20,6 +20,7 @@ Make sure these tools are installed on your computer:
     - DB commands expect `mysql` in PATH
 - [Node.js](http://nodejs.org/)
     - [Python 2.x](https://www.python.org/downloads/) is required to build some NPM modules
+- [Yarn](https://yarnpkg.com/) – the `frontend` project uses it
 - [Gulp](http://gulpjs.com/) (globally)
 
 
@@ -174,7 +175,7 @@ Create new deployment and set it up like this:
 For pure frontend development, it's more convenient to run it outside of the WordPress administration. To do that:
 
 1. Copy `frontend/src/config/config.local.sample.ts` to `frontend/src/config/config.local.ts` and enter your local values.
-2. Find the `plugins/versionpress/bootstrap.php` file inside the live WordPress / VersionPress installation and redefine the `VERSIONPRESS_REQUIRE_API_AUTH` constant to `false`.
+2. Disable API authentication in your WordPress installation's `wp-config.php`: `define( 'VERSIONPRESS_REQUIRE_API_AUTH', false );`
 3. Run `npm run dev` in the `frontend` directory. This launches [webpack dev server](http://webpack.github.io/docs/webpack-dev-server.html) on the default URL http://localhost:8888. Changed files are automatically reflected in the browser.
 
 To deploy the JS app into the WordPress backend, you can use `gulp test-deploy` task in the project root.

@@ -1,12 +1,14 @@
-# IDEA project files
+# Project files
 /.idea
 
-# Build dirs
+# Build artifacts
 /build
-/node_modules
+/src/**/*.js
+/src/**/*.js.map
 
 # Local config files
 /src/config/config.local.ts
 
 # Other
-tsd-debug.log
+/node_modules
+yarn-error.log

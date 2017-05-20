@@ -23,7 +23,7 @@ function getAllModifiers(config: SearchConfig): SearchConfigItemContent[] {
       value: key,
       label: configItem.type === 'date' ? moment().format('YYYY-MM-DD') : configItem.defaultHint,
       modifier: true,
-      section: section,
+      section,
     });
   }
   return modifiers;

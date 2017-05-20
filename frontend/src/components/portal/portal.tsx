@@ -2,13 +2,13 @@ import * as React from 'react';
 import * as DOM from 'react-dom';
 import * as request from 'superagent';
 
-import ConfirmDialog, {ConfirmDialogProps} from '../dialogs/ConfirmDialog';
+import ConfirmDialog, { ConfirmDialogProps } from '../dialogs/ConfirmDialog';
 import UndoEnabledDialog from '../dialogs/UndoEnabledDialog';
 import UndoDisabledDialog from '../dialogs/UndoDisabledDialog';
 import Modal from '../modal/Modal';
 import * as WpApi from '../../services/WpApi';
 
-var portalNode;
+let portalNode;
 
 export function alertDialog(title: React.ReactNode, body: React.ReactNode) {
   closePortal();

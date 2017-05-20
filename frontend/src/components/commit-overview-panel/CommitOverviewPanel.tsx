@@ -29,7 +29,7 @@ export default class CommitOverviewPanel extends React.Component<CommitOverviewP
     this.setState((prevState, props) => ({
       expandedLists: prevState.expandedLists.concat([listKey]),
     }));
-  };
+  }
 
   renderLines = (lines: PreprocessedLine[]) => {
     const { commit } = this.props;
@@ -42,7 +42,7 @@ export default class CommitOverviewPanel extends React.Component<CommitOverviewP
       return [<NoChanges />];
     }
 
-    return lines.map(({key, changes}) => (
+    return lines.map(({ key, changes }) => (
       <li key={key}>
         <Line
           changes={changes}
@@ -51,7 +51,7 @@ export default class CommitOverviewPanel extends React.Component<CommitOverviewP
         />
       </li>
     ));
-  };
+  }
 
   render() {
     const { commit } = this.props;

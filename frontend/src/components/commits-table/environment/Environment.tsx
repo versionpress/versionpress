@@ -77,4 +77,4 @@ export default class Environment extends React.Component<EnvironmentProps, {}> {
     );
   }
 
-};
+}

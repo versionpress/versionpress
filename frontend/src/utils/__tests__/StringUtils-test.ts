@@ -1,6 +1,6 @@
-import {expect} from 'chai';
+import { expect } from 'chai';
 
-import {getValidVPJSON} from '../StringUtils';
+import { getValidVPJSON } from '../StringUtils';
 
 describe('getValidVPJSON', () => {
   it('correctly returns valid JSON', () => {
@@ -38,11 +38,11 @@ describe('getValidVPJSON', () => {
 
   it('works with any string around the valid JSON', () => {
     const objects = [
-      ['     {"__VP__": true}     ',            '{"__VP__": true}'],
-      ['{} {"__VP__": true} }{}',               '{"__VP__": true}'],
-      ['"{"__VP__": true}"',                    '{"__VP__": true}'],
-      ['{"hello": "world", {"__VP__": true}',   '{"__VP__": true}'],
-      ['{"test": "object"} {"__VP__": true}}',  '{"__VP__": true}'],
+      ['     {"__VP__": true}     ', '{"__VP__": true}'],
+      ['{} {"__VP__": true} }{}', '{"__VP__": true}'],
+      ['"{"__VP__": true}"', '{"__VP__": true}'],
+      ['{"hello": "world", {"__VP__": true}', '{"__VP__": true}'],
+      ['{"test": "object"} {"__VP__": true}}', '{"__VP__": true}'],
       [
         '{"a": 1, {"hello": "world", "test": {"__VP__": true, "hello": "world"}}}',
         '{"hello": "world", "test": {"__VP__": true, "hello": "world"}}', // Max 2 levels deep

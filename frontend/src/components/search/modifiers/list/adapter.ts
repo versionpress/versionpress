@@ -6,7 +6,7 @@ import * as ArrayUtils from '../../../../utils/ArrayUtils';
 
 const ListAdapter = (config: SearchConfigItem): Adapter => ({
 
-  autoComplete: function(token: Token) {
+  autoComplete: (token: Token) => {
     const value = trim(token.value, true);
     const hints = this.getHints(token);
     const hint = hints[0];
@@ -19,13 +19,13 @@ const ListAdapter = (config: SearchConfigItem): Adapter => ({
     return null;
   },
 
-  getDefaultHint: function() {
+  getDefaultHint: () => {
     return config
       ? config.defaultHint
       : '';
   },
 
-  getHints: function(token: Token) {
+  getHints: (token: Token) => {
     const list = config && config.content;
 
     if (list && list.length) {
@@ -50,7 +50,7 @@ const ListAdapter = (config: SearchConfigItem): Adapter => ({
     return [];
   },
 
-  isValueValid: function(value: string) {
+  isValueValid: (value: string) => {
     const list = config && config.content;
 
     if (list) {
@@ -59,7 +59,7 @@ const ListAdapter = (config: SearchConfigItem): Adapter => ({
     return !!value;
   },
 
-  serialize: function(item: SearchConfigItemContent) {
+  serialize: (item: SearchConfigItemContent) => {
     if (!item) {
       return null;
     }
@@ -69,7 +69,7 @@ const ListAdapter = (config: SearchConfigItem): Adapter => ({
     return '"' + item.value + '"';
   },
 
-  deserialize: function(value: string) {
+  deserialize: (value: string) => {
     const list = config && config.content;
 
     if (list) {
