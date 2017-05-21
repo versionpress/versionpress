@@ -21,6 +21,7 @@ This leaves you with a working development environment:
 
 - VersionPress is mapped to container's `wp-content/plugins` so you can start hacking. (The `./frontend` project requires a rebuild, see below.)
 - Database can be inspected at `http://localhost:8088`, server name: `db`, login info: see `docker-compose.yml`.
+    - You can also use local tools like MySQL Workbench or `mysql` command-line client, the server is exposed on port `3366`. For example: `mysql --port=3366 -u root -p`.
 - WordPress site root from the container is mapped to `./dev-env/wp` where you can inspect the files and Git history using your favorite tool.
 - To invoke certain binaries, e.g., WP-CLI, in the context of a test WordPress site, you have these options:
     - SSH into container the container: `docker-compose exec wordpress /bin/bash`
