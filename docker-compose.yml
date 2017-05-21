@@ -1,0 +1,33 @@
+version: '3.1'
+services:
+
+  wordpress:
+    build: ./dev-env
+    image: versionpress/wordpress
+    ports:
+      - 8088:80
+    volumes:
+      - ./plugins/versionpress:/var/www/html/wp-content/plugins/versionpress
+    depends_on:
+      - mysql
+    environment:
+      WORDPRESS_DB_PASSWORD: r00tpwd
+
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: r00tpwd
+  
+  adminer:
+    image: adminer
+    ports:
+      - 8099:8080
+    links:
+      - mysql:db
+    depends_on:
+      - mysql
+
+volumes:
+  db_data:
