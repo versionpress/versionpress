@@ -8,6 +8,7 @@ services:
       - 8088:80
     volumes:
       - ./plugins/versionpress:/var/www/html/wp-content/plugins/versionpress
+      - ./dev-env/wp:/var/www/html
     depends_on:
       - mysql
     environment:

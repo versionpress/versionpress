@@ -19,11 +19,13 @@ Then run:
 
 This leaves you with a working development environment:
 
-- **PHP source files** at `./plugins/versionpress` are mapped into the container, any changes are immediately reflected.
-    - Frontend (the UI) is a React single page app that requires a rebuild. See below for instructions. 
-- **DB** can be inspected at `http://localhost:8088`, server name `db`, login info form `docker-compose.yml`.
-- **WP-CLI**: invoke `docker-compose exec wordpress wp <command>` in a new console, e.g., `docker-compose exec wordpress wp option update blogname "Hello"`.
-    - Create an alias if you use this often.
-- **Git**: `docker-compose exec wordpress git log`.
+- VersionPress is mapped to container's `wp-content/plugins` so you can start hacking. (The `./frontend` project requires a rebuild, see below.)
+- Database can be inspected at `http://localhost:8088`, server name: `db`, login info: see `docker-compose.yml`.
+- WordPress site root from the container is mapped to `./dev-env/wp` where you can inspect the files and Git history using your favorite tool.
+- To invoke certain binaries, e.g., WP-CLI, in the context of a test WordPress site, you have these options:
+    - SSH into container the container: `docker-compose exec wordpress /bin/bash`
+    - Use `docker-compose exec wordpress <command>`, for example:
+        - `docker-compose exec wordpress wp option update blogname "Hello"`
+        - `docker-compose exec wordpress git log`
 - Stop all Docker services: `Ctrl+C` in the console.
     - `docker-compose down -v` to clear up everything if you want to start fresh.
