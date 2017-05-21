@@ -36,6 +36,7 @@ This leaves you with a working development environment:
 Next steps:
 
 - [Debugging](#debugging)
+- [PhpStorm tips](#phpstorm)
 
 ## Debugging
 
@@ -55,4 +56,24 @@ Debugging should now work:
 
 ![image](https://cloud.githubusercontent.com/assets/101152/26285090/bb8aa432-3e48-11e7-973a-944abfe0039e.png)
     
+<div id="phpstorm"></div>
 
+## PhpStorm tips
+
+The initial `npm install` copies `.idea` to `./plugins/versionpress` where most things are already configured, however, some manual steps are still needed.
+
+On the first PhpStorm start, you'll see two prompts:
+
+![image](https://cloud.githubusercontent.com/assets/101152/26286846/c369a5b0-3e6e-11e7-8781-c1a3c8446aa6.png)
+
+Enable **WordPress support** but leave the installation path empty (ignore the warning):
+
+![image](https://cloud.githubusercontent.com/assets/101152/26286883/6d11d22c-3e6f-11e7-94eb-a4c0287fb181.png)
+
+Also initialize the **Composer** support:
+
+![image](https://cloud.githubusercontent.com/assets/101152/26286903/c2d1befc-3e6f-11e7-9296-062fbed20983.png)
+
+For **Code Sniffer** inspections to work, there's a one-time configuration: Go to *Settings* > *PHP* > *Code Sniffer*, select *Local*, click the three dots next to it and provide your full system path to `./vendor/bin/phpcs`. After this is done, PhpStorm will start checking the code style.
+
+> Note: the same checks run on Travis CI once the code is pushed to GitHub so it's useful to have that configured in PhpStorm.
