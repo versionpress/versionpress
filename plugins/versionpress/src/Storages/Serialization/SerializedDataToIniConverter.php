@@ -147,6 +147,7 @@ class SerializedDataToIniConverter
 
                     $attributeName = str_replace("\0*\0", '*', $attributeName);
                     $attributeName = str_replace("\0{$className}\0", '-', $attributeName);
+                    $attributeName = preg_replace("/^\\0(.*)\\0(.*)$/", "-\$1->\$2", $attributeName);
 
                     $attributeValue = self::parseSerializedString();
 
@@ -337,8 +338,15 @@ class SerializedDataToIniConverter
                 return "\"\0*\0" . substr($subkey, 2);
             }
 
-            if (strpos($subkey, '-') === 1) {
+            $objectOperatorPosition = strpos($subkey, '->');
+            if (strpos($subkey, '-') === 1 && $objectOperatorPosition === false) {
                 return "\"\0{$type}\0" . substr($subkey, 2);
+            }
+
+            if (strpos($subkey, '-') === 1) {
+                $parentClass = str_replace('\\\\', '\\', substr($subkey, 2, $objectOperatorPosition - 2));
+                $attributeName = substr($subkey, $objectOperatorPosition + 2, strlen($subkey) - 2);
+                return "\"\0{$parentClass}\0{$attributeName}";
             }
 
             return $subkey;

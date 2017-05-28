@@ -60,3 +60,8 @@ class IniSerializer_FooWithCleanup
         return 'cached attribute: ' . $attribute;
     }
 }
+
+class IniSerializer_FooPrivateChild extends IniSerializer_FooPrivate
+{
+
+}
