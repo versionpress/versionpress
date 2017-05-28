@@ -41,6 +41,9 @@ class TrackedChangeInfo implements ChangeInfo
     /** @var string */
     private $commitMessageSubject;
 
+    /** @var number */
+    private $priority;
+
     /**
      * VP tag common to all tracked change infos. It is the only required tag for them.
      */
@@ -137,7 +140,15 @@ class TrackedChangeInfo implements ChangeInfo
 
     public function getPriority()
     {
-        return $this->actionsInfo->getActionPriority($this->getAction());
+        if (!$this->priority) {
+
+            $defaultPriority = $this->actionsInfo->getActionPriority($this->getAction());
+
+            $scope = $this->scope;
+            $this->priority = apply_filters("vp_action_priority_{$scope}", $defaultPriority, $this->getAction(), $this->getId());
+        }
+
+        return $this->priority;
     }
 
     /**
