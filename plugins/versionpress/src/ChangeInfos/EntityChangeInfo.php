@@ -35,10 +35,11 @@ class EntityChangeInfo extends TrackedChangeInfo
      * @param string $entityId
      * @param array $customTags
      * @param array $customFiles
+     * @param int $priority
      */
-    public function __construct($entityInfo, $actionsInfo, $action, $entityId, $customTags = [], $customFiles = [])
+    public function __construct($entityInfo, $actionsInfo, $action, $entityId, $customTags = [], $customFiles = [], $priority = 10)
     {
-        parent::__construct($entityInfo->entityName, $actionsInfo, $action, $entityId, $customTags, $customFiles);
+        parent::__construct($entityInfo->entityName, $actionsInfo, $action, $entityId, $customTags, $customFiles, $priority);
         $this->entityInfo = $entityInfo;
         $this->actionsInfo = $actionsInfo;
     }
