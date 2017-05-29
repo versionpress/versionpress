@@ -157,13 +157,13 @@ add_filter('vp_entity_files_option', function ($files, $oldEntity, $newEntity) {
     return $files;
 }, 10, 3);
 
-add_filter('vp_action_priority_option', function ($originalPriority, $action, $optionName) {
-    if ($optionName === 'WPLANG' && $action === 'create') {
-        return 12;
+add_filter('vp_action_priority_option', function ($originalPriority, $action, $optionName, $entity) {
+    if ($optionName === 'WPLANG' && $action === 'create' && $entity['option_value'] === '') {
+        return 20;
     }
 
     return $originalPriority;
-}, 10, 3);
+}, 10, 4);
 
 add_filter('vp_entity_action_comment', function ($action, $oldEntity, $newEntity) {
 

@@ -49,7 +49,7 @@ class TrackedChangeInfo implements ChangeInfo
      */
     const ACTION_TAG = "VP-Action";
 
-    public function __construct($scope, $actionsInfo, $action, $id, $customTags = [], $customFiles = [])
+    public function __construct($scope, $actionsInfo, $action, $id, $customTags = [], $customFiles = [], $priority = 10)
     {
         $this->scope = $scope;
         $this->actionsInfo = $actionsInfo;
@@ -57,6 +57,7 @@ class TrackedChangeInfo implements ChangeInfo
         $this->id = $id;
         $this->customTags = $customTags;
         $this->customFiles = $customFiles;
+        $this->priority = $priority;
     }
 
     public function getCommitMessage()
@@ -140,14 +141,6 @@ class TrackedChangeInfo implements ChangeInfo
 
     public function getPriority()
     {
-        if (!$this->priority) {
-
-            $defaultPriority = $this->actionsInfo->getActionPriority($this->getAction());
-
-            $scope = $this->scope;
-            $this->priority = apply_filters("vp_action_priority_{$scope}", $defaultPriority, $this->getAction(), $this->getId());
-        }
-
         return $this->priority;
     }
 
