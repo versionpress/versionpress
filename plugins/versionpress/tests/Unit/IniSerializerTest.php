@@ -1144,6 +1144,28 @@ INI
     /**
      * @test
      */
+    public function serializedCustomClassWithPrivateAttributeInParent()
+    {
+        $object = new IniSerializer_FooPrivateChild('value');
+
+        $serializedString = serialize($object);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::ensureLf(<<<'INI'
+[Section]
+data = <<<serialized>>> <VersionPress\Tests\Unit\IniSerializer_FooPrivateChild>
+data["-VersionPress\\Tests\\Unit\\IniSerializer_FooPrivate->attribute"] = "value"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
     public function serializedNull()
     {
         $serializedString = serialize(null);
