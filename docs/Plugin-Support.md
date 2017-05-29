@@ -69,6 +69,7 @@ These are the main elements:
 - **The `actions` section** defines all actions of a scope.
     - An action has a **message** that can reference tags to make it more user-friendly. Messages use past tense.
     - Each action has a **priority** – 10 by default. Priorities behave like on WordPress filters and actions: the lower the number, the higher the priority. A more important action beats the less important one if both appear in the same commit. For example, `theme/switch` beats `option/edit` which means that the user will see a message about changing themes, not updating some internal option.
+    You can change this priority on run using filter `vp_action_priority_{$scope}`. For example if some option is more important than others.
     - A combination of a scope and an action, e.g., `post/create` or `theme/install`, uniquely identifies the action and can be [searched for in the UI](https://docs.versionpress.net/en/feature-focus/searching-history).
 - An action has a **message**, usually in past tense, and a **priority**. If priority is not set, the default value of 10 is used.
     - Priorities behave like on WordPress filters and actions: the lower the number, the higher the priority. A more important action beats the less important one if both appear in the same commit. For example, `theme/switch` beats `option/edit` which means that the user will see a message about changing themes, not updating some internal option.
