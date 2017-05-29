@@ -23,6 +23,10 @@ class RequestDetector
             return $this->isWpCliCommand(['theme', 'delete']);
         }
 
+        if ($this->isAdminAjax()) {
+            return $this->postVariableEquals('action', 'delete-theme');
+        }
+
         return basename($_SERVER['PHP_SELF']) === 'themes.php' && $this->queryVariableEquals('action', 'delete');
     }
 
@@ -35,10 +39,15 @@ class RequestDetector
             ]);
         }
 
-        return basename($_SERVER['PHP_SELF']) === 'plugins.php'
-        && ($this->queryVariableEquals('action', 'delete-selected')
-            || $this->postVariableEquals('action', 'delete-selected'))
-        && isset($_REQUEST['verify-delete']);
+        if ($this->isAdminAjax()) {
+            return $this->postVariableEquals('action', 'delete-plugin');
+        } else {
+            $isPluginAction = basename($_SERVER['PHP_SELF']) === 'plugins.php';
+            $isDeleteAction = $this->queryVariableEquals('action', 'delete-selected') || $this->postVariableEquals('action', 'delete-selected');
+            $deleteIsConfirmed = isset($_REQUEST['verify-delete']);
+
+            return $isPluginAction && $isDeleteAction && $deleteIsConfirmed;
+        }
     }
 
     public function isCoreLanguageUninstallRequest()
@@ -73,6 +82,10 @@ class RequestDetector
     public function getPluginNames()
     {
         if (!$this->isWpCli) {
+            if ($this->isAdminAjax()) {
+                return (array) $_POST['plugin'];
+            }
+
             return $_REQUEST['checked'];
         }
 
@@ -113,9 +126,18 @@ class RequestDetector
     public function getThemeStylesheets()
     {
         if (!$this->isWpCli) {
-            return [$_GET['stylesheet']];
+            if ($this->isAdminAjax()) {
+                return (array) $_POST['slug'];
+            }
+
+            return (array) $_GET['stylesheet'];
         }
 
         return array_slice($this->wpCliArguments, 2); // theme delete <stylesheet>
+    }
+
+    private function isAdminAjax()
+    {
+        return basename($_SERVER['PHP_SELF']) === 'admin-ajax.php';
     }
 }
