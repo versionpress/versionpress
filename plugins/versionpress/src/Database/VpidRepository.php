@@ -242,16 +242,16 @@ class VpidRepository
                                             on pm.post_id = vpid.id where pm.meta_key = '_menu_item_type'
                                             and vpid.vp_id = UNHEX(\"{$postmeta['vp_post_id']}\")");
 
-        if ($menuItemType === 'taxonomy') {
+        if ($menuItemType[0] === 'taxonomy') {
             return 'term_taxonomy';
         }
 
-        if ($menuItemType === 'post_type') {
+        if ($menuItemType[0] === 'post_type') {
             return 'post';
         }
 
         // Special case - reference to homepage (WP sets it as 'custom', but actually it is 'post_type')
-        if ($menuItemType === 'custom' && is_numeric($postmeta['meta_value'])) {
+        if ($menuItemType[0] === 'custom' && is_numeric($postmeta['meta_value'])) {
             return 'post';
         }
 

@@ -360,6 +360,10 @@ class VPCommand extends WP_CLI_Command
      * : URL of the clone. By default, the original URL is searched for <cwd>
      * and replaced with the clone name.
      *
+     * [--dirpath=<dir>]
+     * : Relative directory path to the clone. By default, sibling directory
+     * to current site.
+     *
      * [--dbname=<dbname>]
      * : Database name for the clone.
      *
@@ -428,7 +432,7 @@ class VPCommand extends WP_CLI_Command
 
         $currentWpPath = realpath(VP_PROJECT_ROOT);
         $cloneDirName = $name;
-        $clonePath = dirname($currentWpPath) . '/' . $cloneDirName;
+        $clonePath = isset($assoc_args['dirpath']) ? realpath($currentWpPath . '/' . $assoc_args['dirpath']) : dirname($currentWpPath) . '/' . $cloneDirName;
         $cloneVpPluginPath = $clonePath . '/' . str_replace($currentWpPath, '', realpath(VERSIONPRESS_PLUGIN_DIR));
 
         $cloneDbUser = isset($assoc_args['dbuser']) ? $assoc_args['dbuser'] : DB_USER;
