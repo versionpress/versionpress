@@ -2,4 +2,5 @@ version: '3.1'
 services:
   wordpress:
     environment:
+      # This should be your IP as seen on local network, e.g., by your home router
       XDEBUG_CONFIG: remote_host=192.168.1.1
