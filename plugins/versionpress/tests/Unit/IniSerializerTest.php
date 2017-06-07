@@ -1525,6 +1525,70 @@ INI
     /**
      * @test
      */
+    public function serializedArrayInSerializedArray()
+    {
+        $serializedString = serialize([serialize(['some string'])]);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::ensureLf(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = <<<serialized>>> <array>
+data[0][0] = "some string"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedStringInSerializedArray()
+    {
+        $serializedString = serialize([serialize('some string')]);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::ensureLf(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = <<<serialized>>> "some string"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function threeNestedSerializedValues()
+    {
+        $stdClass = new \stdClass();
+        $stdClass->data = serialize('some string');
+        $serializedString = serialize([serialize($stdClass)]);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::ensureLf(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = <<<serialized>>> <stdClass>
+data[0]["data"] = <<<serialized>>> "some string"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
     public function nullValueSerializesCorrectly()
     {
         $data = ["Section" => ["data" => null]];
