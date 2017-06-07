@@ -309,13 +309,25 @@ option:
 
 It probably won't surprise you that this is a real example used in WordPress' `schema.yml`. :stuck_out_tongue_winking_eye:
 
+Another supported feature are IDs in serialized data in serialized data (really).
+
+An example from WooCommerce: `a:1:{s:4:"cart";s:99:"a:1:{s:32:"a5bfc9e07964f8dddeb95fc584cd965d";a:2:{s:10:"product_id";i:37;s:12:"variation_id";i:0;}}";}`.
+
+```yaml
+session:
+  value-references:
+    session_key@session_value:
+      "*[\"cart\"]..[/.*/][\"product_id\"]": product
+      "*[\"cart\"]..[/.*/][\"variation_id\"]": variation
+```
+
 The complete syntax is:
 
 ```yaml
 value-references:
   <source_column_name>@<value_column_name>:
     <source_column_value>: <foreign_entity_name | @mapping_function>
-    <source_column_value>["path-in-serialized-objects"][/\d+/][0]: <foreign_entity_name | @mapping_function>
+    <source_column_value>["path-in-serialized-objects"][/\d+/][0]..["key-in-nested-serialized-array"]: <foreign_entity_name | @mapping_function>
     <columns_with_prefix_*>: <foreign_entity_name | @mapping_function>
 ```
 
