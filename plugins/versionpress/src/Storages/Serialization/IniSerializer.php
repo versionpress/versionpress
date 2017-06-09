@@ -112,7 +112,7 @@ class IniSerializer
                     $output[] = self::serializeKeyValuePair($key . "[$arrayKey]", $arrayValue);
                 }
             } elseif (StringUtils::isSerializedValue($value)) {
-                $lines = SerializedDataToIniConverter::toIniLines($key, $value);
+                $lines = (new SerializedDataToIniConverter())->toIniLines($key, $value);
                 $output = array_merge($output, $lines);
             } else {
                 $output[] = self::serializeKeyValuePair($key, $value);
@@ -443,7 +443,9 @@ class IniSerializer
     {
         $keysToRestore = [];
 
-        foreach ($deserialized as $key => $value) {
+        $reversed = array_reverse($deserialized);
+
+        foreach ($reversed as $key => $value) {
             if (is_array($value)) {
                 $deserialized[$key] = self::restorePhpSerializedData($value);
             } else {
@@ -463,7 +465,7 @@ class IniSerializer
             unset($keysToUnset[$key]);
 
             $deserialized = array_diff_key($deserialized, $keysToUnset);
-            $deserialized[$key] = SerializedDataToIniConverter::fromIniLines($key, $relatedKeys);
+            $deserialized[$key] = (new SerializedDataToIniConverter())->fromIniLines($key, $relatedKeys);
         }
 
         return $deserialized;

@@ -26,7 +26,8 @@
     "icecave/semver": "3.0.3",
     "mikey179/vfsStream": "^1.6",
     "squizlabs/php_codesniffer": "^2.6",
-    "10up/wp_mock": "dev-master"
+    "10up/wp_mock": "dev-master",
+    "mockery/mockery": "^0.9.9"
   },
   "autoload": {
     "psr-4": {
