@@ -8,6 +8,7 @@ post:
     term_relationships.term_taxonomy_id: term_taxonomy
   ignored-entities:
     - 'post_type: revision'
+    - 'post_type: customize_changeset'
     - 'post_status: auto-draft'
     # Also ignored are:
     #  - Attachments without post_title
