@@ -19,7 +19,6 @@ post:
   clean-cache:
     - post: id
 
-
 postmeta:
   id: meta_id
   parent-reference: post_id
@@ -59,7 +58,6 @@ commentmeta:
     comment_id: comment
   clean-cache:
     - comment: comment_id
-
 
 user:
   table: users
@@ -127,6 +125,9 @@ option:
       theme_mods_*["nav_menu_locations"][/.*/]: term
       theme_mods_*["header_image_data"]["attachment_id"]: post
       theme_mods_*["custom_logo"]: post
+      theme_mods_*["header_video"]: post
+      theme_mods_*["custom_css_post_id"]: post
+      theme_mods_twentyseventeen*[/panel_\d+/]: post
   frequently-written:
     - 'option_name: akismet_spam_count'
   ignored-entities:
