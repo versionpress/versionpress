@@ -83,28 +83,41 @@ class ReferenceUtils
     }
 
     /**
-     * Returns list of all paths in hierarchic structure (nested arrays, objects) matching given pattern.
-     * The pattern comes from a schema file. For example line `some_option[/\d+/]["key"]` contains
-     * pattern `[/\d+/]["key"]`. It can contain regular expressions to match multiple / dynamic keys.
+     * Returns list of all paths in hierarchic serialized structure (serialzied nested arrays, objects) matching given pattern.
+     * The pattern comes from a schema file. For example line `some_option[/\d+/]["key"]..["subkey"]` contains
+     * pattern `[/\d+/]["key"]..["subkey"]`. It can contain regular expressions to match multiple / dynamic keys.
+     * It handles multiple levels of serialization (e.g. serialized array in serialized array).
      *
      * Examples:
-     * For $value = [0 => [key => value], 1 => [key => value]]
+     * For $value = serialize([0 => ['key' => 'value'], 1 => ['key' => 'value']])
      * And $pathInStructure = [0]["key"]
-     * Returns [[0, key]]
+     * Returns [[[0, key]]]
      *
      * For the same $value nad $pathInStructure = [/\d+/]["key"]
-     * Returns [[0, key], [1, key]]
+     * Returns [[[0, key]], [[1, key]]]
+     *
+     * For $value = serialize(['key' => serialize(['subkey' => 'value'])])
+     * And $pathInStructure = ["key"]..["subkey"]
+     * Returns [[['key'], ['subkey']]]
      *
      *
      * @param array|object $value
      * @param string $pathInStructure
      * @return array
      */
-    public static function getMatchingPaths($value, $pathInStructure)
+    public static function getMatchingPathsInSerializedData($value, $pathInStructure)
     {
+        $pathsInSerializationLevels = explode('..', $pathInStructure);
+        return self::getMatchingPathsOnAllSublevels($value, $pathsInSerializationLevels);
+    }
+
+    private static function getMatchingPathsOnAllSublevels($value, $pathsInSerializationLevels)
+    {
+        $pathOnCurrentLevel = array_shift($pathsInSerializationLevels);
+
         // https://regex101.com/r/vR8yK3/2
         $re = "/(?:\\[(?<number>\\d+)|\"(?<string>(?:[^\"\\\\]|\\\\.)*)\"|\\/(?<regex>(?:[^\\/\\\\]|\\\\.)*)\\/)\\]+/";
-        preg_match_all($re, $pathInStructure, $matches, PREG_SET_ORDER);
+        preg_match_all($re, $pathOnCurrentLevel, $matches, PREG_SET_ORDER);
         $pathParts = array_map(function ($match) {
             if (strlen($match['number']) > 0) {
                 return ['type' => 'exact-value', 'value' => intval($match['number'])];
@@ -118,9 +131,24 @@ class ReferenceUtils
             }
         }, $matches);
 
-        $paths = self::getMatchingPathsFromSubtree($value, $pathParts);
+        $unserializedValue = unserialize($value);
+        $matchingPaths = self::getMatchingPathsFromSubtree($unserializedValue, $pathParts);
 
-        return $paths;
+        $allMatchingPaths = [];
+        foreach ($matchingPaths as $matchingPath) {
+            if ($pathsInSerializationLevels === []) {
+                $allMatchingPaths[] = [$matchingPath];
+                continue;
+            }
+
+            $currentLevelValue = (new Cursor($unserializedValue, $matchingPath))->getValue();
+            $subPaths = self::getMatchingPathsOnAllSublevels($currentLevelValue, $pathsInSerializationLevels);
+
+            foreach ($subPaths as $subPath) {
+                $allMatchingPaths[] = [$matchingPath, $subPath[0]];
+            }
+        }
+        return $allMatchingPaths;
     }
 
     private static function getMatchingPathsFromSubtree($value, $pathParts)

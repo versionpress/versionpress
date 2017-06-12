@@ -689,6 +689,7 @@ function vp_display_activation_notice($file, $plugin_data)
 
 
 add_filter('wp_insert_post_data', 'vp_generate_post_guid', '99', 2);
+add_filter('wp_insert_attachment_data', 'vp_generate_post_guid', '99', 2);
 /**
  * Creates random GUID that is not based on URL
  *
