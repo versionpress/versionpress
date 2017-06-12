@@ -258,10 +258,19 @@ add_filter('vp_entity_action_term', function ($action, $oldEntity, $newEntity) {
 }, 10, 3);
 
 add_filter('vp_entity_tags_term', function ($tags, $oldEntity, $newEntity, $action) {
+    global $versionPressContainer;
+    /** @var VpidRepository $vpidRepository */
+    $vpidRepository = $versionPressContainer->resolve(VersionPressServices::VPID_REPOSITORY);
 
     if ($action === 'rename') {
         $tags['VP-Term-OldName'] = $oldEntity['name'];
     }
+
+    $termVpid = $newEntity ? $newEntity['vp_id'] : $oldEntity['vp_id'];
+    $termId = $vpidRepository->getIdForVpid($termVpid);
+
+    $term = get_term($termId);
+    $tags['VP-Term-Taxonomy'] = $term instanceof WP_Term ? $term->taxonomy : 'term';
 
     return $tags;
 }, 10, 4);

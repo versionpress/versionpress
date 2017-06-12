@@ -70,6 +70,7 @@ term_taxonomy:
   tags:
     VP-TermTaxonomy-Taxonomy: taxonomy
     VP-Term-Name: /
+    VP-Term-Id: vp_term_id
   actions:
     create: New %VP-TermTaxonomy-Taxonomy% '%VP-Term-Name%'
     edit:
