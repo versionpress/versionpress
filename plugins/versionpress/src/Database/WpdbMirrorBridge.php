@@ -357,8 +357,13 @@ class WpdbMirrorBridge
     private function processInsertQuery($parsedQueryData)
     {
 
+        if ($this->database->insert_id == 0) {
+            $idColumnNames = $parsedQueryData->idColumnsNames[0];
+            $id = $parsedQueryData->data[0][$idColumnNames];
+        } else {
+            $id = $this->database->insert_id;
+        }
 
-        $id = $this->database->insert_id;
         $entitiesCount = count($parsedQueryData->data);
 
         for ($i = 0; $i < $entitiesCount; $i++) {
