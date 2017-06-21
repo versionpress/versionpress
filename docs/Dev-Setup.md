@@ -7,7 +7,7 @@
 Install:
 
 - Git 2.10+
-- Node.js 6+ 
+- Node.js 8+
 - Docker 17+
 
 Then run:
