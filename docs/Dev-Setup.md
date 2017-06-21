@@ -38,6 +38,7 @@ Next steps:
 
 - [PhpStorm setup](#phpstorm)
 - [Debugging](#debugging)
+- [Production build](#production-build)
 
 <div id="phpstorm"></div>
 
@@ -83,3 +84,9 @@ The development environment is preconfigured with [Xdebug](https://xdebug.org/).
 Debugging should now work:
 
 ![image](https://cloud.githubusercontent.com/assets/101152/26285090/bb8aa432-3e48-11e7-973a-944abfe0039e.png)
+
+## Production build
+
+Run `npm run build`,  it will produce a file like `dist/versionpress-3.0.2.zip`.
+
+The version number is based on the nearest Git tag and can also be something like `3.0.2-27-g0e1ce7f` meaning that the closest tag is `3.0.2`, there have been 27 commits since then and the package was built from `0e1ce7f`. See [`git describe --tags`](https://git-scm.com/docs/git-describe#_examples) for more examples.
