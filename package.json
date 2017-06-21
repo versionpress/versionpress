@@ -9,7 +9,6 @@
   "dependencies": {},
   "devDependencies": {
     "chalk": "^1.1.1",
-    "coffee-script": "^1.12.6",
     "del": "^3.0.0",
     "gulp": "~3.9.0",
     "gulp-composer": "^0.4.0",
