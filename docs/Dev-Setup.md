@@ -37,6 +37,7 @@ This leaves you with this working environment:
 Next steps:
 
 - [PhpStorm setup](#phpstorm)
+- [Writing code](#writing-code)
 - [Debugging](#debugging)
 - [Production build](#production-build)
 
@@ -65,6 +66,10 @@ For **Code Sniffer** inspections to work, there's a one-time configuration: Go t
 > Note: the same checks run on Travis CI once the code is pushed to GitHub so it's useful to have that configured in PhpStorm.
 
 It is also useful to **install the [EditorConfig](https://plugins.jetbrains.com/plugin/7294?pr=phpStorm) extension**, VersionPress ships with some basic formatting rules in `.editorconfig`.
+
+## Writing code
+
+Please refer to the [Contributing code](https://github.com/versionpress/versionpress/blob/master/CONTRIBUTING.md#contributing-code) section in `CONTRIBUTING.md`.
 
 ## Debugging
 
