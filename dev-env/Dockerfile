@@ -22,3 +22,7 @@ RUN yes | pecl install xdebug \
     && echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_autostart=0" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.profiler_enable=0" >> /usr/local/etc/php/conf.d/xdebug.ini
+
+COPY vp-entrypoint.sh /usr/local/bin/
+ENTRYPOINT ["vp-entrypoint.sh"]
+CMD ["apache2-foreground"]

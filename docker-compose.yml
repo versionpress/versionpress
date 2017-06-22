@@ -14,6 +14,13 @@ services:
     environment:
       WORDPRESS_DB_PASSWORD: r00tpwd
 
+      # Environment variables for `wp core install`
+      WORDPRESS_SITEURL: http://localhost:8088
+      WORDPRESS_SITE_TITLE: VP Dev
+      WORDPRESS_ADMIN_USER: admin
+      WORDPRESS_ADMIN_PASSWORD: adminpwd
+      WORDPRESS_ADMIN_EMAIL: admin@example.com
+
   mysql:
     image: mysql:5.7
     ports:

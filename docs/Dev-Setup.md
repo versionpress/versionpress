@@ -15,13 +15,14 @@ Then run:
 1. `git clone <repo>` && `cd <repo>`
 2. `npm install`
 3. `docker-compose up`
-4. Finish WordPress installation at `http://localhost:8088`
+
+You can now log in to a WordPress site at `http://localhost:8088`, username `admin`, password `adminpwd` (all this can be changed via `docker-compose.yml`).
 
 ![image](https://cloud.githubusercontent.com/assets/101152/26283542/17fccd8a-3e2b-11e7-9881-a26fbb49d144.png)
 
 This leaves you with this working environment:
 
-- The source files are mapped to container's `wp-content/plugins` so you can start hacking straight away.
+- VersionPress source files are mapped to container's `wp-content/plugins/versionpress` so any changes you make locally are immediately reflected in the test site.
     - The React `./frontend` app requires a build, see below.
 - Database can be inspected at `http://localhost:8099`, server name: `db`, username: `root`, password: `r00tpwd`.
     - You can also use tools like MySQL Workbench or `mysql` command-line client on port 3399, e.g., `mysql --port=3399 -u root -p`.
