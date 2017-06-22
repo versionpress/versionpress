@@ -4,10 +4,14 @@
 # [entrypoint](https://github.com/docker-library/wordpress/blob/master/php5.6/apache/docker-entrypoint.sh)
 # contains logic that waits for DB to be ready. Let's inject our code just before the end of that file.
 
-ORIG_ENTRYPOINT='/usr/local/bin/docker-entrypoint.sh'
 
-# '~' characters are used to indicate newline (sed is single-line only, `tr` will fix up newlines later)
-CODE_TO_INJECT=$(cat <<'CODE_TO_INJECT'
+# Inject code into docker-entrypoint.sh
+ORIG_ENTRYPOINT='/usr/local/bin/docker-entrypoint.sh'
+ORIG_ENTRYPOINT_FINAL_LINE='exec "$@"'
+
+sed -i "/$ORIG_ENTRYPOINT_FINAL_LINE/d" "$ORIG_ENTRYPOINT"
+
+cat <<'CODE_TO_INJECT' >> "$ORIG_ENTRYPOINT"
 wp core install \
     --url="$WORDPRESS_SITEURL" \
     --title="$WORDPRESS_SITE_TITLE" \
@@ -15,21 +19,13 @@ wp core install \
     --admin_password="$WORDPRESS_ADMIN_PASSWORD" \
     --admin_email="$WORDPRESS_ADMIN_EMAIL" \
     --skip-email
-~
-~
-echo WordPress installed at "$WORDPRESS_SITEURL"
-~
-~
+
+echo WordPress site is running at "$WORDPRESS_SITEURL"
+
 CODE_TO_INJECT
-)
 
-ORIG_CODE_TO_LOOK_FOR='exec "$@"'
+echo $ORIG_ENTRYPOINT_FINAL_LINE >> "$ORIG_ENTRYPOINT"
 
-# https://stackoverflow.com/a/407649/21728
-sed -i -e "s/$ORIG_CODE_TO_LOOK_FOR/$(echo $CODE_TO_INJECT$ORIG_CODE_TO_LOOK_FOR | sed -e 's/\\/\\\\/g; s/\//\\\//g; s/&/\\\&/g')/g" "$ORIG_ENTRYPOINT"
 
-# fix the newlines using `tr`
-cat "$ORIG_ENTRYPOINT" | tr '~' '\n' | cat > "$ORIG_ENTRYPOINT"
-
-# Finally, run the entrypoint
+# Run it
 source "$ORIG_ENTRYPOINT" "$@"
