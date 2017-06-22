@@ -8,6 +8,8 @@
   "scripts": {
     "init-dev": "gulp init-dev",
     "build": "gulp build",
+    "start": "docker-compose up",
+    "cleanup-docker-stack": "docker-compose down -v && rm -rf ./dev-env/wp",
     "postinstall": "npm run init-dev"
   },
   "dependencies": {},

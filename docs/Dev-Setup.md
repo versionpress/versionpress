@@ -14,7 +14,7 @@ Then run:
 
 1. `git clone <repo>` && `cd <repo>`
 2. `npm install`
-3. `docker-compose up`
+3. `npm start`
 
 You can now log in to a WordPress site at `http://localhost:8088`, username `admin`, password `adminpwd` (all this can be changed via `docker-compose.yml`).
 
@@ -32,8 +32,7 @@ This leaves you with this working environment:
     - Use `docker-compose exec wordpress <command>`, for example:
         - `docker-compose exec wordpress wp option update blogname "Hello"`
         - `docker-compose exec wordpress git log`
-- Stop all Docker services: `Ctrl+C` in the console.
-    - `docker-compose down -v && rm -rf ./dev-env/wp` clears up everything if you want to start fresh. Otherwise, both files and database data are persisted.
+- Stop all Docker services: `Ctrl+C` in the console. `npm run cleanup-docker-stack` clears up everything if you want to start fresh. Otherwise, both files and database data are persisted.
 
 Next steps:
 
