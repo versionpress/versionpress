@@ -1,10 +1,14 @@
 {
-  "name": "versionpress",
+  "name": "versionpress-dev-workspace",
   "version": "1.0.0",
-  "description": "",
+  "description": "VersionPress development workspace",
   "main": "gulpfile.js",
-  "directories": {
-    "test": "tests"
+  "author": "VersionPress",
+  "license": "GPL",
+  "scripts": {
+    "init-dev": "gulp init-dev",
+    "build": "gulp build",
+    "postinstall": "npm run init-dev"
   },
   "dependencies": {},
   "devDependencies": {
@@ -23,12 +27,5 @@
     "run-sequence": "^1.1.5",
     "shelljs": "^0.7.8",
     "yamljs": "^0.2.6"
-  },
-  "scripts": {
-    "postinstall": "gulp init-dev",
-    "build": "gulp build",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "GPL"
+  }
 }
