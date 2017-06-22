@@ -39,6 +39,7 @@ Next steps:
 - [PhpStorm setup](#phpstorm)
 - [Writing code](#writing-code)
 - [Debugging](#debugging)
+- [Testing](#testing)
 - [Production build](#production-build)
 
 <div id="phpstorm"></div>
@@ -90,6 +91,60 @@ The development environment is preconfigured with [Xdebug](https://xdebug.org/).
 Debugging should now work:
 
 ![image](https://cloud.githubusercontent.com/assets/101152/26285090/bb8aa432-3e48-11e7-973a-944abfe0039e.png)
+
+## Testing
+
+Tests are currently about 60% of the PHP code in the project so pretty significant. They live in the `./plugins/versionpress/tests` directory and there are several types of them, from unit tests to full end2end tests.
+
+> Note that the `./frontend` app might have its own tests. This section is about core VersionPress tests.
+
+### Dockerized setup
+
+Running tests is much easier with Docker, however, there is some initial setup. VersionPress ships with PhpStorm project files so some of the things below might be already set up for you but let's do a full walk-through.
+
+ First, if you're on Mac or Windows, expose this daemon in Docker settings:
+
+![image](https://user-images.githubusercontent.com/101152/27441580-43a964c8-576e-11e7-9912-1be811f73c4b.png)
+
+In PhpStorm, create a new Docker environment:
+
+![image](https://user-images.githubusercontent.com/101152/27441828-ec760098-576e-11e7-9251-670204bf2643.png)
+
+In the Docker panel, you should now be able to connect:
+
+![image](https://user-images.githubusercontent.com/101152/27441986-508eb2e6-576f-11e7-83b6-20e9b6944619.png)
+
+Now let's define a remote interpreter. Make sure you have the **PHP Docker** plugin enabled and go to *Settings* > *Languages & Frameworks* > *PHP*. Add a new interpreter there:
+
+![image](https://user-images.githubusercontent.com/101152/27442419-6e177932-5770-11e7-9d28-dfc219a41fcd.png)
+
+We recommend some image with Xdebug installed, e.g., `phpstorm/php-71-cli-xdebug`:
+
+![image](https://user-images.githubusercontent.com/101152/27456995-518482f0-57a3-11e7-9d77-cd254c56a7c5.png)
+
+These two paths should be mapped into the container:
+
+![image](https://user-images.githubusercontent.com/101152/27457048-78b63800-57a3-11e7-83c2-fd97b8caf6bc.png)
+
+The final step is to set up a test framework:
+
+![image](https://user-images.githubusercontent.com/101152/27457076-9afdc02c-57a3-11e7-8b00-7d3dc8dae5a3.png)
+
+Now you're ready to run the tests.
+
+### Unit tests
+
+Unit tests are best suited for small pieces of algorithmic functionality. For example, `IniSerializer` is covered with unit tests extensively.
+
+You can run any or all unit tests in PhpStorm easily e.g. by right-clicking test names. The Run panel should look like this:
+
+![image](https://user-images.githubusercontent.com/101152/27459292-c8eadbe6-57ad-11e7-96bd-3b77f255247f.png)
+
+Debugging also works well:
+
+![image](https://user-images.githubusercontent.com/101152/27459354-23388d96-57ae-11e7-8bc0-684d6634e6d6.png)
+
+
 
 ## Production build
 
