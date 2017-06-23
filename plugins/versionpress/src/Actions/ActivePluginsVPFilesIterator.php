@@ -24,11 +24,14 @@ class ActivePluginsVPFilesIterator implements \IteratorAggregate
 
         $plugins = get_option('active_plugins');
 
+        $globalDefinitionsDir = WP_CONTENT_DIR . '/.versionpress';
         foreach ($plugins as $pluginFile) {
-            $pluginDir = WP_PLUGIN_DIR . '/' . dirname($pluginFile);
-            $path = $pluginDir . '/.versionpress/' . $this->iteratedFiles;
-            if (file_exists($path)) {
-                yield $path;
+            $defaultDefinitionFile = $globalDefinitionsDir . '/' . dirname($pluginFile) . '/' . $this->iteratedFiles;
+            $pluginDirDefinitionFile = WP_PLUGIN_DIR . '/' . dirname($pluginFile) . '/.versionpress/' . $this->iteratedFiles;
+            if (file_exists($defaultDefinitionFile)) {
+                yield $defaultDefinitionFile;
+            } elseif (file_exists($pluginDirDefinitionFile)) {
+                yield $pluginDirDefinitionFile;
             }
         }
     }

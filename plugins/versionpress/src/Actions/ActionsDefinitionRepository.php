@@ -31,14 +31,19 @@ class ActionsDefinitionRepository
     public function saveDefinitionForPlugin($pluginFile)
     {
         $pluginSlug = basename(dirname($pluginFile));
-        $actionsFile = WP_PLUGIN_DIR . '/' . $pluginSlug . '/.versionpress/actions.yml';
+        $defaultActionsFile = WP_CONTENT_DIR . '/.versionpress/' . $pluginSlug . '/actions.yml';
+        $pluginDirActionsFile = WP_PLUGIN_DIR . '/' . $pluginSlug . '/.versionpress/actions.yml';
 
-        if (!is_file($actionsFile)) {
+        if (is_file($defaultActionsFile)) {
+            $effectiveActionsFile = $defaultActionsFile;
+        } elseif (is_file($pluginDirActionsFile)) {
+            $effectiveActionsFile = $pluginDirActionsFile;
+        } else {
             return;
         }
 
         $targetFile = $this->getDefinitionFileName($pluginSlug);
-        FileSystem::copy($actionsFile, $targetFile);
+        FileSystem::copy($effectiveActionsFile, $targetFile);
     }
 
     public function restoreAllDefinitionFilesFromHistory()

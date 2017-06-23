@@ -531,8 +531,9 @@ Feel free to use custom `.gitignore` for files in the plugin directory. You can 
 
 VersionPress looks for plugin descriptors in these locations, in this order:
 
-1. `.versionpress` folder in plugin root
-2. Online repository (soon)
+1. `wp-content/.versionpress/<plugin-name>`
+2. `.versionpress` folder in plugin root
+3. Online repository (soon)
 
 Option **(1)** is good if the plugin authors want to support VersionPress directly (and hopefully more and more will).
 
