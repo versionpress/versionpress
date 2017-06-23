@@ -529,16 +529,12 @@ Feel free to use custom `.gitignore` for files in the plugin directory. You can 
 
 ## Discovery mechanism
 
-VersionPress looks for plugin descriptors in these locations, in this order:
+VersionPress looks for plugin definitions in these locations, in this order:
 
-1. `wp-content/.versionpress/<plugin-name>`
-2. `.versionpress` folder in plugin root
-3. Online repository (soon)
+1. `WP_CONTENT_DIR/.versionpress/<plugin-slug>`
+2. `WP_PLUGIN_DIR/<plugin-slug>/.versionpress`
 
-Option **(1)** is good if the plugin authors want to support VersionPress directly (and hopefully more and more will).
-
-Option **(2)** is a fallback method but a good one: anyone can create a definition files for their favorite plugins and share them via an online repository. We're working on it.
-
+The first definition found is used.
 
 ## Resources
 
