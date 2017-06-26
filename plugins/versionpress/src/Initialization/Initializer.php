@@ -644,10 +644,10 @@ class Initializer
 
     private function persistActionsDefinitions()
     {
-        $this->actionsDefinitionRepository->restoreAllDefinitionFilesFromHistory();
+        $this->actionsDefinitionRepository->restoreAllActionsFilesFromHistory();
 
         foreach (get_option('active_plugins') as $plugin) {
-            $this->actionsDefinitionRepository->saveDefinitionForPlugin($plugin);
+            $this->actionsDefinitionRepository->saveActionsFileForPlugin($plugin);
         }
     }
 }

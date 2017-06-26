@@ -62,7 +62,7 @@ class VPInternalCommand extends WP_CLI_Command
 
         /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
         $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
-        $actionsDefinitionRepository->restoreAllDefinitionFilesFromHistory();
+        $actionsDefinitionRepository->restoreAllActionsFilesFromHistory();
 
         // Truncate tables
         /** @var Database $database */
@@ -132,7 +132,7 @@ class VPInternalCommand extends WP_CLI_Command
 
         /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
         $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
-        $actionsDefinitionRepository->restoreAllDefinitionFilesFromHistory();
+        $actionsDefinitionRepository->restoreAllActionsFilesFromHistory();
 
         /** @var Initializer $initializer */
         $initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);
@@ -189,7 +189,7 @@ class VPInternalCommand extends WP_CLI_Command
 
         /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
         $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
-        $actionsDefinitionRepository->restoreAllDefinitionFilesFromHistory();
+        $actionsDefinitionRepository->restoreAllActionsFilesFromHistory();
 
         // Run synchronization
         /** @var SynchronizationProcess $syncProcess */

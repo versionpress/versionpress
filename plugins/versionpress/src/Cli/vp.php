@@ -736,7 +736,7 @@ class VPCommand extends WP_CLI_Command
 
         /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
         $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
-        $actionsDefinitionRepository->restoreAllDefinitionFilesFromHistory();
+        $actionsDefinitionRepository->restoreAllActionsFilesFromHistory();
 
         // Run synchronization
         /** @var SynchronizationProcess $syncProcess */
@@ -775,7 +775,7 @@ class VPCommand extends WP_CLI_Command
 
         /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
         $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
-        $actionsDefinitionRepository->restoreAllDefinitionFilesFromHistory();
+        $actionsDefinitionRepository->restoreAllActionsFilesFromHistory();
 
         /** @var SynchronizationProcess $syncProcess */
         $syncProcess = $versionPressContainer->resolve(VersionPressServices::SYNCHRONIZATION_PROCESS);
