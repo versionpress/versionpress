@@ -143,7 +143,7 @@ class ShortcodesReplacer
 
             $shortcodeTag = $m[2];
             $shortcodeInfo = $shortcodesInfo->getShortcodeInfo($shortcodeTag);
-            $attributes = shortcode_parse_atts($m[3]);
+            $attributes = shortcode_parse_atts($m[3]) ?: [];
 
             foreach ($attributes as $attribute => $value) {
                 if (isset($shortcodeInfo[$attribute])) {
