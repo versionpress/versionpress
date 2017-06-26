@@ -25,7 +25,7 @@ add_filter('vp_entity_should_be_saved_post', function ($shouldBeSaved, $data, $s
 
     // ignoring ajax autosaves
     if ($isExistingEntity && isset($data['post_status']) && ($data['post_status'] === 'draft' &&
-            defined('DOING_AJAX') && DOING_AJAX === true)
+            defined('DOING_AJAX') && DOING_AJAX === true && $_POST['action'] === 'heartbeat')
     ) {
         return false;
     }
