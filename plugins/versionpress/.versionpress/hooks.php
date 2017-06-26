@@ -2,7 +2,7 @@
 
 use Nette\Utils\Strings;
 use VersionPress\Actions\ActionsDefinitionRepository;
-use VersionPress\Actions\ActivePluginsVPFilesIterator;
+use VersionPress\Actions\PluginDefinitionDiscovery;
 use VersionPress\ChangeInfos\CommitMessageParser;
 use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
@@ -426,7 +426,7 @@ add_action('vp_wordpress_updated', function ($version) {
     /** @var DbSchemaInfo $dbSchema */
     $dbSchema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
     $tableSchemaStorage = $versionPressContainer->resolve(VersionPressServices::TABLE_SCHEMA_STORAGE);
-    $dbSchema->refreshDbSchema(new ActivePluginsVPFilesIterator('schema.yml'));
+    $dbSchema->refreshDbSchema(PluginDefinitionDiscovery::getPathsForActivePlugins('schema.yml'));
 
     vp_update_table_ddl_scripts($dbSchema, $tableSchemaStorage);
 
@@ -443,14 +443,14 @@ add_action('vp_plugin_changed', function ($action, $pluginFile, $pluginName) {
     /** @var DbSchemaInfo $dbSchema */
     $dbSchema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
     $tableSchemaStorage = $versionPressContainer->resolve(VersionPressServices::TABLE_SCHEMA_STORAGE);
-    $dbSchema->refreshDbSchema(new ActivePluginsVPFilesIterator('schema.yml'));
+    $dbSchema->refreshDbSchema(PluginDefinitionDiscovery::getPathsForActivePlugins('schema.yml'));
 
     vp_update_table_ddl_scripts($dbSchema, $tableSchemaStorage);
 
     if ($action !== 'delete') {
         /** @var ActionsDefinitionRepository $actionsDefinitionRepository */
         $actionsDefinitionRepository = $versionPressContainer->resolve(VersionPressServices::ACTIONS_DEFINITION_REPOSITORY);
-        $actionsDefinitionRepository->saveDefinitionForPlugin($pluginFile);
+        $actionsDefinitionRepository->saveActionsFileForPlugin($pluginFile);
     }
 
     $pluginPath = WP_PLUGIN_DIR . "/";
@@ -492,7 +492,7 @@ add_action('vp_theme_changed', function ($action, $stylesheet, $themeName) {
 
     $dbSchema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
     $tableSchemaStorage = $versionPressContainer->resolve(VersionPressServices::TABLE_SCHEMA_STORAGE);
-    $dbSchema->refreshDbSchema(new ActivePluginsVPFilesIterator('schema.yml'));
+    $dbSchema->refreshDbSchema(PluginDefinitionDiscovery::getPathsForActivePlugins('schema.yml'));
 
     vp_update_table_ddl_scripts($dbSchema, $tableSchemaStorage);
 
