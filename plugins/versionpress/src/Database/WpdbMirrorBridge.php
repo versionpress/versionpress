@@ -356,23 +356,34 @@ class WpdbMirrorBridge
      */
     private function processInsertQuery($parsedQueryData)
     {
+        $firstId = $this->database->insert_id;
+        $entityName = $parsedQueryData->entityName;
+        $entityInfo = $this->dbSchemaInfo->getEntityInfo($entityName);
+        $hasNaturalVpid = $entityInfo->hasNaturalVpid;
+        $idColumnName = $entityInfo->idColumnName;
 
-
-        $id = $this->database->insert_id;
         $entitiesCount = count($parsedQueryData->data);
 
         for ($i = 0; $i < $entitiesCount; $i++) {
-            $data = $this->vpidRepository->replaceForeignKeysWithReferences(
-                $parsedQueryData->entityName,
-                $parsedQueryData->data[$i]
-            );
-            $shouldBeSaved = $this->mirror->shouldBeSaved($parsedQueryData->entityName, $data);
+            if ($hasNaturalVpid) {
+                $id = $parsedQueryData->data[$i][$idColumnName];
+            } else {
+                $id = $firstId + $i;
+            }
+
+            $prefixedTableName = $this->dbSchemaInfo->getPrefixedTableName($entityName);
+            $sql = $this->database->prepare("SELECT * FROM `{$prefixedTableName}` WHERE `$idColumnName` = %s", $id);
+            $entity = $this->database->get_row($sql, ARRAY_A);
+            $entity = $this->vpidRepository->replaceForeignKeysWithReferences($entityName, $entity);
+
+            $shouldBeSaved = $this->mirror->shouldBeSaved($entityName, $entity);
 
             if (!$shouldBeSaved) {
                 continue;
             }
-            $data = $this->vpidRepository->identifyEntity($parsedQueryData->entityName, $data, ($id - $i));
-            $this->mirror->save($parsedQueryData->entityName, $data);
+
+            $entity = $this->vpidRepository->identifyEntity($entityName, $entity, $id);
+            $this->mirror->save($entityName, $entity);
         }
     }
 
