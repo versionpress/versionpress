@@ -11,9 +11,6 @@ wp-cli-version: latest-stable
 # Selenium configuration
 selenium:
 
-  # DEPRECATED - tests run in Docker now.
-  firefox-binary:
-
   # How long to wait after commit is made
   post-commit-wait-time: 500
 

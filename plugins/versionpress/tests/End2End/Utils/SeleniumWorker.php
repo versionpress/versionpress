@@ -96,10 +96,6 @@ class SeleniumWorker implements ITestWorker
             'browserUrl' => new PHPUnit_Extensions_Selenium2TestCase_URL(self::$testConfig->testSite->url)
         ];
 
-        if (isset(self::$testConfig->seleniumConfig->firefoxBinary)) {
-            $parameters['desiredCapabilities'] = ['firefox_binary' => self::$testConfig->seleniumConfig->firefoxBinary];
-        }
-
         $strategy = new PHPUnit_Extensions_Selenium2TestCase_SessionStrategy_Shared(
             new PHPUnit_Extensions_Selenium2TestCase_SessionStrategy_Isolated()
         );

@@ -50,7 +50,6 @@ class TestConfig
         $rawConfig = Yaml::parse(file_get_contents($configFile));
 
         $this->seleniumConfig = new SeleniumConfig();
-        $this->seleniumConfig->firefoxBinary = $rawConfig['selenium']['firefox-binary'];
         $this->seleniumConfig->postCommitWaitTime = $rawConfig['selenium']['post-commit-wait-time'];
         $this->end2endTestType = $rawConfig['end2end-test-type'];
         $this->wpCliVersion = $rawConfig['wp-cli-version'];
