@@ -23,9 +23,9 @@ add_filter('vp_entity_should_be_saved_post', function ($shouldBeSaved, $data, $s
         return false;
     }
 
-    // ignoring ajax autosaves
+    // ignoring ajax autosaves for drafts - WP saves them using Heartbeat API
     if ($isExistingEntity && isset($data['post_status']) && ($data['post_status'] === 'draft' &&
-            defined('DOING_AJAX') && DOING_AJAX === true && $_POST['action'] === 'heartbeat')
+        defined('DOING_AJAX') && DOING_AJAX === true && $_POST['action'] === 'heartbeat')
     ) {
         return false;
     }
