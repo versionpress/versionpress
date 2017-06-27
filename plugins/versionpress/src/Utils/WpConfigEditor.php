@@ -18,6 +18,7 @@ class WpConfigEditor
         'VP_PROJECT_ROOT',
         'VP_ENVIRONMENT',
         'VP_GIT_BINARY',
+        'VP_WP_CLI_BINARY',
     ];
 
     public function __construct($wpConfigPath, $isCommonConfig)

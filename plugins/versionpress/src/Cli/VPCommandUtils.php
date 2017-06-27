@@ -12,7 +12,7 @@ class VPCommandUtils
     public static function runWpCliCommand($command, $subcommand, $args = [], $cwd = null)
     {
 
-        $cliCommand = "wp $command";
+        $cliCommand = VP_WP_CLI_BINARY . " $command";
 
         if ($subcommand) {
             $cliCommand .= " $subcommand";
