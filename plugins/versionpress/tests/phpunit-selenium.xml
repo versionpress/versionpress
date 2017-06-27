@@ -1,0 +1,9 @@
+<phpunit bootstrap="phpunit-bootstrap.php">
+    <testsuites>
+
+        <testsuite name="Temp selenium test">
+            <file>Selenium/PublicWebTest.php</file>
+        </testsuite>
+
+    </testsuites>
+</phpunit>

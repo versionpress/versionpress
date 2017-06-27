@@ -281,7 +281,7 @@ class CommentsTestSeleniumWorker extends SeleniumWorker implements ICommentsTest
 
     private function prepareTestComment()
     {
-        $author = self::$testConfig->testSite->adminName;
+        $author = self::$testConfig->testSite->adminUser;
         $email = self::$testConfig->testSite->adminEmail;
 
         if (!$this->testPostId) {

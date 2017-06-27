@@ -4,25 +4,21 @@ namespace VersionPress\Tests\Automation;
 
 use Exception;
 use Nette\Utils\Strings;
+use Symfony\Component\Filesystem\Exception\IOException;
 use VersionPress\Tests\Utils\SiteConfig;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\Process;
 use VersionPress\Utils\ProcessUtils;
 
 /**
- * Automates some common tasks like setting up a WP site, installing VersionPress, working with posts, comments etc.
+ * Automates tasks like setting up a WP site, installing VersionPress, creating posts, etc.
+ * based on test-config.yml.
  *
- * You should have the whole development environment set up as described on our wiki. Specifically, these are required:
+ * Most of the functionality is internally provided by WP-CLI which is automatically downloaded
+ * if it's not available locally.
  *
- *  - WP-CLI (`wp --info` works in console)
- *  - NPM packages installed in <project_root>
- *  - Gulp (`gulp -v` works in console)
- *  - `test-config.yml` file created in `versionpress/tests`
- *
- * Currently, WpAutomation is a set of static functions as of v1; other options will be considered for v2, see WP-56.
- *
- * Note: Currently, the intention is to add supported tasks as public methods to this class. If this gets
- * unwieldy it will probably be split into multiple files / classes.
+ * NOTE: this class dates back to VersionPress 1.0 and contains quite a few legacy approaches.
+ * For example, methods for manipulating WP site entities could be moved to tests.
  */
 class WpAutomation
 {
@@ -58,7 +54,11 @@ class WpAutomation
      */
     public function setUpSite($entityCounts = [])
     {
-        FileSystem::removeContent($this->siteConfig->path);
+        try {
+            FileSystem::removeContent($this->siteConfig->path);
+        } catch (IOException $e) {
+            // Dockerized setup uses read-only mount for the VP plugin so it's OK if some contents cannot be removed
+        }
 
         if ($this->siteConfig->installationType === 'standard') {
             $this->prepareStandardWpInstallation();
@@ -102,21 +102,9 @@ class WpAutomation
         return $vpdbDir !== '' && is_file($vpdbDir . '/.active');
     }
 
-    /**
-     * Copies VP files to the test site and possibly removes all old files from there. It does so using
-     * a Gulp script which specifies which paths to include and which ones to ignore.
-     * See <project_root>\gulpfile.js.
-     */
     public function copyVersionPressFiles()
     {
-        $versionPressDir = __DIR__ . '/../..';
-        $gulpBaseDir = $versionPressDir . '/../..'; // project root as checked out from our repository
-        $this->exec(
-            'gulp test-deploy',
-            $gulpBaseDir,
-            false,
-            ['VP_DEPLOY_TARGET' => $this->siteConfig->path]
-        ); // this also cleans the destination directory, see gulpfile.js "clean" task
+        return; // noop for Dockerized workflows, VP is mapped into containers
     }
 
     /**
@@ -554,6 +542,11 @@ class WpAutomation
     {
         $this->ensureCleanInstallationIsAvailable();
         FileSystem::copyDir($this->getCleanInstallationPath(), $this->siteConfig->path);
+        try {
+            $this->exec("chown -f -R www-data:www-data {$this->siteConfig->path}");
+        } catch (Exception $e) {
+            // VP plugin itself is mounted as read-only so chown will fail on it
+        }
         $this->createConfigFile();
     }
 
@@ -577,7 +570,7 @@ class WpAutomation
                 $downloadCommand .= " --locale=$wpLocale";
             }
 
-            $this->exec($downloadCommand, null);
+            $this->exec($downloadCommand, null, false, null, 'root');
         }
     }
 
@@ -625,6 +618,7 @@ class WpAutomation
         }
 
         $args["skip-salts"] = null;
+        $args["skip-check"] = null;
 
         $this->runWpCliCommand("core", "config", $args);
     }
@@ -646,7 +640,7 @@ class WpAutomation
         $cmdArgs = [
             "url" => $this->siteConfig->url,
             "title" => $this->siteConfig->title,
-            "admin_name" => $this->siteConfig->adminName,
+            "admin_user" => $this->siteConfig->adminUser,
             "admin_email" => $this->siteConfig->adminEmail,
             "admin_password" => $this->siteConfig->adminPassword
         ];
@@ -660,16 +654,16 @@ class WpAutomation
      * @param string $command
      * @param string $executionPath Working directory for the command. If null, the path will be determined
      *   automatically.
-     *
      * @param bool $debug
      * @param null|array $env
+     * @param string $wpCliRunAsUser Useful only for WP-CLI (yes, the current design smells)
      * @return string When process execution is not successful
      * @throws Exception
      */
-    private function exec($command, $executionPath = null, $debug = false, $env = null)
+    private function exec($command, $executionPath = null, $debug = false, $env = null, $wpCliRunAsUser = 'www-data')
     {
 
-        $command = $this->rewriteWpCliCommand($command);
+        $command = $this->possiblyRewriteWpCliCommand($command, $wpCliRunAsUser);
 
         if (!$executionPath) {
             $executionPath = $this->siteConfig->path;
@@ -740,35 +734,34 @@ class WpAutomation
 
 
     /**
-     * Rewrites WP-CLI command to use a well-known binary and to possibly rewrite it for remote
-     * execution over SSH. If the command is not a WP-CLI command (doesn't start with "wp ..."),
-     * no rewriting is done.
+     * If the command starts "wp ", it rewrites it to a full format. No transformation
+     * is done for non-WP-CLI commands.
      *
      * @param string $command
-     * @param $autoSshTunnelling
+     * @param string $runAsUser
+     *
      * @return string
      */
-    private function rewriteWpCliCommand($command)
+    private function possiblyRewriteWpCliCommand($command, $runAsUser = 'www-data')
     {
-
         if (!Strings::startsWith($command, "wp ")) {
             return $command;
         }
 
         $command = substr($command, 3); // strip "wp " prefix
 
-        $command = "php " . ProcessUtils::escapeshellarg($this->getWpCli()) . " $command";
+        $rewrittenCommand = "sudo -u $runAsUser -- ";
+        $rewrittenCommand .= "php " . ProcessUtils::escapeshellarg($this->getWpCli());
+        $rewrittenCommand .= $runAsUser === 'root' ? ' --allow-root' : '';
+        $rewrittenCommand .= " $command";
 
-        return $command;
-
-
+        return $rewrittenCommand;
     }
 
     /**
      * Checks whether a WP-CLI binary is available, possibly downloads it and returns the path to it.
      *
-     * We use a custom WP-CLI PHAR (latest stable). The local custom binary
-     * is re-downloaded every day to keep it fresh (stable WP-CLI releases go out every couple of months).
+     * If "latest-stable" version is used, it is re-downloaded every day to keep it fresh.
      *
      * @return string The path to the custom WP-CLI PHAR.
      */

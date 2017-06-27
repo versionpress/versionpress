@@ -1,11 +1,21 @@
 # Dev setup
 
-🚧 This is being updated for Dockerized dev setup 🚧
+This will set you up for VersionPress development.
+
+## Introduction
+
+While VersionPress ships as a WordPress plugin, it is a relatively large piece of software where good development tools and workflows are necessary. We try to provide as much as possible out of the box, relying on this general approach:
+
+- You should use **local tools** and their power to **write** code. Specifically, we recommend PhpStorm.
+- All **runtime concerns** are handled by **Docker**. For example, you do not need a local WordPress site, it run as a Docker container. Same for testing, etc.
+
+> **Note**: If you still need to use the legacy approach where the entire setup was local, refer to the the `4.0-alpha1` tag of the documents [Dev-Setup.md](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Dev-Setup.md) and [Testing.md](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Testing.md).
 
 ## Getting started
 
 Install:
 
+- PHP 5.6+ and Composer
 - Git 2.10+
 - Node.js 8+
 - Docker 17+
@@ -41,6 +51,7 @@ Next steps:
 - [Debugging](#debugging)
 - [Testing](#testing)
 - [Production build](#production-build)
+- [Docker tips](#docker-tips)
 
 <div id="phpstorm"></div>
 
@@ -94,15 +105,33 @@ Debugging should now work:
 
 ## Testing
 
-Tests are currently about 60% of the PHP code in the project so pretty significant. They live in the `./plugins/versionpress/tests` directory and there are several types of them, from unit tests to full end2end tests.
+Tests are a significant part of VersionPress core, currently about 60% of the codebase. They live in `./plugins/versionpress/tests` and there are several types of them, from unit tests to full end2end tests. They all run in a dockerized test environment.
 
-> Note that the `./frontend` app might have its own tests. This section is about core VersionPress tests.
+> **Note**: the `./frontend` app has its own tests, this section is about core VersionPress tests (PHP code) only.
 
-### Dockerized setup
+In this section:
 
-Running tests is much easier with Docker, however, there is some initial setup. VersionPress ships with PhpStorm project files so some of the things below might be already set up for you but let's do a full walk-through.
+- [Dockerized testing environment](#dockerized-tests) (optional)
+- [Unit tests](#unit-tests)
+- [End2end tests](#end2end-tests)
+- [Other tests](#other-tests)
 
- First, if you're on Mac or Windows, expose this daemon in Docker settings:
+<div id="dockerized-tests"></div>
+
+### Dockerized testing environment
+
+Docker greatly helps with running tests: it requires almost no local setup and produces consistent results across platforms. If you don't need to run or debug tests from PhpStorm, running tests is as simple as:
+
+1. `cd ./plugins/versionpress/tests`
+2. `npm run test:<type>`, e.g., `npm run test:unit-tests`
+
+After you inspect the results, run `npm run cleanup-tests` to shut down the Docker stack (it is left up and running so that you can e.g. inspect the resulting WordPress site in case of end2end tests).
+
+The only local requirement is a free port 80 (end2end tests make the WordPress site available for local inspection).
+
+If you also want to run or debug tests from PhpStorm, this is a one-time example setup:
+
+First, if you're using _Docker for Mac_ or _Docker for Windows_, expose a daemon in Docker settings:
 
 ![image](https://user-images.githubusercontent.com/101152/27441580-43a964c8-576e-11e7-9912-1be811f73c4b.png)
 
@@ -114,7 +143,7 @@ In the Docker panel, you should now be able to connect:
 
 ![image](https://user-images.githubusercontent.com/101152/27441986-508eb2e6-576f-11e7-83b6-20e9b6944619.png)
 
-Now let's define a remote interpreter. Make sure you have the **PHP Docker** plugin enabled and go to *Settings* > *Languages & Frameworks* > *PHP*. Add a new interpreter there:
+Next, define a remote interpreter. Make sure you have the **PHP Docker** plugin enabled and go to *Settings* > *Languages & Frameworks* > *PHP*. Add a new interpreter there:
 
 ![image](https://user-images.githubusercontent.com/101152/27442419-6e177932-5770-11e7-9d28-dfc219a41fcd.png)
 
@@ -136,7 +165,16 @@ Now you're ready to run the tests.
 
 Unit tests are best suited for small pieces of algorithmic functionality. For example, `IniSerializer` is covered with unit tests extensively.
 
-You can run any or all unit tests in PhpStorm easily e.g. by right-clicking test names. The Run panel should look like this:
+The easiest way to run unit tests is:
+
+1. `cd ./plugins/versionpress/tests`
+2. `npm run test:unit-tests`
+
+You should see something like this:
+
+![image](https://user-images.githubusercontent.com/101152/27480550-a4364fea-5818-11e7-9d33-b96accab59ce.png)
+
+You can also run any or all tests in PhpStorm easily by right-clicking test names and other methods provided by this IDE. The _Run_ panel will look like this:
 
 ![image](https://user-images.githubusercontent.com/101152/27459292-c8eadbe6-57ad-11e7-96bd-3b77f255247f.png)
 
@@ -144,10 +182,63 @@ Debugging also works well:
 
 ![image](https://user-images.githubusercontent.com/101152/27459354-23388d96-57ae-11e7-8bc0-684d6634e6d6.png)
 
+### End2end tests
+
+End2end tests exercise a full WordPress site and check that VersionPress creates the right Git commits and other similar things. These tests are quite heavy and slow to run but if they pass, there's a good chance that VersionPress works correctly. (Before the project had these, long and painful manual testing period was necessary before each release.)
+
+Running and debugging end2end tests is very similar to unit tests above, just with docker-compose instead of a single container. An example CLI interpreter would be like this (note the selected "service" which is `selenium-tests` in this example):
+
+![image](https://user-images.githubusercontent.com/101152/27520544-44122be6-5a0e-11e7-9847-ec8547c219b6.png)
+
+Then a test framework setup:
+
+![image](https://user-images.githubusercontent.com/101152/27520565-91ce0ee0-5a0e-11e7-8390-8bea5006acc7.png)
+
+Then just select any test and run or debug it:
+
+![image](https://user-images.githubusercontent.com/101152/27520576-c9bc7bca-5a0e-11e7-8e80-4163bfb36219.png)
+
+From the command line, you just run e.g. `docker-compose run selenium-tests` – see `docker-compose.yml` in the `tests` folder for all the available test types.
+
+After the tests are run, the docker-compose stack is left up and running so that you can inspect it:
+
+- You can access the site in your local browser by aliasing a `wordpress` host in your `hosts` file (add a line with `127.0.0.1 wordpress`) and then visiting `http://wordpress/vp01`.
+- `docker exec -ti tests_wordpress_1 /bin/bash` to start an interactive session inside the WordPress site container. You can then e.g. run `git log` against the site.
+- `docker-compose ps` lists all the running services.
+- `docker-compose down` shuts the whole stack down.
+
+
+<div id="other-tests"></div>
+
+### Other tests
+
+There are also other types of integration tests, e.g., `GitRepositoryTests` or `StorageTests`. These are lighter than End2End tests but still depend on some external subsystem like Git or file system.
+
+You run these tests in the same manner as End2End or unit tests.
+
 
 
 ## Production build
 
-Run `npm run build`,  it will produce a file like `dist/versionpress-3.0.2.zip`.
+Run `npm run build`, it will produce a file like `dist/versionpress-3.0.2.zip`.
 
 The version number is based on the nearest Git tag and can also be something like `3.0.2-27-g0e1ce7f` meaning that the closest tag is `3.0.2`, there have been 27 commits since then and the package was built from `0e1ce7f`. See [`git describe --tags`](https://git-scm.com/docs/git-describe#_examples) for more examples.
+
+## Docker tips
+
+Here are some tips for working with Docker / Docker Compose:
+
+- Aliasing `docker-compose` to `dc` will save you some typing. (All examples here still use the full variant.)
+- You can start the whole stack in the background via `docker-compose up -d`. Then, you would use:
+    - `docker-compose logs --tail=10` to display last 10 log messages from each container. Logs can also be followed (similar to `docker-compose up`) by `docker-compose logs -f`.
+    - `docker-compose ps` to list the containers.
+    - `docker-compose stop` to shut down the stack.
+    - `npm run cleanup-docker-stack` to clean up everything.
+- Most values in `docker-compose.yml` like environment variables can be changed in `docker-compose.override.yml`.
+- Any container from the stack can be started by `docker-compose run <service>`, e.g., `docker-compose run unit-tests`.
+    - The session can be made interactive by putting
+        ```
+        stdin_open: true
+        tty: true
+        ```
+        next to the service. Then, it's possible to do e.g. `docker-compose run unit-tests /bin/bash`. (This unfortunately needs to be done in Compose file, not yet possible on the command line. Tracking issue: https://github.com/docker/compose/issues/363.)

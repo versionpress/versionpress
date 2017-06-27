@@ -87,7 +87,7 @@ class SeleniumWorker implements ITestWorker
     private static function startSession()
     {
         $parameters = [
-            'host' => 'localhost',
+            'host' => 'selenium-hub',
             'port' => 4444,
             'browser' => null,
             'desiredCapabilities' => [],
@@ -154,7 +154,7 @@ class SeleniumWorker implements ITestWorker
             return;
         }
 
-        $this->byId('user_login')->value(self::$testConfig->testSite->adminName);
+        $this->byId('user_login')->value(self::$testConfig->testSite->adminUser);
         usleep(100 * 1000); // wait for change focus
         $this->byId('user_pass')->value(self::$testConfig->testSite->adminPassword);
         $this->byId("loginform")->submit();

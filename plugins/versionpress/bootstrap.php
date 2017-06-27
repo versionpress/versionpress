@@ -17,7 +17,7 @@ if (!defined('VP_VPDB_DIR')) {
 /**
  * Absolute path to the directory where VersionPress saves temporary data, e.g. mutex locks.
  */
-define('VERSIONPRESS_TEMP_DIR', VERSIONPRESS_PLUGIN_DIR . '/temp');
+define('VERSIONPRESS_TEMP_DIR', WP_CONTENT_DIR . '/vpcache');
 
 /**
  * Absolute path to the activation file.

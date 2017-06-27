@@ -43,6 +43,10 @@
       <path value="$PROJECT_DIR$/vendor/hamcrest/hamcrest-php" />
       <path value="$PROJECT_DIR$/vendor/antecedent/patchwork" />
       <path value="$PROJECT_DIR$/vendor/10up/wp_mock" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/phpunit-selenium" />
+      <path value="$PROJECT_DIR$/vendor/icecave/semver" />
+      <path value="$PROJECT_DIR$/vendor/icecave/parity" />
+      <path value="$PROJECT_DIR$/vendor/icecave/repr" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

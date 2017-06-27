@@ -1,0 +1,65 @@
+# ---------------------------------------------------------------------
+# Test configuration used by WpAutomation, parsed into `TestConfig`.
+# ---------------------------------------------------------------------
+
+# Worker type to run the tests, 'selenium' or 'wp-cli'
+end2end-test-type: selenium
+
+# WP-CLI version used, e.g., '1.1.0' or 'latest-stable'
+wp-cli-version: latest-stable
+
+# Selenium configuration
+selenium:
+
+  # DEPRECATED - tests run in Docker now.
+  firefox-binary:
+
+  # How long to wait after commit is made
+  post-commit-wait-time: 500
+
+# Default values for all sites, may be overridden by a specific site
+common-site-config:
+  db:
+    table-prefix: wp_
+  wp-site:
+    admin-user: admin
+    admin-email: admin@example.com
+    admin-pass: admin
+    wp-version: 4.8
+    wp-locale: en_US
+    wp-autoupdate: false
+
+# One of the sites below, used as the active one
+test-site: vp01
+
+# Test sites
+sites:
+
+  # Host names and paths must match those in docker-compose.yml
+  vp01:
+    host: wordpress
+    installation-type: standard
+    db:
+      host: mysql
+      dbname: wordpress
+      user: root
+      password: r00tpwd
+    wp-site:
+      path: /var/www/html/vp01
+      url: http://wordpress/vp01
+      wp-admin-path: wp-admin
+      title: "VersionPress Test"
+
+  vp01-composer:
+    host: wordpress
+    installation-type: composer
+    db:
+      host: mysql
+      dbname: wordpress
+      user: root
+      password: r00tpwd
+    wp-site:
+      path: /var/www/html/vp01
+      url: http://wordpress/vp01/web # Note that the site runs from subdirectory
+      wp-admin-path: wp/wp-admin
+      title: "VersionPress Test (Composer)"

@@ -100,7 +100,7 @@ class SiteConfig
     /**
      * @var string
      */
-    public $adminName;
+    public $adminUser;
 
     /**
      * @var string
