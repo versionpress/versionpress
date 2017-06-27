@@ -184,7 +184,14 @@ Debugging also works well:
 
 ### End2end tests
 
-End2end tests exercise a full WordPress site and check that VersionPress creates the right Git commits and other similar things. These tests are quite heavy and slow to run but if they pass, there's a good chance that VersionPress works correctly. (Before the project had these, long and painful manual testing period was necessary before each release.)
+End2end tests exercise a full WordPress site and check that VersionPress creates the right Git commits and that the database is in correct state. These tests are quite heavy and slow to run but if they pass, there's a good chance that VersionPress works correctly. (Before the project had these, long and painful manual testing period was necessary before each release.)
+
+End2end tests use the concept of **workers**: each test itself is implemented once but e.g. how a post is created or a user deleted is up to a specific worker. There are currently two types of workers:
+
+1. **Selenium workers** – simulate real user by clicking in a browser.
+2. **WP-CLI workers** – run WP-CLI commands against the test site.
+
+In the future, we might add REST API workers; the idea is to cover all possible interactions with the site as different workers can (and in practice do) produce slightly different results.
 
 Running and debugging end2end tests is very similar to unit tests above, just with docker-compose instead of a single container. An example CLI interpreter would be like this (note the selected "service" which is `selenium-tests` in this example):
 
@@ -214,9 +221,7 @@ After the tests are run, the docker-compose stack is left up and running so that
 
 There are also other types of integration tests, e.g., `GitRepositoryTests` or `StorageTests`. These are lighter than End2End tests but still depend on some external subsystem like Git or file system.
 
-You run these tests in the same manner as End2End or unit tests.
-
-
+You run these tests in the same manner as end2end or unit tests.
 
 ## Production build
 
