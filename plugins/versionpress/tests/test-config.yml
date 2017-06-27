@@ -11,6 +11,9 @@ wp-cli-version: latest-stable
 # Selenium configuration
 selenium:
 
+  # Where Selenium runs (port is expected to be 4444)
+  host: selenium-hub
+
   # How long to wait after commit is made
   post-commit-wait-time: 500
 

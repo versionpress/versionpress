@@ -50,7 +50,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
 
         $this->setBrowser("firefox");
 
-        $this->setHost('selenium-hub');
+        $this->setHost(self::$testConfig->seleniumConfig->host);
 
         $capabilities = $this->getDesiredCapabilities();
         $this->setDesiredCapabilities($capabilities);

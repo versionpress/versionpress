@@ -49,9 +49,15 @@ class TestConfig
     {
         $rawConfig = Yaml::parse(file_get_contents($configFile));
 
-        $this->seleniumConfig = new SeleniumConfig();
-        $this->seleniumConfig->postCommitWaitTime = $rawConfig['selenium']['post-commit-wait-time'];
+        // General configuration
         $this->end2endTestType = $rawConfig['end2end-test-type'];
+
+        // Selenium settings
+        $this->seleniumConfig = new SeleniumConfig();
+        $this->seleniumConfig->host = $rawConfig['selenium']['host'];
+        $this->seleniumConfig->postCommitWaitTime = $rawConfig['selenium']['post-commit-wait-time'];
+
+        // WP-CLI settings
         $this->wpCliVersion = $rawConfig['wp-cli-version'];
 
         $this->sites = [];

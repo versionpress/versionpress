@@ -87,7 +87,7 @@ class SeleniumWorker implements ITestWorker
     private static function startSession()
     {
         $parameters = [
-            'host' => 'selenium-hub',
+            'host' => self::$testConfig->seleniumConfig->host,
             'port' => 4444,
             'browser' => null,
             'desiredCapabilities' => [],
