@@ -540,65 +540,22 @@ class WpAutomation
      */
     private function prepareStandardWpInstallation()
     {
-        $this->ensureCleanInstallationIsAvailable();
-        FileSystem::copyDir($this->getCleanInstallationPath(), $this->siteConfig->path);
+
+        $wpVersion = $this->siteConfig->wpVersion;
+        $wpLocale = $this->siteConfig->wpLocale;
+        $downloadCommand = "wp core download --path=\"{$this->siteConfig->path}\" --version=\"$wpVersion\"";
+        if ($wpLocale) {
+            $downloadCommand .= " --locale=$wpLocale";
+        }
+
+        $this->exec($downloadCommand);
+
         try {
             $this->exec("chown -f -R www-data:www-data {$this->siteConfig->path}");
         } catch (Exception $e) {
             // VP plugin itself is mounted as read-only so chown will fail on it
         }
         $this->createConfigFile();
-    }
-
-    /**
-     * Ensures that the clean installation of WordPress is available locally. If not,
-     * downloads it from wp.org and stores it as `<clean-installations-dir>/<version>`.
-     */
-    private function ensureCleanInstallationIsAvailable()
-    {
-
-        $cleanInstallationPath = $this->getCleanInstallationPath();
-
-        if (!$this->isCorrectlyDownloaded($cleanInstallationPath)) {
-            FileSystem::remove($cleanInstallationPath);
-            FileSystem::mkdir($cleanInstallationPath);
-
-            $wpVersion = $this->siteConfig->wpVersion;
-            $wpLocale = $this->siteConfig->wpLocale;
-            $downloadCommand = "wp core download --path=\"$cleanInstallationPath\" --version=\"$wpVersion\"";
-            if ($wpLocale) {
-                $downloadCommand .= " --locale=$wpLocale";
-            }
-
-            $this->exec($downloadCommand, null, false, null, 'root');
-        }
-    }
-
-    /**
-     * Checks that clean WP installation is available and downloaded correctly. (Simple implementation
-     * for now, just checking some basic paths.)
-     *
-     * @param string $cleanInstallationPath
-     * @return bool
-     */
-    private function isCorrectlyDownloaded($cleanInstallationPath)
-    {
-        return is_dir($cleanInstallationPath) && is_file($cleanInstallationPath . '/wp-settings.php');
-    }
-
-
-    /**
-     * Returns a path where a clean installation of the configured WP version is stored and cached.
-     *
-     * @return string
-     */
-    private function getCleanInstallationPath()
-    {
-
-        $homeDir = getenv('HOME') ?: getenv('HOMEDRIVE') . getenv('HOMEPATH');
-        $wpCliCacheDir = getenv('WP_CLI_CACHE_DIR') ?: "$homeDir/.wp-cli/cache";
-
-        return "$wpCliCacheDir/clean-installations/{$this->siteConfig->wpVersion}";
     }
 
     /**
@@ -656,14 +613,13 @@ class WpAutomation
      *   automatically.
      * @param bool $debug
      * @param null|array $env
-     * @param string $wpCliRunAsUser Useful only for WP-CLI (yes, the current design smells)
      * @return string When process execution is not successful
      * @throws Exception
      */
-    private function exec($command, $executionPath = null, $debug = false, $env = null, $wpCliRunAsUser = 'www-data')
+    private function exec($command, $executionPath = null, $debug = false, $env = null)
     {
 
-        $command = $this->possiblyRewriteWpCliCommand($command, $wpCliRunAsUser);
+        $command = $this->possiblyRewriteWpCliCommand($command);
 
         if (!$executionPath) {
             $executionPath = $this->siteConfig->path;
@@ -738,24 +694,20 @@ class WpAutomation
      * is done for non-WP-CLI commands.
      *
      * @param string $command
-     * @param string $runAsUser
      *
      * @return string
      */
-    private function possiblyRewriteWpCliCommand($command, $runAsUser = 'www-data')
+    private function possiblyRewriteWpCliCommand($command)
     {
         if (!Strings::startsWith($command, "wp ")) {
             return $command;
         }
 
         $command = substr($command, 3); // strip "wp " prefix
+        $command = "php " . ProcessUtils::escapeshellarg($this->getWpCli()) . " $command";
+        $command = "sudo -H -u www-data bash -c " . ProcessUtils::escapeshellarg($command);
 
-        $rewrittenCommand = "sudo -u $runAsUser -- ";
-        $rewrittenCommand .= "php " . ProcessUtils::escapeshellarg($this->getWpCli());
-        $rewrittenCommand .= $runAsUser === 'root' ? ' --allow-root' : '';
-        $rewrittenCommand .= " $command";
-
-        return $rewrittenCommand;
+        return $command;
     }
 
     /**
