@@ -32,6 +32,9 @@ services:
       # Project mounts
       - ..:/opt/project:ro # we need to map the whole `versionpress` folder, the `vendor` folder is there
       - ../../../ext-libs:/opt/ext-libs:ro
+
+      # Caching downloaded WP ZIPs
+      - wpcli-cache:/var/www/.wp-cli
     links:
       - selenium-hub:selenium-hub
       - mysql:mysql
@@ -67,3 +70,4 @@ services:
 volumes:
   mysql-data:
   test-site:
+  wpcli-cache:

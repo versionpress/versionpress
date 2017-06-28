@@ -541,6 +541,9 @@ class WpAutomation
     private function prepareStandardWpInstallation()
     {
 
+        // mounted as root:root by Docker
+        $this->exec("chown -f -R www-data:www-data /var/www/.wp-cli");
+
         $wpVersion = $this->siteConfig->wpVersion;
         $wpLocale = $this->siteConfig->wpLocale;
         $downloadCommand = "wp core download --path=\"{$this->siteConfig->path}\" --version=\"$wpVersion\"";

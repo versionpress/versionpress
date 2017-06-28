@@ -10,6 +10,7 @@
     "test": "echo Choose one of the `test:<test-type>` scripts",
     "test:unit-tests": "docker-compose run unit-tests || true",
     "test:selenium-tests": "docker-compose run selenium-tests || true",
+    "stop-tests": "docker-compose down",
     "cleanup-tests": "docker-compose down -v"
   },
   "devDependencies": {

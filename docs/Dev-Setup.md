@@ -125,7 +125,7 @@ Docker greatly helps with running tests: it requires almost no local setup and p
 1. `cd ./plugins/versionpress/tests`
 2. `npm run test:<type>`, e.g., `npm run test:unit-tests`
 
-After you inspect the results, run `npm run cleanup-tests` to shut down the Docker stack (it is left up and running so that you can e.g. inspect the resulting WordPress site in case of end2end tests).
+You can now inspect the results in the console and also, the whole Docker stack is still running so you can e.g. inspect the test site or its database. Run `npm run stop-tests` to shut down the Docker stack or `npm run cleanup-tests` to also remove all the volumes (next start will be completely fresh).
 
 The only local requirement is a free port 80 (end2end tests make the WordPress site available for local inspection).
 
