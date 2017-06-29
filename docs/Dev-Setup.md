@@ -57,11 +57,11 @@ Next steps:
 
 ## PhpStorm setup
 
-We recommend [PhpStorm](https://www.jetbrains.com/phpstorm/) for VersionPress development.
+We recommend [PhpStorm](https://www.jetbrains.com/phpstorm/) for VersionPress development. Version **2017.2** is necessary for Docker Compose workflows below.
 
-The initial `npm install` copies `.idea` to `./plugins/versionpress` where most things are already configured, however, some manual steps are still needed.
+First, **run `npm run init-phpstorm`**. This copies `.idea` to `./plugins/versionpress` where most things are already preconfigured for you.
 
-On the first PhpStorm start, you'll see two prompts:
+Then, open the `./plugins/versionpress` project in PhpStorm. On the first start, you'll see two prompts:
 
 ![image](https://cloud.githubusercontent.com/assets/101152/26286846/c369a5b0-3e6e-11e7-8781-c1a3c8446aa6.png)
 

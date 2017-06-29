@@ -7,6 +7,7 @@
   "license": "GPL",
   "scripts": {
     "init-dev": "gulp init-dev",
+    "init-phpstorm": "gulp idea",
     "build": "gulp build",
     "start": "docker-compose up",
     "cleanup-docker-stack": "docker-compose down -v && rm -rf ./dev-env/wp",
