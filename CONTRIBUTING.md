@@ -56,9 +56,7 @@ The following discusses some of the important details if you want to contribute.
 
 ### Our development process
 
-[**Issues**](https://github.com/versionpress/versionpress/issues) are the most important tool to plan and manage almost everything around VersionPress. We create them for new features, bugs, improvements or even larger things like planning documents. **We strongly prefer issues over wiki** or other documents as they are actionable and time-framed.
-
-[These **labels**](https://github.com/versionpress/versionpress/wiki/Issues#labels) are used to categorize issues.
+[**Issues**](https://github.com/versionpress/versionpress/issues) are the most important tool to plan and manage almost everything around VersionPress. We create them for new features, bugs, improvements or even larger things like planning documents. **We strongly prefer issues over wiki** or other documents as they are actionable and time-framed. The issues we use are described in [docs/Issues.md](./docs/Issues.md).
 
 [**Milestones**](https://github.com/versionpress/versionpress/milestones) are used to assign issues to major releases like 4.0 or 5.0 (we don't use minor releases like 4.1 or 4.2, see our [release versioning](https://docs.versionpress.net/en/release-notes#release-versioning)). [**Projects**](https://github.com/versionpress/versionpress/projects) are then used for more granular planning, e.g., to assign issues to various alpha, beta or final releases.
 
