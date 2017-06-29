@@ -5,7 +5,7 @@ use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\ChangeInfos\EntityChangeInfo;
 
-class EditActionChangeInfoPreprocessor implements ChangeInfoPreprocessor
+class UpdateActionChangeInfoPreprocessor implements ChangeInfoPreprocessor
 {
 
     public function __construct(ChangeInfoFactory $changeInfoFactory)
@@ -13,7 +13,7 @@ class EditActionChangeInfoPreprocessor implements ChangeInfoPreprocessor
     }
 
     /**
-     * More actions '* /edit' for same entity are replaced with one '* /edit' action.
+     * More actions '* /update' for same entity are replaced with one '* /update' action.
      *
      * @param ChangeInfo[] $changeInfoList
      * @return ChangeInfo[][]
@@ -21,21 +21,20 @@ class EditActionChangeInfoPreprocessor implements ChangeInfoPreprocessor
     public function process($changeInfoList)
     {
 
-        // 1) Find all post/edit
-        $entities = $this->getChangeInfosByIndicies($changeInfoList, ["edit"]);
+        // 1) Find all post/update
+        $entities = $this->getChangeInfosByIndicies($changeInfoList, ["update"]);
 
-        // 2) Replace all post/edit with single post/edit action
+        // 2) Replace all post/update with single post/update action
         foreach ($entities as $entityId => $changeInfos) {
-            $edits = $changeInfos['edit'];
-            if (count($edits) > 1) {
-                $updatedProperties = [];
-                /** @var EntityChangeInfo $firstEditChangeInfo */
-                $firstEditChangeInfo = $changeInfoList[$changeInfos["edit"][0]];
-                foreach ($edits as $edit) {
-                    unset($changeInfoList[$edit]);
+            $updates = $changeInfos['update'];
+            if (count($updates) > 1) {
+                /** @var EntityChangeInfo $firstUpdateChangeInfo */
+                $firstUpdateChangeInfo = $changeInfoList[$changeInfos["update"][0]];
+                foreach ($updates as $update) {
+                    unset($changeInfoList[$update]);
                 }
 
-                $changeInfoList[] = $firstEditChangeInfo;
+                $changeInfoList[] = $firstUpdateChangeInfo;
             }
         }
         return [$changeInfoList];

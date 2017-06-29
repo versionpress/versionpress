@@ -81,7 +81,7 @@ class CommentsTest extends End2EndTestCase
 
     /**
      * @test
-     * @testdox Editing comment creates 'comment/edit' action
+     * @testdox Editing comment creates 'comment/update' action
      * @depends addingCommentCreatesCommentCreateAction
      */
     public function editingCommentCreatesCommentEditAction()
@@ -93,7 +93,7 @@ class CommentsTest extends End2EndTestCase
         self::$worker->editComment();
 
         $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("comment/edit");
+        $this->commitAsserter->assertCommitAction("comment/update");
         $this->commitAsserter->assertCommitTag("VP-Comment-Author", self::$testConfig->testSite->adminName);
         $this->commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
         $this->commitAsserter->assertCleanWorkingDirectory();
@@ -253,7 +253,7 @@ class CommentsTest extends End2EndTestCase
         self::$worker->editTwoComments();
 
         $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertBulkAction('comment/edit', 2);
+        $this->commitAsserter->assertBulkAction('comment/update', 2);
         $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }

@@ -10,7 +10,7 @@ use VersionPress\Git\CommitMessage;
  * and later read when the main VersionPress table is being rendered. At least
  * the VP-Action tag is always present, something like:
  *
- *     VP-Action: post/edit/VPID123
+ *     VP-Action: post/update/VPID123
  *
  * Specific subclasses optionally add their own tags.
  *
@@ -114,7 +114,7 @@ class TrackedChangeInfo implements ChangeInfo
     /**
      * Object type, the first part of the VP-Action tag value.
      *
-     * For example, when objectType is "post", the VP-Action tag will be something like "post/edit/VPID123".
+     * For example, when objectType is "post", the VP-Action tag will be something like "post/update/VPID123".
      *
      * @return string
      */

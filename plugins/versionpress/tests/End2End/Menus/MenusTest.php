@@ -74,7 +74,7 @@ class MenusTest extends End2EndTestCase
 
     /**
      * @test
-     * @testdox Editing menu item order creates 'post/edit' action.
+     * @testdox Editing menu item order creates 'post/update' action.
      * @depends addingMenuItemCreatesPostCreateAction
      */
     public function editingMenuItemCreatesPostEditAction()
@@ -86,7 +86,7 @@ class MenusTest extends End2EndTestCase
         self::$worker->editMenuItem();
 
         $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/edit");
+        $this->commitAsserter->assertCommitAction("post/update");
         $this->commitAsserter->assertCommitTag("VP-Post-Type", "nav_menu_item");
         $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();

@@ -71,7 +71,7 @@ add_filter('vp_entity_should_be_saved_option', function ($shouldBeSaved, $data, 
 
 add_filter('vp_entity_action_post', function ($action, $oldEntity, $newEntity) {
 
-    if ($action === 'edit') { // determine more specific edit action
+    if ($action === 'update') { // determine more specific action
 
         $diff = EntityUtils::getDiff($oldEntity, $newEntity);
 
@@ -123,7 +123,7 @@ add_filter('vp_bulk_change_description_post', function ($description, $action, $
             return "Moved $count $postTypePlural to trash";
         case "untrash":
             return "Moved $count $postTypePlural from trash";
-        case "edit":
+        case "update":
             return "Updated $count $postTypePlural";
     }
 
@@ -171,7 +171,7 @@ add_filter('vp_entity_action_comment', function ($action, $oldEntity, $newEntity
         return 'create-pending';
     }
 
-    if ($action !== 'edit') {
+    if ($action !== 'update') {
         return $action;
     }
 
@@ -184,7 +184,7 @@ add_filter('vp_entity_action_comment', function ($action, $oldEntity, $newEntity
     if (($oldEntity['comment_approved'] === 'trash' && $newEntity['comment_approved'] === 'post-trashed') ||
         ($oldEntity['comment_approved'] === 'post-trashed' && $newEntity['comment_approved'] === 'trash')
     ) {
-        return 'edit'; // trash -> post-trashed and post-trashed -> trash are not interesting action for us
+        return 'update'; // trash -> post-trashed and post-trashed -> trash are not interesting action for us
     }
 
     if ($diff['comment_approved'] === 'trash') {
@@ -250,7 +250,7 @@ add_filter('vp_bulk_change_description_comment', function ($description, $action
 
 add_filter('vp_entity_action_term', function ($action, $oldEntity, $newEntity) {
 
-    if ($action === 'edit' && $oldEntity['name'] !== $newEntity['name']) {
+    if ($action === 'update' && $oldEntity['name'] !== $newEntity['name']) {
         return 'rename';
     }
 
@@ -355,7 +355,7 @@ add_filter('vp_action_description_postmeta', function ($message, $action, $vpid,
 
         $verbs = [
             'create' => 'Set',
-            'edit' => 'Changed',
+            'update' => 'Changed',
             'delete' => 'Removed',
         ];
 

@@ -14,7 +14,7 @@ class OptionsTest extends End2EndTestCase
 
     /**
      * @test
-     * @testdox Changing option creates 'option/edit' action
+     * @testdox Changing option creates 'option/update' action
      */
     public function changingOptionCreatesOptionEditAction()
     {
@@ -25,7 +25,7 @@ class OptionsTest extends End2EndTestCase
         self::$worker->changeOption();
 
         $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction('option/edit');
+        $this->commitAsserter->assertCommitAction('option/update');
         $this->commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
         $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
@@ -33,7 +33,7 @@ class OptionsTest extends End2EndTestCase
 
     /**
      * @test
-     * @testdox Changing more option creates bulk 'option/edit' action
+     * @testdox Changing more option creates bulk 'option/update' action
      */
     public function changingMoreOptionsCreatesOptionEditAction()
     {
@@ -44,7 +44,7 @@ class OptionsTest extends End2EndTestCase
         self::$worker->changeTwoOptions();
 
         $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertBulkAction('option/edit', 2);
+        $this->commitAsserter->assertBulkAction('option/update', 2);
         $this->commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
         $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();

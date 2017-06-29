@@ -45,7 +45,7 @@ class AutocompleteUtils
         }
         return [
             'type' => 'list',
-            'defaultHint' => 'e.g. post/edit',
+            'defaultHint' => 'e.g. post/update',
             'sectionTitle' => 'Actions',
             'content' => $actions
         ];

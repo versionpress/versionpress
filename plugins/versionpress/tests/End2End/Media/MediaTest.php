@@ -30,7 +30,7 @@ class MediaTest extends End2EndTestCase
 
         self::$worker->uploadFile();
 
-        $this->commitAsserter->ignoreCommits(["usermeta/create", "usermeta/edit"]);
+        $this->commitAsserter->ignoreCommits(["usermeta/create", "usermeta/update"]);
 
         $this->commitAsserter->assertNumCommits(1);
         $this->commitAsserter->assertCommitAction("post/create");
@@ -42,7 +42,7 @@ class MediaTest extends End2EndTestCase
 
     /**
      * @test
-     * @testdox Editing file name creates 'post/edit' action
+     * @testdox Editing file name creates 'post/update' action
      * @depends uploadingFileCreatesPostCreateAction
      */
     public function editingFileNameCreatesPostEditAction()
@@ -54,7 +54,7 @@ class MediaTest extends End2EndTestCase
         self::$worker->editFileName();
 
         $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/edit");
+        $this->commitAsserter->assertCommitAction("post/update");
         $this->commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
         $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
@@ -94,7 +94,7 @@ class MediaTest extends End2EndTestCase
         self::$worker->editFile();
 
         $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/edit");
+        $this->commitAsserter->assertCommitAction("post/update");
         $this->commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
         $this->commitAsserter->assertCommitPath("A", "%uploads%/*");
         $this->commitAsserter->assertCleanWorkingDirectory();

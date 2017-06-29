@@ -34,11 +34,11 @@ class PostChangeInfoPreprocessor implements ChangeInfoPreprocessor
         // 1) Find and replace combination of post/draft and post/publish with single post/create action
         $this->replaceChangeInfosCombination($changeInfoList, ["draft", "publish"], "create");
 
-        // 1) Find and replace combination of post/draft and post/edit with single post/create action
-        $this->replaceChangeInfosCombination($changeInfoList, ["draft", "edit"], "draft");
+        // 1) Find and replace combination of post/draft and post/update with single post/create action
+        $this->replaceChangeInfosCombination($changeInfoList, ["draft", "update"], "draft");
 
-        // 1) Find and replace combination of post/create and post/edit with single post/create action
-        $this->replaceChangeInfosCombination($changeInfoList, ["create", "edit"], "create");
+        // 1) Find and replace combination of post/create and post/update with single post/create action
+        $this->replaceChangeInfosCombination($changeInfoList, ["create", "update"], "create");
 
         return [$changeInfoList];
     }

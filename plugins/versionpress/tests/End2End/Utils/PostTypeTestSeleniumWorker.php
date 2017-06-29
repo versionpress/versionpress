@@ -244,7 +244,7 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
 
     private function changeStatusOfTwoLastPosts($status)
     {
-        $this->performBulkActionWithTwoLastPosts('edit');
+        $this->performBulkActionWithTwoLastPosts('update');
 
         // change status and submit
         $this->select($this->byCssSelector('#bulk-edit [name=_status]'))->selectOptionByValue($status);

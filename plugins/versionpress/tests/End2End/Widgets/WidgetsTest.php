@@ -42,7 +42,7 @@ class WidgetsTest extends End2EndTestCase
         if (self::$testConfig->end2endTestType === 'selenium' &&
             WpVersionComparer::compare(self::$testConfig->testSite->wpVersion, '4.4-beta1') >= 0
         ) {
-            $this->commitAsserter->assertCommitAction('option/edit');
+            $this->commitAsserter->assertCommitAction('option/update');
             $this->commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
         } else {
             $this->commitAsserter->assertCommitAction('option/create');
@@ -68,7 +68,7 @@ class WidgetsTest extends End2EndTestCase
         self::$worker->createWidget();
 
         $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction('option/edit');
+        $this->commitAsserter->assertCommitAction('option/update');
         $this->commitAsserter->assertCountOfAffectedFiles(2);
         $this->commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
         $this->commitAsserter->assertCleanWorkingDirectory();
@@ -77,7 +77,7 @@ class WidgetsTest extends End2EndTestCase
 
     /**
      * @test
-     * @testdox Editing widget creates 'option/edit' action.
+     * @testdox Editing widget creates 'option/update' action.
      */
     public function editingWidgetCreatesOptionEditAction()
     {
@@ -88,7 +88,7 @@ class WidgetsTest extends End2EndTestCase
         self::$worker->editWidget();
 
         $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction('option/edit');
+        $this->commitAsserter->assertCommitAction('option/update');
         $this->commitAsserter->assertCountOfAffectedFiles(1);
         $this->commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
         $this->commitAsserter->assertCleanWorkingDirectory();
@@ -97,7 +97,7 @@ class WidgetsTest extends End2EndTestCase
 
     /**
      * @test
-     * @testdox Deleting widget creates 'option/edit' action
+     * @testdox Deleting widget creates 'option/update' action
      */
     public function deletingWidgetCreatesOptionEditAction()
     {
@@ -108,7 +108,7 @@ class WidgetsTest extends End2EndTestCase
         self::$worker->deleteWidget();
 
         $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction('option/edit');
+        $this->commitAsserter->assertCommitAction('option/update');
         $this->commitAsserter->assertCountOfAffectedFiles(2);
         $this->commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
         $this->commitAsserter->assertCleanWorkingDirectory();

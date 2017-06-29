@@ -15,7 +15,7 @@ class ActionsInfo
     private $scope;
 
     /**
-     * Actions in given scope. For example `create`, `edit`, `activate` etc.
+     * Actions in given scope. For example `create`, `update`, `activate` etc.
      * It is a map where key is a name of the action (e.g. `create`) and value is another map with two keys - `priority`
      * and `message`.
      *
@@ -23,7 +23,7 @@ class ActionsInfo
      *
      * [
      *  create => [ priority => 10, message => Created %VP-Post-Type% '%VP-Post-Title%' ],
-     *  edit => [ priority => 12, message => Edited %VP-Post-Type% '%VP-Post-Title%' ],
+     *  update => [ priority => 12, message => Updated %VP-Post-Type% '%VP-Post-Title%' ],
      * ]
      *
      * @var array

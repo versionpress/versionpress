@@ -98,11 +98,11 @@ class CommitAsserter
      *
      * This is useful in tests where different number of commits might be created in different circumstances.
      * For example, file upload will create two commits on first attempted upload ('post/create'
-     * and 'usermeta/edit') while it will only generate a single commit ('post/create') for repeated
-     * runs. In such case, if we only care about the 'post/create' action, 'usermeta/edit' can be set as ignored
+     * and 'usermeta/update') while it will only generate a single commit ('post/create') for repeated
+     * runs. In such case, if we only care about the 'post/create' action, 'usermeta/update' can be set as ignored
      * using this method.
      *
-     * @param string|string[] $action An action like "usermeta/edit", or an array of them
+     * @param string|string[] $action An action like "usermeta/update", or an array of them
      */
     public function ignoreCommits($action)
     {
@@ -134,13 +134,13 @@ class CommitAsserter
 
 
     /**
-     * Asserts that the recorded commit if of certain type, e.g. "post/edit". By default inspects
+     * Asserts that the recorded commit if of certain type, e.g. "post/update". By default inspects
      * the most recent commit; if this asserter captured more commits $whichCommit specifies
      * which commit to assert against.
      *
      * @see $whichCommitParameter
      *
-     * @param string $expectedAction Expected action, e.g., "post/edit" or "wordpress/update".
+     * @param string $expectedAction Expected action, e.g., "post/update" or "plugin/activate".
      * @param int $whichCommit See $whichCommitParameter documentation. "HEAD" by default.
      * @param bool $regardlessOfPriority By default, commit action must be the "main" one in the envelope
      *   (with the highest priority). If this param is set to true the whole envelope is searched for
@@ -173,7 +173,7 @@ class CommitAsserter
     /**
      * Asserts that commit is a bulk action. Asserts the action and number of grouped change info objects.
      *
-     * @param string $expectedAction Expected action, e.g., "post/edit" or "plugin/activate".
+     * @param string $expectedAction Expected action, e.g., "post/update" or "plugin/activate".
      * @param int $expectedCountOfGroupedActions
      */
     public function assertBulkAction($expectedAction, $expectedCountOfGroupedActions)
