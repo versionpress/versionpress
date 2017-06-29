@@ -7,9 +7,7 @@
     "url": "https://bitbucket.org/agilio/versionpress"
   },
   "scripts": {
-    "test": "echo Choose one of the `test:<test-type>` scripts",
-    "test:unit-tests": "docker-compose run unit-tests || true",
-    "test:selenium-tests": "docker-compose run selenium-tests || true",
+    "tests": "docker-compose run tests || true",
     "stop-tests": "docker-compose down",
     "cleanup-tests": "docker-compose down -v"
   },

@@ -21,7 +21,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: r00tpwd
 
-  selenium-tests:
+  tests:
     build: ./dockerfiles/testenv
     image: versionpress/testenv
     volumes:
@@ -40,17 +40,17 @@ services:
       - mysql:mysql
       - wordpress:wordpress
     working_dir: /opt/project/tests
-    command: ../vendor/bin/phpunit --verbose --colors -c phpunit-selenium.xml
+    command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml
     stdin_open: true
     tty: true
 
-  unit-tests:
+  unit-tests-runner:
+    # This service is used only from PhpStorm to run the unit tests faster.
     image: prooph/php:5.6-cli
     volumes:
       - ..:/opt/project:ro
       - ../../../ext-libs:/opt/ext-libs:ro
     working_dir: /opt/project/tests
-    command: ../vendor/bin/phpunit --verbose --colors -c phpunit-unit.xml
 
   selenium-hub:
     # We're using the generic name "selenium-hub" here because it should be transparent for the clients

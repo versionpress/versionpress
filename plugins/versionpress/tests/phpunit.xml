@@ -1,0 +1,41 @@
+<phpunit bootstrap="phpunit-bootstrap.php">
+    <testsuites>
+
+        <testsuite name="Unit Tests">
+            <directory>Unit</directory>
+        </testsuite>
+
+        <testsuite name="Storage Tests">
+            <directory>StorageTests</directory>
+        </testsuite>
+
+        <testsuite name="Synchronizer Tests">
+            <directory>SynchronizerTests</directory>
+        </testsuite>
+
+        <testsuite name="GitRepository Tests">
+            <directory>GitRepositoryTests</directory>
+        </testsuite>
+
+        <testsuite name="SQL Parser Tests">
+            <directory>SqlTests</directory>
+        </testsuite>
+
+        <testsuite name="End 2 End">
+            <directory>End2End</directory>
+        </testsuite>
+
+        <testsuite name="Selenium Tests">
+            <directory>Selenium</directory>
+        </testsuite>
+
+        <testsuite name="Workflow Tests">
+            <directory>Workflow</directory>
+        </testsuite>
+
+        <testsuite name="Load Tests">
+            <directory>LoadTests</directory>
+        </testsuite>
+
+    </testsuites>
+</phpunit>
