@@ -1,73 +1,51 @@
 # Issue management
 
-On this page:
-
-- [Labels](#labels)
-- [About the imported issues 1..522](#imported-issues-1522)
+The project is managed via GitHub [issues](https://github.com/versionpress/versionpress/issues). They are assigned to [milestones](https://github.com/versionpress/versionpress/milestones) for each major version (3.0, 4.0 etc.) and more granularly managed in GitHub [projects](https://github.com/versionpress/versionpress/projects) (4.0-alpha, 4.0-beta etc.).
 
 ## Labels
 
-We use these labels to tag GitHub issues:
+We use [these labels](https://github.com/versionpress/versionpress/labels) to tag GitHub issues:
 
-
-### Issue type
-
- - `bug` – yes, that. If it's a major bug, it has additionally the `major` label.
- - `feature` – something new in a release.
- - `improvement` – an improvement of an existing feature.
- - `task` – e.g. to write a documentation; rarer than the previous types.
-
-
-### Importance
-
-- `minor` marks relatively unimportant issues.
-- `major` is only used with bugs, forming the "major bug" pseudo-label.
-- `significant` is used to highlight issues that are worth mentioning in the release notes or are otherwise significant.
-
-We also use **[overv.io](https://overv.io/versionpress/versionpress/) for priorities** – cards placed higher have higher priority. The board is not always in sync with reality though.
-
-
-### Issue states
-
-1. **Open issues** don't have any label, they are just 'Open' on GitHub. Nobody is working on them currently. `discussion` label can be used when a decision needs to be made before coding starts.
-2. `in progress` marks issues that are being worked on.
-3. `in review` marks issues that are considered done by the assignee and are undergoing a review.
-4. **Closed issues** again have no label, they just use the 'Closed' GitHub state. There are some special labels marking the closed issues:
-    - `won't fix`
-    - `duplicate`
-
-
-### Scopes (areas of work)
-
-Areas of work (scopes, components) are prefixed `scope:`. We use these:
-
- - `scope: core`
- The core versioning functionality. Technically, most of the PHP code of the plugin falls into this category, just the workflow features (cloning, merging etc.) are marked with the `scope: workflows` label.
- - `scope: gui` UI things, i.e., what users click on. Technically, the 'frontend' project.
- - `scope: integrations` Integrations with 3<sup>rd</sup> party plugins, themes, hosts etc.
- - `scope: workflows` Things like branching, merging, cloning, pulling etc.
- - `scope: tests` Automated tests.
- - `scope: dev-infrastructure` Things regarding development environment like IDE settings, build scripts etc.
-
-We also historically have labels like `scope: website`, `scope: docs`, `scope: blog` etc. but those are managed via separate repositories now.
-
-
-### Sizes
-
-The effort is sometimes estimated using the `size:` labels using T-shirt-like sizes of L, M, S etc.
-
-Note: sizes are not priorities.
-
-### Other
-
-- `needs-migration` – such issues change the storage format and require proper migration between two VersionPress versions. (Currently, we do not have migrations which means that if a release contains one or more `needs-migration` issues, full deactivation and re-activation is required. See [#275](https://github.com/versionpress/versionpress/issues/275).)
-- `WP 4.7` – compatibility with WordPress 4.7.
-- `support` – issue that should have been opened in the [support repo](https://github.com/versionpress/support).
-- `plugin-support` – label for issues around plugin support in VP 4.0.
-
+- Issue type:
+    - `bug` – a major bug has an additional `major` label
+    - `feature` – something new in a release
+    - `improvement` – an improvement of an existing feature
+    - `task`
+    - `question`
+    - `support` – issue that should have been opened in the [support repo](https://github.com/versionpress/support)
+- Importance:
+    - `minor`
+    - `major` – only used with bugs, see above
+    - `significant` – used to highlight issues that are worth mentioning in release notes or otherwise significant
+- Scopes (areas of work):
+    - `scope: core` – the core VersionPress functionality like tracking actions, creating Git commits etc.
+    - `scope: workflows` – things like cloning, pulling, pushing, etc.
+    - `scope: gui` – issue for the 'frontend' React app and other UI things
+    - `scope: tests`
+    - `scope: dev-infrastructure` – IDE settings, build scripts, etc.
+    - `scope: docs`
+    - `scope: integrations` – integrations with WordPress plugins, themes, hosts etc.
+    - Some historic labels like `scope: website`, `scope: blog` etc. Those are commonly managed via separate repositories now.
+- Effort, roughly:
+    - `size: xs` – 1 to 2 hours
+    - `size: s` – about half a day
+    - `size: m` – day or two
+    - `size: l` – three to five days
+    - `size: xl` – multiple weeks
+- Resolution:
+    - Most issues are just closed when done without any additional label. They are also moved to the _Done_ column in a GitHub project.
+    - `duplicate` – issue is resolved by some other ticket
+    - `invalid` – incorrectly reported, not an actual bug etc.
+    - `obsolete` – no longer valid
+    - `won't fix` – we don't plan to implement this
+- Other:
+    - `needs-migration` – such issues change a storage format and require migration between two VersionPress versions. (Currently, we do not have migrations which means that if a release contains one or more `needs-migration` issues, full deactivation and re-activation is required. See [#275](https://github.com/versionpress/versionpress/issues/275).)
+    - `WP 4.7` – compatibility with WordPress 4.7.
+    - `plugin-support` – issues implementing the plugin support in VersionPress 4.0.
+    
 ## Imported issues 1..522
 
-In the early days, we used JIRA and the Czech language to track the project (*bad* decision in retrospect :sweat_smile:), with the earliest issues not even up to the common standards as we were a team of two and discussed many things face to face.
+In the early days, we used JIRA and the Czech language to track the project (*bad* decision in retrospect 😅), with the earliest issues not even up to the common standards as we were a team of two and discussed many things face to face.
 
 In October 2015, we decided to move to GitHub and take the project **history** with us, both on the repo level (no "initial commit" with thousands of lines of code) and the issues. The issues were not fun as we needed to write a migration script, fight the GitHub API limitations (e.g., dates cannot be set properly) and eventually translate the issues to English. But there's valuable information in there so we didn't want to throw that part of the project history away.
 
