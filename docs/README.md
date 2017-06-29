@@ -5,6 +5,7 @@
 - [Plugin-Support.md](./Plugin-Support.md)
 - [Dev-Setup.md](./Dev-Setup.md)
 - [Testing.md](./Testing.md)
+- [Issues.md](./Issues.md)
 
 ## User documentation
 
