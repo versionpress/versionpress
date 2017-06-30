@@ -2,6 +2,7 @@
 
 namespace VersionPress\Tests\Unit;
 
+use org\bovigo\vfs\vfsStream;
 use VersionPress\Initialization\WpConfigSplitter;
 
 class WpConfigSplitterTest extends \PHPUnit_Framework_TestCase {
@@ -113,7 +114,9 @@ DOC;
 
     protected function setUp()
     {
-        $this->wpConfigPath = __DIR__ . '/wp-config.php';
+        $root = vfsStream::setup();
+
+        $this->wpConfigPath = vfsStream::newFile('wp-config.php')->at($root)->url();
         $this->commonConfigPath = dirname($this->wpConfigPath) . '/' . $this->commonConfigName;
         file_put_contents($this->wpConfigPath, $this->originalConfig);
         $commonConfigTemplate = file_get_contents(__DIR__ . '/../../src/Initialization/wp-config.common.tpl.php');
