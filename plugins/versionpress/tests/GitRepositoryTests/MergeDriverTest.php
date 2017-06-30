@@ -21,7 +21,8 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        self::$repositoryDir = __DIR__ . '/repository';
+        self::$repositoryDir = sys_get_temp_dir() . '/vp-repository';
+        mkdir(self::$repositoryDir);
     }
 
     public function setUp()

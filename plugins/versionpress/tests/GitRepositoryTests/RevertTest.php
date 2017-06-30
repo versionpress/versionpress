@@ -20,8 +20,8 @@ class RevertTest extends \PHPUnit_Framework_TestCase
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        self::$repositoryPath = __DIR__ . '/repository';
-        self::$tempPath = __DIR__ . '/temp';
+        self::$repositoryPath = sys_get_temp_dir() . '/vp-repository';
+        self::$tempPath = sys_get_temp_dir() . '/vp-temp';
         self::$repository = new GitRepository(self::$repositoryPath, self::$tempPath);
         mkdir(self::$repositoryPath);
         mkdir(self::$tempPath);
