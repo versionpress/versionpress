@@ -40,6 +40,8 @@ class RevertTest extends \PHPUnit_Framework_TestCase
         FileSystem::removeContent(self::$repositoryPath);
         FileSystem::removeContent(self::$tempPath);
         self::$repository->init();
+        VPCommandUtils::exec('git config user.name test', self::$repositoryPath);
+        VPCommandUtils::exec('git config user.email test@example.com', self::$repositoryPath);
 
         $this->commitFile('initial-file', 'Initial commit');
     }
