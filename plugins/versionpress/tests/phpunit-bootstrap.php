@@ -6,7 +6,10 @@ use VersionPress\Tests\Utils\TestConfig;
 use VersionPress\Tests\Utils\TestRunnerOptions;
 
 require_once(__DIR__ . '/../vendor/autoload.php');
-Debugger::enable(Debugger::DEVELOPMENT, __DIR__ . '/../log');
+
+$logDir = sys_get_temp_dir() . '/vp-log';
+@mkdir($logDir);
+Debugger::enable(Debugger::DEVELOPMENT, $logDir);
 
 TestRunnerOptions::getInstance()->configureInstance([
 
