@@ -10,6 +10,9 @@ class DirectoryStorageTest extends StorageTestCase
     /** @var DirectoryStorage */
     private $storage;
 
+    /** @var string */
+    private $storageDir;
+
     private $testingEntity = [
         "comment_author" => "Mr WordPress",
         "comment_author_email" => "",
@@ -146,7 +149,7 @@ class DirectoryStorageTest extends StorageTestCase
 
         $changeInfoFactory = $this->createChangeInfoFactoryMock();
 
-        $storage = new DirectoryStorage(__DIR__ . '/entities', $entityInfo, 'prefix_', $changeInfoFactory);
+        $storage = new DirectoryStorage($this->storageDir, $entityInfo, 'prefix_', $changeInfoFactory);
 
         $storage->save($entity);
         $loadedEntity = $storage->loadEntity($id);
@@ -195,7 +198,8 @@ class DirectoryStorageTest extends StorageTestCase
     {
         parent::setUp();
 
-        $storageDir = __DIR__ . '/entities';
+        $this->storageDir = sys_get_temp_dir() . '/vp-storage-dir';
+
         $entityInfo = $this->createEntityInfoMock([
             'vpidColumnName' => 'vp_id',
             'usesGeneratedVpids' => true,
@@ -205,18 +209,22 @@ class DirectoryStorageTest extends StorageTestCase
         ]);
 
 
-        if (file_exists($storageDir)) {
-            FileSystem::remove($storageDir);
+        if (file_exists($this->storageDir)) {
+            FileSystem::remove($this->storageDir);
         }
-        mkdir($storageDir);
+        mkdir($this->storageDir);
+
+        if (!file_exists($this->storageDir)) {
+            throw new \Exception('wat?');
+        }
 
         $changeInfoFactory = $this->createChangeInfoFactoryMock();
-        $this->storage = new DirectoryStorage($storageDir, $entityInfo, 'prefix_', $changeInfoFactory);
+        $this->storage = new DirectoryStorage($this->storageDir, $entityInfo, 'prefix_', $changeInfoFactory);
     }
 
     protected function tearDown()
     {
         parent::tearDown();
-        FileSystem::remove(__DIR__ . '/entities');
+        FileSystem::remove($this->storageDir);
     }
 }
