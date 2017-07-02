@@ -16,7 +16,7 @@ class RevertTestWpCliWorker extends WpCliWorker implements IRevertTestWorker
     public function __construct(TestConfig $testConfig)
     {
         parent::__construct($testConfig);
-        $this->repository = new GitRepository($this->testConfig->testSite->path);
+        $this->repository = new GitRepository($this->testConfig->testSite->path, sys_get_temp_dir());
     }
 
     public function prepare_undoLastCommit()
