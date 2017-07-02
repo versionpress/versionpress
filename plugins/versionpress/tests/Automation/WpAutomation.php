@@ -778,17 +778,6 @@ class WpAutomation
         );
     }
 
-    public function disableDebugger()
-    {
-        $bootstrapFile = $this->siteConfig->path . '/wp-content/plugins/versionpress/bootstrap.php';
-        $lines = file($bootstrapFile);
-        $lines = array_filter($lines, function ($line) {
-            return !Strings::contains($line, "Debugger::enable(");
-        });
-
-        file_put_contents($bootstrapFile, join("\n", $lines));
-    }
-
     /**
      * Creates project structure similar to Bedrock.
      * Pedestal (https://github.com/versionpress/pedestal) is inpired by Bedrock. It only have

@@ -68,7 +68,9 @@ if (defined('DOING_AJAX')) {
     $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
 }
 
-Debugger::enable(Debugger::DEVELOPMENT, VERSIONPRESS_PLUGIN_DIR . '/log');
+if (defined('VP_DEBUG') && VP_DEBUG) {
+    Debugger::enable(Debugger::DEVELOPMENT, VERSIONPRESS_PLUGIN_DIR . '/log');
+}
 
 global $versionPressContainer;
 $versionPressContainer = DIContainer::getConfiguredInstance();

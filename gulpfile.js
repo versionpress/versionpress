@@ -76,7 +76,7 @@ var adminGuiDir = vpDir + '/admin/public/gui';
 var srcDef = [];
 
 /**
- * Set to true for test-deploy build 
+ * Set to true for test-deploy build
  *
  * @type {boolean}
  */
@@ -188,15 +188,6 @@ gulp.task('remove-composer-files', false, ['composer-install'], function (cb) {
 });
 
 /**
- * Disables the debugger because we don't want to handle all exceptions and errors caused by all plugins. See WP-268.
- */
-gulp.task('disable-debugger', false, ['copy'], function (cb) {
-    return gulp.src(buildDir + '/bootstrap.php').pipe(removeLines(
-        {filters: [/^Debugger::enable/]}
-    )).pipe(gulp.dest(buildDir));
-});
-
-/**
  * Fills the packageVersion variable
  */
 gulp.task('fill-vp-version', false, function(cb) {
@@ -236,7 +227,7 @@ gulp.task('update-plugin-version', false, ['fill-vp-version', 'copy'], function(
 /**
  * Builds the final ZIP in the `distDir` folder.
  */
-gulp.task('zip', false, ['copy', 'disable-debugger', 'remove-composer-files', 'fill-vp-version', 'update-plugin-version'], function (cb) {
+gulp.task('zip', false, ['copy', 'remove-composer-files', 'fill-vp-version', 'update-plugin-version'], function (cb) {
     return gulp.src(buildDir + '/**', {dot: true}).
         pipe(rename(function (path) {
             path.dirname = 'versionpress/' + path.dirname;
@@ -300,13 +291,13 @@ gulp.task('git-config', false, function (cb) {
             console.log(err);
             cb();
         }
-        
+
         git.exec({args: 'config core.filemode false'}, function (err, stdout) {
             if (err) {
                 console.log(err);
                 cb();
             }
-        
+
             cb();
         });
     });
