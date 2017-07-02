@@ -14,7 +14,7 @@ if (count($args) < count($opts)) {
 
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
-\Tracy\Debugger::enable(\Tracy\Debugger::DEVELOPMENT, __DIR__);
+\Tracy\Debugger::enable(\Tracy\Debugger::DEVELOPMENT, sys_get_temp_dir());
 
 $classloader = new ClassLoader();
 $classloader->addPsr4('VersionPress\\', __DIR__ . '/../../src');
@@ -67,29 +67,40 @@ class FooChangeInfo extends \VersionPress\ChangeInfos\TrackedChangeInfo
             ];
         }, $this->files);
     }
+
+    public function getPriority()
+    {
+        return 10;
+    }
+
+
 }
 
 
-define('ABSPATH', __DIR__); // fake
-define('VERSIONPRESS_PLUGIN_DIR', __DIR__); // fake
-define('VERSIONPRESS_TEMP_DIR', __DIR__); // fake
-$repositoryDir = __DIR__ . '/repository';
+define('ABSPATH', sys_get_temp_dir()); // fake
+define('VERSIONPRESS_PLUGIN_DIR', sys_get_temp_dir()); // fake
+define('VERSIONPRESS_TEMP_DIR', sys_get_temp_dir()); // fake
+$repositoryDir = sys_get_temp_dir() . '/vp-repository';
 
 $changeList = createFiles($repositoryDir, $args['from'], $args['to']);
 
-$mirror = getMock(Mirror::class);
-$mirror->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount)
-    ->method('getChangeList')
-    ->will(new PHPUnit_Framework_MockObject_Stub_Return($changeList));
+$mirror = Mockery::mock(Mirror::class);
+$mirror->shouldReceive('getChangeList')->andReturn($changeList);
 
-$storageFactory = getMock(StorageFactory::class);
+$storageFactory = Mockery::mock(StorageFactory::class);
 
-$gitRepository = new \VersionPress\Git\GitRepository($repositoryDir, __DIR__);
+$gitRepository = new \VersionPress\Git\GitRepository($repositoryDir, sys_get_temp_dir());
 
 /**
  * @var Mirror $mirror
  * @var StorageFactory $storageFactory
  */
+
+global $versionPressContainer;
+$versionPressContainer = new \VersionPress\DI\DIContainer();
+$versionPressContainer->register(\VersionPress\DI\VersionPressServices::CHANGEINFO_FACTORY, function () {
+    return Mockery::mock(\VersionPress\ChangeInfos\ChangeInfoFactory::class);
+});
 
 $committer = new \VersionPress\Git\Committer($mirror, $gitRepository, $storageFactory);
 $committer->commit();
@@ -102,36 +113,9 @@ function createFiles($dir, $from, $to)
     }, range($from, $to - 1));
 }
 
-/**
- * @param $originalClassName
- * @return PHPUnit_Framework_MockObject_MockObject
- */
-function getMock($originalClassName)
-{
-    return PHPUnit_Framework_MockObject_Generator::getMock(
-        $originalClassName,
-        [],
-        [],
-        '',
-        false
-    );
-}
-
-/**
- * @param $className
- * @return PHPUnit_Framework_MockObject_MockObject
- */
-function getMockForAbstractClass($className)
-{
-    return PHPUnit_Framework_MockObject_Generator::getMockForAbstractClass($className);
-}
-
 function createChangeInfo($files)
 {
-
     $fooChangeInfo = new FooChangeInfo($files);
-
-
     return $fooChangeInfo;
 }
 

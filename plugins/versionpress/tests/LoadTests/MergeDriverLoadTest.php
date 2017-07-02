@@ -17,7 +17,7 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        self::$repositoryDir = __DIR__ . '/repository';
+        self::$repositoryDir = sys_get_temp_dir() . '/repository';
     }
 
     public function setUp()
