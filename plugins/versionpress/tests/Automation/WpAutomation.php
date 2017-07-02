@@ -818,13 +818,7 @@ class WpAutomation
 
     public function getVpdbDir()
     {
-        static $vpdbDir = false;
-
-        if ($vpdbDir === false) {
-            $vpdbDir = $this->runWpCliCommand('eval', null, ['defined("VP_VPDB_DIR") && print(VP_VPDB_DIR);']) ?: null;
-        }
-
-        return $vpdbDir;
+        return $this->runWpCliCommand('eval', null, ['defined("VP_VPDB_DIR") && print(VP_VPDB_DIR);']) ?: null;
     }
 
     public function getAbspath()
