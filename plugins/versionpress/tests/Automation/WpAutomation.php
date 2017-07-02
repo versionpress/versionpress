@@ -99,7 +99,7 @@ class WpAutomation
     public function isVersionPressInitialized()
     {
         $vpdbDir = $this->getVpdbDir();
-        return $vpdbDir !== '' && is_file($vpdbDir . '/.active');
+        return $vpdbDir && is_file($vpdbDir . '/.active');
     }
 
     public function copyVersionPressFiles()
@@ -546,7 +546,7 @@ class WpAutomation
 
         $wpVersion = $this->siteConfig->wpVersion;
         $wpLocale = $this->siteConfig->wpLocale;
-        $downloadCommand = "wp core download --path=\"{$this->siteConfig->path}\" --version=\"$wpVersion\"";
+        $downloadCommand = "wp core download --path=\"{$this->siteConfig->path}\" --version=\"$wpVersion\" --force";
         if ($wpLocale) {
             $downloadCommand .= " --locale=$wpLocale";
         }
@@ -579,6 +579,7 @@ class WpAutomation
 
         $args["skip-salts"] = null;
         $args["skip-check"] = null;
+        $args["force"] = null;
 
         $this->runWpCliCommand("core", "config", $args);
     }
