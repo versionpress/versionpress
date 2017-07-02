@@ -3,9 +3,11 @@
 namespace VersionPress\Tests\Workflow;
 
 use PHPUnit_Framework_TestCase;
+use VersionPress\Cli\VPCommandUtils;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\SiteConfig;
 use VersionPress\Tests\Utils\TestConfig;
+use VersionPress\Utils\FileSystem;
 
 class CloneMergeTest extends PHPUnit_Framework_TestCase
 {
@@ -73,7 +75,6 @@ class CloneMergeTest extends PHPUnit_Framework_TestCase
      */
     public function dateModifiedMergesAutomatically()
     {
-        $cloneSiteConfig = self::$cloneSiteConfig;
         $internalCommandPath = __DIR__ . '/../../src/Cli/vp-internal.php';
 
         $wpAutomation = new WpAutomation(self::$siteConfig, self::$testConfig->wpCliVersion);
@@ -111,6 +112,9 @@ class CloneMergeTest extends PHPUnit_Framework_TestCase
         );
         $cloneWpAutomation->editPost($clonedPostId, ['post_content' => 'Some new content']);
 
+        VPCommandUtils::exec('sudo -u www-data git config user.name test', self::$siteConfig->path);
+        VPCommandUtils::exec('sudo -u www-data git config user.email test@example.com', self::$siteConfig->path);
+
         $wpAutomation->runWpCliCommand('vp', 'pull', ['from' => self::$cloneSiteConfig->name]);
 
         $modifiedDate = $wpAutomation->runWpCliCommand('post get', $postId, ['field' => 'post_modified']);
@@ -143,6 +147,9 @@ class CloneMergeTest extends PHPUnit_Framework_TestCase
 
         $wpAutomation = new WpAutomation(self::$siteConfig, self::$testConfig->wpCliVersion);
         $wpAutomation->editOption('blogname', 'Blogname from original - conflict');
+
+        VPCommandUtils::exec('sudo -u www-data git config user.name test', self::$siteConfig->path);
+        VPCommandUtils::exec('sudo -u www-data git config user.email test@example.com', self::$siteConfig->path);
 
         $output = $wpAutomation->runWpCliCommand('vp', 'pull', ['from' => self::$cloneSiteConfig->name]);
 
@@ -177,6 +184,11 @@ class CloneMergeTest extends PHPUnit_Framework_TestCase
         $siteConfig = self::$siteConfig;
         $wpAutomation = new WpAutomation($siteConfig, self::$testConfig->wpCliVersion);
         $this->prepareSite($wpAutomation);
+
+        FileSystem::mkdir(self::$cloneSiteConfig->path);
+        chown(self::$cloneSiteConfig->path, 'www-data');
+        chgrp(self::$cloneSiteConfig->path, 'www-data');
+
         $wpAutomation->runWpCliCommand('vp', 'clone', [
             'name' => self::$cloneSiteConfig->name,
             'dbprefix' => self::$cloneSiteConfig->dbTablePrefix,
@@ -215,7 +227,6 @@ class CloneMergeTest extends PHPUnit_Framework_TestCase
     {
         $wpAutomation->setUpSite();
         $wpAutomation->copyVersionPressFiles();
-        $wpAutomation->disableDebugger();
 
         $wpAutomation->activateVersionPress();
         $wpAutomation->initializeVersionPress();
