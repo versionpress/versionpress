@@ -3,7 +3,7 @@
 # ---------------------------------------------------------------------
 
 # Worker type to run the tests, 'selenium' or 'wp-cli'
-end2end-test-type: selenium
+end2end-test-type: wp-cli
 
 # WP-CLI version used, e.g., '1.1.0' or 'latest-stable'
 wp-cli-version: latest-stable
