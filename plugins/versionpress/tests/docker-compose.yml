@@ -7,7 +7,7 @@ services:
     ports:
       - 80:80
     volumes:
-      - test-site:/var/www/html/vp01
+      - document-root:/var/www/html
       - ..:/var/www/html/vp01/wp-content/plugins/versionpress:ro
     depends_on:
       - mysql
@@ -26,7 +26,7 @@ services:
     image: versionpress/testenv
     volumes:
       # Same volumes as in `wordpress`
-      - test-site:/var/www/html/vp01
+      - document-root:/var/www/html
       - ..:/var/www/html/vp01/wp-content/plugins/versionpress:ro
 
       # Project mounts
@@ -69,5 +69,5 @@ services:
 
 volumes:
   mysql-data:
-  test-site:
+  document-root:
   wpcli-cache:
