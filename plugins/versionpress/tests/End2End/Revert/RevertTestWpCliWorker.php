@@ -21,6 +21,8 @@ class RevertTestWpCliWorker extends WpCliWorker implements IRevertTestWorker
 
     public function prepare_undoLastCommit()
     {
+        // Creates two posts because `fresh_site` option could be saved together with the first one. It can be removed after #1254.
+        $this->createTestPost();
         $this->createTestPost();
         return [['D', '%vpdb%/posts/*']];
     }
