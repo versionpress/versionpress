@@ -195,7 +195,8 @@ class VpidRepository
 
     private function isNullReference($id)
     {
-        return (is_numeric($id) && intval($id) === 0) || $id === '';
+        // WordPress / plugins sometimes use empty string, zero or negative number to express null reference.
+        return (is_numeric($id) && intval($id) <= 0) || $id === '';
     }
 
     private function replaceIdsInString($targetEntity, $stringWithIds)
