@@ -375,6 +375,7 @@ function isRelative(sitePath) {
 
 /**
  * Compress the build into a zip file.
+ * We don't use gulp-zip because of this bug: https://github.com/sindresorhus/gulp-zip/issues/79
  * Inspiration from https://github.com/sindresorhus/gulp-tar/blob/cbe4e1df44fdc477a3a9743cfb62ccb999748c16/index.js
  */
 function compress(filename) {
