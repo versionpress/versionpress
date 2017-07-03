@@ -6,11 +6,9 @@ class SeleniumConfig
 {
 
     /**
-     * Path to a Firefox binary. Null means that system Firefox should be used instead.
-     *
-     * @var string
+     * Host where Selenium hub or server runs
      */
-    public $firefoxBinary;
+    public $host;
 
     /**
      * How long to wait in Selenium tests after a commit before doing asserts against this commit

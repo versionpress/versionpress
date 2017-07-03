@@ -94,7 +94,7 @@ class MergeDriverInstaller
         if ($driver == MergeDriverInstaller::DRIVER_BASH
             || ($driver == MergeDriverInstaller::DRIVER_AUTO && DIRECTORY_SEPARATOR == '/')) {
             $mergeDriverScript = $pluginDir . '/src/Git/merge-drivers/ini-merge.sh';
-            chmod($mergeDriverScript, 0750);
+            @chmod($mergeDriverScript, 0750); // Catching warning in case of read-only FS. However, it should already be 0750.
         }
 
         if ($driver == MergeDriverInstaller::DRIVER_PHP

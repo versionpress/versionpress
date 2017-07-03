@@ -1,0 +1,73 @@
+version: '2' # PhpStorm 2017.2 does not support v3
+services:
+
+  wordpress:
+    build: ./dockerfiles/php5.6-apache
+    image: versionpress/php5.6-apache
+    ports:
+      - 80:80
+    volumes:
+      - document-root:/var/www/html
+      - ..:/var/www/html/vp01/wp-content/plugins/versionpress:ro
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:5.7
+    ports:
+      - 3391:3306
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: r00tpwd
+
+  tests:
+    build: ./dockerfiles/testenv
+    image: versionpress/testenv
+    volumes:
+      # Same volumes as in `wordpress`
+      - document-root:/var/www/html
+      - ..:/var/www/html/vp01/wp-content/plugins/versionpress:ro
+
+      # Project mounts
+      - ..:/opt/project:ro # we need to map the whole `versionpress` folder, the `vendor` folder is there
+      - ../../../ext-libs:/opt/ext-libs:ro
+
+      # Caching downloaded WP ZIPs
+      - wpcli-cache:/var/www/.wp-cli
+    links:
+      - selenium-hub:selenium-hub
+      - mysql:mysql
+      - wordpress:wordpress
+    working_dir: /opt/project/tests
+    command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml
+    stdin_open: true
+    tty: true
+
+  unit-tests-runner:
+    # This service is used only from PhpStorm to run the unit tests faster.
+    image: prooph/php:5.6-cli
+    volumes:
+      - ..:/opt/project:ro
+      - ../../../ext-libs:/opt/ext-libs:ro
+    working_dir: /opt/project/tests
+
+  selenium-hub:
+    # We're using the generic name "selenium-hub" here because it should be transparent for the clients
+    # whether this is standalone image like `selenium/standalone-firefox` or a grid setup with
+    # `selenium/hub` + a couple of nodes like `selenium/node-firefox` and `selenium/node-chrome`.
+    image: selenium/standalone-firefox
+
+  adminer:
+    image: adminer
+    ports:
+      - 8099:8080
+    links:
+      - mysql:db
+    depends_on:
+      - mysql
+
+volumes:
+  mysql-data:
+  document-root:
+  wpcli-cache:

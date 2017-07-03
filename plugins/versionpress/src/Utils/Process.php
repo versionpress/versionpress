@@ -39,7 +39,7 @@ class Process extends \Symfony\Component\Process\Process
     }
 
 
-    public function start($callback = null)
+    public function start(callable $callback = null/*, array $env = array()*/)
     {
         $this->consoleOutput = '';
         parent::start($callback);

@@ -3,8 +3,6 @@
 namespace VersionPress\Tests\End2End\Utils;
 
 use PHPUnit_Framework_TestCase;
-use Symfony\Component\Yaml\Yaml;
-use VersionPress\Actions\ActionsInfo;
 use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Git\GitRepository;
@@ -32,8 +30,11 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase
     {
         parent::__construct($name, $data, $dataName);
         $this->staticInitialization();
+
         $this->gitRepository = new GitRepository(self::$testConfig->testSite->path);
         self::$wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
+
+        self::setUpSite(false);
 
         $vpdbDir = self::$wpAutomation->getVpdbDir();
         $relativePathToVpdb = PathUtils::getRelativePath(self::$testConfig->testSite->path, $vpdbDir);

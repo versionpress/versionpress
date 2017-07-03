@@ -253,7 +253,7 @@ class GitRepository
     {
         $output = $this->runShellCommandWithErrorOutput("git revert -n %s", $commitHash);
 
-        if ($output !== null) { // revert conflict
+        if ($output !== null && $output !== '') { // revert conflict
             $this->abortRevert();
             return false;
         }

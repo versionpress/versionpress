@@ -13,6 +13,8 @@ class MnReferenceStorageTest extends StorageTestCase
     private $storage;
     /** @var DirectoryStorage */
     private $parentStorage;
+    /** @var string */
+    private $storageDir;
 
     /**
      * @test
@@ -91,7 +93,7 @@ class MnReferenceStorageTest extends StorageTestCase
     {
         parent::setUp();
 
-        $storageDir = __DIR__ . '/entities';
+        $this->storageDir = sys_get_temp_dir() . '/entities';
         $entityInfo = $this->createEntityInfoMock([
             'vpidColumnName' => 'vp_id',
             'usesGeneratedVpids' => true,
@@ -109,14 +111,14 @@ class MnReferenceStorageTest extends StorageTestCase
         ];
 
 
-        if (file_exists($storageDir)) {
-            FileSystem::remove($storageDir);
+        if (file_exists($this->storageDir)) {
+            FileSystem::remove($this->storageDir);
         }
 
-        mkdir($storageDir);
+        mkdir($this->storageDir);
 
         $changeInfoFactory = $this->createChangeInfoFactoryMock();
-        $this->parentStorage = new DirectoryStorage($storageDir, $entityInfo, 'prefix_', $changeInfoFactory);
+        $this->parentStorage = new DirectoryStorage($this->storageDir, $entityInfo, 'prefix_', $changeInfoFactory);
         $this->storage = new MnReferenceStorage($this->parentStorage, $referenceDetails);
     }
 

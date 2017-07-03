@@ -142,6 +142,7 @@ class Initializer
             $this->createVersionPressTables();
             $this->lockDatabase();
             $this->saveDatabaseToStorages();
+            $this->createCacheDirectory();
             $this->commitDatabase();
             $this->createGitRepository();
             $this->activateVersionPress();
@@ -414,6 +415,11 @@ class Initializer
             $this->database->query("UNLOCK TABLES");
             $this->isDatabaseLocked = false;
         }
+    }
+
+    private function createCacheDirectory()
+    {
+        FileSystem::mkdir(VERSIONPRESS_TEMP_DIR);
     }
 
     /**

@@ -17,6 +17,10 @@
             <directory>GitRepositoryTests</directory>
         </testsuite>
 
+        <testsuite name="SQL Parser Tests">
+            <directory>SqlTests</directory>
+        </testsuite>
+
         <testsuite name="End 2 End">
             <directory>End2End</directory>
         </testsuite>
@@ -27,6 +31,10 @@
 
         <testsuite name="Workflow Tests">
             <directory>Workflow</directory>
+        </testsuite>
+
+        <testsuite name="Load Tests">
+            <directory>LoadTests</directory>
         </testsuite>
 
     </testsuites>

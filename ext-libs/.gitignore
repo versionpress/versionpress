@@ -1,5 +1,2 @@
 /vendor/
 /wordpress/
-
-# For ext dependencies we don't need version locking
-/composer.lock

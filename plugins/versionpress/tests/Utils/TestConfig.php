@@ -49,10 +49,15 @@ class TestConfig
     {
         $rawConfig = Yaml::parse(file_get_contents($configFile));
 
-        $this->seleniumConfig = new SeleniumConfig();
-        $this->seleniumConfig->firefoxBinary = $rawConfig['selenium']['firefox-binary'];
-        $this->seleniumConfig->postCommitWaitTime = $rawConfig['selenium']['post-commit-wait-time'];
+        // General configuration
         $this->end2endTestType = $rawConfig['end2end-test-type'];
+
+        // Selenium settings
+        $this->seleniumConfig = new SeleniumConfig();
+        $this->seleniumConfig->host = $rawConfig['selenium']['host'];
+        $this->seleniumConfig->postCommitWaitTime = $rawConfig['selenium']['post-commit-wait-time'];
+
+        // WP-CLI settings
         $this->wpCliVersion = $rawConfig['wp-cli-version'];
 
         $this->sites = [];
@@ -78,7 +83,7 @@ class TestConfig
             $this->sites[$siteId]->url = $rawSiteConfig['wp-site']['url'];
             $this->sites[$siteId]->wpAdminPath = $rawSiteConfig['wp-site']['wp-admin-path'];
             $this->sites[$siteId]->title = $rawSiteConfig['wp-site']['title'];
-            $this->sites[$siteId]->adminName = $rawSiteConfig['wp-site']['admin-name'];
+            $this->sites[$siteId]->adminUser = $rawSiteConfig['wp-site']['admin-user'];
             $this->sites[$siteId]->adminPassword = $rawSiteConfig['wp-site']['admin-pass'];
             $this->sites[$siteId]->adminEmail = $rawSiteConfig['wp-site']['admin-email'];
             $this->sites[$siteId]->wpVersion = $rawSiteConfig['wp-site']['wp-version'];

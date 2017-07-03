@@ -50,10 +50,9 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
 
         $this->setBrowser("firefox");
 
+        $this->setHost(self::$testConfig->seleniumConfig->host);
+
         $capabilities = $this->getDesiredCapabilities();
-        if (self::$testConfig->seleniumConfig->firefoxBinary) {
-            $capabilities["firefox_binary"] = self::$testConfig->seleniumConfig->firefoxBinary;
-        }
         $this->setDesiredCapabilities($capabilities);
 
         $this->setBrowserUrl(self::$testConfig->testSite->url);
@@ -134,7 +133,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
             return;
         }
 
-        $this->byId('user_login')->value(self::$testConfig->testSite->adminName);
+        $this->byId('user_login')->value(self::$testConfig->testSite->adminUser);
         usleep(100 * 1000); // wait for change focus
         $this->byId('user_pass')->value(self::$testConfig->testSite->adminPassword);
         $this->byId("loginform")->submit();

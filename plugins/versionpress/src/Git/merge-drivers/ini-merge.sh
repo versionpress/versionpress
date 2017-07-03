@@ -4,57 +4,64 @@ O=$1
 A=$2
 B=$3
 
-
 # Date fields to merge
-declare -a datesArray=("post_modified" "post_modified_gmt")
+export DATE_FIELDS="post_modified post_modified_gmt"
 
 
 # Iterate through array of date fields
-for i in "${datesArray[@]}"
+for FIELD in $DATE_FIELDS
 do
     # Find Values
-    aDateString=$(sed -ne "s/$i = \"\([^'\"]*\)\"/\1/p" $A)
-    aDateString=${aDateString//[$'\r\n']/}
+    A_DATE_STR=$(sed -ne "s/$FIELD = \"\([^'\"]*\)\"/\1/p" "$A")
+    A_DATE_STR=$(printf "%s" "$A_DATE_STR" | tr -d '\r\n')
 
     # If the file does not contain value from array, we can skip it
-    if [[ -z "$aDateString" ]]; then
+    if [ -z "$A_DATE_STR" ]; then
         break
     fi
 
-    bDateString=$(sed -ne "s/$i = \"\([^'\"]*\)\"/\1/p" $B)
-    bDateString=${bDateString//[$'\r\n']/}
+    B_DATE_STR=$(sed -ne "s/$FIELD = \"\([^'\"]*\)\"/\1/p" "$B")
+    B_DATE_STR=$(printf "%s" "$B_DATE_STR" | tr -d '\r\n')
 
     # Transform them to Numbers
-    aDateNumber=${aDateString//[-: ]/}
-    bDateNumber=${bDateString//[-: ]/}
+    A_DATE_NUM=$(printf "%s" "$A_DATE_STR" | tr -d "\-: ")
+    B_DATE_NUM=$(printf "%s" "$B_DATE_STR" | tr -d "\-: ")
 
     # Compare and make both values same
-    if [ "$aDateNumber" -lt "$bDateNumber" ]; then
-        sed -i '' "s/$i = \"\([^\r\n\"]*\)\"\([\r\n]*\)/$i = \"$bDateString\"\2/g" $A
+    if [ "$A_DATE_NUM" -lt "$B_DATE_NUM" ]; then
+        REPLACED_CONTENT=$(sed "s/$FIELD = \"\([^\r\n\"]*\)\"\([\r\n]*\)/$FIELD = \"$B_DATE_STR\"\2/g" "$A")
+        printf "%s\n" "$REPLACED_CONTENT" > "$A"
     else
-          sed -i '' "s/$i = \"\([^\r\n\"]*\)\"\([\r\n]*\)/$i = \"$aDateString\"\2/g" $B
+        REPLACED_CONTENT=$(sed "s/$FIELD = \"\([^\r\n\"]*\)\"\([\r\n]*\)/$FIELD = \"$A_DATE_STR\"\2/g" "$B")
+        printf "%s\n" "$REPLACED_CONTENT" > "$B"
     fi
 
 
 done
 
 # Place temporary placeholder between lines to avoid merge conflicts on adjacent lines
-sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/\n/&###VP###&/g' $O
-sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/\n/&###VP###&/g' $A
-sed -i '' -e ':a' -e 'N' -e '$!ba' -e 's/\n/&###VP###&/g' $B
+REPLACED_CONTENT=$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/&###VP###&/g' "$O")
+printf "%s\n" "$REPLACED_CONTENT" > "$O"
+REPLACED_CONTENT=$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/&###VP###&/g' "$A")
+printf "%s\n" "$REPLACED_CONTENT" > "$A"
+REPLACED_CONTENT=$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/&###VP###&/g' "$B")
+printf "%s\n" "$REPLACED_CONTENT" > "$B"
 
 # Process everything else through standard
-git merge-file -L mine -L base -L theirs $A $O $B
+git merge-file -L mine -L base -L theirs "$A" "$O" "$B"
 
 # Save Git merge status exit code
 GIT_MERGE_EXIT_CODE=$?
 
 # Remove temporary placeholders
-sed -e ':a' -e 'N' -e '$!ba' -e 's/\n###VP###//g' -i '' $A
-sed -e ':a' -e 'N' -e '$!ba' -e 's/\n###VP###//g' -i '' $B
-sed -e ':a' -e 'N' -e '$!ba' -e 's/\n###VP###//g' -i '' $O
+REPLACED_CONTENT=$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n###VP###//g' "$O")
+printf "%s\n" "$REPLACED_CONTENT" > "$O"
+REPLACED_CONTENT=$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n###VP###//g' "$A")
+printf "%s\n" "$REPLACED_CONTENT" > "$A"
+REPLACED_CONTENT=$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n###VP###//g' "$B")
+printf "%s\n" "$REPLACED_CONTENT" > "$B"
 
 # If Git merge fails, we should also 'fail'
-if [ $GIT_MERGE_EXIT_CODE -ne 0 ]; then
+if [ ${GIT_MERGE_EXIT_CODE} -ne 0 ]; then
     exit 1
 fi

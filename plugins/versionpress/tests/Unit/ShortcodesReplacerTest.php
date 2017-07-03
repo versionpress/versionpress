@@ -29,7 +29,14 @@ class ShortcodesReplacerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         if (!function_exists('get_shortcode_regex')) {
-            include_once __DIR__ . '/../../../../ext-libs/wordpress/wp-includes/shortcodes.php';
+
+            $shortcodesFileRelativePath = 'ext-libs/wordpress/wp-includes/shortcodes.php';
+            $shortcodesFile = __DIR__ . '/../../../../' . $shortcodesFileRelativePath;
+            if (!file_exists($shortcodesFile)) {
+                // Probably running in Docker, `ext-lib` is expected as a folder in /opt
+                $shortcodesFile = '/opt/' . $shortcodesFileRelativePath;
+            }
+            include_once $shortcodesFile;
         }
 
         $this->shortcodesInfo = $this->getMockBuilder(ShortcodesInfo::class)

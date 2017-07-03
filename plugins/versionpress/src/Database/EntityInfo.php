@@ -302,4 +302,10 @@ class EntityInfo
 
         return array_values(array_unique($references));
     }
+
+    // Mocking in ChangeInfoEnvelopeTest needs this method here, otherwise, PHPUnit 5.7 produces this error:
+    // > Trying to configure method "__get" which cannot be configured because it does not exist, has not been specified, is final, or is static
+    public function __get($name)
+    {
+    }
 }

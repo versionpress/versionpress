@@ -4,7 +4,6 @@
 
 - [Plugin-Support.md](./Plugin-Support.md)
 - [Dev-Setup.md](./Dev-Setup.md)
-- [Testing.md](./Testing.md)
 - [Development-Process.md](./Development-Process.md)
 
 ## User documentation

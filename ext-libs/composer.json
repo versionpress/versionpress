@@ -3,8 +3,8 @@
     "description": "Libraries referenced by PhpStorm but not actually dependencies",
     "minimum-stability": "beta",
     "require-dev": {
-        "johnpbloch/wordpress": "*",
-        "wp-cli/wp-cli": "~0.22"
+        "johnpbloch/wordpress": "^4.8",
+        "wp-cli/wp-cli": "^1.2"
     },
     "extra": {
         "wordpress-install-dir": "wordpress"

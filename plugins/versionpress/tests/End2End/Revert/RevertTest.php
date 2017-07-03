@@ -152,13 +152,15 @@ class RevertTest extends End2EndTestCase
         $commitHash = $this->gitRepository->getLastCommitHash();
         $sitePath = self::$testConfig->testSite->path;
 
-        VPCommandUtils::exec('git branch test', $sitePath);
+        VPCommandUtils::exec('sudo -u www-data git branch test', $sitePath);
         self::$wpAutomation->createOption('vp_option_master', 'foo');
-        VPCommandUtils::exec('git checkout test', $sitePath);
+        VPCommandUtils::exec('sudo -u www-data git checkout test', $sitePath);
         self::$wpAutomation->createOption('vp_option_test', 'foo');
-        VPCommandUtils::exec('git checkout master', $sitePath);
-        VPCommandUtils::exec('git merge test', $sitePath);
-        VPCommandUtils::exec('git branch -d test', $sitePath);
+        VPCommandUtils::exec('sudo -u www-data git checkout master', $sitePath);
+        VPCommandUtils::exec('sudo -u www-data git config user.name test', $sitePath);
+        VPCommandUtils::exec('sudo -u www-data git config user.email test@example.com', $sitePath);
+        VPCommandUtils::exec('sudo -u www-data git merge test', $sitePath);
+        VPCommandUtils::exec('sudo -u www-data git branch -d test', $sitePath);
 
         $this->commitAsserter->reset();
 
