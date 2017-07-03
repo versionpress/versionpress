@@ -23,6 +23,8 @@ class VPCommandUtils
             $args['color'] = null;
         }
 
+        $args['--allow-root'] = null;
+
         foreach ($args as $name => $value) {
             if (is_int($name)) { // positional argument
                 $cliCommand .= " " . ProcessUtils::escapeshellarg($value);
