@@ -52,6 +52,7 @@ Next steps:
 - [Writing code](#writing-code)
 - [Debugging](#debugging)
 - [Testing](#testing)
+- [Frontend development](#frontend-development)
 - [Production build](#production-build)
 - [Docker tips](#docker-tips)
 
@@ -228,6 +229,36 @@ After you run the tests using one of the methods described above, the Docker Com
 There are also other types of integration tests, e.g., `GitRepositoryTests` or `StorageTests`. These are lighter than End2End tests but still depend on some external subsystem like Git or file system.
 
 You can run these tests individually as per instructions above. 
+
+## Frontend development
+
+VersionPress uses a JavaScript frontend implemented as a React app in the `./frontend` folder.
+
+### PhpStorm / WebStorm setup
+
+1. Run `npm run init-phpstorm` if you haven't done that already.
+2. Open the `frontend` project in PhpStorm.
+3. Answer "No" to *Compile TypeScript to JavaScript?* prompt.
+
+Linting task is set up for the frontend project. Run `npm run lint` in the `frontend` directory.
+
+### Running frontend separately
+
+For pure frontend development, it's more convenient to run it outside of the WordPress administration. Let's assume you run the frontend against the default Docker site.
+
+1. Make sure that the site is running and that VersionPress is activated in it. You should be able to visit `http://localhost:8088` in the browser and the `frontend/src/config/config.local.ts` should contain this URL as API root.
+2. In your test WordPress site, put this to `wp-config.php` (the file should be editable at `./dev-env/wp/wp-config.php`):
+    ```
+    define('VERSIONPRESS_REQUIRE_API_AUTH', false);
+    ```
+3. Run `npm start` in the `frontend` directory.
+
+This launches [webpack dev server](https://webpack.js.org/configuration/dev-server/) at http://localhost:8888:
+
+![image](https://cloud.githubusercontent.com/assets/101152/26268495/c4738ff0-3cef-11e7-90ce-b807cc085865.png)
+
+Source code edits will be automatically reflected in the browser.
+
 
 ## Production build
 
