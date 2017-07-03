@@ -8,6 +8,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "archiver": "~1.1.0",
     "chalk": "^1.1.1",
     "coffee-script": "~1.10.0",
     "del": "~2.0.2",
@@ -19,11 +20,12 @@
     "gulp-rename": "~1.2.0",
     "gulp-replace": "~0.5.4",
     "gulp-shell": "~0.4.3",
-    "gulp-zip": "~3.0.2",
+    "gulp-util": "~3.0.7",
     "merge-stream": "^1.0.0",
-    "yamljs": "^0.2.6",
     "run-sequence": "^1.1.5",
-    "shelljs": "^0.5.3"
+    "shelljs": "^0.5.3",
+    "through2": "~2.0.1",
+    "yamljs": "^0.2.6"
   },
   "scripts": {
     "postinstall": "gulp init-dev",
