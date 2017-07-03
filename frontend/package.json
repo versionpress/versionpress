@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node webpack/webpack-dev-server.js --config webpack/webpack.dev.js --env.port 8888",
-    "build": "yarn && tsc --noEmit && webpack -p --config webpack/webpack.prod.js --hide-modules",
+    "build": "npm install && tsc --noEmit && webpack -p --config webpack/webpack.prod.js --hide-modules",
     "tsc": "tsc --noEmit",
     "clean": "rimraf build/* && git clean -fx -- \"src/**.js\" \"src/**.map\"",
     "lint": "tslint src/**/*.{ts,tsx}"
