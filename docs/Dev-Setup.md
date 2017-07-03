@@ -237,17 +237,17 @@ The version number is based on the nearest Git tag and can also be something lik
 
 Here are some tips for working with Docker / Docker Compose:
 
-- Aliasing `docker-compose` to `dc` will save you some typing. (All examples here still use the full variant.)
+- Inspect `tests/package.json` to see which Docker Compose commands run in the background.
+- Aliasing `docker-compose` to `dc` will save you some typing.
 - You can start the whole stack in the background via `docker-compose up -d`. Then, you would use:
     - `docker-compose logs --tail=10` to display last 10 log messages from each container. Logs can also be followed (similar to `docker-compose up`) by `docker-compose logs -f`.
     - `docker-compose ps` to list the containers.
     - `docker-compose stop` to shut down the stack.
     - `npm run cleanup-docker-stack` to clean up everything.
 - Most values in `docker-compose.yml` like environment variables can be changed in `docker-compose.override.yml`.
-- Any container from the stack can be started by `docker-compose run <service>`, e.g., `docker-compose run unit-tests`.
-    - The session can be made interactive by putting
-        ```
-        stdin_open: true
-        tty: true
-        ```
-        next to the service. Then, it's possible to do e.g. `docker-compose run unit-tests /bin/bash`. (This unfortunately needs to be done in Compose file, not yet possible on the command line. Tracking issue: https://github.com/docker/compose/issues/363.)
+- Any container from the stack can be started in an interactive session by adding this to `docker-compose.yml`:
+    ```
+    stdin_open: true
+    tty: true
+    ```
+    Then, it's possible to do e.g. `docker-compose run tests /bin/bash`.
