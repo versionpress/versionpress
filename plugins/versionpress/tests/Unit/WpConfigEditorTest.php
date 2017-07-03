@@ -235,6 +235,21 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedContent, file_get_contents($this->commonConfigPath));
     }
 
+    /**
+     * @test
+     */
+    public function editorSavesValueWithRegexReferenceCorrectly()
+    {
+        file_put_contents($this->commonConfigPath, "<?php\ndefine('TEST', 'value');\n");
+
+        $a = new WpConfigEditor($this->commonConfigPath, true);
+        $a->updateConfigConstant('TEST', 'value with regex reference $1');
+
+        $expectedContent = "<?php\ndefine('TEST', 'value with regex reference $1');\n";
+
+        $this->assertEquals($expectedContent, file_get_contents($this->commonConfigPath));
+    }
+
 // ---------- wp-config.php ------------
 
     /**

@@ -81,7 +81,7 @@ class WpConfigEditor
     {
         $wpConfigContent = file_get_contents($this->wpConfigPath);
 
-        $phpizedValue = $usePlainValue ? $value : var_export($value, true);
+        $phpizedValue = preg_quote($usePlainValue ? $value : var_export($value, true), '/');
 
         $configContainsDefinition = preg_match($replaceRegex, $wpConfigContent);
 
