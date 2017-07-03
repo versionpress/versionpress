@@ -7,7 +7,7 @@ This will set you up for VersionPress development.
 While VersionPress ships as a WordPress plugin, it is a relatively large piece of software where good development tools and workflows are necessary. We try to provide as much as possible out of the box, relying on this general approach:
 
 - You should use **local tools** and their power to **write** code. Specifically, we recommend PhpStorm.
-- All **runtime concerns** are handled by **Docker**. For example, you do not need a local WordPress site, it run as a Docker container. Same for testing, etc.
+- **Runtime** is handled by **Docker**. For example, you do not need a local WordPress site or a MySQL server, all runs as Docker containers.
 
 > **Note**: If you still need to use the legacy approach where the entire setup was local, refer to the the `4.0-alpha1` tag of the documents [Dev-Setup.md](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Dev-Setup.md) and [Testing.md](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Testing.md).
 
