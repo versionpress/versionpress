@@ -34,7 +34,7 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase
         $this->gitRepository = new GitRepository(self::$testConfig->testSite->path);
         self::$wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
 
-        self::setUpSite(TestRunnerOptions::getInstance()->forceSetup == "before-class");
+        self::setUpSite(false);
 
         $vpdbDir = self::$wpAutomation->getVpdbDir();
         $relativePathToVpdb = PathUtils::getRelativePath(self::$testConfig->testSite->path, $vpdbDir);
@@ -60,6 +60,7 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
+        self::setUpSite(TestRunnerOptions::getInstance()->forceSetup == "before-class");
     }
 
     private function staticInitialization()
