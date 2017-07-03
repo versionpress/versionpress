@@ -44,6 +44,8 @@ This leaves you with this working environment:
         - `docker-compose exec wordpress git log`
 - Stop all Docker services: `Ctrl+C` in the console. `npm run cleanup-docker-stack` clears up everything if you want to start fresh. Otherwise, both files and database data are persisted.
 
+See also [Docker tips](#docker-tips) section below.
+
 Next steps:
 
 - [PhpStorm setup](#phpstorm)
