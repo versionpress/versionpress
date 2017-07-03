@@ -39,7 +39,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
   backgroundNode: HTMLDivElement = null;
   popupComponentNode: ModifierComponent<any> = null;
 
-  componentDidUpdate = () => {
+  componentDidUpdate() {
     this.scrollBackground();
   }
 
