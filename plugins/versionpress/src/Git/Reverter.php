@@ -15,6 +15,7 @@ use VersionPress\Utils\Comparators;
 use VersionPress\Utils\Cursor;
 use VersionPress\Utils\IdUtil;
 use VersionPress\Utils\ReferenceUtils;
+use VersionPress\Utils\SerializedDataCursor;
 
 class Reverter
 {
@@ -264,15 +265,14 @@ class Reverter
             }
 
             if ($pathInStructure) {
-                $entity[$valueColumn] = unserialize($entity[$valueColumn]);
-                $paths = ReferenceUtils::getMatchingPaths($entity[$valueColumn], $pathInStructure);
+                $paths = ReferenceUtils::getMatchingPathsInSerializedData($entity[$valueColumn], $pathInStructure);
             } else {
                 $paths = [[]]; // root = the value itself
             }
 
             /** @var Cursor[] $cursors */
             $cursors = array_map(function ($path) use (&$entity, $valueColumn) {
-                return new Cursor($entity[$valueColumn], $path);
+                return new SerializedDataCursor($entity[$valueColumn], $path);
             }, $paths);
 
             foreach ($cursors as $cursor) {
@@ -286,10 +286,6 @@ class Reverter
                         return false;
                     }
                 }
-            }
-
-            if ($pathInStructure) {
-                $entity[$valueColumn] = serialize($entity[$valueColumn]);
             }
         }
 
@@ -368,7 +364,7 @@ class Reverter
                             if ($pathInStructure) {
                                 $possiblyReferencingEntity[$valueColumn] =
                                     unserialize($possiblyReferencingEntity[$valueColumn]);
-                                $paths = ReferenceUtils::getMatchingPaths(
+                                $paths = ReferenceUtils::getMatchingPathsInSerializedData(
                                     $possiblyReferencingEntity[$valueColumn],
                                     $pathInStructure
                                 );

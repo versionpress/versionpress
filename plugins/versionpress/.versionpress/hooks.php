@@ -23,9 +23,9 @@ add_filter('vp_entity_should_be_saved_post', function ($shouldBeSaved, $data, $s
         return false;
     }
 
-    // ignoring ajax autosaves
+    // ignoring ajax autosaves for drafts - WP saves them using Heartbeat API
     if ($isExistingEntity && isset($data['post_status']) && ($data['post_status'] === 'draft' &&
-            defined('DOING_AJAX') && DOING_AJAX === true)
+        defined('DOING_AJAX') && DOING_AJAX === true && $_POST['action'] === 'heartbeat')
     ) {
         return false;
     }
@@ -157,6 +157,14 @@ add_filter('vp_entity_files_option', function ($files, $oldEntity, $newEntity) {
     return $files;
 }, 10, 3);
 
+add_filter('vp_action_priority_option', function ($originalPriority, $action, $optionName, $entity) {
+    if ($optionName === 'WPLANG' && $action === 'create' && $entity['option_value'] === '') {
+        return 20;
+    }
+
+    return $originalPriority;
+}, 10, 4);
+
 add_filter('vp_entity_action_comment', function ($action, $oldEntity, $newEntity) {
 
     if ($action === 'create' && $newEntity['comment_approved'] == 0) {
@@ -250,10 +258,19 @@ add_filter('vp_entity_action_term', function ($action, $oldEntity, $newEntity) {
 }, 10, 3);
 
 add_filter('vp_entity_tags_term', function ($tags, $oldEntity, $newEntity, $action) {
+    global $versionPressContainer;
+    /** @var VpidRepository $vpidRepository */
+    $vpidRepository = $versionPressContainer->resolve(VersionPressServices::VPID_REPOSITORY);
 
     if ($action === 'rename') {
         $tags['VP-Term-OldName'] = $oldEntity['name'];
     }
+
+    $termVpid = $newEntity ? $newEntity['vp_id'] : $oldEntity['vp_id'];
+    $termId = $vpidRepository->getIdForVpid($termVpid);
+
+    $term = get_term($termId);
+    $tags['VP-Term-Taxonomy'] = $term instanceof WP_Term ? $term->taxonomy : 'term';
 
     return $tags;
 }, 10, 4);

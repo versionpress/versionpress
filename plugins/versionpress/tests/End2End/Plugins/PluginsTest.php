@@ -3,6 +3,7 @@
 namespace VersionPress\Tests\End2End\Plugins;
 
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
+use VersionPress\Tests\End2End\Utils\WpCliWorker;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\Process;
@@ -220,10 +221,20 @@ class PluginsTest extends End2EndTestCase
 
         self::$worker->uninstallTwoPlugins();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertBulkAction('plugin/delete', 2);
-        $this->commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
-        $this->commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$secondPluginInfo['affected-path']);
+        if (version_compare(self::$testConfig->testSite->wpVersion, '4.6', '<') || self::$worker instanceof WpCliWorker) {
+            $this->commitAsserter->assertNumCommits(1);
+            $this->commitAsserter->assertBulkAction('plugin/delete', 2);
+            $this->commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$pluginInfo['affected-path']);
+            $this->commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$secondPluginInfo['affected-path']);
+        } else {
+            $this->commitAsserter->assertNumCommits(2);
+            $this->commitAsserter->assertCommitAction('plugin/delete', 0);
+            $this->commitAsserter->assertCommitAction('plugin/delete', 1);
+            $this->commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$secondPluginInfo['affected-path'], 0);
+            $this->commitAsserter->assertCommitPath("D", "wp-content/plugins/" . self::$pluginInfo['affected-path'], 1);
+        }
+
+
         $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }

@@ -69,6 +69,7 @@ These are the main elements:
 - **The `actions` section** defines all actions of a scope.
     - An action has a **message** that can reference tags to make it more user-friendly. Messages use past tense.
     - Each action has a **priority** – 10 by default. Priorities behave like on WordPress filters and actions: the lower the number, the higher the priority. A more important action beats the less important one if both appear in the same commit. For example, `theme/switch` beats `option/edit` which means that the user will see a message about changing themes, not updating some internal option.
+    - Priorities can be set dynamically using the `vp_action_priority_{$scope}` filter, see [WPLANG handling](https://github.com/versionpress/versionpress/blob/7a500248a363472127c93a2ffffaec11f486e6e5/plugins/versionpress/.versionpress/hooks.php#L160-L166) as an example.
     - A combination of a scope and an action, e.g., `post/create` or `theme/install`, uniquely identifies the action and can be [searched for in the UI](https://docs.versionpress.net/en/feature-focus/searching-history).
 - An action has a **message**, usually in past tense, and a **priority**. If priority is not set, the default value of 10 is used.
     - Priorities behave like on WordPress filters and actions: the lower the number, the higher the priority. A more important action beats the less important one if both appear in the same commit. For example, `theme/switch` beats `option/edit` which means that the user will see a message about changing themes, not updating some internal option.
@@ -308,13 +309,25 @@ option:
 
 It probably won't surprise you that this is a real example used in WordPress' `schema.yml`. :stuck_out_tongue_winking_eye:
 
+Another supported feature are IDs in serialized data in serialized data (really).
+
+An example from WooCommerce: `a:1:{s:4:"cart";s:99:"a:1:{s:32:"a5bfc9e07964f8dddeb95fc584cd965d";a:2:{s:10:"product_id";i:37;s:12:"variation_id";i:0;}}";}`.
+
+```yaml
+session:
+  value-references:
+    session_key@session_value:
+      "*[\"cart\"]..[/.*/][\"product_id\"]": product
+      "*[\"cart\"]..[/.*/][\"variation_id\"]": variation
+```
+
 The complete syntax is:
 
 ```yaml
 value-references:
   <source_column_name>@<value_column_name>:
     <source_column_value>: <foreign_entity_name | @mapping_function>
-    <source_column_value>["path-in-serialized-objects"][/\d+/][0]: <foreign_entity_name | @mapping_function>
+    <source_column_value>["path-in-serialized-objects"][/\d+/][0]..["key-in-nested-serialized-array"]: <foreign_entity_name | @mapping_function>
     <columns_with_prefix_*>: <foreign_entity_name | @mapping_function>
 ```
 
@@ -554,6 +567,9 @@ TODO this will be auto-generated from code.
    - `apply_filters("vp_bulk_change_description_{$entityName}", $description, $action, $count, $tags)`
  - `vp_action_description_{$scope}`
    - `apply_filters("vp_action_description_{$scope}", $message, $action, $vpid, $tags)`
+ - `vp_action_priority_{$scope}`
+   - `apply_filters("vp_action_priority_{$entityName}", $defaultPriority, $action, $vpid, $entity)`
+   - `apply_filters("vp_action_priority_{$entityName}", $defaultPriority, $action, $vpid)`
 
 ### Actions
 

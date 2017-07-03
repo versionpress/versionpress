@@ -37,11 +37,18 @@ class ChangeInfoFactory
         $tags = ChangeInfoUtils::extractTags($automaticallySavedTags, $entity, $entity);
         $tags = array_merge($tags, $customTags);
 
-        return new EntityChangeInfo($entityInfo, $actionsInfo, $action, $vpid, $tags, $customFiles);
+        $defaultPriority = $actionsInfo->getActionPriority($action);
+        $priority = apply_filters("vp_action_priority_{$entityName}", $defaultPriority, $action, $vpid, $entity);
+
+        return new EntityChangeInfo($entityInfo, $actionsInfo, $action, $vpid, $tags, $customFiles, $priority);
     }
 
-    public function createTrackedChangeInfo($scope, $action, $entityId = null, $tags = [], $files = [])
+    public function createTrackedChangeInfo($scope, $action, $id = null, $tags = [], $files = [])
     {
-        return new TrackedChangeInfo($scope, $this->actionsInfoProvider->getActionsInfo($scope), $action, $entityId, $tags, $files);
+        $actionsInfo = $this->actionsInfoProvider->getActionsInfo($scope);
+        $defaultPriority = $actionsInfo->getActionPriority($action);
+        $priority = apply_filters("vp_action_priority_{$scope}", $defaultPriority, $action, $id);
+
+        return new TrackedChangeInfo($scope, $actionsInfo, $action, $id, $tags, $files, $priority);
     }
 }

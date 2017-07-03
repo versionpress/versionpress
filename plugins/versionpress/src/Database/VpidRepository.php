@@ -4,10 +4,9 @@ namespace VersionPress\Database;
 
 use Nette\Utils\Strings;
 use VersionPress\DI\VersionPressServices;
-use VersionPress\Utils\Cursor;
 use VersionPress\Utils\IdUtil;
 use VersionPress\Utils\ReferenceUtils;
-use wpdb;
+use VersionPress\Utils\SerializedDataCursor;
 
 class VpidRepository
 {
@@ -81,25 +80,20 @@ class VpidRepository
                 }
 
                 if ($pathInStructure) {
-                    $entity[$valueColumn] = unserialize($entity[$valueColumn]);
-                    $paths = ReferenceUtils::getMatchingPaths($entity[$valueColumn], $pathInStructure);
+                    $paths = ReferenceUtils::getMatchingPathsInSerializedData($entity[$valueColumn], $pathInStructure);
                 } else {
                     $paths = [[]]; // root = the value itself
                 }
 
-                /** @var Cursor[] $cursors */
+                /** @var SerializedDataCursor[] $cursors */
                 $cursors = array_map(function ($path) use (&$entity, $valueColumn) {
-                    return new Cursor($entity[$valueColumn], $path);
+                    return new SerializedDataCursor($entity[$valueColumn], $path);
                 }, $paths);
 
                 foreach ($cursors as $cursor) {
                     $ids = $cursor->getValue();
                     $referenceVpids = $this->replaceIdsInString($targetEntity, $ids);
                     $cursor->setValue($referenceVpids);
-                }
-
-                if ($pathInStructure) {
-                    $entity[$valueColumn] = serialize($entity[$valueColumn]);
                 }
             }
         }
@@ -140,25 +134,20 @@ class VpidRepository
                 }
 
                 if ($pathInStructure) {
-                    $entity[$valueColumn] = unserialize($entity[$valueColumn]);
-                    $paths = ReferenceUtils::getMatchingPaths($entity[$valueColumn], $pathInStructure);
+                    $paths = ReferenceUtils::getMatchingPathsInSerializedData($entity[$valueColumn], $pathInStructure);
                 } else {
                     $paths = [[]]; // root = the value itself
                 }
 
-                /** @var Cursor[] $cursors */
+                /** @var SerializedDataCursor[] $cursors */
                 $cursors = array_map(function ($path) use (&$entity, $valueColumn) {
-                    return new Cursor($entity[$valueColumn], $path);
+                    return new SerializedDataCursor($entity[$valueColumn], $path);
                 }, $paths);
 
                 foreach ($cursors as $cursor) {
                     $vpids = $cursor->getValue();
                     $referenceVpId = $this->restoreIdsInString($vpids);
                     $cursor->setValue($referenceVpId);
-                }
-
-                if ($pathInStructure) {
-                    $entity[$valueColumn] = serialize($entity[$valueColumn]);
                 }
             }
         }
@@ -206,7 +195,8 @@ class VpidRepository
 
     private function isNullReference($id)
     {
-        return (is_numeric($id) && intval($id) === 0) || $id === '';
+        // WordPress / plugins sometimes use empty string, zero or negative number to express null reference.
+        return (is_numeric($id) && intval($id) <= 0) || $id === '';
     }
 
     private function replaceIdsInString($targetEntity, $stringWithIds)

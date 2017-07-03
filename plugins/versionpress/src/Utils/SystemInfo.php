@@ -28,6 +28,8 @@ class SystemInfo
         $output['summary']['git-full-path'] =
             isset($output['git-info']['git-full-path']) ? $output['git-info']['git-full-path'] : '';
 
+        $output['summary']['wp-cli-full-path'] = VP_WP_CLI_BINARY;
+
         return $output;
     }
 

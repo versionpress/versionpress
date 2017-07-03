@@ -75,6 +75,7 @@ class ActionsInfo
         }
 
         $message = str_replace('%VPID%', $vpid, $message);
+        $message = ucfirst($message);
 
         return apply_filters("vp_action_description_{$this->scope}", $message, $action, $vpid, $tags);
     }

@@ -9,6 +9,7 @@ use VersionPress\Git\ChangeInfoPreprocessors\ChangeInfoPreprocessor;
 use VersionPress\Git\ChangeInfoPreprocessors\EditActionChangeInfoPreprocessor;
 use VersionPress\Git\ChangeInfoPreprocessors\PostChangeInfoPreprocessor;
 use VersionPress\Git\ChangeInfoPreprocessors\PostTermSplittingPreprocessor;
+use VersionPress\Git\ChangeInfoPreprocessors\TermTaxonomyPreprocessor;
 use VersionPress\Storages\Mirror;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\FileSystem;
@@ -142,6 +143,7 @@ class Committer
             EditActionChangeInfoPreprocessor::class,
             PostChangeInfoPreprocessor::class,
             PostTermSplittingPreprocessor::class,
+            TermTaxonomyPreprocessor::class,
         ];
 
         $changeInfoLists = [$changeInfoList];

@@ -606,6 +606,10 @@ class WpAutomation
             "admin_password" => $this->siteConfig->adminPassword
         ];
 
+        if (version_compare($this->wpCliVersion, '0.22.0', '>=')) {
+            $cmdArgs['skip-email'] = null;
+        }
+
         $this->runWpCliCommand("core", "install", $cmdArgs);
     }
 

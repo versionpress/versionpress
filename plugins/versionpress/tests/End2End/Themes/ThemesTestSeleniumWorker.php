@@ -26,6 +26,10 @@ class ThemesTestSeleniumWorker extends SeleniumWorker implements IThemesTestWork
 
     public function uploadTheme()
     {
+        if (version_compare(self::$testConfig->testSite->wpVersion, '4.6', '>=')) {
+            $this->byCssSelector('button.upload-view-toggle')->click();
+        }
+
         $this->byCssSelector('input[name=themezip]')->value(self::$themeInfo['zipfile']);
         $this->byCssSelector('#install-theme-submit')->click();
         $this->waitAfterRedirect();

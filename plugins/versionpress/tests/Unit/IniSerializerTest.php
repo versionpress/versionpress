@@ -1144,6 +1144,28 @@ INI
     /**
      * @test
      */
+    public function serializedCustomClassWithPrivateAttributeInParent()
+    {
+        $object = new IniSerializer_FooPrivateChild('value');
+
+        $serializedString = serialize($object);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::ensureLf(<<<'INI'
+[Section]
+data = <<<serialized>>> <VersionPress\Tests\Unit\IniSerializer_FooPrivateChild>
+data["-VersionPress\\Tests\\Unit\\IniSerializer_FooPrivate->attribute"] = "value"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
     public function serializedNull()
     {
         $serializedString = serialize(null);
@@ -1492,6 +1514,70 @@ INI
 [Section]
 data = <<<serialized>>> <array>
 data[0] = "777"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedArrayInSerializedArray()
+    {
+        $serializedString = serialize([serialize(['some string'])]);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::ensureLf(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = <<<serialized>>> <array>
+data[0][0] = "some string"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function serializedStringInSerializedArray()
+    {
+        $serializedString = serialize([serialize('some string')]);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::ensureLf(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = <<<serialized>>> "some string"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function threeNestedSerializedValues()
+    {
+        $stdClass = new \stdClass();
+        $stdClass->data = serialize('some string');
+        $serializedString = serialize([serialize($stdClass)]);
+
+        $data = ["Section" => ["data" => $serializedString]];
+        $ini = StringUtils::ensureLf(<<<'INI'
+[Section]
+data = <<<serialized>>> <array>
+data[0] = <<<serialized>>> <stdClass>
+data[0]["data"] = <<<serialized>>> "some string"
 
 INI
         );

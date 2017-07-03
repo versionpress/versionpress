@@ -15,6 +15,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "archiver": "~1.1.0",
     "chalk": "^1.1.1",
     "del": "^3.0.0",
     "gulp": "~3.9.0",
@@ -29,6 +30,7 @@
     "merge-stream": "^1.0.0",
     "run-sequence": "^1.1.5",
     "shelljs": "^0.7.8",
+    "through2": "~2.0.1",
     "yamljs": "^0.2.6"
   }
 }

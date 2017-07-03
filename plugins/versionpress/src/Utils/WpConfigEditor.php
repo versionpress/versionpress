@@ -18,6 +18,7 @@ class WpConfigEditor
         'VP_PROJECT_ROOT',
         'VP_ENVIRONMENT',
         'VP_GIT_BINARY',
+        'VP_WP_CLI_BINARY',
     ];
 
     public function __construct($wpConfigPath, $isCommonConfig)
@@ -80,7 +81,7 @@ class WpConfigEditor
     {
         $wpConfigContent = file_get_contents($this->wpConfigPath);
 
-        $phpizedValue = $usePlainValue ? $value : var_export($value, true);
+        $phpizedValue = preg_quote($usePlainValue ? $value : var_export($value, true), '/');
 
         $configContainsDefinition = preg_match($replaceRegex, $wpConfigContent);
 

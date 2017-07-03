@@ -41,12 +41,15 @@ class TrackedChangeInfo implements ChangeInfo
     /** @var string */
     private $commitMessageSubject;
 
+    /** @var number */
+    private $priority;
+
     /**
      * VP tag common to all tracked change infos. It is the only required tag for them.
      */
     const ACTION_TAG = "VP-Action";
 
-    public function __construct($scope, $actionsInfo, $action, $id, $customTags = [], $customFiles = [])
+    public function __construct($scope, $actionsInfo, $action, $id, $customTags = [], $customFiles = [], $priority = 10)
     {
         $this->scope = $scope;
         $this->actionsInfo = $actionsInfo;
@@ -54,6 +57,7 @@ class TrackedChangeInfo implements ChangeInfo
         $this->id = $id;
         $this->customTags = $customTags;
         $this->customFiles = $customFiles;
+        $this->priority = $priority;
     }
 
     public function getCommitMessage()
@@ -137,7 +141,7 @@ class TrackedChangeInfo implements ChangeInfo
 
     public function getPriority()
     {
-        return $this->actionsInfo->getActionPriority($this->getAction());
+        return $this->priority;
     }
 
     /**
