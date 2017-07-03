@@ -111,7 +111,7 @@ Tests are a significant part of VersionPress core, currently about 60% of the co
 
 In this section:
 
-- [Dockerized testing environment](#dockerized-tests) (optional)
+- [Dockerized testing environment](#dockerized-tests)
 - [Unit tests](#unit-tests)
 - [End2end tests](#end2end-tests)
 - [Other tests](#other-tests)
@@ -120,22 +120,30 @@ In this section:
 
 ### Dockerized testing environment
 
-Docker greatly helps with running tests: it requires almost no local setup and produces consistent results across platforms. If you don't need to run or debug tests from PhpStorm, running tests is as simple as:
+Docker greatly helps with running tests: it requires almost no local setup and produces consistent results across platforms.
+
+#### Command line
+
+If you don't need to run or debug tests from PhpStorm, running tests is as simple as:
 
 1. `cd ./plugins/versionpress/tests`
-2. `npm run test:<type>`, e.g., `npm run test:unit-tests`
+2. `npm run tests`
+
+This runs all the tests in the project (see below for tips how to run a subset of them). The firsts run downloads and builds a lot of stuff, subsequent runs are almost instant.
 
 You can now inspect the results in the console and also, the whole Docker stack is still running so you can e.g. inspect the test site or its database. Run `npm run stop-tests` to shut down the Docker stack or `npm run cleanup-tests` to also remove all the volumes (next start will be completely fresh).
 
 The only local requirement is a free port 80 (end2end tests make the WordPress site available for local inspection).
 
-If you also want to run or debug tests from PhpStorm, this is a one-time example setup:
+#### Running tests from PhpStorm
+
+It is often useful to run or debug tests from PhpStorm. There is a one-time setup:
 
 First, if you're using _Docker for Mac_ or _Docker for Windows_, expose a daemon in Docker settings:
 
 ![image](https://user-images.githubusercontent.com/101152/27441580-43a964c8-576e-11e7-9912-1be811f73c4b.png)
 
-In PhpStorm, create a new Docker environment:
+In PhpStorm, create a new Docker environment in _Build, Execution, Deployment_ > _Docker_:
 
 ![image](https://user-images.githubusercontent.com/101152/27441828-ec760098-576e-11e7-9251-670204bf2643.png)
 
@@ -147,44 +155,52 @@ Next, define a remote interpreter. Make sure you have the **PHP Docker** plugin 
 
 ![image](https://user-images.githubusercontent.com/101152/27442419-6e177932-5770-11e7-9d28-dfc219a41fcd.png)
 
-We recommend some image with Xdebug installed, e.g., `phpstorm/php-71-cli-xdebug`:
+![image](https://user-images.githubusercontent.com/101152/27796438-3fec98e2-600a-11e7-9e9b-f6276ddb0a63.png)
 
-![image](https://user-images.githubusercontent.com/101152/27456995-518482f0-57a3-11e7-9d77-cd254c56a7c5.png)
+If this doesn't go smoothly, try unchecking the _Include parent environment variables_ checkbox in the _Environment variables_ field:
 
-These two paths should be mapped into the container:
+![image](https://user-images.githubusercontent.com/101152/27796503-81cff2f4-600a-11e7-8cfb-96661f0281a9.png)
 
-![image](https://user-images.githubusercontent.com/101152/27457048-78b63800-57a3-11e7-83c2-fd97b8caf6bc.png)
+Select this CLI interpreter as the main one for the project and define two path mappings:
 
-The final step is to set up a test framework:
+![image](https://user-images.githubusercontent.com/101152/27796964-2834b8c2-600c-11e7-8a0a-8d7ad43e1471.png)
 
-![image](https://user-images.githubusercontent.com/101152/27457076-9afdc02c-57a3-11e7-8b00-7d3dc8dae5a3.png)
+The final step is to set up a test framework in _PHP_ > _Test Frameworks_. Don't forget to set the _Default bootstrap file_ to `/opt/project/tests/phpunit-bootstrap.php`.
 
-Now you're ready to run the tests.
+![image](https://user-images.githubusercontent.com/101152/27797069-900fafce-600c-11e7-9ff9-db2d4507aa89.png)
+
+Now you're ready to run the tests. For example, to run all unit tests, right-click the `Unit` folder and select _Run_:
+
+![image](https://user-images.githubusercontent.com/101152/27797266-48a041fc-600d-11e7-88f0-aa557eb02325.png)
+
+Debugging also works, just select _Debug_ instead of _Run_:
+
+![image](https://user-images.githubusercontent.com/101152/27797346-93e132ca-600d-11e7-8052-9b4790739747.png)
+
+This works equally well other types of tests as well, for example, Selenium tests:
+
+![image](https://user-images.githubusercontent.com/101152/27797533-57f12904-600e-11e7-971b-08fd943aaf7b.png)
+
+#### Tips for running tests
+
+- You can start the `tests` container in an interactive session via `docker-compose run tests /bin/bash`. You can then invoke `phpunit` manually, e.g., `/opt/project/vendor/phpunit/phpunit/phpunit --bootstrap /opt/project/tests/phpunit-bootstrap.php --no-configuration /opt/project/tests/Unit`.
+- If you frequently run only a subset of tests from command line, say, `PublicWebTest`, you can create `docker-compose.override.yml` in the `tests` folder with a command inspired by what PhpStorm executes. For example:
+    ```yaml
+    version: '2'
+    services:
+      tests:
+        command: /opt/project/vendor/phpunit/phpunit/phpunit --bootstrap /opt/project/tests/phpunit-bootstrap.php --no-configuration VersionPress\Tests\Selenium\PublicWebTest /opt/project/tests/Selenium/PublicWebTest.php
+    ```
 
 ### Unit tests
 
 Unit tests are best suited for small pieces of algorithmic functionality. For example, `IniSerializer` is covered with unit tests extensively.
 
-The easiest way to run unit tests is:
-
-1. `cd ./plugins/versionpress/tests`
-2. `npm run test:unit-tests`
-
-You should see something like this:
-
-![image](https://user-images.githubusercontent.com/101152/27480550-a4364fea-5818-11e7-9d33-b96accab59ce.png)
-
-You can also run any or all tests in PhpStorm easily by right-clicking test names and other methods provided by this IDE. The _Run_ panel will look like this:
-
-![image](https://user-images.githubusercontent.com/101152/27459292-c8eadbe6-57ad-11e7-96bd-3b77f255247f.png)
-
-Debugging also works well:
-
-![image](https://user-images.githubusercontent.com/101152/27459354-23388d96-57ae-11e7-8bc0-684d6634e6d6.png)
+You can either run unit tests in a dockerized environment as described above or set up a local CLI interpret; it makes the execution a bit faster.
 
 ### End2end tests
 
-End2end tests exercise a full WordPress site and check that VersionPress creates the right Git commits and that the database is in correct state. These tests are quite heavy and slow to run but if they pass, there's a good chance that VersionPress works correctly. (Before the project had these, long and painful manual testing period was necessary before each release.)
+End2end tests exercise a WordPress site and check that VersionPress creates the right Git commits and that the database is in correct state. These tests are quite heavy and slow to run but if they pass, there's a good chance that VersionPress works correctly. (Before the project had these, long and painful manual testing period was necessary before each release.)
 
 End2end tests use the concept of **workers**: each test itself is implemented once but e.g. how a post is created or a user deleted is up to a specific worker. There are currently two types of workers:
 
@@ -193,21 +209,9 @@ End2end tests use the concept of **workers**: each test itself is implemented on
 
 In the future, we might add REST API workers; the idea is to cover all possible interactions with the site as different workers can (and in practice do) produce slightly different results.
 
-Running and debugging end2end tests is very similar to unit tests above, just with docker-compose instead of a single container. An example CLI interpreter would be like this (note the selected "service" which is `selenium-tests` in this example):
+Currently, the default worker is WP-CLI (is used when you `npm run tests`) and the only way to switch workers is to update `tests/test-config.yml`, the `end2end-test-type` key, but this will be changing soon as this file is not intended for local changes. In the future, there will be another method to parametrize this, e.g., a command line switch or two sets of test classes.
 
-![image](https://user-images.githubusercontent.com/101152/27520544-44122be6-5a0e-11e7-9847-ec8547c219b6.png)
-
-Then a test framework setup:
-
-![image](https://user-images.githubusercontent.com/101152/27520565-91ce0ee0-5a0e-11e7-8390-8bea5006acc7.png)
-
-Then just select any test and run or debug it:
-
-![image](https://user-images.githubusercontent.com/101152/27520576-c9bc7bca-5a0e-11e7-8e80-4163bfb36219.png)
-
-From the command line, you just run e.g. `docker-compose run selenium-tests` – see `docker-compose.yml` in the `tests` folder for all the available test types.
-
-After the tests are run, the docker-compose stack is left up and running so that you can inspect it:
+After you run the tests using one of the methods described above, the Docker Compose stack is left up and running so that you can inspect it:
 
 - You can access the site in your local browser by aliasing a `wordpress` host in your `hosts` file (add a line with `127.0.0.1 wordpress`) and then visiting `http://wordpress/vp01`.
 - `docker exec -ti tests_wordpress_1 /bin/bash` to start an interactive session inside the WordPress site container. You can then e.g. run `git log` against the site.
@@ -221,7 +225,7 @@ After the tests are run, the docker-compose stack is left up and running so that
 
 There are also other types of integration tests, e.g., `GitRepositoryTests` or `StorageTests`. These are lighter than End2End tests but still depend on some external subsystem like Git or file system.
 
-You run these tests in the same manner as end2end or unit tests.
+You can run these tests individually as per instructions above. 
 
 ## Production build
 
