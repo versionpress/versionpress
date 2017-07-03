@@ -1899,16 +1899,16 @@
         },
         {
             "name": "wp-cli/entity-command",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-cli/entity-command.git",
-                "reference": "ad1c634fb51a48ff81b591211076b176c72f45c4"
+                "reference": "5f925201062c7a308f6cbbfc56bc8dec20d2ff80"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-cli/entity-command/zipball/ad1c634fb51a48ff81b591211076b176c72f45c4",
-                "reference": "ad1c634fb51a48ff81b591211076b176c72f45c4",
+                "url": "https://api.github.com/repos/wp-cli/entity-command/zipball/5f925201062c7a308f6cbbfc56bc8dec20d2ff80",
+                "reference": "5f925201062c7a308f6cbbfc56bc8dec20d2ff80",
                 "shasum": ""
             },
             "require-dev": {
@@ -1963,7 +1963,7 @@
             ],
             "description": "Manage WordPress core entities.",
             "homepage": "https://github.com/wp-cli/entity-command",
-            "time": "2017-05-30T18:59:14+00:00"
+            "time": "2017-06-29T22:26:09+00:00"
         },
         {
             "name": "wp-cli/eval-command",
