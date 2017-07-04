@@ -28,42 +28,27 @@ class ActionsDefinitionRepository
         return new \GlobIterator($this->directory . '/*-actions.yml', \FilesystemIterator::CURRENT_AS_PATHNAME);
     }
 
-    public function saveDefinitionForPlugin($pluginFile)
+    public function saveActionsFileForPlugin($pluginFile)
     {
         $pluginSlug = basename(dirname($pluginFile));
-        $actionsFile = WP_PLUGIN_DIR . '/' . $pluginSlug . '/.versionpress/actions.yml';
+        $actionsFile = PluginDefinitionDiscovery::getPathForPlugin($pluginSlug, 'actions.yml');
 
-        if (!is_file($actionsFile)) {
+        if (!$actionsFile) {
             return;
         }
 
-        $targetFile = $this->getDefinitionFileName($pluginSlug);
+        $targetFile = $this->getActionsFileName($pluginSlug);
         FileSystem::copy($actionsFile, $targetFile);
     }
 
-    public function restoreAllDefinitionFilesFromHistory()
+    public function restoreAllActionsFilesFromHistory()
     {
         FileSystem::removeContent($this->directory);
 
-        $definitionFilesWildcard = WP_PLUGIN_DIR . '/*/.versionpress/actions.yml';
-        $modifications = $this->gitRepository->getFileModifications($definitionFilesWildcard);
+        $this->restoreActionFilesByWildcard(WP_PLUGIN_DIR . '/*/.versionpress/actions.yml');
+        $this->restoreActionFilesByWildcard(WP_CONTENT_DIR . '/.versionpress/plugins/*/actions.yml');
 
-        $modifications = array_filter($modifications, function ($modification) {
-            return $modification['status'] !== 'D';
-        });
-        $lastModifications = ArrayUtils::unique($modifications, function ($modification) {
-            return $modification['path'];
-        });
-
-        foreach ($lastModifications as $modification) {
-            $fileContent = $this->gitRepository->getFileInRevision($modification['path'], $modification['commit']);
-            $plugin = basename(dirname(dirname($modification['path'])));
-
-            $targetFile = $this->getDefinitionFileName($plugin);
-            file_put_contents($targetFile, $fileContent);
-        }
-
-        $this->saveDefinitionForPlugin('versionpress/versionpress.php');
+        $this->saveActionsFileForPlugin('versionpress/versionpress.php');
     }
 
     private function sanitizePluginName($pluginName)
@@ -71,8 +56,29 @@ class ActionsDefinitionRepository
         return str_replace('/', '---', $pluginName);
     }
 
-    private function getDefinitionFileName($plugin)
+    private function getActionsFileName($plugin)
     {
         return $this->directory . '/' . $this->sanitizePluginName($plugin) . '-actions.yml';
+    }
+
+    private function restoreActionFilesByWildcard($definitionFilesWildcard)
+    {
+        $modifications = $this->gitRepository->getFileModifications($definitionFilesWildcard);
+
+        $deletions = array_filter($modifications, function ($modification) {
+            return $modification['status'] !== 'D';
+        });
+
+        $lastDeletions = ArrayUtils::unique($deletions, function ($modification) {
+            return $modification['path'];
+        });
+
+        foreach ($lastDeletions as $deletion) {
+            $fileContent = $this->gitRepository->getFileInRevision($deletion['path'], $deletion['commit']);
+            $plugin = basename(dirname(dirname($deletion['path'])));
+
+            $targetFile = $this->getActionsFileName($plugin);
+            file_put_contents($targetFile, $fileContent);
+        }
     }
 }

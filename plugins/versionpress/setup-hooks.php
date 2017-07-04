@@ -110,8 +110,10 @@ function vp_register_hooks()
 
     foreach ($plugins as $pluginFile) {
         $pluginDir = dirname($pluginFile);
-        $hooksFile = $pluginDir . '/.versionpress/hooks.php';
-        if (file_exists($hooksFile)) {
+        $pluginName = basename($pluginDir);
+        $hooksFile = \VersionPress\Actions\PluginDefinitionDiscovery::getPathForPlugin($pluginName, 'hooks.php');
+
+        if ($hooksFile) {
             require_once $hooksFile;
         }
     }
