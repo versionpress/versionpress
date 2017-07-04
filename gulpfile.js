@@ -248,7 +248,7 @@ gulp.task('clean-build', false, ['zip'], function (cb) {
  * Installs Composer external libs.
  */
 gulp.task('composer-install-ext-libs', false, function () {
-    return composer('update', {cwd: './ext-libs', bin: 'composer', 'ignore-platform-reqs': true});
+    return composer({cwd: './ext-libs', bin: 'composer', 'ignore-platform-reqs': true});
 });
 
 /**
