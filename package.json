@@ -13,6 +13,10 @@
     "cleanup-docker-stack": "docker-compose down -v && rm -rf ./dev-env/wp",
     "postinstall": "npm run init-dev"
   },
+  "engines": {
+    "node": ">= 8.1",
+    "npm": ">= 5"
+  },
   "dependencies": {},
   "devDependencies": {
     "archiver": "~1.1.0",
