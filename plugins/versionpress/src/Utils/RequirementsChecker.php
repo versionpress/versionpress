@@ -274,7 +274,7 @@ class RequirementsChecker
 
     private function tryAccessControlFiles()
     {
-        $securedUrl = site_url() . '/wp-content/plugins/versionpress/temp/security-check.txt';
+        $securedUrl = site_url() . '/wp-content/plugins/versionpress/versionpress-nginx.conf';
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
         return @file_get_contents($securedUrl) === false; // intentionally @
     }
