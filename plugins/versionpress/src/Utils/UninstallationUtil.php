@@ -2,6 +2,7 @@
 namespace VersionPress\Utils;
 
 use VersionPress\ChangeInfos\CommitMessageParser;
+use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\GitRepository;
 
@@ -37,6 +38,6 @@ class UninstallationUtil
         $changeInfoList = $changeInfoEnvelope->getChangeInfoList();
         $firstChangeInfo = $changeInfoList[0];
 
-        return $changeInfoList[0]->getScope() === 'versionpress' && $firstChangeInfo->getAction() === 'activate';
+        return $firstChangeInfo instanceof TrackedChangeInfo && $firstChangeInfo->getScope() === 'versionpress' && $firstChangeInfo->getAction() === 'activate';
     }
 }
