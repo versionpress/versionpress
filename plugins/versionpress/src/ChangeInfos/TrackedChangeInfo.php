@@ -106,6 +106,11 @@ class TrackedChangeInfo implements ChangeInfo
     {
         if (empty($this->commitMessageSubject)) {
             $this->commitMessageSubject = $this->actionsInfo->getDescription($this->getAction(), $this->getId(), $this->getCustomTags());
+
+            // Backward compatibility - displaying update message for old edit actions
+            if ($this->commitMessageSubject === null && $this->getAction() === 'edit') {
+                $this->commitMessageSubject = $this->actionsInfo->getDescription('update', $this->getId(), $this->getCustomTags());
+            }
         }
 
         return $this->commitMessageSubject;

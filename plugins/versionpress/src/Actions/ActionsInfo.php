@@ -68,6 +68,10 @@ class ActionsInfo
 
     public function getDescription($action, $vpid, $tags)
     {
+        if (!isset($this->actions[$action])) {
+            return null;
+        }
+
         $message = $this->actions[$action]['message'];
 
         foreach ($tags as $tag => $value) {
