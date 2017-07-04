@@ -531,8 +531,8 @@ Feel free to use custom `.gitignore` for files in the plugin directory. You can 
 
 VersionPress looks for plugin definitions in these locations, in this order:
 
-1. `WP_CONTENT_DIR/.versionpress/<plugin-slug>`
-2. `WP_PLUGIN_DIR/<plugin-slug>/.versionpress`
+1. `WP_CONTENT_DIR/.versionpress/plugins/<plugin-slug>` (user-editable definitions in the `wp-content` directory)
+2. `WP_PLUGIN_DIR/<plugin-slug>/.versionpress` (definitions bundled with plugins)
 
 The first definition found is used.
 

@@ -12,7 +12,7 @@ class PluginDefinitionDiscovery
     {
         $globalDefinitionsDir = WP_CONTENT_DIR . '/.versionpress';
 
-        $defaultDefinitionFile = $globalDefinitionsDir . '/' . $pluginSlug . '/' . $definitionFile;
+        $defaultDefinitionFile = $globalDefinitionsDir . '/plugins/' . $pluginSlug . '/' . $definitionFile;
         $pluginDirDefinitionFile = WP_PLUGIN_DIR . '/' . $pluginSlug . '/.versionpress/' . $definitionFile;
 
         if (file_exists($defaultDefinitionFile)) {

@@ -46,7 +46,7 @@ class ActionsDefinitionRepository
         FileSystem::removeContent($this->directory);
 
         $this->restoreActionFilesByWildcard(WP_PLUGIN_DIR . '/*/.versionpress/actions.yml');
-        $this->restoreActionFilesByWildcard(WP_CONTENT_DIR . '/.versionpress/*/actions.yml');
+        $this->restoreActionFilesByWildcard(WP_CONTENT_DIR . '/.versionpress/plugins/*/actions.yml');
 
         $this->saveActionsFileForPlugin('versionpress/versionpress.php');
     }
