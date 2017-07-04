@@ -17,7 +17,7 @@ Install:
 
 - PHP 5.6+ and Composer
 - Git 2.10+
-- Node.js 8+
+- Node.js 8.1+, npm 5+
 - Docker 17+
 
 Then run:
