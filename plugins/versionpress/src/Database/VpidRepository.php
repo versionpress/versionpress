@@ -238,20 +238,20 @@ class VpidRepository
         /** @var Database $database */
         $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
 
-        $menuItemType = $database->get_col("select meta_value from {$database->postmeta} pm join {$database->vp_id} vpid
+        $menuItemType = $database->get_var("select meta_value from {$database->postmeta} pm join {$database->vp_id} vpid
                                             on pm.post_id = vpid.id where pm.meta_key = '_menu_item_type'
                                             and vpid.vp_id = UNHEX(\"{$postmeta['vp_post_id']}\")");
 
-        if ($menuItemType[0] === 'taxonomy') {
+        if ($menuItemType === 'taxonomy') {
             return 'term_taxonomy';
         }
 
-        if ($menuItemType[0] === 'post_type') {
+        if ($menuItemType === 'post_type') {
             return 'post';
         }
 
         // Special case - reference to homepage (WP sets it as 'custom', but actually it is 'post_type')
-        if ($menuItemType[0] === 'custom' && is_numeric($postmeta['meta_value'])) {
+        if ($menuItemType === 'custom' && is_numeric($postmeta['meta_value'])) {
             return 'post';
         }
 
