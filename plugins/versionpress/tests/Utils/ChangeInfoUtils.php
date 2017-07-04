@@ -14,7 +14,7 @@ class ChangeInfoUtils
 {
 
     /**
-     * Returns full action such as "post/edit" or "wordpress/update".
+     * Returns full action such as "post/update" or "plugin/activate".
      *
      * Note: changeinfo objects in production code don't have a need to represent
      * the concept of "full action"; tracked entities simply have entity names and actions.

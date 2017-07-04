@@ -18,7 +18,7 @@ class PagesTest extends PostTypeTestCase
 
     /**
      * @test
-     * @testdox Updating page content creates 'post/edit' action
+     * @testdox Updating page content creates 'post/update' action
      *
      * @depends addingPageCreatesPostCreateAction
      */
@@ -29,7 +29,7 @@ class PagesTest extends PostTypeTestCase
 
     /**
      * @test
-     * @testdox Updating page via quick edit creates equivalent 'post/edit' action
+     * @testdox Updating page via quick edit creates equivalent 'post/update' action
      *
      * @depends updatingPageCreatesPostEditAction
      */

@@ -20,7 +20,7 @@ class PostsTest extends PostTypeTestCase
 
     /**
      * @test
-     * @testdox Updating post creates 'post/edit' action
+     * @testdox Updating post creates 'post/update' action
      *
      * @depends addingPostCreatesPostCreateAction
      */
@@ -31,7 +31,7 @@ class PostsTest extends PostTypeTestCase
 
     /**
      * @test
-     * @testdox Updating post via quick edit creates equivalent 'post/edit' action
+     * @testdox Updating post via quick edit creates equivalent 'post/update' action
      *
      * @depends updatingPostCreatesPostEditAction
      */
@@ -129,7 +129,7 @@ class PostsTest extends PostTypeTestCase
         self::$worker->createTagInEditationForm();
 
         $this->commitAsserter->assertNumCommits(2);
-        $this->commitAsserter->assertCommitAction('post/edit');
+        $this->commitAsserter->assertCommitAction('post/update');
         $this->commitAsserter->assertCommitAction('term/create', 1);
         $this->commitAsserter->assertCommitTag("VP-Post-Type", self::$worker->getPostType());
         $this->commitAsserter->assertCleanWorkingDirectory();
@@ -168,7 +168,7 @@ class PostsTest extends PostTypeTestCase
 
         $this->commitAsserter->ignoreCommits('term/create');
         $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction('post/edit');
+        $this->commitAsserter->assertCommitAction('post/update');
         $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }

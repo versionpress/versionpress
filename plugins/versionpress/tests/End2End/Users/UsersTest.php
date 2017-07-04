@@ -48,7 +48,7 @@ class UsersTest extends End2EndTestCase
 
     /**
      * @test
-     * @testdox Editing user's email creates 'user/edit' action
+     * @testdox Editing user's email creates 'user/update' action
      * @depends addingUserCreatesUserCreateAction
      */
     public function editingUserCreatesUserEditAction()
@@ -60,7 +60,7 @@ class UsersTest extends End2EndTestCase
         self::$worker->editUser();
 
         $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("user/edit");
+        $this->commitAsserter->assertCommitAction("user/update");
         $this->commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
         $this->commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID%.ini");
         $this->commitAsserter->assertCleanWorkingDirectory();
@@ -69,7 +69,7 @@ class UsersTest extends End2EndTestCase
 
     /**
      * @test
-     * @testdox Editing user's name creates 'usermeta/edit' action
+     * @testdox Editing user's name creates 'usermeta/update' action
      * @depends addingUserCreatesUserCreateAction
      */
     public function editingUsermetaCreatesUsermetaEditAction()
@@ -81,7 +81,7 @@ class UsersTest extends End2EndTestCase
         self::$worker->editUsermeta();
 
         $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("usermeta/edit");
+        $this->commitAsserter->assertCommitAction("usermeta/update");
         $this->commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
         $this->commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID(VP-User-Id)%.ini");
         $this->commitAsserter->assertCleanWorkingDirectory();
@@ -122,7 +122,7 @@ class UsersTest extends End2EndTestCase
         self::$worker->editTwoUsers();
 
         $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertBulkAction("user/edit", 2);
+        $this->commitAsserter->assertBulkAction("user/update", 2);
         $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
@@ -159,7 +159,7 @@ class UsersTest extends End2EndTestCase
         self::$worker->editTwoUsermeta();
 
         $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertBulkAction("usermeta/edit", 2);
+        $this->commitAsserter->assertBulkAction("usermeta/update", 2);
         $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }

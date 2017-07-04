@@ -48,7 +48,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         self::$worker->updatePost();
 
         $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/edit");
+        $this->commitAsserter->assertCommitAction("post/update");
         $this->commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
         $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
@@ -213,7 +213,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         self::$worker->changeStatusOfTwoPosts();
 
         $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertBulkAction('post/edit', 2);
+        $this->commitAsserter->assertBulkAction('post/update', 2);
         $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }

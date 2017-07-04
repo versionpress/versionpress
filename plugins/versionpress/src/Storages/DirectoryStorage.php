@@ -88,7 +88,7 @@ class DirectoryStorage extends Storage
             FileSystem::mkdir(dirname($this->getEntityFilename($vpid)));
             file_put_contents($filename, $this->serializeEntity($vpid, $newEntity));
 
-            return $this->createChangeInfo($oldEntity, $newEntity, !$isExistingEntity ? 'create' : 'edit');
+            return $this->createChangeInfo($oldEntity, $newEntity, !$isExistingEntity ? 'create' : 'update');
         } else {
             return null;
         }

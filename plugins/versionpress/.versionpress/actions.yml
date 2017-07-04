@@ -10,26 +10,25 @@ post:
     delete: Deleted %VP-Post-Format% '%VP-Post-Title%'
     draft: Created draft for %VP-Post-Format% '%VP-Post-Title%'
     publish: Published %VP-Post-Format% '%VP-Post-Title%'
-    edit:
-      message: Edited %VP-Post-Format% '%VP-Post-Title%'
+    update:
+      message: Updated %VP-Post-Format% '%VP-Post-Title%'
       priority: 12
-    update: Updated %VP-Post-Format% '%VP-Post-Title%'
 
 user:
   tags:
     VP-User-Login: user_login
   actions:
     create: Created user '%VP-User-Login%'
-    edit:
-      message: Edited user '%VP-User-Login%'
+    update:
+      message: Updated user '%VP-User-Login%'
       priority: 12
     delete: Deleted user '%VP-User-Login%'
 
 option:
   actions:
     create: Created option '%VPID%'
-    edit:
-      message: Edited option '%VPID%'
+    update:
+      message: Updated option '%VPID%'
       priority: 12
     delete: Deleted option '%VPID%'
 
@@ -39,8 +38,8 @@ comment:
     VP-Comment-Author: comment_author
   actions:
     create: New comment for post '%VP-Comment-PostTitle%'
-    edit:
-      message: Edited comment for post '%VP-Comment-PostTitle%'
+    update:
+      message: Updated comment for post '%VP-Comment-PostTitle%'
       priority: 12
     delete: Deleted comment for post '%VP-Comment-PostTitle%
     trash: Comment for post '%VP-Comment-PostTitle%' moved to trash
@@ -62,8 +61,8 @@ term:
       priority: 9
     delete: Deleted %VP-Term-Taxonomy% '%VP-Term-Name%'
     rename: %VP-Term-Taxonomy% '%VP-Term-OldName%' renamed to '%VP-Term-Name%'
-    edit:
-      message: Edited %VP-Term-Taxonomy% '%VP-Term-Name%'
+    update:
+      message: Updated %VP-Term-Taxonomy% '%VP-Term-Name%'
       priority: 12
 
 term_taxonomy:
@@ -73,8 +72,8 @@ term_taxonomy:
     VP-Term-Id: vp_term_id
   actions:
     create: New %VP-TermTaxonomy-Taxonomy% '%VP-Term-Name%'
-    edit:
-      message: Edited %VP-TermTaxonomy-Taxonomy% '%VP-Term-Name%'
+    update:
+      message: Updated %VP-TermTaxonomy-Taxonomy% '%VP-Term-Name%'
       priority: 12
     delete: Deleted %VP-TermTaxonomy-Taxonomy% '%VP-Term-Name%'
 
@@ -87,8 +86,8 @@ commentmeta:
     create:
       message: Created commentmeta '%VP-CommentMeta-Key%'
       priority: 15
-    edit:
-      message: Edited commentmeta '%VP-CommentMeta-Key%'
+    update:
+      message: Updated commentmeta '%VP-CommentMeta-Key%'
       priority: 17
     delete:
       message: Deleted commentmeta '%VP-CommentMeta-Key%'
@@ -104,8 +103,8 @@ usermeta:
     create:
       message: Created usermeta '%VP-UserMeta-Key%'
       priority: 15
-    edit:
-      message: Edited usermeta '%VP-UserMeta-Key%'
+    update:
+      message: Updated usermeta '%VP-UserMeta-Key%'
       priority: 17
     delete:
       message: Deleted usermeta '%VP-UserMeta-Key%'
@@ -120,8 +119,8 @@ termmeta:
     create:
       message: Created termmeta '%VP-TermMeta-Key%'
       priority: 15
-    edit:
-      message: Edited termmeta '%VP-TermMeta-Key%'
+    update:
+      message: Updated termmeta '%VP-TermMeta-Key%'
       priority: 17
     delete:
       message: Deleted termmeta '%VP-TermMeta-Key%'
@@ -138,8 +137,8 @@ postmeta:
     create:
       message: Created postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'
       priority: 15
-    edit:
-      message: Edited postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'
+    update:
+      message: Updated postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'
       priority: 17
     delete:
       message: Deleted postmeta '%VP-PostMeta-Key%' for %VP-Post-Type% '%VP-Post-Title%'
@@ -158,8 +157,8 @@ plugin:
     install: Installed plugin '%VP-Plugin-Name%'
     activate: Activated plugin '%VP-Plugin-Name%'
     deactivate: Deactivated plugin '%VP-Plugin-Name%'
-    update: Updated plugin '%VP-Plugin-Name%'
-    edit: Edited plugin '%VP-Plugin-Name%'
+    update: Updated plugin '%VP-Plugin-Name%' # Updating the plugin itself
+    edit: Edited plugin '%VP-Plugin-Name%' # Editing plugin files
     delete: Deleted plugin '%VP-Plugin-Name%'
 
 theme:
@@ -167,8 +166,8 @@ theme:
     VP-Theme-Name: /
   actions:
     install: Installed theme '%VP-Theme-Name%'
-    update: Updated theme '%VP-Theme-Name%'
-    edit: Edited theme '%VP-Theme-Name%'
+    update: Updated theme '%VP-Theme-Name%' # Updating the theme itself
+    edit: Edited theme '%VP-Theme-Name%' # Editing theme files
     switch: Theme switched to '%VP-Theme-Name%'
     delete: Deleted theme '%VP-Theme-Name%'
 

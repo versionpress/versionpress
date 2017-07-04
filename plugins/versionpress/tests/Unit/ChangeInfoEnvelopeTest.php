@@ -36,7 +36,7 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
         $lowerPriorityActionsInfo = $this->createActionsInfoMock(15);
         $normalPriorityActionsInfo = $this->createActionsInfoMock(10);
 
-        $lowerPriorityChangeInfo = new EntityChangeInfo($entityInfo, $lowerPriorityActionsInfo, 'edit', 'vpid');
+        $lowerPriorityChangeInfo = new EntityChangeInfo($entityInfo, $lowerPriorityActionsInfo, 'update', 'vpid');
         $normalPriorityChangeInfo = new EntityChangeInfo($entityInfo, $normalPriorityActionsInfo, 'create', 'vpid');
 
         $input = [$lowerPriorityChangeInfo, $normalPriorityChangeInfo];
@@ -56,8 +56,8 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
         $lowerPriorityActionsInfo = $this->createActionsInfoMock(15);
 
         $higherPriorityChangeInfo = new EntityChangeInfo($entityInfo, $higherPriorityActionsInfo, 'create', 'vpid');
-        $lowerPriorityChangeInfo1 = new EntityChangeInfo($entityInfo, $lowerPriorityActionsInfo, 'edit', 'vpid');
-        $lowerPriorityChangeInfo2 = new EntityChangeInfo($entityInfo, $lowerPriorityActionsInfo, 'edit', 'vpid');
+        $lowerPriorityChangeInfo1 = new EntityChangeInfo($entityInfo, $lowerPriorityActionsInfo, 'update', 'vpid');
+        $lowerPriorityChangeInfo2 = new EntityChangeInfo($entityInfo, $lowerPriorityActionsInfo, 'update', 'vpid');
 
         $input = [$higherPriorityChangeInfo, $lowerPriorityChangeInfo1, $lowerPriorityChangeInfo2];
         $changeInfoEnvelope = new ChangeInfoEnvelope($input, "1.0");
@@ -99,8 +99,8 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
         $wordpressUpdateChangeInfo1 = new TrackedChangeInfo('wordpress', $actionsInfoMock, 'update', '4.0');
         $wordPressUpdateChangeInfo2 = new TrackedChangeInfo('wordpress', $actionsInfoMock, 'update', '4.1');
 
-        $normalPriorityPostChangeInfo1 = new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'edit', 'vpid');
-        $normalPriorityPostChangeInfo2 = new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'edit', 'another vpid');
+        $normalPriorityPostChangeInfo1 = new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'update', 'vpid');
+        $normalPriorityPostChangeInfo2 = new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'update', 'another vpid');
 
         return [
             [
@@ -124,15 +124,15 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
         return [
             [
                 [
-                    new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'edit', '1st vpid'),
-                    new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'edit', '2nd vpid'),
+                    new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'update', '1st vpid'),
+                    new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'update', '2nd vpid'),
                 ]
             ],
             [
                 [
-                    new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'edit', '1st vpid'),
-                    new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'edit', '2nd vpid'),
-                    new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'edit', '3rd vpid'),
+                    new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'update', '1st vpid'),
+                    new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'update', '2nd vpid'),
+                    new EntityChangeInfo($entityInfoMock, $actionsInfoMock, 'update', '3rd vpid'),
                 ]
             ],
         ];

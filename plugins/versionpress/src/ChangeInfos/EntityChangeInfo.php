@@ -12,7 +12,7 @@ use VersionPress\Database\EntityInfo;
  * Derived ChangeInfos have these things in common:
  *
  * - The VP-Action tag value has the form of "entityName/action/entityId",
- *   e.g. "post/create/8F805A77ABC9485BA3F114E3E251E5FD" or "option/edit/blogname".
+ *   e.g. "post/create/8F805A77ABC9485BA3F114E3E251E5FD" or "option/update/blogname".
  *   Most commonly, the entityId is VPID.
  *
  * - Subclasses usually provide a set of VP tags to store additional info to commits, usually

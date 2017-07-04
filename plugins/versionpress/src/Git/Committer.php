@@ -6,7 +6,7 @@ use VersionPress\ChangeInfos\ChangeInfoEnvelope;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\DI\VersionPressServices;
 use VersionPress\Git\ChangeInfoPreprocessors\ChangeInfoPreprocessor;
-use VersionPress\Git\ChangeInfoPreprocessors\EditActionChangeInfoPreprocessor;
+use VersionPress\Git\ChangeInfoPreprocessors\UpdateActionChangeInfoPreprocessor;
 use VersionPress\Git\ChangeInfoPreprocessors\PostChangeInfoPreprocessor;
 use VersionPress\Git\ChangeInfoPreprocessors\PostTermSplittingPreprocessor;
 use VersionPress\Git\ChangeInfoPreprocessors\TermTaxonomyPreprocessor;
@@ -140,7 +140,7 @@ class Committer
         global $versionPressContainer;
 
         $preprocessors = [
-            EditActionChangeInfoPreprocessor::class,
+            UpdateActionChangeInfoPreprocessor::class,
             PostChangeInfoPreprocessor::class,
             PostTermSplittingPreprocessor::class,
             TermTaxonomyPreprocessor::class,

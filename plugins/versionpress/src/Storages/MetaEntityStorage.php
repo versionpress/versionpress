@@ -65,7 +65,7 @@ class MetaEntityStorage extends Storage
         if (!$oldEntity) {
             $action = 'create';
         } else {
-            $action = 'edit';
+            $action = 'update';
         }
 
         return $this->createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParent, $newParent, $action);

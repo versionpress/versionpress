@@ -287,7 +287,7 @@ function vp_register_hooks()
         $post = get_post($post_id);
         $actionsInfo = $actionsInfoProvider->getActionsInfo('post');
 
-        $changeInfo = new EntityChangeInfo($dbSchemaInfo->getEntityInfo('post'), $actionsInfo, 'edit', $vpid, ['VP-Post-Type' => $post->post_type, 'VP-Post-Title' => $post->post_title]);
+        $changeInfo = new EntityChangeInfo($dbSchemaInfo->getEntityInfo('post'), $actionsInfo, 'update', $vpid, ['VP-Post-Type' => $post->post_type, 'VP-Post-Title' => $post->post_title]);
         $committer->forceChangeInfo($changeInfo);
     }, 10, 5);
 
@@ -438,7 +438,7 @@ function vp_register_hooks()
         $stylesheet = $_GET['theme'];
         $themeName = wp_get_theme($stylesheet)->get('Name');
 
-        do_action('vp_theme_changed', 'edit', $stylesheet, $themeName);
+        do_action('vp_theme_changed', 'update', $stylesheet, $themeName);
     }
 
     if (basename($_SERVER['PHP_SELF']) === 'plugin-editor.php' &&
@@ -478,7 +478,7 @@ function vp_register_hooks()
             }
         }
 
-        do_action('vp_plugin_changed', 'edit', $bestMatch, $plugins[$bestMatch]['Name']);
+        do_action('vp_plugin_changed', 'update', $bestMatch, $plugins[$bestMatch]['Name']);
     }
 
     add_filter('cron_schedules', function ($schedules) use ($dbSchemaInfo) {

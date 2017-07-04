@@ -23,6 +23,6 @@ class ThemeCustomizerTest // extends SeleniumTestCase // temporarily disabled
         $this->waitForAjax();
 
         $lastCommit = $this->gitRepository->getCommit($this->gitRepository->getLastCommitHash());
-        $this->assertContains('option/edit', $lastCommit->getMessage()->getBody());
+        $this->assertContains('option/update', $lastCommit->getMessage()->getBody());
     }
 }
