@@ -318,7 +318,7 @@ class WpdbMirrorBridge
                 }
 
                 if (!$entityInfo) {
-                    $referenceDetails = $this->dbSchemaInfo->getMnReferenceDetails($parsedQueryData->table);
+                    $referenceDetails = $this->dbSchemaInfo->getMnReferenceDetails($this->dbSchemaInfo->trimPrefix($parsedQueryData->table));
                     if (!$referenceDetails) {
                         return;
                     }
