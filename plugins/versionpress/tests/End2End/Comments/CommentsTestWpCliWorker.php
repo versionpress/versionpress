@@ -51,7 +51,7 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
 
     public function createComment()
     {
-        $author = $this->testConfig->testSite->adminName;
+        $author = $this->testConfig->testSite->adminUser;
         $email = $this->testConfig->testSite->adminEmail;
         $comment = [
             'comment_author' => $author,
@@ -70,7 +70,7 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
 
     public function editComment()
     {
-        $author = $this->testConfig->testSite->adminName;
+        $author = $this->testConfig->testSite->adminUser;
         $comment = [
             'comment_content' => 'Updated comment by ' . $author,
         ];
@@ -106,7 +106,7 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
 
     public function prepare_unapproveComment()
     {
-        $author = $this->testConfig->testSite->adminName;
+        $author = $this->testConfig->testSite->adminUser;
         $email = $this->testConfig->testSite->adminEmail;
         $comment = [
             'comment_author' => $author,
@@ -185,7 +185,7 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
 
     private function prepareTestComment()
     {
-        $author = $this->testConfig->testSite->adminName;
+        $author = $this->testConfig->testSite->adminUser;
         $email = $this->testConfig->testSite->adminEmail;
 
         if (!$this->testPostId) {

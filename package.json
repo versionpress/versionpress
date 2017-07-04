@@ -1,34 +1,36 @@
 {
-  "name": "versionpress",
+  "name": "versionpress-dev-workspace",
   "version": "1.0.0",
-  "description": "",
+  "description": "VersionPress development workspace",
   "main": "gulpfile.js",
-  "directories": {
-    "test": "tests"
+  "author": "VersionPress",
+  "license": "GPL",
+  "scripts": {
+    "init-dev": "gulp init-dev",
+    "init-phpstorm": "gulp idea",
+    "build": "gulp build",
+    "start": "docker-compose up",
+    "cleanup-docker-stack": "docker-compose down -v && rm -rf ./dev-env/wp",
+    "postinstall": "npm run init-dev"
   },
   "dependencies": {},
   "devDependencies": {
+    "archiver": "~1.1.0",
     "chalk": "^1.1.1",
-    "coffee-script": "~1.10.0",
-    "del": "~2.0.2",
+    "del": "^3.0.0",
     "gulp": "~3.9.0",
-    "gulp-composer": "^0.1.0",
-    "gulp-git": "^1.0.1",
+    "gulp-composer": "^0.4.0",
+    "gulp-git": "^2.4.1",
     "gulp-help": "^1.6.1",
     "gulp-remove-lines": "^0.1.0",
     "gulp-rename": "~1.2.0",
-    "gulp-replace": "~0.5.4",
-    "gulp-shell": "~0.4.3",
-    "gulp-zip": "~3.0.2",
+    "gulp-replace": "^0.6.1",
+    "gulp-shell": "^0.6.3",
+    "gulp-zip": "^4.0.0",
     "merge-stream": "^1.0.0",
-    "yamljs": "^0.2.6",
     "run-sequence": "^1.1.5",
-    "shelljs": "^0.5.3"
-  },
-  "scripts": {
-    "postinstall": "gulp init-dev",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "GPL"
+    "shelljs": "^0.7.8",
+    "through2": "~2.0.1",
+    "yamljs": "^0.2.6"
+  }
 }

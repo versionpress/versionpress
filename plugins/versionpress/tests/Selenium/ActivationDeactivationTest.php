@@ -11,7 +11,7 @@ use VersionPress\Tests\Utils\WpVersionComparer;
 /**
  * Tests VersionPress deactivation / reactivation / uninstallation flow.
  */
-class ActivationDeactivationTest extends SeleniumTestCase
+class ActivationDeactivationTest // extends SeleniumTestCase // disabled in Docker env
 {
 
     /**

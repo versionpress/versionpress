@@ -4,7 +4,7 @@ namespace VersionPress\Tests\Selenium;
 
 use VersionPress\Tests\Utils\CommitAsserter;
 
-class ThemeCustomizerTest extends SeleniumTestCase
+class ThemeCustomizerTest // extends SeleniumTestCase // temporarily disabled
 {
     /**
      * @test

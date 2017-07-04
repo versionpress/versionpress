@@ -1,6 +1,6 @@
 {
     "version": "2.0.0",
-    "command": "yarn",
+    "command": "npm",
     "isShellCommand": true,
     "tasks": [
         {

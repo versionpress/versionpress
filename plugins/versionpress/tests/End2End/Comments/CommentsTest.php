@@ -73,7 +73,7 @@ class CommentsTest extends End2EndTestCase
 
         $this->commitAsserter->assertNumCommits(1);
         $this->commitAsserter->assertCommitAction("comment/create");
-        $this->commitAsserter->assertCommitTag("VP-Comment-Author", self::$testConfig->testSite->adminName);
+        $this->commitAsserter->assertCommitTag("VP-Comment-Author", self::$testConfig->testSite->adminUser);
         $this->commitAsserter->assertCommitPath("A", "%vpdb%/comments/%VPID%.ini");
         $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
@@ -94,7 +94,7 @@ class CommentsTest extends End2EndTestCase
 
         $this->commitAsserter->assertNumCommits(1);
         $this->commitAsserter->assertCommitAction("comment/update");
-        $this->commitAsserter->assertCommitTag("VP-Comment-Author", self::$testConfig->testSite->adminName);
+        $this->commitAsserter->assertCommitTag("VP-Comment-Author", self::$testConfig->testSite->adminUser);
         $this->commitAsserter->assertCommitPath("M", "%vpdb%/comments/%VPID%.ini");
         $this->commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();

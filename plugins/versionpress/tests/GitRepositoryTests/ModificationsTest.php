@@ -17,8 +17,8 @@ class ModificationsTest extends \PHPUnit_Framework_TestCase
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        self::$repositoryPath = __DIR__ . '/repository';
-        self::$tempPath = __DIR__ . '/temp';
+        self::$repositoryPath = sys_get_temp_dir() . '/vp-repository';
+        self::$tempPath = sys_get_temp_dir() . '/vp-temp';
         FileSystem::remove(self::$repositoryPath);
         FileSystem::remove(self::$tempPath);
 

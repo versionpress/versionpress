@@ -13,7 +13,7 @@ class CommitterTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        self::$repositoryDir = __DIR__ . '/repository';
+        self::$repositoryDir = sys_get_temp_dir() . '/vp-repository';
         FileSystem::remove(self::$repositoryDir);
         mkdir(self::$repositoryDir);
     }
@@ -28,7 +28,7 @@ class CommitterTest extends \PHPUnit_Framework_TestCase
      */
     public function committerIsThreadSafe()
     {
-        $gitRepository = new GitRepository(self::$repositoryDir, __DIR__);
+        $gitRepository = new GitRepository(self::$repositoryDir, sys_get_temp_dir());
         $gitRepository->init();
 
         $numberOfParallelCommits = 50;

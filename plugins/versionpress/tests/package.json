@@ -6,6 +6,11 @@
     "type": "git",
     "url": "https://bitbucket.org/agilio/versionpress"
   },
+  "scripts": {
+    "tests": "docker-compose run tests || true",
+    "stop-tests": "docker-compose down",
+    "cleanup-tests": "docker-compose down -v"
+  },
   "devDependencies": {
     "chalk": "^0.5.1",
     "gulp": "^3.8.10",

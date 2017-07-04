@@ -16,11 +16,13 @@ class RevertTestWpCliWorker extends WpCliWorker implements IRevertTestWorker
     public function __construct(TestConfig $testConfig)
     {
         parent::__construct($testConfig);
-        $this->repository = new GitRepository($this->testConfig->testSite->path);
+        $this->repository = new GitRepository($this->testConfig->testSite->path, sys_get_temp_dir());
     }
 
     public function prepare_undoLastCommit()
     {
+        // Creates two posts because `fresh_site` option could be saved together with the first one. It can be removed after #1254.
+        $this->createTestPost();
         $this->createTestPost();
         return [['D', '%vpdb%/posts/*']];
     }

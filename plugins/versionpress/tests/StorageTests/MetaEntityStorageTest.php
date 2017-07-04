@@ -12,6 +12,8 @@ class MetaEntityStorageTest extends StorageTestCase
     private $storage;
     /** @var DirectoryStorage */
     private $parentStorage;
+    /** @var string */
+    private $storageDir;
 
     private $testingMetaEntity = [
         'meta_key' => 'some-meta',
@@ -19,7 +21,6 @@ class MetaEntityStorageTest extends StorageTestCase
         'vp_id' => "F11A5FF2219A3430E099B3838C42EBCA",
         'vp_parent_id' => "F0E1B6313B7A48E49A1B38DF382B350D",
     ];
-
     private $testingParentEntity = [
         'post_content' => "Welcome to WordPress.",
         'post_title' => "Hello world!",
@@ -55,7 +56,7 @@ class MetaEntityStorageTest extends StorageTestCase
     {
         parent::setUp();
 
-        $storageDir = __DIR__ . '/entities';
+        $this->storageDir = sys_get_temp_dir() . '/vp-storage-dir';
 
         $metaEntityInfo = $this->createEntityInfoMock([
             'vpidColumnName' => 'vp_id',
@@ -74,15 +75,15 @@ class MetaEntityStorageTest extends StorageTestCase
             'getIgnoredColumns' => [],
         ]);
 
-        if (file_exists($storageDir)) {
-            FileSystem::remove($storageDir);
+        if (file_exists($this->storageDir)) {
+            FileSystem::remove($this->storageDir);
         }
 
-        mkdir($storageDir);
+        mkdir($this->storageDir);
 
         $changeInfoFactory = $this->createChangeInfoFactoryMock();
 
-        $this->parentStorage = new DirectoryStorage($storageDir, $entityInfo, 'prefix_', $changeInfoFactory);
+        $this->parentStorage = new DirectoryStorage($this->storageDir, $entityInfo, 'prefix_', $changeInfoFactory);
         $this->storage = new MetaEntityStorage($this->parentStorage, $metaEntityInfo, 'prefix_', $changeInfoFactory);
     }
 
