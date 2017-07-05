@@ -8,9 +8,11 @@ import { getMatch } from '../../utils/';
 const DATE_FORMAT = 'YYYY-MM-DD';
 const DATE_FORMAT_REGEXP = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$/;
 
-const DateAdapter = (config: SearchConfigItem): Adapter => ({
+class DateAdapter implements Adapter {
 
-  autoComplete: (token: Token) => {
+  constructor (config: SearchConfigItem) {}
+
+  autoComplete = (token: Token) => {
     const { value } = token;
 
     const hints = this.getHints(token);
@@ -18,41 +20,41 @@ const DateAdapter = (config: SearchConfigItem): Adapter => ({
     if (hints.length && hints[0].indexOf(value) === 0) {
       return hints[0];
     }
-  },
+  };
 
-  getDefaultHint: () => {
+  getDefaultHint = () => {
     return moment().format(DATE_FORMAT);
-  },
+  };
 
-  getHints: (token: Token) => {
+  getHints = (token: Token) => {
     if (token) {
       const possibleValues = [moment().format(DATE_FORMAT)];
       return getMatch(token.value, possibleValues);
     }
     return [];
-  },
+  };
 
-  isValueValid: (value: string) => {
+  isValueValid = (value: string) => {
     return DATE_FORMAT_REGEXP.test(value) && moment(value, DATE_FORMAT).isValid();
-  },
+  };
 
-  serialize: (date: any) => {
+  serialize = (date: any) => {
     if (!date) {
       return '';
     }
     if (typeof date === 'string') {
-      if (this.isValueValid(new Date(date))) {
+      if (this.isValueValid(date)) {
         return moment(date).format(DATE_FORMAT);
       }
       return date;
     }
     return (date as moment.Moment).format(DATE_FORMAT);
-  },
+  };
 
-  deserialize: (value: string) => {
+  deserialize = (value: string) => {
     return null;
-  },
+  };
 
-});
+};
 
 export default DateAdapter;

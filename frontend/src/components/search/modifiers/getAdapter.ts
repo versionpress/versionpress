@@ -10,10 +10,10 @@ export default function getAdapter(config: SearchConfig) {
     const type = token && token.type;
 
     if (type === 'date') {
-      return DateAdapter(configItem);
+      return new DateAdapter(configItem);
     }
 
-    return ListAdapter(configItem);
+    return new ListAdapter(configItem);
   };
 }
 
