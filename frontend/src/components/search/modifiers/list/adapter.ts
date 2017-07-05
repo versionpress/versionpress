@@ -4,9 +4,11 @@
 import { getMatch, trim, IN_QUOTES_REGEXP } from '../../utils/';
 import * as ArrayUtils from '../../../../utils/ArrayUtils';
 
-const ListAdapter = (config: SearchConfigItem): Adapter => ({
+class ListAdapter implements Adapter {
 
-  autoComplete: (token: Token) => {
+  constructor (private config: SearchConfigItem) {}
+
+  autoComplete = (token: Token) => {
     const value = trim(token.value, true);
     const hints = this.getHints(token);
     const hint = hints[0];
@@ -17,16 +19,16 @@ const ListAdapter = (config: SearchConfigItem): Adapter => ({
     }
 
     return null;
-  },
+  };
 
-  getDefaultHint: () => {
-    return config
-      ? config.defaultHint
+  getDefaultHint = () => {
+    return this.config
+      ? this.config.defaultHint
       : '';
-  },
+  };
 
-  getHints: (token: Token) => {
-    const list = config && config.content;
+  getHints = (token: Token) => {
+    const list = this.config && this.config.content;
 
     if (list && list.length) {
       if (token && token.type !== 'space' && (token.modifier.length || token.value.length)) {
@@ -48,18 +50,18 @@ const ListAdapter = (config: SearchConfigItem): Adapter => ({
     }
 
     return [];
-  },
+  };
 
-  isValueValid: (value: string) => {
-    const list = config && config.content;
+  isValueValid = (value: string) => {
+    const list = this.config && this.config.content;
 
     if (list) {
       return list.some(item => trim(this.serialize(item)) === trim(value));
     }
     return !!value;
-  },
+  };
 
-  serialize: (item: SearchConfigItemContent) => {
+  serialize = (item: SearchConfigItemContent) => {
     if (!item) {
       return null;
     }
@@ -67,17 +69,17 @@ const ListAdapter = (config: SearchConfigItem): Adapter => ({
       return item.value;
     }
     return '"' + item.value + '"';
-  },
+  };
 
-  deserialize: (value: string) => {
-    const list = config && config.content;
+  deserialize = (value: string) => {
+    const list = this.config && this.config.content;
 
     if (list) {
       return ArrayUtils.find(list, item => item.value === value);
     }
     return value;
-  },
+  };
 
-});
+};
 
 export default ListAdapter;
