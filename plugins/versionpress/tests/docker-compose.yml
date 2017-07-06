@@ -47,14 +47,6 @@ services:
     stdin_open: true
     tty: true
 
-  # This service is used only from PhpStorm to run the unit tests faster.
-  unit-tests-runner:
-    image: prooph/php:5.6-cli-xdebug
-    volumes:
-      - ..:/opt/project:ro
-      - ../../../ext-libs:/opt/ext-libs:ro
-    working_dir: /opt/project/tests
-
   selenium-hub:
     # Standalone Firefox is enough but could also be a full grid setup, hence the service name
     image: selenium/standalone-firefox
