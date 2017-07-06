@@ -1,6 +1,6 @@
 <?php
 
-namespace VersionPress\Tests\SqlTests;
+namespace VersionPress\Tests\Unit;
 
 use PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount;
 use PHPUnit_Framework_MockObject_MockObject;
