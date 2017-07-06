@@ -125,9 +125,9 @@ In this section:
 
 Docker greatly helps with running tests: it requires almost no local setup and produces consistent results across platforms.
 
-#### Command line
+#### Running tests from command line
 
-If you don't need to run or debug tests from PhpStorm, **running tests** is as simple as:
+If you don't need to run or debug tests from PhpStorm, running tests is as simple as:
 
 1. Make sure you have Docker 17+ up and running.
 2. `cd ./plugins/versionpress/tests`
@@ -135,9 +135,18 @@ If you don't need to run or debug tests from PhpStorm, **running tests** is as s
 
 The first run fetches all the Docker images and can be quite slow but subsequent runs are almost instant.
 
-If you want to run only a **subset of tests**, e.g., unit tests, it's often the easiest to use PhpStorm (the setup is [described below](#running-tests-from-phpstorm)) but you can also achieve that easily on the command line. Basically just override the default Docker Compose `command` by executing `docker-compose run tests <your-command>`. For example, to run unit tests, you would run `docker-compose run tests ../vendor/bin/phpunit --bootstrap /opt/project/tests/phpunit-bootstrap.php --no-configuration /opt/project/tests/Unit`.
+If you want to run only a **subset of tests**, e.g., unit tests, override the default Docker Compose `command`. Some examples:
 
-If you prefer defining tests in `phpunit.xml`, copy the default one to `phpunit.override.xml` (gitignored for your convenience), customize to your liking and then run something like `docker-compose run tests ../vendor/bin/phpunit -c phpunit.override.xml --color`.
+```sh
+# pick a test suite from phpunit.xml:
+docker-compose run tests ../vendor/bin/phpunit -c phpunit.xml --testsuite Unit
+
+# PhpStorm-like invocation (copy/paste from its console):
+docker-compose run tests ../vendor/bin/phpunit --bootstrap /opt/project/tests/phpunit-bootstrap.php --no-configuration /opt/project/tests/Unit
+
+# Create your own phpunit.override.xml (gitignored), customize and then:
+docker-compose run tests ../vendor/bin/phpunit -c phpunit.override.xml --color
+```
 
 After the tests are run, you would **inspect the results** in the console. Also, the whole Docker stack is kept running which is useful for integration tests; you can e.g. inspect the test WordPress site, its database, etc. The [end2end tests](#end2end-tests) section provides more info on this.
 
@@ -147,7 +156,7 @@ Run `npm run stop-tests` to **shut down the Docker stack** or `npm run cleanup-t
 
 #### Running tests from PhpStorm
 
-It is often useful to run or debug tests from PhpStorm. There is a one-time setup:
+It is often useful to run or debug tests from PhpStorm. Again, version **2017.2** or newer is required as the earlier versions didn't support Docker Compose. There is a one-time setup to go through:
 
 First, if you're using _Docker for Mac_ or _Docker for Windows_, expose a daemon in Docker settings:
 
@@ -175,9 +184,11 @@ Select this CLI interpreter as the main one for the project and define two path 
 
 ![image](https://user-images.githubusercontent.com/101152/27796964-2834b8c2-600c-11e7-8a0a-8d7ad43e1471.png)
 
-The final step is to set up a test framework in _PHP_ > _Test Frameworks_. Don't forget to set the _Default bootstrap file_ to `/opt/project/tests/phpunit-bootstrap.php`.
+The final step is to set up a test framework in _PHP_ > _Test Frameworks_. Add a new _PHPUnit by Remote Interpreter_:
 
 ![image](https://user-images.githubusercontent.com/101152/27797069-900fafce-600c-11e7-9ff9-db2d4507aa89.png)
+
+Don't forget to set the _Default bootstrap file_ to `/opt/project/tests/phpunit-bootstrap.php`.
 
 Now you're ready to run the tests. For example, to run all unit tests, right-click the `Unit` folder and select _Run_:
 
@@ -196,7 +207,7 @@ This works equally well other types of tests as well, for example, Selenium test
 
 Unit tests are best suited for small pieces of algorithmic functionality. For example, `IniSerializer` is covered with unit tests extensively.
 
-You can either run unit tests in a dockerized environment as described above or set up a local CLI interpret; it makes the execution a bit faster.
+You can either run unit tests in a dockerized environment as described above or set up a local CLI interpret which makes the execution a bit faster (all unit tests run in-memory).
 
 ### End2end tests
 
@@ -225,9 +236,14 @@ After you run the tests using one of the methods described above, the Docker Com
 
 ### Other tests
 
-There are also other types of integration tests, e.g., `GitRepositoryTests` or `StorageTests`. These are lighter than End2End tests but still depend on some external subsystem like Git or file system.
+The project has these other types of tests (folders in the `./plugins/versionpress/tests` folder and also test suite names in `phpunit.xml` so that you can run them using `--testsuite <SuiteName>`):
 
-You can run these tests individually as per instructions above. 
+- `GitRepositoryTests` – test Git repository manipulation in `GitRepository`.
+- `SynchronizerTests` – these are quite slow and test that given some INI files on disk, the database is in a correct state after synchronization runs.
+- `StorageTests` – test that entities are stored correctly as INI files.
+- `LoadTests` – they are run together with other tests but with very few iterations; manually update their source files and execute them separately to properly exercise them.
+- `Selenium` – a bit like end2end tests but for rarer cases, like VersionPress not being activated yet.
+- `Workflow` – exercise cloning and merging between environments.
 
 ## Frontend development
 

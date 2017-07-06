@@ -1,35 +1,35 @@
 <phpunit bootstrap="phpunit-bootstrap.php">
     <testsuites>
 
-        <testsuite name="Unit Tests">
+        <testsuite name="Unit">
             <directory>Unit</directory>
         </testsuite>
 
-        <testsuite name="Storage Tests">
+        <testsuite name="StorageTests">
             <directory>StorageTests</directory>
         </testsuite>
 
-        <testsuite name="Synchronizer Tests">
+        <testsuite name="SynchronizerTests">
             <directory>SynchronizerTests</directory>
         </testsuite>
 
-        <testsuite name="GitRepository Tests">
+        <testsuite name="GitRepositoryTests">
             <directory>GitRepositoryTests</directory>
         </testsuite>
 
-        <testsuite name="End 2 End">
+        <testsuite name="End2End">
             <directory>End2End</directory>
         </testsuite>
 
-        <testsuite name="Selenium Tests">
+        <testsuite name="Selenium">
             <directory>Selenium</directory>
         </testsuite>
 
-        <testsuite name="Workflow Tests">
+        <testsuite name="Workflow">
             <directory>Workflow</directory>
         </testsuite>
 
-        <testsuite name="Load Tests">
+        <testsuite name="LoadTests">
             <directory>LoadTests</directory>
         </testsuite>
 
