@@ -70,7 +70,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorSavesIntValuesAsIntegers()
+    public function editorSavesIntConstantsAsIntegers()
     {
         file_put_contents($this->commonConfigPath, "<?php\ndefine('TEST', 'value');\n");
 
@@ -85,7 +85,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorSavesBoolValuesAsBooleans()
+    public function editorSavesBoolConstantsAsBooleans()
     {
         file_put_contents($this->commonConfigPath, "<?php\ndefine('TEST', 'value');\n");
 
@@ -100,7 +100,22 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorSavesPlainValuesOfConstantsCorrectly()
+    public function editorSavesConstantWithRegexReferenceCorrectly()
+    {
+        file_put_contents($this->commonConfigPath, "<?php\ndefine('TEST', 'value');\n");
+
+        $a = new WpConfigEditor($this->commonConfigPath, true);
+        $a->updateConfigConstant('TEST', 'value with regex reference $1');
+
+        $expectedContent = "<?php\ndefine('TEST', 'value with regex reference $1');\n";
+
+        $this->assertEquals($expectedContent, file_get_contents($this->commonConfigPath));
+    }
+
+    /**
+     * @test
+     */
+    public function editorSavesPlainValueConstantsCorrectly()
     {
         file_put_contents($this->commonConfigPath, "<?php\ndefine('TEST', 'value');\n");
 
@@ -108,6 +123,21 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
         $a->updateConfigConstant('TEST', '__DIR__ . "/some-path"', true);
 
         $expectedContent = "<?php\ndefine('TEST', __DIR__ . \"/some-path\");\n";
+
+        $this->assertEquals($expectedContent, file_get_contents($this->commonConfigPath));
+    }
+
+    /**
+     * @test
+     */
+    public function editorSavesPlainValueConstantsWithRegexReferenceCorrectly()
+    {
+        file_put_contents($this->commonConfigPath, "<?php\ndefine('TEST', 'value');\n");
+
+        $a = new WpConfigEditor($this->commonConfigPath, true);
+        $a->updateConfigConstant('TEST', '__DIR__ . "/$1-path"', true);
+
+        $expectedContent = "<?php\ndefine('TEST', __DIR__ . \"/$1-path\");\n";
 
         $this->assertEquals($expectedContent, file_get_contents($this->commonConfigPath));
     }
@@ -208,7 +238,37 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorSavesPlainValuesOfVariablesCorrectly()
+    public function editorSavesVariableWithRegexReferenceCorrectly()
+    {
+        file_put_contents($this->commonConfigPath, "<?php\n\$test = 'value';\n");
+
+        $a = new WpConfigEditor($this->commonConfigPath, true);
+        $a->updateConfigVariable('test', 'value with regex reference $1');
+
+        $expectedContent = "<?php\n\$test = 'value with regex reference $1';\n";
+
+        $this->assertEquals($expectedContent, file_get_contents($this->commonConfigPath));
+    }
+
+    /**
+     * @test
+     */
+    public function editorSavesVariableWithCrazyRegexCorrectly()
+    {
+        file_put_contents($this->commonConfigPath, "<?php\n\$test = 'value';\n");
+
+        $a = new WpConfigEditor($this->commonConfigPath, true);
+        $a->updateConfigVariable('test', 'crazy $$$ value $1 $a');
+
+        $expectedContent = "<?php\n\$test = 'crazy \$\$\$ value \$1 \$a';\n";
+
+        $this->assertEquals($expectedContent, file_get_contents($this->commonConfigPath));
+    }
+
+    /**
+     * @test
+     */
+    public function editorSavesPlainValueVariablesCorrectly()
     {
         file_put_contents($this->commonConfigPath, "<?php\n\$test = 'value';\n");
 
@@ -216,6 +276,21 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
         $a->updateConfigVariable('test', '__DIR__ . "/some-path"', true);
 
         $expectedContent = "<?php\n\$test = __DIR__ . \"/some-path\";\n";
+
+        $this->assertEquals($expectedContent, file_get_contents($this->commonConfigPath));
+    }
+
+    /**
+     * @test
+     */
+    public function editorSavesPlainValueVariablesWithRegexReferenceCorrectly()
+    {
+        file_put_contents($this->commonConfigPath, "<?php\n\$test = 'value';\n");
+
+        $a = new WpConfigEditor($this->commonConfigPath, true);
+        $a->updateConfigVariable('test', '__DIR__ . "/$1-path"', true);
+
+        $expectedContent = "<?php\n\$test = __DIR__ . \"/$1-path\";\n";
 
         $this->assertEquals($expectedContent, file_get_contents($this->commonConfigPath));
     }
@@ -231,21 +306,6 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
         $a->updateConfigVariable('my_variable', 'another value');
 
         $expectedContent = "<?php\n\$test = 'value';\n\$my_variable = 'another value';\n";
-
-        $this->assertEquals($expectedContent, file_get_contents($this->commonConfigPath));
-    }
-
-    /**
-     * @test
-     */
-    public function editorSavesValueWithRegexReferenceCorrectly()
-    {
-        file_put_contents($this->commonConfigPath, "<?php\ndefine('TEST', 'value');\n");
-
-        $a = new WpConfigEditor($this->commonConfigPath, true);
-        $a->updateConfigConstant('TEST', 'value with regex reference $1');
-
-        $expectedContent = "<?php\ndefine('TEST', 'value with regex reference $1');\n";
 
         $this->assertEquals($expectedContent, file_get_contents($this->commonConfigPath));
     }

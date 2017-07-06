@@ -13,14 +13,6 @@ class WpConfigEditor
     private $wpConfigPath;
     private $isCommonConfig;
 
-    private static $vpPublicConstants = [
-        'VP_VPDB_DIR',
-        'VP_PROJECT_ROOT',
-        'VP_ENVIRONMENT',
-        'VP_GIT_BINARY',
-        'VP_WP_CLI_BINARY',
-    ];
-
     public function __construct($wpConfigPath, $isCommonConfig)
     {
         $this->wpConfigPath = $wpConfigPath;
@@ -28,8 +20,22 @@ class WpConfigEditor
     }
 
     /**
-     * Sets value of a constant. It creates new one if it's missing.
-     * By default it saves string in single quotes. See $usePlainValue.
+     * Sets value of a constant, creates it if it doesn't exist. See {@link updateConfigVariable}
+     * for similar functionality for variables.
+     *
+     * Examples:
+     *
+     * ```
+     * updateConfigConstant('TEST', 1);       ->    define('TEST', 1);
+     * updateConfigConstant('TEST', true);    ->    define('TEST', true);
+     * updateConfigConstant('TEST', 'abc');   ->    define('TEST', 'abc');
+     * updateConfigConstant('TEST', "abc");   ->    define('TEST', 'abc');
+     * updateConfigConstant(
+     *     'TEST',
+     *     '"plain value" . __DIR__',
+     *     true
+     * );                                     ->    define('TEST', "plain value" . __DIR__);
+     * ```
      *
      * @param $constantName
      * @param string|number|bool $value
@@ -45,24 +51,24 @@ class WpConfigEditor
         self::updateConfig($value, $constantRegex, $constantTemplate, $usePlainValue);
     }
 
-    /**
-     * Removes VersionPress public constants from config files.
-     * @param array $configFiles List of config file paths from which constants should be removed.
-     */
-    public static function removeVersionPressConstants($configFiles)
-    {
-        foreach ($configFiles as $configFile) {
-            $constantsForRegex = join('|', self::$vpPublicConstants);
-            // https://regex101.com/r/zD3mJ4/2
-            $defineRegexPattern = "/(define\\s*\\(\\s*['\"]($constantsForRegex)['\"]\\s*,.*\\)\\s*;)/m";
-            $wpConfigContent = file_get_contents($configFile);
-            file_put_contents($configFile, preg_replace($defineRegexPattern, '', $wpConfigContent));
-        }
-    }
 
     /**
-     * Sets value of a variable. It creates new one if it's missing.
-     * By default it saves string in single quotes. See $usePlainValue.
+     * Sets value of a variable, creates it if it doesn't exist. See {@link updateConfigConstant}
+     * for similar functionality for constants.
+     *
+     * Examples:
+     *
+     * ```
+     * updateConfigVariable('test', 1);       ->    $test = 1;
+     * updateConfigVariable('test', true);    ->    $test = true;
+     * updateConfigVariable('test', 'abc');   ->    $test = 'abc';
+     * updateConfigVariable('test', "abc");   ->    $test = 'abc';
+     * updateConfigVariable(
+     *     'test',
+     *     '"plain value" . __DIR__',
+     *     true
+     * );                                     ->    $test = "plain value" . __DIR__;
+     * ```
      *
      * @param $variableName
      * @param string|number|bool $value
@@ -77,11 +83,36 @@ class WpConfigEditor
         self::updateConfig($value, $variableRegex, $variableTemplate, $usePlainValue);
     }
 
+    /**
+     * Removes VersionPress public constants from config files.
+     *
+     * @param array $configFiles List of config file paths from which constants should be removed.
+     */
+    public static function removeVersionPressConstants($configFiles)
+    {
+        $vpConstants = [
+            'VP_VPDB_DIR',
+            'VP_PROJECT_ROOT',
+            'VP_ENVIRONMENT',
+            'VP_GIT_BINARY',
+            'VP_WP_CLI_BINARY',
+        ];
+
+        foreach ($configFiles as $configFile) {
+            $constantsForRegex = join('|', $vpConstants);
+            // https://regex101.com/r/zD3mJ4/2
+            $defineRegexPattern = "/(define\\s*\\(\\s*['\"]($constantsForRegex)['\"]\\s*,.*\\)\\s*;)/m";
+            $wpConfigContent = file_get_contents($configFile);
+            file_put_contents($configFile, preg_replace($defineRegexPattern, '', $wpConfigContent));
+        }
+    }
+
     private function updateConfig($value, $replaceRegex, $definitionTemplate, $usePlainValue)
     {
         $wpConfigContent = file_get_contents($this->wpConfigPath);
 
-        $phpizedValue = preg_quote($usePlainValue ? $value : var_export($value, true), '/');
+        $phpizedValue = $usePlainValue ? $value : var_export($value, true);
+        $phpizedValue = str_replace('$', '\$', $phpizedValue); // prevent preg_replace from interpreting what seems like references
 
         $configContainsDefinition = preg_match($replaceRegex, $wpConfigContent);
 
