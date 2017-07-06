@@ -4,7 +4,7 @@ services:
 
   wordpress:
     build: ./dockerfiles/php5.6-apache
-    image: versionpress/php5.6-apache
+    image: versionpress/php5.6-apache:1
     ports:
       - 80:80
     volumes:
@@ -24,7 +24,7 @@ services:
 
   tests:
     build: ./dockerfiles/testenv
-    image: versionpress/testenv
+    image: versionpress/testenv:1
     volumes:
       # Same volumes as in `wordpress`
       - document-root:/var/www/html
