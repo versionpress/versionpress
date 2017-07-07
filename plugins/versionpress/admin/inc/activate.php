@@ -106,6 +106,7 @@ function _vp_show_progress_message($progressMessage, $forceDisplay = false)
             $initializer = $versionPressContainer->resolve(VersionPressServices::INITIALIZER);
             $initializer->onProgressChanged[] = '_vp_show_progress_message';
 
+            vp_load_hooks_files();
             $initializer->initializeVersionPress();
 
 
