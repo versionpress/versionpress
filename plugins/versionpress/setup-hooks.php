@@ -106,17 +106,7 @@ function vp_register_hooks()
         require_once ABSPATH . 'wp-admin/includes/plugin.php';
     }
 
-    $plugins = wp_get_active_and_valid_plugins();
-
-    foreach ($plugins as $pluginFile) {
-        $pluginDir = dirname($pluginFile);
-        $pluginName = basename($pluginDir);
-        $hooksFile = \VersionPress\Actions\PluginDefinitionDiscovery::getPathForPlugin($pluginName, 'hooks.php');
-
-        if ($hooksFile) {
-            require_once $hooksFile;
-        }
-    }
+    vp_load_hooks_files();
 
     add_filter('update_feedback', function () {
         touch(ABSPATH . 'versionpress.maintenance');
