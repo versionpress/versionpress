@@ -4,21 +4,19 @@ namespace VersionPress\Tests\Automation;
 
 use Exception;
 use Nette\Utils\Strings;
-use Symfony\Component\Filesystem\Exception\IOException;
 use VersionPress\Tests\Utils\SiteConfig;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\Process;
 use VersionPress\Utils\ProcessUtils;
 
 /**
- * Automates tasks like setting up a WP site, installing VersionPress, creating posts, etc.
- * based on test-config.yml.
- *
- * Most of the functionality is internally provided by WP-CLI which is automatically downloaded
+ * Automates tasks like setting up a WP site, installing VersionPress, creating posts, etc. for tests
+ * based on test-config.yml. Most of the functionality is provided by WP-CLI which is downloaded automatically
  * if it's not available locally.
  *
- * NOTE: this class dates back to VersionPress 1.0 and contains quite a few legacy approaches.
- * For example, methods for manipulating WP site entities could be moved to tests.
+ * NOTE: this class dates back to VersionPress 1.0 and contains some legacy approaches.
+ * For example, methods for manipulating WP site entities could be moved to tests and only
+ * basic site automation could stay here.
  */
 class WpAutomation
 {
@@ -54,11 +52,7 @@ class WpAutomation
      */
     public function setUpSite($entityCounts = [])
     {
-        try {
-            FileSystem::removeContent($this->siteConfig->path);
-        } catch (IOException $e) {
-            // Dockerized setup uses read-only mount for the VP plugin so it's OK if some contents cannot be removed
-        }
+        FileSystem::removeContent($this->siteConfig->path);
 
         if ($this->siteConfig->installationType === 'standard') {
             $this->prepareStandardWpInstallation();
@@ -102,9 +96,20 @@ class WpAutomation
         return $vpdbDir && is_file($vpdbDir . '/.active');
     }
 
+    /**
+     * Copies VersionPress from testenv (`/opt/project`) to the test site. Leaves the files owned by `root`
+     * which tests that we treat the plugin location as read-only (generally a good thing).
+     */
     public function copyVersionPressFiles()
     {
-        return; // noop for Dockerized workflows, VP is mapped into containers
+        // Does a copy of everything incl. tests and dev dependencies which is not ideal but the alternatives
+        // have their issues as well:
+        //
+        // - Invoking the canonical Gulp task would require bundling Node and installing dependencies in testenv (slow).
+        // - More careful `cp` code here would duplicate rules in Gulpfile (a bit risky).
+        //
+        FileSystem::copyDir('/opt/project', $this->siteConfig->path . '/wp-content/plugins/versionpress');
+        $this->exec("chown -f -R www-data:www-data {$this->siteConfig->path}/wp-content/plugins/versionpress");
     }
 
     /**
@@ -552,12 +557,8 @@ class WpAutomation
         }
 
         $this->exec($downloadCommand);
+        $this->exec("chown -f -R www-data:www-data {$this->siteConfig->path}");
 
-        try {
-            $this->exec("chown -f -R www-data:www-data {$this->siteConfig->path}");
-        } catch (Exception $e) {
-            // VP plugin itself is mounted as read-only so chown will fail on it
-        }
         $this->createConfigFile();
     }
 

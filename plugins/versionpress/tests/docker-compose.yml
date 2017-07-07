@@ -9,7 +9,6 @@ services:
       - 80:80
     volumes:
       - document-root:/var/www/html
-      - ..:/var/www/html/vp01/wp-content/plugins/versionpress:ro
     depends_on:
       - mysql
 
@@ -28,7 +27,6 @@ services:
     volumes:
       # Same volumes as in `wordpress`
       - document-root:/var/www/html
-      - ..:/var/www/html/vp01/wp-content/plugins/versionpress:ro
 
       # Project mounts
       - ..:/opt/project:ro
