@@ -24,7 +24,7 @@ class VPCommandUtils
         }
 
         // For commands that were run under root - #1049
-        $args['--allow-root'] = null;
+        $args['allow-root'] = null;
 
         foreach ($args as $name => $value) {
             if (is_int($name)) { // positional argument

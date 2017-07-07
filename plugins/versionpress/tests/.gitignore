@@ -1,5 +1,4 @@
-# Various PHPUnit reporting formats
 phpunit-log.*
+phpunit.override.xml
 
-# WP-CLI config
 wp-cli.local.yml

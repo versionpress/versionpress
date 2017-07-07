@@ -125,22 +125,38 @@ In this section:
 
 Docker greatly helps with running tests: it requires almost no local setup and produces consistent results across platforms.
 
-#### Command line
+#### Running tests from command line
 
 If you don't need to run or debug tests from PhpStorm, running tests is as simple as:
 
-1. `cd ./plugins/versionpress/tests`
-2. `npm run tests`
+1. Make sure you have Docker 17+ up and running.
+2. `cd ./plugins/versionpress/tests`
+3. `npm run tests`
 
-This runs all the tests in the project (see below for tips how to run a subset of them). The firsts run downloads and builds a lot of stuff, subsequent runs are almost instant.
+The first run fetches all the Docker images and can be quite slow but subsequent runs are almost instant.
 
-You can now inspect the results in the console and also, the whole Docker stack is still running so you can e.g. inspect the test site or its database. Run `npm run stop-tests` to shut down the Docker stack or `npm run cleanup-tests` to also remove all the volumes (next start will be completely fresh).
+If you want to run only a **subset of tests**, e.g., unit tests, override the default Docker Compose `command`. Some examples:
 
-The only local requirement is a free port 80 (end2end tests make the WordPress site available for local inspection).
+```sh
+# pick a test suite from phpunit.xml:
+docker-compose run tests ../vendor/bin/phpunit -c phpunit.xml --testsuite Unit
+
+# PhpStorm-like invocation (copy/paste from its console):
+docker-compose run tests ../vendor/bin/phpunit --bootstrap /opt/project/tests/phpunit-bootstrap.php --no-configuration /opt/project/tests/Unit
+
+# Create your own phpunit.override.xml (gitignored), customize and then:
+docker-compose run tests ../vendor/bin/phpunit -c phpunit.override.xml --color
+```
+
+After the tests are run, you would **inspect the results** in the console. Also, the whole Docker stack is kept running which is useful for integration tests; you can e.g. inspect the test WordPress site, its database, etc. The [end2end tests](#end2end-tests) section provides more info on this.
+
+Run `npm run stop-tests` to **shut down the Docker stack** or `npm run cleanup-tests` to also remove all the volumes (next start will be completely fresh).
+
+<div id="running-tests-from-phpstorm"></div>
 
 #### Running tests from PhpStorm
 
-It is often useful to run or debug tests from PhpStorm. There is a one-time setup:
+It is often useful to run or debug tests from PhpStorm. Again, version **2017.2** or newer is required as the earlier versions didn't support Docker Compose. There is a one-time setup to go through:
 
 First, if you're using _Docker for Mac_ or _Docker for Windows_, expose a daemon in Docker settings:
 
@@ -168,9 +184,11 @@ Select this CLI interpreter as the main one for the project and define two path 
 
 ![image](https://user-images.githubusercontent.com/101152/27796964-2834b8c2-600c-11e7-8a0a-8d7ad43e1471.png)
 
-The final step is to set up a test framework in _PHP_ > _Test Frameworks_. Don't forget to set the _Default bootstrap file_ to `/opt/project/tests/phpunit-bootstrap.php`.
+The final step is to set up a test framework in _PHP_ > _Test Frameworks_. Add a new _PHPUnit by Remote Interpreter_:
 
 ![image](https://user-images.githubusercontent.com/101152/27797069-900fafce-600c-11e7-9ff9-db2d4507aa89.png)
+
+Don't forget to set the _Default bootstrap file_ to `/opt/project/tests/phpunit-bootstrap.php`.
 
 Now you're ready to run the tests. For example, to run all unit tests, right-click the `Unit` folder and select _Run_:
 
@@ -184,26 +202,16 @@ This works equally well other types of tests as well, for example, Selenium test
 
 ![image](https://user-images.githubusercontent.com/101152/27797533-57f12904-600e-11e7-971b-08fd943aaf7b.png)
 
-#### Tips for running tests
-
-- You can start the `tests` container in an interactive session via `docker-compose run tests /bin/bash`. You can then invoke `phpunit` manually, e.g., `/opt/project/vendor/phpunit/phpunit/phpunit --bootstrap /opt/project/tests/phpunit-bootstrap.php --no-configuration /opt/project/tests/Unit`.
-- If you frequently run only a subset of tests from command line, say, `PublicWebTest`, you can create `docker-compose.override.yml` in the `tests` folder with a command inspired by what PhpStorm executes. For example:
-    ```yaml
-    version: '2'
-    services:
-      tests:
-        command: /opt/project/vendor/phpunit/phpunit/phpunit --bootstrap /opt/project/tests/phpunit-bootstrap.php --no-configuration VersionPress\Tests\Selenium\PublicWebTest /opt/project/tests/Selenium/PublicWebTest.php
-    ```
 
 ### Unit tests
 
 Unit tests are best suited for small pieces of algorithmic functionality. For example, `IniSerializer` is covered with unit tests extensively.
 
-You can either run unit tests in a dockerized environment as described above or set up a local CLI interpret; it makes the execution a bit faster.
+You can either run unit tests in a dockerized environment as described above or set up a local CLI interpret which makes the execution a bit faster (all unit tests run in-memory).
 
 ### End2end tests
 
-End2end tests exercise a WordPress site and check that VersionPress creates the right Git commits and that the database is in correct state. These tests are quite heavy and slow to run but if they pass, there's a good chance that VersionPress works correctly. (Before the project had these, long and painful manual testing period was necessary before each release.)
+End2end tests exercise a WordPress site and check that VersionPress creates the right Git commits, that the database is in correct state, etc. These tests are quite heavy and slow to run but if they pass, there's a good chance that VersionPress works correctly. (Before the project had these, long and painful manual testing period was necessary before each release.)
 
 End2end tests use the concept of **workers**: each test itself is implemented once but e.g. how a post is created or a user deleted is up to a specific worker. There are currently two types of workers:
 
@@ -216,19 +224,26 @@ Currently, the default worker is WP-CLI (is used when you `npm run tests`) and t
 
 After you run the tests using one of the methods described above, the Docker Compose stack is left up and running so that you can inspect it:
 
-- You can access the site in your local browser by aliasing a `wordpress` host in your `hosts` file (add a line with `127.0.0.1 wordpress`) and then visiting `http://wordpress/vp01`.
-- `docker exec -ti tests_wordpress_1 /bin/bash` to start an interactive session inside the WordPress site container. You can then e.g. run `git log` against the site.
+- You can access the **test WordPress site** on **port 80** in your local browser by aliasing a `wordpress` host in your `hosts` file (add a line with `127.0.0.1 wordpress`) and then visiting `http://wordpress/vp01`.
+- You can start a **Bash session** in the WordPress container by running `docker exec -ti tests_wordpress_1 /bin/bash`. You can then e.g. inspect Git history via `git log`, etc.
+- The **database** is available on **port 3391**, you can connect to it e.g. by `mysql --port 3391 -u root -p`.
+- **Adminer** is available on **port 8099** after you run `docker-compose run -d --service-ports adminer`.
 - `docker-compose ps` lists all the running services.
-- `docker-compose down` shuts the whole stack down.
+- `docker-compose down [-v]` shuts down the whole stack (there are npm scripts for that too, see above).
 
 
 <div id="other-tests"></div>
 
 ### Other tests
 
-There are also other types of integration tests, e.g., `GitRepositoryTests` or `StorageTests`. These are lighter than End2End tests but still depend on some external subsystem like Git or file system.
+The project has these other types of tests (folders in the `./plugins/versionpress/tests` folder and also test suite names in `phpunit.xml` so that you can run them using `--testsuite <SuiteName>`):
 
-You can run these tests individually as per instructions above. 
+- `GitRepositoryTests` – test Git repository manipulation in `GitRepository`.
+- `SynchronizerTests` – these are quite slow and test that given some INI files on disk, the database is in a correct state after synchronization runs.
+- `StorageTests` – test that entities are stored correctly as INI files.
+- `LoadTests` – they are run together with other tests but with very few iterations; manually update their source files and execute them separately to properly exercise them.
+- `Selenium` – a bit like end2end tests but for rarer cases, like VersionPress not being activated yet.
+- `Workflow` – exercise cloning and merging between environments.
 
 ## Frontend development
 
