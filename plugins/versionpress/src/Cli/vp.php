@@ -1222,7 +1222,7 @@ class VPCommand extends WP_CLI_Command
 
     private function runVPInternalCommand($subcommand, $args = [], $cwd = null)
     {
-        $args = $args + ['require' => __DIR__ . '/vp-internal.php'];
+        $args = ['require' => __DIR__ . '/vp-internal.php'] + $args;
         return VPCommandUtils::runWpCliCommand('vp-internal', $subcommand, $args, $cwd);
     }
 
