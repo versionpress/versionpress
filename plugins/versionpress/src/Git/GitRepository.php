@@ -90,13 +90,13 @@ class GitRepository
         $this->runShellCommand("git commit --file=%s", $tempCommitMessagePath);
         FileSystem::remove($tempCommitMessagePath);
 
-        if ($localConfigUserName === null) {
+        if (!$localConfigUserName) {
             $this->runShellCommand('git config --local --unset user.name');
         } else {
             $this->runShellCommand('git config --local user.name %s', $localConfigUserName);
         }
 
-        if ($localConfigUserEmail === null) {
+        if (!$localConfigUserEmail) {
             $this->runShellCommand('git config --local --unset user.email');
         } else {
             $this->runShellCommand('git config --local user.email %s', $localConfigUserEmail);
