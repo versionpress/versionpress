@@ -1,6 +1,8 @@
 # VersionPress
 
-Git-based version control plugin for WordPress. Undo any change, branch & merge easily, migrate database content between environments and more. <https://versionpress.net/>
+Git-based version control plugin for WordPress. Allows you to track site changes in Git, undo them easily, merge databases and more. <https://versionpress.net/>
+
+![image](https://user-images.githubusercontent.com/101152/27992357-15600e14-6493-11e7-8e19-1e85c858a1b8.png)
 
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/versionpress/versionpress)
 
@@ -14,7 +16,7 @@ VersionPress is young 🐣. It works fine on simpler sites and you're encouraged
 To **use** VersionPress:
 
 1. Make sure you understand the [Developer Preview project status](https://docs.versionpress.net/en/getting-started/about-eap).
-2. Download the latest version from [GitHub releases](https://github.com/versionpress/versionpress/releases). **It must be the built ZIP**, e.g., `versionpress-3.0.zip`, not the source codes ZIP!
+2. Download the latest version from [GitHub releases](https://github.com/versionpress/versionpress/releases).
 3. Install to your WordPress site.
 4. Read the [quick start tutorial](https://blog.versionpress.net/2015/05/versionpress-1-0-walkthrough/) and [part 2 on staging](https://blog.versionpress.net/2015/09/versionpress-2-0-staging/).
 5. Enjoy!
@@ -22,27 +24,20 @@ To **use** VersionPress:
 
 To **develop** VersionPress:
 
-1. Make sure you have tools like Git, NPM, Composer, WP-CLI etc. installed, see [Dev-Setup.md](./docs/Dev-Setup.md).
-2. Clone this repo.
-3. Run `npm install`.
+1. Set up your development environment as per [Dev-Setup.md](./docs/Dev-Setup.md).
+2. Send pull requests.
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for more.
 
 
 ## Useful resources
 
-- <https://versionpress.net/> 
+- Homepage: <https://versionpress.net/> 
 - [User documentation](https://docs.versionpress.net/)
 - [Blog](https://blog.versionpress.net/)
-- [Support repo](https://github.com/versionpress/support)
+- Support repo: [`versionpress/support`](https://github.com/versionpress/support)
 
 
 ## Contributing
 
-There are many ways to contribute:
-
-- Developers, we'd love [your help](./CONTRIBUTING.md).
-- Good at writing? Help maintain [the docs](https://github.com/versionpress/docs).
-- Found a bug? [File an issue](https://github.com/versionpress/versionpress/issues).
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for more. Thank you!
+Please see [CONTRIBUTING.md](./CONTRIBUTING.md), thank you!
