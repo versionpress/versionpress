@@ -1,13 +1,13 @@
 # VersionPress
 
-Built on Git, VersionPress allows you to manage your WordPress sites like never before:
+User-friendly versioning for WordPress, powered by Git. You can:
 
-- Track and review all changes easily, _including database_
-- Undo anything
+- See what changed, _including database changes_
+- Undo anything (failed updates, anyone?)
 - Roll back to previous states
-- Create staging sites easily: `wp vp clone --name=staging`
+- Create staging sites: `wp vp clone --name=staging`
 - Merge databases: `wp vp pull --from=staging`
-- Push to GitHub, implement any workflow you like
+- Push to GitHub or implement any workflow you like
 
 ![image](https://user-images.githubusercontent.com/101152/27992357-15600e14-6493-11e7-8e19-1e85c858a1b8.png)
 
