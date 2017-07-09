@@ -1,6 +1,6 @@
 # VersionPress
 
-Git-based version control plugin for WordPress. Allows you to track site changes in Git, undo them easily, merge databases and more. <https://versionpress.net/>
+Track your WordPress sites in Git, including database! Undo anything easily, create staging sites, merge databases and more. <https://versionpress.net/>
 
 ![image](https://user-images.githubusercontent.com/101152/27992357-15600e14-6493-11e7-8e19-1e85c858a1b8.png)
 
