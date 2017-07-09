@@ -1,4 +1,4 @@
-FROM wordpress:php5.6
+FROM wordpress:4.8-php5.6-apache
 
 # Requirements for WP-CLI & VersionPress (separate lines to make it clear)
 RUN apt-get update \
@@ -6,7 +6,7 @@ RUN apt-get update \
   && apt-get install -y git \
   && rm -rf /var/lib/apt/lists/*
 
-# Install WP-CLI 
+# Install WP-CLI
 RUN curl -o /bin/wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 RUN { \
   echo '#!/bin/sh'; \

@@ -2,22 +2,15 @@
 
 This will set you up for VersionPress development.
 
-## Introduction
-
-While VersionPress ships as a WordPress plugin, it is a relatively large piece of software where good development tools and workflows are necessary. We try to provide as much as possible out of the box, relying on this general approach:
-
-- You should use **local tools** and their power to **write** code. Specifically, we recommend PhpStorm.
-- **Runtime** is handled by **Docker**. For example, you do not need a local WordPress site or a MySQL server, all runs as Docker containers.
-
-> **Note**: If you still need to use the legacy approach where the entire setup was local, refer to the the `4.0-alpha1` tag of the documents [Dev-Setup.md](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Dev-Setup.md) and [Testing.md](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Testing.md).
+> **Note**: Since 4.0-beta, we rely on Docker which makes things much easier than full local setup. The legacy approach is still documented in [Dev-Setup.md@4.0-alpha1](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Dev-Setup.md) and [Testing.md@4.0-alpha1](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Testing.md).
 
 ## Getting started
 
 Install:
 
-- PHP 5.6+ and Composer
+- PHP 5.6+ and Composer 1.4+
 - Git 2.10+
-- Node.js 8.1+, npm 5+
+- Node.js 8.1+, npm 5.1+
 - Docker 17+
 
 Then run:
@@ -26,17 +19,16 @@ Then run:
 2. `npm install`
 3. `npm start`
 
-You can now log in to a WordPress site at `http://localhost:8088`, username `admin`, password `adminpwd` (all this can be changed via `docker-compose.yml`).
+Wait for all the things to download and build (☕), then log into the test site at  `http://localhost:8088`, username `admin`, password `adminpwd` (see `docker-compose.yml`) and activate VersionPress on the _Plugins_ page. You're now all set up! 🎉
 
 ![image](https://cloud.githubusercontent.com/assets/101152/26283542/17fccd8a-3e2b-11e7-9881-a26fbb49d144.png)
 
-This leaves you with this working environment:
+Some useful things about your development environment:
 
-- VersionPress source files are mapped to container's `wp-content/plugins/versionpress` so any changes you make locally are immediately reflected in the test site.
-    - The React `./frontend` app requires a build, see below.
-- Database can be inspected at `http://localhost:8099`, server name: `db`, username: `root`, password: `r00tpwd`.
+- VersionPress source files are directly mapped to the site's `wp-content/plugins/versionpress` so any changes you make locally are immediately live.
+- Database can be inspected using [Adminer](https://www.adminer.org/) at `http://localhost:8099`, server name: `db`, username: `root`, password: `r00tpwd`.
     - You can also use tools like MySQL Workbench or `mysql` command-line client on port 3399, e.g., `mysql --port=3399 -u root -p`.
-- WordPress site is mapped to `./dev-env/wp` where you can inspect the files and Git history using your favorite tools.
+- WordPress site's web root is mapped to `./dev-env/wp` so you can e.g. use your local Git client to inspect the history.
 - To invoke things like WP-CLI in the context of a test WordPress site, you have these options:
     - SSH into container the container: `docker-compose exec wordpress /bin/bash`
     - Use `docker-compose exec wordpress <command>`, for example:
