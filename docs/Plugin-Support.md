@@ -1,6 +1,6 @@
 # Plugin Support
 
-> :construction: Plugin support is the main theme of [VersionPress 4.0](https://blog.versionpress.net/2016/10/versionpress-4-0-alpha/) which is currently in alpha. Plugin developers, we'd like your feedback on this, feel free to [open new issues](https://github.com/versionpress/versionpress/issues/new) or chat with us [on Gitter](https://gitter.im/versionpress/versionpress).
+> :construction: Plugin support is the main theme of [VersionPress 4.0](https://github.com/versionpress/versionpress/milestone/16) which is currently in [beta](https://github.com/versionpress/versionpress/releases/tag/4.0-beta). Plugin developers, we'd like your feedback on this, feel free to [open new issues](https://github.com/versionpress/versionpress/issues/new) or chat with us [on Gitter](https://gitter.im/versionpress/versionpress).
 
 VersionPress needs to understand plugin data, actions, shortcodes and other things to automatically provide version control for them. This document describes how plugins (and themes, later) can hook into VersionPress functionality.
 
