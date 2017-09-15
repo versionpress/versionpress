@@ -1,9 +1,4 @@
-Visit https://github.com/versionpress/support first please, or chat with us on Gitter.
+<!-- Do you have a question? Please ask it on Gitter: https://gitter.im/versionpress/versionpress -->
+<!-- Support request? Please open a new issue here: https://github.com/versionpress/support -->
 
-Good issue contains:
-
-- Clear description
-- An example, screenshot or GIF
-- Info about the environment (VP and WP version, OS etc.) if relevant
-
-Thanks!
+<!-- Otherwise, thanks for taking the time to help improve VersionPress!  -->
