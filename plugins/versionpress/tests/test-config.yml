@@ -25,7 +25,7 @@ common-site-config:
     admin-user: admin
     admin-email: admin@example.com
     admin-pass: admin
-    wp-version: 4.8
+    wp-version: 4.9
     wp-locale: en_US
     wp-autoupdate: false
 

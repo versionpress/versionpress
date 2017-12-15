@@ -10,7 +10,7 @@ Install:
 
 - PHP 5.6+ and Composer 1.4+
 - Git 2.10+
-- Node.js 8.1+, npm 5.1+
+- Node.js 8+, npm 5+
 - Docker 17+
 
 Then run:
@@ -23,7 +23,7 @@ Wait for all the things to download and build (☕), then log into the test site
 
 ![image](https://cloud.githubusercontent.com/assets/101152/26283542/17fccd8a-3e2b-11e7-9881-a26fbb49d144.png)
 
-Some useful things about your development environment:
+Useful to know about your development environment:
 
 - VersionPress source files are directly mapped to the site's `wp-content/plugins/versionpress` so any changes you make locally are immediately live.
 - Database can be inspected using [Adminer](https://www.adminer.org/) at `http://localhost:8099`, server name: `db`, username: `root`, password: `r00tpwd`.
