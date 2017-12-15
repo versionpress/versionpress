@@ -17,7 +17,7 @@ const Checkbox: React.StatelessComponent<CheckboxProps> = (props) => {
   } = props;
 
   return isVisible
-    ? <td className='column-cb' onClick={e => { e.preventDefault(); onClick(e.shiftKey); }}>
+    ? <td className='column-cb' onClick={e => { e.stopPropagation(); onClick(e.shiftKey); }}>
         <input
           type='checkbox'
           checked={isChecked}
