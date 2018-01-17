@@ -164,6 +164,10 @@ class VPCommand extends WP_CLI_Command
     public function activate($args, $assoc_args)
     {
         global $versionPressContainer;
+        if (VersionPress::isActive()) {
+            WP_CLI::error('VersionPress is already fully activated.');
+            return;
+        }
 
         $this->checkVpRequirements($assoc_args, RequirementsChecker::SITE);
 
@@ -176,9 +180,7 @@ class VPCommand extends WP_CLI_Command
 
         WP_CLI::line('');
 
-        $successfullyInitialized = VersionPress::isActive();
-
-        if ($successfullyInitialized) {
+        if (VersionPress::isActive()) {
             WP_CLI::success('VersionPress is fully activated.');
         } else {
             WP_CLI::error('Something went wrong. Please try the activation again.');
