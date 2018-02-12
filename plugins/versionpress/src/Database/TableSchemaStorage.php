@@ -43,12 +43,10 @@ class TableSchemaStorage
     {
         $schemaFile = $this->getSchemaFile($table);
 
-        if (!file_exists($schemaFile)) {
-            throw new \Exception("Schema for table '$table' not found");
+        if (file_exists($schemaFile)) {
+            $tableDDL = file_get_contents($schemaFile);
+            return str_replace(Storage::PREFIX_PLACEHOLDER, $this->database->prefix, $tableDDL);
         }
-
-        $tableDDL = file_get_contents($schemaFile);
-        return str_replace(Storage::PREFIX_PLACEHOLDER, $this->database->prefix, $tableDDL);
     }
 
     public function containsSchema($table)
