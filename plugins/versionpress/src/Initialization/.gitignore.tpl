@@ -19,6 +19,7 @@ versionpress.maintenance
 !{{wp-content}}/themes/
 !{{wp-content}}/languages/
 !{{wp-content}}/uploads/
+{{wp-content}}/uploads/cache
 !{{wp-content}}/vpdb/
 
 
