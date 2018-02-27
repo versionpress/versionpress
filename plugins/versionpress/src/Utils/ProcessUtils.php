@@ -69,7 +69,7 @@ class ProcessUtils
     private static function escapeshellargWindows($arg)
     {
         // Double up existing backslashes
-        $arg = preg_replace('/\\\/', '\\\\\\\\', $arg);
+        $arg = preg_replace('/(?!\\\\\/)\\\/', '\\\\\\\\', $arg);
 
         // Double up double quotes
         $arg = preg_replace('/"/', '""', $arg);
