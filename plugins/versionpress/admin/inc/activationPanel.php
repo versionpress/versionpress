@@ -37,7 +37,7 @@ jQuery(document).ready(function($) {
         <h3>Welcome to VersionPress!</h3>
 
         <p class="about-description">
-            VersionPress needs a one-time activation step that initializes its internal storage. <strong>This step is resource-intensive and might take a while</strong> if your site has many entities (posts, comments etc.). The site will be put in maintanenance mode until it finishes.
+            VersionPress needs a one-time activation step that initializes its internal storage. <strong>This step is resource-intensive and might take a while</strong> if your site has many entities (posts, comments etc.). The site will be put in maintenance mode until it finishes.
         </p>
 
         <div class="checks-and-warnings">
