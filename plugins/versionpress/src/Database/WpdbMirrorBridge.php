@@ -356,13 +356,13 @@ class WpdbMirrorBridge
      */
     private function processInsertQuery($parsedQueryData)
     {
-        $firstId = $this->database->insert_id;
         $entityName = $parsedQueryData->entityName;
         $entityInfo = $this->dbSchemaInfo->getEntityInfo($entityName);
         $hasNaturalVpid = $entityInfo->hasNaturalVpid;
         $idColumnName = $entityInfo->idColumnName;
 
         $entitiesCount = count($parsedQueryData->data);
+        $firstId = $this->database->insert_id - $entitiesCount + 1;
 
         for ($i = 0; $i < $entitiesCount; $i++) {
             if ($hasNaturalVpid) {

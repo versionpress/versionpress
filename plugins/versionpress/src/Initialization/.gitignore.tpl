@@ -14,10 +14,12 @@ versionpress.maintenance
 !{{wp-content}}/index.php
 !{{wp-plugins}}/
 {{wp-plugins}}/versionpress/
+!{{wp-content}}/.versionpress/
 !{{wp-content}}/mu-plugins/
 !{{wp-content}}/themes/
 !{{wp-content}}/languages/
 !{{wp-content}}/uploads/
+{{wp-content}}/uploads/cache
 !{{wp-content}}/vpdb/
 
 

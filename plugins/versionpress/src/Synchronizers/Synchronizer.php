@@ -268,8 +268,10 @@ class Synchronizer
 
     private function createTable()
     {
-        $tableDDL = $this->tableSchemaStorage->getSchema($this->entityInfo->tableName);
-        $this->database->query($tableDDL);
+        if ($this->tableSchemaStorage->getSchema($this->entityInfo->tableName)) {
+            $tableDDL = $this->tableSchemaStorage->getSchema($this->entityInfo->tableName);
+            $this->database->query($tableDDL);
+        }
     }
 
     /**
