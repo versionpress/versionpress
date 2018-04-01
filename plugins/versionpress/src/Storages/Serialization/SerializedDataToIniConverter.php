@@ -271,7 +271,7 @@ class SerializedDataToIniConverter
         $type = null; // string or number
 
         // https://regex101.com/r/gJ1oF2/1
-        if (preg_match('/^<(\*?[\w\d\\\\]+\*?)> ?(.*)/', $value, $matches)) {
+        if (preg_match('/^<(\*?[\w\d\\\\]+\*?)> ?((.|\s)*)/', $value, $matches)) {
             $type = $matches[1]; // detect type and value from eg. `<boolean> false`
             $value = $matches[2];
         }
