@@ -17,7 +17,7 @@ class WordPressMissingFunctions
         return $elevatedWpConfigPath;
     }
 
-    public static function renderShortcode($shortcodeTag, $attributes)
+    public static function renderShortcode($shortcodeTag, $attributes, $shortcodeSelfClosing, $shortcodeContent)
     {
         $renderedAttributes = [];
 
@@ -25,7 +25,13 @@ class WordPressMissingFunctions
             $renderedAttributes[] = sprintf('%s="%s"', $attribute, $value);
         }
 
-        return sprintf('[%s %s]', $shortcodeTag, join(' ', $renderedAttributes));
+        if (empty($shortcodeSelfClosing)) {
+            if (empty($shortcodeContent)) {
+                return sprintf('[%s %s][/%s]', $shortcodeTag, join(' ', $renderedAttributes), $shortcodeTag);
+            }
+            return sprintf('[%s %s]%s[/%s]', $shortcodeTag, join(' ', $renderedAttributes), $shortcodeContent, $shortcodeTag);
+        }
+        return sprintf('[%s %s /]', $shortcodeTag, join(' ', $renderedAttributes));
     }
 
     public static function pipeAction($source, $destination, $priority = 10, $acceptedArgs = 1)
