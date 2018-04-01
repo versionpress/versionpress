@@ -92,7 +92,7 @@ class DIContainer
         $dic->register(VersionPressServices::DB_SCHEMA, function () {
             global $table_prefix, $wp_db_version;
             return new DbSchemaInfo(
-                PluginDefinitionDiscovery::getPathsForActivePlugins('schema.yml'),
+                PluginDefinitionDiscovery::getPathsForPlugins('schema.yml'),
                 $table_prefix,
                 $wp_db_version
             );
@@ -107,7 +107,7 @@ class DIContainer
         });
 
         $dic->register(VersionPressServices::ACTIONSINFO_PROVIDER_ACTIVE_PLUGINS, function () {
-            return new ActionsInfoProvider(PluginDefinitionDiscovery::getPathsForActivePlugins('actions.yml'));
+            return new ActionsInfoProvider(PluginDefinitionDiscovery::getPathsForPlugins('actions.yml'));
         });
 
         $dic->register(VersionPressServices::CHANGEINFO_FACTORY, function () use ($dic) {
@@ -208,7 +208,7 @@ class DIContainer
         });
 
         $dic->register(VersionPressServices::SHORTCODES_INFO, function () {
-            return new ShortcodesInfo(PluginDefinitionDiscovery::getPathsForActivePlugins('shortcodes.yml'));
+            return new ShortcodesInfo(PluginDefinitionDiscovery::getPathsForPlugins('shortcodes.yml'));
         });
 
         $dic->register(VersionPressServices::SQL_QUERY_PARSER, function () use ($dic) {
