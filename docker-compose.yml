@@ -29,7 +29,7 @@ services:
       - db_data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: r00tpwd
-  
+
   adminer:
     image: adminer
     ports:

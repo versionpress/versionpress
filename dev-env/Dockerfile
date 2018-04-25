@@ -1,4 +1,4 @@
-FROM wordpress:4.9-php5.6-apache
+FROM wordpress:4.9-php7.2-apache
 
 # Requirements for WP-CLI & VersionPress (separate lines to make it clear)
 RUN apt-get update \

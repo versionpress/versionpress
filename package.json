@@ -11,6 +11,9 @@
     "build": "gulp build",
     "start": "docker-compose up",
     "cleanup-docker-stack": "docker-compose down -v && rm -rf ./dev-env/wp",
+    "rebuild-images": "npm run _rebuild-images__dev-env && npm run _rebuild-images__tests",
+    "_rebuild-images__dev-env": "docker-compose -f ./docker-compose.yml build --no-cache",
+    "_rebuild-images__tests": "docker-compose -f ./plugins/versionpress/tests/docker-compose.yml build --no-cache",
     "postinstall": "npm run init-dev"
   },
   "engines": {

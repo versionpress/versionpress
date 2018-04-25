@@ -2,13 +2,13 @@
 
 This will set you up for VersionPress development.
 
-> **Note**: Since 4.0-beta, we rely on Docker which makes things much easier than full local setup. The legacy approach is still documented in [Dev-Setup.md@4.0-alpha1](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Dev-Setup.md) and [Testing.md@4.0-alpha1](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Testing.md).
+> **Note**: Since 4.0-beta, we rely on Docker which makes things much easier. The legacy approach is documented in [Dev-Setup.md (4.0-alpha1)](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Dev-Setup.md) and [Testing.md (4.0-alpha1)](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Testing.md).
 
 ## Getting started
 
 Install:
 
-- PHP 5.6+ and Composer 1.4+
+- PHP 7+ and Composer 1.4+
 - Git 2.10+
 - Node.js 8+, npm 6+
 - Docker 17+
@@ -121,11 +121,13 @@ Docker greatly helps with running tests: it requires almost no local setup and p
 
 If you don't need to run or debug tests from PhpStorm, running tests is as simple as:
 
-1. Make sure you have Docker 17+ up and running.
+1. Make sure you have Docker up and running.
 2. `cd ./plugins/versionpress/tests`
 3. `npm run tests`
+4. Inspect the results and/or look around in the WordPress site or the database.
+5. Stop the tests with `npm run stop-tests`.
 
-The first run fetches all the Docker images and can be quite slow but subsequent runs are almost instant.
+The first run fetches and builds Docker images and can be quite slow but subsequent runs are much faster.
 
 If you want to run only a **subset of tests**, e.g., unit tests, override the default Docker Compose `command`. Some examples:
 
@@ -133,14 +135,14 @@ If you want to run only a **subset of tests**, e.g., unit tests, override the de
 # pick a test suite from phpunit.xml:
 docker-compose run tests ../vendor/bin/phpunit -c phpunit.xml --testsuite Unit
 
-# PhpStorm-like invocation (copy/paste from its console):
+# PhpStorm-like invocation (copy/pasted from its console):
 docker-compose run tests ../vendor/bin/phpunit --bootstrap /opt/project/tests/phpunit-bootstrap.php --no-configuration /opt/project/tests/Unit
 
 # Create your own phpunit.override.xml (gitignored), customize and then:
 docker-compose run tests ../vendor/bin/phpunit -c phpunit.override.xml --color
 ```
 
-After the tests are run, you would **inspect the results** in the console. Also, the whole Docker stack is kept running which is useful for integration tests; you can e.g. inspect the test WordPress site, its database, etc. The [end2end tests](#end2end-tests) section provides more info on this.
+After the tests are run, the whole Docker stack is kept up and running so that you can inspect the test WordPress site, its database, etc. The [end2end tests](#end2end-tests) section provides more info on this.
 
 Run `npm run stop-tests` to **shut down the Docker stack** or `npm run cleanup-tests` to also remove all the volumes (next start will be completely fresh).
 
@@ -194,7 +196,6 @@ This works equally well other types of tests as well, for example, Selenium test
 
 ![image](https://user-images.githubusercontent.com/101152/27797533-57f12904-600e-11e7-971b-08fd943aaf7b.png)
 
-
 ### Unit tests
 
 Unit tests are best suited for small pieces of algorithmic functionality. For example, `IniSerializer` is covered with unit tests extensively.
@@ -218,11 +219,10 @@ After you run the tests using one of the methods described above, the Docker Com
 
 - You can access the **test WordPress site** on **port 80** in your local browser by aliasing a `wordpress` host in your `hosts` file (add a line with `127.0.0.1 wordpress`) and then visiting `http://wordpress/vp01`.
 - You can start a **Bash session** in the WordPress container by running `docker exec -ti tests_wordpress_1 /bin/bash`. You can then e.g. inspect Git history via `git log`, etc.
-- The **database** is available on **port 3391**, you can connect to it e.g. by `mysql --port 3391 -u root -p`.
+- The **database** is available on the standard **port 3306**, you can connect to it e.g. by `mysql -u root -p`.
 - **Adminer** is available on **port 8099** after you run `docker-compose run -d --service-ports adminer`.
 - `docker-compose ps` lists all the running services.
 - `docker-compose down [-v]` shuts down the whole stack (there are npm scripts for that too, see above).
-
 
 <div id="other-tests"></div>
 
@@ -260,12 +260,11 @@ For pure frontend development, it's more convenient to run it outside of the Wor
     ```
 3. Run `npm start` in the `frontend` directory.
 
-This launches [webpack dev server](https://webpack.js.org/configuration/dev-server/) at http://localhost:8888:
+This launches [webpack dev server](https://webpack.js.org/configuration/dev-server/) at <http://localhost:8888>:
 
 ![image](https://cloud.githubusercontent.com/assets/101152/26268495/c4738ff0-3cef-11e7-90ce-b807cc085865.png)
 
 Source code edits will be automatically reflected in the browser.
-
 
 ## Production build
 
@@ -277,14 +276,15 @@ The version number is based on the nearest Git tag and can also be something lik
 
 Here are some tips for working with Docker / Docker Compose:
 
-- Inspect `tests/package.json` to see which Docker Compose commands run in the background.
 - Aliasing `docker-compose` to `dc` will save you some typing.
+- Inspect `tests/package.json` to see which Docker Compose commands run in the background.
 - You can start the whole stack in the background via `docker-compose up -d`. Then, you would use:
     - `docker-compose logs --tail=10` to display last 10 log messages from each container. Logs can also be followed (similar to `docker-compose up`) by `docker-compose logs -f`.
     - `docker-compose ps` to list the containers.
     - `docker-compose stop` to shut down the stack.
     - `npm run cleanup-docker-stack` to clean up everything.
-- Most values in `docker-compose.yml` like environment variables can be changed in `docker-compose.override.yml`.
+- You can rebuild all images with `npm run rebuild-images`, e.g., to get a newer WordPress or WP-CLI release.
+- Most values in `docker-compose.yml` can be customized via `docker-compose.override.yml`.
 - Any container from the stack can be started in an interactive session by adding this to `docker-compose.yml`:
     ```
     stdin_open: true
