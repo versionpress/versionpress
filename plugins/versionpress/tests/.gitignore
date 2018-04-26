@@ -1,4 +1,4 @@
-phpunit-log.*
+/logs
 phpunit.override.xml
 
 wp-cli.local.yml

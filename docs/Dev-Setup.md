@@ -142,7 +142,15 @@ docker-compose run tests ../vendor/bin/phpunit --bootstrap /opt/project/tests/ph
 docker-compose run tests ../vendor/bin/phpunit -c phpunit.override.xml --color
 ```
 
-After the tests are run, the whole Docker stack is kept up and running so that you can inspect the test WordPress site, its database, etc. The [end2end tests](#end2end-tests) section provides more info on this.
+If you want to **log output of tests** to a file using one of [PHPUnit's supported formats](http://phpunit.readthedocs.io/en/7.1/textui.html#command-line-options), do something like this:
+
+```
+docker-compose run tests ../vendor/bin/phpunit -c phpunit.xml --testdox-text /opt/logs/testdox.txt
+```
+
+The `/opt/logs` folder in the container is mapped to your local `./plugins/versionpress/tests/logs` folder where you can inspect the logs.
+
+After the tests are run, the whole Docker stack is kept up and running so that you can **inspect the test WordPress site**, its database, etc. The [end2end tests](#end2end-tests) section provides more info on this.
 
 Run `npm run stop-tests` to **shut down the Docker stack** or `npm run cleanup-tests` to also remove all the volumes (next start will be completely fresh).
 

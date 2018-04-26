@@ -28,6 +28,9 @@ services:
       # Same volumes as in `wordpress`
       - document-root:/var/www/html
 
+      # Possibly output logs here
+      - ./logs:/opt/logs
+
       # Project mounts
       - ..:/opt/project:ro
       - ../../../ext-libs:/opt/ext-libs:ro
