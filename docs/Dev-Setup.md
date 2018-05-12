@@ -19,7 +19,7 @@ Then run:
 2. `npm install`
 3. `npm start`
 
-Wait for all the things to download and build (☕), then log into the test site at  `http://localhost:8088`, username `admin`, password `adminpwd` (see `docker-compose.yml`) and activate VersionPress on the _Plugins_ page. You're now all set up! 🎉
+Wait for all the things to download and build (☕), then log into the test site at `http://localhost:8088`, install WordPress and activate VersionPress on the _Plugins_ page. You're now all set up! 🎉
 
 ![image](https://cloud.githubusercontent.com/assets/101152/26283542/17fccd8a-3e2b-11e7-9881-a26fbb49d144.png)
 
