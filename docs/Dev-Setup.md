@@ -1,19 +1,39 @@
 # Dev setup
 
-This will set you up for VersionPress development.
-
-> **Note**: Since 4.0-beta, we rely on Docker which makes things much easier. The legacy approach is documented in [Dev-Setup.md (4.0-alpha1)](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Dev-Setup.md) and [Testing.md (4.0-alpha1)](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Testing.md).
+This will set you up for VersionPress development. 👩‍💻 👨‍💻
 
 ## Getting started
 
-Install:
+Since VersionPress 4.0, our approach is:
 
-- PHP 7+ and Composer 1.4+
+- You develop in **local tools** you're comfortable with – PhpStorm, vim, VSCode, etc.
+- Runtime is handled by **Docker**. You don't need to have MAMP/XAMPP, set up WordPress, Java, Selenium etc.
+- Common tasks are easy to do via **npm scripts**. For example, to run tests you'll just run `npm run tests`.
+
+You can familiarize yourself with Docker in [this great quick start](https://docs.docker.com/get-started/) and we also have some [tips](#docker-tips) for you.
+
+This software is expected on your machine:
+
 - Git 2.10+
 - Node.js 8+, npm 6+
-- Docker 17+
+- Docker 18+
+- PHP 7+ and Composer 1.4+
 
-Then run:
+## Project checkout
+
+Then clone a repo and install the dev dependencies:
+
+1. `git clone https://github.com/versionpress/versionpress`
+2. `cd versionpress`
+3. `npm install`
+
+Have a ☕ as this will take a while, initially.
+
+## Exploring dockerized environment
+
+For regular development, you'll want to have a test WordPress site which is provided for you – you don't need to set up MAMP or XAMPP or anything like that.
+
+After you have started Docker on your machine, run this:
 
 1. `git clone <repo>` && `cd <repo>`
 2. `npm install`
@@ -128,8 +148,10 @@ Docker greatly helps with running tests: it requires almost no local setup and p
 If you don't need to run or debug tests from PhpStorm, running tests is as simple as:
 
 1. Make sure you have Docker up and running.
-2. `npm run tests:unit` or `npm run tests:full`
+2. `npm run tests:unit` or `npm run tests:full`.
 3. If you've run full tests, stop the Docker stack with `npm run stop` or `npm run stop-and-cleanup` after you've explored the test WordPress site and no longer need it. 
+
+> **Note**: Full tests are _slow_ to start (can take up to a couple of minutes to even start producing output) and _slow_ to run (can take over 30 minutes to complete) as they explore every corner of WordPress. See [end2end tests](#end2end-tests) for more. 🐌
 
 If you want to further customize which tests run, use standard PHPUnit approaches like providing your own `phpunit.xml` or customizing via command-line parameters. Some examples:
 
