@@ -31,7 +31,7 @@ services:
 
   # Just test runner. See `tests-with-wordpress` for test runner with WordPress.
   tests:
-    image: wordpress:cli
+    image: versionpress/wordpress:cli
     volumes:
       # Same volumes as in `wordpress`
       - ./dev-env/wp:/var/www/html
@@ -53,7 +53,7 @@ services:
     tty: true
 
   tests-with-wordpress:
-    image: wordpress:cli
+    image: versionpress/wordpress:cli
     volumes:
       # Same volumes as in `tests-plain`
       - ./dev-env/wp:/var/www/html
@@ -63,7 +63,6 @@ services:
       - wpcli-cache:/var/www/.wp-cli
     links:
       - selenium-hub:selenium-hub
-      # - mysql:mysql
       - wordpress:wordpress
     working_dir: /opt/project/tests
     command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml
