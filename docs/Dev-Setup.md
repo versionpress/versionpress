@@ -313,6 +313,16 @@ Run `npm run build`, it will produce a file like `dist/versionpress-3.0.2.zip`.
 
 The version number is based on the nearest Git tag and can also be something like `3.0.2-27-g0e1ce7f` meaning that the closest tag is `3.0.2`, there have been 27 commits since then and the package was built from `0e1ce7f`. See [`git describe --tags`](https://git-scm.com/docs/git-describe#_examples) for more examples.
 
+## Developing the dev setup
+
+Meta! If you're working on updating the dev setup (this document, Docker images, etc.), here are some tips for you.
+
+### Building and pushing images
+
+1. `npm run build-images`
+2. `docker login`
+3. `docker push versionpress/wordpress` / `versionpress/wordpress:cli`
+
 ## Docker tips
 
 Here are some tips for working with Docker / Docker Compose:
