@@ -48,7 +48,7 @@ services:
     working_dir: /opt/project/tests
     command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml
 
-    # Allow interactive session by running `docker-compose run tests /bin/bash`
+    # Allow interactive session by running `docker-compose run --rm tests sh`
     stdin_open: true
     tty: true
 
@@ -68,7 +68,7 @@ services:
     working_dir: /opt/project/tests
     command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml
 
-    # Allow interactive session by running `docker-compose run tests /bin/bash`
+    # Allow interactive session by running `docker-compose run --rm tests-with-wordpress sh`
     stdin_open: true
     tty: true
 

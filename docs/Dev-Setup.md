@@ -135,24 +135,24 @@ If you want to further customize which tests run, use standard PHPUnit approache
 
 ```sh
 # Pick a test suite from the default phpunit.xml:
-docker-compose run tests ../vendor/bin/phpunit -c phpunit.xml --testsuite Unit
+docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.xml --testsuite Unit
 
 # Create your own phpunit.override.xml (gitignored), customize and then:
-docker-compose run tests ../vendor/bin/phpunit -c phpunit.override.xml --color
+docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.override.xml --color
 
 # PhpStorm-like invocation (copy/pasted from its console):
-docker-compose run tests ../vendor/bin/phpunit --bootstrap /opt/project/tests/phpunit-bootstrap.php --no-configuration /opt/project/tests/Unit
+docker-compose run --rm tests ../vendor/bin/phpunit --bootstrap /opt/project/tests/phpunit-bootstrap.php --no-configuration /opt/project/tests/Unit
 ```
 
 One thing to understand here is that there are two Docker Compose services:
 
-- Use `docker-compose run tests` to run tests that don't need to boot up a working WordPress site, like unit tests.
-- Use `docker-compose run tests-with-wordpress` for full integration tests.
+- Use `docker-compose run --rm tests` to run tests that don't need to boot up a working WordPress site, like unit tests.
+- Use `docker-compose run --rm tests-with-wordpress` for full integration tests.
 
 If you want to **log output of tests** to a file using one of [PHPUnit's supported formats](http://phpunit.readthedocs.io/en/7.1/textui.html#command-line-options), do something like this:
 
 ```
-docker-compose run tests ../vendor/bin/phpunit -c phpunit.xml --testdox-text /opt/logs/testdox.txt
+docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.xml --testdox-text /opt/logs/testdox.txt
 ```
 
 The `/opt/logs` folder in the container is mapped to your local `./dev-env/test-logs` folder where you can inspect the logs.
@@ -300,4 +300,5 @@ Here are some tips for working with Docker / Docker Compose:
     stdin_open: true
     tty: true
     ```
-    Then, it's possible to do e.g. `docker-compose run tests /bin/bash`.
+    Then, it's possible to do e.g. `docker-compose run --rm tests sh`.
+

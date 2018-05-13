@@ -10,8 +10,8 @@
     "init-phpstorm": "gulp idea",
     "build": "gulp build",
     "start": "docker-compose up -d wordpress",
-    "tests:unit": "docker-compose run tests ../vendor/bin/phpunit -c phpunit.xml --testsuite Unit",
-    "tests:full": "docker-compose run tests-with-wordpress",
+    "tests:unit": "docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.xml --testsuite Unit",
+    "tests:full": "docker-compose run --rm tests-with-wordpress",
     "stop": "docker-compose stop",
     "stop-and-cleanup": "docker-compose down -v && rm -rf ./dev-env/wp",
     "postinstall": "npm run init-dev"
