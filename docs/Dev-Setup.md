@@ -149,13 +149,11 @@ One thing to understand here is that there are two Docker Compose services:
 - Use `docker-compose run --rm tests` to run tests that don't need to boot up a working WordPress site, like unit tests.
 - Use `docker-compose run --rm tests-with-wordpress` for full integration tests.
 
-If you want to **log output of tests** to a file using one of [PHPUnit's supported formats](http://phpunit.readthedocs.io/en/7.1/textui.html#command-line-options), do something like this:
+**Output of tests** is written in the testdox format to container's `/opt/logs` which is made available to you in your local folder `./dev-env/test-logs`. If you want to logs in [another format supported by PHPUnit](http://phpunit.readthedocs.io/en/7.1/textui.html#command-line-options), run tests manually like this:
 
 ```
-docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.xml --testdox-text /opt/logs/testdox.txt
+docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.xml --log-junit /opt/logs/vp-tests.log
 ```
-
-The `/opt/logs` folder in the container is mapped to your local `./dev-env/test-logs` folder where you can inspect the logs.
 
 After the tests are run, the whole Docker stack is kept up and running so that you can **inspect the test WordPress site**, its database, etc. The [end2end tests](#end2end-tests) section provides more info on this.
 

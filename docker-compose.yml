@@ -46,7 +46,7 @@ services:
       # Caching downloaded WP ZIPs
       - wpcli-cache:/var/www/.wp-cli
     working_dir: /opt/project/tests
-    command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml
+    command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /opt/logs/testdox.txt
 
     # Allow interactive session by running `docker-compose run --rm tests sh`
     stdin_open: true
@@ -65,7 +65,7 @@ services:
       - selenium-hub:selenium-hub
       - wordpress:wordpress
     working_dir: /opt/project/tests
-    command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml
+    command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /opt/logs/testdox.txt
 
     # Allow interactive session by running `docker-compose run --rm tests-with-wordpress sh`
     stdin_open: true

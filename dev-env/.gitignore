@@ -1,2 +1,2 @@
-# Mapped WP site root from inside the container
 /wp
+/test-logs
