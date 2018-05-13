@@ -14,6 +14,9 @@
     "tests:full": "docker-compose run --rm tests-with-wordpress",
     "stop": "docker-compose stop",
     "stop-and-cleanup": "docker-compose down -v && rm -rf ./dev-env/wp",
+    "build-images": "npm run __build-wp-image && npm run __build-wp-cli-image",
+    "__build-wp-image": "docker build --pull -t versionpress/wordpress dev-env/wordpress-image",
+    "__build-wp-cli-image": "docker build --pull -t versionpress/wordpress:cli dev-env/wordpress-cli-image",
     "postinstall": "npm run init-dev"
   },
   "engines": {
