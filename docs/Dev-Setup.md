@@ -19,11 +19,11 @@ Then run:
 2. `npm install`
 3. `npm start`
 
-Wait for all the things to download and build (☕), then log into the test site at `http://localhost:8088`, install WordPress and activate VersionPress on the _Plugins_ page. You're now all set up! 🎉
+This starts a set of Docker containers in the background, you can view the progress by running `docker-compose logs -f`. When everything boots up, log into the test site at `http://localhost:8088`, install WordPress and activate VersionPress on the _Plugins_ page. You're now all set up! 🎉
 
 ![image](https://cloud.githubusercontent.com/assets/101152/26283542/17fccd8a-3e2b-11e7-9881-a26fbb49d144.png)
 
-Useful to know about your development environment:
+Explore your development environment:
 
 - VersionPress source files are directly mapped to the site's `wp-content/plugins/versionpress` so any changes you make locally are immediately live.
 - Database can be inspected using [Adminer](https://www.adminer.org/) at `http://localhost:8099`, server name: `db`, username: `root`, password: `r00tpwd`.
@@ -34,7 +34,13 @@ Useful to know about your development environment:
     - Use `docker-compose exec wordpress <command>`, for example:
         - `docker-compose exec wordpress wp option update blogname "Hello"`
         - `docker-compose exec wordpress git log`
-- Stop all Docker services: `Ctrl+C` in the console. `npm run cleanup-docker-stack` clears up everything if you want to start fresh. Otherwise, both files and database data are persisted.
+
+Some useful tips for managing your Dockerized environment:
+
+- `docker-compose ps` lists running containers.
+- `docker-compose logs -f` displays live logs.
+
+To stop your environment, run `npm run stop`. To also delete WordPress data so that next start is fresh, run `npm run stop-and-cleanup`.
 
 See also [Docker tips](#docker-tips) section below.
 
@@ -122,25 +128,26 @@ Docker greatly helps with running tests: it requires almost no local setup and p
 If you don't need to run or debug tests from PhpStorm, running tests is as simple as:
 
 1. Make sure you have Docker up and running.
-2. `cd ./plugins/versionpress/tests`
-3. `npm run tests`
-4. Inspect the results and/or look around in the WordPress site or the database.
-5. Stop the tests with `npm run stop-tests`.
+2. `npm run tests:unit` or `npm run tests:full`
+3. If you've run full tests, stop the Docker stack with `npm run stop` or `npm run stop-and-cleanup` after you've explored the test WordPress site and no longer need it. 
 
-The first run fetches and builds Docker images and can be quite slow but subsequent runs are much faster.
-
-If you want to run only a **subset of tests**, e.g., unit tests, override the default Docker Compose `command`. Some examples:
+If you want to further customize which tests run, use standard PHPUnit approaches like providing your own `phpunit.xml` or customizing via command-line parameters. Some examples:
 
 ```sh
-# pick a test suite from phpunit.xml:
+# Pick a test suite from the default phpunit.xml:
 docker-compose run tests ../vendor/bin/phpunit -c phpunit.xml --testsuite Unit
-
-# PhpStorm-like invocation (copy/pasted from its console):
-docker-compose run tests ../vendor/bin/phpunit --bootstrap /opt/project/tests/phpunit-bootstrap.php --no-configuration /opt/project/tests/Unit
 
 # Create your own phpunit.override.xml (gitignored), customize and then:
 docker-compose run tests ../vendor/bin/phpunit -c phpunit.override.xml --color
+
+# PhpStorm-like invocation (copy/pasted from its console):
+docker-compose run tests ../vendor/bin/phpunit --bootstrap /opt/project/tests/phpunit-bootstrap.php --no-configuration /opt/project/tests/Unit
 ```
+
+One thing to understand here is that there are two Docker Compose services:
+
+- Use `docker-compose run tests` to run tests that don't need to boot up a working WordPress site, like unit tests.
+- Use `docker-compose run tests-with-wordpress` for full integration tests.
 
 If you want to **log output of tests** to a file using one of [PHPUnit's supported formats](http://phpunit.readthedocs.io/en/7.1/textui.html#command-line-options), do something like this:
 
@@ -148,11 +155,11 @@ If you want to **log output of tests** to a file using one of [PHPUnit's support
 docker-compose run tests ../vendor/bin/phpunit -c phpunit.xml --testdox-text /opt/logs/testdox.txt
 ```
 
-The `/opt/logs` folder in the container is mapped to your local `./plugins/versionpress/tests/logs` folder where you can inspect the logs.
+The `/opt/logs` folder in the container is mapped to your local `./dev-env/test-logs` folder where you can inspect the logs.
 
 After the tests are run, the whole Docker stack is kept up and running so that you can **inspect the test WordPress site**, its database, etc. The [end2end tests](#end2end-tests) section provides more info on this.
 
-Run `npm run stop-tests` to **shut down the Docker stack** or `npm run cleanup-tests` to also remove all the volumes (next start will be completely fresh).
+Run `npm run stop` to **shut down the Docker stack** or `npm run stop-and-cleanup` to also remove the volumes and start fresh the next time.
 
 <div id="running-tests-from-phpstorm"></div>
 
@@ -286,11 +293,6 @@ Here are some tips for working with Docker / Docker Compose:
 
 - Aliasing `docker-compose` to `dc` will save you some typing.
 - Inspect `tests/package.json` to see which Docker Compose commands run in the background.
-- You can start the whole stack in the background via `docker-compose up -d`. Then, you would use:
-    - `docker-compose logs --tail=10` to display last 10 log messages from each container. Logs can also be followed (similar to `docker-compose up`) by `docker-compose logs -f`.
-    - `docker-compose ps` to list the containers.
-    - `docker-compose stop` to shut down the stack.
-    - `npm run cleanup-docker-stack` to clean up everything.
 - You can rebuild all images with `npm run rebuild-images`, e.g., to get a newer WordPress or WP-CLI release.
 - Most values in `docker-compose.yml` can be customized via `docker-compose.override.yml`.
 - Any container from the stack can be started in an interactive session by adding this to `docker-compose.yml`:

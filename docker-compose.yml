@@ -1,30 +1,22 @@
-version: '3.1'
+version: '3.6'
 services:
 
   wordpress:
-    build: ./dev-env
     image: versionpress/wordpress
     ports:
       - 8088:80
     volumes:
       - ./plugins/versionpress:/var/www/html/wp-content/plugins/versionpress
       - ./dev-env/wp:/var/www/html
-    depends_on:
+    links:
       - mysql
     environment:
       WORDPRESS_DB_PASSWORD: r00tpwd
 
-      # Environment variables for `wp core install`
-      WORDPRESS_SITEURL: http://localhost:8088
-      WORDPRESS_SITE_TITLE: VP Dev
-      WORDPRESS_ADMIN_USER: admin
-      WORDPRESS_ADMIN_PASSWORD: adminpwd
-      WORDPRESS_ADMIN_EMAIL: admin@example.com
-
   mysql:
     image: mysql:5.7
     ports:
-      - 3399:3306
+      - 3306:3306
     volumes:
       - db_data:/var/lib/mysql
     environment:
@@ -36,8 +28,54 @@ services:
       - 8099:8080
     links:
       - mysql:db
-    depends_on:
-      - mysql
+
+  # Just test runner. See `tests-with-wordpress` for test runner with WordPress.
+  tests:
+    image: wordpress:cli
+    volumes:
+      # Same volumes as in `wordpress`
+      - ./dev-env/wp:/var/www/html
+
+      # Possibly output logs here
+      - ./dev-env/test-logs:/opt/logs
+
+      # Project mounts
+      - ./plugins/versionpress:/opt/project:ro
+      - ./ext-libs:/opt/ext-libs:ro
+
+      # Caching downloaded WP ZIPs
+      - wpcli-cache:/var/www/.wp-cli
+    working_dir: /opt/project/tests
+    command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml
+
+    # Allow interactive session by running `docker-compose run tests /bin/bash`
+    stdin_open: true
+    tty: true
+
+  tests-with-wordpress:
+    image: wordpress:cli
+    volumes:
+      # Same volumes as in `tests-plain`
+      - ./dev-env/wp:/var/www/html
+      - ./dev-env/test-logs:/opt/logs
+      - ./plugins/versionpress:/opt/project:ro
+      - ./ext-libs:/opt/ext-libs:ro
+      - wpcli-cache:/var/www/.wp-cli
+    links:
+      - selenium-hub:selenium-hub
+      # - mysql:mysql
+      - wordpress:wordpress
+    working_dir: /opt/project/tests
+    command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml
+
+    # Allow interactive session by running `docker-compose run tests /bin/bash`
+    stdin_open: true
+    tty: true
+
+  selenium-hub:
+    # Standalone Firefox is enough but could also be a full grid setup, hence the service name
+    image: selenium/standalone-firefox
 
 volumes:
   db_data:
+  wpcli-cache:
