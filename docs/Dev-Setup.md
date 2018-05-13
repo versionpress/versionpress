@@ -19,6 +19,12 @@ This software is expected on your machine:
 - Docker 18+
 - PHP 7+ and Composer 1.4+
 
+### Windows users: use Git Bash
+
+The dev setup is actively tested on Windows but you have to use Git Bash (or WSL) for all commands to work. We currently don't have enough capacity to port the dev setup to `cmd.exe`, sorry.
+
+Please see [Windows tips](#windows-tips) below.
+
 ## Project checkout
 
 Then clone a repo and install the dev dependencies:
@@ -322,3 +328,20 @@ Here are some tips for working with Docker / Docker Compose:
     ```
     Then, it's possible to do e.g. `docker-compose run --rm tests sh`.
 
+## Windows tips
+
+### Git Bash
+
+As noted in the _Getting started_ section, we currently only support Git Bash (or WSL) on Windows, not `cmd.exe`. This simplifies many scripts and instructions as macOS, Linux and Windows can be treated basically the same.
+
+Git Bash comes with [Git for Windows](https://gitforwindows.org/) and after you get used to paths like `/c/Users/You/versionpress` instead of `C:\Users\You\versionpress`, you'll love it, we guarantee :)
+
+The only problematic issue is that Docker messes with paths and for example, trying to run `docker run --rm -it ubuntu /bin/bash`, you'll see an error like `C:/Program Files/Git/usr/bin/bash.exe: no such file or directory` – Docker will try to prepend `C:/Program Files/Git` for some reason. [Use this workaround](https://gist.github.com/borekb/cb1536a3685ca6fc0ad9a028e6a959e3) and you'll be fine.
+
+### Docker for Windows
+
+If you can, use [Docker for Windows](https://www.docker.com/docker-windows), not [Docker Toolbox](https://docs.docker.com/toolbox/toolbox_install_windows/). The experience will be generally smoother.
+
+### Disable antivirus software
+
+You might want to disable your antivirus software when working with Docker. Recommendations differ between version, please look it up.
