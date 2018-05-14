@@ -319,9 +319,15 @@ Meta! If you're working on updating the dev setup (this document, Docker images,
 
 ### Building and pushing images
 
+We're keeping our images close to two [official ones](https://hub.docker.com/_/wordpress/), [`wordpress:php7.2-apache`](https://github.com/docker-library/wordpress/blob/master/php7.2/apache/Dockerfile) and [`wordpress:cli`](https://github.com/docker-library/wordpress/blob/master/php7.2/cli/Dockerfile).
+
+The only goal of our images is to be close to the official project and have the right environment in it, e.g., the PHP version. We don't care that much about specific WordPress versions (WordPress is often installed dynamically anyway, based on `test-config.yml`) so we only use "vague" tags like `php7.2-apache` or `cli`.
+
+To build and push tags to Docker Hub:
+
 1. `npm run build-images`
 2. `docker login`
-3. `docker push versionpress/wordpress` / `versionpress/wordpress:cli`
+3. `docker push versionpress/wordpress:php7.2-apache` / `versionpress/wordpress:cli`
 
 ## Docker tips
 

@@ -2,7 +2,7 @@ version: '3.6'
 services:
 
   wordpress:
-    image: versionpress/wordpress
+    image: versionpress/wordpress:php7.2-apache
     ports:
       - 8088:80
     volumes:
