@@ -327,7 +327,7 @@ To build and push tags to Docker Hub:
 
 1. `npm run build-images`
 2. `docker login`
-3. `docker push versionpress/wordpress:php7.2-apache` / `versionpress/wordpress:cli`
+3. `npm run push-images`
 
 ## Docker tips
 
