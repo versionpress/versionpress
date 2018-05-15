@@ -317,6 +317,10 @@ The version number is based on the nearest Git tag and can also be something lik
 
 Meta! If you're working on updating the dev setup (this document, Docker images, etc.), here are some tips for you.
 
+### npm scripts
+
+Simpler tasks are scripted directly in `package.json`, more complex ones in the `./scripts` folder, see for example `scripts/build.ts`.
+
 ### Building and pushing images
 
 We're keeping our images close to two [official ones](https://hub.docker.com/_/wordpress/), [`wordpress:php7.2-apache`](https://github.com/docker-library/wordpress/blob/master/php7.2/apache/Dockerfile) and [`wordpress:cli`](https://github.com/docker-library/wordpress/blob/master/php7.2/cli/Dockerfile).
