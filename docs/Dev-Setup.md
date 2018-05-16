@@ -16,7 +16,7 @@ This software is expected on your machine:
 
 - Git 2.10+
 - Node.js 8+, npm 6+
-- Docker 18+
+- Docker 18.03+
 - PHP 7+ and Composer 1.4+
 
 ### Windows users: use Git Bash
@@ -118,19 +118,32 @@ Please refer to the [Contributing code](https://github.com/versionpress/versionp
 
 The development environment is preconfigured with [Xdebug](https://xdebug.org/). Here's an example setup:
 
-1. Create a `docker-compose.override.yml` file next to `docker-compose.yml` (it's in the repo root, not in `./plugins/versionpress`). You can copy it from `docker-compose.override.example.yml`.
-2. Put your computer IP address there as seen on the local network, e.g., `192.168.1.2`. Tools like `ipconfig` or `ifconfig` will show that.
-3. Start the Docker stack: `docker-compose up`.
-4. In PhpStorm, go to Settings > Languages & Frameworks > PHP > Servers and create a server with two file mappings:<br><br>![image](https://cloud.githubusercontent.com/assets/101152/26285020/999202ea-3e47-11e7-8859-c792ca0d7d36.png)<br><br>
-    - `<project root>/plugins/versionpress` -> `/var/www/html/wp-content/plugins/versionpress`
-    - `<project root>/ext-libs/wordpress` -> `/var/www/html`
-5. The default zero configuration settings in Settings > Languages & Frameworks > PHP > Debug should be fine: <br><br>![image](https://cloud.githubusercontent.com/assets/101152/26285067/34fefbd4-3e48-11e7-8f11-544507a1c5f7.png)<br><br>
-6. Enable debugging in the browser, most commonly using a [browser extension or a bookmarklet](https://confluence.jetbrains.com/display/PhpStorm/Browser+Debugging+Extensions): <br><br> ![image](https://cloud.githubusercontent.com/assets/101152/26764669/7f3e4dc0-496b-11e7-9dc2-10351d6378bc.png)
-7. Place a breakpoint somewhere and start listening for debug connections ![image](https://cloud.githubusercontent.com/assets/101152/26285076/5b9b2ca4-3e48-11e7-8ea3-280f9027831a.png)
+Start the Docker stack with `npm start`.
 
-Debugging should now work:
+In PhpStorm, go to _Settings_ > _Languages & Frameworks_ > _PHP_ > _Servers_ and check the path mappings of the pre-configured _WordPress in Docker (VersionPress dev env)_ server. Specifically, update the WordPress mapping which PhpStorm 2018.1 does not persist automatically:
 
-![image](https://cloud.githubusercontent.com/assets/101152/26285090/bb8aa432-3e48-11e7-973a-944abfe0039e.png)
+![image](https://user-images.githubusercontent.com/101152/40107856-b1f7ff88-58f9-11e8-8f4f-beb1fffbe8bb.png)
+
+The two mappings should be:
+
+- `<your local path>/plugins/versionpress` -> `/var/www/html/wp-content/plugins/versionpress`
+- `<your local path>/ext-libs/wordpress` -> `/var/www/html`
+
+The default zero configuration settings in _Settings_ > _Languages & Frameworks_ > _PHP_ > _Debug_ should be fine:
+
+![image](https://cloud.githubusercontent.com/assets/101152/26285067/34fefbd4-3e48-11e7-8f11-544507a1c5f7.png)
+
+Enable debugging in the browser, most commonly using a [browser extension or a bookmarklet](https://confluence.jetbrains.com/display/PhpStorm/Browser+Debugging+Extensions):
+
+![image](https://cloud.githubusercontent.com/assets/101152/26764669/7f3e4dc0-496b-11e7-9dc2-10351d6378bc.png)
+
+Place a breakpoint somewhere, e.g., in the main `versionpress.php` file, and start listening for debug connections in PhpStorm.
+
+Reload a page in your browser. Debugging should now work:
+
+![image](https://user-images.githubusercontent.com/101152/40105051-2cdd1524-58f2-11e8-8880-d50d70d4195f.png)
+
+After you're done with debugging, stop the Docker stack with `npm stop` or clean it up entirely with `npm run stop-and-cleanup`.
 
 ## Testing
 
