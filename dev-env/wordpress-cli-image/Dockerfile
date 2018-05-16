@@ -14,7 +14,7 @@ RUN set -ex; \
 #
 # ! Make sure the list of folders matches volumes in docker-compose.yml.
 RUN set -ex; \
-    for f in /var/www/html /var/www/.wp-cli /opt/logs; \
+    for f in /var/www/html /var/www/.wp-cli /var/opt/versionpress/logs; \
     do \
       mkdir -p "$f"; \
 	  chown -R www-data:www-data "$f"; \

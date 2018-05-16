@@ -37,16 +37,16 @@ services:
       - ./dev-env/wp:/var/www/html
 
       # Possibly output logs here
-      - ./dev-env/test-logs:/opt/logs
+      - ./dev-env/test-logs:/var/opt/versionpress/logs
 
       # Project mounts
-      - ./plugins/versionpress:/opt/project:ro
+      - ./plugins/versionpress:/opt/versionpress:ro
       - ./ext-libs:/opt/ext-libs:ro
 
       # Caching downloaded WP ZIPs
       - wpcli-cache:/var/www/.wp-cli
-    working_dir: /opt/project/tests
-    command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /opt/logs/testdox.txt
+    working_dir: /opt/versionpress/tests
+    command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /var/opt/versionpress/logs/testdox.txt
 
     # Allow interactive session by running `docker-compose run --rm tests sh`
     stdin_open: true
@@ -57,15 +57,15 @@ services:
     volumes:
       # Same volumes as in `tests-plain`
       - ./dev-env/wp:/var/www/html
-      - ./dev-env/test-logs:/opt/logs
-      - ./plugins/versionpress:/opt/project:ro
+      - ./dev-env/test-logs:/var/opt/versionpress/logs
+      - ./plugins/versionpress:/opt/versionpress:ro
       - ./ext-libs:/opt/ext-libs:ro
       - wpcli-cache:/var/www/.wp-cli
     links:
       - selenium-hub:selenium-hub
       - wordpress:wordpress
-    working_dir: /opt/project/tests
-    command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /opt/logs/testdox.txt
+    working_dir: /opt/versionpress/tests
+    command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /var/opt/versionpress/logs/testdox.txt
 
     # Allow interactive session by running `docker-compose run --rm tests-with-wordpress sh`
     stdin_open: true

@@ -184,7 +184,7 @@ docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.xml --testsuite U
 docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.override.xml --color
 
 # PhpStorm-like invocation (copy/pasted from its console):
-docker-compose run --rm tests ../vendor/bin/phpunit --bootstrap /opt/project/tests/phpunit-bootstrap.php --no-configuration /opt/project/tests/Unit
+docker-compose run --rm tests ../vendor/bin/phpunit --bootstrap /opt/versionpress/tests/phpunit-bootstrap.php --no-configuration /opt/versionpress/tests/Unit
 ```
 
 One thing to understand here is that there are two Docker Compose services:
@@ -192,10 +192,10 @@ One thing to understand here is that there are two Docker Compose services:
 - Use `docker-compose run --rm tests` to run tests that don't need to boot up a working WordPress site, like unit tests.
 - Use `docker-compose run --rm tests-with-wordpress` for full integration tests.
 
-**Output of tests** is written in the testdox format to container's `/opt/logs` which is made available to you in your local folder `./dev-env/test-logs`. If you want to logs in [another format supported by PHPUnit](http://phpunit.readthedocs.io/en/7.1/textui.html#command-line-options), run tests manually like this:
+**Output of tests** is written in the testdox format to container's `/var/opt/versionpress/logs` which is made available to you in your local folder `./dev-env/test-logs`. If you want to logs in [another format supported by PHPUnit](http://phpunit.readthedocs.io/en/7.1/textui.html#command-line-options), run tests manually like this:
 
 ```
-docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.xml --log-junit /opt/logs/vp-tests.log
+docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.xml --log-junit /var/opt/versionpress/logs/vp-tests.log
 ```
 
 After the tests are run, the whole Docker stack is kept up and running so that you can **inspect the test WordPress site**, its database, etc. The [end2end tests](#end2end-tests) section provides more info on this.
@@ -238,7 +238,7 @@ The final step is to set up a test framework in _PHP_ > _Test Frameworks_. Add a
 
 ![image](https://user-images.githubusercontent.com/101152/27797069-900fafce-600c-11e7-9ff9-db2d4507aa89.png)
 
-Don't forget to set the _Default bootstrap file_ to `/opt/project/tests/phpunit-bootstrap.php`.
+Don't forget to set the _Default bootstrap file_ to `/opt/versionpress/tests/phpunit-bootstrap.php`.
 
 Now you're ready to run the tests. For example, to run all unit tests, right-click the `Unit` folder and select _Run_:
 

@@ -97,7 +97,7 @@ class WpAutomation
     }
 
     /**
-     * Copies VersionPress from testenv (`/opt/project`) to the test site. Leaves the files owned by `root`
+     * Copies VersionPress from testenv (`/opt/versionpress`) to the test site. Leaves the files owned by `root`
      * which tests that we treat the plugin location as read-only (generally a good thing).
      */
     public function copyVersionPressFiles()
@@ -108,7 +108,7 @@ class WpAutomation
         // - Invoking the canonical Gulp task would require bundling Node and installing dependencies in testenv (slow).
         // - More careful `cp` code here would duplicate rules in Gulpfile (a bit risky).
         //
-        FileSystem::copyDir('/opt/project', $this->siteConfig->path . '/wp-content/plugins/versionpress');
+        FileSystem::copyDir('/opt/versionpress', $this->siteConfig->path . '/wp-content/plugins/versionpress');
         $this->exec("chown -f -R www-data:www-data {$this->siteConfig->path}/wp-content/plugins/versionpress");
     }
 

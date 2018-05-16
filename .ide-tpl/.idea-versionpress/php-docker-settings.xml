@@ -10,7 +10,7 @@
               <option name="volumeBindings">
                 <list>
                   <DockerVolumeBindingImpl>
-                    <option name="containerPath" value="/opt/project" />
+                    <option name="containerPath" value="/opt/versionpress" />
                     <option name="hostPath" value="$PROJECT_DIR$" />
                   </DockerVolumeBindingImpl>
                   <DockerVolumeBindingImpl>

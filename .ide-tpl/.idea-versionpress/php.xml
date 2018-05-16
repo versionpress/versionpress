@@ -52,7 +52,7 @@
 	<component name="PhpInterpreters">
 		<interpreters>
 			<interpreter debugger_id="php.debugger.XDebug" home="docker://phpstorm/php-71-cli-xdebug/php" id="95838ae0-b671-48e7-bff6-e9e882b74df8" name="phpstorm/php-71-cli-xdebug">
-				<remote_data DOCKER_ACCOUNT_NAME="Docker" DOCKER_IMAGE_NAME="phpstorm/php-71-cli-xdebug" DOCKER_REMOTE_PROJECT_PATH="/opt/project" HELPERS_PATH="/opt/.phpstorm_helpers" INITIALIZED="false" INTERPRETER_PATH="php" VALID="true"/>
+				<remote_data DOCKER_ACCOUNT_NAME="Docker" DOCKER_IMAGE_NAME="phpstorm/php-71-cli-xdebug" DOCKER_REMOTE_PROJECT_PATH="/opt/versionpress" HELPERS_PATH="/opt/.phpstorm_helpers" INITIALIZED="false" INTERPRETER_PATH="php" VALID="true"/>
 			</interpreter>
 		</interpreters>
 	</component>
@@ -357,7 +357,7 @@
 	</component>
 	<component name="PhpUnit">
 		<phpunit_settings>
-			<phpunit_by_interpreter custom_loader_path="/opt/project/vendor/autoload.php" interpreter_id="95838ae0-b671-48e7-bff6-e9e882b74df8" load_method="CUSTOM_LOADER" phpunit_phar_path=""/>
+			<phpunit_by_interpreter custom_loader_path="/opt/versionpress/vendor/autoload.php" interpreter_id="95838ae0-b671-48e7-bff6-e9e882b74df8" load_method="CUSTOM_LOADER" phpunit_phar_path=""/>
 			<PhpUnitSettings custom_loader_path="$PROJECT_DIR$/vendor/autoload.php" load_method="CUSTOM_LOADER"/>
 		</phpunit_settings>
 	</component>
