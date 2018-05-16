@@ -180,8 +180,8 @@ If you want to further customize which tests run, use standard PHPUnit approache
 # Pick a test suite from the default phpunit.xml:
 docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.xml --testsuite Unit
 
-# Create your own phpunit.override.xml (gitignored), customize and then:
-docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.override.xml --color
+# Create your own phpunit.*.xml (gitignored):
+docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.custom.xml
 
 # PhpStorm-like invocation (copy/pasted from its console):
 docker-compose run --rm tests ../vendor/bin/phpunit --bootstrap /opt/versionpress/tests/phpunit-bootstrap.php --no-configuration /opt/versionpress/tests/Unit

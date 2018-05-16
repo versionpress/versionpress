@@ -14,7 +14,7 @@ npm-debug.log
 
 # Various overrides
 docker-compose.override.yml
-phpunit.override.xml
+phpunit.*.xml
 wp-cli.local.yml
 
 # OS-generated files
