@@ -23,8 +23,8 @@
     "debug-script": "node -r ts-node/register --inspect-brk"
   },
   "engines": {
-    "node": ">= 8.1",
-    "npm": ">= 5"
+    "node": ">= 8.11",
+    "npm": ">= 6"
   },
   "devDependencies": {
     "@types/archiver": "^2.1.1",
