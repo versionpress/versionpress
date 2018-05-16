@@ -19,7 +19,8 @@
     "push-images": "npm-run-all -p _push-image-*",
     "_push-image-wp": "docker push versionpress/wordpress:php7.2-apache",
     "_push-image-cli": "docker push versionpress/wordpress:cli",
-    "postinstall": "npm run init-dev"
+    "postinstall": "npm run init-dev",
+    "debug-script": "node -r ts-node/register --inspect-brk"
   },
   "engines": {
     "node": ">= 8.1",

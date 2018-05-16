@@ -325,6 +325,14 @@ Meta! If you're working on updating the dev setup (this document, Docker images,
 
 Simpler tasks are scripted directly in `package.json`, more complex ones in the `./scripts` folder, see for example `scripts/build.ts`.
 
+To debug the scripts in VSCode, run the script via `debug-script`, e.g.:
+
+```
+npm run debug-script scripts/init-dev.ts
+```
+
+Then in VSCode, create a "Node attach" configuration and run it.
+
 ### Building and pushing images
 
 We're keeping our images close to two [official ones](https://hub.docker.com/_/wordpress/), [`wordpress:php7.2-apache`](https://github.com/docker-library/wordpress/blob/master/php7.2/apache/Dockerfile) and [`wordpress:cli`](https://github.com/docker-library/wordpress/blob/master/php7.2/cli/Dockerfile).
