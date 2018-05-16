@@ -88,27 +88,25 @@ Next steps:
 
 ## PhpStorm setup
 
-We recommend [PhpStorm](https://www.jetbrains.com/phpstorm/) for VersionPress development. Version **2017.2** is necessary for Docker Compose workflows below.
+We recommend [PhpStorm](https://www.jetbrains.com/phpstorm/) for developing the PHP parts of VersionPress (`./frontend` is a React app and for example [VSCode](https://code.visualstudio.com/) works great there). The steps below have been tested with PhpStorm 2018.1.
 
-First, **run `npm run init-phpstorm`**. This copies `.idea` to `./plugins/versionpress` where most things are already preconfigured for you.
+First, run `npm run init-phpstorm`. This copies `.idea` to `./plugins/versionpress` where most things are preconfigured for you.
 
 Then, open the `./plugins/versionpress` project in PhpStorm. On the first start, you'll see two prompts:
 
-![image](https://cloud.githubusercontent.com/assets/101152/26286846/c369a5b0-3e6e-11e7-8781-c1a3c8446aa6.png)
+![image](https://user-images.githubusercontent.com/101152/40103254-1e1bb46e-58ed-11e8-8fd3-42c47a504fa7.png)
 
 **Enable WordPress support** but leave the installation path empty (ignore the warning):
 
-![image](https://cloud.githubusercontent.com/assets/101152/26286883/6d11d22c-3e6f-11e7-94eb-a4c0287fb181.png)
+![image](https://user-images.githubusercontent.com/101152/40103297-4420c96a-58ed-11e8-9bd7-8e36c8851a45.png)
 
-Also initialize the **Composer** support:
+For **Composer**, enable sync.
 
-![image](https://cloud.githubusercontent.com/assets/101152/26286903/c2d1befc-3e6f-11e7-9296-062fbed20983.png)
+For **Code Sniffer inspections** to work, there's a one-time configuration: Go to *Settings* > *Languages & Frameworks* > *PHP* > *Code Sniffer*, select *Local*, click the three dots next to it and provide your full system path to `./vendor/bin/phpcs`. After this is done, PhpStorm will start checking the code style.
 
-For **Code Sniffer** inspections to work, there's a one-time configuration: Go to *Settings* > *Languages & Frameworks* > *PHP* > *Code Sniffer*, select *Local*, click the three dots next to it and provide your full system path to `./vendor/bin/phpcs`. After this is done, PhpStorm will start checking the code style.
+> **Note**: Most VersionPress code uses the [PSR-2](http://www.php-fig.org/psr/psr-2/) coding standard with only the parts directly interacting with WordPress using WordPress conventions. For example, global functions are defined as `vp_register_hooks()`, not `registerHooks()`.
 
-> **Note**: Most VersionPress code uses the [PSR-2](http://www.php-fig.org/psr/psr-2/) coding standard with only the parts directly interacting with WordPress might use WordPress-like conventions, e.g., global functions are defined as `vp_register_hooks()`, not `registerHooks()`.
-
-It is also useful to **install the [EditorConfig](https://plugins.jetbrains.com/plugin/7294?pr=phpStorm) extension**, VersionPress ships with some basic formatting rules in `.editorconfig`.
+It is also useful to **install the [EditorConfig](https://plugins.jetbrains.com/plugin/7294?pr=phpStorm) extension**, VersionPress ships with some basic formatting rules.
 
 ## Writing code
 
