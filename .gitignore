@@ -1,14 +1,23 @@
-# Build dirs
-/build
+# VersionPress-specific folders
 /dist
 
-node_modules
-/plugins/versionpress/admin/public/gui
+# IDEs
+.vscode
+.idea
 
-# Other
-Thumbs.db
+# PHP
+vendor
+
+# Node / npm
+node_modules
 npm-debug.log
 
+# Various overrides
 docker-compose.override.yml
+phpunit.override.xml
+wp-cli.local.yml
 
-/.vscode
+# OS-generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
