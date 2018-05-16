@@ -21,8 +21,6 @@ if (isWindows) {
   }
 }
 
-// process.exit();
-
 //------------------------------------
 utils.printTaskHeading('Configuring git');
 shell.exec('git config core.ignorecase false && git config core.filemode false');
