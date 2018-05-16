@@ -21,9 +21,13 @@ This software is expected on your machine:
 
 ### Windows users: use Git Bash
 
-The dev setup is actively tested on Windows but you have to use Git Bash (or WSL) for all commands to work. We currently don't have enough capacity to port the dev setup to `cmd.exe`, sorry.
+The dev setup is actively tested on Windows but only in Git Bash. Please use it instead of `cmd.exe` for both interactive sessions and as your npm script shell:
 
-Please see [Windows tips](#windows-tips) below.
+```
+npm config set script-shell "c:\Program Files\git\bin\bash.exe"
+```
+
+See also [Windows tips](#windows-tips) below.
 
 ## Project checkout
 
@@ -352,11 +356,9 @@ Here are some tips for working with Docker / Docker Compose:
 
 ### Git Bash
 
-As noted in the _Getting started_ section, we currently only support Git Bash (or WSL) on Windows, not `cmd.exe`. This simplifies many scripts and instructions as macOS, Linux and Windows can be treated basically the same.
+As noted in [Getting started](#getting-started), we only actively test the dev setup in Git Bash, not `cmd.exe`. Git Bash is an awesome shell that allows you to treat the system almost as it was Linux or macOS which is great for development. Git Bash comes with [Git for Windows](https://gitforwindows.org/).
 
-Git Bash comes with [Git for Windows](https://gitforwindows.org/) and after you get used to paths like `/c/Users/You/versionpress` instead of `C:\Users\You\versionpress`, you'll love it, we guarantee :)
-
-The only problematic issue is that Docker messes with paths and for example, trying to run `docker run --rm -it ubuntu /bin/bash`, you'll see an error like `C:/Program Files/Git/usr/bin/bash.exe: no such file or directory` – Docker will try to prepend `C:/Program Files/Git` for some reason. [Use this workaround](https://gist.github.com/borekb/cb1536a3685ca6fc0ad9a028e6a959e3) and you'll be fine.
+The only problematic issue is that Docker messes with paths and for example, trying to run `docker run --rm -it ubuntu /bin/bash`, you'll see an error like `C:/Program Files/Git/usr/bin/bash.exe: no such file or directory`. It's because Docker will try to prepend `C:/Program Files/Git` for some reason; [use this workaround](https://gist.github.com/borekb/cb1536a3685ca6fc0ad9a028e6a959e3) and you'll be fine.
 
 ### Docker for Windows
 
