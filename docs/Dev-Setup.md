@@ -174,15 +174,24 @@ If you don't need to run or debug tests from PhpStorm, running tests is as simpl
 
 > **Note**: Full tests are _slow_ to start (can take up to a couple of minutes to even start producing output) and _slow_ to run (can take over 30 minutes to complete) as they explore every corner of WordPress. See [end2end tests](#end2end-tests) for more. 🐌
 
-If you want to further customize which tests run, use standard PHPUnit approaches like providing your own `phpunit.xml` or customizing via command-line parameters. Some examples:
+If you want to further customize which tests run, you can use standard PHPUnit approaches like providing your own `phpunit.xml` or customizing via command-line parameters. Two scripts, `npm run tests:custom` and `tests:custom-with-wordpress`, come with some sensible defaults for you.
+
+> ❕ Notice how custom arguments come after `--`.
 
 ```sh
-# Pick a test suite from the default phpunit.xml:
-docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.xml --testsuite Unit
+# Pick a test suite from the default phpunit.xml
+npm run tests:custom -- -c phpunit.xml --testsuite Unit
 
-# Create your own phpunit.*.xml (gitignored):
-docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.custom.xml
+# Create your own phpunit.*.xml (gitignored)
+npm run tests:custom -- -c phpunit.custom.xml
 
+# Run specific test class
+npm run tests:custom-with-wordpress -- -c phpunit.xml --filter RevertTest
+```
+
+If you want to go entirely custom, use a raw `docker-compose` command:
+
+```sh
 # PhpStorm-like invocation (copy/pasted from its console):
 docker-compose run --rm tests ../vendor/bin/phpunit --bootstrap /opt/versionpress/tests/phpunit-bootstrap.php --no-configuration /opt/versionpress/tests/Unit
 ```
