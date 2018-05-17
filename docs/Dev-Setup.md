@@ -70,7 +70,7 @@ Some useful tips for managing your Dockerized environment:
 - `docker-compose ps` lists running containers.
 - `docker-compose logs -f` displays live logs.
 
-To stop your environment, run `npm run stop`. To also delete WordPress data so that next start is fresh, run `npm run stop-and-cleanup`.
+To stop your environment, run `npm stop`. To also delete WordPress data so that next start is fresh, run `npm run stop-and-cleanup`.
 
 See also [Docker tips](#docker-tips) section below.
 
@@ -147,7 +147,7 @@ After you're done with debugging, stop the Docker stack with `npm stop` or clean
 
 ## Testing
 
-Tests are a significant part of VersionPress core, currently about 60% of the codebase. They live in `./plugins/versionpress/tests` and there are several types of them, from unit tests to full end2end tests. They all run in a dockerized test environment.
+Tests are a significant part of the VersionPress project, we care about writing and maintaining them. They live in `./plugins/versionpress/tests` and there are several types of them, from unit tests to full end2end tests. They all run in a dockerized test environment.
 
 > **Note**: the `./frontend` app has its own tests, this section is about core VersionPress tests (PHP code) only.
 
@@ -162,21 +162,29 @@ In this section:
 
 ### Dockerized testing environment
 
-Docker greatly helps with running tests: it requires almost no local setup and produces consistent results across platforms.
+Similarly to the [development environment](#exploring-dockerized-environment), tests utilize Docker Compose as well. The main benefit is that you don't need to set up things like Selenium or Java locally, everything comes preconfigured for you.
 
-#### Running tests from command line
+Most testing tasks are scripted, for example, you just run `npm run tests:unit` but you can also drop to the raw Docker Compose mode and do things like `docker-compose run --rm tests ...`. In that case, one thing to understand is that there are two services in `docker-compose.yml` to choose from:
 
-If you don't need to run or debug tests from PhpStorm, running tests is as simple as:
+- `tests` which is just a test runner.
+- `tests-with-wordpress` which starts a full WordPress stack.
+
+Choose the appropriate service for your use case, or just use the npm scripts which have the right service hardcoded.
+
+### Running tests from command line
 
 1. Make sure you have Docker up and running.
-2. `npm run tests:unit` or `npm run tests:full`.
-3. If you've run full tests, stop the Docker stack with `npm run stop` or `npm run stop-and-cleanup` after you've explored the test WordPress site and no longer need it. 
+2. Run `npm run tests:unit` or `npm run tests:full`
 
-> **Note**: Full tests are _slow_ to start (can take up to a couple of minutes to even start producing output) and _slow_ to run (can take over 30 minutes to complete) as they explore every corner of WordPress. See [end2end tests](#end2end-tests) for more. 🐌
+Unit tests use a simpler `tests` Docker Compose service that doesn't start a WordPress stack. They are fast to execute.
 
-If you want to further customize which tests run, you can use standard PHPUnit approaches like providing your own `phpunit.xml` or customizing via command-line parameters. Two scripts, `npm run tests:custom` and `tests:custom-with-wordpress`, come with some sensible defaults for you.
+The `full` tests include [end2end tests](#end2end-tests) and are relatively slow. But if they pass, there's a good chance that VersionPress works correctly.
 
-> ❕ Notice how custom arguments come after `--`.
+#### Customizing what tests run
+
+`tests:custom` and `tests:custom-with-wordpress` scripts allow you to run custom tests easily. Here are some examples:
+
+> ❕ Notice how PHPUnit arguments come after `--`; this is important.
 
 ```sh
 # Pick a test suite from the default phpunit.xml
@@ -189,39 +197,46 @@ npm run tests:custom -- -c phpunit.custom.xml
 npm run tests:custom-with-wordpress -- -c phpunit.xml --filter RevertTest
 ```
 
-If you want to go entirely custom, use a raw `docker-compose` command:
+If you want to go entirely custom, use raw `docker-compose`:
 
 ```sh
 # PhpStorm-like invocation (copy/pasted from its console):
 docker-compose run --rm tests ../vendor/bin/phpunit --bootstrap /opt/versionpress/tests/phpunit-bootstrap.php --no-configuration /opt/versionpress/tests/Unit
 ```
 
-One thing to understand here is that there are two Docker Compose services:
+#### Test output
 
-- Use `docker-compose run --rm tests` to run tests that don't need to boot up a working WordPress site, like unit tests.
-- Use `docker-compose run --rm tests-with-wordpress` for full integration tests.
+Npm scripts are configured to log in a TestDox format to container's `/var/opt/versionpress/logs` which is available to you in your local folder `./dev-env/test-logs`.
 
-**Output of tests** is written in the testdox format to container's `/var/opt/versionpress/logs` which is made available to you in your local folder `./dev-env/test-logs`. If you want to logs in [another format supported by PHPUnit](http://phpunit.readthedocs.io/en/7.1/textui.html#command-line-options), run tests manually like this:
+To log in [another supported format](http://phpunit.readthedocs.io/en/7.1/textui.html#command-line-options), run tests manually like this:
 
 ```
 docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.xml --log-junit /var/opt/versionpress/logs/vp-tests.log
 ```
 
-After the tests are run, the whole Docker stack is kept up and running so that you can **inspect the test WordPress site**, its database, etc. The [end2end tests](#end2end-tests) section provides more info on this.
+#### Clean up tests
 
-Run `npm run stop` to **shut down the Docker stack** or `npm run stop-and-cleanup` to also remove the volumes and start fresh the next time.
+If you've run tests that use the `tests-with-wordpress` service, the whole Docker stack is kept running so that you can inspect it later. For example, you can use your local Git client to explore the site's history in `dev-env/wp-for-tests`. The [end2end tests](#end2end-tests) section provides more info on this.
+
+When you're done with tests, run `npm stop` to shut down the Docker stack or `npm run stop-and-cleanup` to also remove the volumes so that the next start is entirely fresh.
+
+#### Tips for tests
+
+- If you're trying to narrow down a bug, it's useful to run a smaller test suite via one of the options above and add `stopOnFailure="true"` to the XML file or `--stop-on-failure` on the command line.
+- Unit tests are also easy to get running locally, basically just run them in PhpStorm.
+- Tests can be debugged from PhpStorm, see below.
 
 <div id="running-tests-from-phpstorm"></div>
 
-#### Running tests from PhpStorm
+### Running tests from PhpStorm
 
-It is often useful to run or debug tests from PhpStorm. Again, version **2017.2** or newer is required as the earlier versions didn't support Docker Compose. There is a one-time setup to go through:
+PhpStorm makes it easy to select specific tests and also to debug them. There is a one-time setup to go through.
 
 First, if you're using _Docker for Mac_ or _Docker for Windows_, expose a daemon in Docker settings:
 
 ![image](https://user-images.githubusercontent.com/101152/27441580-43a964c8-576e-11e7-9912-1be811f73c4b.png)
 
-In PhpStorm, create a new Docker environment in _Build, Execution, Deployment_ > _Docker_:
+In PhpStorm, create a new Docker environment in _Settings_ > _Build, Execution, Deployment_ > _Docker_:
 
 ![image](https://user-images.githubusercontent.com/101152/27441828-ec760098-576e-11e7-9251-670204bf2643.png)
 
@@ -231,17 +246,19 @@ In the Docker panel, you should now be able to connect:
 
 Next, define a remote interpreter. Make sure you have the **PHP Docker** plugin enabled and go to *Settings* > *Languages & Frameworks* > *PHP*. Add a new interpreter there:
 
-![image](https://user-images.githubusercontent.com/101152/27442419-6e177932-5770-11e7-9d28-dfc219a41fcd.png)
+![image](https://user-images.githubusercontent.com/101152/40119446-04674760-591d-11e8-9a53-43f61eb7de5c.png)
 
-![image](https://user-images.githubusercontent.com/101152/27796438-3fec98e2-600a-11e7-9e9b-f6276ddb0a63.png)
+Note that the `docker-compose.yml` is at the repo root, not inside `./plugins/versionpress`:
+
+![image](https://user-images.githubusercontent.com/101152/40119401-de795a66-591c-11e8-97cd-8c14e7a1976c.png)
 
 If this doesn't go smoothly, try unchecking the _Include parent environment variables_ checkbox in the _Environment variables_ field:
 
 ![image](https://user-images.githubusercontent.com/101152/27796503-81cff2f4-600a-11e7-8cfb-96661f0281a9.png)
 
-Select this CLI interpreter as the main one for the project and define two path mappings:
+Select this CLI interpreter as the main one for the project and make sure the path mappings are correct:
 
-![image](https://user-images.githubusercontent.com/101152/27796964-2834b8c2-600c-11e7-8a0a-8d7ad43e1471.png)
+![image](https://user-images.githubusercontent.com/101152/40119974-51c4b528-591e-11e8-8d55-56fac37ffa18.png)
 
 The final step is to set up a test framework in _PHP_ > _Test Frameworks_. Add a new _PHPUnit by Remote Interpreter_:
 
@@ -263,31 +280,30 @@ This works equally well other types of tests as well, for example, Selenium test
 
 ### Unit tests
 
-Unit tests are best suited for small pieces of algorithmic functionality. For example, `IniSerializer` is covered with unit tests extensively.
+Unit tests are best suited for small pieces of algorithmic functionality. For example, `IniSerializer` is covered by unit tests extensively.
 
-You can either run unit tests in a dockerized environment as described above or set up a local CLI interpret which makes the execution a bit faster (all unit tests run in-memory).
+You can either run unit tests in a dockerized environment as described above or set up a local CLI interpret which makes the execution a bit faster.
 
 ### End2end tests
 
 End2end tests exercise a WordPress site and check that VersionPress creates the right Git commits, that the database is in correct state, etc. These tests are quite heavy and slow to run but if they pass, there's a good chance that VersionPress works correctly. (Before the project had these, long and painful manual testing period was necessary before each release.)
 
-End2end tests use the concept of **workers**: each test itself is implemented once but e.g. how a post is created or a user deleted is up to a specific worker. There are currently two types of workers:
+End2end tests use the concept of **workers**: each test itself is implemented once but how e.g. a post is created or a user deleted is up to a specific worker. There are currently two types of workers:
 
-1. **Selenium workers** – simulate real user by clicking in a browser.
-2. **WP-CLI workers** – run WP-CLI commands against the test site.
+1. **WP-CLI workers** – run WP-CLI commands against the test site.
+2. **Selenium workers** – simulate real user by clicking in a browser.
 
-In the future, we might add REST API workers; the idea is to cover all possible interactions with the site as different workers can (and in practice do) produce slightly different results.
+In the future, we might add REST API workers; you get the idea.
 
-Currently, the default worker is WP-CLI (is used when you `npm run tests`) and the only way to switch workers is to update `tests/test-config.yml`, the `end2end-test-type` key, but this will be changing soon as this file is not intended for local changes. In the future, there will be another method to parametrize this, e.g., a command line switch or two sets of test classes.
+Currently, the default worker is WP-CLI and the only way to switch workers is to update `tests/test-config.yml`, the `end2end-test-type` key. We'll make it more flexible in the future.
 
-After you run the tests using one of the methods described above, the Docker Compose stack is left up and running so that you can inspect it:
+After you've run the tests, the Docker stack is left up and running so that you can inspect it:
 
-- You can access the **test WordPress site** on **port 80** in your local browser by aliasing a `wordpress` host in your `hosts` file (add a line with `127.0.0.1 wordpress`) and then visiting `http://wordpress/vp01`.
-- You can start a **Bash session** in the WordPress container by running `docker exec -ti tests_wordpress_1 /bin/bash`. You can then e.g. inspect Git history via `git log`, etc.
-- The **database** is available on the standard **port 3306**, you can connect to it e.g. by `mysql -u root -p`.
-- **Adminer** is available on **port 8099** after you run `docker-compose run -d --service-ports adminer`.
-- `docker-compose ps` lists all the running services.
-- `docker-compose down [-v]` shuts down the whole stack (there are npm scripts for that too, see above).
+- The site is running at <http://localhost:8088>. `test-config.yml` contains the login info.
+- The files are mapped to `./dev-env/wp-for-tests`. You can use your Git client in this directory as well.
+- The database is available on port 3306, you can connect to it e.g. by `mysql -u root -p` or via Adminer which you can access by running `docker-compose run -d --service-ports adminer` and visiting <http://localhost:8099>.
+
+Stop the Docker stack with `npm stop` or `npm run stop-and-cleanup`.
 
 <div id="other-tests"></div>
 
@@ -370,23 +386,17 @@ To build and push tags to Docker Hub:
 Here are some tips for working with Docker / Docker Compose:
 
 - Aliasing `docker-compose` to `dc` will save you some typing.
-- Inspect `tests/package.json` to see which Docker Compose commands run in the background.
-- You can rebuild all images with `npm run rebuild-images`, e.g., to get a newer WordPress or WP-CLI release.
-- Most values in `docker-compose.yml` can be customized via `docker-compose.override.yml`.
-- Any container from the stack can be started in an interactive session by adding this to `docker-compose.yml`:
-    ```
-    stdin_open: true
-    tty: true
-    ```
-    Then, it's possible to do e.g. `docker-compose run --rm tests sh`.
+- Values in `docker-compose.yml` can be customized via `docker-compose.override.yml`.
 
 ## Windows tips
 
 ### Git Bash
 
-As noted in [Getting started](#getting-started), we only actively test the dev setup in Git Bash, not `cmd.exe`. Git Bash is an awesome shell that allows you to treat the system almost as it was Linux or macOS which is great for development. Git Bash comes with [Git for Windows](https://gitforwindows.org/).
+As noted in [Getting started](#getting-started), we only actively test the dev setup in Git Bash, not `cmd.exe` or other shells. Git Bash comes with [Git for Windows](https://gitforwindows.org/) and is an awesome shell that allows us to treat Windows similarly to macOS or Linux.
 
 The only problematic issue is that Docker messes with paths and for example, trying to run `docker run --rm -it ubuntu /bin/bash`, you'll see an error like `C:/Program Files/Git/usr/bin/bash.exe: no such file or directory`. It's because Docker will try to prepend `C:/Program Files/Git` for some reason; [use this workaround](https://gist.github.com/borekb/cb1536a3685ca6fc0ad9a028e6a959e3) and you'll be fine.
+
+Overall, if you see a path issue like that, just prepend `/` to it. For example, try `//var/ww/html` instead of `/var/www/html`.
 
 ### Docker for Windows
 
