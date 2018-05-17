@@ -32,6 +32,9 @@ services:
   # Just test runner. See `tests-with-wordpress` for test runner with WordPress.
   tests:
     image: versionpress/wordpress:cli
+    environment:
+      VP_DIR: /opt/versionpress
+      VP_TESTS_LOG_DIR: /var/opt/versionpress/logs/.tracy
     volumes:
       - ./dev-env/wp-for-tests:/var/www/html
       - ./dev-env/test-logs:/var/opt/versionpress/logs
@@ -45,24 +48,25 @@ services:
     stdin_open: true
     tty: true
 
+  # Same as `tests` but adds links to `wordpress`
   tests-with-wordpress:
     image: versionpress/wordpress:cli
+    environment:
+      VP_DIR: /opt/versionpress
+      VP_TESTS_LOG_DIR: /var/opt/versionpress/logs/.tracy
     volumes:
-      # Same volumes as in `tests-plain`
       - ./dev-env/wp-for-tests:/var/www/html
       - ./dev-env/test-logs:/var/opt/versionpress/logs
       - ./plugins/versionpress:/opt/versionpress:ro
       - ./ext-libs:/opt/ext-libs:ro
       - wpcli-cache:/var/www/.wp-cli
-    links:
-      - selenium-hub:selenium-hub
-      - wordpress:wordpress
     working_dir: /opt/versionpress/tests
     command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /var/opt/versionpress/logs/testdox.txt
-
-    # Allow interactive session by running `docker-compose run --rm tests-with-wordpress sh`
     stdin_open: true
     tty: true
+    links:
+      - selenium-hub
+      - wordpress
 
   selenium-hub:
     # Standalone Firefox is enough but could also be a full grid setup, hence the service name

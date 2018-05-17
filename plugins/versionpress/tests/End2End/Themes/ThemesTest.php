@@ -3,7 +3,6 @@
 namespace VersionPress\Tests\End2End\Themes;
 
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
-use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 
 class ThemesTest extends End2EndTestCase
@@ -55,15 +54,15 @@ class ThemesTest extends End2EndTestCase
     {
         self::$worker->prepare_uploadTheme();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->uploadTheme();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("theme/install");
-        $this->commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
-        $this->commitAsserter->assertCommitPath("A", "wp-content/themes/" . self::$themeInfo['affected-path']);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("theme/install");
+        $commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
+        $commitAsserter->assertCommitPath("A", "wp-content/themes/" . self::$themeInfo['affected-path']);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -76,15 +75,15 @@ class ThemesTest extends End2EndTestCase
         self::$worker->prepare_switchTheme();
         $currentTheme = self::$wpAutomation->getCurrentTheme();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->switchTheme();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("theme/switch");
-        $this->commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
-        $this->commitAsserter->assertCommitPath(["A", "M"], "%vpdb%/options/cu/current_theme.ini");
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("theme/switch");
+        $commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
+        $commitAsserter->assertCommitPath(["A", "M"], "%vpdb%/options/cu/current_theme.ini");
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
 
         self::$wpAutomation->switchTheme($currentTheme);
@@ -98,15 +97,15 @@ class ThemesTest extends End2EndTestCase
     {
         self::$worker->prepare_deleteTheme();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->deleteTheme();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("theme/delete");
-        $this->commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
-        $this->commitAsserter->assertCommitPath("D", "wp-content/themes/" . self::$themeInfo['affected-path']);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("theme/delete");
+        $commitAsserter->assertCommitTag("VP-Theme-Name", self::$themeInfo['name']);
+        $commitAsserter->assertCommitPath("D", "wp-content/themes/" . self::$themeInfo['affected-path']);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -117,15 +116,15 @@ class ThemesTest extends End2EndTestCase
     public function uploadingTwoThemesCreatesBulkAction()
     {
         self::$worker->prepare_uploadTwoThemes();
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->uploadTwoThemes();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertBulkAction('theme/install', 2);
-        $this->commitAsserter->assertCommitPath("A", "wp-content/themes/" . self::$themeInfo['affected-path']);
-        $this->commitAsserter->assertCommitPath("A", "wp-content/themes/" . self::$secondThemeInfo['affected-path']);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('theme/install', 2);
+        $commitAsserter->assertCommitPath("A", "wp-content/themes/" . self::$themeInfo['affected-path']);
+        $commitAsserter->assertCommitPath("A", "wp-content/themes/" . self::$secondThemeInfo['affected-path']);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -136,15 +135,15 @@ class ThemesTest extends End2EndTestCase
     public function deletingTwoThemesCreatesBulkAction()
     {
         self::$worker->prepare_deleteTwoThemes();
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->deleteTwoThemes();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertBulkAction('theme/delete', 2);
-        $this->commitAsserter->assertCommitPath("D", "wp-content/themes/" . self::$themeInfo['affected-path']);
-        $this->commitAsserter->assertCommitPath("D", "wp-content/themes/" . self::$secondThemeInfo['affected-path']);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('theme/delete', 2);
+        $commitAsserter->assertCommitPath("D", "wp-content/themes/" . self::$themeInfo['affected-path']);
+        $commitAsserter->assertCommitPath("D", "wp-content/themes/" . self::$secondThemeInfo['affected-path']);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 }

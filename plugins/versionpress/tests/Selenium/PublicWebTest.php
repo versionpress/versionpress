@@ -2,6 +2,7 @@
 
 namespace VersionPress\Tests\Selenium;
 
+use VersionPress\Git\GitRepository;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Utils\PathUtils;
 
@@ -61,7 +62,8 @@ class PublicWebTest extends SeleniumTestCase
         $this->byCssSelector('#submit')->click();
         $this->waitAfterRedirect();
 
-        $lastCommit = $this->gitRepository->getCommit($this->gitRepository->getLastCommitHash());
+        $repo = new GitRepository(self::$testConfig->testSite->path);
+        $lastCommit = $repo->getCommit($this->gitRepository->getLastCommitHash());
         $this->assertContains('comment/create', $lastCommit->getMessage()->getBody());
 
     }

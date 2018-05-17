@@ -3,10 +3,8 @@ namespace VersionPress\Tests\Selenium;
 
 use PHPUnit_Extensions_Selenium2TestCase;
 use PHPUnit_Extensions_Selenium2TestCase_WebDriverException;
-use VersionPress\Git\GitRepository;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\TestConfig;
-use VersionPress\Tests\Utils\TestRunnerOptions;
 
 /**
  * Base class for VersionPress Selenium tests
@@ -14,21 +12,11 @@ use VersionPress\Tests\Utils\TestRunnerOptions;
 abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
 {
 
-    /**
-     * @var TestConfig
-     */
+    /** @var TestConfig */
     protected static $testConfig;
 
-    /**
-     * @var WpAutomation
-     */
+    /** @var WpAutomation */
     protected static $wpAutomation;
-
-    /**
-     * @var string
-     */
-    protected static $wpAdminPath;
-
 
     /**
      * If true, {@link loginIfNecessary} is called on {@link setUpSite}.
@@ -37,17 +25,21 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
      */
     protected static $autologin = true;
 
-    /**
-     * @var GitRepository
-     */
-    protected $gitRepository;
-
-    public function __construct($name = null, array $data = [], $dataName = '')
+    public static function setUpBeforeClass()
     {
-        parent::__construct($name, $data, $dataName);
+        parent::setUpBeforeClass();
 
-        self::staticInitialization();
+        self::$testConfig = TestConfig::createDefaultConfig();
 
+        if (!self::$wpAutomation) {
+            self::$wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
+        }
+
+        self::$wpAutomation->ensureTestSiteIsReady();
+    }
+
+    public function setUp()
+    {
         $this->setBrowser("firefox");
 
         $this->setHost(self::$testConfig->seleniumConfig->host);
@@ -56,61 +48,6 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
         $this->setDesiredCapabilities($capabilities);
 
         $this->setBrowserUrl(self::$testConfig->testSite->url);
-
-        $this->gitRepository = new GitRepository(self::$testConfig->testSite->path);
-    }
-
-    private static $staticInitializationDone = false;
-
-    /**
-     * Makes sure some static properties are initialized. Called from constructor and from static methods
-     * that might run before it.
-     */
-    private static function staticInitialization()
-    {
-
-        if (self::$staticInitializationDone) {
-            return;
-        }
-
-        if (!self::$testConfig) {
-            self::$testConfig = TestConfig::createDefaultConfig();
-            self::$wpAdminPath = self::$testConfig->testSite->wpAdminPath;
-        }
-
-        if (!self::$wpAutomation) {
-            self::$wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
-        }
-
-        self::$staticInitializationDone = true;
-
-    }
-
-    public static function setUpBeforeClass()
-    {
-        self::setUpSite(TestRunnerOptions::getInstance()->forceSetup == "before-class");
-    }
-
-    /**
-     * Check if site is set up and VersionPress fully activated, and if not, do so. The $force
-     * parametr may force this.
-     *
-     * @param bool $force Force all the automation actions to be taken regardless of the site state
-     */
-    public static function setUpSite($force)
-    {
-
-        self::staticInitialization();
-
-        if ($force || !self::$wpAutomation->isSiteSetUp()) {
-            self::$wpAutomation->setUpSite();
-        }
-
-        if ($force || !self::$wpAutomation->isVersionPressInitialized()) {
-            self::$wpAutomation->copyVersionPressFiles();
-            self::$wpAutomation->initializeVersionPress();
-        }
-
     }
 
     public function setUpPage()
@@ -126,7 +63,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
             return;
         }
 
-        $this->url(self::$wpAdminPath);
+        $this->url(self::$testConfig->testSite->wpAdminPath);
         usleep(100 * 1000); // sometimes we need to wait for the page to fully load
 
         if (!$this->elementExists('#user_login')) {
@@ -141,7 +78,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
 
     protected function logOut()
     {
-        $this->url(dirname(self::$wpAdminPath) . '/wp-login.php?action=logout');
+        $this->url(dirname(self::$testConfig->testSite->wpAdminPath) . '/wp-login.php?action=logout');
         $this->byCssSelector('body>p>a')->click();
         $this->waitAfterRedirect();
     }

@@ -71,6 +71,21 @@ class WpAutomation
     }
 
     /**
+     * Makes sure that the test site is set-up and VersionPress fully activated.
+     */
+    public function ensureTestSiteIsReady()
+    {
+        if (!$this->isSiteSetUp()) {
+            $this->setUpSite();
+        }
+
+        if (!$this->isVersionPressInitialized()) {
+            $this->copyVersionPressFiles();
+            $this->initializeVersionPress();
+        }
+    }
+
+    /**
      * Returns true if the site is installed and working
      *
      * @return bool
@@ -97,19 +112,13 @@ class WpAutomation
     }
 
     /**
-     * Copies VersionPress from testenv (`/opt/versionpress`) to the test site. Leaves the files owned by `root`
-     * which tests that we treat the plugin location as read-only (generally a good thing).
+     * Copies development version of VersionPress to the test site. It currently also includes tests and dev dependencies
+     * which is not ideal but we can live with that.
      */
     public function copyVersionPressFiles()
     {
-        // Does a copy of everything incl. tests and dev dependencies which is not ideal but the alternatives
-        // have their issues as well:
-        //
-        // - Invoking the canonical Gulp task would require bundling Node and installing dependencies in testenv (slow).
-        // - More careful `cp` code here would duplicate rules in Gulpfile (a bit risky).
-        //
-        FileSystem::copyDir('/opt/versionpress', $this->siteConfig->path . '/wp-content/plugins/versionpress');
-        $this->exec("chown -f -R www-data:www-data {$this->siteConfig->path}/wp-content/plugins/versionpress");
+        $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
+        $fileSystem->symlink(getenv('VP_DIR'), "{$this->siteConfig->path}/wp-content/plugins/versionpress");
     }
 
     /**

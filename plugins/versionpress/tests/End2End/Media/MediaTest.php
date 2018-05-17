@@ -3,7 +3,6 @@
 namespace VersionPress\Tests\End2End\Media;
 
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
-use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 
 class MediaTest extends End2EndTestCase
@@ -26,17 +25,17 @@ class MediaTest extends End2EndTestCase
     {
         self::$worker->prepare_uploadFile();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->uploadFile();
 
-        $this->commitAsserter->ignoreCommits(["usermeta/create", "usermeta/update"]);
+        $commitAsserter->ignoreCommits(["usermeta/create", "usermeta/update"]);
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/create");
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
-        $this->commitAsserter->assertCommitPath("A", "%uploads%/*");
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/create");
+        $commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
+        $commitAsserter->assertCommitPath("A", "%uploads%/*");
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -49,14 +48,14 @@ class MediaTest extends End2EndTestCase
     {
         self::$worker->prepare_editFileName();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->editFileName();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/update");
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/update");
+        $commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -69,15 +68,15 @@ class MediaTest extends End2EndTestCase
     {
         self::$worker->prepare_deleteFile();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->deleteFile();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/delete");
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
-        $this->commitAsserter->assertCommitPath("D", "%uploads%/*");
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/delete");
+        $commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
+        $commitAsserter->assertCommitPath("D", "%uploads%/*");
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -89,15 +88,15 @@ class MediaTest extends End2EndTestCase
     {
         self::$worker->prepare_editFile();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->editFile();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/update");
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
-        $this->commitAsserter->assertCommitPath("A", "%uploads%/*");
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/update");
+        $commitAsserter->assertCommitTag("VP-Post-Type", "attachment");
+        $commitAsserter->assertCommitPath("A", "%uploads%/*");
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 }
