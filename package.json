@@ -10,7 +10,7 @@
     "build": "ts-node scripts/build.ts",
     "start": "docker-compose up -d wordpress",
     "stop": "docker-compose stop",
-    "stop-and-cleanup": "docker-compose down -v && rm -rf ./dev-env/wp && rm -rf ./dev-env/test-logs",
+    "stop-and-cleanup": "docker-compose down -v && rm -rf dev-env/wp dev-env/wp-for-tests dev-env/test-logs",
     "tests:unit": "docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.xml --testsuite Unit --verbose --colors --testdox-text /var/opt/versionpress/logs/testdox.txt",
     "tests:full": "docker-compose run --rm tests-with-wordpress ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /var/opt/versionpress/logs/testdox.txt",
     "build-images": "npm-run-all -s _build-image-*",

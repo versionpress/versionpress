@@ -33,17 +33,10 @@ services:
   tests:
     image: versionpress/wordpress:cli
     volumes:
-      # Same volumes as in `wordpress`
-      - ./dev-env/wp:/var/www/html
-
-      # Possibly output logs here
+      - ./dev-env/wp-for-tests:/var/www/html
       - ./dev-env/test-logs:/var/opt/versionpress/logs
-
-      # Project mounts
       - ./plugins/versionpress:/opt/versionpress:ro
       - ./ext-libs:/opt/ext-libs:ro
-
-      # Caching downloaded WP ZIPs
       - wpcli-cache:/var/www/.wp-cli
     working_dir: /opt/versionpress/tests
     command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /var/opt/versionpress/logs/testdox.txt
@@ -56,7 +49,7 @@ services:
     image: versionpress/wordpress:cli
     volumes:
       # Same volumes as in `tests-plain`
-      - ./dev-env/wp:/var/www/html
+      - ./dev-env/wp-for-tests:/var/www/html
       - ./dev-env/test-logs:/var/opt/versionpress/logs
       - ./plugins/versionpress:/opt/versionpress:ro
       - ./ext-libs:/opt/ext-libs:ro
