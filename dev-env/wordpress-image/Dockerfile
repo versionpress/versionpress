@@ -23,10 +23,3 @@ RUN yes | pecl install xdebug \
     && echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_autostart=0" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.profiler_enable=0" >> /usr/local/etc/php/conf.d/xdebug.ini
-
-# Make port that Apache runs on customizable – based on https://github.com/docker-library/php/issues/94#issuecomment-320695125
-# Port mappings like "8089:80" won't really work for WordPress due to redirections to 'home'
-# so this customization allows to do something like `-e PORT 8089 -p 8089:8089`.
-ENV PORT 80
-ENTRYPOINT []
-CMD sed -i "s/80/$PORT/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf && docker-entrypoint.sh apache2-foreground
