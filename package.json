@@ -11,7 +11,7 @@
     "start": "docker-compose up -d wordpress",
     "stop": "docker-compose stop",
     "stop-and-cleanup": "docker-compose down -v && rm -rf dev-env/wp dev-env/wp-for-tests dev-env/test-logs",
-    "tests:unit": "docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.xml --testsuite Unit",
+    "tests:unit": "docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.xml --testsuite Unit --printer \"PHPUnit_TextUI_ResultPrinter\"",
     "tests:full": "docker-compose run --rm tests-with-wordpress ../vendor/bin/phpunit -c phpunit.xml",
     "tests:custom": "docker-compose run --rm tests ../vendor/bin/phpunit",
     "tests:custom-with-wordpress": "docker-compose run --rm tests-with-wordpress ../vendor/bin/phpunit",
