@@ -1,6 +1,6 @@
-# ---------------------------------------------------------------------
 # Test configuration used by WpAutomation, parsed into `TestConfig`.
-# ---------------------------------------------------------------------
+#
+# ! Keep this in sync with docker-compose.yml
 
 # Worker type to run the tests, 'selenium' or 'wp-cli'
 end2end-test-type: wp-cli
@@ -24,42 +24,42 @@ common-site-config:
   wp-site:
     admin-user: admin
     admin-email: admin@example.com
-    admin-pass: admin
+    admin-pass: adminpwd
     wp-version: 4.9
     wp-locale: en_US
     wp-autoupdate: false
 
 # One of the sites below, used as the active one
-test-site: vp01
+test-site: wptest
 
 # Test sites
 sites:
 
   # Host names and paths must match those in docker-compose.yml
-  vp01:
-    host: wordpress
+  wptest:
+    host: wordpress-for-tests:8089
     installation-type: standard
     db:
-      host: mysql
+      host: mysql-for-tests
       dbname: wordpress
       user: root
       password: r00tpwd
     wp-site:
-      path: /var/www/html/vp01
-      url: http://wordpress/vp01
+      path: /var/www/html
+      url: http://wordpress-for-tests:8089
       wp-admin-path: wp-admin
       title: "VersionPress Test"
 
-  vp01-composer:
-    host: wordpress
+  wptest-composer:
+    host: wordpress-for-tests:8089
     installation-type: composer
     db:
-      host: mysql
+      host: mysql-for-tests
       dbname: wordpress
       user: root
       password: r00tpwd
     wp-site:
-      path: /var/www/html/vp01
-      url: http://wordpress/vp01/web # Note that the site runs from subdirectory
+      path: /var/www/html
+      url: http://wordpress-for-tests:8089/web # The site runs from subdirectory
       wp-admin-path: wp/wp-admin
       title: "VersionPress Test (Composer)"

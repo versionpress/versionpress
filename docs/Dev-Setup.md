@@ -56,8 +56,8 @@ This starts a set of Docker containers in the background, you can view the progr
 Explore your development environment:
 
 - VersionPress source files are directly mapped to the site's `wp-content/plugins/versionpress` so any changes you make locally are immediately live.
-- Database can be inspected using [Adminer](https://www.adminer.org/) at `http://localhost:8099`, server name: `db`, username: `root`, password: `r00tpwd`.
-    - You can also use tools like MySQL Workbench or `mysql` command-line client on port 3399, e.g., `mysql --port=3399 -u root -p`.
+- Database can be inspected using [Adminer](https://www.adminer.org/) at `http://localhost:8099`, server name `mysql`, username: `root` and password: `r00tpwd`.
+    - You can also use tools like MySQL Workbench or `mysql` command-line client, e.g., `mysql -u root -p`.
 - WordPress site's web root is mapped to `./dev-env/wp` so you can e.g. use your local Git client to inspect the history.
 - To invoke things like WP-CLI in the context of a test WordPress site, you have these options:
     - SSH into container the container: `docker-compose exec wordpress /bin/bash`
@@ -299,11 +299,11 @@ Currently, the default worker is WP-CLI and the only way to switch workers is to
 
 After you've run the tests, the Docker stack is left up and running so that you can inspect it:
 
-- The site is running at <http://localhost:8088>. `test-config.yml` contains the login info.
-- The files are mapped to `./dev-env/wp-for-tests`. You can use your Git client in this directory as well.
-- The database is available on port 3306, you can connect to it e.g. by `mysql -u root -p` or via Adminer which you can access by running `docker-compose run -d --service-ports adminer` and visiting <http://localhost:8099>.
+- The site is running at <http://localhost:8089>, `test-config.yml` contains login info.
+- The files are mapped to `./dev-env/wp-for-tests`, you can use your local Git client to inspect it.
+- Connect to the database via `mysql -u root -p` or Adminer which you can access by running `docker-compose run -d --service-ports adminer` and visiting <http://localhost:8099>. The database name is `mysql-for-wordpress`.
 
-Stop the Docker stack with `npm stop` or `npm run stop-and-cleanup`.
+Stop the Docker stack with `npm run stop-and-cleanup` (stop-and-cleanup is strongly recommended here; end2end tests are not perfectly isolated yet).
 
 <div id="other-tests"></div>
 
