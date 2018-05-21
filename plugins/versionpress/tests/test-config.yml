@@ -37,7 +37,7 @@ sites:
 
   # Host names and paths must match those in docker-compose.yml
   wptest:
-    host: wordpress-for-tests:8089
+    host: wordpress-for-tests
     installation-type: standard
     db:
       host: mysql-for-tests
@@ -46,12 +46,12 @@ sites:
       password: r00tpwd
     wp-site:
       path: /var/www/html
-      url: http://wordpress-for-tests:8089
+      url: http://wordpress-for-tests
       wp-admin-path: wp-admin
       title: "VersionPress Test"
 
   wptest-composer:
-    host: wordpress-for-tests:8089
+    host: wordpress-for-tests
     installation-type: composer
     db:
       host: mysql-for-tests
@@ -60,6 +60,6 @@ sites:
       password: r00tpwd
     wp-site:
       path: /var/www/html
-      url: http://wordpress-for-tests:8089/web # The site runs from subdirectory
+      url: http://wordpress-for-tests/web # The site runs from subdirectory
       wp-admin-path: wp/wp-admin
       title: "VersionPress Test (Composer)"

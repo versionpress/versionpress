@@ -41,15 +41,17 @@ Have a ☕ as this will take a while, initially.
 
 ## Exploring dockerized environment
 
-For regular development, you'll want to have a test WordPress site which is provided for you – you don't need to set up MAMP or XAMPP or anything like that.
+For regular development, you'll want to have a test WordPress site which is provided for you – you don't need to set up MAMP or XAMPP or anything like that. Just run:
 
-After you have started Docker on your machine, run this:
+```
+npm start
+```
 
-1. `git clone <repo>` && `cd <repo>`
-2. `npm install`
-3. `npm start`
+This starts a set of Docker containers in the background, you can view the progress by running `docker-compose logs -f`.
 
-This starts a set of Docker containers in the background, you can view the progress by running `docker-compose logs -f`. When everything boots up, log into the test site at `http://localhost:8088`, install WordPress and activate VersionPress on the _Plugins_ page. You're now all set up! 🎉
+> **Note**: the services still occupy their normal ports 80 (web server) and 3306 (database) which might conflict with your local tools like MAMP or XAMPP. Please make sure you shut those down before running VersionPress.
+
+When everything boots up, log into the test site at `http://localhost`, install WordPress and activate VersionPress on the _Plugins_ page. You're now all set up! 🎉
 
 ![image](https://cloud.githubusercontent.com/assets/101152/26283542/17fccd8a-3e2b-11e7-9881-a26fbb49d144.png)
 
@@ -299,7 +301,7 @@ Currently, the default worker is WP-CLI and the only way to switch workers is to
 
 After you've run the tests, the Docker stack is left up and running so that you can inspect it:
 
-- The site is running at <http://wordpress-for-tests:8089> – [update your hosts file](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/) accordingly and log in using the info in `test-config.yml`.
+- The site is running at <http://wordpress-for-tests/> – [update your hosts file](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/) accordingly and log in using the info in `test-config.yml`.
 - The files are mapped to `./dev-env/wp-for-tests`, you can use your local Git client to inspect it.
 - Connect to the database via `mysql -u root -p` or Adminer which you can access by running `docker-compose run -d --service-ports adminer` and visiting <http://localhost:8099>. The database name is `mysql-for-wordpress`.
 
@@ -334,7 +336,7 @@ Linting task is set up for the frontend project. Run `npm run lint` in the `fron
 
 For pure frontend development, it's more convenient to run it outside of the WordPress administration. Let's assume you run the frontend against the default Docker site.
 
-1. Make sure that the site is running and that VersionPress is activated in it. You should be able to visit `http://localhost:8088` in the browser and the `frontend/src/config/config.local.ts` should contain this URL as API root.
+1. Make sure that the site is running and that VersionPress is activated in it. You should be able to visit `http://localhost` in the browser and the `frontend/src/config/config.local.ts` should contain this URL as API root.
 2. In your test WordPress site, put this to `wp-config.php` (the file should be editable at `./dev-env/wp/wp-config.php`):
     ```
     define('VERSIONPRESS_REQUIRE_API_AUTH', false);

@@ -4,7 +4,7 @@ services:
   wordpress:
     image: versionpress/wordpress:php7.2-apache
     ports:
-      - "8088:80"
+      - "80:80"
     volumes:
       - ./plugins/versionpress:/var/www/html/wp-content/plugins/versionpress
       - ./dev-env/wp:/var/www/html
@@ -16,7 +16,7 @@ services:
   wordpress-for-tests:
     image: versionpress/wordpress:php7.2-apache
     ports:
-      - "8089:80"
+      - "80:80"
     volumes:
       - ./dev-env/wp-for-tests:/var/www/html
     links:
