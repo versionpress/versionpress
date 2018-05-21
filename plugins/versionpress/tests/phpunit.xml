@@ -1,5 +1,4 @@
 <phpunit bootstrap="phpunit-bootstrap.php"
-         printerClass="ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter"
          verbose="true"
          colors="true">
     <logging>

@@ -32,8 +32,7 @@
     "mikey179/vfsStream": "^1.6",
     "10up/wp_mock": "^0.1.1",
     "phpunit/phpunit-selenium": "^3.0",
-    "icecave/semver": "^3.0",
-    "scriptfusion/phpunit-immediate-exception-printer": "^2.0"
+    "icecave/semver": "^3.0"
   },
   "autoload": {
     "psr-4": {

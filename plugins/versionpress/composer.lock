@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4611b7bd8e116bbf08df412f9f51626d",
+    "content-hash": "d328bc2ba7d10eb5a7da42c0a6c0aa1d",
     "packages": [
         {
             "name": "michelf/php-markdown",
@@ -1589,39 +1589,6 @@
                 "xunit"
             ],
             "time": "2017-01-23T22:12:35+00:00"
-        },
-        {
-            "name": "scriptfusion/phpunit-immediate-exception-printer",
-            "version": "2.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ScriptFUSION/PHPUnit-Immediate-Exception-Printer.git",
-                "reference": "df2b810ac7013bbb55910f5c4011f813f69e6b1d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ScriptFUSION/PHPUnit-Immediate-Exception-Printer/zipball/df2b810ac7013bbb55910f5c4011f813f69e6b1d",
-                "reference": "df2b810ac7013bbb55910f5c4011f813f69e6b1d",
-                "shasum": ""
-            },
-            "require": {
-                "phpunit/phpunit": "^5.5|^6"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "ScriptFUSION\\PHPUnitImmediateExceptionPrinter\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "authors": [
-                {
-                    "name": "Bilge",
-                    "email": "bilge@scriptfusion.com"
-                }
-            ],
-            "description": "Immediately prints exception and assertion failures during testing.",
-            "time": "2017-08-16T22:49:09+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
