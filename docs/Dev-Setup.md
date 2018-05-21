@@ -184,7 +184,7 @@ The `full` tests include [end2end tests](#end2end-tests) and are relatively slow
 
 `tests:custom` and `tests:custom-with-wordpress` scripts allow you to run custom tests easily. Here are some examples:
 
-> ❕ Notice how PHPUnit arguments come after `--`; this is important.
+> ❕ Notice how PHPUnit arguments come after `--`.
 
 ```sh
 # Pick a test suite from the default phpunit.xml
@@ -299,7 +299,7 @@ Currently, the default worker is WP-CLI and the only way to switch workers is to
 
 After you've run the tests, the Docker stack is left up and running so that you can inspect it:
 
-- The site is running at <http://localhost:8089>, `test-config.yml` contains login info.
+- The site is running at <http://wordpress-for-tests:8089> – [update your hosts file](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/) accordingly and log in using the info in `test-config.yml`.
 - The files are mapped to `./dev-env/wp-for-tests`, you can use your local Git client to inspect it.
 - Connect to the database via `mysql -u root -p` or Adminer which you can access by running `docker-compose run -d --service-ports adminer` and visiting <http://localhost:8099>. The database name is `mysql-for-wordpress`.
 
@@ -380,6 +380,13 @@ To build and push tags to Docker Hub:
 1. `npm run build-images`
 2. `docker login`
 3. `npm run push-images`
+
+## Other notes
+
+Legacy approaches are documented at the `4.0-alpha1` tag:
+
+- [Dev-Setup.md](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Dev-Setup.md)
+- [Testing.md](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Testing.md)
 
 ## Docker tips
 
