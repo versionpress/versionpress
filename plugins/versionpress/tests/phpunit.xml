@@ -1,4 +1,10 @@
-<phpunit bootstrap="phpunit-bootstrap.php" printerClass="ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter">
+<phpunit bootstrap="phpunit-bootstrap.php"
+         printerClass="ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter"
+         verbose="true"
+         colors="true">
+    <logging>
+        <log type="testdox-text" target="/var/opt/versionpress/logs/testdox.txt" />
+    </logging>
     <testsuites>
 
         <testsuite name="Unit">
