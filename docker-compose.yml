@@ -16,12 +16,13 @@ services:
   wordpress-for-tests:
     image: versionpress/wordpress:php7.2-apache
     ports:
-      - "8089:80"
+      - "8089:8089"
     volumes:
       - ./dev-env/wp-for-tests:/var/www/html
     links:
       - mysql-for-tests:mysql
     environment:
+      PORT: "8089"
       WORDPRESS_DB_PASSWORD: r00tpwd
 
   mysql:
