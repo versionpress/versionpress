@@ -1,4 +1,4 @@
-<phpunit bootstrap="phpunit-bootstrap.php">
+<phpunit bootstrap="phpunit-bootstrap.php" printerClass="ScriptFUSION\PHPUnitImmediateExceptionPrinter\ImmediateExceptionPrinter">
     <testsuites>
 
         <testsuite name="Unit">
