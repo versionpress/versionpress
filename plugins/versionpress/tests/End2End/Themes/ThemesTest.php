@@ -18,6 +18,7 @@ class ThemesTest extends End2EndTestCase
     /** @var IThemesTestWorker */
     private static $worker;
 
+    private static $defaultTheme;
 
     public static function setupBeforeClass()
     {
@@ -44,6 +45,8 @@ class ThemesTest extends End2EndTestCase
 
         self::$worker->setThemeInfo(self::$themeInfo);
         self::$worker->setSecondThemeInfo(self::$secondThemeInfo);
+
+        self::$defaultTheme = self::$wpAutomation->getCurrentTheme();
     }
 
     /**
@@ -73,7 +76,6 @@ class ThemesTest extends End2EndTestCase
     public function switchingThemeCreatesThemeSwitchAction()
     {
         self::$worker->prepare_switchTheme();
-        $currentTheme = self::$wpAutomation->getCurrentTheme();
 
         $commitAsserter = $this->newCommitAsserter();
 
@@ -85,8 +87,6 @@ class ThemesTest extends End2EndTestCase
         $commitAsserter->assertCommitPath(["A", "M"], "%vpdb%/options/cu/current_theme.ini");
         $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
-
-        self::$wpAutomation->switchTheme($currentTheme);
     }
 
     /**
@@ -95,6 +95,9 @@ class ThemesTest extends End2EndTestCase
      */
     public function deletingThemeCreatesThemeDeleteAction()
     {
+
+        self::$wpAutomation->switchTheme(self::$defaultTheme);
+
         self::$worker->prepare_deleteTheme();
 
         $commitAsserter = $this->newCommitAsserter();
