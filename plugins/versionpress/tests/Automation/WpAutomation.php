@@ -5,6 +5,7 @@ namespace VersionPress\Tests\Automation;
 use Exception;
 use Nette\Utils\Strings;
 use VersionPress\Tests\Utils\SiteConfig;
+use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\Process;
 use VersionPress\Utils\ProcessUtils;
 
@@ -107,8 +108,7 @@ class WpAutomation
      */
     public function copyVersionPressFiles()
     {
-        $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
-        $fileSystem->symlink(getenv('VP_DIR'), "{$this->siteConfig->path}/wp-content/plugins/versionpress");
+        FileSystem::copyDir(getenv('VP_DIR'), $this->siteConfig->path . '/wp-content/plugins/versionpress');
     }
 
     /**
