@@ -26,9 +26,9 @@
             <directory>End2End</directory>
         </testsuite>
 
-        <testsuite name="Selenium">
+        <!-- <testsuite name="Selenium">
             <directory>Selenium</directory>
-        </testsuite>
+        </testsuite> -->
 
         <testsuite name="Workflow">
             <directory>Workflow</directory>
