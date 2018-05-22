@@ -171,7 +171,7 @@ Most testing tasks are scripted, for example, you just run `npm run tests:unit` 
 - `tests` which is just a test runner.
 - `tests-with-wordpress` which starts a full WordPress stack.
 
-Choose the appropriate service for your use case, or just use the npm scripts which have the right service hardcoded.
+All scripts also come with the `...:debug` version, e.g., `tests:unit:debug`. See [Starting a debugging session from command line](#starting-debugging-session-from-command-line) for more.
 
 ### Running tests from command line
 
@@ -230,9 +230,11 @@ When you're done with tests, run `npm stop` to shut down the Docker stack or `np
 
 <div id="running-tests-from-phpstorm"></div>
 
-### Running tests from PhpStorm
+### Running and debugging tests from PhpStorm
 
-PhpStorm makes it easy to select specific tests and also to debug them. There is a one-time setup to go through.
+PhpStorm makes it easy to select specific tests and to debug them. Also, if you stop debugging, you will see the intermediate results which is something that the console doesn't give you by default. There is a one-time setup to go through though.
+
+> 💡 If this doesn't work for you for any reason, you can also [start a debugging session from command line](#starting-debugging-session-from-command-line). This works for PhpStorm, VSCode and other IDEs.
 
 First, if you're using _Docker for Mac_ or _Docker for Windows_, expose a daemon in Docker settings:
 
@@ -279,6 +281,48 @@ Debugging also works, just select _Debug_ instead of _Run_:
 This works equally well other types of tests as well, for example, Selenium tests:
 
 ![image](https://user-images.githubusercontent.com/101152/27797533-57f12904-600e-11e7-971b-08fd943aaf7b.png)
+
+### Starting debugging session from command line
+
+In the setup above, PhpStorm is actively launching the tests and setting up a debugger. If that doesn't work for you for any reason, you can use this alternative method which is generally more compatible.
+
+Generally:
+
+1. Set a breakpoint.
+2. Start listening in your IDE.
+3. Launch a debug-enabled script like `npm run tests:unit:debug` – see [package.json](../package.json) for all the scripts available.
+
+#### PhpStorm example
+
+First, make sure you have the 'VersionPress-tests' server defined in _Settings > Languages & Frameworks > PHP > Servers_. If not, run `npm run init-phpstorm`.
+
+Then, set a breakpoint in some test and start listening for debug connections in the toolbar.
+
+Run `npm run tests:unit:debug` in the console, skip the first break at the `wp` binary and see your breakpoint hit:
+
+![image](https://user-images.githubusercontent.com/101152/40370369-66eda84e-5de0-11e8-88f5-9792421a92ab.png)
+
+See [this JetBrains help page](https://confluence.jetbrains.com/display/PhpStorm/Debugging+PHP+CLI+scripts+with+PhpStorm) for more.
+
+#### VSCode example
+
+In VSCode, install [PHP Debug extension](https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-debug) and create a `launch.json` config containing this:
+
+```json
+{
+  "name": "PHP: Listen for Xdebug",
+  "type": "php",
+  "request": "launch",
+  "port": 9000,
+  "pathMappings": {
+    "/opt/versionpress": "${workspaceRoot}/plugins/versionpress",
+  }
+}
+```
+
+Then, start a debugging session in VSCode and set a breakpoint. Run the `tests:unit:debug` script and see the breakpoint hit:
+
+![image](https://user-images.githubusercontent.com/101152/40372175-7880a49a-5de4-11e8-9e87-adfb25d184ef.png)
 
 ### Unit tests
 

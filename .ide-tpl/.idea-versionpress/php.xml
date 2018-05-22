@@ -51,9 +51,14 @@
 	</component>
 	<component name="PhpProjectServersManager">
 		<servers>
-			<server host="localhost" id="0e23ef92-80ff-4bc7-ae15-8fb62bb4b323" name="WordPress in Docker (VersionPress dev env)" port="8088" use_path_mappings="true">
+			<server host="localhost" id="0e23ef92-80ff-4bc7-ae15-8fb62bb4b323" name="VersionPress-dev" use_path_mappings="true">
 				<path_mappings>
 					<mapping local-root="$PROJECT_DIR$" remote-root="/var/www/html/wp-content/plugins/versionpress"/>
+				</path_mappings>
+			</server>
+			<server host="localhost" id="ee1474e0-20d1-49a3-9b47-8353cc81ec30" name="VersionPress-tests" use_path_mappings="true">
+				<path_mappings>
+					<mapping local-root="$PROJECT_DIR$" remote-root="/opt/versionpress"/>
 				</path_mappings>
 			</server>
 		</servers>

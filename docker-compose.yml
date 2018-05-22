@@ -53,6 +53,7 @@ services:
     environment:
       VP_DIR: /opt/versionpress
       VP_TESTS_LOG_DIR: /var/opt/versionpress/logs/.tracy
+      PHP_IDE_CONFIG: serverName=VersionPress-tests
     volumes:
       # !!! This must be kept in sync with wordpress-cli-image/Dockerfile
       - ./dev-env/test-logs:/var/opt/versionpress/logs
@@ -67,6 +68,7 @@ services:
     environment:
       VP_DIR: /opt/versionpress
       VP_TESTS_LOG_DIR: /var/opt/versionpress/logs/.tracy
+      PHP_IDE_CONFIG: serverName=VersionPress-tests
     volumes:
       # !!! This must be kept in sync with wordpress-cli-image/Dockerfile
       - ./dev-env/wp-for-tests:/var/www/html
