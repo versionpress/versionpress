@@ -427,6 +427,15 @@ To build and push tags to Docker Hub:
 2. `docker login`
 3. `npm run push-images`
 
+You can get Docker Hub digests by running:
+
+```
+$ npm run get-image-digests
+
+cli sha256:11c49ba4d7198c17660f30e8db4d00ca356b1c4414f338076bf99ab4dd295184
+php7.2-apache sha256:39ed34f84a5ccf8ab47eb1db4041c226ffe6f874127ead4c26f0b607457b7377
+```
+
 ## Other notes
 
 Legacy approaches are documented at the `4.0-alpha1` tag:
