@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+	<component name="PhpAnalysisConfiguration">
+		<unchecked_exceptions>
+			<fqn value="\Error"/>
+			<fqn value="\Exception"/>
+			<fqn value="\LogicException"/>
+			<fqn value="\RuntimeException"/>
+		</unchecked_exceptions>
+	</component>
+	<component name="PhpCodeSniffer">
+		<phpcs_settings>
+			<PhpCSConfiguration tool_path="$PROJECT_DIR$/vendor/bin/phpcs"/>
+		</phpcs_settings>
+	</component>
 	<component name="PhpIncludePathManager">
 		<include_path>
 			<path value="$PROJECT_DIR$/../../ext-libs/vendor/wp-cli"/>
