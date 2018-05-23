@@ -10,6 +10,7 @@ services:
       - ./dev-env/wp:/var/www/html
     links:
       - mysql
+      - adminer
     environment:
       WORDPRESS_DB_PASSWORD: r00tpwd
 
