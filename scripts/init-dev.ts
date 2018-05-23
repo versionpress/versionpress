@@ -8,7 +8,7 @@ utils.exitIfNotRunFromRootDir();
 
 //------------------------------------
 utils.printTaskHeading('Checking your local environment');
-if (isWindows) {
+if (isWindows()) {
   const scriptShell = shell.exec('npm config get script-shell', { silent: true }).stdout.toString().trim();
   if (!scriptShell.endsWith('bash.exe')) {
     console.log('');
