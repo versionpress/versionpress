@@ -40,7 +40,7 @@ class DBAsserter
     public static function assertFilesEqualDatabase()
     {
         HookMock::setUp(HookMock::TRUE_HOOKS);
-        self::staticInitialization();
+        self::setUp();
         $entityNames = self::$schemaInfo->getAllEntityNames();
         foreach ($entityNames as $entityName) {
             self::assertEntitiesEqualDatabase($entityName);
@@ -49,10 +49,27 @@ class DBAsserter
         HookMock::tearDown();
     }
 
-    private static function staticInitialization()
+    private static function setUp()
     {
-        self::$testConfig = TestConfig::createDefaultConfig();
-        self::$wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
+        // One-time initialization
+        if (!self::$testConfig) {
+            self::$testConfig = TestConfig::createDefaultConfig();
+            self::$wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
+
+            $dbHost = self::$testConfig->testSite->dbHost;
+            $dbUser = self::$testConfig->testSite->dbUser;
+            $dbPassword = self::$testConfig->testSite->dbPassword;
+            $dbName = self::$testConfig->testSite->dbName;
+            $dbPrefix = self::$testConfig->testSite->dbTablePrefix;
+
+            self::$database = new \mysqli($dbHost, $dbUser, $dbPassword, $dbName);
+            self::$wpdb = new \wpdb($dbUser, $dbPassword, $dbName, $dbHost);
+            self::$wpdb->set_prefix($dbPrefix);
+            self::$vp_database = new Database(self::$wpdb);
+        }
+
+        // The remaining probably needs to run before every `assertFilesEqualDatabase()`, otherwise tests are failing
+        // on storage having more entities than the database. This should be reviewed.
 
         $yamlDir = self::$wpAutomation->getPluginsDir() . '/versionpress/.versionpress';
         $schemaFile = $yamlDir . '/schema.yml';
@@ -74,15 +91,6 @@ class DBAsserter
         );
         $taxonomies = array_column(json_decode($rawTaxonomies, true), 'name');
 
-        $dbHost = self::$testConfig->testSite->dbHost;
-        $dbUser = self::$testConfig->testSite->dbUser;
-        $dbPassword = self::$testConfig->testSite->dbPassword;
-        $dbName = self::$testConfig->testSite->dbName;
-        $dbPrefix = self::$testConfig->testSite->dbTablePrefix;
-        self::$database = new \mysqli($dbHost, $dbUser, $dbPassword, $dbName);
-        self::$wpdb = new \wpdb($dbUser, $dbPassword, $dbName, $dbHost);
-        self::$wpdb->set_prefix($dbPrefix);
-        self::$vp_database = new Database(self::$wpdb);
         $shortcodesInfo = new ShortcodesInfo([$shortcodeFile]);
         self::$vpidRepository = new VpidRepository(self::$vp_database, self::$schemaInfo);
         self::$shortcodesReplacer = new ShortcodesReplacer($shortcodesInfo, self::$vpidRepository);
