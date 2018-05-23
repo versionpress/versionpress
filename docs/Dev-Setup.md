@@ -4,13 +4,13 @@ This will set you up for VersionPress development. 👩‍💻 👨‍💻
 
 ## Getting started
 
-Since VersionPress 4.0, our approach is:
+Our approach is:
 
-- You develop in **local tools** you're comfortable with – PhpStorm, vim, VSCode, etc.
-- Runtime is handled by **Docker**. You don't need to have MAMP/XAMPP, set up WordPress, Java, Selenium etc.
-- Common tasks are easy to do via **npm scripts**. For example, to run tests you'll just run `npm run tests`.
+- You develop in **local tools** you're comfortable with – PhpStorm, vim, VSCode, ...
+- Runtime is handled by **Docker**. You don't need MAMP / XAMPP, local installation of Selenium, etc.
+- Common tasks are automated via **npm scripts**, for example, `npm run tests:full`.
 
-You can familiarize yourself with Docker in [this great quick start](https://docs.docker.com/get-started/) and we also have some [tips](#docker-tips) for you.
+If you're not familiar with Docker, this is [great quick start](https://docs.docker.com/get-started/). We also have some [tips for you](#docker-tips).
 
 This software is expected on your machine:
 
@@ -21,7 +21,7 @@ This software is expected on your machine:
 
 ### Windows users: use Git Bash
 
-The dev setup is actively tested on Windows but only in Git Bash. Please use it instead of `cmd.exe` for both interactive sessions and as your npm script shell:
+Git Bash (part of [Git for Windows](https://gitforwindows.org/)) is required on Windows, please use it instead of `cmd.exe` / PowerShell for both interactive sessions and as your npm script shell:
 
 ```
 npm config set script-shell "c:\Program Files\git\bin\bash.exe"
@@ -29,74 +29,51 @@ npm config set script-shell "c:\Program Files\git\bin\bash.exe"
 
 See also [Windows tips](#windows-tips) below.
 
-## Project checkout
-
-Then clone a repo and install the dev dependencies:
+## Project initialization
 
 1. `git clone https://github.com/versionpress/versionpress`
 2. `cd versionpress`
 3. `npm install`
 
-Have a ☕ as this will take a while, initially.
+Have a ☕, this will take a while.
 
-> **Tip**: From time to time, it's useful to clean up everything and pull latest Docker images: `npm run refresh-dev`.
+> **Tip**: From time to time, it's useful to clean up everything and pull latest Docker images. Run `npm run refresh-dev`.
 
-## Exploring dockerized environment
+## Dockerized development environment
 
-For regular development, you'll want to have a test WordPress site which is provided for you – you don't need to set up MAMP or XAMPP or anything like that. Just run:
+To start a development site:
 
-```
-npm start
-```
+1. Make sure ports 80 and 3306 are free, e.g., no local MAMP / XAMPP is running.
+2. Run `npm start`.
 
-This starts a set of Docker containers in the background, you can view the progress by running `docker-compose logs -f`.
+This will start a set of Docker containers in the background. When everything boots up, log into the test site at <http://localhost>, install WordPress and activate VersionPress on the _Plugins_ page. You're now all set up! 🎉
 
-> **Note**: the services still occupy their normal ports 80 (web server) and 3306 (database) which might conflict with your local tools like MAMP or XAMPP. Please make sure you shut those down before running VersionPress.
+![image](https://user-images.githubusercontent.com/101152/40431982-e2884a72-5ea8-11e8-9a07-e9857b5f1b67.png)
 
-When everything boots up, log into the test site at `http://localhost`, install WordPress and activate VersionPress on the _Plugins_ page. You're now all set up! 🎉
+Let's explore your development environment:
 
-![image](https://cloud.githubusercontent.com/assets/101152/26283542/17fccd8a-3e2b-11e7-9881-a26fbb49d144.png)
+- VersionPress source files are directly mapped to the site's `wp-content/plugins/versionpress`. Any changes you make locally are immediately live.
+- Database can be inspected using [Adminer](https://www.adminer.org/) at <http://localhost:8099>, server name `mysql`, login `root` / `r00tpwd`. You can also use tools like MySQL Workbench or `mysql` command-line client, e.g., `mysql -u root -p`.
+- WordPress root is mapped to `./dev-env/wp`. You can use your local Git client to inspect the site's history there.
+- To invoke WP-CLI or Git commands in the site, create a terminal session via `docker-compose exec wordpress /bin/bash` or invoke the command directly, e.g., `docker-compose exec wordpress git log` or `docker-compose exec wordpress wp option update blogname "Hello"`.
 
-Explore your development environment:
-
-- VersionPress source files are directly mapped to the site's `wp-content/plugins/versionpress` so any changes you make locally are immediately live.
-- Database can be inspected using [Adminer](https://www.adminer.org/) at `http://localhost:8099`, server name `mysql`, username: `root` and password: `r00tpwd`.
-    - You can also use tools like MySQL Workbench or `mysql` command-line client, e.g., `mysql -u root -p`.
-- WordPress site's web root is mapped to `./dev-env/wp` so you can e.g. use your local Git client to inspect the history.
-- To invoke things like WP-CLI in the context of a test WordPress site, you have these options:
-    - SSH into container the container: `docker-compose exec wordpress /bin/bash`
-    - Use `docker-compose exec wordpress <command>`, for example:
-        - `docker-compose exec wordpress wp option update blogname "Hello"`
-        - `docker-compose exec wordpress git log`
-
-Some useful tips for managing your Dockerized environment:
+Some useful tips for managing your Docker environment:
 
 - `docker-compose ps` lists running containers.
-- `docker-compose logs -f` displays live logs.
+- `docker-compose logs -f` displays live logs
+- `docker-compose logs wordpress` displays logs of a single service.
+- `docker stats` show live CPU / memory usage.
+- See also [Docker tips](#docker-tips) below.
 
-To stop your environment, run `npm stop`. To also delete WordPress data so that next start is fresh, run `npm run stop-and-cleanup`.
+Run `npm stop` to stop the development environment. Run `npm run stop-and-cleanup` to also clean up WordPress files and MySQL database for a fresh start next time.
 
-See also [Docker tips](#docker-tips) section below.
+### PhpStorm setup
 
-Next steps:
+For PHP development, we recommend [PhpStorm](https://www.jetbrains.com/phpstorm/) and ship project files for it. The steps here have been tested in PhpStorm **2018.1**.
 
-- [PhpStorm setup](#phpstorm)
-- [Writing code](#writing-code)
-- [Debugging](#debugging)
-- [Testing](#testing)
-- [Frontend development](#frontend-development)
-- [Production build](#production-build)
-- [Docker tips](#docker-tips)
+Run `npm run init-phpstorm`. This copies `.idea` to `plugins/versionpress`.
 
-<div id="phpstorm"></div>
-
-## PhpStorm setup
-
-We recommend [PhpStorm](https://www.jetbrains.com/phpstorm/) for developing the PHP parts of VersionPress (`./frontend` is a React app and for example [VSCode](https://code.visualstudio.com/) works great there). The steps below have been tested with PhpStorm 2018.1.
-
-First, run `npm run init-phpstorm`. This copies `.idea` to `./plugins/versionpress` where most things are preconfigured for you.
-
-Then, open the `./plugins/versionpress` project in PhpStorm. On the first start, you'll see two prompts:
+Open the `plugins/versionpress` project in PhpStorm. On the first start, you'll see two prompts:
 
 ![image](https://user-images.githubusercontent.com/101152/40103254-1e1bb46e-58ed-11e8-8fd3-42c47a504fa7.png)
 
@@ -104,29 +81,27 @@ Then, open the `./plugins/versionpress` project in PhpStorm. On the first start,
 
 ![image](https://user-images.githubusercontent.com/101152/40103297-4420c96a-58ed-11e8-9bd7-8e36c8851a45.png)
 
-For **Composer**, enable sync.
+Enable **Composer sync**.
 
-For **Code Sniffer inspections** to work, there's a one-time configuration: Go to *Settings* > *Languages & Frameworks* > *PHP* > *Code Sniffer*, select *Local*, click the three dots next to it and provide your full system path to `./vendor/bin/phpcs`. After this is done, PhpStorm will start checking the code style.
+For **Code Sniffer inspections** to work, there's a one-time configuration: Go to *Settings* > *Languages & Frameworks* > *PHP* > *Code Sniffer*, select *Local*, click the three dots next to it and provide your full system path to `./vendor/bin/phpcs`.
 
 > **Note**: Most VersionPress code uses the [PSR-2](http://www.php-fig.org/psr/psr-2/) coding standard with only the parts directly interacting with WordPress using WordPress conventions. For example, global functions are defined as `vp_register_hooks()`, not `registerHooks()`.
 
 It is also useful to **install the [EditorConfig](https://plugins.jetbrains.com/plugin/7294?pr=phpStorm) extension**, VersionPress ships with some basic formatting rules.
 
-## Writing code
+### Writing code
 
 Please refer to the [Contributing code](https://github.com/versionpress/versionpress/blob/master/CONTRIBUTING.md#contributing-code) section in `CONTRIBUTING.md`.
 
-## Debugging
+### Debugging
 
-> **Note**: VersionPress consists of core PHP code plus React app for the frontend. This section is about PHP debugging only.
-
-The development environment is preconfigured with [Xdebug](https://xdebug.org/). Here's an example setup:
+The development containers have [Xdebug](https://xdebug.org/) installed and configured. Here is how to make debugging work in PhpStorm; the [Debugging tests](#starting-debugging-session-from-command-line) section gives an example of how to make debugging work in VSCode.
 
 Start the Docker stack with `npm start`.
 
-In PhpStorm, go to _Settings_ > _Languages & Frameworks_ > _PHP_ > _Servers_ and check the path mappings of the pre-configured _WordPress in Docker (VersionPress dev env)_ server. Specifically, update the WordPress mapping which PhpStorm 2018.1 does not persist automatically:
+In PhpStorm, go to _Settings_ > _Languages & Frameworks_ > _PHP_ > _Servers_ and check the path mappings of the pre-configured _VersionPress-dev_ server. Specifically, update the WordPress mapping which PhpStorm does not persist automatically:
 
-![image](https://user-images.githubusercontent.com/101152/40107856-b1f7ff88-58f9-11e8-8f4f-beb1fffbe8bb.png)
+![image](https://user-images.githubusercontent.com/101152/40432492-1f2f7530-5eaa-11e8-91f2-8b3794f97b74.png)
 
 The two mappings should be:
 
@@ -147,42 +122,33 @@ Reload a page in your browser. Debugging should now work:
 
 ![image](https://user-images.githubusercontent.com/101152/40105051-2cdd1524-58f2-11e8-8880-d50d70d4195f.png)
 
-After you're done with debugging, stop the Docker stack with `npm stop` or clean it up entirely with `npm run stop-and-cleanup`.
+After you're done with debugging, run `npm stop` or `npm run stop-and-cleanup`.
 
 ## Testing
 
-Tests are a significant part of the VersionPress project, we care about writing and maintaining them. They live in `./plugins/versionpress/tests` and there are several types of them, from unit tests to full end2end tests. They all run in a dockerized test environment.
+Tests are a significant part of the VersionPress project, we care about writing and maintaining them. They live in `plugins/versionpress/tests` and there are several types of them, from unit to full end2end tests. They all run in a dockerized test environment.
 
 > **Note**: the `./frontend` app has its own tests, this section is about core VersionPress tests (PHP code) only.
 
-In this section:
-
-- [Dockerized testing environment](#dockerized-tests)
-- [Unit tests](#unit-tests)
-- [End2end tests](#end2end-tests)
-- [Other tests](#other-tests)
-
-<div id="dockerized-tests"></div>
-
 ### Dockerized testing environment
 
-Similarly to the [development environment](#exploring-dockerized-environment), tests utilize Docker Compose as well. The main benefit is that you don't need to set up things like Selenium or Java locally, everything comes preconfigured for you.
+Similarly to the [development environment](#exploring-dockerized-environment), tests utilize Docker Compose as well. The main benefit is that you don't need to set up things like Selenium or Java locally.
 
-Most testing tasks are scripted, for example, you just run `npm run tests:unit` but you can also drop to the raw Docker Compose mode and do things like `docker-compose run --rm tests ...`. In that case, one thing to understand is that there are two services in `docker-compose.yml` to choose from:
+Most tasks are scripted, for example, you just run `npm run tests:unit` but you can also drop to the raw Docker Compose mode and do things like `docker-compose run --rm tests ...`. In that case, one thing to understand is that there are two services in `docker-compose.yml` to choose from:
 
-- `tests` which is just a test runner.
-- `tests-with-wordpress` which starts a full WordPress stack.
+- `tests` – just a test runner.
+- `tests-with-wordpress` – starts a WordPress stack.
 
-All scripts also come with the `...:debug` version, e.g., `tests:unit:debug`. See [Starting a debugging session from command line](#starting-debugging-session-from-command-line) for more.
+All scripts also come with a `...:debug` version, for example, `tests:unit:debug`. See [Starting a debugging session from command line](#starting-debugging-session-from-command-line).
 
 ### Running tests from command line
 
-1. Make sure you have Docker up and running.
-2. Run `npm run tests:unit` or `npm run tests:full`
+1. Make sure you have run `npm install` as described above and have Docker running.
+2. Run `npm run tests:unit` or `npm run tests:full`.
 
-Unit tests use a simpler `tests` Docker Compose service that doesn't start a WordPress stack. They are fast to execute.
+Unit tests use a simpler `tests` service and are fast to execute.
 
-The `full` tests include [end2end tests](#end2end-tests) and are relatively slow. But if they pass, there's a good chance that VersionPress works correctly.
+The full tests include [end2end tests](#end2end-tests) and are relatively slow to run, however, if they pass, there's a good chance that VersionPress works correctly.
 
 #### Customizing what tests run
 
@@ -210,7 +176,7 @@ docker-compose run --rm tests ../vendor/bin/phpunit --bootstrap /opt/versionpres
 
 #### Test output
 
-Npm scripts are configured to log in a TestDox format to container's `/var/opt/versionpress/logs` which is available to you in your local folder `./dev-env/test-logs`.
+Npm scripts are configured to log in a TestDox format to container's `/var/opt/versionpress/logs` which is mapped to your local folder `./dev-env/test-logs`.
 
 To log in [another supported format](http://phpunit.readthedocs.io/en/7.1/textui.html#command-line-options), run tests manually like this:
 
@@ -220,23 +186,20 @@ docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.xml --log-junit /
 
 #### Clean up tests
 
-If you've run tests that use the `tests-with-wordpress` service, the whole Docker stack is kept running so that you can inspect it later. For example, you can use your local Git client to explore the site's history in `dev-env/wp-for-tests`. The [end2end tests](#end2end-tests) section provides more info on this.
+If you've run tests that use the `tests-with-wordpress` service, the whole Docker stack is kept running so that you can inspect it. For example, you can use your local Git client to explore the site's history in `dev-env/wp-for-tests/wptest`. The [end2end tests](#end2end-tests) section provides more info on this.
 
 When you're done with tests, run `npm stop` to shut down the Docker stack or `npm run stop-and-cleanup` to also remove the volumes so that the next start is entirely fresh.
 
 #### Tips for tests
 
 - If you're trying to narrow down a bug, it's useful to run a smaller test suite via one of the options above and add `stopOnFailure="true"` to the XML file or `--stop-on-failure` on the command line.
-- Unit tests are also easy to get running locally, basically just run them in PhpStorm.
-- Tests can be debugged from PhpStorm, see below.
-
-<div id="running-tests-from-phpstorm"></div>
+- Unit tests can also easily be run using a local `php` interpreter, basically just run them in PhpStorm.
 
 ### Running and debugging tests from PhpStorm
 
-PhpStorm makes it easy to select specific tests and to debug them. Also, if you stop debugging, you will see the intermediate results which is something that the console doesn't give you by default. There is a one-time setup to go through though.
+PhpStorm makes it easy to select specific tests and to debug them. Also, if you stop debugging, you will see messages gathered so far. There is a one-time setup to go through.
 
-> 💡 If this doesn't work for you for any reason, you can also [start a debugging session from command line](#starting-debugging-session-from-command-line). This works for PhpStorm, VSCode and other IDEs.
+> 💡 If this doesn't work for you, e.g., due to some Docker Compose bug in PhpStorm, you can [start debugging from command line](#starting-debugging-session-from-command-line).
 
 First, if you're using _Docker for Mac_ or _Docker for Windows_, expose a daemon in Docker settings:
 
@@ -286,13 +249,11 @@ This works equally well other types of tests as well, for example, Selenium test
 
 ### Starting debugging session from command line
 
-In the setup above, PhpStorm is actively launching the tests and setting up a debugger. If that doesn't work for you for any reason, you can use this alternative method which is generally more compatible.
-
-Generally:
+This method is more universal and works for PhpStorm, VSCode and other IDEs. You generally do this:
 
 1. Set a breakpoint.
 2. Start listening in your IDE.
-3. Launch a debug-enabled script like `npm run tests:unit:debug` – see [package.json](../package.json) for all the scripts available.
+3. Launch a debug-enabled script like `npm run tests:unit:debug` (see [package.json](../package.json)).
 
 #### PhpStorm example
 
@@ -330,7 +291,7 @@ Then, start a debugging session in VSCode and set a breakpoint. Run the `tests:u
 
 Unit tests are best suited for small pieces of algorithmic functionality. For example, `IniSerializer` is covered by unit tests extensively.
 
-You can either run unit tests in a dockerized environment as described above or set up a local CLI interpret which makes the execution a bit faster.
+You can either run unit tests in a dockerized environment as described above or set up a local CLI interpret which makes the execution faster and more convenient.
 
 ### End2end tests
 
@@ -352,8 +313,6 @@ After you've run the tests, the Docker stack is left up and running so that you 
 - Connect to the database via `mysql -u root -p` or Adminer which you can access by running `docker-compose run -d --service-ports adminer` and visiting <http://localhost:8099>. The database name is `mysql-for-wordpress`.
 
 Stop the Docker stack with `npm run stop-and-cleanup` (stop-and-cleanup is strongly recommended here; end2end tests are not perfectly isolated yet).
-
-<div id="other-tests"></div>
 
 ### Other tests
 
@@ -438,9 +397,9 @@ cli sha256:11c49ba4d7198c17660f30e8db4d00ca356b1c4414f338076bf99ab4dd295184
 php7.2-apache sha256:39ed34f84a5ccf8ab47eb1db4041c226ffe6f874127ead4c26f0b607457b7377
 ```
 
-## Other notes
+### Links to older documents
 
-Legacy approaches are documented at the `4.0-alpha1` tag:
+Legacy approach is documented at the `4.0-alpha1` tag:
 
 - [Dev-Setup.md](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Dev-Setup.md)
 - [Testing.md](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Testing.md)
@@ -456,11 +415,9 @@ Here are some tips for working with Docker / Docker Compose:
 
 ### Git Bash
 
-As noted in [Getting started](#getting-started), we only actively test the dev setup in Git Bash, not `cmd.exe` or other shells. Git Bash comes with [Git for Windows](https://gitforwindows.org/) and is an awesome shell that allows us to treat Windows similarly to macOS or Linux.
+As noted in [Getting started](#getting-started), we only support Git Bash on Windows, a shell that comes with [Git for Windows](https://gitforwindows.org/). `cmd.exe` or PowerShell will not work as we use Linux-style syntax (single quotes, setting environment variables, etc.) and tools like `curl` or `rm -rf` in scripts.
 
-The only problematic issue is that Docker messes with paths and for example, trying to run `docker run --rm -it ubuntu /bin/bash`, you'll see an error like `C:/Program Files/Git/usr/bin/bash.exe: no such file or directory`. It's because Docker will try to prepend `C:/Program Files/Git` for some reason; [use this workaround](https://gist.github.com/borekb/cb1536a3685ca6fc0ad9a028e6a959e3) and you'll be fine.
-
-Overall, if you see a path issue like that, just prepend `/` to it. For example, try `//var/ww/html` instead of `/var/www/html`.
+Git Bash is generally an awesome shell, the only problems you might encounter are related to paths. For example, Docker messes with them and when you try to run `docker run --rm -it ubuntu /bin/bash`, you'll see an error like `C:/Program Files/Git/usr/bin/bash.exe: no such file or directory`. Docker prepends `C:/Program Files/Git` for some reason but you can [use this workaround](https://gist.github.com/borekb/cb1536a3685ca6fc0ad9a028e6a959e3) or use double slash like `//bin/bash`.
 
 ### Docker for Windows
 
