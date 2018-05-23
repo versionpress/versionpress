@@ -6,6 +6,7 @@
   "license": "GPL",
   "scripts": {
     "init-dev": "ts-node scripts/init-dev.ts",
+    "refresh-dev": "git clean -fxd && npm i && docker-compose pull",
     "init-phpstorm": "ts-node scripts/init-phpstorm.ts",
     "build": "ts-node scripts/build.ts",
     "start": "docker-compose up -d wordpress",

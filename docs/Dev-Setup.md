@@ -39,6 +39,8 @@ Then clone a repo and install the dev dependencies:
 
 Have a ☕ as this will take a while, initially.
 
+> **Tip**: From time to time, it's useful to clean up everything and pull latest Docker images: `npm run refresh-dev`.
+
 ## Exploring dockerized environment
 
 For regular development, you'll want to have a test WordPress site which is provided for you – you don't need to set up MAMP or XAMPP or anything like that. Just run:
