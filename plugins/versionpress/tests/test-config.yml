@@ -45,6 +45,7 @@ sites:
       user: root
       password: r00tpwd
     wp-site:
+      # Path must always be a subfolder of /var/www/html for cloning & merging tests to work
       path: /var/www/html/wptest
       url: http://wordpress-for-tests/wptest
       wp-admin-path: wp-admin

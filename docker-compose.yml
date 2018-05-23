@@ -21,6 +21,7 @@ services:
       - ./dev-env/wp-for-tests:/var/www/html
     links:
       - mysql-for-tests:mysql
+    working_dir: /var/www/html/wptest
     environment:
       WORDPRESS_DB_PASSWORD: r00tpwd
 
