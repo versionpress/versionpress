@@ -45,8 +45,8 @@ sites:
       user: root
       password: r00tpwd
     wp-site:
-      path: /var/www/html
-      url: http://wordpress-for-tests
+      path: /var/www/html/wptest
+      url: http://wordpress-for-tests/wptest
       wp-admin-path: wp-admin
       title: "VersionPress Test"
 
@@ -59,7 +59,7 @@ sites:
       user: root
       password: r00tpwd
     wp-site:
-      path: /var/www/html
-      url: http://wordpress-for-tests/web # The site runs from subdirectory
+      path: /var/www/html/wptest
+      url: http://wordpress-for-tests/wptest/web # The site runs from subdirectory
       wp-admin-path: wp/wp-admin
       title: "VersionPress Test (Composer)"
