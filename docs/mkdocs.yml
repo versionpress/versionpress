@@ -102,5 +102,24 @@ pages:
 
 # Extensions
 markdown_extensions:
- - pymdownx.emoji:
-    emoji_generator: !!python/name:pymdownx.emoji.to_svg
+# PyMdown extensions https://facelessuser.github.io/pymdown-extensions/#extensions
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.inlinehilite
+  - pymdownx.mark
+  - pymdownx.magiclink
+  - pymdownx.keys
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+  - admonition # https://squidfunk.github.io/mkdocs-material/extensions/admonition/
+  - codehilite: # https://squidfunk.github.io/mkdocs-material/extensions/codehilite/
+      guess_lang: false
+      linenums: true
+  - meta # https://squidfunk.github.io/mkdocs-material/extensions/metadata/
+  - toc:
+      permalink: true
