@@ -52,7 +52,7 @@ pages:
       - 'Change Tracking': 'en/user/feature-focus/change-tracking.md'
       - 'Undo and Rollback': 'en/user/feature-focus/undo-and-rollback.md'
       - 'Searching History': 'en/user/feature-focus/searching-history.md'
-      - 'External Plugins and Themes': 'en/user/feature-focus/index.md'
+      - 'External Plugins and Themes': 'en/user/feature-focus/external-plugins.md'
       - 'Custom project structure': 'en/user/feature-focus/custom-project-structure.md'
       - 'WP-CLI Commands': 'en/user/feature-focus/wp-cli.md'
       - 'Versioning Engine - Git': 'en/user/feature-focus/git.md'
@@ -99,3 +99,8 @@ pages:
     - '1.0-alpha3 Release Notes': 'en/release-notes/1.0-alpha3.md'
     - '1.0-alpha2 Release Notes': 'en/release-notes/1.0-alpha2.md'
     - '1.0-alpha1 Release Notes': 'en/release-notes/1.0-alpha1.md'
+
+# Extensions
+markdown_extensions:
+ - pymdownx.emoji:
+    emoji_generator: !!python/name:pymdownx.emoji.to_svg
