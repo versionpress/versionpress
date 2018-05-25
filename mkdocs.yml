@@ -1,7 +1,17 @@
+# General Setup
 site_name: VersionPress Documentation
+site_url: 'http://127.0.0.1:8000'
+docs_dir: './docs/content'
+repo_url: https://github.com/versionpress/versionpress
+site_description: 'Welcome to VersionPress documentation. VersionPress itself is intuitive to use but some things like core concepts or installation details require more attention and are described here.'
+copyright: 'Copyright &copy; 2018 VersionPress'
+
+# Marketing Stuff
 google_analytics:
   - 'UA-XXXXXXXX-X'
   - 'auto'
+
+# Extras (dependent on material theme)
 extra:
   social:
     - type: 'github'
@@ -10,11 +20,8 @@ extra:
       link: 'https://twitter.com/versionpress'
   search:
     tokenizer: '[\s\-\.]+'
-site_url: 'http://127.0.0.1:8000/en'
-docs_dir: './docs/content'
-repo_url: https://github.com/versionpress/versionpress
-site_description: 'Welcome to VersionPress documentation. VersionPress itself is intuitive to use but some things like core concepts or installation details require more attention and are described here.'
-copyright: 'Copyright &copy; 2018 VersionPress'
+
+# Theme Config
 theme:
   name: 'material'
   feature:
@@ -27,8 +34,10 @@ theme:
   palette:
     primary: 'cyan'
     accent: 'teal'
+
+# Nav structure
 pages:
-  - Home: 'en/index.md'
+  - Home: 'index.md'
   - User:
     - Getting Started:
       - 'Getting Started Home': 'en/user/getting-started/index.md'
