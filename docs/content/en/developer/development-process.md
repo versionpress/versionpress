@@ -12,7 +12,7 @@ Here is a set of tools and approaches we use during VersionPress development.
 
 > Issues not assigned to any milestone are in a backlog – we want to do them one day but there are no immediate plans.
 
-[**Pull requests**](https://github.com/versionpress/versionpress/pulls) implement issues. Commonly, a piece of functionality starts as an issue but quickly transitions into a PR where most of the technical discussion happens. In other words, issues are the original ideas of how to improve or fix something, PR's are how it was actually done. 
+[**Pull requests**](https://github.com/versionpress/versionpress/pulls) implement issues. Commonly, a piece of functionality starts as an issue but quickly transitions into a PR where most of the technical discussion happens. In other words, issues are the original ideas of how to improve or fix something, PR's are how it was actually done.
 
 ## Development workflow
 
@@ -22,7 +22,7 @@ We use the [GitHub flow](https://guides.github.com/introduction/flow/):
 
 Some tips:
 
-- Development setup is described in [Dev-Setup.md](./Dev-Setup.md).
+- Development setup is described in [setup.md](setup.md).
 - Branches are commonly named `<issue_number>-<short_description>`, e.g., `123-row-filtering`.
 - All branches start from `master`.
 - We care about small and focused commits with good commit messages.
@@ -72,7 +72,7 @@ We use [these labels](https://github.com/versionpress/versionpress/labels) to ta
     - `needs-migration` – such issues change a storage format and require migration between two VersionPress versions. (Currently, we do not have migrations which means that if a release contains one or more `needs-migration` issues, full deactivation and re-activation is required. See [#275](https://github.com/versionpress/versionpress/issues/275).)
     - `WP 4.7` – compatibility with WordPress 4.7.
     - `plugin-support` – issues implementing the plugin support in VersionPress 4.0.
-    
+
 ### Note on imported issues 1..522
 
 In the early days, we used JIRA and the Czech language to track the project (*bad* decision in retrospect 😅), with the earliest issues not even up to the common standards as we were a team of two and discussed many things face to face.
