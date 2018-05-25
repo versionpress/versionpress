@@ -1,6 +1,6 @@
 # Release Notes
 
-The current release is **[3.0](./release-notes/3.0)**, released on 28 Apr 2016, and it is an [Early Access release](getting-started/about-eap). VersionPress can be obtained via the main **[versionpress.net](https://versionpress.net/)** site.
+The current release is **[3.0](./release-notes/3.0)**, released on 28 Apr 2016, and it is an [Early Access release](../user/getting-started/about-eap). VersionPress can be obtained via the main **[versionpress.net](https://versionpress.net/)** site.
 
 
 ## Release versioning
@@ -19,4 +19,4 @@ Versions are compared and ordered by the same rules that [semver](http://semver.
 
 ## Roadmap
 
-See [roadmap here](./release-notes/roadmap).
+See [roadmap here](./roadmap).
