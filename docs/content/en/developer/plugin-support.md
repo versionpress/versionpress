@@ -105,9 +105,7 @@ Tags can be altered (or created entirely if the YAML only uses `/` as a tag valu
 
 **Non-database actions** are tracked manually by calling a global [`vp_force_action()`](https://github.com/versionpress/versionpress/blob/3b0b242b11804d39c838b15a21ffbd7a27b404b4/plugins/versionpress/public-functions.php#L18-L18) function. This overwrites all other actions VersionPress might have collected during the request. For example, this is how `wordpress/update` action is tracked:
 
-```php
-vp_force_action('wordpress', 'update', $version, [], $wpFiles);
-```
+`#!php-inline vp_force_action('wordpress', 'update', $version, [], $wpFiles);`
 
 !!! Info "v4.0 change"
     :construction: We're planning to change this for the final VersionPress 4.0 release. Some filter will probably be used instead.
@@ -131,7 +129,7 @@ The array of files to commit can contain three different types of items:
 
 1. Single file corresponding to an entity, for example:
 
-    ``` php
+    ```php
     [
       'type' => 'storage-file',
       'entity' => 'post',
@@ -181,7 +179,7 @@ For **non-database actions**, this list is one of the arguments of the [`vp_forc
 
 If the plugin adds custom data into the database it must provide a `schema.yml` file describing the database model. For example, this is how WordPress posts are described:
 
-```json
+```yaml
 post:
   table: posts
   id: ID
@@ -450,7 +448,7 @@ post:
 
 It tells VersionPress to delete the post cache (VP resolves the function name as `clean_<cache-type>_cache`). You can use `id` as the source of IDs for invalidation or a reference. For example like this:
 
-```
+``` yaml
 post:
   references:
       post_author: user
@@ -517,7 +515,7 @@ For example the `[gallery]` shortcode has four attributes that can contain refer
 
 Note that you don't have to worry about the attribute type, whether it contains a single ID or a list of IDs. VersionPress handles both cases automatically:
 
-```
+``` php
 [gallery id="1"]
 [gallery id="1,2,3,6,11,20"]
 ```
@@ -586,4 +584,3 @@ TODO this will be auto-generated from code.
 
  - `vp_force_action`
    - `vp_force_action($scope, $action, $id = '', $tags = [], $files = [])`
-

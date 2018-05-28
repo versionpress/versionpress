@@ -32,8 +32,6 @@ Content is organized in **the `content` directory**:
 
 We **don't really use docs versioning** via URL like "/latest" or "/v2", the state of the documentation in `master` should reflect all versions. If something has been deprecated or is new, just indicate it in the text.
 
-> **Power user tip**:
-
 ### Authoring documentation
 
  - **Start each file with an H1 header** (`# Some Title`). This MUST be the first non-front-matter line of the document; the navigation system depends on it.
@@ -45,15 +43,19 @@ We **don't really use docs versioning** via URL like "/latest" or "/v2", the sta
       <figcaption>Image caption</figcaption>
     </figure>
     ```
- - **Notes / warnings / tips** can be written in special boxes. Supported CSS classes are `note` (green), `tip` (blue), `important` (orange) and `warning` (red), the syntax is:
+ - **Notes / warnings / tips** and other kinds of notes can be written in special boxes.
+ Admonition is an extension included in the standard Markdown library that makes it possible to add block-styled side content to your documentation, for example summaries, notes, hints or warnings. Supported types are listed at [the Admonition documentation](https://squidfunk.github.io/mkdocs-material/extensions/admonition/). The syntax is:
     ```
-    <div class="note">
-      <p><strong>Note title</strong></p>
-      <p>This will be rendered in a highlighted box.</p>
-    </div>
+    !!! Note "Note Title"
+        This will be rendered in a highlighted box.
     ```
  - **TODO markers** can be written as `[TODO]` or `[TODO some arbitrary text]`. They will be highlighted in yellow and should be used rarely, possibly in alpha / beta versions of the doc topic.
-
+ - **Emojis** You can use [emoji shortcodes](https://www.webpagefx.com/tools/emoji-cheat-sheet/) to display on your pages.
+ - **Magic Links** You can use link shorthand and mentions using the [MagicLink](https://facelessuser.github.io/pymdown-extensions/extensions/magiclink/) markdown plugin. Just paste links directly in the document like this: https://google.com. Or even an email address: fake.email@email.com. Check out the docs for other tricks using github pull requests etc.
+ - **Progress Bars** automatically generate using simple markup:
+    ```
+    [=25% "25%"]
+    ```
 
 ### Deploying docs
 

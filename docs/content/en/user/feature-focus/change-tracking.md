@@ -12,12 +12,8 @@ Change tracking is a core feature of VersionPress. This page describes the three
 
 Most of the time, VersionPress works silently, simply tracking all the important changes and recording them for later use. This includes both files and database entities like posts or comments. This section contains some specifics on what is tracked and how.
 
-<div class="note">
-  <p><strong>Note</strong></p>
-  <p>The info below might not be entirely complete as there are lots of details for various content types. Consider it a brief overview.</p>
-</div>
-
-
+!!! Warning "Possibility content not complete"
+    The info below might not be entirely complete as there are lots of details for various content types. Consider it a brief overview.
 
 ### Files
 
@@ -32,8 +28,8 @@ Most tracked changes involve database entities which are described below but som
 
 When any such action happens, VersionPress commits both the database change and a related file(s) change. For example, when installing a plugin, VersionPress will take note that the list of installed plugins has been changed in the database and commit the corresponding plugin files as well.
 
-Note that not all files are versioned because you e.g. don't want to commit cache files, large backup ZIPs etc. Please refer to the [What's not tracked](#what-s-not-tracked) section for more.  
- 
+Note that not all files are versioned because you e.g. don't want to commit cache files, large backup ZIPs etc. Please refer to the [What's not tracked](#what-s-not-tracked) section for more.
+
 
 
 ### Database entities
@@ -62,7 +58,7 @@ Special treatment:
 
  * We don't track WordPress **revisions**, i.e., posts of a type `revision`. Git versions are our revisions – more powerful, space efficient etc.
  * **Drafts** are treated specially because WordPress updates them unnecessarily often. VersionPress ignores most of the internal updates and only stores a new revisions when a draft is saved or eventually published as a full post.
-     * (In more detail, the draft is first stored by VersionPress when the post state changes from `auto-draft` to `draft`. This happens either after title is filled in and the field loses focus, or after a couple of seconds timeout. The next revision of that draft is then created every time the user clicks *Save draft*, or, eventually, when he/she publishes the post. New revision is *not* created when the user clicks *Preview*.)  
+     * (In more detail, the draft is first stored by VersionPress when the post state changes from `auto-draft` to `draft`. This happens either after title is filled in and the field loses focus, or after a couple of seconds timeout. The next revision of that draft is then created every time the user clicks *Save draft*, or, eventually, when he/she publishes the post. New revision is *not* created when the user clicks *Preview*.)
  * **Attachments** are special types of posts too. VersionPress tracks both the database change related to these post types as well as files created on the disk.
 
 ##### Postmeta
@@ -139,7 +135,7 @@ Widgets are technically entries in the `options` table and are fully supported.
 
 #### Menus
 
-Menus are technically stored as half terms (the menu itself), half posts (menu items) and are fully supported.  
+Menus are technically stored as half terms (the menu itself), half posts (menu items) and are fully supported.
 
 
 #### Other entities
@@ -154,9 +150,9 @@ Some changes cannot be auto-tracked by VersionPress, e.g., manual file edits on 
 You can use any Git client for it or, since VersionPress 2.0, there is a GUI for it:
 
 <figure style="width: 90%;">
-  <img src="https://cloud.githubusercontent.com/assets/101152/26038403/df254b0e-3907-11e7-8f62-50e31c81a740.png" alt="Manual commit" /> 
+  <img src="https://cloud.githubusercontent.com/assets/101152/26038403/df254b0e-3907-11e7-8f62-50e31c81a740.png" alt="Manual commit" />
 </figure>
- 
+
 
 VersionPress treats manual commits exactly the same as auto-generated commits – they will be visible in the table, [undo or rollback](./undo-and-rollback) them, etc.
 
@@ -178,22 +174,24 @@ There are certain things that VersionPress intentionally omits from versioning:
 
 Ignoring is done using the standard [Gitignore files](http://git-scm.com/docs/gitignore) and VersionPress will try to install appropriate `.gitignore` files upon its activation.
 
-<div class="note">
-  <p><strong>Note</strong></p>
-  <p>If the installation finds existing `.gitignore` file already in place, it will assume that the site is managed professionally and will not attempt to modify the ignore rules itself. The user will be notified about this.</p> 
-</div>
+!!! Note "Existing .gitignore will not be modified"
+    If the installation finds existing `.gitignore` file already in place, it will assume that the site is managed professionally and will not attempt to modify the ignore rules itself. The user will be notified about this.
 
 As an example, let's say that you have a `wp-content/myfolder` folder that you want to track. This is a part of the default `.gitgnore` file which causes the `myfolder` being ignored:
 
+``` bash
     wp-content/*
     !wp-content/plugins/
     !wp-content/themes/
     !wp-content/uploads/
+```
 
 It basically reads "ignore everything in wp-content *(line 1)* except plugins (line 2), themes (line 3) and uploads (line 4)". To add `myfolder` to tracking, just add a fifth line:
 
+``` bash
     wp-content/*
     !wp-content/plugins/
     !wp-content/themes/
     !wp-content/uploads/
     !wp-content/myfolder/
+```

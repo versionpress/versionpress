@@ -250,7 +250,7 @@ For pure frontend development, it's more convenient to run it outside of the Wor
 
 1. Make sure that the site is running and that VersionPress is activated in it. You should be able to visit `http://localhost:8088` in the browser and the `frontend/src/config/config.local.ts` should contain this URL as API root.
 2. In your test WordPress site, put this to `wp-config.php` (the file should be editable at `./dev-env/wp/wp-config.php`):
-    ```
+    ``` php
     define('VERSIONPRESS_REQUIRE_API_AUTH', false);
     ```
 3. Run `npm start` in the `frontend` directory.
@@ -281,7 +281,7 @@ Here are some tips for working with Docker / Docker Compose:
     - `npm run cleanup-docker-stack` to clean up everything.
 - Most values in `docker-compose.yml` like environment variables can be changed in `docker-compose.override.yml`.
 - Any container from the stack can be started in an interactive session by adding this to `docker-compose.yml`:
-    ```
+    ```yaml
     stdin_open: true
     tty: true
     ```

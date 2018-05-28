@@ -29,30 +29,39 @@ Let's go through a couple of scenarios to see the commands in action.
 
 Let's start with the main site, e.g., "live", living in `<some path>/www/live` and served from `http://example.com/live`. We want to create a staging environment so we call:
 
+``` bash
     wp vp clone --name=staging
+```
 
 That creates a clone in `www/staging`, running at `http://example.com/staging` (configurable, see [cloning](./cloning) for more). Then we do some changes in this staging environment via the web.
 
 When done, we `cd` into the `staging` folder and run:
-
+``` bash
     # /www/staging
     wp vp pull
+```
 
 We don't need to provide any additional parameters because by default, VersionPress will pull from the environment where this clone originated (in Git's language, it's called the *origin*). If we wanted to be explicit, this would have the same effect:
 
+``` bash
     # /www/staging
     wp vp pull --from=origin
+```
 
 Here, the use of `origin` doesn't really add any value but sometimes, the `--from` parameter might be useful. For instance, if we wanted to pull changes from the staging environment into the live site, we would run this:
 
+``` bash
     # /www/live
     wp vp pull --from=staging
+```
 
 In either case, the result is an updated site with both the local changes and the changes pulled from the other environment. A merge was performed here.
 
 The push command is useful when we performed the pull standing in the `staging` folder. In that case, we see the merged environment on the staging site but not on the live site yet. We need to push:
 
+``` bash
     wp vp push
+```
 
 Again, there is no need to provide the `--to=origin` parameter as `origin` is the default target of our clone. After this command, the live site is updated and looks exactly like the staging clone.
 

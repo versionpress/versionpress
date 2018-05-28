@@ -44,7 +44,7 @@ pages:
       - 'Undo and Rollback': 'en/user/feature-focus/undo-and-rollback.md'
       - 'Searching History': 'en/user/feature-focus/searching-history.md'
       - 'External Plugins and Themes': 'en/user/feature-focus/external-plugins.md'
-      - 'Custom project structure': 'en/user/feature-focus/custom-project-structure.md'
+      - 'Custom Project Structure': 'en/user/feature-focus/custom-project-structure.md'
       - 'WP-CLI Commands': 'en/user/feature-focus/wp-cli.md'
       - 'Versioning Engine - Git': 'en/user/feature-focus/git.md'
       - 'Performance Considerations': 'en/user/feature-focus/performance.md'
@@ -98,19 +98,35 @@ markdown_extensions:
       emoji_generator: !!python/name:pymdownx.emoji.to_svg
   - pymdownx.critic
   - pymdownx.details
-  - pymdownx.inlinehilite
+  - pymdownx.highlight:
+      use_pygments: true
+      linenums: true
+      extend_pygments_lang:
+        - name: php-inline
+          lang: php
+          options:
+            startinline: true
+        - name: php
+          lang: php
+          options:
+            startinline: true
+        # note: yaml highlighting only works if second value in key pair is quoted, which isn't standard - problem with pygments
+        # https://bitbucket.org/birkenfeld/pygments-main/issues/890/yaml-highlight
+        - name: yaml
+          lang: yaml
+          options:
+            startinline: true
+  - pymdownx.inlinehilite:
+  - pymdownx.superfences:
   - pymdownx.mark
   - pymdownx.magiclink
   - pymdownx.keys
   - pymdownx.smartsymbols
-  - pymdownx.superfences
+  # - pymdownx.superfences
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tilde
   - admonition # https://squidfunk.github.io/mkdocs-material/extensions/admonition/
-  - codehilite: # https://squidfunk.github.io/mkdocs-material/extensions/codehilite/
-      guess_lang: true
-      linenums: true
   - meta # https://squidfunk.github.io/mkdocs-material/extensions/metadata/
   - toc:
       permalink: true

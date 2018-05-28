@@ -1,6 +1,6 @@
 # Developer Preview
 
-Currently, VersionPress is a **"Developer Preview"**. It can be tried on simpler sites for development purposes but it's not production-ready yet. 
+Currently, VersionPress is a **"Developer Preview"**. It can be tried on simpler sites for development purposes but it's not production-ready yet.
 
 
 ## Considerations
@@ -13,8 +13,7 @@ Currently, VersionPress is a **"Developer Preview"**. It can be tried on simpler
 
 You can tell whether you are using a Developer Preview / Early Access release of VersionPress from the top admin bar.
 
-<div class="note">
-  <p><strong>Note on 'Early Access' and 'EAP'</strong></p>
-  <p>Between January 2015 and March 2016, VersionPress used to be available through the <strong>Early Access Program (EAP)</strong>. It was discontinued when VersionPress <a href="https://blog.versionpress.net/2016/04/going-open-source/">moved to a fully open development model</a> in April 2016.</p>
-  <p>Between April 2016 and May 2017, the term "Early Access" was used. We then switched to "Developer Preview" which better indicates the project status. See <a href="https://github.com/versionpress/versionpress/issues/1201">issue #1201</a>.</p>  
-</div>
+!!! Note "Note on 'Early Access' and 'EAP'"
+    Between January 2015 and March 2016, VersionPress used to be available through the *Early Access Program (EAP)*. It was discontinued when VersionPress [moved](https://blog.versionpress.net/2016/04/going-open-source/moved) to a fully open development model in April 2016.
+
+    Between April 2016 and May 2017, the term "Early Access" was used. We then switched to "Developer Preview" which better indicates the project status. See [issue #1201](https://github.com/versionpress/versionpress/issues/1201)

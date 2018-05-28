@@ -13,14 +13,12 @@ Both things are important, please read on.
 The server environment must match certain requirements, some of which are checked automatically on VersionPress activation. We also recommend some other setup steps below.
 
 <figure style="width: 80%;">
-  <img src="https://cloud.githubusercontent.com/assets/101152/26038379/7f8dbaf0-3907-11e7-92f4-3d211ae0d882.png" alt="Pre-activation check" /> 
+  <img src="https://cloud.githubusercontent.com/assets/101152/26038379/7f8dbaf0-3907-11e7-92f4-3d211ae0d882.png" alt="Pre-activation check" />
   <figcaption>Pre-activation check performed by VersionPress</figcaption>
 </figure>
 
-<div class="important">
-  <p><strong>Important</strong></p>
-  <p>VersionPress is a lot more involved than most other WordPress plugins. Please pay attention to this section before proceeding with installation.</p> 
-</div>
+!!! warning "Before proceeding with installation"
+    VersionPress is a lot more involved than most other WordPress plugins. Please pay attention to this section before proceeding with installation.
 
 Minimum system requirements are (as a general rule, **we recommend using the latest versions of everything**):
 
@@ -94,7 +92,7 @@ The last step is important, otherwise VersionPress wouldn't be able to track cha
 Upon successful activation, you should see a screen like this:
 
 <figure style="width: 80%;">
-  <img src="https://cloud.githubusercontent.com/assets/101152/26038360/1f325f26-3907-11e7-9993-0e25ff3299d7.png" alt="VersionPress activated" /> 
+  <img src="https://cloud.githubusercontent.com/assets/101152/26038360/1f325f26-3907-11e7-9993-0e25ff3299d7.png" alt="VersionPress activated" />
   <figcaption>VersionPress successfully activated</figcaption>
 </figure>
 
@@ -107,7 +105,7 @@ Since [VersionPress 3.0](../release-notes/3.0), the simplest way to update is to
 wp vp update ./versionpress.zip
 ```
 
-This will keep the Git repo and continue tracking the site fine, however, keep in mind that the original history becomes unactionable: you will not be able to undo old changes or roll back to previous states. ([Full migrations](https://github.com/versionpress/versionpress/issues/275) are on our roadmap). 
+This will keep the Git repo and continue tracking the site fine, however, keep in mind that the original history becomes unactionable: you will not be able to undo old changes or roll back to previous states. ([Full migrations](https://github.com/versionpress/versionpress/issues/275) are on our roadmap).
 
 If you cannot use the WP-CLI update method, these are the manual steps:
 
@@ -127,13 +125,13 @@ Uninstallation is a standard two-step process:
 1. You first **deactivate** the plugin on the *Plugins* admin screen
 2. You then **delete** the plugin to get rid of all its files
     - :warning: If you didn't deactivate the plugin via admin screens and manually removed the `wp-content/plugins/versionpress` folder (which is NOT recommended), you have to manually restore the `wp-db.php` file from `wp-db.php.original`.
-3. *Optional:* Manually download or delete a repository backup which was created under `wp-content/backup`. 
+3. *Optional:* Manually download or delete a repository backup which was created under `wp-content/backup`.
 
 There are two important things to note:
 
 * Once VersionPress is deactivated, **it cannot be fully reactivated again on the same repository**. This means that while you can initialize VersionPress again and the presence of the old repository will not be a problem, features like Undo or Rollback will only be available for *new* commits, created by the current activation of VersionPress. This is technical limitation that is not easy to overcome.
 * **On uninstallation, the Git repository is moved to a backup folder** under `wp-content/vpbackups`. You can download or recover it from there manually.
-    * Note: VersionPress will only remove / backup the repository if it detects that it was VersionPress-initiated repository. If you created the Git repository manually before installing VersionPress the repository will not be touched.  
+    * Note: VersionPress will only remove / backup the repository if it detects that it was VersionPress-initiated repository. If you created the Git repository manually before installing VersionPress the repository will not be touched.
 
 
 ## VersionPress states at a glance
@@ -150,7 +148,7 @@ To sum up the previous text, here are the states that the site can be in:
 | VersionPress reactivated on the *Plugins* screen (similar to step 3) | Yes (but obsolete) | **Still no** |
 | Fully activated again (similar to step 4) | Yes | **Yes** |
 | Uninstalled | **No** (backed up) | No |
- 
+
 <sup>1)</sup> The repo might exist if you created it manually or if VersionPress was previously installed. It is not a problem – VersionPress will happily add commits to the existing repository but a common scenario is that there is no default Git repository and VersionPress creates one.
 
 

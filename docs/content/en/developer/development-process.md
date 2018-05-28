@@ -10,7 +10,8 @@ Here is a set of tools and approaches we use during VersionPress development.
 
 [**Projects**](https://github.com/versionpress/versionpress/projects) are then used for more granular planning, e.g., to assign issues to various alpha, beta or final releases.
 
-> Issues not assigned to any milestone are in a backlog – we want to do them one day but there are no immediate plans.
+!!! Note "Backlog"
+    Issues not assigned to any milestone are in a backlog – we want to do them one day but there are no immediate plans.
 
 [**Pull requests**](https://github.com/versionpress/versionpress/pulls) implement issues. Commonly, a piece of functionality starts as an issue but quickly transitions into a PR where most of the technical discussion happens. In other words, issues are the original ideas of how to improve or fix something, PR's are how it was actually done.
 

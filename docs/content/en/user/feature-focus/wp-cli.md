@@ -23,12 +23,15 @@ Here is an [overview of all the supported installation methods](https://github.c
 
 When VersionPress is installed *and activated* on the plugins screen, `cd` into the site root and run:
 
-    $ wp vp <command> <parameters>
+``` bash
+$ wp vp <command> <parameters>
+```
 
 If VersionPress is not active or cannot be active, for example, in case of a broken site, use `--require` to load a specific WP-CLI command. For example, `restore-site` will usually need this so it will be called like this:
 
-    $ wp vp restore-site --siteurl='http://localhost/mysite' --require=wp-content/plugins/versionpress/src/Cli/vp.php
-
+``` bash
+$ wp vp restore-site --siteurl='http://localhost/mysite' --require=wp-content/plugins/versionpress/src/Cli/vp.php
+```
 
 ## Command reference ##
 
@@ -49,8 +52,9 @@ Takes a commit SHA-1 as an argument and which can either be a full SHA1 like `4d
 
 *Examples:*
 
-    $ wp vp undo a34bc28
-
+``` bash
+$ wp vp undo a34bc28
+```
 
 
 ### vp rollback
@@ -64,8 +68,9 @@ Takes a commit SHA-1 as an argument and which can either be a full SHA1 like `4d
 
 *Examples:*
 
-    $ wp vp rollback a34bc28
-
+``` bash
+$ wp vp rollback a34bc28
+```
 
 ### vp restore-site
 
@@ -80,8 +85,9 @@ Let's focus on the first scenario now. In the worst case, you completely lost th
 
 Note that with this command, you will **need to include the `--require=...` parameter** because on a broken or non-existent site, WP-CLI will not be able to automatically detect the `vp` command. The complete command invocation will usually look like this:
 
-    $ wp vp restore-site --siteurl='http://localhost/mysite' --require=wp-content/plugins/versionpress/src/Cli/vp.php
-
+``` bash
+$ wp vp restore-site --siteurl='http://localhost/mysite' --require=wp-content/plugins/versionpress/src/Cli/vp.php
+```
 
 The other, **development scenario** assumes that the only thing you have is a Git clone of a site. That is quite extreme because not only you don't have a database at all but you also don't have these two vital things due to the fact that VersionPress doesn't store them in the Git repo (for good reasons [described here](../feature-focus/change-tracking#whats-not-tracked)):
 

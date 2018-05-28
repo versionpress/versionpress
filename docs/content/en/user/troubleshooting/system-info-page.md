@@ -4,7 +4,9 @@ As VersionPress is [more demanding](../getting-started/installation-uninstallati
 
 The system info page is available at this URL:
 
-    http://YOURSITE/wp-admin/admin.php?page=versionpress%2Fadmin%2Fsystem-info.php
+``` bash
+http://YOURSITE/wp-admin/admin.php?page=versionpress%2Fadmin%2Fsystem-info.php
+```
 
 You can also find a link to this page from the bottom left corner of the initialization page:
 
