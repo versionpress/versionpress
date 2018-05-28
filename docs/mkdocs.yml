@@ -11,29 +11,19 @@ google_analytics:
   - 'UA-XXXXXXXX-X'
   - 'auto'
 
-# Extras (dependent on material theme)
-extra:
-  social:
-    - type: 'github'
-      link: 'https://github.com/versionpress'
-    - type: 'twitter'
-      link: 'https://twitter.com/versionpress'
-  search:
-    tokenizer: '[\s\-\.]+'
-
 # Theme Config
 theme:
   name: 'material'
   custom_dir: 'vp_theme'
   feature:
-    tabs: true
+    # tabs: true
   logo: 'img/icon.png'
   favicon: 'img/favicon.ico'
   font:
-    text: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif'
-    code: 'Consolas, "Liberation Mono", Menlo, Courier, monospace'
+    text: "Helvetica Neue"
+    code: 'Consolas'
   palette:
-    primary: 'cyan'
+    primary: '#4183c4'
     accent: 'teal'
 
 # Nav structure
@@ -125,8 +115,18 @@ markdown_extensions:
   - toc:
       permalink: true
 
+# Extras (dependent on material theme)
+extra:
+  social:
+    - type: 'github'
+      link: 'https://github.com/versionpress'
+    - type: 'twitter'
+      link: 'https://twitter.com/versionpress'
+  search:
+    tokenizer: '[\s\-\.]+'
+
 # Custom styles and scripts
 extra_css:
   - 'stylesheets/extra.css'
 extra_javascript:
-  - 'javascripts/extra.js'
+  - 'javascript/extra.js'
