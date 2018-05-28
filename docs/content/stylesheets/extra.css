@@ -5,6 +5,12 @@ body {
     word-wrap: break-word;
 }
 
+/* Link styles */
+
+a:hover {
+    text-decoration: underline;
+}
+
 /* Header styles  */
 
 header.md-header {
@@ -25,7 +31,7 @@ header.md-header {
 
 /* Typography */
 
-.md-typeset h1, .md-typeset h2, .md-typeset h3, .md-typeset h4{
+.md-typeset h1, .md-typeset h2, .md-typeset h3, .md-typeset h4, .md-typeset h5 {
     font-weight: bold;
 }
 
@@ -39,6 +45,14 @@ header.md-header {
     font-size: 2.25em;
     margin: 0;
 }
+
+.md-typeset h4, .md-typeset h5 {
+    font-size: 1em;
+    font-style: italic;
+    margin-top: 1em;
+    margin-bottom: 0.1em;
+}
+
 
 strong {
     font-weight: bold;
@@ -80,6 +94,11 @@ figcaption {
     content: "\A0";
 }
 
+.md-typeset h3 code {
+    margin-right: 2px;
+    background: none repeat scroll 0% 0% #F5F5F5;
+}
+
 /* Lists */
 
 .md-typeset ol li, .md-typeset ul li {
@@ -103,7 +122,7 @@ tbody tr:nth-child(odd) {
 
 /* overrides */
 
-.note, .important {
+.note, .important, .warning {
     padding: 10px 10px 10px 20px;
     background-color: #eeeeee;
     border-left: 4px solid white;
@@ -118,7 +137,18 @@ tbody tr:nth-child(odd) {
     border-left-color: #97CA41;
 }
 
-.important p:first-child {
+.warning {
+    border-left-color: #ff3535;
+}
+
+.important p:first-child, .note p:first-child, .warning p:first-child {
     text-transform: uppercase;
-    margin-bottom: 0;
+}
+
+div.note p, div.important p, div.warning p {
+    margin:0;
+}
+
+div.note code, div.important code, div.warning code {
+    background-color: #fff;
 }

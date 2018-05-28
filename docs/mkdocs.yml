@@ -24,7 +24,7 @@ theme:
     code: 'Consolas'
   palette:
     primary: '#4183c4'
-    accent: 'teal'
+    accent: '#4183c4'
 
 # Nav structure
 pages:
