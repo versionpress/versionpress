@@ -111,6 +111,7 @@ dl dt {
     font-size: 1em;
     font-style: italic;
     font-weight: bold;
+    .codehilite .il { color: #009999 } /* Literal.Number.Integer.Long */
 }
 dt, dd {
     line-height: 1.46;

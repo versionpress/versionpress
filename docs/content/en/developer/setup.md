@@ -2,7 +2,8 @@
 
 This will set you up for VersionPress development.
 
-> **Note**: Since 4.0-beta, we rely on Docker which makes things much easier than full local setup. The legacy approach is still documented in [Dev-Setup.md@4.0-alpha1](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Dev-Setup.md) and [Testing.md@4.0-alpha1](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Testing.md).
+!!! Note "Docker vs Legacy Setup"
+    Since 4.0-beta, we rely on Docker which makes things much easier than full local setup. The legacy approach is still documented in [Dev-Setup.md@4.0-alpha1](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Dev-Setup.md) and [Testing.md@4.0-alpha1](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Testing.md).
 
 ## Getting started
 
@@ -40,15 +41,13 @@ See also [Docker tips](#docker-tips) section below.
 
 Next steps:
 
-- [PhpStorm setup](#phpstorm)
+- [PhpStorm setup](##phpstorm-setup)
 - [Writing code](#writing-code)
 - [Debugging](#debugging)
 - [Testing](#testing)
 - [Frontend development](#frontend-development)
 - [Production build](#production-build)
 - [Docker tips](#docker-tips)
-
-<div id="phpstorm"></div>
 
 ## PhpStorm setup
 
@@ -70,7 +69,8 @@ Also initialize the **Composer** support:
 
 For **Code Sniffer** inspections to work, there's a one-time configuration: Go to *Settings* > *Languages & Frameworks* > *PHP* > *Code Sniffer*, select *Local*, click the three dots next to it and provide your full system path to `./vendor/bin/phpcs`. After this is done, PhpStorm will start checking the code style.
 
-> **Note**: Most VersionPress code uses the [PSR-2](http://www.php-fig.org/psr/psr-2/) coding standard with only the parts directly interacting with WordPress might use WordPress-like conventions, e.g., global functions are defined as `vp_register_hooks()`, not `registerHooks()`.
+!!! Note "Coding Standards"
+    Most VersionPress code uses the [PSR-2](http://www.php-fig.org/psr/psr-2/) coding standard with only the parts directly interacting with WordPress might use WordPress-like conventions, e.g., global functions are defined as `vp_register_hooks()`, not `registerHooks()`.
 
 It is also useful to **install the [EditorConfig](https://plugins.jetbrains.com/plugin/7294?pr=phpStorm) extension**, VersionPress ships with some basic formatting rules in `.editorconfig`.
 
@@ -80,7 +80,8 @@ Please refer to the [Contributing code](https://github.com/versionpress/versionp
 
 ## Debugging
 
-> **Note**: VersionPress consists of core PHP code plus React app for the frontend. This section is about PHP debugging only.
+!!! Warning "PHP Debugging"
+    VersionPress consists of core PHP code plus React app for the frontend. This section is about PHP debugging only.
 
 The development environment is preconfigured with [Xdebug](https://xdebug.org/). Here's an example setup:
 
@@ -102,16 +103,15 @@ Debugging should now work:
 
 Tests are a significant part of VersionPress core, currently about 60% of the codebase. They live in `./plugins/versionpress/tests` and there are several types of them, from unit tests to full end2end tests. They all run in a dockerized test environment.
 
-> **Note**: the `./frontend` app has its own tests, this section is about core VersionPress tests (PHP code) only.
+!!! Warning "Core VersionPress Tests"
+    the `./frontend` app has its own tests, this section is about core VersionPress tests (PHP code) only.
 
 In this section:
 
-- [Dockerized testing environment](#dockerized-tests)
+- [Dockerized testing environment](#dockerized-testing-environment)
 - [Unit tests](#unit-tests)
 - [End2end tests](#end2end-tests)
 - [Other tests](#other-tests)
-
-<div id="dockerized-tests"></div>
 
 ### Dockerized testing environment
 
@@ -127,7 +127,7 @@ If you don't need to run or debug tests from PhpStorm, running tests is as simpl
 
 The first run fetches all the Docker images and can be quite slow but subsequent runs are almost instant.
 
-If you want to run only a **subset of tests**, e.g., unit tests, override the default Docker Compose `command`. Some examples:
+If you want to run only a **subset of tests**, e.g., unit tests, override the default `Docker Compose` command. Some examples:
 
 ```sh
 # pick a test suite from phpunit.xml:
@@ -143,8 +143,6 @@ docker-compose run tests ../vendor/bin/phpunit -c phpunit.override.xml --color
 After the tests are run, you would **inspect the results** in the console. Also, the whole Docker stack is kept running which is useful for integration tests; you can e.g. inspect the test WordPress site, its database, etc. The [end2end tests](#end2end-tests) section provides more info on this.
 
 Run `npm run stop-tests` to **shut down the Docker stack** or `npm run cleanup-tests` to also remove all the volumes (next start will be completely fresh).
-
-<div id="running-tests-from-phpstorm"></div>
 
 #### Running tests from PhpStorm
 
@@ -222,9 +220,6 @@ After you run the tests using one of the methods described above, the Docker Com
 - **Adminer** is available on **port 8099** after you run `docker-compose run -d --service-ports adminer`.
 - `docker-compose ps` lists all the running services.
 - `docker-compose down [-v]` shuts down the whole stack (there are npm scripts for that too, see above).
-
-
-<div id="other-tests"></div>
 
 ### Other tests
 

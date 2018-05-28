@@ -49,7 +49,7 @@ Takes a commit SHA-1 as an argument and which can either be a full SHA1 like `4d
 
 *Examples:*
 
-    $ wp vp undo a34bc28 
+    $ wp vp undo a34bc28
 
 
 
@@ -64,7 +64,7 @@ Takes a commit SHA-1 as an argument and which can either be a full SHA1 like `4d
 
 *Examples:*
 
-    $ wp vp rollback a34bc28 
+    $ wp vp rollback a34bc28
 
 
 ### vp restore-site

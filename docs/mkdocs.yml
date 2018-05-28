@@ -109,7 +109,7 @@ markdown_extensions:
   - pymdownx.tilde
   - admonition # https://squidfunk.github.io/mkdocs-material/extensions/admonition/
   - codehilite: # https://squidfunk.github.io/mkdocs-material/extensions/codehilite/
-      guess_lang: false
+      guess_lang: true
       linenums: true
   - meta # https://squidfunk.github.io/mkdocs-material/extensions/metadata/
   - toc:

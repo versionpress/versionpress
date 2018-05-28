@@ -80,7 +80,7 @@ We currently don't have a good way to generate the definitive list of supported 
 
 VP tags are pieces of metadata that VersionPress stores with each commit. For example, updating the site title creates a commit message like this:
 
-```
+```json
 [VP] Edited option 'blogname'
 
 VP-Action: option/edit/blogname

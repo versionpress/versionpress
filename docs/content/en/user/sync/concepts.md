@@ -2,11 +2,8 @@
 
 Previous sections focused on using VersionPress on a single site, or more precisely, on a single site *instance*. It offers many useful features there but where it truly shines is when it comes to **multiple instances** (*clones* of the WP site, *environments* if you will) and **synchronization** between them.
 
-<div class="note">
-  <p><strong>Terminology</strong></p>
-  <p>The terms *clone*, *WP instance*, *installation*, *environment* etc. all represent the same concept and are used interchangeably here.</p>
-</div>
-
+!!! Note "Terminology"
+    The terms *clone*, *WP instance*, *installation*, *environment* etc. all represent the same concept and are used interchangeably here.
 
 ## Why multiple instances
 
@@ -28,11 +25,8 @@ That's where VersionPress comes in.
 
 Let's discuss a workflow that seems basic but actually covers almost any real-world scenario – you can use it for staging, team work, hosting the repository on GitHub, almost anything.
 
-<div class="note">
-  <p><strong>See also</strong></p>
-  <p>The workflow has been showcased in the blog post [VersionPress 2.0: Easy Staging](https://blog.versionpress.net/2015/09/versionpress-2-0-staging/).</p>
-</div>
-
+!!! Tip "See Also"
+    The workflow has been showcased in the blog post [VersionPress 2.0: Easy Staging](https://blog.versionpress.net/2015/09/versionpress-2-0-staging/).
 
 **(1)** You start by **[cloning a site](./cloning)**. That creates a new site instance that looks exactly like the original one but with its own files and database tables. Technically, it is a separate WordPress installation.
 
