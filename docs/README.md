@@ -73,9 +73,19 @@ We **don't really use docs versioning** via URL like "/latest" or "/v2", the sta
  - **Emojis** You can use [emoji shortcodes](https://www.webpagefx.com/tools/emoji-cheat-sheet/) to display on your pages. :metal: :raised_hands: :sparkles: :boom: :clap: :tada:
  - **Magic Links** You can use link shorthand and mentions using the [MagicLink](https://facelessuser.github.io/pymdown-extensions/extensions/magiclink/) markdown plugin. Just paste links directly in the document like this: https://google.com. Or even an email address: fake.email@email.com. Check out [the docs](https://facelessuser.github.io/pymdown-extensions/extensions/magiclink/) for other tricks using github pull requests etc.
 
+
+### Building docs
+
+1. Install mkdocs on local machine [install documentation](https://www.mkdocs.org/#installation)
+2. clone docs directory to local
+3. run `mkdocs serve` to test it out
+4. run `mkdocs build` to build static files into `./site` directory
+
 ### Deploying docs
 
-When a PR is merged into `master`, it is automatically deployed to [docs.versionpress.net](http://docs.versionpress.net/en).
+- [ ] TODO: determine best approach for hosting and document process here - leaving repo owners to decide
+
+<!-- When a PR is merged into `master`, it is automatically deployed to [docs.versionpress.net](http://docs.versionpress.net/en). -->
 
 
 ### Redirects
