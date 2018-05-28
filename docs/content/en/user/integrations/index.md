@@ -2,11 +2,11 @@
 
 WordPress is a rich ecosystem and its plugins & themes can do anything and everything. This is a huge advantage for users but also a challenge for VersionPress as some of these external pieces of code might need special handling.
 
-This page provides general overview and there are three sub-pages discussing specific: 
+This page provides general overview and there are three sub-pages discussing specific:
 
- * [plugins](./integrations/plugins)
- * [themes](./integrations/themes)
- * and [hosts](./integrations/hosts)
+ * [plugins](./plugins)
+ * [themes](./themes)
+ * and [hosts](./hosts)
 
 
 ## General notes on external plugins & themes
@@ -20,10 +20,10 @@ Though we don't have concrete stats, many plugins and almost all themes fall int
 
 However, there are also plugins that are either not quite well coded or so complex that they require specific support. To a lesser extent, this is also true for themes, mostly the "page builder" themes that possibly use their own database tables, etc. But it is far more common for plugins.
 
-Please refer to these to pages for the specifics: 
+Please refer to these to pages for the specifics:
 
- * [Plugins](./integrations/plugins)
- * [Themes](./integrations/themes)
+ * [Plugins](./plugins)
+ * [Themes](./themes)
 
 
 ### Note for plugin developers
