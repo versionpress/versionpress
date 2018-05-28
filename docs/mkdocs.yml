@@ -123,3 +123,9 @@ markdown_extensions:
   - meta # https://squidfunk.github.io/mkdocs-material/extensions/metadata/
   - toc:
       permalink: true
+
+# Custom styles and scripts
+extra_css:
+  - 'stylesheets/extra.css'
+extra_javascript:
+  - 'javascripts/extra.js'
