@@ -122,7 +122,7 @@ tbody tr:nth-child(odd) {
 
 /* overrides */
 
-.note, .important, .warning {
+.note, .important, .warning, .tip {
     padding: 10px 10px 10px 20px;
     background-color: #eeeeee;
     border-left: 4px solid white;
@@ -141,14 +141,18 @@ tbody tr:nth-child(odd) {
     border-left-color: #ff3535;
 }
 
-.important p:first-child, .note p:first-child, .warning p:first-child {
+.tip {
+    border-left-color: #3596ff;
+}
+
+.important p:first-child, .note p:first-child, .warning p:first-child, .tip p:first-child {
     text-transform: uppercase;
 }
 
-div.note p, div.important p, div.warning p {
+div.note p, div.important p, div.warning p, div.tip p {
     margin:0;
 }
 
-div.note code, div.important code, div.warning code {
+div.note code, div.important code, div.warning code, div.tip code {
     background-color: #fff;
 }
