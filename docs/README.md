@@ -62,11 +62,29 @@ When a PR is merged into `master`, it is automatically deployed to [docs.version
 
 ### Redirects
 
-URL redirects can be specified in `content/config.yml` like so:
+TODO: how to make redirects work in mkdocs
 
-```
-redirects:
-  'en/getting-started/old-name': 'en/getting-started/new-name'
-```
+### Theme Info
 
-Note that there is no leading slash. This leads to HTTP 301 Moved Permanently.
+The theme is modded from the 3rd party theme [Material](https://squidfunk.github.io/mkdocs-material/), used more for it's function than it's look.
+
+Some of this functionality includes:
+
+* better mobile support
+* configuration within mkdocs.yml
+  * easy color customization
+  * easy font changes
+  * branding options
+  * localization - in the event that we branch documentation beyond english in future
+  * fast search using [lunr.js](https://lunrjs.com/) and tokenizer settings (index words separated by - or .)
+  * markdown extensions
+    * see mkdocs for list of enabled extensions
+
+You can customize the theme by updating the following files:
+
+  * /stylesheets/extra.css
+  * /javascript/extra.js
+
+  OR
+
+You can override Material and create a ['child theme'](https://www.mkdocs.org/user-guide/styling-your-docs/#using-the-theme-custom_dir) in the vp_theme directory. Any file in the Material theme can be overridden by adding a modified version of that file in the same structure. Support for this already exists in the configuration.
