@@ -1,0 +1,117 @@
+body {
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.6;
+    word-wrap: break-word;
+}
+
+/* Header styles  */
+
+header.md-header {
+    background-color: rgba(211, 223, 235, 0.25);
+    border-top: 1px solid rgba(141, 172, 203, 0.25);
+    border-bottom: 1px solid rgba(141, 172, 203, 0.25);
+}
+
+.md-header-nav__topic {
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.md-source__repository, .md-source__icon, .md-header-nav__topic  {
+    color: #777;
+}
+
+
+/* Typography */
+
+.md-typeset h1, .md-typeset h2, .md-typeset h3, .md-typeset h4{
+    font-weight: bold;
+}
+
+.md-typeset h1, .md-typeset h2 {
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid #eee;
+}
+
+.md-typeset h1 {
+    color: #000;
+    font-size: 2.25em;
+    margin: 0;
+}
+
+.md-typeset p {
+    margin: 0;
+}
+
+strong {
+    font-weight: bold;
+}
+
+/* image sections */
+
+figure {
+    margin: 30px 0;
+    text-align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+figcaption {
+    margin-top: 10px;
+    font-style: italic;
+    display: block;
+}
+
+/* Code blocks */
+
+.md-typeset code, .md-typeset tt {
+    background: none repeat scroll 0% 0% #F5F5F5;
+    color: #333333;
+    border: 1px solid #CCC;
+    border-radius: 3px;
+    margin:0;
+    box-shadow: none;
+    padding: 1px 3px;
+}
+.md-typeset code:before, .md-typeset tt:before, .md-typeset code:after, .md-typeset tt:after {
+    content: "";
+}
+
+.md-typeset code:before, .md-typeset code:after {
+    letter-spacing: -0.2em;
+    content: "\A0";
+}
+
+/* Lists */
+
+.md-typeset ol li, .md-typeset ul li {
+    margin-bottom:0;
+}
+
+dl dt {
+    padding: 0;
+    margin-top: 16px;
+    font-size: 1em;
+    font-style: italic;
+    font-weight: bold;
+}
+dt, dd {
+    line-height: 1.46;
+}
+
+/* overrides */
+
+.important {
+    padding: 10px 10px 10px 20px;
+    background-color: #eeeeee;
+    border-left: 4px solid white;
+    margin-bottom: 16px;
+    border-left-color: #FFA600;
+}
+
+.important p:first-child {
+    text-transform: uppercase;
+    margin-bottom: 0;
+}
