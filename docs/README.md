@@ -2,9 +2,9 @@
 
 ## Developer documentation
 
-- [Plugin-Support.md](./en/developer/plugin-support.md)
-- [Dev-Setup.md](./en/developer/setup.md)
-- [Development-Process.md](./en/developer/development-process.md)
+- [Plugin Support](/en/developer/plugin-support.md)
+- [Developer Setup](/en/developer/setup.md)
+- [Development Process](/en/developer/development-process.md)
 
 ## User documentation
 
@@ -14,11 +14,11 @@ User documentation is authored in the `content` folder and published to [docs.ve
 
 VersionPress uses a Python based docs system called [MkDocs](https://www.mkdocs.org/). The content is authored as a set of Markdown files in this repo, built through `mkdocs build` and eventually published at [docs.versionpress.net](http://docs.versionpress.net/en).
 
-Documentation is authored in **Markdown**, specifically in the [MarkdownDeep dialect](http://www.toptensoftware.com/markdowndeep/) with extra mode switched on. This makes it pretty close to GitHub Flavored Markdown (GFM) although there might be some differences. <small>(We will switch to GFM one day.)</small> See [authoring tips below](#authoring-documentation).
+Documentation is authored in **Markdown**. See [authoring tips below](#authoring-documentation).
 
 Content is organized in **the `content` directory**:
 
-![Content structure](https://cloud.githubusercontent.com/assets/101152/14105777/ee4fc5da-f5ad-11e5-86b1-ec73ac35419e.png)
+![Content structure](content/img/structure.png)
 
 **URLs** map to this structure pretty closely. `index.md` are special files representing section homepages. Some examples:
 
@@ -28,7 +28,7 @@ Content is organized in **the `content` directory**:
 | `content/en/sync/index.md`         | `/en/sync`         |
 | `content/en/index.md`              | `/en`              |
 
-**Site navigation** also reflects the file / folder structure, both in the sidebar and the "Next / Previous" links at the bottom of each topic. **Documents' H1** determine the texts rendered.
+**Site navigation** is defined in the `mkdocs.yml` file in the root directory. This file must be manually updated whenever a new file is added or an existing file is moved. This structure will automatically generate the navigation on the site in both the sidebar and in the "next"/"previous" links in the footer.
 
 We **don't really use docs versioning** via URL like "/latest" or "/v2", the state of the documentation in `master` should reflect all versions. If something has been deprecated or is new, just indicate it in the text.
 
@@ -47,15 +47,31 @@ We **don't really use docs versioning** via URL like "/latest" or "/v2", the sta
  Admonition is an extension included in the standard Markdown library that makes it possible to add block-styled side content to your documentation, for example summaries, notes, hints or warnings. Supported types are listed at [the Admonition documentation](https://squidfunk.github.io/mkdocs-material/extensions/admonition/). The syntax is:
     ```
     !!! Note "Note Title"
-        This will be rendered in a highlighted box.
+        This will be rendered in a highlighted box. Pay attention to the spaces below the !!!
     ```
+
+    !!! Note "Note Title"
+        This will be rendered in a highlighted box. Pay attention to the spaces below the !!!
+
+    ```
+    !!! Warning "Warning Title"
+        This will be rendered in a highlighted box. Pay attention to the spaces below the !!!
+    ```
+
+    !!! Warning "Warning Title"
+        This will be rendered in a highlighted box. Pay attention to the spaces below the !!!
+
+    ```
+    !!! Danger ""
+        This will be rendered in a highlighted box with **NO TITLE**.
+    ```
+
+    !!! Danger ""
+        This will be rendered in a highlighted box with **NO TITLE**.
+
  - **TODO markers** can be written as `[TODO]` or `[TODO some arbitrary text]`. They will be highlighted in yellow and should be used rarely, possibly in alpha / beta versions of the doc topic.
- - **Emojis** You can use [emoji shortcodes](https://www.webpagefx.com/tools/emoji-cheat-sheet/) to display on your pages.
- - **Magic Links** You can use link shorthand and mentions using the [MagicLink](https://facelessuser.github.io/pymdown-extensions/extensions/magiclink/) markdown plugin. Just paste links directly in the document like this: https://google.com. Or even an email address: fake.email@email.com. Check out the docs for other tricks using github pull requests etc.
- - **Progress Bars** automatically generate using simple markup:
-    ```
-    [=25% "25%"]
-    ```
+ - **Emojis** You can use [emoji shortcodes](https://www.webpagefx.com/tools/emoji-cheat-sheet/) to display on your pages. :metal: :raised_hands: :sparkles: :boom: :clap: :tada:
+ - **Magic Links** You can use link shorthand and mentions using the [MagicLink](https://facelessuser.github.io/pymdown-extensions/extensions/magiclink/) markdown plugin. Just paste links directly in the document like this: https://google.com. Or even an email address: fake.email@email.com. Check out [the docs](https://facelessuser.github.io/pymdown-extensions/extensions/magiclink/) for other tricks using github pull requests etc.
 
 ### Deploying docs
 
@@ -64,7 +80,9 @@ When a PR is merged into `master`, it is automatically deployed to [docs.version
 
 ### Redirects
 
-TODO: how to make redirects work in mkdocs
+- [ ] TODO: how to make redirects work in mkdocs
+  * one way is to leave old file but add `<meta http-equiv="refresh" content="0; url=new" />` to redirect it
+  * discussions on board about plugins (if someone could port https://github.com/jekyll/jekyll-redirect-from that would be awesome)
 
 ### Theme Info
 
@@ -73,18 +91,19 @@ The theme is modded from the 3rd party theme [Material](https://squidfunk.github
 Some of this functionality includes:
 
 * better mobile support
+* embedded search
 * configuration within mkdocs.yml
-  * easy color customization
+  * easy color customization / syntax highlighting
   * easy font changes
   * branding options
   * localization - in the event that we branch documentation beyond english in future
   * fast search using [lunr.js](https://lunrjs.com/) and tokenizer settings (index words separated by - or .)
   * markdown extensions
-    * see mkdocs for list of enabled extensions
+    * see mkdocs.yml file for list of enabled extensions
 
 You can customize the theme by updating the following files:
 
-  * /stylesheets/extra.css
+  * /stylesheets/extra.css (slight modifications have been made there to make current site look like last version)
   * /javascript/extra.js
 
   OR
