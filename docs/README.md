@@ -2,9 +2,9 @@
 
 ## Developer documentation
 
-- [Plugin-Support.md](./Plugin-Support.md)
-- [Dev-Setup.md](./Dev-Setup.md)
-- [Development-Process.md](./Development-Process.md)
+- [Plugin-Support.md](./en/developer/plugin-support.md)
+- [Dev-Setup.md](./en/developer/setup.md)
+- [Development-Process.md](./en/developer/development-process.md)
 
 ## User documentation
 
@@ -12,7 +12,7 @@ User documentation is authored in the `content` folder and published to [docs.ve
 
 ### Overview
 
-VersionPress uses a docs system inspired by [Composer Docs](https://github.com/composer/composer/tree/master/doc), [Git Book](https://github.com/progit/progit) or [Azure Docs](https://github.com/Azure/azure-content/). The content is authored as a set of Markdown files in this repo and eventually published at [docs.versionpress.net](http://docs.versionpress.net/en).
+VersionPress uses a Python based docs system called [MkDocs](https://www.mkdocs.org/). The content is authored as a set of Markdown files in this repo, built through `mkdocs build` and eventually published at [docs.versionpress.net](http://docs.versionpress.net/en).
 
 Documentation is authored in **Markdown**, specifically in the [MarkdownDeep dialect](http://www.toptensoftware.com/markdowndeep/) with extra mode switched on. This makes it pretty close to GitHub Flavored Markdown (GFM) although there might be some differences. <small>(We will switch to GFM one day.)</small> See [authoring tips below](#authoring-documentation).
 
@@ -20,19 +20,19 @@ Content is organized in **the `content` directory**:
 
 ![Content structure](https://cloud.githubusercontent.com/assets/101152/14105777/ee4fc5da-f5ad-11e5-86b1-ec73ac35419e.png)
 
-**URLs** map to this structure pretty closely, basically just omitting the two-digit prefixes (the purpose of which is just to order things) and the file extensions. `_index.md` are special files representing section homepages. Some examples:
+**URLs** map to this structure pretty closely. `index.md` are special files representing section homepages. Some examples:
 
 | File on disk                       | URL                |
 | ---------------------------------- | ------------------ |
-| `content/en/03-sync/02-cloning.md` | `/en/sync/cloning` |
-| `content/en/03-sync/_index.md`     | `/en/sync`         |
-| `content/en/_index.md`             | `/en`              |
+| `content/en/sync/cloning.md`       | `/en/sync/cloning` |
+| `content/en/sync/index.md`         | `/en/sync`         |
+| `content/en/index.md`              | `/en`              |
 
 **Site navigation** also reflects the file / folder structure, both in the sidebar and the "Next / Previous" links at the bottom of each topic. **Documents' H1** determine the texts rendered.
 
 We **don't really use docs versioning** via URL like "/latest" or "/v2", the state of the documentation in `master` should reflect all versions. If something has been deprecated or is new, just indicate it in the text.
 
-> **Power user tip**: there is a `since:` tag to be used in a front matter or in `config.yml`, and a global `displayVersion` in `content/config.yml`. For examples, with `displayVersion: '3.0'` and an article marked `since: 4.0`, that one will not be rendered. But usually, it's not necessary.
+> **Power user tip**:
 
 ### Authoring documentation
 
