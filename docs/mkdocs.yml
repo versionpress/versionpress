@@ -29,7 +29,6 @@ theme:
 # Nav structure
 pages:
   - Home: 'index.md'
-  - README: 'README.md'
   - User:
     - Getting Started:
       - 'Getting Started Home': 'en/user/getting-started/index.md'
