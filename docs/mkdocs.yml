@@ -24,6 +24,7 @@ extra:
 # Theme Config
 theme:
   name: 'material'
+  custom_dir: 'vp_theme'
   feature:
     tabs: true
   logo: 'img/icon.png'
