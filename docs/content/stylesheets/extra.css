@@ -40,10 +40,6 @@ header.md-header {
     margin: 0;
 }
 
-.md-typeset p {
-    margin: 0;
-}
-
 strong {
     font-weight: bold;
 }
@@ -101,14 +97,25 @@ dt, dd {
     line-height: 1.46;
 }
 
+tbody tr:nth-child(odd) {
+   background-color: #eee;
+}
+
 /* overrides */
 
-.important {
+.note, .important {
     padding: 10px 10px 10px 20px;
     background-color: #eeeeee;
     border-left: 4px solid white;
     margin-bottom: 16px;
+}
+
+.important {
     border-left-color: #FFA600;
+}
+
+.note {
+    border-left-color: #97CA41;
 }
 
 .important p:first-child {
