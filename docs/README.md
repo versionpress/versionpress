@@ -2,9 +2,9 @@
 
 ## Developer documentation
 
-- [Plugin Support](/en/developer/plugin-support.md)
-- [Developer Setup](/en/developer/setup.md)
-- [Development Process](/en/developer/development-process.md)
+- [Plugin Support](content/en/developer/plugin-support.md)
+- [Developer Setup](content/en/developer/setup.md)
+- [Development Process](content/en/developer/development-process.md)
 
 ## User documentation
 
