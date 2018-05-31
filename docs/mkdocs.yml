@@ -6,9 +6,9 @@ repo_url: https://github.com/versionpress/versionpress
 site_description: 'Welcome to VersionPress documentation. VersionPress itself is intuitive to use but some things like core concepts or installation details require more attention and are described here.'
 copyright: 'Copyright &copy; 2018 VersionPress'
 
-# Marketing Stuff
 google_analytics:
-  - 'UA-XXXXXXXX-X'
+  # this is set only in build-time to exclude hits during development
+  - !!python/object/apply:os.getenv ["GOOGLE_ANALYTICS_KEY"]
   - 'auto'
 
 # Theme Config
