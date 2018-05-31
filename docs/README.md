@@ -12,9 +12,14 @@ User documentation is authored in the `content` folder and published to [docs.ve
 
 ### Overview
 
-VersionPress uses a Python based docs system called [MkDocs](https://www.mkdocs.org/). The content is authored as a set of Markdown files in this repo, built through `mkdocs build` and eventually published at [docs.versionpress.net](http://docs.versionpress.net/en).
+We use [MkDocs](https://www.mkdocs.org/) to author and publish the documentation. To get started:
 
-Documentation is authored in **Markdown**. See [authoring tips below](#authoring-documentation).
+1. Start Docker
+2. Run `npm run start`
+3. Visit <http://localhost:8000>
+4. [Edit some Markdown](#authoring-documentation) files in the `content/en` directory
+
+The site is eventually [built](#building-docs) and deployed to `docs.versionpress.net`.
 
 Content is organized in **the `content` directory**:
 
@@ -76,10 +81,11 @@ We **don't really use docs versioning** via URL like "/latest" or "/v2", the sta
 
 ### Building docs
 
-1. Install mkdocs on local machine [install documentation](https://www.mkdocs.org/#installation)
-2. clone docs directory to local
-3. run `mkdocs serve` to test it out
-4. run `mkdocs build` to build static files into `./site` directory
+```
+npm run build
+```
+
+This builds the site to a `site` directory.
 
 ### Deploying docs
 
