@@ -12,40 +12,39 @@ docs_dir: 'content'
 
 pages:
   - Home: 'index.md'
-  - User:
-    - Getting Started:
-      - 'Getting Started Home': 'en/user/getting-started/index.md'
-      - 'Basic Concepts': 'en/user/getting-started/concepts.md'
-      - 'Installation and Uninstallation': 'en/user/getting-started/installation-uninstallation.md'
-      - 'Configuration': 'en/user/getting-started/configuration.md'
-      - 'Using VersionPress': 'en/user/getting-started/using-versionpress.md'
-      - 'Developer Preview': 'en/user/getting-started/about-eap.md'
-    - Feature Focus:
-      - 'Feature Focus Home': 'en/user/feature-focus/index.md'
-      - 'How VersionPress Works': 'en/user/feature-focus/how-versionpress-works.md'
-      - 'Change Tracking': 'en/user/feature-focus/change-tracking.md'
-      - 'Undo and Rollback': 'en/user/feature-focus/undo-and-rollback.md'
-      - 'Searching History': 'en/user/feature-focus/searching-history.md'
-      - 'External Plugins and Themes': 'en/user/feature-focus/external-plugins.md'
-      - 'Custom Project Structure': 'en/user/feature-focus/custom-project-structure.md'
-      - 'WP-CLI Commands': 'en/user/feature-focus/wp-cli.md'
-      - 'Versioning Engine - Git': 'en/user/feature-focus/git.md'
-      - 'Performance Considerations': 'en/user/feature-focus/performance.md'
-    - Sync / Team Workflows:
-      - 'Sync / Team Workflows Home': 'en/user/sync/index.md'
-      - 'Concepts': 'en/user/sync/concepts.md'
-      - 'Cloning a Site': 'en/user/sync/cloning.md'
-      - 'Merging Sites': 'en/user/sync/merging.md'
-    - 3rd Party Integrations:
-      - '3rd Party Integrations Home': 'en/user/integrations/index.md'
-      - 'Plugins': 'en/user/integrations/plugins.md'
-      - 'Themes': 'en/user/integrations/themes.md'
-      - 'Hosts': 'en/user/integrations/hosts.md'
-    - Troubleshooting:
-      - 'Troubleshooting Home': 'en/user/troubleshooting/index.md'
-      - 'System Info Page': 'en/user/troubleshooting/system-info-page.md'
-      - 'UI Not Loading': 'en/user/troubleshooting/ui-not-loading.md'
-      - 'IIS': 'en/user/troubleshooting/iis.md'
+  - Getting Started:
+    - 'Getting Started Home': 'en/getting-started/index.md'
+    - 'Basic Concepts': 'en/getting-started/concepts.md'
+    - 'Installation and Uninstallation': 'en/getting-started/installation-uninstallation.md'
+    - 'Configuration': 'en/getting-started/configuration.md'
+    - 'Using VersionPress': 'en/getting-started/using-versionpress.md'
+    - 'Developer Preview': 'en/getting-started/about-eap.md'
+  - Feature Focus:
+    - 'Feature Focus Home': 'en/feature-focus/index.md'
+    - 'How VersionPress Works': 'en/feature-focus/how-versionpress-works.md'
+    - 'Change Tracking': 'en/feature-focus/change-tracking.md'
+    - 'Undo and Rollback': 'en/feature-focus/undo-and-rollback.md'
+    - 'Searching History': 'en/feature-focus/searching-history.md'
+    - 'External Plugins and Themes': 'en/feature-focus/external-plugins.md'
+    - 'Custom Project Structure': 'en/feature-focus/custom-project-structure.md'
+    - 'WP-CLI Commands': 'en/feature-focus/wp-cli.md'
+    - 'Versioning Engine - Git': 'en/feature-focus/git.md'
+    - 'Performance Considerations': 'en/feature-focus/performance.md'
+  - Sync / Team Workflows:
+    - 'Sync / Team Workflows Home': 'en/sync/index.md'
+    - 'Concepts': 'en/sync/concepts.md'
+    - 'Cloning a Site': 'en/sync/cloning.md'
+    - 'Merging Sites': 'en/sync/merging.md'
+  - 3rd Party Integrations:
+    - '3rd Party Integrations Home': 'en/integrations/index.md'
+    - 'Plugins': 'en/integrations/plugins.md'
+    - 'Themes': 'en/integrations/themes.md'
+    - 'Hosts': 'en/integrations/hosts.md'
+  - Troubleshooting:
+    - 'Troubleshooting Home': 'en/troubleshooting/index.md'
+    - 'System Info Page': 'en/troubleshooting/system-info-page.md'
+    - 'UI Not Loading': 'en/troubleshooting/ui-not-loading.md'
+    - 'IIS': 'en/troubleshooting/iis.md'
   - Developer:
     - 'Developer Setup': 'en/developer/setup.md'
     - 'Plugin Support': 'en/developer/plugin-support.md'

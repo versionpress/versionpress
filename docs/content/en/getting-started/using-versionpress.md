@@ -5,7 +5,7 @@ VersionPress is used in three main ways:
 
 ## Auto-tracking (unattended mode)
 
-You can activate VersionPress and forget it. It will work behind the scenes, automatically tracking changes on the site. Learn more in the [change tracking](../feature-focus/change-tracking) topic. 
+You can activate VersionPress and forget it. It will work behind the scenes, automatically tracking changes on the site. Learn more in the [change tracking](../feature-focus/change-tracking.md) topic. 
 
 
 ## Inspecting history of changes
@@ -35,7 +35,7 @@ Related:
 
 ## Undoing changes
 
-When something goes wrong, you can use the [Undo and Rollback feature](../feature-focus/undo-and-rollback) to return to a previous state of a site or to revert a specific change.
+When something goes wrong, you can use the [Undo and Rollback feature](../feature-focus/undo-and-rollback.md) to return to a previous state of a site or to revert a specific change.
 
 Related:
 
@@ -44,7 +44,7 @@ Related:
 
 ## Sync / staging workflows
 
-Since VersionPress 2.0, [sync / staging workflows](../sync) are supported. See the dedicated section for that.
+Since VersionPress 2.0, [sync / staging workflows](../sync/index.md) are supported. See the dedicated section for that.
 
 Related:
 

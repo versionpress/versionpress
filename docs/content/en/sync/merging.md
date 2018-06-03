@@ -1,6 +1,6 @@
 # Merging Sites
 
-After you [created a clone](./cloning) of a site and tested the changes, you want to merge them back. Merge is an operation that maintains changes from both environments (as opposed to a copy&paste / replace operation which is destructive by nature) and is achieved by a **pull** command in VersionPress. The result can then be **pushed** to another site instance, for example, the live site.
+After you [created a clone](./cloning.md) of a site and tested the changes, you want to merge them back. Merge is an operation that maintains changes from both environments (as opposed to a copy&paste / replace operation which is destructive by nature) and is achieved by a **pull** command in VersionPress. The result can then be **pushed** to another site instance, for example, the live site.
 
 !!! Note
     There is **no 'merge' command**. While the operation indeed does a merge, what you're really doing is pulling and pushing the changes between two environments. Git calls these commands `push` and `pull`, and so do we. `merge` in Git is used for merging between *branches*, not clones, and we might introduce such command in the future when/if we support branches as well.
@@ -25,7 +25,7 @@ The important thing to realize that there is a *direction* to these commands. Yo
 Let's go through a couple of scenarios to see the commands in action.
 
 !!! Note
-    Push and pull are currently implemented as WP-CLI commands. You need to have [WP-CLI installed and working](../feature-focus/wp-cli) on your machine.
+    Push and pull are currently implemented as WP-CLI commands. You need to have [WP-CLI installed and working](../feature-focus/wp-cli.md) on your machine.
 
 Let's start with the main site, e.g., "live", living in `<some path>/www/live` and served from `http://example.com/live`. We want to create a staging environment so we call:
 
@@ -33,7 +33,7 @@ Let's start with the main site, e.g., "live", living in `<some path>/www/live` a
     wp vp clone --name=staging
 ```
 
-That creates a clone in `www/staging`, running at `http://example.com/staging` (configurable, see [cloning](./cloning) for more). Then we do some changes in this staging environment via the web.
+That creates a clone in `www/staging`, running at `http://example.com/staging` (configurable, see [cloning](./cloning.md) for more). Then we do some changes in this staging environment via the web.
 
 When done, we `cd` into the `staging` folder and run:
 ``` bash

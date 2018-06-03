@@ -50,7 +50,7 @@ The last scenario where revert will not work is uncommited changes somewhere in 
 
 ### Merge commits
 
-Merge commits join two lines of development back together. For example, if you did some changes in the live environment and some other changes in the staging environment, doing a [pull](../sync/merging) creates a merge commit.
+Merge commits join two lines of development back together. For example, if you did some changes in the live environment and some other changes in the staging environment, doing a [pull](../sync/merging.md) creates a merge commit.
 
 Merge commits cannot be undone because there is no opposite state to them, i.e., there is no logical "reverse change" that we could apply to the current state of the site.
 

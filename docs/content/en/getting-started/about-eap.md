@@ -7,8 +7,8 @@ Currently, VersionPress is a **"Developer Preview"**. It can be tried on simpler
 
  - A safe bet is to use VersionPress for testing / dev purposes only. Local, throw-away sites and workflows are ideal.
  - Production deployment is strongly discouraged but if you attempt it despite the warning, at least **<span style="color:red;">keep backup at all times</span>**.
- - Compatibility with WordPress plugins and themes is often problematic, see [3rd Party Integrations section](../integrations).
- - Compatibility with hosts is often problematic as Git and `proc_open()` are required on the server. See [Hosting](../integrations/hosts) and [System requirements](./installation-uninstallation).
+ - Compatibility with WordPress plugins and themes is often problematic, see [3rd Party Integrations section](../integrations/index.md).
+ - Compatibility with hosts is often problematic as Git and `proc_open()` are required on the server. See [Hosting](../integrations/hosts.md) and [System requirements](./installation-uninstallation.md).
  - Be familiar with WordPress and Git.
 
 You can tell whether you are using a Developer Preview / Early Access release of VersionPress from the top admin bar.

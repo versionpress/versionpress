@@ -28,15 +28,15 @@ Let's discuss a workflow that seems basic but actually covers almost any real-wo
 !!! Tip "See Also"
     The workflow has been showcased in the blog post [VersionPress 2.0: Easy Staging](https://blog.versionpress.net/2015/09/versionpress-2-0-staging/).
 
-**(1)** You start by **[cloning a site](./cloning)**. That creates a new site instance that looks exactly like the original one but with its own files and database tables. Technically, it is a separate WordPress installation.
+**(1)** You start by **[cloning a site](./cloning.md)**. That creates a new site instance that looks exactly like the original one but with its own files and database tables. Technically, it is a separate WordPress installation.
 
 **(2)** Then you **do the work** there. You can experiment with new stuff, you can break things, it doesn't matter as the environment is completely separate and safe. If things go too crazy, you can always start over and clone from the origin again.
 
-Then, at some point, you're happy with the result and  you're going to **(3)** **[merge](./merging)** the changes back. In VersionPress' (and Git's) terminology, you're going to **push** or **pull** changes between environments.
+Then, at some point, you're happy with the result and  you're going to **(3)** **[merge](./merging.md)** the changes back. In VersionPress' (and Git's) terminology, you're going to **push** or **pull** changes between environments.
 
 In most cases, the merge will be fully automatic and painless. However, a **conflict** might also occur. This happens when two different edits are done to the same piece of data, for example, when two copywriters edit the same paragraph or the site title is updated differently in two environments.
 
-**(4)** In such case, the **conflict needs to be resolved**. This is always a human work and currently, we do not have a user interface for that but because VersionPress is powered by Git and very close to it, you can (and currently need to) do it manually. When the conflict is resolved, you commit the result and run a special synchronization command as discussed in the [merging](./merging) topic again.
+**(4)** In such case, the **conflict needs to be resolved**. This is always a human work and currently, we do not have a user interface for that but because VersionPress is powered by Git and very close to it, you can (and currently need to) do it manually. When the conflict is resolved, you commit the result and run a special synchronization command as discussed in the [merging](./merging.md) topic again.
 
 That's all there is to it, really. Happy cloning & merging!
 

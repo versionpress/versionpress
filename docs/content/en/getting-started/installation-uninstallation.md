@@ -30,14 +30,14 @@ Minimum system requirements are (as a general rule, **we recommend using the lat
  - Write permissions in the site root and everywhere under it
  - Standard WordPress configuration system (`wp-config.php`)
 
-On top of that, if you want to use the [multi-instance / sync features](../sync) of VersionPress 2.0, probably even more control over the requirement will be required. In practice, this means that a custom server / VPS is your best bet. See also the section on [hosting providers](../integrations/hosts).
+On top of that, if you want to use the [multi-instance / sync features](../sync/index.md) of VersionPress 2.0, probably even more control over the requirement will be required. In practice, this means that a custom server / VPS is your best bet. See also the section on [hosting providers](../integrations/hosts.md).
 
 Here are notes on some of the requirements:
 
 
 ### Git
 
-VersionPress takes a strategic dependency on [Git](http://git-scm.com/) which provides [many benefits](../feature-focus/git) but also requires this tool to be installed on the server and accessible from PHP. Make sure that `proc_open()` is enabled on the server and that the Git installation is in the PATH (if it's not, you can tell VersionPress where to find the binary via [Configuration](./configuration)).
+VersionPress takes a strategic dependency on [Git](http://git-scm.com/) which provides [many benefits](../feature-focus/git.md) but also requires this tool to be installed on the server and accessible from PHP. Make sure that `proc_open()` is enabled on the server and that the Git installation is in the PATH (if it's not, you can tell VersionPress where to find the binary via [Configuration](./configuration.md)).
 
 Git **1.9** and newer are supported. Do not attempt to make VersionPress run with older releases (1.7 and 1.8 are still quite popular), there are known issues with them.
 
@@ -46,8 +46,8 @@ Git **1.9** and newer are supported. Do not attempt to make VersionPress run wit
 
 We recommend Apache or nginx (as [WordPress itself](https://wordpress.org/about/requirements/)) but almost any web server should work. Just pay attention to two things:
 
- 1. **Write permissions**. The user that runs PHP and the eventual Git process needs to have write access into the locations listed below and the `sys_get_temp_dir()`. Initialization page checks this automatically and the [system info page](../troubleshooting/system-info-page) has a dedicated section on permissions if you need more info.
-     - IIS users, please [read this page](../troubleshooting/iis).
+ 1. **Write permissions**. The user that runs PHP and the eventual Git process needs to have write access into the locations listed below and the `sys_get_temp_dir()`. Initialization page checks this automatically and the [system info page](../troubleshooting/system-info-page.md) has a dedicated section on permissions if you need more info.
+     - IIS users, please [read this page](../troubleshooting/iis.md).
  2. **Access rules**. The locations listed below should be protected against direct requests.
 
 The sensitive locations are:
@@ -74,7 +74,7 @@ Some advanced users like having WordPress in its own directory or move plugins, 
 - giving WordPress its own directory
 - renaming `wp-content`, `plugins` or `uploads` directories.
 
-See [custom project structure](../feature-focus/custom-project-structure) page for more.
+See [custom project structure](../feature-focus/custom-project-structure.md) page for more.
 
 ## Installation
 
@@ -99,7 +99,7 @@ Upon successful activation, you should see a screen like this:
 
 ## Update
 
-Since [VersionPress 3.0](../release-notes/3.0), the simplest way to update is to run the `wp vp update` command, e.g.:
+Since [VersionPress 3.0](../release-notes/3.0.md), the simplest way to update is to run the `wp vp update` command, e.g.:
 
 ```
 wp vp update ./versionpress.zip

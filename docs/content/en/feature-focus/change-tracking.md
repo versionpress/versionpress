@@ -154,7 +154,7 @@ You can use any Git client for it or, since VersionPress 2.0, there is a GUI for
 </figure>
 
 
-VersionPress treats manual commits exactly the same as auto-generated commits – they will be visible in the table, [undo or rollback](./undo-and-rollback) them, etc.
+VersionPress treats manual commits exactly the same as auto-generated commits – they will be visible in the table, [undo or rollback](undo-and-rollback.md) them, etc.
 
 ## Frequent DB writes
 
@@ -164,7 +164,7 @@ Some entities are changed very often, e.g., view counters, Akismet spam count, e
 
 There are certain things that VersionPress intentionally omits from versioning:
 
- - **wp-config.php** – this file is environment-specific which means there would be collisions between various developers, staging/live environments etc. However, some parts of the config should be shared which is why VersionPress introduced **wp-config.common.php** in v3.0 – this file is committed in the Git repo and `require`'d from `wp-config.php`. See [Configuration](../getting-started/configuration) for details.
+ - **wp-config.php** – this file is environment-specific which means there would be collisions between various developers, staging/live environments etc. However, some parts of the config should be shared which is why VersionPress introduced **wp-config.common.php** in v3.0 – this file is committed in the Git repo and `require`'d from `wp-config.php`. See [Configuration](../getting-started/configuration.md) for details.
  - **VersionPress itself** – the folder `plugins/versionpress` is excluded because you don't want a rollback to take you to a state where VersionPress is outdated and possibly buggy.
  - **Anything in `wp-content` other than plugins, themes and uploads**. Common things in `wp-content` are backup folders, cache directories etc. which should generally not be versioned.
  - Log files, system files etc.

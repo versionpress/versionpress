@@ -39,7 +39,7 @@ Generally, **use `wp help` as the primary source of information** as that will a
 
 ### vp config
 
-Configures VersionPress. See [configuration](../getting-started/configuration).
+Configures VersionPress. See [configuration](../getting-started/configuration.md).
 
 
 ### vp undo
@@ -89,7 +89,7 @@ Note that with this command, you will **need to include the `--require=...` para
 $ wp vp restore-site --siteurl='http://localhost/mysite' --require=wp-content/plugins/versionpress/src/Cli/vp.php
 ```
 
-The other, **development scenario** assumes that the only thing you have is a Git clone of a site. That is quite extreme because not only you don't have a database at all but you also don't have these two vital things due to the fact that VersionPress doesn't store them in the Git repo (for good reasons [described here](../feature-focus/change-tracking#whats-not-tracked)):
+The other, **development scenario** assumes that the only thing you have is a Git clone of a site. That is quite extreme because not only you don't have a database at all but you also don't have these two vital things due to the fact that VersionPress doesn't store them in the Git repo (for good reasons [described here](../feature-focus/change-tracking.md#whats-not-tracked)):
 
  * `wp-config.php`
  * VersionPress itself, i.e., `wp-content/plugins/versionpress`
@@ -104,22 +104,22 @@ The second point means that you can't immediately run `wp vp restore-site` becau
 
 ### vp clone
 
-Clones site to a new folder, database and Git branch. See [Cloning a site](../sync/cloning).
+Clones site to a new folder, database and Git branch. See [Cloning a site](../sync/cloning.md).
 
 
 ### vp pull
 
-Pulls changes from another site instance and creates a merge if necessary. See [merging](../sync/merging).
+Pulls changes from another site instance and creates a merge if necessary. See [merging](../sync/merging.md).
 
 
 ### vp push
 
-Pushes changes to another site instance. Does not create a merge; see [merging](../sync/merging).
+Pushes changes to another site instance. Does not create a merge; see [merging](../sync/merging.md).
 
 
 ### vp apply-changes
 
-Applies changes found on the disk to the database. Useful e.g. after resolving merge conflicts. See [merging](../sync/merging).
+Applies changes found on the disk to the database. Useful e.g. after resolving merge conflicts. See [merging](../sync/merging.md).
 
 ### vp check-requirements
 

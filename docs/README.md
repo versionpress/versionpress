@@ -14,6 +14,10 @@ The documentation at [`docs.versionpress.net`](https://docs.versionpress.net/) i
 
 Site navigation is defined in `mkdocs.yml`. This file must be manually updated whenever a new file is added or an existing file moved. This structure will automatically generate the navigation on the site in both the sidebar and in the "next" / "previous" links in the footer.
 
+### Links
+
+Links should be written as **relative** and **ending with .md**, for example, `[configuration](../getting-started/configuration.md)`. Only this form ensures that links work both on GitHub and rendered on docs.versionpress.net.
+
 ### Title casing
 
 - Use **Title Case** for H1 headers.

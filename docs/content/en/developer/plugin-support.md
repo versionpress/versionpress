@@ -18,7 +18,7 @@ Plugins are described to VersionPress by a set of files stored in the `.versionp
 All files are optional so for example, if a plugin doesn't define any new shortcodes it can omit the `shortcodes.yml` file. Simple plugins like _Hello Dolly_ might even omit everything.
 
 !!! Tip
-    WordPress core is described using the very same format and you can find the definition files in the [`.versionpress`](../plugins/versionpress/.versionpress) folder inside the plugin.
+    WordPress core is described using the very same format and you can find the definition files in the [`.versionpress`](../../../../plugins/versionpress/.versionpress) folder inside the plugin.
 
 
 ## Actions
@@ -34,7 +34,7 @@ Actions are described in the `actions.yml` file.
 
 ### `actions.yml`
 
-Here's an example from the [WordPress core `actions.yml` file](../plugins/versionpress/.versionpress/actions.yml):
+Here's an example from the [WordPress core `actions.yml` file](../../../../plugins/versionpress/.versionpress/actions.yml):
 
 ```yaml
 post:

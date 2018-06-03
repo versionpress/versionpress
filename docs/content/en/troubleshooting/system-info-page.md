@@ -1,6 +1,6 @@
 # System Info Page
 
-As VersionPress is [more demanding](../getting-started/installation-uninstallation) on server environment than your common WordPress installation, we've created a system info page that gives more insight into what is actually available on the server.
+As VersionPress is [more demanding](../getting-started/installation-uninstallation.md) on server environment than your common WordPress installation, we've created a system info page that gives more insight into what is actually available on the server.
 
 The system info page is available at this URL:
 

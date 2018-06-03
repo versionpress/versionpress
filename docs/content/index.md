@@ -9,7 +9,7 @@ Welcome to [VersionPress](https://versionpress.net/) documentation. VersionPress
 
 These docs are divided into a couple of sections:
 
-* [Getting Started](./en/user/getting-started) – brief introduction to VersionPress
-* [Feature Focus](./en/user/feature-focus) – discusses most important feature areas in more detail
-* [Sync / Workflows](./en/user/sync) – how VersionPress helps with multiple environments like live and staging
-* [Release Notes](./en/release-notes) – details of all releases
+* [Getting Started](en/getting-started/index.md) – brief introduction to VersionPress
+* [Feature Focus](en/feature-focus/index.md) – discusses most important feature areas in more detail
+* [Sync / Workflows](en/sync/index.md) – how VersionPress helps with multiple environments like live and staging
+* [Release Notes](en/release-notes/index.md) – details of all releases
