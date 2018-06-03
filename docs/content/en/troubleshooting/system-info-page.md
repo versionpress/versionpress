@@ -4,7 +4,7 @@ As VersionPress is [more demanding](../getting-started/installation-uninstallati
 
 The system info page is available at this URL:
 
-``` bash
+```bash
 http://YOURSITE/wp-admin/admin.php?page=versionpress%2Fadmin%2Fsystem-info.php
 ```
 

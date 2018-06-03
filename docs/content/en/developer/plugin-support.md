@@ -105,7 +105,9 @@ Tags can be altered (or created entirely if the YAML only uses `/` as a tag valu
 
 **Non-database actions** are tracked manually by calling a global [`vp_force_action()`](https://github.com/versionpress/versionpress/blob/3b0b242b11804d39c838b15a21ffbd7a27b404b4/plugins/versionpress/public-functions.php#L18-L18) function. This overwrites all other actions VersionPress might have collected during the request. For example, this is how `wordpress/update` action is tracked:
 
-`#!php-inline vp_force_action('wordpress', 'update', $version, [], $wpFiles);`
+```php
+vp_force_action('wordpress', 'update', $version, [], $wpFiles);
+```
 
 !!! info "v4.0 change"
     :construction: We're planning to change this for the final VersionPress 4.0 release. Some filter will probably be used instead.
@@ -142,7 +144,7 @@ The array of files to commit can contain three different types of items:
 
 2. All files of an entity type:
 
-    ``` php
+    ```php
     [
       'type' => 'all-storage-files',
       'entity' => 'option'
@@ -151,7 +153,7 @@ The array of files to commit can contain three different types of items:
 
 3. Path on the filesystem:
 
-    ``` php
+    ```php
     [
       'type' => 'path',
       'path' => 'some/path/supports/wildcards/*'
@@ -448,7 +450,7 @@ post:
 
 It tells VersionPress to delete the post cache (VP resolves the function name as `clean_<cache-type>_cache`). You can use `id` as the source of IDs for invalidation or a reference. For example like this:
 
-``` yaml
+```yaml
 post:
   references:
       post_author: user
@@ -515,7 +517,7 @@ For example the `[gallery]` shortcode has four attributes that can contain refer
 
 Note that you don't have to worry about the attribute type, whether it contains a single ID or a list of IDs. VersionPress handles both cases automatically:
 
-``` php
+```php
 [gallery id="1"]
 [gallery id="1,2,3,6,11,20"]
 ```

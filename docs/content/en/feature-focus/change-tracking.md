@@ -179,19 +179,19 @@ Ignoring is done using the standard [Gitignore files](http://git-scm.com/docs/gi
 
 As an example, let's say that you have a `wp-content/myfolder` folder that you want to track. This is a part of the default `.gitgnore` file which causes the `myfolder` being ignored:
 
-``` bash
-    wp-content/*
-    !wp-content/plugins/
-    !wp-content/themes/
-    !wp-content/uploads/
+```
+wp-content/*
+!wp-content/plugins/
+!wp-content/themes/
+!wp-content/uploads/
 ```
 
 It basically reads "ignore everything in wp-content *(line 1)* except plugins (line 2), themes (line 3) and uploads (line 4)". To add `myfolder` to tracking, just add a fifth line:
 
-``` bash
-    wp-content/*
-    !wp-content/plugins/
-    !wp-content/themes/
-    !wp-content/uploads/
-    !wp-content/myfolder/
+```
+wp-content/*
+!wp-content/plugins/
+!wp-content/themes/
+!wp-content/uploads/
+!wp-content/myfolder/
 ```
