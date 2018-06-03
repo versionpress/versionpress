@@ -33,7 +33,7 @@ Generally:
 5. PR will be merged.
 6. :tada:
 
-Learn more about [our development process](docs/content/en/developer/development-process.md) and [set up your local development environment](docs/content/en/developer/setup.md).
+Learn more about [our development process](docs/content/en/developer/development-process.md) and [set up your local development environment](docs/content/en/developer/dev-setup.md).
 
 Happy hacking!
 

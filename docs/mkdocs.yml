@@ -46,7 +46,7 @@ pages:
     - 'UI Not Loading': 'en/troubleshooting/ui-not-loading.md'
     - 'IIS': 'en/troubleshooting/iis.md'
   - Developer:
-    - 'Developer Setup': 'en/developer/setup.md'
+    - 'Dev Setup': 'en/developer/dev-setup.md'
     - 'Plugin Support': 'en/developer/plugin-support.md'
     - 'Development Process': 'en/developer/development-process.md'
   - Release Notes:

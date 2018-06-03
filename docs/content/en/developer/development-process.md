@@ -23,7 +23,7 @@ We use the [GitHub flow](https://guides.github.com/introduction/flow/):
 
 Some tips:
 
-- Development setup is described in [setup.md](setup.md).
+- Development setup is described in [dev-setup.md](dev-setup.md).
 - Branches are commonly named `<issue_number>-<short_description>`, e.g., `123-row-filtering`.
 - All branches start from `master`.
 - We care about small and focused commits with good commit messages.
