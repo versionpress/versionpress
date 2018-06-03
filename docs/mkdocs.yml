@@ -74,43 +74,27 @@ pages:
     - '1.0-alpha1 Release Notes': 'en/release-notes/1.0-alpha1.md'
 
 markdown_extensions:
-  # PyMdown extensions https://facelessuser.github.io/pymdown-extensions/#extensions
-  - pymdownx.emoji:
-      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
   - pymdownx.critic
   - pymdownx.details
-  - pymdownx.highlight:
-      use_pygments: true
-      linenums: true
-      extend_pygments_lang:
-        - name: php-inline
-          lang: php
-          options:
-            startinline: true
-        - name: php
-          lang: php
-          options:
-            startinline: true
-        # note: yaml highlighting only works if second value in key pair is quoted, which isn't standard - problem with pygments
-        # https://bitbucket.org/birkenfeld/pygments-main/issues/890/yaml-highlight
-        - name: yaml
-          lang: yaml
-          options:
-            startinline: true
-  - pymdownx.inlinehilite:
-  - pymdownx.superfences:
-  - pymdownx.mark
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+  - pymdownx.inlinehilite
   - pymdownx.magiclink
-  - pymdownx.keys
+  - pymdownx.mark
   - pymdownx.smartsymbols
-  # - pymdownx.superfences
+  - pymdownx.superfences
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tilde
-  - admonition # https://squidfunk.github.io/mkdocs-material/extensions/admonition/
-  - meta # https://squidfunk.github.io/mkdocs-material/extensions/metadata/
-  - toc:
-      permalink: true
 
 theme:
   name: 'material'
