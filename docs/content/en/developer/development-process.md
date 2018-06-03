@@ -1,4 +1,4 @@
-# Development process
+# Development Process
 
 Here is a set of tools and approaches we use during VersionPress development.
 

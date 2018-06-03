@@ -1,4 +1,4 @@
-# Dev setup
+# Dev Setup
 
 This will set you up for VersionPress development.
 
