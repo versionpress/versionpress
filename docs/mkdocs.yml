@@ -1,6 +1,5 @@
 # General Setup
 site_name: VersionPress Documentation
-site_url: 'http://127.0.0.1:8000'
 docs_dir: './content'
 repo_url: https://github.com/versionpress/versionpress
 site_description: 'Welcome to VersionPress documentation. VersionPress itself is intuitive to use but some things like core concepts or installation details require more attention and are described here.'
