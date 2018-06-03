@@ -1,7 +1,3 @@
----
-since: '3.0'
----
-
 # Searching History
 
 VersionPress has powerful search with syntax inspired by GitHub or Gmail. It lets you filter the main table by authors, post types, date ranges etc.

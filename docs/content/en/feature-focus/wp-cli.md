@@ -1,7 +1,3 @@
----
-since: '2.0'
----
-
 # WP-CLI Commands #
 
 For advanced usage, VersionPress comes with several [WP-CLI](http://wp-cli.org/) commands. They are useful in two main scenarios:
