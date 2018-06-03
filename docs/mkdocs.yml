@@ -1,33 +1,15 @@
-# General Setup
+# See https://www.mkdocs.org/user-guide/configuration/
+
 site_name: VersionPress Documentation
-docs_dir: './content'
-repo_url: https://github.com/versionpress/versionpress
-repo_name: versionpress/versionpress
-edit_uri: edit/master/docs/content
 site_description: 'User and developer documentation for VersionPress'
 copyright: 'Copyright &copy; 2018 VersionPress'
 
-google_analytics:
-  # this is set only in build-time to exclude hits during development
-  - !!python/object/apply:os.getenv ["GOOGLE_ANALYTICS_KEY"]
-  - 'auto'
+repo_url: https://github.com/versionpress/versionpress
+repo_name: versionpress/versionpress
+edit_uri: edit/master/docs/content
 
-# Theme Config
-theme:
-  name: 'material'
-  custom_dir: 'vp_theme'
-  feature:
-    # tabs: true
-  logo: 'img/icon.png'
-  favicon: 'img/favicon.ico'
-  font:
-    text: "Helvetica Neue"
-    code: 'Consolas'
-  palette:
-    primary: '#4183c4'
-    accent: '#4183c4'
+docs_dir: 'content'
 
-# Nav structure
 pages:
   - Home: 'index.md'
   - User:
@@ -92,9 +74,8 @@ pages:
     - '1.0-alpha2 Release Notes': 'en/release-notes/1.0-alpha2.md'
     - '1.0-alpha1 Release Notes': 'en/release-notes/1.0-alpha1.md'
 
-# Extensions
 markdown_extensions:
-# PyMdown extensions https://facelessuser.github.io/pymdown-extensions/#extensions
+  # PyMdown extensions https://facelessuser.github.io/pymdown-extensions/#extensions
   - pymdownx.emoji:
       emoji_generator: !!python/name:pymdownx.emoji.to_svg
   - pymdownx.critic
@@ -132,7 +113,21 @@ markdown_extensions:
   - toc:
       permalink: true
 
-# Extras (dependent on material theme)
+theme:
+  name: 'material'
+  custom_dir: 'vp_theme'
+  feature:
+    # tabs: true
+  logo: 'img/icon.png'
+  favicon: 'img/favicon.ico'
+  font:
+    text: "Helvetica Neue"
+    code: 'Consolas'
+  palette:
+    primary: '#4183c4'
+    accent: '#4183c4'
+
+# Extras for material theme
 extra:
   social:
     - type: 'github'
@@ -142,8 +137,12 @@ extra:
   search:
     tokenizer: '[\s\-\.]+'
 
-# Custom styles and scripts
 extra_css:
   - 'stylesheets/extra.css'
 extra_javascript:
   - 'javascript/extra.js'
+
+google_analytics:
+  # this is set only in build-time to exclude hits during development
+  - !!python/object/apply:os.getenv ["GOOGLE_ANALYTICS_KEY"]
+  - 'auto'
