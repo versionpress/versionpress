@@ -115,7 +115,7 @@ markdown_extensions:
 
 theme:
   name: 'material'
-  custom_dir: 'vp_theme'
+  custom_dir: 'theme-mods' # See https://squidfunk.github.io/mkdocs-material/customization/#extending-the-theme
   feature:
     # tabs: true
   logo: 'img/icon.png'
@@ -138,9 +138,9 @@ extra:
     tokenizer: '[\s\-\.]+'
 
 extra_css:
-  - 'stylesheets/extra.css'
+  - 'assets/stylesheets/extra.css'
 extra_javascript:
-  - 'javascript/extra.js'
+  - 'assets/javascripts/extra.js'
 
 google_analytics:
   # this is set only in build-time to exclude hits during development
