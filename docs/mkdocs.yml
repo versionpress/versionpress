@@ -2,6 +2,7 @@
 site_name: VersionPress Documentation
 docs_dir: './content'
 repo_url: https://github.com/versionpress/versionpress
+repo_name: versionpress/versionpress
 edit_uri: edit/master/docs/content
 site_description: 'User and developer documentation for VersionPress'
 copyright: 'Copyright &copy; 2018 VersionPress'
