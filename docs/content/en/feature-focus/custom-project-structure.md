@@ -15,7 +15,7 @@ Some advanced users like having WordPress in its own directory or move plugins, 
 
 You can move WordPress into its own directory by following [instructions on Codex](https://codex.wordpress.org/Giving_WordPress_Its_Own_Directory). However, there is one extra step. You need to define `VP_PROJECT_ROOT` constant to let VersionPress know where it should create the repository. See the [configuration page](../getting-started/configuration.md#vp_project_root) for instructions.
 
-!!! Note ".git directory"
+!!! note ".git directory"
     Be sure that the `.git` directory stays in the root directory if the project is already versioned.
 
 ## Moving wp-content, plugin or uploads directories

@@ -12,7 +12,7 @@ Change tracking is a core feature of VersionPress. This page describes the three
 
 Most of the time, VersionPress works silently, simply tracking all the important changes and recording them for later use. This includes both files and database entities like posts or comments. This section contains some specifics on what is tracked and how.
 
-!!! Warning "Possibility content not complete"
+!!! warning "Possibility content not complete"
     The info below might not be entirely complete as there are lots of details for various content types. Consider it a brief overview.
 
 ### Files
@@ -174,7 +174,7 @@ There are certain things that VersionPress intentionally omits from versioning:
 
 Ignoring is done using the standard [Gitignore files](http://git-scm.com/docs/gitignore) and VersionPress will try to install appropriate `.gitignore` files upon its activation.
 
-!!! Note "Existing .gitignore will not be modified"
+!!! note "Existing .gitignore will not be modified"
     If the installation finds existing `.gitignore` file already in place, it will assume that the site is managed professionally and will not attempt to modify the ignore rules itself. The user will be notified about this.
 
 As an example, let's say that you have a `wp-content/myfolder` folder that you want to track. This is a part of the default `.gitgnore` file which causes the `myfolder` being ignored:

@@ -1,6 +1,6 @@
 # Plugin Support
 
-!!! Info "Plugin Support"
+!!! info "Plugin Support"
     :construction: Plugin support is the main theme of [VersionPress 4.0](https://github.com/versionpress/versionpress/milestone/16) which is currently in [beta](https://github.com/versionpress/versionpress/releases/tag/4.0-beta). Plugin developers, we'd like your feedback on this, feel free to [open new issues](https://github.com/versionpress/versionpress/issues/new) or chat with us [on Gitter](https://gitter.im/versionpress/versionpress).
 
 VersionPress needs to understand plugin data, actions, shortcodes and other things to automatically provide version control for them. This document describes how plugins (and themes, later) can hook into VersionPress functionality.
@@ -17,7 +17,7 @@ Plugins are described to VersionPress by a set of files stored in the `.versionp
 
 All files are optional so for example, if a plugin doesn't define any new shortcodes it can omit the `shortcodes.yml` file. Simple plugins like _Hello Dolly_ might even omit everything.
 
-!!! Tip
+!!! tip
     WordPress core is described using the very same format and you can find the definition files in the [`.versionpress`](../../../../plugins/versionpress/.versionpress) folder inside the plugin.
 
 
@@ -89,7 +89,7 @@ There are generally two types of actions:
 
 If you need more specific actions like `post/trash` or `comment/approve`, filters are used: [`vp_entity_action_{$entityName}`](https://github.com/versionpress/versionpress/blob/0a29069de769841ed545556cecf4d2323a92741b/plugins/versionpress/src/Storages/DirectoryStorage.php#L225-L225) for standard entities and [`vp_meta_entity_action_{$entityName}`](https://github.com/versionpress/versionpress/blob/49fdc0ba737b40560c40129d791e0cf63b1031e0/plugins/versionpress/src/Storages/MetaEntityStorage.php#L166-L16) for meta entities.
 
-!!! Info "Hooks"
+!!! info "Hooks"
     🚧 Hooks are not properly documented yet, please click through the hook names to at least browse the source codes on GitHub.
 
 Tags are automatically extracted from the database entity. For example,
@@ -107,7 +107,7 @@ Tags can be altered (or created entirely if the YAML only uses `/` as a tag valu
 
 `#!php-inline vp_force_action('wordpress', 'update', $version, [], $wpFiles);`
 
-!!! Info "v4.0 change"
+!!! info "v4.0 change"
     :construction: We're planning to change this for the final VersionPress 4.0 release. Some filter will probably be used instead.
 
 
@@ -117,14 +117,14 @@ Every action has a message and some content. It's this content that is undone wh
 
 For **database actions**, VersionPress automatically commits the corresponding INI file. For example, for a `post/edit` action, a post's INI file is committed.
 
-!!! Note "Side note"
+!!! note "Side note"
     VersionPress stores database entities in the `wp-content/vpdb` folder as a set of INI files.
 
 This behavior is sufficient most of the time, however, some changes should commit more files. For example, when the post is an attachment, the uploaded file should also be committed. For this, the list of files to commit can be filtered using the `vp_entity_files_{$entityName}` or `vp_meta_entity_files_{$entityName}` filters.
 
 The array of files to commit can contain three different types of items:
 
-!!! Note "VPIDs"
+!!! note "VPIDs"
     Concepts like VPIDs are explained in the "[Database schema](#database-schema)" section below.
 
 1. Single file corresponding to an entity, for example:
@@ -172,7 +172,7 @@ The full example might look something like this:
 
 For **non-database actions**, this list is one of the arguments of the [`vp_force_action()`](https://github.com/versionpress/versionpress/blob/3b0b242b11804d39c838b15a21ffbd7a27b404b4/plugins/versionpress/public-functions.php#L18-L18) function.
 
-!!! Note ""
+!!! note ""
     As noted above, we'll be getting rid of this approach so this is temporary info.
 
 ## Database schema

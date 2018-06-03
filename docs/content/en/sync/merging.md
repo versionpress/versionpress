@@ -2,7 +2,7 @@
 
 After you [created a clone](./cloning.md) of a site and tested the changes, you want to merge them back. Merge is an operation that maintains changes from both environments (as opposed to a copy&paste / replace operation which is destructive by nature) and is achieved by a **pull** command in VersionPress. The result can then be **pushed** to another site instance, for example, the live site.
 
-!!! Note
+!!! note
     There is **no 'merge' command**. While the operation indeed does a merge, what you're really doing is pulling and pushing the changes between two environments. Git calls these commands `push` and `pull`, and so do we. `merge` in Git is used for merging between *branches*, not clones, and we might introduce such command in the future when/if we support branches as well.
 
 Merge usually works automatically, however, there might be **conflicts** if a conflicting change has been done to a single piece of data. In such case, you need to **resolve** the conflict manually and commit the result using the `git commit` + `vp apply-changes` commands.
@@ -24,7 +24,7 @@ The important thing to realize that there is a *direction* to these commands. Yo
 
 Let's go through a couple of scenarios to see the commands in action.
 
-!!! Note
+!!! note
     Push and pull are currently implemented as WP-CLI commands. You need to have [WP-CLI installed and working](../feature-focus/wp-cli.md) on your machine.
 
 Let's start with the main site, e.g., "live", living in `<some path>/www/live` and served from `http://example.com/live`. We want to create a staging environment so we call:
@@ -87,5 +87,5 @@ To resolve the actual conflict, after you've chosen the first option above, do t
 
 After this, the conflicts are resolved and the resulting state with all the changes applied is visible on the WordPress site.
 
-!!! Tip
+!!! tip
     The `vp apply-changes` command can also be used outside of the conflict resolution scenario. For example, if you do a Git revert manually or edit some file in `vpdb`, you can then run `vp apply-changes` to see them reflected in the database and the running site.

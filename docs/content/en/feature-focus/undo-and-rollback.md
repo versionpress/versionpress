@@ -2,7 +2,7 @@
 
 Undo and rollback are two essential, most visible features of VersionPress. They share some common behavior but are typically used for different purposes.
 
-!!! Warning "Backup during EAP period"
+!!! warning "Backup during EAP period"
     Reverts manipulate the database and if there are any kind of problems, the database might be left in a broken state. That is why we strongly recommend having an external site backup at least during the EAP period.
 
 

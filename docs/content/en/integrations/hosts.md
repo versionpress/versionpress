@@ -2,7 +2,7 @@
 
 As described on the [installation page](../getting-started/installation-uninstallation.md), VersionPress has stricter system requirements than vanilla WordPress – specifically, we require Git on the server and `proc_open()` enabled. This is for [good reasons](../feature-focus/git.md) but also means that hosting is a bit of a challenge. Most of our early users run VersionPress on dedicated servers or VPS's that allow complete control and that's still recommended, however, there are also a couple of shared hosts that fully support VersionPress today.
 
-!!! Important
+!!! important
     The info here largely applies to the single-site features of VersionPress only. Version 2.0 added support for [sync / team workflows](../sync/index.md) that are even more tricky to support on a shared hosting. For those scenarios, VPS or a custom server is strongly recommended.
 
 ## Supported hosts

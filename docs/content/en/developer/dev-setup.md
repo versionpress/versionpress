@@ -2,7 +2,7 @@
 
 This will set you up for VersionPress development.
 
-!!! Note "Docker vs Legacy Setup"
+!!! note "Docker vs Legacy Setup"
     Since 4.0-beta, we rely on Docker which makes things much easier than full local setup. The legacy approach is still documented in [Dev-Setup.md@4.0-alpha1](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Dev-Setup.md) and [Testing.md@4.0-alpha1](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Testing.md).
 
 ## Getting started
@@ -69,7 +69,7 @@ Also initialize the **Composer** support:
 
 For **Code Sniffer** inspections to work, there's a one-time configuration: Go to *Settings* > *Languages & Frameworks* > *PHP* > *Code Sniffer*, select *Local*, click the three dots next to it and provide your full system path to `./vendor/bin/phpcs`. After this is done, PhpStorm will start checking the code style.
 
-!!! Note "Coding Standards"
+!!! note "Coding Standards"
     Most VersionPress code uses the [PSR-2](http://www.php-fig.org/psr/psr-2/) coding standard with only the parts directly interacting with WordPress might use WordPress-like conventions, e.g., global functions are defined as `vp_register_hooks()`, not `registerHooks()`.
 
 It is also useful to **install the [EditorConfig](https://plugins.jetbrains.com/plugin/7294?pr=phpStorm) extension**, VersionPress ships with some basic formatting rules in `.editorconfig`.
@@ -80,7 +80,7 @@ Please refer to the [Contributing code](https://github.com/versionpress/versionp
 
 ## Debugging
 
-!!! Warning "PHP Debugging"
+!!! warning "PHP Debugging"
     VersionPress consists of core PHP code plus React app for the frontend. This section is about PHP debugging only.
 
 The development environment is preconfigured with [Xdebug](https://xdebug.org/). Here's an example setup:
@@ -103,7 +103,7 @@ Debugging should now work:
 
 Tests are a significant part of VersionPress core, currently about 60% of the codebase. They live in `./plugins/versionpress/tests` and there are several types of them, from unit tests to full end2end tests. They all run in a dockerized test environment.
 
-!!! Warning "Core VersionPress Tests"
+!!! warning "Core VersionPress Tests"
     the `./frontend` app has its own tests, this section is about core VersionPress tests (PHP code) only.
 
 In this section:
