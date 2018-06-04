@@ -14,9 +14,9 @@ a:hover {
 /* Header styles  */
 
 header.md-header {
-    background-color: rgba(211, 223, 235, 0.25);
-    border-top: 1px solid rgba(141, 172, 203, 0.25);
-    border-bottom: 1px solid rgba(141, 172, 203, 0.25);
+    background-color: #F2F5F9;
+    border-top: 1px solid rgba(141, 172, 203, .2);
+    border-bottom: 1px solid rgba(141, 172, 203, .2);
 }
 
 .md-header-nav__topic {
@@ -24,10 +24,30 @@ header.md-header {
     font-weight: bold;
 }
 
-.md-source__repository, .md-source__icon, .md-header-nav__topic  {
-    color: #777;
+.md-source__repository, .md-source__icon, .md-header-nav__topic, .md-header  {
+    color: #555;
 }
 
+/* Footer Styles */
+
+.md-footer-nav__direction, .md-footer-nav, .md-footer-meta * {
+    color: #333;
+}
+
+html .md-footer-meta.md-typeset a  {
+    color: #337ab7;
+}
+html .md-footer-meta.md-typeset a:hover  {
+    color: #23527c;
+}
+
+.md-footer-nav, .md-footer-meta {
+    background-color:#F2F5F9;
+}
+
+.md-footer-meta {
+
+}
 
 /* Typography */
 
