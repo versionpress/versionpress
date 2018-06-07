@@ -13,24 +13,19 @@ use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\ChangeInfos\UntrackedChangeInfo;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Git\Commit;
+use VersionPress\Git\GitRepository;
 
 /**
- * A short-lived object with lifespan of one test method that stores the most recent
- * commit on creation and then asserts that there were expected number of commits since then,
- * of certain type etc.
- *
- * Can be used from any type of tests (Selenium, WP-CLI, ...).
+ * A short-lived object that stores the current commit on its creation and then allows asserts
+ * like how many new commits have been created, what were their actions, etc.
  */
 class CommitAsserter
 {
 
-
-    /**
-     * When this object is created, a reference to most recent commit at that time
-     * is stored in this variable so that asserts can only work with the newly created commits.
-     * @var Commit
-     */
+    /** @var Commit */
     private $startCommit;
+
+    /** @var GitRepository */
     private $gitRepository;
 
     /**
@@ -76,15 +71,6 @@ class CommitAsserter
         if ($gitRepository->isVersioned()) {
             $this->startCommit = $gitRepository->getCommit($gitRepository->getLastCommitHash());
         }
-    }
-
-
-    public function reset()
-    {
-        $this->startCommit = $this->gitRepository->getCommit($this->gitRepository->getLastCommitHash());
-        $this->ignoreCommitsWithActions = [];
-
-
     }
 
     //---------------------------
@@ -269,7 +255,7 @@ class CommitAsserter
      *
      * Placeholders are case sensitive.
      *
-     * @param string $type Standard git "M" (modified), "A" (added), "D" (deleted) etc.
+     * @param string|string[] $type Standard git "M" (modified), "A" (added), "D" (deleted) etc.
      *                     or array of actions for more possibilities.
      * @param string $path Path relative to repo root. Supports wildcards, e.g. "wp-content/uploads/*",
      *                     and placeholders, e.g., "%vpdb%/posts/%VPID%.ini"

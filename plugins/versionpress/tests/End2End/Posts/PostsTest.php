@@ -3,7 +3,6 @@
 namespace VersionPress\Tests\End2End\Posts;
 
 use VersionPress\Tests\End2End\Utils\PostTypeTestCase;
-use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 
 class PostsTest extends PostTypeTestCase
@@ -124,15 +123,15 @@ class PostsTest extends PostTypeTestCase
     {
         self::$worker->prepare_createTagInEditationForm();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->createTagInEditationForm();
 
-        $this->commitAsserter->assertNumCommits(2);
-        $this->commitAsserter->assertCommitAction('post/update');
-        $this->commitAsserter->assertCommitAction('term/create', 1);
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", self::$worker->getPostType());
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(2);
+        $commitAsserter->assertCommitAction('post/update');
+        $commitAsserter->assertCommitAction('term/create', 1);
+        $commitAsserter->assertCommitTag("VP-Post-Type", self::$worker->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -163,13 +162,13 @@ class PostsTest extends PostTypeTestCase
     public function changingPostFormatUpdatesItsTaxonomy()
     {
         self::$worker->prepare_changePostFormat();
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
         self::$worker->changePostFormat();
 
-        $this->commitAsserter->ignoreCommits('term/create');
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction('post/update');
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->ignoreCommits('term/create');
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('post/update');
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -225,11 +224,11 @@ class PostsTest extends PostTypeTestCase
     public function deletingOfPostmetaCreatesPostmetaDeleteAction()
     {
         self::$worker->prepare_deletePostmeta();
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
         self::$worker->deletePostmeta();
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction('postmeta/delete');
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('postmeta/delete');
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 }

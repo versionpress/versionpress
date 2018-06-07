@@ -215,7 +215,7 @@ function vp_register_hooks()
 
     add_action('switch_theme', function () use ($committer) {
         if (defined('WP_CLI') && WP_CLI) {
-            wp_remote_get(admin_url()); //
+            wp_remote_get(admin_url());
         } else {
             $committer->disableCommit(); // the change will be committed on next load
         }

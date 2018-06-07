@@ -1,2 +1,3 @@
-# Mapped WP site root from inside the container
 /wp
+/wp-for-tests
+/test-logs

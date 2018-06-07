@@ -3,7 +3,6 @@
 namespace VersionPress\Tests\End2End\Options;
 
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
-use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 
 class OptionsTest extends End2EndTestCase
@@ -20,14 +19,14 @@ class OptionsTest extends End2EndTestCase
     {
         self::$worker->prepare_changeOption();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->changeOption();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction('option/update');
-        $this->commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('option/update');
+        $commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -39,14 +38,14 @@ class OptionsTest extends End2EndTestCase
     {
         self::$worker->prepare_changeTwoOptions();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->changeTwoOptions();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertBulkAction('option/update', 2);
-        $this->commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('option/update', 2);
+        $commitAsserter->assertCommitPath('M', '%vpdb%/options/%VPID%.ini');
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 }

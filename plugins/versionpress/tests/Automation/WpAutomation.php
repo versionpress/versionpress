@@ -10,20 +10,17 @@ use VersionPress\Utils\Process;
 use VersionPress\Utils\ProcessUtils;
 
 /**
- * Automates tasks like setting up a WP site, installing VersionPress, creating posts, etc. for tests
- * based on test-config.yml. Most of the functionality is provided by WP-CLI which is downloaded automatically
- * if it's not available locally.
+ * Helper functions around WP-CLI.
  *
  * NOTE: this class dates back to VersionPress 1.0 and contains some legacy approaches.
- * For example, methods for manipulating WP site entities could be moved to tests and only
- * basic site automation could stay here.
+ * For example, methods for manipulating WP site entities could be moved to tests.
  */
 class WpAutomation
 {
 
-
     /** @var SiteConfig */
     private $siteConfig;
+
     /** @var string */
     private $wpCliVersion;
 
@@ -37,31 +34,42 @@ class WpAutomation
         $this->wpCliVersion = $wpCliVersion;
     }
 
+    /**
+     * Makes sure that the test site is set-up and VersionPress fully activated.
+     */
+    public function ensureTestSiteIsReady()
+    {
+        if (!$this->isSiteSetUp()) {
+            $this->setUpSite();
+        }
+
+        if (!$this->isVersionPressInitialized()) {
+            $this->copyVersionPressFiles();
+            $this->initializeVersionPress();
+        }
+    }
 
     /**
-     * Does a full setup of a WP site including removing the old site,
-     * downloading files from wp.org, setting up a fresh database, executing
-     * the install script etc.
-     *
-     * Database as specified in the config file must exist and be accessible.
-     *
-     * It takes optional parameter entityCounts, that is an array containing
-     * an amount of generated entities - {@see populateSite}.
-     *
-     * @param array $entityCounts
+     * @param array $entityCounts {@see populateSite}
      */
     public function setUpSite($entityCounts = [])
     {
-        FileSystem::removeContent($this->siteConfig->path);
-
         if ($this->siteConfig->installationType === 'standard') {
             $this->prepareStandardWpInstallation();
         } elseif ($this->siteConfig->installationType === 'composer') {
             $this->createPedestalBasedSite();
         }
 
-        $this->clearDatabase();
-        $this->installWordPress();
+        $this->runWpCliCommand('db', 'reset', [ 'yes' => null]);
+
+        $this->runWpCliCommand('core', 'install', [
+            'url' => $this->siteConfig->url,
+            'title' => $this->siteConfig->title,
+            'admin_user' => $this->siteConfig->adminUser,
+            'admin_email' => $this->siteConfig->adminEmail,
+            'admin_password' => $this->siteConfig->adminPassword,
+            'skip-email' => null,
+        ]);
 
         if (!$this->siteConfig->wpAutoupdate) {
             $this->disableAutoUpdate();
@@ -71,14 +79,12 @@ class WpAutomation
     }
 
     /**
-     * Returns true if the site is installed and working
-     *
      * @return bool
      */
     public function isSiteSetUp()
     {
         try {
-            $this->runWpCliCommand("core", "is-installed");
+            $this->runWpCliCommand('core', 'is-installed');
             return true;
         } catch (Exception $e) {
             return false;
@@ -97,19 +103,12 @@ class WpAutomation
     }
 
     /**
-     * Copies VersionPress from testenv (`/opt/project`) to the test site. Leaves the files owned by `root`
-     * which tests that we treat the plugin location as read-only (generally a good thing).
+     * Copies development version of VersionPress to the test site. It currently also includes tests and dev dependencies
+     * which is not ideal but we can live with that.
      */
     public function copyVersionPressFiles()
     {
-        // Does a copy of everything incl. tests and dev dependencies which is not ideal but the alternatives
-        // have their issues as well:
-        //
-        // - Invoking the canonical Gulp task would require bundling Node and installing dependencies in testenv (slow).
-        // - More careful `cp` code here would duplicate rules in Gulpfile (a bit risky).
-        //
-        FileSystem::copyDir('/opt/project', $this->siteConfig->path . '/wp-content/plugins/versionpress');
-        $this->exec("chown -f -R www-data:www-data {$this->siteConfig->path}/wp-content/plugins/versionpress");
+        FileSystem::copyDir(getenv('VP_DIR'), $this->siteConfig->path . '/wp-content/plugins/versionpress');
     }
 
     /**
@@ -118,7 +117,7 @@ class WpAutomation
      */
     public function activateVersionPress()
     {
-        $activateCommand = "wp plugin activate versionpress";
+        $activateCommand = 'wp plugin activate versionpress';
         $this->exec($activateCommand);
     }
 
@@ -472,7 +471,6 @@ class WpAutomation
      *
      * @param int $id
      * @param array $changes
-     * @return int
      */
     public function editMenuItem($id, $changes)
     {
@@ -545,19 +543,15 @@ class WpAutomation
      */
     private function prepareStandardWpInstallation()
     {
-
-        // mounted as root:root by Docker
-        $this->exec("chown -f -R www-data:www-data /var/www/.wp-cli");
-
-        $wpVersion = $this->siteConfig->wpVersion;
-        $wpLocale = $this->siteConfig->wpLocale;
-        $downloadCommand = "wp core download --path=\"{$this->siteConfig->path}\" --version=\"$wpVersion\" --force";
-        if ($wpLocale) {
-            $downloadCommand .= " --locale=$wpLocale";
-        }
-
-        $this->exec($downloadCommand);
-        $this->exec("chown -f -R www-data:www-data {$this->siteConfig->path}");
+        $this->runWpCliCommand(
+            'core',
+            'download',
+            array_merge([
+                'path' => $this->siteConfig->path,
+                'version' => $this->siteConfig->wpVersion,
+                'force' => null,
+            ], $this->siteConfig->wpLocale ? [ 'locale' => $this->siteConfig->wpLocale ] : [])
+        );
 
         $this->createConfigFile();
     }
@@ -583,35 +577,6 @@ class WpAutomation
         $args["force"] = null;
 
         $this->runWpCliCommand("core", "config", $args);
-    }
-
-    /**
-     * Deletes all tables from the database.
-     */
-    private function clearDatabase()
-    {
-        $this->runWpCliCommand("db", "reset", ["yes" => null]);
-    }
-
-    /**
-     * Installs WordPress. Assumes that files have been prepared on the file system, database is clean
-     * and wp-config.php has been created.
-     */
-    public function installWordPress()
-    {
-        $cmdArgs = [
-            "url" => $this->siteConfig->url,
-            "title" => $this->siteConfig->title,
-            "admin_user" => $this->siteConfig->adminUser,
-            "admin_email" => $this->siteConfig->adminEmail,
-            "admin_password" => $this->siteConfig->adminPassword
-        ];
-
-        if (version_compare($this->wpCliVersion, '0.22.0', '>=')) {
-            $cmdArgs['skip-email'] = null;
-        }
-
-        $this->runWpCliCommand("core", "install", $cmdArgs);
     }
 
     /**
@@ -714,7 +679,6 @@ class WpAutomation
 
         $command = substr($command, 3); // strip "wp " prefix
         $command = "php " . ProcessUtils::escapeshellarg($this->getWpCli()) . " $command";
-        $command = "sudo -H -u www-data bash -c " . ProcessUtils::escapeshellarg($command);
 
         return $command;
     }
@@ -801,7 +765,7 @@ class WpAutomation
         $this->updateConfigConstant('WP_HOME', $this->siteConfig->url);
     }
 
-    private function updateConfigConstant($constant, $value, $variable = false)
+    private function updateConfigConstant($constant, $value)
     {
         $vpInternalCommandFile = __DIR__ . '/../../src/Cli/vp-internal.php';
         $this->runWpCliCommand(

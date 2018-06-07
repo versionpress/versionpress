@@ -1,4 +1,2 @@
-# IDEA project files
-/.idea
-
-vendor
+# Copied from 'frontend' by build scripts
+/admin/public/gui

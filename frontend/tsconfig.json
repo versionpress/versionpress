@@ -5,7 +5,8 @@
     "target": "es5",
     "jsx": "react",
     "lib": ["es2016", "dom"],
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "typeRoots" : ["./node_modules/@types/"]
   },
   "include": [
     "src/**/*.ts",
