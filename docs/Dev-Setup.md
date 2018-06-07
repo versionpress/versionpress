@@ -423,10 +423,10 @@ Git Bash is generally an awesome shell, the only problems you might encounter ar
 
 If you can, use [Docker for Windows](https://www.docker.com/docker-windows), not [Docker Toolbox](https://docs.docker.com/toolbox/toolbox_install_windows/). The experience will be generally smoother.
 
-But there are also some tips for **Docker Toolbox**:
+If you need to use Docker Toolbox:
 
 - Enable port forwarding in VirtualBox (especially for ports 80, 3306, 8080 and 8099), see [details](https://stackoverflow.com/questions/42866013/docker-toolbox-localhost-not-working/45822356#45822356).
-- Docker Toolbox is slower, but you can try to adjust system perfomance in VirtualBox settings. However, you can run into timeout issues in Workflow tests sometimes and exceed default value of 5 seconds in `wp_remote_get()` in End2End tests.
+- Docker Toolbox is slower, but you can try to adjust system performance in VirtualBox settings. However, you can run into timeout issues in Workflow tests sometimes and exceed default value of 5 seconds in `wp_remote_get()` in End2End tests.
 - Run Git Bash and Docker Quickstart Terminal as an Administrator to avoid potential problems (for example permissions and symlinks).
 
 ### Disable antivirus software
