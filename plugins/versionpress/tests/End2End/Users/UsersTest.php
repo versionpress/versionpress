@@ -3,7 +3,6 @@
 namespace VersionPress\Tests\End2End\Users;
 
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
-use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 
 class UsersTest extends End2EndTestCase
@@ -34,15 +33,15 @@ class UsersTest extends End2EndTestCase
     {
         self::$worker->prepare_createUser();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->createUser();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("user/create");
-        $this->commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
-        $this->commitAsserter->assertCommitPath("A", "%vpdb%/users/%VPID%.ini");
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("user/create");
+        $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
+        $commitAsserter->assertCommitPath("A", "%vpdb%/users/%VPID%.ini");
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -55,15 +54,15 @@ class UsersTest extends End2EndTestCase
     {
         self::$worker->prepare_editUser();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->editUser();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("user/update");
-        $this->commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
-        $this->commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID%.ini");
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("user/update");
+        $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
+        $commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID%.ini");
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -76,15 +75,15 @@ class UsersTest extends End2EndTestCase
     {
         self::$worker->prepare_editUsermeta();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->editUsermeta();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("usermeta/update");
-        $this->commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
-        $this->commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID(VP-User-Id)%.ini");
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("usermeta/update");
+        $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
+        $commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID(VP-User-Id)%.ini");
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -97,15 +96,15 @@ class UsersTest extends End2EndTestCase
     {
         self::$worker->prepare_deleteUser();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->deleteUser();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("user/delete");
-        $this->commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
-        $this->commitAsserter->assertCommitPath("D", "%vpdb%/users/%VPID%.ini");
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("user/delete");
+        $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
+        $commitAsserter->assertCommitPath("D", "%vpdb%/users/%VPID%.ini");
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -117,13 +116,13 @@ class UsersTest extends End2EndTestCase
     {
         self::$worker->prepare_editTwoUsers();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->editTwoUsers();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertBulkAction("user/update", 2);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction("user/update", 2);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -135,13 +134,13 @@ class UsersTest extends End2EndTestCase
     {
         self::$worker->prepare_deleteTwoUsers();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->deleteTwoUsers();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertBulkAction("user/delete", 2);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction("user/delete", 2);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -154,13 +153,13 @@ class UsersTest extends End2EndTestCase
     {
         self::$worker->prepare_editTwoUsermeta();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->editTwoUsermeta();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertBulkAction("usermeta/update", 2);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction("usermeta/update", 2);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -172,15 +171,15 @@ class UsersTest extends End2EndTestCase
     {
         self::$worker->prepare_deleteUsermeta();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->deleteUsermeta();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("usermeta/delete");
-        $this->commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
-        $this->commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID(VP-User-Id)%.ini");
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("usermeta/delete");
+        $commitAsserter->assertCommitTag("VP-User-Login", self::$testUser['login']);
+        $commitAsserter->assertCommitPath("M", "%vpdb%/users/%VPID(VP-User-Id)%.ini");
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 

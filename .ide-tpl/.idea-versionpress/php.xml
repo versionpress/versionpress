@@ -1,352 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PhpIncludePathManager">
-    <include_path>
-      <path value="$PROJECT_DIR$/../../ext-libs/wordpress" />
-      <path value="$PROJECT_DIR$/../../ext-libs/vendor/wp-cli" />
-      <path value="$PROJECT_DIR$/vendor/phpmyadmin/sql-parser" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/comparator" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/diff" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/exporter" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/recursion-context" />
-      <path value="$PROJECT_DIR$/vendor/symfony/filesystem" />
-      <path value="$PROJECT_DIR$/vendor/composer" />
-      <path value="$PROJECT_DIR$/vendor/tracy/tracy" />
-      <path value="$PROJECT_DIR$/vendor/michelf/php-markdown" />
-      <path value="$PROJECT_DIR$/vendor/nette/utils" />
-      <path value="$PROJECT_DIR$/vendor/phpunit/php-code-coverage" />
-      <path value="$PROJECT_DIR$/vendor/phpunit/php-file-iterator" />
-      <path value="$PROJECT_DIR$/vendor/phpunit/php-text-template" />
-      <path value="$PROJECT_DIR$/vendor/phpunit/php-timer" />
-      <path value="$PROJECT_DIR$/vendor/phpunit/php-token-stream" />
-      <path value="$PROJECT_DIR$/vendor/phpunit/phpunit" />
-      <path value="$PROJECT_DIR$/vendor/phpunit/phpunit-mock-objects" />
-      <path value="$PROJECT_DIR$/vendor/symfony/process" />
-      <path value="$PROJECT_DIR$/vendor/symfony/yaml" />
-      <path value="$PROJECT_DIR$/vendor/phpdocumentor/reflection-docblock" />
-      <path value="$PROJECT_DIR$/vendor/phpdocumentor/type-resolver" />
-      <path value="$PROJECT_DIR$/vendor/phpdocumentor/reflection-common" />
-      <path value="$PROJECT_DIR$/vendor/myclabs/deep-copy" />
-      <path value="$PROJECT_DIR$/vendor/phpspec/prophecy" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/resource-operations" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/global-state" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/object-enumerator" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/environment" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/version" />
-      <path value="$PROJECT_DIR$/vendor/sebastian/code-unit-reverse-lookup" />
-      <path value="$PROJECT_DIR$/vendor/webmozart/assert" />
-      <path value="$PROJECT_DIR$/vendor/doctrine/instantiator" />
-      <path value="$PROJECT_DIR$/vendor/squizlabs/php_codesniffer" />
-      <path value="$PROJECT_DIR$/vendor/fzaninotto/faker" />
-      <path value="$PROJECT_DIR$/vendor/mikey179/vfsStream" />
-      <path value="$PROJECT_DIR$/vendor/mockery/mockery" />
-      <path value="$PROJECT_DIR$/vendor/hamcrest/hamcrest-php" />
-      <path value="$PROJECT_DIR$/vendor/antecedent/patchwork" />
-      <path value="$PROJECT_DIR$/vendor/10up/wp_mock" />
-      <path value="$PROJECT_DIR$/vendor/phpunit/phpunit-selenium" />
-      <path value="$PROJECT_DIR$/vendor/icecave/semver" />
-      <path value="$PROJECT_DIR$/vendor/icecave/parity" />
-      <path value="$PROJECT_DIR$/vendor/icecave/repr" />
-    </include_path>
-  </component>
-  <component name="PhpInterpreters">
-    <interpreters>
-      <interpreter home="docker://phpstorm/php-71-cli-xdebug/php" id="95838ae0-b671-48e7-bff6-e9e882b74df8" name="phpstorm/php-71-cli-xdebug" debugger_id="php.debugger.XDebug">
-        <remote_data DOCKER_ACCOUNT_NAME="Docker" DOCKER_IMAGE_NAME="phpstorm/php-71-cli-xdebug" DOCKER_REMOTE_PROJECT_PATH="/opt/project" INTERPRETER_PATH="php" HELPERS_PATH="/opt/.phpstorm_helpers" INITIALIZED="false" VALID="true" />
-      </interpreter>
-    </interpreters>
-  </component>
-  <component name="PhpInterpretersPhpInfoCache">
-    <phpInfoCache>
-      <interpreter name="phpstorm/php-71-cli-xdebug">
-        <phpinfo binary_type="PHP" php_cli="/usr/local/bin/php" path_separator=":" version="7.1.2">
-          <additional_php_ini>/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini</additional_php_ini>
-          <configuration_file />
-          <configuration_options>
-            <configuration_option name="SMTP" value="localhost" />
-            <configuration_option name="allow_url_fopen" value="1" />
-            <configuration_option name="allow_url_include" value="0" />
-            <configuration_option name="arg_separator.input" value="&amp;" />
-            <configuration_option name="arg_separator.output" value="&amp;" />
-            <configuration_option name="assert.active" value="1" />
-            <configuration_option name="assert.bail" value="0" />
-            <configuration_option name="assert.callback" value="" />
-            <configuration_option name="assert.exception" value="0" />
-            <configuration_option name="assert.quiet_eval" value="0" />
-            <configuration_option name="assert.warning" value="1" />
-            <configuration_option name="auto_append_file" value="" />
-            <configuration_option name="auto_detect_line_endings" value="0" />
-            <configuration_option name="auto_globals_jit" value="1" />
-            <configuration_option name="auto_prepend_file" value="" />
-            <configuration_option name="browscap" value="" />
-            <configuration_option name="cli.pager" value="" />
-            <configuration_option name="cli.prompt" value="\b \&gt; " />
-            <configuration_option name="curl.cainfo" value="" />
-            <configuration_option name="date.default_latitude" value="31.7667" />
-            <configuration_option name="date.default_longitude" value="35.2333" />
-            <configuration_option name="date.sunrise_zenith" value="90.583333" />
-            <configuration_option name="date.sunset_zenith" value="90.583333" />
-            <configuration_option name="date.timezone" value="" />
-            <configuration_option name="default_charset" value="UTF-8" />
-            <configuration_option name="default_mimetype" value="text/html" />
-            <configuration_option name="default_socket_timeout" value="60" />
-            <configuration_option name="disable_classes" value="" />
-            <configuration_option name="disable_functions" value="" />
-            <configuration_option name="display_errors" value="1" />
-            <configuration_option name="display_startup_errors" value="0" />
-            <configuration_option name="doc_root" value="" />
-            <configuration_option name="docref_ext" value="" />
-            <configuration_option name="docref_root" value="" />
-            <configuration_option name="enable_dl" value="1" />
-            <configuration_option name="enable_post_data_reading" value="1" />
-            <configuration_option name="error_append_string" value="" />
-            <configuration_option name="error_log" value="" />
-            <configuration_option name="error_prepend_string" value="" />
-            <configuration_option name="error_reporting" value="0" />
-            <configuration_option name="expose_php" value="1" />
-            <configuration_option name="extension_dir" value="/usr/local/lib/php/extensions/no-debug-non-zts-20160303" />
-            <configuration_option name="file_uploads" value="1" />
-            <configuration_option name="filter.default" value="unsafe_raw" />
-            <configuration_option name="filter.default_flags" value="" />
-            <configuration_option name="from" value="" />
-            <configuration_option name="hard_timeout" value="2" />
-            <configuration_option name="highlight.comment" value="#FF8000" />
-            <configuration_option name="highlight.default" value="#0000BB" />
-            <configuration_option name="highlight.html" value="#000000" />
-            <configuration_option name="highlight.keyword" value="#007700" />
-            <configuration_option name="highlight.string" value="#DD0000" />
-            <configuration_option name="html_errors" value="0" />
-            <configuration_option name="iconv.input_encoding" value="" />
-            <configuration_option name="iconv.internal_encoding" value="" />
-            <configuration_option name="iconv.output_encoding" value="" />
-            <configuration_option name="ignore_repeated_errors" value="0" />
-            <configuration_option name="ignore_repeated_source" value="0" />
-            <configuration_option name="ignore_user_abort" value="0" />
-            <configuration_option name="implicit_flush" value="1" />
-            <configuration_option name="include_path" value=".:/usr/local/lib/php" />
-            <configuration_option name="input_encoding" value="" />
-            <configuration_option name="internal_encoding" value="" />
-            <configuration_option name="log_errors" value="0" />
-            <configuration_option name="log_errors_max_len" value="1024" />
-            <configuration_option name="mail.add_x_header" value="0" />
-            <configuration_option name="mail.force_extra_parameters" value="" />
-            <configuration_option name="mail.log" value="" />
-            <configuration_option name="max_execution_time" value="0" />
-            <configuration_option name="max_file_uploads" value="20" />
-            <configuration_option name="max_input_nesting_level" value="64" />
-            <configuration_option name="max_input_time" value="-1" />
-            <configuration_option name="max_input_vars" value="1000" />
-            <configuration_option name="mbstring.detect_order" value="" />
-            <configuration_option name="mbstring.encoding_translation" value="0" />
-            <configuration_option name="mbstring.func_overload" value="0" />
-            <configuration_option name="mbstring.http_input" value="" />
-            <configuration_option name="mbstring.http_output" value="" />
-            <configuration_option name="mbstring.http_output_conv_mimetypes" value="^(text/|application/xhtml\+xml)" />
-            <configuration_option name="mbstring.internal_encoding" value="" />
-            <configuration_option name="mbstring.language" value="neutral" />
-            <configuration_option name="mbstring.strict_detection" value="0" />
-            <configuration_option name="mbstring.substitute_character" value="" />
-            <configuration_option name="memory_limit" value="128M" />
-            <configuration_option name="mysqlnd.collect_memory_statistics" value="0" />
-            <configuration_option name="mysqlnd.collect_statistics" value="1" />
-            <configuration_option name="mysqlnd.debug" value="" />
-            <configuration_option name="mysqlnd.fetch_data_copy" value="0" />
-            <configuration_option name="mysqlnd.log_mask" value="0" />
-            <configuration_option name="mysqlnd.mempool_default_size" value="16000" />
-            <configuration_option name="mysqlnd.net_cmd_buffer_size" value="4096" />
-            <configuration_option name="mysqlnd.net_read_buffer_size" value="32768" />
-            <configuration_option name="mysqlnd.net_read_timeout" value="31536000" />
-            <configuration_option name="mysqlnd.sha256_server_public_key" value="" />
-            <configuration_option name="mysqlnd.trace_alloc" value="" />
-            <configuration_option name="open_basedir" value="" />
-            <configuration_option name="openssl.cafile" value="" />
-            <configuration_option name="openssl.capath" value="" />
-            <configuration_option name="output_buffering" value="0" />
-            <configuration_option name="output_encoding" value="" />
-            <configuration_option name="output_handler" value="" />
-            <configuration_option name="pcre.backtrack_limit" value="1000000" />
-            <configuration_option name="pcre.jit" value="1" />
-            <configuration_option name="pcre.recursion_limit" value="100000" />
-            <configuration_option name="phar.cache_list" value="" />
-            <configuration_option name="phar.readonly" value="1" />
-            <configuration_option name="phar.require_hash" value="1" />
-            <configuration_option name="post_max_size" value="8M" />
-            <configuration_option name="precision" value="14" />
-            <configuration_option name="realpath_cache_size" value="4096K" />
-            <configuration_option name="realpath_cache_ttl" value="120" />
-            <configuration_option name="register_argc_argv" value="1" />
-            <configuration_option name="report_memleaks" value="1" />
-            <configuration_option name="report_zend_debug" value="0" />
-            <configuration_option name="request_order" value="" />
-            <configuration_option name="sendmail_from" value="" />
-            <configuration_option name="sendmail_path" value=" -t -i " />
-            <configuration_option name="serialize_precision" value="-1" />
-            <configuration_option name="session.auto_start" value="0" />
-            <configuration_option name="session.cache_expire" value="180" />
-            <configuration_option name="session.cache_limiter" value="nocache" />
-            <configuration_option name="session.cookie_domain" value="" />
-            <configuration_option name="session.cookie_httponly" value="" />
-            <configuration_option name="session.cookie_lifetime" value="0" />
-            <configuration_option name="session.cookie_path" value="/" />
-            <configuration_option name="session.cookie_secure" value="" />
-            <configuration_option name="session.gc_divisor" value="100" />
-            <configuration_option name="session.gc_maxlifetime" value="1440" />
-            <configuration_option name="session.gc_probability" value="1" />
-            <configuration_option name="session.lazy_write" value="1" />
-            <configuration_option name="session.name" value="PHPSESSID" />
-            <configuration_option name="session.referer_check" value="" />
-            <configuration_option name="session.save_handler" value="files" />
-            <configuration_option name="session.save_path" value="" />
-            <configuration_option name="session.serialize_handler" value="php" />
-            <configuration_option name="session.sid_bits_per_character" value="4" />
-            <configuration_option name="session.sid_length" value="32" />
-            <configuration_option name="session.trans_sid_hosts" value="" />
-            <configuration_option name="session.trans_sid_tags" value="a=href,area=href,frame=src,form=" />
-            <configuration_option name="session.upload_progress.cleanup" value="1" />
-            <configuration_option name="session.upload_progress.enabled" value="1" />
-            <configuration_option name="session.upload_progress.freq" value="1%" />
-            <configuration_option name="session.upload_progress.min_freq" value="1" />
-            <configuration_option name="session.upload_progress.name" value="PHP_SESSION_UPLOAD_PROGRESS" />
-            <configuration_option name="session.upload_progress.prefix" value="upload_progress_" />
-            <configuration_option name="session.use_cookies" value="1" />
-            <configuration_option name="session.use_only_cookies" value="1" />
-            <configuration_option name="session.use_strict_mode" value="0" />
-            <configuration_option name="session.use_trans_sid" value="0" />
-            <configuration_option name="short_open_tag" value="1" />
-            <configuration_option name="smtp_port" value="25" />
-            <configuration_option name="sql.safe_mode" value="0" />
-            <configuration_option name="sqlite3.extension_dir" value="" />
-            <configuration_option name="sys_temp_dir" value="" />
-            <configuration_option name="track_errors" value="0" />
-            <configuration_option name="unserialize_callback_func" value="" />
-            <configuration_option name="upload_max_filesize" value="2M" />
-            <configuration_option name="upload_tmp_dir" value="" />
-            <configuration_option name="url_rewriter.hosts" value="" />
-            <configuration_option name="url_rewriter.tags" value="form=" />
-            <configuration_option name="user_agent" value="" />
-            <configuration_option name="user_dir" value="" />
-            <configuration_option name="user_ini.cache_ttl" value="300" />
-            <configuration_option name="user_ini.filename" value=".user.ini" />
-            <configuration_option name="variables_order" value="EGPCS" />
-            <configuration_option name="xdebug.auto_trace" value="0" />
-            <configuration_option name="xdebug.cli_color" value="0" />
-            <configuration_option name="xdebug.collect_assignments" value="0" />
-            <configuration_option name="xdebug.collect_includes" value="1" />
-            <configuration_option name="xdebug.collect_params" value="0" />
-            <configuration_option name="xdebug.collect_return" value="0" />
-            <configuration_option name="xdebug.collect_vars" value="0" />
-            <configuration_option name="xdebug.coverage_enable" value="1" />
-            <configuration_option name="xdebug.default_enable" value="1" />
-            <configuration_option name="xdebug.dump.COOKIE" value="" />
-            <configuration_option name="xdebug.dump.ENV" value="" />
-            <configuration_option name="xdebug.dump.FILES" value="" />
-            <configuration_option name="xdebug.dump.GET" value="" />
-            <configuration_option name="xdebug.dump.POST" value="" />
-            <configuration_option name="xdebug.dump.REQUEST" value="" />
-            <configuration_option name="xdebug.dump.SERVER" value="" />
-            <configuration_option name="xdebug.dump.SESSION" value="" />
-            <configuration_option name="xdebug.dump_globals" value="1" />
-            <configuration_option name="xdebug.dump_once" value="1" />
-            <configuration_option name="xdebug.dump_undefined" value="0" />
-            <configuration_option name="xdebug.extended_info" value="1" />
-            <configuration_option name="xdebug.file_link_format" value="" />
-            <configuration_option name="xdebug.force_display_errors" value="0" />
-            <configuration_option name="xdebug.force_error_reporting" value="0" />
-            <configuration_option name="xdebug.halt_level" value="0" />
-            <configuration_option name="xdebug.idekey" value="" />
-            <configuration_option name="xdebug.max_nesting_level" value="256" />
-            <configuration_option name="xdebug.max_stack_frames" value="-1" />
-            <configuration_option name="xdebug.overload_var_dump" value="2" />
-            <configuration_option name="xdebug.profiler_aggregate" value="0" />
-            <configuration_option name="xdebug.profiler_append" value="0" />
-            <configuration_option name="xdebug.profiler_enable" value="0" />
-            <configuration_option name="xdebug.profiler_enable_trigger" value="0" />
-            <configuration_option name="xdebug.profiler_enable_trigger_value" value="" />
-            <configuration_option name="xdebug.profiler_output_dir" value="/tmp" />
-            <configuration_option name="xdebug.profiler_output_name" value="cachegrind.out.%p" />
-            <configuration_option name="xdebug.remote_addr_header" value="" />
-            <configuration_option name="xdebug.remote_autostart" value="0" />
-            <configuration_option name="xdebug.remote_connect_back" value="0" />
-            <configuration_option name="xdebug.remote_cookie_expire_time" value="3600" />
-            <configuration_option name="xdebug.remote_enable" value="0" />
-            <configuration_option name="xdebug.remote_handler" value="dbgp" />
-            <configuration_option name="xdebug.remote_host" value="localhost" />
-            <configuration_option name="xdebug.remote_log" value="" />
-            <configuration_option name="xdebug.remote_mode" value="req" />
-            <configuration_option name="xdebug.remote_port" value="9000" />
-            <configuration_option name="xdebug.scream" value="0" />
-            <configuration_option name="xdebug.show_error_trace" value="0" />
-            <configuration_option name="xdebug.show_exception_trace" value="0" />
-            <configuration_option name="xdebug.show_local_vars" value="0" />
-            <configuration_option name="xdebug.show_mem_delta" value="0" />
-            <configuration_option name="xdebug.trace_enable_trigger" value="0" />
-            <configuration_option name="xdebug.trace_enable_trigger_value" value="" />
-            <configuration_option name="xdebug.trace_format" value="0" />
-            <configuration_option name="xdebug.trace_options" value="0" />
-            <configuration_option name="xdebug.trace_output_dir" value="/tmp" />
-            <configuration_option name="xdebug.trace_output_name" value="trace.%c" />
-            <configuration_option name="xdebug.var_display_max_children" value="128" />
-            <configuration_option name="xdebug.var_display_max_data" value="512" />
-            <configuration_option name="xdebug.var_display_max_depth" value="3" />
-            <configuration_option name="xmlrpc_error_number" value="0" />
-            <configuration_option name="xmlrpc_errors" value="0" />
-            <configuration_option name="zend.assertions" value="1" />
-            <configuration_option name="zend.detect_unicode" value="1" />
-            <configuration_option name="zend.enable_gc" value="1" />
-            <configuration_option name="zend.multibyte" value="0" />
-            <configuration_option name="zend.script_encoding" value="" />
-            <configuration_option name="zend.signal_check" value="0" />
-            <configuration_option name="zlib.output_compression" value="0" />
-            <configuration_option name="zlib.output_compression_level" value="-1" />
-            <configuration_option name="zlib.output_handler" value="" />
-          </configuration_options>
-          <debuggers>
-            <debugger_info debugger="xdebug" debugger_version="2.5.0">
-              <debug_extensions />
-            </debugger_info>
-          </debuggers>
-          <loaded_extensions>
-            <extension name="Core" />
-            <extension name="PDO" />
-            <extension name="Phar" />
-            <extension name="Reflection" />
-            <extension name="SPL" />
-            <extension name="SimpleXML" />
-            <extension name="ctype" />
-            <extension name="curl" />
-            <extension name="date" />
-            <extension name="dom" />
-            <extension name="fileinfo" />
-            <extension name="filter" />
-            <extension name="ftp" />
-            <extension name="hash" />
-            <extension name="iconv" />
-            <extension name="json" />
-            <extension name="libxml" />
-            <extension name="mbstring" />
-            <extension name="mysqlnd" />
-            <extension name="openssl" />
-            <extension name="pcre" />
-            <extension name="pdo_sqlite" />
-            <extension name="posix" />
-            <extension name="readline" />
-            <extension name="session" />
-            <extension name="sqlite3" />
-            <extension name="standard" />
-            <extension name="tokenizer" />
-            <extension name="xdebug" />
-            <extension name="xml" />
-            <extension name="xmlreader" />
-            <extension name="xmlwriter" />
-            <extension name="zlib" />
-          </loaded_extensions>
-        </phpinfo>
-      </interpreter>
-    </phpInfoCache>
-  </component>
-  <component name="PhpUnit">
-    <phpunit_settings>
-      <phpunit_by_interpreter interpreter_id="95838ae0-b671-48e7-bff6-e9e882b74df8" load_method="CUSTOM_LOADER" custom_loader_path="/opt/project/vendor/autoload.php" phpunit_phar_path="" />
-    </phpunit_settings>
-  </component>
+	<component name="PhpAnalysisConfiguration">
+		<unchecked_exceptions>
+			<fqn value="\Error"/>
+			<fqn value="\Exception"/>
+			<fqn value="\LogicException"/>
+			<fqn value="\RuntimeException"/>
+		</unchecked_exceptions>
+	</component>
+	<component name="PhpCodeSniffer">
+		<phpcs_settings>
+			<PhpCSConfiguration tool_path="$PROJECT_DIR$/vendor/bin/phpcs"/>
+		</phpcs_settings>
+	</component>
+	<component name="PhpIncludePathManager">
+		<include_path>
+			<path value="$PROJECT_DIR$/../../ext-libs/vendor/wp-cli"/>
+			<path value="$PROJECT_DIR$/../../ext-libs/wordpress"/>
+			<path value="$PROJECT_DIR$/vendor/10up/wp_mock"/>
+			<path value="$PROJECT_DIR$/vendor/antecedent/patchwork"/>
+			<path value="$PROJECT_DIR$/vendor/composer"/>
+			<path value="$PROJECT_DIR$/vendor/doctrine/instantiator"/>
+			<path value="$PROJECT_DIR$/vendor/fzaninotto/faker"/>
+			<path value="$PROJECT_DIR$/vendor/hamcrest/hamcrest-php"/>
+			<path value="$PROJECT_DIR$/vendor/icecave/parity"/>
+			<path value="$PROJECT_DIR$/vendor/icecave/repr"/>
+			<path value="$PROJECT_DIR$/vendor/icecave/semver"/>
+			<path value="$PROJECT_DIR$/vendor/michelf/php-markdown"/>
+			<path value="$PROJECT_DIR$/vendor/mikey179/vfsStream"/>
+			<path value="$PROJECT_DIR$/vendor/mockery/mockery"/>
+			<path value="$PROJECT_DIR$/vendor/myclabs/deep-copy"/>
+			<path value="$PROJECT_DIR$/vendor/nette/utils"/>
+			<path value="$PROJECT_DIR$/vendor/phpdocumentor/reflection-common"/>
+			<path value="$PROJECT_DIR$/vendor/phpdocumentor/reflection-docblock"/>
+			<path value="$PROJECT_DIR$/vendor/phpdocumentor/type-resolver"/>
+			<path value="$PROJECT_DIR$/vendor/phpmyadmin/sql-parser"/>
+			<path value="$PROJECT_DIR$/vendor/phpspec/prophecy"/>
+			<path value="$PROJECT_DIR$/vendor/phpunit/php-code-coverage"/>
+			<path value="$PROJECT_DIR$/vendor/phpunit/php-file-iterator"/>
+			<path value="$PROJECT_DIR$/vendor/phpunit/php-text-template"/>
+			<path value="$PROJECT_DIR$/vendor/phpunit/php-timer"/>
+			<path value="$PROJECT_DIR$/vendor/phpunit/php-token-stream"/>
+			<path value="$PROJECT_DIR$/vendor/phpunit/phpunit"/>
+			<path value="$PROJECT_DIR$/vendor/phpunit/phpunit-mock-objects"/>
+			<path value="$PROJECT_DIR$/vendor/phpunit/phpunit-selenium"/>
+			<path value="$PROJECT_DIR$/vendor/sebastian/code-unit-reverse-lookup"/>
+			<path value="$PROJECT_DIR$/vendor/sebastian/comparator"/>
+			<path value="$PROJECT_DIR$/vendor/sebastian/diff"/>
+			<path value="$PROJECT_DIR$/vendor/sebastian/environment"/>
+			<path value="$PROJECT_DIR$/vendor/sebastian/exporter"/>
+			<path value="$PROJECT_DIR$/vendor/sebastian/global-state"/>
+			<path value="$PROJECT_DIR$/vendor/sebastian/object-enumerator"/>
+			<path value="$PROJECT_DIR$/vendor/sebastian/recursion-context"/>
+			<path value="$PROJECT_DIR$/vendor/sebastian/resource-operations"/>
+			<path value="$PROJECT_DIR$/vendor/sebastian/version"/>
+			<path value="$PROJECT_DIR$/vendor/squizlabs/php_codesniffer"/>
+			<path value="$PROJECT_DIR$/vendor/symfony/filesystem"/>
+			<path value="$PROJECT_DIR$/vendor/symfony/process"/>
+			<path value="$PROJECT_DIR$/vendor/symfony/yaml"/>
+			<path value="$PROJECT_DIR$/vendor/tracy/tracy"/>
+			<path value="$PROJECT_DIR$/vendor/webmozart/assert"/>
+		</include_path>
+	</component>
+	<component name="PhpProjectServersManager">
+		<servers>
+			<server host="localhost" id="0e23ef92-80ff-4bc7-ae15-8fb62bb4b323" name="VersionPress-dev" use_path_mappings="true">
+				<path_mappings>
+					<mapping local-root="$PROJECT_DIR$" remote-root="/var/www/html/wp-content/plugins/versionpress"/>
+				</path_mappings>
+			</server>
+			<server host="localhost" id="ee1474e0-20d1-49a3-9b47-8353cc81ec30" name="VersionPress-tests" use_path_mappings="true">
+				<path_mappings>
+					<mapping local-root="$PROJECT_DIR$" remote-root="/opt/versionpress"/>
+				</path_mappings>
+			</server>
+		</servers>
+	</component>
+	<component name="PhpUnit">
+		<phpunit_settings>
+			<phpunit_by_interpreter custom_loader_path="/opt/versionpress/vendor/autoload.php" interpreter_id="95838ae0-b671-48e7-bff6-e9e882b74df8" load_method="CUSTOM_LOADER" phpunit_phar_path=""/>
+			<PhpUnitSettings custom_loader_path="$PROJECT_DIR$/vendor/autoload.php" load_method="CUSTOM_LOADER"/>
+		</phpunit_settings>
+	</component>
 </project>

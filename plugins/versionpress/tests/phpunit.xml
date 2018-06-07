@@ -1,4 +1,9 @@
-<phpunit bootstrap="phpunit-bootstrap.php">
+<phpunit bootstrap="phpunit-bootstrap.php"
+         verbose="true"
+         colors="true">
+    <logging>
+        <log type="testdox-text" target="/var/opt/versionpress/logs/testdox.txt" />
+    </logging>
     <testsuites>
 
         <testsuite name="Unit">
@@ -21,9 +26,9 @@
             <directory>End2End</directory>
         </testsuite>
 
-        <testsuite name="Selenium">
+        <!-- <testsuite name="Selenium">
             <directory>Selenium</directory>
-        </testsuite>
+        </testsuite> -->
 
         <testsuite name="Workflow">
             <directory>Workflow</directory>

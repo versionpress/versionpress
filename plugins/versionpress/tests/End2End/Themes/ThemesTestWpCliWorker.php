@@ -26,7 +26,10 @@ class ThemesTestWpCliWorker extends WpCliWorker implements IThemesTestWorker
 
     public function uploadTheme()
     {
-        $this->wpAutomation->runWpCliCommand('theme', 'install', [$this->themeInfo['zipfile']]);
+        $this->wpAutomation->runWpCliCommand('theme', 'install', [
+            $this->themeInfo['zipfile'],
+            'force' => null,
+        ]);
     }
 
     public function prepare_switchTheme()

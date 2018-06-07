@@ -3,7 +3,6 @@
 namespace VersionPress\Tests\End2End\Menus;
 
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
-use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 
 class MenusTest extends End2EndTestCase
@@ -20,15 +19,15 @@ class MenusTest extends End2EndTestCase
     {
         self::$worker->prepare_createMenu();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->createMenu();
 
-        $this->commitAsserter->ignoreCommits("usermeta/create");
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("term/create");
-        $this->commitAsserter->assertCommitPath('A', "%vpdb%/terms/%VPID%.ini");
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->ignoreCommits("usermeta/create");
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("term/create");
+        $commitAsserter->assertCommitPath('A', "%vpdb%/terms/%VPID%.ini");
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -41,14 +40,14 @@ class MenusTest extends End2EndTestCase
     {
         self::$worker->prepare_editMenu();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->editMenu();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("term/rename");
-        $this->commitAsserter->assertCommitPath('M', "%vpdb%/terms/%VPID%.ini");
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("term/rename");
+        $commitAsserter->assertCommitPath('M', "%vpdb%/terms/%VPID%.ini");
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -61,14 +60,14 @@ class MenusTest extends End2EndTestCase
     {
         self::$worker->prepare_addMenuItem();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->addMenuItem();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/create");
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", "nav_menu_item");
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/create");
+        $commitAsserter->assertCommitTag("VP-Post-Type", "nav_menu_item");
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -81,14 +80,14 @@ class MenusTest extends End2EndTestCase
     {
         self::$worker->prepare_editMenuItem();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->editMenuItem();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/update");
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", "nav_menu_item");
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/update");
+        $commitAsserter->assertCommitTag("VP-Post-Type", "nav_menu_item");
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -101,12 +100,12 @@ class MenusTest extends End2EndTestCase
     {
         self::$worker->prepare_createMenuItemDraft();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->createMenuItemDraft();
 
-        $this->commitAsserter->assertNumCommits(0);
-        $this->commitAsserter->assertCountOfUntrackedFiles(1);
+        $commitAsserter->assertNumCommits(0);
+        $commitAsserter->assertCountOfUntrackedFiles(1);
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -119,12 +118,12 @@ class MenusTest extends End2EndTestCase
     {
         self::$worker->prepare_deleteOrphanedMenuItems();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->deleteOrphanedMenuItems();
 
-        $this->commitAsserter->assertNumCommits(0);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(0);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -137,14 +136,14 @@ class MenusTest extends End2EndTestCase
     {
         self::$worker->prepare_removeMenuItem();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->removeMenuItem();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/delete");
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", "nav_menu_item");
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/delete");
+        $commitAsserter->assertCommitTag("VP-Post-Type", "nav_menu_item");
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -156,14 +155,14 @@ class MenusTest extends End2EndTestCase
     {
         self::$worker->prepare_removeMenuItemWithChildren();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->removeMenuItemWithChildren();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/delete");
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", "nav_menu_item");
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/delete");
+        $commitAsserter->assertCommitTag("VP-Post-Type", "nav_menu_item");
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -176,14 +175,14 @@ class MenusTest extends End2EndTestCase
     {
         self::$worker->prepare_deleteMenu();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->deleteMenu();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("term/delete");
-        $this->commitAsserter->assertCommitPath('D', "%vpdb%/terms/%VPID%.ini");
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("term/delete");
+        $commitAsserter->assertCommitPath('D', "%vpdb%/terms/%VPID%.ini");
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 }

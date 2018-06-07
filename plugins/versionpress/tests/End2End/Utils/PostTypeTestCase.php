@@ -2,11 +2,7 @@
 
 namespace VersionPress\Tests\End2End\Utils;
 
-use PHPUnit_Framework_AssertionFailedError;
-use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
-use VersionPress\Tests\Utils\TestConfig;
-use VersionPress\Tests\Utils\WpVersionComparer;
 
 /**
  * Contains the actual logic for post-type tests (posts tests, pages tests etc.) as a set of methods.
@@ -29,70 +25,70 @@ abstract class PostTypeTestCase extends End2EndTestCase
     {
         self::$worker->prepare_addPost();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->addPost();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/create");
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/create");
+        $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
     public function runUpdatePostTest()
     {
         self::$worker->prepare_updatePost();
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->updatePost();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/update");
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/update");
+        $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
     public function runUpdatePostViaQuickEditTest()
     {
         self::$worker->prepare_quickEditPost();
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->quickEditPost();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitsAreEquivalent();
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitsAreEquivalent();
+        $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
     public function runTrashPostTest()
     {
         self::$worker->prepare_trashPost();
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->trashPost();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/trash");
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/trash");
+        $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
     public function runUndoTrashTest()
     {
         self::$worker->prepare_untrashPost();
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->untrashPost();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/untrash");
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/untrash");
+        $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -100,14 +96,14 @@ abstract class PostTypeTestCase extends End2EndTestCase
     {
         self::$worker->prepare_deletePost();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->deletePost();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/delete");
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/delete");
+        $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -115,14 +111,14 @@ abstract class PostTypeTestCase extends End2EndTestCase
     {
         self::$worker->prepare_createDraft();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->createDraft();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/draft");
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/draft");
+        $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -130,12 +126,12 @@ abstract class PostTypeTestCase extends End2EndTestCase
     {
         self::$worker->prepare_previewDraft();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->previewDraft();
 
-        $this->commitAsserter->assertNumCommits(0);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(0);
+        $commitAsserter->assertCleanWorkingDirectory();
 
         // This time we DO NOT want to assert that files equal database. It's because previewing
         // the post updates `post_date` and similar fields in the database while we don't want
@@ -148,14 +144,14 @@ abstract class PostTypeTestCase extends End2EndTestCase
     {
         self::$worker->prepare_previewUnsavedPost();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->previewUnsavedPost();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/draft");
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/draft");
+        $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -163,14 +159,14 @@ abstract class PostTypeTestCase extends End2EndTestCase
     {
         self::$worker->prepare_publishDraft();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->publishDraft();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction("post/publish");
-        $this->commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction("post/publish");
+        $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -178,12 +174,12 @@ abstract class PostTypeTestCase extends End2EndTestCase
     {
         self::$worker->prepare_setFeaturedImageForUnsavedPost();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->setFeaturedImageForUnsavedPost();
 
-        $this->commitAsserter->assertNumCommits(0);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(0);
+        $commitAsserter->assertCleanWorkingDirectory();
         // In this case we dont want to check the integrity with database. There is one extra postmeta in the database
         // representing the relation to the featured image. It will be saved in the following test.
     }
@@ -193,14 +189,14 @@ abstract class PostTypeTestCase extends End2EndTestCase
     {
         self::$worker->prepare_makeDraftFromUnsavedPost();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->makeDraftFromUnsavedPost();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction('post/draft');
-        $this->commitAsserter->assertCommitAction('postmeta/create', 0, true);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('post/draft');
+        $commitAsserter->assertCommitAction('postmeta/create', 0, true);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -208,13 +204,13 @@ abstract class PostTypeTestCase extends End2EndTestCase
     {
         self::$worker->prepare_changeStatusOfTwoPosts();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->changeStatusOfTwoPosts();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertBulkAction('post/update', 2);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('post/update', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -222,13 +218,13 @@ abstract class PostTypeTestCase extends End2EndTestCase
     {
         self::$worker->prepare_moveTwoPostsInTrash();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->moveTwoPostsInTrash();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertBulkAction('post/trash', 2);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('post/trash', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -236,13 +232,13 @@ abstract class PostTypeTestCase extends End2EndTestCase
     {
         self::$worker->prepare_moveTwoPostsFromTrash();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->moveTwoPostsFromTrash();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertBulkAction('post/untrash', 2);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('post/untrash', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -250,13 +246,13 @@ abstract class PostTypeTestCase extends End2EndTestCase
     {
         self::$worker->prepare_deleteTwoPosts();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->deleteTwoPosts();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertBulkAction('post/delete', 2);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('post/delete', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -264,13 +260,13 @@ abstract class PostTypeTestCase extends End2EndTestCase
     {
         self::$worker->prepare_publishTwoPosts();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->publishTwoPosts();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertBulkAction('post/publish', 2);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertBulkAction('post/publish', 2);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 

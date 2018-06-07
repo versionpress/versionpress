@@ -3,8 +3,8 @@
 namespace VersionPress\Tests\End2End\Revert;
 
 use VersionPress\Cli\VPCommandUtils;
+use VersionPress\Git\GitRepository;
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
-use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\DBAsserter;
 
 class RevertTest extends End2EndTestCase
@@ -21,15 +21,15 @@ class RevertTest extends End2EndTestCase
     {
         $changes = self::$worker->prepare_undoLastCommit();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->undoLastCommit();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction('versionpress/undo');
-        $this->commitAsserter->assertCountOfAffectedFiles(count($changes));
-        $this->commitAsserter->assertCommitPaths($changes);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('versionpress/undo');
+        $commitAsserter->assertCountOfAffectedFiles(count($changes));
+        $commitAsserter->assertCommitPaths($changes);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -40,15 +40,15 @@ class RevertTest extends End2EndTestCase
     public function undoRevertsOnlyOneCommit()
     {
         $changes = self::$worker->prepare_undoSecondCommit();
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->undoSecondCommit();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction('versionpress/undo');
-        $this->commitAsserter->assertCountOfAffectedFiles(count($changes));
-        $this->commitAsserter->assertCommitPaths($changes);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('versionpress/undo');
+        $commitAsserter->assertCountOfAffectedFiles(count($changes));
+        $commitAsserter->assertCommitPaths($changes);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -60,16 +60,16 @@ class RevertTest extends End2EndTestCase
     {
         $changes = self::$worker->prepare_undoRevertedCommit();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->undoLastCommit();
         self::$worker->undoLastCommit();
 
-        $this->commitAsserter->assertNumCommits(2);
-        $this->commitAsserter->assertCommitAction('versionpress/undo');
-        $this->commitAsserter->assertCountOfAffectedFiles(count($changes));
-        $this->commitAsserter->assertCommitPaths($changes);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(2);
+        $commitAsserter->assertCommitAction('versionpress/undo');
+        $commitAsserter->assertCountOfAffectedFiles(count($changes));
+        $commitAsserter->assertCommitPaths($changes);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -81,11 +81,11 @@ class RevertTest extends End2EndTestCase
     {
         self::$worker->prepare_tryRestoreEntityWithMissingReference();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->tryRestoreEntityWithMissingReference();
-        $this->commitAsserter->assertNumCommits(0);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(0);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -97,14 +97,14 @@ class RevertTest extends End2EndTestCase
     {
         $changes = self::$worker->prepare_rollbackMoreChanges();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->rollbackMoreChanges();
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction('versionpress/rollback');
-        $this->commitAsserter->assertCountOfAffectedFiles(count($changes));
-        $this->commitAsserter->assertCommitPaths($changes);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('versionpress/rollback');
+        $commitAsserter->assertCountOfAffectedFiles(count($changes));
+        $commitAsserter->assertCommitPaths($changes);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -116,12 +116,12 @@ class RevertTest extends End2EndTestCase
     {
         self::$worker->prepare_clickOnCancel();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->clickOnCancel();
 
-        $this->commitAsserter->assertNumCommits(0);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(0);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -133,14 +133,14 @@ class RevertTest extends End2EndTestCase
     {
         self::$worker->prepare_undoWithNotCleanWorkingDirectory();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
         touch(self::$testConfig->testSite->path . '/revert-test-file');
 
         self::$worker->undoLastCommit();
 
-        $this->commitAsserter->assertNumCommits(0);
+        $commitAsserter->assertNumCommits(0);
         unlink(self::$testConfig->testSite->path . '/revert-test-file');
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -149,7 +149,8 @@ class RevertTest extends End2EndTestCase
      */
     public function rollbackWorksWithMergeCommits()
     {
-        $commitHash = $this->gitRepository->getLastCommitHash();
+        $gitRepository = new GitRepository(self::$testConfig->testSite->path);
+        $commitHash = $gitRepository->getLastCommitHash();
         $sitePath = self::$testConfig->testSite->path;
 
         VPCommandUtils::exec('sudo -u www-data git branch test', $sitePath);
@@ -162,15 +163,15 @@ class RevertTest extends End2EndTestCase
         VPCommandUtils::exec('sudo -u www-data git merge test', $sitePath);
         VPCommandUtils::exec('sudo -u www-data git branch -d test', $sitePath);
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$wpAutomation->runWpCliCommand('vp', 'rollback', [$commitHash]);
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCleanWorkingDirectory();
-        $this->commitAsserter->assertCountOfAffectedFiles(2);
-        $this->commitAsserter->assertCommitPath('D', '%vpdb%/options/vp/vp_option_master.ini');
-        $this->commitAsserter->assertCommitPath('D', '%vpdb%/options/vp/vp_option_test.ini');
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertCountOfAffectedFiles(2);
+        $commitAsserter->assertCommitPath('D', '%vpdb%/options/vp/vp_option_master.ini');
+        $commitAsserter->assertCommitPath('D', '%vpdb%/options/vp/vp_option_test.ini');
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -182,12 +183,12 @@ class RevertTest extends End2EndTestCase
     {
         self::$worker->prepare_undoToTheSameState();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->undoSecondCommit();
 
-        $this->commitAsserter->assertNumCommits(0);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(0);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -199,12 +200,12 @@ class RevertTest extends End2EndTestCase
     {
         self::$worker->prepare_rollbackToTheSameState();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->rollbackToTheSameState();
 
-        $this->commitAsserter->assertNumCommits(0);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(0);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -215,15 +216,15 @@ class RevertTest extends End2EndTestCase
     public function undoMultipleCommitsCreatesOneCommit()
     {
         $changes = self::$worker->prepare_undoMultipleCommits();
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->undoMultipleCommits();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction('versionpress/undo');
-        $this->commitAsserter->assertCountOfAffectedFiles(count($changes));
-        $this->commitAsserter->assertCommitPaths($changes);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('versionpress/undo');
+        $commitAsserter->assertCountOfAffectedFiles(count($changes));
+        $commitAsserter->assertCommitPaths($changes);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -233,15 +234,15 @@ class RevertTest extends End2EndTestCase
     public function undoMultipleCommitsDetectsMissingReferencesCorrectly()
     {
         $changes = self::$worker->prepare_undoMultipleDependentCommits();
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->undoMultipleDependentCommits();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction('versionpress/undo');
-        $this->commitAsserter->assertCountOfAffectedFiles(count($changes));
-        $this->commitAsserter->assertCommitPaths($changes);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('versionpress/undo');
+        $commitAsserter->assertCountOfAffectedFiles(count($changes));
+        $commitAsserter->assertCommitPaths($changes);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -253,11 +254,11 @@ class RevertTest extends End2EndTestCase
     {
         self::$worker->prepare_undoMultipleCommitsThatCannotBeReverted();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->undoMultipleCommitsThatCannotBeReverted();
-        $this->commitAsserter->assertNumCommits(0);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(0);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 
@@ -269,15 +270,15 @@ class RevertTest extends End2EndTestCase
     {
         $changes = self::$worker->prepare_undoNonDbChange();
 
-        $this->commitAsserter->reset();
+        $commitAsserter = $this->newCommitAsserter();
 
         self::$worker->undoNonDbChange();
 
-        $this->commitAsserter->assertNumCommits(1);
-        $this->commitAsserter->assertCommitAction('versionpress/undo');
-        $this->commitAsserter->assertCountOfAffectedFiles(count($changes));
-        $this->commitAsserter->assertCommitPaths($changes);
-        $this->commitAsserter->assertCleanWorkingDirectory();
+        $commitAsserter->assertNumCommits(1);
+        $commitAsserter->assertCommitAction('versionpress/undo');
+        $commitAsserter->assertCountOfAffectedFiles(count($changes));
+        $commitAsserter->assertCommitPaths($changes);
+        $commitAsserter->assertCleanWorkingDirectory();
         DBAsserter::assertFilesEqualDatabase();
     }
 }
