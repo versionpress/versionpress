@@ -1,26 +1,14 @@
-body {
-    min-height: 100vh;
-    font-size: 16px;
-    line-height: 1.6;
-    word-wrap: break-word;
-}
+/* The colors here were built for white (primary) & light blue (accent) colors of the material theme */
 
-/* Link styles */
+/* Header styles */
 
-a:hover {
-    text-decoration: underline;
-}
-
-/* Header styles  */
-
-header.md-header {
+[data-md-color-primary] header.md-header {
     background-color: #F2F5F9;
     border-top: 1px solid rgba(141, 172, 203, .2);
     border-bottom: 1px solid rgba(141, 172, 203, .2);
 }
 
 .md-header-nav__topic {
-    font-size: 19px;
     font-weight: bold;
 }
 
@@ -28,7 +16,7 @@ header.md-header {
     color: #555;
 }
 
-/* Footer Styles */
+/* Footer styles */
 
 .md-footer-nav__direction, .md-footer-nav, .md-footer-meta * {
     color: #333;
@@ -45,11 +33,11 @@ html .md-footer-meta.md-typeset a:hover  {
     background-color:#F2F5F9;
 }
 
-.md-footer-meta {
-
-}
-
 /* Typography */
+
+.md-typeset a, .md-nav__link--active {
+    color: #337ab7;
+}
 
 .md-typeset h1, .md-typeset h2, .md-typeset h3, .md-typeset h4, .md-typeset h5 {
     font-weight: bold;
@@ -61,7 +49,7 @@ html .md-footer-meta.md-typeset a:hover  {
 }
 
 .md-typeset h1 {
-    color: #000;
+    color: rgba(0,0,0,.87);
     font-size: 2.25em;
     margin: 0;
 }
@@ -73,12 +61,7 @@ html .md-footer-meta.md-typeset a:hover  {
     margin-bottom: 0.1em;
 }
 
-
-strong {
-    font-weight: bold;
-}
-
-/* image sections */
+/* Images */
 
 figure {
     margin: 30px 0;
@@ -94,7 +77,7 @@ figcaption {
     display: block;
 }
 
-/* Code blocks */
+/* Inline code, GitHub style */
 
 .md-typeset code, .md-typeset tt {
     background: none repeat scroll 0% 0% #F5F5F5;
@@ -123,69 +106,4 @@ figcaption {
 
 .md-typeset ol li, .md-typeset ul li {
     margin-bottom:0;
-}
-
-dl dt {
-    padding: 0;
-    margin-top: 16px;
-    font-size: 1em;
-    font-style: italic;
-    font-weight: bold;
-    .codehilite .il { color: #009999 } /* Literal.Number.Integer.Long */
-}
-dt, dd {
-    line-height: 1.46;
-}
-
-tbody tr:nth-child(odd) {
-   background-color: #eee;
-}
-
-/* Custom checkboxes */
-.markdown-body .task-list-item {
-  list-style-type: none !important;
-}
-
-.markdown-body .task-list-item input[type="checkbox"] {
-  margin: 0 4px 0.25em -20px;
-  vertical-align: middle;
-}
-
-.markdown-body .task-list-control {
-  display: inline; /* Ensure label is inline incase theme sets it to block.*/
-}
-
-.markdown-body .task-list-control {
-  position: relative;
-  display: inline-block;
-  color: #555;
-  cursor: pointer;
-}
-
-.markdown-body .task-list-control input[type="checkbox"] {
-  position: absolute;
-  opacity: 0;
-  z-index: -1; /* Put the input behind the label so it doesn't overlay text */
-}
-
-.markdown-body .task-list-indicator {
-  position: absolute;
-  top: -8px;
-  left: -18px;
-  display: block;
-  width:  14px;
-  height: 14px;
-  color: #eee;
-  background-color: #eee;
-  border-radius: .25rem;
-}
-
-.markdown-body .task-list-control input[type="checkbox"]:checked + .task-list-indicator::before {
-  display: block;
-  margin-top: -4px;
-  margin-left: 2px;
-  font-size: 16px;
-  line-height: 1;
-  content: "✔";
-  color: #1EBB52;
 }

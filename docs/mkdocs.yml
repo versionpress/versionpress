@@ -107,8 +107,8 @@ theme:
     text: "Helvetica Neue"
     code: 'Consolas'
   palette:
-    primary: '#4183c4'
-    accent: '#4183c4'
+    primary: 'white'
+    accent: 'light blue'
 
 # Extras for material theme
 extra:
