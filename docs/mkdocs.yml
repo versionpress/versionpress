@@ -117,6 +117,10 @@ extra:
       link: 'https://github.com/versionpress'
     - type: 'twitter'
       link: 'https://twitter.com/versionpress'
+    - type: 'facebook'
+      link: 'https://facebook.com/VersionPress'
+    - type: 'wordpress'
+      link: 'https://blog.versionpress.net/'
   search:
     tokenizer: '[\s\-\.]+'
 
