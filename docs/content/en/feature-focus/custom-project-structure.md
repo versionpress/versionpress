@@ -2,7 +2,7 @@
 
 Some advanced users like having WordPress in its own directory or move plugins, themes or uploads in another directory. VersionPress supports some scenarios. Just remember that all files related to the site have to be under the project root ([`VP_PROJECT_ROOT`](../getting-started/configuration.md#vp_project_root)).
 
-!!! warning "Project structure"
+!!! warning
     You need to adjust your project structure _before_ fully initalizing VersionPress. The recommended procedure is:
 
      * Customize your WordPress site structure.
@@ -25,6 +25,6 @@ It is possible to move these folders by following [instructions on Codex](https:
 
 You can also rename or move the directory where VersionPress saves all its data. Use constant `VP_VPDB_DIR` to get it done. See the [configuration page](../getting-started/configuration.md#vp_vpdb_dir) for instructions.
 
-!!! warning
+!!! important "Note"
     It will NOT be possible to undo changes before moving the directory.
 

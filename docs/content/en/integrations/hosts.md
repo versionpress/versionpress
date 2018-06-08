@@ -20,7 +20,7 @@ Here are a couple of hosts that we or our users confirmed work fine with Version
  - [x] [45AIR](https://www.45air.com/) – Low Cost WordPress Hosting - Git 2.10+, full shell access, and VersionPress pre-installed.
 
 !!! check "Help us improve this list"
-    If you know of a host that supports VersionPress please **send a pull request**.
+    If you know of a host that supports VersionPress please [send a pull request](https://github.com/versionpress/versionpress/edit/master/docs/content/en/integrations/hosts.md).
 
 
 ## Unsupported hosts

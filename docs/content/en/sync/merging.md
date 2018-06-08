@@ -30,12 +30,13 @@ Let's go through a couple of scenarios to see the commands in action.
 Let's start with the main site, e.g., "live", living in `<some path>/www/live` and served from `http://example.com/live`. We want to create a staging environment so we call:
 
 ```bash
-    wp vp clone --name=staging
+wp vp clone --name=staging
 ```
 
 That creates a clone in `www/staging`, running at `http://example.com/staging` (configurable, see [cloning](./cloning.md) for more). Then we do some changes in this staging environment via the web.
 
 When done, we `cd` into the `staging` folder and run:
+
 ```bash
 # /www/staging
 wp vp pull

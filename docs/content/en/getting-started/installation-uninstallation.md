@@ -17,7 +17,7 @@ The server environment must match certain requirements, some of which are checke
   <figcaption>Pre-activation check performed by VersionPress</figcaption>
 </figure>
 
-!!! warning "Before proceeding with installation"
+!!! warning "Important"
     VersionPress is a lot more involved than most other WordPress plugins. Please pay attention to this section before proceeding with installation.
 
 Minimum system requirements are (as a general rule, **we recommend using the latest versions of everything**):
