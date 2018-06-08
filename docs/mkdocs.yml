@@ -101,8 +101,8 @@ theme:
   custom_dir: 'theme-mods' # See https://squidfunk.github.io/mkdocs-material/customization/#extending-the-theme
   feature:
     # tabs: true
-  logo: 'img/icon.png'
-  favicon: 'img/favicon.ico'
+  logo: 'https://user-images.githubusercontent.com/101152/41179166-07f4a0b2-6b6a-11e8-98f1-c21d285dbb48.png'
+  favicon: 'https://user-images.githubusercontent.com/101152/41179166-07f4a0b2-6b6a-11e8-98f1-c21d285dbb48.png'
   font:
     text: "Helvetica Neue"
     code: 'Consolas'
