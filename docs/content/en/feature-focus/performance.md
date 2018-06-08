@@ -1,4 +1,4 @@
-# Performance Considerations #
+# Performance Considerations
 
 VersionPress generally consumes server resources only after some change has occurred on the web site while for read-only requests, it adds hardly any overhead at all (WordPress fetches the data like if there was no VersionPress).
 
@@ -12,4 +12,4 @@ If there is one category of operations that is generally slow, it's reverts. It 
 
 ### Initialization
 
-The other slow operation, that you'll fortunately encounter very rarely, ideally once, is the initial activation, or, initialization. When VersionPress first creates a mirror of the site in the Git repository, it basically needs to go through the whole database, extract data from it and commit it to the repository together with all the files. This can take many seconds or even minutes for large sites. The pre-activation screen will try to make an estimate of how many entities are there in the database and whether PHP time limit should allow it to run but if you encounter any issues, try increasing the timeout or allocate more hardware resources to the site.   
+The other slow operation, that you'll fortunately encounter very rarely, ideally once, is the initial activation, or, initialization. When VersionPress first creates a mirror of the site in the Git repository, it basically needs to go through the whole database, extract data from it and commit it to the repository together with all the files. This can take many seconds or even minutes for large sites. The pre-activation screen will try to make an estimate of how many entities are there in the database and whether PHP time limit should allow it to run but if you encounter any issues, try increasing the timeout or allocate more hardware resources to the site.

@@ -7,7 +7,6 @@ VersionPress ships as a standard plugin but there are two important things to be
 
 Both things are important, please read on.
 
-
 ## System requirements
 
 The server environment must match certain requirements, some of which are checked automatically on VersionPress activation. We also recommend some other setup steps below.
@@ -22,18 +21,17 @@ The server environment must match certain requirements, some of which are checke
 
 Minimum system requirements are (as a general rule, **we recommend using the latest versions of everything**):
 
- - WordPress 4.8 or higher
- - PHP 5.6 or higher
- - Git 1.9 or higher (2.13 or newer recommended)
- - Apache, nginx or IIS 7+ web server
- - `proc_open()` enabled
- - Write permissions in the site root and everywhere under it
- - Standard WordPress configuration system (`wp-config.php`)
+- WordPress 4.8 or higher
+- PHP 5.6 or higher
+- Git 1.9 or higher (2.13 or newer recommended)
+- Apache, nginx or IIS 7+ web server
+- `proc_open()` enabled
+- Write permissions in the site root and everywhere under it
+- Standard WordPress configuration system (`wp-config.php`)
 
 On top of that, if you want to use the [multi-instance / sync features](../sync/index.md) of VersionPress 2.0, probably even more control over the requirement will be required. In practice, this means that a custom server / VPS is your best bet. See also the section on [hosting providers](../integrations/hosts.md).
 
 Here are notes on some of the requirements:
-
 
 ### Git
 
@@ -41,31 +39,28 @@ VersionPress takes a strategic dependency on [Git](http://git-scm.com/) which pr
 
 Git **1.9** and newer are supported. Do not attempt to make VersionPress run with older releases (1.7 and 1.8 are still quite popular), there are known issues with them.
 
-
 ### Supported web servers
 
 We recommend Apache or nginx (as [WordPress itself](https://wordpress.org/about/requirements/)) but almost any web server should work. Just pay attention to two things:
 
- 1. **Write permissions**. The user that runs PHP and the eventual Git process needs to have write access into the locations listed below and the `sys_get_temp_dir()`. Initialization page checks this automatically and the [system info page](../troubleshooting/system-info-page.md) has a dedicated section on permissions if you need more info.
-     - IIS users, please [read this page](../troubleshooting/iis.md).
- 2. **Access rules**. The locations listed below should be protected against direct requests.
+1. **Write permissions**. The user that runs PHP and the eventual Git process needs to have write access into the locations listed below and the `sys_get_temp_dir()`. Initialization page checks this automatically and the [system info page](../troubleshooting/system-info-page.md) has a dedicated section on permissions if you need more info.
+    - IIS users, please [read this page](../troubleshooting/iis.md).
+2. **Access rules**. The locations listed below should be protected against direct requests.
 
 The sensitive locations are:
 
- - `/wp-content/vpdb`
- - `/wp-content/vpbackups`
- - `/wp-content/plugins/versionpress`
- - `/.git`
+- `/wp-content/vpdb`
+- `/wp-content/vpbackups`
+- `/wp-content/plugins/versionpress`
+- `/.git`
 
 We ship `.htaccess` rules for Apache, `web.config` rules for IIS and `wp-content/plugins/versionpress/versionpress-nginx.conf` template for nginx but please confirm manually that direct access to e.g. `yoursite/.git/config` is prevented.
-
 
 ### PHP 5.6
 
 WordPress can run on an old and [long unsupported](http://php.net/eol.php) PHP 5.2. We also started with this version but eventually dropped it so that we could use the newer language features and some 3<sup>rd</sup> party libraries. We recommend using one of the [actively supported](http://php.net/supported-versions.php) PHP versions.
 
 Note: VersionPress is currently not being tested on HHVM.
-
 
 ### Project structure
 
@@ -96,7 +91,6 @@ Upon successful activation, you should see a screen like this:
   <figcaption>VersionPress successfully activated</figcaption>
 </figure>
 
-
 ## Update
 
 Since [VersionPress 3.0](../release-notes/3.0.md), the simplest way to update is to run the `wp vp update` command, e.g.:
@@ -117,7 +111,6 @@ If you cannot use the WP-CLI update method, these are the manual steps:
 
 The difference from the automated method is that the internal representation of the database has been regenerated from scratch so you won't be able to track the history of database entities easily. We will improve the GUI update method in the future.
 
-
 ## Uninstallation
 
 Uninstallation is a standard two-step process:
@@ -129,10 +122,9 @@ Uninstallation is a standard two-step process:
 
 There are two important things to note:
 
-* Once VersionPress is deactivated, **it cannot be fully reactivated again on the same repository**. This means that while you can initialize VersionPress again and the presence of the old repository will not be a problem, features like Undo or Rollback will only be available for *new* commits, created by the current activation of VersionPress. This is technical limitation that is not easy to overcome.
-* **On uninstallation, the Git repository is moved to a backup folder** under `wp-content/vpbackups`. You can download or recover it from there manually.
-    * Note: VersionPress will only remove / backup the repository if it detects that it was VersionPress-initiated repository. If you created the Git repository manually before installing VersionPress the repository will not be touched.
-
+- Once VersionPress is deactivated, **it cannot be fully reactivated again on the same repository**. This means that while you can initialize VersionPress again and the presence of the old repository will not be a problem, features like Undo or Rollback will only be available for *new* commits, created by the current activation of VersionPress. This is technical limitation that is not easy to overcome.
+- **On uninstallation, the Git repository is moved to a backup folder** under `wp-content/vpbackups`. You can download or recover it from there manually.
+    - Note: VersionPress will only remove / backup the repository if it detects that it was VersionPress-initiated repository. If you created the Git repository manually before installing VersionPress the repository will not be touched.
 
 ## VersionPress states at a glance
 
@@ -150,5 +142,3 @@ To sum up the previous text, here are the states that the site can be in:
 | Uninstalled | **No** (backed up) | No |
 
 <sup>1)</sup> The repo might exist if you created it manually or if VersionPress was previously installed. It is not a problem – VersionPress will happily add commits to the existing repository but a common scenario is that there is no default Git repository and VersionPress creates one.
-
-

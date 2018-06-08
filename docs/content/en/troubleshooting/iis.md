@@ -4,7 +4,6 @@ Though IIS is not an [officially recommended](https://wordpress.org/about/requir
 
 In theory, IIS should work just fine but in practice, there are often setup issues related to users and permissions. This is what we know so far; if you're an IIS guru and can help us improve this page, please [file an issue on GitHub](https://github.com/versionpress/docs/issues).
 
-
 ## The problem
 
 The core issue on IIS seems to be that the [Symfony\Process](http://symfony.com/doc/current/components/process.html) cannot read the process output. We use the Process component to interact with Git, and even when Git is installed and Symfony can successfully call it, it eventually fails because it cannot read what Git returned.

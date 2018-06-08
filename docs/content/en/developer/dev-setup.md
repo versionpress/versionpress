@@ -253,7 +253,7 @@ This method is more universal and works for PhpStorm, VSCode and other IDEs. You
 
 1. Set a breakpoint.
 2. Start listening in your IDE.
-3. Launch a debug-enabled script like `npm run tests:unit:debug` (see [package.json](../package.json)).
+3. Launch a debug-enabled script like `npm run tests:unit:debug` (see [package.json](https://github.com/versionpress/versionpress/blob/master/package.json)).
 
 #### PhpStorm example
 

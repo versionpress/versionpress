@@ -4,11 +4,9 @@ Themes are generally supported fine, as long they stay simple (for example, the 
 
 This page lists supported, unsupported and partially supported themes.
 
-
 ## Supported themes
 
 As stated above, most simple themes are supported out of the box. That should be around 99% themes by our strict scientific measurements.
-
 
 ## Unsupported themes
 

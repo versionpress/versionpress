@@ -5,7 +5,6 @@
 
 VersionPress needs to understand plugin data, actions, shortcodes and other things to automatically provide version control for them. This document describes how plugins (and themes, later) can hook into VersionPress functionality.
 
-
 ## Introduction
 
 Plugins are described to VersionPress by a set of files stored in the `.versionpress` folder in the plugin root (with other discovery options available, see below). They include:
@@ -20,7 +19,6 @@ All files are optional so for example, if a plugin doesn't define any new shortc
 !!! tip
     WordPress core is described using the very same format and you can find the definition files in the [`.versionpress`](../../../../plugins/versionpress/.versionpress) folder inside the plugin.
 
-
 ## Actions
 
 Actions represent what the plugin does. For example, WordPress core has actions like "update option", "publish post" and many others. They are the smallest changes in a WordPress site and are eventually stored as Git commits by VersionPress.
@@ -30,7 +28,6 @@ An action is identified by a string like `option/edit` or `post/publish`, commit
 Some commits may even contain multiple actions. For example, if a user switches to a new theme that also creates some options of its own, a single commit with `theme/switch` and several `option/create` actions will be created. When this operation is undone, it takes back both the theme switching and options creation.
 
 Actions are described in the `actions.yml` file.
-
 
 ### `actions.yml`
 
@@ -77,7 +74,6 @@ These are the main elements:
     - Priorities behave like on WordPress filters and actions: the lower the number, the higher the priority. A more important action beats the less important one if both appear in the same commit. For example, `theme/switch` beats `option/edit` which means that the user will see a message about changing themes, not updating some internal option.
 - **Meta entities** also contain **`parent-id-tag`** with the name of a tag containing ID of the parent entity.
 
-
 ### Action detection
 
 There are generally two types of actions:
@@ -109,7 +105,6 @@ vp_force_action('wordpress', 'update', $version, [], $wpFiles);
 ```
 
 > :construction: We're planning to change this for the final VersionPress 4.0 release. Some filter will probably be used instead.
-
 
 ### Files to commit with an action
 
@@ -195,7 +190,6 @@ post:
     - post: id
 ```
 
-
 ### Defining entities
 
 The top-level keys define entities such as `post`, `comment`, `option` or `postmeta`. Entity names use a singular form.
@@ -210,14 +204,13 @@ post:
 
 Again, this is prefix-less; `wp_` or another prefix will be added automatically.
 
-
 ### Identifying entities
 
 VersionPress needs to know how to identify entities. There are two approaches and they are represented by either using a `id` or `vpid` property in the schema:
 
- * **`id`** points to a standard WordPress auto-increment primary key. **VersionPress will generate VPIDs** (globally unique IDs) for such entities. Most entities are of this type – posts, comments, users etc.
+- **`id`** points to a standard WordPress auto-increment primary key. **VersionPress will generate VPIDs** (globally unique IDs) for such entities. Most entities are of this type – posts, comments, users etc.
 
- * **`vpid`** points VersionPress directly to use the given column as a unique identifier and skip the whole VPID generation and maintenance process. Entities of this type **will not have artificial VPIDs**. The `options` table is an example of this – even though it has an `option_id` auto-increment primary key, from VersionPress' point of view the unique identifier is `option_name`.
+- **`vpid`** points VersionPress directly to use the given column as a unique identifier and skip the whole VPID generation and maintenance process. Entities of this type **will not have artificial VPIDs**. The `options` table is an example of this – even though it has an `option_id` auto-increment primary key, from VersionPress' point of view the unique identifier is `option_name`.
 
 Examples:
 
@@ -368,7 +361,6 @@ term_taxonomy:
     ~term_relationships.object_id: post
 ```
 
-
 #### Parent references
 
 Some entities are stored within other entities, for example, postmeta are stored in the same INI file as their parent post. This is captured using a `parent-reference` property:
@@ -382,7 +374,6 @@ postmeta:
 ```
 
 This references one of the basic reference column names, not the final entity. The notation above reads "postmeta stores a parent reference in the `post_id` column, and that points to the `post` entity".
-
 
 ### Frequently written entities
 
@@ -401,7 +392,6 @@ The values in the `frequently-written` array can either be strings which are the
 - **Queries** use the same syntax as search / filtering in the UI, with some small differences like that the date range operator cannot be used but overall, the syntax is pretty intuitive. _TODO add link_
 - The **interval** is parsed by the `strtotime()` function and the default value is one hour.
 
-
 ### Ignoring entities
 
 Some entities should be ignored (not tracked at all) like transient options, environment-specific options, etc. This is an example from the `option` entity:
@@ -414,7 +404,6 @@ Some entities should be ignored (not tracked at all) like transient options, env
 ```
 
 Again, queries are used. Wildcards are supported.
-
 
 #### Ignoring columns
 
@@ -456,7 +445,6 @@ post:
     - user: post_author
     - post: post_parent
 ```
-
 
 ## Shortcodes
 
@@ -524,11 +512,9 @@ If something cannot be described statically, VersionPress offers several filters
 
 Most of the filters have already been discussed in the text above, you can find the full API reference below.
 
-
 ## Ignored folders
 
 Feel free to use custom `.gitignore` for files in the plugin directory. You can also ignore files / directories outside the plugin directory. There will be a filter to let VersionPress know which files / directories you want to ignore.
-
 
 ## Discovery mechanism
 
@@ -549,36 +535,36 @@ TODO this will be auto-generated from code.
 
 ### Filters
 
- - `vp_entity_action_{$entityName}`
-   - `apply_filters("vp_entity_action_{$entityName}", $action, $oldEntity, $newEntity)`
- - `vp_meta_entity_action_{$entityName}`
-   - `apply_filters("vp_meta_entity_action_{$entityName}", $action, $oldEntity, $newEntity, $oldParentEntity, $newParentEntity)`
- - `vp_entity_tags_{$entityName}`
-   - `apply_filters("vp_entity_tags_{$entityName}", $tags, $oldEntity, $newEntity, $action)`
- - `vp_meta_entity_tags_{$entityName}`
-   - `apply_filters("vp_meta_entity_tags_{$entityName}", $tags, $oldEntity, $newEntity, $action, $oldParentEntity, $newParentEntity)`
- - `vp_entity_files_{$entityName}`
-   - `apply_filters("vp_entity_files_{$entityName}", $files, $oldEntity, $newEntity)`
- - `vp_meta_entity_files_{$entityName}`
-   - `apply_filters("vp_meta_entity_files_{$entityName}", $files, $oldEntity, $newEntity, $oldParentEntity, $newParentEntity)`
- - `vp_entity_should_be_saved_{$entityName}`
-   - `apply_filters("vp_entity_should_be_saved_{$entityName}", $shouldBeSaved, $data, $storage)`
- - `vp_bulk_change_description_{$entityName}`
-   - `apply_filters("vp_bulk_change_description_{$entityName}", $description, $action, $count, $tags)`
- - `vp_action_description_{$scope}`
-   - `apply_filters("vp_action_description_{$scope}", $message, $action, $vpid, $tags)`
- - `vp_action_priority_{$scope}`
-   - `apply_filters("vp_action_priority_{$entityName}", $defaultPriority, $action, $vpid, $entity)`
-   - `apply_filters("vp_action_priority_{$entityName}", $defaultPriority, $action, $vpid)`
+- `vp_entity_action_{$entityName}`
+    - `apply_filters("vp_entity_action_{$entityName}", $action, $oldEntity, $newEntity)`
+- `vp_meta_entity_action_{$entityName}`
+    - `apply_filters("vp_meta_entity_action_{$entityName}", $action, $oldEntity, $newEntity, $oldParentEntity, $newParentEntity)`
+- `vp_entity_tags_{$entityName}`
+    - `apply_filters("vp_entity_tags_{$entityName}", $tags, $oldEntity, $newEntity, $action)`
+- `vp_meta_entity_tags_{$entityName}`
+    - `apply_filters("vp_meta_entity_tags_{$entityName}", $tags, $oldEntity, $newEntity, $action, $oldParentEntity, $newParentEntity)`
+- `vp_entity_files_{$entityName}`
+    - `apply_filters("vp_entity_files_{$entityName}", $files, $oldEntity, $newEntity)`
+- `vp_meta_entity_files_{$entityName}`
+    - `apply_filters("vp_meta_entity_files_{$entityName}", $files, $oldEntity, $newEntity, $oldParentEntity, $newParentEntity)`
+- `vp_entity_should_be_saved_{$entityName}`
+    - `apply_filters("vp_entity_should_be_saved_{$entityName}", $shouldBeSaved, $data, $storage)`
+- `vp_bulk_change_description_{$entityName}`
+    - `apply_filters("vp_bulk_change_description_{$entityName}", $description, $action, $count, $tags)`
+- `vp_action_description_{$scope}`
+    - `apply_filters("vp_action_description_{$scope}", $message, $action, $vpid, $tags)`
+- `vp_action_priority_{$scope}`
+    - `apply_filters("vp_action_priority_{$entityName}", $defaultPriority, $action, $vpid, $entity)`
+    - `apply_filters("vp_action_priority_{$entityName}", $defaultPriority, $action, $vpid)`
 
-### Actions
+### Actions (API)
 
- - `vp_before_synchronization_{$entityName}`
-   - `do_action("vp_before_synchronization_{$entityName}")`
- - `vp_after_synchronization_{$entityName}`
-   - `do_action("vp_after_synchronization_{$entityName}")`
+- `vp_before_synchronization_{$entityName}`
+    - `do_action("vp_before_synchronization_{$entityName}")`
+- `vp_after_synchronization_{$entityName}`
+    - `do_action("vp_after_synchronization_{$entityName}")`
 
 ### Functions
 
- - `vp_force_action`
-   - `vp_force_action($scope, $action, $id = '', $tags = [], $files = [])`
+- `vp_force_action`
+    - `vp_force_action($scope, $action, $id = '', $tags = [], $files = [])`

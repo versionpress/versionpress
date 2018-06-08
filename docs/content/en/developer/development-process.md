@@ -84,7 +84,6 @@ Still, please consider **issues #1 through #522 "quick and dirty"** – the tran
 
 For newer issues, we try to make them useful and high-quality; they are one of our key artifacts.
 
-
 ## Release versioning
 
 We bump major version with every release like browsers do so VersionPress quickly advances from `4.0` to `5.0` to `6.0` etc. We do not use minor versions like `4.1` or `4.2`. We do, however, use patch releases like `4.0.1` or `4.0.2`.

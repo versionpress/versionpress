@@ -7,18 +7,16 @@ After you [created a clone](./cloning.md) of a site and tested the changes, you 
 
 Merge usually works automatically, however, there might be **conflicts** if a conflicting change has been done to a single piece of data. In such case, you need to **resolve** the conflict manually and commit the result using the `git commit` + `vp apply-changes` commands.
 
-
 ## Pulling and pushing changes
 
 The important thing to realize that there is a *direction* to these commands. You always push / pull between two environments and you need to stand in one of them to run the command, which determines the direction.
 
 **Pull** fetches the changes from the other environment and **does the merge**. Well, that is the most common result but there might also be two others:
 
- - If there were no concurrent changes in the remote environment, no merge commit is created. The history will remain linear which is a so called "fast-forward" merge in the Git terminology.
- - There might have been merge conflicts, in which case the merge commit is postponed until after the conflicts are resolved. See a separate section below on that.
+- If there were no concurrent changes in the remote environment, no merge commit is created. The history will remain linear which is a so called "fast-forward" merge in the Git terminology.
+- There might have been merge conflicts, in which case the merge commit is postponed until after the conflicts are resolved. See a separate section below on that.
 
 **Push** is the opposite command but somewhat simpler because **it doesn't do a merge**. It will only succeed if there are no changes in the target environment. You typically push only after a pull.
-
 
 ### Examples
 
@@ -66,25 +64,22 @@ wp vp push
 
 Again, there is no need to provide the `--to=origin` parameter as `origin` is the default target of our clone. After this command, the live site is updated and looks exactly like the staging clone.
 
-
-
 ## Resolving conflicts
 
 Conflicts happen when one piece of data is updated in two environments, independently. Conflicts need to be resolved by a human as someone needs to decide which change to keep and which change to discard.
 
 Conflicts can happen during the `pull` command as it is the only one doing the merge. You will be given two options:
 
- 1. **Keep the conflict** so that it can be resolved manually ***and* keep the maintenance mode on** (all merging / synchronization is always done under the maintenance mode; the site cannot be working while the conflict markers are in place). You'll typically choose this in a safe environment like staging or dev where downtime isn't that much of an issue.
- 2. **Abort the pull and turn the maintenance mode off**. If you choose this, all will be like the pull never ran. You'll probably want to choose this on the live site where you cannot afford extensive downtime.
-
+1. **Keep the conflict** so that it can be resolved manually ***and* keep the maintenance mode on** (all merging / synchronization is always done under the maintenance mode; the site cannot be working while the conflict markers are in place). You'll typically choose this in a safe environment like staging or dev where downtime isn't that much of an issue.
+2. **Abort the pull and turn the maintenance mode off**. If you choose this, all will be like the pull never ran. You'll probably want to choose this on the live site where you cannot afford extensive downtime.
 
 To resolve the actual conflict, after you've chosen the first option above, do this:
 
- 1. **Resolve conflict** manually with a standard Git workflow. There are [many](http://githowto.com/resolving_conflicts) [good](https://help.github.com/articles/resolving-a-merge-conflict-from-the-command-line/) [resources](https://www.atlassian.com/git/tutorials/using-branches/git-merge) on this but generally:
-      1. Resolve the conflict by editing the text files (in your favorite editor or a merge tool like KDiff3, WinMerge etc.)
-      2. Stage files
-      3. Commit them
- 2. Run the **apply-changes** command: `wp vp apply-changes`
+1. **Resolve conflict** manually with a standard Git workflow. There are [many](http://githowto.com/resolving_conflicts) [good](https://help.github.com/articles/resolving-a-merge-conflict-from-the-command-line/) [resources](https://www.atlassian.com/git/tutorials/using-branches/git-merge) on this but generally:
+    1. Resolve the conflict by editing the text files (in your favorite editor or a merge tool like KDiff3, WinMerge etc.)
+    2. Stage files
+    3. Commit them
+2. Run the **apply-changes** command: `wp vp apply-changes`
 
 After this, the conflicts are resolved and the resulting state with all the changes applied is visible on the WordPress site.
 

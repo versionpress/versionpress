@@ -4,6 +4,6 @@ VersionPress is a version control plugin for WordPress. It maintains a Git repos
 
 VersionPress is currently a [Developer Preview](./about-eap.md), please make sure you understand the consequences.
 
-* [Understand the basic concepts](./concepts.md) (optional but useful)
-* [Install VersionPress](./installation-uninstallation.md)
-* [Use it](./using-versionpress.md)
+- [Understand the basic concepts](./concepts.md) (optional but useful)
+- [Install VersionPress](./installation-uninstallation.md)
+- [Use it](./using-versionpress.md)

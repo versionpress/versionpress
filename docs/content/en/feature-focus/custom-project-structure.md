@@ -27,4 +27,3 @@ You can also rename or move the directory where VersionPress saves all its data.
 
 !!! important "Note"
     It will NOT be possible to undo changes before moving the directory.
-

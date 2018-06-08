@@ -1,27 +1,24 @@
-# Undo and Rollback #
+# Undo and Rollback
 
 Undo and rollback are two essential, most visible features of VersionPress. They share some common behavior but are typically used for different purposes.
 
 !!! warning "Keep backup"
     Reverts manipulate the database and if there are any kind of problems, the database might be left in a broken state. That is why we strongly recommend having an external site backup at least during the EAP period.
 
-
-## Undo ##
+## Undo
 
 The Undo feature can **selectively undo only some changes while keeping the newer updates**. For example, if you edited a post and then updated the site title, undo can revert just the post change without taking the site title with it.
 
 This is a very powerful feature that not many other technologies support – for example, the undo button in text editors is more like our rollback, as are most backup solutions. Right now, you can undo a single change; in the future we will have a way to undo a range of changes, or their selection.
 
-
-## Rollback ##
+## Rollback
 
 **Rollback takes the site to some previous state.** For example, if you roll back to the state where you first installed VersionPress, all your changes done since then will be gone.
 
 Rollback works by creating a **new state** that looks like some previous one. This is a very important concept that means two things:
 
- 1. VersionPress never loses anything from its history. Once something is there, it is always recoverable.
- 2. The rollback itself can be easily reverted. It is a change like any other so just click *Undo* next to it if you need.
-
+1. VersionPress never loses anything from its history. Once something is there, it is always recoverable.
+2. The rollback itself can be easily reverted. It is a change like any other so just click *Undo* next to it if you need.
 
 ## When reverts won't work
 
@@ -35,18 +32,15 @@ Undo will not work when **the change being reverted is in *conflict* with some m
 
 When VersionPress encounters a conflict – and it can detect them reliably – it will just report this to the user and stop doing the revert. We don't have a conflict resolution UI yet – it might come in a future update.
 
-
 ### Invalid entity references
 
 Say that you delete a *comment*, want VersionPress to restore it but the related *post* no longer exists. VersionPress will see this as a **logical conflict in relations between two entities** and will reject the revert. In other words, VersionPress checks "foreign keys" before it proceeds with the undo.
 
 To fix this, first restore the related entity (e.g., the post) and only then the original entity (e.g., the comment).
 
-
 ### Uncommitted files
 
-The last scenario where revert will not work is uncommited changes somewhere in the site files. For example, if you manually edited a theme file and haven't committed this change to Git, revert will be rejected because your changes could be possibly lost. In technical terms, **working directory must be clean for reverts to work.**
-
+The last scenario where revert will not work is uncommitted changes somewhere in the site files. For example, if you manually edited a theme file and haven't committed this change to Git, revert will be rejected because your changes could be possibly lost. In technical terms, **working directory must be clean for reverts to work.**
 
 ### Merge commits
 

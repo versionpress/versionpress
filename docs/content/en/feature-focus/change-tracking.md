@@ -1,12 +1,10 @@
-# Change Tracking #
+# Change Tracking
 
 Change tracking is a core feature of VersionPress. This page describes the three main facets of it:
 
- - [Automatic change tracking](#automatic-change-tracking)
- - [Manual change tracking](#manual-change-tracking)
- - [What's not tracked](#whats-not-tracked)
-
-
+- [Automatic change tracking](#automatic-change-tracking)
+- [Manual change tracking](#manual-change-tracking)
+- [What's not tracked](#whats-not-tracked)
 
 ## Automatic change tracking
 
@@ -19,23 +17,20 @@ Most of the time, VersionPress works silently, simply tracking all the important
 
 Most tracked changes involve database entities which are described below but some actions involve files as well. These are the common situations:
 
- - **Theme** installations, uninstallations and updates
-     - Note: theme files are often edited manually and externally, in some kind of editor, which is not (and cannot be) tracked by VersionPress automatically. Please see [Manual change tracking](#manual-change-tracking).
- - **Plugin** installations, uninstallations and updates
- - **WordPress core** updates
- - **Media** uploads
- - **Translations**
+- **Theme** installations, uninstallations and updates
+    - Note: theme files are often edited manually and externally, in some kind of editor, which is not (and cannot be) tracked by VersionPress automatically. Please see [Manual change tracking](#manual-change-tracking).
+- **Plugin** installations, uninstallations and updates
+- **WordPress core** updates
+- **Media** uploads
+- **Translations**
 
 When any such action happens, VersionPress commits both the database change and a related file(s) change. For example, when installing a plugin, VersionPress will take note that the list of installed plugins has been changed in the database and commit the corresponding plugin files as well.
 
 Note that not all files are versioned because you e.g. don't want to commit cache files, large backup ZIPs etc. Please refer to the [What's not tracked](#what-s-not-tracked) section for more.
 
-
-
 ### Database entities
 
 The biggest added value of VersionPress is in *database change tracking*. This section describes what database entities are tracked and how.
-
 
 #### Posts
 
@@ -45,21 +40,21 @@ The biggest added value of VersionPress is in *database change tracking*. This s
 
 Tracked actions:
 
- * Create post
- * Edit post
- * Create draft
- * Update draft
- * Publish draft
- * Trash post
- * Untrash post
- * Delete post
+- Create post
+- Edit post
+- Create draft
+- Update draft
+- Publish draft
+- Trash post
+- Untrash post
+- Delete post
 
 Special treatment:
 
- * We don't track WordPress **revisions**, i.e., posts of a type `revision`. Git versions are our revisions – more powerful, space efficient etc.
- * **Drafts** are treated specially because WordPress updates them unnecessarily often. VersionPress ignores most of the internal updates and only stores a new revisions when a draft is saved or eventually published as a full post.
-     * (In more detail, the draft is first stored by VersionPress when the post state changes from `auto-draft` to `draft`. This happens either after title is filled in and the field loses focus, or after a couple of seconds timeout. The next revision of that draft is then created every time the user clicks *Save draft*, or, eventually, when he/she publishes the post. New revision is *not* created when the user clicks *Preview*.)
- * **Attachments** are special types of posts too. VersionPress tracks both the database change related to these post types as well as files created on the disk.
+- We don't track WordPress **revisions**, i.e., posts of a type `revision`. Git versions are our revisions – more powerful, space efficient etc.
+- **Drafts** are treated specially because WordPress updates them unnecessarily often. VersionPress ignores most of the internal updates and only stores a new revisions when a draft is saved or eventually published as a full post.
+    - (In more detail, the draft is first stored by VersionPress when the post state changes from `auto-draft` to `draft`. This happens either after title is filled in and the field loses focus, or after a couple of seconds timeout. The next revision of that draft is then created every time the user clicks *Save draft*, or, eventually, when he/she publishes the post. New revision is *not* created when the user clicks *Preview*.)
+- **Attachments** are special types of posts too. VersionPress tracks both the database change related to these post types as well as files created on the disk.
 
 ##### Postmeta
 
@@ -67,25 +62,21 @@ Special treatment:
 
 Tracked actions:
 
- * Create postmeta
- * Edit postmeta
- * Delete postmeta
-
-
+- Create postmeta
+- Edit postmeta
+- Delete postmeta
 
 #### Comments
 
 Tracked actions:
 
- * Create comment
- * Edit comment
- * Delete comment
- * Trash comment
- * Untrash comment
+- Create comment
+- Edit comment
+- Delete comment
+- Trash comment
+- Untrash comment
 
 Comment workflows (pending, approved etc.) are going to be supported post-1.0-beta1 release.
-
-
 
 #### Options
 
@@ -93,25 +84,21 @@ Most options are tracked but e.g. transient options and some others are ignored.
 
 Tracked actions:
 
- * Create option
- * Edit option
- * Delete option
-
-
+- Create option
+- Edit option
+- Delete option
 
 #### Users
 
 Tracked actions:
 
- * Create user
- * Edit user
- * Delete user
+- Create user
+- Edit user
+- Delete user
 
 ##### Usermeta
 
 Quite a lot of user properties are stored as *usermeta*. Most usermeta are tracked, some are intentionally ignored (e.g., session tokens).
-
-
 
 #### Terms
 
@@ -119,29 +106,25 @@ Terms are things like categories or tags (or custom types, depending on term tax
 
 Tracked actions:
 
- * Create term
- * Edit term
- * Delete term
+- Create term
+- Edit term
+- Delete term
 
 ##### Term taxonomies
 
 Defines meaning for terms. Tracked together with terms.
 
-
 #### Widgets
 
 Widgets are technically entries in the `options` table and are fully supported.
-
 
 #### Menus
 
 Menus are technically stored as half terms (the menu itself), half posts (menu items) and are fully supported.
 
-
 #### Other entities
 
 VersionPress tracks everything that goes into the standard WordPress tables, which often covers even 3rd party WP plugins if they use features like custom post types etc. VersionPress doesn't track any custom database tables by default.
-
 
 ## Manual change tracking
 
@@ -153,7 +136,6 @@ You can use any Git client for it or, since VersionPress 2.0, there is a GUI for
   <img src="https://cloud.githubusercontent.com/assets/101152/26038403/df254b0e-3907-11e7-8f62-50e31c81a740.png" alt="Manual commit" />
 </figure>
 
-
 VersionPress treats manual commits exactly the same as auto-generated commits – they will be visible in the table, [undo or rollback](undo-and-rollback.md) them, etc.
 
 ## Frequent DB writes
@@ -164,11 +146,10 @@ Some entities are changed very often, e.g., view counters, Akismet spam count, e
 
 There are certain things that VersionPress intentionally omits from versioning:
 
- - **wp-config.php** – this file is environment-specific which means there would be collisions between various developers, staging/live environments etc. However, some parts of the config should be shared which is why VersionPress introduced **wp-config.common.php** in v3.0 – this file is committed in the Git repo and `require`'d from `wp-config.php`. See [Configuration](../getting-started/configuration.md) for details.
- - **VersionPress itself** – the folder `plugins/versionpress` is excluded because you don't want a rollback to take you to a state where VersionPress is outdated and possibly buggy.
- - **Anything in `wp-content` other than plugins, themes and uploads**. Common things in `wp-content` are backup folders, cache directories etc. which should generally not be versioned.
- - Log files, system files etc.
-
+- **wp-config.php** – this file is environment-specific which means there would be collisions between various developers, staging/live environments etc. However, some parts of the config should be shared which is why VersionPress introduced **wp-config.common.php** in v3.0 – this file is committed in the Git repo and `require`'d from `wp-config.php`. See [Configuration](../getting-started/configuration.md) for details.
+- **VersionPress itself** – the folder `plugins/versionpress` is excluded because you don't want a rollback to take you to a state where VersionPress is outdated and possibly buggy.
+- **Anything in `wp-content` other than plugins, themes and uploads**. Common things in `wp-content` are backup folders, cache directories etc. which should generally not be versioned.
+- Log files, system files etc.
 
 ### Updating ignore rules
 

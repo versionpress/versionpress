@@ -9,8 +9,8 @@ Previous sections focused on using VersionPress on a single site, or more precis
 
 There are two main reasons why you would want to have two or more instances of a WordPress site:
 
- 1. Safe testing environment (*staging*)
- 2. Team workflows
+1. Safe testing environment (*staging*)
+2. Team workflows
 
 A **safe testing environment** is essential when you have a larger or risky change like trying out a new plugin, changing a theme or upgrading WordPress. While it is true that VersionPress greatly helps with the Undo / Rollback functionality even on the live site, it is even better to test those changes beforehand. The technique of this is sometimes broadly referred to as staging.
 
@@ -19,7 +19,6 @@ Another common scenario is **team work**. On many projects, several people coope
 There is a **common problem** though: while it is simple to create multiple instances of a site, it is generally very hard to *merge* them back together. And you need a merge because simply replacing one site with another could lose newer changes there.
 
 That's where VersionPress comes in.
-
 
 ## Cloning and merging with VersionPress
 
@@ -39,4 +38,3 @@ In most cases, the merge will be fully automatic and painless. However, a **conf
 **(4)** In such case, the **conflict needs to be resolved**. This is always a human work and currently, we do not have a user interface for that but because VersionPress is powered by Git and very close to it, you can (and currently need to) do it manually. When the conflict is resolved, you commit the result and run a special synchronization command as discussed in the [merging](./merging.md) topic again.
 
 That's all there is to it, really. Happy cloning & merging!
-

@@ -5,11 +5,9 @@ VersionPress has powerful search with syntax inspired by GitHub or Gmail. It let
 !!! note
     Search is available since VersionPress 3.0
 
-
 ## Examples
 
 Let's start with a couple of examples.
-
 
 **`hello world`**<br>
 Finds changes that have the words "hello" and "world" somewhere in the change description (commit message).
@@ -19,7 +17,6 @@ Search operators are supported, e.g., `author:`. The search is always case insen
 
 **`hello world author: joe* date:">= 2016-01-01"`**<br>
 Here you can see a couple of syntax rules in play: you can combine as many operators as you like, wildcards are supported, value containing spaces must be quoted, there are optional spaces after the colon, etc.
-
 
 ## Syntax
 
@@ -39,7 +36,6 @@ Multiple operators are combined using logical AND.
 
 All of the syntaxes above can be freely combined.
 
-
 ## Operators
 
 ### `author:`
@@ -51,7 +47,6 @@ There are two special authors:
 - `author:nonadmin@example.com` finds anonymous actions like posting a comment on a blog.
 - `author:wp-cli` finds actions done via [WP-CLI](http://wp-cli.org/).
 
-
 ### `date:`
 
 Commit date. Recommended format is `YYYY-MM-DD`, e.g., `date: 2016-01-01`, but anything that can be parsed by [`strtotime()`](http://php.net/manual/en/function.strtotime.php) is supported. You can use **greater than / less than operators** such as `date: >=2016-01-01` or a **range operator** `..`, for example, `date: 2016-01-01..2016-02-01`. Either boundary can be replaced with a wildcard, e.g., `date: 2016-01-01..*`.
@@ -62,13 +57,11 @@ The `date:` operator has currently some limitations:
 - Repeating this operator is tricky and we recommend using only a single `date:` at a time. For example, if you searched for `date:2016-01-01 date:2016-01-02` you might expect to see commits from both of the dates, but the result would be empty because `date:` uses logical AND due to technical limitations. You could use the AND logic for something like `date:>2016-01-01 date:<2016-02-01` but we recommend you use the range operator instead.
 - You cannot search for two date periods with a gap between them. The range must be continuous.
 
-
 ### `entity:`, `action:`, `vpid:`
 
 All actions tracked by VersionPress are done on some entity (`post`, `user`, `option`, `postmeta` etc.), the action is something like `create` or `delete` and every entity has a unique ID, something like `126BBC0541B14B528C623E32EE1B497C`. You can search for these using the operators above, most commonly by `entity` or `action`.
 
 We currently don't have a good way to generate the definitive list of supported entities, you can see them in the commit messages when using a standard Git client but it's not ideal. We'll have a better way to document this in the future.
-
 
 ### **`arbitrary-vp-tag:`**
 
@@ -94,7 +87,6 @@ You can search for VP tags, either in a full form or without the `VP-` / `X-VP-`
 - `vp-version: 3.0`
 
 VP-Action actually gets a bit of a treatment because it is also an operator (see above) and quite useful. You can skip the `/*` wildcard as that is added automatically so something like `action: option/edit` will just work.
-
 
 ## Current limitations
 
