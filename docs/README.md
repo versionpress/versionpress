@@ -4,19 +4,21 @@ The documentation at [`docs.versionpress.net`](https://docs.versionpress.net/) i
 
 ## Updating documentation
 
-1. Edit some Markdown files in the `content` directory.
-2. _(Optional)_ Live-preview the changes by starting up Docker and running `npm run start` – the site will be ready for you at <http://localhost:8000>.
+1. Edit Markdown files in the `content` directory.
+2. Live-preview the changes by starting up Docker, running `npm start` and visiting <http://localhost:8000>.
 3. Submit a pull request with your changes.
+
+If you want to update the site visuals, please see [theme info](#theme-info).
 
 ## Authoring tips
 
 ### Site navigation
 
-Site navigation is defined in `mkdocs.yml`. This file must be manually updated whenever a new file is added or an existing file moved. This structure will automatically generate the navigation on the site in both the sidebar and in the "next" / "previous" links in the footer.
+Site navigation is defined in `mkdocs.yml`. This file must be manually updated whenever a new file is added or an existing file moved.
 
 ### Links
 
-Links should be written as **relative** and **ending with .md**, for example, `[configuration](../getting-started/configuration.md)`. Only this form ensures that links work both on GitHub and rendered on docs.versionpress.net.
+Links should be written as **relative** and **ending with .md**, for example, `[configuration](../getting-started/configuration.md)`. This form ensures that links work both on GitHub and rendered on `docs.versionpress.net`.
 
 ### Title casing
 
@@ -25,10 +27,10 @@ Links should be written as **relative** and **ending with .md**, for example, `[
 
 ### Images
 
-- Recommended maximum width is 700 px.
+- Try to avoid large images, e.g., screenshots taken on retina displays.
 - Optimize via [TinyPNG](https://tinypng.com/) or similar.
-- Paste to GitHub comment which produces a Markdown like `![image](https://user-images.githubusercontent.com/image-id-1234.png)`
-- Either use that piece of Markdown directly, or use this snippet:
+- Paste to a GitHub comment field which produces a Markdown like `![image](https://user-images.githubusercontent.com/image-id-1234.png)`
+- Either use that piece of Markdown directly, or this snippet:
 
 ```html
 <figure style="width: 80%;">
@@ -46,7 +48,7 @@ Various boxes ("admonitions") can be used, for example:
     This will be rendered in a highlighted box.
 ```
 
-Common keywords are `tip`, `note` or `warning`, see the [full list](https://squidfunk.github.io/mkdocs-material/extensions/admonition/).
+Common keywords are `tip`, `note`, `info` or `warning`, see the [full list](https://squidfunk.github.io/mkdocs-material/extensions/admonition/).
 
 ### Other MkDocs extensions
 
@@ -56,13 +58,13 @@ See `mkdocs.yml` for a list of enabled extensions.
 
 Redirects are not handled very well by MkDocs at this point, just keep the old page and add a note about the new location, or use the `<meta http-equiv="refresh" content="0; url=new" />` tag.
 
-## Build
+### Documenting different versions of VersionPress
 
-Run `npm run build` to build the site into the `site` directory.
+We don't use a URL scheme like `/latest` or `/v2`, the documentation always reflects the current version and if something has been deprecated or added, just indicate it in the text.
 
 ## Deployment
 
-The docs site is hosted on GitHub Pages, via the [`versionpress/docs.versionpress.net`](https://github.com/versionpress/docs.versionpress.net) repo. To deploy:
+The docs site is hosted on GitHub Pages, via the [`versionpress/docs.versionpress.net`](https://github.com/versionpress/docs.versionpress.net) repository. To deploy:
 
 1. Build the site to the `site` directory:
     ```
@@ -81,13 +83,4 @@ Verify the updated docs at <https://docs.versionpress.net/>.
 
 ## Theme info
 
-The theme is built on [mkdocs-material](https://squidfunk.github.io/mkdocs-material/). You can customize it by updating the following files:
-
-* `content/stylesheets/extra.css`
-* `content/javascript/extra.js`
-
-You can also put files in `content/wp_theme` to [override the base theme](https://www.mkdocs.org/user-guide/styling-your-docs/#using-the-theme-custom_dir).
-
-## Documenting different versions of VersionPress
-
-We don't use a URL scheme like `/latest` or `/v2`, the documentation always reflects the current version and if something has been deprecated or added, just indicate it in the text.
+The theme is a slightly customized [mkdocs-material](https://squidfunk.github.io/mkdocs-material/), see `mkdocs.yml` and the `theme-mods` directory for customizations. The theme itself has [awesome documentation](https://squidfunk.github.io/mkdocs-material/).
