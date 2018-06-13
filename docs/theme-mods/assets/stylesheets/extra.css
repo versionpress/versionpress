@@ -1,0 +1,117 @@
+/* The colors here were built for white (primary) & light blue (accent) colors of the material theme */
+
+/* Header styles */
+
+[data-md-color-primary] header.md-header {
+    background-color: #F2F5F9;
+    border-top: 1px solid rgba(141, 172, 203, .2);
+    border-bottom: 1px solid rgba(141, 172, 203, .2);
+}
+
+.md-header-nav__topic {
+    font-weight: bold;
+}
+
+.md-source__repository, .md-source__icon, .md-header-nav__topic, .md-header  {
+    color: #555;
+}
+
+/* Footer styles */
+
+.md-footer-nav__direction, .md-footer-nav, .md-footer-meta * {
+    color: #333;
+}
+
+html .md-footer-meta.md-typeset a  {
+    color: #337ab7;
+}
+html .md-footer-meta.md-typeset a:hover  {
+    color: #23527c;
+}
+
+.md-footer-nav, .md-footer-meta {
+    background-color:#F2F5F9;
+}
+
+/* Color of links ('white' palette uses violet by default) */
+
+.md-typeset a, .md-nav__link--active {
+    color: #337ab7;
+}
+
+/* Headings */
+
+.md-typeset h1, .md-typeset h2, .md-typeset h3, .md-typeset h4, .md-typeset h5 {
+    font-weight: bold;
+}
+
+.md-typeset h1, .md-typeset h2 {
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid #eee;
+}
+
+.md-typeset h1 {
+    color: rgba(0,0,0,.87);
+    font-size: 2.25em;
+    margin: 0;
+}
+
+.md-typeset h4, .md-typeset h5 {
+    font-size: 1em;
+    font-style: italic;
+    margin-top: 1em;
+    margin-bottom: 0.1em;
+}
+
+.md-typeset h5 {
+    font-size: 0.9em;
+    color: rgba(0,0,0,.7);
+    text-transform: none;
+}
+
+/* Images */
+
+figure {
+    margin: 30px 0;
+    text-align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+figcaption {
+    margin-top: 10px;
+    font-style: italic;
+    display: block;
+}
+
+/* Inline code, GitHub style */
+
+.md-typeset code, .md-typeset tt {
+    background: none repeat scroll 0% 0% #F5F5F5;
+    color: #333333;
+    border: 1px solid #CCC;
+    border-radius: 3px;
+    margin:0;
+    box-shadow: none;
+    padding: 1px 3px;
+}
+.md-typeset code:before, .md-typeset tt:before, .md-typeset code:after, .md-typeset tt:after {
+    content: "";
+}
+
+.md-typeset code:before, .md-typeset code:after {
+    letter-spacing: -0.2em;
+    content: "\A0";
+}
+
+.md-typeset h3 code {
+    margin-right: 2px;
+    background: none repeat scroll 0% 0% #F5F5F5;
+}
+
+/* Lists */
+
+.md-typeset ol li, .md-typeset ul li {
+    margin-bottom:0;
+}

@@ -31,7 +31,7 @@ To **use** VersionPress:
 
 To **develop** VersionPress:
 
-1. Set up your development environment as per [Dev-Setup.md](./docs/Dev-Setup.md).
+1. Set up your development environment as per [Dev-Setup.md](docs/content/en/developer/dev-setup.md).
 2. Send pull requests.
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for more.

@@ -1,0 +1,135 @@
+# See https://www.mkdocs.org/user-guide/configuration/
+
+site_name: VersionPress Documentation
+site_description: 'User and developer documentation for VersionPress'
+copyright: 'Copyright &copy; 2018 VersionPress'
+
+repo_url: https://github.com/versionpress/versionpress
+repo_name: versionpress/versionpress
+edit_uri: edit/master/docs/content
+
+docs_dir: 'content'
+
+pages:
+  - Home: 'index.md'
+  - Getting Started:
+    - 'Getting Started Home': 'en/getting-started/index.md'
+    - 'Basic Concepts': 'en/getting-started/concepts.md'
+    - 'Installation and Uninstallation': 'en/getting-started/installation-uninstallation.md'
+    - 'Configuration': 'en/getting-started/configuration.md'
+    - 'Using VersionPress': 'en/getting-started/using-versionpress.md'
+    - 'Developer Preview': 'en/getting-started/about-eap.md'
+  - Feature Focus:
+    - 'Feature Focus Home': 'en/feature-focus/index.md'
+    - 'How VersionPress Works': 'en/feature-focus/how-versionpress-works.md'
+    - 'Change Tracking': 'en/feature-focus/change-tracking.md'
+    - 'Undo and Rollback': 'en/feature-focus/undo-and-rollback.md'
+    - 'Searching History': 'en/feature-focus/searching-history.md'
+    - 'External Plugins and Themes': 'en/feature-focus/external-plugins.md'
+    - 'Custom Project Structure': 'en/feature-focus/custom-project-structure.md'
+    - 'WP-CLI Commands': 'en/feature-focus/wp-cli.md'
+    - 'Versioning Engine - Git': 'en/feature-focus/git.md'
+    - 'Performance Considerations': 'en/feature-focus/performance.md'
+  - Sync / Team Workflows:
+    - 'Sync / Team Workflows Home': 'en/sync/index.md'
+    - 'Concepts': 'en/sync/concepts.md'
+    - 'Cloning a Site': 'en/sync/cloning.md'
+    - 'Merging Sites': 'en/sync/merging.md'
+  - 3rd Party Integrations:
+    - '3rd Party Integrations Home': 'en/integrations/index.md'
+    - 'Plugins': 'en/integrations/plugins.md'
+    - 'Themes': 'en/integrations/themes.md'
+    - 'Hosts': 'en/integrations/hosts.md'
+  - Troubleshooting:
+    - 'Troubleshooting Home': 'en/troubleshooting/index.md'
+    - 'System Info Page': 'en/troubleshooting/system-info-page.md'
+    - 'UI Not Loading': 'en/troubleshooting/ui-not-loading.md'
+    - 'IIS': 'en/troubleshooting/iis.md'
+  - Developer:
+    - 'Dev Setup': 'en/developer/dev-setup.md'
+    - 'Plugin Support': 'en/developer/plugin-support.md'
+    - 'Development Process': 'en/developer/development-process.md'
+  - Release Notes:
+    - 'Release Notes Home': 'en/release-notes/index.md'
+    - 'Roadmap': 'en/release-notes/roadmap.md'
+    - '4.0-beta Release Notes': 'en/release-notes/4.0-beta.md'
+    - '4.0-alpha1 Release Notes': 'en/release-notes/4.0-alpha1.md'
+    - '3.0.2 Release Notes': 'en/release-notes/3.0.2.md'
+    - '3.0.1 Release Notes': 'en/release-notes/3.0.1.md'
+    - '3.0 Release Notes': 'en/release-notes/3.0.md'
+    - '2.2 Release Notes': 'en/release-notes/2.2.md'
+    - '2.1.1 Release Notes': 'en/release-notes/2.1.1.md'
+    - '2.1 Release Notes': 'en/release-notes/2.1.md'
+    - '2.0.1 Release Notes': 'en/release-notes/2.0.1.md'
+    - '2.0 Release Notes': 'en/release-notes/2.0.md'
+    - '1.0.1 Release Notes': 'en/release-notes/1.0.1.md'
+    - '1.0 Release Notes': 'en/release-notes/1.0.md'
+    - '1.0-rc3 Release Notes': 'en/release-notes/1.0-rc3.md'
+    - '1.0-rc2 Release Notes': 'en/release-notes/1.0-rc2.md'
+    - '1.0-rc1 Release Notes': 'en/release-notes/1.0-rc1.md'
+    - '1.0-beta2 Release Notes': 'en/release-notes/1.0-beta2.md'
+    - '1.0-beta1 Release Notes': 'en/release-notes/1.0-beta1.md'
+    - '1.0-alpha3 Release Notes': 'en/release-notes/1.0-alpha3.md'
+    - '1.0-alpha2 Release Notes': 'en/release-notes/1.0-alpha2.md'
+    - '1.0-alpha1 Release Notes': 'en/release-notes/1.0-alpha1.md'
+
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+theme:
+  name: 'material'
+  custom_dir: 'theme-mods' # See https://squidfunk.github.io/mkdocs-material/customization/#extending-the-theme
+  feature:
+    # tabs: true
+  logo: 'https://user-images.githubusercontent.com/101152/41179166-07f4a0b2-6b6a-11e8-98f1-c21d285dbb48.png'
+  favicon: 'https://user-images.githubusercontent.com/101152/41179166-07f4a0b2-6b6a-11e8-98f1-c21d285dbb48.png'
+  font:
+    text: "Helvetica Neue"
+    code: 'Consolas'
+  palette:
+    primary: 'white'
+    accent: 'light blue'
+
+# Extras for material theme
+extra:
+  social:
+    - type: 'github'
+      link: 'https://github.com/versionpress'
+    - type: 'twitter'
+      link: 'https://twitter.com/versionpress'
+    - type: 'facebook'
+      link: 'https://facebook.com/VersionPress'
+    - type: 'wordpress'
+      link: 'https://blog.versionpress.net/'
+  search:
+    tokenizer: '[\s\-\.]+'
+
+extra_css:
+  - 'assets/stylesheets/extra.css'
+extra_javascript:
+  - 'assets/javascripts/extra.js'
+
+google_analytics:
+  # this is set only in build-time to exclude hits during development
+  - !!python/object/apply:os.getenv ["GOOGLE_ANALYTICS_KEY"]
+  - 'auto'

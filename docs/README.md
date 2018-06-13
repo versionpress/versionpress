@@ -1,72 +1,86 @@
 # VersionPress docs
 
-## Developer documentation
+The documentation at [`docs.versionpress.net`](https://docs.versionpress.net/) is authored in Markdown and built using [MkDocs](https://www.mkdocs.org/).
 
-- [Plugin-Support.md](./Plugin-Support.md)
-- [Dev-Setup.md](./Dev-Setup.md)
-- [Development-Process.md](./Development-Process.md)
+## Updating documentation
 
-## User documentation
+1. Edit Markdown files in the `content` directory.
+2. Live-preview the changes by starting up Docker, running `npm start` and visiting <http://localhost:8000>.
+3. Submit a pull request with your changes.
 
-User documentation is authored in the `content` folder and published to [docs.versionpress.net](http://docs.versionpress.net/en), a site powered by [`versionpress/docs-site`](https://github.com/versionpress/docs-site).
+If you want to update the site visuals, please see [theme info](#theme-info).
 
-### Overview
+## Authoring tips
 
-VersionPress uses a docs system inspired by [Composer Docs](https://github.com/composer/composer/tree/master/doc), [Git Book](https://github.com/progit/progit) or [Azure Docs](https://github.com/Azure/azure-content/). The content is authored as a set of Markdown files in this repo and eventually published at [docs.versionpress.net](http://docs.versionpress.net/en).
+### Site navigation
 
-Documentation is authored in **Markdown**, specifically in the [MarkdownDeep dialect](http://www.toptensoftware.com/markdowndeep/) with extra mode switched on. This makes it pretty close to GitHub Flavored Markdown (GFM) although there might be some differences. <small>(We will switch to GFM one day.)</small> See [authoring tips below](#authoring-documentation).
+Site navigation is defined in `mkdocs.yml`. This file must be manually updated whenever a new file is added or an existing file moved.
 
-Content is organized in **the `content` directory**:
+### Links
 
-![Content structure](https://cloud.githubusercontent.com/assets/101152/14105777/ee4fc5da-f5ad-11e5-86b1-ec73ac35419e.png)
+Links should be written as **relative** and **ending with .md**, for example, `[configuration](../getting-started/configuration.md)`. This form ensures that links work both on GitHub and rendered on `docs.versionpress.net`.
 
-**URLs** map to this structure pretty closely, basically just omitting the two-digit prefixes (the purpose of which is just to order things) and the file extensions. `_index.md` are special files representing section homepages. Some examples:
+### Title casing
 
-| File on disk                       | URL                |
-| ---------------------------------- | ------------------ |
-| `content/en/03-sync/02-cloning.md` | `/en/sync/cloning` |
-| `content/en/03-sync/_index.md`     | `/en/sync`         |
-| `content/en/_index.md`             | `/en`              |
+- Use **Title Case** for H1 headers.
+- Use **Sentence case** for H2 and below.
 
-**Site navigation** also reflects the file / folder structure, both in the sidebar and the "Next / Previous" links at the bottom of each topic. **Documents' H1** determine the texts rendered.
+### Images
 
-We **don't really use docs versioning** via URL like "/latest" or "/v2", the state of the documentation in `master` should reflect all versions. If something has been deprecated or is new, just indicate it in the text.
+- Try to avoid large images, e.g., screenshots taken on retina displays.
+- Optimize via [TinyPNG](https://tinypng.com/) or similar.
+- Paste to a GitHub comment field which produces a Markdown like `![image](https://user-images.githubusercontent.com/image-id-1234.png)`
+- Either use that piece of Markdown directly, or this snippet:
 
-> **Power user tip**: there is a `since:` tag to be used in a front matter or in `config.yml`, and a global `displayVersion` in `content/config.yml`. For examples, with `displayVersion: '3.0'` and an article marked `since: 4.0`, that one will not be rendered. But usually, it's not necessary.
+```html
+<figure style="width: 80%;">
+    <img src="https://user-images.githubusercontent.com/image-id-1234.png" alt="Alt text" />
+    <figcaption>Some caption</figcaption>
+</figure>
+```
 
-### Authoring documentation
+### Notes, warnings, tips
 
- - **Start each file with an H1 header** (`# Some Title`). This MUST be the first non-front-matter line of the document; the navigation system depends on it.
- - Use **'Title Case' for H1** headers, **'Sentence case' for H2** and below.
- - **Images**: max 700px wide, optimize them, paste to GitHub and copy the URL. Include them into Markdown like this:
-    ```
-    <figure style="width: 80%;">
-      <img src="../../media/image.png" alt="Alt text" />
-      <figcaption>Image caption</figcaption>
-    </figure>
-    ```
- - **Notes / warnings / tips** can be written in special boxes. Supported CSS classes are `note` (green), `tip` (blue), `important` (orange) and `warning` (red), the syntax is:
-    ```
-    <div class="note">
-      <p><strong>Note title</strong></p>
-      <p>This will be rendered in a highlighted box.</p>
-    </div>
-    ```
- - **TODO markers** can be written as `[TODO]` or `[TODO some arbitrary text]`. They will be highlighted in yellow and should be used rarely, possibly in alpha / beta versions of the doc topic.
+Various boxes ("admonitions") can be used, for example:
 
+```
+!!! tip
+    This will be rendered in a highlighted box.
+```
 
-### Deploying docs
+Common keywords are `tip`, `note`, `info` or `warning`, see the [full list](https://squidfunk.github.io/mkdocs-material/extensions/admonition/).
 
-When a PR is merged into `master`, it is automatically deployed to [docs.versionpress.net](http://docs.versionpress.net/en).
+### Other MkDocs extensions
 
+See `mkdocs.yml` for a list of enabled extensions.
 
 ### Redirects
 
-URL redirects can be specified in `content/config.yml` like so:
+Redirects are not handled very well by MkDocs at this point, just keep the old page and add a note about the new location, or use the `<meta http-equiv="refresh" content="0; url=new" />` tag.
 
-```
-redirects:
-  'en/getting-started/old-name': 'en/getting-started/new-name'
-```
+### Documenting different versions of VersionPress
 
-Note that there is no leading slash. This leads to HTTP 301 Moved Permanently.
+We don't use a URL scheme like `/latest` or `/v2`, the documentation always reflects the current version and if something has been deprecated or added, just indicate it in the text.
+
+## Deployment
+
+The docs site is hosted on GitHub Pages, via the [`versionpress/docs.versionpress.net`](https://github.com/versionpress/docs.versionpress.net) repository. To deploy:
+
+1. Build the site to the `site` directory:
+    ```
+    npm run build
+    ```
+2. Optionally verify locally, e.g., `cd site && php -S localhost:1234`.
+3. Clone the [`docs.versionpress.net`](https://github.com/versionpress/docs.versionpress.net) repo next to your `versionpress` directory (they should be sibling folders).
+4. Copy the built site into it:
+    ```
+    cp -r site/* ../../docs.versionpress.net
+    ```
+5. Commit the new build. The commit message doesn't matter too much, use e.g. _New build of docs.versionpress.net_.
+6. Push the repo.
+
+Verify the updated docs at <https://docs.versionpress.net/>.
+
+## Theme info
+
+The theme is a slightly customized [mkdocs-material](https://squidfunk.github.io/mkdocs-material/), see `mkdocs.yml` and the `theme-mods` directory for customizations. The theme itself has [awesome documentation](https://squidfunk.github.io/mkdocs-material/).

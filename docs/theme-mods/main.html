@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{#
+    Copy of https://github.com/squidfunk/mkdocs-material/blob/416fd474b497c2f4b5307f75f3f6aed173179f16/src/base.html#L34-L84,
+    adapted for favicon hosted on CDN. Related: https://github.com/squidfunk/mkdocs-material/issues/789
+#}
+{% block site_meta %}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Keep for compatibility, see http://bit.ly/2tMB6ag -->
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+
+    <!-- Page description -->
+    {% if page and page.meta and page.meta.description %}
+    <meta name="description"
+        content="{{ page.meta.description }}" />
+    {% elif config.site_description %}
+    <meta name="description" content="{{ config.site_description }}" />
+    {% endif %}
+
+    <!-- Canonical -->
+    {% if page.canonical_url %}
+    <link rel="canonical" href="{{ page.canonical_url }}" />
+    {% endif %}
+
+    <!-- Page author -->
+    {% if page and page.meta and page.meta.author %}
+    <meta name="author" content="{{ page.meta.author | first }}" />
+    {% elif config.site_author %}
+    <meta name="author" content="{{ config.site_author }}" />
+    {% endif %}
+
+    <!-- Localization -->
+    {% for key in [
+    "clipboard.copy",
+    "clipboard.copied",
+    "search.language",
+    "search.pipeline.stopwords",
+    "search.pipeline.trimmer",
+    "search.result.none",
+    "search.result.one",
+    "search.result.other",
+    "search.tokenizer"
+    ] %}
+    <meta name="lang:{{ key }}" content="{{ lang.t(key) }}" />
+    {% endfor %}
+
+    <!-- Favicon -->
+    <link rel="shortcut icon"
+        href="{{ config.theme.favicon }}">
+
+    <!-- Generator banner -->
+    <meta name="generator"
+        content="mkdocs-{{ mkdocs_version }}, $md-name$-$md-version$" />
+{% endblock %}

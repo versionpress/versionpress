@@ -1,0 +1,11 @@
+{
+  "name": "versionpress-docs",
+  "version": "1.0.0",
+  "description": "VersionPress documentation",
+  "author": "VersionPress",
+  "license": "GPL",
+  "scripts": {
+    "start": "docker run --rm -it -p 8000:8000 -v `pwd`:/docs squidfunk/mkdocs-material:2.7.3",
+    "build": "rm -rf site && docker run --rm -it -e GOOGLE_ANALYTICS_KEY=UA-51665915-2 -v `pwd`:/docs squidfunk/mkdocs-material:2.7.3 build"
+  }
+}
