@@ -63,11 +63,24 @@ See `mkdocs.yml` for a list of enabled extensions.
 
 Run `npm run build` to build the site into the `site` directory.
 
-## Deploy
+## Deployment
 
-- [ ] TODO: determine best approach for hosting and document process here.
+The docs site is hosted on GitHub Pages, via the [`versionpress/docs.versionpress.net`](https://github.com/versionpress/docs.versionpress.net) repo. To deploy:
 
-<!-- When a PR is merged into `master`, it is automatically deployed to [docs.versionpress.net](http://docs.versionpress.net/en). -->
+1. Build the site to the `site` directory:
+    ```
+    npm run build
+    ```
+2. Optionally verify locally, e.g., `cd site && php -S localhost:1234`.
+3. Clone the [`docs.versionpress.net`](https://github.com/versionpress/docs.versionpress.net) repo next to your `versionpress` directory (they should be sibling folders).
+4. Copy the built site into it:
+    ```
+    cp -r site/* ../../docs.versionpress.net
+    ```
+5. Commit the new build. The commit message doesn't matter too much, use e.g. _New build of docs.versionpress.net_.
+6. Push the repo.
+
+Verify the updated docs at <https://docs.versionpress.net/>.
 
 ## Theme info
 
