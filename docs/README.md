@@ -54,10 +54,7 @@ See `mkdocs.yml` for a list of enabled extensions.
 
 ### Redirects
 
-- [ ] TODO: how to make redirects work in MkDocs
-  * one way is to leave old file but add `<meta http-equiv="refresh" content="0; url=new" />` to redirect it
-  * discussions on board about plugins (if someone could port https://github.com/jekyll/jekyll-redirect-from that would be awesome)
-
+Redirects are not handled very well by MkDocs at this point, just keep the old page and add a note about the new location, or use the `<meta http-equiv="refresh" content="0; url=new" />` tag.
 
 ## Build
 
