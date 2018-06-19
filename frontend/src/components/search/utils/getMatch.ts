@@ -1,6 +1,6 @@
 /// <reference path='../Search.d.ts' />
 
-export function getMatch(subString: string, array: any[], key: string = null) {
+export function getMatch(subString: string, array: any[], key?: string) {
   return array
     .filter(item => {
       const value: string = key ? item[key] : item;

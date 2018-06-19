@@ -1,6 +1,5 @@
 import { runInAction } from 'mobx';
 import * as request from 'superagent';
-import { appHistory } from '../routes';
 
 import config from '../config/config';
 import * as WpApi from '../services/WpApi';
@@ -23,7 +22,7 @@ export function fetchCommits (page: number | string = appStore.page) {
 
   if (typeof page === 'string' && parsePageNumber(page) < 1) {
     page = 0;
-    appHistory.replace(routes.home);
+    appStore.appHistory.replace(routes.home);
   }
 
   appStore.setPage(page);
@@ -84,7 +83,7 @@ function wpUndoRollback(name: string, query: any) {
           servicePanelStore.setMessage(getErrorMessage(res, err));
         });
       } else {
-        appHistory.push(routes.home);
+        appStore.appHistory.push(routes.home);
         document.location.reload();
       }
     });

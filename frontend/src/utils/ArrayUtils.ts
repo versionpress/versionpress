@@ -24,10 +24,10 @@
  * }
  *
  */
-export function groupBy<T>(array: T[], keyExtractorFn: (T) => string|string[]) {
+export function groupBy<T>(array: T[], keyExtractorFn: (item: T) => string|string[]) {
   let result = {};
   array.forEach(item => {
-    let keys: any = keyExtractorFn(item);
+    let keys = keyExtractorFn(item);
     if (typeof(keys) === 'string') {
       keys = [keys];
     }
@@ -71,8 +71,8 @@ export function interspace(array: any[], separator: any, lastSeparator: any = se
  * for every item.
  *
  */
-export function filterDuplicates<T>(array: T[], hashFn: (T) => string = item => item) {
-  let uniqueHashSet = [];
+export function filterDuplicates<T>(array: T[], hashFn: (item: T) => string = item => `${item}`) {
+  let uniqueHashSet: string[] = [];
 
   return array.filter(item => {
     let hash = hashFn(item);
@@ -88,10 +88,10 @@ export function filterDuplicates<T>(array: T[], hashFn: (T) => string = item => 
  * Counts duplicates of objects in array. Uses `groupBy` function and have similar
  * output. Only instead of arrays with grouped objects contains count of these objects.
  */
-export function countDuplicates<T>(array: T[], fn: (T) => any|any[]) {
+export function countDuplicates<T>(array: T[], fn: (item: T) => any|any[]) {
   let groupedChanges = groupBy(array, fn);
 
-  function countNestedArrays(arr) {
+  function countNestedArrays(arr: any) {
     for (let key in arr) {
       if (Array.isArray(arr[key])) {
         arr[key] = arr[key].length;

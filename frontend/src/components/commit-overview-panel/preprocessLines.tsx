@@ -5,7 +5,7 @@ import * as ArrayUtils from '../../utils/ArrayUtils';
 
 const preprocessLines = (changes: Change[]): PreprocessedLine[] => {
   const changesByTypeAndAction = ArrayUtils.groupBy(changes, change => [change.type, change.action]) as ChangesByTypeAndAction;
-  let preprocessedLines = [];
+  let preprocessedLines: PreprocessedLine[] = [];
 
   for (const type in changesByTypeAndAction) {
     for (const action in changesByTypeAndAction[type]) {
@@ -19,7 +19,7 @@ const preprocessLines = (changes: Change[]): PreprocessedLine[] => {
 };
 
 const groupByTag = (changes: Change[], tag: string): PreprocessedLine[] => {
-  const metaByTag = ArrayUtils.groupBy(changes, c => c.tags[tag]);
+  const metaByTag = ArrayUtils.groupBy(changes, c => c.tags[tag]) as { [key: string]: Change[] };
   return Object.keys(metaByTag).map(tagValue => {
     const { type, action } = changes[0];
     return {

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 
 import { clearSelection, filter, undoCommits } from '../../actions';
 import BulkActionPanel from '../bulk-action-panel/BulkActionPanel';
@@ -14,17 +14,18 @@ interface NavigationProps {
   navigationStore?: NavigationStore;
 }
 
-@observer(['appStore', 'navigationStore'])
+@inject('appStore', 'navigationStore')
+@observer
 export default class Navigation extends React.Component<NavigationProps, {}> {
 
   onFilterQueryChange = (query: string) => {
     const { navigationStore } = this.props;
-    navigationStore.changeFilterQuery(query);
+    navigationStore!.changeFilterQuery(query);
   }
 
   onBulkAction = (action: string) => {
     if (action === 'undo') {
-      const { changesCount, hashes } = this.props.navigationStore;
+      const { changesCount, hashes } = this.props.navigationStore!;
 
       const title = (
         <span>Undo <em>{changesCount} {changesCount === 1 ? 'change' : 'changes'}</em>?</span>
@@ -36,8 +37,8 @@ export default class Navigation extends React.Component<NavigationProps, {}> {
 
   render() {
     const { appStore, navigationStore } = this.props;
-    const { enableActions } = appStore;
-    const { query, changesCount } = navigationStore;
+    const { enableActions } = appStore!;
+    const { query, changesCount } = navigationStore!;
 
     return (
       <div className='tablenav top'>

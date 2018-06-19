@@ -26,7 +26,7 @@ const Message: React.StatelessComponent<MessageProps> = ({ commit, detailsLevel,
   </td>
 );
 
-function renderMessage(message: string) {
+function renderMessage(message: string): React.ReactNode {
   const messageChunks = /(.*)'(.*)'(.*)/.exec(message);
 
   if (!messageChunks || messageChunks.length !== 4) {

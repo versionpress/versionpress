@@ -7,9 +7,9 @@ import DetailsLevel from '../enums/DetailsLevel';
 class CommitPanelStore {
 
   @observable detailsLevel: DetailsLevel = DetailsLevel.None;
-  @observable diff: string = null;
-  @observable gitStatus: VpApi.GetGitStatusResponse = null;
-  @observable error: string = null;
+  @observable diff: string;
+  @observable gitStatus: VpApi.GetGitStatusResponse;
+  @observable error: string;
   @observable isLoading: boolean = false;
 
   get hash() {

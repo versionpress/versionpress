@@ -10,7 +10,7 @@ request.parse['application/json'] = function(str: string) {
   try {
     parsedJSON = JSON.parse(str);
   } catch (e) {
-    const validJSON = getValidVPJSON(str);
+    const validJSON = getValidVPJSON(str)!;
     parsedJSON = JSON.parse(validJSON);
   }
   if ('__VP__' in parsedJSON || ('code' in parsedJSON && 'message' in parsedJSON)) {
@@ -19,7 +19,7 @@ request.parse['application/json'] = function(str: string) {
   throw new Error('Error: Parser is unable to parse the response');
 };
 
-const noCache = function (request) {
+const noCache = function (request: request.Request) {
   let timestamp = Date.now().toString();
   request.query(timestamp);
   return request;

@@ -11,7 +11,7 @@ export function prepareConfig(config: SearchConfig): SearchConfig {
 }
 
 function getAllModifiers(config: SearchConfig): SearchConfigItemContent[] {
-  let modifiers = [];
+  let modifiers: SearchConfigItemContent[] = [];
   for (let key in config) {
     if (key.substr(0, 1) === '_') {
       continue;
@@ -21,7 +21,7 @@ function getAllModifiers(config: SearchConfig): SearchConfigItemContent[] {
     const section = configItem.type === 'date' ? 'time' : 'modifiers';
     modifiers.push({
       value: key,
-      label: configItem.type === 'date' ? moment().format('YYYY-MM-DD') : configItem.defaultHint,
+      label: configItem.type === 'date' ? moment().format('YYYY-MM-DD') : configItem.defaultHint!,
       modifier: true,
       section,
     });

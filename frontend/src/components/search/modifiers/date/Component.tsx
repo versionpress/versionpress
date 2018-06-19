@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as DayPicker from 'react-day-picker';
+import DayPicker from 'react-day-picker';
 import * as moment from 'moment';
 
 import ModifierComponent from '../ModifierComponent';

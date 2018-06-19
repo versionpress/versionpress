@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 
 import QueryInput from './QueryInput';
 import Submit from './Submit';
@@ -16,12 +16,13 @@ interface FilterProps {
   onFilter(): void;
 }
 
-@observer(['searchStore'])
+@inject('searchStore')
+@observer
 export default class Filter extends React.Component<FilterProps, {}> {
 
   render() {
     const { query, searchStore, onQueryChange, onFilter } = this.props;
-    const { config } = searchStore;
+    const { config } = searchStore!;
 
     return (
       <div className='Filter'>

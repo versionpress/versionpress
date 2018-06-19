@@ -18,7 +18,7 @@ export function capitalize(word: string) {
 
 /* Inspired by http://kuwamoto.org/2007/12/17/improved-pluralizing-in-php-actionscript-and-ror/ */
 export function pluralize(word: string) {
-  const plural = {
+  const plural: { [key: string]: string } = {
     '(quiz)$'               : '$1zes',
     '^(ox)$'                : '$1en',
     '([m|l])ouse$'          : '$1ice',
@@ -57,7 +57,7 @@ export function getValidVPJSON(str: string) {
   const index = str.indexOf('__VP__');
   const len = str.length;
 
-  function findFirstFreeQuote(openBrackets, from, dir, cond: (i: number, openBrackets: number) => boolean) {
+  function findFirstFreeQuote(openBrackets: number, from: number, dir: number, cond: (i: number, openBrackets: number) => boolean) {
     let inQuotes = false;
     let i;
 

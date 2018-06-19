@@ -20,11 +20,11 @@ class DateAdapter implements Adapter {
     if (hints.length && hints[0].indexOf(value) === 0) {
       return hints[0];
     }
-  };
+  }
 
   getDefaultHint = () => {
     return moment().format(DATE_FORMAT);
-  };
+  }
 
   getHints = (token: Token) => {
     if (token) {
@@ -32,11 +32,11 @@ class DateAdapter implements Adapter {
       return getMatch(token.value, possibleValues);
     }
     return [];
-  };
+  }
 
   isValueValid = (value: string) => {
     return DATE_FORMAT_REGEXP.test(value) && moment(value, DATE_FORMAT).isValid();
-  };
+  }
 
   serialize = (date: any) => {
     if (!date) {
@@ -49,12 +49,12 @@ class DateAdapter implements Adapter {
       return date;
     }
     return (date as moment.Moment).format(DATE_FORMAT);
-  };
+  }
 
   deserialize = (value: string) => {
-    return null;
-  };
+    return '';
+  }
 
-};
+}
 
 export default DateAdapter;

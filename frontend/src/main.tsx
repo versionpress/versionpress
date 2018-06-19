@@ -2,22 +2,25 @@ import 'core-js';
 
 import * as React from 'react';
 import { render } from 'react-dom';
-import { useStrict } from 'mobx';
+import { HashRouter, Route } from 'react-router-dom';
 import { Provider } from 'mobx-react';
+import { hot } from 'react-hot-loader';
 
-import { routes } from './routes';
 import * as stores from './stores';
 
 import App from './components/app/App';
 
-// Disables changing state outside of an action
-useStrict(true);
+declare const module: { hot: any };
+
+const HotComponent = (Component: any) => hot(module)(Component);
 
 const root = document.getElementById('vp');
 
 render(
   <Provider {...stores}>
-      {routes}
+    <HashRouter>
+      <Route component={HotComponent(App)} />
+    </HashRouter>
   </Provider>,
   root,
 );

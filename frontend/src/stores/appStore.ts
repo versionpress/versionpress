@@ -1,6 +1,7 @@
 /// <reference path='../components/common/Commits.d.ts' />
 
 import { action, computed, observable } from 'mobx';
+import { History } from 'history';
 
 import { checkUpdate } from '../actions';
 import { parsePageNumber } from '../actions/utils';
@@ -9,19 +10,25 @@ class AppStore {
 
   @observable page: number = 0;
   @observable selectedCommits: Commit[] = [];
-  @observable lastSelectedCommit: Commit = null;
+  @observable lastSelectedCommit: Commit | null = null;
   @observable displayWelcomePanel: boolean = false;
   @observable displayUpdateNotice: boolean = false;
   @observable isDirtyWorkingDirectory: boolean = false;
 
-  refreshInterval;
+  @observable appHistory: History;
+
+  refreshInterval: number;
 
   constructor() {
-    this.refreshInterval = setInterval(() => checkUpdate(), 10 * 1000);
+    this.refreshInterval = window.setInterval(() => checkUpdate(), 10 * 1000);
   }
 
   @computed get enableActions() {
     return !this.isDirtyWorkingDirectory;
+  }
+
+  @action setAppHistory(appHistory: History) {
+    this.appHistory = appHistory;
   }
 
   @action setPage = (page: number | string) => {
@@ -40,7 +47,7 @@ class AppStore {
     this.isDirtyWorkingDirectory = isDirtyWorkingDirectory;
   }
 
-  @action setLastSelectedCommit = (lastSelectedCommit: Commit) => {
+  @action setLastSelectedCommit = (lastSelectedCommit: Commit | null) => {
     this.lastSelectedCommit = lastSelectedCommit;
   }
 

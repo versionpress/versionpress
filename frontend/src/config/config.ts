@@ -2,6 +2,7 @@
 
 import * as _ from 'lodash';
 import localConfig from './config.local';
+import window from './window';
 
 const defaultConfig: VersionPressConfig = {
   api: {
@@ -10,7 +11,7 @@ const defaultConfig: VersionPressConfig = {
     urlPrefix: 'wp-json',
     queryParam: 'rest_route',
     permalinkStructure: false,
-    nonce: null,
+    nonce: undefined,
   },
   routes: {
     page: 'page',
@@ -19,7 +20,7 @@ const defaultConfig: VersionPressConfig = {
 };
 
 const vpApiConfig = {
-  api: window['VP_API_Config'] || {},
+  api: window.VP_API_Config || {},
 };
 
 let config = <VersionPressConfig> _.merge(defaultConfig, localConfig, vpApiConfig);

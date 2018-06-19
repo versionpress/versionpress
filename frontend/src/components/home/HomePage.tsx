@@ -2,7 +2,8 @@
 /// <reference path='../../interfaces/State.d.ts' />
 
 import * as React from 'react';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
+import { RouteComponentProps } from 'react-router-dom';
 
 import CommitPanel from '../commit-panel/CommitPanel';
 import CommitsTable from '../commits-table/CommitsTable';
@@ -19,28 +20,29 @@ import { LoadingStore } from '../../stores/loadingStore';
 
 import './HomePage.less';
 
-interface HomePageProps {
+interface HomePageProps extends RouteComponentProps<{page?: string }> {
   appStore?: AppStore;
-  params: {
-    page?: string,
-  };
   loadingStore?: LoadingStore;
 }
 
-@observer(['appStore', 'loadingStore'])
+@inject('appStore', 'loadingStore')
+@observer
 export default class HomePage extends React.Component<HomePageProps, {}> {
 
   componentDidMount() {
-    const { appStore, params } = this.props;
+    const { appStore, match } = this.props;
 
-    appStore.setPage(params.page);
+    if (match.params.page) {
+      appStore!.setPage(match.params.page);
+    }
+
     fetchWelcomePanel();
     fetchCommits();
     fetchSearchConfig();
   }
 
   componentWillReceiveProps(nextProps: HomePageProps) {
-    const page = nextProps.params.page || 0;
+    const page = nextProps.match.params.page || 0;
 
     fetchCommits(page);
   }
@@ -51,8 +53,8 @@ export default class HomePage extends React.Component<HomePageProps, {}> {
       displayWelcomePanel,
       displayUpdateNotice,
       isDirtyWorkingDirectory,
-    } = appStore;
-    const { progress } = loadingStore;
+    } = appStore!;
+    const { progress } = loadingStore!;
 
     return (
       <div>

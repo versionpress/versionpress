@@ -33,7 +33,7 @@ class CommitsTableStore {
   }
 
   @computed get branches() {
-    let branches = [];
+    let branches: number[] = [];
 
     this.commitRows.forEach(commitRow => {
       const { branch } = commitRow.visualisation;
@@ -61,7 +61,7 @@ class CommitsTableStore {
   @action setCommitRows = (commitRows: CommitRow[]) => {
     this.commitRows = commitRows;
 
-    let graphStructure = [];
+    let graphStructure: CommitGraph[] = [];
     this.commits.forEach(commit => {
       graphStructure.push({
         sha: commit.hash,
@@ -72,7 +72,7 @@ class CommitsTableStore {
 
     const visualization = generateGraphData(graphStructure);
 
-    let environments = {};
+    let environments: { [key: string]: boolean } = {};
     this.commitRows.forEach((commitRow, i) => {
       let upper, lower;
 
@@ -85,8 +85,8 @@ class CommitsTableStore {
         : visualization[i - 1];
 
       commitRow.setVisualisation({
-        upperRoutes: upper ? upper.routes : null,
-        lowerRoutes: lower ? lower.routes : null,
+        upperRoutes: upper ? upper.routes : [],
+        lowerRoutes: lower ? lower.routes : [],
         environment: visualization[i].environment,
         branch: visualization[i].branch,
         offset: visualization[i].offset,

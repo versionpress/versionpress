@@ -3,7 +3,7 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
 import * as moment from 'moment';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 
 import { undoCommits, rollbackToCommit, selectCommits } from '../../actions';
 import Row from './row/Row';
@@ -28,13 +28,14 @@ interface CommitsTableProps {
   loadingStore?: LoadingStore;
 }
 
-@observer(['appStore', 'commitsTableStore', 'navigationStore', 'loadingStore'])
+@inject('appStore', 'commitsTableStore', 'navigationStore', 'loadingStore')
+@observer
 export default class CommitsTable extends React.Component<CommitsTableProps, {}> {
 
   onSelectAllChange = (isChecked: boolean) => {
     const { commitsTableStore } = this.props;
 
-    this.onCommitsSelect(commitsTableStore.commits, isChecked, false);
+    this.onCommitsSelect(commitsTableStore!.commits, isChecked, false);
   }
 
   onUndo = (hash: string, message: string) => {
@@ -63,12 +64,12 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
     const row = (
       <Row
         commitRow={commitRow}
-        enableActions={appStore.enableActions}
-        showVisualisation={commitsTableStore.showVisualisation}
+        enableActions={appStore!.enableActions}
+        showVisualisation={commitsTableStore!.showVisualisation}
         onUndo={this.onUndo}
         onRollback={this.onRollback}
         onCommitsSelect={this.onCommitsSelect}
-        onToggleShowVisualisation={commitsTableStore.toggleShowVisualisation}
+        onToggleShowVisualisation={commitsTableStore!.toggleShowVisualisation}
         key={commitRow.commit.hash}
       />
     );
@@ -87,7 +88,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
 
   render() {
     const { appStore, commitsTableStore, navigationStore, loadingStore } = this.props;
-    const { enableActions } = appStore;
+    const { enableActions } = appStore!;
     const {
       pages,
       commits,
@@ -97,8 +98,8 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
       areAllCommitsSelected,
       branches,
       toggleShowVisualisation,
-    } = commitsTableStore;
-    const { isLoading } = loadingStore;
+    } = commitsTableStore!;
+    const { isLoading } = loadingStore!;
 
     const commitsTableClassName = classNames({
       'vp-table': true,
@@ -117,7 +118,7 @@ export default class CommitsTable extends React.Component<CommitsTableProps, {}>
           areAllCommitsSelected={areAllCommitsSelected}
           selectableCommitsCount={selectableCommits.length}
           enableActions={enableActions}
-          canToggleVisualisation={navigationStore.activeQuery === ''}
+          canToggleVisualisation={navigationStore!.activeQuery === ''}
           showVisualisation={showVisualisation}
           branches={branches}
           onSelectAllChange={this.onSelectAllChange}

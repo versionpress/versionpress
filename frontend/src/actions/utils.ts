@@ -42,7 +42,7 @@ export function getDiff(hash: string) {
   return new Promise((resolve, reject) => {
     WpApi
       .get('diff')
-      .query(hash === '' ? null : { commit: hash })
+      .query(hash === '' ? {} : { commit: hash })
       .end((err, res: request.Response) => {
         const data = res.body.data as VpApi.GetDiffResponse;
         if (err) {
@@ -56,14 +56,13 @@ export function getDiff(hash: string) {
 
 // Inspiration from https://github.com/jsdf/react-commits-graph/blob/170ab272020e1dc8b960ca6110f23c91524013f3/src/generate-graph-data.coffee
 export function generateGraphData(commits: CommitGraph[]): CommitNode[] {
-  let
-    nodes = [],
-    branchIndex = 0,
-    reserve = [],
-    branches = {},
-    environments = {};
+  let nodes: CommitNode[] = [];
+  let branchIndex = 0;
+  let reserve: number[] = [];
+  let branches: { [key: string]: any } = {};
+  let environments: { [key: string]: any } = {};
 
-  const remove = (list, item) => {
+  const remove = (list: any[], item: any) => {
     list.splice(list.indexOf(item), 1);
     return list;
   };
@@ -82,9 +81,9 @@ export function generateGraphData(commits: CommitGraph[]): CommitNode[] {
     const branch = getBranch(commit.sha);
     const parentsCount = commit.parents.length;
     const offset = reserve.indexOf(branch);
-    let routes = [];
+    let routes: CommitBranchRoute[] = [];
 
-    const insertToRoutes = (from, to, branch) => {
+    const insertToRoutes = (from: number, to: number, branch: number) => {
       routes.push({
         from,
         to,

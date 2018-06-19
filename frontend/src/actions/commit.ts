@@ -1,3 +1,5 @@
+/// <reference path='../services/VpApi.d.ts' />
+
 import { runInAction } from 'mobx';
 
 import DetailsLevel from '../enums/DetailsLevel';
@@ -26,31 +28,31 @@ export function changeDetailsLevel(detailsLevel: DetailsLevel, store: Store) {
 
   runInAction(() => {
     store.setDetailsLevel(detailsLevel);
-    store.setError(null);
+    store.setError('');
     store.setLoading(false);
   });
 }
 
 function handleSuccess(detailsLevel: DetailsLevel, store: Store) {
   if (detailsLevel === DetailsLevel.Overview && 'gitStatus' in store) {
-    return gitStatus => runInAction(() => {
+    return (gitStatus: VpApi.GetGitStatusResponse) => runInAction(() => {
       store.setDetailsLevel(detailsLevel);
       (store as CommitPanelStore).setGitStatus(gitStatus);
-      store.setError(null);
+      store.setError('');
       store.setLoading(false);
     });
   } else if (detailsLevel === DetailsLevel.FullDiff) {
-    return diff => runInAction(() => {
+    return (diff: string) => runInAction(() => {
       store.setDetailsLevel(detailsLevel);
       store.setDiff(diff);
-      store.setError(null);
+      store.setError('');
       store.setLoading(false);
     });
   }
 }
 
 function handleError(detailsLevel: DetailsLevel, store: Store) {
-  return err => runInAction(() => {
+  return (err: { message: string }) => runInAction(() => {
     store.setDetailsLevel(detailsLevel);
     store.setError(err.message);
     store.setLoading(false);

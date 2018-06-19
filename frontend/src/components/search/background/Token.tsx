@@ -34,7 +34,7 @@ const Token: React.StatelessComponent<TokenProps> = ({ token, adapter }) => {
 
 const excludedTokenTypes = ['default', 'modifier-list', 'space'];
 
-function isExcluded(token) {
+function isExcluded(token: Token) {
   return excludedTokenTypes.indexOf(token.type) === -1;
 }
 

@@ -29,13 +29,13 @@ export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {
   };
 
   onOkClick = () => {
-    if (this.props.onOkButtonClick() !== false) {
+    if (this.props.onOkButtonClick!() !== false) {
       portal.closePortal();
     }
   }
 
   onCancelClick = () => {
-    if (this.props.onCancelButtonClick() !== false) {
+    if (this.props.onCancelButtonClick!() !== false) {
       portal.closePortal();
     }
   }
@@ -45,8 +45,8 @@ export default class ConfirmDialog extends React.Component<ConfirmDialogProps, {
       message,
       okButtonText,
       cancelButtonText,
-      okButtonClasses,
-      cancelButtonClasses,
+      okButtonClasses = '',
+      cancelButtonClasses = '',
       isLoading,
     } = this.props;
 

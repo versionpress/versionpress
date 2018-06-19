@@ -20,7 +20,7 @@ import './Search.less';
 
 interface SearchProps {
   config: SearchConfig;
-  onChange?(query: string): void;
+  onChange(query: string): void;
 }
 
 interface SearchState {
@@ -35,9 +35,9 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     cursorLocation: -1,
   };
 
-  inputNode: HTMLInputElement = null;
-  backgroundNode: HTMLDivElement = null;
-  popupComponentNode: ModifierComponent<any> = null;
+  inputNode: HTMLInputElement | null = null;
+  backgroundNode: HTMLDivElement | null = null;
+  popupComponentNode: ModifierComponent<any> | null = null;
 
   componentDidUpdate() {
     this.scrollBackground();
@@ -48,18 +48,18 @@ export default class Search extends React.Component<SearchProps, SearchState> {
   }
 
   onClick = (e: React.MouseEvent<HTMLInputElement>) => {
-    this.setCursorLocation(e.currentTarget.selectionStart);
+    this.setCursorLocation(e.currentTarget.selectionStart!);
   }
 
   onCut = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    this.setCursorLocation(e.currentTarget.selectionStart);
+    this.setCursorLocation(e.currentTarget.selectionStart!);
     this.setState({
       inputValue: e.currentTarget.value,
     });
   }
 
   onPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    this.setCursorLocation(e.currentTarget.selectionStart);
+    this.setCursorLocation(e.currentTarget.selectionStart!);
     this.setState({
       inputValue: e.currentTarget.value,
     });
@@ -76,7 +76,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
         break;
       case KEYS.ESC:
         e.preventDefault();
-        this.inputNode.blur();
+        this.inputNode!.blur();
         break;
       case KEYS.UP:
         if (this.popupComponentNode) {
@@ -104,11 +104,11 @@ export default class Search extends React.Component<SearchProps, SearchState> {
         if (newValue) {
           this.onChangeTokenModel(activeTokenIndex, newValue, true);
         } else if (activeToken.type !== 'date') {
-          this.popupComponentNode.onDownClicked();
+          this.popupComponentNode!.onDownClicked();
         }
         break;
       default:
-        this.setCursorLocation(e.currentTarget.selectionStart);
+        this.setCursorLocation(e.currentTarget.selectionStart!);
         if (e.currentTarget.value !== this.state.inputValue) {
           this.setState({
             inputValue: e.currentTarget.value,
@@ -118,7 +118,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
   }
 
   onKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    this.setCursorLocation(e.currentTarget.selectionStart);
+    this.setCursorLocation(e.currentTarget.selectionStart!);
     if (e.currentTarget.value !== this.state.inputValue) {
       this.setState({
         inputValue: e.currentTarget.value,
@@ -145,7 +145,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     let token, index = tokenIndex;
 
     if (tokenIndex === -1 || tokens[tokenIndex].type === 'space') {
-      token = updateToken(createToken(null), model, config);
+      token = updateToken(createToken(''), model, config);
       index = tokens.length;
       tokens.push(token);
     } else {
@@ -175,7 +175,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
   }
 
   setInputValue(value: string) {
-    this.inputNode.value = value;
+    this.inputNode!.value = value;
     this.setState({
       inputValue: value,
     });
@@ -183,7 +183,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
 
   setCursor(location: number) {
     this.setCursorLocation(location);
-    setCursor(this.inputNode, location);
+    setCursor(this.inputNode!, location);
   }
 
   setCursorLocation(location: number) {
@@ -194,14 +194,14 @@ export default class Search extends React.Component<SearchProps, SearchState> {
   }
 
   scrollInputAndBackground(location: number) {
-    this.inputNode.scrollLeft = location;
+    this.inputNode!.scrollLeft = location;
     this.scrollBackground();
   }
 
   scrollBackground() {
     if (this.backgroundNode
-        && this.backgroundNode.scrollLeft !== this.inputNode.scrollLeft) {
-      this.backgroundNode.scrollLeft = this.inputNode.scrollLeft;
+        && this.backgroundNode.scrollLeft !== this.inputNode!.scrollLeft) {
+      this.backgroundNode.scrollLeft = this.inputNode!.scrollLeft;
     }
   }
 
@@ -311,7 +311,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
           nodeRef={node => this.backgroundNode = node}
           tokens={tokens}
           getAdapter={getAdapter(config)}
-          isLastTokenSelected={isLastTokenSelected}
+          isLastTokenSelected={!!isLastTokenSelected}
           activeToken={activeToken}
         />
         {displayPopup &&

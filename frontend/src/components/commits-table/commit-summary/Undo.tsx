@@ -18,7 +18,7 @@ const Undo: React.StatelessComponent<UndoProps> = ({ commit, enableActions, onCl
     ? 'Merge commit cannot be undone.'
     : !enableActions
       ? 'You have uncommitted changes in your WordPress directory.'
-      : null;
+      : '';
 
   return (
     <a
