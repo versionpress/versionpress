@@ -19,6 +19,7 @@ module.exports = () => {
                     parallel: true,
                     sourceMap: true,
                 }),
+                new OptimizeCSSAssetsPlugin({}),
             ],
         },
     };
