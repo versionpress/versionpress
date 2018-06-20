@@ -37,10 +37,10 @@ const CommitDetails: React.StatelessComponent<CommitDetailsProps> = (props) => {
     ? <Overview
         commit={commit}
         className={rowClassName}
-        isLoading={isLoading}
+        isLoading={!!isLoading}
       />
     : <FullDiff
-        diff={diff}
+        diff={diff || ''}
         className={rowClassName}
       />;
 };

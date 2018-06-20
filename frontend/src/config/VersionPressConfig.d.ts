@@ -1,17 +1,17 @@
 interface VersionPressConfig {
 
-  api?: {
-    root?: string;
-    adminUrl?: string;
-    urlPrefix?: string;
-    queryParam?: string;
-    permalinkStructure?: boolean|string;
+  api: {
+    root: string;
+    adminUrl: string;
+    urlPrefix: string;
+    queryParam: string;
+    permalinkStructure: boolean|string;
     nonce?: string;
   };
 
-  routes?: {
-    page?: string;
-    home?: string;
+  routes: {
+    page: string;
+    home: string;
   };
 
 }

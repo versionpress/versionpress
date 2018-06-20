@@ -15,7 +15,7 @@ const ItemListItem: React.StatelessComponent<ItemListItemProps> = (props) => {
 
   return (
     <li
-      onMouseDown={e => { e.preventDefault(); onSelectItem(item.index); }}
+      onMouseDown={e => { e.preventDefault(); onSelectItem(item.index!); }}
       className={className}
     >
       <span>

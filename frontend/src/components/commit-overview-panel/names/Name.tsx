@@ -25,7 +25,9 @@ const Name: React.StatelessComponent<NameProps> = ({ change, countOfDuplicates }
   );
 };
 
-function getUserFriendlyName({ type, name, tags }) {
+function getUserFriendlyName(change: Change) {
+  const { type, name, tags } = change;
+
   switch (type) {
     case 'user':
       return tags['VP-User-Login'];

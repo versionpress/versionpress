@@ -17,15 +17,7 @@ new WebpackDevServer(webpack(config), {
     publicPath: config.output.publicPath,
     quiet: false,
     noInfo: false,
-    stats: {
-        assets: true,
-        chunkModules: false,
-        chunks: true,
-        colors: true,
-        hash: true,
-        timings: true,
-        version: true,
-    },
+    stats: 'minimal',
 }).listen(env.port, 'localhost', function (err) {
     if (err) {
         return console.error(err);

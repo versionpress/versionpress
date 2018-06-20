@@ -4,13 +4,13 @@ import DetailsLevel from '../enums/DetailsLevel';
 
 class CommitRow {
 
-  @observable commit: Commit = null;
+  @observable commit: Commit;
   @observable isSelected: boolean = false;
   @observable detailsLevel: DetailsLevel = DetailsLevel.None;
-  @observable diff: string = null;
-  @observable error: string = null;
+  @observable diff: string;
+  @observable error: string;
   @observable isLoading: boolean = false;
-  @observable visualisation: Visualisation = null;
+  @observable visualisation: Visualisation;
 
   constructor(commit: Commit, isSelected: boolean = false) {
     this.commit = commit;

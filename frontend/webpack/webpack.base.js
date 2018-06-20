@@ -1,5 +1,5 @@
 const CheckerPlugin = require('awesome-typescript-loader').CheckerPlugin;
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 const webpack = require('webpack');
 const autoprefixer = require('autoprefixer');
@@ -23,6 +23,8 @@ const postCssLoader = {
 };
 
 module.exports = (isDevelopment, options) => ({
+    mode: options.mode,
+    optimization: options.optimization,
     entry: options.entry,
     output: {
         filename: '[name].js',
@@ -33,17 +35,14 @@ module.exports = (isDevelopment, options) => ({
     devtool: isDevelopment ? 'source-map' : '',
     plugins: [
         new CheckerPlugin(),
-        new ExtractTextPlugin({
-            filename: '[name].css',
-            // ExtractTextPlugin doesn't support hot reloading and is disabled in dev mode;
-            // see the 'fallback' attribute below
-            disable: isDevelopment,
+        new MiniCssExtractPlugin({
+            filename: '[name].css'
         }),
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/), // http://stackoverflow.com/a/25426019/1243495
         new webpack.NamedModulesPlugin(),
     ].concat(isDevelopment
         ?  [
             new webpack.HotModuleReplacementPlugin(),
-            new webpack.NoEmitOnErrorsPlugin(),
         ] : []
     ).concat(options.plugins || []),
     resolve: {
@@ -55,7 +54,16 @@ module.exports = (isDevelopment, options) => ({
                 test: /\.tsx?$/,
                 exclude: /node_modules/,
                 use: isDevelopment
-                    ? ['react-hot-loader', 'awesome-typescript-loader']
+                    ? [
+                          {
+                              loader: 'babel-loader',
+                              options: {
+                                  babelrc: true,
+                                  plugins: ['react-hot-loader/babel'],
+                              },
+                          },
+                          'awesome-typescript-loader',
+                    ]
                     : ['awesome-typescript-loader'],
             },
             {
@@ -82,28 +90,12 @@ module.exports = (isDevelopment, options) => ({
             },
             {
                 test: /\.less$/,
-                use: ExtractTextPlugin.extract({
-                    fallback: 'style-loader?sourceMap',
-                    use: [
-                        'css-loader?sourceMap',
-                        {
-                          loader: 'postcss-loader',
-                          options: {
-                              plugins: function () {
-                                  return [autoprefixer({
-                                      browsers: [
-                                          '>1%',
-                                          'last 4 versions',
-                                          'Firefox ESR',
-                                          'not ie < 9', // React doesn't support IE8 anyway
-                                      ],
-                                  })];
-                              },
-                          },
-                      },
-                      'less-loader?sourceMap',
-                    ]
-                }),
+                use: [
+                    isDevelopment ? 'style-loader?sourceMap' : MiniCssExtractPlugin.loader,
+                    'css-loader?sourceMap',
+                    postCssLoader,
+                    'less-loader?sourceMap',
+                ],
             },
         ].concat(options.module && options.module.rules || []),
     },

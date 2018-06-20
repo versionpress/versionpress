@@ -1,28 +1,31 @@
 import * as React from 'react';
+import * as classNames from 'classnames';
 import { observer } from 'mobx-react';
-import { IndexLink, Link } from 'react-router';
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import config from '../../../config/config';
 
 const routes = config.routes;
 
-interface FooterProps {
+interface FooterProps extends RouteComponentProps<{ page?: string }> {
   pages: number[];
 }
 
-const Footer: React.StatelessComponent<FooterProps> = ({ pages }) => (
+const Footer: React.StatelessComponent<FooterProps> = ({
+  pages, match: { params: { page: routePage } },
+}) => (
   <tfoot>
     <tr>
       <td className='vp-table-pagination' colSpan={6}>
         {pages.map((page: number) => {
           return page === 1
-            ? <IndexLink
-                activeClassName='active'
+            ? <Link
+                className={classNames({ active: !routePage || `${page}` === routePage })}
                 to={routes.home}
                 key={page}
-              >{page}</IndexLink>
+              >{page}</Link>
             : <Link
-                activeClassName='active'
+                className={classNames({ active: `${page}` === routePage })}
                 to={`/${routes.page}/${page}`}
                 key={page}
               >{page}</Link>;
@@ -32,4 +35,4 @@ const Footer: React.StatelessComponent<FooterProps> = ({ pages }) => (
   </tfoot>
 );
 
-export default observer(Footer);
+export default withRouter(observer(Footer));

@@ -18,7 +18,7 @@ interface BackgroundProps {
 
 const Background: React.StatelessComponent<BackgroundProps> = (props) => {
   const {
-    nodeRef = null,
+    nodeRef,
     tokens,
     getAdapter,
     isLastTokenSelected,

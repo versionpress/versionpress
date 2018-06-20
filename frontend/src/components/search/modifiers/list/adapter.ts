@@ -19,13 +19,13 @@ class ListAdapter implements Adapter {
     }
 
     return null;
-  };
+  }
 
   getDefaultHint = () => {
     return this.config
-      ? this.config.defaultHint
+      ? this.config.defaultHint!
       : '';
-  };
+  }
 
   getHints = (token: Token) => {
     const list = this.config && this.config.content;
@@ -50,7 +50,7 @@ class ListAdapter implements Adapter {
     }
 
     return [];
-  };
+  }
 
   isValueValid = (value: string) => {
     const list = this.config && this.config.content;
@@ -59,27 +59,27 @@ class ListAdapter implements Adapter {
       return list.some(item => trim(this.serialize(item)) === trim(value));
     }
     return !!value;
-  };
+  }
 
   serialize = (item: SearchConfigItemContent) => {
     if (!item) {
-      return null;
+      return '';
     }
     if (IN_QUOTES_REGEXP.test(item.value) || item.value.indexOf(' ') === -1) {
       return item.value;
     }
     return '"' + item.value + '"';
-  };
+  }
 
   deserialize = (value: string) => {
     const list = this.config && this.config.content;
 
     if (list) {
-      return ArrayUtils.find(list, item => item.value === value);
+      return ArrayUtils.find(list, item => item!.value === value) || '';
     }
     return value;
-  };
+  }
 
-};
+}
 
 export default ListAdapter;

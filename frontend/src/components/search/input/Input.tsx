@@ -22,7 +22,7 @@ interface InputProps {
 
 const Input: React.StatelessComponent<InputProps> = (props) => {
   const {
-    nodeRef = null,
+    nodeRef,
     maxLength = 250,
     placeholder = 'Search...',
     value = '',
@@ -46,7 +46,6 @@ const Input: React.StatelessComponent<InputProps> = (props) => {
       defaultValue={value}
       disabled={disabled}
       spellCheck={false}
-      autoComplete={null}
       onBlur={onBlur}
       onFocus={onFocus}
       onClick={onClick}

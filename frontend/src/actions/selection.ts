@@ -16,7 +16,7 @@ export function selectCommits(commitsToSelect: Commit[], isChecked: boolean, isS
       let lastIndex = -1;
       const index = indexOf(commits, commit);
 
-      if (!isBulk && isShiftKey) {
+      if (!isBulk && isShiftKey && lastSelectedCommit) {
         lastIndex = indexOf(commits, lastSelectedCommit);
       }
 

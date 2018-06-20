@@ -8,7 +8,7 @@ import UndoDisabledDialog from '../dialogs/UndoDisabledDialog';
 import Modal from '../modal/Modal';
 import * as WpApi from '../../services/WpApi';
 
-let portalNode;
+let portalNode: Element | null = null;
 
 export function alertDialog(title: React.ReactNode, body: React.ReactNode) {
   closePortal();
@@ -29,12 +29,12 @@ export function confirmDialog(title: React.ReactNode, body: React.ReactNode, opt
   );
 }
 
-export function revertDialog(title: React.ReactNode, okHandler: Function) {
+export function revertDialog(title: React.ReactNode, okHandler: () => void) {
   const req = WpApi
     .get('can-revert')
     .end((err: any, res: request.Response) => {
       const data = res.body.data as VpApi.CanRevertResponse;
-      let body, options;
+      let body, options: ConfirmDialogProps;
 
       if (data === true) {
         body = <UndoEnabledDialog />;
@@ -54,7 +54,7 @@ export function revertDialog(title: React.ReactNode, okHandler: Function) {
   confirmDialog(title, '', options);
 }
 
-export function openPortal(children) {
+export function openPortal(children: any) {
   portalNode = document.createElement('div');
   document.body.appendChild(portalNode);
   DOM.render(children, portalNode);
@@ -62,7 +62,7 @@ export function openPortal(children) {
 
 export function closePortal() {
   if (portalNode && portalNode.parentNode && close) {
-    DOM.unmountComponentAtNode(portalNode.parentNode);
+    DOM.unmountComponentAtNode(portalNode.parentNode as Element);
     portalNode.parentNode.removeChild(portalNode);
     portalNode = null;
   }

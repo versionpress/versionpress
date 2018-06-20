@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 
 import Button from './Button';
 import FlashMessage from './flash-message/FlashMessage';
@@ -14,17 +14,18 @@ interface ServicePanelProps {
   servicePanelStore?: ServicePanelStore;
 }
 
-@observer(['servicePanelStore'])
+@inject('servicePanelStore')
+@observer
 export default class ServicePanel extends React.Component<ServicePanelProps, {}> {
 
   onButtonClick = () => {
     const { servicePanelStore } = this.props;
-    servicePanelStore.toggleVisibility();
+    servicePanelStore!.toggleVisibility();
   }
 
   render() {
     const { children, servicePanelStore } = this.props;
-    const { message, isVisible } = servicePanelStore;
+    const { message, isVisible } = servicePanelStore!;
 
     return (
       <div>

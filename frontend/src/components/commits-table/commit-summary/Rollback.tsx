@@ -15,7 +15,7 @@ const Rollback: React.StatelessComponent<RollbackProps> = ({ enableActions, onCl
 
   const title = !enableActions
     ? 'You have uncommitted changes in your WordPress directory.'
-    : null;
+    : '';
 
   return (
     <a

@@ -24,14 +24,18 @@ export default class Modal extends React.Component<ModalProps, {}> {
     onClose: () => {},
   };
 
-  contentNode: HTMLDivElement = null;
+  contentNode: HTMLDivElement | null = null;
 
   componentDidMount() {
-    this.contentNode.focus();
+    if (this.contentNode) {
+      this.contentNode.focus();
+    }
   }
 
   componentDidUpdate() {
-    this.contentNode.focus();
+    if (this.contentNode) {
+      this.contentNode.focus();
+    }
   }
 
   onBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -49,7 +53,7 @@ export default class Modal extends React.Component<ModalProps, {}> {
   }
 
   private closeModal = () => {
-    this.props.onClose();
+    this.props.onClose!();
     portal.closePortal();
   }
 
@@ -67,7 +71,7 @@ export default class Modal extends React.Component<ModalProps, {}> {
         >
           <Header
             title={title}
-            showCloseIcon={showCloseIcon}
+            showCloseIcon={!!showCloseIcon}
             onCloseClick={this.closeModal}
           />
           <Body>
