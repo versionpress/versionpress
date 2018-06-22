@@ -14,6 +14,10 @@
     "clean": "rimraf build/* && git clean -fx -- \"src/**.js\" \"src/**.map\"",
     "lint": "tslint src/**/*.{ts,tsx}"
   },
+  "engines": {
+    "node": ">=8.0.0",
+    "npm": ">=6.0.0"
+  },
   "dependencies": {
     "classnames": "^2.2.6",
     "core-js": "^2.5.7",
@@ -29,13 +33,13 @@
     "superagent": "^3.8.3"
   },
   "devDependencies": {
-    "@types/chai": "^3.5.2",
+    "@types/chai": "^4.1.4",
     "@types/classnames": "^2.2.4",
     "@types/core-js": "^2.5.0",
     "@types/diff": "^3.5.1",
     "@types/history": "^4.6.2",
     "@types/lodash": "^4.14.109",
-    "@types/mocha": "~2.2.32",
+    "@types/mocha": "^5.2.3",
     "@types/react": "^16.3.18",
     "@types/react-dom": "^16.0.6",
     "@types/react-router-dom": "^4.2.7",
@@ -45,13 +49,13 @@
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
     "babel-runtime": "^6.26.0",
-    "chai": "~3.5.0",
+    "chai": "^4.1.2",
     "css-loader": "^0.28.11",
     "file-loader": "^1.1.11",
     "less": "~3.0.4",
     "less-loader": "^4.1.0",
     "mini-css-extract-plugin": "^0.4.0",
-    "mocha": "^3.3.0",
+    "mocha": "^5.2.0",
     "optimize-css-assets-webpack-plugin": "^4.0.2",
     "postcss": "^6.0.22",
     "postcss-loader": "^2.1.5",
