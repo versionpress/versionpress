@@ -43,7 +43,7 @@ Have a ☕, this will take a while.
 
 To start a development site:
 
-1. Make sure ports 80 and 3306 are free, e.g., no local MAMP / XAMPP is running.
+1. Make sure Docker is running and ports 80 and 3306 are free (no local MAMP / XAMPP / MySQL running).
 2. Run `npm start`.
 
 This will start a set of Docker containers in the background. When everything boots up, log into the test site at <http://localhost>, install WordPress and activate VersionPress on the _Plugins_ page. You're now all set up! 🎉
@@ -59,11 +59,12 @@ Let's explore your development environment:
 
 Some useful tips for managing your Docker environment:
 
-- `docker-compose ps` lists running containers.
+- `docker-compose ps` lists running containers
 - `docker-compose logs -f` displays live logs
-- `docker-compose logs wordpress` displays logs of a single service.
-- `docker stats` show live CPU / memory usage.
-- See also [Docker tips](#docker-tips) below.
+- `docker-compose logs wordpress` displays logs of a single service
+- `docker stats` show live CPU / memory usage
+
+See also [Docker tips](#docker-tips) below.
 
 Run `npm stop` to stop the development environment. Run `npm run stop-and-cleanup` to also clean up WordPress files and MySQL database for a fresh start next time.
 
