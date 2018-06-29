@@ -76,7 +76,12 @@ The docs site is hosted on GitHub Pages, via the [`versionpress/docs.versionpres
     ```
     cp -r site/* ../../docs.versionpress.net
     ```
-5. Commit the new build. The commit message doesn't matter too much, use e.g. _New build of docs.versionpress.net_.
+5. Commit the new build. If you want to be super-nice, mention the deployed PR(s) in the commit message, e.g.:
+    ```
+    cd ../../docs.versionpress.net
+    git add -A
+    git commit -m "Deploy versionpress/versionpress#1234"
+    ```
 6. Push the repo.
 
 Verify the updated docs at <https://docs.versionpress.net/>.
