@@ -128,7 +128,7 @@ In Morse Code, `-.-` means k.
 
 .
 
-Ok, there are people that use VersionPress in production or to power their workflows. However, be aware of a couple of important things:
+Ok, there are people that use VersionPress in production or to power their workflows. However, make sure you understand a couple of key points:
 
 - For actions that perform database merging (pull, undo, ...), all plugins on your site _must_ be compatible with VersionPress, otherwise the site integrity cannot be guaranteed. At this point, you will need to ensure this yourself and possibly write [plugin definitions](https://docs.versionpress.net/en/developer/plugin-support/).
 - You'll probably need to be a developer yourself, with good knowledge of Git, WordPress and debugging in general.
