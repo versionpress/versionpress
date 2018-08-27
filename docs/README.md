@@ -6,7 +6,8 @@ The documentation at [`docs.versionpress.net`](https://docs.versionpress.net/) i
 
 1. Edit Markdown files in the `content` directory.
 2. Live-preview the changes by starting up Docker, running `npm start` and visiting <http://localhost:8000>.
-3. Submit a pull request with your changes.
+3. Run linter on your docs: `npm run lint:markdown`.
+4. Submit a pull request with your changes.
 
 If you want to update the site visuals, please see [theme info](#theme-info).
 
