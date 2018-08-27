@@ -1,6 +1,6 @@
 # Basic Concepts
 
-VersionPress brings true version control to WordPress. Version control is a fairly simple concept but if you never worked with it, this page will walk you through the basic ideas, commonly used terms, etc. 
+VersionPress brings true version control to WordPress. Version control is a fairly simple concept but if you never worked with it, this page will walk you through the basic ideas, commonly used terms, etc.
 
 ## Version control
 
