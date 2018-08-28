@@ -405,7 +405,7 @@ Some entities should be ignored (not tracked at all) like transient options, env
 
 Again, queries are used. Wildcards are supported.
 
-#### Ignoring columns
+### Ignoring columns
 
 It is possible to ignore just parts of entities. The columns might either be ignored entirely or computed dynamically using a PHP function:
 
@@ -419,7 +419,7 @@ entity:
 
 The function is called whenever VersionPress does its INI files => DB synchronization. The function will get an instance of `VersionPress\Database\Database` as an argument and is expected to update the database appropriately. The `Database` class has the same methods as `wpdb` but the changes it make are not tracked by VersionPress itself.
 
-#### Cache invalidation
+### Cache invalidation
 
 WordPress uses cache for posts, comments, users, terms, etc. This cache needs to be invalidated when VersionPress updates database (on undo, rollback, pull, etc.). It is possible to tell VersionPress which cache to invalidate and where to find the related IDs.
 
