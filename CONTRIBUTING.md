@@ -12,9 +12,9 @@ You're awesome!
 ## Reporting bugs
 
 1. This repo (`versionpress/versionpress`) is for coding issues only. If you have trouble running VersionPress on your host etc., please visit [`versionpress/support`](https://github.com/versionpress/support).
-2. **Search** [ the issues](https://github.com/versionpress/versionpress/issues) first.
+2. **Search** [the issues](https://github.com/versionpress/versionpress/issues) first.
 3. [Open a new issue](https://github.com/versionpress/versionpress/issues/new).
-    - You can also **discuss** it first [on Gitter](https://gitter.im/versionpress/versionpress). 
+    - You can also **discuss** it first [on Gitter](https://gitter.im/versionpress/versionpress).
 
 Providing steps to reproduce greatly helps!
 
@@ -37,12 +37,10 @@ Learn more about [our development process](docs/content/en/developer/development
 
 Happy hacking!
 
-
 ## Improving docs
 
 Public docs at [docs.versionpress.net](https://docs.versionpress.net/en) are exported from the `./docs/content` directory. We're always happy to accept pull requests with clarifications, grammar fixes, etc. More in [docs/README.md](./docs/README.md), thank you!
 
-
 ---
 
-Other ideas of how to contribute? Tell us [on Gitter](https://gitter.im/versionpress/versionpress). 
+Other ideas of how to contribute? Tell us [on Gitter](https://gitter.im/versionpress/versionpress).

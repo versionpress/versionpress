@@ -62,6 +62,12 @@ Redirects are not handled very well by MkDocs at this point, just keep the old p
 
 We don't use a URL scheme like `/latest` or `/v2`, the documentation always reflects the current version and if something has been deprecated or added, just indicate it in the text.
 
+### Markdown linting
+
+Pre-commit hook is set up to run [markdownlint](https://github.com/DavidAnson/markdownlint) automatically on staged files.
+
+If you want to lint all Markdown files in the repository, run `npm run lint:markdown`.
+
 ## Deployment
 
 The docs site is hosted on GitHub Pages, via the [`versionpress/docs.versionpress.net`](https://github.com/versionpress/docs.versionpress.net) repository. To deploy:
