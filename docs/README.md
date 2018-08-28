@@ -6,8 +6,7 @@ The documentation at [`docs.versionpress.net`](https://docs.versionpress.net/) i
 
 1. Edit Markdown files in the `content` directory.
 2. Live-preview the changes by starting up Docker, running `npm start` and visiting <http://localhost:8000>.
-3. Run linter on your docs: `npm run lint:markdown`.
-4. Submit a pull request with your changes.
+3. Submit a pull request with your changes.
 
 If you want to update the site visuals, please see [theme info](#theme-info).
 
@@ -62,6 +61,12 @@ Redirects are not handled very well by MkDocs at this point, just keep the old p
 ### Documenting different versions of VersionPress
 
 We don't use a URL scheme like `/latest` or `/v2`, the documentation always reflects the current version and if something has been deprecated or added, just indicate it in the text.
+
+### Markdown linting
+
+Pre-commit hook is set up to run [markdownlint](https://github.com/DavidAnson/markdownlint) automatically on staged files.
+
+If you want to lint all Markdown files in the repository, run `npm run lint:markdown`.
 
 ## Deployment
 
