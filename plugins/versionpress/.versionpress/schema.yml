@@ -150,6 +150,7 @@ option:
     - 'option_name: logged_in_key'
     - 'option_name: logged_in_salt'
     - 'option_name: theme_switched'
+    - 'option_name: openid_nonces'
     # All {$taxonomy}_children are also ignored - see filter `vp_entity_should_be_saved_option`
   ignored-columns:
     - option_id
