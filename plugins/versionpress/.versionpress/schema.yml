@@ -104,6 +104,7 @@ usermeta:
     - 'meta_key: nav_menu_recently_edited'
     - 'meta_key: wporg_favorites'
     - 'meta_key: *dashboard_quick_press_last_post_id'
+    - 'meta_key: community-events-location'
   clean-cache:
     - user: user_id
 
