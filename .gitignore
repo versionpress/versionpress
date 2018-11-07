@@ -1,8 +1,7 @@
 # VersionPress-specific folders
 /dist
 
-# IDEs
-.vscode
+# PhpStorm
 .idea
 
 # PHP
