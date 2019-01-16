@@ -70,27 +70,16 @@ If you want to lint all Markdown files in the repository, run `npm run lint:mark
 
 ## Deployment
 
-The docs site is hosted on GitHub Pages, via the [`versionpress/docs.versionpress.net`](https://github.com/versionpress/docs.versionpress.net) repository. To deploy:
+The docs site is automatically deployed to Netlify under info@versionpress.com account (credentials are in LastPass). It deploys a preview for PRs and updates the live site after merge to master.
 
-1. Build the site to the `site` directory:
-    ```
-    npm run build
-    ```
-2. Optionally verify locally, e.g., `cd site && php -S localhost:1234`.
-3. Clone the [`docs.versionpress.net`](https://github.com/versionpress/docs.versionpress.net) repo next to your `versionpress` directory (they should be sibling folders).
-4. Copy the built site into it:
-    ```
-    cp -r site/* ../../docs.versionpress.net
-    ```
-5. Commit the new build. If you want to be super-nice, mention the deployed PR(s) in the commit message, e.g.:
-    ```
-    cd ../../docs.versionpress.net
-    git add -A
-    git commit -m "Deploy versionpress/versionpress#1234"
-    ```
-6. Push the repo.
+The deployment is configured directly in the Netlify's UI. Command used for build:
 
-Verify the updated docs at <https://docs.versionpress.net/>.
+```
+export PIPENV_IGNORE_VIRTUALENVS=1
+echo -e "[requires]\npython_version = '3.6'\n\n[packages]\nmkdocs-material = '~=3.2.0'\nmkdocs = '>=1'\nPygments = '>=2.2'\npymdown-extensions = '>=4.11'" > Pipfile
+pipenv install
+pipenv run mkdocs build
+```
 
 ## Theme info
 
