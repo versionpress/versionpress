@@ -233,7 +233,7 @@ class VpidRepository
                                             and vpid.vp_id = UNHEX(\"{$postmeta['vp_post_id']}\")");
 
         if ($menuItemType === 'taxonomy') {
-            return 'term_taxonomy';
+            return 'terms';
         }
 
         if ($menuItemType === 'post_type') {
