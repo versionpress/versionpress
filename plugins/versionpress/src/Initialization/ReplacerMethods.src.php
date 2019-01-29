@@ -103,7 +103,7 @@ class ReplacerMethods
             return $this->__wp_query($query);
         }
 
-        if (strpos(strtolower($query), 'select') === 0 || strpos(strtolower($query), 'show') === 0) {
+        if (strpos(trim(strtolower($query)), 'select') === 0 || strpos(trim(strtolower($query)), 'show') === 0) {
             // VP does not need to track SELECT and SHOW queries
             return $this->__wp_query($query);
         }
