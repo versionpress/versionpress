@@ -6,8 +6,8 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./plugins/versionpress:/var/www/html/wp-content/plugins/versionpress
-      - ./dev-env/wp:/var/www/html
+      - ./plugins/versionpress:/var/www/html/wp-content/plugins/versionpress:z
+      - ./dev-env/wp:/var/www/html:z
     links:
       - mysql
       - adminer
@@ -19,7 +19,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./dev-env/wp-for-tests:/var/www/html
+      - ./dev-env/wp-for-tests:/var/www/html:z
     links:
       - mysql-for-tests:mysql
     working_dir: /var/www/html/wptest
@@ -31,7 +31,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - db_data:/var/lib/mysql
+      - db_data:/var/lib/mysql:z
     environment:
       MYSQL_ROOT_PASSWORD: r00tpwd
 
@@ -40,7 +40,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - db_data_for_tests:/var/lib/mysql
+      - db_data_for_tests:/var/lib/mysql:z
     environment:
       MYSQL_ROOT_PASSWORD: r00tpwd
 
@@ -58,10 +58,10 @@ services:
       PHP_IDE_CONFIG: serverName=VersionPress-tests
     volumes:
       # !!! This must be kept in sync with wordpress-cli-image/Dockerfile
-      - ./dev-env/test-logs:/var/opt/versionpress/logs
-      - ./plugins/versionpress:/opt/versionpress:ro
-      - ./ext-libs:/opt/ext-libs:ro
-      - wpcli-cache:/var/www/.wp-cli
+      - ./dev-env/test-logs:/var/opt/versionpress/logs:z
+      - ./plugins/versionpress:/opt/versionpress:ro,z
+      - ./ext-libs:/opt/ext-libs:ro,z
+      - wpcli-cache:/var/www/.wp-cli:z
     working_dir: /opt/versionpress/tests
     command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /var/opt/versionpress/logs/testdox.txt
 
@@ -73,11 +73,11 @@ services:
       PHP_IDE_CONFIG: serverName=VersionPress-tests
     volumes:
       # !!! This must be kept in sync with wordpress-cli-image/Dockerfile
-      - ./dev-env/wp-for-tests:/var/www/html
-      - ./dev-env/test-logs:/var/opt/versionpress/logs
-      - ./plugins/versionpress:/opt/versionpress:ro
-      - ./ext-libs:/opt/ext-libs:ro
-      - wpcli-cache:/var/www/.wp-cli
+      - ./dev-env/wp-for-tests:/var/www/html:z
+      - ./dev-env/test-logs:/var/opt/versionpress/logs:z
+      - ./plugins/versionpress:/opt/versionpress:ro,z
+      - ./ext-libs:/opt/ext-libs:ro,z
+      - wpcli-cache:/var/www/.wp-cli:z
     working_dir: /opt/versionpress/tests
     command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /var/opt/versionpress/logs/testdox.txt
     links:
