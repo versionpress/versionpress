@@ -49,10 +49,10 @@ class VPInternalCommand extends WP_CLI_Command
         $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
         require_once $wpConfigPath;
 
-        require ABSPATH . WPINC . '/formatting.php';
-        require ABSPATH . WPINC . '/link-template.php';
-        require ABSPATH . WPINC . '/shortcodes.php';
-        require ABSPATH . WPINC . '/taxonomy.php';
+        require_once ABSPATH . WPINC . '/formatting.php';
+        require_once ABSPATH . WPINC . '/link-template.php';
+        require_once ABSPATH . WPINC . '/shortcodes.php';
+        require_once ABSPATH . WPINC . '/taxonomy.php';
 
         wp_plugin_directory_constants();
 
