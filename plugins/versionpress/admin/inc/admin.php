@@ -68,7 +68,7 @@ if (!empty($error)) {
 $showWelcomePanel = get_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, true);
 
 if ($showWelcomePanel === "") {
-?>
+    ?>
 
     <div id="welcome-panel" class="welcome-panel">
 

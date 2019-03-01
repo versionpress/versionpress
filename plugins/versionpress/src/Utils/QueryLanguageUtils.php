@@ -115,12 +115,12 @@ class QueryLanguageUtils
                 // name and email
                 if (strpos($value, '@') && strpos($value, '<')) {
                     $query .= ' --author="^' . $value . '$"';
-                } // email only
-                else {
+                } else {
+                    // email only
                     if (strpos($value, '@')) {
                         $query .= ' --author="^.* <' . $value . '>$"';
-                    } // name only
-                    else {
+                    } else {
+                        // name only
                         $query .= ' --author="^' . $value . ' <.*>$"';
                     }
                 }
