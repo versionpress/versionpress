@@ -18,8 +18,6 @@ services:
     image: versionpress/wordpress:php7.2-apache
     ports:
       - "80:80"
-    volumes:
-      - ./dev-env/wp-for-tests:/var/www/html:z
     links:
       - mysql-for-tests:mysql
     working_dir: /var/www/html/wptest
@@ -73,7 +71,6 @@ services:
       PHP_IDE_CONFIG: serverName=VersionPress-tests
     volumes:
       # !!! This must be kept in sync with wordpress-cli-image/Dockerfile
-      - ./dev-env/wp-for-tests:/var/www/html:z
       - ./dev-env/test-logs:/var/opt/versionpress/logs:z
       - ./plugins/versionpress:/opt/versionpress:ro,z
       - ./ext-libs:/opt/ext-libs:ro,z
