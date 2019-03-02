@@ -143,8 +143,11 @@ class CloneMergeTest extends PHPUnit_Framework_TestCase
             ['field' => 'post_modified_gmt']
         );
 
-        $this->assertEquals($clonedModifiedDate, $modifiedDate);
-        $this->assertEquals($clonedModifiedDateGmt, $modifiedDateGmt);
+        // post_modified and post_modified_gmt are explicitly set to "now"
+        // see commit ff504f77
+        // therefore, the dates won't be exactly the same due to processing time and the sleep(1) above
+        $this->assertEquals(new DateTime($clonedModifiedDate), new DateTime($modifiedDate), '', 5);
+        $this->assertEquals(new DateTime($clonedModifiedDateGmt), new DateTime($modifiedDateGmt), '', 5);
     }
 
 
