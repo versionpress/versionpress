@@ -158,8 +158,8 @@ class CloneMergeTest extends PHPUnit_Framework_TestCase
         $wpAutomation = new WpAutomation(self::$siteConfig, self::$testConfig->wpCliVersion);
         $wpAutomation->editOption('blogname', 'Blogname from original - conflict');
 
-        VPCommandUtils::exec('sudo -u www-data git config user.name test', self::$siteConfig->path);
-        VPCommandUtils::exec('sudo -u www-data git config user.email test@example.com', self::$siteConfig->path);
+        VPCommandUtils::exec('git config user.name test', self::$siteConfig->path);
+        VPCommandUtils::exec('git config user.email test@example.com', self::$siteConfig->path);
 
         $output = $wpAutomation->runWpCliCommand('vp', 'pull', ['from' => self::$cloneSiteConfig->name]);
 
