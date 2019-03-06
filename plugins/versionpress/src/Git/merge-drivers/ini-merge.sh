@@ -24,8 +24,8 @@ do
     B_DATE_STR=$(printf "%s" "$B_DATE_STR" | tr -d '\r\n')
 
     # Transform them to Numbers
-    A_DATE_NUM=$(printf "%s" "$A_DATE_STR" | tr -d "\-: ")
-    B_DATE_NUM=$(printf "%s" "$B_DATE_STR" | tr -d "\-: ")
+    A_DATE_NUM=$(printf "%s" "$A_DATE_STR" | tr -d ": -")
+    B_DATE_NUM=$(printf "%s" "$B_DATE_STR" | tr -d ": -")
 
     # Compare and make both values same
     if [ "$A_DATE_NUM" -lt "$B_DATE_NUM" ]; then
