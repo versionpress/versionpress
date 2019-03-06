@@ -38,8 +38,6 @@ class CloneMergeTest extends PHPUnit_Framework_TestCase
         $wpAutomation->ensureTestSiteIsReady();
 
         FileSystem::mkdir(self::$cloneSiteConfig->path);
-        chown(self::$cloneSiteConfig->path, 'www-data');
-        chgrp(self::$cloneSiteConfig->path, 'www-data');
 
         $wpAutomation->runWpCliCommand('vp', 'clone', [
             'name' => self::$cloneSiteConfig->name,
