@@ -64,6 +64,7 @@ services:
       - wpcli-cache:/var/www/.wp-cli:z
     working_dir: /opt/versionpress/tests
     command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /var/opt/versionpress/logs/testdox.txt
+    user: "33:33"
 
   tests-with-wordpress:
     image: versionpress/wordpress:cli
@@ -83,6 +84,7 @@ services:
     links:
       - selenium-hub
       - wordpress-for-tests
+    user: "33:33"
 
   selenium-hub:
     # Standalone Firefox is enough but could also be a full grid setup, hence the service name
