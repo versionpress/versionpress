@@ -30,7 +30,6 @@ class VpidRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $databaseMock->shouldReceive('get_var')->andReturn('vpid3456');
 
-
         $vpidRepository = new VpidRepository($databaseMock, $schemaInfoMock);
 
         $entity = [
@@ -44,8 +43,16 @@ class VpidRepositoryTest extends \PHPUnit_Framework_TestCase
             'name' => 'bar',
             'value' => 'vpid3456',
         ];
+        
+        $nullEntity = [
+            'id' => 4321,
+            'name' => 'bar',
+            'value' => -1,
+        ];
+        $replacedNullEntity = $vpidRepository->replaceForeignKeysWithReferences('foo', $nullEntity);
 
         $this->assertSame($expectedEntity, $replacedEntity);
+        $this->assertSame($nullEntity, $replacedNullEntity);
     }
 
     /** @test */
@@ -69,7 +76,6 @@ class VpidRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $databaseMock->shouldReceive('get_var')->andReturn('vpid3456');
 
-
         $vpidRepository = new VpidRepository($databaseMock, $schemaInfoMock);
 
         $entity = [
@@ -84,7 +90,15 @@ class VpidRepositoryTest extends \PHPUnit_Framework_TestCase
             'value' => serialize(['id' => 'vpid3456']),
         ];
 
+        $nullEntity = [
+            'id' => 4321,
+            'name' => 'bar',
+            'value' => serialize(['id' => -1]),
+        ];
+        $replacedNullEntity = $vpidRepository->replaceForeignKeysWithReferences('foo', $nullEntity);
+
         $this->assertSame($expectedEntity, $replacedEntity);
+        $this->assertSame($nullEntity, $replacedNullEntity);
     }
 
     /** @test */
@@ -107,7 +121,6 @@ class VpidRepositoryTest extends \PHPUnit_Framework_TestCase
         $schemaInfoMock->shouldReceive('getTableName')->with('bar')->andReturn('bar');
 
         $databaseMock->shouldReceive('get_var')->andReturn('vpid3456');
-
 
         $vpidRepository = new VpidRepository($databaseMock, $schemaInfoMock);
 
@@ -146,7 +159,6 @@ class VpidRepositoryTest extends \PHPUnit_Framework_TestCase
         $schemaInfoMock->shouldReceive('getTableName')->with('bar')->andReturn('bar');
 
         $databaseMock->shouldReceive('get_var')->andReturn('vpid3456');
-
 
         $vpidRepository = new VpidRepository($databaseMock, $schemaInfoMock);
 
@@ -187,7 +199,6 @@ class VpidRepositoryTest extends \PHPUnit_Framework_TestCase
         $databaseMock->shouldReceive('get_var')->once()->andReturn('vpid3456');
         $databaseMock->shouldReceive('get_var')->once()->andReturn('vpid5678');
 
-
         $vpidRepository = new VpidRepository($databaseMock, $schemaInfoMock);
 
         $entity = [
@@ -225,7 +236,6 @@ class VpidRepositoryTest extends \PHPUnit_Framework_TestCase
         $schemaInfoMock->shouldReceive('getTableName')->with('baz')->andReturn('baz');
 
         $databaseMock->shouldReceive('get_var')->andReturn('vpid3456');
-
 
         $vpidRepository = new VpidRepository($databaseMock, $schemaInfoMock);
 
