@@ -8,7 +8,12 @@ Tests are a significant part of the VersionPress project, we care about writing 
 
 Similarly to the [development environment](dev-setup.md#dockerized-development-environment), tests utilize Docker & Docker Compose as well. The main benefit is that you don't need to set up things like Selenium or Java locally.
 
-Most tasks are scripted, for example, you just run `npm run tests:unit` but you can also drop to the raw Docker Compose mode and do things like `docker-compose run --rm tests ...`. In that case, one thing to understand is that there are two services in `docker-compose.yml` to choose from:
+Most tasks are scripted, for example, you just run `npm run tests:unit` but you can also drop to the raw Docker Compose mode and do things like `docker-compose -f docker-compose-tests.yml run --rm tests ...`.
+
+!!! tip "Note the different docker-compose file"
+    Tests use a separate docker-compose file, add `-f docker-compose-tests.yml` when running `docker-compose`.
+
+In that case, one thing to understand is that there are two services in `docker-compose-tests.yml` to choose from:
 
 - `tests` – just a test runner.
 - `tests-with-wordpress` – starts a WordPress stack.
@@ -45,7 +50,10 @@ If you want to go entirely custom, use raw `docker-compose`:
 
 ```sh
 # PhpStorm-like invocation (copy/pasted from its console):
-docker-compose run --rm tests ../vendor/bin/phpunit --bootstrap /opt/versionpress/tests/phpunit-bootstrap.php --no-configuration /opt/versionpress/tests/Unit
+docker-compose -f docker-compose-tests.yml run --rm tests \
+  ../vendor/bin/phpunit \
+  --bootstrap /opt/versionpress/tests/phpunit-bootstrap.php \
+  --no-configuration /opt/versionpress/tests/Unit
 ```
 
 ### Test output
@@ -55,14 +63,16 @@ Npm scripts are configured to log in a TestDox format to container's `/var/opt/v
 To log in [another supported format](http://phpunit.readthedocs.io/en/7.1/textui.html#command-line-options), run tests manually like this:
 
 ```
-docker-compose run --rm tests ../vendor/bin/phpunit -c phpunit.xml --log-junit /var/opt/versionpress/logs/vp-tests.log
+docker-compose -f docker-compose-tests.yml run --rm tests \
+  ../vendor/bin/phpunit \
+  -c phpunit.xml --log-junit /var/opt/versionpress/logs/vp-tests.log
 ```
 
 ### Clean up tests
 
 If you've run tests that use the `tests-with-wordpress` service, the whole Docker stack is kept running so that you can inspect it. For example, you can use your local Git client to explore the site's history in `dev-env/wp-for-tests/wptest`. The [end2end tests](#end2end-tests) section provides more info on this.
 
-When you're done with tests, run `npm stop` to shut down the Docker stack or `npm run stop-and-cleanup` to also remove the volumes so that the next start is entirely fresh.
+When you're done with tests, run `npm tests:stop` to shut down the Docker stack or `npm run tests:stop-and-cleanup` to also remove the volumes so that the next start is entirely fresh.
 
 ### Tips for tests
 
@@ -91,7 +101,9 @@ Next, define a remote interpreter. Make sure you have the **PHP Docker** plugin 
 
 ![image](https://user-images.githubusercontent.com/101152/40119446-04674760-591d-11e8-9a53-43f61eb7de5c.png)
 
-Note that the `docker-compose.yml` is at the repo root, not inside `./plugins/versionpress`:
+Note that the `docker-compose-tests.yml` is at the repo root, not inside `./plugins/versionpress`:
+
+> ⚠️ **Note**: the screenshot uses the old path `docker-compose.yml`; it should be `docker-compose-tests.yml`.
 
 ![image](https://user-images.githubusercontent.com/101152/40119401-de795a66-591c-11e8-97cd-8c14e7a1976c.png)
 
@@ -186,7 +198,7 @@ After you've run the tests, the Docker stack is left up and running so that you 
 - The files are mapped to `./dev-env/wp-for-tests`, you can use your local Git client to inspect it.
 - Connect to the database via `mysql -u root -p` or Adminer which you can access by running `docker-compose run -d --service-ports adminer` and visiting <http://localhost:8099>. The database name is `mysql-for-wordpress`.
 
-Stop the Docker stack with `npm run stop-and-cleanup` (stop-and-cleanup is strongly recommended here; end2end tests are not perfectly isolated yet).
+Stop the Docker stack with `npm run tests:stop-and-cleanup` (stop-and-cleanup is strongly recommended here; end2end tests are not perfectly isolated yet).
 
 ## Other tests
 
