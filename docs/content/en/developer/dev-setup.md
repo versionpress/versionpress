@@ -8,7 +8,7 @@ Our approach is:
 
 - You develop in **local tools** you're comfortable with – PhpStorm, vim, VSCode, ...
 - Runtime is handled by **Docker**. You don't need MAMP / XAMPP, local installation of Selenium, etc.
-- Common tasks are automated via **npm scripts**, for example, `npm run tests:full`.
+- Common tasks are automated via **npm scripts**, for example, `npm run build`.
 
 If you're not familiar with Docker, this is [great quick start](https://docs.docker.com/get-started/). We also have some [tips for you](#docker-tips).
 
@@ -100,7 +100,7 @@ Please refer to the [Contributing code](https://github.com/versionpress/versionp
 
 ### Debugging
 
-The development containers have [Xdebug](https://xdebug.org/) installed and configured. Here is how to make debugging work in PhpStorm; the [Debugging tests](#starting-debugging-session-from-command-line) section gives an example of how to make debugging work in VSCode.
+The development containers have [Xdebug](https://xdebug.org/) installed and configured. Here is how to make debugging work in PhpStorm; the [Debugging tests](testing.md#starting-debugging-session-from-command-line) section gives an example of how to make debugging work in VSCode.
 
 Start the Docker stack with `npm start`.
 
