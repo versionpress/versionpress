@@ -68,6 +68,10 @@ See also [Docker tips](#docker-tips) below.
 
 Run `npm stop` to stop the development environment. Run `npm run stop-and-cleanup` to also clean up WordPress files and MySQL database for a fresh start next time.
 
+## Plugin development
+
+VersionPress consists of PHP code implementing the core versioning logic and a React frontend. This section is about the former, the latter is described in [Frontend development](#frontend-development) below.
+
 ### PhpStorm setup
 
 For PHP development, we recommend [PhpStorm](https://www.jetbrains.com/phpstorm/) and ship project files for it. The steps here have been tested in PhpStorm **2018.1**.
@@ -125,10 +129,6 @@ Reload a page in your browser. Debugging should now work:
 
 After you're done with debugging, run `npm stop` or `npm run stop-and-cleanup`.
 
-## Testing
-
-See [Testing](testing.md).
-
 ## Frontend development
 
 VersionPress uses a JavaScript frontend implemented as a React app in the `./frontend` folder.
@@ -157,6 +157,10 @@ This launches [webpack dev server](https://webpack.js.org/configuration/dev-serv
 ![image](https://cloud.githubusercontent.com/assets/101152/26268495/c4738ff0-3cef-11e7-90ce-b807cc085865.png)
 
 Source code edits will be automatically reflected in the browser.
+
+## Testing
+
+See [Testing](testing.md).
 
 ## Production build
 
