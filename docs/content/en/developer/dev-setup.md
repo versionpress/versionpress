@@ -63,8 +63,8 @@ Some useful tips for managing your Docker environment:
 - `docker-compose logs -f` displays live logs
 - `docker-compose logs wordpress` displays logs of a single service
 - `docker stats` show live CPU / memory usage
-
-See also [Docker tips](#docker-tips) below.
+- Aliasing `docker-compose` to `dc` will save you some typing.
+- Values in `docker-compose.yml` can be customized via `docker-compose.override.yml`.
 
 Run `npm stop` to stop the development environment. Run `npm run stop-and-cleanup` to also clean up WordPress files and MySQL database for a fresh start next time.
 
@@ -169,13 +169,6 @@ See [Testing](testing.md).
 Run `npm run build`, it will produce a file like `dist/versionpress-3.0.2.zip`.
 
 The version number is based on the nearest Git tag and can also be something like `3.0.2-27-g0e1ce7f` meaning that the closest tag is `3.0.2`, there have been 27 commits since then and the package was built from `0e1ce7f`. See [`git describe --tags`](https://git-scm.com/docs/git-describe#_examples) for more examples.
-
-## Docker tips
-
-Here are some tips for working with Docker / Docker Compose:
-
-- Aliasing `docker-compose` to `dc` will save you some typing.
-- Values in `docker-compose.yml` can be customized via `docker-compose.override.yml`.
 
 ## Windows tips
 
