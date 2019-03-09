@@ -6,7 +6,7 @@ Tests are a significant part of the VersionPress project, we care about writing 
 
 ## Dockerized testing environment
 
-Similarly to the [development environment](#exploring-dockerized-environment), tests utilize Docker Compose as well. The main benefit is that you don't need to set up things like Selenium or Java locally.
+Similarly to the [development environment](dev-setup.md#dockerized-development-environment), tests utilize Docker & Docker Compose as well. The main benefit is that you don't need to set up things like Selenium or Java locally.
 
 Most tasks are scripted, for example, you just run `npm run tests:unit` but you can also drop to the raw Docker Compose mode and do things like `docker-compose run --rm tests ...`. In that case, one thing to understand is that there are two services in `docker-compose.yml` to choose from:
 

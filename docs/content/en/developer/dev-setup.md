@@ -8,7 +8,7 @@ Our approach is:
 
 - You develop in **local tools** you're comfortable with – PhpStorm, vim, VSCode, ...
 - Runtime is handled by **Docker**. You don't need MAMP / XAMPP, local installation of Selenium, etc.
-- Common tasks are automated via **npm scripts**, for example, `npm run tests:full`.
+- Common tasks are automated via **npm scripts**, for example, `npm run build`.
 
 If you're not familiar with Docker, this is [great quick start](https://docs.docker.com/get-started/). We also have some [tips for you](#docker-tips).
 
@@ -63,10 +63,14 @@ Some useful tips for managing your Docker environment:
 - `docker-compose logs -f` displays live logs
 - `docker-compose logs wordpress` displays logs of a single service
 - `docker stats` show live CPU / memory usage
-
-See also [Docker tips](#docker-tips) below.
+- Aliasing `docker-compose` to `dc` will save you some typing.
+- Values in `docker-compose.yml` can be customized via `docker-compose.override.yml`.
 
 Run `npm stop` to stop the development environment. Run `npm run stop-and-cleanup` to also clean up WordPress files and MySQL database for a fresh start next time.
+
+## Plugin development
+
+VersionPress consists of PHP code implementing the core versioning logic and a React frontend. This section is about the former, the latter is described in [Frontend development](#frontend-development) below.
 
 ### PhpStorm setup
 
@@ -96,7 +100,7 @@ Please refer to the [Contributing code](https://github.com/versionpress/versionp
 
 ### Debugging
 
-The development containers have [Xdebug](https://xdebug.org/) installed and configured. Here is how to make debugging work in PhpStorm; the [Debugging tests](#starting-debugging-session-from-command-line) section gives an example of how to make debugging work in VSCode.
+The development containers have [Xdebug](https://xdebug.org/) installed and configured. Here is how to make debugging work in PhpStorm; the [Debugging tests](testing.md#starting-debugging-session-from-command-line) section gives an example of how to make debugging work in VSCode.
 
 Start the Docker stack with `npm start`.
 
@@ -125,10 +129,6 @@ Reload a page in your browser. Debugging should now work:
 
 After you're done with debugging, run `npm stop` or `npm run stop-and-cleanup`.
 
-## Testing
-
-See [Testing](testing.md).
-
 ## Frontend development
 
 VersionPress uses a JavaScript frontend implemented as a React app in the `./frontend` folder.
@@ -147,9 +147,11 @@ For pure frontend development, it's more convenient to run it outside of the Wor
 
 1. Make sure that the site is running and that VersionPress is activated in it. You should be able to visit `http://localhost` in the browser and the `frontend/src/config/config.local.ts` should contain this URL as API root.
 2. In your test WordPress site, put this to `wp-config.php` (the file should be editable at `./dev-env/wp/wp-config.php`):
+
     ```
     define('VERSIONPRESS_REQUIRE_API_AUTH', false);
     ```
+
 3. Run `npm start` in the `frontend` directory.
 
 This launches [webpack dev server](https://webpack.js.org/configuration/dev-server/) at <http://localhost:8888>:
@@ -158,11 +160,37 @@ This launches [webpack dev server](https://webpack.js.org/configuration/dev-serv
 
 Source code edits will be automatically reflected in the browser.
 
+## Testing
+
+See [Testing](testing.md).
+
 ## Production build
 
 Run `npm run build`, it will produce a file like `dist/versionpress-3.0.2.zip`.
 
 The version number is based on the nearest Git tag and can also be something like `3.0.2-27-g0e1ce7f` meaning that the closest tag is `3.0.2`, there have been 27 commits since then and the package was built from `0e1ce7f`. See [`git describe --tags`](https://git-scm.com/docs/git-describe#_examples) for more examples.
+
+## Windows tips
+
+### Git Bash
+
+As noted in [Getting started](#getting-started), we only support Git Bash on Windows, a shell that comes with [Git for Windows](https://gitforwindows.org/). `cmd.exe` or PowerShell will not work as we use Linux-style syntax (single quotes, setting environment variables, etc.) and tools like `curl` or `rm -rf` in scripts.
+
+Git Bash is generally an awesome shell, the only problems you might encounter are related to paths. For example, Docker messes with them and when you try to run `docker run --rm -it ubuntu /bin/bash`, you'll see an error like `C:/Program Files/Git/usr/bin/bash.exe: no such file or directory`. Docker prepends `C:/Program Files/Git` for some reason but you can [use this workaround](https://gist.github.com/borekb/cb1536a3685ca6fc0ad9a028e6a959e3) or use double slash like `//bin/bash`.
+
+### Docker for Windows
+
+If you can, use [Docker for Windows](https://www.docker.com/docker-windows), not [Docker Toolbox](https://docs.docker.com/toolbox/toolbox_install_windows/). The experience will be generally smoother.
+
+If you need to use Docker Toolbox:
+
+- Enable port forwarding in VirtualBox (especially for ports 80, 3306, 8080 and 8099), see [details](https://stackoverflow.com/questions/42866013/docker-toolbox-localhost-not-working/45822356#45822356).
+- Docker Toolbox is slower, but you can try to adjust system performance in VirtualBox settings. However, you can run into timeout issues in Workflow tests sometimes and exceed default value of 5 seconds in `wp_remote_get()` in End2End tests.
+- Run Git Bash and Docker Quickstart Terminal as an Administrator to avoid potential problems (for example permissions and symlinks).
+
+### Disable antivirus software
+
+You might want to disable your antivirus software when working with Docker. Recommendations differ between version, please look it up.
 
 ## Developing the dev setup
 
@@ -207,32 +235,3 @@ Legacy approach is documented at the `4.0-alpha1` tag:
 
 - [Dev-Setup.md](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Dev-Setup.md)
 - [Testing.md](https://github.com/versionpress/versionpress/blob/4.0-alpha1/docs/Testing.md)
-
-## Docker tips
-
-Here are some tips for working with Docker / Docker Compose:
-
-- Aliasing `docker-compose` to `dc` will save you some typing.
-- Values in `docker-compose.yml` can be customized via `docker-compose.override.yml`.
-
-## Windows tips
-
-### Git Bash
-
-As noted in [Getting started](#getting-started), we only support Git Bash on Windows, a shell that comes with [Git for Windows](https://gitforwindows.org/). `cmd.exe` or PowerShell will not work as we use Linux-style syntax (single quotes, setting environment variables, etc.) and tools like `curl` or `rm -rf` in scripts.
-
-Git Bash is generally an awesome shell, the only problems you might encounter are related to paths. For example, Docker messes with them and when you try to run `docker run --rm -it ubuntu /bin/bash`, you'll see an error like `C:/Program Files/Git/usr/bin/bash.exe: no such file or directory`. Docker prepends `C:/Program Files/Git` for some reason but you can [use this workaround](https://gist.github.com/borekb/cb1536a3685ca6fc0ad9a028e6a959e3) or use double slash like `//bin/bash`.
-
-### Docker for Windows
-
-If you can, use [Docker for Windows](https://www.docker.com/docker-windows), not [Docker Toolbox](https://docs.docker.com/toolbox/toolbox_install_windows/). The experience will be generally smoother.
-
-If you need to use Docker Toolbox:
-
-- Enable port forwarding in VirtualBox (especially for ports 80, 3306, 8080 and 8099), see [details](https://stackoverflow.com/questions/42866013/docker-toolbox-localhost-not-working/45822356#45822356).
-- Docker Toolbox is slower, but you can try to adjust system performance in VirtualBox settings. However, you can run into timeout issues in Workflow tests sometimes and exceed default value of 5 seconds in `wp_remote_get()` in End2End tests.
-- Run Git Bash and Docker Quickstart Terminal as an Administrator to avoid potential problems (for example permissions and symlinks).
-
-### Disable antivirus software
-
-You might want to disable your antivirus software when working with Docker. Recommendations differ between version, please look it up.
