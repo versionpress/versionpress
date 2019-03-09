@@ -1,0 +1,73 @@
+version: '3.6'
+services:
+
+  wordpress-for-tests:
+    image: versionpress/wordpress:php7.2-apache
+    ports:
+      - "80:80"
+    volumes:
+      - ./dev-env/wp-for-tests:/var/www/html:z
+    links:
+      - mysql-for-tests:mysql
+    working_dir: /var/www/html/wptest
+    environment:
+      WORDPRESS_DB_PASSWORD: r00tpwd
+
+  mysql-for-tests:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data_for_tests:/var/lib/mysql:z
+    environment:
+      MYSQL_ROOT_PASSWORD: r00tpwd
+
+  adminer:
+    image: adminer
+    ports:
+      - "8099:8080"
+
+  # See `tests-with-wordpress` for a service that also starts WordPress.
+  tests:
+    image: versionpress/wordpress:cli
+    environment:
+      VP_DIR: /opt/versionpress
+      VP_TESTS_LOG_DIR: /var/opt/versionpress/logs/.tracy
+      PHP_IDE_CONFIG: serverName=VersionPress-tests
+    volumes:
+      # !!! This must be kept in sync with wordpress-cli-image/Dockerfile
+      - ./dev-env/test-logs:/var/opt/versionpress/logs:z
+      - ./plugins/versionpress:/opt/versionpress:ro,z
+      - ./ext-libs:/opt/ext-libs:ro,z
+      - wpcli-cache:/var/www/.wp-cli:z
+    working_dir: /opt/versionpress/tests
+    command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /var/opt/versionpress/logs/testdox.txt
+    user: "33:33"
+
+  tests-with-wordpress:
+    image: versionpress/wordpress:cli
+    environment:
+      VP_DIR: /opt/versionpress
+      VP_TESTS_LOG_DIR: /var/opt/versionpress/logs/.tracy
+      PHP_IDE_CONFIG: serverName=VersionPress-tests
+    volumes:
+      # !!! This must be kept in sync with wordpress-cli-image/Dockerfile
+      - ./dev-env/wp-for-tests:/var/www/html:z
+      - ./dev-env/test-logs:/var/opt/versionpress/logs:z
+      - ./plugins/versionpress:/opt/versionpress:ro,z
+      - ./ext-libs:/opt/ext-libs:ro,z
+      - wpcli-cache:/var/www/.wp-cli:z
+    working_dir: /opt/versionpress/tests
+    command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /var/opt/versionpress/logs/testdox.txt
+    links:
+      - selenium-hub
+      - wordpress-for-tests
+    user: "33:33"
+
+  selenium-hub:
+    # Standalone Firefox is enough but could also be a full grid setup, hence the service name
+    image: selenium/standalone-firefox
+
+volumes:
+  db_data_for_tests:
+  wpcli-cache:
