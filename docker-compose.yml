@@ -2,7 +2,7 @@ version: '3.6'
 services:
 
   wordpress:
-    image: versionpress/wordpress:php7.2-apache
+    image: versionpress/wordpress:php7.2-apache@sha256:64b3c10adfef9ae65a140d5547d670d996c5c852b9a840c71a86a5be4f777fdc
     ports:
       - "80:80"
     volumes:
@@ -15,7 +15,7 @@ services:
       WORDPRESS_DB_PASSWORD: r00tpwd
 
   mysql:
-    image: mysql:5.7
+    image: mysql:5.7@sha256:1590f2540fd87e39605686873fb10206da4cbd7e83df2bc4110abe9fb740699e
     ports:
       - "3306:3306"
     volumes:
@@ -24,7 +24,7 @@ services:
       MYSQL_ROOT_PASSWORD: r00tpwd
 
   adminer:
-    image: adminer
+    image: adminer@sha256:0e245b5550d7710ebfe728e682804947e2edade4d7f3313e7066b4629b728c5c
     ports:
       - "8099:8080"
 
