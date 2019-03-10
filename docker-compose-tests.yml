@@ -6,7 +6,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./dev-env/wp-for-tests:/var/www/html:z
+      - wordpress-files:/var/www/html:z
     links:
       - mysql-for-tests:mysql
     working_dir: /var/www/html/wptest
@@ -18,7 +18,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - db_data_for_tests:/var/lib/mysql:z
+      - db-data-for-tests:/var/lib/mysql:z
     environment:
       MYSQL_ROOT_PASSWORD: r00tpwd
 
@@ -32,11 +32,11 @@ services:
     image: versionpress/wordpress:cli
     environment:
       VP_DIR: /opt/versionpress
-      VP_TESTS_LOG_DIR: /var/opt/versionpress/logs/.tracy
       PHP_IDE_CONFIG: serverName=VersionPress-tests
     volumes:
       # !!! This must be kept in sync with wordpress-cli-image/Dockerfile
-      - ./dev-env/test-logs:/var/opt/versionpress/logs:z
+      - wordpress-files:/var/www/html:z
+      - test-logs:/var/opt/versionpress/logs:z
       - ./plugins/versionpress:/opt/versionpress:ro,z
       - ./ext-libs:/opt/ext-libs:ro,z
       - wpcli-cache:/var/www/.wp-cli:z
@@ -47,12 +47,11 @@ services:
     image: versionpress/wordpress:cli
     environment:
       VP_DIR: /opt/versionpress
-      VP_TESTS_LOG_DIR: /var/opt/versionpress/logs/.tracy
       PHP_IDE_CONFIG: serverName=VersionPress-tests
     volumes:
       # !!! This must be kept in sync with wordpress-cli-image/Dockerfile
-      - ./dev-env/wp-for-tests:/var/www/html:z
-      - ./dev-env/test-logs:/var/opt/versionpress/logs:z
+      - wordpress-files:/var/www/html:z
+      - test-logs:/var/opt/versionpress/logs:z
       - ./plugins/versionpress:/opt/versionpress:ro,z
       - ./ext-libs:/opt/ext-libs:ro,z
       - wpcli-cache:/var/www/.wp-cli:z
@@ -66,6 +65,17 @@ services:
     # Standalone Firefox is enough but could also be a full grid setup, hence the service name
     image: selenium/standalone-firefox
 
+  copy-files-to-host:
+    image: alpine
+    volumes:
+      - wordpress-files:/tmp/wp
+      - ./dev-env/wp-for-tests:/tmp/wp-copy
+      - test-logs:/tmp/test-logs
+      - ./dev-env/test-logs:/tmp/test-logs-copy
+    command: '/bin/sh -c "cp -a /tmp/test-logs/. /tmp/test-logs-copy/; cp -a /tmp/wp/. /tmp/wp-copy/"'
+
 volumes:
-  db_data_for_tests:
+  db-data-for-tests:
   wpcli-cache:
+  wordpress-files:
+  test-logs:

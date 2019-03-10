@@ -194,9 +194,11 @@ Currently, the default worker is WP-CLI and the only way to switch workers is to
 
 After you've run the tests, the Docker stack is left up and running so that you can inspect it:
 
-- The site is running at <http://wordpress-for-tests/> – [update your hosts file](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/) accordingly and log in using the info in `test-config.yml`.
-- The files are mapped to `./dev-env/wp-for-tests`, you can use your local Git client to inspect it.
+- The site is running at <http://wordpress-for-tests/wptest> – check `test-config.yml` for the login info. (You'll also need to update your hosts file so that `wordpress-for-tests` resolves to `127.0.0.1`.)
 - Connect to the database via `mysql -u root -p` or Adminer which you can access by running `docker-compose run -d --service-ports adminer` and visiting <http://localhost:8099>. The database name is `mysql-for-wordpress`.
+- To inspect the site files or the logs, you have two options:
+    1. Run `docker-compose -f docker-compose-tests.yml run --rm tests sh` and use commands like `ls -ls /var/www/html/wptest` or `cd /var/www/html/wptest && git log` to explore the files. Type `exit` when finished.
+    2. Run `npm run tests:copy-files-to-host` to copy files to your local filesystem. This will create two folders, `dev-env/wp-for-tests` and `dev-env/test-logs`, where you can conveniently use your local tools (editors, Git GUI clients, etc.). Note that this can be quite resource-intensive, for example, on Docker for Mac, this will overwhelm the system for several minutes.
 
 Stop the Docker stack with `npm run tests:stop-and-cleanup` (stop-and-cleanup is strongly recommended here; end2end tests are not perfectly isolated yet).
 

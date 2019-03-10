@@ -19,7 +19,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - db_data:/var/lib/mysql:z
+      - db-data:/var/lib/mysql:z
     environment:
       MYSQL_ROOT_PASSWORD: r00tpwd
 
@@ -29,4 +29,4 @@ services:
       - "8099:8080"
 
 volumes:
-  db_data:
+  db-data:
