@@ -18,7 +18,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - db_data_for_tests:/var/lib/mysql:z
+      - db-data-for-tests:/var/lib/mysql:z
     environment:
       MYSQL_ROOT_PASSWORD: r00tpwd
 
@@ -75,7 +75,7 @@ services:
     command: '/bin/sh -c "cp -a /tmp/test-logs/. /tmp/test-logs-copy/; cp -a /tmp/wp/. /tmp/wp-copy/"'
 
 volumes:
-  db_data_for_tests:
+  db-data-for-tests:
   wpcli-cache:
   wordpress-files:
   test-logs:
