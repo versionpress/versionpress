@@ -2,7 +2,7 @@ version: '3.6'
 services:
 
   wordpress-for-tests:
-    image: versionpress/wordpress:php7.2-apache
+    image: versionpress/wordpress:php7.2-apache@sha256:64b3c10adfef9ae65a140d5547d670d996c5c852b9a840c71a86a5be4f777fdc
     ports:
       - "80:80"
     volumes:
@@ -14,7 +14,7 @@ services:
       WORDPRESS_DB_PASSWORD: r00tpwd
 
   mysql-for-tests:
-    image: mysql:5.7
+    image: mysql:5.7@sha256:1590f2540fd87e39605686873fb10206da4cbd7e83df2bc4110abe9fb740699e
     ports:
       - "3306:3306"
     volumes:
@@ -22,14 +22,9 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: r00tpwd
 
-  adminer:
-    image: adminer
-    ports:
-      - "8099:8080"
-
   # See `tests-with-wordpress` for a service that also starts WordPress.
   tests:
-    image: versionpress/wordpress:cli
+    image: versionpress/wordpress:cli@sha256:86fc95921f1ac48950ab593b0b970e9a98ad3b28c0b16c5c6007ea0fac2839e9
     environment:
       VP_DIR: /opt/versionpress
       PHP_IDE_CONFIG: serverName=VersionPress-tests
@@ -44,7 +39,7 @@ services:
     command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /var/opt/versionpress/logs/testdox.txt
 
   tests-with-wordpress:
-    image: versionpress/wordpress:cli
+    image: versionpress/wordpress:cli@sha256:86fc95921f1ac48950ab593b0b970e9a98ad3b28c0b16c5c6007ea0fac2839e9
     environment:
       VP_DIR: /opt/versionpress
       PHP_IDE_CONFIG: serverName=VersionPress-tests
@@ -63,10 +58,10 @@ services:
 
   selenium-hub:
     # Standalone Firefox is enough but could also be a full grid setup, hence the service name
-    image: selenium/standalone-firefox
+    image: selenium/standalone-firefox@sha256:541e4d726136b3fbf0220c1feb4d3a76c577d302e77050f1191a0d5b3a029c10
 
   copy-files-to-host:
-    image: alpine
+    image: alpine@sha256:644fcb1a676b5165371437feaa922943aaf7afcfa8bfee4472f6860aad1ef2a0
     volumes:
       - wordpress-files:/tmp/wp
       - ./dev-env/wp-for-tests:/tmp/wp-copy

@@ -1,4 +1,4 @@
-FROM wordpress:cli
+FROM wordpress:cli@sha256:f8600f5df710c0973ed250e16c1286de7f8344cd8ce0dcba3779931010e956d4
 
 # IMPORTANT: this image is Apline-based where www-data is UID 82 while in Debian-based WordPress image,
 # it's 33. Both will be reading and writing to `/var/www/html` so we'll be using UID 33 in this Dockerfile
