@@ -70,9 +70,13 @@ docker-compose -f docker-compose-tests.yml run --rm tests \
 
 ### Clean up tests
 
-If you've run tests that use the `tests-with-wordpress` service, the whole Docker stack is kept running so that you can inspect it. For example, you can use your local Git client to explore the site's history in `dev-env/wp-for-tests/wptest`. The [end2end tests](#end2end-tests) section provides more info on this.
+Tests persist data (MySQL database files, WordPress files etc.) to Docker volumes which are re-attached between test runs. This speeds things up but for tests that are not perfectly isolated, e.g., [end2end tests](#end2end-tests), it can also cause weird test failures. For cases like that, run
 
-When you're done with tests, run `npm tests:stop` to shut down the Docker stack or `npm run tests:stop-and-cleanup` to also remove the volumes so that the next start is entirely fresh.
+```
+npm run tests:cleanup
+```
+
+to ensure that all containers are stopped and volumes deleted. The next test run will be entirely fresh.
 
 ### Tips for tests
 

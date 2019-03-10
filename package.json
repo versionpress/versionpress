@@ -21,7 +21,7 @@
     "tests:custom-with-wordpress": "docker-compose -f docker-compose-tests.yml run --rm tests-with-wordpress ../vendor/bin/phpunit; npm run tests:stop",
     "tests:custom-with-wordpress:debug": "docker-compose -f docker-compose-tests.yml run --rm -e XDEBUG_CONFIG='idekey=vp-tests' tests-with-wordpress ../vendor/bin/phpunit",
     "tests:stop": "docker-compose -f docker-compose-tests.yml stop",
-    "tests:stop-and-cleanup": "docker-compose -f docker-compose-tests.yml down -v && rm -rf dev-env/wp-for-tests dev-env/test-logs",
+    "tests:cleanup": "docker-compose -f docker-compose-tests.yml down -v && rm -rf dev-env/wp-for-tests dev-env/test-logs",
     "tests:copy-files-to-host": "rm -rf dev-env/wp-for-tests dev-env/test-logs && docker-compose -f docker-compose-tests.yml run --rm copy-files-to-host",
     "build-images": "npm-run-all -s _build-image-*",
     "_build-image-wp": "docker build --pull -t versionpress/wordpress:php7.2-apache dev-env/wordpress-image",
