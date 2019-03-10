@@ -70,9 +70,13 @@ docker-compose -f docker-compose-tests.yml run --rm tests \
 
 ### Clean up tests
 
-If you've run tests that use the `tests-with-wordpress` service, the whole Docker stack is kept running so that you can inspect it. For example, you can use your local Git client to explore the site's history in `dev-env/wp-for-tests/wptest`. The [end2end tests](#end2end-tests) section provides more info on this.
+Tests persist data (MySQL database files, WordPress files etc.) to Docker volumes which are re-attached between test runs. This speeds things up but for tests that are not perfectly isolated, e.g., [end2end tests](#end2end-tests), it can also cause weird test failures. For cases like that, run
 
-When you're done with tests, run `npm tests:stop` to shut down the Docker stack or `npm run tests:stop-and-cleanup` to also remove the volumes so that the next start is entirely fresh.
+```
+npm run tests:cleanup
+```
+
+to ensure that all containers are stopped and volumes deleted. The next test run will be entirely fresh.
 
 ### Tips for tests
 
@@ -192,7 +196,15 @@ In the future, we might add REST API workers; you get the idea.
 
 Currently, the default worker is WP-CLI and the only way to switch workers is to update `tests/test-config.yml`, the `end2end-test-type` key. We'll make it more flexible in the future.
 
-After you've run the tests, the Docker stack is left up and running so that you can inspect it:
+### Troubleshooting failed tests
+
+The Docker containers are stopped when tests finish running but the data is kept in Docker volumes. You can start the WordPress site again via:
+
+```
+docker-compose -f docker-compose-tests.yml up -d wordpress-for-tests
+```
+
+You can now inspect it:
 
 - The site is running at <http://wordpress-for-tests/wptest> – check `test-config.yml` for the login info. (You'll also need to update your hosts file so that `wordpress-for-tests` resolves to `127.0.0.1`.)
 - Connect to the database via `mysql -u root -p` or Adminer which you can access by running `docker-compose run -d --service-ports adminer` and visiting <http://localhost:8099>. The database name is `mysql-for-wordpress`.
@@ -200,7 +212,13 @@ After you've run the tests, the Docker stack is left up and running so that you 
     1. Run `docker-compose -f docker-compose-tests.yml run --rm tests sh` and use commands like `ls -ls /var/www/html/wptest` or `cd /var/www/html/wptest && git log` to explore the files. Type `exit` when finished.
     2. Run `npm run tests:copy-files-to-host` to copy files to your local filesystem. This will create two folders, `dev-env/wp-for-tests` and `dev-env/test-logs`, where you can conveniently use your local tools (editors, Git GUI clients, etc.). Note that this can be quite resource-intensive, for example, on Docker for Mac, this will overwhelm the system for several minutes.
 
-Stop the Docker stack with `npm run tests:stop-and-cleanup` (stop-and-cleanup is strongly recommended here; end2end tests are not perfectly isolated yet).
+When you're done, clean up everything by running:
+
+```
+npm run tests:cleanup
+```
+
+This will stop & remove containers, delete volumes and remove temporaray files under `dev-env`.
 
 ## Other tests
 
