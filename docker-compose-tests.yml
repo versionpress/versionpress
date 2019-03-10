@@ -35,6 +35,7 @@ services:
       PHP_IDE_CONFIG: serverName=VersionPress-tests
     volumes:
       # !!! This must be kept in sync with wordpress-cli-image/Dockerfile
+      - wordpress-files:/var/www/html:z
       - test-logs:/var/opt/versionpress/logs:z
       - ./plugins/versionpress:/opt/versionpress:ro,z
       - ./ext-libs:/opt/ext-libs:ro,z
@@ -63,6 +64,15 @@ services:
   selenium-hub:
     # Standalone Firefox is enough but could also be a full grid setup, hence the service name
     image: selenium/standalone-firefox
+
+  copy-files-to-host:
+    image: alpine
+    volumes:
+      - wordpress-files:/tmp/wp
+      - ./dev-env/wp-for-tests:/tmp/wp-copy
+      - test-logs:/tmp/test-logs
+      - ./dev-env/test-logs:/tmp/test-logs-copy
+    command: '/bin/sh -c "cp -a /tmp/test-logs/. /tmp/test-logs-copy/; cp -a /tmp/wp/. /tmp/wp-copy/"'
 
 volumes:
   db_data_for_tests:
