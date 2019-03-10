@@ -35,7 +35,7 @@ services:
       PHP_IDE_CONFIG: serverName=VersionPress-tests
     volumes:
       # !!! This must be kept in sync with wordpress-cli-image/Dockerfile
-      - ./dev-env/test-logs:/var/opt/versionpress/logs:z
+      - test-logs:/var/opt/versionpress/logs:z
       - ./plugins/versionpress:/opt/versionpress:ro,z
       - ./ext-libs:/opt/ext-libs:ro,z
       - wpcli-cache:/var/www/.wp-cli:z
@@ -51,7 +51,7 @@ services:
     volumes:
       # !!! This must be kept in sync with wordpress-cli-image/Dockerfile
       - wordpress-files:/var/www/html:z
-      - ./dev-env/test-logs:/var/opt/versionpress/logs:z
+      - test-logs:/var/opt/versionpress/logs:z
       - ./plugins/versionpress:/opt/versionpress:ro,z
       - ./ext-libs:/opt/ext-libs:ro,z
       - wpcli-cache:/var/www/.wp-cli:z
@@ -70,3 +70,4 @@ volumes:
   db_data_for_tests:
   wpcli-cache:
   wordpress-files:
+  test-logs:
