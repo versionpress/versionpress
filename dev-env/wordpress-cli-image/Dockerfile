@@ -1,12 +1,8 @@
 FROM wordpress:cli
 
-# IMPORTANT: About users
-#
-# This image is Alpine-based but needs to interact with Debian-based WordPress image. The catch is
-# that "www-data" is a different UID on the two systems – 33 in Debian but 82 on Alpine Linux.
-#
-# To make everything work smoothly together, we explicitly use UID 33 here (which could also
-# be written as the 'xfs' user).
+# IMPORTANT: this image is Apline-based where www-data is UID 82 while in Debian-based WordPress image,
+# it's 33. Both will be reading and writing to `/var/www/html` so we'll be using UID 33 in this Dockerfile
+# to avoid any permission issues. See e.g. docker-library/wordpress#256.
 #
 # Never use www-data in this Dockerfile!
 
@@ -29,7 +25,7 @@ RUN apk add --no-cache $PHPIZE_DEPS \
     } >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 # Docker mounts all volumes as root (moby/moby#2259) but we'll be running as UID 33. As a workaround,
-# we're going to create all future mount points here.
+# we're going to create all mount points ahead of time.
 #
 # ! Make sure the list of folders matches volumes in `docker-compose-test.yml`.
 RUN set -ex; \
