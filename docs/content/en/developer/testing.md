@@ -194,7 +194,7 @@ Currently, the default worker is WP-CLI and the only way to switch workers is to
 
 After you've run the tests, the Docker stack is left up and running so that you can inspect it:
 
-- The site is running at <http://wordpress-for-tests/> – [update your hosts file](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/) accordingly and log in using the info in `test-config.yml`.
+- The site is running at <http://wordpress-for-tests/wptest> – check `test-config.yml` for the login info. (You'll also need to update your hosts file so that `wordpress-for-tests` resolves to `127.0.0.1`.)
 - The files are mapped to `./dev-env/wp-for-tests`, you can use your local Git client to inspect it.
 - Connect to the database via `mysql -u root -p` or Adminer which you can access by running `docker-compose run -d --service-ports adminer` and visiting <http://localhost:8099>. The database name is `mysql-for-wordpress`.
 
