@@ -22,11 +22,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: r00tpwd
 
-  adminer:
-    image: adminer
-    ports:
-      - "8099:8080"
-
   # See `tests-with-wordpress` for a service that also starts WordPress.
   tests:
     image: versionpress/wordpress:cli
