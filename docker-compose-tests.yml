@@ -53,8 +53,13 @@ services:
     working_dir: /opt/versionpress/tests
     command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /var/opt/versionpress/logs/testdox.txt
     links:
-      - selenium-hub
       - wordpress-for-tests
+      - mysql-for-tests:mysql
+
+  wait:
+    image: janvoracek/docker-wait@sha256:2d91ec68cf3e0dbcd03addaded0af238944f75378f5062358bd3c5fb839b60d2
+    environment:
+      - TARGETS=wordpress-for-tests:80,mysql-for-tests:3306
 
   selenium-hub:
     # Standalone Firefox is enough but could also be a full grid setup, hence the service name
