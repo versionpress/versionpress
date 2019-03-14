@@ -15,7 +15,8 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [MergeDriverInstaller::DRIVER_BASH],
-            [MergeDriverInstaller::DRIVER_PHP]
+            [MergeDriverInstaller::DRIVER_PHP],
+            [MergeDriverInstaller::DRIVER_GO],
         ];
     }
 

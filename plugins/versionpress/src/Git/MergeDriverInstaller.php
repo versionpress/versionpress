@@ -10,6 +10,7 @@ class MergeDriverInstaller
 
     const DRIVER_BASH = 'bash';
     const DRIVER_PHP = 'php';
+    const DRIVER_GO = 'go';
     const DRIVER_AUTO = 'auto';
 
     /**
@@ -112,6 +113,11 @@ class MergeDriverInstaller
 
             $mergeDriverScript = '"' . $phpBinary . '" "' . $pluginDir . '/src/Git/merge-drivers/ini-merge.php' . '"';
         }
+
+        if ($driver == MergeDriverInstaller::DRIVER_GO) {
+            $mergeDriverScript = 'go run ' . $pluginDir . '/src/Git/merge-drivers/ini-merge.go';
+        }
+
 
         $gitconfigVariables = [
             'merge-driver-script' => str_replace('\\', '/', $mergeDriverScript)
