@@ -1,9 +1,0 @@
-<phpunit bootstrap="phpunit-bootstrap.php"
-         verbose="true"
-         colors="true">
-    <testsuites>
-        <testsuite name="Temporary">
-            <directory>Temporary</directory>
-        </testsuite>
-    </testsuites>
-</phpunit>
