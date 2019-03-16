@@ -22,10 +22,6 @@
             <directory>GitRepositoryTests</directory>
         </testsuite>
 
-        <testsuite name="Workflow">
-            <directory>Workflow</directory>
-        </testsuite>
-
         <testsuite name="End2End">
             <directory>End2End</directory>
         </testsuite>
@@ -33,6 +29,10 @@
         <!-- <testsuite name="Selenium">
             <directory>Selenium</directory>
         </testsuite> -->
+
+        <testsuite name="Workflow">
+            <directory>Workflow</directory>
+        </testsuite>
 
         <testsuite name="LoadTests">
             <directory>LoadTests</directory>
