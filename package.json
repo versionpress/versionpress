@@ -14,7 +14,7 @@
     "stop-and-cleanup": "docker-compose down -v && rm -rf dev-env/wp",
     "tests:unit": "node -r ./scripts/node_modules/ts-node/register scripts/run-tests.ts --testsuite Unit",
     "tests:unit:debug": "docker-compose -f docker-compose-tests.yml run --rm -e XDEBUG_CONFIG='idekey=vp-tests' tests ../vendor/bin/phpunit -c phpunit.xml --testsuite Unit",
-    "tests:full": "docker-compose -f docker-compose-tests.yml run --rm tests-with-wordpress ../vendor/bin/phpunit -c phpunit.xml; npm run tests:stop",
+    "tests:full": "node -r ./scripts/node_modules/ts-node/register scripts/run-tests.ts",
     "tests:full:debug": "docker-compose -f docker-compose-tests.yml run --rm -e XDEBUG_CONFIG='idekey=vp-tests' tests-with-wordpress ../vendor/bin/phpunit -c phpunit.xml",
     "tests:custom": "docker-compose -f docker-compose-tests.yml run --rm tests ../vendor/bin/phpunit",
     "tests:custom:debug": "docker-compose -f docker-compose-tests.yml run --rm -e XDEBUG_CONFIG='idekey=vp-tests' tests ../vendor/bin/phpunit",

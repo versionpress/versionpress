@@ -28,6 +28,11 @@ if (args['--help']) {
   process.exit();
 }
 
+if (!args['--testsuite']) {
+  // All tests will be run, we need to start WordPress
+  args['--with-wordpress'] = true;
+}
+
 if (args['--with-wordpress']) {
   utils.printTaskHeading('Cleaning up Docker containers and volumes...');
   shell.exec(`${dc} down -v`, { cwd: repoRoot });
