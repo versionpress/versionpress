@@ -18,9 +18,11 @@ if (args['--help']) {
     $ run-tests ...
 
   Options
-    --testsuite           Testsuite from phpunit.xml to run. Can be repeated.
-    --with-wordpress      Start WordPress & MySQL containers.
-    -h, --help            Show help.
+    --testsuite         Testsuite from phpunit.xml to run. Can be repeated
+                        multiple times.
+    --with-wordpress    Start WordPress & MySQL containers. WIP: is implied
+                        from --testsuite in some cases.
+    -h, --help          Show help.
 
   Examples
     $ run-tests --testsuite Unit
