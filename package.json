@@ -12,7 +12,7 @@
     "start": "docker-compose up -d wordpress",
     "stop": "docker-compose stop",
     "stop-and-cleanup": "docker-compose down -v && rm -rf dev-env/wp",
-    "tests:unit": "docker-compose -f docker-compose-tests.yml run --rm tests ../vendor/bin/phpunit -c phpunit.xml --testsuite Unit",
+    "tests:unit": "node -r ./scripts/node_modules/ts-node/register scripts/run-tests.ts --testsuite Unit",
     "tests:unit:debug": "docker-compose -f docker-compose-tests.yml run --rm -e XDEBUG_CONFIG='idekey=vp-tests' tests ../vendor/bin/phpunit -c phpunit.xml --testsuite Unit",
     "tests:full": "docker-compose -f docker-compose-tests.yml run --rm tests-with-wordpress ../vendor/bin/phpunit -c phpunit.xml; npm run tests:stop",
     "tests:full:debug": "docker-compose -f docker-compose-tests.yml run --rm -e XDEBUG_CONFIG='idekey=vp-tests' tests-with-wordpress ../vendor/bin/phpunit -c phpunit.xml",
