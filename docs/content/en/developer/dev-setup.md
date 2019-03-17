@@ -178,15 +178,16 @@ As noted in [Getting started](#getting-started), we only support Git Bash on Win
 
 Git Bash is generally an awesome shell, the only problems you might encounter are related to paths. For example, Docker messes with them and when you try to run `docker run --rm -it ubuntu /bin/bash`, you'll see an error like `C:/Program Files/Git/usr/bin/bash.exe: no such file or directory`. Docker prepends `C:/Program Files/Git` for some reason but you can [use this workaround](https://gist.github.com/borekb/cb1536a3685ca6fc0ad9a028e6a959e3) or use double slash like `//bin/bash`.
 
-### Docker for Windows
+### Docker Desktop vs. Docker Toolbox
 
-If you can, use [Docker for Windows](https://www.docker.com/docker-windows), not [Docker Toolbox](https://docs.docker.com/toolbox/toolbox_install_windows/). The experience will be generally smoother.
+If you can, use [Docker Desktop](https://www.docker.com/products/docker-desktop), not [Docker Toolbox](https://docs.docker.com/toolbox/toolbox_install_windows/). The experience will be generally smoother.
 
 If you need to use Docker Toolbox:
 
-- Enable port forwarding in VirtualBox (especially for ports 80, 3306, 8080 and 8099), see [details](https://stackoverflow.com/questions/42866013/docker-toolbox-localhost-not-working/45822356#45822356).
-- Docker Toolbox is slower, but you can try to adjust system performance in VirtualBox settings. However, you can run into timeout issues in Workflow tests sometimes and exceed default value of 5 seconds in `wp_remote_get()` in End2End tests.
-- Run Git Bash and Docker Quickstart Terminal as an Administrator to avoid potential problems (for example permissions and symlinks).
+1. [Enable port forwarding in VirtualBox](https://stackoverflow.com/questions/42866013/docker-toolbox-localhost-not-working/45822356#45822356), especially for ports 80 and 3306.
+2. If you have the repo checked out in a folder _not_ under `C:\Users`, add it as a shared folder in VirtualBox settings. For example, add a share where _Folder Path_ is `C:\Projects` and _Folder Name_ is `c/Projects`. [Details](https://stackoverflow.com/a/32030385).
+3. Run _Docker Quickstart Terminal_ which uses Git Bash – we want that.
+4. If the performance is not great, try adjusting VirtualBox settings. However, you can run into timeout issues in Workflow tests sometimes and exceed default value of 5 seconds in `wp_remote_get()` in End2End tests.
 
 ### Disable antivirus software
 
