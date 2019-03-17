@@ -198,15 +198,7 @@ Meta! If you're working on updating the dev setup (this document, Docker images,
 
 ### npm scripts
 
-Simpler tasks are scripted directly in `package.json`, more complex ones in the `./scripts` folder, see for example `scripts/build.ts`.
-
-To debug the scripts in VSCode, run the script via `debug-script`, e.g.:
-
-```
-npm run debug-script scripts/init-dev.ts
-```
-
-Then in VSCode, create a "Node attach" configuration and run it.
+Simpler tasks are scripted directly in `package.json`, more complex ones in the `./scripts` folder. See its README for more info.
 
 ### Building and pushing images
 
