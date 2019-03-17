@@ -1,6 +1,6 @@
 import * as shell from 'shelljs';
 import * as utils from './script-utils';
-import * as cpy from 'cpy';
+import cpy from 'cpy';
 import * as fs from 'fs-extra';
 import * as archiver from 'archiver';
 import chalk from 'chalk';
