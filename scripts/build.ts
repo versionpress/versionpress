@@ -1,23 +1,22 @@
 import * as shell from 'shelljs';
-import * as utils from './script-utils';
 import cpy from 'cpy';
 import * as fs from 'fs-extra';
 import * as archiver from 'archiver';
 import chalk from 'chalk';
-
-utils.exitIfNotRunFromRootDir();
+import * as utils from './script-utils';
+import { repoRoot } from './script-utils';
 
 (async () => {
 
   //------------------------------------
   utils.printTaskHeading('Clean');
-  shell.rm('-rf', 'dist/tmp');
-  shell.mkdir('-p', 'dist/tmp');
+  shell.rm('-rf', `${repoRoot}/dist/tmp`);
+  shell.mkdir('-p', `${repoRoot}/dist/tmp`);
 
   //------------------------------------
   utils.printTaskHeading('Build frontend');
-  shell.exec('npm run build', { cwd: 'frontend' });
-  shell.cp('-r', 'frontend/build/.', 'plugins/versionpress/admin/public/gui');
+  shell.exec('npm run build', { cwd: `${repoRoot}/frontend` });
+  shell.cp('-r', `${repoRoot}/frontend/build/.`, `${repoRoot}/plugins/versionpress/admin/public/gui`);
 
   //------------------------------------
   utils.printTaskHeading('Copy files to dist/tmp');
@@ -32,37 +31,37 @@ utils.exitIfNotRunFromRootDir();
   ];
 
   await cpy(filesToCopy, '../../dist/tmp', {
-    cwd: 'plugins/versionpress',
+    cwd: `${repoRoot}/plugins/versionpress`,
     parents: true,
     dot: true,
   });
 
   //------------------------------------
   utils.printTaskHeading('Install production Composer dependencies');
-  shell.exec('composer install -d dist/tmp --no-dev --prefer-dist --ignore-platform-reqs --optimize-autoloader');
-  shell.rm('dist/tmp/composer.{json,lock}');
+  shell.exec('composer install -d dist/tmp --no-dev --prefer-dist --ignore-platform-reqs --optimize-autoloader', { cwd: `${repoRoot}`} );
+  shell.rm(`${repoRoot}/dist/tmp/composer.{json,lock}`);
 
   //------------------------------------
   utils.printTaskHeading('Update version in plugin file');
-  let version = shell.exec('git describe --tags').stdout.trim();
+  let version = shell.exec('git describe --tags', { cwd: `${repoRoot}` }).stdout!.toString().trim();
 
-  const versionpressPhpPath = 'dist/tmp/versionpress.php';
+  const versionpressPhpPath = `${repoRoot}/dist/tmp/versionpress.php`;
   let content = await fs.readFile(versionpressPhpPath, { encoding: 'utf8' });
   content = content.replace(/^Version: (.*)$/m, 'Version: ' + version);
   await fs.writeFile(versionpressPhpPath, content, { encoding: 'utf8' });
 
   //------------------------------------
   utils.printTaskHeading('Produce ZIP file');
-  const outFilePath = `dist/versionpress-${version}.zip`;
+  const outFilePath = `${repoRoot}/dist/versionpress-${version}.zip`;
   const outFile = fs.createWriteStream(outFilePath);
   const archive = archiver('zip');
   archive.pipe(outFile);
-  archive.directory('dist/tmp/', 'versionpress');
+  archive.directory(`${repoRoot}/dist/tmp/`, 'versionpress');
   await archive.finalize();
 
   //------------------------------------
   utils.printTaskHeading('Remove temp directory');
-  shell.rm('-rf', 'dist/tmp');
+  shell.rm('-rf', `${repoRoot}/dist/tmp`);
 
   //------------------------------------
   utils.printTaskHeading('Done!');
