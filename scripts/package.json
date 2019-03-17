@@ -1,0 +1,26 @@
+{
+  "name": "versionpress-scripts",
+  "version": "1.0.0",
+  "description": "Scripts for VersionPress development",
+  "author": "VersionPress",
+  "license": "GPL",
+  "scripts": {},
+  "dependencies": {
+    "archiver": "^3.0.0",
+    "chalk": "^2.4.2",
+    "cpy": "^7.1.0",
+    "fs-extra": "^7.0.1",
+    "got": "^9.6.0",
+    "is-windows": "^1.0.2",
+    "shelljs": "^0.8.3",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.3.3333"
+  },
+  "devDependencies": {
+    "@types/archiver": "^2.1.2",
+    "@types/fs-extra": "^5.0.5",
+    "@types/got": "^9.4.1",
+    "@types/is-windows": "^0.2.0",
+    "@types/shelljs": "^0.8.3"
+  }
+}
