@@ -4,6 +4,14 @@ import { repoRoot } from './script-utils';
 import * as arg from 'arg';
 
 const dc = 'docker-compose -f docker-compose-tests.yml';
+const wait = (target: string) =>
+  [
+    `docker run --rm`,
+    `--network versionpress_default`,
+    `-e TARGETS=${target}`,
+    `-e TIMEOUT=120`,
+    `janvoracek/docker-wait@sha256:2d91ec68cf3e0dbcd03addaded0af238944f75378f5062358bd3c5fb839b60d2`,
+  ].join(' ');
 
 const args = arg({
   '--help': Boolean,
@@ -39,9 +47,13 @@ if (args['--with-wordpress']) {
   utils.printTaskHeading('Cleaning up Docker containers and volumes...');
   shell.exec(`${dc} down -v`, { cwd: repoRoot });
 
-  utils.printTaskHeading('Starting WordPress and MySQL for tests...');
+  utils.printTaskHeading('Starting MySQL...');
+  shell.exec(`${dc} up -d mysql-for-tests`, { cwd: repoRoot });
+  shell.exec(wait('mysql-for-tests:3306'), { cwd: repoRoot });
+
+  utils.printTaskHeading('Starting WordPress...');
   shell.exec(`${dc} up -d wordpress-for-tests`, { cwd: repoRoot });
-  shell.exec(`${dc} run --rm wait`, { cwd: repoRoot });
+  shell.exec(wait('wordpress-for-tests:80'), { cwd: repoRoot });
 }
 
 utils.printTaskHeading('Running tests...');

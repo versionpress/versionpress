@@ -1,16 +1,19 @@
 version: '3.6'
 services:
 
+  # !!! Containers in this file are meant to be started via `scripts/run-tests.ts`, not manully.
+  # For example, `links:` are not defined below and it's up to the script to start the containers properly.
+  # PR #1401 explains why.
+
   wordpress-for-tests:
     image: versionpress/wordpress:php7.2-apache@sha256:64b3c10adfef9ae65a140d5547d670d996c5c852b9a840c71a86a5be4f777fdc
     ports:
       - "80:80"
     volumes:
       - wordpress-files:/var/www/html:z
-    links:
-      - mysql-for-tests:mysql
     working_dir: /var/www/html/wptest
     environment:
+      WORDPRESS_DB_HOST: mysql-for-tests
       WORDPRESS_DB_PASSWORD: r00tpwd
 
   mysql-for-tests:
@@ -22,7 +25,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: r00tpwd
 
-  # See `tests-with-wordpress` for a service that also starts WordPress.
   tests:
     image: versionpress/wordpress:cli@sha256:86fc95921f1ac48950ab593b0b970e9a98ad3b28c0b16c5c6007ea0fac2839e9
     environment:
@@ -52,14 +54,6 @@ services:
       - wpcli-cache:/var/www/.wp-cli:z
     working_dir: /opt/versionpress/tests
     command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /var/opt/versionpress/logs/testdox.txt
-    links:
-      - wordpress-for-tests
-      - mysql-for-tests:mysql
-
-  wait:
-    image: janvoracek/docker-wait@sha256:2d91ec68cf3e0dbcd03addaded0af238944f75378f5062358bd3c5fb839b60d2
-    environment:
-      - TARGETS=wordpress-for-tests:80,mysql-for-tests:3306
 
   selenium-hub:
     # Standalone Firefox is enough but could also be a full grid setup, hence the service name
