@@ -55,6 +55,12 @@ services:
     working_dir: /opt/versionpress/tests
     command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /var/opt/versionpress/logs/testdox.txt
 
+  wait:
+    image: janvoracek/docker-wait@sha256:2d91ec68cf3e0dbcd03addaded0af238944f75378f5062358bd3c5fb839b60d2
+    environment:
+      - TIMEOUT=120
+      # - TARGETS are specified in run-tests.ts
+
   selenium-hub:
     # Standalone Firefox is enough but could also be a full grid setup, hence the service name
     image: selenium/standalone-firefox@sha256:541e4d726136b3fbf0220c1feb4d3a76c577d302e77050f1191a0d5b3a029c10

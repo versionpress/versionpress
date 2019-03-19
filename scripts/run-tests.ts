@@ -4,14 +4,7 @@ import { repoRoot } from './script-utils';
 import * as arg from 'arg';
 
 const dc = 'docker-compose -f docker-compose-tests.yml';
-const wait = (target: string) =>
-  [
-    `docker run --rm`,
-    `--network versionpress_default`,
-    `-e TARGETS=${target}`,
-    `-e TIMEOUT=120`,
-    `janvoracek/docker-wait@sha256:2d91ec68cf3e0dbcd03addaded0af238944f75378f5062358bd3c5fb839b60d2`,
-  ].join(' ');
+const wait = (target: string) => `${dc} run --rm -e TARGETS=${target} wait`;
 
 const args = arg({
   '--help': Boolean,
