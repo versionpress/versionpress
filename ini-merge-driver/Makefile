@@ -7,6 +7,7 @@ BUILDS=\
   windows-amd64 \
 
 build: $(BUILDS)
+	@rm 'dist/*.*' 2> /dev/null || true
 
 $(BUILDS): OS = $(word 1,$(subst -, ,$*))
 $(BUILDS): ARCH = $(word 2,$(subst -, ,$*))
