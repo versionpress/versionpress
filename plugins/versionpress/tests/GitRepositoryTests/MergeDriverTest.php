@@ -5,20 +5,12 @@ use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Tests\Utils\MergeAsserter;
 use VersionPress\Tests\Utils\MergeDriverTestUtils;
 use VersionPress\Utils\StringUtils;
+use VersionPress\Utils\SystemInfo;
 
 class MergeDriverTest extends \PHPUnit_Framework_TestCase
 {
 
     private static $repositoryDir;
-
-    public function driverProvider()
-    {
-        return [
-            [MergeDriverInstaller::DRIVER_BASH],
-            [MergeDriverInstaller::DRIVER_PHP],
-            [MergeDriverInstaller::DRIVER_GO],
-        ];
-    }
 
     public static function setUpBeforeClass()
     {
@@ -36,16 +28,14 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase
         MergeDriverTestUtils::destroyRepository();
     }
 
-    /**
-     * @param string $driver See MergeDriverInstaller::installMergeDriver()'s $driver parameter
-     */
-    private function installMergeDriver($driver)
+    private function installMergeDriver()
     {
         MergeDriverInstaller::installMergeDriver(
             self::$repositoryDir,
             __DIR__ . '/../..',
             self::$repositoryDir,
-            $driver
+            SystemInfo::getOS(),
+            SystemInfo::getArchitecture()
         );
     }
 
@@ -128,18 +118,11 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase
      * This should result in a clean merge when our merge driver is installed.
      *
      * @test
-     * @dataProvider driverProvider
-     * @param string $driver
      */
-    public function mergedDatesWithoutConflict($driver)
+    public function mergedDatesWithoutConflict()
     {
 
-        if (DIRECTORY_SEPARATOR == '\\' && $driver == MergeDriverInstaller::DRIVER_BASH) {
-            $this->markTestSkipped('No Bash on Windows.');
-            return;
-        }
-
-        $this->installMergeDriver($driver);
+        $this->installMergeDriver();
 
         MergeDriverTestUtils::writeIniFile('file.ini', '2011-11-11 11:11:11');
         MergeDriverTestUtils::commit('Initial commit to common ancestor');
@@ -163,18 +146,10 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase
      * dates are merged automatically but the content conflicts.
      *
      * @test
-     * @dataProvider driverProvider
-     * @param string $driver
      */
-    public function conflictingContentsCreatedConflict($driver)
+    public function conflictingContentsCreatedConflict()
     {
-
-        if (DIRECTORY_SEPARATOR == '\\' && $driver == MergeDriverInstaller::DRIVER_BASH) {
-            $this->markTestSkipped('No Bash on Windows.');
-            return;
-        }
-
-        $this->installMergeDriver($driver);
+        $this->installMergeDriver();
 
         MergeDriverTestUtils::writeIniFile('file.ini', '2011-11-11 11:11:11');
         MergeDriverTestUtils::commit('Initial commit to common ancestor');
@@ -200,18 +175,10 @@ class MergeDriverTest extends \PHPUnit_Framework_TestCase
     /**
      *
      * @test
-     * @dataProvider driverProvider
-     * @param string $driver
      */
-    public function changesOnAdjacentLinesMergeWithoutConflict($driver)
+    public function changesOnAdjacentLinesMergeWithoutConflict()
     {
-
-        if (DIRECTORY_SEPARATOR == '\\' && $driver == MergeDriverInstaller::DRIVER_BASH) {
-            $this->markTestSkipped('No Bash on Windows.');
-            return;
-        }
-
-        $this->installMergeDriver($driver);
+        $this->installMergeDriver();
 
         $date = '2011-11-11 11:11:11';
 

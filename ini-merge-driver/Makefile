@@ -24,3 +24,8 @@ build-in-docker:
 
 build-dev:
 	@make build UPX_COMPRESSION=-1
+
+install:
+	@(ls dist > /dev/null 2>&1 || (echo 'Build the merge driver first' && exit 1))
+	@rm -rf ../plugins/versionpress/src/Git/merge-drivers/*
+	@cp -r dist/. ../plugins/versionpress/src/Git/merge-drivers

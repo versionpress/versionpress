@@ -43,6 +43,11 @@ utils.exitIfNotRunFromRootDir();
   shell.rm('dist/tmp/composer.{json,lock}');
 
   //------------------------------------
+  utils.printTaskHeading('Build ini-merge-driver');
+  shell.exec('make build-in-docker', { cwd: './ini-merge-driver' });
+  shell.exec('make install', { cwd: './ini-merge-driver' });
+
+  //------------------------------------
   utils.printTaskHeading('Update version in plugin file');
   let version = shell.exec('git describe --tags').stdout.trim();
 
