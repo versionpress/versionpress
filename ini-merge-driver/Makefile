@@ -18,5 +18,9 @@ $(BUILDS): %:
 		@GOOS=$(OS) GOARCH=$(ARCH) go build -ldflags="-s -w" -o dist/$(NAME)-$(OS)-$(ARCH) merge_driver.go
 		@upx $(UPX_COMPRESSION) dist/$(NAME)-$(OS)-$(ARCH)
 
+build-in-docker:
+	@docker build -t vp-ini-merge-driver-build -f Dockerfile-for-build .
+	@docker run --rm -v $(PWD):/data vp-ini-merge-driver-build
+
 build-dev:
 	@make build UPX_COMPRESSION=-1
