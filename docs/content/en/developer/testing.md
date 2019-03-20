@@ -47,7 +47,7 @@ This method is more universal and works for PhpStorm, VSCode and other IDEs. You
 
 1. Set a breakpoint.
 2. Start listening in your IDE.
-3. Launch a debug-enabled script like `npm run tests:unit:debug` (see [package.json](https://github.com/versionpress/versionpress/blob/master/package.json)).
+3. Launch a debug-enabled script (TODO).
 
 ### PhpStorm example
 
@@ -55,7 +55,7 @@ First, make sure you have the 'VersionPress-tests' server defined in _Settings >
 
 Then, set a breakpoint in some test and start listening for debug connections in the toolbar.
 
-Run `npm run tests:unit:debug` in the console, skip the first break at the `wp` binary and see your breakpoint hit:
+Run `TODO` in the console, skip the first break at the `wp` binary and see your breakpoint hit:
 
 ![image](https://user-images.githubusercontent.com/101152/40370369-66eda84e-5de0-11e8-88f5-9792421a92ab.png)
 
@@ -77,7 +77,7 @@ In VSCode, install [PHP Debug extension](https://marketplace.visualstudio.com/it
 }
 ```
 
-Then, start a debugging session in VSCode and set a breakpoint. Run the `tests:unit:debug` script and see the breakpoint hit:
+Then, start a debugging session in VSCode and set a breakpoint. Run the `TODO` script and see the breakpoint hit:
 
 ![image](https://user-images.githubusercontent.com/101152/40372175-7880a49a-5de4-11e8-9e87-adfb25d184ef.png)
 
