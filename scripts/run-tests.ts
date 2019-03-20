@@ -8,8 +8,7 @@ const wait = (target: string) => `${dc} run --rm -e TARGETS=${target} wait`;
 
 const args = arg({
   '--help': Boolean,
-  '--with-wordpress': Boolean,
-  '--testsuite': [String],
+  '--testsuite': String,
   '-h': '--help',
 });
 
@@ -19,10 +18,7 @@ if (args['--help']) {
     $ run-tests ...
 
   Options
-    --testsuite         Testsuite from phpunit.xml to run. Can be repeated
-                        multiple times.
-    --with-wordpress    Start WordPress & MySQL containers. WIP: is implied
-                        from --testsuite in some cases.
+    --testsuite         Testsuite from phpunit.xml.
     -h, --help          Show help.
 
   Examples
@@ -31,12 +27,13 @@ if (args['--help']) {
   process.exit();
 }
 
-if (!args['--testsuite']) {
-  // All tests will be run, we need to start WordPress
-  args['--with-wordpress'] = true;
-}
+const withWordPress = (() => {
+  return args['--testsuite'] === undefined
+    ? true
+    : ['End2End', 'Selenium', 'SynchronizerTests', 'Workflow'].includes(args['--testsuite']);
+})();
 
-if (args['--with-wordpress']) {
+if (withWordPress) {
   utils.printTaskHeading('Cleaning up Docker containers and volumes...');
   shell.exec(`${dc} down -v`, { cwd: repoRoot });
 
@@ -51,14 +48,14 @@ if (args['--with-wordpress']) {
 
 utils.printTaskHeading('Running tests...');
 
-const containerToUse = args['--with-wordpress'] ? 'tests-with-wordpress' : 'tests';
-const customTestSuite = args['--testsuite'] ? args['--testsuite'].map(suite => `--testsuite ${suite}`).join(' ') : '';
+const containerToUse = withWordPress ? 'tests-with-wordpress' : 'tests';
+const customTestSuite = args['--testsuite'] ? `--testsuite ${args['--testsuite']}` : '';
 
 shell.exec(`${dc} run --rm ${containerToUse} ../vendor/bin/phpunit -c phpunit.xml ${customTestSuite}`, {
   cwd: repoRoot,
 });
 
-if (args['--with-wordpress']) {
+if (withWordPress) {
   utils.printTaskHeading('Stopping containers...');
   shell.exec(`${dc} down`, { cwd: repoRoot });
 }
