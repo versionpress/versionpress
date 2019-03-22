@@ -7,30 +7,16 @@ Tests are a significant part of the VersionPress project, we care about writing 
 ## Running tests from command line
 
 1. Make sure you have run `npm install` as described in [dev setup](dev-setup.md).
-2. Run `npm run tests:unit` as a quick check that your local setup is correct.
-3. Run `npm run tests:full` to run the full test suite – this should take somewhere between 10 and 30 minutes, depending on your machine.
+2. Run `npm run tests:unit` as a quick check that unit tests work fine and your local setup is correct.
+3. Run `npm run tests` to run the full test suite – this should take somewhere between 10 and 30 minutes, depending on your machine.
 
 ### Customizing what tests run
 
-The `tests:unit` and `tests:full` are just convenience scripts defined in `package.json`. They do something like this:
+The `tests` script invokes `scripts/run-tests.ts` which accepts parameters to customize which tests run. For example, `npm run tests -- --testsuite Workflow` will only run workflow tests.
 
-```
-node -r ./scripts/node_modules/ts-node/register scripts/run-tests.ts --testsuite Unit
-```
+Run `npm run tests -- -h` to learn about the options available – it's generally a subset of PHPUnit's CLI.
 
-If you `cd` into the `scripts` directory, this can be simplified to:
-
-```
-node -r ts-node/register run-tests ...
-```
-
-For example, to run just the End2End tests, you'd do this:
-
-```
-node -r ts-node/register run-tests --testsuite End2End
-```
-
-Run `node -r ts-node/register run-tests --help` to learn more about the capabilities.
+❗️ Notice how parameters come after `--`. That is required by npm.
 
 ### Tips for tests
 
