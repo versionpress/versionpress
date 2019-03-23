@@ -1,7 +1,7 @@
 version: '3.6'
 services:
 
-  # !!! Containers in this file are meant to be started via `scripts/run-tests.ts`, not manully.
+  # !!! Containers in this file are meant to be started via `scripts/run-tests.ts`, not manually.
   # For example, `links:` are not defined below and it's up to the script to start the containers properly.
   # PR #1401 explains why.
 
