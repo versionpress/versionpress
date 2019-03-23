@@ -62,10 +62,16 @@ utils.printTaskHeading('Running tests...');
 const containerToUse = withWordPress ? 'tests-with-wordpress' : 'tests';
 const customTestSuite = args['--testsuite'] ? `--testsuite ${args['--testsuite']}` : '';
 const phpunitXml = args['-c'] ? `-c ${args['-c']}` : '-c phpunit.xml';
+const colorizeOutput = process.stdout.isTTY ? '--colors=always' : '';
 
-shell.exec(`${dc} run --rm ${containerToUse} ../vendor/bin/phpunit ${phpunitXml} ${customTestSuite} ${args._.join(' ')}`, {
-  cwd: repoRoot,
-});
+shell.exec(
+  `${dc} run --rm ${containerToUse} ../vendor/bin/phpunit ${phpunitXml} ${customTestSuite} ${colorizeOutput} ${args._.join(
+    ' '
+  )}`,
+  {
+    cwd: repoRoot,
+  }
+);
 
 if (withWordPress) {
   utils.printTaskHeading('Stopping containers...');
