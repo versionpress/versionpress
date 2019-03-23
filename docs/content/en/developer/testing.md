@@ -12,16 +12,23 @@ Tests are a significant part of the VersionPress project, we care about writing 
 
 ### Customizing what tests run
 
-The `tests` script invokes `scripts/run-tests.ts` which accepts parameters to customize which tests run. For example, `npm run tests -- --testsuite Workflow` will only run workflow tests.
+The `tests` script accepts [PHPUnit parameters](https://phpunit.de/manual/5.7/en/textui.html), here are some examples:
 
-Run `npm run tests -- -h` to learn about the options available – it's generally a subset of PHPUnit's CLI.
+❗️ Notice how parameters come after `--`; this is required by npm.
 
-❗️ Notice how parameters come after `--`. That is required by npm.
+```
+# Pick a test suite (see phpunit.xml):
+npm run tests -- --testsuite Unit
 
-### Tips for tests
+# Filter down further:
+npm run tests -- --testsuite Unit --filter CursorTest
 
-- If you're trying to narrow down a bug, it's useful to run a smaller test suite via one of the options above and add `stopOnFailure="true"` to the XML file or `--stop-on-failure` on the command line.
-- Unit tests can also easily be run using a local `php` interpreter, basically just run them in PhpStorm.
+# Stop on the first error or failure:
+npm run tests -- --stop-on-failure
+
+# Create your own phpunit.xml (phpunit.*.xml is Git-ignored)
+npm run tests -- -c phpunit.custom.xml
+```
 
 ## Running and debugging tests from PhpStorm
 

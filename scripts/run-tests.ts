@@ -6,23 +6,34 @@ import * as arg from 'arg';
 const dc = 'docker-compose -f docker-compose-tests.yml';
 const wait = (target: string) => `${dc} run --rm -e TARGETS=${target} wait`;
 
-const args = arg({
-  '--help': Boolean,
-  '--testsuite': String,
-  '-h': '--help',
-});
+const args = arg(
+  {
+    '--help': Boolean,
+    '--testsuite': String,
+    '-c': String,
+    '-h': '--help',
+  },
+  { permissive: true }
+);
 
 if (args['--help']) {
   console.log(`
   Usage
     $ run-tests ...
 
-  Options
-    --testsuite         Testsuite from phpunit.xml.
-    -h, --help          Show help.
+  PHPUnit options
+    --testsuite         Testsuite from phpunit.xml
+    -c                  Custom phpunit.xml
+    [...other-args]     You can pass other PHPUnit args like --filter
+                        or --stop-on-failure
+
+  Non-PHPUnit options
+    -h, --help          Show help
 
   Examples
     $ run-tests --testsuite Unit
+    $ run-tests -c phpunit.custom.xml
+    $ run-tests --testsuite End2End --filter OptionsTest
 `);
   process.exit();
 }
@@ -50,8 +61,9 @@ utils.printTaskHeading('Running tests...');
 
 const containerToUse = withWordPress ? 'tests-with-wordpress' : 'tests';
 const customTestSuite = args['--testsuite'] ? `--testsuite ${args['--testsuite']}` : '';
+const phpunitXml = args['-c'] ? `-c ${args['-c']}` : '-c phpunit.xml';
 
-shell.exec(`${dc} run --rm ${containerToUse} ../vendor/bin/phpunit -c phpunit.xml ${customTestSuite}`, {
+shell.exec(`${dc} run --rm ${containerToUse} ../vendor/bin/phpunit ${phpunitXml} ${customTestSuite} ${args._.join(' ')}`, {
   cwd: repoRoot,
 });
 
