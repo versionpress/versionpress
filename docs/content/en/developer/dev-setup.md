@@ -185,8 +185,8 @@ If you can, use [Docker Desktop](https://www.docker.com/products/docker-desktop)
 If you need to use Docker Toolbox:
 
 - [Enable port forwarding in VirtualBox](https://stackoverflow.com/questions/42866013/docker-toolbox-localhost-not-working/45822356#45822356) for ports 80, 3306 and 8099.
-- If you have the repo checked out in a folder _not_ under `C:\Users\youruser`, add it as a shared folder in VirtualBox settings. For example, add a share where _Folder Path_ is `C:\Projects` and _Folder Name_ is `c/Projects`. [Details](https://stackoverflow.com/a/32030385).
-- Start _Docker Quickstart Terminal_ which uses Git Bash – we want that.
+- If you have the repo checked out in a folder _not_ under `C:\Users\youruser`, add it as a shared folder in VirtualBox settings. For example, add a share where _Folder Path_ is `C:\Projects`, _Folder Name_ is `c/Projects`, check both "Auto-mount" and "Make Permanent" and restart the VM. [Details](https://stackoverflow.com/a/32030385).
+- Start _Docker Quickstart Terminal_ which uses Git Bash.
 - If the performance is not great, try adjusting VirtualBox settings. However, you can run into timeout issues in Workflow tests sometimes and exceed default value of 5 seconds in `wp_remote_get()` in End2End tests.
 
 ### Disable antivirus software
