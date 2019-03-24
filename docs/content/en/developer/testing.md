@@ -6,9 +6,11 @@ Tests are a significant part of the VersionPress project, we care about writing 
 
 ## Running tests from command line
 
-1. Make sure you have run `npm install` as described in [dev setup](dev-setup.md).
-2. Run `npm run tests:unit` as a quick check that unit tests work fine and your local setup is correct.
-3. Run `npm run tests` to run the full test suite – this should take somewhere between 10 and 30 minutes, depending on your machine.
+1. Make sure you ran `npm install` as described in [Dev Setup](dev-setup.md).
+2. Run `npm run tests:unit` as a sanity check – this should pass quickly.
+3. Run `npm run tests` to run the full test suite.
+
+The first run might be very slow as Docker images need to be pulled. Subsequent runs should take between 10 and 30 minutes, depending on your machine and how you run Docker runs (for example, Docker Toolbox on Windows uses slower virtualization than Docker Desktop).
 
 ### Customizing what tests run
 
