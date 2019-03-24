@@ -191,7 +191,7 @@ If you need to use Docker Toolbox because you have an older machine or OS, brace
 
 - [Enable port forwarding in VirtualBox](https://stackoverflow.com/questions/42866013/docker-toolbox-localhost-not-working/45822356#45822356) for ports 80, 3306 and 8099.
 - If you have the repo checked out in a folder _not_ under `C:\Users\youruser`, add it as a shared folder in VirtualBox settings. For example, add a share where _Folder Path_ is `C:\Projects`, _Folder Name_ is `c/Projects`, check both "Auto-mount" and "Make Permanent" and restart the VM. [Details](https://stackoverflow.com/a/32030385).
-- Start _Docker Quickstart Terminal_ which uses Git Bash.
+- Feel free to use the default Docker Quickstart Terminal: it uses Git Bash which is good.
 
 ### Disable antivirus software
 
