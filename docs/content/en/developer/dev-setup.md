@@ -180,14 +180,18 @@ Git Bash is generally an awesome shell, the only problems you might encounter ar
 
 ### Docker Desktop vs. Docker Toolbox
 
-If you can, use [Docker Desktop](https://www.docker.com/products/docker-desktop), not [Docker Toolbox](https://docs.docker.com/toolbox/toolbox_install_windows/) – the experience will be smoother.
+If you can, use [Docker Desktop](https://www.docker.com/products/docker-desktop), not [Docker Toolbox](https://docs.docker.com/toolbox/toolbox_install_windows/). The experience will be smoother (for example, ports are forwarded by default) and also the performance is much better due to a more modern virtualization technology.
 
-If you need to use Docker Toolbox:
+!!! important "Performance is important"
+    You'll notice a big difference between Docker Desktop and Docker Toolbox, for example, [tests](testing.md) run 3-4× slower in Toolbox (10 vs. 40 minutes). You might also run into various timeouts, for example, `wp_remote_get()` has a default timeout of 5 seconds which might not be enough.
+
+    Note that it's generally hard to improve the performance of Toolbox, even if you give the virtual machine more CPUs and RAM, see [these results for tests](https://github.com/versionpress/versionpress/pull/1401#issuecomment-476004709).
+
+If you need to use Docker Toolbox because you have an older machine or OS, brace yourself and follow these steps:
 
 - [Enable port forwarding in VirtualBox](https://stackoverflow.com/questions/42866013/docker-toolbox-localhost-not-working/45822356#45822356) for ports 80, 3306 and 8099.
 - If you have the repo checked out in a folder _not_ under `C:\Users\youruser`, add it as a shared folder in VirtualBox settings. For example, add a share where _Folder Path_ is `C:\Projects`, _Folder Name_ is `c/Projects`, check both "Auto-mount" and "Make Permanent" and restart the VM. [Details](https://stackoverflow.com/a/32030385).
 - Start _Docker Quickstart Terminal_ which uses Git Bash.
-- If the performance is not great, try adjusting VirtualBox settings. However, you can run into timeout issues in Workflow tests sometimes and exceed default value of 5 seconds in `wp_remote_get()` in End2End tests.
 
 ### Disable antivirus software
 
