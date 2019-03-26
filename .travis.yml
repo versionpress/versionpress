@@ -2,18 +2,36 @@ sudo: false
 language: php
 php:
   - 7.2
-
-branches:
-  only: 
-    - master
-
+services:
+  - docker
+addons:
+  apt:
+    packages:
+      - docker-ce
 cache:
   directories:
     - $HOME/.composer/cache
-
+    - $HOME/docker
+    - $HOME/.npm
 before_install:
-  - git config --global github.accesstoken $GITHUB_OAUTH_TOKEN
-  - composer config -g github-oauth.github.com $GITHUB_OAUTH_TOKEN --no-interaction
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+  - nvm install 8
+  - nvm use 8
+
+install:
+  - npm ci
+  - npm run init-dev
+
+before_script:
+  - sudo /etc/init.d/mysql stop # Travis runs mysql by default and our docker tests want the mysql port (3306), so stop mysql
 
 script:
-    cd plugins/versionpress && composer install && ./vendor/bin/phpcs --standard=ruleset.xml
+  - set -e
+  - npm run lint:markdown
+  - npm run lint:php
+  - npm run build-images
+  - npm run tests
+
