@@ -20,10 +20,10 @@ node -r ./scripts/node_modules/ts-node/register scripts/build.ts
 
 ## Debugging scripts
 
-To debug a script, add `--inspect-brk`:
+Use a `npm run debug-script -- ...` or manually add `--inspect-brk`:
 
 ```
 node -r ts-node/register --inspect-brk build.ts
 ```
 
-Then in VSCode, create a "Node attach" configuration and run it.
+In VSCode, use the "Node attach" configuration.

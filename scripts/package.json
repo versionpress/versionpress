@@ -5,7 +5,8 @@
   "author": "VersionPress",
   "license": "GPL",
   "scripts": {
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "debug-script": "node -r ts-node/register --inspect-brk"
   },
   "dependencies": {
     "apollo-boost": "^0.3.1",
