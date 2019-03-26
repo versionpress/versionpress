@@ -18,12 +18,11 @@ if (args['--help']) {
     $ changelog <ref1..ref2>
 
   Examples
-    $ changelog abcd1234..efaa4213
-    $ changelog 4.0..master plugins/versionpress
+    $ changelog 4.0..master
+    $ changelog 4cf80ca..ef39bb2
 
   Limitations
     - Maximum of 100 items are returned (hard limit).
-
 `);
   process.exit();
 }
