@@ -100,7 +100,7 @@ Currently, the default worker is WP-CLI and the only way to switch workers is to
 The Docker containers are stopped when tests finish running but the data is kept in Docker volumes. You can start the WordPress site again via:
 
 ```
-docker-compose -f docker-compose-tests.yml up -d wordpress-for-tests mysql-for-tests
+npm run tests -- --explore
 ```
 
 You can now inspect it:

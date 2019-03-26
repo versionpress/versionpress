@@ -11,6 +11,7 @@ const args = arg(
     '--help': Boolean,
     '--testsuite': String,
     '-c': String,
+    '--explore': Boolean,
     '-h': '--help',
   },
   { permissive: true }
@@ -28,6 +29,7 @@ if (args['--help']) {
                         or --stop-on-failure
 
   Non-PHPUnit options
+    --explore           Start containers to explore test results
     -h, --help          Show help
 
   Examples
@@ -35,6 +37,11 @@ if (args['--help']) {
     $ run-tests -c phpunit.custom.xml
     $ run-tests --testsuite End2End --filter OptionsTest
 `);
+  process.exit();
+}
+
+if (args['--explore']) {
+  startWPSite();
   process.exit();
 }
 
@@ -48,13 +55,7 @@ if (withWordPress) {
   utils.printTaskHeading('Cleaning up Docker containers and volumes...');
   shell.exec(`${dc} down -v`, { cwd: repoRoot });
 
-  utils.printTaskHeading('Starting MySQL...');
-  shell.exec(`${dc} up -d mysql-for-tests`, { cwd: repoRoot });
-  shell.exec(wait('mysql-for-tests:3306'), { cwd: repoRoot });
-
-  utils.printTaskHeading('Starting WordPress...');
-  shell.exec(`${dc} up -d wordpress-for-tests`, { cwd: repoRoot });
-  shell.exec(wait('wordpress-for-tests:80'), { cwd: repoRoot });
+  startWPSite();
 }
 
 utils.printTaskHeading('Running tests...');
@@ -76,4 +77,14 @@ shell.exec(
 if (withWordPress) {
   utils.printTaskHeading('Stopping containers...');
   shell.exec(`${dc} down`, { cwd: repoRoot });
+}
+
+function startWPSite() {
+  utils.printTaskHeading('Starting MySQL...');
+  shell.exec(`${dc} up -d mysql-for-tests`, { cwd: repoRoot });
+  shell.exec(wait('mysql-for-tests:3306'), { cwd: repoRoot });
+
+  utils.printTaskHeading('Starting WordPress...');
+  shell.exec(`${dc} up -d wordpress-for-tests`, { cwd: repoRoot });
+  shell.exec(wait('wordpress-for-tests:80'), { cwd: repoRoot });
 }
