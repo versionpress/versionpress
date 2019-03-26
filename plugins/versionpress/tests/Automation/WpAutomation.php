@@ -50,10 +50,13 @@ class WpAutomation
     }
 
     /**
+     * Sets up a site to a fresh state (previous files and the database are removed).
+     *
      * @param array $entityCounts {@see populateSite}
      */
     public function setUpSite($entityCounts = [])
     {
+        FileSystem::remove($this->siteConfig->path);
         if ($this->siteConfig->installationType === 'standard') {
             $this->prepareStandardWpInstallation();
         } elseif ($this->siteConfig->installationType === 'composer') {
