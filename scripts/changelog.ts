@@ -15,7 +15,7 @@ if (args['--help']) {
   Lists pull requests, their related issues and other changes between two versions.
 
   Usage
-    $ changelog <ref1..ref2> [paths]
+    $ changelog <ref1..ref2>
 
   Examples
     $ changelog abcd1234..efaa4213
@@ -95,10 +95,7 @@ interface IssueGqlResponse {
 
 (async function main() {
   const range = parseRange(args._[0]);
-  const { directCommits, pullRequests, mergeCommitsWithoutPR, noteworthyIssues, noteworthyPrs } = await getData(
-    range,
-    args._.slice(1)
-  );
+  const { directCommits, pullRequests, mergeCommitsWithoutPR, noteworthyIssues, noteworthyPrs } = await getData(range);
 
   // Formatting uses `eval` which is slightly controversial but simple and allows `chalk` formatting.
   // Possible tokens need to be in function scope for `getFormattedMessage` to work.
@@ -160,13 +157,10 @@ interface IssueGqlResponse {
   printCommits(directCommits, 'DIRECT COMMITS TO BASE BRANCH:');
 })();
 
-async function getData(range: GitRange, paths?: string[]): Promise<DiffBetweenVersions> {
+async function getData(range: GitRange): Promise<DiffBetweenVersions> {
   github.exitIfNoGithubAccess();
 
-  const result = await Promise.all([
-    getMergeCommitsAndRelatedGithubIssues(range, paths),
-    getDirectCommits(range, paths),
-  ]);
+  const result = await Promise.all([getMergeCommitsAndRelatedGithubIssues(range), getDirectCommits(range)]);
   return {
     pullRequests: result[0].pullRequests,
     mergeCommitsWithoutPR: result[0].mergeCommitsWithoutPR,
@@ -188,10 +182,7 @@ interface MergeCommitsAndRelatedGitHubData {
  *
  * @param range
  */
-async function getMergeCommitsAndRelatedGithubIssues(
-  range: GitRange,
-  paths?: string[]
-): Promise<MergeCommitsAndRelatedGitHubData> {
+async function getMergeCommitsAndRelatedGithubIssues(range: GitRange): Promise<MergeCommitsAndRelatedGitHubData> {
   const result = <MergeCommitsAndRelatedGitHubData>{
     pullRequests: [],
     mergeCommitsWithoutPR: [],
@@ -199,7 +190,7 @@ async function getMergeCommitsAndRelatedGithubIssues(
     noteworthyPrs: [],
   };
 
-  const mergeCommits = (await execa('git', getGitLogParams(range, '--merges', paths))).stdout;
+  const mergeCommits = (await execa('git', getGitLogParams(range, '--merges'))).stdout;
   if (!mergeCommits) {
     return result;
   }
@@ -314,8 +305,8 @@ async function getMergeCommitsAndRelatedGithubIssues(
   return result;
 }
 
-async function getDirectCommits(range: GitRange, paths?: string[]): Promise<Commit[]> {
-  const directCommitsFromGit = (await execa('git', getGitLogParams(range, '--no-merges', paths))).stdout;
+async function getDirectCommits(range: GitRange): Promise<Commit[]> {
+  const directCommitsFromGit = (await execa('git', getGitLogParams(range, '--no-merges'))).stdout;
   if (!directCommitsFromGit) {
     return [];
   }
@@ -330,17 +321,8 @@ async function getDirectCommits(range: GitRange, paths?: string[]): Promise<Comm
   return directCommits;
 }
 
-function getGitLogParams(range: GitRange, mergeOption: '--merges' | '--no-merges', paths: string[] = []) {
-  return [
-    'log',
-    '--oneline',
-    mergeOption,
-    '--first-parent',
-    '-100',
-    `${range.oldCommit}..${range.newCommit}`,
-    '--',
-    ...paths,
-  ];
+function getGitLogParams(range: GitRange, mergeOption: '--merges' | '--no-merges') {
+  return ['log', '--oneline', mergeOption, '--first-parent', '-100', `${range.oldCommit}..${range.newCommit}`];
 }
 
 export function parseRange(revisionRange: string): GitRange {
