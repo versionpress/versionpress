@@ -119,7 +119,7 @@ When you're done, clean up everything by running:
 npm run tests:cleanup
 ```
 
-This will stop & remove containers, delete volumes and remove temporaray files under `dev-env`.
+This will stop & remove containers and delete temporary files in `dev-env`.
 
 ## Other tests
 
