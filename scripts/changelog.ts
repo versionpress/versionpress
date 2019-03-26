@@ -28,12 +28,6 @@ if (args['--help']) {
   process.exit();
 }
 
-// --------------------------
-
-const prFormat = '#${prNumber} ${title}${relatedIssues.length > 0 ? " (" + relatedIssues + ")" : ""}';
-const issueFormat = '#${issueNumber} ${title}';
-const commitFormat = '${sha1} ${commitMessage}';
-
 interface GitRange {
   oldCommit: string;
   newCommit: string;
@@ -97,37 +91,15 @@ interface IssueGqlResponse {
   const range = parseRange(args._[0]);
   const { directCommits, pullRequests, mergeCommitsWithoutPR, noteworthyIssues, noteworthyPrs } = await getData(range);
 
-  // Formatting uses `eval` which is slightly controversial but simple and allows `chalk` formatting.
-  // Possible tokens need to be in function scope for `getFormattedMessage` to work.
-
-  // Possible issue tokens
-  let issueNumber: string;
-  let title: string;
-
-  // Possible PR tokens
-  let prNumber: string;
-  // title: string; - see above
-  let url: string;
-  // tslint:disable-next-line
-  let relatedIssues: string; // concatenated with comma, e.g., "#123, versionpress/internal#12"
-
-  // Possible commit tokens
-  let sha1: string;
-  let commitMessage: string;
-
-  function getFormattedMessage(userTemplate: string): string {
-    return eval('`' + userTemplate + '`');
-  }
-
   function printPullRequests(pullRequests: PullRequest[], sectionTitle: string) {
     if (pullRequests.length === 0) {
       return;
     }
     console.log('\n' + chalk.cyan(sectionTitle));
     pullRequests.forEach(pullRequest => {
-      ({ prNumber, title, url } = pullRequest);
-      relatedIssues = pullRequest.relatedIssues.join(', ');
-      console.log(getFormattedMessage(prFormat));
+      const { prNumber, title } = pullRequest;
+      const relatedIssues = pullRequest.relatedIssues.join(', ');
+      console.log(`#${prNumber} ${title}${relatedIssues.length > 0 ? ' (' + relatedIssues + ')' : ''}`);
     });
   }
 
@@ -137,16 +109,16 @@ interface IssueGqlResponse {
     }
     console.log('\n' + chalk.cyan(sectionTitle));
     commits.forEach(commit => {
-      ({ sha1, commitMessage } = commit);
-      console.log(getFormattedMessage(commitFormat));
+      const { sha1, commitMessage } = commit;
+      console.log(`${sha1} ${commitMessage}`);
     });
   }
 
   if (noteworthyIssues.length > 0) {
     console.log(chalk.cyan('\nNOTEWORTHY ISSUES:'));
     noteworthyIssues.forEach(iss => {
-      ({ issueNumber, title } = iss);
-      console.log(getFormattedMessage(issueFormat));
+      const { issueNumber, title } = iss;
+      console.log(`#${issueNumber} ${title}`);
     });
   }
 
