@@ -4,6 +4,7 @@ import * as github from './utils/github';
 import _ = require('lodash');
 import * as execa from 'execa';
 import * as arg from 'arg';
+import matchAll = require('string.prototype.matchall');
 
 const args = arg({
   '--help': Boolean,
@@ -210,8 +211,12 @@ async function getMergeCommitsAndRelatedGithubIssues(range: GitRange): Promise<M
     pr.url = prFromGithub.url;
     pr.labels = _.map(prFromGithub.labels.nodes, _.property('name'));
 
-    // https://regex101.com/r/SQrOlx/12
-    pr.relatedIssues = prFromGithub.body.match(/(?:\w[\w-.]+\/\w[\w-.]+|\B)#[1-9]\d*\b/g) || [];
+    // https://regex101.com/r/YII6P2/2
+    const matches = matchAll(
+      prFromGithub.body,
+      /(?:close|closes|fix|fixes|resolve|resolves|issue):? (?:\w[\w-.]+\/\w[\w-.]+|\B)(#[1-9]\d*)\b/gi
+    );
+    pr.relatedIssues = Array.from(matches).map(m => m[1]);
   });
 
   result.noteworthyPrs = _.filter(result.pullRequests, pr => pr.labels.includes('significant'));
