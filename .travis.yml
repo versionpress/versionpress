@@ -23,7 +23,6 @@ before_install:
 
 install:
   - npm ci
-  - npm run init-dev
 
 before_script:
   - sudo /etc/init.d/mysql stop # Travis runs mysql by default and our docker tests want the mysql port (3306), so stop mysql
