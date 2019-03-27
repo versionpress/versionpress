@@ -24,7 +24,8 @@
     "_push-image-cli": "docker push versionpress/wordpress:cli",
     "get-image-digests": "node -r ./scripts/node_modules/ts-node/register scripts/get-dockerhub-digests.ts versionpress/wordpress",
     "postinstall": "(cd scripts && npm install) && npm run init-dev",
-    "lint:markdown": "markdownlint -i '{**/vendor/**,**/node_modules/**,ext-libs/**,dev-env/**}' ."
+    "lint:markdown": "markdownlint -i '{**/vendor/**,**/node_modules/**,ext-libs/**,dev-env/**}' .",
+    "lint:php": "./plugins/versionpress/vendor/bin/phpcs --standard=./plugins/versionpress/ruleset.xml"
   },
   "engines": {
     "node": ">= 8.11",
