@@ -8,17 +8,14 @@ addons:
   apt:
     packages:
       - docker-ce
-env:
-  - DOCKER_COMPOSE_VERSION=1.23.2
-
 cache:
   directories:
     - $HOME/.composer/cache
-    - "$HOME/.npm"
-
+    - $HOME/docker
+    - $HOME/.npm
 before_install:
   - sudo rm /usr/local/bin/docker-compose
-  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
   - nvm install 8
@@ -26,13 +23,14 @@ before_install:
 
 install:
   - npm ci
-  - ( cd plugins/versionpress && composer install )
 
 before_script:
   - sudo /etc/init.d/mysql stop # Travis runs mysql by default and our docker tests want the mysql port (3306), so stop mysql
 
 script:
+  - set -e
   - npm run lint:markdown
+  - npm run lint:php
   - npm run build-images
-  - npm run tests:full
-  - ( cd plugins/versionpress && ./vendor/bin/phpcs --standard=ruleset.xml )
+  - npm run tests
+

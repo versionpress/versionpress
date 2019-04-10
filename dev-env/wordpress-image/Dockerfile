@@ -1,4 +1,4 @@
-FROM wordpress:php7.2-apache
+FROM wordpress:php7.2-apache@sha256:08c71170cdd4427d155906f8eb0e715768c133f836780c97b0e3cc3e7c1288e2
 
 # Install prerequisites for WP-CLI & VersionPress
 RUN apt-get update \

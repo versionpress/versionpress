@@ -26,6 +26,13 @@ class CloneMergeTest extends PHPUnit_Framework_TestCase
         self::$siteConfig = self::$testConfig->testSite;
 
         self::$cloneSiteConfig = self::getCloneSiteConfig(self::$siteConfig);
+
+        // Currently, workflow tests only pass when they are run on a fresh WordPress install, see #1409. That's why
+        // we force a full setup here. In the future, just `$wpAutomation->ensureTestSiteIsReady` should be used.
+        $wpAutomation = new WpAutomation(self::$siteConfig, self::$testConfig->wpCliVersion);
+        $wpAutomation->setUpSite();
+        $wpAutomation->copyVersionPressFiles();
+        $wpAutomation->initializeVersionPress();
     }
 
     /**
@@ -33,12 +40,9 @@ class CloneMergeTest extends PHPUnit_Framework_TestCase
      */
     public function cloneLooksExactlySameAsOriginal()
     {
-        $siteConfig = self::$siteConfig;
-        $wpAutomation = new WpAutomation($siteConfig, self::$testConfig->wpCliVersion);
-        $wpAutomation->ensureTestSiteIsReady();
-
         FileSystem::mkdir(self::$cloneSiteConfig->path);
 
+        $wpAutomation = new WpAutomation(self::$siteConfig, self::$testConfig->wpCliVersion);
         $wpAutomation->runWpCliCommand('vp', 'clone', [
             'name' => self::$cloneSiteConfig->name,
             'dbprefix' => self::$cloneSiteConfig->dbTablePrefix,
