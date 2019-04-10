@@ -65,7 +65,7 @@ const customTestSuite = args['--testsuite'] ? `--testsuite ${args['--testsuite']
 const phpunitXml = args['-c'] ? `-c ${args['-c']}` : '-c phpunit.xml';
 const colorizeOutput = process.stdout.isTTY ? '--colors=always' : '';
 
-shell.exec(
+const result = shell.exec(
   `${dc} run --rm ${containerToUse} ../vendor/bin/phpunit ${phpunitXml} ${customTestSuite} ${colorizeOutput} ${args._.join(
     ' '
   )}`,
@@ -78,6 +78,8 @@ if (withWordPress) {
   utils.printTaskHeading('Stopping containers...');
   shell.exec(`${dc} down`, { cwd: repoRoot });
 }
+
+process.exit((result as shell.ExecOutputReturnValue).code);
 
 function startWPSite() {
   utils.printTaskHeading('Starting MySQL...');
