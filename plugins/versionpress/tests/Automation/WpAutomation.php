@@ -139,6 +139,7 @@ class WpAutomation
      */
     public function createPost(array $post)
     {
+        sleep(1); // Ensure that there are no testing posts published at the same time, see issue #1420
         $post["porcelain"] = null; // wp-Cli returns only id
         return intval($this->runWpCliCommand('post', 'create', $post));
     }

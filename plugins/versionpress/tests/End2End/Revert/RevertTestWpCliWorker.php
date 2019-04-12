@@ -210,7 +210,6 @@ class RevertTestWpCliWorker extends WpCliWorker implements IRevertTestWorker
             "post_type" => "post",
             "post_status" => "publish",
             "post_title" => "Test post for revert",
-            "post_date" => "2011-11-11 11:11:11",
             "post_content" => "Test post",
             "post_author" => 1
         ];

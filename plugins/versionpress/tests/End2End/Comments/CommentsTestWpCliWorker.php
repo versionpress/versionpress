@@ -157,7 +157,6 @@ class CommentsTestWpCliWorker extends WpCliWorker implements ICommentsTestWorker
             "post_type" => "post",
             "post_status" => "publish",
             "post_title" => "Test post for comments",
-            "post_date" => "2010-10-10 10:10:10",
             "post_content" => "Test post",
             "post_author" => 1
         ];

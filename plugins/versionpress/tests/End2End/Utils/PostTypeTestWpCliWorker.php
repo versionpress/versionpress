@@ -11,7 +11,6 @@ abstract class PostTypeTestWpCliWorker extends WpCliWorker implements IPostTypeT
         "post_type" => "post",
         "post_status" => "publish",
         "post_title" => "Test post",
-        "post_date" => "2011-11-11 11:11:11",
         "post_content" => "Test post",
         "post_author" => 1
     ];
