@@ -195,15 +195,11 @@ class CloneMergeTest extends PHPUnit_Framework_TestCase
     private function assertCloneLooksExactlySameAsOriginal()
     {
         $origContent = $this->getTextContentAtUrl(self::$siteConfig->url);
-        // todo: remove replacing of line endings in #589
+
         $cloneContent = str_replace(
-            "\r\n",
-            "\n",
-            str_replace(
-                self::$cloneSiteConfig->name,
-                self::$siteConfig->name,
-                $this->getTextContentAtUrl(self::$cloneSiteConfig->url)
-            )
+            self::$cloneSiteConfig->name,
+            self::$siteConfig->name,
+            $this->getTextContentAtUrl(self::$cloneSiteConfig->url)
         );
 
         $this->assertEquals($origContent, $cloneContent);
