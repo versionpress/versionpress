@@ -37,3 +37,11 @@ How to use it:
 1. Create a new [personal access token](https://github.com/settings/tokens) on GitHub. It only needs the `public_repo` scope.
 2. Copy `.env.example` to `.env` and put the token there.
 3. Run the tool like this: `npm run changelog -- 4.0-beta..master`
+
+The CLI output is directly paste-able to GitHub issues, however, if you want to paste it to a Markdown document (e.g., release notes), add the `--format` flag:
+
+```
+npm run changelog -- --format markdown 4.0-beta..master | pbcopy
+```
+
+This will convert strings like `#123` to `[#123](https://github.com/versionpress/versionpress/issues/123)`, will handle newlines etc.
