@@ -219,7 +219,7 @@ async function getMergeCommitsAndRelatedGithubIssues(range: GitRange): Promise<M
     pr.relatedIssues = Array.from(matches).map(m => m[1]);
   });
 
-  result.noteworthyPrs = _.filter(result.pullRequests, pr => pr.labels.includes('significant'));
+  result.noteworthyPrs = _.filter(result.pullRequests, pr => pr.labels.includes('noteworthy'));
 
   // Now find noteworthy issues from pull requests and their related issues. We'll query GitHub and
   // find out which issues are labeled "noteworthy".
@@ -275,7 +275,7 @@ async function getMergeCommitsAndRelatedGithubIssues(range: GitRange): Promise<M
         };
       })
     ),
-    iss => iss.labels.includes('significant')
+    iss => iss.labels.includes('noteworthy')
   );
 
   return result;
