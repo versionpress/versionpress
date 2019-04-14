@@ -8,6 +8,7 @@ import matchAll = require('string.prototype.matchall');
 
 const args = arg({
   '--help': Boolean,
+  '--format': String,
   '-h': '--help',
 });
 
@@ -16,7 +17,7 @@ if (args._.length === 0 || args['--help']) {
   Lists pull requests, their related issues and other changes between two versions.
 
   Usage
-    $ changelog <ref1..ref2>
+    $ changelog [--format markdown] <ref1..ref2>
 
   Examples
     $ changelog 4.0..master
@@ -88,6 +89,7 @@ interface IssueGqlResponse {
 }
 
 (async function main() {
+  const cliOutput = args['--format'] !== 'markdown';
   const range = parseRange(args._[0]);
   const { directCommits, pullRequests, mergeCommitsWithoutPR, noteworthyIssues, noteworthyPrs } = await getData(range);
 
@@ -95,11 +97,15 @@ interface IssueGqlResponse {
     if (pullRequests.length === 0) {
       return;
     }
-    console.log('\n' + chalk.cyan(sectionTitle));
+    console.log(formatTitle(sectionTitle, cliOutput));
     pullRequests.forEach(pullRequest => {
       const { prNumber, title } = pullRequest;
       const relatedIssues = pullRequest.relatedIssues.join(', ');
-      console.log(`#${prNumber} ${title}${relatedIssues.length > 0 ? ' (' + relatedIssues + ')' : ''}`);
+      console.log(
+        `${formatIssueOrPr(prNumber, 'pr', cliOutput)} ${title}${
+          relatedIssues.length > 0 ? ' (' + formatRelatedIssues(relatedIssues, cliOutput) + ')' : ''
+        }${formatEol(cliOutput)}`
+      );
     });
   }
 
@@ -107,27 +113,53 @@ interface IssueGqlResponse {
     if (commits.length === 0) {
       return;
     }
-    console.log('\n' + chalk.cyan(sectionTitle));
+    console.log(formatTitle(sectionTitle, cliOutput));
     commits.forEach(commit => {
       const { sha1, commitMessage } = commit;
-      console.log(`${sha1} ${commitMessage}`);
+      console.log(`${formatCommit(sha1, commitMessage, cliOutput)}${formatEol(cliOutput)}`);
     });
   }
 
   if (noteworthyIssues.length > 0) {
-    console.log(chalk.cyan('\nNOTEWORTHY ISSUES:'));
+    console.log(formatTitle('Noteworthy issues', cliOutput));
     noteworthyIssues.forEach(iss => {
       const { issueNumber, title } = iss;
-      console.log(`#${issueNumber} ${title}`);
+      console.log(`${formatIssueOrPr(issueNumber, 'issue', cliOutput)} ${title}${formatEol(cliOutput)}`);
     });
   }
 
-  printPullRequests(noteworthyPrs, 'NOTEWORTHY PULL REQUESTS:');
-  printPullRequests(pullRequests, 'PULL REQUESTS:');
+  printPullRequests(noteworthyPrs, 'Noteworthy pull requests');
+  printPullRequests(pullRequests, 'Pull requests');
 
-  printCommits(mergeCommitsWithoutPR, 'MERGE COMMITS WITHOUT PR:');
-  printCommits(directCommits, 'DIRECT COMMITS TO MASTER:');
+  printCommits(mergeCommitsWithoutPR, 'Merge commits without a PR');
+  printCommits(directCommits, 'Direct commits to master');
 })();
+
+function formatTitle(title: string, isCli: boolean) {
+  return isCli ? `\n${chalk.cyan(title.toUpperCase())}` : `\n## ${title}\n`;
+}
+
+function formatCommit(sha1: string, commitMessage: string, isCli: boolean) {
+  return isCli
+    ? `${sha1} ${commitMessage}`
+    : `[\`${sha1.substring(0, 9)}\`](https://github.com/versionpress/versionpress/commit/${sha1}) ${commitMessage}`;
+}
+
+function formatIssueOrPr(issueOrPrNumber: string, kind: 'pr' | 'issue', isCli: boolean) {
+  return isCli
+    ? `#${issueOrPrNumber}`
+    : `[#${issueOrPrNumber}](https://github.com/versionpress/versionpress/${
+        kind === 'issue' ? 'issues' : 'pull'
+      }/${issueOrPrNumber})`;
+}
+
+function formatEol(isCli: boolean) {
+  return isCli ? '' : `<br>`;
+}
+
+function formatRelatedIssues(str: string, isCli: boolean) {
+  return isCli ? str : str.replace(/#(\d+)/g, '[#$1](https://github.com/versionpress/versionpress/issues/$1)');
+}
 
 async function getData(range: GitRange): Promise<DiffBetweenVersions> {
   github.exitIfNoGithubAccess();
