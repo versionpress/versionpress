@@ -31,7 +31,7 @@ Generally:
 3. Push the branch, open a pull request.
 4. The core team will review it and work with you if necessary.
 5. PR will be merged.
-6. :tada:
+6. 🎉
 
 Learn more about [our development process](docs/content/en/developer/development-process.md) and [set up your local development environment](docs/content/en/developer/dev-setup.md).
 
