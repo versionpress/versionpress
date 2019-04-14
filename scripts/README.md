@@ -27,3 +27,13 @@ node -r ts-node/register --inspect-brk build.ts
 ```
 
 In VSCode, use the "Node attach" configuration.
+
+## About the `changelog` script
+
+The script is used when [preparing a release](../docs/content/en/developer/development-process.md#release-process).
+
+How to use it:
+
+1. Create a new [personal access token](https://github.com/settings/tokens) on GitHub. It only needs the `public_repo` scope.
+2. Copy `.env.example` to `.env` and put the token there.
+3. Run the tool like this: `npm run changelog -- 4.0-beta..master`
