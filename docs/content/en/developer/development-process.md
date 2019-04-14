@@ -4,29 +4,33 @@ If you want to contribute, this is an overview of how we manage the project.
 
 ## Workflow on GitHub
 
-All usually starts with a [GitHub issue](https://github.com/versionpress/versionpress/issues) – someone reports a bug or requests a feature.
-
-The issue is [labeled](https://github.com/versionpress/versionpress/labels) and put to a certain [milestone](https://github.com/versionpress/versionpress/milestones) if we have a rough idea when we'd like to work on it. [GitHub projects](https://github.com/versionpress/versionpress/projects) are then used to track the issues' progress.
+All usually starts with a [GitHub issue](https://github.com/versionpress/versionpress/issues) which is [labeled](https://github.com/versionpress/versionpress/labels) and put to a certain [milestones](https://github.com/versionpress/versionpress/milestones). [GitHub projects](https://github.com/versionpress/versionpress/projects) are used to more granularly track issue states.
 
 [Pull requests](https://github.com/versionpress/versionpress/pulls) implement the functionality. We use [the GitHub flow](https://guides.github.com/introduction/flow/):
 
 ![GitHub Flow](https://guides.github.com/activities/hello-world/branching.png)
 
-If you're contributing, please note the following:
+Some guidelines:
 
-- We appreciate small and focused commits with [good commit messages](https://chris.beams.io/posts/git-commit/).
-- Base your branch on `master` and name it `123-some-feature` where `123` is an issue reference.
-- Use merging, not rebasing. More broadly, never overwrite _published_ commits by rebasing, squashing or force-pushing them.
-
-Feel free to open a pull request early to gather feedback. When the development is done, please update the PR description to be a good overview of the change for anyone reading it in the future.
+- Name branches `123-some-feature` where `123` is an issue reference.
+- Never force-push or otherwise amend published commits. For example, don't rebase or squash commits.
+- Feel free to open a pull request early to gather feedback.
+- When the development is done, please update the PR description to be a good overview of the change for anyone reading it in the future.
 
 ## Release process
 
-### Version numbers
+It slightly evolves over time, it's best to find the most recent [release issue](https://github.com/versionpress/versionpress/labels/release) and start from there. General steps will involve:
 
-We bump major version with every release like browsers do, so you'll typically see a sequence like `2.0` → `3.0` → `3.0.1` (a bugfix release) → `4.0` etc.
+- Writing [release notes](#release-notes).
+- Preparing a build.
+- Publishing a GitHub release.
+- Announcing the release.
 
-Major versions typically go through alphas and betas which are tagged e.g. `4.0-beta2`.
+### Release versioning
+
+We use semver-like version numbers but the versioning is more like what web browsers do, i.e., bump major versions pretty frequently. We barely use minor versions so a typical sequence might look like this:
+
+`3.0` → `3.0.1` → `4.0-alpha` → `4.0-beta` → `4.0` etc.
 
 ### Release notes
 
