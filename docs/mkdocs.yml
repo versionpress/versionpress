@@ -53,6 +53,7 @@ pages:
   - Release Notes:
     - 'Release Notes Home': 'en/release-notes/index.md'
     - 'Roadmap': 'en/release-notes/roadmap.md'
+    - '4.0-beta2 Release Notes': 'en/release-notes/4.0-beta2.md'
     - '4.0-beta Release Notes': 'en/release-notes/4.0-beta.md'
     - '4.0-alpha1 Release Notes': 'en/release-notes/4.0-alpha1.md'
     - '3.0.2 Release Notes': 'en/release-notes/3.0.2.md'
