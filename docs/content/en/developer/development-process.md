@@ -21,10 +21,11 @@ Guidelines we follow:
 
 It evolves over time, it's best to find the most recent [release issue](https://github.com/versionpress/versionpress/labels/release) and start from there. General steps involve:
 
-- [Writing release notes](#release-notes).
-- Preparing a build.
-- Publishing a GitHub release.
-- Announcing the release.
+- Generate a list of pull requests between the latest released version and `master` by running e.g. `npm run changelog -- 4.0..master`, see `scripts/README.md`. Review the pull requests, possibly update their titles, add 'noteworthy' label to those that should be highlighted, etc.
+- [Write release notes](#release-notes).
+- Prepare a build.
+- Publish a GitHub release.
+- Announce the release.
 
 ### Release versioning
 

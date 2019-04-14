@@ -1,6 +1,6 @@
 # VersionPress dev scripts
 
-Scripts that overgrew the one-liners in `package.json`.
+Scripts that have outgrown the one-liners in `package.json`.
 
 ## Dev setup
 
@@ -20,10 +20,20 @@ node -r ./scripts/node_modules/ts-node/register scripts/build.ts
 
 ## Debugging scripts
 
-To debug a script, add `--inspect-brk`:
+Use a `npm run debug-script -- ...` or manually add `--inspect-brk`:
 
 ```
 node -r ts-node/register --inspect-brk build.ts
 ```
 
-Then in VSCode, create a "Node attach" configuration and run it.
+In VSCode, use the "Node attach" configuration.
+
+## About the `changelog` script
+
+The script is used when [preparing a release](../docs/content/en/developer/development-process.md#release-process).
+
+How to use it:
+
+1. Create a new [personal access token](https://github.com/settings/tokens) on GitHub. It only needs the `public_repo` scope.
+2. Copy `.env.example` to `.env` and put the token there.
+3. Run the tool like this: `npm run changelog -- 4.0-beta..master`

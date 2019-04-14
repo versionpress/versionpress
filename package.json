@@ -9,6 +9,7 @@
     "refresh-dev": "git clean -fxd && npm i",
     "init-phpstorm": "node -r ./scripts/node_modules/ts-node/register scripts/init-phpstorm.ts",
     "build": "node -r ./scripts/node_modules/ts-node/register scripts/build.ts",
+    "changelog": "node -r ./scripts/node_modules/ts-node/register scripts/changelog.ts",
     "start": "docker-compose up -d wordpress",
     "stop": "docker-compose stop",
     "stop-and-cleanup": "docker-compose down -v && rm -rf dev-env/wp",
