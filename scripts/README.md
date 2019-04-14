@@ -1,6 +1,6 @@
 # VersionPress dev scripts
 
-Scripts that overgrew the one-liners in `package.json`.
+Scripts that have outgrown the one-liners in `package.json`.
 
 ## Dev setup
 
