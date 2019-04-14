@@ -126,7 +126,7 @@ interface IssueGqlResponse {
   printPullRequests(pullRequests, 'PULL REQUESTS:');
 
   printCommits(mergeCommitsWithoutPR, 'MERGE COMMITS WITHOUT PR:');
-  printCommits(directCommits, 'DIRECT COMMITS TO BASE BRANCH:');
+  printCommits(directCommits, 'DIRECT COMMITS TO MASTER:');
 })();
 
 async function getData(range: GitRange): Promise<DiffBetweenVersions> {
