@@ -11,7 +11,7 @@ const args = arg({
   '-h': '--help',
 });
 
-if (args['--help']) {
+if (args._.length === 0 || args['--help']) {
   console.log(`
   Lists pull requests, their related issues and other changes between two versions.
 
