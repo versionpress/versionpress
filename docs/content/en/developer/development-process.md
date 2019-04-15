@@ -19,11 +19,12 @@ Guidelines we follow:
 
 ## Release process
 
-It evolves over time, it's best to find the most recent [release issue](https://github.com/versionpress/versionpress/labels/release) and start from there. General steps involve:
+It evolves over time, it's best to find the most recent issue with the [`release`](https://github.com/versionpress/versionpress/labels/release) label and start from there. General steps involve:
 
-- Generate a list of pull requests between the latest released version and `master` by running e.g. `npm run changelog -- 4.0..master`, see `scripts/README.md`. Review the pull requests, possibly update their titles, add 'noteworthy' label to those that should be highlighted, etc.
+- Generate a list of pull requests between the latest released version and `master` by running e.g. `npm run changelog -- 4.0..master`, see `scripts/README.md`.
+    - Review the pull requests, possibly update their titles, add 'noteworthy' label to those that should be highlighted, etc.
 - [Write release notes](#release-notes).
-- Prepare a build.
+- Tag a version, prepare a build. (The WP plugin version is automatically inferred from a Git tag.)
 - Publish a GitHub release.
 - Announce the release.
 
