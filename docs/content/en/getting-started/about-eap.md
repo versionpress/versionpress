@@ -2,8 +2,6 @@
 
 Currently, VersionPress is a _Developer Preview_ and **should not be used in production**. We really mean it: any bugs or plugin incompatibilities might mess up your database.
 
-If you're eager to start using better WordPress workflows today, you can check out [VersionPress.com](https://versionpress.com): a simplified take on database merging by the same team, with different set of trade-offs (not directly built on Git, not as powerful but much more compatible with real-world sites). Note that VersionPress.com is a hosted service, not a plugin.
-
 .
 
 .
