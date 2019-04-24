@@ -83,7 +83,7 @@ class QueryLanguageUtils
 
                 if ($isWildcard && preg_match(QueryLanguageUtils::tokensToRegex($valueTokens), $entity[$field])) {
                     return true;
-                } elseif (strtolower(strval($entity[$field])) === strtolower($value)) {
+                } elseif (strtolower(strval($entity[$field])) === $value) {
                     return true;
                 }
 
