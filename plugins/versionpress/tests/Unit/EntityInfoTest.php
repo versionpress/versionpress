@@ -19,6 +19,7 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase
             ],
             'ignored-entities' => [
                 'some_field: value other_field: a',
+                'capitalized_value_field: VALUE',
                 'other_field: value'
             ],
             'ignored-columns' => [
@@ -70,6 +71,9 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase
                 'other_field' => ['a'],
             ],
             [
+                'capitalized_value_field' => ['value'], // the value is lowercased
+            ],
+            [
                 'other_field' => ['value']
             ],
         ];
@@ -110,6 +114,20 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase
         $entity = [
             'some_field' => 'value',
             'other_field' => 'a',
+        ];
+
+        $this->assertTrue($this->entityInfo->isIgnoredEntity($entity));
+    }
+
+    /**
+     * @test
+     */
+    public function ignoredEntityCapitalizedIsCorrectlyIdentified()
+    {
+        $entity = [
+            'some_field' => 'b',
+            'other_field' => 'a',
+            'capitalized_value_field' => 'VaLuE', // comparison must be case insensitive
         ];
 
         $this->assertTrue($this->entityInfo->isIgnoredEntity($entity));
