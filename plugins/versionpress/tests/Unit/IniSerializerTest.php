@@ -1617,4 +1617,84 @@ INI
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
     }
+
+    /**
+     * @test
+     */
+    public function arrayWithMultilineValueDeserializedToOriginalValue()
+    {
+        $data = ["section" => ["key1" => [ <<<'DATA'
+-----BEGIN CERTIFICATE-----
+MIIDnDCCAoSgAwIBAgIGAV2hzwAUMA0GCSqGSIb3DQEBCwUAMIGOMQswCQYDVQQG
+EwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNj
+bzENMAsGA1UECgwET2t0YTEUMBIGA1UECwwLU1NPUHJvdmlkZXIxDzANBgNVBAMM
+Bmlzb2JhcjEcMBoGCSqGSIb3DQEJARYNaW5mb0Bva3RhLmNvbTAeFw0xNzA4MDIw
+NzE3MDRaFw0yNzA4MDIwNzE4MDNaMIGOMQswCQYDVQQGEwJVUzETMBEGA1UECAwK
+Q2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0
+YTEUMBIGA1UECwwLU1NPUHJvdmlkZXIxDzANBgNVBAMMBmlzb2JhcjEcMBoGCSqG
+SIb3DQEJARYNaW5mb0Bva3RhLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+AQoCggEBAJqzbApk1LTFnGF9E3OvS9fZkcRbHoiLVHyqnE5+ZIUsL3qBwgXbLlg1
+aiV3y5QCpv/SoDYNTkmG8Af5PC+qEFDqA1UnqDs3epJtK/SLLdRHNTJjesLXtgWL
+8YxcVh0FQkDUBUmOomEfokGU1oda+jjxYcee/zF7IUcETenWRmM5RXPvMxOVeSsq
+6ecc1z84gYiuD2qUR/WpZsA3A83K1O+kGhM56qkjlb9X1yco9vavw0NI+m70pSri
+VhcETrIZZpT1I4G3DRPAnStnoLFyp44WGPd8S4G3dSjClA4+cdTphKZL5nKin02F
+NGNB3sv+ubmsmsHUnTzkyr18iXKRbxMCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEA
+CQW2NW9GjtkcZRImC+l9hSlDZ5NYvgjGE67arPdrbS1EDjmpOdz7E7yLEU6mpzsO
+xMsi5kta9rQhsOdbydz6swkkUxrhSm7lBbttkggHULN1dfhLMUmbBDCZ9cmfRZCo
+D0dW+bHjH4aDd3X1uguoGjoxTMaR3EM5z663rA3ogjRTbsdag4sjlpoVah40y0vi
+tVl4j/Uxn/VzzG1yGmPffrv8AWG4Zll9ZjIowbE9MnHdcMgj6sPBYJ7J1iVwlRMj
+9F8SeUPTzQhnh/40TH3KNVU6QSb5J1W4gCrRwxQ0HDlCZOAZyL5JJoIlGTqCbF5b
+AcPvBc/ggs5jNB6jaqLJ/A==
+-----END CERTIFICATE-----
+DATA
+        ]]];
+        $ini = StringUtils::ensureLf(<<<'INI'
+[section]
+key1 = <<<serialized>>> <<<serialized>>> <array>
+key1[0] = "-----BEGIN CERTIFICATE-----
+MIIDnDCCAoSgAwIBAgIGAV2hzwAUMA0GCSqGSIb3DQEBCwUAMIGOMQswCQYDVQQG
+EwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNj
+bzENMAsGA1UECgwET2t0YTEUMBIGA1UECwwLU1NPUHJvdmlkZXIxDzANBgNVBAMM
+Bmlzb2JhcjEcMBoGCSqGSIb3DQEJARYNaW5mb0Bva3RhLmNvbTAeFw0xNzA4MDIw
+NzE3MDRaFw0yNzA4MDIwNzE4MDNaMIGOMQswCQYDVQQGEwJVUzETMBEGA1UECAwK
+Q2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0
+YTEUMBIGA1UECwwLU1NPUHJvdmlkZXIxDzANBgNVBAMMBmlzb2JhcjEcMBoGCSqG
+SIb3DQEJARYNaW5mb0Bva3RhLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+AQoCggEBAJqzbApk1LTFnGF9E3OvS9fZkcRbHoiLVHyqnE5+ZIUsL3qBwgXbLlg1
+aiV3y5QCpv/SoDYNTkmG8Af5PC+qEFDqA1UnqDs3epJtK/SLLdRHNTJjesLXtgWL
+8YxcVh0FQkDUBUmOomEfokGU1oda+jjxYcee/zF7IUcETenWRmM5RXPvMxOVeSsq
+6ecc1z84gYiuD2qUR/WpZsA3A83K1O+kGhM56qkjlb9X1yco9vavw0NI+m70pSri
+VhcETrIZZpT1I4G3DRPAnStnoLFyp44WGPd8S4G3dSjClA4+cdTphKZL5nKin02F
+NGNB3sv+ubmsmsHUnTzkyr18iXKRbxMCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEA
+CQW2NW9GjtkcZRImC+l9hSlDZ5NYvgjGE67arPdrbS1EDjmpOdz7E7yLEU6mpzsO
+xMsi5kta9rQhsOdbydz6swkkUxrhSm7lBbttkggHULN1dfhLMUmbBDCZ9cmfRZCo
+D0dW+bHjH4aDd3X1uguoGjoxTMaR3EM5z663rA3ogjRTbsdag4sjlpoVah40y0vi
+tVl4j/Uxn/VzzG1yGmPffrv8AWG4Zll9ZjIowbE9MnHdcMgj6sPBYJ7J1iVwlRMj
+9F8SeUPTzQhnh/40TH3KNVU6QSb5J1W4gCrRwxQ0HDlCZOAZyL5JJoIlGTqCbF5b
+AcPvBc/ggs5jNB6jaqLJ/A==
+-----END CERTIFICATE-----"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+
+
+
+
+
+
+
+
+        $data = ["Section" => ["data" => "<null>"]];
+        $ini = StringUtils::ensureLf(<<<'INI'
+[Section]
+data = "<null>"
+
+INI
+        );
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
 }
