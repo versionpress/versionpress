@@ -147,7 +147,6 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase
         $entity = [
             'some_field' => 'value',
             'other_field' => 'b',
-            'capitalized_value_field' => 'qqq',
         ];
 
         $this->assertFalse($this->entityInfo->isIgnoredEntity($entity));
