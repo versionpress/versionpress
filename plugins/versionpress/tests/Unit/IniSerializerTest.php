@@ -1566,6 +1566,43 @@ INI
     /**
      * @test
      */
+    public function doubleSerializedString()
+    {
+	$value = serialize(serialize('test'));
+	$this->assertSame('s:11:"s:4:"test";";', $value);
+        $data = ["Section" => ["data" => $value ] ];
+        $ini = StringUtils::ensureLf(<<<'INI'
+[Section]
+data = <<<serialized>>> <<<serialized>>> "test"
+
+INI
+        );
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function doubleSerializedArray()
+    {
+	$value = serialize(serialize(['test']));
+	$this->assertSame('s:21:"a:1:{i:0;s:4:"test";}";', $value);
+        $data = ["Section" => ["data" => $value ] ];
+        $ini = StringUtils::ensureLf(<<<'INI'
+[Section]
+data = <<<serialized>>> <<<serialized>>> <array>
+data[0] = "test"
+
+INI
+        );
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
     public function threeNestedSerializedValues()
     {
         $stdClass = new \stdClass();
