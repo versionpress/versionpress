@@ -97,8 +97,9 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function commonEntityIsNotFalselyIdentifiedAsFrequentlyWritten()
+    public function partialMatchIsNotFalselyIdentifiedAsFrequentlyWritten()
     {
+        // The rule is `'some_field: value other_field: a'` and the entity only partially matches it:
         $entity = [
             'some_field' => 'value'
         ];
@@ -136,8 +137,10 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function commonEntityIsNotFalselyIdentifiedAsIgnored()
+    public function partialMatchIsNotFalselyIdentifiedAsIgnored()
     {
+        // The rule is `'some_field: value other_field: a'` and the entity must match it entirely.
+
         $entity = [
             'some_field' => 'value'
         ];
