@@ -57,7 +57,7 @@ class SerializedDataToIniConverter
      */
     public function fromIniLines($key, $lines)
     {
-        $value = substr($lines[$key], strlen(self::SERIALIZED_MARKER) + 1); // + space
+        $value = preg_replace('/' . preg_quote(self::SERIALIZED_MARKER) . ' /', '', $lines[$key], -1, $count);
         unset($lines[$key]);
 
         if (is_numeric($value)) {
@@ -69,7 +69,11 @@ class SerializedDataToIniConverter
             $relatedLines[substr($relatedKey, strlen($key))] = $lineValue;
         }
 
-        return $this->convertValueToSerializedString($value, $relatedLines);
+        $ret = $this->convertValueToSerializedString($value, $relatedLines);
+        for ($i = 1; $i < $count; $i++) {
+            $ret = serialize($ret);
+        }
+        return $ret;
     }
 
     /**
