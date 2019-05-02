@@ -22,7 +22,7 @@
     "symfony/process": "^3.3",
     "michelf/php-markdown": "^1.7",
     "symfony/filesystem": "^3.3",
-    "phpmyadmin/sql-parser": "3.4",
+    "phpmyadmin/sql-parser": "^4",
     "tracy/tracy": "^2.4"
   },
   "require-dev": {

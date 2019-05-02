@@ -2,12 +2,12 @@
 
 namespace VersionPress\Database;
 
-use SqlParser\Parser;
-use SqlParser\Statement;
-use SqlParser\Statements\DeleteStatement;
-use SqlParser\Statements\InsertStatement;
-use SqlParser\Statements\ReplaceStatement;
-use SqlParser\Statements\UpdateStatement;
+use PhpMyAdmin\SqlParser\Parser;
+use PhpMyAdmin\SqlParser\Statement;
+use PhpMyAdmin\SqlParser\Statements\DeleteStatement;
+use PhpMyAdmin\SqlParser\Statements\InsertStatement;
+use PhpMyAdmin\SqlParser\Statements\ReplaceStatement;
+use PhpMyAdmin\SqlParser\Statements\UpdateStatement;
 
 class SqlQueryParser
 {
