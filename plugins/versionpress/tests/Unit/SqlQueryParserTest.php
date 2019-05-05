@@ -193,6 +193,11 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase
                 "INSERT INTO `wp_terms` (term_id, name) VALUES (10, 'term')",
                 [["term_id" => 10, "name" => "term"]],
                 ParsedQueryData::INSERT_QUERY
+            ],
+            [
+                "INSERT INTO `wp_terms` (term_id, name) VALUES (10, 'term line 1\\nterm line 2')",
+                [["term_id" => 10, "name" => "term line 1\nterm line 2"]],
+                ParsedQueryData::INSERT_QUERY
             ]
 
         ];
@@ -252,7 +257,14 @@ class SqlQueryParserTest extends PHPUnit_Framework_TestCase
                 "SELECT ID FROM `wp_posts` WHERE post_author = 5",
                 ["post_author" => 4],
                 $testIds
-            ]
+            ],
+            [
+                "UPDATE `wp_options` SET option_value='line 1\\nline 2'" .
+                "WHERE option_name LIKE '%_' AND option_value LIKE '%s'",
+                "SELECT option_name FROM `wp_options` WHERE option_name LIKE '%_' AND option_value LIKE '%s'",
+                ["option_value" => "'line 1\nline 2'"],
+                $testIds
+            ],
 
         ];
     }

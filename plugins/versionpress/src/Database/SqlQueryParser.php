@@ -204,7 +204,7 @@ class SqlQueryParser
         if ($sqlStatement instanceof UpdateStatement) {
             $dataSet = [];
             foreach ($sqlStatement->set as $set) {
-                $dataSet[str_replace('`', '', $set->column)] = stripslashes($set->value);
+                $dataSet[str_replace('`', '', $set->column)] = stripcslashes($set->value);
             };
             return $dataSet;
         } elseif ($sqlStatement instanceof InsertStatement) {
@@ -214,7 +214,7 @@ class SqlQueryParser
                 $data = [];
                 foreach ($sets->values as $i => $value) {
                     if (is_string($value)) {
-                        $data[$columns[$i]] = stripslashes($value);
+                        $data[$columns[$i]] = stripcslashes($value);
                     } else {
                         $data[$columns[$i]] = $value;
                     }
