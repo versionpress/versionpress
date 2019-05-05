@@ -879,7 +879,7 @@ INI
 
         $this->assertSame($ini, IniSerializer::serialize($data));
         $this->assertSame($data, IniSerializer::deserialize($ini));
-        
+
     }
 
     /**
@@ -1555,6 +1555,45 @@ INI
 [Section]
 data = <<<serialized>>> <array>
 data[0] = <<<serialized>>> "some string"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function doubleSerializedString()
+    {
+	    $serializedValue = serialize(serialize('test'));
+
+        $data = ["Section" => ["data" => $serializedValue ] ];
+        $ini = StringUtils::ensureLf(<<<'INI'
+[Section]
+data = <<<serialized>>> <<<serialized>>> "test"
+
+INI
+        );
+
+        $this->assertSame($ini, IniSerializer::serialize($data));
+        $this->assertSame($data, IniSerializer::deserialize($ini));
+    }
+
+    /**
+     * @test
+     */
+    public function doubleSerializedArray()
+    {
+	    $serializedValue = serialize(serialize(['test']));
+
+        $data = ["Section" => ["data" => $serializedValue ] ];
+        $ini = StringUtils::ensureLf(<<<'INI'
+[Section]
+data = <<<serialized>>> <<<serialized>>> <array>
+data[0] = "test"
 
 INI
         );
