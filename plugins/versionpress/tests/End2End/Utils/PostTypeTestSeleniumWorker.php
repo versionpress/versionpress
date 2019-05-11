@@ -260,7 +260,7 @@ abstract class PostTypeTestSeleniumWorker extends SeleniumWorker implements IPos
             "post_content" => "Test post",
             "post_author" => 1
         ];
-        self::$wpAutomation->createPost($post);
+        self::$wpAutomation->createPost($post, true);
         self::$wpAutomation->createPost($post);
     }
 

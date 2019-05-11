@@ -135,11 +135,15 @@ class WpAutomation
      *
      * @see wp_insert_post()
      * @param array $post (as wp_insert_post)
+     * @param bool $waitOneSecond Wait to ensure that there are no testing posts published at the same time.
+     *                            Currently used only for End2End tests which would fail without it, see #1420.    
      * @return int
      */
-    public function createPost(array $post)
+    public function createPost(array $post, $waitOneSecond = false)
     {
-        sleep(1); // Ensure that there are no testing posts published at the same time, see issue #1420
+        if ($waitOneSecond) {
+            sleep(1);
+        }
         $post["porcelain"] = null; // wp-Cli returns only id
         return intval($this->runWpCliCommand('post', 'create', $post));
     }

@@ -185,7 +185,7 @@ abstract class PostTypeTestWpCliWorker extends WpCliWorker implements IPostTypeT
     {
         $trashedPost = array_merge($this->testPost, ['post_status' => 'trash']);
         $this->postId = [];
-        $this->postId[] = $this->wpAutomation->createPost($trashedPost);
+        $this->postId[] = $this->wpAutomation->createPost($trashedPost, true);
         $this->postId[] = $this->wpAutomation->createPost($trashedPost);
     }
 
@@ -214,7 +214,7 @@ abstract class PostTypeTestWpCliWorker extends WpCliWorker implements IPostTypeT
     {
         $draft = array_merge($this->testPost, ['post_status' => 'draft']);
         $this->postId = [];
-        $this->postId[] = $this->wpAutomation->createPost($draft);
+        $this->postId[] = $this->wpAutomation->createPost($draft, true);
         $this->postId[] = $this->wpAutomation->createPost($draft);
     }
 
