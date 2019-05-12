@@ -71,7 +71,7 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase
                 'other_field' => ['a'],
             ],
             [
-                'capitalized_value_field' => ['value'], // the value is lowercased
+                'capitalized_value_field' => ['VALUE']
             ],
             [
                 'other_field' => ['value']
@@ -128,7 +128,7 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase
         $entity = [
             'some_field' => 'b',
             'other_field' => 'a',
-            'capitalized_value_field' => 'VaLuE', // comparison must be case insensitive
+            'capitalized_value_field' => 'VALUE',
         ];
 
         $this->assertTrue($this->entityInfo->isIgnoredEntity($entity));
