@@ -21,10 +21,9 @@ class QueryLanguageUtils
      *  array = ['some_field' => ['value'], 'other_field' => ['other_value']]
      *
      * @param $queries
-     * @param $allowEmpty boolean Allow empty values
      * @return array
      */
-    public static function createRulesFromQueries($queries, $allowEmpty = false)
+    public static function createRulesFromQueries($queries)
     {
         $rules = [];
         foreach ($queries as $query) {
@@ -48,7 +47,7 @@ class QueryLanguageUtils
                 isset($match[4]) ? $match[4] : (
                 isset($match[3]) ? $match[3] : ''));
 
-                if ($value !== '' || $allowEmpty) {
+                if ($value !== '') {
                     if (!isset($ruleParts[$key])) {
                         $ruleParts[$key] = [];
                     }
