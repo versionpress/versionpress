@@ -21,6 +21,7 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [['field: value'], ['field' => 'value']],
+            [['Field: VALUE'], ['Field' => 'VALUE']],
             [['field: value'], ['field' => 'value', 'other_field' => 'other_value']],
             [['field: 0'], ['field' => 0]],
             [['field: value other_field: other_value'], ['field' => 'value', 'other_field' => 'other_value']],
@@ -46,6 +47,7 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [['field: value'], ['field' => 'another_value']],
+            [['Field: VALUE'], ['field' => 'value']],
             [['field: value'], ['other_field' => 'value']],
             [['field: value'], ['field' => 0]],
             [['field: value other_field: other_value'], ['field' => 'value']],
@@ -71,6 +73,7 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [['field' => ['value']], '(`field` = "value")'],
+            [['Field' => ['VALUE']], '(`Field` = "VALUE")'],
             [
                 ['field' => ['value'], 'other_field' => ['other_value']],
                 '(`field` = "value" AND `other_field` = "other_value")'
@@ -178,7 +181,7 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
                 '-i --all-match --grep="^VP-Action: \(entity\|.*\)/.*/\(.*vp.*\|vpid\)$"'
             ],
             [['text' => ['text1', 'Test text', '*']], '-i --all-match --grep="text1" --grep="Test text" --grep=".*"'],
-            [['x-vp-another-key' => ['Test value']], '-i --all-match --grep="^x-vp-another-key: \(Test value\)$"'],
+            [['X-vp-another-key' => ['Test value']], '-i --all-match --grep="^x-vp-another-key: \(Test value\)$"'],
             [['vp-another-key' => ['Test value']], '-i --all-match --grep="^\(x-\)\?vp-another-key: \(Test value\)$"'],
             [['another-key' => ['Test value']], '-i --all-match --grep="^\(x-vp-\|vp-\)another-key: \(Test value\)$"'],
             [
