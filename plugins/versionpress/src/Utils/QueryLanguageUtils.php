@@ -226,16 +226,16 @@ class QueryLanguageUtils
             }
 
             if (substr($key, 0, 5) === 'x-vp-') {
-                $prefix = '';
+                $key = str_replace( 'x-vp-', 'X-VP-', $key );
             } else {
                 if (substr($key, 0, 3) === 'vp-') {
-                    $prefix = '\(X-\)\?';
+                    $key = '\(X-\)\?' . str_replace( 'vp-', 'VP-', $key );
                 } else {
-                    $prefix = '\(X-VP-\|VP-\)';
+                    $key = '\(X-VP-\|VP-\)' . $key;
                 }
             }
 
-            $query .= ' --grep="^' . $prefix . $key . ': \(' . implode('\|', $values) . '\)$"';
+            $query .= ' --grep="^' . $key . ': \(' . implode('\|', $values) . '\)$"';
         }
 
         return $query;

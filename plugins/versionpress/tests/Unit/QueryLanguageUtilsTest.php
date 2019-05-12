@@ -104,8 +104,7 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
     public function queryLanguageUtilsCreatesCorrectRules($query, $expectedRules)
     {
         $rules = QueryLanguageUtils::createRulesFromQueries($query);
-        // Perform case insensitive match
-        $this->assertEquals($expectedRules, $rules, '', 0, 10, false, true);
+        $this->assertEquals($expectedRules, $rules);
     }
 
     public function queryAndRulesProvider()
@@ -139,8 +138,7 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
     public function queryLanguageUtilsGeneratesCorrectGitLogQuery($rules, $expectedQuery)
     {
         $query = QueryLanguageUtils::createGitLogQueryFromRule($rules);
-        // Perform case insensitive match
-        $this->assertEquals($expectedQuery, $query, '', 0, 10, false, true);
+        $this->assertEquals($expectedQuery, $query);
     }
 
     public function rulesAndGitLogQueryProvider()
@@ -181,12 +179,12 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
                 '-i --all-match --grep="^VP-Action: \(entity\|.*\)/.*/\(.*vp.*\|vpid\)$"'
             ],
             [['text' => ['text1', 'Test text', '*']], '-i --all-match --grep="text1" --grep="Test text" --grep=".*"'],
-            [['X-vp-another-key' => ['Test value']], '-i --all-match --grep="^x-vp-another-key: \(Test value\)$"'],
-            [['vp-another-key' => ['Test value']], '-i --all-match --grep="^\(x-\)\?vp-another-key: \(Test value\)$"'],
-            [['another-key' => ['Test value']], '-i --all-match --grep="^\(x-vp-\|vp-\)another-key: \(Test value\)$"'],
+            [['X-vp-another-key' => ['Test value']], '-i --all-match --grep="^X-VP-another-key: \(Test value\)$"'],
+            [['vp-another-key' => ['Test value']], '-i --all-match --grep="^\(X-\)\?VP-another-key: \(Test value\)$"'],
+            [['another-key' => ['Test value']], '-i --all-match --grep="^\(X-VP-\|VP-\)another-key: \(Test value\)$"'],
             [
                 ['*-key' => ['^+?(){|$*\.[']],
-                '-i --all-match --grep="^\(x-vp-\|vp-\).*-key: \(^+?(){|\\\\\\$.*\\\\\\\\\.\[\)$"'
+                '-i --all-match --grep="^\(X-VP-\|VP-\).*-key: \(^+?(){|\\\\\\$.*\\\\\\\\\.\[\)$"'
             ]
         ];
     }
