@@ -225,10 +225,10 @@ class QueryLanguageUtils
             }
 
             if (substr($key, 0, 5) === 'x-vp-') {
-                $key = str_replace( 'x-vp-', 'X-VP-', $key );
+                $key = str_replace('x-vp-', 'X-VP-', $key);
             } else {
                 if (substr($key, 0, 3) === 'vp-') {
-                    $key = '\(X-\)\?' . str_replace( 'vp-', 'VP-', $key );
+                    $key = '\(X-\)\?' . str_replace('vp-', 'VP-', $key);
                 } else {
                     $key = '\(X-VP-\|VP-\)' . $key;
                 }
