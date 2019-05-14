@@ -72,7 +72,7 @@ class VersionPressApi
 
         $this->registerRestRoute('/undo', [
             'methods' => WP_REST_Server::READABLE,
-            'callback' => $this->handleAsAdminSectionRoute('undoCommits'),
+            'callback' => array($this, 'undoCommit'),
             'args' => [
                 'commits' => [
                     'required' => true
@@ -82,7 +82,7 @@ class VersionPressApi
 
         $this->registerRestRoute('/rollback', [
             'methods' => WP_REST_Server::READABLE,
-            'callback' => $this->handleAsAdminSectionRoute('rollbackToCommit'),
+            'callback' => array($this, 'rollbackToCommit'),
             'args' => [
                 'commit' => [
                     'required' => true
@@ -112,7 +112,7 @@ class VersionPressApi
 
         $this->registerRestRoute('/hide-welcome-panel', [
             'methods' => WP_REST_Server::CREATABLE,
-            'callback' => $this->handleAsAdminSectionRoute('hideWelcomePanel')
+            'callback' => array($this, 'hideWelcomePanel')
         ]);
 
         $this->registerRestRoute('/should-update', [
@@ -127,7 +127,7 @@ class VersionPressApi
 
         $this->registerRestRoute('/commit', [
             'methods' => WP_REST_Server::CREATABLE,
-            'callback' => $this->handleAsAdminSectionRoute('commit'),
+            'callback' => array($this, 'commit'),
             'args' => [
                 'commit-message' => [
                     'required' => true
@@ -137,12 +137,12 @@ class VersionPressApi
 
         $this->registerRestRoute('/discard-changes', [
             'methods' => WP_REST_Server::CREATABLE,
-            'callback' => $this->handleAsAdminSectionRoute('discardChanges')
+            'callback' => array($this, 'discardChanges')
         ]);
 
         $this->registerRestRoute('/autocomplete-config', [
             'methods' => WP_REST_Server::READABLE,
-            'callback' => $this->handleAsAdminSectionRoute('getAutocompleteConfig')
+            'callback' => array($this, 'getAutocompleteConfig')
         ]);
     }
 
@@ -153,24 +153,6 @@ class VersionPressApi
             $args['permission_callback'] = [$this, 'checkPermissions'];
         }
         return register_rest_route(self::NAMESPACE_VP, $route, $args, $override);
-    }
-
-    /**
-     * Adds WP_ADMIN constant before route handling function is called. Routes calls are than evaluated as called
-     * in admin section of WordPress even if the routes are called using AJAX (WordPress native function is_admin()
-     * evaluates call correctly.
-     *
-     * @param string $routeHandler
-     * @return \Closure
-     */
-    private function handleAsAdminSectionRoute($routeHandler)
-    {
-        return function (WP_REST_Request $request) use ($routeHandler) {
-            if (!defined('WP_ADMIN')) {
-                define('WP_ADMIN', true);
-            }
-            return $this->$routeHandler($request);
-        };
     }
 
     /**
