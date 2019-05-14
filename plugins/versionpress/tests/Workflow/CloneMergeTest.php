@@ -26,12 +26,6 @@ class CloneMergeTest extends PHPUnit_Framework_TestCase
         self::$siteConfig = self::$testConfig->testSite;
 
         self::$cloneSiteConfig = self::getCloneSiteConfig(self::$siteConfig);
-
-        // Currently, we use an empty site as a basic test.
-        $wpAutomation = new WpAutomation(self::$siteConfig, self::$testConfig->wpCliVersion);
-        $wpAutomation->setUpSite();
-        $wpAutomation->copyVersionPressFiles();
-        $wpAutomation->initializeVersionPress();
     }
 
     /**
@@ -39,6 +33,12 @@ class CloneMergeTest extends PHPUnit_Framework_TestCase
      */
     public function cloneLooksExactlySameAsOriginal()
     {
+        // Currently, we use an empty site as a basic test.
+        $wpAutomation = new WpAutomation(self::$siteConfig, self::$testConfig->wpCliVersion);
+        $wpAutomation->setUpSite();
+        $wpAutomation->copyVersionPressFiles();
+        $wpAutomation->initializeVersionPress();
+
         FileSystem::mkdir(self::$cloneSiteConfig->path);
 
         $wpAutomation = new WpAutomation(self::$siteConfig, self::$testConfig->wpCliVersion);
