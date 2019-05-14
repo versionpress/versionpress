@@ -86,7 +86,7 @@ class Committer
             return;
         }
 
-        if (is_user_logged_in() && is_admin()) {
+        if (is_user_logged_in()) {
             $currentUser = wp_get_current_user();
             /** @noinspection PhpUndefinedFieldInspection */
             $authorName = $currentUser->display_name;
