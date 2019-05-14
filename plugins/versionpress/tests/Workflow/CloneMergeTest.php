@@ -27,8 +27,7 @@ class CloneMergeTest extends PHPUnit_Framework_TestCase
 
         self::$cloneSiteConfig = self::getCloneSiteConfig(self::$siteConfig);
 
-        // Currently, workflow tests only pass when they are run on a fresh WordPress install, see #1409. That's why
-        // we force a full setup here. In the future, just `$wpAutomation->ensureTestSiteIsReady` should be used.
+        // Currently, we use an empty site as a basic test.
         $wpAutomation = new WpAutomation(self::$siteConfig, self::$testConfig->wpCliVersion);
         $wpAutomation->setUpSite();
         $wpAutomation->copyVersionPressFiles();
