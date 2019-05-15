@@ -101,8 +101,6 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
     public function queryLanguageUtilsCreatesCorrectRules($query, $expectedRules)
     {
         $rules = QueryLanguageUtils::createRulesFromQueries($query);
-        // Perform case insensitive match
-        $this->assertEquals($expectedRules, $rules, '', 0, 10, false, true);
     }
 
     public function queryAndRulesProvider()
@@ -136,8 +134,6 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
     public function queryLanguageUtilsGeneratesCorrectGitLogQuery($rules, $expectedQuery)
     {
         $query = QueryLanguageUtils::createGitLogQueryFromRule($rules);
-        // Perform case insensitive match
-        $this->assertEquals($expectedQuery, $query, '', 0, 10, false, true);
     }
 
     public function rulesAndGitLogQueryProvider()
