@@ -70,10 +70,13 @@ class QueryLanguageUtils
      */
     public static function entityMatchesSomeRule($entity, $rules)
     {
+        $entity = array_change_key_case($entity, CASE_LOWER);
         return ArrayUtils::any($rules, function ($rule) use ($entity) {
             // check all parts of rule
             return ArrayUtils::all($rule, function ($values, $field) use ($entity) {
-                if (!isset($entity[$field])) {
+                $field = strtolower($field);
+
+                if (!isset($entity[strtolower($field)])) {
                     return false;
                 }
 
