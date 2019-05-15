@@ -72,7 +72,7 @@ class VersionPressApi
 
         $this->registerRestRoute('/undo', [
             'methods' => WP_REST_Server::READABLE,
-            'callback' => array($this, 'undoCommit'),
+            'callback' => [$this, 'undoCommits'],
             'args' => [
                 'commits' => [
                     'required' => true
@@ -82,7 +82,7 @@ class VersionPressApi
 
         $this->registerRestRoute('/rollback', [
             'methods' => WP_REST_Server::READABLE,
-            'callback' => array($this, 'rollbackToCommit'),
+            'callback' => [$this, 'rollbackToCommit'],
             'args' => [
                 'commit' => [
                     'required' => true
@@ -112,7 +112,7 @@ class VersionPressApi
 
         $this->registerRestRoute('/hide-welcome-panel', [
             'methods' => WP_REST_Server::CREATABLE,
-            'callback' => array($this, 'hideWelcomePanel')
+            'callback' => [$this, 'hideWelcomePanel']
         ]);
 
         $this->registerRestRoute('/should-update', [
@@ -127,7 +127,7 @@ class VersionPressApi
 
         $this->registerRestRoute('/commit', [
             'methods' => WP_REST_Server::CREATABLE,
-            'callback' => array($this, 'commit'),
+            'callback' => [$this, 'commit'],
             'args' => [
                 'commit-message' => [
                     'required' => true
@@ -137,12 +137,12 @@ class VersionPressApi
 
         $this->registerRestRoute('/discard-changes', [
             'methods' => WP_REST_Server::CREATABLE,
-            'callback' => array($this, 'discardChanges')
+            'callback' => [$this, 'discardChanges']
         ]);
 
         $this->registerRestRoute('/autocomplete-config', [
             'methods' => WP_REST_Server::READABLE,
-            'callback' => array($this, 'getAutocompleteConfig')
+            'callback' => [$this, 'getAutocompleteConfig']
         ]);
     }
 
