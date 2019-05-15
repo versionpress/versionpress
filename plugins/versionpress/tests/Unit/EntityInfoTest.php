@@ -71,7 +71,7 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase
                 'other_field' => ['a'],
             ],
             [
-                'capitalized_value_field' => ['value'], // the value is lowercased
+                'capitalized_value_field' => ['VALUE'],
             ],
             [
                 'other_field' => ['value']

@@ -36,7 +36,7 @@ class QueryLanguageUtils
 
             $ruleParts = [];
             foreach ($matches as $match) {
-                $key = empty($match[2]) ? 'text' : strtolower($match[2]);
+                $key = empty($match[2]) ? 'text' : $match[2];
 
                 /* value can be in 3rd, 4th or 5th index
                  *
@@ -44,9 +44,9 @@ class QueryLanguageUtils
                  * 4th index => value is in double quotes
                  * 5th index => value is without quotes
                  */
-                $value = strtolower(isset($match[5]) ? $match[5] : (
-                isset($match[4]) ? $match[4] : (
-                isset($match[3]) ? $match[3] : '')));
+                $value = isset($match[5]) ? $match[5] : (
+                    isset($match[4]) ? $match[4] : (
+                    isset($match[3]) ? $match[3] : ''));
 
                 if ($value !== '' || $allowEmpty) {
                     if (!isset($ruleParts[$key])) {
@@ -83,7 +83,7 @@ class QueryLanguageUtils
 
                 if ($isWildcard && preg_match(QueryLanguageUtils::tokensToRegex($valueTokens), $entity[$field])) {
                     return true;
-                } elseif (strtolower(strval($entity[$field])) === $value) {
+                } elseif (strtolower(strval($entity[$field])) === strtolower($value)) {
                     return true;
                 }
 
