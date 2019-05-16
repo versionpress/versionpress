@@ -185,12 +185,14 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
                 '-i --all-match --grep="^VP-Action: \(entity\|.*\)/.*/\(.*vp.*\|vpid\)$"'
             ],
             [['text' => ['text1', 'Test text', '*']], '-i --all-match --grep="text1" --grep="Test text" --grep=".*"'],
+
             [['x-vp-another-key' => ['Test value']], '-i --all-match --grep="^x-vp-another-key: \(Test value\)$"'],
-            [['vp-another-key' => ['Test value']], '-i --all-match --grep="^\(x-\)\?vp-another-key: \(Test value\)$"'],
-            [['another-key' => ['Test value']], '-i --all-match --grep="^\(x-vp-\|vp-\)another-key: \(Test value\)$"'],
+            [['X-VP-another-key' => ['Test value']], '-i --all-match --grep="^X-VP-another-key: \(Test value\)$"'],
+            [['vp-another-key' => ['Test value']], '-i --all-match --grep="^\(X-\)\?vp-another-key: \(Test value\)$"'],
+            [['another-key' => ['Test value']], '-i --all-match --grep="^\(X-VP-\|VP-\)another-key: \(Test value\)$"'],
             [
                 ['*-key' => ['^+?(){|$*\.[']],
-                '-i --all-match --grep="^\(x-vp-\|vp-\).*-key: \(^+?(){|\\\\\\$.*\\\\\\\\\.\[\)$"'
+                '-i --all-match --grep="^\(X-VP-\|VP-\).*-key: \(^+?(){|\\\\\\$.*\\\\\\\\\.\[\)$"'
             ]
         ];
     }

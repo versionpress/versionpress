@@ -227,10 +227,10 @@ class QueryLanguageUtils
                 continue;
             }
 
-            if (substr($key, 0, 5) === 'x-vp-') {
+            if (strtolower(substr($key, 0, 5)) === 'x-vp-') {
                 $prefix = '';
             } else {
-                if (substr($key, 0, 3) === 'vp-') {
+                if (strtolower(substr($key, 0, 3)) === 'vp-') {
                     $prefix = '\(X-\)\?';
                 } else {
                     $prefix = '\(X-VP-\|VP-\)';
