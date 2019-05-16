@@ -80,6 +80,7 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [['field' => ['value']], '(`field` = "value")'],
+            [['FIELD' => ['Value']], '(`FIELD` = "Value")'],
             [
                 ['field' => ['value'], 'other_field' => ['other_value']],
                 '(`field` = "value" AND `other_field` = "other_value")'
