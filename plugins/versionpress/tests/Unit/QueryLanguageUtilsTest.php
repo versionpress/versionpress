@@ -110,6 +110,7 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
     public function queryLanguageUtilsCreatesCorrectRules($query, $expectedRules)
     {
         $rules = QueryLanguageUtils::createRulesFromQueries($query);
+        $this->assertEquals($expectedRules, $rules);
     }
 
     public function queryAndRulesProvider()
@@ -143,6 +144,7 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
     public function queryLanguageUtilsGeneratesCorrectGitLogQuery($rules, $expectedQuery)
     {
         $query = QueryLanguageUtils::createGitLogQueryFromRule($rules);
+        $this->assertEquals($expectedQuery, $query);
     }
 
     public function rulesAndGitLogQueryProvider()
