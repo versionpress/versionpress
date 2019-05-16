@@ -389,12 +389,12 @@ entity:
 
 The values in the `frequently-written` array can either be strings which are then interpreted as queries, or objects with `query` and `interval` keys.
 
-- **Queries** use the same syntax as search / filtering in the UI, with some small differences like that the date range operator cannot be used but overall, the syntax is pretty intuitive. _TODO add link_
+- **Queries** identify entities via [this syntax](#query-syntax).
 - The **interval** is parsed by the `strtotime()` function and the default value is one hour.
 
 ### Ignoring entities
 
-Some entities should be ignored (not tracked at all) like transient options, environment-specific options, etc. This is an example from the `option` entity:
+Some entities should be ignored (not tracked at all) like transient options, environment-specific options, etc. [Queries](#query-syntax) are used again:
 
 ```yaml
   ignored-entities:
@@ -402,8 +402,6 @@ Some entities should be ignored (not tracked at all) like transient options, env
     - 'option_name: _site_transient_*'
     - 'option_name: siteurl'
 ```
-
-Again, queries are used. Wildcards are supported.
 
 ### Ignoring columns
 
@@ -568,3 +566,25 @@ TODO this will be auto-generated from code.
 
 - `vp_force_action`
     - `vp_force_action($scope, $action, $id = '', $tags = [], $files = [])`
+
+### Query syntax
+
+[Ignored](#ignoring-entities) and [frequently written](#frequently-written-entities) entities are identified using small queries that look like this:
+
+```yaml
+frequently-written:
+  - 'option_name: akismet_spam_count'
+ignored-entities:
+  - 'option_name: _transient_*'
+  - 'option_name: cron'
+  - ...
+```
+
+The syntax is generally shared with the [commit search](../feature-focus/searching-history.md):
+
+- Everything is case insensitive. `field: value` is equivalent to `field: VALUE` or `FiELd: vaLUE`.
+    - One caveat is that your database might be configured to use case sensitive comparisons, in which case you'll need to be precise. (WordPress uses the case insensitive `utf8_general_ci` collation by default.)
+- Wildcards are supported.
+- Multiple fields can be used, for example, `field1:value field2:value`.
+
+Unlike the full search, you can only target entity fields, not things like commit authors, date ranges, etc.
