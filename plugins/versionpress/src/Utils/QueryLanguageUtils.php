@@ -76,7 +76,7 @@ class QueryLanguageUtils
             return ArrayUtils::all($rule, function ($values, $field) use ($entity) {
                 $field = strtolower($field);
 
-                if (!isset($entity[strtolower($field)])) {
+                if (!isset($entity[$field])) {
                     return false;
                 }
 
