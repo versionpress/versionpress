@@ -14,6 +14,8 @@ namespace VersionPress\Utils;
  * 4. Logical AND for multiple operators: `operator1:value operator2:value`.
  * 5. Everything is case insensitivity: `"search term" author: Joe` is equivalent to `"SEarCH TErm" Author: joe`.
  *
+ * See examples in https://regex101.com/r/wT6zG3/6.
+ *
  * Notes on case insensitivity:
  *
  * - Rules are parsed as they are, maintaining their original letter casing.
@@ -34,7 +36,7 @@ class QueryLanguageUtils
     const VALUE_WILDCARD = 'VALUE_WILDCARD';
     const VALUE_STRING = 'VALUE_STRING';
 
-    // https://regex101.com/r/wT6zG3/4 (query language)
+    // https://regex101.com/r/wT6zG3/6 (query language)
     private static $queryRegex = "/(-)?(?:(\\S+):\\s*)?(?:'((?:[^'\\\\]|\\\\.)*)'|\"((?:[^\"\\\\]|\\\\.)*)\"|(\\S+))/";
 
     // https://regex101.com/r/pL2zA2/3 (support for * wildcard)
@@ -62,17 +64,19 @@ class QueryLanguageUtils
 
             $ruleParts = [];
             foreach ($matches as $match) {
+
+                // If a match is for an `operator:value` query, $match[2] is the operator
                 $key = empty($match[2]) ? 'text' : $match[2];
 
-                /* value can be in 3rd, 4th or 5th index
-                 *
-                 * 3rd index => value is in single quotes
-                 * 4th index => value is in double quotes
-                 * 5th index => value is without quotes
-                 */
-                $value = isset($match[5]) ? $match[5] : (
-                    isset($match[4]) ? $match[4] : (
-                    isset($match[3]) ? $match[3] : ''));
+                // Depending on how the value was quoted, it's available in a different index
+                $value =
+                    isset($match[5]) ? // unquoted value
+                    $match[5] :
+                    (isset($match[4]) ? // double quotes
+                    $match[4] :
+                    (isset($match[3]) ? // single quotes
+                    $match[3] :
+                    ''));
 
                 if ($value !== '' || $allowEmpty) {
                     if (!isset($ruleParts[$key])) {
