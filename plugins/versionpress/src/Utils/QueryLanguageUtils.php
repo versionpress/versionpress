@@ -2,6 +2,32 @@
 
 namespace VersionPress\Utils;
 
+/**
+ * This class groups several functions around a small query language that is used in search
+ * and for ignored & frequently written entities in plugin definitions.
+ *
+ * Rules of the language:
+ *
+ * 1. Basic search with wildcard support: `just text` (all words), `"just text" (exact match)`, `w*ldcards`.
+ * 2. `operator:value` syntax for operators, with optional spaces after the colon.
+ * 3. Logical OR for repeated operators: `operator:value1 operator:value2`.
+ * 4. Logical AND for multiple operators: `operator1:value operator2:value`.
+ * 5. Everything is case insensitivity: `"search term" author: Joe` is equivalent to `"SEarCH TErm" Author: joe`.
+ *
+ * Notes on case insensitivity:
+ *
+ * - Rules are parsed as they are, maintaining their original letter casing.
+ * - When constructing Git search command, rules are passed as is but an `-i` flag is added.
+ * - When matching rules for for ignored and frequently written entities, case insensitive comparisons are done.
+ * - When constructing SQL restrictions, for example, `(field LIKE "value")`, values are passed without any
+ *   case conversion and it's up to the configuration of MySQL how it treats that. By default, WordPress
+ *   sets the case insensitive `utf8_general_ci` collation.
+ *
+ * When updating this code, also think about our public documentation related to this, currently in:
+ *
+ * - searching-history.md
+ * - plugin-support.md
+ */
 class QueryLanguageUtils
 {
 
