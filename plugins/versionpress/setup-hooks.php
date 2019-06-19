@@ -719,7 +719,7 @@ function vp_admin_menu()
         'manage_options',
         'versionpress',
         'versionpress_page',
-        'dashicons-backup,
+        'dashicons-backup',
         0.001234987
     );
 
