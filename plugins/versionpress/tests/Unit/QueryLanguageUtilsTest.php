@@ -20,19 +20,19 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
     public function validQueryAndEntityProvider()
     {
         return [
-        	// basic rule matching
+            // basic rule matching
             [['field: value'], ['field' => 'value']],
             [['field: value'], ['field' => 'value', 'other_field' => 'other_value']],
             [['field: 0'], ['field' => 0]],
             [['field: value other_field: other_value'], ['field' => 'value', 'other_field' => 'other_value']],
 
-	        // wildcards
+            // wildcards
             [['field: val*'], ['field' => 'value']],
             [['field: *ue'], ['field' => 'value']],
             [['field: v*ue'], ['field' => 'value']],
             [['field: *al*'], ['field' => 'value']],
 
-	        // case insensitivity
+            // case insensitivity
             [['FIELD: value'], ['field' => 'value']],
             [['field: VALUE'], ['field' => 'value']],
             [['field: value'], ['FIELD' => 'value']],
