@@ -2,13 +2,44 @@
 
 namespace VersionPress\Utils;
 
+/**
+ * This class contains several functions for handling a small query language that is used in search
+ * and for ignored & frequently written entities in plugin definitions.
+ *
+ * Rules of the language:
+ *
+ * 1. Basic search with wildcard support:
+ *     - `just text` – matches all words
+ *     - `"just text"` – exact match
+ *     - `w*ldcards`
+ * 2. `operator:value` syntax for operators, with optional spaces after the colon.
+ * 3. Logical OR when the same operator is repeated: `operator:value1 operator:value2`.
+ * 4. Logical AND for multiple operators: `operator1:value operator2:value`.
+ * 5. Everything is case insensitive: `"search term" author: Joe` is equivalent to `"SEarCH TErm" Author: JOE`.
+ *
+ * See examples in https://regex101.com/r/wT6zG3/6.
+ *
+ * Notes on case (in)sensitivity:
+ *
+ * - Rules are parsed as they are, maintaining their original letter casing.
+ * - When constructing Git search command, the `-i` flag is added to achieve case insensitivity (so it's up to Git).
+ * - When matching rules for ignored and frequently written entities, case insensitive comparisons are done.
+ * - When constructing SQL restrictions, for example, `(field LIKE "value")`, values are passed without any
+ *   case conversion and it's up to the configuration of MySQL how it treats it. By default, WordPress
+ *   sets the case insensitive `utf8_general_ci` collation.
+ *
+ * DEVELOPER NOTE: When updating this code, also think about our public documentation related to this, currently in:
+ *
+ * - searching-history.md
+ * - plugin-support.md
+ */
 class QueryLanguageUtils
 {
 
     const VALUE_WILDCARD = 'VALUE_WILDCARD';
     const VALUE_STRING = 'VALUE_STRING';
 
-    // https://regex101.com/r/wT6zG3/4 (query language)
+    // https://regex101.com/r/wT6zG3/6 (query language)
     private static $queryRegex = "/(-)?(?:(\\S+):\\s*)?(?:'((?:[^'\\\\]|\\\\.)*)'|\"((?:[^\"\\\\]|\\\\.)*)\"|(\\S+))/";
 
     // https://regex101.com/r/pL2zA2/3 (support for * wildcard)
@@ -36,17 +67,19 @@ class QueryLanguageUtils
 
             $ruleParts = [];
             foreach ($matches as $match) {
-                $key = empty($match[2]) ? 'text' : strtolower($match[2]);
 
-                /* value can be in 3rd, 4th or 5th index
-                 *
-                 * 3rd index => value is in single quotes
-                 * 4th index => value is in double quotes
-                 * 5th index => value is without quotes
-                 */
-                $value = strtolower(isset($match[5]) ? $match[5] : (
-                isset($match[4]) ? $match[4] : (
-                isset($match[3]) ? $match[3] : '')));
+                // If a match is for an `operator:value` query, $match[2] is the operator
+                $key = empty($match[2]) ? 'text' : $match[2];
+
+                // Depending on how the value was quoted, it's available in a different index
+                $value =
+                    isset($match[5]) ? // unquoted value
+                    $match[5] :
+                    (isset($match[4]) ? // double quotes
+                    $match[4] :
+                    (isset($match[3]) ? // single quotes
+                    $match[3] :
+                    ''));
 
                 if ($value !== '' || $allowEmpty) {
                     if (!isset($ruleParts[$key])) {
@@ -70,9 +103,12 @@ class QueryLanguageUtils
      */
     public static function entityMatchesSomeRule($entity, $rules)
     {
+        $entity = array_change_key_case($entity, CASE_LOWER);
         return ArrayUtils::any($rules, function ($rule) use ($entity) {
             // check all parts of rule
             return ArrayUtils::all($rule, function ($values, $field) use ($entity) {
+                $field = strtolower($field);
+
                 if (!isset($entity[$field])) {
                     return false;
                 }
@@ -83,7 +119,7 @@ class QueryLanguageUtils
 
                 if ($isWildcard && preg_match(QueryLanguageUtils::tokensToRegex($valueTokens), $entity[$field])) {
                     return true;
-                } elseif (strtolower(strval($entity[$field])) === $value) {
+                } elseif (strtolower(strval($entity[$field])) === strtolower($value)) {
                     return true;
                 }
 
@@ -224,10 +260,10 @@ class QueryLanguageUtils
                 continue;
             }
 
-            if (substr($key, 0, 5) === 'x-vp-') {
+            if (strtolower(substr($key, 0, 5)) === 'x-vp-') {
                 $prefix = '';
             } else {
-                if (substr($key, 0, 3) === 'vp-') {
+                if (strtolower(substr($key, 0, 3)) === 'vp-') {
                     $prefix = '\(X-\)\?';
                 } else {
                     $prefix = '\(X-VP-\|VP-\)';
