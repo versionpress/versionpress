@@ -1,23 +1,35 @@
-# Plugin Support
+# Plugin Definitions
 
-!!! info "Plugin Support"
-    :construction: Plugin support is the main theme of [VersionPress 4.0](https://github.com/versionpress/versionpress/milestone/16) which is currently in [beta](https://github.com/versionpress/versionpress/releases/tag/4.0-beta). Plugin developers, we'd like your feedback on this, feel free to [open new issues](https://github.com/versionpress/versionpress/issues/new) or chat with us [on Gitter](https://gitter.im/versionpress/versionpress).
+!!! info "Work in progress"
+    Plugin support is the main theme of [VersionPress 4.0](https://github.com/versionpress/versionpress/milestone/16) which is currently in development. If you're a plugin developer, we'd like your feedback on this – feel free to [open new issues](https://github.com/versionpress/versionpress/issues/new) or chat with us [on Gitter](https://gitter.im/versionpress/versionpress).
 
-VersionPress needs to understand plugin data, actions, shortcodes and other things to automatically provide version control for them. This document describes how plugins (and themes, later) can hook into VersionPress functionality.
+VersionPress needs to understand plugin data, actions, shortcodes and other things to automatically provide version control for them. This document describes how to write plugin (and later, theme) definitions.
 
 ## Introduction
 
-Plugins are described to VersionPress by a set of files stored in the `.versionpress` folder in the plugin root (with other discovery options available, see below). They include:
+The goals of the system are:
 
-- `actions.yml` – plugin actions, i.e., what the plugin does
-- `schema.yml` – database schema (how the plugin stores data)
-- `shortcodes.yml` – shortcodes
-- `hooks.php` – other hooks
+- **Anyone can write plugin definitions**, not just plugin authors.
+- The format should be **succinct yet flexible**. Writing definitions shouldn't be scary.
+- Plugin definitions can be **shared** in the community via an online repository.
 
-All files are optional so for example, if a plugin doesn't define any new shortcodes it can omit the `shortcodes.yml` file. Simple plugins like _Hello Dolly_ might even omit everything.
+Currently, we focus on the format itself; an online repository of definitions is tracked in [#1243](https://github.com/versionpress/versionpress/issues/1243).
 
-!!! tip
-    WordPress core is described using the very same format and you can find the definition files in the [`.versionpress`](../../../../plugins/versionpress/.versionpress) folder inside the plugin.
+Each plugin definition consists of these four files (all optional):
+
+- `actions.yml` – describes actions of the plugin.
+- `schema.yml` – describes database schema.
+- `shortcodes.yml` – describes shortcodes.
+- `hooks.php` – provides a way to add programmatic hooks.
+
+If you like learning by example, these are some existing definitions:
+
+- [WordPress core](https://github.com/versionpress/versionpress/tree/master/plugins/versionpress/.versionpress) (shipped with VersionPress)
+- [WooCommerce](https://github.com/pavelevap/versionpress-for-woocommerce/tree/master/.versionpress) by **@pavelevap**.
+- [WPML](https://github.com/mkreckovic/versionpress-sitepress-multilingual-cms) by **@mkreckovic**.
+- [Divi Builder](https://github.com/mkreckovic/versionpress-divi-builder) by **@mkreckovic**.
+
+The sections below provide an in-depth guide on writing the definition files.
 
 ## Actions
 

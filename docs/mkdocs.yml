@@ -48,7 +48,7 @@ pages:
   - Developer:
     - 'Dev Setup': 'en/developer/dev-setup.md'
     - 'Testing': 'en/developer/testing.md'
-    - 'Plugin Support': 'en/developer/plugin-support.md'
+    - 'Plugin Definitions': 'en/developer/plugin-support.md'
     - 'Development Process': 'en/developer/development-process.md'
   - Release Notes:
     - 'Release Notes Home': 'en/release-notes/index.md'
