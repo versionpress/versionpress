@@ -3,29 +3,32 @@
 namespace VersionPress\Utils;
 
 /**
- * This class groups several functions around a small query language that is used in search
+ * This class contains several functions for handling a small query language that is used in search
  * and for ignored & frequently written entities in plugin definitions.
  *
  * Rules of the language:
  *
- * 1. Basic search with wildcard support: `just text` (all words), `"just text" (exact match)`, `w*ldcards`.
+ * 1. Basic search with wildcard support:
+ *     - `just text` – matches all words
+ *     - `"just text"` – exact match
+ *     - `w*ldcards`
  * 2. `operator:value` syntax for operators, with optional spaces after the colon.
- * 3. Logical OR for repeated operators: `operator:value1 operator:value2`.
+ * 3. Logical OR when the same operator is repeated: `operator:value1 operator:value2`.
  * 4. Logical AND for multiple operators: `operator1:value operator2:value`.
- * 5. Everything is case insensitivity: `"search term" author: Joe` is equivalent to `"SEarCH TErm" Author: joe`.
+ * 5. Everything is case insensitive: `"search term" author: Joe` is equivalent to `"SEarCH TErm" Author: JOE`.
  *
  * See examples in https://regex101.com/r/wT6zG3/6.
  *
- * Notes on case insensitivity:
+ * Notes on case (in)sensitivity:
  *
  * - Rules are parsed as they are, maintaining their original letter casing.
- * - When constructing Git search command, rules are passed as is but an `-i` flag is added.
- * - When matching rules for for ignored and frequently written entities, case insensitive comparisons are done.
+ * - When constructing Git search command, the `-i` flag is added to achieve case insensitivity (so it's up to Git).
+ * - When matching rules for ignored and frequently written entities, case insensitive comparisons are done.
  * - When constructing SQL restrictions, for example, `(field LIKE "value")`, values are passed without any
- *   case conversion and it's up to the configuration of MySQL how it treats that. By default, WordPress
+ *   case conversion and it's up to the configuration of MySQL how it treats it. By default, WordPress
  *   sets the case insensitive `utf8_general_ci` collation.
  *
- * When updating this code, also think about our public documentation related to this, currently in:
+ * DEVELOPER NOTE: When updating this code, also think about our public documentation related to this, currently in:
  *
  * - searching-history.md
  * - plugin-support.md
