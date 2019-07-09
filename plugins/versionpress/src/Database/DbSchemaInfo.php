@@ -110,13 +110,20 @@ class DbSchemaInfo
 
     /**
      * For something like "post", returns "wp_posts"
+     * This will respect the custom prefix from the entity.
      *
      * @param $entityName
      * @return string
      */
     public function getPrefixedTableName($entityName)
     {
-        return $this->prefix . $this->getTableName($entityName);
+        $tablePrefix = $this->getEntityInfo($entityName)->tablePrefix;
+
+        if (isset($tablePrefix)) {
+            return $tablePrefix . $this->getTableName($entityName);
+        } else {
+            return $this->prefix . $this->getTableName($entityName);
+        }
     }
 
     /**

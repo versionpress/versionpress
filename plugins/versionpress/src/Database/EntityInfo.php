@@ -29,6 +29,13 @@ class EntityInfo
     public $tableName;
 
     /**
+     * Custom defined prefix for the table. By default the default prefix is prepended to the table name.
+     *
+     * @var string
+     */
+    public $tablePrefix;
+
+    /**
      * Name of a column that uniquely identifies the entity within a db table. This is most
      * commonly an auto-increment primary key but not always - e.g., options use the 'option_name'
      * which is not a primary key in that table but is a local id as far as VersionPress is concerned.
@@ -167,6 +174,10 @@ class EntityInfo
             $this->tableName = $schemaInfo['table'];
         } else {
             $this->tableName = $this->entityName;
+        }
+
+        if (isset($schemaInfo['prefix'])) {
+            $this->tablePrefix = $schemaInfo['prefix'];
         }
 
         // The schema defines either 'id' or 'vpid', see schema-readme.md. This has this meaning:
