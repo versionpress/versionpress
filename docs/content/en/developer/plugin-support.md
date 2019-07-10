@@ -204,6 +204,15 @@ post:
 
 Again, this is prefix-less; `wp_` or another prefix will be added automatically.
 
+If you want to define a custom prefix for the entity you can define the `prefix` property. When defined Versionpress will prefix the table with it instead of the default one configured in `wp-config.php` (mostly `wp_`).
+
+```yaml
+post:
+  table: users
+  prefix: b2s_
+  ...
+```
+
 ### Identifying entities
 
 VersionPress needs to know how to identify entities. There are two approaches and they are represented by either using a `id` or `vpid` property in the schema:
