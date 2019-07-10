@@ -26,11 +26,11 @@ class DbSchemaInfo
     private $schema = [];
 
     /**
-     * Database tables prefix, e.g. "wp_"
+     * Database default tables prefix, e.g. "wp_"
      *
      * @var string
      */
-    private $prefix;
+    private $defaultPrefix;
 
     /**
      * @var array entityName => EntityInfo object. Lazily constructed, see getEntityInfo().
@@ -48,7 +48,7 @@ class DbSchemaInfo
     public function __construct($schemaFiles, $prefix, $dbVersion)
     {
         $this->dbVersion = $dbVersion;
-        $this->prefix = $prefix;
+        $this->defaultPrefix = $prefix;
 
         $this->refreshDbSchema($schemaFiles);
     }
@@ -122,7 +122,7 @@ class DbSchemaInfo
         if (isset($tablePrefix)) {
             return $tablePrefix . $this->getTableName($entityName);
         } else {
-            return $this->prefix . $this->getTableName($entityName);
+            return $this->defaultPrefix . $this->getTableName($entityName);
         }
     }
 
@@ -280,6 +280,6 @@ class DbSchemaInfo
 
     public function trimPrefix($tableName)
     {
-        return substr($tableName, strlen($this->prefix));
+        return substr($tableName, strlen($this->defaultPrefix));
     }
 }
