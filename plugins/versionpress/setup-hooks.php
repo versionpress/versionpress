@@ -78,8 +78,7 @@ if (VersionPress::isActive()) {
 //----------------------------------
 
 add_filter('automatic_updates_is_vcs_checkout', function () {
-    $forceUpdate = UninstallationUtil::uninstallationShouldRemoveGitRepo(); // first commit was created by VersionPress
-    return !$forceUpdate; // 'false' forces the update
+    return !VersionPress::isActive(); // 'false' allows the update
 });
 
 function vp_register_hooks()
