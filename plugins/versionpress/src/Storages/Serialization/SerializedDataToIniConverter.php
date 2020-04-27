@@ -19,7 +19,7 @@ class SerializedDataToIniConverter
     private $value;
 
     /**
-     * Converts PHP-serialized string to mutiple INI lines.
+     * Converts PHP-serialized string to multiple INI lines.
      *
      * For example string 'a:1:{i:0;s:3:"foo";}' with key 'data' is converted to
      * [

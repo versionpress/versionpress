@@ -20,7 +20,7 @@ class IniSerializer_IssueWP284Test extends PHPUnit_Framework_TestCase
     public function justSerializedValue()
     {
 
-        // All HTML replaced wtih empty string
+        // All HTML replaced with empty string
 
         $data = [
             "avia_options_enfold" => [
@@ -333,7 +333,7 @@ INI
 
 						<div class='live-main_color border avia_half'>
 							<h3 class='webfont_google_webfont main_h3'>Main Content heading</h3>
-								<p class='content_p'>This is default content with a default heading. Font color, headings and link colors can be choosen below. <br/>
+								<p class='content_p'>This is default content with a default heading. Font color, headings and link colors can be chosen below. <br/>
 									<a class='a_link' href='#'>A link</a>
 									<a class='an_activelink' href='#'>A hovered link</a>
 								</p>
@@ -441,7 +441,7 @@ option_value = "<style type='text/css'>
 
 						<div class='live-main_color border avia_half'>
 							<h3 class='webfont_google_webfont main_h3'>Main Content heading</h3>
-								<p class='content_p'>This is default content with a default heading. Font color, headings and link colors can be choosen below. <br/>
+								<p class='content_p'>This is default content with a default heading. Font color, headings and link colors can be chosen below. <br/>
 									<a class='a_link' href='#'>A link</a>
 									<a class='an_activelink' href='#'>A hovered link</a>
 								</p>
@@ -927,7 +927,7 @@ a:1:{s:4:"avia";a:174:{s:21:"default_layout_target";s:5431:"
 
 						<div class='live-main_color border avia_half'>
 							<h3 class='webfont_google_webfont main_h3'>Main Content heading</h3>
-								<p class='content_p'>This is default content with a default heading. Font color, headings and link colors can be choosen below. <br/>
+								<p class='content_p'>This is default content with a default heading. Font color, headings and link colors can be chosen below. <br/>
 									<a class='a_link' href='#'>A link</a>
 									<a class='an_activelink' href='#'>A hovered link</a>
 								</p>
@@ -1218,7 +1218,7 @@ option_value = "a:1:{s:4:\"avia\";a:174:{s:21:\"default_layout_target\";s:5431:\
 
 						<div class='live-main_color border avia_half'>
 							<h3 class='webfont_google_webfont main_h3'>Main Content heading</h3>
-								<p class='content_p'>This is default content with a default heading. Font color, headings and link colors can be choosen below. <br/>
+								<p class='content_p'>This is default content with a default heading. Font color, headings and link colors can be chosen below. <br/>
 									<a class='a_link' href='#'>A link</a>
 									<a class='an_activelink' href='#'>A hovered link</a>
 								</p>

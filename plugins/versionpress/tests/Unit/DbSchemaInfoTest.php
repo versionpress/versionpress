@@ -152,7 +152,7 @@ class DbSchemaInfoTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * Creates a virtual file containg YAML created from $scopesDefinition and returns its path.
+     * Creates a virtual file containing YAML created from $scopesDefinition and returns its path.
      *
      * @param array $scopesDefinition
      * @return string

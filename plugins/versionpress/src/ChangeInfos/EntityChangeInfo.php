@@ -7,7 +7,7 @@ use VersionPress\Database\EntityInfo;
 
 /**
  * Base class for entity change infos like PostChangeInfo, CommentChangeInfo etc.
- * An entity is a database-tracked object that usually has a VPID (but not alwasy, see e.g. options).
+ * An entity is a database-tracked object that usually has a VPID (but not always, see e.g. options).
  *
  * Derived ChangeInfos have these things in common:
  *

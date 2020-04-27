@@ -351,7 +351,7 @@ class DBAsserter
 
     /**
      * Defines global constants, container and wpdb dynamic mapping of value references.
-     * It's not pretty, but makes the mapping functions very flexible (they can have various dependecies).
+     * It's not pretty, but makes the mapping functions very flexible (they can have various dependencies).
      */
     private static function defineGlobalVariables()
     {

@@ -18,7 +18,7 @@ class TermTaxonomyPreprocessor implements ChangeInfoPreprocessor
     }
 
     /**
-     * Reads taxonomy from `term_taxonomy` action and assings it to `term`.
+     * Reads taxonomy from `term_taxonomy` action and assigns it to `term`.
      *
      * @param ChangeInfo[] $changeInfoList
      * @return ChangeInfo[][]

@@ -673,7 +673,7 @@ class VPCommand extends WP_CLI_Command
         if (is_dir($remoteUrl)) {
             $this->runVPInternalCommand('commit-frequently-written-entities', [], $remoteUrl);
         } else {
-            // We currently do not support commiting frequently written entities for repositories on a different server
+            // We currently do not support committing frequently written entities for repositories on a different server
         }
 
         $this->switchMaintenance('on');
@@ -1100,7 +1100,7 @@ class VPCommand extends WP_CLI_Command
             $this->switchMaintenance('off');
         } else {
             WP_CLI::error(join("\n", [
-                'Update failed. Unfortunatelly, you have to manually update VersionPress.',
+                'Update failed. Unfortunately, you have to manually update VersionPress.',
                 ' 1. Delete wp-content/versionpress.',
                 ' 2. Extract the ZIP to wp-content/versionpress.',
                 ' 3. Run \'wp plugin activate versionpress\' and \'wp vp activate\'.',

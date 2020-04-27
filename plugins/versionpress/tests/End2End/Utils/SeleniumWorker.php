@@ -188,7 +188,7 @@ class SeleniumWorker implements ITestWorker
     }
 
     /**
-     * Small wrapper aroung built-in execute() method
+     * Small wrapper around built-in execute() method
      *
      * @param string $code JavaScript code
      * @return string JS result, if any

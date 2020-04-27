@@ -45,7 +45,7 @@ class RequirementsChecker
      * RequirementsChecker constructor.
      * @param Database $database
      * @param DbSchemaInfo $schema
-     * @param string $checkScope determines if all VersionPress requirements need to be fullfilled or just some of them.
+     * @param string $checkScope determines if all VersionPress requirements need to be fulfilled or just some of them.
      * Possible values are RequirementsChecker::SITE or RequirementsChecker::ENVIRONMENT
      * Default value is RequirementsChecker::SITE which means that all requirements need to be matched.
      * RequirementsChecker::ENVIRONMENT checks only requirements related to "runtime" environment.
