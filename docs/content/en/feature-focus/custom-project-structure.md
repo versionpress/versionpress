@@ -3,7 +3,7 @@
 Some advanced users like having WordPress in its own directory or move plugins, themes or uploads in another directory. VersionPress supports some scenarios. Just remember that all files related to the site have to be under the project root ([`VP_PROJECT_ROOT`](../getting-started/configuration.md#vp_project_root)).
 
 !!! warning
-    You need to adjust your project structure _before_ fully initalizing VersionPress. The recommended procedure is:
+    You need to adjust your project structure _before_ fully initializing VersionPress. The recommended procedure is:
 
      * Customize your WordPress site structure.
      * Install and active VersionPress, the plugin – do _not_ go through the full initialization yet.
