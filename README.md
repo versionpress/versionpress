@@ -24,7 +24,7 @@ To **use** VersionPress:
 1. Make sure you understand the [Developer Preview project status](https://docs.versionpress.net/en/getting-started/about-eap).
 2. Download the latest version from [GitHub releases](https://github.com/versionpress/versionpress/releases).
 3. Install to your WordPress site.
-4. Read the [quick start tutorial](https://blog.versionpress.net/2015/05/versionpress-1-0-walkthrough/) and [part 2 on staging](https://blog.versionpress.net/2015/09/versionpress-2-0-staging/).
+4. Read the [quick start tutorial](https://versionpress.com/blog/2015/05/versionpress-1-0-walkthrough/) and [part 2 on staging](https://versionpress.com/blog/2015/09/versionpress-2-0-staging/).
 5. Enjoy!
 
 To **develop** VersionPress:
