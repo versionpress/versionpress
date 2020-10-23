@@ -100,9 +100,14 @@ class AbsoluteUrlReplacer
 
                     $r = new \ReflectionObject($value);
                     $p = $r->getProperties();
-                    foreach ($p as $prop) {
-                        $prop->setAccessible(true);
-                        $prop->setValue($value, $this->replaceRecursively($prop->getValue($value), $replaceFn));
+                    if (get_class($value) != 'wpdb' && get_class($value) != 'mysqli' && get_class($value) != 'mysqli_result') {
+                        foreach ($p as $prop) {
+                            $prop->setAccessible(true);
+                            $newValue = $this->replaceRecursively($prop->getValue($value), $replaceFn);
+                            if (get_class($newValue) != 'wpdb' && get_class($newValue) != 'mysqli' && get_class($newValue) != 'mysqli_result') {
+                                $prop->setValue($value, $newValue);
+                            }
+                        }
                     }
                     return $value;
                 } else {
