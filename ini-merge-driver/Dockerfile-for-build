@@ -1,0 +1,8 @@
+FROM golang:1.12.1-stretch
+
+RUN apt-get update && apt-get install make upx-ucl
+
+VOLUME [ "/data" ]
+WORKDIR /data
+
+CMD [ "make", "build" ]

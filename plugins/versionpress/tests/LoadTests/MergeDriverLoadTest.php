@@ -3,6 +3,7 @@ namespace VersionPress\Tests\LoadTests;
 
 use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Tests\Utils\MergeDriverTestUtils;
+use VersionPress\Utils\SystemInfo;
 
 class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,27 +31,23 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase
         MergeDriverTestUtils::destroyRepository();
     }
 
-    /**
-     * @param string $driver See MergeDriverInstaller::installMergeDriver()'s $driver parameter
-     */
-    private function installMergeDriver($driver)
+    private function installMergeDriver()
     {
         MergeDriverInstaller::installMergeDriver(
             self::$repositoryDir,
             __DIR__ . '/../..',
             self::$repositoryDir,
-            $driver
+            SystemInfo::getOS(),
+            SystemInfo::getArchitecture()
         );
     }
 
-
     /**
      * @test
      */
-    public function phpDriverLoadTested()
+    public function mergeDriverLoadTested()
     {
-
-        $this->installMergeDriver(MergeDriverInstaller::DRIVER_PHP);
+        $this->installMergeDriver();
         $this->prepareTestRepositoryHistory();
 
         $time_start = microtime(true);
@@ -58,32 +55,7 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase
         $time_end = microtime(true);
 
         $execution_time = ($time_end - $time_start);
-        echo 'Php Execution Time: ' . $execution_time . " Sec\n";
-
-        $this->assertEquals(0, $mergeCommandExitCode);
-
-    }
-
-    /**
-     * @test
-     */
-    public function bashDriverLoadTested()
-    {
-
-        if (DIRECTORY_SEPARATOR == '\\') {
-            $this->markTestSkipped('No Bash on Windows.');
-            return;
-        }
-
-        $this->installMergeDriver(MergeDriverInstaller::DRIVER_BASH);
-        $this->prepareTestRepositoryHistory();
-
-        $time_start = microtime(true);
-        $mergeCommandExitCode = MergeDriverTestUtils::runGitCommand('git merge test-branch');
-        $time_end = microtime(true);
-
-        $execution_time = ($time_end - $time_start);
-        echo 'Bash Execution Time: ' . $execution_time . " Sec\n";
+        echo 'Merge Execution Time: ' . $execution_time . " Sec\n";
 
         $this->assertEquals(0, $mergeCommandExitCode);
     }

@@ -22,6 +22,7 @@ use VersionPress\Utils\IdUtil;
 use VersionPress\Utils\PathUtils;
 use VersionPress\Utils\SecurityUtils;
 use VersionPress\Utils\StringUtils;
+use VersionPress\Utils\SystemInfo;
 use VersionPress\Utils\WordPressMissingFunctions;
 use VersionPress\VersionPress;
 
@@ -444,7 +445,7 @@ class Initializer
         }
 
         $this->installGitignore();
-        MergeDriverInstaller::installMergeDriver(VP_PROJECT_ROOT, VERSIONPRESS_PLUGIN_DIR, VP_VPDB_DIR);
+        MergeDriverInstaller::installMergeDriver(VP_PROJECT_ROOT, VERSIONPRESS_PLUGIN_DIR, VP_VPDB_DIR, SystemInfo::getOS(), SystemInfo::getArchitecture());
     }
 
     private function activateVersionPress()

@@ -8,6 +8,45 @@ use VersionPress\VersionPress;
 
 class SystemInfo
 {
+    const OS_DARWIN = 'darwin';
+    const OS_LINUX = 'linux';
+    const OS_WINDOWS = 'windows';
+    const OS_UNKNOWN = 'unknown';
+
+    const ARCH_368 = '386';
+    const ARCH_AMD64 = 'amd64';
+    const ARCH_UNKNOWN = 'unknown';
+
+    public static function getOS()
+    {
+        switch (PHP_OS) {
+            case 'Linux':
+                return self::OS_LINUX;
+            case 'Darwin':
+                return self::OS_DARWIN;
+            case 'Windows':
+            case 'WIN32':
+            case 'WINNT':
+                return self::OS_WINDOWS;
+            default:
+                return self::OS_UNKNOWN;
+        }
+    }
+
+    public static function getArchitecture()
+    {
+        $arch = php_uname('m');
+
+        if (strrpos($arch, '64') !== false) {
+            return self::ARCH_AMD64;
+        }
+
+        if (strpos($arch, '86') !== false) {
+            return self::ARCH_368;
+        }
+
+        return self::ARCH_UNKNOWN;
+    }
 
     public static function getAllInfo()
     {

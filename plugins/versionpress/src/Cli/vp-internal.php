@@ -12,6 +12,7 @@ use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Initialization\Initializer;
 use VersionPress\Initialization\WpConfigSplitter;
 use VersionPress\Synchronizers\SynchronizationProcess;
+use VersionPress\Utils\SystemInfo;
 use VersionPress\Utils\WordPressMissingFunctions;
 use VersionPress\Utils\WpConfigEditor;
 use WP_CLI;
@@ -96,7 +97,7 @@ class VPInternalCommand extends WP_CLI_Command
 
         // Install Custom merge driver
 
-        MergeDriverInstaller::installMergeDriver(VP_PROJECT_ROOT, VERSIONPRESS_PLUGIN_DIR, VP_VPDB_DIR);
+        MergeDriverInstaller::installMergeDriver(VP_PROJECT_ROOT, VERSIONPRESS_PLUGIN_DIR, VP_VPDB_DIR, SystemInfo::getOS(), SystemInfo::getArchitecture());
         WP_CLI::success("Git merge driver added");
 
 
