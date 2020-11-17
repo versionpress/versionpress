@@ -15,7 +15,7 @@ const Support: React.StatelessComponent<{}> = () => (
         Please visit our <a href='https://github.com/versionpress/support'>support&nbsp;repository</a>.
       </li>
       <li>
-        <a href={`${config.api.adminUrl}/admin.php?page=versionpress/admin/system-info.php`}>
+        <a href={`${config.api.adminUrl}admin.php?page=versionpress/admin/system-info.php`}>
           System information
         </a> page.
       </li>
