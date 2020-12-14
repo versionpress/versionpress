@@ -144,6 +144,9 @@ class StringUtils
      */
     public static function isSerializedValue($value)
     {
+        if (!is_string($value)) {
+            return false;
+        }
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
         $test = @unserialize(($value)); // it throws an error and returns false if $value is not a serialized object
         return $test !== false || $value === 'b:0;';
