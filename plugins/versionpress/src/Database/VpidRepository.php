@@ -92,6 +92,11 @@ class VpidRepository
 
                 foreach ($cursors as $cursor) {
                     $ids = $cursor->getValue();
+
+                    if ($this->isNullReference($ids)) {
+                        continue;
+                    }
+
                     $referenceVpids = $this->replaceIdsInString($targetEntity, $ids);
                     $cursor->setValue($referenceVpids);
                 }
