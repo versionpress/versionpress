@@ -142,6 +142,15 @@ class ShortcodesReplacer
             }
 
             $shortcodeTag = $m[2];
+            $shortcodeSelfClosing = $m[4];
+            $shortcodeContent = $m[5];
+            if (!empty($shortcodeContent)) {
+                if ($idProvider[1] == 'getIdByVpid') {
+                    $shortcodeContent = $this->restoreShortcodes($shortcodeContent);
+                } elseif ($idProvider[1] == 'getVpidByEntityNameAndId') {
+                    $shortcodeContent = $this->replaceShortcodes($shortcodeContent);
+                }
+            }
             $shortcodeInfo = $shortcodesInfo->getShortcodeInfo($shortcodeTag);
             $attributes = shortcode_parse_atts($m[3]) ?: [];
 
@@ -155,7 +164,7 @@ class ShortcodesReplacer
                 }
             }
 
-            return WordPressMissingFunctions::renderShortcode($shortcodeTag, $attributes);
+            return WordPressMissingFunctions::renderShortcode($shortcodeTag, $attributes, $shortcodeSelfClosing, $shortcodeContent);
         };
     }
 
