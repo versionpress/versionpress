@@ -633,6 +633,9 @@ class Synchronizer
     {
         foreach ($vpIds as $vpId) {
             if (!isset($idMap[$vpId])) {
+                error_log(
+                    '[VERSION PRESS]: Error! An invalid $vpId was encountered (' . $vpId . '). As such *ALL* relationships are being skipped, this means everything from the "wp_term_relationships" table (associations of all taxonomies to all post types, custom menus, etc). Please manually resolve this unknown ID and re-run "wp vp apply-changes" (or comparable action).'
+                );
                 return false;
             }
         }
