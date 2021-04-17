@@ -11,9 +11,9 @@ Here are a couple of hosts that we or our users confirmed work fine with Version
 
 - [x] [FastComet](http://www.fastcomet.com/) – SSD cloud hosting with CloudFlare & 24/7 Premium Support
 - [x] [Byte](https://www.byte.nl/) – performance webhosting in Netherlands
-- [x] [WebFaction](https://www.webfaction.com/) – hosting for developers
+- [x] [WebFaction](https://www.webfaction.com/) – hosting for developers (merging into tsoHost and may not support VersionPress any more)
 - [x] [Uberspace](https://uberspace.de/) – hosting space in Germany (Git 1.7 pre-installed, upgradable to 1.9+)
-- [x] [Pair Shared Hosting](https://www.pair.com/hosting/shared/) – by pair Networks
+- [x] [Pair Shared Hosting](https://www.pair.com/solutions/shared/) – by pair Networks
 - [x] [Elbia Hosting (SK)](http://www.elbiahosting.sk/) – Slovak hosting company
 - [x] [SiteGround](https://www.siteground.com/) – VersionPress can be installed but [some issues have been reported](https://github.com/versionpress/support/issues/46)
 - [x] [WebHostFace](https://www.webhostface.com/) – SSD-powered hosting with Free SSLs & 24/7 Expert WordPress Support
