@@ -57,7 +57,7 @@
     "mini-css-extract-plugin": "^0.4.2",
     "mocha": "^5.2.0",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
-    "postcss": "^7.0.2",
+    "postcss": "^8.2.10",
     "postcss-loader": "^3.0.0",
     "react-hot-loader": "^4.3.8",
     "rimraf": "^2.6.2",
