@@ -8,17 +8,27 @@
 versionpress.maintenance
 /.htaccess
 /web.config
+.well-known/
 
 {{wp-content}}/*
 !{{wp-content}}/db.php
 !{{wp-content}}/index.php
 !{{wp-plugins}}/
 {{wp-plugins}}/versionpress/
+!{{wp-content}}/.versionpress/
 !{{wp-content}}/mu-plugins/
 !{{wp-content}}/themes/
 !{{wp-content}}/languages/
 !{{wp-content}}/uploads/
 !{{wp-content}}/vpdb/
+
+
+#------------------------
+#  Cache files
+#------------------------
+
+{{wp-content}}/uploads/cache
+{{wp-content}}/uploads/et_temp
 
 
 #------------------------
@@ -31,7 +41,7 @@ access_log
 
 
 #------------------------
-#  OS Files
+#  OS files
 #------------------------
 
 .DS_Store
@@ -42,3 +52,11 @@ access_log
 ehthumbs.db
 *[Tt]humbs.db
 *.Trashes
+
+
+#------------------------
+#  IDE files
+#------------------------
+
+.idea/
+.vscode/
