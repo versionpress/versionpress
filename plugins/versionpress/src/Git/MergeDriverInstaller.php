@@ -64,13 +64,14 @@ class MergeDriverInstaller
 
         if (is_file($gitattributesPath)) {
             $gitAttributesFileContents = file_get_contents($gitattributesPath);
-            if (strpos($gitAttributesFileContents, $gitattributesContents) !== false) {
-                return;
+            if (strpos(preg_replace( "/\r|\n/", "", $gitAttributesFileContents), preg_replace( "/\r|\n/", "", $gitattributesContents)) === false) {
+                $gitattributesContents = $gitattributesContents . $gitAttributesFileContents;
+                file_put_contents($gitattributesPath, $gitattributesContents);
             }
-            $gitattributesContents = $gitattributesContents . $gitAttributesFileContents;
+        } else {
+            file_put_contents($gitattributesPath, $gitattributesContents);
         }
 
-        file_put_contents($gitattributesPath, $gitattributesContents);
     }
 
 
