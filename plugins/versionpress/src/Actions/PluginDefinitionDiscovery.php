@@ -24,13 +24,13 @@ class PluginDefinitionDiscovery
         return null;
     }
 
-    public static function getPathsForActivePlugins($definitionFile)
+    public static function getPathsForPlugins($definitionFile)
     {
         if (!function_exists('get_plugins')) {
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
         }
 
-        $plugins = get_option('active_plugins');
+        $plugins = array_keys(get_plugins());
 
         foreach ($plugins as $pluginFile) {
             $pluginSlug = dirname($pluginFile);

@@ -426,7 +426,7 @@ add_action('vp_wordpress_updated', function ($version) {
     /** @var DbSchemaInfo $dbSchema */
     $dbSchema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
     $tableSchemaStorage = $versionPressContainer->resolve(VersionPressServices::TABLE_SCHEMA_STORAGE);
-    $dbSchema->refreshDbSchema(PluginDefinitionDiscovery::getPathsForActivePlugins('schema.yml'));
+    $dbSchema->refreshDbSchema(PluginDefinitionDiscovery::getPathsForPlugins('schema.yml'));
 
     vp_update_table_ddl_scripts($dbSchema, $tableSchemaStorage);
 
@@ -443,7 +443,7 @@ add_action('vp_plugin_changed', function ($action, $pluginFile, $pluginName) {
     /** @var DbSchemaInfo $dbSchema */
     $dbSchema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
     $tableSchemaStorage = $versionPressContainer->resolve(VersionPressServices::TABLE_SCHEMA_STORAGE);
-    $dbSchema->refreshDbSchema(PluginDefinitionDiscovery::getPathsForActivePlugins('schema.yml'));
+    $dbSchema->refreshDbSchema(PluginDefinitionDiscovery::getPathsForPlugins('schema.yml'));
 
     vp_update_table_ddl_scripts($dbSchema, $tableSchemaStorage);
 
@@ -492,7 +492,7 @@ add_action('vp_theme_changed', function ($action, $stylesheet, $themeName) {
 
     $dbSchema = $versionPressContainer->resolve(VersionPressServices::DB_SCHEMA);
     $tableSchemaStorage = $versionPressContainer->resolve(VersionPressServices::TABLE_SCHEMA_STORAGE);
-    $dbSchema->refreshDbSchema(PluginDefinitionDiscovery::getPathsForActivePlugins('schema.yml'));
+    $dbSchema->refreshDbSchema(PluginDefinitionDiscovery::getPathsForPlugins('schema.yml'));
 
     vp_update_table_ddl_scripts($dbSchema, $tableSchemaStorage);
 
