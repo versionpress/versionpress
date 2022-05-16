@@ -21,7 +21,7 @@
     "graphql": "^14.1.1",
     "is-windows": "^1.0.2",
     "lodash": "^4.17.13",
-    "node-fetch": "^2.3.0",
+    "node-fetch": "^2.6.7",
     "shelljs": "^0.8.3",
     "string.prototype.matchall": "^3.0.1",
     "ts-node": "^8.0.3",
