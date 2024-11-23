@@ -8,18 +8,15 @@ use VersionPress\Actions\ActionsInfo;
 use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\Tests\Utils\HookMock;
 
-class ActionsInfoTest extends \PHPUnit_Framework_TestCase
-{
-    protected function setUp()
-    {
+class ActionsInfoTest extends \PHPUnit\Framework\TestCase {
+    protected function setUp(): void {
         HookMock::setUp();
     }
 
     /**
      * @test
      */
-    public function actionsInfoCreatesDescriptionForGivenAction()
-    {
+    public function actionsInfoCreatesDescriptionForGivenAction() {
         $actions = [
             'some-action' => ['message' => 'Some description'],
             'other-action' => ['message' => 'Other description'],
@@ -36,8 +33,7 @@ class ActionsInfoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function actionsInfoReplacesTagPlaceholderWithItsValue()
-    {
+    public function actionsInfoReplacesTagPlaceholderWithItsValue() {
         $tags = ['VP-Tag' => '/'];
         $actions = ['some-action' => ['message' => 'Some description containing %VP-Tag%']];
 
@@ -51,8 +47,7 @@ class ActionsInfoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function actionsInfoReplacesVpidPlaceholderWithVpid()
-    {
+    public function actionsInfoReplacesVpidPlaceholderWithVpid() {
         $actions = ['some-action' => ['message' => 'Some description containing %VPID%']];
 
         $actionsInfo = new ActionsInfo('some-scope', $actions);
@@ -63,8 +58,7 @@ class ActionsInfoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function actionsInfoAppliesFilterOnDescription()
-    {
+    public function actionsInfoAppliesFilterOnDescription() {
         $actions = ['some-action' => ['message' => 'Some description']];
 
         add_filter('vp_action_description_some-scope', function ($description) {

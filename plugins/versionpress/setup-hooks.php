@@ -51,18 +51,18 @@ if (!VersionPress::isActive() && is_file(VERSIONPRESS_PLUGIN_DIR . '/.abort-init
 if (VersionPress::isActive()) {
     add_action('init', 'vp_register_hooks');
 
-//----------------------------------
-// Replacing wpdb
-//----------------------------------
+    //----------------------------------
+    // Replacing wpdb
+    //----------------------------------
     register_shutdown_function(function () {
         if (!WpdbReplacer::isReplaced() && !defined('VP_DEACTIVATING') && VersionPress::isActive()) {
             WpdbReplacer::replaceMethods();
         }
     });
 
-//----------------------------------
-// Flushing rewrite rules after clone / pull / push
-//----------------------------------
+    //----------------------------------
+    // Flushing rewrite rules after clone / pull / push
+    //----------------------------------
     add_action('wp_loaded', function () {
         if (get_transient('vp_flush_rewrite_rules') && !defined('WP_CLI')) {
             require_once(ABSPATH . 'wp-admin/includes/misc.php');
@@ -81,8 +81,7 @@ add_filter('automatic_updates_is_vcs_checkout', function () {
     return !VersionPress::isActive(); // 'false' allows the update
 });
 
-function vp_register_hooks()
-{
+function vp_register_hooks() {
     global $versionPressContainer;
     /** @var Committer $committer */
     $committer = $versionPressContainer->resolve(VersionPressServices::COMMITTER);
@@ -228,8 +227,7 @@ function vp_register_hooks()
         do_action('vp_theme_changed', 'switch', $stylesheet, $themeName);
     });
 
-    function _vp_get_language_name_by_code($code)
-    {
+    function _vp_get_language_name_by_code($code) {
         require_once(ABSPATH . 'wp-admin/includes/translation-install.php');
 
         $translations = wp_get_available_translations();
@@ -430,7 +428,8 @@ function vp_register_hooks()
         do_action('vp_theme_changed', 'update', $stylesheet, $themeName);
     }
 
-    if (basename($_SERVER['PHP_SELF']) === 'plugin-editor.php' &&
+    if (
+        basename($_SERVER['PHP_SELF']) === 'plugin-editor.php' &&
         ((isset($_POST['action']) && $_POST['action'] === 'update') || isset($_GET['liveupdate'])
         )
     ) {
@@ -538,8 +537,7 @@ if (get_transient('vp_just_activated')) {
  * @param string $domain Text domain. Unique identifier for retrieving translated strings.
  * @return string
  */
-function vp_gettext_filter_plugin_activated($translation, $text, $domain)
-{
+function vp_gettext_filter_plugin_activated($translation, $text, $domain) {
     if ($text == 'Plugin <strong>activated</strong>.' && get_transient('vp_just_activated')) {
         delete_transient('vp_just_activated');
         // @codingStandardsIgnoreLine
@@ -555,8 +553,7 @@ function vp_gettext_filter_plugin_activated($translation, $text, $domain)
  *
  * @see Initializer
  */
-function vp_activate()
-{
+function vp_activate() {
     WpConfigSplitter::split(WordPressMissingFunctions::getWpConfigPath());
     set_transient('vp_just_activated', '1', 10);
 }
@@ -568,8 +565,7 @@ function vp_activate()
  * @see vp_admin_post_confirm_deactivation()
  * @see vp_admin_post_cancel_deactivation()
  */
-function vp_deactivate()
-{
+function vp_deactivate() {
     if (defined('WP_CLI') || !VersionPress::isActive()) {
         vp_admin_post_confirm_deactivation();
     } else {
@@ -581,8 +577,7 @@ function vp_deactivate()
 /**
  * Handles a situation where user canceled the deactivation
  */
-function vp_admin_post_cancel_deactivation()
-{
+function vp_admin_post_cancel_deactivation() {
     wp_safe_redirect(admin_url('plugins.php'));
     exit();
 }
@@ -592,8 +587,7 @@ function vp_admin_post_cancel_deactivation()
  * to the user confirming the deactivation on `?page=versionpress/admin/deactivate.php`
  * or is called directly from vp_deactivate() if the confirmation screen was not necessary.
  */
-function vp_admin_post_confirm_deactivation()
-{
+function vp_admin_post_confirm_deactivation() {
     //nonce verification is performed according to 'deactivate-plugin_versionpress/versionpress.php'
     // as a standard deactivation token for which nonce is generated
     if (!defined('WP_CLI')) {
@@ -613,8 +607,8 @@ function vp_admin_post_confirm_deactivation()
 
     $filesChangedByDeactivation = [
         ["type" => "path", "path" => VP_VPDB_DIR . "/*"],
-        ["type" => "path", "path" => ABSPATH . WPINC . "/wp-db.php"],
-        ["type" => "path", "path" => ABSPATH . WPINC . "/wp-db.php.original"],
+        ["type" => "path", "path" => WpdbReplacer::$wpdbClassPath],
+        ["type" => "path", "path" => WpdbReplacer::$wpdbClassPath . ".original"],
         ["type" => "path", "path" => ABSPATH . "/.gitattributes"],
     ];
 
@@ -630,8 +624,7 @@ function vp_admin_post_confirm_deactivation()
     }
 }
 
-function vp_send_headers()
-{
+function vp_send_headers() {
     if (isset($_GET['init_versionpress']) && !VersionPress::isActive()) {
         vp_disable_output_buffering();
     }
@@ -642,10 +635,10 @@ add_action('admin_notices', 'vp_activation_nag', 4 /* WP update nag is 3, we are
 /**
  * Displays the activation nag
  */
-function vp_activation_nag()
-{
+function vp_activation_nag() {
 
-    if (VersionPress::isActive() ||
+    if (
+        VersionPress::isActive() ||
         get_current_screen()->id == "toplevel_page_versionpress" ||
         get_current_screen()->id == "versionpress/admin/index" ||
         get_current_screen()->id == "versionpress/admin/deactivate"
@@ -663,8 +656,7 @@ function vp_activation_nag()
 
 add_action("after_plugin_row_versionpress/versionpress.php", 'vp_display_activation_notice', 10, 2);
 
-function vp_display_activation_notice($file, $plugin_data)
-{
+function vp_display_activation_notice($file, $plugin_data) {
     if (VersionPress::isActive()) {
         return;
     }
@@ -688,8 +680,7 @@ add_filter('wp_insert_attachment_data', 'vp_generate_post_guid', '99', 2);
  * @param array $postarr Raw post data
  * @return array
  */
-function vp_generate_post_guid($data, $postarr)
-{
+function vp_generate_post_guid($data, $postarr) {
     if (!VersionPress::isActive()) {
         return $data;
     }
@@ -710,8 +701,7 @@ function vp_generate_post_guid($data, $postarr)
 
 add_action('admin_menu', 'vp_admin_menu');
 
-function vp_admin_menu()
-{
+function vp_admin_menu() {
     add_menu_page(
         'VersionPress',
         'VersionPress',
@@ -742,15 +732,13 @@ function vp_admin_menu()
     }
 }
 
-function versionpress_page()
-{
+function versionpress_page() {
     require_once(VERSIONPRESS_PLUGIN_DIR . '/admin/index.php');
 }
 
 add_action('admin_action_vp_show_undo_confirm', 'vp_show_undo_confirm');
 
-function vp_show_undo_confirm()
-{
+function vp_show_undo_confirm() {
     if (vp_is_ajax()) {
         require_once(VERSIONPRESS_PLUGIN_DIR . '/admin/undo.php');
     } else {
@@ -762,20 +750,17 @@ function vp_show_undo_confirm()
 
 add_action('admin_action_vp_undo', 'vp_undo');
 
-function vp_undo()
-{
+function vp_undo() {
     _vp_revert('undo');
 }
 
 add_action('admin_action_vp_rollback', 'vp_rollback');
 
-function vp_rollback()
-{
+function vp_rollback() {
     _vp_revert('rollback');
 }
 
-function _vp_revert($reverterMethod)
-{
+function _vp_revert($reverterMethod) {
     global $versionPressContainer;
 
     vp_verify_nonce('vp_revert');
@@ -807,8 +792,7 @@ if (VersionPress::isActive()) {
     add_action('admin_bar_menu', 'vp_admin_bar_warning');
 }
 
-function vp_admin_bar_warning(WP_Admin_Bar $adminBar)
-{
+function vp_admin_bar_warning(WP_Admin_Bar $adminBar) {
     if (!current_user_can('manage_options')) {
         return;
     }
@@ -839,8 +823,7 @@ function vp_admin_bar_warning(WP_Admin_Bar $adminBar)
 
 add_action('wp_ajax_hide_vp_welcome_panel', 'vp_ajax_hide_vp_welcome_panel');
 
-function vp_ajax_hide_vp_welcome_panel()
-{
+function vp_ajax_hide_vp_welcome_panel() {
     update_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, "0");
     die(); // this is required to return a proper result
 }
@@ -853,8 +836,7 @@ add_action('wp_ajax_vp_show_undo_confirm', 'vp_show_undo_confirm');
 
 add_action('admin_enqueue_scripts', 'vp_enqueue_styles_and_scripts');
 add_action('wp_enqueue_scripts', 'vp_enqueue_styles_and_scripts');
-function vp_enqueue_styles_and_scripts()
-{
+function vp_enqueue_styles_and_scripts() {
     if (is_admin_bar_showing()) {
         $vpVersion = VersionPress::getVersion();
         wp_enqueue_style(
@@ -881,8 +863,7 @@ function vp_enqueue_styles_and_scripts()
 }
 
 add_action('admin_enqueue_scripts', 'vp_enqueue_admin_styles_and_scripts');
-function vp_enqueue_admin_styles_and_scripts()
-{
+function vp_enqueue_admin_styles_and_scripts() {
     $vpVersion = VersionPress::getVersion();
     wp_enqueue_style(
         'versionpress_admin_style',
@@ -910,8 +891,7 @@ function vp_enqueue_admin_styles_and_scripts()
 // API
 //---------------------------------
 add_action('rest_api_init', 'versionpress_api_init');
-function versionpress_api_init()
-{
+function versionpress_api_init() {
     global $versionPressContainer;
     $gitRepository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
     $reverter = $versionPressContainer->resolve(VersionPressServices::REVERTER);

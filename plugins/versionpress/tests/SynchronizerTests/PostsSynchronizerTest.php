@@ -9,8 +9,7 @@ use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\WordPressMissingFunctions;
 
-class PostsSynchronizerTest extends SynchronizerTestCase
-{
+class PostsSynchronizerTest extends SynchronizerTestCase {
     /** @var DirectoryStorage */
     private $storage;
     /** @var DirectoryStorage */
@@ -34,8 +33,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
     private static $categoryVpId;
     private static $categoryTaxonomyVpId;
 
-    protected function setUp()
-    {
+    protected function setUp(): void {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('post');
         $this->userStorage = self::$storageFactory->getStorage('user');
@@ -88,8 +86,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer adds new post to the database
      */
-    public function synchronizerAddsNewPostToDatabase()
-    {
+    public function synchronizerAddsNewPostToDatabase() {
         $this->createPost();
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
@@ -101,8 +98,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer updates changed post in the database
      */
-    public function synchronizerUpdatesChangedPostInDatabase()
-    {
+    public function synchronizerUpdatesChangedPostInDatabase() {
         $this->editPost();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
@@ -112,8 +108,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer replaces absolute URLs
      */
-    public function synchronizerReplacesAbsoluteUrls()
-    {
+    public function synchronizerReplacesAbsoluteUrls() {
         $this->editPost('post_content', AbsoluteUrlReplacer::PLACEHOLDER);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
@@ -123,8 +118,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer removes deleted post from the database
      */
-    public function synchronizerRemovesDeletedPostFromDatabase()
-    {
+    public function synchronizerRemovesDeletedPostFromDatabase() {
         $this->deletePost();
 
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
@@ -136,8 +130,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer handles circular dependencies
      */
-    public function synchronizerHandlesCircularDependencies()
-    {
+    public function synchronizerHandlesCircularDependencies() {
         $author = EntityUtils::prepareUser();
         $this->userStorage->save($author);
 
@@ -172,8 +165,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer adds new post to the database (selective synchronization)
      */
-    public function synchronizerAddsNewPostToDatabase_selective()
-    {
+    public function synchronizerAddsNewPostToDatabase_selective() {
         $entitiesToSynchronize = $this->createPost();
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
@@ -185,8 +177,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer updates changed post in the database (selective synchronization)
      */
-    public function synchronizerUpdatesChangedPostInDatabase_selective()
-    {
+    public function synchronizerUpdatesChangedPostInDatabase_selective() {
         $entitiesToSynchronize = $this->editPost();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         DBAsserter::assertFilesEqualDatabase();
@@ -196,8 +187,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer removes deleted post from the database (selective synchronization)
      */
-    public function synchronizerRemovesDeletedPostFromDatabase_selective()
-    {
+    public function synchronizerRemovesDeletedPostFromDatabase_selective() {
         $entitiesToSynchronize = $this->deletePost();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
@@ -208,8 +198,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer synchronizes term relationships (changes category)
      */
-    public function synchronizerSynchronizesTermRelationships_changeCategory()
-    {
+    public function synchronizerSynchronizesTermRelationships_changeCategory() {
         $this->createPost();
         $this->changeCategory();
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
@@ -223,8 +212,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer synchronizes term relationships (removes category)
      */
-    public function synchronizerSynchronizesTermRelationships_removeCategory()
-    {
+    public function synchronizerSynchronizesTermRelationships_removeCategory() {
         $this->removeCategory();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         $this->termTaxonomiesSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
@@ -237,8 +225,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer synchronizes term relationships (changes category, selective synchronization)
      */
-    public function synchronizerSynchronizesTermRelationships_changeCategory_selective()
-    {
+    public function synchronizerSynchronizesTermRelationships_changeCategory_selective() {
         $entitiesToSynchronize = $this->createPost();
         $entitiesToSynchronize = array_merge($this->changeCategory(), $entitiesToSynchronize);
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
@@ -252,8 +239,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer synchronizes term relationships (removes category, selective synchronization)
      */
-    public function synchronizerSynchronizesTermRelationships_removeCategory_selective()
-    {
+    public function synchronizerSynchronizesTermRelationships_removeCategory_selective() {
         $entitiesToSynchronize = $this->removeCategory();
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING, $entitiesToSynchronize);
         $this->termTaxonomiesSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
@@ -266,8 +252,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer restores shortcodes
      */
-    public function synchronizerRestoresShortcodes()
-    {
+    public function synchronizerRestoresShortcodes() {
         $this->createPostWithShortcode();
         $this->usersSynchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
 
@@ -290,8 +275,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    private function createPost()
-    {
+    private function createPost() {
         $author = EntityUtils::prepareUser();
         self::$authorVpId = $author['vp_id'];
         $this->userStorage->save($author);
@@ -305,16 +289,14 @@ class PostsSynchronizerTest extends SynchronizerTestCase
         ];
     }
 
-    private function editPost($key = 'post_status', $value = 'trash')
-    {
+    private function editPost($key = 'post_status', $value = 'trash') {
         $this->storage->save(EntityUtils::preparePost(self::$vpId, null, [$key => $value]));
         return [
             ['vp_id' => self::$vpId, 'parent' => self::$vpId],
         ];
     }
 
-    private function deletePost()
-    {
+    private function deletePost() {
         $this->storage->delete(EntityUtils::preparePost(self::$vpId));
         $this->userStorage->delete(EntityUtils::prepareUser(self::$authorVpId));
 
@@ -324,8 +306,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
         ];
     }
 
-    private function changeCategory()
-    {
+    private function changeCategory() {
         $categoryTerm = EntityUtils::prepareTerm(null, 'Some category', 'some-category');
         self::$categoryVpId = $categoryTerm['vp_id'];
         $categoryTaxonomy = EntityUtils::prepareTermTaxonomy(null, self::$categoryVpId, 'category', 'Some description');
@@ -347,8 +328,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
         ];
     }
 
-    private function removeCategory()
-    {
+    private function removeCategory() {
         $this->storage->delete(EntityUtils::preparePost(self::$vpId));
         $this->termTaxonomyStorage->delete(
             EntityUtils::prepareTermTaxonomy(self::$categoryTaxonomyVpId, self::$categoryVpId)
@@ -364,8 +344,7 @@ class PostsSynchronizerTest extends SynchronizerTestCase
         ];
     }
 
-    private function createPostWithShortcode()
-    {
+    private function createPostWithShortcode() {
         $author = EntityUtils::prepareUser();
         self::$authorVpId = $author['vp_id'];
         $this->userStorage->save($author);

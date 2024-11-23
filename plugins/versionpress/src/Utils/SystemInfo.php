@@ -6,11 +6,9 @@ use Nette\Utils\Strings;
 use Symfony\Component\Filesystem\Exception\IOException;
 use VersionPress\VersionPress;
 
-class SystemInfo
-{
+class SystemInfo {
 
-    public static function getAllInfo()
-    {
+    public static function getAllInfo() {
         $output = [];
         $output['summary'] = [];
         $output['git-info'] = self::getGitInfo();
@@ -38,13 +36,12 @@ class SystemInfo
      *
      * @return array
      */
-    public static function getGitInfo()
-    {
+    public static function getGitInfo() {
         $gitBinary = VP_GIT_BINARY;
 
         $info = [];
 
-        $process = new Process(ProcessUtils::escapeshellarg($gitBinary) . " --version");
+        $process = Process::fromShellCommandline(ProcessUtils::escapeshellarg($gitBinary) . " --version");
         $process->run();
 
         $info['git-binary-as-configured'] = $gitBinary;
@@ -69,7 +66,7 @@ class SystemInfo
         $gitPath = "unknown";
         if ($gitBinary == "git") {
             $osSpecificWhereCommand = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? "where" : "which";
-            $process = new Process("$osSpecificWhereCommand git");
+            $process = Process::fromShellCommandline("$osSpecificWhereCommand git");
             $process->run();
 
             if ($process->isSuccessful()) {
@@ -93,8 +90,7 @@ class SystemInfo
      * @return string Like "1.9.4" or "2.3.0"
      * @throws \Exception Throws if Git is not available
      */
-    public static function getGitVersion()
-    {
+    public static function getGitVersion() {
         $gitInfo = self::getGitInfo();
         if (empty($gitInfo)) {
             throw new \Exception("Git not available");
@@ -108,8 +104,7 @@ class SystemInfo
      *
      * @return array
      */
-    public static function getWordPressInfo()
-    {
+    public static function getWordPressInfo() {
 
         $info = [];
 
@@ -138,8 +133,7 @@ class SystemInfo
         return $info;
     }
 
-    public static function getActiveThemeInfo()
-    {
+    public static function getActiveThemeInfo() {
         $info = [];
         $wpTheme = wp_get_theme();
 
@@ -163,8 +157,7 @@ class SystemInfo
      *
      * @return array
      */
-    public static function getPhpInfo()
-    {
+    public static function getPhpInfo() {
         ob_start();
         phpinfo(-1);
 
@@ -182,7 +175,7 @@ class SystemInfo
                 '# class=".*?"#',
                 '%&#039;%',
                 '#<tr>(?:.*?)" src="(?:.*?)=(.*?)" alt="PHP Logo" /></a>'
-                . '<h1>PHP Version (.*?)</h1>(?:\n+?)</td></tr>#',
+                    . '<h1>PHP Version (.*?)</h1>(?:\n+?)</td></tr>#',
                 '#<h1><a href="(?:.*?)\?=(.*?)">PHP Credits</a></h1>#',
                 '#<tr>(?:.*?)" src="(?:.*?)=(.*?)"(?:.*?)Zend Engine (.*?),(?:.*?)</tr>#',
                 "# +#",
@@ -202,10 +195,10 @@ class SystemInfo
                 '',
                 ' ',
                 '<h2>PHP Configuration</h2>' . "\n" . '<tr><td>PHP Version</td><td>$2</td></tr>' .
-                "\n" . '<tr><td>PHP Egg</td><td>$1</td></tr>',
+                    "\n" . '<tr><td>PHP Egg</td><td>$1</td></tr>',
                 '<tr><td>PHP Credits Egg</td><td>$1</td></tr>',
                 '<tr><td>Zend Engine</td><td>$2</td></tr>' . "\n" .
-                '<tr><td>Zend Egg</td><td>$1</td></tr>',
+                    '<tr><td>Zend Egg</td><td>$1</td></tr>',
                 ' ',
                 '%S%',
                 '%E%'
@@ -237,8 +230,7 @@ class SystemInfo
         return $pi;
     }
 
-    private static function getPermissionInfo()
-    {
+    private static function getPermissionInfo() {
         $proc = proc_open(
             'whoami',
             [
@@ -270,7 +262,7 @@ class SystemInfo
             $processInfo['php-can-delete'][$target] = !is_file($filePath);
 
             $filePath = $directory . '/' . '.vp-try-write-process';
-            $process = new Process(sprintf("echo test > %s", ProcessUtils::escapeshellarg($filePath)));
+            $process = Process::fromShellCommandline(sprintf("echo test > %s", ProcessUtils::escapeshellarg($filePath)));
             $process->run();
             $processInfo['process-can-write'][$target] = is_file($filePath);
             try {

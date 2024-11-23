@@ -9,8 +9,7 @@ use VersionPress\Utils\QueryLanguageUtils;
  * Info about an entity. Basically represents a section of the YAML schema file -  find
  * the parsing logic in the constructor.
  */
-class EntityInfo
-{
+class EntityInfo {
 
     const FREQUENTLY_WRITTEN_DEFAULT_INTERVAL = 'hourly';
 
@@ -156,8 +155,7 @@ class EntityInfo
      *      )
      *   ))
      */
-    public function __construct($entitySchema)
-    {
+    public function __construct($entitySchema) {
         list($key) = array_keys($entitySchema);
         $this->entityName = $key;
 
@@ -193,7 +191,7 @@ class EntityInfo
 
         if (isset($schemaInfo['mn-references'])) {
             foreach ($schemaInfo['mn-references'] as $reference => $targetEntity) {
-                if (Strings::startsWith($reference, '~')) {
+                if (str_starts_with($reference, '~')) {
                     $reference = Strings::substring($reference, 1);
                     $this->virtualReferences[$reference] = true;
                 }
@@ -237,31 +235,26 @@ class EntityInfo
         }
     }
 
-    public function getIgnoredColumns()
-    {
+    public function getIgnoredColumns() {
         return $this->ignoredColumns;
     }
 
-    public function isVirtualReference($reference)
-    {
+    public function isVirtualReference($reference) {
         return isset($this->virtualReferences[$reference]);
     }
 
-    public function isFrequentlyWrittenEntity($entity)
-    {
+    public function isFrequentlyWrittenEntity($entity) {
         $rulesAndIntervals = $this->getRulesAndIntervalsForFrequentlyWrittenEntities();
         $rules = array_column($rulesAndIntervals, 'rule');
         return QueryLanguageUtils::entityMatchesSomeRule($entity, $rules);
     }
 
-    public function isIgnoredEntity($entity)
-    {
+    public function isIgnoredEntity($entity) {
         $rules = $this->getRulesForIgnoredEntities();
         return QueryLanguageUtils::entityMatchesSomeRule($entity, $rules);
     }
 
-    public function getRulesAndIntervalsForFrequentlyWrittenEntities()
-    {
+    public function getRulesAndIntervalsForFrequentlyWrittenEntities() {
         $queries = array_map(function ($queryMaybeWithInterval) {
             return is_string($queryMaybeWithInterval) ? $queryMaybeWithInterval : $queryMaybeWithInterval['query'];
         }, $this->frequentlyWritten);
@@ -281,8 +274,7 @@ class EntityInfo
         return $rulesAndIntervals;
     }
 
-    public function getRulesForIgnoredEntities()
-    {
+    public function getRulesForIgnoredEntities() {
         return QueryLanguageUtils::createRulesFromQueries($this->ignoredEntities);
     }
 
@@ -291,13 +283,12 @@ class EntityInfo
      *
      * @return array
      */
-    public function getReferencedEntities()
-    {
+    public function getReferencedEntities() {
         $references = array_values($this->references);
         $references += array_values($this->valueReferences);
         $references += array_values($this->mnReferences);
         $references = array_filter($references, function ($entity) {
-            return !Strings::startsWith($entity, '@');
+            return !str_starts_with($entity, '@');
         });
 
         return array_values(array_unique($references));
@@ -305,7 +296,6 @@ class EntityInfo
 
     // Mocking in ChangeInfoEnvelopeTest needs this method here, otherwise, PHPUnit 5.7 produces this error:
     // > Trying to configure method "__get" which cannot be configured because it does not exist, has not been specified, is final, or is static
-    public function __get($name)
-    {
+    public function __get($name) {
     }
 }

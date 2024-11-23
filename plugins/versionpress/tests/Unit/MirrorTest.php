@@ -7,13 +7,11 @@ use VersionPress\Storages\Storage;
 use VersionPress\Storages\StorageFactory;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 
-class MirrorTest extends \PHPUnit_Framework_TestCase
-{
+class MirrorTest extends \PHPUnit\Framework\TestCase {
     /**
      * @test
      */
-    public function mirrorCallsTheReplacerOnSavingEntity()
-    {
+    public function mirrorCallsTheReplacerOnSavingEntity() {
         $fakeStorageFactory = $this->getMockBuilder(StorageFactory::class)
             ->disableOriginalConstructor()->getMock();
         $fakeReplacer = $this->getMockBuilder(AbsoluteUrlReplacer::class)
@@ -35,8 +33,7 @@ class MirrorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function mirrorUsesRightStorage()
-    {
+    public function mirrorUsesRightStorage() {
         $entityName = 'some-entity';
         $someEntity = ['foo' => 'bar'];
 

@@ -7,10 +7,8 @@ use VersionPress\Utils\Process;
 use VersionPress\Utils\ProcessUtils;
 use WP_CLI;
 
-class VPCommandUtils
-{
-    public static function runWpCliCommand($command, $subcommand, $args = [], $cwd = null)
-    {
+class VPCommandUtils {
+    public static function runWpCliCommand($command, $subcommand, $args = [], $cwd = null) {
 
         $cliCommand = VP_WP_CLI_BINARY . " $command";
 
@@ -47,8 +45,7 @@ class VPCommandUtils
      * @param string|null $cwd
      * @return Process
      */
-    public static function exec($command, $cwd = null)
-    {
+    public static function exec($command, $cwd = null) {
         // Changing env variables for debugging
         // If we run another wp-cli command from our command, it breaks and never continues (with xdebug).
         // So we need to turn xdebug off for all "nested" commands.
@@ -59,7 +56,7 @@ class VPCommandUtils
             $env = null;
         }
 
-        $process = new Process($command, $cwd, $env);
+        $process = Process::fromShellCommandline($command, $cwd, $env);
         $process->run();
         return $process;
     }
@@ -80,8 +77,7 @@ class VPCommandUtils
      *   (Similar behavior to WP_CLI::confirm().)
      * @return string The answer
      */
-    public static function cliQuestion($question, $values, $assoc_args = [])
-    {
+    public static function cliQuestion($question, $values, $assoc_args = []) {
 
         if (isset($assoc_args['yes'])) {
             return in_array('y', $values) ? 'y' : $values[0];
@@ -97,8 +93,7 @@ class VPCommandUtils
         return $answer;
     }
 
-    public static function warning($message)
-    {
+    public static function warning($message) {
         WP_CLI::log(Colors::colorize('%YWarning: %n' . $message));
     }
 
@@ -108,8 +103,7 @@ class VPCommandUtils
      * @param string $value
      * @return bool|int|float|string
      */
-    public static function fixTypeOfValue($value)
-    {
+    public static function fixTypeOfValue($value) {
         if (is_numeric($value)) {
             return $value + 0;
         }

@@ -3,7 +3,7 @@ import * as utils from './script-utils';
 import { repoRoot } from './script-utils';
 import * as arg from 'arg';
 
-const dc = 'docker-compose -f docker-compose-tests.yml';
+const dc = 'docker compose -f docker-compose-tests.yml';
 const wait = (target: string) => `${dc} run --rm -e TARGETS=${target} wait`;
 
 const args = arg(

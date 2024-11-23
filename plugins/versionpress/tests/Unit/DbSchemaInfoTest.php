@@ -8,12 +8,10 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\EntityInfo;
 use VersionPress\Tests\Utils\HookMock;
 
-class DbSchemaInfoTest extends \PHPUnit_Framework_TestCase
-{
+class DbSchemaInfoTest extends \PHPUnit\Framework\TestCase {
     private $root;
 
-    protected function setUp()
-    {
+    protected function setUp(): void {
         $this->root = vfsStream::setup();
         HookMock::setUp();
     }
@@ -22,8 +20,7 @@ class DbSchemaInfoTest extends \PHPUnit_Framework_TestCase
      * @test
      * @dataProvider schemaProvider
      */
-    public function dbSchemaInfoCreatesEntityInfo($schema, $entityName, $idColumnName, $tableName, $references, $vpidColumnName, $hasNaturalId, $mnReferences, $valueReferences, $parentReference)
-    {
+    public function dbSchemaInfoCreatesEntityInfo($schema, $entityName, $idColumnName, $tableName, $references, $vpidColumnName, $hasNaturalId, $mnReferences, $valueReferences, $parentReference) {
 
         $schemaFile = $this->createSchemaFile($schema);
         $schemaInfo = new DbSchemaInfo([$schemaFile], 'prefix_', PHP_INT_MAX);
@@ -44,8 +41,7 @@ class DbSchemaInfoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($parentReference, $entityInfo->parentReference);
     }
 
-    public function schemaProvider()
-    {
+    public function schemaProvider() {
         $simpleEntity = [
             'simple-entity' => [
                 'id' => 'entity_id',
@@ -114,8 +110,7 @@ class DbSchemaInfoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function dbSchemaInfoMergesReferencesFromMultipleSources()
-    {
+    public function dbSchemaInfoMergesReferencesFromMultipleSources() {
         $schema1 = [
             'some-entity' => [
                 'id' => 'some_column',
@@ -147,7 +142,6 @@ class DbSchemaInfoTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertSame($expectedValueReferences, $entityInfo->valueReferences);
-
     }
 
 
@@ -157,8 +151,7 @@ class DbSchemaInfoTest extends \PHPUnit_Framework_TestCase
      * @param array $scopesDefinition
      * @return string
      */
-    private function createSchemaFile($scopesDefinition)
-    {
+    private function createSchemaFile($scopesDefinition) {
         static $fileNumber = 0;
 
         $fileName = 'actions-' . ($fileNumber++) . '.yml';

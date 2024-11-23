@@ -5,8 +5,7 @@ namespace VersionPress\Tests\End2End\Themes;
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\DBAsserter;
 
-class ThemesTest extends End2EndTestCase
-{
+class ThemesTest extends End2EndTestCase {
 
     /**
      * @see IThemesTestWorker::setThemeInfo()
@@ -20,12 +19,11 @@ class ThemesTest extends End2EndTestCase
 
     private static $defaultTheme;
 
-    public static function setupBeforeClass()
-    {
+    public static function setupBeforeClass(): void {
         parent::setUpBeforeClass();
 
         if (self::$testConfig->testSite->installationType !== 'standard') {
-            throw new \PHPUnit_Framework_SkippedTestSuiteError();
+            throw new \PHPUnit\Framework\SkippedTestSuiteError();
         }
 
         $testDataPath = __DIR__ . '/../test-data';
@@ -53,8 +51,7 @@ class ThemesTest extends End2EndTestCase
      * @test
      * @testdox Uploading theme creates 'theme/install' action
      */
-    public function uploadingThemeCreatesThemeInstallAction()
-    {
+    public function uploadingThemeCreatesThemeInstallAction() {
         self::$worker->prepare_uploadTheme();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -73,8 +70,7 @@ class ThemesTest extends End2EndTestCase
      * @test
      * @testdox Switching theme create 'theme/switch' action
      */
-    public function switchingThemeCreatesThemeSwitchAction()
-    {
+    public function switchingThemeCreatesThemeSwitchAction() {
         self::$worker->prepare_switchTheme();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -93,8 +89,7 @@ class ThemesTest extends End2EndTestCase
      * @test
      * @testdox Deleting theme creates 'theme/delete' action
      */
-    public function deletingThemeCreatesThemeDeleteAction()
-    {
+    public function deletingThemeCreatesThemeDeleteAction() {
 
         self::$wpAutomation->switchTheme(self::$defaultTheme);
 
@@ -116,8 +111,7 @@ class ThemesTest extends End2EndTestCase
      * @test
      * @testdox Uploading two themes creates a bulk action
      */
-    public function uploadingTwoThemesCreatesBulkAction()
-    {
+    public function uploadingTwoThemesCreatesBulkAction() {
         self::$worker->prepare_uploadTwoThemes();
         $commitAsserter = $this->newCommitAsserter();
 
@@ -135,8 +129,7 @@ class ThemesTest extends End2EndTestCase
      * @test
      * @testdox Deleting two themes creates a bulk action
      */
-    public function deletingTwoThemesCreatesBulkAction()
-    {
+    public function deletingTwoThemesCreatesBulkAction() {
         self::$worker->prepare_deleteTwoThemes();
         $commitAsserter = $this->newCommitAsserter();
 

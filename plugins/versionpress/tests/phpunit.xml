@@ -1,42 +1,42 @@
-<phpunit bootstrap="phpunit-bootstrap.php"
-         verbose="true"
-         colors="true">
-    <logging>
-        <log type="testdox-text" target="/var/opt/versionpress/logs/testdox.txt" />
-    </logging>
-    <testsuites>
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="phpunit-bootstrap.php" verbose="true" colors="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage/>
+  <logging>
+    <testdoxText outputFile="/var/opt/versionpress/logs/testdox.txt"/>
+    <testdoxHtml outputFile="/var/opt/versionpress/logs/testdox.html"/>
+    <junit outputFile="/var/opt/versionpress/logs/unit_report.xml"/>
+  </logging>
 
-        <testsuite name="Unit">
-            <directory>Unit</directory>
-        </testsuite>
-
-        <testsuite name="StorageTests">
-            <directory>StorageTests</directory>
-        </testsuite>
-
-        <testsuite name="SynchronizerTests">
-            <directory>SynchronizerTests</directory>
-        </testsuite>
-
-        <testsuite name="GitRepositoryTests">
-            <directory>GitRepositoryTests</directory>
-        </testsuite>
-
-        <testsuite name="End2End">
-            <directory>End2End</directory>
-        </testsuite>
-
-        <!-- <testsuite name="Selenium">
+  <testsuites>
+    <!-- <testsuite name="Automation">
+      <directory>Automation</directory>
+    </testsuite> -->
+    <testsuite name="Unit">
+      <directory>Unit</directory>
+    </testsuite>
+    <testsuite name="Utils">
+      <directory>Utils</directory>
+    </testsuite>
+    <testsuite name="StorageTests">
+      <directory>StorageTests</directory>
+    </testsuite>
+    <!-- <testsuite name="SynchronizerTests">
+      <directory>SynchronizerTests</directory>
+    </testsuite> -->
+    <testsuite name="GitRepositoryTests">
+      <directory>GitRepositoryTests</directory>
+    </testsuite>
+    <testsuite name="End2End">
+      <directory>End2End</directory>
+    </testsuite>
+    <!-- <testsuite name="Selenium">
             <directory>Selenium</directory>
         </testsuite> -->
-
-        <testsuite name="Workflow">
-            <directory>Workflow</directory>
-        </testsuite>
-
-        <testsuite name="LoadTests">
-            <directory>LoadTests</directory>
-        </testsuite>
-
-    </testsuites>
+    <testsuite name="Workflow">
+      <directory>Workflow</directory>
+    </testsuite>
+    <testsuite name="LoadTests">
+      <directory>LoadTests</directory>
+    </testsuite>
+  </testsuites>
 </phpunit>

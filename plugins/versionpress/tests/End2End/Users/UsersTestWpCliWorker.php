@@ -2,20 +2,19 @@
 
 namespace VersionPress\Tests\End2End\Users;
 
+use Exception;
 use Nette\Utils\Random;
 use Nette\Utils\Strings;
 use VersionPress\Tests\End2End\Utils\WpCliWorker;
 
-class UsersTestWpCliWorker extends WpCliWorker implements IUsersTestWorker
-{
+class UsersTestWpCliWorker extends WpCliWorker implements IUsersTestWorker {
 
     private $testUser;
     private $userId;
     private $originalEmail;
     private $originalFirstName;
 
-    public function setTestUser($testUser)
-    {
+    public function setTestUser($testUser) {
         $this->testUser = [
             'user_login' => $testUser['login'],
             'user_email' => $testUser['email'],
@@ -25,17 +24,17 @@ class UsersTestWpCliWorker extends WpCliWorker implements IUsersTestWorker
         ];
     }
 
-    public function prepare_createUser()
-    {
+    public function prepare_createUser() {
     }
 
-    public function createUser()
-    {
+    public function createUser() {
+        //try {
         $this->userId = $this->wpAutomation->createUser($this->testUser);
+        // } catch (Exception $e) {
+        // }
     }
 
-    public function prepare_editUser()
-    {
+    public function prepare_editUser() {
         $user = json_decode($this->wpAutomation->runWpCliCommand(
             'user',
             'get',
@@ -48,13 +47,11 @@ class UsersTestWpCliWorker extends WpCliWorker implements IUsersTestWorker
         );
     }
 
-    public function editUser()
-    {
+    public function editUser() {
         $this->wpAutomation->editUser($this->userId, ['user_email' => $this->originalEmail]);
     }
 
-    public function prepare_editUsermeta()
-    {
+    public function prepare_editUsermeta() {
         $this->originalFirstName = trim($this->wpAutomation->runWpCliCommand(
             'user',
             'meta',
@@ -67,8 +64,7 @@ class UsersTestWpCliWorker extends WpCliWorker implements IUsersTestWorker
         );
     }
 
-    public function editUsermeta()
-    {
+    public function editUsermeta() {
         $this->wpAutomation->runWpCliCommand(
             'user',
             'meta',
@@ -76,34 +72,28 @@ class UsersTestWpCliWorker extends WpCliWorker implements IUsersTestWorker
         );
     }
 
-    public function prepare_deleteUsermeta()
-    {
+    public function prepare_deleteUsermeta() {
         $this->createUser();
     }
 
-    public function deleteUsermeta()
-    {
+    public function deleteUsermeta() {
         $this->wpAutomation->runWpCliCommand('user', 'meta', ['delete', $this->userId, 'last_name']);
     }
 
-    public function prepare_deleteUser()
-    {
+    public function prepare_deleteUser() {
     }
 
-    public function deleteUser()
-    {
+    public function deleteUser() {
         $this->wpAutomation->deleteUser($this->userId);
     }
 
-    public function prepare_editTwoUsers()
-    {
+    public function prepare_editTwoUsers() {
         $this->userId = [];
         $this->userId[] = $this->wpAutomation->createUser($this->prepareTestUser());
         $this->userId[] = $this->wpAutomation->createUser($this->prepareTestUser());
     }
 
-    public function editTwoUsers()
-    {
+    public function editTwoUsers() {
         $this->wpAutomation->runWpCliCommand(
             'user',
             'update',
@@ -111,20 +101,17 @@ class UsersTestWpCliWorker extends WpCliWorker implements IUsersTestWorker
         );
     }
 
-    public function prepare_deleteTwoUsers()
-    {
+    public function prepare_deleteTwoUsers() {
         $this->userId = [];
         $this->userId[] = $this->wpAutomation->createUser($this->prepareTestUser());
         $this->userId[] = $this->wpAutomation->createUser($this->prepareTestUser());
     }
 
-    public function deleteTwoUsers()
-    {
+    public function deleteTwoUsers() {
         $this->wpAutomation->runWpCliCommand('user', 'delete', array_merge($this->userId, ['yes' => null]));
     }
 
-    private function prepareTestUser()
-    {
+    private function prepareTestUser() {
         return [
             'user_login' => 'bulk_' . Random::generate(),
             'user_email' => 'bulk.' . Random::generate() . '@example.com',
@@ -134,23 +121,20 @@ class UsersTestWpCliWorker extends WpCliWorker implements IUsersTestWorker
         ];
     }
 
-    public function prepare_editTwoUsermeta()
-    {
-        throw new \PHPUnit_Framework_SkippedTestError("There is no way to change multiple usermeta using WP-CLI");
+    public function prepare_editTwoUsermeta() {
+        throw new \PHPUnit\Framework\SkippedTestError("There is no way to change multiple usermeta using WP-CLI");
     }
 
-    public function editTwoUsermeta()
-    {
+    public function editTwoUsermeta() {
     }
 
-    public function tearDownAfterClass()
-    {
+    public function tearDownAfterClass() {
         $users = json_decode($this->wpAutomation->runWpCliCommand('user', 'list', ['format' => 'json']));
         $userLogins = array_map(function ($user) {
             return $user->user_login;
         }, $users);
         $usersForBulkTests = array_filter($userLogins, function ($login) {
-            return Strings::startsWith($login, 'bulk_');
+            return str_starts_with($login, 'bulk_');
         });
         $this->wpAutomation->runWpCliCommand('user', 'delete', array_merge($usersForBulkTests, ['yes' => null]));
     }

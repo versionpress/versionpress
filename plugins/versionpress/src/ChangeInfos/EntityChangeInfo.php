@@ -20,8 +20,7 @@ use VersionPress\Database\EntityInfo;
  *   tags are used when the commit is read later and human-friendly message is rendered in the UI.
  *
  */
-class EntityChangeInfo extends TrackedChangeInfo
-{
+class EntityChangeInfo extends TrackedChangeInfo {
 
     /** @var EntityInfo */
     private $entityInfo;
@@ -37,20 +36,17 @@ class EntityChangeInfo extends TrackedChangeInfo
      * @param array $customFiles
      * @param int $priority
      */
-    public function __construct($entityInfo, $actionsInfo, $action, $entityId, $customTags = [], $customFiles = [], $priority = 10)
-    {
+    public function __construct($entityInfo, $actionsInfo, $action, $entityId, $customTags = [], $customFiles = [], $priority = 10) {
         parent::__construct($entityInfo->entityName, $actionsInfo, $action, $entityId, $customTags, $customFiles, $priority);
         $this->entityInfo = $entityInfo;
         $this->actionsInfo = $actionsInfo;
     }
 
-    public function getScope()
-    {
+    public function getScope() {
         return $this->entityInfo->entityName;
     }
 
-    public function getChangedFiles()
-    {
+    public function getChangedFiles() {
         $change = [
             "type" => "storage-file",
             "entity" => $this->getScope(),
@@ -67,8 +63,7 @@ class EntityChangeInfo extends TrackedChangeInfo
      *
      * @return string|null
      */
-    public function getParentId()
-    {
+    public function getParentId() {
         if ($this->entityInfo->parentReference) {
             $tagContainingParentId = $this->actionsInfo->getTagContainingParentId();
 

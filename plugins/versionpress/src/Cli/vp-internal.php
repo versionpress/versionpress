@@ -31,8 +31,7 @@ use wpdb;
  * These internal commands are mostly used by public `wp vp` commands.
  *
  */
-class VPInternalCommand extends WP_CLI_Command
-{
+class VPInternalCommand extends WP_CLI_Command {
 
     /**
      * Finishes clone operation
@@ -42,8 +41,7 @@ class VPInternalCommand extends WP_CLI_Command
      * @when before_wp_load
      *
      */
-    public function finishRestore($args, $assoc_args)
-    {
+    public function finishRestore($args, $assoc_args) {
         define('SHORTINIT', true);
 
         $wpConfigPath = \WP_CLI\Utils\locate_wp_config();
@@ -113,8 +111,7 @@ class VPInternalCommand extends WP_CLI_Command
     /**
      * @subcommand flush-regenerable-values
      */
-    public function flushRegenerableValues()
-    {
+    public function flushRegenerableValues() {
         vp_flush_regenerable_options();
         $this->flushRewriteRules();
     }
@@ -124,8 +121,7 @@ class VPInternalCommand extends WP_CLI_Command
      *
      * @subcommand finish-update
      */
-    public function finishUpdate($args, $assoc_args)
-    {
+    public function finishUpdate($args, $assoc_args) {
         global $versionPressContainer;
         activate_plugins("versionpress/versionpress.php");
         WP_CLI::success('Re-activated VersionPress');
@@ -150,13 +146,12 @@ class VPInternalCommand extends WP_CLI_Command
      * : Desired state of maintenance mode. Possible values are 'on' or 'off'.
      *
      */
-    public function maintenance($args)
-    {
+    public function maintenance($args) {
         $mode = $args[0];
         if ($mode === 'on') {
-            vp_enable_maintenance();
+            \vp_enable_maintenance();
         } else {
-            vp_disable_maintenance();
+            \vp_disable_maintenance();
         }
     }
 
@@ -166,8 +161,7 @@ class VPInternalCommand extends WP_CLI_Command
      * @subcommand finish-push
      *
      */
-    public function finishPush($args, $assoc_args)
-    {
+    public function finishPush($args, $assoc_args) {
         global $versionPressContainer;
 
         // Update working copy
@@ -202,8 +196,7 @@ class VPInternalCommand extends WP_CLI_Command
         vp_enable_maintenance();
     }
 
-    private function flushRewriteRules()
-    {
+    private function flushRewriteRules() {
         set_transient('vp_flush_rewrite_rules', 1);
         /**
          * @see VPCommand::flushRewriteRules
@@ -222,8 +215,7 @@ class VPInternalCommand extends WP_CLI_Command
      *
      *
      */
-    public function getEntityId($args = [], $assoc_args = [])
-    {
+    public function getEntityId($args = [], $assoc_args = []) {
         global $versionPressContainer;
         /** @var Database $database */
         $database = $versionPressContainer->resolve(VersionPressServices::DATABASE);
@@ -247,8 +239,7 @@ class VPInternalCommand extends WP_CLI_Command
      *
      *
      */
-    public function getEntityVpid($args = [], $assoc_args = [])
-    {
+    public function getEntityVpid($args = [], $assoc_args = []) {
         global $versionPressContainer;
         /** @var wpdb $wpdb */
         $wpdb = $versionPressContainer->resolve(VersionPressServices::WPDB);
@@ -282,8 +273,7 @@ class VPInternalCommand extends WP_CLI_Command
      *
      * @when before_wp_load
      */
-    public function updateConfig($args = [], $assoc_args = [])
-    {
+    public function updateConfig($args = [], $assoc_args = []) {
         require_once __DIR__ . '/VPCommandUtils.php';
         require_once __DIR__ . '/../Initialization/WpConfigSplitter.php';
         require_once __DIR__ . '/../Utils/WpConfigEditor.php';
@@ -324,8 +314,7 @@ class VPInternalCommand extends WP_CLI_Command
      *
      * @subcommand commit-frequently-written-entities
      */
-    public function commitFrequentlyWrittenEntities($args = [], $assoc_args = [])
-    {
+    public function commitFrequentlyWrittenEntities($args = [], $assoc_args = []) {
         vp_commit_all_frequently_written_entities();
     }
 }

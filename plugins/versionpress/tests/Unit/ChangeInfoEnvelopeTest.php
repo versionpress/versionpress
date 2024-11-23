@@ -2,7 +2,6 @@
 
 namespace VersionPress\Tests\Unit;
 
-use PHPUnit_Framework_TestCase;
 use VersionPress\ChangeInfos\BulkChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfo;
 use VersionPress\ChangeInfos\ChangeInfoEnvelope;
@@ -10,8 +9,7 @@ use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\ChangeInfos\TrackedChangeInfo;
 use VersionPress\Database\EntityInfo;
 
-class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
-{
+class ChangeInfoEnvelopeTest extends \PHPUnit\Framework\TestCase {
 
 
     /**
@@ -20,8 +18,7 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
      * @param $inputChangeInfosSample
      * @param $sortedChangeInfosSample
      */
-    public function changeInfosWithSamePriorityMaintainOrder($inputChangeInfosSample, $sortedChangeInfosSample)
-    {
+    public function changeInfosWithSamePriorityMaintainOrder($inputChangeInfosSample, $sortedChangeInfosSample) {
         $changeInfoEnvelope = new ChangeInfoEnvelope($inputChangeInfosSample, "1.0");
         $sortedByChangeInfoEnvelope = $changeInfoEnvelope->getReorganizedInfoList();
         $sortedByChangeInfoEnvelope = $this->ungroupChangeInfos($sortedByChangeInfoEnvelope);
@@ -30,8 +27,7 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function entityChangeInfoWithCreateActionHasHigherPriorityThanOtherActions()
-    {
+    public function entityChangeInfoWithCreateActionHasHigherPriorityThanOtherActions() {
 
         $entityInfo = $this->createEntityInfoMock('some_entity');
 
@@ -48,8 +44,7 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function bulkChangeInfoDoesNotAffectChangeInfoOrder()
-    {
+    public function bulkChangeInfoDoesNotAffectChangeInfoOrder() {
         $entityInfo = $this->createEntityInfoMock('some_entity');
 
         $normalPriorityChangeInfo = new EntityChangeInfo($entityInfo, null, 'create', 'vpid');
@@ -68,8 +63,7 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
      * @dataProvider changeInfosRepresentingBulkActions
      * @param $changeInfos
      */
-    public function bulkActionsAreGroupedIntoBulkChangeInfo($changeInfos)
-    {
+    public function bulkActionsAreGroupedIntoBulkChangeInfo($changeInfos) {
         $changeInfoEnvelope = new ChangeInfoEnvelope($changeInfos, '1.0');
         $groupedChangeInfoList = $changeInfoEnvelope->getReorganizedInfoList();
         $this->assertCount(1, $groupedChangeInfoList);
@@ -86,8 +80,7 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
      *
      * @return array First item in the nested array is the input array, second is the expected sorted array
      */
-    public function samePriorityExamples()
-    {
+    public function samePriorityExamples() {
 
         $entityName = 'some_entity';
 
@@ -113,8 +106,7 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
         ];
     }
 
-    public function changeInfosRepresentingBulkActions()
-    {
+    public function changeInfosRepresentingBulkActions() {
         $entityInfoMock = $this->createEntityInfoMock('some_entity');
 
         return [
@@ -138,8 +130,7 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
      * @param ChangeInfo[] $changeInfos
      * @return ChangeInfo[]
      */
-    private function ungroupChangeInfos($changeInfos)
-    {
+    private function ungroupChangeInfos($changeInfos) {
         $ungrouped = [];
         foreach ($changeInfos as $changeInfo) {
             if ($changeInfo instanceof BulkChangeInfo) {
@@ -158,8 +149,7 @@ class ChangeInfoEnvelopeTest extends PHPUnit_Framework_TestCase
      * @param string $entityName
      * @return \PHPUnit_Framework_MockObject_MockObject|EntityInfo
      */
-    private function createEntityInfoMock($entityName)
-    {
+    private function createEntityInfoMock($entityName) {
         $entityInfoMock = $this->getMockBuilder(EntityInfo::class)->disableOriginalConstructor()->getMock();
         $entityInfoMock->expects($this->any())->method('__get')->with($this->equalTo('entityName'))->will($this->returnValue($entityName));
 

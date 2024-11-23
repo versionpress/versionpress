@@ -4,21 +4,18 @@ namespace VersionPress\Tests\Unit;
 
 use VersionPress\Utils\QueryLanguageUtils;
 
-class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
-{
+class QueryLanguageUtilsTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @test
      * @dataProvider validQueryAndEntityProvider
      */
-    public function entityMatchesRightQuery($queries, $entity)
-    {
+    public function entityMatchesRightQuery($queries, $entity) {
         $rules = QueryLanguageUtils::createRulesFromQueries($queries);
         $this->assertTrue(QueryLanguageUtils::entityMatchesSomeRule($entity, $rules));
     }
 
-    public function validQueryAndEntityProvider()
-    {
+    public function validQueryAndEntityProvider() {
         return [
             // basic rule matching
             [['field: value'], ['field' => 'value']],
@@ -45,14 +42,12 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
      * @test
      * @dataProvider wrongQueryAndEntityProvider
      */
-    public function entityDoesntMatchWrongQuery($queries, $entity)
-    {
+    public function entityDoesntMatchWrongQuery($queries, $entity) {
         $rules = QueryLanguageUtils::createRulesFromQueries($queries);
         $this->assertFalse(QueryLanguageUtils::entityMatchesSomeRule($entity, $rules));
     }
 
-    public function wrongQueryAndEntityProvider()
-    {
+    public function wrongQueryAndEntityProvider() {
         return [
             [['field: value'], ['field' => 'another_value']],
             [['field: value'], ['other_field' => 'value']],
@@ -70,14 +65,12 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
      * @test
      * @dataProvider ruleAndQueryProvider
      */
-    public function queryLanguageUtilsGeneratesCorrectSqlRestriction($rule, $expectedRestriction)
-    {
+    public function queryLanguageUtilsGeneratesCorrectSqlRestriction($rule, $expectedRestriction) {
         $restriction = QueryLanguageUtils::createSqlRestrictionFromRule($rule);
         $this->assertEquals($expectedRestriction, $restriction);
     }
 
-    public function ruleAndQueryProvider()
-    {
+    public function ruleAndQueryProvider() {
         return [
             [['field' => ['value']], '(`field` = "value")'],
             [['FIELD' => ['Value']], '(`FIELD` = "Value")'],
@@ -108,14 +101,12 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
      * @test
      * @dataProvider queryAndRulesProvider
      */
-    public function queryLanguageUtilsCreatesCorrectRules($query, $expectedRules)
-    {
+    public function queryLanguageUtilsCreatesCorrectRules($query, $expectedRules) {
         $rules = QueryLanguageUtils::createRulesFromQueries($query);
         $this->assertEquals($expectedRules, $rules);
     }
 
-    public function queryAndRulesProvider()
-    {
+    public function queryAndRulesProvider() {
         return [
             [
                 ['Text', ' "Longer text" ', '\'Longer text\''],
@@ -142,14 +133,12 @@ class QueryLanguageUtilsTest extends \PHPUnit_Framework_TestCase
      * @test
      * @dataProvider rulesAndGitLogQueryProvider
      */
-    public function queryLanguageUtilsGeneratesCorrectGitLogQuery($rules, $expectedQuery)
-    {
+    public function queryLanguageUtilsGeneratesCorrectGitLogQuery($rules, $expectedQuery) {
         $query = QueryLanguageUtils::createGitLogQueryFromRule($rules);
         $this->assertEquals($expectedQuery, $query);
     }
 
-    public function rulesAndGitLogQueryProvider()
-    {
+    public function rulesAndGitLogQueryProvider() {
         return [
             [
                 ['author' => ['doe', 'do*', 'John Doe']],

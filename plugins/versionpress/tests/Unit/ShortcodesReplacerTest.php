@@ -6,8 +6,7 @@ use VersionPress\Database\ShortcodesInfo;
 use VersionPress\Database\ShortcodesReplacer;
 use VersionPress\Database\VpidRepository;
 
-class ShortcodesReplacerTest extends \PHPUnit_Framework_TestCase
-{
+class ShortcodesReplacerTest extends \PHPUnit\Framework\TestCase {
 
     private $shortcodeSchemaValueMap = [
         ['foo', ['id' => 'some-entity', 'ids' => 'another-entity']],
@@ -26,8 +25,7 @@ class ShortcodesReplacerTest extends \PHPUnit_Framework_TestCase
 
     private $vpidRepository;
 
-    protected function setUp()
-    {
+    protected function setUp(): void {
         if (!function_exists('get_shortcode_regex')) {
 
             $shortcodesFileRelativePath = 'ext-libs/wordpress/wp-includes/shortcodes.php';
@@ -66,16 +64,13 @@ class ShortcodesReplacerTest extends \PHPUnit_Framework_TestCase
         $this->vpidRepository->expects($this->any())
             ->method('getIdForVpid')
             ->will($this->returnValueMap($vpidValueMap));
-
-
     }
 
     /**
      * @test
      * @dataProvider shortcodeProvider
      */
-    public function replacerReplacesIdForVpidsInEntity($input, $expectedReplacedOutput)
-    {
+    public function replacerReplacesIdForVpidsInEntity($input, $expectedReplacedOutput) {
         $shortcodesReplacer = new ShortcodesReplacer($this->shortcodesInfo, $this->vpidRepository);
         $testingPost = [
             'post_title' => $input,
@@ -93,8 +88,7 @@ class ShortcodesReplacerTest extends \PHPUnit_Framework_TestCase
      * @test
      * @dataProvider shortcodeProvider
      */
-    public function replacerRestoresIdsFromVpidsInEntity($expectedReplacedOutput, $input)
-    {
+    public function replacerRestoresIdsFromVpidsInEntity($expectedReplacedOutput, $input) {
         $shortcodesReplacer = new ShortcodesReplacer($this->shortcodesInfo, $this->vpidRepository);
         $testingPost = [
             'post_title' => $input,
@@ -108,8 +102,7 @@ class ShortcodesReplacerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedPost, $entityWithReplacedShortCodes);
     }
 
-    public function shortcodeProvider()
-    {
+    public function shortcodeProvider() {
         /** @var callable $ids */
         $ids = [$this, 'getVpidForId'];
 
@@ -129,8 +122,7 @@ class ShortcodesReplacerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function getVpidForId($entity, $id1, $id2 = null)
-    {
+    public function getVpidForId($entity, $id1, $id2 = null) {
         $args = func_get_args();
         array_shift($args);
 

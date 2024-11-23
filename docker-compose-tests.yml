@@ -1,4 +1,3 @@
-version: '3.6'
 services:
 
   # !!! Containers in this file are meant to be started via `scripts/run-tests.ts`, not manually.
@@ -6,45 +5,56 @@ services:
   # PR #1401 explains why.
 
   wordpress-for-tests:
-    image: versionpress/wordpress:php7.2-apache@sha256:64b3c10adfef9ae65a140d5547d670d996c5c852b9a840c71a86a5be4f777fdc
+    image: versionpress/wordpress:php8.2-apache
     ports:
       - "80:80"
     volumes:
       - wordpress-files:/var/www/html:z
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     working_dir: /var/www/html/wptest
     environment:
       WORDPRESS_DB_HOST: mysql-for-tests
       WORDPRESS_DB_PASSWORD: r00tpwd
 
   mysql-for-tests:
-    image: mysql:5.7@sha256:1590f2540fd87e39605686873fb10206da4cbd7e83df2bc4110abe9fb740699e
+    image: mysql:8.0
     ports:
       - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password
     volumes:
       - db-data-for-tests:/var/lib/mysql:z
     environment:
       MYSQL_ROOT_PASSWORD: r00tpwd
+      MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password
 
-  tests:
-    image: versionpress/wordpress:cli@sha256:86fc95921f1ac48950ab593b0b970e9a98ad3b28c0b16c5c6007ea0fac2839e9
+  tests-with-wordpress:
+    image: versionpress/wordpress:cli
     environment:
       VP_DIR: /opt/versionpress
       PHP_IDE_CONFIG: serverName=VersionPress-tests
+      XDEBUG_SESSION: 1
+    user: "33"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       # !!! This must be kept in sync with wordpress-cli-image/Dockerfile
       - wordpress-files:/var/www/html:z
       - test-logs:/var/opt/versionpress/logs:z
-      - ./plugins/versionpress:/opt/versionpress:ro,z
+      - ./plugins/versionpress:/opt/versionpress:z
       - ./ext-libs:/opt/ext-libs:ro,z
       - wpcli-cache:/var/www/.wp-cli:z
     working_dir: /opt/versionpress/tests
     command: ../vendor/bin/phpunit --verbose --colors -c phpunit.xml --testdox-text /var/opt/versionpress/logs/testdox.txt
 
-  tests-with-wordpress:
-    image: versionpress/wordpress:cli@sha256:86fc95921f1ac48950ab593b0b970e9a98ad3b28c0b16c5c6007ea0fac2839e9
+  tests:
+    image: versionpress/wordpress:cli
     environment:
       VP_DIR: /opt/versionpress
       PHP_IDE_CONFIG: serverName=VersionPress-tests
+      XDEBUG_SESSION: 1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       # !!! This must be kept in sync with wordpress-cli-image/Dockerfile
       - wordpress-files:/var/www/html:z

@@ -5,15 +5,13 @@ namespace VersionPress\Utils;
 /**
  * Replaces absolute site URL with placeholder
  */
-class AbsoluteUrlReplacer
-{
+class AbsoluteUrlReplacer {
 
     const PLACEHOLDER = "<<[site-url]>>";
     private $siteUrl;
     private $replacedObjects = [];
 
-    public function __construct($siteUrl)
-    {
+    public function __construct($siteUrl) {
         $this->siteUrl = $siteUrl;
     }
 
@@ -23,8 +21,7 @@ class AbsoluteUrlReplacer
      * @param array $entity
      * @return array
      */
-    public function replace($entity)
-    {
+    public function replace($entity) {
         $this->replacedObjects = [];
 
         foreach ($entity as $field => $value) {
@@ -44,20 +41,21 @@ class AbsoluteUrlReplacer
      * @param array $entity
      * @return array
      */
-    public function restore($entity)
-    {
+    public function restore($entity) {
         $this->replacedObjects = [];
 
         foreach ($entity as $field => $value) {
-            if (isset($entity[$field])) {
+            if (isset($entity[$field])) { // has this sense?
                 $entity[$field] = $this->replacePlaceholders($value);
             }
         }
         return $entity;
     }
 
-    private function replaceLocalUrls($value)
-    {
+    private function replaceLocalUrls($value) {
+        if (is_array($value)) {
+            return $this->replaceRecursively($value, [$this, 'replaceLocalUrls']);
+        }
         if (StringUtils::isSerializedValue($value)) {
             $unserializedValue = unserialize($value);
             $replacedValue = $this->replaceRecursively($unserializedValue, [$this, 'replaceLocalUrls']);
@@ -67,8 +65,10 @@ class AbsoluteUrlReplacer
         }
     }
 
-    private function replacePlaceholders($value)
-    {
+    private function replacePlaceholders($value) {
+        if (is_array($value)) {
+            return $this->replaceRecursively($value, [$this, 'replacePlaceholders']);
+        }
         if (StringUtils::isSerializedValue($value)) {
             $unserializedValue = unserialize($value);
             $replacedValue = $this->replaceRecursively($unserializedValue, [$this, 'replacePlaceholders']);
@@ -83,8 +83,7 @@ class AbsoluteUrlReplacer
      * @param callable $replaceFn Takes one parameter - the "haystack" and return replaced string.
      * @return string
      */
-    private function replaceRecursively($value, $replaceFn)
-    {
+    private function replaceRecursively($value, $replaceFn) {
         if (is_string($value)) {
             return call_user_func($replaceFn, $value);
         } else {

@@ -8,25 +8,21 @@ use VersionPress\ChangeInfos\EntityChangeInfo;
 use VersionPress\Database\EntityInfo;
 use VersionPress\Tests\Utils\HookMock;
 
-class StorageTestCase extends \PHPUnit_Framework_TestCase
-{
-    protected function setUp()
-    {
+class StorageTestCase extends \PHPUnit\Framework\TestCase {
+    protected function setUp(): void {
         HookMock::setUp(HookMock::WP_MOCK);
     }
 
-    protected function tearDown()
-    {
+    protected function tearDown(): void {
         HookMock::tearDown();
     }
 
     /**
      * @param array $fields
      * @param array $methods
-     * @return \PHPUnit_Framework_MockObject_MockObject|EntityInfo
+     * @return \PHPUnit\Framework\MockObject\MockObject|EntityInfo
      */
-    protected function createEntityInfoMock($fields, $methods)
-    {
+    protected function createEntityInfoMock($fields, $methods) {
         $entityInfo = $this->getMockBuilder(EntityInfo::class)->disableOriginalConstructor()->getMock();
 
         foreach ($fields as $field => $value) {
@@ -41,10 +37,9 @@ class StorageTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ChangeInfoFactory
+     * @return \PHPUnit\Framework\MockObject\MockObject|ChangeInfoFactory
      */
-    protected function createChangeInfoFactoryMock()
-    {
+    protected function createChangeInfoFactoryMock() {
         $entityChangeInfo = $this->getMockBuilder(EntityChangeInfo::class)->disableOriginalConstructor()->getMock();
 
         $changeInfoFactory = $this->getMockBuilder(ChangeInfoFactory::class)->disableOriginalConstructor()->getMock();

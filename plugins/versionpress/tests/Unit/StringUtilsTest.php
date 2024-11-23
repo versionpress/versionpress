@@ -4,8 +4,7 @@ namespace VersionPress\Tests\Unit;
 
 use VersionPress\Utils\StringUtils;
 
-class StringUtilsTest extends \PHPUnit_Framework_TestCase
-{
+class StringUtilsTest extends \PHPUnit\Framework\TestCase {
 
     public function lfDataProvider() {
         return [
@@ -21,9 +20,7 @@ class StringUtilsTest extends \PHPUnit_Framework_TestCase
      * @test
      * @dataProvider lfDataProvider
      */
-    public function ensureLfWorks($input, $output)
-    {
+    public function ensureLfWorks($input, $output) {
         $this->assertEquals($output, StringUtils::ensureLf($input));
     }
-
 }

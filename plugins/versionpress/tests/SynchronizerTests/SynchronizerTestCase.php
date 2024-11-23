@@ -2,8 +2,6 @@
 
 namespace VersionPress\Tests\SynchronizerTests;
 
-use PHPUnit_Framework_MockObject_Generator;
-use VersionPress\Actions\ActionsInfo;
 use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\ChangeInfos\ChangeInfoFactory;
 use VersionPress\Database\Database;
@@ -21,8 +19,7 @@ use VersionPress\Utils\Process;
 use VersionPress\Utils\ProcessUtils;
 use wpdb;
 
-class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
-{
+class SynchronizerTestCase extends \PHPUnit\Framework\TestCase {
 
     /** @var DbSchemaInfo */
     protected static $schemaInfo;
@@ -43,8 +40,7 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
     /** @var WpAutomation */
     private static $wpAutomation;
 
-    public static function setUpBeforeClass()
-    {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         self::$testConfig = TestConfig::createDefaultConfig();
         self::$wpAutomation = new WpAutomation(self::$testConfig->testSite, self::$testConfig->wpCliVersion);
@@ -85,11 +81,9 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
         self::$tableSchemaRepository = new TableSchemaStorage(self::$database, $vpdbPath . '/.schema');
         self::$storageFactory = new StorageFactory($vpdbPath, self::$schemaInfo, self::$database, [], $changeInfoFactory, self::$tableSchemaRepository);
         self::$urlReplacer = new AbsoluteUrlReplacer(self::$testConfig->testSite->url);
-
     }
 
-    private static function setUpSite()
-    {
+    private static function setUpSite() {
         if (!self::$wpAutomation->isSiteSetUp()) {
             self::$wpAutomation->setUpSite();
         }
@@ -99,10 +93,9 @@ class SynchronizerTestCase extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public static function tearDownAfterClass()
-    {
-        $process = new Process(
-            "git add -A && git commit -m " . ProcessUtils::escapeshellarg("Committed changes made by " . get_called_class()),
+    public static function tearDownAfterClass(): void {
+        $process = Process::fromShellCommandline(
+            "git add -A && git commit -m " . ProcessUtils::escapeshellarg("Committed changes made by " . static::class),
             self::$testConfig->testSite->path
         );
         $process->run();

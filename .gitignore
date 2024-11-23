@@ -20,3 +20,8 @@ wp-cli.local.yml
 .DS_Store
 Thumbs.db
 Desktop.ini
+dev-env/wordpress-cli-image/cert_custom.pem
+dev-env/wordpress-image/cert_custom.pem
+
+# Debug / test report
+index.html

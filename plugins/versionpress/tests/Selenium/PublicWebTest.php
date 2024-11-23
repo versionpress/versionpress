@@ -6,8 +6,7 @@ use VersionPress\Git\GitRepository;
 use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Utils\PathUtils;
 
-class PublicWebTest extends SeleniumTestCase
-{
+class PublicWebTest extends SeleniumTestCase {
 
     private static $testPostId;
     private static $testPost = [
@@ -19,15 +18,13 @@ class PublicWebTest extends SeleniumTestCase
         "post_author" => 1
     ];
 
-    public static function setUpBeforeClass()
-    {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         self::$autologin = false;
         self::$testPostId = self::$wpAutomation->createPost(self::$testPost);
     }
 
-    public static function tearDownAfterClass()
-    {
+    public static function tearDownAfterClass(): void {
         parent::tearDownAfterClass();
         self::$autologin = true;
         self::$wpAutomation->deletePost(self::$testPostId);
@@ -37,8 +34,7 @@ class PublicWebTest extends SeleniumTestCase
      * @test
      * @testdox Public web is accessible
      */
-    public function publicWebIsAccessible()
-    {
+    public function publicWebIsAccessible() {
 
         $this->logOut();
 
@@ -51,8 +47,7 @@ class PublicWebTest extends SeleniumTestCase
      * @test
      * @depends publicWebIsAccessible
      */
-    public function commentCanBeAdded()
-    {
+    public function commentCanBeAdded() {
         $this->url('?p=' . self::$testPostId);
 
         $this->setValue('#author', "John Tester");
@@ -65,6 +60,5 @@ class PublicWebTest extends SeleniumTestCase
         $repo = new GitRepository(self::$testConfig->testSite->path);
         $lastCommit = $repo->getCommit($this->gitRepository->getLastCommitHash());
         $this->assertContains('comment/create', $lastCommit->getMessage()->getBody());
-
     }
 }

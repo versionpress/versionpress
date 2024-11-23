@@ -1,11 +1,11 @@
 <?php
+
 namespace VersionPress\Tests\LoadTests;
 
 use VersionPress\Git\MergeDriverInstaller;
 use VersionPress\Tests\Utils\MergeDriverTestUtils;
 
-class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase
-{
+class MergeDriverLoadTest extends \PHPUnit\Framework\TestCase {
 
     private static $repositoryDir;
 
@@ -15,26 +15,22 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase
      */
     const ITERATIONS = 1;
 
-    public static function setUpBeforeClass()
-    {
+    public static function setUpBeforeClass(): void {
         self::$repositoryDir = sys_get_temp_dir() . '/repository';
     }
 
-    public function setUp()
-    {
+    public function setUp(): void {
         MergeDriverTestUtils::initRepository(self::$repositoryDir);
     }
 
-    public function tearDown()
-    {
+    public function tearDown(): void {
         MergeDriverTestUtils::destroyRepository();
     }
 
     /**
      * @param string $driver See MergeDriverInstaller::installMergeDriver()'s $driver parameter
      */
-    private function installMergeDriver($driver)
-    {
+    private function installMergeDriver($driver) {
         MergeDriverInstaller::installMergeDriver(
             self::$repositoryDir,
             __DIR__ . '/../..',
@@ -47,8 +43,7 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function phpDriverLoadTested()
-    {
+    public function phpDriverLoadTested() {
 
         $this->installMergeDriver(MergeDriverInstaller::DRIVER_PHP);
         $this->prepareTestRepositoryHistory();
@@ -61,14 +56,12 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase
         echo 'Php Execution Time: ' . $execution_time . " Sec\n";
 
         $this->assertEquals(0, $mergeCommandExitCode);
-
     }
 
     /**
      * @test
      */
-    public function bashDriverLoadTested()
-    {
+    public function bashDriverLoadTested() {
 
         if (DIRECTORY_SEPARATOR == '\\') {
             $this->markTestSkipped('No Bash on Windows.');
@@ -88,8 +81,7 @@ class MergeDriverLoadTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $mergeCommandExitCode);
     }
 
-    private function prepareTestRepositoryHistory()
-    {
+    private function prepareTestRepositoryHistory() {
         for ($i = 0; $i < self::ITERATIONS; $i++) {
             MergeDriverTestUtils::writeIniFile('file' . $i . '.ini', '2011-11-11 11:11:11');
         }

@@ -4,16 +4,14 @@ namespace VersionPress\Tests\Unit;
 
 use VersionPress\Utils\AbsoluteUrlReplacer;
 
-class AbsoluteUrlReplacerTest extends \PHPUnit_Framework_TestCase
-{
+class AbsoluteUrlReplacerTest extends \PHPUnit\Framework\TestCase {
 
     const REPLACED_URL = 'http://wp.example.com/';
 
     /** @var \VersionPress\Utils\AbsoluteUrlReplacer */
     private $filter;
 
-    protected function setUp()
-    {
+    protected function setUp(): void {
         parent::setUp();
         $this->filter = new AbsoluteUrlReplacer(self::REPLACED_URL);
     }
@@ -25,8 +23,7 @@ class AbsoluteUrlReplacerTest extends \PHPUnit_Framework_TestCase
      * @param $entity
      * @param $entityWithReplacedUrls
      */
-    public function itReplacesUrlWithPlaceholder($entity, $entityWithReplacedUrls)
-    {
+    public function itReplacesUrlWithPlaceholder($entity, $entityWithReplacedUrls) {
         $result = $this->filter->replace($entity);
         $this->assertEquals($entityWithReplacedUrls, $result);
     }
@@ -38,14 +35,12 @@ class AbsoluteUrlReplacerTest extends \PHPUnit_Framework_TestCase
      * @param $entity
      * @param $entityWithReplacedUrls
      */
-    public function itRestoresUrl($entity, $entityWithReplacedUrls)
-    {
+    public function itRestoresUrl($entity, $entityWithReplacedUrls) {
         $result = $this->filter->restore($entityWithReplacedUrls);
         $this->assertEquals($entity, $result);
     }
 
-    public function entityDataProvider()
-    {
+    public function entityDataProvider() {
 
         $simpleObject = new \stdClass();
         $simpleObject->someUrl = self::REPLACED_URL;

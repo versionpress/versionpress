@@ -7,8 +7,7 @@ namespace VersionPress\Utils;
  *
  * @package VersionPress\Utils
  */
-class Process extends \Symfony\Component\Process\Process
-{
+class Process extends \Symfony\Component\Process\Process {
 
     private $consoleOutput;
 
@@ -33,26 +32,22 @@ class Process extends \Symfony\Component\Process\Process
      *
      * @return string
      */
-    public function getConsoleOutput()
-    {
+    public function getConsoleOutput() {
         return $this->consoleOutput;
     }
 
 
-    public function start(callable $callback = null/*, array $env = array()*/)
-    {
+    public function start($callback = null, array $env = []): void {
         $this->consoleOutput = '';
         parent::start($callback);
     }
 
-    public function addOutput($line)
-    {
+    public function addOutput(string $line): void {
         parent::addOutput($line);
         $this->consoleOutput .= $line;
     }
 
-    public function addErrorOutput($line)
-    {
+    public function addErrorOutput($line): void {
         parent::addErrorOutput($line);
         $this->consoleOutput .= $line;
     }

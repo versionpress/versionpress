@@ -6,13 +6,12 @@ namespace VersionPress\Tests\Unit;
 use VersionPress\Storages\Serialization\IniSerializer;
 use VersionPress\Utils\StringUtils;
 
-class IniSerializer_IssueWP351Test extends \PHPUnit_Framework_TestCase
-{
+class IniSerializer_IssueWP351Test extends  \PHPUnit\Framework\TestCase {
 
     /** @test */
-    public function full()
-    {
-        $ini = StringUtils::ensureLf(<<<'INI'
+    public function full() {
+        $ini = StringUtils::ensureLf(
+            <<<'INI'
 [4FABE013BD2443C0BB80BBA89FF7AF6A]
 post_date = "2013-04-02 11:23:53"
 post_date_gmt = "2013-04-02 11:23:53"
@@ -102,7 +101,8 @@ INI
             "4FABE013BD2443C0BB80BBA89FF7AF6A" => [
                 "post_date" => "2013-04-02 11:23:53",
                 "post_date_gmt" => "2013-04-02 11:23:53",
-                "post_content" => StringUtils::ensureLf(<<<'INI'
+                "post_content" => StringUtils::ensureLf(
+                    <<<'INI'
 [av_section color='alternate_color' custom_bg='' src='' position='top left' repeat='no-repeat' attach='scroll' padding='default' shadow='no-shadow']
 [av_table purpose='pricing' caption='']
 [av_row row_style='avia-heading-row'][av_cell col_style='']Private Plan[/av_cell][av_cell col_style='avia-highlight-col']Business Plan[/av_cell][av_cell col_style='']Mega Plan[/av_cell][/av_row]

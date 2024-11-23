@@ -1,4 +1,5 @@
 <?php
+
 namespace VersionPress\ChangeInfos;
 
 use VersionPress\Actions\ActionsInfo;
@@ -17,8 +18,7 @@ use VersionPress\Git\CommitMessage;
  * @see CommitMessage::getVersionPressTags()
  * @see UntrackedChangeInfo Changes created outside of VersionPress.
  */
-class TrackedChangeInfo implements ChangeInfo
-{
+class TrackedChangeInfo implements ChangeInfo {
 
     /** @var string */
     private $scope;
@@ -49,8 +49,7 @@ class TrackedChangeInfo implements ChangeInfo
      */
     const ACTION_TAG = "VP-Action";
 
-    public function __construct($scope, $actionsInfo, $action, $id, $customTags = [], $customFiles = [], $priority = 10)
-    {
+    public function __construct($scope, $actionsInfo, $action, $id, $customTags = [], $customFiles = [], $priority = 10) {
         $this->scope = $scope;
         $this->actionsInfo = $actionsInfo;
         $this->action = $action;
@@ -60,8 +59,7 @@ class TrackedChangeInfo implements ChangeInfo
         $this->priority = $priority;
     }
 
-    public function getCommitMessage()
-    {
+    public function getCommitMessage() {
         return new CommitMessage($this->getChangeDescription(), $this->getCommitMessageBody());
     }
 
@@ -76,8 +74,7 @@ class TrackedChangeInfo implements ChangeInfo
      *
      * @return string
      */
-    private function getCommitMessageBody()
-    {
+    private function getCommitMessageBody() {
         $actionTag = $this->getActionTagValue();
 
         $tags = [];
@@ -102,8 +99,7 @@ class TrackedChangeInfo implements ChangeInfo
      *
      * @return string
      */
-    public function getChangeDescription()
-    {
+    public function getChangeDescription() {
         if (empty($this->commitMessageSubject)) {
             $this->commitMessageSubject = $this->actionsInfo->getDescription($this->getAction(), $this->getId(), $this->getCustomTags());
 
@@ -123,8 +119,7 @@ class TrackedChangeInfo implements ChangeInfo
      *
      * @return string
      */
-    public function getScope()
-    {
+    public function getScope() {
         return $this->scope;
     }
 
@@ -134,18 +129,15 @@ class TrackedChangeInfo implements ChangeInfo
      *
      * @return string
      */
-    public function getAction()
-    {
+    public function getAction() {
         return $this->action;
     }
 
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
 
-    public function getPriority()
-    {
+    public function getPriority() {
         return $this->priority;
     }
 
@@ -156,8 +148,7 @@ class TrackedChangeInfo implements ChangeInfo
      * @see getCommitMessageBody()
      * @return string
      */
-    protected function getActionTagValue()
-    {
+    protected function getActionTagValue() {
         $actionTagValue = "{$this->getScope()}/{$this->getAction()}";
 
         if ($this->id) {
@@ -174,8 +165,7 @@ class TrackedChangeInfo implements ChangeInfo
      * @see getCommitMessageBody()
      * @return array
      */
-    public function getCustomTags()
-    {
+    public function getCustomTags() {
         return $this->customTags;
     }
 
@@ -197,8 +187,11 @@ class TrackedChangeInfo implements ChangeInfo
      *
      * @return array
      */
-    public function getChangedFiles()
-    {
+    public function getChangedFiles() {
         return $this->customFiles;
+    }
+
+    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
+        throw new \Exception("to Implement(?)");
     }
 }

@@ -10,15 +10,13 @@ use VersionPress\Git\CommitMessage;
 /**
  * Parses ChangeInfoEnvelope from a commit message.
  */
-class CommitMessageParser
-{
+class CommitMessageParser {
     /** @var DbSchemaInfo */
     private $dbSchema;
     /** @var ActionsInfoProvider */
     private $actionsInfoProvider;
 
-    public function __construct(DbSchemaInfo $dbSchema, ActionsInfoProvider $actionsInfoProvider)
-    {
+    public function __construct(DbSchemaInfo $dbSchema, ActionsInfoProvider $actionsInfoProvider) {
         $this->dbSchema = $dbSchema;
         $this->actionsInfoProvider = $actionsInfoProvider;
     }
@@ -27,8 +25,7 @@ class CommitMessageParser
      * @param CommitMessage $commitMessage
      * @return ChangeInfoEnvelope
      */
-    public function parse(CommitMessage $commitMessage)
-    {
+    public function parse(CommitMessage $commitMessage) {
         $fullBody = $commitMessage->getBody();
         $splittedBodies = explode("\n\n", $fullBody);
         $lastBody = $splittedBodies[count($splittedBodies) - 1];
@@ -68,19 +65,16 @@ class CommitMessageParser
         return new ChangeInfoEnvelope($changeInfoList, $version, $environment);
     }
 
-    private static function containsVersion($lastBody)
-    {
-        return Strings::startsWith($lastBody, ChangeInfoEnvelope::VP_VERSION_TAG);
+    private static function containsVersion($lastBody) {
+        return str_starts_with($lastBody, ChangeInfoEnvelope::VP_VERSION_TAG);
     }
 
-    private static function extractTag($tag, $commitMessageBody)
-    {
+    private static function extractTag($tag, $commitMessageBody) {
         $tmpMessage = new CommitMessage("", $commitMessageBody);
         return $tmpMessage->getVersionPressTag($tag);
     }
 
-    private static function isTrackedChangeInfo($body)
-    {
-        return Strings::startsWith($body, TrackedChangeInfo::ACTION_TAG);
+    private static function isTrackedChangeInfo($body) {
+        return str_starts_with($body, TrackedChangeInfo::ACTION_TAG);
     }
 }

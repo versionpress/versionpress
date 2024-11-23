@@ -11,15 +11,13 @@ use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Storages\StorageFactory;
 
-class StorageFactoryTest extends \PHPUnit_Framework_TestCase
-{
+class StorageFactoryTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @test
      * @testdox Factory creates right storages
      */
-    public function factoryCreatesRightStorages()
-    {
+    public function factoryCreatesRightStorages() {
         $storages = [
             'post' => DirectoryStorage::class,
             'comment' => DirectoryStorage::class,

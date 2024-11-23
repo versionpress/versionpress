@@ -9,16 +9,19 @@ const baseDir = process.cwd();
 const postCssLoader = {
     loader: 'postcss-loader',
     options: {
-        plugins: function () {
-            return [autoprefixer({
-                browsers: [
-                    '>1%',
-                    'last 4 versions',
-                    'Firefox ESR',
-                    'not ie < 9', // React doesn't support IE8 anyway
-                ],
-            })];
-        },
+        postcssOptions: {
+            plugins: function () {
+                return [autoprefixer({
+                    browsers: [
+                        '>1%',
+                        'last 4 versions',
+                        'Firefox ESR',
+                        'not ie < 9', // React doesn't support IE8 anyway
+                    ],
+                })];
+            },
+        }
+
     },
 };
 
@@ -32,16 +35,16 @@ module.exports = (isDevelopment, options) => ({
         publicPath: options.output && options.output.publicPath || '/static/',
     },
     cache: isDevelopment,
-    devtool: isDevelopment ? 'source-map' : '',
+    devtool: isDevelopment ? 'source-map' : 'eval',
     plugins: [
         new CheckerPlugin(),
         new MiniCssExtractPlugin({
             filename: '[name].css'
         }),
-        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/), // http://stackoverflow.com/a/25426019/1243495
-        new webpack.NamedModulesPlugin(),
+        //new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/), // http://stackoverflow.com/a/25426019/1243495
+        //new webpack.NamedModulesPlugin(),
     ].concat(isDevelopment
-        ?  [
+        ? [
             new webpack.HotModuleReplacementPlugin(),
         ] : []
     ).concat(options.plugins || []),
@@ -55,14 +58,14 @@ module.exports = (isDevelopment, options) => ({
                 exclude: /node_modules/,
                 use: isDevelopment
                     ? [
-                          {
-                              loader: 'babel-loader',
-                              options: {
-                                  babelrc: true,
-                                  plugins: ['react-hot-loader/babel'],
-                              },
-                          },
-                          'awesome-typescript-loader',
+                        {
+                            loader: 'babel-loader',
+                            options: {
+                                babelrc: true,
+                                plugins: ['react-hot-loader/babel'],
+                            },
+                        },
+                        'awesome-typescript-loader',
                     ]
                     : ['awesome-typescript-loader'],
             },
@@ -92,7 +95,7 @@ module.exports = (isDevelopment, options) => ({
                 test: /\.less$/,
                 use: [
                     isDevelopment ? 'style-loader?sourceMap' : MiniCssExtractPlugin.loader,
-                    'css-loader?sourceMap',
+                    'css-loader',
                     postCssLoader,
                     'less-loader?sourceMap',
                 ],

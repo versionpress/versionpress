@@ -5,24 +5,20 @@ namespace VersionPress\Tests\End2End\Revert;
 use VersionPress\Tests\End2End\Utils\SeleniumWorker;
 use VersionPress\Utils\Process;
 
-class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWorker
-{
+class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWorker {
 
-    public function prepare_undoLastCommit()
-    {
+    public function prepare_undoLastCommit() {
         $this->createTestPost();
         $this->switchToHtmlGui();
         $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
         return [['D', '%vpdb%/posts/*']];
     }
 
-    public function undoLastCommit()
-    {
+    public function undoLastCommit() {
         $this->revertLastCommit();
     }
 
-    public function prepare_undoSecondCommit()
-    {
+    public function prepare_undoSecondCommit() {
         self::$wpAutomation->editOption('blogname', 'Blogname for undo test');
         $this->createTestPost();
         $this->switchToHtmlGui();
@@ -30,21 +26,18 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         return [['M', '%vpdb%/options/*']];
     }
 
-    public function undoSecondCommit()
-    {
+    public function undoSecondCommit() {
         $this->undoNthCommit(2);
     }
 
-    public function prepare_undoRevertedCommit()
-    {
+    public function prepare_undoRevertedCommit() {
         $this->createTestPost();
         $this->switchToHtmlGui();
         $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
         return [['A', '%vpdb%/posts/*']];
     }
 
-    public function prepare_tryRestoreEntityWithMissingReference()
-    {
+    public function prepare_tryRestoreEntityWithMissingReference() {
         $postId = $this->createTestPost();
         $commentId = $this->createCommentForPost($postId);
         self::$wpAutomation->deleteComment($commentId);
@@ -53,14 +46,11 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
     }
 
-    public function tryRestoreEntityWithMissingReference()
-    {
+    public function tryRestoreEntityWithMissingReference() {
         $this->undoNthCommit(2);
-
     }
 
-    public function prepare_rollbackMoreChanges()
-    {
+    public function prepare_rollbackMoreChanges() {
         $postId = $this->createTestPost();
         $this->createCommentForPost($postId);
         self::$wpAutomation->editOption('blogname', 'Blogname for rollback test');
@@ -73,86 +63,69 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         ];
     }
 
-    public function rollbackMoreChanges()
-    {
+    public function rollbackMoreChanges() {
         $this->rollbackToNthCommit(4);
     }
 
-    public function prepare_clickOnCancel()
-    {
+    public function prepare_clickOnCancel() {
         $this->createTestPost();
         $this->switchToHtmlGui();
         $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
     }
 
-    public function clickOnCancel()
-    {
+    public function clickOnCancel() {
         $this->jsClick("#versionpress-commits-table tr:nth-child(1) a.vp-undo");
         $this->waitForAjax();
         $this->jsClick("#popover-cancel-button");
         $this->waitForAjax(); // there shouldn't be any AJAX request, but for sure...
     }
 
-    public function prepare_undoWithNotCleanWorkingDirectory()
-    {
+    public function prepare_undoWithNotCleanWorkingDirectory() {
         $this->createTestPost();
         $this->switchToHtmlGui();
         $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
     }
 
-    public function prepare_undoToTheSameState()
-    {
+    public function prepare_undoToTheSameState() {
         $this->createTestPost();
         $this->switchToHtmlGui();
         $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
         $this->undoLastCommit();
     }
 
-    public function prepare_rollbackToTheSameState()
-    {
+    public function prepare_rollbackToTheSameState() {
         $postId = $this->createTestPost();
         self::$wpAutomation->deletePost($postId);
         $this->switchToHtmlGui();
         $this->url(self::$wpAdminPath . '/admin.php?page=versionpress/');
     }
 
-    public function rollbackToTheSameState()
-    {
+    public function rollbackToTheSameState() {
         $this->rollbackToNthCommit(3);
     }
 
-    public function prepare_undoMultipleCommits()
-    {
-        throw new \PHPUnit_Framework_SkippedTestError("There is no way to undo multiple commits in the old GUI");
+    public function prepare_undoMultipleCommits() {
+        throw new \PHPUnit\Framework\SkippedTestError("There is no way to undo multiple commits in the old GUI");
     }
 
-    public function undoMultipleCommits()
-    {
-
+    public function undoMultipleCommits() {
     }
 
-    public function prepare_undoMultipleDependentCommits()
-    {
-        throw new \PHPUnit_Framework_SkippedTestError("There is no way to undo multiple commits in the old GUI");
+    public function prepare_undoMultipleDependentCommits() {
+        throw new \PHPUnit\Framework\SkippedTestError("There is no way to undo multiple commits in the old GUI");
     }
 
-    public function undoMultipleDependentCommits()
-    {
-
+    public function undoMultipleDependentCommits() {
     }
 
-    public function prepare_undoMultipleCommitsThatCannotBeReverted()
-    {
-        throw new \PHPUnit_Framework_SkippedTestError("There is no way to undo multiple commits in the old GUI");
+    public function prepare_undoMultipleCommitsThatCannotBeReverted() {
+        throw new \PHPUnit\Framework\SkippedTestError("There is no way to undo multiple commits in the old GUI");
     }
 
-    public function undoMultipleCommitsThatCannotBeReverted()
-    {
-
+    public function undoMultipleCommitsThatCannotBeReverted() {
     }
 
-    public function prepare_undoNonDbChange()
-    {
+    public function prepare_undoNonDbChange() {
         $this->switchToJavaScriptGui();
         $newFile = '/vp-file.txt';
         file_put_contents(self::$testConfig->testSite->path . '/' . $newFile, '');
@@ -172,8 +145,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         return [['D', $newFile]];
     }
 
-    public function undoNonDbChange()
-    {
+    public function undoNonDbChange() {
         $this->revertLastCommit();
     }
 
@@ -181,8 +153,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
     // Helper methods
     //---------------------
 
-    private function createTestPost()
-    {
+    private function createTestPost() {
         $post = [
             "post_type" => "post",
             "post_status" => "publish",
@@ -193,12 +164,11 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         ];
 
         $postId = self::$wpAutomation->createPost($post);
-        (new Process('echo foo'))->run();
+        (Process::fromShellCommandline('echo foo'))->run();
         return $postId;
     }
 
-    private function createCommentForPost($postId)
-    {
+    private function createCommentForPost($postId) {
         $comment = [
             "comment_author" => "Mr VersionPress",
             "comment_author_email" => "versionpress@example.com",
@@ -211,33 +181,29 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         ];
 
         $commentId = self::$wpAutomation->createComment($comment);
-        (new Process('echo foo'))->run();
+        (Process::fromShellCommandline('echo foo'))->run();
         return $commentId;
     }
 
-    private function revertLastCommit()
-    {
+    private function revertLastCommit() {
         $this->undoNthCommit(1);
     }
 
-    private function undoNthCommit($whichCommit)
-    {
+    private function undoNthCommit($whichCommit) {
         $this->jsClick("#versionpress-commits-table tr:nth-child($whichCommit) a.vp-undo");
         $this->waitForAjax();
         $this->jsClick("#popover-ok-button");
         $this->waitAfterRedirect(10000);
     }
 
-    private function rollbackToNthCommit($whichCommit)
-    {
+    private function rollbackToNthCommit($whichCommit) {
         $this->jsClick("#versionpress-commits-table tr:nth-child($whichCommit) a.vp-rollback");
         $this->waitForAjax();
         $this->jsClick("#popover-ok-button");
         $this->waitAfterRedirect(10000);
     }
 
-    private function switchToHtmlGui()
-    {
+    private function switchToHtmlGui() {
         $pluginsDir = self::$wpAutomation->getPluginsDir();
         $updateConfigArgs = [
             'VERSIONPRESS_GUI',
@@ -247,8 +213,7 @@ class RevertTestSeleniumWorker extends SeleniumWorker implements IRevertTestWork
         self::$wpAutomation->runWpCliCommand('vp-internal', 'update-config', $updateConfigArgs);
     }
 
-    private function switchToJavaScriptGui()
-    {
+    private function switchToJavaScriptGui() {
         $pluginsDir = self::$wpAutomation->getPluginsDir();
         $updateConfigArgs = [
             'VERSIONPRESS_GUI',

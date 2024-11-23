@@ -1,0 +1,42 @@
+<phpunit bootstrap="phpunit-bootstrap.php"
+         verbose="true"
+         colors="true">
+    <logging>
+        <log type="testdox-text" target="/var/opt/versionpress/logs/testdox.txt" />
+    </logging>
+    <testsuites>
+
+        <testsuite name="Unit">
+            <directory>Unit</directory> 
+        </testsuite>
+
+        <testsuite name="StorageTests">
+            <directory>StorageTests</directory>
+        </testsuite>
+
+        <testsuite name="SynchronizerTests">
+            <directory>SynchronizerTests</directory>
+        </testsuite>
+
+        <testsuite name="GitRepositoryTests">
+            <directory>GitRepositoryTests</directory>
+        </testsuite>
+
+        <testsuite name="End2End">
+            <directory>End2End</directory>
+        </testsuite>
+
+        <!-- <testsuite name="Selenium">
+            <directory>Selenium</directory>
+        </testsuite> -->
+
+        <testsuite name="Workflow">
+            <directory>Workflow</directory>
+        </testsuite>
+
+        <testsuite name="LoadTests">
+            <directory>LoadTests</directory>
+        </testsuite>
+
+    </testsuites>
+</phpunit>

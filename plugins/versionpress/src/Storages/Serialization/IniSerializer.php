@@ -26,8 +26,7 @@ use VersionPress\Utils\StringUtils;
  *
  * @package VersionPress\Utils
  */
-class IniSerializer
-{
+class IniSerializer {
 
     private static $sanitizedChars = [
         "[" => "<<<lbrac>>>",
@@ -62,8 +61,7 @@ class IniSerializer
      * @return string Nested INI format
      * @throws \Exception
      */
-    public static function serialize($data)
-    {
+    public static function serialize($data) {
         $output = [];
         foreach ($data as $sectionName => $section) {
             if (!is_array($section)) {
@@ -85,8 +83,7 @@ class IniSerializer
      * @param array $data
      * @return array Array of strings that will be lines in the output INI string
      */
-    private static function serializeSection($sectionName, $data)
-    {
+    private static function serializeSection($sectionName, $data) {
         $output = [];
         $output[] = "[$sectionName]";
         $output = array_merge($output, self::serializeData($data));
@@ -100,8 +97,7 @@ class IniSerializer
         return $output;
     }
 
-    private static function serializeData($data)
-    {
+    private static function serializeData($data) {
         $output = [];
         foreach ($data as $key => $value) {
             if ($key == '') {
@@ -128,8 +124,7 @@ class IniSerializer
      * @param $str
      * @return mixed
      */
-    private static function escapeString($str)
-    {
+    private static function escapeString($str) {
         $str = str_replace('\\', '\\\\', $str);
         $str = str_replace('"', '\\"', $str);
         return $str;
@@ -142,8 +137,7 @@ class IniSerializer
      * @param $str
      * @return mixed
      */
-    private static function unescapeString($str)
-    {
+    private static function unescapeString($str) {
         $str = str_replace('\\\\', '\\', $str);
         $str = str_replace('\\"', '"', $str);
         return $str;
@@ -156,8 +150,7 @@ class IniSerializer
      * @param string $string INI string
      * @return array Array structure corresponding to the INI format
      */
-    public static function deserialize($string)
-    {
+    public static function deserialize($string) {
         $string = self::eolWorkaround_addPlaceholders($string);
         $string = self::sanitizeSectionsAndKeys_addPlaceholders($string);
         $string = self::preserveNumbers($string);
@@ -259,8 +252,7 @@ class IniSerializer
         return $deserializedArray;
     }
 
-    private static function getReplacedEolString($str, $direction)
-    {
+    private static function getReplacedEolString($str, $direction) {
 
         $replacement = [
             "\n" => "<<<[EOL-LF]>>>",
@@ -274,13 +266,11 @@ class IniSerializer
     }
 
 
-    private static function outputToString($output)
-    {
+    private static function outputToString($output) {
         return implode("\n", $output);
     }
 
-    private static function preserveNumbers($iniString)
-    {
+    private static function preserveNumbers($iniString) {
         // https://regex101.com/r/pH5hE9/3
         $re = "/= -?\\d+(?:\\.\\d+)?\\r?\\n/m";
         return preg_replace_callback($re, function ($m) {
@@ -288,9 +278,8 @@ class IniSerializer
         }, $iniString);
     }
 
-    private static function preserveNULLs($iniString)
-    {
-        https://regex101.com/r/tF2wK2/1
+    private static function preserveNULLs($iniString) {
+        https: //regex101.com/r/tF2wK2/1
         $re = "/= (<null>)\\r?\\n/m";
         return preg_replace_callback($re, function ($m) {
             return str_replace('= ', '= ' . self::$nullMarker, $m[0]);
@@ -304,8 +293,7 @@ class IniSerializer
      * @param string|int|float $value String or a numeric value (number or string containing number)
      * @return string
      */
-    private static function serializeKeyValuePair($key, $value)
-    {
+    private static function serializeKeyValuePair($key, $value) {
         if (is_null($value)) {
             $value = self::$nullValue;
         } elseif (is_string($value)) {
@@ -369,8 +357,7 @@ class IniSerializer
      * @param $deserialized
      * @return array
      */
-    private static function expandArrays($deserialized)
-    {
+    private static function expandArrays($deserialized) {
         $dataWithExpandedArrays = [];
 
         foreach ($deserialized as $key => $value) {
@@ -391,20 +378,22 @@ class IniSerializer
         return $dataWithExpandedArrays;
     }
 
-    private static function restoreTypesOfValues($deserialized)
-    {
+    private static function restoreTypesOfValues($deserialized) {
         $result = [];
-        foreach ($deserialized as $key => $value) {
-            if (is_array($value)) {
-                $result[$key] = self::restoreTypesOfValues($value);
-            } else {
-                if (Strings::startsWith($value, self::$numberMarker)) {
-                    // strip the marker and convert to number
-                    $result[$key] = str_replace(self::$numberMarker, '', $value) + 0;
-                } elseif (Strings::startsWith($value, self::$nullMarker)) {
-                    $result[$key] = null;
+        if ($deserialized) {
+
+            foreach ($deserialized as $key => $value) {
+                if (is_array($value)) {
+                    $result[$key] = self::restoreTypesOfValues($value);
                 } else {
-                    $result[$key] = self::unescapeString($value);
+                    if ($value !== null && str_starts_with($value, self::$numberMarker)) {
+                        // strip the marker and convert to number
+                        $result[$key] = str_replace(self::$numberMarker, '', $value) + 0;
+                    } elseif (str_starts_with($value, self::$nullMarker)) {
+                        $result[$key] = null;
+                    } else {
+                        $result[$key] = self::unescapeString($value);
+                    }
                 }
             }
         }
@@ -439,8 +428,7 @@ class IniSerializer
      * @param $deserialized
      * @return array
      */
-    private static function restorePhpSerializedData($deserialized)
-    {
+    private static function restorePhpSerializedData($deserialized) {
         $keysToRestore = [];
 
         $reversed = array_reverse($deserialized);
@@ -449,7 +437,7 @@ class IniSerializer
             if (is_array($value)) {
                 $deserialized[$key] = self::restorePhpSerializedData($value);
             } else {
-                if (Strings::startsWith($value, SerializedDataToIniConverter::SERIALIZED_MARKER)) {
+                if ($value !== null && str_starts_with($value, SerializedDataToIniConverter::SERIALIZED_MARKER)) {
                     $keysToRestore[] = $key;
                 }
             }
@@ -457,7 +445,7 @@ class IniSerializer
 
         foreach ($keysToRestore as $key) {
             $relatedKeys = array_filter($deserialized, function ($maybeRelatedKey) use ($key) {
-                return Strings::startsWith($maybeRelatedKey, $key);
+                return str_starts_with($maybeRelatedKey, $key);
             }, ARRAY_FILTER_USE_KEY);
 
             $keysToUnset = $relatedKeys;

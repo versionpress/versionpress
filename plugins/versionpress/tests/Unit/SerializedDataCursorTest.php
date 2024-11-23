@@ -4,14 +4,12 @@ namespace VersionPress\Tests\Unit;
 
 use VersionPress\Utils\SerializedDataCursor;
 
-class SerializedDataCursorTest extends \PHPUnit_Framework_TestCase
-{
+class SerializedDataCursorTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @test
      */
-    public function cursorReadsScalarValue()
-    {
+    public function cursorReadsScalarValue() {
         $data = 'value';
         $cursor = new SerializedDataCursor($data, []);
         $this->assertEquals('value', $cursor->getValue());
@@ -20,8 +18,7 @@ class SerializedDataCursorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function cursorReadsSerializedScalarValue()
-    {
+    public function cursorReadsSerializedScalarValue() {
         $data = serialize('value');
         $cursor = new SerializedDataCursor($data, [[]]);
         $this->assertEquals('value', $cursor->getValue());
@@ -30,8 +27,7 @@ class SerializedDataCursorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function cursorReadsFromSimpleSerializedArray()
-    {
+    public function cursorReadsFromSimpleSerializedArray() {
         $data = serialize(['value']);
         $cursor = new SerializedDataCursor($data, [[0]]);
         $this->assertEquals('value', $cursor->getValue());
@@ -40,8 +36,7 @@ class SerializedDataCursorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function cursorReadsFromSerializedNestedArrays()
-    {
+    public function cursorReadsFromSerializedNestedArrays() {
         $data = serialize(['key' => [3 => 'value']]);
         $cursor = new SerializedDataCursor($data, [['key', 3]]);
         $this->assertEquals('value', $cursor->getValue());
@@ -50,8 +45,7 @@ class SerializedDataCursorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function cursorReadsFromSerializedArrayWithMixedKeys()
-    {
+    public function cursorReadsFromSerializedArrayWithMixedKeys() {
         $data = serialize(['key' => [3 => 'value'], 'another-key' => 'another value']);
         $cursor = new SerializedDataCursor($data, [['key', 3]]);
         $this->assertEquals('value', $cursor->getValue());
@@ -60,8 +54,7 @@ class SerializedDataCursorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function cursorReadsFromSerializedObjectWithArray()
-    {
+    public function cursorReadsFromSerializedObjectWithArray() {
         $data = new \stdClass();
         $data->key = [3 => 'value'];
 
@@ -74,8 +67,7 @@ class SerializedDataCursorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function cursorReadsFromSerializedNestedObjects()
-    {
+    public function cursorReadsFromSerializedNestedObjects() {
         $data = new \stdClass();
         $data->key = new \stdClass();
         $data->key->subkey = 'value';
@@ -89,8 +81,7 @@ class SerializedDataCursorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function cursorUpdatesScalarValue()
-    {
+    public function cursorUpdatesScalarValue() {
         $data = 'value';
 
         $cursor = new SerializedDataCursor($data, []);
@@ -102,8 +93,7 @@ class SerializedDataCursorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function cursorUpdatesSimpleSerializedArray()
-    {
+    public function cursorUpdatesSimpleSerializedArray() {
         $originalValue = 'value';
         $newValue = 'another value';
 
@@ -119,8 +109,7 @@ class SerializedDataCursorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function cursorUpdatesNestedSerializedArray()
-    {
+    public function cursorUpdatesNestedSerializedArray() {
         $originalValue = 'value';
         $newValue = 'another value';
 
@@ -136,8 +125,7 @@ class SerializedDataCursorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function cursorUpdatesSerializedArrayWithMixedKeys()
-    {
+    public function cursorUpdatesSerializedArrayWithMixedKeys() {
         $originalValue = 'value';
         $newValue = 'another value';
         $originalData = serialize(['key' => [3 => $originalValue], 'different-key' => 'different value']);
@@ -152,8 +140,7 @@ class SerializedDataCursorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function cursorUpdatesSerializedObjectWithArray()
-    {
+    public function cursorUpdatesSerializedObjectWithArray() {
         $originalValue = 'value';
         $newValue = 'another value';
 
@@ -175,8 +162,7 @@ class SerializedDataCursorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function cursorUpdatesSerializedNestedObjects()
-    {
+    public function cursorUpdatesSerializedNestedObjects() {
         $originalValue = 'VP is cool';
         $newValue = 'another value';
 
@@ -198,8 +184,7 @@ class SerializedDataCursorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function cursorUpdatesSerializedArrayInSerializedArray()
-    {
+    public function cursorUpdatesSerializedArrayInSerializedArray() {
         $originalValue = 'value';
         $newValue = 'another value';
 
@@ -215,8 +200,7 @@ class SerializedDataCursorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function cursorUpdatesSerializedArrayInSerializedObject()
-    {
+    public function cursorUpdatesSerializedArrayInSerializedObject() {
         $originalValue = 'value';
         $newValue = 'another value';
 
@@ -237,8 +221,7 @@ class SerializedDataCursorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function cursorUpdatesSerializedObjectInSerializedObject()
-    {
+    public function cursorUpdatesSerializedObjectInSerializedObject() {
         $originalValue = 'value';
         $newValue = 'another value';
 
@@ -263,8 +246,7 @@ class SerializedDataCursorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function cursorHandlesThreeLevelsOfSerializedArrays()
-    {
+    public function cursorHandlesThreeLevelsOfSerializedArrays() {
         $originalValue = 'value';
         $newValue = 'another value';
 

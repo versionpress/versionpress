@@ -10,8 +10,7 @@ use Nette\Utils\Strings;
  *
  * @link http://doc.nette.org/en/2.2/strings
  */
-class StringUtils
-{
+class StringUtils {
 
     /**
      * Converts given verb to past sense. E.g., "install" -> "installed",
@@ -20,8 +19,7 @@ class StringUtils
      * @param string $verb
      * @return string
      */
-    public static function verbToPastTense($verb)
-    {
+    public static function verbToPastTense($verb) {
         return $verb . (Strings::endsWith($verb, "e") ? "d" : "ed");
     }
 
@@ -31,8 +29,7 @@ class StringUtils
      * @param string $str LF or CRLF line endings
      * @return string LF line endings
      */
-    public static function ensureLf($str)
-    {
+    public static function ensureLf($str) {
         return str_replace("\r\n", "\n", $str);
     }
 
@@ -45,8 +42,7 @@ class StringUtils
      * @param string $string
      * @return string
      */
-    public static function pluralize($string)
-    {
+    public static function pluralize($string) {
         $plural = [
             '/(quiz)$/i' => "$1zes",
             '/^(ox)$/i' => "$1en",
@@ -127,8 +123,7 @@ class StringUtils
      * @param string $templateString template string which contains placeholders for variables to be expanded.
      * @return string templateString with expanded variable placeholders
      */
-    public static function fillTemplateString($variables, $templateString)
-    {
+    public static function fillTemplateString($variables, $templateString) {
         $search = array_map(function ($var) {
             return sprintf('{{%s}}', $var);
         }, array_keys($variables));
@@ -142,11 +137,19 @@ class StringUtils
      * @param $value
      * @return bool
      */
-    public static function isSerializedValue($value)
-    {
+    public static function isSerializedValue($value) {
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
-        $test = @unserialize(($value)); // it throws an error and returns false if $value is not a serialized object
-        return $test !== false || $value === 'b:0;';
+
+        try {
+            $result = @unserialize($value); // it throws an error and returns false if $value is not a serialized object
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        if ($value === 'b:0;')
+            return true;
+
+        return $result !== false;
     }
 
     /**
@@ -157,8 +160,7 @@ class StringUtils
      * @param string $haystack
      * @return string
      */
-    public static function replaceFirst($needle, $replace, $haystack)
-    {
+    public static function replaceFirst($needle, $replace, $haystack) {
         $needlePosition = strpos($haystack, $needle);
         if ($needlePosition === false) {
             return $haystack;
@@ -176,8 +178,7 @@ class StringUtils
      * @param int $to
      * @return string
      */
-    public static function substringFromTo($str, $from, $to)
-    {
+    public static function substringFromTo($str, $from, $to) {
         return substr($str, $from, $to - $from);
     }
 }

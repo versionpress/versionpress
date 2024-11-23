@@ -4,83 +4,68 @@ namespace VersionPress\Tests\End2End\Menus;
 
 use VersionPress\Tests\End2End\Utils\WpCliWorker;
 
-class MenusTestWpCliWorker extends WpCliWorker implements IMenusTestWorker
-{
+class MenusTestWpCliWorker extends WpCliWorker implements IMenusTestWorker {
 
     private $testMenuId = 0;
     private $lastInsertedItem = 0;
     private $testPagesId = 0;
 
-    public function prepare_createMenu()
-    {
+    public function prepare_createMenu() {
     }
 
-    public function createMenu()
-    {
+    public function createMenu() {
         $this->testMenuId = $this->wpAutomation->createMenu("Test menu");
     }
 
-    public function prepare_editMenu()
-    {
+    public function prepare_editMenu() {
     }
 
-    public function editMenu()
-    {
+    public function editMenu() {
         $this->wpAutomation->editMenu($this->testMenuId, "Updated menu");
     }
 
-    public function prepare_addMenuItem()
-    {
+    public function prepare_addMenuItem() {
         $this->testPagesId = $this->createTestPage();
     }
 
-    public function addMenuItem()
-    {
+    public function addMenuItem() {
         $item = [$this->testPagesId];
         $this->lastInsertedItem = $this->wpAutomation->addMenuItem($this->testMenuId, "post", $item);
     }
 
-    public function prepare_editMenuItem()
-    {
+    public function prepare_editMenuItem() {
     }
 
-    public function editMenuItem()
-    {
+    public function editMenuItem() {
         $item = [
             'title' => 'Updated navigation label',
         ];
         $this->wpAutomation->editMenuItem($this->lastInsertedItem, $item);
     }
 
-    public function prepare_createMenuItemDraft()
-    {
-        throw new \PHPUnit_Framework_SkippedTestError('There is no way to create menu item draft in the WP-CLI');
+    public function prepare_createMenuItemDraft() {
+        throw new \PHPUnit\Framework\SkippedTestError('There is no way to create menu item draft in the WP-CLI');
     }
 
-    public function createMenuItemDraft()
-    {
+    public function createMenuItemDraft() {
     }
 
-    public function prepare_deleteOrphanedMenuItems()
-    {
-        throw new \PHPUnit_Framework_SkippedTestError('There is no way to create menu item draft in the WP-CLI');
+    public function prepare_deleteOrphanedMenuItems() {
+        throw new \PHPUnit\Framework\SkippedTestError('There is no way to create menu item draft in the WP-CLI');
     }
 
-    public function deleteOrphanedMenuItems()
-    {
+    public function deleteOrphanedMenuItems() {
     }
 
-    public function prepare_removeMenuItem()
-    {
+    public function prepare_removeMenuItem() {
     }
 
-    public function removeMenuItem()
-    {
+    public function removeMenuItem() {
         $this->wpAutomation->removeMenuItem($this->lastInsertedItem);
     }
 
-    public function prepare_removeMenuItemWithChildren()
-    {
+    public function prepare_removeMenuItemWithChildren() {
+        $this->prepare_addMenuItem();
         $item = [$this->testPagesId, 'title' => 'Parent'];
         $this->lastInsertedItem = $parentId = $this->wpAutomation->addMenuItem($this->testMenuId, "post", $item);
 
@@ -91,22 +76,18 @@ class MenusTestWpCliWorker extends WpCliWorker implements IMenusTestWorker
         $this->wpAutomation->addMenuItem($this->testMenuId, "post", $item);
     }
 
-    public function removeMenuItemWithChildren()
-    {
+    public function removeMenuItemWithChildren() {
         $this->wpAutomation->removeMenuItem($this->lastInsertedItem);
     }
 
-    public function prepare_deleteMenu()
-    {
+    public function prepare_deleteMenu() {
     }
 
-    public function deleteMenu()
-    {
+    public function deleteMenu() {
         $this->wpAutomation->deleteMenu($this->testMenuId);
     }
 
-    private function createTestPage()
-    {
+    private function createTestPage() {
         $post = [
             "post_type" => "page",
             "post_status" => "publish",

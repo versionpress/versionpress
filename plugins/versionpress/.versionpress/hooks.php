@@ -24,13 +24,15 @@ add_filter('vp_entity_should_be_saved_post', function ($shouldBeSaved, $data, $s
     }
 
     // ignoring ajax autosaves for drafts - WP saves them using Heartbeat API
-    if ($isExistingEntity && isset($data['post_status']) && ($data['post_status'] === 'draft' &&
-        defined('DOING_AJAX') && DOING_AJAX === true && $_POST['action'] === 'heartbeat')
+    if (
+        $isExistingEntity && isset($data['post_status']) && ($data['post_status'] === 'draft' &&
+            defined('DOING_AJAX') && DOING_AJAX === true && $_POST['action'] === 'heartbeat')
     ) {
         return false;
     }
 
-    if (!$isExistingEntity && isset($data['post_type']) && $data['post_type'] === 'attachment' &&
+    if (
+        !$isExistingEntity && isset($data['post_type']) && $data['post_type'] === 'attachment' &&
         !isset($data['post_title'])
     ) {
         return false;
@@ -536,8 +538,8 @@ add_action('vp_versionpress_changed', function ($action, $version) {
     if ($action === 'deactivate') {
         $files = [
             ["type" => "path", "path" => VP_VPDB_DIR . "/*"],
-            ["type" => "path", "path" => ABSPATH . WPINC . "/wp-db.php"],
-            ["type" => "path", "path" => ABSPATH . WPINC . "/wp-db.php.original"],
+            ["type" => "path", "path" => WpdbReplacer::$wpdbClassPath],
+            ["type" => "path", "path" => WpdbReplacer::$wpdbClassPath . ".original"],
             ["type" => "path", "path" => ABSPATH . "/.gitattributes"],
         ];
     } else {

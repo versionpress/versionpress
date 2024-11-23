@@ -16,8 +16,7 @@ use VersionPress\Database\EntityInfo;
  * The MetaEntityStorage typically transforms the entity to the format metioned above and then saves it using
  * parent storage as a field of the parent entity.
  */
-class MetaEntityStorage extends Storage
-{
+class MetaEntityStorage extends Storage {
     private $lastVpId;
 
     protected $keyName;
@@ -30,8 +29,7 @@ class MetaEntityStorage extends Storage
     /** @var ChangeInfoFactory */
     private $changeInfoFactory;
 
-    public function __construct(Storage $parentStorage, EntityInfo $entityInfo, $dbPrefix, $changeInfoFactory, $keyName = 'meta_key', $valueName = 'meta_value')
-    {
+    public function __construct(Storage $parentStorage, EntityInfo $entityInfo, $dbPrefix, $changeInfoFactory, $keyName = 'meta_key', $valueName = 'meta_value') {
         parent::__construct($entityInfo, $dbPrefix);
         $this->parentStorage = $parentStorage;
         $this->changeInfoFactory = $changeInfoFactory;
@@ -40,8 +38,7 @@ class MetaEntityStorage extends Storage
         $this->parentReferenceName = "vp_$entityInfo->parentReference";
     }
 
-    public function save($data)
-    {
+    public function save($data) {
 
         if (!$this->shouldBeSaved($data)) {
             return null;
@@ -71,8 +68,7 @@ class MetaEntityStorage extends Storage
         return $this->createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParent, $newParent, $action);
     }
 
-    public function delete($restriction)
-    {
+    public function delete($restriction) {
         $parentVpId = $restriction[$this->parentReferenceName];
         $parent = $this->parentStorage->loadEntity($parentVpId, null);
         $fieldToDelete = $this->getJoinedKeyByVpId($parent, $restriction['vp_id']);
@@ -93,19 +89,16 @@ class MetaEntityStorage extends Storage
         );
     }
 
-    public function saveLater($data)
-    {
+    public function saveLater($data) {
         $transformedData = $this->transformToParentEntityField($data);
         $this->parentStorage->saveLater($transformedData);
     }
 
-    public function commit()
-    {
+    public function commit() {
         $this->parentStorage->commit();
     }
 
-    public function loadAll()
-    {
+    public function loadAll() {
         $parentEntities = $this->parentStorage->loadAll();
         $entities = [];
 
@@ -114,7 +107,7 @@ class MetaEntityStorage extends Storage
                 if (!Strings::contains($field, '#')) {
                     continue;
                 }
-                list ($key, $vpId) = explode('#', $field, 2);
+                list($key, $vpId) = explode('#', $field, 2);
                 $entities[$vpId] = $this->extractEntityFromParentByVpId($parent, $vpId);
             }
         }
@@ -122,8 +115,7 @@ class MetaEntityStorage extends Storage
         return $entities;
     }
 
-    public function exists($vpId, $parentId)
-    {
+    public function exists($vpId, $parentId) {
         $parentExists = $this->parentStorage->exists($parentId, null);
         if (!$parentExists) {
             return false;
@@ -131,30 +123,25 @@ class MetaEntityStorage extends Storage
         return (bool)$this->getJoinedKeyByVpId($this->parentStorage->loadEntity($parentId, null), $vpId);
     }
 
-    public function getEntityFilename($vpId, $parentId)
-    {
+    public function getEntityFilename($vpId, $parentId) {
         return $this->parentStorage->getEntityFilename($parentId, null);
     }
 
-    public function getPathCommonToAllEntities()
-    {
+    public function getPathCommonToAllEntities() {
         return $this->parentStorage->getPathCommonToAllEntities();
     }
 
-    public function loadEntity($id, $parentId)
-    {
+    public function loadEntity($id, $parentId) {
         $parent = $this->parentStorage->loadEntity($parentId, null);
         return $this->extractEntityFromParentByVpId($parent, $id);
     }
 
-    public function loadEntityByName($name, $parentId)
-    {
+    public function loadEntityByName($name, $parentId) {
         $parent = $this->parentStorage->loadEntity($parentId, null);
         return $this->extractEntityFromParentByName($parent, $name);
     }
 
-    protected function createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action)
-    {
+    protected function createChangeInfoWithParentEntity($oldEntity, $newEntity, $oldParentEntity, $newParentEntity, $action) {
         $entityName = $this->entityInfo->entityName;
 
         $entity = array_merge($oldEntity, $newEntity);
@@ -170,8 +157,7 @@ class MetaEntityStorage extends Storage
         return $this->changeInfoFactory->createEntityChangeInfo($entity, $entityName, $action, $tags, $files);
     }
 
-    private function transformToParentEntityField($values)
-    {
+    private function transformToParentEntityField($values) {
         $joinedKey = $this->createJoinedKey($this->maybeReplacePrefixWithPlaceholder($values[$this->keyName]), $values['vp_id']);
 
         $data = [
@@ -189,8 +175,7 @@ class MetaEntityStorage extends Storage
      * @param $vpId
      * @return string
      */
-    protected function createJoinedKey($key, $vpId)
-    {
+    protected function createJoinedKey($key, $vpId) {
         return sprintf('%s#%s', $key, $vpId);
     }
 
@@ -203,8 +188,7 @@ class MetaEntityStorage extends Storage
      * @param $key
      * @return array
      */
-    protected function splitJoinedKey($key)
-    {
+    protected function splitJoinedKey($key) {
         $splittedKey = explode('#', $key, 2);
         return [
             $this->keyName => $splittedKey[0],
@@ -219,8 +203,7 @@ class MetaEntityStorage extends Storage
      * @param $vpId
      * @return string|null
      */
-    private function getJoinedKeyByVpId($parent, $vpId)
-    {
+    private function getJoinedKeyByVpId($parent, $vpId) {
         foreach ($parent as $field => $value) {
             if (Strings::contains($field, $vpId)) {
                 return $field;
@@ -237,10 +220,9 @@ class MetaEntityStorage extends Storage
      * @param $name
      * @return string|null
      */
-    private function getJoinedKeyByName($parent, $name)
-    {
+    private function getJoinedKeyByName($parent, $name) {
         foreach ($parent as $field => $value) {
-            if (Strings::startsWith($field, "$name#")) {
+            if (str_starts_with($field, "$name#")) {
                 return $field;
             }
         }
@@ -253,8 +235,7 @@ class MetaEntityStorage extends Storage
      * @param $vpId
      * @return array|null
      */
-    protected function extractEntityFromParentByVpId($parentEntity, $vpId)
-    {
+    protected function extractEntityFromParentByVpId($parentEntity, $vpId) {
         if (!$parentEntity) {
             return [];
         }
@@ -268,8 +249,7 @@ class MetaEntityStorage extends Storage
         return $this->extractEntityFromParent($parentEntity, $joinedKey);
     }
 
-    protected function extractEntityFromParentByName($parentEntity, $name)
-    {
+    protected function extractEntityFromParentByName($parentEntity, $name) {
         if (!$parentEntity) {
             return null;
         }
@@ -283,8 +263,7 @@ class MetaEntityStorage extends Storage
         return $this->extractEntityFromParent($parentEntity, $joinedKey);
     }
 
-    private function extractEntityFromParent($parentEntity, $joinedKey)
-    {
+    private function extractEntityFromParent($parentEntity, $joinedKey) {
         $splittedKey = $this->splitJoinedKey($joinedKey);
         $entity = [
             $this->keyName => $this->maybeReplacePlaceholderWithPrefix($splittedKey[$this->keyName]),
@@ -296,14 +275,12 @@ class MetaEntityStorage extends Storage
         return $entity;
     }
 
-    public function shouldBeSaved($data)
-    {
+    public function shouldBeSaved($data) {
         return parent::shouldBeSaved($data)
-        && isset($data[$this->parentReferenceName])
-        && $this->parentStorage->exists($data[$this->parentReferenceName], null);
+            && isset($data[$this->parentReferenceName])
+            && $this->parentStorage->exists($data[$this->parentReferenceName], null);
     }
 
-    public function prepareStorage()
-    {
+    public function prepareStorage() {
     }
 }

@@ -15,16 +15,14 @@ use WP_CLI_Command;
 /**
  * VersionPress CLI commands for Composer scripts.
  */
-class VPComposerCommand extends WP_CLI_Command
-{
+class VPComposerCommand extends WP_CLI_Command {
 
     private $pluginsThemesTransient = 'vp_composer_plugins_themes';
 
     /**
      * @subcommand prepare-for-composer-changes
      */
-    public function prepareForComposerChanges($args, $assoc_args)
-    {
+    public function prepareForComposerChanges($args, $assoc_args) {
         set_transient($this->pluginsThemesTransient, $this->getPackages());
     }
 
@@ -33,8 +31,7 @@ class VPComposerCommand extends WP_CLI_Command
      *
      * @subcommand commit-composer-changes
      */
-    public function commitComposerChanges($args, $assoc_args)
-    {
+    public function commitComposerChanges($args, $assoc_args) {
         if (!VersionPress::isActive()) {
             WP_CLI::error('VersionPress is not active. Changes will be not committed.');
         }
@@ -56,11 +53,10 @@ class VPComposerCommand extends WP_CLI_Command
         $this->forceRelatedActions('update', $updatedPackages, $plugins, $themes);
     }
 
-    private function detectChanges()
-    {
+    private function detectChanges() {
         $currentComposerLock = file_get_contents(VP_PROJECT_ROOT . '/composer.lock');
 
-        $process = new Process(VP_GIT_BINARY . ' show HEAD:composer.lock', VP_PROJECT_ROOT);
+        $process = Process::fromShellCommandline(VP_GIT_BINARY . ' show HEAD:composer.lock', VP_PROJECT_ROOT);
         $process->run();
 
         $previousComposerLock = $process->getOutput();
@@ -85,8 +81,7 @@ class VPComposerCommand extends WP_CLI_Command
         ];
     }
 
-    private function getPackagesFromLockFile($lockFileContent)
-    {
+    private function getPackagesFromLockFile($lockFileContent) {
         $lockFile = json_decode($lockFileContent, true);
         return array_combine(
             array_column($lockFile['packages'], 'name'),
@@ -101,13 +96,11 @@ class VPComposerCommand extends WP_CLI_Command
         );
     }
 
-    private function getPackages()
-    {
+    private function getPackages() {
         return ['plugins' => get_plugins(), 'themes' => wp_get_themes()];
     }
 
-    private function getPluginFileAndName($fullPackageName, $plugins)
-    {
+    private function getPluginFileAndName($fullPackageName, $plugins) {
         list($vendor, $packageName) = explode('/', $fullPackageName);
 
         foreach ($plugins as $pluginFile => $plugin) {
@@ -121,8 +114,7 @@ class VPComposerCommand extends WP_CLI_Command
         return null;
     }
 
-    private function getThemeStylesheetAndName($fullPackageName, $themes)
-    {
+    private function getThemeStylesheetAndName($fullPackageName, $themes) {
         list($vendor, $packageName) = explode('/', $fullPackageName);
 
         foreach ($themes as $themeName => $theme) {
@@ -141,8 +133,7 @@ class VPComposerCommand extends WP_CLI_Command
      * @param array $plugins
      * @param array $themes
      */
-    private function forceRelatedActions($action, $packages, $plugins, $themes)
-    {
+    private function forceRelatedActions($action, $packages, $plugins, $themes) {
         foreach ($packages as $package) {
             if ($package['type'] === 'wordpress-plugin') {
                 $fileAndName = $this->getPluginFileAndName($package['name'], $plugins);

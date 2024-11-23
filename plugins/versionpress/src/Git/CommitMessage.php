@@ -17,8 +17,7 @@ use Nette\Utils\Strings;
  *
  * @see Commit  Represents the whole commit
  */
-class CommitMessage
-{
+class CommitMessage {
 
     /**
      * @var string
@@ -40,8 +39,7 @@ class CommitMessage
      * @param string $subject First line of the commit message
      * @param string $body Optional, lines 3..n
      */
-    public function __construct($subject, $body = null)
-    {
+    public function __construct($subject, $body = null) {
         $this->subject = $subject;
         $this->body = $body;
     }
@@ -51,8 +49,7 @@ class CommitMessage
      *
      * @return string
      */
-    public function getSubject()
-    {
+    public function getSubject() {
         return $this->subject;
     }
 
@@ -61,9 +58,8 @@ class CommitMessage
      *
      * @return string
      */
-    public function getUnprefixedSubject()
-    {
-        if (Strings::startsWith($this->subject, VERSIONPRESS_COMMIT_MESSAGE_PREFIX)) {
+    public function getUnprefixedSubject() {
+        if (str_starts_with($this->subject, VERSIONPRESS_COMMIT_MESSAGE_PREFIX)) {
             return substr($this->subject, strlen(VERSIONPRESS_COMMIT_MESSAGE_PREFIX), strlen($this->subject));
         }
         return $this->subject;
@@ -75,8 +71,7 @@ class CommitMessage
      *
      * @return string
      */
-    public function getBody()
-    {
+    public function getBody() {
         return $this->body;
     }
 
@@ -86,13 +81,12 @@ class CommitMessage
      *
      * @return array Array of tagName => value (trimmed)
      */
-    public function getVersionPressTags()
-    {
+    public function getVersionPressTags() {
         if (!$this->tags) {
             $tagLines = array_filter(
                 array_map("trim", explode("\n", $this->getBody())),
                 function ($line) {
-                    return Strings::startsWith($line, "VP-") || Strings::startsWith($line, "X-VP-");
+                    return str_starts_with($line, "VP-") || str_starts_with($line, "X-VP-");
                 }
             );
             $tags = [];
@@ -112,8 +106,7 @@ class CommitMessage
      * @param $tagName
      * @return string
      */
-    public function getVersionPressTag($tagName)
-    {
+    public function getVersionPressTag($tagName) {
         $tags = $this->getVersionPressTags();
         return isset($tags[$tagName]) ? $tags[$tagName] : "";
     }

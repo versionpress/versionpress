@@ -5,8 +5,7 @@ namespace VersionPress\Tests\StorageTests;
 use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Utils\FileSystem;
 
-class DirectoryStorageTest extends StorageTestCase
-{
+class DirectoryStorageTest extends StorageTestCase {
     /** @var DirectoryStorage */
     private $storage;
 
@@ -32,8 +31,7 @@ class DirectoryStorageTest extends StorageTestCase
     /**
      * @test
      */
-    public function savedEntityEqualsLoadedEntity()
-    {
+    public function savedEntityEqualsLoadedEntity() {
         $this->storage->save($this->testingEntity);
         $loadedEntity = $this->storage->loadEntity($this->testingEntity['vp_id']);
         $this->assertEquals($this->testingEntity, $loadedEntity);
@@ -43,8 +41,7 @@ class DirectoryStorageTest extends StorageTestCase
     /**
      * @test
      */
-    public function loadAllReturnsOnlyOriginalEntities()
-    {
+    public function loadAllReturnsOnlyOriginalEntities() {
         $this->storage->save($this->testingEntity);
         $loadedComments = $this->storage->loadAll();
         $this->assertTrue(count($loadedComments) === 1);
@@ -54,8 +51,7 @@ class DirectoryStorageTest extends StorageTestCase
     /**
      * @test
      */
-    public function storageDoesNotContainDeletedEntities()
-    {
+    public function storageDoesNotContainDeletedEntities() {
         $anotherTestingEntity = $this->testingEntity;
         $anotherTestingEntity['another_field'] = 'value';
         $anotherTestingEntity['vp_id'] = '0123456789ABCDEFFEDCBA9876543210';
@@ -76,8 +72,7 @@ class DirectoryStorageTest extends StorageTestCase
     /**
      * @test
      */
-    public function savedEntityDoesNotContainVpIdKey()
-    {
+    public function savedEntityDoesNotContainVpIdKey() {
         $this->storage->save($this->testingEntity);
         $fileName = $this->storage->getEntityFilename($this->testingEntity['vp_id']);
         $content = file_get_contents($fileName);
@@ -87,8 +82,7 @@ class DirectoryStorageTest extends StorageTestCase
     /**
      * @test
      */
-    public function savedEntityDoesNotContainPrimaryKey()
-    {
+    public function savedEntityDoesNotContainPrimaryKey() {
         $testingEntity = $this->testingEntity;
         $testingEntity['comment_id'] = 123;
 
@@ -100,8 +94,7 @@ class DirectoryStorageTest extends StorageTestCase
     /**
      * @test
      */
-    public function savedEntityDoesNotContainIgnoredColumns()
-    {
+    public function savedEntityDoesNotContainIgnoredColumns() {
         $testingEntity = $this->testingEntity;
         $testingEntity['ignored_column'] = 123;
 
@@ -113,8 +106,7 @@ class DirectoryStorageTest extends StorageTestCase
     /**
      * @test
      */
-    public function typesOfSavedAndLoadedEntityMatch()
-    {
+    public function typesOfSavedAndLoadedEntityMatch() {
         $testingEntity = [
             'field_1' => 'some option',
             'field_2' => null,
@@ -130,8 +122,7 @@ class DirectoryStorageTest extends StorageTestCase
      * @test
      * @dataProvider specialIdsProvider
      */
-    public function naturalIdCanContainSpecialChars($id)
-    {
+    public function naturalIdCanContainSpecialChars($id) {
         $idColumnName = 'entity_id';
 
         $entity = [
@@ -156,8 +147,7 @@ class DirectoryStorageTest extends StorageTestCase
         $this->assertEquals($entity, $loadedEntity);
     }
 
-    public function specialIdsProvider()
-    {
+    public function specialIdsProvider() {
         return [
             ['name_with_<'],
             ['name_with_>'],
@@ -181,8 +171,7 @@ class DirectoryStorageTest extends StorageTestCase
      *
      * @test
      */
-    public function vpidShouldBeReplaceableWithZero()
-    {
+    public function vpidShouldBeReplaceableWithZero() {
         $updatedEntity = $this->testingEntity;
 
         $updatedEntity['vp_comment_post_ID'] = 0;
@@ -194,8 +183,7 @@ class DirectoryStorageTest extends StorageTestCase
         $this->assertEquals($updatedEntity, $loadedOption);
     }
 
-    protected function setUp()
-    {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->storageDir = sys_get_temp_dir() . '/vp-storage-dir';
@@ -222,8 +210,7 @@ class DirectoryStorageTest extends StorageTestCase
         $this->storage = new DirectoryStorage($this->storageDir, $entityInfo, 'prefix_', $changeInfoFactory);
     }
 
-    protected function tearDown()
-    {
+    protected function tearDown(): void {
         parent::tearDown();
         FileSystem::remove($this->storageDir);
     }

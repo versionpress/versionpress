@@ -21,11 +21,9 @@ namespace VersionPress\Initialization;
  * @method __wp_delete($table, $where, $where_format)
  * @method __wp_query($query)
  */
-class ReplacerMethods
-{
+class ReplacerMethods {
 
-    public function insert($table, $data, $format = null)
-    {
+    public function insert($table, $data, $format = null) {
         global $versionPressContainer;
         if ($versionPressContainer == null) {
             return $this->__wp_insert($table, $data, $format);
@@ -45,11 +43,9 @@ class ReplacerMethods
         $this->vp_restore_fields();
         $this->vp_use_original_query_method = false;
         return $r;
-
     }
 
-    public function update($table, $data, $where, $format = null, $where_format = null)
-    {
+    public function update($table, $data, $where, $format = null, $where_format = null) {
         global $versionPressContainer;
         if ($versionPressContainer == null) {
             return $this->__wp_update($table, $data, $where, $format, $where_format);
@@ -71,8 +67,7 @@ class ReplacerMethods
         return $r;
     }
 
-    public function delete($table, $where, $where_format = null)
-    {
+    public function delete($table, $where, $where_format = null) {
         global $versionPressContainer;
         if ($versionPressContainer == null) {
             return $this->__wp_delete($table, $where, $where_format);
@@ -96,8 +91,7 @@ class ReplacerMethods
         return $r;
     }
 
-    public function query($query)
-    {
+    public function query($query) {
         global $versionPressContainer;
         if ($versionPressContainer == null || $this->vp_use_original_query_method) {
             return $this->__wp_query($query);
@@ -164,8 +158,7 @@ class ReplacerMethods
     /**
      * @since VersionPress
      */
-    private function vp_backup_fields()
-    {
+    private function vp_backup_fields() {
         $this->vp_field_backup = [
             "last_error" => $this->last_error,
             "last_query" => $this->last_query,
@@ -179,8 +172,7 @@ class ReplacerMethods
     /**
      * @since VersionPress
      */
-    private function vp_restore_fields()
-    {
+    private function vp_restore_fields() {
         $this->last_error = $this->vp_field_backup["last_error"];
         $this->last_query = $this->vp_field_backup["last_query"];
         $this->last_result = $this->vp_field_backup["last_result"];
@@ -192,9 +184,9 @@ class ReplacerMethods
     /**
      * @since VersionPress
      */
-    public static function vp_restore_original()
-    {
-        $wpdbClassPath = ABSPATH . WPINC . '/wp-db.php';
+    public static function vp_restore_original() {
+        $wpdbClassPath = ABSPATH . WPINC . '/class-wpdb.php';
+
         $wpdbOriginalPath = $wpdbClassPath . '.original';
         if (file_exists($wpdbOriginalPath)) {
             copy($wpdbOriginalPath, $wpdbClassPath);

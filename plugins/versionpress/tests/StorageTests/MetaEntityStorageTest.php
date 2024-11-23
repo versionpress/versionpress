@@ -6,8 +6,7 @@ use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\MetaEntityStorage;
 use VersionPress\Utils\FileSystem;
 
-class MetaEntityStorageTest extends StorageTestCase
-{
+class MetaEntityStorageTest extends StorageTestCase {
     /** @var MetaEntityStorage */
     private $storage;
     /** @var DirectoryStorage */
@@ -32,8 +31,7 @@ class MetaEntityStorageTest extends StorageTestCase
     /**
      * @test
      */
-    public function savedMetaEntityEqualsLoadedMetaEntity()
-    {
+    public function savedMetaEntityEqualsLoadedMetaEntity() {
         $this->parentStorage->save($this->testingParentEntity);
         $this->storage->save($this->testingMetaEntity);
         $loadedMetaEntity = $this->storage->loadEntity($this->testingMetaEntity['vp_id'], $this->testingParentEntity['vp_id']);
@@ -43,8 +41,7 @@ class MetaEntityStorageTest extends StorageTestCase
     /**
      * @test
      */
-    public function loadAllReturnsOnlyOriginalEntities()
-    {
+    public function loadAllReturnsOnlyOriginalEntities() {
         $this->parentStorage->save($this->testingParentEntity);
         $this->storage->save($this->testingMetaEntity);
         $loadedPostMeta = $this->storage->loadAll();
@@ -52,8 +49,7 @@ class MetaEntityStorageTest extends StorageTestCase
         $this->assertEquals($this->testingMetaEntity, reset($loadedPostMeta));
     }
 
-    protected function setUp()
-    {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->storageDir = sys_get_temp_dir() . '/vp-storage-dir';
@@ -87,8 +83,7 @@ class MetaEntityStorageTest extends StorageTestCase
         $this->storage = new MetaEntityStorage($this->parentStorage, $metaEntityInfo, 'prefix_', $changeInfoFactory);
     }
 
-    protected function tearDown()
-    {
+    protected function tearDown(): void {
         parent::tearDown();
         FileSystem::remove(__DIR__ . '/entities');
     }

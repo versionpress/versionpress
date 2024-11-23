@@ -15,8 +15,7 @@ use VersionPress\Utils\AbsoluteUrlReplacer;
 use VersionPress\Utils\ArrayUtils;
 use VersionPress\Utils\ReferenceUtils;
 
-class DBAsserter
-{
+class DBAsserter {
     /** @var DbSchemaInfo */
     private static $schemaInfo;
     /** @var StorageFactory */
@@ -37,8 +36,7 @@ class DBAsserter
     private static $wpAutomation;
 
 
-    public static function assertFilesEqualDatabase()
-    {
+    public static function assertFilesEqualDatabase() {
         HookMock::setUp(HookMock::TRUE_HOOKS);
         self::setUp();
         $entityNames = self::$schemaInfo->getAllEntityNames();
@@ -49,8 +47,7 @@ class DBAsserter
         HookMock::tearDown();
     }
 
-    private static function setUp()
-    {
+    private static function setUp(): void {
         // One-time initialization
         if (!self::$testConfig) {
             self::$testConfig = TestConfig::createDefaultConfig();
@@ -107,8 +104,7 @@ class DBAsserter
     /**
      * @param $entityName
      */
-    private static function assertEntitiesEqualDatabase($entityName)
-    {
+    private static function assertEntitiesEqualDatabase($entityName) {
         $storage = self::$storageFactory->getStorage($entityName);
         $entityInfo = self::$schemaInfo->getEntityInfo($entityName);
 
@@ -133,9 +129,9 @@ class DBAsserter
                 $problematicEntities = self::findExceedingEntities($entityName, $storageEntities, $dbEntities);
             }
 
-            throw new \PHPUnit_Framework_AssertionFailedError(
+            throw new \PHPUnit\Framework\AssertionFailedError(
                 "Different count of synchronized entities ($entityName): DB = $countOfentitiesInDb, " .
-                "storage = $countOfentitiesInStorage\nProblematic entities: " . join(", ", $problematicEntities)
+                    "storage = $countOfentitiesInStorage\nProblematic entities: " . join(", ", $problematicEntities)
             );
         }
 
@@ -150,7 +146,7 @@ class DBAsserter
                     continue;
                 }
                 if (!isset($storageEntity[$column])) {
-                    throw new \PHPUnit_Framework_AssertionFailedError(
+                    throw new \PHPUnit\Framework\AssertionFailedError(
                         "{$entityName}[$column] with value = $value, ID = $id not found in storage"
                     );
                 }
@@ -164,7 +160,7 @@ class DBAsserter
                 }
 
                 if ($storageEntity[$column] != $value) {
-                    throw new \PHPUnit_Framework_AssertionFailedError(
+                    throw new \PHPUnit\Framework\AssertionFailedError(
                         "Different values ({$entityName}[$column]: $id): DB = $value, storage = $storageEntity[$column]"
                     );
                 }
@@ -240,13 +236,11 @@ class DBAsserter
         self::reportResultOfMnReferenceCheck($exceedingReferences, "Exceeding");
     }
 
-    private static function selectAll($table)
-    {
+    private static function selectAll($table) {
         return self::fetchAll("SELECT * FROM $table");
     }
 
-    private static function fetchAll($query, $resultType = MYSQLI_ASSOC)
-    {
+    private static function fetchAll($query, $resultType = MYSQLI_ASSOC) {
         $res = self::$database->query($query);
         if (!$res) {
             return [];
@@ -255,8 +249,7 @@ class DBAsserter
         return $res->fetch_all($resultType);
     }
 
-    private static function getVpIdMap()
-    {
+    private static function getVpIdMap() {
         $vpIdTable = self::selectAll(self::$vp_database->vp_id);
         $idMap = [];
         foreach ($vpIdTable as $row) {
@@ -265,8 +258,7 @@ class DBAsserter
         return $idMap;
     }
 
-    private static function identifyEntities($entityName, $entities, $idMap)
-    {
+    private static function identifyEntities($entityName, $entities, $idMap) {
         $entityInfo = self::$schemaInfo->getEntityInfo($entityName);
         if (!$entityInfo->usesGeneratedVpids) {
             return $entities;
@@ -285,8 +277,7 @@ class DBAsserter
         return $entities;
     }
 
-    private static function replaceForeignKeys($entityName, $dbEntities, $idMap)
-    {
+    private static function replaceForeignKeys($entityName, $dbEntities, $idMap) {
         $entities = [];
         foreach ($dbEntities as $entity) {
             $entities[] = self::$vpidRepository->replaceForeignKeysWithReferences($entityName, $entity);
@@ -294,8 +285,7 @@ class DBAsserter
         return $entities;
     }
 
-    private static function findMissingEntities($entityName, $storageEntities, $dbEntities)
-    {
+    private static function findMissingEntities($entityName, $storageEntities, $dbEntities) {
         $storageVpIds = array_keys($storageEntities);
         $idColumnName = self::$schemaInfo->getEntityInfo($entityName)->vpidColumnName;
         foreach ($dbEntities as $dbEntity) {
@@ -304,8 +294,7 @@ class DBAsserter
         return $storageVpIds;
     }
 
-    private static function findExceedingEntities($entityName, $storageEntities, $dbEntities)
-    {
+    private static function findExceedingEntities($entityName, $storageEntities, $dbEntities) {
         $exceedingEntities = [];
         $vpidColumnName = self::$schemaInfo->getEntityInfo($entityName)->vpidColumnName;
         $idColumnName = self::$schemaInfo->getEntityInfo($entityName)->idColumnName;
@@ -321,8 +310,7 @@ class DBAsserter
         return $exceedingEntities;
     }
 
-    private static function reportResultOfMnReferenceCheck($referenceResult, $verb)
-    {
+    private static function reportResultOfMnReferenceCheck($referenceResult, $verb) {
         foreach ($referenceResult as $junctionTable => $references) {
             if (count($references) == 0) {
                 continue;
@@ -337,24 +325,22 @@ class DBAsserter
                 $list .= "] ";
             }
 
-            throw new \PHPUnit_Framework_AssertionFailedError(
+            throw new \PHPUnit\Framework\AssertionFailedError(
                 sprintf($verb . " M:N reference in table %s %s", $junctionTable, $list)
             );
         }
     }
 
-    private static function isInIdMap($idMap, $targetEntity, $id)
-    {
+    private static function isInIdMap($idMap, $targetEntity, $id) {
         return isset($idMap[self::$schemaInfo->getTableName($targetEntity)])
-        && isset($idMap[self::$schemaInfo->getTableName($targetEntity)][$id]);
+            && isset($idMap[self::$schemaInfo->getTableName($targetEntity)][$id]);
     }
 
     /**
      * Defines global constants, container and wpdb dynamic mapping of value references.
      * It's not pretty, but makes the mapping functions very flexible (they can have various dependencies).
      */
-    private static function defineGlobalVariables()
-    {
+    private static function defineGlobalVariables() {
         global $versionPressContainer, $wpdb, $wp_taxonomies;
 
         defined('VERSIONPRESS_PLUGIN_DIR') || define('VERSIONPRESS_PLUGIN_DIR', self::$testConfig->testSite->path .
@@ -372,8 +358,7 @@ class DBAsserter
         $wp_taxonomies = array_combine($taxonomies, $taxonomies);
     }
 
-    private static function clearGlobalVariables()
-    {
+    private static function clearGlobalVariables() {
         global $versionPressContainer, $wpdb, $wp_taxonomies;
         $versionPressContainer = null;
         $wpdb = null;

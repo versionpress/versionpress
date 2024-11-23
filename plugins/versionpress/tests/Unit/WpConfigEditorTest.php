@@ -5,14 +5,12 @@ namespace VersionPress\Tests\Unit;
 use org\bovigo\vfs\vfsStream;
 use VersionPress\Utils\WpConfigEditor;
 
-class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
-{
+class WpConfigEditorTest extends \PHPUnit\Framework\TestCase {
 
     private $configPath;
     private $commonConfigPath;
 
-    protected function setUp()
-    {
+    protected function setUp(): void {
         $root = vfsStream::setup();
         $virtualConfig = vfsStream::newFile('wp-config.common.php')->at($root);
         $virtualCommonConfig = vfsStream::newFile('wp-config.common.php')->at($root);
@@ -20,13 +18,12 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
         $this->commonConfigPath = $virtualCommonConfig->url();
     }
 
-// ---------- wp-config.common.php ------------
+    // ---------- wp-config.common.php ------------
 
     /**
      * @test
      */
-    public function editorCreatesNewConstantInCommonConfigIfItsMissing()
-    {
+    public function editorCreatesNewConstantInCommonConfigIfItsMissing() {
         file_put_contents($this->commonConfigPath, "<?php\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -40,8 +37,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorUpdatesExistingConstantInCommonConfig()
-    {
+    public function editorUpdatesExistingConstantInCommonConfig() {
         file_put_contents($this->commonConfigPath, "<?php\ndefine('TEST', 'value');\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -55,8 +51,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorAppendsNewConstantsAtTheEndOfCommonConfig()
-    {
+    public function editorAppendsNewConstantsAtTheEndOfCommonConfig() {
         file_put_contents($this->commonConfigPath, "<?php\ndefine('EXISTING_CONSTANT', 'value');\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -70,8 +65,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorSavesIntConstantsAsIntegers()
-    {
+    public function editorSavesIntConstantsAsIntegers() {
         file_put_contents($this->commonConfigPath, "<?php\ndefine('TEST', 'value');\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -85,8 +79,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorSavesBoolConstantsAsBooleans()
-    {
+    public function editorSavesBoolConstantsAsBooleans() {
         file_put_contents($this->commonConfigPath, "<?php\ndefine('TEST', 'value');\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -100,8 +93,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorSavesConstantWithRegexReferenceCorrectly()
-    {
+    public function editorSavesConstantWithRegexReferenceCorrectly() {
         file_put_contents($this->commonConfigPath, "<?php\ndefine('TEST', 'value');\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -115,8 +107,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorSavesPlainValueConstantsCorrectly()
-    {
+    public function editorSavesPlainValueConstantsCorrectly() {
         file_put_contents($this->commonConfigPath, "<?php\ndefine('TEST', 'value');\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -130,8 +121,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorSavesPlainValueConstantsWithRegexReferenceCorrectly()
-    {
+    public function editorSavesPlainValueConstantsWithRegexReferenceCorrectly() {
         file_put_contents($this->commonConfigPath, "<?php\ndefine('TEST', 'value');\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -145,8 +135,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorUpdatesOnlyDesiredConstantInCommonConfig()
-    {
+    public function editorUpdatesOnlyDesiredConstantInCommonConfig() {
         file_put_contents(
             $this->commonConfigPath,
             "<?php\ndefine('TEST', 'value');\ndefine('MY_CONSTANT', 'value');\n"
@@ -163,8 +152,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorCreatesNewVariableInCommonConfigIfItsMissing()
-    {
+    public function editorCreatesNewVariableInCommonConfigIfItsMissing() {
         file_put_contents($this->commonConfigPath, "<?php\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -178,8 +166,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorUpdatesExistingVarialbeInCommonConfig()
-    {
+    public function editorUpdatesExistingVarialbeInCommonConfig() {
         file_put_contents($this->commonConfigPath, "<?php\n\$test = 'value';\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -193,8 +180,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorAppendsNewVariablesAtTheEndOfCommonConfig()
-    {
+    public function editorAppendsNewVariablesAtTheEndOfCommonConfig() {
         file_put_contents($this->commonConfigPath, "<?php\n\$existing_variable = 'value';\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -208,8 +194,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorSavesIntVariablesAsIntegers()
-    {
+    public function editorSavesIntVariablesAsIntegers() {
         file_put_contents($this->commonConfigPath, "<?php\n\$test = 'value';\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -223,8 +208,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorSavesBoolVariablesAsBooleans()
-    {
+    public function editorSavesBoolVariablesAsBooleans() {
         file_put_contents($this->commonConfigPath, "<?php\n\$test = 'value';\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -238,8 +222,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorSavesVariableWithRegexReferenceCorrectly()
-    {
+    public function editorSavesVariableWithRegexReferenceCorrectly() {
         file_put_contents($this->commonConfigPath, "<?php\n\$test = 'value';\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -253,8 +236,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorSavesVariableWithCrazyRegexCorrectly()
-    {
+    public function editorSavesVariableWithCrazyRegexCorrectly() {
         file_put_contents($this->commonConfigPath, "<?php\n\$test = 'value';\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -268,8 +250,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorSavesPlainValueVariablesCorrectly()
-    {
+    public function editorSavesPlainValueVariablesCorrectly() {
         file_put_contents($this->commonConfigPath, "<?php\n\$test = 'value';\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -283,8 +264,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorSavesPlainValueVariablesWithRegexReferenceCorrectly()
-    {
+    public function editorSavesPlainValueVariablesWithRegexReferenceCorrectly() {
         file_put_contents($this->commonConfigPath, "<?php\n\$test = 'value';\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -298,8 +278,7 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function editorUpdatesOnlyDesiredVariableInCommonConfig()
-    {
+    public function editorUpdatesOnlyDesiredVariableInCommonConfig() {
         file_put_contents($this->commonConfigPath, "<?php\n\$test = 'value';\n\$my_variable = 'value';\n");
 
         $a = new WpConfigEditor($this->commonConfigPath, true);
@@ -310,13 +289,12 @@ class WpConfigEditorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedContent, file_get_contents($this->commonConfigPath));
     }
 
-// ---------- wp-config.php ------------
+    // ---------- wp-config.php ------------
 
     /**
      * @test
      */
-    public function editorCreatesNewConstantInWpConfigIfItsMissing()
-    {
+    public function editorCreatesNewConstantInWpConfigIfItsMissing() {
         file_put_contents($this->commonConfigPath, '<?php
 // ** MySQL settings ** //
 /** The name of the database for WordPress */
@@ -365,8 +343,7 @@ require_once(ABSPATH . \'wp-settings.php\');
     /**
      * @test
      */
-    public function editorUpdatesExistingConstantInWpConfig()
-    {
+    public function editorUpdatesExistingConstantInWpConfig() {
         file_put_contents($this->commonConfigPath, '<?php
 // ** MySQL settings ** //
 /** The name of the database for WordPress */
@@ -416,8 +393,7 @@ require_once(ABSPATH . \'wp-settings.php\');
     /**
      * @test
      */
-    public function editorUpdatesOnlyDesiredConstantInWpConfig()
-    {
+    public function editorUpdatesOnlyDesiredConstantInWpConfig() {
         file_put_contents($this->commonConfigPath, '<?php
 // ** MySQL settings ** //
 /** The name of the database for WordPress */
@@ -469,8 +445,7 @@ require_once(ABSPATH . \'wp-settings.php\');
     /**
      * @test
      */
-    public function editorCreatesNewVariableInWpConfigIfItsMissing()
-    {
+    public function editorCreatesNewVariableInWpConfigIfItsMissing() {
         file_put_contents($this->commonConfigPath, '<?php
 // ** MySQL settings ** //
 /** The name of the database for WordPress */
@@ -519,8 +494,7 @@ require_once(ABSPATH . \'wp-settings.php\');
     /**
      * @test
      */
-    public function editorUpdatesExistingValueInWpConfig()
-    {
+    public function editorUpdatesExistingValueInWpConfig() {
         file_put_contents($this->commonConfigPath, '<?php
 // ** MySQL settings ** //
 /** The name of the database for WordPress */
@@ -570,8 +544,7 @@ require_once(ABSPATH . \'wp-settings.php\');
     /**
      * @test
      */
-    public function editorUpdatesOnlyDesiredValueInWpConfig()
-    {
+    public function editorUpdatesOnlyDesiredValueInWpConfig() {
         file_put_contents($this->commonConfigPath, '<?php
 // ** MySQL settings ** //
 /** The name of the database for WordPress */
@@ -621,8 +594,7 @@ require_once(ABSPATH . \'wp-settings.php\');
     /**
      * @test
      */
-    public function editorWorksWithLocalizedWpConfig()
-    {
+    public function editorWorksWithLocalizedWpConfig() {
         file_put_contents($this->commonConfigPath, '<?php
 // ** MySQL settings ** //
 /** The name of the database for WordPress */
@@ -671,8 +643,7 @@ require_once(ABSPATH . \'wp-settings.php\');
     /**
      * @test
      */
-    public function editorWorksWithoutHappyBloggingComment()
-    {
+    public function editorWorksWithoutHappyBloggingComment() {
         file_put_contents($this->commonConfigPath, '<?php
 define(\'DB_NAME\', \'vp01\');
 $table_prefix = \'wp_\';
@@ -701,8 +672,7 @@ require_once(ABSPATH . \'wp-settings.php\');
     /**
      * @test
      */
-    public function editorWorksWithoutDefiningAbspath()
-    {
+    public function editorWorksWithoutDefiningAbspath() {
         file_put_contents($this->commonConfigPath, '<?php
 define(\'DB_NAME\', \'vp01\');
 $table_prefix = \'wp_\';

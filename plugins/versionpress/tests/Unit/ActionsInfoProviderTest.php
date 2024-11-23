@@ -8,12 +8,10 @@ use VersionPress\Actions\ActionsInfo;
 use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\Tests\Utils\HookMock;
 
-class ActionsInfoProviderTest extends \PHPUnit_Framework_TestCase
-{
+class ActionsInfoProviderTest extends \PHPUnit\Framework\TestCase {
     private $root;
 
-    protected function setUp()
-    {
+    protected function setUp(): void {
         $this->root = vfsStream::setup();
         HookMock::setUp();
     }
@@ -22,8 +20,7 @@ class ActionsInfoProviderTest extends \PHPUnit_Framework_TestCase
      * @test
      * @dataProvider scopeDefinitionProvider
      */
-    public function actionsInfoProviderCreatesActionInfo($scopeDefinition, $description, $tags, $priority, $parentIdTag)
-    {
+    public function actionsInfoProviderCreatesActionInfo($scopeDefinition, $description, $tags, $priority, $parentIdTag) {
         $actionsFilePath = $this->createActionsFile($scopeDefinition);
 
         $actionsInfoProvider = new ActionsInfoProvider([$actionsFilePath]);
@@ -36,8 +33,7 @@ class ActionsInfoProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($parentIdTag, $actionsInfo->getTagContainingParentId());
     }
 
-    public function scopeDefinitionProvider()
-    {
+    public function scopeDefinitionProvider() {
         $description = 'Some description';
         $simpleScopeDefinition = [
             'some-scope' => [
@@ -65,8 +61,7 @@ class ActionsInfoProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function actionsInfoProviderSupportsMultipleFiles()
-    {
+    public function actionsInfoProviderSupportsMultipleFiles() {
         $description1 = 'Some description for some-scope-1';
         $scopeDefinition1 = [
             'some-scope-1' => [
@@ -99,8 +94,7 @@ class ActionsInfoProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function actionsInfoSupportsActionsFromMultipleFilesForOneScope()
-    {
+    public function actionsInfoSupportsActionsFromMultipleFilesForOneScope() {
         $description1 = 'Some description for some-action-1 with %action-1-tag%';
         $scopeDefinition1 = [
             'some-scope' => [
@@ -134,8 +128,7 @@ class ActionsInfoProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function actionsInfoSupportsActionsFromMultipleFilesWithRedefinedTags()
-    {
+    public function actionsInfoSupportsActionsFromMultipleFilesWithRedefinedTags() {
         $description1 = 'Some description for some-action-1 with %some-tag%';
         $scopeDefinition1 = [
             'some-scope' => [
@@ -168,8 +161,7 @@ class ActionsInfoProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function actionsInfoTakesIteratorAsParameter()
-    {
+    public function actionsInfoTakesIteratorAsParameter() {
         $description = 'Some description';
         $scopeDefinition = [
             'some-scope' => [
@@ -189,8 +181,7 @@ class ActionsInfoProviderTest extends \PHPUnit_Framework_TestCase
      * @param array $scopesDefinition
      * @return string
      */
-    private function createActionsFile($scopesDefinition)
-    {
+    private function createActionsFile($scopesDefinition) {
         static $fileNumber = 0;
 
         $fileName = 'actions-' . ($fileNumber++) . '.yml';

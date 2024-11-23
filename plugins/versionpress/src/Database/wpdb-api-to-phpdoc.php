@@ -2,7 +2,7 @@
 // Generates wpdb API description as PhpDoc. Used by `Database`.
 // Run this file as `php wpdb-api-to-phpdoc.php`.
 
-$pathToWpdb = __DIR__ . '/../../../../ext-libs/wordpress/wp-includes/wp-db.php';
+$pathToWpdb = __DIR__ . '/../../../../ext-libs/wordpress/wp-includes/class-wpdb.php';
 
 require_once $pathToWpdb;
 

@@ -2,6 +2,18 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Listen for Xdebug",
+      "type": "php",
+      "request": "launch",
+      "port": [
+        9003,
+        9000
+      ],
+      "pathMappings": {
+        "/opt/versionpress": "${workspaceRoot}/plugins/versionpress",
+      }
+    },
+    {
       "type": "node",
       "request": "attach",
       "name": "Node attach",

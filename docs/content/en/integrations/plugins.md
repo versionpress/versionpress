@@ -28,3 +28,7 @@ Those that have custom database tables. No specific list at the moment.
 ### Jetpack
 
 Jetpack is actually a collection of plugins, most of which work fine. Some sub-plugins are of category 2 above, i.e., the actions are technically tracked but the descriptions could be improved.
+
+## How to extend support of versionpress to 3rd party plugins
+
+check docs/content/en/developer/plugin-support.md

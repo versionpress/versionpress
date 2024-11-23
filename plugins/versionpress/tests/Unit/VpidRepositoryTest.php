@@ -7,11 +7,9 @@ use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Database\EntityInfo;
 use VersionPress\Database\VpidRepository;
 
-class VpidRepositoryTest extends \PHPUnit_Framework_TestCase
-{
+class VpidRepositoryTest extends \PHPUnit\Framework\TestCase {
     /** @test */
-    public function replacingSimpleValueReference()
-    {
+    public function replacingSimpleValueReference() {
         $databaseMock = \Mockery::mock(Database::class);
         $schemaInfoMock = \Mockery::mock(DbSchemaInfo::class);
 
@@ -49,8 +47,7 @@ class VpidRepositoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function replacingReferenceInSerializedData()
-    {
+    public function replacingReferenceInSerializedData() {
         $databaseMock = \Mockery::mock(Database::class);
         $schemaInfoMock = \Mockery::mock(DbSchemaInfo::class);
 
@@ -88,8 +85,7 @@ class VpidRepositoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function replacingReferenceInSerializedDataWithWildcard()
-    {
+    public function replacingReferenceInSerializedDataWithWildcard() {
         $databaseMock = \Mockery::mock(Database::class);
         $schemaInfoMock = \Mockery::mock(DbSchemaInfo::class);
 
@@ -127,8 +123,7 @@ class VpidRepositoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function replacingReferenceInSerializedDataWithRegex()
-    {
+    public function replacingReferenceInSerializedDataWithRegex() {
         $databaseMock = \Mockery::mock(Database::class);
         $schemaInfoMock = \Mockery::mock(DbSchemaInfo::class);
 
@@ -166,8 +161,7 @@ class VpidRepositoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function replacingAllReferenceInSerializedDataWithRegex()
-    {
+    public function replacingAllReferenceInSerializedDataWithRegex() {
         $databaseMock = \Mockery::mock(Database::class);
         $schemaInfoMock = \Mockery::mock(DbSchemaInfo::class);
 
@@ -206,8 +200,7 @@ class VpidRepositoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
-    public function replacingReferenceInSerializedDataInSerializedData()
-    {
+    public function replacingReferenceInSerializedDataInSerializedData() {
         $databaseMock = \Mockery::mock(Database::class);
         $schemaInfoMock = \Mockery::mock(DbSchemaInfo::class);
 

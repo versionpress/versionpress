@@ -1,4 +1,5 @@
 <?php
+
 namespace VersionPress\Storages;
 
 use Nette\Utils\Strings;
@@ -11,8 +12,7 @@ use VersionPress\Storages\Serialization\IniSerializer;
  * in a way "implement" its API of saving and deleting entities and in the end
  * manage INI files in the `wp-content/vpdb` folder.
  */
-abstract class Storage
-{
+abstract class Storage {
 
     const PREFIX_PLACEHOLDER = "<<table-prefix>>";
 
@@ -28,8 +28,7 @@ abstract class Storage
     /** @var string */
     private $dbPrefix;
 
-    public function __construct(EntityInfo $entityInfo, $dbPrefix)
-    {
+    public function __construct(EntityInfo $entityInfo, $dbPrefix) {
         $this->entityInfo = $entityInfo;
         $this->dbPrefix = $dbPrefix;
     }
@@ -79,8 +78,7 @@ abstract class Storage
      * @param array $data
      * @return bool
      */
-    public function shouldBeSaved($data)
-    {
+    public function shouldBeSaved($data) {
         $shouldBeSaved = true;
 
         if ($this->entityInfo->isIgnoredEntity($data)) {
@@ -136,8 +134,7 @@ abstract class Storage
      */
     abstract public function commit();
 
-    protected function deserializeEntity($serializedEntity)
-    {
+    protected function deserializeEntity($serializedEntity) {
         if ($serializedEntity === '') {
             return [];
         }
@@ -148,16 +145,14 @@ abstract class Storage
         return $entity;
     }
 
-    protected function serializeEntity($vpid, $entity)
-    {
+    protected function serializeEntity($vpid, $entity) {
         $vpid = $this->maybeReplacePrefixWithPlaceholder($vpid);
 
         unset($entity[$this->entityInfo->vpidColumnName]);
         return IniSerializer::serialize([$vpid => $entity]);
     }
 
-    private function flattenEntity($entity)
-    {
+    private function flattenEntity($entity) {
         if (count($entity) === 0) {
             return $entity;
         }
@@ -170,17 +165,15 @@ abstract class Storage
         return $flatEntity;
     }
 
-    protected function maybeReplacePrefixWithPlaceholder($key)
-    {
-        if (Strings::startsWith($key, $this->dbPrefix)) {
+    protected function maybeReplacePrefixWithPlaceholder($key) {
+        if (str_starts_with($key, $this->dbPrefix)) {
             return self::PREFIX_PLACEHOLDER . Strings::substring($key, Strings::length($this->dbPrefix));
         }
         return $key;
     }
 
-    protected function maybeReplacePlaceholderWithPrefix($key)
-    {
-        if (Strings::startsWith($key, self::PREFIX_PLACEHOLDER)) {
+    protected function maybeReplacePlaceholderWithPrefix($key) {
+        if (str_starts_with($key, self::PREFIX_PLACEHOLDER)) {
             return $this->dbPrefix . Strings::substring($key, Strings::length(self::PREFIX_PLACEHOLDER));
         }
         return $key;

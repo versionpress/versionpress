@@ -10,8 +10,7 @@ use VersionPress\Utils\ProcessUtils;
 /**
  * Manipulates the Git repository.
  */
-class GitRepository
-{
+class GitRepository {
 
     private $workingDirectoryRoot;
     private $tempDirectory;
@@ -42,9 +41,8 @@ class GitRepository
      *
      * @param string|null $path Null (the default) means the whole working directory
      */
-    public function stageAll($path = null)
-    {
-        $path = $path ? $path : $this->workingDirectoryRoot;
+    public function stageAll($path = null) {
+        $path = $path ?: $this->workingDirectoryRoot;
         $this->runShellCommand("git add -A %s", $path);
     }
 
@@ -59,8 +57,7 @@ class GitRepository
      * @param string $authorName
      * @param string $authorEmail
      */
-    public function commit($message, $authorName, $authorEmail)
-    {
+    public function commit($message, $authorName, $authorEmail) {
 
         if (is_string($message)) {
             $commitMessage = $message;
@@ -111,16 +108,14 @@ class GitRepository
      *
      * @return bool
      */
-    public function isVersioned()
-    {
+    public function isVersioned() {
         return file_exists($this->workingDirectoryRoot . "/.git");
     }
 
     /**
      * Initializes the repository
      */
-    public function init()
-    {
+    public function init() {
         $this->runShellCommand("git init");
     }
 
@@ -130,8 +125,7 @@ class GitRepository
      * @param string $options Options passed to git log
      * @return string Empty string or SHA1
      */
-    public function getLastCommitHash($options = "")
-    {
+    public function getLastCommitHash($options = "") {
         if (!empty($options)) {
             $command = 'git log --pretty=format:"%%H" --max-count=1';
             $command .= " " . $options;
@@ -153,8 +147,7 @@ class GitRepository
      *
      * @return Commit
      */
-    public function getInitialCommit()
-    {
+    public function getInitialCommit() {
         $initialCommitHash = $this->runShellCommandWithStandardOutput("git rev-list --max-parents=0 HEAD");
         return $this->getCommit($initialCommitHash);
     }
@@ -166,8 +159,7 @@ class GitRepository
      * @param string $gitrevisions Empty by default, i.e., calling full 'git log'
      * @return Commit[]
      */
-    public function log($options = "", $gitrevisions = "")
-    {
+    public function log($options = "", $gitrevisions = "") {
 
         $commitDelimiter = chr(29);
         $dataDelimiter = chr(30);
@@ -204,8 +196,7 @@ class GitRepository
      * @param string $gitrevisions
      * @return string[]
      */
-    public function getModifiedFiles($gitrevisions)
-    {
+    public function getModifiedFiles($gitrevisions) {
         $result = $this->runShellCommandWithStandardOutput("git diff --name-only %s", $gitrevisions);
         $files = explode("\n", $result);
         return $files;
@@ -218,8 +209,7 @@ class GitRepository
      * @param string $gitrevisions See gitrevisions
      * @return array Array of things like `array("status" => "M", "path" => "wp-content/vpdb/something.ini" )`
      */
-    public function getModifiedFilesWithStatus($gitrevisions)
-    {
+    public function getModifiedFilesWithStatus($gitrevisions) {
         $command = 'git diff --name-status %s';
         $output = $this->runShellCommandWithStandardOutput($command, $gitrevisions);
         $result = [];
@@ -237,8 +227,7 @@ class GitRepository
      *
      * @param $commitHash
      */
-    public function revertAll($commitHash)
-    {
+    public function revertAll($commitHash) {
         $this->runShellCommand("git reset --hard %s", $commitHash);
         $this->runShellCommand("git reset --soft HEAD@{1}");
     }
@@ -249,8 +238,7 @@ class GitRepository
      * @param $commitHash
      * @return bool True if it succeeded, false if there was a conflict
      */
-    public function revert($commitHash)
-    {
+    public function revert($commitHash) {
         $output = $this->runShellCommandWithErrorOutput("git revert -n %s", $commitHash);
 
         if ($output !== null && $output !== '') { // revert conflict
@@ -264,8 +252,7 @@ class GitRepository
     /**
      * Aborts a revert, e.g., if there was a conflict
      */
-    public function abortRevert()
-    {
+    public function abortRevert() {
         $this->runShellCommand("git revert --abort");
     }
 
@@ -277,8 +264,7 @@ class GitRepository
      * @param $afterWhichCommitHash
      * @return bool
      */
-    public function wasCreatedAfter($commitHash, $afterWhichCommitHash)
-    {
+    public function wasCreatedAfter($commitHash, $afterWhichCommitHash) {
         $range = sprintf("%s..%s", $afterWhichCommitHash, $commitHash);
         // One commit is enough, only empty/not empty matters in this case
         $cmd = "git log %s --oneline --max-count=1";
@@ -291,8 +277,7 @@ class GitRepository
      * @param $commitHash
      * @return mixed
      */
-    public function getChildCommit($commitHash)
-    {
+    public function getChildCommit($commitHash) {
         $range = "$commitHash..";
         $cmd = "git log --reverse --ancestry-path --format=%%H %s";
         $result = $this->runShellCommandWithStandardOutput($cmd, $range);
@@ -307,8 +292,7 @@ class GitRepository
      * @param string $gitrevisions Empty by default, i.e., calling full 'git log'
      * @return int
      */
-    public function getNumberOfCommits($options = "", $gitrevisions = "")
-    {
+    public function getNumberOfCommits($options = "", $gitrevisions = "") {
         $logCommand = 'git log --pretty=format:"%%h"';
 
         $logCommand .= " " . $options;
@@ -322,8 +306,7 @@ class GitRepository
      *
      * @return bool
      */
-    public function willCommit()
-    {
+    public function willCommit() {
         $status = $this->runShellCommandWithStandardOutput("git status -s");
         return Strings::match($status, "~^[AMD].*~") !== null;
     }
@@ -334,8 +317,7 @@ class GitRepository
      * @param $commitHash
      * @return Commit
      */
-    public function getCommit($commitHash)
-    {
+    public function getCommit($commitHash) {
         $logWithInitialCommit = $this->log($commitHash);
         return $logWithInitialCommit[0];
     }
@@ -351,8 +333,7 @@ class GitRepository
      * @param $array bool Return result as array
      * @return string|array[string]
      */
-    public function getStatus($array = false)
-    {
+    public function getStatus($array = false) {
         $gitCmd = "git status --porcelain -uall";
         $output = $this->runShellCommandWithStandardOutput($gitCmd);
         if ($array) {
@@ -373,8 +354,7 @@ class GitRepository
      *
      * @return bool
      */
-    public function isCleanWorkingDirectory()
-    {
+    public function isCleanWorkingDirectory() {
         $status = $this->getStatus();
         return empty($status);
     }
@@ -386,8 +366,7 @@ class GitRepository
      * @param string $hash
      * @return string
      */
-    public function getDiff($hash = null)
-    {
+    public function getDiff($hash = null) {
         if ($hash === null) {
             $status = $this->getStatus(true);
             $this->runShellCommand("git add -AN");
@@ -400,7 +379,7 @@ class GitRepository
 
             if (count($filesToReset) > 0) {
                 $this->runShellCommand(
-                    sprintf("git reset HEAD %s", join(" ", array_map(['VersionPress\Utils\ProcessUtils', 'escapeshellarg'], $filesToReset)))
+                    sprintf("git reset HEAD %s", join(" ", array_map([\VersionPress\Utils\ProcessUtils::class, 'escapeshellarg'], $filesToReset)))
                 );
             }
 
@@ -426,8 +405,7 @@ class GitRepository
      *
      * @return boolean
      */
-    public function clearWorkingDirectory()
-    {
+    public function clearWorkingDirectory() {
         $this->runShellCommand("git clean -f");
         $this->runShellCommand("git reset --hard");
 
@@ -452,8 +430,7 @@ class GitRepository
      * @param string $args
      * @return string
      */
-    private function runShellCommandWithStandardOutput($command, $args = '')
-    {
+    private function runShellCommandWithStandardOutput($command, $args = '') {
         $result = call_user_func_array([$this, 'runShellCommand'], func_get_args());
         return $result['stdout'];
     }
@@ -469,8 +446,7 @@ class GitRepository
      * @param string $args
      * @return string
      */
-    private function runShellCommandWithErrorOutput($command, $args = '')
-    {
+    private function runShellCommandWithErrorOutput($command, $args = '') {
         $result = call_user_func_array([$this, 'runShellCommand'], func_get_args());
         return $result['stderr'];
     }
@@ -488,14 +464,13 @@ class GitRepository
      * @param string[] $args Will be shell-escaped and replace sprintf markers in $command
      * @return array array('stdout' => , 'stderr' => )
      */
-    private function runShellCommand($command, ...$args)
-    {
+    private function runShellCommand($command, ...$args) {
 
         // replace (optional) "git " with the configured git binary
-        $command = Strings::startsWith($command, "git ") ? substr($command, 4) : $command;
+        $command = str_starts_with($command, "git ") ? substr($command, 4) : $command;
         $command = ProcessUtils::escapeshellarg($this->gitBinary) . " " . $command;
 
-        $escapedArgs = @array_map(['VersionPress\Utils\ProcessUtils', 'escapeshellarg'], $args);
+        $escapedArgs = @array_map([\VersionPress\Utils\ProcessUtils::class, 'escapeshellarg'], $args);
         $commandWithArguments = vsprintf($command, $escapedArgs);
 
         $result = $this->runProcess($commandWithArguments);
@@ -508,8 +483,7 @@ class GitRepository
      * @param $cmd
      * @return array
      */
-    private function runProcess($cmd)
-    {
+    private function runProcess($cmd) {
         /*
          * MAMP / XAMPP issue on Mac OS X, see #106.
          *
@@ -520,7 +494,7 @@ class GitRepository
             putenv("DYLD_LIBRARY_PATH=");
         }
 
-        $process = new Process($cmd, $this->workingDirectoryRoot);
+        $process = Process::fromShellCommandline($cmd, $this->workingDirectoryRoot);
         if ($this->gitProcessTimeout !== null) {
             $process->setTimeout($this->gitProcessTimeout);
         }
@@ -547,13 +521,11 @@ class GitRepository
      * Changes the timeout of {@link \Symfony\Component\Process\Process}
      * @param int $gitProcessTimeout
      */
-    public function setGitProcessTimeout($gitProcessTimeout)
-    {
+    public function setGitProcessTimeout($gitProcessTimeout) {
         $this->gitProcessTimeout = $gitProcessTimeout;
     }
 
-    public function getFileModifications($file)
-    {
+    public function getFileModifications($file) {
         $cmd = "git log --format=format:%%H --name-status -- %s";
         $log = $this->runShellCommandWithStandardOutput($cmd, $file);
 
@@ -582,8 +554,7 @@ class GitRepository
         return call_user_func_array('array_merge', $modificationsGroupedByCommit);
     }
 
-    public function getFileInRevision($path, $commitHash)
-    {
+    public function getFileInRevision($path, $commitHash) {
         return $this->runShellCommandWithStandardOutput('git show %s:%s', $commitHash, $path);
     }
 }

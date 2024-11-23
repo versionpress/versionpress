@@ -4,15 +4,13 @@ namespace VersionPress\Tests\Unit;
 
 use VersionPress\Utils\PathUtils;
 
-class RelativePathsTest extends \PHPUnit_Framework_TestCase
-{
+class RelativePathsTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @test
      * @dataProvider pathProvider
      */
-    public function relativePathIsCountedCorrectly($from, $to, $expectedRelativePath)
-    {
+    public function relativePathIsCountedCorrectly($from, $to, $expectedRelativePath) {
         $relativePath = PathUtils::getRelativePath($from, $to);
         $this->assertEquals($expectedRelativePath, $relativePath, "Wrong relative path from: '{$from}' to: '{$to}'.");
     }
@@ -21,14 +19,12 @@ class RelativePathsTest extends \PHPUnit_Framework_TestCase
      * @test
      * @dataProvider specialPathsProvider
      */
-    public function specialPaths($from, $to, $expected)
-    {
+    public function specialPaths($from, $to, $expected) {
         $relativePath = PathUtils::getRelativePath($from, $to);
         $this->assertEquals($expected, $relativePath, "Wrong relative path from: '{$from}' to: '{$to}'.");
     }
 
-    public function specialPathsProvider()
-    {
+    public function specialPathsProvider() {
         return [
             ['/some/path/..', '/some/other/path', 'other/path'],
             ['/some/path/.', '/some/other/path', '../other/path'],
@@ -39,8 +35,7 @@ class RelativePathsTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function pathProvider()
-    {
+    public function pathProvider() {
         $testedRoots = [
             __DIR__, // existingDirectory
             __DIR__ . '/', // existingDirectory with trailing slash
@@ -55,8 +50,7 @@ class RelativePathsTest extends \PHPUnit_Framework_TestCase
         ];
 
         // Used instead of dirname() because of testing Windows paths on Unix-like OS
-        function uberDirname($path)
-        {
+        function uberDirname($path) {
             $realPath = rtrim($path, '\\/'); // don't care about some trailing slash or backslash
 
             $backslashPosition = strrpos($realPath, '\\');

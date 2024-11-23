@@ -4,14 +4,12 @@ namespace VersionPress\Tests\Utils;
 
 use VersionPress\Utils\ReferenceUtils;
 
-class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase
-{
+class ReferenceUtilsTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @test
      */
-    public function simpleNumericKey()
-    {
+    public function simpleNumericKey() {
         $pathInStructure = '[0]';
         $value = serialize([0 => 'value']);
 
@@ -23,8 +21,7 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function nestedNumericKeys()
-    {
+    public function nestedNumericKeys() {
         $pathInStructure = '[0][1]';
         $value = serialize([0 => [1 => 'value']]);
 
@@ -36,8 +33,7 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function moreNestedNumericKeys()
-    {
+    public function moreNestedNumericKeys() {
         $pathInStructure = '[0][1][2]';
         $value = serialize([0 => [1 => [2 => 'value']]]);
 
@@ -49,8 +45,7 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function combinedNumericAndStringKeys()
-    {
+    public function combinedNumericAndStringKeys() {
         $pathInStructure = '[0]["some-key"][1]';
         $value = serialize([0 => ['some-key' => [1 => 'value']]]);
 
@@ -62,8 +57,7 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function structureWithNotMatchingData()
-    {
+    public function structureWithNotMatchingData() {
         $pathInStructure = '[0]["some-key"][1]';
         $value = serialize([
             0 => ['some-key' => [1 => 'value']],
@@ -78,8 +72,7 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function simpleRegex()
-    {
+    public function simpleRegex() {
         $pathInStructure = '[/\d+/]';
         $value = serialize([
             0 => 'value',
@@ -94,8 +87,7 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function simpleRegexWithNotMatchingData()
-    {
+    public function simpleRegexWithNotMatchingData() {
         $pathInStructure = '[/\d+/]';
         $value = serialize([
             0 => 'value',
@@ -112,8 +104,7 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function morePatternsWithNotMatchingData()
-    {
+    public function morePatternsWithNotMatchingData() {
         $pathInStructure = '[/\d+/][/some-.*/][/[0-9]+/]';
         $value = serialize([
             0 => ['some-key' => [1 => 'value']],
@@ -130,8 +121,7 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function nestedSerializedData()
-    {
+    public function nestedSerializedData() {
         $pathInStructure = '[0]..[0]';
         $value = serialize([serialize(['value'])]);
 
@@ -143,8 +133,7 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function regexPathsInNestedSerializedData()
-    {
+    public function regexPathsInNestedSerializedData() {
         $pathInStructure = '[/\d+/]..[/prefix_\d+/]';
         $value = serialize([serialize(['prefix_0' => 'value', 'prefix_1' => 'value']), serialize(['prefix_2' => 'value', 'prefix_3' => 'value'])]);
 
@@ -162,8 +151,7 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function regexPathsInNestedSerializedDataWithMissingKeys()
-    {
+    public function regexPathsInNestedSerializedDataWithMissingKeys() {
         $pathInStructure = '[/\d+/]..[/prefix_\d+/]';
         $value = serialize([serialize(['prefix_0' => 'value', 'prefix_1' => 'value']), serialize(['different_key' => 'value'])]);
 
@@ -179,8 +167,7 @@ class ReferenceUtilsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function regexPathsInNestedSerializedDataWithExtraKeys()
-    {
+    public function regexPathsInNestedSerializedDataWithExtraKeys() {
         $pathInStructure = '[/\d+/]..[/prefix_\d+/]';
         $value = serialize([serialize(['prefix_0' => 'value', 'prefix_1' => 'value']), serialize(['prefix_2' => 'value', 'prefix_3' => 'value', 'different_key' => 'value'])]);
 

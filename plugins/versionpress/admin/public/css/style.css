@@ -94,6 +94,7 @@
 
 .welcome-panel {
     padding: 23px 10px;
+    background-color: unset;
 }
 
 
@@ -141,8 +142,7 @@ h2.vp-deactivation-header {
     margin-right: 10px;
 }
 
-.deactivation-buttons .cancel-deactivation {
-}
+.deactivation-buttons .cancel-deactivation {}
 
 .undo-warning {
     padding-left: 24px;
@@ -172,7 +172,7 @@ h2.vp-deactivation-header {
     vertical-align: top;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-decoration: none!important;
+    text-decoration: none !important;
     color: #444;
 }
 

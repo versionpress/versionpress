@@ -3,8 +3,8 @@
     "description": "Libraries referenced by PhpStorm but not actually dependencies",
     "minimum-stability": "beta",
     "require-dev": {
-        "johnpbloch/wordpress": "^4.9",
-        "wp-cli/wp-cli": "^1.2"
+        "johnpbloch/wordpress": "^6.5.5",
+        "wp-cli/wp-cli": "^2.10.0"
     },
     "extra": {
         "wordpress-install-dir": "wordpress"
@@ -14,5 +14,10 @@
             "name": "VersionPress",
             "email": "info@versionpress.net"
         }
-    ]
+    ],
+    "config": {
+        "allow-plugins": {
+            "johnpbloch/wordpress-core-installer": true
+        }
+    }
 }

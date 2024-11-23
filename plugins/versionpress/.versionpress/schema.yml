@@ -126,14 +126,15 @@ option:
       theme_mods_*["header_image_data"]["attachment_id"]: post
       theme_mods_*["custom_logo"]: post
       theme_mods_*["header_video"]: post
-      theme_mods_*["custom_css_post_id"]: post
       theme_mods_twentyseventeen*[/panel_\d+/]: post
       widget_media_image[/\d+/]["attachment_id"]: post
       widget_media_audio[/\d+/]["attachment_id"]: post
       widget_media_video[/\d+/]["attachment_id"]: post
+      elementor_active_kit: post
   frequently-written:
     - 'option_name: akismet_spam_count'
   ignored-entities:
+    - 'option_name: theme_mods_*["custom_css_post_id"]'
     - 'option_name: _transient_*'
     - 'option_name: _site_transient_*'
     - 'option_name: cron'

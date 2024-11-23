@@ -8,8 +8,7 @@ use VersionPress\Storages\Serialization\IniSerializer;
 use VersionPress\Utils\FileSystem;
 use VersionPress\Utils\Process;
 
-class MergeDriverTestUtils
-{
+class MergeDriverTestUtils {
 
     private static $repositoryDir;
 
@@ -18,8 +17,7 @@ class MergeDriverTestUtils
      */
     private static $gitRepository;
 
-    public static function initRepository($repositoryDir)
-    {
+    public static function initRepository($repositoryDir) {
         self::$repositoryDir = $repositoryDir;
 
         $driverScriptName = 'ini-merge.php';
@@ -38,18 +36,15 @@ class MergeDriverTestUtils
         $driverScriptName = 'ini-merge.sh';
         $driverScript = __DIR__ . '/../../src/Git/merge-drivers/' . $driverScriptName;
         copy($driverScript, $driverScriptFakeDir . '/' . $driverScriptName);
-
     }
 
 
-    public static function destroyRepository()
-    {
+    public static function destroyRepository() {
         FileSystem::remove(self::$repositoryDir);
     }
 
 
-    public static function writeIniFile($fileName, $date, $content = 'Default content', $title = 'Default title')
-    {
+    public static function writeIniFile($fileName, $date, $content = 'Default content', $title = 'Default title') {
         $data = [
             "GUID" => [
                 'post_modified' => $date,
@@ -70,8 +65,7 @@ class MergeDriverTestUtils
         file_put_contents(self::$repositoryDir . '/' . $fileName, IniSerializer::serialize($data));
     }
 
-    public static function commit($message = 'Default commit message')
-    {
+    public static function commit($message = 'Default commit message') {
         self::$gitRepository->stageAll();
         self::$gitRepository->commit($message, GitConfig::$wpcliUserName, GitConfig::$wpcliUserEmail);
     }
@@ -103,9 +97,8 @@ class MergeDriverTestUtils
      * @param string $cmd
      * @return int Exit code
      */
-    public static function runGitCommand($cmd)
-    {
-        $process = new Process($cmd, self::$repositoryDir);
+    public static function runGitCommand($cmd) {
+        $process = Process::fromShellCommandline($cmd, self::$repositoryDir);
         $process->run();
         return $process->getExitCode();
     }

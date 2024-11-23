@@ -8,8 +8,7 @@ use VersionPress\Tests\SynchronizerTests\Utils\EntityUtils;
 use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\AbsoluteUrlReplacer;
 
-class OptionsSynchronizerTest extends SynchronizerTestCase
-{
+class OptionsSynchronizerTest extends SynchronizerTestCase {
 
     /** @var DirectoryStorage */
     private $storage;
@@ -22,8 +21,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
 
     private $entitiesForSelectiveSynchronization = [['vp_id' => 'foo', 'parent' => null]];
 
-    protected function setUp()
-    {
+    protected function setUp(): void {
         parent::setUp();
         $this->storage = self::$storageFactory->getStorage('option');
         $this->postStorage = self::$storageFactory->getStorage('post');
@@ -53,8 +51,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer adds new option to the database
      */
-    public function synchronizerAddsNewOptionToDatabase()
-    {
+    public function synchronizerAddsNewOptionToDatabase() {
         $this->storage->save(EntityUtils::prepareOption('foo', 'bar'));
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
@@ -64,8 +61,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer does not delete ignored options
      */
-    public function synchronizerDoesNotDeleteIgnoredOptions()
-    {
+    public function synchronizerDoesNotDeleteIgnoredOptions() {
         $optionTable = self::$database->options;
 
         $ignoredEntities = self::$schemaInfo->getEntityInfo('option')->getRulesForIgnoredEntities();
@@ -88,8 +84,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer updates changed option in the database
      */
-    public function synchronizerUpdatesChangedOptionInDatabase()
-    {
+    public function synchronizerUpdatesChangedOptionInDatabase() {
         $this->storage->save(EntityUtils::prepareOption('foo', 'another value'));
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
@@ -99,8 +94,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer replaces URLs
      */
-    public function synchronizerReplacesUrls()
-    {
+    public function synchronizerReplacesUrls() {
         $this->storage->save(EntityUtils::prepareOption('foo', AbsoluteUrlReplacer::PLACEHOLDER));
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
@@ -110,8 +104,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer removes deleted option from the database
      */
-    public function synchronizerRemovesDeletedOptionFromDatabase()
-    {
+    public function synchronizerRemovesDeletedOptionFromDatabase() {
         $this->storage->delete(EntityUtils::prepareOption('foo', 'bar'));
         $this->synchronizer->synchronize(Synchronizer::SYNCHRONIZE_EVERYTHING);
         DBAsserter::assertFilesEqualDatabase();
@@ -121,8 +114,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer adds new option to the database
      */
-    public function synchronizerAddsNewOptionToDatabase_selective()
-    {
+    public function synchronizerAddsNewOptionToDatabase_selective() {
         $this->storage->save(EntityUtils::prepareOption('foo', 'bar'));
         $this->synchronizer->synchronize(
             Synchronizer::SYNCHRONIZE_EVERYTHING,
@@ -135,8 +127,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer updates changed option in the database
      */
-    public function synchronizerUpdatesChangedOptionInDatabase_selective()
-    {
+    public function synchronizerUpdatesChangedOptionInDatabase_selective() {
         $this->storage->save(EntityUtils::prepareOption('foo', 'another value'));
         $this->synchronizer->synchronize(
             Synchronizer::SYNCHRONIZE_EVERYTHING,
@@ -149,8 +140,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer removes deleted option from the database
      */
-    public function synchronizerRemovesDeletedOptionFromDatabase_selective()
-    {
+    public function synchronizerRemovesDeletedOptionFromDatabase_selective() {
         $this->storage->delete(EntityUtils::prepareOption('foo', 'bar'));
         $this->synchronizer->synchronize(
             Synchronizer::SYNCHRONIZE_EVERYTHING,
@@ -163,8 +153,7 @@ class OptionsSynchronizerTest extends SynchronizerTestCase
      * @test
      * @testdox Synchronizer replaces value references
      */
-    public function synchronizerReplacesValueReferences()
-    {
+    public function synchronizerReplacesValueReferences() {
         $post = EntityUtils::preparePost();
         $optionToSynchronize = [['vp_id' => 'site_icon', 'parent' => null]];
         $postToSynchronize = [['vp_id' => $post['vp_id'], 'parent' => null]];

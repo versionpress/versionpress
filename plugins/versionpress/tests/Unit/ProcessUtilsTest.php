@@ -4,30 +4,26 @@ namespace VersionPress\Tests\Unit;
 
 use VersionPress\Utils\ProcessUtils;
 
-class ProcessUtilsTest extends \PHPUnit_Framework_TestCase
-{
+class ProcessUtilsTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * @test
      */
-    public function windowsEscapingUsesDoubleQuotes()
-    {
+    public function windowsEscapingUsesDoubleQuotes() {
         $this->assertEquals("\"arg\"", ProcessUtils::escapeshellarg("arg", "windows"));
     }
 
     /**
      * @test
      */
-    public function linuxEscapingUsesSingleQuotes()
-    {
+    public function linuxEscapingUsesSingleQuotes() {
         $this->assertEquals("'arg'", ProcessUtils::escapeshellarg("arg", "linux"));
     }
 
     /**
      * @test
      */
-    public function linuxEscapingPassesStandardTests()
-    {
+    public function linuxEscapingPassesStandardTests() {
 
         // @codingStandardsIgnoreLine
         // see https://github.com/php/php-src/blob/3551083c2c188d3d5de5e58f3bd2624f2abfefc4/ext/standard/tests/general_functions/escapeshellarg_basic.phpt
@@ -40,8 +36,7 @@ class ProcessUtilsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function windowsEscapingPassesStandardTests()
-    {
+    public function windowsEscapingPassesStandardTests() {
 
         // @codingStandardsIgnoreLine
         // Inspired by https://github.com/php/php-src/blob/3551083c2c188d3d5de5e58f3bd2624f2abfefc4/ext/standard/tests/general_functions/escapeshellarg_basic-win32.phpt

@@ -6,16 +6,14 @@ use VersionPress\Git\CommitMessage;
 use VersionPress\Git\GitRepository;
 use VersionPress\Utils\FileSystem;
 
-class ModificationsTest extends \PHPUnit_Framework_TestCase
-{
+class ModificationsTest extends \PHPUnit\Framework\TestCase {
 
     private static $repositoryPath;
     private static $tempPath;
     /** @var GitRepository */
     private static $repository;
 
-    public static function setUpBeforeClass()
-    {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         self::$repositoryPath = sys_get_temp_dir() . '/vp-repository';
         self::$tempPath = sys_get_temp_dir() . '/vp-temp';
@@ -27,15 +25,13 @@ class ModificationsTest extends \PHPUnit_Framework_TestCase
         mkdir(self::$tempPath);
     }
 
-    public static function tearDownAfterClass()
-    {
+    public static function tearDownAfterClass(): void {
         parent::tearDownAfterClass();
         FileSystem::remove(self::$repositoryPath);
         FileSystem::remove(self::$tempPath);
     }
 
-    protected function setUp()
-    {
+    protected function setUp(): void {
         parent::setUp();
         FileSystem::removeContent(self::$repositoryPath);
         FileSystem::removeContent(self::$tempPath);
@@ -45,8 +41,7 @@ class ModificationsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function thereAreNoModificationsInEmptyRepository()
-    {
+    public function thereAreNoModificationsInEmptyRepository() {
         $modifications = self::$repository->getFileModifications('somefile');
         $this->assertEquals([], $modifications);
     }
@@ -54,8 +49,7 @@ class ModificationsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function thereIsOneModificationAfterAdding()
-    {
+    public function thereIsOneModificationAfterAdding() {
         touch(self::$repositoryPath . '/somefile');
         touch(self::$repositoryPath . '/otherfile');
         $this->commitEverything();
@@ -73,8 +67,7 @@ class ModificationsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function thereAreTwoModificationsAfterAddingAndDeleting()
-    {
+    public function thereAreTwoModificationsAfterAddingAndDeleting() {
         touch(self::$repositoryPath . '/somefile');
         touch(self::$repositoryPath . '/otherfile');
         $this->commitEverything();
@@ -95,8 +88,7 @@ class ModificationsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function itSupportsWildcards()
-    {
+    public function itSupportsWildcards() {
         touch(self::$repositoryPath . '/somefile');
         touch(self::$repositoryPath . '/otherfile');
         $this->commitEverything();
@@ -115,8 +107,7 @@ class ModificationsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedModifications, $modifications);
     }
 
-    private function commitEverything()
-    {
+    private function commitEverything() {
         self::$repository->stageAll();
         self::$repository->commit(new CommitMessage("Some commit"), "Author name", "author@example.com");
     }

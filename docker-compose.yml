@@ -1,8 +1,7 @@
-version: '3.6'
 services:
 
   wordpress:
-    image: versionpress/wordpress:php7.2-apache@sha256:64b3c10adfef9ae65a140d5547d670d996c5c852b9a840c71a86a5be4f777fdc
+    image: versionpress/wordpress:php8.2-apache
     ports:
       - "80:80"
     volumes:
@@ -10,23 +9,29 @@ services:
       - ./dev-env/wp:/var/www/html:z
     links:
       - mysql
-      - adminer
+    build:
+      context: .
+      dockerfile: dev-env/wordpress-image/Dockerfile
+    #  - adminer
     environment:
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_USER: root
       WORDPRESS_DB_PASSWORD: r00tpwd
+      WORDPRESS_DEBUG: true
 
   mysql:
-    image: mysql:5.7@sha256:1590f2540fd87e39605686873fb10206da4cbd7e83df2bc4110abe9fb740699e
+    image: mysql:8.0
     ports:
       - "3306:3306"
     volumes:
       - db-data:/var/lib/mysql:z
     environment:
       MYSQL_ROOT_PASSWORD: r00tpwd
-
-  adminer:
-    image: adminer@sha256:0e245b5550d7710ebfe728e682804947e2edade4d7f3313e7066b4629b728c5c
-    ports:
-      - "8099:8080"
+      MYSQL_DATABASE: wordpress
+  #adminer:
+  #  image: adminer@sha256:0e245b5550d7710ebfe728e682804947e2edade4d7f3313e7066b4629b728c5c
+  #  ports:
+  #    - "8099:8080"
 
 volumes:
   db-data:

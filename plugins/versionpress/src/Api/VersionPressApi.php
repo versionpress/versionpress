@@ -29,8 +29,7 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 
-class VersionPressApi
-{
+class VersionPressApi {
 
     /** @var GitRepository */
     private $gitRepository;
@@ -44,8 +43,7 @@ class VersionPressApi
     /** @var CommitMessageParser */
     private $commitMessageParser;
 
-    public function __construct(GitRepository $gitRepository, Reverter $reverter, SynchronizationProcess $synchronizationProcess, CommitMessageParser $commitMessageParser)
-    {
+    public function __construct(GitRepository $gitRepository, Reverter $reverter, SynchronizationProcess $synchronizationProcess, CommitMessageParser $commitMessageParser) {
         $this->gitRepository = $gitRepository;
         $this->reverter = $reverter;
         $this->synchronizationProcess = $synchronizationProcess;
@@ -55,8 +53,7 @@ class VersionPressApi
     /**
      * Register the VersionPress related routes
      */
-    public function registerRoutes()
-    {
+    public function registerRoutes() {
         $this->registerRestRoute('/commits', [
             'methods' => WP_REST_Server::READABLE,
             'callback' => [$this, 'getCommits'],
@@ -146,8 +143,7 @@ class VersionPressApi
         ]);
     }
 
-    private function registerRestRoute($route, $args = [], $override = false)
-    {
+    private function registerRestRoute($route, $args = [], $override = false) {
         $args['callback'] = $this->handleErrorOutput($args['callback']);
         if (!isset($args['permission_callback'])) {
             $args['permission_callback'] = [$this, 'checkPermissions'];
@@ -163,8 +159,7 @@ class VersionPressApi
      * @param string $routeHandler
      * @return \Closure
      */
-    private function handleAsAdminSectionRoute($routeHandler)
-    {
+    private function handleAsAdminSectionRoute($routeHandler) {
         return function (WP_REST_Request $request) use ($routeHandler) {
             if (!defined('WP_ADMIN')) {
                 define('WP_ADMIN', true);
@@ -179,8 +174,7 @@ class VersionPressApi
      * @param callable|string $routeHandler
      * @return \Closure
      */
-    private function handleErrorOutput($routeHandler)
-    {
+    private function handleErrorOutput($routeHandler) {
         return function (WP_REST_Request $request) use ($routeHandler) {
             ob_start();
             /** @var WP_REST_Response|WP_Error $response */
@@ -216,8 +210,7 @@ class VersionPressApi
      * @param WP_REST_Request $request
      * @return WP_REST_Response|WP_Error
      */
-    public function getCommits(WP_REST_Request $request)
-    {
+    public function getCommits(WP_REST_Request $request) {
         $gitLogPaginator = new GitLogPaginator($this->gitRepository);
 
         $query = urldecode(stripslashes($request['query']));
@@ -289,8 +282,7 @@ class VersionPressApi
      * @param WP_REST_Request $request
      * @return WP_REST_Response|WP_Error
      */
-    public function undoCommits(WP_REST_Request $request)
-    {
+    public function undoCommits(WP_REST_Request $request) {
         $commitHashes = explode(',', $request['commits']);
 
         $initialCommitHash = $this->getInitialCommitHash();
@@ -315,8 +307,7 @@ class VersionPressApi
      * @param WP_REST_Request $request
      * @return WP_REST_Response|WP_Error
      */
-    public function rollbackToCommit(WP_REST_Request $request)
-    {
+    public function rollbackToCommit(WP_REST_Request $request) {
         $commitHash = $request['commit'];
 
         $initialCommitHash = $this->getInitialCommitHash();
@@ -325,7 +316,8 @@ class VersionPressApi
         if (!preg_match('/^[0-9a-f]+$/', $commitHash) || count($log) === 0) {
             return new WP_Error('error', 'Invalid commit hash', ['status' => 404]);
         }
-        if (!$this->gitRepository->wasCreatedAfter($commitHash, $initialCommitHash) &&
+        if (
+            !$this->gitRepository->wasCreatedAfter($commitHash, $initialCommitHash) &&
             $log[0]->getHash() !== $initialCommitHash
         ) {
             return new WP_Error('error', 'Cannot roll back before initial commit', ['status' => 403]);
@@ -344,8 +336,7 @@ class VersionPressApi
     /**
      * @return WP_REST_Response|WP_Error
      */
-    public function canRevert()
-    {
+    public function canRevert() {
         return new WP_REST_Response($this->reverter->canRevert());
     }
 
@@ -354,8 +345,7 @@ class VersionPressApi
      * @param array $commits
      * @return WP_REST_Response|WP_Error
      */
-    public function revertCommits($reverterMethod, $commits)
-    {
+    public function revertCommits($reverterMethod, $commits) {
         vp_enable_maintenance();
         $revertStatus = call_user_func([$this->reverter, $reverterMethod], $commits);
         vp_disable_maintenance();
@@ -373,8 +363,7 @@ class VersionPressApi
      * @param WP_REST_Request $request
      * @return WP_REST_Response|WP_Error
      */
-    public function getDiff(WP_REST_Request $request)
-    {
+    public function getDiff(WP_REST_Request $request) {
         $commitHash = $request['commit'];
 
         if (!preg_match('/^[0-9a-f]*$/', $commitHash)) {
@@ -401,8 +390,7 @@ class VersionPressApi
     /**
      * @return WP_REST_Response
      */
-    public function displayWelcomePanel()
-    {
+    public function displayWelcomePanel() {
         $showWelcomePanel = get_user_meta(
             get_current_user_id(),
             VersionPressOptions::USER_META_SHOW_WELCOME_PANEL,
@@ -414,14 +402,12 @@ class VersionPressApi
     /**
      * @return WP_REST_Response
      */
-    public function hideWelcomePanel()
-    {
+    public function hideWelcomePanel() {
         update_user_meta(get_current_user_id(), VersionPressOptions::USER_META_SHOW_WELCOME_PANEL, "0");
         return new WP_REST_Response(null, 204);
     }
 
-    public function shouldUpdate(WP_REST_Request $request)
-    {
+    public function shouldUpdate(WP_REST_Request $request) {
         global $versionPressContainer;
         /** @var GitRepository $repository */
         $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
@@ -458,8 +444,7 @@ class VersionPressApi
      *
      * @return WP_REST_Response
      */
-    public function getGitStatus()
-    {
+    public function getGitStatus() {
         global $versionPressContainer;
         /** @var GitRepository $repository */
         $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
@@ -473,8 +458,7 @@ class VersionPressApi
      * @param WP_REST_Request $request
      * @return WP_REST_Response|WP_Error
      */
-    public function commit(WP_REST_Request $request)
-    {
+    public function commit(WP_REST_Request $request) {
         $currentUser = wp_get_current_user();
         if ($currentUser->ID === 0) {
             return new WP_Error(
@@ -495,8 +479,7 @@ class VersionPressApi
         if (ArrayUtils::any($status, function ($fileStatus) {
             $vpdbName = basename(VP_VPDB_DIR);
             return Strings::contains($fileStatus[1], $vpdbName);
-        })
-        ) {
+        })) {
             $this->updateDatabase($status);
         }
 
@@ -507,8 +490,7 @@ class VersionPressApi
         return new WP_REST_Response(true);
     }
 
-    private function updateDatabase($status)
-    {
+    private function updateDatabase($status) {
         $fullDiff = $this->gitRepository->getDiff();
 
         $diffFiles = explode('diff --git', $fullDiff);
@@ -544,8 +526,7 @@ class VersionPressApi
      * Discards all changes in working directory.
      * @return WP_REST_Response
      */
-    public function discardChanges()
-    {
+    public function discardChanges() {
         global $versionPressContainer;
         /** @var GitRepository $repository */
         $repository = $versionPressContainer->resolve(VersionPressServices::GIT_REPOSITORY);
@@ -559,8 +540,7 @@ class VersionPressApi
      * Returns current WP configuration for autocomplete component.
      * @return WP_REST_Response
      */
-    public function getAutocompleteConfig()
-    {
+    public function getAutocompleteConfig() {
         global $versionPressContainer;
         /** @var ActionsInfoProvider $actionsInfoProvider */
         $actionsInfoProvider = $versionPressContainer->resolve(VersionPressServices::ACTIONSINFO_PROVIDER_ACTIVE_PLUGINS);
@@ -574,8 +554,7 @@ class VersionPressApi
      * @param string $status
      * @return WP_Error
      */
-    public function getError($status)
-    {
+    public function getError($status) {
         $errors = [
             RevertStatus::MERGE_CONFLICT => [
                 'class' => 'error',
@@ -612,8 +591,7 @@ class VersionPressApi
      * @param WP_REST_Request $request
      * @return WP_Error|bool
      */
-    public function checkPermissions(WP_REST_Request $request)
-    {
+    public function checkPermissions(WP_REST_Request $request) {
         return !VERSIONPRESS_REQUIRE_API_AUTH || current_user_can('manage_options')
             ? true
             : new WP_Error(
@@ -623,13 +601,11 @@ class VersionPressApi
             );
     }
 
-    private function convertChangeInfoList($getChangeInfoList)
-    {
+    private function convertChangeInfoList($getChangeInfoList) {
         return array_map([$this, 'convertChangeInfo'], $getChangeInfoList);
     }
 
-    private function convertChangeInfo($changeInfo)
-    {
+    private function convertChangeInfo($changeInfo) {
         if ($changeInfo instanceof UntrackedChangeInfo) {
             return null;
         }
@@ -678,8 +654,7 @@ class VersionPressApi
      * @param bool $skipVpdbFiles
      * @return array
      */
-    private function getFileChanges(Commit $commit, $skipVpdbFiles)
-    {
+    private function getFileChanges(Commit $commit, $skipVpdbFiles) {
         $changedFiles = $commit->getChangedFiles();
 
         if ($skipVpdbFiles) {
@@ -687,7 +662,7 @@ class VersionPressApi
                 $path = str_replace('\\', '/', realpath(VP_PROJECT_ROOT) . '/' . $changedFile['path']);
                 $vpdbPath = str_replace('\\', '/', realpath(VP_VPDB_DIR));
 
-                return !Strings::startsWith($path, $vpdbPath);
+                return !str_starts_with($path, $vpdbPath);
             });
         }
 
@@ -708,8 +683,7 @@ class VersionPressApi
     /**
      * @return string
      */
-    private function getInitialCommitHash()
-    {
+    private function getInitialCommitHash() {
         $preActivationHash = trim(file_get_contents(VERSIONPRESS_ACTIVATION_FILE));
         if (empty($preActivationHash)) {
             return $this->gitRepository->getInitialCommit()->getHash();

@@ -2,7 +2,6 @@
 
 namespace VersionPress\Tests\End2End\Utils;
 
-use PHPUnit_Framework_TestCase;
 use VersionPress\Actions\ActionsInfoProvider;
 use VersionPress\Database\DbSchemaInfo;
 use VersionPress\Git\GitRepository;
@@ -11,8 +10,7 @@ use VersionPress\Tests\Utils\CommitAsserter;
 use VersionPress\Tests\Utils\TestConfig;
 use VersionPress\Utils\PathUtils;
 
-class End2EndTestCase extends PHPUnit_Framework_TestCase
-{
+class End2EndTestCase extends \PHPUnit\Framework\TestCase {
 
     /** @var TestConfig */
     protected static $testConfig;
@@ -24,8 +22,7 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase
 
     private static $infoForNewCommitAsserter = [];
 
-    public static function setUpBeforeClass()
-    {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         self::$testConfig = TestConfig::createDefaultConfig();
@@ -39,12 +36,12 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase
             'gitRepository' => new GitRepository(self::$testConfig->testSite->path),
             'relativePathToVpdb' => PathUtils::getRelativePath(self::$testConfig->testSite->path, $vpdbDir = self::$wpAutomation->getVpdbDir()),
             'relativePathToUploads' => PathUtils::getRelativePath(self::$testConfig->testSite->path, self::$wpAutomation->getUploadsDir()),
-            'dbSchema' => new DbSchemaInfo([ self::$wpAutomation->getPluginsDir() . '/versionpress/.versionpress/schema.yml'], self::$testConfig->testSite->dbTablePrefix, PHP_INT_MAX),
-            'actionsInfoProvider' => new ActionsInfoProvider([ self::$wpAutomation->getPluginsDir() . '/versionpress/.versionpress/actions.yml']),
+            'dbSchema' => new DbSchemaInfo([self::$wpAutomation->getPluginsDir() . '/versionpress/.versionpress/schema.yml'], self::$testConfig->testSite->dbTablePrefix, PHP_INT_MAX),
+            'actionsInfoProvider' => new ActionsInfoProvider([self::$wpAutomation->getPluginsDir() . '/versionpress/.versionpress/actions.yml']),
         ];
 
         // Select a worker
-        $class = get_called_class();
+        $class = static::class;
         $workerType = implode('', array_map('ucfirst', explode('-', self::$testConfig->end2endTestType)));
         $workerClass = $class . $workerType . 'Worker';
 
@@ -60,16 +57,14 @@ class End2EndTestCase extends PHPUnit_Framework_TestCase
         $propertyReflection->setValue(null, $worker);
     }
 
-    protected function setUp()
-    {
+    protected function setUp(): void {
         parent::setUp();
         if (self::$skipAllBecauseOfMissingWorker) {
             $this->markTestSkipped('Missing worker');
         }
     }
 
-    protected function newCommitAsserter()
-    {
+    protected function newCommitAsserter() {
         return new CommitAsserter(
             self::$infoForNewCommitAsserter['gitRepository'],
             self::$infoForNewCommitAsserter['dbSchema'],

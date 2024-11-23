@@ -8,8 +8,7 @@ use VersionPress\Tests\Utils\DBAsserter;
 use VersionPress\Utils\Process;
 use VersionPress\Utils\ProcessUtils;
 
-class PluginsTest extends End2EndTestCase
-{
+class PluginsTest extends End2EndTestCase {
 
     /** @var IPluginsTestWorker */
     private static $worker;
@@ -26,12 +25,11 @@ class PluginsTest extends End2EndTestCase
      */
     private static $secondPluginInfo;
 
-    public static function setUpBeforeClass()
-    {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         if (self::$testConfig->testSite->installationType !== 'standard') {
-            throw new \PHPUnit_Framework_SkippedTestSuiteError();
+            throw new \PHPUnit\Framework\SkippedTestSuiteError();
         }
 
         $testDataPath = __DIR__ . '/../test-data';
@@ -65,7 +63,7 @@ class PluginsTest extends End2EndTestCase
         } catch (\Exception $e) {
         }
 
-        $process = new Process(
+        $process = Process::fromShellCommandline(
             "git add -A && git commit -m " . ProcessUtils::escapeshellarg("Plugin setup"),
             self::$testConfig->testSite->path
         );
@@ -76,8 +74,7 @@ class PluginsTest extends End2EndTestCase
      * @test
      * @testdox Uploading plugin creates 'plugin/install' action
      */
-    public function uploadingPluginCreatesPluginInstallAction()
-    {
+    public function uploadingPluginCreatesPluginInstallAction() {
         self::$worker->prepare_installPlugin();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -97,8 +94,7 @@ class PluginsTest extends End2EndTestCase
      * @testdox Activating plugin creates 'plugin/activate' action
      * @depends uploadingPluginCreatesPluginInstallAction
      */
-    public function activatingPluginCreatesPluginActivateAction()
-    {
+    public function activatingPluginCreatesPluginActivateAction() {
         self::$worker->prepare_activatePlugin();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -118,8 +114,7 @@ class PluginsTest extends End2EndTestCase
      * @testdox Deactivating plugin creates 'plugin/deactivate' action
      * @depends activatingPluginCreatesPluginActivateAction
      */
-    public function deactivatingPluginCreatesPluginDeactivateAction()
-    {
+    public function deactivatingPluginCreatesPluginDeactivateAction() {
         self::$worker->prepare_deactivatePlugin();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -139,8 +134,7 @@ class PluginsTest extends End2EndTestCase
      * @testdox Deleting plugin creates 'plugin/delete' action
      * @depends deactivatingPluginCreatesPluginDeactivateAction
      */
-    public function deletingPluginCreatesPluginDeleteAction()
-    {
+    public function deletingPluginCreatesPluginDeleteAction() {
         self::$worker->prepare_deletePlugin();
         $commitAsserter = $this->newCommitAsserter();
 
@@ -158,8 +152,7 @@ class PluginsTest extends End2EndTestCase
      * @test
      * @testdox Installing two plugins creates a bulk action
      */
-    public function installingTwoPluginsCreatesBulkAction()
-    {
+    public function installingTwoPluginsCreatesBulkAction() {
         self::$worker->prepare_installTwoPlugins();
         $commitAsserter = $this->newCommitAsserter();
 
@@ -177,8 +170,7 @@ class PluginsTest extends End2EndTestCase
      * @test
      * @testdox Activation of two plugins creates a bulk action
      */
-    public function activatingTwoPluginsCreatesBulkAction()
-    {
+    public function activatingTwoPluginsCreatesBulkAction() {
         self::$worker->prepare_activateTwoPlugins();
         $commitAsserter = $this->newCommitAsserter();
 
@@ -195,8 +187,7 @@ class PluginsTest extends End2EndTestCase
      * @test
      * @testdox Deactivation of two plugins creates a bulk action
      */
-    public function deactivatingTwoPluginsCreatesBulkAction()
-    {
+    public function deactivatingTwoPluginsCreatesBulkAction() {
         self::$worker->prepare_deactivateTwoPlugins();
         $commitAsserter = $this->newCommitAsserter();
 
@@ -213,8 +204,7 @@ class PluginsTest extends End2EndTestCase
      * @test
      * @testdox Uninstalling two plugins creates a bulk action
      */
-    public function uninstallingTwoPluginsCreatesBulkAction()
-    {
+    public function uninstallingTwoPluginsCreatesBulkAction() {
         self::$worker->prepare_uninstallTwoPlugins();
         $commitAsserter = $this->newCommitAsserter();
 

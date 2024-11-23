@@ -1,16 +1,14 @@
 <?php
+
 namespace VersionPress\Tests\Selenium;
 
-use PHPUnit_Extensions_Selenium2TestCase;
-use PHPUnit_Extensions_Selenium2TestCase_WebDriverException;
 use VersionPress\Tests\Automation\WpAutomation;
 use VersionPress\Tests\Utils\TestConfig;
 
 /**
  * Base class for VersionPress Selenium tests
  */
-abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
-{
+abstract class SeleniumTestCase extends \PHPUnit\Extensions\Selenium2TestCase {
 
     /** @var TestConfig */
     protected static $testConfig;
@@ -25,8 +23,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
      */
     protected static $autologin = true;
 
-    public static function setUpBeforeClass()
-    {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
         self::$testConfig = TestConfig::createDefaultConfig();
@@ -38,8 +35,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
         self::$wpAutomation->ensureTestSiteIsReady();
     }
 
-    public function setUp()
-    {
+    public function setUp(): void {
         $this->setBrowser("firefox");
 
         $this->setHost(self::$testConfig->seleniumConfig->host);
@@ -50,15 +46,13 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
         $this->setBrowserUrl(self::$testConfig->testSite->url);
     }
 
-    public function setUpPage()
-    {
+    public function setUpPage() {
         if (self::$autologin) {
             $this->loginIfNecessary();
         }
     }
 
-    protected function loginIfNecessary()
-    {
+    protected function loginIfNecessary() {
         if ($this->elementExists('#wpadminbar')) {
             return;
         }
@@ -76,8 +70,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
         $this->byId("loginform")->submit();
     }
 
-    protected function logOut()
-    {
+    protected function logOut() {
         $this->url(dirname(self::$testConfig->testSite->wpAdminPath) . '/wp-login.php?action=logout');
         $this->byCssSelector('body>p>a')->click();
         $this->waitAfterRedirect();
@@ -95,8 +88,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
      * @param $cssSelector
      * @param $value
      */
-    protected function setValue($cssSelector, $value)
-    {
+    protected function setValue($cssSelector, $value) {
 
         // Implementation note: calling $element->clear() causes image edit form in WP 4.1 to dispatch
         // an unwanted AJAX request, which is why we need to clear the value using JavaScript.
@@ -113,8 +105,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
      * @param string $code JavaScript code
      * @return string JS result, if any
      */
-    protected function executeScript($code)
-    {
+    protected function executeScript($code) {
         return $this->execute([
             'script' => $code,
             'args' => []
@@ -127,8 +118,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
      *
      * @param string $cssSelector
      */
-    protected function jsClick($cssSelector)
-    {
+    protected function jsClick($cssSelector) {
         $this->executeScript("jQuery(\"$cssSelector\")[0].click()");
     }
 
@@ -137,8 +127,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
      *
      * @param string $cssSelector
      */
-    protected function jsClickAndWait($cssSelector)
-    {
+    protected function jsClickAndWait($cssSelector) {
         $this->jsClick($cssSelector);
         usleep(100 * 1000);
         $this->waitForAjax();
@@ -149,21 +138,19 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
      *
      * @param string $cssSelector
      */
-    protected function assertElementExists($cssSelector)
-    {
+    protected function assertElementExists($cssSelector) {
         if (!$this->elementExists($cssSelector)) {
             $this->fail("Element \"$cssSelector\" does not exist");
         }
     }
 
-    protected function elementExists($cssSelector)
-    {
+    protected function elementExists($cssSelector) {
         try {
             // @codingStandardsIgnoreLine
             // See e.g. https://github.com/giorgiosironi/phpunit-selenium/blob/a6fdffdd56f4884ef39e09a9c62e5e4eb273e42c/Tests/Selenium2TestCaseTest.php#L1065
             $this->byCssSelector($cssSelector);
             return true;
-        } catch (PHPUnit_Extensions_Selenium2TestCase_WebDriverException $e) {
+        } catch (\PHPUnit\Extensions\Selenium2TestCase\WebDriverException $e) {
             return false;
         }
     }
@@ -173,8 +160,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
      *
      * @param string $text
      */
-    protected function setTinyMCEContent($text)
-    {
+    protected function setTinyMCEContent($text) {
         $this->executeScript("tinyMCE.activeEditor.setContent('$text')");
     }
 
@@ -191,8 +177,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
      * @param string $cssSelector
      * @param int $timeout Timeout in milliseconds. Default: 3 seconds.
      */
-    protected function waitForElement($cssSelector, $timeout = 3000)
-    {
+    protected function waitForElement($cssSelector, $timeout = 3000) {
         $previousImplicitWait = $this->timeouts()->getLastImplicitWaitValue();
         $this->timeouts()->implicitWait($timeout);
         $this->assertElementExists($cssSelector);
@@ -205,8 +190,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
      *
      * @param int $timeout Milliseconds
      */
-    protected function waitAfterRedirect($timeout = 5000)
-    {
+    protected function waitAfterRedirect($timeout = 5000) {
         $this->waitUntilTrue(function (SeleniumTestCase $testCase) {
             return $testCase->executeScript("return document.readyState;") == "complete";
         }, $timeout);
@@ -220,8 +204,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
      * @param $callback
      * @param $timeout
      */
-    protected function waitUntilTrue($callback, $timeout = null)
-    {
+    protected function waitUntilTrue($callback, $timeout = null) {
         $this->waitUntil(function (SeleniumTestCase $testCase) use ($callback) {
             $result = call_user_func($callback, $testCase);
             return $result === true ? true : null;
@@ -231,8 +214,7 @@ abstract class SeleniumTestCase extends PHPUnit_Extensions_Selenium2TestCase
     /**
      * Wait for all AJAX requests caused by jQuery are done.
      */
-    protected function waitForAjax()
-    {
+    protected function waitForAjax() {
         $this->waitUntilTrue(function (SeleniumTestCase $testCase) {
             return $testCase->executeScript("return jQuery.active;") === 0;
         }, 5000);

@@ -4,8 +4,7 @@ namespace VersionPress\Tests\Unit;
 
 use VersionPress\Database\EntityInfo;
 
-class EntityInfoTest extends \PHPUnit_Framework_TestCase
-{
+class EntityInfoTest extends \PHPUnit\Framework\TestCase {
 
     private $entitySchema = [
         'some-entity' => [
@@ -32,23 +31,21 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase
     /** @var EntityInfo */
     private $entityInfo;
 
-    protected function setUp()
-    {
+    protected function setUp(): void {
         $this->entityInfo = new EntityInfo($this->entitySchema);
     }
 
     /**
      * @test
      */
-    public function rulesAndIntervalsOfFrequentlyWrittenEntitiesEqualEntitySchema()
-    {
+    public function rulesAndIntervalsOfFrequentlyWrittenEntitiesEqualEntitySchema() {
         $expectedRules = [
             [
                 'rule' =>
-                    [
-                        'some_field' => ['value'],
-                        'other_field' => ['a'],
-                    ],
+                [
+                    'some_field' => ['value'],
+                    'other_field' => ['a'],
+                ],
                 'interval' => 'hourly',
             ],
             [
@@ -63,8 +60,7 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function rulesOfIgnoredEntitiesEqualEntitySchema()
-    {
+    public function rulesOfIgnoredEntitiesEqualEntitySchema() {
         $expectedRules = [
             [
                 'some_field' => ['value'],
@@ -84,8 +80,7 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function frequentlyWrittenEntityIsCorrectlyIdentified()
-    {
+    public function frequentlyWrittenEntityIsCorrectlyIdentified() {
         $entity = [
             'some_field' => 'value',
             'other_field' => 'a',
@@ -97,8 +92,7 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function partialMatchIsNotFalselyIdentifiedAsFrequentlyWritten()
-    {
+    public function partialMatchIsNotFalselyIdentifiedAsFrequentlyWritten() {
         // The rule is `'some_field: value other_field: a'` and the entity only partially matches it:
         $entity = [
             'some_field' => 'value'
@@ -110,8 +104,7 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function ignoredEntityIsCorrectlyIdentified()
-    {
+    public function ignoredEntityIsCorrectlyIdentified() {
         $entity = [
             'some_field' => 'value',
             'other_field' => 'a',
@@ -123,8 +116,7 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function ignoredEntityCapitalizedIsCorrectlyIdentified()
-    {
+    public function ignoredEntityCapitalizedIsCorrectlyIdentified() {
         $entity = [
             'some_field' => 'b',
             'other_field' => 'a',
@@ -137,8 +129,7 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function partialMatchIsNotFalselyIdentifiedAsIgnored()
-    {
+    public function partialMatchIsNotFalselyIdentifiedAsIgnored() {
         // The rule is `'some_field: value other_field: a'` and the entity must match it entirely.
 
         $entity = [
@@ -158,8 +149,7 @@ class EntityInfoTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function ignoredColumnsAreIdentifiedCorrectly()
-    {
+    public function ignoredColumnsAreIdentifiedCorrectly() {
         $this->assertEquals([], array_diff(
             ['ignored_column', 'other_ignored_column'],
             array_keys($this->entityInfo->getIgnoredColumns())

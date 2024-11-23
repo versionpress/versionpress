@@ -1,4 +1,5 @@
 <?php
+
 namespace VersionPress\ChangeInfos;
 
 use VersionPress\Git\CommitMessage;
@@ -10,29 +11,28 @@ use VersionPress\Git\CommitMessage;
  *
  * @see TrackedChangeInfo
  */
-class UntrackedChangeInfo implements ChangeInfo
-{
+class UntrackedChangeInfo implements ChangeInfo {
 
     /** @var CommitMessage */
     private $commitMessage;
 
-    public function __construct(CommitMessage $commitMessage)
-    {
+    public function __construct(CommitMessage $commitMessage) {
         $this->commitMessage = $commitMessage;
     }
 
-    public function getCommitMessage()
-    {
+    public function getCommitMessage() {
         return $this->commitMessage;
     }
 
-    public function getChangeDescription()
-    {
+    public function getChangeDescription() {
         return $this->commitMessage->getUnprefixedSubject();
     }
 
-    public function getPriority()
-    {
+    public function getPriority() {
         return 0;
+    }
+
+    public static function buildFromCommitMessage(CommitMessage $commitMessage) {
+        throw new \Exception("To Implement (?)");
     }
 }

@@ -2,7 +2,7 @@
 
 ---
 
-💤 Please note that VersionPress is not actively developed, see [#1481](https://github.com/versionpress/versionpress/issues/1481).
+This is a new fork actively mantained by the community, the original project is not actively developed, see [#1481](https://github.com/versionpress/versionpress/issues/1481).
 
 ---
 

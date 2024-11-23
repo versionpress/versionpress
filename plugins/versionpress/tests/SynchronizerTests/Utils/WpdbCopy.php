@@ -164,7 +164,7 @@ class wpdb
      * @access private
      * @var bool
      */
-    var $show_errors = false;
+    public $show_errors = false;
 
     /**
      * Whether to suppress errors during the DB bootstrapping.
@@ -173,7 +173,7 @@ class wpdb
      * @since 2.5.0
      * @var bool
      */
-    var $suppress_errors = false;
+    public $suppress_errors = false;
 
     /**
      * The last error during query.
@@ -190,7 +190,7 @@ class wpdb
      * @access private
      * @var int
      */
-    var $num_queries = 0;
+    public $num_queries = 0;
 
     /**
      * Count of rows returned by previous query
@@ -199,7 +199,7 @@ class wpdb
      * @access private
      * @var int
      */
-    var $num_rows = 0;
+    public $num_rows = 0;
 
     /**
      * Count of affected rows by previous query
@@ -208,7 +208,7 @@ class wpdb
      * @access private
      * @var int
      */
-    var $rows_affected = 0;
+    public $rows_affected = 0;
 
     /**
      * The ID generated for an AUTO_INCREMENT column by the previous query (usually INSERT).
@@ -217,7 +217,7 @@ class wpdb
      * @access public
      * @var int
      */
-    var $insert_id = 0;
+    public $insert_id = 0;
 
     /**
      * Last query made
@@ -226,7 +226,7 @@ class wpdb
      * @access private
      * @var array
      */
-    var $last_query;
+    public $last_query;
 
     /**
      * Results of the last query made
@@ -235,7 +235,7 @@ class wpdb
      * @access private
      * @var array|null
      */
-    var $last_result;
+    public $last_result;
 
     /**
      * MySQL result, which is either a resource or boolean.
@@ -262,7 +262,7 @@ class wpdb
      * @access private
      * @var array
      */
-    var $queries;
+    public $queries;
 
     /**
      * The number of times to retry reconnecting before dying.
@@ -285,7 +285,7 @@ class wpdb
      * @access private
      * @var string
      */
-    var $prefix = '';
+    public $prefix = '';
 
     /**
      * WordPress base table prefix.
@@ -303,7 +303,7 @@ class wpdb
      * @access private
      * @var bool
      */
-    var $ready = false;
+    public $ready = false;
 
     /**
      * {@internal Missing Description}}
@@ -331,7 +331,7 @@ class wpdb
      * @see wpdb::tables()
      * @var array
      */
-    var $tables = [
+    public $tables = [
         'posts',
         'comments',
         'links',
@@ -353,7 +353,7 @@ class wpdb
      * @see wpdb::tables()
      * @var array
      */
-    var $old_tables = ['categories', 'post2cat', 'link2cat'];
+    public $old_tables = ['categories', 'post2cat', 'link2cat'];
 
     /**
      * List of WordPress global tables
@@ -363,7 +363,7 @@ class wpdb
      * @see wpdb::tables()
      * @var array
      */
-    var $global_tables = ['users', 'usermeta'];
+    public $global_tables = ['users', 'usermeta'];
 
     /**
      * List of Multisite global tables
@@ -373,7 +373,7 @@ class wpdb
      * @see wpdb::tables()
      * @var array
      */
-    var $ms_global_tables = [
+    public $ms_global_tables = [
         'blogs',
         'signups',
         'site',
@@ -2117,14 +2117,14 @@ class wpdb
         }
 
         if ($output == OBJECT) {
-            return $this->last_result[$y] ? $this->last_result[$y] : null;
+            return $this->last_result[$y] ?: null;
         } elseif ($output == ARRAY_A) {
             return $this->last_result[$y] ? get_object_vars($this->last_result[$y]) : null;
         } elseif ($output == ARRAY_N) {
             return $this->last_result[$y] ? array_values(get_object_vars($this->last_result[$y])) : null;
         } elseif (strtoupper($output) === OBJECT) {
             // Back compat for OBJECT being previously case insensitive.
-            return $this->last_result[$y] ? $this->last_result[$y] : null;
+            return $this->last_result[$y] ?: null;
         } else {
             $this->print_error(" \$db->get_row(string query, output type, int offset) -- Output type must be one of: OBJECT, ARRAY_A, ARRAY_N");
         }
@@ -2412,7 +2412,7 @@ class wpdb
      */
     public function get_caller()
     {
-        return wp_debug_backtrace_summary(__CLASS__);
+        return wp_debug_backtrace_summary(self::class);
     }
 
     /**

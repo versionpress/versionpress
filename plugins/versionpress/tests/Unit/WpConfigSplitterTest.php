@@ -5,7 +5,7 @@ namespace VersionPress\Tests\Unit;
 use org\bovigo\vfs\vfsStream;
 use VersionPress\Initialization\WpConfigSplitter;
 
-class WpConfigSplitterTest extends \PHPUnit_Framework_TestCase {
+class WpConfigSplitterTest extends \PHPUnit\Framework\TestCase {
     // @codingStandardsIgnoreStart
     private $originalConfig = <<<'DOC'
 <?php
@@ -112,8 +112,7 @@ DOC;
     private $wpConfigPath;
     private $commonConfigPath;
 
-    protected function setUp()
-    {
+    protected function setUp(): void {
         $root = vfsStream::setup();
 
         $this->wpConfigPath = vfsStream::newFile('wp-config.php')->at($root)->url();
@@ -124,8 +123,7 @@ DOC;
         @unlink($this->commonConfigPath);
     }
 
-    protected function tearDown()
-    {
+    protected function tearDown(): void {
         @unlink($this->wpConfigPath);
         @unlink($this->commonConfigPath);
     }
@@ -133,8 +131,7 @@ DOC;
     /**
      * @test
      */
-    public function splitterExtractsDesiredConstantsIntoSeparateFile()
-    {
+    public function splitterExtractsDesiredConstantsIntoSeparateFile() {
         WpConfigSplitter::split($this->wpConfigPath, $this->commonConfigName);
         $filteredConfig = file_get_contents($this->wpConfigPath);
         $commonConfig = file_get_contents($this->commonConfigPath);
@@ -146,8 +143,7 @@ DOC;
     /**
      * @test
      */
-    public function runningSplitterMultipleTimesDoesntChangeTheOutput()
-    {
+    public function runningSplitterMultipleTimesDoesntChangeTheOutput() {
         WpConfigSplitter::split($this->wpConfigPath, $this->commonConfigName);
         WpConfigSplitter::split($this->wpConfigPath, $this->commonConfigName);
         WpConfigSplitter::split($this->wpConfigPath, $this->commonConfigName);

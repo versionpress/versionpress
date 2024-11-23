@@ -5,14 +5,12 @@ namespace VersionPress\Tests\End2End\Media;
 use VersionPress\Tests\End2End\Utils\End2EndTestCase;
 use VersionPress\Tests\Utils\DBAsserter;
 
-class MediaTest extends End2EndTestCase
-{
+class MediaTest extends End2EndTestCase {
 
     /** @var IMediaTestWorker */
     private static $worker;
 
-    public static function setUpBeforeClass()
-    {
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         self::$worker->setUploadedFilePath(realpath(__DIR__ . '/../test-data/test.png'));
     }
@@ -21,8 +19,7 @@ class MediaTest extends End2EndTestCase
      * @test
      * @testdox Uploading file creates 'post/create' action
      */
-    public function uploadingFileCreatesPostCreateAction()
-    {
+    public function uploadingFileCreatesPostCreateAction() {
         self::$worker->prepare_uploadFile();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -44,8 +41,7 @@ class MediaTest extends End2EndTestCase
      * @testdox Editing file name creates 'post/update' action
      * @depends uploadingFileCreatesPostCreateAction
      */
-    public function editingFileNameCreatesPostEditAction()
-    {
+    public function editingFileNameCreatesPostEditAction() {
         self::$worker->prepare_editFileName();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -64,8 +60,7 @@ class MediaTest extends End2EndTestCase
      * @testdox Deleting file creates 'post/delete' action
      * @depends editingFileNameCreatesPostEditAction
      */
-    public function deletingFileCreatesPostDeleteAction()
-    {
+    public function deletingFileCreatesPostDeleteAction() {
         self::$worker->prepare_deleteFile();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -84,8 +79,7 @@ class MediaTest extends End2EndTestCase
      * @test
      * @depends uploadingFileCreatesPostCreateAction
      */
-    public function editationOfFileCreatesCommit()
-    {
+    public function editationOfFileCreatesCommit() {
         self::$worker->prepare_editFile();
 
         $commitAsserter = $this->newCommitAsserter();

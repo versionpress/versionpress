@@ -15,20 +15,21 @@ use VersionPress\Tests\Utils\DBAsserter;
  * Note2: helper test methods are called runXyzTest(), not testXyz() because otherwise PHPUnit would consider
  * them real tests.
  */
-abstract class PostTypeTestCase extends End2EndTestCase
-{
+abstract class PostTypeTestCase extends End2EndTestCase {
 
     /** @var IPostTypeTestWorker */
     protected static $worker;
 
-    public function runAddPostTest()
-    {
+    public function runAddPostTest() {
+        /*
+        27) VersionPress\Tests\End2End\Posts\PostsTest::addingPostCreatesPostCreateAction
+There were 0 commit(s) after 510b25a while we expected 1
+        */
+
         self::$worker->prepare_addPost();
-
-        $commitAsserter = $this->newCommitAsserter();
-
         self::$worker->addPost();
 
+        $commitAsserter = $this->newCommitAsserter();
         $commitAsserter->assertNumCommits(1);
         $commitAsserter->assertCommitAction("post/create");
         $commitAsserter->assertCommitTag("VP-Post-Type", $this->getPostType());
@@ -36,8 +37,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    public function runUpdatePostTest()
-    {
+    public function runUpdatePostTest() {
         self::$worker->prepare_updatePost();
         $commitAsserter = $this->newCommitAsserter();
 
@@ -50,8 +50,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    public function runUpdatePostViaQuickEditTest()
-    {
+    public function runUpdatePostViaQuickEditTest() {
         self::$worker->prepare_quickEditPost();
         $commitAsserter = $this->newCommitAsserter();
 
@@ -64,8 +63,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    public function runTrashPostTest()
-    {
+    public function runTrashPostTest() {
         self::$worker->prepare_trashPost();
         $commitAsserter = $this->newCommitAsserter();
 
@@ -78,8 +76,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    public function runUndoTrashTest()
-    {
+    public function runUndoTrashTest() {
         self::$worker->prepare_untrashPost();
         $commitAsserter = $this->newCommitAsserter();
 
@@ -92,8 +89,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    public function runDeletePostTest()
-    {
+    public function runDeletePostTest() {
         self::$worker->prepare_deletePost();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -107,8 +103,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    public function runDraftTest()
-    {
+    public function runDraftTest() {
         self::$worker->prepare_createDraft();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -122,8 +117,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    public function runPreviewDraftTest()
-    {
+    public function runPreviewDraftTest() {
         self::$worker->prepare_previewDraft();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -140,8 +134,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         self::$worker->cleanup_previewDraft();
     }
 
-    public function runPreviewUnsavedPostTest()
-    {
+    public function runPreviewUnsavedPostTest() {
         self::$worker->prepare_previewUnsavedPost();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -155,8 +148,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    public function runPublishDraftTest()
-    {
+    public function runPublishDraftTest() {
         self::$worker->prepare_publishDraft();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -170,8 +162,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    public function runSetFeaturedImageForUnsavedPostTest()
-    {
+    public function runSetFeaturedImageForUnsavedPostTest() {
         self::$worker->prepare_setFeaturedImageForUnsavedPost();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -185,8 +176,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
     }
 
 
-    public function runMakeDraftFromUnsavedPostWithFeaturedImageTest()
-    {
+    public function runMakeDraftFromUnsavedPostWithFeaturedImageTest() {
         self::$worker->prepare_makeDraftFromUnsavedPost();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -200,8 +190,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    public function runEditationOfMultiplePostsCreatesBulkAction()
-    {
+    public function runEditationOfMultiplePostsCreatesBulkAction() {
         self::$worker->prepare_changeStatusOfTwoPosts();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -214,8 +203,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    public function runTrashingMultiplePostsCreatesBulkAction()
-    {
+    public function runTrashingMultiplePostsCreatesBulkAction() {
         self::$worker->prepare_moveTwoPostsInTrash();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -228,8 +216,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    public function runUntrashingMultiplePostsCreatesBulkAction()
-    {
+    public function runUntrashingMultiplePostsCreatesBulkAction() {
         self::$worker->prepare_moveTwoPostsFromTrash();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -242,8 +229,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    public function runDeletingMultiplePostsCreatesBulkAction()
-    {
+    public function runDeletingMultiplePostsCreatesBulkAction() {
         self::$worker->prepare_deleteTwoPosts();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -256,8 +242,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    public function runPublishingMultiplePostsCreatesBulkAction()
-    {
+    public function runPublishingMultiplePostsCreatesBulkAction() {
         self::$worker->prepare_publishTwoPosts();
 
         $commitAsserter = $this->newCommitAsserter();
@@ -270,8 +255,7 @@ abstract class PostTypeTestCase extends End2EndTestCase
         DBAsserter::assertFilesEqualDatabase();
     }
 
-    private function getPostType()
-    {
+    private function getPostType() {
         return self::$worker->getPostType();
     }
 }

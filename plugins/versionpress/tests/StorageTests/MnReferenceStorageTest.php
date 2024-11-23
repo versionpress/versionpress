@@ -6,8 +6,7 @@ use VersionPress\Storages\DirectoryStorage;
 use VersionPress\Storages\MnReferenceStorage;
 use VersionPress\Utils\FileSystem;
 
-class MnReferenceStorageTest extends StorageTestCase
-{
+class MnReferenceStorageTest extends StorageTestCase {
 
     /** @var MnReferenceStorage */
     private $storage;
@@ -19,8 +18,7 @@ class MnReferenceStorageTest extends StorageTestCase
     /**
      * @test
      */
-    public function parentEntityContainsReferenceAfterItsSaved()
-    {
+    public function parentEntityContainsReferenceAfterItsSaved() {
         $parent = [
             'vp_id' => '927D63C187164CA1BCEAB2B13B29C8F0',
             'some_field' => 'some_value',
@@ -29,7 +27,7 @@ class MnReferenceStorageTest extends StorageTestCase
         $mnReference = [
             'vp_some_entity' => '927D63C187164CA1BCEAB2B13B29C8F0',
             'vp_other_entity' => 'F0E1B6313B7A48E49A1B38DF382B350D',
-         ];
+        ];
 
         $this->parentStorage->save($parent);
         $this->storage->save($mnReference);
@@ -45,8 +43,7 @@ class MnReferenceStorageTest extends StorageTestCase
     /**
      * @test
      */
-    public function parentEntityContainsReferenceOnlyOnce()
-    {
+    public function parentEntityContainsReferenceOnlyOnce() {
         $parent = [
             'vp_id' => '927D63C187164CA1BCEAB2B13B29C8F0',
             'some_field' => 'some_value',
@@ -69,8 +66,7 @@ class MnReferenceStorageTest extends StorageTestCase
     /**
      * @test
      */
-    public function parentEntityDoesNotContainReferenceAfterItsDeleted()
-    {
+    public function parentEntityDoesNotContainReferenceAfterItsDeleted() {
         $parent = [
             'vp_id' => '927D63C187164CA1BCEAB2B13B29C8F0',
             'some_field' => 'some_value',
@@ -89,8 +85,7 @@ class MnReferenceStorageTest extends StorageTestCase
         $this->assertArrayNotHasKey('vp_other_entity', $loadedParent);
     }
 
-    protected function setUp()
-    {
+    protected function setUp(): void {
         parent::setUp();
 
         $this->storageDir = sys_get_temp_dir() . '/entities';
@@ -122,8 +117,7 @@ class MnReferenceStorageTest extends StorageTestCase
         $this->storage = new MnReferenceStorage($this->parentStorage, $referenceDetails);
     }
 
-    protected function tearDown()
-    {
+    protected function tearDown(): void {
         parent::tearDown();
         FileSystem::remove(__DIR__ . '/entities');
     }

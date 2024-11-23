@@ -4,10 +4,11 @@ namespace VersionPress\Initialization;
 
 use Nette\Utils\Strings;
 
-class WpdbReplacer
-{
+class WpdbReplacer {
 
     private static $methodPrefix = '__wp_';
+    public static $wpdbClassPath = ABSPATH . WPINC . '/class-wpdb.php';
+
     private static $vpFirstLineComment = '// Enhanced by VersionPress';
     private static $bootstrapRequire = "
     if (!defined('WP_PLUGIN_DIR')) {
@@ -21,16 +22,14 @@ class WpdbReplacer
         register_shutdown_function(array('wpdb', 'vp_restore_original'));
     }";
 
-    public static function replaceMethods()
-    {
-        $wpdbClassPath = ABSPATH . WPINC . '/wp-db.php';
-        $wpdbSource = file_get_contents($wpdbClassPath);
+    public static function replaceMethods() {
+        $wpdbSource = file_get_contents(self::$wpdbClassPath);
 
         if (self::isReplaced()) {
             return;
         }
 
-        copy($wpdbClassPath, $wpdbClassPath . '.original');
+        copy(self::$wpdbClassPath, self::$wpdbClassPath . '.original');
 
         $wpdbSource = substr_replace(
             $wpdbSource,
@@ -45,44 +44,38 @@ class WpdbReplacer
         $wpdbSource = self::replaceMethod($wpdbSource, 'query');
         $wpdbSource = self::injectVersionPressMethods($wpdbSource);
 
-        file_put_contents($wpdbClassPath, $wpdbSource);
+        file_put_contents(self::$wpdbClassPath, $wpdbSource);
     }
 
-    public static function isReplaced()
-    {
-        $firstLine = fgets(fopen(ABSPATH . WPINC . '/wp-db.php', 'r'));
+    public static function isReplaced() {
+        $firstLine = fgets(fopen(self::$wpdbClassPath, 'r'));
         return Strings::contains($firstLine, self::$vpFirstLineComment);
     }
 
-    public static function restoreOriginal()
-    {
-        $original = ABSPATH . WPINC . '/wp-db.php.original';
+    public static function restoreOriginal() {
+        $original = self::$wpdbClassPath . '.original';
         if (file_exists($original)) {
-            rename($original, ABSPATH . WPINC . '/wp-db.php');
+            rename($original, self::$wpdbClassPath);
         }
     }
 
-    private static function replaceMethod($source, $method)
-    {
+    private static function replaceMethod($source, $method) {
         $newName = self::$methodPrefix . $method;
         return str_replace("function $method(", "function $newName(", $source);
     }
 
-    private static function injectVersionPressMethods($wpdbSource)
-    {
+    private static function injectVersionPressMethods($wpdbSource) {
         $indexOfLastCurlyBracket = strrpos($wpdbSource, '}');
         $codeToInject = self::getCodeToInject();
         $wpdbSource = self::injectCode($wpdbSource, $indexOfLastCurlyBracket, $codeToInject);
         return $wpdbSource;
     }
 
-    private static function injectCode($originalSource, $position, $code)
-    {
+    private static function injectCode($originalSource, $position, $code) {
         return substr($originalSource, 0, $position) . $code . substr($originalSource, $position);
     }
 
-    private static function getCodeToInject()
-    {
+    private static function getCodeToInject() {
         $replacerMethodsClassSource = file_get_contents(__DIR__ . '/ReplacerMethods.src.php');
         $methodsStartPosition = strpos($replacerMethodsClassSource, '{') + 1; // after first curly bracket
         $methodsEndPosition = strrpos($replacerMethodsClassSource, '}'); // before last curly bracket

@@ -1,4 +1,5 @@
 <?php
+
 namespace VersionPress\ChangeInfos;
 
 use Nette\Utils\Strings;
@@ -9,8 +10,7 @@ use VersionPress\VersionPress;
 /**
  * Class representing more changes in one commit
  */
-class ChangeInfoEnvelope implements ChangeInfo
-{
+class ChangeInfoEnvelope implements ChangeInfo {
 
     /**
      * VP meta tag that says the version of VersionPress in which was the commit made.
@@ -39,8 +39,7 @@ class ChangeInfoEnvelope implements ChangeInfo
      * @param string|null $version
      * @param string|null $environment
      */
-    public function __construct($changeInfoList, $version = null, $environment = null)
-    {
+    public function __construct($changeInfoList, $version = null, $environment = null) {
         $this->changeInfoList = $changeInfoList;
         $this->version = $version === null ? VersionPress::getVersion() : $version;
         $this->environment = $environment ?: VersionPress::getEnvironment();
@@ -52,8 +51,7 @@ class ChangeInfoEnvelope implements ChangeInfo
      * @see Committer::commit()
      * @return CommitMessage
      */
-    public function getCommitMessage()
-    {
+    public function getCommitMessage() {
         $subject = $this->getChangeDescription();
 
         $bodies = [];
@@ -75,8 +73,7 @@ class ChangeInfoEnvelope implements ChangeInfo
      *
      * @return string
      */
-    public function getChangeDescription()
-    {
+    public function getChangeDescription() {
         $changeList = $this->getReorganizedInfoList();
         $firstChangeDescription = $changeList[0]->getChangeDescription();
         return $firstChangeDescription;
@@ -87,8 +84,7 @@ class ChangeInfoEnvelope implements ChangeInfo
      *
      * @return TrackedChangeInfo[]
      */
-    public function getChangeInfoList()
-    {
+    public function getChangeInfoList() {
         return $this->changeInfoList;
     }
 
@@ -97,34 +93,29 @@ class ChangeInfoEnvelope implements ChangeInfo
      *
      * @return TrackedChangeInfo[]
      */
-    public function getReorganizedInfoList()
-    {
+    public function getReorganizedInfoList() {
         return $this->sortChangeInfoList($this->groupBulkActions($this->changeInfoList));
     }
 
     /**
      * @return null|string
      */
-    public function getEnvironment()
-    {
+    public function getEnvironment() {
         return $this->environment;
     }
 
     /**
      * @return TrackedChangeInfo[]
      */
-    private function getSortedChangeInfoList()
-    {
+    private function getSortedChangeInfoList() {
         return $this->sortChangeInfoList($this->changeInfoList);
     }
 
-    private static function containsVersion($lastBody)
-    {
-        return Strings::startsWith($lastBody, self::VP_VERSION_TAG);
+    private static function containsVersion($lastBody) {
+        return str_starts_with($lastBody, self::VP_VERSION_TAG);
     }
 
-    private static function extractTag($tag, $lastBody)
-    {
+    private static function extractTag($tag, $lastBody) {
         $tmpMessage = new CommitMessage("", $lastBody);
         return $tmpMessage->getVersionPressTag($tag);
     }
@@ -133,8 +124,7 @@ class ChangeInfoEnvelope implements ChangeInfo
      * @param TrackedChangeInfo[] $changeInfoList
      * @return TrackedChangeInfo[]
      */
-    private function sortChangeInfoList($changeInfoList)
-    {
+    private function sortChangeInfoList($changeInfoList) {
         ArrayUtils::stablesort($changeInfoList, function ($changeInfo1, $changeInfo2) {
             /** @var TrackedChangeInfo|BulkChangeInfo $changeInfo1 */
             /** @var TrackedChangeInfo|BulkChangeInfo $changeInfo2 */
@@ -145,8 +135,7 @@ class ChangeInfoEnvelope implements ChangeInfo
         return $changeInfoList;
     }
 
-    private function groupBulkActions($changeInfoList)
-    {
+    private function groupBulkActions($changeInfoList) {
         $groupedChangeInfos = ArrayUtils::mapreduce($changeInfoList, function (ChangeInfo $item, $mapEmit) {
             if ($item instanceof TrackedChangeInfo) {
                 $key = "{$item->getScope()}/{$item->getAction()}";
@@ -177,8 +166,7 @@ class ChangeInfoEnvelope implements ChangeInfo
         return $changeInfos;
     }
 
-    public function getPriority()
-    {
+    public function getPriority() {
         // There are never envelopes inside an envelope; therefore, the priority is irrelevant.
         return 0;
     }

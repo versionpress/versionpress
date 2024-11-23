@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
-const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+//const UglifyJsPlugin = require("uglifyjs-webpack-plugin-new");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 module.exports = () => {
     let config = {
@@ -14,12 +14,12 @@ module.exports = () => {
         },
         optimization: {
             minimizer: [
-                new UglifyJsPlugin({
-                    cache: true,
-                    parallel: true,
-                    sourceMap: true,
-                }),
-                new OptimizeCSSAssetsPlugin({}),
+                //new UglifyJsPlugin({
+                //    cache: true,
+                //    parallel: true,
+                //    sourceMap: true,
+                //}),
+                new CssMinimizerPlugin({}),
             ],
         },
     };

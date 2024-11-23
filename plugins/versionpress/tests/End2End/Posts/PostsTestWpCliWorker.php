@@ -5,23 +5,19 @@ namespace VersionPress\Tests\End2End\Posts;
 use Nette\Utils\Random;
 use VersionPress\Tests\End2End\Utils\PostTypeTestWpCliWorker;
 
-class PostsTestWpCliWorker extends PostTypeTestWpCliWorker
-{
+class PostsTestWpCliWorker extends PostTypeTestWpCliWorker {
 
     private $postId;
 
-    public function getPostType()
-    {
+    public function getPostType() {
         return "post";
     }
 
-    public function prepare_createTagInEditationForm()
-    {
+    public function prepare_createTagInEditationForm() {
         $this->postId = $this->wpAutomation->createPost($this->testPost);
     }
 
-    public function createTagInEditationForm()
-    {
+    public function createTagInEditationForm() {
         $this->wpAutomation->runWpCliCommand(
             'post',
             'term',
@@ -29,8 +25,7 @@ class PostsTestWpCliWorker extends PostTypeTestWpCliWorker
         );
     }
 
-    public function prepare_deletePostmeta()
-    {
+    public function prepare_deletePostmeta() {
         $this->postId = $this->wpAutomation->createPost($this->testPost);
         $this->wpAutomation->runWpCliCommand(
             'post',
@@ -39,18 +34,14 @@ class PostsTestWpCliWorker extends PostTypeTestWpCliWorker
         );
     }
 
-    public function deletePostmeta()
-    {
+    public function deletePostmeta() {
         $this->wpAutomation->runWpCliCommand('post', 'meta', ['delete', $this->postId, 'random_meta']);
     }
 
-    public function prepare_changePostFormat()
-    {
-        throw new \PHPUnit_Framework_SkippedTestError("Post format cannot be changed using WP-CLI.");
+    public function prepare_changePostFormat() {
+        throw new \PHPUnit\Framework\SkippedTestError("Post format cannot be changed using WP-CLI.");
     }
 
-    public function changePostFormat()
-    {
-
+    public function changePostFormat() {
     }
 }

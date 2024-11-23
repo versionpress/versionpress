@@ -2,8 +2,7 @@
 
 namespace VersionPress\Tests\End2End\Comments;
 
-interface ICommentsTestWorker
-{
+interface ICommentsTestWorker {
     public function prepare_createCommentAwaitingModeration();
 
     public function createCommentAwaitingModeration();

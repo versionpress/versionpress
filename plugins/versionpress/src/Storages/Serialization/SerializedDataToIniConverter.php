@@ -9,8 +9,7 @@ use VersionPress\Utils\StringUtils;
  * This class converts PHP-serialized data to INI and vice versa.
  * Serialized data are prefixed with the $serializedMarker.
  */
-class SerializedDataToIniConverter
-{
+class SerializedDataToIniConverter {
 
     const SERIALIZED_MARKER = '<<<serialized>>>';
 
@@ -33,8 +32,7 @@ class SerializedDataToIniConverter
      * @param string $serializedData
      * @return string[]
      */
-    public function toIniLines($key, $serializedData)
-    {
+    public function toIniLines($key, $serializedData) {
         $this->value = $serializedData;
         $parsingResult = $this->parseSerializedString();
         $iniLines = $this->convertParsingResultToIni($key, $parsingResult);
@@ -55,8 +53,7 @@ class SerializedDataToIniConverter
      * @param string[] $lines Lines related to the $key. Hierarchical structures are saved as multiple lines.
      * @return string Original result of PHP serialization.
      */
-    public function fromIniLines($key, $lines)
-    {
+    public function fromIniLines($key, $lines) {
         $value = preg_replace('/' . preg_quote(self::SERIALIZED_MARKER) . ' /', '', $lines[$key], -1, $count);
         unset($lines[$key]);
 
@@ -82,8 +79,7 @@ class SerializedDataToIniConverter
      *
      * @return array
      */
-    private function parseSerializedString()
-    {
+    private function parseSerializedString() {
         $type = $this->value[$this->index];
         $this->index += 2; // <type>:
 
@@ -183,8 +179,7 @@ class SerializedDataToIniConverter
         }
     }
 
-    public function convertParsingResultToIni($key, $parsingResult)
-    {
+    public function convertParsingResultToIni($key, $parsingResult) {
         $type = $parsingResult['type'];
 
         switch ($type) {
@@ -230,8 +225,7 @@ class SerializedDataToIniConverter
      * @param string|null $value
      * @return string[]
      */
-    public function createFirstLine($key, $type = null, $value = null)
-    {
+    public function createFirstLine($key, $type = null, $value = null) {
         $parts = [$key, '='];
 
         if ($type !== null) {
@@ -245,8 +239,7 @@ class SerializedDataToIniConverter
         return [join(' ', $parts)];
     }
 
-    private function primitiveToEscapedString($value)
-    {
+    private function primitiveToEscapedString($value) {
         if (is_string($value)) {
             $value = str_replace('\\', '\\\\', $value);
             $value = str_replace('"', '\"', $value);
@@ -270,8 +263,7 @@ class SerializedDataToIniConverter
      * @param array $relatedLines
      * @return string
      */
-    private function convertValueToSerializedString($value, $relatedLines = [])
-    {
+    private function convertValueToSerializedString($value, $relatedLines = []) {
         $type = null; // string or number
 
         // https://regex101.com/r/gJ1oF2/1
@@ -296,7 +288,7 @@ class SerializedDataToIniConverter
             return $this->convertArrayToSerializedString($relatedLines);
         }
 
-        if (class_exists($type)) {
+        if ($type !== null && class_exists($type)) {
             return $this->convertObjectToSerializedString($type, $relatedLines);
         }
 
@@ -312,7 +304,7 @@ class SerializedDataToIniConverter
             return 'r:' . $value . ';';
         }
 
-        if (Strings::startsWith($value, '"')) {
+        if (str_starts_with($value, '"')) {
             // plain serialized strings are in quotes because of `<<<serialized>>> "string"`
             $value = preg_replace('/^"(.*)"$/', '$1', $value);
         }
@@ -329,8 +321,7 @@ class SerializedDataToIniConverter
      * @param $relatedLines
      * @return string
      */
-    private function convertArrayToSerializedString($relatedLines)
-    {
+    private function convertArrayToSerializedString($relatedLines) {
         $subItems = $this->getSubItems($relatedLines);
         return 'a:' . count($subItems) . ':{' . join('', $subItems) . '}';
     }
@@ -345,8 +336,7 @@ class SerializedDataToIniConverter
      * @param $relatedKeys
      * @return string
      */
-    private function convertObjectToSerializedString($type, $relatedKeys)
-    {
+    private function convertObjectToSerializedString($type, $relatedKeys) {
         $subItems = $this->getSubItems($relatedKeys, function ($subkey) use ($type) {
             if (strpos($subkey, '*') === 1) {
                 return "\"\0*\0" . substr($subkey, 2);
@@ -380,17 +370,20 @@ class SerializedDataToIniConverter
      * @param callable|null $subkeyTransformFn
      * @return array
      */
-    private function getSubItems($relatedLines, $subkeyTransformFn = null)
-    {
+    private function getSubItems($relatedLines, $subkeyTransformFn = null) {
         $items = [];
         foreach ($relatedLines as $relatedKey => $value) {
+
+            // Certains keys in the ini were not including brackets, so checking before is a good way
+            if (!str_starts_with($relatedKey, '[') && !Strings::endsWith($relatedKey, ']')) continue;
+
             $indexAfterFirstOpeningBracket = strpos($relatedKey, '[') + 1;
             $indexOfFirstClosingBracket = strpos($relatedKey, ']');
             $keyLength = $indexOfFirstClosingBracket - $indexAfterFirstOpeningBracket;
 
             $subkey = substr($relatedKey, $indexAfterFirstOpeningBracket, $keyLength);
 
-            if (!Strings::startsWith($subkey, '"')) {
+            if (!str_starts_with($subkey, '"')) {
                 $subkey += 0; // convert to number
             }
 
@@ -422,13 +415,12 @@ class SerializedDataToIniConverter
      * @param $commonKey
      * @return array
      */
-    private function findRelatedKeys($maybeRelatedKeys, $commonKey)
-    {
+    private function findRelatedKeys($maybeRelatedKeys, $commonKey) {
         $rel = [];
         $lengthOfCommonPart = strlen($commonKey);
 
         foreach ($maybeRelatedKeys as $key => $value) {
-            if (Strings::startsWith($key, $commonKey) && $key !== $commonKey) {
+            if (str_starts_with($key, $commonKey) && $key !== $commonKey) {
                 $rel[substr($key, $lengthOfCommonPart)] = $value;
             }
         }

@@ -8,8 +8,7 @@ use VersionPress\Database\Database;
 use VersionPress\Database\DbSchemaInfo;
 use wpdb;
 
-class RequirementsChecker
-{
+class RequirementsChecker {
     private $requirements = [];
     /**
      * @var Database
@@ -50,8 +49,7 @@ class RequirementsChecker
      * Default value is RequirementsChecker::SITE which means that all requirements need to be matched.
      * RequirementsChecker::ENVIRONMENT checks only requirements related to "runtime" environment.
      */
-    public function __construct($database, $schema, $checkScope = RequirementsChecker::SITE)
-    {
+    public function __construct($database, $schema, $checkScope = RequirementsChecker::SITE) {
 
         $this->database = $database;
         $this->schema = $schema;
@@ -133,7 +131,7 @@ class RequirementsChecker
             $this->requirements[] = [
                 'name' => 'wpdb hook',
                 'level' => 'critical',
-                'fulfilled' => is_writable(ABSPATH . WPINC . '/wp-db.php'),
+                'fulfilled' => is_writable(\VersionPress\Initialization\WpdbReplacer::$wpdbClassPath),
                 // @codingStandardsIgnoreLine
                 'help' => 'For VersionPress to do its magic, it needs to change the `wpdb` class and put some code there. ' .
                     'To do so it needs write access to the `wp-includes/wp-db.php` file. Please update the permissions.'
@@ -200,25 +198,21 @@ class RequirementsChecker
      *
      * @return array
      */
-    public function getRequirements()
-    {
+    public function getRequirements() {
         return $this->requirements;
     }
 
-    public function isWithoutCriticalErrors()
-    {
+    public function isWithoutCriticalErrors() {
         return $this->isWithoutCriticalErrors;
     }
 
-    public function isEverythingFulfilled()
-    {
+    public function isEverythingFulfilled() {
         return $this->isEverythingFulfilled;
     }
 
-    private function tryRunProcess()
-    {
+    private function tryRunProcess() {
         try {
-            $process = new Process("echo test");
+            $process = Process::fromShellCommandline("echo test");
             $process->run();
             return true;
         } catch (Exception $e) {
@@ -229,8 +223,7 @@ class RequirementsChecker
     /**
      * @return string "ok", "no-git" or "wrong-version"
      */
-    private function tryGit()
-    {
+    private function tryGit() {
         try {
             $gitVersion = SystemInfo::getGitVersion();
             return self::gitMatchesMinimumRequiredVersion($gitVersion) ? "ok" : "wrong-version";
@@ -239,8 +232,7 @@ class RequirementsChecker
         }
     }
 
-    private function tryWrite()
-    {
+    private function tryWrite() {
         $filename = ".vp-try-write";
         $testPaths = [
             ABSPATH,
@@ -258,7 +250,7 @@ class RequirementsChecker
             FileSystem::remove($filePath);
 
             // Trying to create file from process (issue #522)
-            $process = new Process(sprintf("echo test > %s", ProcessUtils::escapeshellarg($filePath)));
+            $process = Process::fromShellCommandline(sprintf("echo test > %s", ProcessUtils::escapeshellarg($filePath)));
             $process->run();
             $writable &= is_file($filePath);
 
@@ -272,15 +264,13 @@ class RequirementsChecker
         return $writable;
     }
 
-    private function tryAccessControlFiles()
-    {
+    private function tryAccessControlFiles() {
         $securedUrl = plugins_url('versionpress-nginx.conf', 'versionpress/versionpress.php');
         /** @noinspection PhpUsageOfSilenceOperatorInspection */
         return @file_get_contents($securedUrl) === false; // intentionally @
     }
 
-    private function testDirectoryLayout()
-    {
+    private function testDirectoryLayout() {
         $uploadDirInfo = wp_upload_dir();
         $isStandardLayout = true;
         $isStandardLayout &= ABSPATH . 'wp-content' === WP_CONTENT_DIR;
@@ -305,14 +295,12 @@ class RequirementsChecker
      * @param string $minimumRequiredVersion
      * @return bool
      */
-    public static function gitMatchesMinimumRequiredVersion($gitVersion, $minimumRequiredVersion = null)
-    {
+    public static function gitMatchesMinimumRequiredVersion($gitVersion, $minimumRequiredVersion = null) {
         $minimumRequiredVersion = $minimumRequiredVersion ?: self::GIT_MINIMUM_REQUIRED_VERSION;
         return version_compare($gitVersion, $minimumRequiredVersion, ">=");
     }
 
-    private function countEntities()
-    {
+    private function countEntities() {
         $entities = $this->schema->getAllEntityNames();
         $totalEntitiesCount = 0;
 
@@ -327,8 +315,7 @@ class RequirementsChecker
     /**
      * @return int Number of unsupported plugins.
      */
-    private function testExternalPlugins()
-    {
+    private function testExternalPlugins() {
         $plugins = get_option('active_plugins');
         $unsupportedPluginsCount = 0;
         foreach ($plugins as $plugin) {
@@ -339,8 +326,7 @@ class RequirementsChecker
         return $unsupportedPluginsCount;
     }
 
-    private function testComposerJson()
-    {
+    private function testComposerJson() {
         $composerJsonPath = VP_PROJECT_ROOT . '/composer.json';
         $composerJson = json_decode(file_get_contents($composerJsonPath));
         if (!isset($composerJson->scripts)) {
